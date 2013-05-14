@@ -1,7 +1,9 @@
 TOP_DIR = ../..
 include $(TOP_DIR)/tools/Makefile.common
 
-JARFILE = $(PWD)/dist/lib/kbapi_common.jar
+WD = $(shell pwd)
+
+JARFILE = $(WD)/dist/lib/kbapi_common.jar
 
 all: jar
 
