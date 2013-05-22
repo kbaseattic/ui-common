@@ -66,6 +66,11 @@ class ExcelDictReader(object):
             ret = {n: v for n, v in zip(self._heads, r)}
             yield ret
 
+    def sheet_headers(self):
+        if not self._sheet:
+            return None
+        return self._heads
+
 
 def convert_xl_row(xlrdbook, xlrdsheetname, rownum):
     '''Converts an xlrd excel worksheet row into a standard python format.
