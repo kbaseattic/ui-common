@@ -2,6 +2,7 @@ import os as _os
 import xlrd as _xlrd
 import datetime as _datetime
 
+
 def touch(fname, times=None):
     '''Python implementation of the unix touch command. See os.utime for the
     format of the times argument. Reference:
@@ -10,6 +11,7 @@ def touch(fname, times=None):
 
     with file(fname, 'a'):
         _os.utime(fname, times)
+
 
 class ExcelDictReader(object):
     '''Iterates over an Excel sheet and returns the rows as a dictionary, the
@@ -29,7 +31,7 @@ class ExcelDictReader(object):
 
     def num_sheets(self):
         return len(self._xl.sheet_names())
-    
+
     def sheet_names(self):
         return self._xl.sheet_names()
 
@@ -45,7 +47,7 @@ class ExcelDictReader(object):
             self._sheet = self._xl.sheet_by_index(sheet)
         else:
             raise ValueError('sheet argument must be a string or integer')
-        self._heads = self._convertrow(0)
+        self._heads = convert_xl_row(self._xl, self._sheet.name, 0)
         uniqheads = set(self._heads)
         if None in uniqheads:
             self._sheet = None
@@ -53,7 +55,6 @@ class ExcelDictReader(object):
         if len(uniqheads) < len(self._heads):
             self._sheet = None
             raise ValueError('Non unique values in the header row')
-        
 
     def __iter__(self):
         if not self._sheet:
@@ -61,31 +62,37 @@ class ExcelDictReader(object):
         s = self._sheet
         for i in xrange(1, s.nrows):
             self._rownum = i + 1
-            r = self._convertrow(i)
+            r = convert_xl_row(self._xl, self._sheet.name, i)
             ret = {n: v for n, v in zip(self._heads, r)}
             yield ret
 
-    #copied from the exchangeformatsupport ExcelReader class
-    def _convertrow(self, rownum):
-        ret = []
-        for i, cell in enumerate(self._sheet.row(rownum)):
-            if (cell.ctype == _xlrd.XL_CELL_EMPTY or
-                cell.ctype == _xlrd.XL_CELL_BLANK):
-                ret.append(None)
-            elif (cell.ctype == _xlrd.XL_CELL_NUMBER or
-                  cell.ctype == _xlrd.XL_CELL_TEXT):
-                ret.append(cell.value)
-            elif cell.ctype == _xlrd.XL_CELL_BOOLEAN:
-                ret.append(bool(cell.value))
-            elif cell.ctype == _xlrd.XL_CELL_DATE:
-                dt = _xlrd.xldate_as_tuple(cell.value, self._xl.datemode)
-                d = str(_datetime.datetime(*dt))
-                ret.append(d)
-            elif cell.ctype == _xlrd.XL_CELL_ERROR:
-                raise ValueError(
-                    ' '.join(['Cell', _xlrd.cellname(rownum, i), 'in sheet',
-                    self._sheet.name, 'has an error']))
-            else:
-                raise ValueError('Unknown cell type')  # error in xlrd
-        return ret
 
+def convert_xl_row(xlrdbook, xlrdsheetname, rownum):
+    '''Converts an xlrd excel worksheet row into a standard python format.
+    Empty or blank cells -> None
+    Number or text -> float or string
+    Boolean -> True or False
+    Date -> date string as rendered by datetime.datetime
+    Raises ValueError if a cell has an error.'''
+    xlrdsheet = xlrdbook.sheet_by_name(xlrdsheetname)
+    ret = []
+    for i, cell in enumerate(xlrdsheet.row(rownum)):
+        if (cell.ctype == _xlrd.XL_CELL_EMPTY or
+            cell.ctype == _xlrd.XL_CELL_BLANK):
+            ret.append(None)
+        elif (cell.ctype == _xlrd.XL_CELL_NUMBER or
+              cell.ctype == _xlrd.XL_CELL_TEXT):
+            ret.append(cell.value)
+        elif cell.ctype == _xlrd.XL_CELL_BOOLEAN:
+            ret.append(bool(cell.value))
+        elif cell.ctype == _xlrd.XL_CELL_DATE:
+            dt = _xlrd.xldate_as_tuple(cell.value, xlrdbook.datemode)
+            d = str(_datetime.datetime(*dt))
+            ret.append(d)
+        elif cell.ctype == _xlrd.XL_CELL_ERROR:
+            raise ValueError(
+                ' '.join(['Cell', _xlrd.cellname(rownum, i), 'in sheet',
+                xlrdsheet.name, 'has an error']))
+        else:
+            raise ValueError('Unknown cell type')  # error in xlrd
+    return ret
