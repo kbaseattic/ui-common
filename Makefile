@@ -24,6 +24,8 @@ deploy-client: deploy-libs  deploy-java
 deploy-java: jar
 	cp $(JARFILE) $(TARGET)/lib
 
+test:
+	echo "no tests available for kbapi_common"
 clean:
 	ant clean
 
