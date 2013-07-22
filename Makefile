@@ -1,7 +1,9 @@
 TOP_DIR = ../..
 include $(TOP_DIR)/tools/Makefile.common
 
-JARFILE = $(PWD)/dist/lib/kbapi_common.jar
+WD = $(shell pwd)
+
+JARFILE = $(WD)/dist/lib/kbapi_common.jar
 
 all: jar
 
@@ -22,6 +24,8 @@ deploy-client: deploy-libs  deploy-java
 deploy-java: jar
 	cp $(JARFILE) $(TARGET)/lib
 
+test:
+	echo "no tests available for kbapi_common"
 clean:
 	ant clean
 
