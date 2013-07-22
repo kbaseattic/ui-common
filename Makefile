@@ -1,5 +1,9 @@
 TOP_DIR = ../..
+DEPLOY_RUNTIME ?= /kb/runtime
+TARGET ?= /kb/deployment
+
 include $(TOP_DIR)/tools/Makefile.common
+TESTS = $(wildcard tests/*.t)
 
 WD = $(shell pwd)
 
@@ -25,7 +29,13 @@ deploy-java: jar
 	cp $(JARFILE) $(TARGET)/lib
 
 test:
-	echo "no tests available for kbapi_common"
+	for t in $(TESTS) ; do \
+		$(DEPLOY_RUNTIME)/bin/perl $$t ; \
+		if [ $$? -ne 0 ] ; then \
+			exit 1 ; \
+		fi \
+	done
+
 clean:
 	ant clean
 
