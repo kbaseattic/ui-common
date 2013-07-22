@@ -16,7 +16,7 @@ is($obj->service_name, 'foo');
 is($obj->setting('service-port'), 3333);
 
 delete $ENV{KB_SERVICE_NAME};
-$ENV{KB_DEPLOYMENT_CONFIG} = "test1.cfg";
+$ENV{KB_DEPLOYMENT_CONFIG} = "tests/test1.cfg";
 
 $obj = new_ok('Bio::KBase::DeploymentConfig', ['kb_seed', { 'service-port' => 3333 }]);
 
