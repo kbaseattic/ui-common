@@ -1,6 +1,6 @@
 (function( $, undefined ) {
 
-$.KBWidget("kbaseModelView", 'kbaseWidget', {
+$.KBWidget("kbaseModelTabs", 'kbaseWidget', {
     version: "1.0.0",
     options: {
     },
@@ -8,15 +8,14 @@ $.KBWidget("kbaseModelView", 'kbaseWidget', {
         this._super(options);
         var models = options.ids;
         var workspaces = options.workspaces;
+        var token = options.auth;
 
-        //extendDefaults();
-
-        this.$elem.append('<div id="kbase-model-view" class="panel">\
+        this.$elem.append('<div id="kbase-model-tabs" class="panel">\
                                 <div class="panel-heading"><b>Model Info</b><br> '
                                 +models[0]+
-                                ' <div style="float:right;">Workspace:'+workspaces[0]+'</div></div>\
+                                ' <div style="float:right;">Workspace: '+workspaces[0]+'</div></div>\
                            </div>');
-        var container = $('#kbase-model-view');
+        var container = $('#kbase-model-tabs');
 
         var fba = new fbaModelServices('https://kbase.us/services/fba_model_services/');
         var kbws = new workspaceService('http://kbase.us/services/workspace_service/');
@@ -102,10 +101,10 @@ $.KBWidget("kbaseModelView", 'kbaseWidget', {
 
             // reaction table
             var dataDict = model.reactions;
-            var keys = ["compartment", "definition", "direction", "equation",
-                        "features","id","name","reaction"];
-            var labels = ["compartment", "definition", "direction", "equation",
-                        "features","id","name","reaction"];
+            var keys = ["reaction", "compartment", "definition", "direction", "equation",
+                        "features","id","name"];
+            var labels = ["reaction", "compartment", "definition", "direction", "equation",
+                        "features","id","name"];
             var cols = getColumns(keys, labels)
             tableSettings.aoColumns = getColumns(keys, labels)
             var table = $('#reaction-table').dataTable(tableSettings);
