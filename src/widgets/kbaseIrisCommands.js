@@ -49,7 +49,6 @@
                 this.client = options.client;
             }
 
-            this.commands = [];
             this.commandCategories = {};
 
             return this;
@@ -62,9 +61,11 @@
 
             var commandRegex = new RegExp('^' + command + '.*');
 
-            for (var idx = 0; idx < this.commands.length; idx++) {
-                if (this.commands[idx].match(commandRegex)) {
-                    completions.push(this.commands[idx]);
+            for (group in this.commandCategories) {
+                for (var idx = 0; idx < this.commandCategories[group].length; idx++) {
+                    if (this.commandCategories[group][idx].match(commandRegex)) {
+                        completions.push([this.commandCategories[group][idx], group]);
+                    }
                 }
             }
 
@@ -112,9 +113,11 @@
 
         commandsMatchingRegex : function (regex) {
             var matches =[];
-            for (var idx = 0; idx < this.commands.length; idx++) {
-                if (this.commands[idx].match(regex)) {
-                    matches.push(this.commands[idx]);
+            for (var group in this.commandCategories) {
+                for (var idx = 0; idx < this.commandCategories[group].length; idx++) {
+                    if (this.commandCategories[group][idx].match(regex)) {
+                        matches.push([this.commandCategories[group][idx], group]);
+                    }
                 }
             }
 
@@ -126,14 +129,12 @@
             this.client.valid_commands(
                 $.proxy(
                     function (res) {
-var num = 0;
+
                         var commands = [];
                         $.each(
                             res,
                             $.proxy(
                                 function (idx, group) {
-num += group.items.length;
-                                    group.title;
 
                                     var $ul = $('<ul></ul>')
                                         .addClass('unstyled')
@@ -155,11 +156,10 @@ num += group.items.length;
                                                     }
                                                 }
 
-                                                this.commands.push(val.cmd);
-                                                if (this.commandCategories[group.name] == undefined) {
-                                                    this.commandCategories[group.name] = [];
+                                                if (this.commandCategories[group.title] == undefined) {
+                                                    this.commandCategories[group.title] = [];
                                                 }
-                                                this.commandCategories[group.name].push(val.cmd);
+                                                this.commandCategories[group.title].push(val.cmd);
 
                                                 $ul.append(
                                                     this.createLI(val.cmd, label)
@@ -180,7 +180,7 @@ num += group.items.length;
                                 this
                             )
                         );
-console.log("NUM " + num);
+
                         this.loadedCallback($elem, commands);
                     },
                     this
@@ -189,7 +189,7 @@ console.log("NUM " + num);
 
         },
 
-        createLI : function(cmd, label, func) {
+        createLI : function(cmd, label, func, extra) {
 
             if (label == undefined) {
                 label = cmd;
@@ -212,10 +212,7 @@ console.log("NUM " + num);
                 )
             ;
 
-            $li.kbaseButtonControls(
-                {
-                    context : this,
-                    controls : [
+            var controls = [
                         {
                             icon : 'icon-question',
                             callback : function(e, $ic) {
@@ -226,7 +223,18 @@ console.log("NUM " + num);
                             id : 'helpButton',
                            // 'tooltip' : {title : label + ' help', placement : 'bottom'},
                         },
-                    ]
+                    ];
+
+            if (extra != undefined && extra.length) {
+                for (var i = 0; i < extra.length; i++) {
+                    controls.push(extra[i]);
+                }
+            }
+
+            $li.kbaseButtonControls(
+                {
+                    context : this,
+                    controls : controls
                 }
             );
 
@@ -284,7 +292,7 @@ console.log("NUM " + num);
                                                 }
                                                 return;
                                             }
-
+                                            this.data('command-container').scrollTop('0px');
                                             this.data('test').animate({left : "0px"}, 150);
 
                                             var regex = new RegExp(value, 'i');
@@ -299,13 +307,86 @@ console.log("NUM " + num);
                                             $.each(
                                                 commands,
                                                 $.proxy( function (idx, cmd) {
+                                                //console.log("CREATE ");console.log(cmd);
                                                     $ul.append(
                                                         this.createLI(
-                                                            cmd,
-                                                            cmd,
+                                                            cmd[0],
+                                                            cmd[0],
                                                             function (e) {
                                                                 that.options.link.call(this, e);
-                                                            }
+                                                            },
+                                                            [
+                                                                {
+                                                                    icon : 'icon-long-arrow-right',
+                                                                    callback : function(e, $ic) {
+                                                                        $ic.data('searchField').val('');
+                                                                        $ic.data('searchField').trigger('keyup');
+var $plink = $('.panel-heading').find('a[title="Phispy commands"]');
+var $pgroup = $plink.parent().parent();
+console.log($pgroup.scrollTop());
+console.log($pgroup.offset().top - $ic.data('command-container').offset().top);
+var $mlink = $('.panel-heading').find('a[title="Modeling Scripts"]');
+var $mgroup = $mlink.parent().parent();
+console.log($mgroup.scrollTop());
+console.log($mgroup.offset().top - $ic.data('command-container').offset().top);
+var $glink = $('.panel-heading').find('a[title="Genotype/Phenotype Scripts"]');
+var $ggroup = $glink.parent().parent();
+console.log($ggroup.scrollTop());
+console.log($ggroup.offset().top - $ic.data('command-container').offset().top);
+
+
+//$ic.data('command-container').scrollTop(($ggroup.offset().top - $ic.data('command-container').offset().top));
+//$ic.data('command-container').scrollTop(($mgroup.offset().top - $ic.data('command-container').offset().top) + 'px');
+//return;
+                                                                        var $link = $('.panel-heading').find('a[title="' + cmd[1]+'"]');
+                                                                        var $group = $link.parent().parent();
+console.log($group);
+var open = $group.find('.in');
+console.log(open);
+console.log($group.find('.in').length);
+                                                                        if ($group.find('.in').length == 0) {
+                                                                        console.log("CLICKS!");
+//                                                                            $link.trigger('click');
+                                                                        }
+console.log($ic);
+console.log($group);
+console.log($group.offset().top);
+//$ic.$elem.scrollTop($group.offset().top);
+console.log($ic.data('command-container').scrollTop());
+console.log("SCROLL");
+console.log($group.offset().top);
+console.log($group.offset().top - $ic.data('command-container').offset().top);
+
+
+$ic.data('command-container').scrollTop(($group.offset().top - $ic.data('command-container').offset().top));
+
+                                                                        if ($group.find('.in').length == 0) {
+                                                                        console.log("CLICKS!");
+                                                                            $link.trigger('click');
+                                                                        }
+
+/*$ic.data('command-container').animate(
+    {
+        scrollTop: $group.offset().top - $ic.data('command-container').offset().top,
+    },
+    {
+        duration : 150,
+        complete : function() {
+console.log($ic.data('command-container').scrollTop());
+console.log($group.offset().top);
+        }
+    }
+);*/
+console.log($ic.$elem.attr('scrollTop'));
+
+                                                                        //if ($ic.options.terminal != undefined) {
+                                                                        //    $ic.options.terminal.run(cmd + ' -h');
+                                                                        //}
+                                                                    },
+                                                                    id : 'linkButton',
+                                                                   // 'tooltip' : {title : label + ' help', placement : 'bottom'},
+                                                                },
+                                                            ]
                                                         )
                                                     );
                                                 }, this)

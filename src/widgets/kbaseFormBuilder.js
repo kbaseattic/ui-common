@@ -58,6 +58,7 @@
             select
             multiselect
             radio
+            file
 
             string  (which is a text field)
             secure  (which is a password field)
@@ -123,7 +124,8 @@
 
         version: "1.0.0",
         options: {
-            elements : [],
+            elements    : [],
+            values      : {},
 
             //don't mess with the dispatch.
             dispatch : {
@@ -134,6 +136,7 @@
                 select      : 'buildSelectbox',
                 multiselect : 'buildSelectbox',
                 radio       : 'buildRadioButton',
+                //file        : 'buildFileField',   //this one doesn't actually work...
 
                 string      : 'buildTextField',
                 secure      : 'buildSecureTextField',
@@ -142,6 +145,7 @@
             },
 
             canSubmit : false,
+            submitButton : 'Submit',
 
         },
 
@@ -152,6 +156,9 @@
         },
 
         getFormValuesAsObject : function() {
+
+            var formValues = this.data('formValues');
+
             var values = this.getFormValuesAsArray();
 
             var ret = {};
@@ -163,6 +170,14 @@
                     if (val.length == 1) {
                         ret[val[0]] = true;
                     }
+
+                    var type = formValues[val[0]].type;
+                    var multi = formValues[val[0]].multi;
+
+                    if (val.length == 2 && ! multi && type != 'multiselect') {
+                        ret[val[0]] = ret[val[0]][0];
+                    }
+
                 }
             );
 
@@ -228,6 +243,36 @@
                     if (hasSelection) {
                         ret.push(selectedValues);
                     }
+                }
+                else if (type == 'file') {
+                    var files = form[field].files || form[field].dataTransfer.files;
+
+                    $.each(
+                        files,
+                        $.proxy(
+                            function (idx, file) {
+
+                                ret.jobs++;
+                                var response = [key];
+                                ret.push(response);
+
+                                var reader = new FileReader();
+
+                                reader.onload = $.proxy(
+                                    function(e) {
+                                        ret.jobs--;
+                                        response.push(e.target.result);
+                                    },
+                                    this
+                                );
+
+                                reader.readAsBinaryString(file);
+
+                            },
+                            this
+                        )
+                    );
+
                 }
                 else {
 
@@ -390,8 +435,12 @@
                 $.proxy(
                     function(idx, formInput) {
 
-                        if (formInput.key == undefined) {
-                            formInput.key = formInput.name;
+                        if (typeof formInput == 'string') {
+                            formInput = {key : formInput};
+                        }
+
+                        if (formInput.name == undefined) {
+                            formInput.name = formInput.key;
                         }
 
                         if (formValues[formInput.key] != undefined) {
@@ -422,7 +471,7 @@
 
                         var labelText = formInput.label != undefined
                             ? formInput.label
-                            : formInput.name;
+                            : formInput.name.charAt(0).toUpperCase() + formInput.name.slice(1);
 
                         var $label = $.jqElem('label')
                             .addClass('control-label col-lg-2')
@@ -483,8 +532,16 @@
                                                     .bind(
                                                         'click',
                                                         function (evt) {
-                                                            $container.append($field.clone());
-                                                            evt.stopPropagation();
+                                                            evt.stopPropagation(); evt.preventDefault();
+                                                            var $newgroup = $container.children().first().clone();
+                                                            $newgroup.find('i').toggleClass('icon-plus icon-minus');
+                                                            $newgroup.find('i').unbind('click');
+                                                            $newgroup.find('i').bind('click', function (e) {
+                                                                e.stopPropagation(); e.preventDefault();
+                                                                $newgroup.remove();
+                                                            });
+                                                            $newgroup.find('input').val(undefined);
+                                                            $container.append($newgroup);
                                                         }
                                                     )
                                             )
@@ -514,6 +571,19 @@
                 )
             );
 
+            if (this.options.canSubmit) {
+                $form.append(
+                    $.jqElem('div')
+                        .addClass('pull-right')
+                        .append(
+                            $.jqElem('input')
+                                .addClass('btn btn-default btn-primary')
+                                .attr('type', 'submit')
+                                .val(this.options.submitButton)
+                        )
+                )
+            }
+
             return $form;
 
         },
@@ -521,6 +591,15 @@
         buildTextField : function(data) {
             return $.jqElem('input')
                     .attr('type', 'text')
+                    .attr('value', data.value)
+                    .attr('name', data.name)
+                    .addClass('form-control')
+            ;
+        },
+
+        buildFileField : function(data) {
+            return $.jqElem('input')
+                    .attr('type', 'file')
                     .attr('value', data.value)
                     .attr('name', data.name)
                     .addClass('form-control')

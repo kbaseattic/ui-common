@@ -118,7 +118,6 @@
                 $.proxy(function (e, callback) {
 
                 var auth = this.auth();
-                console.log("TRIG AUTH");console.log(auth);
                     if (callback && auth != undefined && auth.unauthenticated == true) {
                         callback(auth);
                     }
@@ -167,6 +166,7 @@
             this.cwd = '/';
             this.commandHistory = undefined;
             this.terminal.empty();
+            this.variables = {};
             this.trigger('clearIrisProcesses');
         },
 
@@ -334,6 +334,10 @@
                 var m;
                 if (m = cmd.match(/^\s*(\$\S+)/)) {
                     exception = m[1];
+                }
+
+                if (m = cmd.match(/^(\$\S+)\s*=\s*(\S+)/)) {
+                    delete this.variables[m[1]];
                 }
 
                 for (variable in this.variables) {
@@ -679,6 +683,7 @@
         },
 
         cleanUp : function ($commandDiv) {
+            return; // do nothing. Don't auto-cleanup.
             setTimeout(function() {
                 var cleanupTime = 5000;
                 setTimeout(function() {$commandDiv.prev().fadeOut(500, function() {$commandDiv.prev().remove()})}, cleanupTime);
@@ -1600,12 +1605,6 @@
                 ),
                 $.proxy( function(res) { this.trigger( 'removeIrisProcess', pid ); }, this)
             );
-/*            console.log("XHR");
-            console.log(promise.xhr);
-            console.log("URL");
-            console.log(this.client().url);
-            promise.xhr.abort();
-*/
         }
 
     });
