@@ -89,6 +89,10 @@
             return prefix;
         },
 
+        // note that 'commands' is assumed to be the array handed back from completeCommand
+        // this returns an array of arrays - first element is the command, second is the
+        // category which contains it
+
         commonCommandPrefix : function (commands) {
 
             var prefix = '';
@@ -96,10 +100,10 @@
             if (commands.length > 1) {
 
             //find the longest common prefix for the first two commands. That's our start.
-                prefix = this.commonPrefix(commands[0], commands[1]);
+                prefix = this.commonPrefix(commands[0][0], commands[1][0]);
 
                 for (var idx = 2; idx < commands.length; idx++) {
-                    prefix = this.commonPrefix(prefix, commands[idx]);
+                    prefix = this.commonPrefix(prefix, commands[idx][0]);
                 }
 
             }
@@ -136,7 +140,7 @@
                             $.proxy(
                                 function (idx, group) {
 
-                                    var $ul = $('<ul></ul>')
+                                    var $ul = $.jqElem('ul')
                                         .addClass('unstyled')
                                         .css('max-height', this.options.overflow ? this.options.sectionHeight : '5000px')
                                         .css('overflow', this.options.overflow ? 'auto' : 'visible')
@@ -284,6 +288,12 @@
                                                 return;
                                             }
 
+                                            if (e.keyCode == 27) {
+                                                this.data('searchField').val('');
+                                                this.data('searchField').trigger('keyup');
+                                                return;
+                                            }
+
                                             var value = this.data('searchField').val();
 
                                             if (value.length < 3) {
@@ -301,13 +311,14 @@
                                             var $ul = $.jqElem('ul')
                                                 .css('font-size', this.options.fontSize)
                                                 .css('padding-left', '15px')
-                                                .addClass('unstyled');
+                                                .addClass('unstyled')
+                                                .css('max-height', this.options.overflow ? this.options.sectionHeight : '5000px')
+                                                .css('overflow', this.options.overflow ? 'auto' : 'visible');
 
 
                                             $.each(
                                                 commands,
                                                 $.proxy( function (idx, cmd) {
-                                                //console.log("CREATE ");console.log(cmd);
                                                     $ul.append(
                                                         this.createLI(
                                                             cmd[0],
@@ -321,67 +332,22 @@
                                                                     callback : function(e, $ic) {
                                                                         $ic.data('searchField').val('');
                                                                         $ic.data('searchField').trigger('keyup');
-var $plink = $('.panel-heading').find('a[title="Phispy commands"]');
-var $pgroup = $plink.parent().parent();
-console.log($pgroup.scrollTop());
-console.log($pgroup.offset().top - $ic.data('command-container').offset().top);
-var $mlink = $('.panel-heading').find('a[title="Modeling Scripts"]');
-var $mgroup = $mlink.parent().parent();
-console.log($mgroup.scrollTop());
-console.log($mgroup.offset().top - $ic.data('command-container').offset().top);
-var $glink = $('.panel-heading').find('a[title="Genotype/Phenotype Scripts"]');
-var $ggroup = $glink.parent().parent();
-console.log($ggroup.scrollTop());
-console.log($ggroup.offset().top - $ic.data('command-container').offset().top);
 
-
-//$ic.data('command-container').scrollTop(($ggroup.offset().top - $ic.data('command-container').offset().top));
-//$ic.data('command-container').scrollTop(($mgroup.offset().top - $ic.data('command-container').offset().top) + 'px');
-//return;
                                                                         var $link = $('.panel-heading').find('a[title="' + cmd[1]+'"]');
                                                                         var $group = $link.parent().parent();
-console.log($group);
-var open = $group.find('.in');
-console.log(open);
-console.log($group.find('.in').length);
-                                                                        if ($group.find('.in').length == 0) {
-                                                                        console.log("CLICKS!");
-//                                                                            $link.trigger('click');
-                                                                        }
-console.log($ic);
-console.log($group);
-console.log($group.offset().top);
-//$ic.$elem.scrollTop($group.offset().top);
-console.log($ic.data('command-container').scrollTop());
-console.log("SCROLL");
-console.log($group.offset().top);
-console.log($group.offset().top - $ic.data('command-container').offset().top);
 
-
-$ic.data('command-container').scrollTop(($group.offset().top - $ic.data('command-container').offset().top));
+                                                                        var newScrollTop = ($group.offset().top - $ic.data('command-container').offset().top);
+                                                                        $ic.data('command-container').scrollTop(
+                                                                            newScrollTop
+                                                                        );
 
                                                                         if ($group.find('.in').length == 0) {
-                                                                        console.log("CLICKS!");
                                                                             $link.trigger('click');
-                                                                        }
+                                                                            setTimeout(function() {$ic.data('command-container').scrollTop(
+                                                                                newScrollTop
+                                                                            )}, 200);
+                                                                        };
 
-/*$ic.data('command-container').animate(
-    {
-        scrollTop: $group.offset().top - $ic.data('command-container').offset().top,
-    },
-    {
-        duration : 150,
-        complete : function() {
-console.log($ic.data('command-container').scrollTop());
-console.log($group.offset().top);
-        }
-    }
-);*/
-console.log($ic.$elem.attr('scrollTop'));
-
-                                                                        //if ($ic.options.terminal != undefined) {
-                                                                        //    $ic.options.terminal.run(cmd + ' -h');
-                                                                        //}
                                                                     },
                                                                     id : 'linkButton',
                                                                    // 'tooltip' : {title : label + ' help', placement : 'bottom'},

@@ -11,12 +11,16 @@
 
         version: "1.0.0",
         options: {
-            defaultGrammarURL : 'http://www.prototypesite.net/iris-dev/grammar.json',
+            defaultGrammarURL : document.URL.replace('iris.html', 'grammar.json'),
         },
 
         init: function(options) {
 
             this._super(options);
+
+            if (this.options.defaultGrammarURL.match(/^file:\/\//)) {
+                this.options.defaultGrammarURL = 'grammar.json';
+            }
 
             if (this.options.$loginbox != undefined) {
                 this.$loginbox = this.options.$loginbox;
@@ -377,8 +381,18 @@
 
 		            }, this),
             		error: $.proxy(function(xhr, textStatus, errorThrown) {
-            		    this.dbg(textStatus);
-                        //throw xhr;
+
+            		    try {
+                            var json = JSON.parse(xhr.responseText);
+
+                            this.grammar = json;
+
+                            if (callback) {
+                                callback();
+                            }
+                        }
+                        catch (e) {}
+
 		            }, this),
                     type: 'GET',
     	        }

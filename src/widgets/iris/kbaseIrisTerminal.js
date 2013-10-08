@@ -85,7 +85,7 @@
                 );
             }
 
-            this.tutorial = $('<div></div>').kbaseIrisTutorial();
+            this.tutorial = $.jqElem('div').kbaseIrisTutorial();
 
             this.commandHistory = [];
             this.commandHistoryPosition = 0;
@@ -104,7 +104,7 @@
             else if (this.options.autocreateFileBrowser) {
 
                 this.addFileBrowser(
-                    $('<div></div>').kbaseIrisFileBrowser (
+                    $.jqElem('div').kbaseIrisFileBrowser (
                         {
                             client              : this.client(),
                             externalControls    : false,
@@ -137,17 +137,19 @@
                     $.proxy( function (newsid) {
                         this.loadCommandHistory();
                         if (args.token) {
-                            this.out("Authenticated as " + args.name);
+                            this.out_text("Authenticated as " + args.name);
                         }
                         else {
-                            this.out("Unauthenticated logged in as " + args.kbase_sessionid);
+                            this.out_text("Unauthenticated logged in as " + args.kbase_sessionid);
                         }
                         this.out_line();
                         this.scroll();
                     }, this ),
                     $.proxy( function (err) {
-                        this.out("<i>Error on session_start:<br>" +
-                        err.error.message.replace("\n", "<br>\n") + "</i>", 0, 1);
+                        this.out_text(
+                            "<i>Error on session_start:<br>" + err.error.message.replace("\n", "<br>\n") + "</i>",
+                            'html'
+                        );
                     }, this )
                 );
 
@@ -232,24 +234,27 @@
             this.terminal = this.data('terminal');
             this.input_box = this.data('input_box');
 
-            this.out("Welcome to the interactive KBase terminal!<br>\n"
+            this.out_text("Welcome to the interactive KBase terminal!<br>\n"
                     +"Please click the 'Sign in' button in the upper right to get started.<br>\n"
                     +"Type <b>commands</b> for a list of commands.<br>\n"
                     +"For usage information about a specific command, type the command name with -h or --help after it.<br>\n"
-                    +"Please visit <a href = 'http://kbase.us/for-users/tutorials/navigating-iris/' target = '_blank'>http://kbase.us/for-users/tutorials/navigating-iris/</a> or type <b>tutorial</b> for an IRIS tutorial.<br>\n"
+                    +"Please visit <a href = 'http://kbase.us/for-users/tutorials/navigating-iris/' target = '_blank'>http://kbase.us/for-users/tutorials/navigating-iris/</a> or type <b>tutorial</b> for an Iris tutorial.<br>\n"
                     +"To find out what's new, type <b>whatsnew</b><br>\n",
-                    0,1);
+
+                    'html'
+            );
+
             this.out_line();
 
-            this.input_box.bind(
+            this.input_box.on(
                 'keypress',
                 jQuery.proxy(function(event) { this.keypress(event); }, this)
             );
-            this.input_box.bind(
+            this.input_box.on(
                 'keydown',
                 jQuery.proxy(function(event) { this.keydown(event) }, this)
             );
-            this.input_box.bind(
+            this.input_box.on(
                 "onchange",
                 jQuery.proxy(function(event) { this.dbg("change"); }, this)
             );
@@ -288,6 +293,9 @@
                 jQuery.proxy(
                     function (txt) {
                         this.commandHistory = JSON.parse(txt);
+                        if (this.commandHistory == undefined) {
+                            this.commandHistory = [];
+                        }
                         this.commandHistoryPosition = this.commandHistory.length;
                     },
                     this
@@ -327,8 +335,11 @@
                 cmd = cmd.replace(/^ +/, '');
                 cmd = cmd.replace(/ +$/, '');
 
+                var $widget = $.jqElem('div').kbaseIrisTerminalWidget();
+                this.terminal.append($widget.$elem);
+                $widget.setInput(">" + this.cwd + " " + cmd);
+
                 this.dbg("Run (" + cmd + ')');
-                this.out_cmd(cmd);
 
                 var exception = cmd + cmd; //something that cannot possibly be a match
                 var m;
@@ -348,8 +359,7 @@
                     var varRegex = new RegExp(escapedVar, 'g');
                     cmd = cmd.replace(varRegex, this.variables[variable]);
                 }
-
-                this.run(cmd);
+                this.run(cmd, $widget);
                 this.scroll();
                 this.input_box.val('');
             }
@@ -442,7 +452,7 @@
 
                         var completions = this.options.commandsElement.kbaseIrisCommands('completeCommand', toComplete);
                         if (completions.length == 1) {
-                            var completion = completions[0].replace(new RegExp('^' + toComplete), '');
+                            var completion = completions[0][0].replace(new RegExp('^' + toComplete), '');
                             this.appendInput(completion + ' ', 0);
                         }
                         else if (completions.length) {
@@ -479,7 +489,7 @@
 
         search_json_to_table : function(json, filter) {
 
-            var $div = $('<div></div>');
+            var $div = $.jqElem('div');
 
             var filterRegex = new RegExp('.');
             if (filter) {
@@ -489,7 +499,7 @@
             $.each(
                 json,
                 $.proxy(function(idx, record) {
-                    var $tbl = $('<table></table>')
+                    var $tbl = $.jqElem('table')
                         .css('border', '1px solid black')
                         .css('margin-bottom', '2px');
                         var keys = Object.keys(record).sort();
@@ -518,6 +528,7 @@
         },
 
         displayCompletions : function(completions, toComplete) {
+
             var prefix = this.options.commandsElement.kbaseIrisCommands('commonCommandPrefix', completions);
 
             if (prefix != undefined && prefix.length) {
@@ -529,16 +540,13 @@
                 prefix = toComplete;
             }
 
-            var $commandDiv = $('<div></div>');
-            this.terminal.append($commandDiv);
-
-            var $tbl = $('<table></table>')
+            var $tbl = $.jqElem('table')
                 .attr('border', 1)
                 .css('margin-top', '10px')
                 .append(
-                    $('<tr></tr>')
+                    $.jqElem('tr')
                         .append(
-                            $('<th></th>')
+                            $.jqElem('th')
                                 .text('Suggested commands')
                         )
                     );
@@ -546,25 +554,27 @@
                 completions,
                 jQuery.proxy(
                     function (idx, val) {
+
+                        var label = $.isArray(val)
+                            ? val[0]
+                            : val;
+
                         $tbl.append(
-                            $('<tr></tr>')
+                            $.jqElem('tr')
                                 .append(
-                                    $('<td></td>')
+                                    $.jqElem('td')
                                         .append(
-                                            $('<a></a>')
+                                            $.jqElem('a')
                                                 .attr('href', '#')
-                                                .text(val)
-                                                .bind('click',
-                                                    jQuery.proxy(
-                                                        function (evt) {
-                                                            evt.preventDefault();
-                                                            this.input_box.val(
-                                                                this.input_box.val().replace(new RegExp(prefix + '\s*$'), '')
-                                                            );
-                                                            this.appendInput(val + ' ');
-                                                        },
-                                                        this
-                                                    )
+                                                .text(label)
+                                                .on('click',
+                                                    $.proxy(function (evt) {
+                                                        evt.preventDefault();
+                                                        this.input_box.val(
+                                                            this.input_box.val().replace(new RegExp(prefix + '\s*$'), '')
+                                                        );
+                                                        this.appendInput(label + ' ');
+                                                    }, this)
                                                 )
                                         )
                                     )
@@ -573,103 +583,25 @@
                     this
                 )
             );
-            $commandDiv.append($tbl);
+            var $widget = $.jqElem('div').kbaseIrisTerminalWidget();
+            this.terminal.append($widget.$elem);
+            $widget.setOutput($tbl);
             this.scroll();
 
         },
 
-        out_cmd: function(text) {
+        out_text: function(text, type) {
 
+            var $text = $.jqElem('div').kbaseIrisTextWidget();
+            this.terminal.append( $text.$elem );
 
-            var $wrapperDiv = $('<div></div>')
-                .css('white-space', 'pre')
-                .css('position', 'relative')
-                .append(
-                    $('<span></span>')
-                        .addClass('command')
-                        .text(">" + this.cwd + " " + text)
-                )
-                .mouseover(
-                    function(e) {
-                        $(this).children().first().show();
-                    }
-                )
-                .mouseout(
-                    function(e) {
-                        $(this).children().first().hide();
-                    }
-                )
-            ;
+            $text.setText(text, type);
 
-            $wrapperDiv.kbaseButtonControls(
-                {
-                    controls : [
-                        {
-                            icon : 'icon-eye-open',
-                            callback :
-                                function (e) {
-                                    var win = window.open();
-                                    win.document.open();
-                                    var output =
-                                        $('<div></div>')
-                                            .append(
-                                                $('<div></div>')
-                                                    .css('white-space', 'pre')
-                                                    .css('font-family' , 'monospace')
-                                                    .append(
-                                                        $(this).parent().parent().next().clone()
-                                                    )
-                                            )
-                                    ;
-                                    $.each(
-                                        output.find('a'),
-                                        function (idx, val) {
-                                            $(val).replaceWith($(val).html());
-                                        }
-                                    );
-
-                                    win.document.write(output.html());
-                                    win.document.close();
-                                },
-                        },
-                        {
-                            icon : 'icon-remove',
-                            callback :
-                                function (e) {
-                                    $(this).parent().parent().next().remove();
-                                    $(this).parent().parent().next().remove();
-                                    $(this).parent().parent().remove();
-                                }
-                        },
-
-                    ]
-                }
-            );
-
-            this.terminal.append($wrapperDiv);
         },
 
-        // Outputs a line of text
-        out: function(text, scroll, html) {
-            this.out_to_div(this.terminal, text, scroll, html);
-        },
-
-        // Outputs a line of text
-        out_to_div : function($div, text, scroll, html) {
-            if (!html && typeof text == 'string') {
-                text = text.replace(/</g, '&lt;');
-                text = text.replace(/>/g, '&gt;');
-            }
-
-            $div.append(text);
-            if (scroll) {
-                this.scroll(0);
-            }
-        },
-
-        // Outputs a line of text
+        // Outputs an hr
         out_line: function(text) {
-            var $hr = $('<hr/>');
+            var $hr = $('<hr>');
             this.terminal.append($hr);
             this.scroll(0);
         },
@@ -682,30 +614,17 @@
             this.terminal.animate({scrollTop: this.terminal.prop('scrollHeight') - this.terminal.height()}, speed);
         },
 
-        cleanUp : function ($commandDiv) {
-            return; // do nothing. Don't auto-cleanup.
-            setTimeout(function() {
-                var cleanupTime = 5000;
-                setTimeout(function() {$commandDiv.prev().fadeOut(500, function() {$commandDiv.prev().remove()})}, cleanupTime);
-                setTimeout(function() {$commandDiv.next().fadeOut(500, function() {$commandDiv.next().remove()})}, cleanupTime);
-                setTimeout(function() {$commandDiv.fadeOut(500, function() {$commandDiv.remove()})}, cleanupTime);
-            }, 1000);
-        },
-
-
         // Executes a command
-        run: function(command) {
+        run: function(command, $widget) {
 
             if (command == 'help') {
-                this.out('There is an introductory Iris tutorial available <a target="_blank" href="http://kbase.us/developer-zone/tutorials/iris/introduction-to-the-kbase-iris-interface/">on the KBase tutorials website</a>.', 0, 1);
+                $widget.setOutput(
+                    $.jqElem('span').html(
+                        'There is an introductory Iris tutorial available <a target="_blank" href="http://kbase.us/developer-zone/tutorials/iris/introduction-to-the-kbase-iris-interface/">on the KBase tutorials website</a>.'
+                    )
+                );
                 return;
             }
-
-
-            var $commandDiv = $('<div></div>').css('white-space', 'pre');
-//            $wrapperDiv.append($commandDiv);
-
-            this.terminal.append($commandDiv);
 
             this.out_line();
 
@@ -713,9 +632,10 @@
 
             if (m = command.match(/^log[io]n\s*(.*)/)) {
                 var args = m[1].split(/\s+/);
+
                 this.dbg(args.length);
-                if (args.length != 1) {
-                    this.out_to_div($commandDiv, "Invalid login syntax.");
+                if (! args[0].match(/^\w/)) {
+                    $widget.setError('Invalid login syntax');
                     return;
                 }
                 sid = args[0];
@@ -737,8 +657,10 @@
                     ),
                     jQuery.proxy(
                         function (err) {
-                            this.out_to_div($commandDiv, "<i>Error on session_start:<br>" +
-                                err.error.message.replace("\n", "<br>\n") + "</i>", 0, 1);
+                            $widget.setError(
+                                "Error on session_start:<br>" + err.error.message.replace("\n", "<br>\n"),
+                                "html"
+                            );
                         },
                         this
                     )
@@ -750,7 +672,7 @@
             if (m = command.match(/^authenticate\s*(.*)/)) {
                 var args = m[1].split(/\s+/)
                 if (args.length != 1) {
-                    this.out_to_div($commandDiv, "Invalid login syntax.");
+                    $widget.setError("Invalid login syntax.");
                     return;
                 }
                 sid = args[0];
@@ -777,7 +699,6 @@
             }
 
             if (m = command.match(/^whatsnew/)) {
-                $commandDiv.css('white-space', '');
                 $.ajax(
                     {
                         async : true,
@@ -785,11 +706,11 @@
                         url: "whatsnew.html",
                         crossDomain : true,
                         success: $.proxy(function (data, status, xhr) {
-                            $commandDiv.append(data);
+                            $widget.setOutput($.jqElem('div').html(data));
                             this.scroll();
                         }, this),
                         error : $.proxy(function(xhr, textStatus, errorThrown) {
-                            $commandDiv.append(xhr.responseText);
+                            $widget.setOutput($.jqElem('div').html(xhr.responseText));
                             this.scroll();
                         }, this),
                         type: 'GET',
@@ -817,22 +738,29 @@
                 var list = this.tutorial.list();
 
                 if (list.length == 0) {
-                    this.out_to_div($commandDiv, "Could not load tutorials.<br>\n",0,1);
-                    this.out_to_div($commandDiv, "Type <i>tutorial list</i> to see available tutorials.", 0, 1);
+                    $widget.setError(
+                        "Could not load tutorials.<br>\n"
+                        + "Type <i>tutorial list</i> to see available tutorials.",
+                        'html'
+                    );
                     return;
                 }
+
+                var $output = $widget.data('output');
+                $output.empty();
+
 
                 $.each(
                     list,
                     $.proxy( function (idx, val) {
-                        $commandDiv.append(
+                        $output.append(
                             $('<a></a>')
                                 .attr('href', '#')
                                 .append(val.title)
                                 .bind('click', $.proxy( function (e) {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    this.out_to_div($commandDiv, 'Set tutorial to <i>' + val.title + '</i><br>', 0, 1);
+                                    $widget.setError($.jqElem('span').append('Set tutorial to <b>' + val.title + '</b><br>'));
                                     this.tutorial.retrieveTutorial(val.url);
                                     this.input_box.focus();
                                 }, this))
@@ -841,7 +769,7 @@
 
                     }, this)
                 );
-                //this.out_to_div($commandDiv, output, 0, 1);
+
                 this.scroll();
                 return;
             }
@@ -850,7 +778,7 @@
                 var $page = this.tutorial.contentForCurrentPage();
 
                 if ($page == undefined) {
-                    this.out_to_div($commandDiv, "Could not load tutorial");
+                    $widget.setError("Could not load tutorial");
                     return;
                 }
 
@@ -867,8 +795,7 @@
                 }
                 $page.append("<br>Type <i>tutorial list</i> to see available tutorials.");
 
-                $commandDiv.css('white-space', '');
-                this.out_to_div($commandDiv, $page, 0, 1);
+                $widget.setOutput($page);
                 this.scroll();
 
                 return;
@@ -909,7 +836,7 @@
 
                             var $tbl = $.jqElem('div').kbaseTable(data);
 
-                            $commandDiv.append($tbl.$elem);
+                            $widget.setOutput($tbl.$elem);
                             this.scroll();
 
                         },
@@ -960,7 +887,7 @@
 
                 var $tbl = $.jqElem('div').kbaseTable(data);
 
-                $commandDiv.append($tbl.$elem);
+                $widget.setOutput($tbl.$elem);
                 this.scroll();
 
                 return;
@@ -972,7 +899,7 @@
             }
 
             if (! this.sessionId()) {
-                this.out_to_div($commandDiv, "You are not logged in.");
+                $widget.setError("You are not logged in.");
                 this.scroll();
                 return;
             }
@@ -1022,18 +949,18 @@
 
                 var $tbl = $.jqElem('div').kbaseTable(data);
 
-                this.out_to_div($commandDiv, $tbl.$elem);
+                $widget.setOutput($tbl.$elem);
                 return;
             }
             else if (m = command.match(/^!(\d+)/)) {
-                command = this.commandHistory.item(m[1]);
+                command = this.commandHistory[m[1]];
             }
 
 
             if (m = command.match(/^cd\s*(.*)/)) {
                 var args = m[1].split(/\s+/)
                 if (args.length != 1) {
-                    this.out_to_div($commandDiv, "Invalid cd syntax.");
+                    $widget.setError("Invalid cd syntax.");
                     return;
                 }
                 dir = args[0];
@@ -1051,8 +978,7 @@
                     jQuery.proxy(
                         function (err) {
                             var m = err.error.message.replace("/\n", "<br>\n");
-                            this.out_to_div($commandDiv, "<i>Error received:<br>" + err.error.code + "<br>" + m + "</i>", 0, 1);
-                            this.cleanUp($commandDiv);
+                            $widget.setError("Error received:<br>" + err.error.code + "<br>" + m, 'html');
                         },
                         this
                     )
@@ -1062,13 +988,13 @@
 
             if (m = command.match(/^(\$\S+)\s*=\s*(\S+)/)) {
                 this.variables[m[1]] = m[2];
-                this.out_to_div($commandDiv, m[1] + ' set to ' + m[2]);
+                $widget.setOutput(m[1] + ' set to ' + m[2]);
                 return;
             }
 
             if (m = command.match(/^alias\s+(\S+)\s*=\s*(\S+)/)) {
                 this.aliases[m[1]] = m[2];
-                this.out_to_div($commandDiv, m[1] + ' set to ' + m[2]);
+                $widget.setOutput(m[1] + ' set to ' + m[2]);
                 return;
             }
 
@@ -1086,8 +1012,9 @@
             }
 
             if (m = command.match(/^#\s*(.+)/)) {
-                $commandDiv.prev().remove();
-                this.out_to_div($commandDiv, $('<i></i>').text(m[1]));
+                //$widget.$elem.remove();
+                $widget.setInput('');
+                $widget.setOutput($.jqElem('i').text(m[1]));
                 return;
             }
 
@@ -1103,16 +1030,15 @@
                     if (file.match(/\.(jpg|gif|png)$/)) {
                         var $img = $.jqElem('img')
                             .attr('src', 'data:image/jpeg;base64,' + btoa(res));
-                        $commandDiv.append($img);
+                        $widget.setOutput($img);
                     }
                     else {
-                        $commandDiv.append(res);
+                        $widget.setOutput(res);
                     }
                     this.scroll();
                 }, this))
                 .fail($.proxy(function(res) {
-                    $commandDiv.append($.jqElem('i').text('No such file'));
-                    this.cleanUp($commandDiv);
+                    $widget.setError('No such file');
                 }, this));
 
                 return;
@@ -1156,16 +1082,18 @@
                          },
                         success         : $.proxy(
                             function (data,res,jqXHR) {
-                                this.out_to_div($commandDiv, $('<br>'));
-                                this.out_to_div($commandDiv, $('<i></i>').html("Command completed."));
-                                this.out_to_div($commandDiv, $('<br>'));
-                                this.out_to_div($commandDiv,
-                                    $('<span></span>')
-                                        .append($('<b></b>').html(data.found))
+                                var $output = $.jqElem('span');
+                                $output.append('<br>', 'html');
+                                $output.append($('<i></i>').html("Command completed."));
+                                $output.append('<br>', 'html');
+                                $output.append(
+                                    $.jqElem('span')
+                                        .append($.jqElem('b').html(data.found))
                                         .append(" records found.")
                                 );
-                                this.out_to_div($commandDiv, $('<br>'));
-                                this.out_to_div($commandDiv, this.search_json_to_table(data.body, filter));
+                                $output.append('<br>', 'html');
+                                $output.append(this.search_json_to_table(data.body, filter));
+                                $widget.setOutput($output);
                                 var res = this.search_json_to_table(data.body, filter);
 
                                 this.scroll();
@@ -1176,7 +1104,7 @@
                         error: $.proxy(
                             function (jqXHR, textStatus, errorThrown) {
 
-                                this.out_to_div($commandDiv, errorThrown);
+                                $widget.setError(errorThrown);
 
                             }, this
                         ),
@@ -1189,7 +1117,7 @@
             if (m = command.match(/^cp\s*(.*)/)) {
                 var args = m[1].split(/\s+/)
                 if (args.length != 2) {
-                    this.out_to_div($commandDiv, "Invalid cp syntax.");
+                    $widget.setError("Invalid cp syntax.");
                     return;
                 }
                 from = args[0];
@@ -1207,8 +1135,7 @@
                     jQuery.proxy(
                         function (err) {
                             var m = err.error.message.replace("\n", "<br>\n");
-                            this.out_to_div($commandDiv, "<i>Error received:<br>" + err.error.code + "<br>" + m + "</i>", 0, 1);
-                            this.cleanUp($commandDiv);
+                            $widget.setError("Error received:<br>" + err.error.code + "<br>" + m, 'html');
                         },
                         this
                     )
@@ -1218,7 +1145,7 @@
             if (m = command.match(/^mv\s*(.*)/)) {
                 var args = m[1].split(/\s+/)
                 if (args.length != 2) {
-                    this.out_to_div($commandDiv, "Invalid mv syntax.");
+                    $widget.setError("Invalid mv syntax.");
                     return;
                 }
 
@@ -1237,8 +1164,7 @@
                     jQuery.proxy(
                         function (err) {
                             var m = err.error.message.replace("\n", "<br>\n");
-                            this.out_to_div($commandDiv, "<i>Error received:<br>" + err.error.code + "<br>" + m + "</i>", 0, 1);
-                            this.cleanUp($commandDiv);
+                            $widget.setError("Error received:<br>" + err.error.code + "<br>" + m, 'html');
                         },
                         this
                     ));
@@ -1247,8 +1173,8 @@
 
             if (m = command.match(/^mkdir\s*(.*)/)) {
                 var args = m[1].split(/\s+/)
-                if (args.length < 1){
-                    this.out_to_div($commandDiv, "Invalid mkdir syntax.");
+                if (args[0].length < 1){
+                    $widget.setError("Invalid mkdir syntax.");
                     return;
                 }
                 $.each(
@@ -1266,8 +1192,7 @@
                             jQuery.proxy(
                                 function (err) {
                                     var m = err.error.message.replace("\n", "<br>\n");
-                                    this.out_to_div($commandDiv, "<i>Error received:<br>" + err.error.code + "<br>" + m + "</i>", 0, 1);
-                                    this.cleanUp($commandDiv);
+                                    $widget.setError("Error received:<br>" + err.error.code + "<br>" + m, 'html');
                                 },
                                 this
                             )
@@ -1279,8 +1204,8 @@
 
             if (m = command.match(/^rmdir\s*(.*)/)) {
                 var args = m[1].split(/\s+/)
-                if (args.length < 1) {
-                    this.out_to_div($commandDiv, "Invalid rmdir syntax.");
+                if (args[0].length < 1) {
+                    $widget.setError("Invalid rmdir syntax.");
                     return;
                 }
                 $.each(
@@ -1298,8 +1223,7 @@
                             jQuery.proxy(
                                 function (err) {
                                     var m = err.error.message.replace("\n", "<br>\n");
-                                    this.out_to_div($commandDiv, "<i>Error received:<br>" + err.error.code + "<br>" + m + "</i>", 0, 1);
-                                    this.cleanUp($commandDiv);
+                                    $widget.setError("Error received:<br>" + err.error.code + "<br>" + m, 'html');
                                 },
                                 this
                             )
@@ -1311,8 +1235,8 @@
 
             if (m = command.match(/^rm\s+(.*)/)) {
                 var args = m[1].split(/\s+/);
-                if (args.length < 1) {
-                    this.out_to_div($commandDiv, "Invalid rm syntax.");
+                if (args[0].length < 1) {
+                    $widget.setError("Invalid rm syntax.");
                     return;
                 }
                 $.each(
@@ -1330,8 +1254,7 @@
                             jQuery.proxy(
                                 function (err) {
                                     var m = err.error.message.replace("\n", "<br>\n");
-                                    this.out_to_div($commandDiv, "<i>Error received:<br>" + err.error.code + "<br>" + m + "</i>", 0, 1);
-                                    this.cleanUp($commandDiv);
+                                    $widget.setError("Error received:<br>" + err.error.code + "<br>" + m, 'html');
                                 },
                                 this
                             )
@@ -1349,7 +1272,7 @@
                 }
                 else {
                     if (args.length != 1) {
-                        this.out_to_div($commandDiv, "Invalid ls syntax.");
+                        $widget.setError("Invalid ls syntax.");
                         return;
                     }
                     else {
@@ -1399,12 +1322,13 @@
                                                     //comment out this block if you don't want the clicks to pop up via the api
                                                     //*
                                                     .attr('href', '#')
-                                                    .bind(
+                                                    .on(
                                                         'click',
                                                         jQuery.proxy(
-                                                            function (event) {
-                                                                event.preventDefault();
+                                                            function (e) {
+                                                                e.preventDefault();e.stopPropagation();
                                                                 this.open_file(val['full_path']);
+                                                                return false;
                                                             },
                                                             this
                                                         )
@@ -1441,7 +1365,7 @@
 
                             var $tbl = $.jqElem('div').kbaseTable(data);
 
-                            $commandDiv.append($tbl.$elem);
+                            $widget.setOutput($tbl.$elem);
                             this.scroll();
                          },
                          this
@@ -1449,8 +1373,7 @@
                      function (err)
                      {
                          var m = err.error.message.replace("\n", "<br>\n");
-                         obj.out_to_div($commandDiv, "<i>Error received:<br>" + err.error.code + "<br>" + m + "</i>", 0, 1);
-                        obj.cleanUp($commandDiv);
+                         $widget.setError("Error received:<br>" + err.error.code + "<br>" + m, 'html')
                      }
                     );
                 return;
@@ -1463,13 +1386,13 @@
                     command = parsed.execute;
 
                     if (parsed.explain) {
-                        $commandDiv.append(parsed.execute);
+                        $widget.setOutput(parsed.execute);
                         return;
                     }
 
                 }
                 else if (parsed.parsed.length && parsed.fail) {
-                    $commandDiv.append($('<i></i>').html(parsed.error));
+                    $widget.setError(parsed.error);
                     return;
                 }
             }
@@ -1479,7 +1402,7 @@
 
             var pid = this.uuid();
 
-            var $pe = $('<div></div>').text(command);
+            var $pe = $.jqElem('div').text(command);
             $pe.kbaseButtonControls(
                 {
                     onMouseover : true,
@@ -1489,11 +1412,9 @@
                             'icon' : 'icon-ban-circle',
                             //'tooltip' : 'Cancel',
                             callback : function(e, $term) {
-                                $commandDiv.prev().remove();
-                                $commandDiv.next().remove();
-                                $commandDiv.remove();
-
-                                $term.trigger('removeIrisProcess', pid);
+                                $widget.promise().xhr.abort();
+                                $widget.$elem.remove();
+//                                $term.trigger('removeIrisProcess', pid);
                             }
                         },
                     ]
@@ -1563,41 +1484,21 @@
                                         this
                                     )
                                 );
-                                $commandDiv.append($tbl);
+                                $widget.setOutput($tbl);
                             }
                             else {
-                                jQuery.each(
-                                    output,
-                                    jQuery.proxy(
-                                        function (idx, val) {
-                                            this.out_to_div($commandDiv, val, 0);
-                                        },
-                                        this
-                                    )
-                                );
+                                $widget.setOutput(output.join(''));
                             }
 
                             if (error.length) {
-                                jQuery.each(
-                                    error,
-                                    jQuery.proxy(
-                                        function (idx, val) {
-                                            this.out_to_div($commandDiv, $('<i></i>').html(val));
-                                        },
-                                        this
-                                    )
-                                );
-                                if (error.length != 1 || ! error[0].match(/^Output truncated/)) {
-                                    this.cleanUp($commandDiv);
-                                }
+                                $widget.setError(error.join(''));
                             }
                             else {
-                                this.out_to_div($commandDiv, $('<i></i>').html("<br>Command completed."));
+                                $widget.setError('Command Completed');
                             }
                         }
                         else {
-                            this.out_to_div($commandDiv, "Error running command.");
-                            this.cleanUp($commandDiv);
+                            $widget.setError('Error running command.');
                         }
                         this.scroll();
                     },
@@ -1605,6 +1506,8 @@
                 ),
                 $.proxy( function(res) { this.trigger( 'removeIrisProcess', pid ); }, this)
             );
+
+            $widget.promise(promise);
         }
 
     });

@@ -51,8 +51,8 @@
         }
         else {
             return {
-                    setter : 'text',
-                    getter : 'text'
+                    setter : 'html',
+                    getter : 'html'
                 }
         }
     };
@@ -424,6 +424,7 @@
 
                     }
                     else {
+
                         if (info.type.match(/w/) && info.setter != undefined) {
                             Widget.prototype[info.setter] = KBase._functions.setter(info.name);
                         }
@@ -580,7 +581,7 @@
             return this;
         }
     }
-    
+
     /**
      * @method registry
      * The set of globally-registered widgets.
@@ -598,7 +599,7 @@
         }
         return registry;
     }
-    
+
     /**
      * @method resetRegistry
      * Unregisters all global widgets.
@@ -658,7 +659,8 @@
 
                 for (attribute in this.__attributes) {
                     if (this.options[attribute] != undefined) {
-                        this.setValueForKey(attribute, this.options[attribute]);
+                        var setter = this.__attributes[attribute].setter;
+                        this[setter](this.options[attribute]);
                     }
                 }
 

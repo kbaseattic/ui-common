@@ -795,14 +795,14 @@
                                                     .append(
                                                         $('<label></label>')
                                                             .addClass('control-label')
-                                                            .addClass('col-lg-2')
+                                                            .addClass('col-md-2')
                                                             .attr('for', 'user_id')
                                                             .css('margin-right', '10px')
                                                             .append('Username:\n')
                                                     )
                                                     .append(
                                                         $.jqElem('div')
-                                                        .addClass('col-lg-9')
+                                                        .addClass('col-md-9')
                                                         .append(
                                                             $('<input>')
                                                                 .addClass('form-control')
@@ -819,14 +819,14 @@
                                                     .append(
                                                         $('<label></label>')
                                                             .addClass('control-label')
-                                                            .addClass('col-lg-2')
+                                                            .addClass('col-md-2')
                                                             .attr('for', 'password')
                                                             .css('margin-right', '10px')
                                                             .append('Password:\n')
                                                     )
                                                     .append(
                                                         $.jqElem('div')
-                                                        .addClass('col-lg-9')
+                                                        .addClass('col-md-9')
                                                         .append(
                                                             $('<input>')
                                                                 .addClass('form-control')

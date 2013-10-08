@@ -65,11 +65,45 @@
 		  name: "kbaseTable",
 
         version: "1.0.0",
+        _accessors : ['numRows'],
         options: {
             sortable    : false,
             striped     : true,
             hover       : true,
             bordered    : true,
+            headerOptions : {},
+
+            header_callback : function(header) {
+                if (header.label != undefined) {
+                    return header.label;
+                }
+                else {
+                    return header.value.replace(/(?:^|\s+)([a-z])/g, function(v) { return v.toUpperCase(); });
+                }
+            },
+
+            row_callback : function (cell, header, row, $kb) {
+                return $kb.default_row_callback(cell);
+            }
+        },
+
+        default_row_callback : function (cell) {
+
+            if (cell.label != undefined) {
+                return cell.label;
+            }
+            else {
+                value = typeof cell == 'string'
+                    ? cell
+                    : cell.value;
+
+                if (cell.type == 'th') {
+                    value = value.replace(/(?:^|\s+)([a-z])/g, function(v) { return v.toUpperCase(); });
+                    value += ' : ';
+                }
+
+                return value;
+            }
         },
 
         init: function(options) {
@@ -83,7 +117,6 @@
         },
 
         appendUI : function ($elem, struct) {
-            struct = (struct || {});
 
             $elem.empty();
 
@@ -124,74 +157,85 @@
                     struct.header,
                     $.proxy(function (idx, header) {
 
-                        var h = this.nameOfHeader(header);
-                        var zed = new Date();
+                        if (typeof header == 'string') {
+                            header = {value : header};
+                            struct.header[idx] = header;
+                        }
+
+                        var callback = header.callback || this.options.header_callback;
+                        var label = callback(header, this);
+                        var h = header.value;
 
                         var $th = $('<th></th>')
-                            .append(h)
+                            .append(label)
                         ;
 
-                        if (typeof header != 'string') {
-                            this.addOptions($th, header);
+                        this.addOptions($th, $.extend(true, {}, this.options.headerOptions, header));
 
-                            if (header.sortable) {
-                                var buttonId = h + '-sortButton';
-                                var $buttonIcon = $('<i></i>')
-                                    .addClass('icon-sort');
-                                var $button = $('<button></button>')
-                                    .addClass('btn btn-default btn-xs')
-                                    .attr('id', buttonId)
-                                    .css('display', 'none')
-                                    .css('float', 'right')
-                                    .append($buttonIcon)
-                                    .data('shouldHide', true)
-                                ;
-                                $button.bind('click', $.proxy(function (e) {
+                        if (header.sortable || (header.sortable == undefined && this.options.sortable)) {
 
-                                        var $lastSort = this.data('lastSort');
-                                        if ($lastSort != undefined && $lastSort.get(0) != $button.get(0)) {
-                                            $lastSort.children(':first').removeClass('icon-sort-up');
-                                            $lastSort.children(':first').removeClass('icon-sort-down');
-                                            $lastSort.children(':first').addClass('icon-sort');
-                                            $lastSort.data('shouldHide', true);
-                                            $lastSort.css('display', 'none');
-                                        }
+                            var buttonId = header.value + '-sortButton';
+                            var $buttonIcon = $('<i></i>')
+                                .addClass('icon-sort');
+                            var $button = $('<button></button>')
+                                .addClass('btn btn-default btn-xs')
+                                .attr('id', buttonId)
+                                .css('display', 'none')
+                                .css('float', 'right')
+                                .append($buttonIcon)
+                                .data('shouldHide', true)
+                            ;
+                            $button.bind('click', $.proxy(function (e) {
 
-                                        if ($buttonIcon.hasClass('icon-sort')) {
-                                            $buttonIcon.removeClass('icon-sort');
-                                            $buttonIcon.addClass('icon-sort-up');
-                                            $button.data('shouldHide', false);
-                                            this.sortAndLayoutOn(h, 1);
-                                        }
-                                        else if ($buttonIcon.hasClass('icon-sort-up')) {
-                                            $buttonIcon.removeClass('icon-sort-up');
-                                            $buttonIcon.addClass('icon-sort-down');
-                                            $button.data('shouldHide', false);
-                                            this.sortAndLayoutOn(h, -1);
-                                        }
-                                        else if ($buttonIcon.hasClass('icon-sort-down')) {
-                                            $buttonIcon.removeClass('icon-sort-down');
-                                            $buttonIcon.addClass('icon-sort');
-                                            $button.data('shouldHide', true);
-                                            this.sortAndLayoutOn(undefined);
-                                        }
-
-                                        this.data('lastSort', $button);
-
-                                    }, this))
-                                ;
-
-                                $th.append($button);
-                                $th.bind('mouseover', $.proxy(function(e) {
-                                    $button.css('display', 'inline');
-                                }, this));
-                                $th.bind('mouseout', $.proxy(function(e) {
-                                    if ($button.data('shouldHide')) {
-                                        $button.css('display', 'none');
+                                    var $lastSort = this.data('lastSort');
+                                    if ($lastSort != undefined && $lastSort.get(0) != $button.get(0)) {
+                                        $lastSort.children(':first').removeClass('icon-sort-up');
+                                        $lastSort.children(':first').removeClass('icon-sort-down');
+                                        $lastSort.children(':first').addClass('icon-sort');
+                                        $lastSort.data('shouldHide', true);
+                                        $lastSort.css('display', 'none');
                                     }
 
-                                }, this));
-                            }
+                                    this.data('lastSortHeader', h);
+
+                                    if ($buttonIcon.hasClass('icon-sort')) {
+                                        $buttonIcon.removeClass('icon-sort');
+                                        $buttonIcon.addClass('icon-sort-up');
+                                        $button.data('shouldHide', false);
+                                        this.sortAndLayoutOn(h, 1);
+                                        this.data('lastSortDir', 1);
+                                    }
+                                    else if ($buttonIcon.hasClass('icon-sort-up')) {
+                                        $buttonIcon.removeClass('icon-sort-up');
+                                        $buttonIcon.addClass('icon-sort-down');
+                                        $button.data('shouldHide', false);
+                                        this.sortAndLayoutOn(h, -1);
+                                        this.data('lastSortDir', -1);
+                                    }
+                                    else if ($buttonIcon.hasClass('icon-sort-down')) {
+                                        $buttonIcon.removeClass('icon-sort-down');
+                                        $buttonIcon.addClass('icon-sort');
+                                        $button.data('shouldHide', true);
+                                        this.sortAndLayoutOn(undefined);
+                                        this.data('lastSortHeader', undefined);
+                                        this.data('lastSortDir', undefined);
+                                    }
+
+                                    this.data('lastSort', $button);
+
+                                }, this))
+                            ;
+
+                            $th.append($button);
+                            $th.bind('mouseover', $.proxy(function(e) {
+                                $button.css('display', 'inline');
+                            }, this));
+                            $th.bind('mouseout', $.proxy(function(e) {
+                                if ($button.data('shouldHide')) {
+                                    $button.css('display', 'none');
+                                }
+
+                            }, this));
                         }
 
                         $tr.append($th);
@@ -235,13 +279,18 @@
 
         },
 
-        sortAndLayoutOn : function(header, dir) {
+        refilter : function (filter) {
+            this.options.filter = filter;
+            this.sortAndLayoutOn(this.data('lastSortHeader'), this.data('lastSortDir'));
+        },
+
+        sortAndLayoutOn : function(h, dir) {
 
             var sortedRows = this.options.structure.rows;
 
-            if (header != undefined) {
+            if (h != undefined) {
 
-                var h = this.nameOfHeader(header);
+                //var h = header.value;
 
                 sortedRows =
                     this.options.structure.rows.slice().sort(
@@ -265,24 +314,51 @@
 
         },
 
-        nameOfHeader : function (header) {
-            return typeof header == 'string'
-                ? header
-                : header.value;
-        },
-
         layoutRows : function (rows, header) {
 
             this.data('tbody').empty();
 
-            for (var idx = 0; idx < rows.length; idx++) {
+            var numRows = 0;
 
-                this.data('tbody').append(this.createRow(rows[idx], header));
-
+            if ($.isArray(rows)) {
+                for (var idx = 0; idx < rows.length; idx++) {
+                    var $row = this.createRow(rows[idx], header);
+                    if ($row != undefined && $row.children().length) {
+                        numRows++;
+                        this.data('tbody').append($row);
+                    }
+                }
             }
+            else if (this.options.structure.keys != undefined) {
+                for (var idx = 0; idx < this.options.structure.keys.length; idx++) {
+                    var key = this.options.structure.keys[idx];
+
+                    key.type = 'th';
+                    key.style = 'white-space : nowrap';
+                    var $row = this.createRow(
+                        {
+                            key : key,
+                            value : {value : rows[key.value], key : key.value},
+                        },
+                        [{value : 'key'}, {value : 'value'}]
+                    );
+
+                    if ($row != undefined && $row.children().length) {
+                        numRows++;
+                        this.data('tbody').append($row);
+                    }
+                }
+            }
+
+            this.numRows(numRows);
         },
 
         addOptions : function ($cell, options) {
+
+            if (typeof options == 'string' || options == undefined) {
+                return;
+            }
+
             if (options.style != undefined) {
                 $cell.attr('style', options.style);
             }
@@ -322,59 +398,75 @@
 
         createRow : function (rowData, headers) {
 
-            var $tr = $('<tr></tr>');
+            var $tr = $.jqElem('tr');
+
+            var callback = this.options.row_callback;
+
+            var filterString = '';
 
             if ( $.isArray(rowData) ) {
 
                 $.each(
                     rowData,
-                    $.proxy( function(idx, row) {
+                    $.proxy( function(idx, cell) {
 
-                        var value = typeof row == 'string' || typeof row == 'number'
-                            ? row
-                            : row.value;
+                        var value = typeof cell == 'object'
+                            ? cell.value
+                            : cell;
+
+                        if (value == undefined) {
+                            return;
+                        }
+
+                        filterString += value;
 
                         var $td = $.jqElem('td').append(value);
 
-                        if (typeof row != 'string' && typeof row != 'number') {
-                            this.addOptions($td, row);
+                        if (typeof cell == 'object') {
+
+                            this.addOptions($td, cell);
                         }
 
-                        if (value != undefined) {
+                        $tr.append($td);
+
+                    }, this)
+                );
+            }
+            else if (headers != undefined && headers.length) {
+
+                $.each(
+                    headers,
+                    $.proxy(function (hidx, header) {
+                        var h = header.value;
+
+                        var type = 'td';
+                        if (typeof rowData[h] == 'object' && rowData[h].type != undefined) {
+                            type = rowData[h].type;
+                        }
+                        var $td = $.jqElem(type);
+
+                        var label = callback(rowData[h], h, rowData, this);
+                        filterString += rowData[h];
+
+                        $td.append(label);
+
+                        if (typeof rowData[h] != 'string') {
+                            this.addOptions($td, rowData[h]);
+                        }
+
+                        if (label != undefined) {
                             $tr.append($td);
                         }
 
                     }, this)
                 );
             }
-            else {
 
-                $.each(
-                    headers,
-                    $.proxy(function (hidx, header) {
-                        var h = this.nameOfHeader(header);
-
-                        var $td = $('<td></td>');
-
-                        if (rowData[h] != undefined) {
-
-                            var value = typeof rowData[h] == 'string'
-                                ? rowData[h]
-                                : rowData[h].value;
-
-                            $td.append(value);
-
-                            if (typeof rowData[h] != 'string') {
-                                this.addOptions($td, rowData[h]);
-                            }
-                        }
-
-                        if (value != undefined) {
-                            $tr.append($td);
-                        }
-
-                    }, this)
-                );
+            if (this.options.filter != undefined) {
+                var filterRegex = new RegExp(this.options.filter, 'i');
+                if (! filterString.match(filterRegex)) {
+                    $tr = undefined;
+                }
             }
 
             return $tr;
