@@ -754,6 +754,7 @@
                     $elem.find('[id]'),
                     function(idx) {
                         $target.data($(this).attr('id'), $(this));
+                        $(this).attr('data-id', $(this).attr('id'));
                         $(this).removeAttr('id');
                         }
                 );

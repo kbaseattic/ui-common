@@ -17,7 +17,8 @@
                 'promise',
                 {name : 'input', setter : 'setInput'},
                 {name : 'output', setter : 'setOutput'},
-                {name : 'error', setter : 'setError'}
+                {name : 'error', setter : 'setError'},
+                {name : 'cwd', setter : 'setCwd'}
             ],
             options: {
 
@@ -49,10 +50,12 @@
                 this.setEscapedText('error', newVal);
             },
 
-            setEscapedText : function (key, newVal) {
-            console.log("KEY : " + key);
+            setCwd : function (newVal) {
+                this.setEscapedText('cwd', newVal);
+            },
+
+            escapeText : function (newVal) {
                 if (typeof newVal == 'string') {
-                console.log("IS STRING");
                     newVal = newVal.replace(/</g, '&lt;');
                     newVal = newVal.replace(/>/g, '&gt;');
                     newVal = $.jqElem('span')
@@ -63,10 +66,14 @@
                         );
                 }
                 else {
-                console.log("IS OBJ");
                     newVal = $.jqElem('span').append(newVal);
                 }
-console.log("VAL IS NOW : " + newVal);
+
+                return newVal;
+            },
+
+            setEscapedText : function (key, newVal) {
+                newVal = this.escapeText(newVal);
                 this.setValueForKey(key, newVal);
             },
 

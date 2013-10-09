@@ -14,8 +14,12 @@
 
             version: "1.0.0",
 
-            options: {
+            _accessors : [
+                {name : 'subCommand', setter : 'setSubCommand'}
+            ],
 
+            options: {
+                subCommand : false,
             },
 
             appendUI : function($elem) {
@@ -24,12 +28,19 @@ console.log("E IN");console.log($elem);
                 var $inputDiv = $.jqElem('div')
                     .css('white-space', 'pre')
                     .css('position', 'relative')
+                    .css('style', 'font-weight : bold')
+                    .append('&gt;')
                     .append(
-                        $('<span></span>')
+                        $.jqElem('span')
+                            .attr('id', 'cwd')
+                            .addClass('command')
+                            .kb_bind(this, 'cwd')
+                    )
+                    .append('&nbsp;')
+                    .append(
+                        $.jqElem('span')
                             .attr('id', 'input')
                             .addClass('command')
-                            .css('style', 'font-weight : bold')
-//                            .text(">" + this.cwd + " " + text)
                             .kb_bind(this, 'input')
                     )
                     .mouseover(
@@ -88,10 +99,11 @@ console.log("E IN");console.log($elem);
                         ]
                     }
                 );
-console.log($elem);
+
                 $elem
                     .append(
                         $inputDiv
+                            .attr('id', 'inputContainer')
                     )
                     .append(
                         $.jqElem('div')
@@ -109,6 +121,24 @@ console.log($elem);
                 this._rewireIds($elem, this);
 
                 return $elem;
+
+            },
+
+            setSubCommand : function(subCommand) {
+
+                if (this.data('inputContainer') == undefined) {
+                console.log("NO INPUT CONTAINER!");
+                    return;
+                }
+
+                if (subCommand) {
+                console.log("SC");
+                    this.data('inputContainer').css('color', 'gray');
+                }
+                else {
+                console.log("is C");
+                    this.data('inputContainer').css('color', 'black');
+                }
 
             },
         }

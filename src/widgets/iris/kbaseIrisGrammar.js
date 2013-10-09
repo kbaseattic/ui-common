@@ -57,7 +57,12 @@
                         }
                     }
                     else {
-                        detokenized += ' ' + token;
+                        if (token.length) {
+                            detokenized += ' ' + token;
+                        }
+                        else {
+                            detokenized += " ''";
+                        }
                     }
                 }
             }
@@ -87,7 +92,7 @@
                 var chr = string.charAt(idx);
 
                 if (quote == undefined) {
-                    if (chr.match(/[?;]/)) {
+                    if (chr.match(/[?;\n]/)) {
 
                         if (partial.length) {
                             tokens.push(partial);
