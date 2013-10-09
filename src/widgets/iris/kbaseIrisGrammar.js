@@ -38,24 +38,93 @@
 
         },
 
+        detokenize : function (tokens) {
+
+            var detokenized = '';
+
+            for (var idx = 0; idx < tokens.length; idx++) {
+                var token = tokens[idx];
+                if ($.isArray(token)) {
+                    detokenized += this.detokenize(token) + ';';
+                }
+                else {
+                    if (token.match(/\s/)) {
+                        if (token.match(/"/) && ! token.match(/\\"/)) {
+                            detokenized += " '" + token + "'";
+                        }
+                        else {
+                            detokenized += ' "' + token + '"';
+                        }
+                    }
+                    else {
+                        detokenized += ' ' + token;
+                    }
+                }
+            }
+
+            if (detokenized.match(/;$/)) {
+                detokenized = detokenized.substring(0, detokenized.length - 1);
+            }
+
+            if (detokenized.match(/^ /)) {
+                detokenized = detokenized.substring(1, detokenized.length);
+            }
+
+            return detokenized;
+
+        },
+
         tokenize : function(string) {
 
             var tokens = [];
             var partial = '';
             var quote = undefined;
             var escaped = false;
+            var tokensList = [];
+            var lastRedirectChar = false;
 
             for (var idx = 0; idx < string.length; idx++) {
                 var chr = string.charAt(idx);
+
                 if (quote == undefined) {
-                    //semi colons and question marks will be delimiters...eventually. Just skip 'em for now.
                     if (chr.match(/[?;]/)) {
+
+                        if (partial.length) {
+                            tokens.push(partial);
+                            partial = '';
+                        }
+
+                        if (tokens.length) {
+                            tokensList.push(tokens);
+                            tokens = [];
+                        }
                         continue;
                     }
                 }
 
                 if (chr.match(/\S/) || quote != undefined) {
-                    partial = partial + chr;
+
+                    var isRedirectChar = chr.match(/[\|><]/)
+                        ? true
+                        : false;
+
+                    var isKBid = false;
+                    if (partial.match(/kb$/) && chr == '|' || partial.match(/kb\|$/)  ) {
+                        isKBid = true;
+                    }
+
+                    if ( (isRedirectChar || lastRedirectChar) && ! quote && ! isKBid) {
+                        if (partial.length) {
+                            tokens.push(partial);
+                        }
+                        partial = chr;
+                    }
+                    else {
+                        partial += chr;
+                    }
+
+                    lastRedirectChar = isRedirectChar;
+
                 }
                 else {
                     if (partial.length) {
@@ -96,10 +165,19 @@
                 tokens.push(partial)
             }
 
-            return tokens;
+            if (tokensList.length && tokens.length) {
+                tokensList.push(tokens);
+            }
+
+            return tokensList.length
+                ? tokensList
+                : tokens;
         },
 
 
+        //IMPORTANT NOTE! WE CAN CURRENTLY -ONLY- EVALUATE SINGLE COMMAND QUESTIONS
+        //IF YOU PASS IN A TOKENIZED LIST OF TOKENS (; or / delimited), IT WILL -ONLY-
+        //EVALUATE THE FIRST ONE
         evaluate : function (string, callback) {
 
             var tokens  = this.tokenize(string);
@@ -122,6 +200,11 @@
                 string : string,
                 grammar : grammar._root,
             };
+
+            // XXX ONLY EVALUATE FIRST QUESTION.
+            if ($.isArray(tokens[0])) {
+                tokens = tokens[0];
+            }
 
             if (tokens[0] == 'explain') {
                 tokens.shift();
@@ -164,7 +247,7 @@
                         }
 
                         if (returnObj.parsed.length) {
-                            returnObj.parsed = returnObj.parsed + ' ' + token;
+                            returnObj.parsed += ' ' + token;
                         }
                         else {
                             returnObj.parsed = token;
@@ -213,7 +296,7 @@
             if (returnObj.tail) {
                 var m;
                 if (m = returnObj.tail.match(/^into\s+(\S+)/)) {
-                    returnObj.execute = returnObj.execute + ' > ' + m[1];
+                    returnObj.execute += ' > ' + m[1];
                 }
                 else {
                     returnObj.fail = 1;

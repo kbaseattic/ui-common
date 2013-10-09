@@ -13,27 +13,9 @@
             parent: 'kbaseIrisWidget',
 
             version: "1.0.0",
-            _accessors : [
-                {name : 'input', setter : 'setInput'},
-                {name : 'output', setter : 'setOutput'},
-                {name : 'error', setter : 'setError'}
-            ],
 
             options: {
 
-            },
-
-            setInput : function (newVal) {
-            console.log("SEIT " + newVal);
-                this.setEscapedText('input', newVal);
-            },
-
-            setOutput : function (newVal) {
-                this.setEscapedText('output', newVal);
-            },
-
-            setError : function (newVal) {
-                this.setEscapedText('error', newVal);
             },
 
             appendUI : function($elem) {

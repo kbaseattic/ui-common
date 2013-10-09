@@ -13,7 +13,12 @@
             parent: 'kbaseAuthenticatedWidget',
 
             version: "1.0.0",
-            _accessors : ['input', 'output', 'promise'],
+            _accessors : [
+                'promise',
+                {name : 'input', setter : 'setInput'},
+                {name : 'output', setter : 'setOutput'},
+                {name : 'error', setter : 'setError'}
+            ],
             options: {
 
             },
@@ -26,6 +31,22 @@
 
                 return this;
 
+            },
+
+            setValue : function(newVal) {
+                this.setValueForKey('value', newVal);
+            },
+
+            setInput : function (newVal) {
+                this.setEscapedText('input', newVal);
+            },
+
+            setOutput : function (newVal) {
+                this.setEscapedText('output', newVal);
+            },
+
+            setError : function (newVal) {
+                this.setEscapedText('error', newVal);
             },
 
             setEscapedText : function (key, newVal) {

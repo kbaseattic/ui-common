@@ -586,6 +586,12 @@
             var $widget = $.jqElem('div').kbaseIrisTerminalWidget();
             this.terminal.append($widget.$elem);
             $widget.setOutput($tbl);
+            $widget.setValue(
+                {
+                    completions : completions,
+                    prefix : prefix
+                }
+            );
             this.scroll();
 
         },
@@ -616,6 +622,11 @@
 
         // Executes a command
         run: function(command, $widget) {
+console.log("COMMAND " + command);
+console.log(this.options.grammar.tokenize(command));
+console.log("(" + this.options.grammar.detokenize(this.options.grammar.tokenize(command)) + ")");
+
+            var $promise = $.Deferred();
 
             if (command == 'help') {
                 $widget.setOutput(
@@ -776,6 +787,7 @@
 
             if (command == 'show_tutorial') {
                 var $page = this.tutorial.contentForCurrentPage();
+                $widget.setValue($page);
 
                 if ($page == undefined) {
                     $widget.setError("Could not load tutorial");
@@ -837,6 +849,7 @@
                             var $tbl = $.jqElem('div').kbaseTable(data);
 
                             $widget.setOutput($tbl.$elem);
+                            $widget.setValue(cmds);
                             this.scroll();
 
                         },
@@ -888,6 +901,7 @@
                 var $tbl = $.jqElem('div').kbaseTable(data);
 
                 $widget.setOutput($tbl.$elem);
+                $widget.setValue(questions);
                 this.scroll();
 
                 return;
@@ -926,7 +940,7 @@
                                 [
                                     idx,
                                     {
-                                        value : $('<a></a>')
+                                        value : $.jqElem('a')
                                             .attr('href', '#')
                                             .text(val)
                                             .bind('click',
@@ -950,6 +964,7 @@
                 var $tbl = $.jqElem('div').kbaseTable(data);
 
                 $widget.setOutput($tbl.$elem);
+                $widget.setValue(this.commandHistory);
                 return;
             }
             else if (m = command.match(/^!(\d+)/)) {
@@ -1015,6 +1030,7 @@
                 //$widget.$elem.remove();
                 $widget.setInput('');
                 $widget.setOutput($.jqElem('i').text(m[1]));
+                $widget.setValue(m[1]);
                 return;
             }
 
@@ -1094,6 +1110,10 @@
                                 $output.append('<br>', 'html');
                                 $output.append(this.search_json_to_table(data.body, filter));
                                 $widget.setOutput($output);
+                                $widget.setValue({
+                                    results : data.body,
+                                    filter : filter
+                                });
                                 var res = this.search_json_to_table(data.body, filter);
 
                                 this.scroll();
@@ -1366,6 +1386,7 @@
                             var $tbl = $.jqElem('div').kbaseTable(data);
 
                             $widget.setOutput($tbl.$elem);
+                            $widget.setValue(filelist);
                             this.scroll();
                          },
                          this
@@ -1414,7 +1435,6 @@
                             callback : function(e, $term) {
                                 $widget.promise().xhr.abort();
                                 $widget.$elem.remove();
-//                                $term.trigger('removeIrisProcess', pid);
                             }
                         },
                     ]
@@ -1485,9 +1505,11 @@
                                     )
                                 );
                                 $widget.setOutput($tbl);
+                                $widget.setValue(output);
                             }
                             else {
                                 $widget.setOutput(output.join(''));
+                                $widget.setValue(output);
                             }
 
                             if (error.length) {
