@@ -1,0 +1,158 @@
+1) landing-pages/js/app.js
+
+        .when('/spec/:kind/:id',
+            {templateUrl: 'views/objects/spec.html',
+             controller: SpecDetail})
+
+2) landing-pages/js/controllers.js
+
+function SpecDetail($scope, $routeParams) {
+	$scope.params = {
+		'kind' : $routeParams.kind,
+		'id' : $routeParams.id
+	};
+}
+
+3) landing-pages/views/objects -> new file 'spec.html'
+
+<div class="row">
+    <div class="col-md-12">
+        <div speccards></div>
+    </div>
+</div>
+
+4) landing-pages/js/card-directives.js
+
+    .directive('speccards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                $(element).KBaseCardLayoutManager({template: "spec", 
+                                                   data: scope.params, 
+                                                   auth: $rootScope.USER_TOKEN,
+                                                   userId: $rootScope.USER_ID});
+            }
+        };
+    })
+
+5) src/widgets/kbaseCardLayoutManager.js
+
+        ...
+        showInitialCards: function() {
+        ...
+            else if (this.options.template.toLowerCase() === "spec")
+                this.showSpecCards();
+        ...
+
+        ...
+        ...
+        ...
+
+        /**
+         * Template for showing spec-document elements cards.
+         */
+        showSpecCards: function() {
+        	var cardName = 'KBaseSpecUnknownCard';
+        	if (this.options.data.kind === "storage") {
+        		cardName = 'KBaseSpecStorageCard';
+        	} else if (this.options.data.kind === "module") {
+        		cardName = 'KBaseSpecModuleCard';
+        	} else if (this.options.data.kind === "type") {
+        		cardName = 'KBaseSpecTypeCard';
+        	} else if (this.options.data.kind === "function") {
+        		cardName = 'KBaseSpecFunctionCard';
+        	}        		
+            this.addNewCard(cardName,
+                        {
+                            kind: this.options.data.kind,
+                            id: this.options.data.id
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+        	return this;
+        },
+
+        ...
+        ...
+        ...
+
+            this.registeredEvents = ["featureClick", 
+        ...
+                                     "showSpecElement", 
+
+        ...
+        ...
+        ...
+
+            /**
+             * Event: showSpecElement
+             * ------------------
+             * Adds new KBaseSpec[Storage|Module|Type|Function]Card card.
+             */
+            $(document).on("showSpecElement", function(event, data) {
+            	var cardName = 'KBaseSpecUnknownCard';
+            	if (data.kind === "storage") {
+            		cardName = 'KBaseSpecStorageCard';
+            	} else if (data.kind === "module") {
+            		cardName = 'KBaseSpecModuleCard';
+            	} else if (data.kind === "type") {
+            		cardName = 'KBaseSpecTypeCard';
+            	} else if (data.kind === "function") {
+            		cardName = 'KBaseSpecFunctionCard';
+            	}
+                self.addNewCard(cardName,
+                {
+                    id: data.id
+                },
+                {
+                    my: "left top",
+                    at: "center",
+                    of: data.event
+                });
+            });
+
+6) src/widgets/spec -> new files kbaseSpec[Kind={Storage,Module,Type,Function}]Card.js
+
+(function( $, undefined ) { 
+    $.KBWidget({ 
+        name: "KBaseSpec[Kind]Card", 
+        parent: "kbaseWidget", 
+        version: "1.0.0",
+
+        options: {
+            id: null,
+            width: 200
+        },
+
+        init: function(options) {
+            this._super(options);
+            var self = this;
+            var $helloDiv = $("<div/>")
+                            .append("[Kind]")
+                            .on("click", function(event) {
+                                self.trigger("showSpecElement", 
+                                    { 
+                                      kind: "[another-kind]",
+                                      id: "...", 
+                                      event: event
+                                    }
+                                )
+                            });
+
+            this.$elem.append($helloDiv);
+            return this;
+        }
+    });
+})( jQuery );
+
+7) landing-pages/index.html
+
+        <!-- Spec widgets -->
+        <script src="../src/widgets/spec/kbaseSpecStorageCard.js"></script>
+        <script src="../src/widgets/spec/kbaseSpecModuleCard.js"></script>
+        <script src="../src/widgets/spec/kbaseSpecTypeCard.js"></script>
+        <script src="../src/widgets/spec/kbaseSpecFunctionCard.js"></script>
+        <!-- End Spec widgets -->
