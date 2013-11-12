@@ -5,8 +5,8 @@
         version: "1.0.0",
 
         options: {
-            id: null,
-            name: null,
+            id: "",
+            name: "",
             width: 600
         },
 
@@ -16,7 +16,7 @@
             var container = this.$elem;
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace('http://localhost:9999/');
+            var kbws = new Workspace('http://Romans-MacBook-Pro-4.local:9999/');
             var moduleName = this.options.id;
             var moduleVer = null;
             if (moduleName.indexOf('-') >= 0) {
@@ -25,10 +25,11 @@
             }
         	self.options.name = moduleName;
         	var pref = (new Date()).getTime();
+            //alert("moduleName=" + moduleName + ", moduleVer=" + moduleVer + ", pref=" + pref);
         	
         	// build tabs
         	var tabNames = ['Overview', 'Spec-file', 'Types', 'Functions', 'Included modules', 'Versions'];
-        	var tabIds = ['overview', 'spec', 'types', 'funcs', 'includes', 'versions'];
+        	var tabIds = ['overview', 'spec', 'types', 'funcs', 'incs', 'vers'];
         	var tabs = $('<ul id="'+pref+'table-tabs" class="nav nav-tabs"/>');
             tabs.append('<li class="active"><a href="#'+pref+tabIds[0]+'" data-toggle="tab" >'+tabNames[0]+'</a></li>');
         	for (var i=1; i<tabIds.length; i++) {
@@ -59,7 +60,8 @@
             	$('#'+pref+'overview').append('<table class="table table-striped table-bordered" \
                         style="margin-left: auto; margin-right: auto;" id="'+pref+'overview-table"/>');
             	var overviewLabels = ['Name', 'Owners', 'Version', 'Upload time'];
-            	var overviewData = [moduleName, data.owners, data.ver, new Date(data.ver)];
+            	moduleVer = data.ver;
+            	var overviewData = [moduleName, data.owners, moduleVer, "" + (new Date(data.ver))];
                 var overviewTable = $('#'+pref+'overview-table');
                 for (var i=0; i<overviewData.length; i++) {
                 	overviewTable.append('<tr><td>'+overviewLabels[i]+'</td> \
@@ -141,8 +143,88 @@
                     });
                 }
 
-            });
+            	////////////////////////////// Includes Tab //////////////////////////////
+            	$('#'+pref+'incs').append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'incs-table" \
+        				class="table table-bordered table-striped" style="width: 100%;"/>');
+            	var incsData = [];
+            	for (var incName in data.included_spec_version) {
+            		var incVer = data.included_spec_version[incName];
+            		var incId = incName + "-" + incVer;
+            		incsData[incsData.length] = {name: '<a class="incs-click" data-incid="'+incId+'">'+incName+'</a>', ver: incVer};
+            	}
+                var incsSettings = {
+                        "fnDrawCallback": incsEvents,
+                        "sPaginationType": "full_numbers",
+                        "iDisplayLength": 10,
+                        "aoColumns": [{sTitle: "Module name", mData: "name"}, {sTitle: "Module version", mData: "ver"}],
+                        "aaData": [],
+                        "oLanguage": {
+                            "sSearch": "Search module:",
+                            "sEmptyTable": "No included modules used."
+                        }
+                    };
+                var incsTable = $('#'+pref+'incs-table').dataTable(incsSettings);
+                incsTable.fnAddData(incsData);
+            	function incsEvents() {
+                    $('.incs-click').unbind('click');
+                    $('.incs-click').click(function() {
+                        var incId = $(this).data('incid');
+                        self.trigger('showSpecElement', 
+                        		{
+                        			kind: "module", 
+                        			id : incId,
+                        			event: event
+                        		});
+                    });
+                }
 
+                var wsAJAX2 = kbws.list_module_versions({mod: moduleName});
+                $.when(wsAJAX2).done(function(data){
+
+                	////////////////////////////// Versions Tab //////////////////////////////
+                	$('#'+pref+'vers').append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'vers-table" \
+            				class="table table-bordered table-striped" style="width: 100%;"/>');
+                	var versData = [];
+                	for (var i in data.vers) {
+                		var ver = data.vers[i];
+                		var verDate = "" + (new Date(ver));
+                		var link = null;
+                		if (ver === moduleVer) {
+                			link = "" + ver + " (current)";
+                		} else {
+                			link = '<a class="vers-click" data-verid="'+moduleName+'-'+ver+'">'+ver+'</a>';
+                		}
+                		versData[versData.length] = {ver: link, date: verDate};
+                	}
+                    var versSettings = {
+                            "fnDrawCallback": versEvents,
+                            "sPaginationType": "full_numbers",
+                            "iDisplayLength": 10,
+                            "aoColumns": [{sTitle: "Module version", mData: "ver"}, {sTitle: "Upload date", mData: "date"}],
+                            "aaData": [],
+                            "oLanguage": {
+                                "sSearch": "Search version:",
+                                "sEmptyTable": "No versions registered."
+                            }
+                        };
+                    var versTable = $('#'+pref+'vers-table').dataTable(versSettings);
+                    versTable.fnAddData(versData);
+                	function versEvents() {
+                        $('.vers-click').unbind('click');
+                        $('.vers-click').click(function() {
+                            var modId = $(this).data('verid');
+                            self.trigger('showSpecElement', 
+                            		{
+                            			kind: "module", 
+                            			id : modId,
+                            			event: event
+                            		});
+                        });
+                    }
+
+                });
+
+            });            	
             
             return this;
         },

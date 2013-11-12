@@ -263,6 +263,26 @@ function Workspace(url, auth, auth_cb) {
         return json_call_ajax("Workspace.translate_to_MD5_types", [arg_1], 1, _callback, _error_callback);
     };
 
+    this.get_type_info = function (type, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.get_type_info",
+        [type], 1, _callback, _errorCallback);
+};
+
+    this.get_type_info_async = function (type, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.get_type_info", [type], 1, _callback, _error_callback);
+    };
+
+    this.get_func_info = function (func, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.get_func_info",
+        [func], 1, _callback, _errorCallback);
+};
+
+    this.get_func_info_async = function (func, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.get_func_info", [func], 1, _callback, _error_callback);
+    };
+
     this.administer = function (command, _callback, _errorCallback) {
     return json_call_ajax("Workspace.administer",
         [command], 1, _callback, _errorCallback);

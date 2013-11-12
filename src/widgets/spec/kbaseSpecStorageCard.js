@@ -15,7 +15,7 @@
             var self = this;
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace('http://localhost:9999/');
+            var kbws = new Workspace('http://Romans-MacBook-Pro-4.local:9999/');
             var wsAJAX = kbws.list_modules({});
 
             $.when(wsAJAX).done(function(data){
