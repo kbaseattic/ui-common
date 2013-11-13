@@ -16,11 +16,11 @@
         	var pref = (new Date()).getTime();
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace('http://Romans-MacBook-Pro-4.local:9999/');
-            var wsAJAX = kbws.list_modules({});
+            var kbws = new Workspace('http://140.221.84.170:7058/');
+            kbws.list_modules({}, function(data) {
+                $('.loader-table').remove();
 
-            $.when(wsAJAX).done(function(data){
-            	var dataList = [];
+                var dataList = [];
             	for (var i = 0; i < data.length; i++)
             		dataList[i] = {module: '<a class="'+pref+'module-click" data-module="'+data[i]+'">'+data[i]+'</a>'};
                 self.$elem.append('<table id="'+pref+'module-table" class="table table-striped table-bordered"></table>');
@@ -45,8 +45,10 @@
                     			event: event
                     		});
                 });
-
-                $('.loader-table').remove();
+            }, function(data) {
+            	$('.loader-table').remove();
+                self.$elem.append('<p>[Error] ' + data.error.message + '</p>');
+                return;
             });
             
             return this;

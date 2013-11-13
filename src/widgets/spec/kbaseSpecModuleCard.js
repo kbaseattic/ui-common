@@ -16,7 +16,7 @@
             var container = this.$elem;
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace('http://Romans-MacBook-Pro-4.local:9999/');
+            var kbws = new Workspace('http://140.221.84.170:7058/');
             var moduleName = this.options.id;
             var moduleVer = null;
             if (moduleName.indexOf('-') >= 0) {
@@ -27,34 +27,33 @@
         	var pref = (new Date()).getTime();
             //alert("moduleName=" + moduleName + ", moduleVer=" + moduleVer + ", pref=" + pref);
         	
-        	// build tabs
-        	var tabNames = ['Overview', 'Spec-file', 'Types', 'Functions', 'Included modules', 'Versions'];
-        	var tabIds = ['overview', 'spec', 'types', 'funcs', 'incs', 'vers'];
-        	var tabs = $('<ul id="'+pref+'table-tabs" class="nav nav-tabs"/>');
-            tabs.append('<li class="active"><a href="#'+pref+tabIds[0]+'" data-toggle="tab" >'+tabNames[0]+'</a></li>');
-        	for (var i=1; i<tabIds.length; i++) {
-            	tabs.append('<li><a href="#'+pref+tabIds[i]+'" data-toggle="tab">'+tabNames[i]+'</a></li>');
-        	}
-        	container.append(tabs);
-
-        	// tab panel
-        	var tab_pane = $('<div id="'+pref+'tab-content" class="tab-content">');
-        	tab_pane.append('<div class="tab-pane in active" id="'+pref+tabIds[0]+'"/>');
-        	for (var i=1; i<tabIds.length; i++) {
-            	var tableDiv = $('<div class="tab-pane in" id="'+pref+tabIds[i]+'"> ');
-            	tab_pane.append(tableDiv);
-        	}
-        	container.append(tab_pane);
-        
-        	// event for showing tabs
-        	$('#'+pref+'table-tabs a').click(function (e) {
-        		e.preventDefault();
-        		$(this).tab('show');
-        	});
-
-            var wsAJAX = kbws.get_module_info({mod: moduleName, ver:moduleVer});
-            $.when(wsAJAX).done(function(data){
+            kbws.get_module_info({mod: moduleName, ver:moduleVer}, function(data) {
             	$('.loader-table').remove();
+
+            	// build tabs
+            	var tabNames = ['Overview', 'Spec-file', 'Types', 'Functions', 'Included modules', 'Versions'];
+            	var tabIds = ['overview', 'spec', 'types', 'funcs', 'incs', 'vers'];
+            	var tabs = $('<ul id="'+pref+'table-tabs" class="nav nav-tabs"/>');
+                tabs.append('<li class="active"><a href="#'+pref+tabIds[0]+'" data-toggle="tab" >'+tabNames[0]+'</a></li>');
+            	for (var i=1; i<tabIds.length; i++) {
+                	tabs.append('<li><a href="#'+pref+tabIds[i]+'" data-toggle="tab">'+tabNames[i]+'</a></li>');
+            	}
+            	container.append(tabs);
+
+            	// tab panel
+            	var tab_pane = $('<div id="'+pref+'tab-content" class="tab-content">');
+            	tab_pane.append('<div class="tab-pane in active" id="'+pref+tabIds[0]+'"/>');
+            	for (var i=1; i<tabIds.length; i++) {
+                	var tableDiv = $('<div class="tab-pane in" id="'+pref+tabIds[i]+'"> ');
+                	tab_pane.append(tableDiv);
+            	}
+            	container.append(tab_pane);
+            
+            	// event for showing tabs
+            	$('#'+pref+'table-tabs a').click(function (e) {
+            		e.preventDefault();
+            		$(this).tab('show');
+            	});
 
             	////////////////////////////// Overview Tab //////////////////////////////
             	$('#'+pref+'overview').append('<table class="table table-striped table-bordered" \
@@ -208,6 +207,10 @@
 
                 });
 
+            }, function(data) {
+            	$('.loader-table').remove();
+                self.$elem.append('<p>[Error] ' + data.error.message + '</p>');
+                return;
             });            	
             
             return this;
