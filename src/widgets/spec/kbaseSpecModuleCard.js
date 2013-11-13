@@ -79,10 +79,9 @@
             	for (var typeId in data.types) {
             		var typeName = typeId.substring(typeId.indexOf('.') + 1, typeId.indexOf('-'));
             		var typeVer = typeId.substring(typeId.indexOf('-') + 1);
-            		typesData[typesData.length] = {name: '<a class="types-click" data-typeid="'+typeId+'">'+typeName+'</a>', ver: typeVer};
+            		typesData[typesData.length] = {name: '<a class="'+pref+'types-click" data-typeid="'+typeId+'">'+typeName+'</a>', ver: typeVer};
             	}
                 var typesSettings = {
-                        "fnDrawCallback": typesEvents,
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
@@ -94,18 +93,15 @@
                     };
                 var typesTable = $('#'+pref+'types-table').dataTable(typesSettings);
                 typesTable.fnAddData(typesData);
-            	function typesEvents() {
-                    $('.types-click').unbind('click');
-                    $('.types-click').click(function() {
-                        var typeId = $(this).data('typeid');
-                        self.trigger('showSpecElement', 
-                        		{
-                        			kind: "type", 
-                        			id : typeId,
-                        			event: event
-                        		});
-                    });
-                }
+                $('.'+pref+'types-click').click(function() {
+                    var typeId = $(this).data('typeid');
+                    self.trigger('showSpecElement', 
+                    		{
+                    			kind: "type", 
+                    			id : typeId,
+                    			event: event
+                    		});
+                });
 
             	////////////////////////////// Functions Tab //////////////////////////////
             	$('#'+pref+'funcs').append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'funcs-table" \
@@ -115,10 +111,9 @@
             		var funcId = data.functions[i];
             		var funcName = funcId.substring(funcId.indexOf('.') + 1, funcId.indexOf('-'));
             		var funcVer = funcId.substring(funcId.indexOf('-') + 1);
-            		funcsData[funcsData.length] = {name: '<a class="funcs-click" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer};
+            		funcsData[funcsData.length] = {name: '<a class="'+pref+'funcs-click" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer};
             	}
                 var funcsSettings = {
-                        "fnDrawCallback": funcsEvents,
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function name", mData: "name"}, {sTitle: "Function version", mData: "ver"}],
@@ -130,18 +125,15 @@
                     };
                 var funcsTable = $('#'+pref+'funcs-table').dataTable(funcsSettings);
                 funcsTable.fnAddData(funcsData);
-            	function funcsEvents() {
-                    $('.funcs-click').unbind('click');
-                    $('.funcs-click').click(function() {
-                        var funcId = $(this).data('funcid');
-                        self.trigger('showSpecElement', 
-                        		{
-                        			kind: "function", 
-                        			id : funcId,
-                        			event: event
-                        		});
-                    });
-                }
+                $('.'+pref+'funcs-click').click(function() {
+                    var funcId = $(this).data('funcid');
+                    self.trigger('showSpecElement', 
+                    		{
+                    			kind: "function", 
+                    			id : funcId,
+                    			event: event
+                    		});
+                });
 
             	////////////////////////////// Includes Tab //////////////////////////////
             	$('#'+pref+'incs').append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'incs-table" \
@@ -150,10 +142,9 @@
             	for (var incName in data.included_spec_version) {
             		var incVer = data.included_spec_version[incName];
             		var incId = incName + "-" + incVer;
-            		incsData[incsData.length] = {name: '<a class="incs-click" data-incid="'+incId+'">'+incName+'</a>', ver: incVer};
+            		incsData[incsData.length] = {name: '<a class="'+pref+'incs-click" data-incid="'+incId+'">'+incName+'</a>', ver: incVer};
             	}
                 var incsSettings = {
-                        "fnDrawCallback": incsEvents,
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Module name", mData: "name"}, {sTitle: "Module version", mData: "ver"}],
@@ -165,18 +156,15 @@
                     };
                 var incsTable = $('#'+pref+'incs-table').dataTable(incsSettings);
                 incsTable.fnAddData(incsData);
-            	function incsEvents() {
-                    $('.incs-click').unbind('click');
-                    $('.incs-click').click(function() {
-                        var incId = $(this).data('incid');
-                        self.trigger('showSpecElement', 
-                        		{
-                        			kind: "module", 
-                        			id : incId,
-                        			event: event
-                        		});
-                    });
-                }
+                $('.'+pref+'incs-click').click(function() {
+                    var incId = $(this).data('incid');
+                    self.trigger('showSpecElement', 
+                    		{
+                    			kind: "module", 
+                    			id : incId,
+                    			event: event
+                    		});
+                });
 
                 var wsAJAX2 = kbws.list_module_versions({mod: moduleName});
                 $.when(wsAJAX2).done(function(data){
@@ -192,12 +180,11 @@
                 		if (ver === moduleVer) {
                 			link = "" + ver + " (current)";
                 		} else {
-                			link = '<a class="vers-click" data-verid="'+moduleName+'-'+ver+'">'+ver+'</a>';
+                			link = '<a class="'+pref+'vers-click" data-verid="'+moduleName+'-'+ver+'">'+ver+'</a>';
                 		}
                 		versData[versData.length] = {ver: link, date: verDate};
                 	}
                     var versSettings = {
-                            "fnDrawCallback": versEvents,
                             "sPaginationType": "full_numbers",
                             "iDisplayLength": 10,
                             "aoColumns": [{sTitle: "Module version", mData: "ver"}, {sTitle: "Upload date", mData: "date"}],
@@ -209,18 +196,15 @@
                         };
                     var versTable = $('#'+pref+'vers-table').dataTable(versSettings);
                     versTable.fnAddData(versData);
-                	function versEvents() {
-                        $('.vers-click').unbind('click');
-                        $('.vers-click').click(function() {
-                            var modId = $(this).data('verid');
-                            self.trigger('showSpecElement', 
-                            		{
-                            			kind: "module", 
-                            			id : modId,
-                            			event: event
-                            		});
-                        });
-                    }
+                    $('.'+pref+'vers-click').click(function() {
+                        var modId = $(this).data('verid');
+                        self.trigger('showSpecElement', 
+                        		{
+                        			kind: "module", 
+                        			id : modId,
+                        			event: event
+                        		});
+                    });
 
                 });
 

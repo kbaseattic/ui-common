@@ -13,6 +13,7 @@
         	options.id = '';
             this._super(options);
             var self = this;
+        	var pref = (new Date()).getTime();
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
             var kbws = new Workspace('http://Romans-MacBook-Pro-4.local:9999/');
@@ -21,10 +22,9 @@
             $.when(wsAJAX).done(function(data){
             	var dataList = [];
             	for (var i = 0; i < data.length; i++)
-            		dataList[i] = {module: '<a class="module-click" data-module="'+data[i]+'">'+data[i]+'</a>'};
-                self.$elem.append('<table id="module-table" class="table table-striped table-bordered"></table>');
+            		dataList[i] = {module: '<a class="'+pref+'module-click" data-module="'+data[i]+'">'+data[i]+'</a>'};
+                self.$elem.append('<table id="'+pref+'module-table" class="table table-striped table-bordered"></table>');
                 var tableSettings = {
-                        "fnDrawCallback": modelEvents,
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Module name", mData: "module"}],
@@ -34,15 +34,9 @@
                             "sEmptyTable": "No modules registered."
                         }
                     };
-                var table = $('#module-table').dataTable(tableSettings);
+                var table = $('#'+pref+'module-table').dataTable(tableSettings);
                 table.fnAddData(dataList);
-
-                $('.loader-table').remove();
-            });
-            
-            function modelEvents() {
-                $('.module-click').unbind('click');
-                $('.module-click').click(function() {
+                $('.'+pref+'module-click').click(function() {
                     var module = $(this).data('module');
                     self.trigger('showSpecElement', 
                     		{
@@ -51,8 +45,10 @@
                     			event: event
                     		});
                 });
-            }
 
+                $('.loader-table').remove();
+            });
+            
             return this;
         },
         

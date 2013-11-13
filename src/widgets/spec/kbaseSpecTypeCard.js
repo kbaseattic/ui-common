@@ -68,12 +68,11 @@
                 for (var i in data.module_vers) {
                 	var moduleVer = data.module_vers[i];
                 	var moduleId = moduleName + '-' + moduleVer;
-                	moduleLinks[moduleLinks.length] = '<a class="modver-click" data-moduleid="'+moduleId+'">'+moduleVer+'</a>';
+                	moduleLinks[moduleLinks.length] = '<a class="'+pref+'modver-click" data-moduleid="'+moduleId+'">'+moduleVer+'</a>';
                 }
                 overviewTable.append('<tr><td>Module version(s)</td><td>'+moduleLinks+'</td></tr>');
             	overviewTable.append('<tr><td>Description</td><td><textarea style="width:100%;" cols="2" rows="7" readonly>'+data.description+'</textarea></td></tr>');
-                $('.modver-click').unbind('click');
-                $('.modver-click').click(function() {
+                $('.'+pref+'modver-click').click(function() {
                     var moduleId = $(this).data('moduleid');
                     self.trigger('showSpecElement', 
                     		{
@@ -93,12 +92,11 @@
             	var funcsData = [];
             	for (var i in data.using_func_defs) {
             		var funcId = data.using_func_defs[i];
-            		var funcName = funcId.substring(funcId.indexOf('.') + 1, funcId.indexOf('-'));
+            		var funcName = funcId.substring(0, funcId.indexOf('-'));
             		var funcVer = funcId.substring(funcId.indexOf('-') + 1);
-            		funcsData[funcsData.length] = {name: '<a class="funcs-click" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer};
+            		funcsData[funcsData.length] = {name: '<a class="'+pref+'funcs-click" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer};
             	}
                 var funcsSettings = {
-                        "fnDrawCallback": funcsEvents,
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function name", mData: "name"}, {sTitle: "Function version", mData: "ver"}],
@@ -110,20 +108,79 @@
                     };
                 var funcsTable = $('#'+pref+'funcs-table').dataTable(funcsSettings);
                 funcsTable.fnAddData(funcsData);
-            	function funcsEvents() {
-                    $('.funcs-click').unbind('click');
-                    $('.funcs-click').click(function() {
-                        var funcId = $(this).data('funcid');
-                        self.trigger('showSpecElement', 
-                        		{
-                        			kind: "function", 
-                        			id : funcId,
-                        			event: event
-                        		});
-                    });
-                }
+                $('.'+pref+'funcs-click').click(function() {
+                    var funcId = $(this).data('funcid');
+                    self.trigger('showSpecElement', 
+                    		{
+                    			kind: "function", 
+                    			id : funcId,
+                    			event: event
+                    		});
+                });
 
+            	////////////////////////////// Using Types Tab //////////////////////////////
+            	$('#'+pref+'types').append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'types-table" \
+                		class="table table-bordered table-striped" style="width: 100%;"/>');
+            	var typesData = [];
+            	for (var i in data.using_type_defs) {
+            		var aTypeId = data.using_type_defs[i];
+            		var aTypeName = aTypeId.substring(0, aTypeId.indexOf('-'));
+            		var aTypeVer = aTypeId.substring(aTypeId.indexOf('-') + 1);
+            		typesData[typesData.length] = {name: '<a class="'+pref+'types-click" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer};
+            	}
+                var typesSettings = {
+                        "sPaginationType": "full_numbers",
+                        "iDisplayLength": 10,
+                        "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
+                        "aaData": [],
+                        "oLanguage": {
+                            "sSearch": "Search type:",
+                            "sEmptyTable": "No types use this type."
+                        }
+                    };
+                var typesTable = $('#'+pref+'types-table').dataTable(typesSettings);
+                typesTable.fnAddData(typesData);
+                $('.'+pref+'types-click').click(function() {
+                    var aTypeId = $(this).data('typeid');
+                    self.trigger('showSpecElement', 
+                    		{
+                    			kind: "type", 
+                    			id : aTypeId,
+                    			event: event
+                    		});
+                });
             	
+            	////////////////////////////// Sub-types Tab //////////////////////////////
+            	$('#'+pref+'subs').append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'subs-table" \
+                		class="table table-bordered table-striped" style="width: 100%;"/>');
+            	var subsData = [];
+            	for (var i in data.used_type_defs) {
+            		var aTypeId = data.used_type_defs[i];
+            		var aTypeName = aTypeId.substring(0, aTypeId.indexOf('-'));
+            		var aTypeVer = aTypeId.substring(aTypeId.indexOf('-') + 1);
+            		subsData[subsData.length] = {name: '<a class="'+pref+'subs-click" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer};
+            	}
+                var subsSettings = {
+                        "sPaginationType": "full_numbers",
+                        "iDisplayLength": 10,
+                        "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
+                        "aaData": [],
+                        "oLanguage": {
+                            "sSearch": "Search type:",
+                            "sEmptyTable": "No types used by this type."
+                        }
+                    };
+                var subsTable = $('#'+pref+'subs-table').dataTable(subsSettings);
+                subsTable.fnAddData(subsData);
+                $('.'+pref+'subs-click').click(function() {
+                    var aTypeId = $(this).data('typeid');
+                    self.trigger('showSpecElement', 
+                    		{
+                    			kind: "type", 
+                    			id : aTypeId,
+                    			event: event
+                    		});
+                });
             	
             	////////////////////////////// Versions Tab //////////////////////////////
             	$('#'+pref+'vers').append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'vers-table" \
@@ -136,12 +193,11 @@
                 	if (typeVer === aTypeVer) {
                 		link = aTypeId;
                 	} else {
-                		link = '<a class="vers-click" data-typeid="'+aTypeId+'">'+aTypeId+'</a>';
+                		link = '<a class="'+pref+'vers-click" data-typeid="'+aTypeId+'">'+aTypeId+'</a>';
                 	}
             		versData[versData.length] = {name: link};
             	}
                 var versSettings = {
-                        "fnDrawCallback": versEvents,
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type version", mData: "name"}],
@@ -153,18 +209,15 @@
                     };
                 var versTable = $('#'+pref+'vers-table').dataTable(versSettings);
                 versTable.fnAddData(versData);
-            	function versEvents() {
-                    $('.vers-click').unbind('click');
-                    $('.vers-click').click(function() {
-                        var aTypeId = $(this).data('typeid');
-                        self.trigger('showSpecElement', 
-                        		{
-                        			kind: "type", 
-                        			id : aTypeId,
-                        			event: event
-                        		});
-                    });
-                }
+                $('.'+pref+'vers-click').click(function() {
+                    var aTypeId = $(this).data('typeid');
+                    self.trigger('showSpecElement', 
+                    		{
+                    			kind: "type", 
+                    			id : aTypeId,
+                    			event: event
+                    		});
+                });
 
             });
             
