@@ -16,7 +16,7 @@
         	var pref = (new Date()).getTime();
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace('http://140.221.84.170:7058/');
+            var kbws = new Workspace(newWorkspaceServiceUrlForSpec);
             kbws.list_modules({}, function(data) {
                 $('.loader-table').remove();
 

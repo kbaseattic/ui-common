@@ -16,7 +16,7 @@
             var container = this.$elem;
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace('http://140.221.84.170:7058/');
+            var kbws = new Workspace(newWorkspaceServiceUrlForSpec);
             var typeName = this.options.id;
             var typeVer = null;
             if (typeName.indexOf('-') >= 0) {
@@ -82,8 +82,20 @@
                 });
             	
             	////////////////////////////// Spec-file Tab //////////////////////////////
-                var specText = '/*\n' + data.description + "\n*/\n" + data.spec_def;
-            	$('#'+pref+'spec').append('<textarea style="width:100%;" cols="2" rows="15" readonly>' + specText + "</textarea>");
+                var specText = $('<div/>').text(data.spec_def).html();
+                specText = replaceMarkedTypeLinksInSpec(moduleName, specText, pref+'links-click');
+            	$('#'+pref+'spec').append(
+            			'<div style="width:100%; overflow-y: auto; height: 300px;"><pre style="height:95%;">' + specText + "</pre></div>"
+            	);
+                $('.'+pref+'links-click').click(function() {
+                    var aTypeId = $(this).data('typeid');
+                    self.trigger('showSpecElement', 
+                    		{
+                    			kind: "type", 
+                    			id : aTypeId,
+                    			event: event
+                    		});
+                });
                 
             	////////////////////////////// Functions Tab //////////////////////////////
             	$('#'+pref+'funcs').append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'funcs-table" \

@@ -16,7 +16,7 @@
             var container = this.$elem;
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace('http://140.221.84.170:7058/');
+            var kbws = new Workspace(newWorkspaceServiceUrlForSpec);
             var moduleName = this.options.id;
             var moduleVer = null;
             if (moduleName.indexOf('-') >= 0) {
@@ -25,7 +25,6 @@
             }
         	self.options.name = moduleName;
         	var pref = (new Date()).getTime();
-            //alert("moduleName=" + moduleName + ", moduleVer=" + moduleVer + ", pref=" + pref);
         	
             kbws.get_module_info({mod: moduleName, ver:moduleVer}, function(data) {
             	$('.loader-table').remove();
@@ -69,7 +68,10 @@
             	overviewTable.append('<tr><td>Description</td><td><textarea style="width:100%;" cols="2" rows="5" readonly>'+data.description+'</textarea></td></tr>');
 
             	////////////////////////////// Spec-file Tab //////////////////////////////
-            	$('#'+pref+'spec').append('<textarea style="width:100%;" cols="2" rows="20" readonly>' + data.spec + "</textarea>");
+            	var specText = $('<div/>').text(data.spec).html();
+            	$('#'+pref+'spec').append(
+            			'<div style="width:100%; overflow-y: auto; height: 300px;"><pre>' + specText + '</pre></div>'
+            	);
 
             	////////////////////////////// Types Tab //////////////////////////////
             	$('#'+pref+'types').append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'types-table" \
