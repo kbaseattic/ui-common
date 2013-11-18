@@ -94,6 +94,7 @@
             this.cwd = "/";
             this.variables = {};
             this.aliases = {};
+            this.live_widgets = [];
 
             this.appendUI( $( this.$elem ) );
 
@@ -239,7 +240,7 @@
                     +"Type <b>commands</b> for a list of commands.<br>\n"
                     +"For usage information about a specific command, type the command name with -h or --help after it.<br>\n"
                     +"Please visit <a href = 'http://kbase.us/for-users/tutorials/navigating-iris/' target = '_blank'>http://kbase.us/for-users/tutorials/navigating-iris/</a> or type <b>tutorial</b> for an Iris tutorial.<br>\n"
-                    +"To find out what's new, type <b>whatsnew</b><br>\n",
+                    +"To find out what's new, type <b>whatsnew</b> (v0.0.5 - 11/18/2013)<br>\n",
 
                     'html'
             );
@@ -321,6 +322,19 @@
 
                 event.preventDefault();
                 var cmd = this.input_box.val();
+
+                if (cmd == 'gui') {
+                    this.gui = true;
+                    this.input_box.val('');
+                    return;
+                }
+                if (cmd == 'nogui') {
+                    this.gui = false;
+                    this.input_box.val('');
+                    return;
+                }
+
+
 
                 this.run(cmd);
                 this.scroll();
@@ -584,7 +598,7 @@
         },
 
         replaceVariables : function(command) {
-console.log("RV");console.log(command);
+
             command = command.replace(/^ +/, '');
             command = command.replace(/ +$/, '');
 
@@ -607,6 +621,22 @@ console.log("RV");console.log(command);
                 command = command.replace(varRegex, this.variables[variable]);
             }
             return command;
+        },
+
+        addWidget : function(widgetName) {
+            var $widget = $.jqElem('div').kbaseIrisContainerWidget(
+                {
+                    widget : this.options.widgets[widgetName]()
+                }
+            );
+            this.terminal.append( $widget.$elem);
+            $widget.render();
+            if (this.live_widgets.length) {
+                $widget.acceptInput(this.live_widgets[this.live_widgets.length - 1]);
+                $widget.setInput(this.live_widgets[this.live_widgets.length - 1].value());
+            }
+
+            this.live_widgets.push($widget);
         },
 
         // Executes a command
@@ -644,6 +674,7 @@ console.log("RV");console.log(command);
                 rawCmd = this.options.grammar.detokenize(tokens.shift());
                 $deferred.done(
                     $.proxy(function(res) {
+                        //$widget.remove();
                         this.run(
                             this.options.grammar.detokenize(tokens),
                             undefined,
@@ -667,12 +698,6 @@ console.log("RV");console.log(command);
             this.terminal.append($widget.$elem);
 
             this.dbg("Run (" + command + ')');
-
-console.log("OFF WE GO");
-
-console.log("COMMAND " + command);
-console.log(this.options.grammar.tokenize(command));
-console.log("(" + this.options.grammar.detokenize(this.options.grammar.tokenize(command)) + ")");
 
             if (command == 'help') {
                 $widget.setOutput(
@@ -987,9 +1012,8 @@ console.log("(" + this.options.grammar.detokenize(this.options.grammar.tokenize(
                 $deferred.resolve();
                 return;
             }
-console.log("HISTORY FOR " + command + "?");
-            if (! subCommand) {
-            console.log("ADDS SC");
+
+            if (! subCommand && this.commandHistory != undefined) {
                 this.commandHistory.push(command);
                 this.saveCommandHistory();
                 this.commandHistoryPosition = this.commandHistory.length;
@@ -1397,7 +1421,6 @@ console.log("HISTORY FOR " + command + "?");
                     args[0], this.cwd,
                     jQuery.proxy(
                         function (script) {
-                            console.log("EXECUTING " + script);
                             $deferred.resolve();
                             this.run(script, undefined, true);
                         },
@@ -1530,6 +1553,23 @@ console.log("HISTORY FOR " + command + "?");
                 return;
             }
 
+            if (w = command.match(/^widget\s+(.*)/)) {
+                var args = w[1].split(/\s+/)
+                var obj = this;
+
+                if (args.length != 1 || ! args[0].length) {
+                    $widget.setError("incorrect add widget syntax");
+                    $deferred.reject();
+                    return;
+                }
+
+                this.addWidget(args[0]);
+
+                $deferred.resolve();
+                return;
+            }
+
+
             var parsed = this.options.grammar.evaluate(command);
 
             if (parsed != undefined) {
@@ -1645,9 +1685,7 @@ console.log("HISTORY FOR " + command + "?");
                             }
 
                             if (error.length) {
-                            console.log("ERROR HERE");
-                            console.log(error);
-                            console.log(runout);
+
                                 $widget.setError(error.join(''));
                                 if (output.length) {
                                     $deferred.resolve();
@@ -1673,6 +1711,7 @@ console.log("HISTORY FOR " + command + "?");
             );
 
             $widget.promise(promise);
+            this.live_widgets.push($widget);
 
             return $deferred.promise();
         }

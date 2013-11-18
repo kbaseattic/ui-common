@@ -163,6 +163,7 @@
                         }
 
                         var callback = header.callback || this.options.header_callback;
+
                         var label = callback(header, this);
                         var h = header.value;
 
@@ -333,8 +334,13 @@
                 for (var idx = 0; idx < this.options.structure.keys.length; idx++) {
                     var key = this.options.structure.keys[idx];
 
+                    if (typeof key == 'string') {
+                        key = { value : key };
+                    }
+
                     key.type = 'th';
                     key.style = 'white-space : nowrap';
+
                     var $row = this.createRow(
                         {
                             key : key,
@@ -440,9 +446,21 @@
                         var h = header.value;
 
                         var type = 'td';
+
+                        // null is an irritating special case. Because it's not defined,
+                        // but it is a type of object. frick.
+
+                        if (rowData[h] == null) {
+                            rowData[h] = undefined;
+                        }
+                        if (typeof rowData[h] == 'object' && rowData[h].value == null) {
+                            rowData[h].value = '';
+                        }
+
                         if (typeof rowData[h] == 'object' && rowData[h].type != undefined) {
                             type = rowData[h].type;
                         }
+
                         var $td = $.jqElem(type);
 
                         var label = callback(rowData[h], h, rowData, this);

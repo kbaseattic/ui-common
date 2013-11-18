@@ -80,11 +80,11 @@
         },
 
         startThinking : function() {
-            this.data('banner').addClass('progress progress-striped active')
+            this.data('thinking').css('display', 'inline');
         },
 
         stopThinking : function() {
-            this.data('banner').removeClass('progress progress-striped active')
+            this.data('thinking').css('display', 'none');
         },
 
         appendUI : function ($elem) {
@@ -136,6 +136,16 @@
                                     .append(
                                         $('<span></span>')
                                             .attr('id', 'title')
+                                    )
+                                    .append(
+                                        $('<span></span>')
+                                            .attr('id', 'thinking')
+                                            .css('display', 'none')
+                                            .append('&nbsp;&nbsp;')
+                                            .append(
+                                                $.jqElem('i')
+                                                    .addClass('icon-spinner icon-spin')
+                                            )
                                     )
                             )
                         )

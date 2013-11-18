@@ -21,7 +21,9 @@
 (function ($) {
     var KBase;
     var ucfirst = function(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
+        if (string != undefined && string.length) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
     };
 
     var willChangeNoteForName = function(name) {
@@ -154,7 +156,6 @@
     };
 
     $.fn.kb_bind = function($target, attribute, transformers, accessors) {
-
         if (this.length > 1) {
             var methodArgs = arguments;
             $.each(
@@ -708,7 +709,6 @@
 
                         if (triggerValues.newValue != oldVal) {
                             var didChangeNote  = didChangeNoteForName(attribute);
-
                             this.trigger(didChangeNote, triggerValues);
                         }
                     }

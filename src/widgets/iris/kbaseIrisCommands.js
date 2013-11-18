@@ -185,6 +185,34 @@
                             )
                         );
 
+                        /*commands.push(
+                            {
+                                'title'     : 'Widgets',
+                                'category'  : 'widgets',
+                                'body'      :
+                                    $.jqElem('ul')
+                                        .addClass('unstyled')
+                                        .css('max-height', this.options.overflow ? this.options.sectionHeight : '5000px')
+                                        .css('overflow', this.options.overflow ? 'auto' : 'visible')
+                                        .append(
+                                            this.createLI(
+                                                'network',
+                                                'Network',
+                                                this.options.addWidget
+                                            )
+                                        )
+                                        .append(
+                                            this.createLI(
+                                                'echo',
+                                                'Echo',
+                                                this.options.addWidget
+                                            )
+                                        )
+                            }
+                        );*/
+                        this.commandCategories['Widgets'] = [];
+                        this.commandCategories['Widgets'].push('Network');
+
                         this.loadedCallback($elem, commands);
                     },
                     this

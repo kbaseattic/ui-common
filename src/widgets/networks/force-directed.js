@@ -32,10 +32,29 @@
     var WS_URL   = "http://kbase.us/services/workspace_service/";
     $.KBWidget({
         name: "ForceDirectedNetwork",
+        parent : 'kbaseAuthenticatedWidget',
         version: "0.1.0",
         options: {
             minHeight: "300px"
         },
+
+        loggedInCallback : function(auth) {
+            this.render();
+        },
+
+        loggedOutCallback : function(auth) {
+            this.$elem.empty();
+        },
+
+        loggedInQueryCallback : function(auth) {
+            console.log("LIQC");
+            this.render();
+        },
+
+        setInput : function (workspace) {
+            this.options.workspaceID = workspace;
+        },
+
         init: function(options) {
             this._super(options);
             this.render();
@@ -47,13 +66,13 @@
             if (self.options.minHeight) {
                 self.$elem.css("min-height", self.options.minHeight);
             }
-            if (self.options.token) {
+            if (self.auth().token) {
                 var wsRegex = /^(\w+)\.(.+)/;
                 var wsid = wsRegex.exec(self.options.workspaceID);
                 if (wsid !== null && wsid[1] && wsid[2]) {
                     var kbws = new workspaceService(WS_URL);
                     fetchAjax = kbws.get_object({
-                        auth: self.options.token,
+                        auth: self.auth().token,
                         workspace: wsid[1],
                         id: wsid[2],
                         type: 'Networks'

@@ -18,7 +18,9 @@
                 {name : 'input', setter : 'setInput'},
                 {name : 'output', setter : 'setOutput'},
                 {name : 'error', setter : 'setError'},
-                {name : 'cwd', setter : 'setCwd'}
+                {name : 'value', setter : 'setValue'},
+                {name : 'cwd', setter : 'setCwd'},
+                {name : 'subCommand', setter : 'setSubCommand'},
             ],
             options: {
 
@@ -32,6 +34,10 @@
 
                 return this;
 
+            },
+
+            setSubCommand : function(subCommand) {
+                this.setValueForKey('subCommand', subCommand);
             },
 
             setValue : function(newVal) {
@@ -75,6 +81,44 @@
             setEscapedText : function (key, newVal) {
                 newVal = this.escapeText(newVal);
                 this.setValueForKey(key, newVal);
+            },
+
+            viewOutput : function() {
+
+                var win = window.open();
+                win.document.open();
+                var output =
+                    $('<div></div>')
+                        .append(
+                            $('<div></div>')
+                                .css('white-space', 'pre')
+                                .css('font-family' , 'monospace')
+                                .append(
+                                    this.output().clone()
+                                )
+                        )
+                ;
+                $.each(
+                    output.find('a'),
+                    function (idx, val) {
+                        $(val).replaceWith($(val).html());
+                    }
+                );
+
+                win.document.write(output.html());
+                win.document.close();
+            },
+
+            acceptInput : function($widget) {
+
+                this.kb_bind(
+                    $widget,
+                    'value',
+                    function (e, $target, vals) {
+                        this.setInput(vals.newValue);
+                        this.render();
+                    }
+                );
             },
 
         }
