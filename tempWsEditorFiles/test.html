@@ -1,0 +1,176 @@
+<html>
+    <head>
+        <title>KBase</title>
+        <meta charset="utf-8">
+        <link rel="icon" href="static/images/KBase_favicon.ico" type="image/x-icon">
+        <link href="static/bootstrap-3.0.0/css/bootstrap.min.css" rel="stylesheet">
+        <link href="static/css/kbase_stylesheet.css" rel="stylesheet">
+        <link href="static/css/datastore.css" rel="stylesheet">
+        <link href="static/css/user.css" rel="stylesheet">
+        <style type="text/css">
+            a.btn-default {
+                color: black;
+            }
+        </style>
+    
+    
+        <link rel="stylesheet" type="text/css" href="jsoneditor/jsoneditor-min.css">
+        <script type="text/javascript" src="jsoneditor/jsoneditor.js"></script>
+        
+        <script type="text/javascript" src="jsoneditor/lib/ace/ace.js"></script>
+        <script type="text/javascript" src="jsoneditor/lib/ace/mode-json.js"></script>
+        <script type="text/javascript" src="jsoneditor/lib/ace/theme-textmate.js"></script>
+        <script type="text/javascript" src="jsoneditor/lib/ace/theme-jsoneditor.js"></script>
+
+        <!-- json lint -->
+        <script type="text/javascript" src="jsoneditor/lib/jsonlint/jsonlint.js"></script>
+        
+    </head>
+<body>
+    
+    <!--#include virtual="header.html" -->
+    <header id="alt_banner" role="banner">
+        <div id="navrow" class="row">     
+            <div id="logo" class="col-sm-1">
+                <a href="http://www.kbase.us"><img src="static/images/kbase_logo.png" alt="KBase User Home" /></a>
+            </div>
+            <div class="col-sm-2">
+                <div id="login-widget" class="pull-right" />
+            </div>
+        </div>
+    </header>
+    
+    <div id="main" class="container">
+        
+        <div id="login_section" class="col-md-4">
+            <form id="login_form">
+                <div>
+                    <legend>Please Sign in</legend>
+                    <p id="login_error" class="text-error" style="display:none"></p>
+                    <div class="form-group">
+                        <label for="kbase_username">Username:</label>
+                        <input type="text" placeholder="username" id="kbase_username" class=" form-control" tabindex="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="kbase_password" class="full-width">Password:<span class="pull-right"><a target="_blank" href="http://gologin.kbase.us/ResetPassword" tabindex="4">Forgot password?</a></span></label>
+                        <input type="password" placeholder="password" id="kbase_password" class="form-control" tabindex="2">
+                    </div>
+
+                    <button id="signinbtn" type="button" class="btn btn-primary" tabindex="3">Sign In</button> <img src="./static/images/ajax-loader.gif" id="loading-indicator" style="display: none;"  />
+                </div>
+             </form>
+            <span>New to KBase? <a target="_blank" href="http://gologin.kbase.us/Signup">Register now</a></span>
+         </div>
+        
+        <div id="jsoneditor" style="display:none; width: 800px; height: 550px;">
+            
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div class="col-md-10" style="padding-bottom:25px;">
+                    <div class="input-group">
+                        <!-- span class="input-group-addon">workspace:</span -->
+                        <select class="form-control" id="je_selectWorkspace"> </select>
+                        <!-- div class="input-group-addon">object:</div -->
+                        <select class="form-control" id="je_selectObjectId"> </select>
+                        <div class="input-group-btn">
+                            <button id="je_loadWsObj" type="button" class="btn btn-primary">load</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div id="je_savingObject" style="display:none;padding-bottom:25px;"> <!--  class="progress progress-striped active" style="display: none"> -->
+                <center><img src="./static/images/ajax-loader.gif" id="loading-indicator" /></center>
+                <center>saving...</center>
+                <!-- <div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                <span class="sr-only">saving</span>
+                </div> -->
+            </div>
+            <div id="je_loadingObject" style="display:none;padding-bottom:25px;"> <!-- class="progress progress-striped active" style="display: none"> -->
+                <center><img src="./static/images/ajax-loader.gif" id="loading-indicator" /></center>
+                <center>loading...</center>
+                <!-- <img src="./static/images/ajax-loader.gif" id="loading-indicator" style="display: none;"  />
+                <div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                <span class="sr-only">loading</span>
+                </div> -->
+            </div>
+            
+            
+            <div class="row" id="je_editorControlBar">
+                <div class="col-md-5" >
+                    <label>view:</label>
+                    <button id="je_setTreeView" type="button" class="btn btn-sm">tree</button>
+                    <button id="je_setFormView" type="button" class="btn btn-sm">form</button>
+                    <button id="je_setTextView" type="button" class="btn btn-sm">text</button>
+                    <button id="je_setCodeView" type="button" class="btn btn-sm">code</button>
+                </div>
+                <div class="col-md-5" >
+                    <button id="je_checkJsonStructure" type="button" class="btn btn-sm">validate json</button>
+                    <span id="je_jsonStatus" class="label label-success">valid</span>
+                </div>
+                <div class="col-md-2" >
+                    <!-- button id="je_saveObject" type="button" class="btn btn-sm btn-primary">new</button -->
+                    <!-- button id="je_saveObject" type="button" class="btn btn-sm btn-primary">load</button -->
+                    <button id="je_saveObject" type="button" class="btn btn-sm btn-primary">save</button>
+                    <button id="je_saveAsObject" type="button" class="btn btn-sm btn-primary">save as</button>
+                </div>
+            </div>
+            
+            
+            <div class="modal fade" id="je_chooseObjNameModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Select a new WS ID</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group">    
+                                <div class="input-group-addon">object name:</div>
+                                <input class="form-control" id="je_saveObjectNewName"></input>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button id="je_chooseObjNameModalSaveBtn" type="button" class="btn btn-primary">Save</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div>
+            
+            
+        </div>
+        
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    <script src="static/js/jquery-1.10.2.min.js"></script>
+    <script src="static/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+    <script src="static/dataTables/1.9.4/js/jquery.dataTables.js"></script>
+    <script src="static/js/jquery.cookie.min.js"></script>
+    <script src="static/js/kbwidget.js"></script>
+    <script src="static/js/kbaseLogging.js"></script>
+    <script src="static/js/kbasePrompt.js"></script>
+    <script src="static/js/kbaseLogin.js"></script>
+    <script src="static/js/kbase.js"></script>
+    <script src="static/js/underscore.js"></script>
+    <!-- script src="static/js/ICanHaz.min.js"></script -->
+    <script src="static/js/projects.js"></script>
+    <script src="static/js/header.js"></script>
+    
+    <script src="login.js"></script>
+    
+    
+    
+</body>
+</html>
