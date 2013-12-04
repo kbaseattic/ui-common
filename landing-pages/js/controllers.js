@@ -117,3 +117,9 @@ function SpecDetail($scope, $routeParams) {
 	};
 }
 
+function TempDetail($scope, $routeParams) {
+    $scope.params = {
+    		'ws_id': $routeParams.id,
+            'ws_name': $routeParams.ws
+    };
+}

@@ -33,6 +33,36 @@ function Workspace(url, auth, auth_cb) {
         return json_call_ajax("Workspace.create_workspace", [params], 1, _callback, _error_callback);
     };
 
+    this.clone_workspace = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.clone_workspace",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.clone_workspace_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.clone_workspace", [params], 1, _callback, _error_callback);
+    };
+
+    this.lock_workspace = function (wsi, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.lock_workspace",
+        [wsi], 1, _callback, _errorCallback);
+};
+
+    this.lock_workspace_async = function (wsi, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.lock_workspace", [wsi], 1, _callback, _error_callback);
+    };
+
+    this.get_workspacemeta = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.get_workspacemeta",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.get_workspacemeta_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.get_workspacemeta", [params], 1, _callback, _error_callback);
+    };
+
     this.get_workspace_info = function (wsi, _callback, _errorCallback) {
     return json_call_ajax("Workspace.get_workspace_info",
         [wsi], 1, _callback, _errorCallback);
@@ -63,6 +93,26 @@ function Workspace(url, auth, auth_cb) {
         return json_call_ajax("Workspace.set_permissions", [params], 0, _callback, _error_callback);
     };
 
+    this.set_global_permission = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.set_global_permission",
+        [params], 0, _callback, _errorCallback);
+};
+
+    this.set_global_permission_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.set_global_permission", [params], 0, _callback, _error_callback);
+    };
+
+    this.set_workspace_description = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.set_workspace_description",
+        [params], 0, _callback, _errorCallback);
+};
+
+    this.set_workspace_description_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.set_workspace_description", [params], 0, _callback, _error_callback);
+    };
+
     this.get_permissions = function (wsi, _callback, _errorCallback) {
     return json_call_ajax("Workspace.get_permissions",
         [wsi], 1, _callback, _errorCallback);
@@ -71,6 +121,16 @@ function Workspace(url, auth, auth_cb) {
     this.get_permissions_async = function (wsi, _callback, _error_callback) {
         deprecationWarning();
         return json_call_ajax("Workspace.get_permissions", [wsi], 1, _callback, _error_callback);
+    };
+
+    this.save_object = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.save_object",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.save_object_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.save_object", [params], 1, _callback, _error_callback);
     };
 
     this.save_objects = function (params, _callback, _errorCallback) {
@@ -83,24 +143,14 @@ function Workspace(url, auth, auth_cb) {
         return json_call_ajax("Workspace.save_objects", [params], 1, _callback, _error_callback);
     };
 
-    this.prealpha_list_workspaces = function (_callback, _errorCallback) {
-    return json_call_ajax("Workspace.prealpha_list_workspaces",
-        [], 1, _callback, _errorCallback);
+    this.get_object = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.get_object",
+        [params], 1, _callback, _errorCallback);
 };
 
-    this.prealpha_list_workspaces_async = function (_callback, _error_callback) {
+    this.get_object_async = function (params, _callback, _error_callback) {
         deprecationWarning();
-        return json_call_ajax("Workspace.prealpha_list_workspaces", [], 1, _callback, _error_callback);
-    };
-
-    this.prealpha_list_objects = function (wsi, _callback, _errorCallback) {
-    return json_call_ajax("Workspace.prealpha_list_objects",
-        [wsi], 1, _callback, _errorCallback);
-};
-
-    this.prealpha_list_objects_async = function (wsi, _callback, _error_callback) {
-        deprecationWarning();
-        return json_call_ajax("Workspace.prealpha_list_objects", [wsi], 1, _callback, _error_callback);
+        return json_call_ajax("Workspace.get_object", [params], 1, _callback, _error_callback);
     };
 
     this.get_objects = function (object_ids, _callback, _errorCallback) {
@@ -113,14 +163,134 @@ function Workspace(url, auth, auth_cb) {
         return json_call_ajax("Workspace.get_objects", [object_ids], 1, _callback, _error_callback);
     };
 
-    this.get_object_info = function (object_ids, _callback, _errorCallback) {
-    return json_call_ajax("Workspace.get_object_info",
-        [object_ids], 1, _callback, _errorCallback);
+    this.get_object_history = function (object, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.get_object_history",
+        [object], 1, _callback, _errorCallback);
 };
 
-    this.get_object_info_async = function (object_ids, _callback, _error_callback) {
+    this.get_object_history_async = function (object, _callback, _error_callback) {
         deprecationWarning();
-        return json_call_ajax("Workspace.get_object_info", [object_ids], 1, _callback, _error_callback);
+        return json_call_ajax("Workspace.get_object_history", [object], 1, _callback, _error_callback);
+    };
+
+    this.list_workspaces = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.list_workspaces",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.list_workspaces_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.list_workspaces", [params], 1, _callback, _error_callback);
+    };
+
+    this.list_workspace_info = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.list_workspace_info",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.list_workspace_info_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.list_workspace_info", [params], 1, _callback, _error_callback);
+    };
+
+    this.list_workspace_objects = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.list_workspace_objects",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.list_workspace_objects_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.list_workspace_objects", [params], 1, _callback, _error_callback);
+    };
+
+    this.list_objects = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.list_objects",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.list_objects_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.list_objects", [params], 1, _callback, _error_callback);
+    };
+
+    this.get_objectmeta = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.get_objectmeta",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.get_objectmeta_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.get_objectmeta", [params], 1, _callback, _error_callback);
+    };
+
+    this.get_object_info = function (object_ids, includeMetadata, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.get_object_info",
+        [object_ids, includeMetadata], 1, _callback, _errorCallback);
+};
+
+    this.get_object_info_async = function (object_ids, includeMetadata, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.get_object_info", [object_ids, includeMetadata], 1, _callback, _error_callback);
+    };
+
+    this.rename_workspace = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.rename_workspace",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.rename_workspace_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.rename_workspace", [params], 1, _callback, _error_callback);
+    };
+
+    this.rename_object = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.rename_object",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.rename_object_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.rename_object", [params], 1, _callback, _error_callback);
+    };
+
+    this.copy_object = function (params, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.copy_object",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.copy_object_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.copy_object", [params], 1, _callback, _error_callback);
+    };
+
+    this.revert_object = function (object, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.revert_object",
+        [object], 1, _callback, _errorCallback);
+};
+
+    this.revert_object_async = function (object, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.revert_object", [object], 1, _callback, _error_callback);
+    };
+
+    this.hide_objects = function (object_ids, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.hide_objects",
+        [object_ids], 0, _callback, _errorCallback);
+};
+
+    this.hide_objects_async = function (object_ids, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.hide_objects", [object_ids], 0, _callback, _error_callback);
+    };
+
+    this.unhide_objects = function (object_ids, _callback, _errorCallback) {
+    return json_call_ajax("Workspace.unhide_objects",
+        [object_ids], 0, _callback, _errorCallback);
+};
+
+    this.unhide_objects_async = function (object_ids, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("Workspace.unhide_objects", [object_ids], 0, _callback, _error_callback);
     };
 
     this.delete_objects = function (object_ids, _callback, _errorCallback) {

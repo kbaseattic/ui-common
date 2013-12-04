@@ -576,6 +576,8 @@
                 this.showModelCards();
             else if (this.options.template.toLowerCase() === "spec")
                 this.showSpecCards();
+            else if (this.options.template.toLowerCase() === "temp")
+                this.showTempCards();
             else {
                 // throw an error for an unknown template. modal dialog, maybe?
             }
@@ -750,6 +752,27 @@
             this.addNewCard(cardName,
                         {
                             id: this.options.data.id
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+        	return this;
+        },
+
+        /**
+         * Template for showing spec-document elements cards.
+         */
+        showTempCards: function() {
+        	var cardName = 'NarrativeTempCard';        		
+            this.addNewCard(cardName,
+                        {
+                            ws_id: this.options.data.ws_id,
+                            ws_name: this.options.data.ws_name,
+                            token: this.options.auth,
+                            user_id: this.options.userId
                         },
                         {
                             my: "left top",

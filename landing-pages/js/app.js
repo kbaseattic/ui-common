@@ -111,6 +111,10 @@ var app = angular.module('landing-pages',
             {templateUrl: 'views/objects/spec.html',
              controller: SpecDetail})
 
+        .when('/temp/:ws/:id',
+            {templateUrl: 'views/objects/temp.html',
+             controller: TempDetail})
+
         .when('/bambi/:ws/:id',
             {templateUrl: 'views/objects/bambi.html',
              controller: BambiDetail})
