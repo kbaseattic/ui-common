@@ -1,3 +1,16 @@
+var geneClickListener = null;
+var contigClickListener = null;
+
+function onGeneClick(data) {
+	if (geneClickListener != null)
+		geneClickListener(data);
+}
+
+function onContigClick(data) {
+	if (contigClickListener != null)
+		contigClickListener(data);
+}
+
 (function( $, undefined ) {
     $.KBWidget({
         name: "NarrativeTempCard",
@@ -43,7 +56,7 @@
             	var pref = (new Date()).getTime();
             	var tabPane = $('<div id="'+pref+'tab-content">');
             	container.append(tabPane);
-                tabPane.kbaseTabs({canDelete : false, tabs : []});
+                tabPane.kbaseTabs({canDelete : true, tabs : []});
             	var tabNames = ['Overview', 'Contigs', 'Genes'];  //, 'Element'];
             	var tabIds = ['overview', 'contigs', 'genes'];  //, 'elem'];
             	for (var i=0; i<tabIds.length; i++) {
@@ -76,6 +89,11 @@
             	var genesData = [];
             	var geneMap = {};
             	var contigMap = {};
+            	
+            	geneClickListener = function(aHref) {
+            		showGene($(aHref).data('geneid'));
+            	};
+            	
             	for (var genePos in gnm.features) {
             		var gene = gnm.features[genePos];
             		var geneId = gene.id;
@@ -91,7 +109,7 @@
             		}
             		var geneType = gene.type;
             		var geneFunc = gene['function'];
-            		genesData[genesData.length] = {id: '<a class="'+pref+'genes-click" data-geneid="'+geneId+'">'+geneId+'</a>', 
+            		genesData[genesData.length] = {id: '<a onclick="onGeneClick(this); return false;" data-geneid="'+geneId+'">'+geneId+'</a>', 
             				contig: contigName, start: geneStart, dir: geneDir, len: geneLen, type: geneType, func: geneFunc};
             		geneMap[geneId] = gene;
             		var contig = contigMap[contigName];
@@ -127,17 +145,19 @@
                     };
                 var genesTable = $('#'+pref+'genes-table').dataTable(genesSettings);
                 genesTable.fnAddData(genesData);
-                $('.'+pref+'genes-click').click(function() {
-                    showGene($(this).data('geneid'));
-                });
 
             	////////////////////////////// Contigs Tab //////////////////////////////
             	$('#'+pref+'contigs').append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'contigs-table" \
                 		class="table table-bordered table-striped" style="width: 100%;"/>');
             	var contigsData = [];
+            	
+            	contigClickListener = function(aHref) {
+            		showContig($(aHref).data('contigname'));
+            	};
+
             	for (var key in contigMap) {
             		var contig = contigMap[key];
-            		contigsData.push({name: '<a class="'+pref+'contigs-click" data-contigname="'+contig.name+'">'+contig.name+'</a>', 
+            		contigsData.push({name: '<a onclick="onContigClick(this); return false;" data-contigname="'+contig.name+'">'+contig.name+'</a>', 
             				length: contig.length, genecount: contig.genes.length});
             		
             	}
@@ -157,9 +177,6 @@
                     };
                 var contigsTable = $('#'+pref+'contigs-table').dataTable(contigsSettings);
                 contigsTable.fnAddData(contigsData);
-                $('.'+pref+'contigs-click').click(function() {
-                    showContig($(this).data('contigname'));
-                });
 
             	////////////////////////////// Overview Tab //////////////////////////////
             	//$('#'+pref+'elem').append('<p class="' + pref + 'elemstyle">Click on any element in Contigs or Genes tab</p>');
@@ -234,7 +251,7 @@
                     }
                     var cgb = new ContigBrowserPanel();
                     cgb.data.options.contig = contig;
-                    cgb.data.options.svgWidth = self.options.width - 10;
+                    cgb.data.options.svgWidth = self.options.width - 28;
                     cgb.data.options.onClickFunction = function(svgElement, feature) {
                     	showGene(feature.feature_id);
                     };
