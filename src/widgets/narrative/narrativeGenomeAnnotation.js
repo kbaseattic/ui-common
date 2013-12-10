@@ -13,6 +13,8 @@
 
         init: function(options) {
             this._super(options);
+            var self = this;
+            
             //var wsUrl = 'http://140.221.84.170:7058/';								// WS2
             var wsUrl = 'http://kbase.us/services/workspace/';
             var container = this.$elem;
@@ -42,8 +44,8 @@
             	var tabPane = $('<div id="'+pref+'tab-content">');
             	container.append(tabPane);
                 tabPane.kbaseTabs({canDelete : false, tabs : []});
-            	var tabNames = ['Overview', 'Contigs', 'Genes', 'Element'];
-            	var tabIds = ['overview', 'contigs', 'genes', 'elem'];
+            	var tabNames = ['Overview', 'Contigs', 'Genes'];  //, 'Element'];
+            	var tabIds = ['overview', 'contigs', 'genes'];  //, 'elem'];
             	for (var i=0; i<tabIds.length; i++) {
                 	var tabDiv = $('<div id="'+pref+tabIds[i]+'"> ');
                     tabPane.kbaseTabs('addTab', {tab: tabNames[i], content: tabDiv, canDelete : false, show: (i == 0)});
@@ -53,7 +55,10 @@
             	$('#'+pref+'overview').append('<table class="table table-striped table-bordered" \
                         style="margin-left: auto; margin-right: auto;" id="'+pref+'overview-table"/>');
             	var overviewLabels = ['Id', 'Name', 'Domain', 'Genetic code', 'Source', "Source id", "GC", "Taxonomy", "Size"];
-            	var overviewData = [gnm.id, gnm.scientific_name, gnm.domain, gnm.genetic_code, gnm.source, gnm.source_id, gnm.gc, gnm.taxonomy, gnm.size];
+            	var tax = gnm.taxonomy;
+            	if (tax == null)
+            		tax = '';
+            	var overviewData = [gnm.id, gnm.scientific_name, gnm.domain, gnm.genetic_code, gnm.source, gnm.source_id, gnm.gc, tax, gnm.size];
                 var overviewTable = $('#'+pref+'overview-table');
                 for (var i=0; i<overviewData.length; i++) {
                 	if (overviewLabels[i] === 'Taxonomy') {
@@ -157,10 +162,27 @@
                 });
 
             	////////////////////////////// Overview Tab //////////////////////////////
-            	$('#'+pref+'elem').append('<p class="' + pref + 'elemstyle">Click on any element in Contigs or Genes tab</p>');
+            	//$('#'+pref+'elem').append('<p class="' + pref + 'elemstyle">Click on any element in Contigs or Genes tab</p>');
 
+                var lastElemTabNum = 0;
+                
+                function openTabGetId(tabName) {
+                	if (tabPane.kbaseTabs('hasTab', tabName))
+                		return null;
+                	lastElemTabNum++;
+                	var tabId = '' + pref + 'elem' + lastElemTabNum;
+                	var tabDiv = $('<div id="'+tabId+'"> ');
+                    tabPane.kbaseTabs('addTab', {tab: tabName, content: tabDiv, canDelete : true, show: (i == 0)});
+                    return tabId;
+                }
+                
             	function showGene(geneId) {
-                	$('.'+pref+'elemstyle').remove();
+                	//$('.'+pref+'elemstyle').remove();
+            		var tabId = openTabGetId(geneId);
+            		if (tabId == null) {
+                        tabPane.kbaseTabs('showTab', geneId);
+            			return;
+            		}
             		var gene = geneMap[geneId];
         			var contigName = null;
         			var geneStart = null;
@@ -174,11 +196,11 @@
             		}
             		var geneType = gene.type;
             		var geneFunc = gene['function'];
-                	$('#'+pref+'elem').append('<table class="table table-striped table-bordered '+pref+'elemstyle" \
-                            style="margin-left: auto; margin-right: auto;" id="'+pref+'elem-table"/>');
+                	$('#'+tabId).append('<table class="table table-striped table-bordered" \
+                            style="margin-left: auto; margin-right: auto;" id="'+tabId+'-table"/>');
                 	var elemLabels = ['Gene ID', 'Contig name', 'Gene start', 'Strand', 'Gene length', "Gene type", "Function"];
-                	var elemData = [geneId, '<a class="'+pref+'contigs-click2" data-contigname="'+contigName+'">' + contigName + '</a>', geneStart, geneDir, geneLen, geneType, geneFunc];
-                    var elemTable = $('#'+pref+'elem-table');
+                	var elemData = [geneId, '<a class="'+tabId+'-click2" data-contigname="'+contigName+'">' + contigName + '</a>', geneStart, geneDir, geneLen, geneType, geneFunc];
+                    var elemTable = $('#'+tabId+'-table');
                     for (var i=0; i<elemData.length; i++) {
                     	if (elemLabels[i] === 'Function') {
                         	elemTable.append('<tr><td>' + elemLabels[i] + '</td> \
@@ -188,25 +210,41 @@
                     				<td>'+elemData[i]+'</td></tr>');
                     	}
                     }
-                    $('.'+pref+'contigs-click2').unbind("click");
-                    $('.'+pref+'contigs-click2').click(function() {
+                    $('.'+tabId+'-click2').click(function() {
                     	showContig($(this).data('contigname'));
                     });
-                    tabPane.kbaseTabs('showTab', tabNames[3]);
+                    tabPane.kbaseTabs('showTab', geneId);
             	}
             	
             	function showContig(contigName) {
-                	$('.'+pref+'elemstyle').remove();
+                	//$('.'+pref+'elemstyle').remove();
+            		var tabId = openTabGetId(contigName);
+            		if (tabId == null) {
+                        tabPane.kbaseTabs('showTab', contigName);
+            			return;
+            		}
                     var contig = contigMap[contigName];
-                	$('#'+pref+'elem').append('<table class="table table-striped table-bordered '+pref+'elemstyle" \
-                            style="margin-left: auto; margin-right: auto;" id="'+pref+'elem-table"/>');
+                	$('#'+tabId).append('<table class="table table-striped table-bordered" \
+                            style="margin-left: auto; margin-right: auto;" id="'+tabId+'-table"/>');
                 	var elemLabels = ['Contig name', 'Length', 'Gene count'];
                 	var elemData = [contigName, contig.length, contig.genes.length];
-                    var elemTable = $('#'+pref+'elem-table');
+                    var elemTable = $('#'+tabId+'-table');
                     for (var i=0; i<elemData.length; i++) {
                     	elemTable.append('<tr><td>'+elemLabels[i]+'</td><td>'+elemData[i]+'</td></tr>');
                     }
-                    tabPane.kbaseTabs('showTab', tabNames[3]);
+                    var cgb = new ContigBrowserPanel();
+                    cgb.data.options.contig = contig;
+                    cgb.data.options.svgWidth = self.options.width - 10;
+                    cgb.data.options.onClickFunction = function(svgElement, feature) {
+                    	showGene(feature.feature_id);
+                    };
+                    cgb.data.$elem = $('<div style="width:100%; height: 300px;"/>');
+                    cgb.data.$elem.show(function(){
+                    	cgb.data.update();
+                    });
+                    $('#'+tabId).append(cgb.data.$elem);
+                    cgb.data.init();
+                    tabPane.kbaseTabs('showTab', contigName);
             	}
             	
             	function logObject(obj) {
