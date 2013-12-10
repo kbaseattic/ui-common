@@ -85,7 +85,7 @@
          * I prefer to keep initialization and rendering code separate, but
          * that's just a style thing. You can do whatever the widget requires.
          */
-        render: function(options) {
+        render: function() {
             this.$elem.append($('<div>')
                               .append(this.options.stubString + '<br>')
                               .append('User: ' + this.user_id()));
