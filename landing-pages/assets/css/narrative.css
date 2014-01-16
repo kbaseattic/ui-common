@@ -99,3 +99,71 @@ ul#narr-sidenav-items li {
 	color: #555;
 }
 
+/* narrative site top navbar */
+.navbar-nav {
+	margin-left: 30px;
+}
+
+.navbar-nav li {
+	font-family: 'RobotoBlack', Arial, sans-serif;
+	font-size: 15px;
+	
+}
+
+.navbar-nav > li > a {
+	color: #5E8F43;
+	
+}
+
+.nav-pills {
+	margin-top: 5px;
+}
+
+.nav-pills > li > a {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+
+.navbar-nav .dropdown li a {
+	font-family: 'Roboto', Arial, sans-serif;
+	font-size: 14px;
+	
+}
+
+.nav a .caret, .nav a:hover .caret {
+	border-top-color: #000;
+	border-bottom-color: #000;
+}
+
+#header .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+	color: #ffffff;
+	background-color: #5E8F43;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+	background-color: #f2f2f2 !important; /* had to do this bc of landing.css */
+}
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+	color: #ffffff !important; /* kludge bc of something in landing.css */
+	background-color: #5E8F43 !important;
+}
+
+li.active > a .caret, li.active > a:hover .caret {
+	border-top-color: #fff;
+	border-bottom-color: #fff;
+}
+
+#narr-search-label {
+	font-family: 'RobotoBlack', Arial, sans-serif;
+	font-size: 15px;
+	background-color: #fff;
+	border: none;
+	color: #5E8F43;
+	position: relative;
+	top: 1px;
+}
+
+
+
