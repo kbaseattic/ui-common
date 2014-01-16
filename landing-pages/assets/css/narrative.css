@@ -111,7 +111,7 @@ ul#narr-sidenav-items li {
 }
 
 .navbar-nav > li > a {
-	color: #5E8F43;
+	color: #63B75C;
 	
 }
 
@@ -138,7 +138,7 @@ ul#narr-sidenav-items li {
 
 #header .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
 	color: #ffffff;
-	background-color: #5E8F43;
+	background-color: #78DB6F;
 }
 
 .nav > li > a:hover, .nav > li > a:focus {
@@ -147,7 +147,7 @@ ul#narr-sidenav-items li {
 
 .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
 	color: #ffffff !important; /* kludge bc of something in landing.css */
-	background-color: #5E8F43 !important;
+	background-color: #6DC865 !important;
 }
 
 li.active > a .caret, li.active > a:hover .caret {
@@ -160,9 +160,10 @@ li.active > a .caret, li.active > a:hover .caret {
 	font-size: 15px;
 	background-color: #fff;
 	border: none;
-	color: #5E8F43;
+	color: #63B75C;
+
 	position: relative;
-	top: 1px;
+	/*top: 1px;*/
 }
 
 
