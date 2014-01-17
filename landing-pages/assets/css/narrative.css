@@ -147,7 +147,8 @@ ul#narr-sidenav-items li {
 
 .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
 	color: #ffffff !important; /* kludge bc of something in landing.css */
-	background-color: #6DC865 !important;
+	/* background-color: #6DC865 !important; */
+	background-color: #6CC644 !important; 
 }
 
 li.active > a .caret, li.active > a:hover .caret {
