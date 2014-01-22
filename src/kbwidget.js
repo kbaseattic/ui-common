@@ -18,10 +18,14 @@
  *         init: function () {}
  *     });
  */
-(function ($) {
+
+define('kbwidget', ['jquery'], function ($) {
+
     var KBase;
     var ucfirst = function(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
+        if (string != undefined && string.length) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
     };
 
     var willChangeNoteForName = function(name) {
@@ -51,8 +55,8 @@
         }
         else {
             return {
-                    setter : 'text',
-                    getter : 'text'
+                    setter : 'html',
+                    getter : 'html'
                 }
         }
     };
@@ -136,6 +140,7 @@
                 var setter = $target.__attributes[attribute].setter;
 
                 $target[setter](newVal);
+                this.data('kbase_bindingValue', this[accessors.getter]());
             }
 
         }, $(elem))
@@ -153,8 +158,14 @@
 
     };
 
-    $.fn.kb_bind = function($target, attribute, transformers, accessors) {
+    $.fn.asD3 = function() {
+        if (this.data('d3rep') == undefined) {
+            this.data('d3rep', d3.select(this.get(0)));
+        }
+        return this.data('d3rep')
+    };
 
+    $.fn.kb_bind = function($target, attribute, transformers, accessors) {
         if (this.length > 1) {
             var methodArgs = arguments;
             $.each(
@@ -384,7 +395,8 @@
         if (parent) {
             var pWidget = widgetRegistry[parent];
             if (pWidget === undefined)
-                throw new Error("Parent widget is not registered");
+                throw new Error("Parent widget is not registered. Cannot find " + parent
+                    + " for " + name);
             subclass(Widget, pWidget);
         }
 
@@ -424,6 +436,7 @@
 
                     }
                     else {
+
                         if (info.type.match(/w/) && info.setter != undefined) {
                             Widget.prototype[info.setter] = KBase._functions.setter(info.name);
                         }
@@ -580,7 +593,7 @@
             return this;
         }
     }
-    
+
     /**
      * @method registry
      * The set of globally-registered widgets.
@@ -598,7 +611,7 @@
         }
         return registry;
     }
-    
+
     /**
      * @method resetRegistry
      * Unregisters all global widgets.
@@ -658,7 +671,8 @@
 
                 for (attribute in this.__attributes) {
                     if (this.options[attribute] != undefined) {
-                        this.setValueForKey(attribute, this.options[attribute]);
+                        var setter = this.__attributes[attribute].setter;
+                        this[setter](this.options[attribute]);
                     }
                 }
 
@@ -706,7 +720,6 @@
 
                         if (triggerValues.newValue != oldVal) {
                             var didChangeNote  = didChangeNoteForName(attribute);
-
                             this.trigger(didChangeNote, triggerValues);
                         }
                     }
@@ -738,7 +751,6 @@
             },
 
             _rewireIds : function($elem, $target) {
-
                 if ($target == undefined) {
                     $target = $elem;
                 }
@@ -752,6 +764,7 @@
                     $elem.find('[id]'),
                     function(idx) {
                         $target.data($(this).attr('id'), $(this));
+                        $(this).attr('data-id', $(this).attr('id'));
                         $(this).removeAttr('id');
                         }
                 );
@@ -858,4 +871,4 @@
 
         }
     );
-})(jQuery);
+});

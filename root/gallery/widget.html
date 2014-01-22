@@ -1,84 +1,286 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="App">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Widget Viewer</title>
-    
-    <link href="../css/bootstrap.css" rel="stylesheet">
-    <style type="text/css" media="screen">
-    body {
-        padding-top: 50px;
-    }
-    #main-container {
-        padding: 40px 15px;
-        text-align: center;
-    }
-    .dropdown-menu {
-        max-height: 500px;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-    </style>
-</head>
+<html>
 
-<body>
+    <head>
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-              <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                  Widget <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" ng-controller="WidgetListCtrl">
-                    <li ng-repeat="widget in widgets">
-                        <a href="Widget/{{widget}}">{{widget}}</a>
-                    </li>
-                </ul>
-              </li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </div>
+        <link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
 
-    <div class="container" id="main-container" ng-controller="MainCtrl">
-        <div class="widget" ng-view>
-            <h1>Widget</h1>
+        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+
+<style>
+.bar {
+
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+</style>
+
+
+        <script type = 'text/javascript'>
+            <!--
+
+                require(['kbpaths'], function() {
+                    require(['jquery', 'bootstrap',
+                        'kbaseLinechart',
+                        'kbaseBarchart',
+                        'kbaseScatterplot',
+                        'kbasePiechart',
+                        'kbaseHeatmap',
+                        'kbaseForcedNetwork',
+                        ], function($) {
+                        $(function() {
+                            $('#linechartWidget').kbaseLinechart(
+                                {
+                                    scaleAxes       : true,
+
+                                    xLabel      : 'Some useful experiment',
+                                    yLabel      : 'Meaningful data',
+
+                                    dataset : [
+                                        {
+                                            color : 'green',
+                                            label : 'Data set 1',
+                                            values : [{x : 0, y : -1}, {x : 1, y : -0.5}, {x : 2, y : 0}, {x : 3, y : 0.5}, {x : 4, y : 1}],
+                                        },
+                                        {
+                                            color : 'blue',
+                                            label : 'Data set 2',
+                                            values : [{x : 0, y : 0.0001}, {x : 1, y : 100}, {x : 2, y : 0.0001}, {x : 3, y : 500}, {x : 4, y : .0001}],
+                                        },
+                                        {
+                                            color : 'gray',
+                                            label : 'mean line',
+                                            dasharray : 5,
+                                            values : [{x : 0, y : -0.3333}, {x : 1, y : 33.5}, {x : 2, y : 0.6667}, {x : 3, y : 167.833}, {x : 4, y : 1.6667}],
+                                        },
+                                    ],
+
+                                }
+                            );
+
+                            $('#barchartWidget').kbaseBarchart(
+                                {
+                                    scaleAxes   : true,
+
+                                    xLabel      : 'Some useful experiment',
+                                    yLabel      : 'Meaningful data',
+
+                                    dataset : [
+                                        {
+                                            bar : 'Bar 1',
+                                            value : 20,
+                                            color : 'red'
+                                        },
+                                        {
+                                            bar : 'Bar 2',
+                                            value : 50,
+                                            color : 'green'
+                                        },
+                                        {
+                                            bar : 'Bar 3',
+                                            value : 10,
+                                            color : 'blue',
+                                            label : 'Some meaningful mouseover value'
+                                        },
+
+                                        {
+                                            bar : 'Bar 4',
+                                            value : [10,20,30,40,50],
+                                            color : 'purple',
+                                        },
+
+                                    ],
+
+                                }
+                            );
+
+                            $('#scatterplotWidget').kbaseScatterplot(
+                                {
+                                    scaleAxes   : true,
+
+                                    xLabel      : 'Some useful experiment',
+                                    yLabel      : 'Meaningful data',
+
+                                    dataset : [
+                                        {
+                                            x : 10,
+                                            y : 10,
+                                            weight : 10,
+                                            color  : 'blue',
+                                            label : 'This one looks like earth'
+                                        },
+                                        {
+                                            x : 20,
+                                            y : 12,
+                                            weight : 6,
+                                            color  : 'red',
+                                            label : 'This one looks like mars'
+                                        },
+                                        {
+                                            x : 40,
+                                            y : 8,
+                                            weight : 16,
+                                            color  : 'orange',
+                                            label : 'This one looks like jupiter'
+                                        },
+                                        {
+                                            x : 80,
+                                            y : 18,
+                                            weight : 13,
+                                            color  : 'green',
+                                            label : 'This one looks like Uranus'
+                                        },
+                                        {
+                                            x : 100,
+                                            y : 30,
+                                            weight : 5,
+                                            color  : 'black',
+                                        },
+
+                                    ],
+
+                                }
+                            );
+
+                            $('#piechartWidget').kbasePiechart(
+                                {
+                                    scaleAxes   : true,
+
+                                    xLabel      : 'Some useful experiment',
+
+                                    dataset : [
+                                        {
+                                            value : 0.25,
+                                            color : '#00FFFF',
+                                            label : 'one'
+                                        },
+                                        {
+                                            value : 0.25,
+                                            color : 'blue',
+                                            label : 'two'
+                                        },
+                                        {
+                                            value : 0.25,
+                                            color : 'green',
+                                            label : 'three'
+                                        },
+                                        {
+                                            value : 0.125,
+                                            color : 'yellow',
+                                            label : 'four'
+                                        },
+                                        {
+                                            value : 0.125,
+                                            color : '#FF00FF',
+                                            label : 'five'
+                                        },
+                                    ],
+
+                                }
+                            );
+
+                            var heatmap = [];
+                            var numCells = 20;
+                            var colors = ['red', 'green', 'blue', 'purple', 'cyan'];
+                            for (var idx = 0; idx < numCells; idx++) {
+                                for (var jdx = 0; jdx < numCells; jdx++) {
+                                    heatmap.push(
+                                        {
+                                            x       : 'Frobnoz ' + idx,
+                                            y       : 'Wingding ' + jdx,
+                                            value   : Math.random(),
+                                            color   : d3.shuffle(colors)[0]
+                                        }
+                                    )
+                                }
+                            } //*/
+
+                            $('#heatmapWidget').kbaseHeatmap(
+                                {
+                                    scaleAxes   : true,
+                                    yGutter     : 80,
+                                    xPadding    : 80,
+
+                                    xLabel      : 'Frobnozes',
+                                    yLabel      : 'Wingdings',
+
+                                    dataset : heatmap,
+
+                                }
+                            );
+
+                            $('#forcedNetwork').kbaseForcedNetwork(
+                                {
+                                    scaleAxes   : true,
+
+                                    xLabel      : 'The Solar System',
+
+                                    dataset : {
+                                        nodes : [
+                                            {name : 'sun', radius : 42, fixed : true, x : 150, y : 150, color : 'yellow'},
+                                            {name : 'mercury', radius : 4, color : 'red'},
+                                            {name : 'venus', radius : 8, color : 'red'},
+                                            {name : 'earth', radius : 9, color : 'blue'},
+                                            {name : 'moon', radius : 3, color : 'gray'},
+                                            {name : 'mars', radius : 5, color : 'red'},
+                                            {name : 'jupiter', radius : 20, color : 'orange'},
+                                            {name : 'saturn', radius : 18, color : 'yellow',},
+                                            {name : 'uranus', radius : 14, color : 'green'},
+                                            {name : 'neptune', radius : 15, color : 'blue'},
+
+                                        ],
+                                        edges : [
+                                            {source : 0, target : 1},
+                                            {source : 1, target : 2},
+                                            {source : 2, target : 3},
+                                            {source : 3, target : 4, linkDistance : 20, charge : 0},
+                                            {source : 3, target : 5},
+                                            {source : 5, target : 6},
+                                            {source : 6, target : 7},
+                                            {source : 7, target : 8},
+                                            {source : 8, target : 9},
+                                        ]
+                                    }
+
+                                }
+                            );
+
+                        });
+                    });
+                });
+
+
+            //-->
+        </script>
+    </head>
+
+    <body>
+
+        <div>
+            Simple demonstrations of visualization widgets. Mouse over the charts, they're all interactive (except the pie chart).<br>
+            The force directed graph has draggable nodes, and they can be selected by drawing on the box.
         </div>
 
-    </div><!-- /.container -->
+        <div id = 'linechartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+        <div id = 'barchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+        <div id = 'scatterplotWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+        <div id = 'piechartWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+        <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+        <div id = 'forcedNetwork' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
 
+    </body>
 
-    <script src="../js/jquery.js"></script>
-    <script src="../js/jquery-ui.js"></script>
-    <script src="../js/bootstrap.js"></script>
-    <script src="../js/kbase.js"></script>
-    <script src="../js/angular.js"></script>
-    <script type="text/javascript">
-    angular.module("App", ["ngRoute"])
-        .config(function ($routeProvider, $locationProvider) {
-            console.log("configing")
-            $routeProvider
-                .when("/Widget/:id", {
-                    template: "<div></div>",
-                    controller: WidgetDetailCtrl
-                });
-            // $locationProvider.html5Mode(true);
-        });
-    function WidgetListCtrl($scope) {
-        $scope.widgets = Object.keys($.KBWidget.registry());
-    }
-    function WidgetDetailCtrl($scope, $params) {
-        console.log("Params", $params);
-    }
-    function MainCtrl($scope, $route, $routeParams, $location) {
-        $scope.$route = $route;
-        $scope.$location = $location;
-        $scope.$routeParams = $routeParams;
-    }
-    </script>
-</body>
 </html>
