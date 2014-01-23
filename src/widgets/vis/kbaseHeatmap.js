@@ -29,6 +29,7 @@ define('kbaseHeatmap',
             xPadding    : 50,
             xGutter     : 5,
             overColor   : '#999900',
+            cellColor   : 'red',
 
         },
 
@@ -253,7 +254,7 @@ define('kbaseHeatmap',
 
                         var colorScale = d3.scale.linear()
                             .domain([0,1])
-                            .range(['white', d.color]);
+                            .range(['white', d.color || $hm.options.cellColor]);
 
                         return colorScale(d.value);
 
