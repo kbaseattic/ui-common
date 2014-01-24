@@ -6,7 +6,6 @@ define('kbaseHeatmap',
     [
         'jquery',
         'd3',
-        'bootstrap',
         'kbaseVisWidget',
         'RGBColor',
         'geometry_rectangle',

@@ -35,6 +35,8 @@ define('kbaseVisWidget',
             scaleXAxis : false,
             scaleYAxis : false,
             scaleAxes  : false,
+
+            transitionTime : 100,
         },
 
         shouldScaleAxis : function (axis) {
@@ -60,10 +62,11 @@ define('kbaseVisWidget',
             'width',
             'height',
             {name : 'dataset', setter : 'setDataset'},
-            'xLabel',
-            'yLabel',
-            'xScale',
-            'yScale',
+            {name : 'input',   setter : 'setInput'},
+            {name : 'xLabel', setter : 'setXLabel'},
+            {name : 'yLabel', setter : 'setYLabel'},
+            {name : 'xScale', setter : 'setXScale'},
+            {name : 'yScale', setter : 'setYScale'},
             'xScaleType',
             'yScaleType',
             'yHeightScaleType',
@@ -71,23 +74,38 @@ define('kbaseVisWidget',
             'yIDMap',
         ],
 
+        input : function() {
+            return this.dataset();
+        },
+
+        setInput : function(newInput) {
+
+            if ($.isPlainObject(newInput) && newInput.dataset != undefined) {
+                return this.setValuesForKeys(newInput);
+            }
+            else {
+                return this.setDataset(newInput);
+            }
+
+        },
+
         setXLabel : function (newXLabel) {
-            this.xLabel(newXLabel);
+            this.setValueForKey('xLabel',newXLabel);
             this.render('xLabel');
         },
 
         setYLabel : function (newYLabel) {
-            this.yLabel(newYLabel);
+            this.setValueForKey('yLabel',newYLabel);
             this.render('yLabel');
         },
 
         setXScale : function (newXScale) {
-            this.xScale(newXScale);
+            this.setValueForKey('xScale', newXScale);
             this.render('xAxis');
         },
 
         setYScale : function (newYScale) {
-            this.yScale(newYScale);
+            this.setValueForKey('yScale', newYScale);
             this.render('yAxis');
         },
 
@@ -113,7 +131,7 @@ define('kbaseVisWidget',
                 xScale = d3.scale[scaleType]();
 
                 this.setXScaleRange([0, this.chartBounds().size.width], xScale);
-                this.xScale(xScale);
+                this.setValueForKey('xScale', xScale);
             }
 
             xScale.domain(domain);
@@ -146,7 +164,7 @@ define('kbaseVisWidget',
                 yScale = d3.scale[scaleType]();
 
                 this.setYScaleRange([0,this.chartBounds().size.height], yScale);
-                this.yScale(yScale);
+                this.setValueForKey('yScale', yScale);
             }
 
             yScale.domain(domain);
@@ -181,8 +199,12 @@ define('kbaseVisWidget',
 
             this.callAfterInit(
                 $.proxy(function() {
-                    this.setXScaleRange([0, this.chartBounds().size.width], this.xScale());
-                    this.setYScaleRange([0, this.chartBounds().size.height], this.yScale());
+                    if (this.xScale()) {
+                        this.setXScaleRange([0, this.chartBounds().size.width], this.xScale());
+                    }
+                    if (this.yScale()) {
+                        this.setYScaleRange([0, this.chartBounds().size.height], this.yScale());
+                    }
                     this.render();
                 }, this)
             );
@@ -264,6 +286,7 @@ define('kbaseVisWidget',
         },
 
         setDataset : function(newDataset) {
+
             this.setValueForKey('dataset', newDataset);
 
             if (this.shouldScaleAxis('x')) {
@@ -418,6 +441,12 @@ define('kbaseVisWidget',
 */
 
         appendUI : function ($elem) {
+
+            $elem.append(
+                $.jqElem('style')
+                    .html('.axis path, .axis line { fill : none; stroke : black; shape-rendering : crispEdges;} .axis text \
+                        {font-family : sans-serif; font-size : 11px}')
+            );
 
             var D3svg = d3.select($elem.get(0))
                 .append('svg')
@@ -575,11 +604,12 @@ define('kbaseVisWidget',
         },
 
         showToolTip : function(args) {
+
             this.data('tooltip-paragraph')
-                .html(args.label)
+                .html(args.label);
             this.data('tooltip')
-                .css("left", (args.event.pageX+10) + "px")
-                .css("top", (args.event.pageY-10) + "px")
+                .css("left", (args.coords[0]+10) + "px")
+                .css("top", (args.coords[1]-10) + "px")
                 .show();
         },
 
