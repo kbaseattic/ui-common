@@ -70,40 +70,12 @@ define('kbaseBarchart',
 
         renderChart : function() {
 
+            if (this.dataset() == undefined) {
+                return;
+            }
+
             var bounds = this.chartBounds();
             var $bar = this;
-
-            var oldFunkyTown = function() {
-
-                this
-                    .attr('x',
-                        function (d) {
-                            var xId = d.bar;
-                            if ($bar.options.useIDMapping) {
-                                xId = $bar.xIDMap()[xId];
-                            }
-
-                            return $bar.xScale()(xId)
-                        }
-                    )
-                    .attr('y',
-                        function (d) {
-                            return $bar.yScale()(Math.max(0,d.value));
-                        }
-                    )
-                    .attr('width', $bar.xScale().rangeBand())
-                    .attr('height',
-                        function (d) {
-                            return Math.abs($bar.yScale()(0) - $bar.yScale()(d.value));
-                        }
-                    )
-                    .attr('fill',
-                        function(d) {
-                            return d.color;
-                        }
-                    )
-                return this;
-            };
 
             var funkyTown = function(barScale, d, i) {
                 this
@@ -163,7 +135,7 @@ define('kbaseBarchart',
                             $bar.showToolTip(
                                 {
                                     label : label,
-                                    event : d3.event,
+                                    coords : d3.mouse(this),
                                 }
                             );
                         }

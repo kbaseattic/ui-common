@@ -176,6 +176,10 @@ define('kbaseForcedNetwork',
 
         renderChart : function() {
 
+            if (this.dataset() == undefined) {
+                return;
+            }
+
             var bounds = this.chartBounds();
             var $force  = this;
 
@@ -244,7 +248,7 @@ define('kbaseForcedNetwork',
                         $force.showToolTip(
                             {
                                 label : d.label || 'Node: ' + d.name,
-                                event: d3.event
+                                coords : d3.mouse(this),
                             }
                         );
                         d.highlighted = true;

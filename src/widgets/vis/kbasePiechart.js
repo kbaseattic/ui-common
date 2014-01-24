@@ -29,6 +29,10 @@ define('kbasePiechart',
 
         renderChart : function() {
 
+            if (this.dataset() == undefined) {
+                return;
+            }
+
             var bounds = this.chartBounds();
             var $pie  = this;
 

@@ -117,7 +117,7 @@ define('kbaseLinechart',
                         $line.showToolTip(
                             {
                                 label : d.label,
-                                event: d3.event
+                                coords : d3.mouse(this),
                             }
                         );
                     }
@@ -151,7 +151,7 @@ define('kbaseLinechart',
                     .data(this.dataset())
                         .call(mouseAction)
                         .transition()
-                        .duration(2000)
+                        .duration(this.options.transitionTime)
                         .call(funkyTown)
                 ;
 

@@ -63,6 +63,10 @@ define('kbaseScatterplot',
 
         renderChart : function() {
 
+            if (this.dataset() == undefined) {
+                return;
+            }
+
             var bounds = this.chartBounds();
             var $scatter = this;
 
@@ -109,7 +113,7 @@ define('kbaseScatterplot',
                         $scatter.showToolTip(
                             {
                                 label : label,
-                                event : d3.event,
+                                coords : d3.mouse(this),
                             }
                         );
                     }

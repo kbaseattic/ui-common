@@ -61,7 +61,7 @@ define('kbwidget', ['jquery'], function ($) {
         }
     };
 
-    makeBindingCallback = function(elem, $target, attribute, transformers, accessors) {
+    var makeBindingCallback = function(elem, $target, attribute, transformers, accessors) {
 
         return $.proxy(function (e, vals) {
             e.preventDefault();
@@ -83,7 +83,7 @@ define('kbwidget', ['jquery'], function ($) {
         }, $(elem))
     };
 
-    makeBindingBlurCallback = function(elem, $target, attribute, transformers, accessors) {
+    var makeBindingBlurCallback = function(elem, $target, attribute, transformers, accessors) {
 
         return $.proxy(function (e, vals) {
 
@@ -146,7 +146,7 @@ define('kbwidget', ['jquery'], function ($) {
         }, $(elem))
     };
 
-    makeBindingFocusCallback = function(elem, transformers, accessors) {
+    var makeBindingFocusCallback = function(elem, transformers, accessors) {
 
         return $.proxy( function (e) {
             e.preventDefault();
@@ -291,7 +291,7 @@ define('kbwidget', ['jquery'], function ($) {
 
 
     var widgetRegistry = {};
-    if (KBase === undefined) {
+    if (window.KBase === undefined) {
         KBase = window.KBase = {
             _functions : {
 
@@ -726,6 +726,22 @@ define('kbwidget', ['jquery'], function ($) {
 
                     return this.valueForKey(attribute);
                 },
+
+            setValuesForKeys : function (obj) {
+
+                var objCopy = $.extend({}, obj);
+
+                for (attribute in this.__attributes) {
+                    if (objCopy[attribute] != undefined) {
+                        var setter = this.__attributes[attribute].setter;
+                        this[setter](objCopy[attribute]);
+                        delete objCopy[attribute];
+                    }
+                }
+
+                this.options = $.extend(this.options, objCopy);
+
+            },
 
             /**
              * Sets data.

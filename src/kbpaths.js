@@ -22,6 +22,7 @@ define('kbpaths',[], function (paths) {
 
         //iris widgets
         iris              : 'iris/iris',
+        vis              : 'vis/vis',
         kbaseIrisCommands : 'iris/kbaseIrisCommands',
         kbaseIrisContainerWidget : 'iris/kbaseIrisContainerWidget',
         kbaseIrisEchoWidget : 'iris/kbaseIrisEchoWidget',
