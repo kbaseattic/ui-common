@@ -56,10 +56,20 @@ define('kbasePlantsNetworkNarrative',
                 });
 */
 
+                if (this.input()) {
+                    this.setInput(this.input());
+                }
+
                 return this;
             },
 
             setInput : function(cds_list) {
+
+                this.setValueForKey('input', cds_list);
+
+                if (this.networkClient() == undefined) {
+                    return;
+                }
 
                 var colorCats = d3.scale.category20();
 
