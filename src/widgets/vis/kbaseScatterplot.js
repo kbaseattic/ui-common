@@ -113,7 +113,6 @@ define('kbaseScatterplot',
                         $scatter.showToolTip(
                             {
                                 label : label,
-                                coords : d3.mouse(this),
                             }
                         );
                     }

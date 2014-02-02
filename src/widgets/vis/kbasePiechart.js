@@ -116,6 +116,11 @@ define('kbasePiechart',
                     .call(funkyTown)
             ;
 
+            slices
+                .data(pieData)
+                .exit()
+                    .remove();
+
             var labels = pie.selectAll('.label');
 
             labels
@@ -133,6 +138,12 @@ define('kbasePiechart',
                     .duration(500)
                     .call(labelTown)
             ;
+
+            labels
+                .data(pieData)
+                .exit()
+                    .remove();
+
 
         },
 

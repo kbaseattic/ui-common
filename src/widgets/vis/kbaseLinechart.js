@@ -117,7 +117,6 @@ define('kbaseLinechart',
                         $line.showToolTip(
                             {
                                 label : d.label,
-                                coords : d3.mouse(this),
                             }
                         );
                     }
@@ -154,6 +153,11 @@ define('kbaseLinechart',
                         .duration(this.options.transitionTime)
                         .call(funkyTown)
                 ;
+
+                chart
+                    .data(this.dataset())
+                    .exit()
+                        .remove();
 
         },
 

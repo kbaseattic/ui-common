@@ -37,6 +37,7 @@ define('kbaseVisWidget',
             scaleAxes  : false,
 
             transitionTime : 100,
+            ulIcon         : 'img/labs_icon.png',
         },
 
         shouldScaleAxis : function (axis) {
@@ -197,14 +198,15 @@ define('kbaseVisWidget',
 
             this.appendUI(this.$elem);
 
+            if (this.xScale()) {
+                this.setXScaleRange([0, this.chartBounds().size.width], this.xScale());
+            }
+            if (this.yScale()) {
+                this.setYScaleRange([0, this.chartBounds().size.height], this.yScale());
+            }
+
             this.callAfterInit(
                 $.proxy(function() {
-                    if (this.xScale()) {
-                        this.setXScaleRange([0, this.chartBounds().size.width], this.xScale());
-                    }
-                    if (this.yScale()) {
-                        this.setYScaleRange([0, this.chartBounds().size.height], this.yScale());
-                    }
                     this.render();
                 }, this)
             );
@@ -270,19 +272,21 @@ define('kbaseVisWidget',
                 return;
             }
 
-            var ulDataset = ['img/labs_icon.png'];
+            var ulDataset = [this.options.ulIcon];
 
-            var ulLabel = this.data('D3svg').select('.UL').selectAll('.ULLabel');
+            if (this.options.ulIcon) {
+                var ulLabel = this.data('D3svg').select('.UL').selectAll('.ULLabel');
 
-            ulLabel
-                .data(ulDataset)
-                .enter()
-                    .append('image')
-                        .attr('x', inset / 2)
-                        .attr('y', inset / 2)
-                        .attr('width', imgSize.width)
-                        .attr('height', imgSize.height)
-                        .attr('xlink:href', function(d) { return d})
+                ulLabel
+                    .data(ulDataset)
+                    .enter()
+                        .append('image')
+                            .attr('x', inset / 2)
+                            .attr('y', inset / 2)
+                            .attr('width', imgSize.width)
+                            .attr('height', imgSize.height)
+                            .attr('xlink:href', function(d) { return d})
+            }
         },
 
         setDataset : function(newDataset) {
@@ -360,7 +364,17 @@ define('kbaseVisWidget',
 
         },
 
+        xTickValues : function() {
+            return;
+        },
+
+        xTickLabel : function(val) {
+            return val;
+        },
+
         renderXAxis : function() {
+
+            var $self = this;
 
             if (this.xScale() == undefined || this.xScale().domain == undefined) {
                 return;
@@ -370,6 +384,16 @@ define('kbaseVisWidget',
                 d3.svg.axis()
                     .scale(this.xScale())
                     .orient('bottom');
+
+            var ticks = this.xTickValues();
+
+            if (ticks != undefined) {
+                xAxis
+                    .tickValues(ticks)
+                    .tickSubdivide(0)
+                    .tickFormat( function(d) { return $self.xTickLabel.call($self, d) } )
+                ;
+            }
 
             var gxAxis = this.data('D3svg').select('.yPadding').select('.xAxis');
 
@@ -454,40 +478,36 @@ define('kbaseVisWidget',
                 .attr('height', this.height())
                 .attr('style', this.options.debug ? 'border : 1px solid blue' : undefined);
 
-            $elem.append(
-                $.jqElem('div')
-                    .attr('id', 'tooltip')
-                    .css({
-                            position                : 'absolute',
-                            'max-width'             : '300px',
-                            height                  : 'auto',
-                            padding                 : '10px',
-                            'background-color'      : 'white',
-                            '-webkit-border-radius' : '10px',
-                            '-moz-border-radius'    : '10px',
-                            'border-radius'         : '10px',
-                            '-webkit-box-shadow'    : '4px 4px 10px rgba(0, 0, 0, 0.4)',
-                            '-moz-box-shadow'       : '4px 4px 10px rgba(0, 0, 0, 0.4)',
-                            'box-shadow'            : '4px 4px 10px rgba(0, 0, 0, 0.4)',
-                            'pointer-events'        : 'none',
-                            'display'               : 'none',
-                        })
-                    .append(
-                        $.jqElem('p')
-                        .attr('id', 'tooltip-paragraph')
-                        .css({
-                            margin: '0',
-                            'font-family'   : 'sans-serif',
-                            'font-size'     : '12px',
-                            'line-height'   : '20px',
-                        })
-                        .append("This is a tooltip, yo!")
-                    )
-
-            );
+            var tooltip = d3.select('body').selectAll('.visToolTip')
+                .data([0])
+                .enter()
+                    .append('div')
+                        .attr('class', 'visToolTip')
+                        .style(
+                            {
+                                position                : 'absolute',
+                                'max-width'             : '300px',
+                                height                  : 'auto',
+                                padding                 : '10px',
+                                'background-color'      : 'white',
+                                '-webkit-border-radius' : '10px',
+                                '-moz-border-radius'    : '10px',
+                                'border-radius'         : '10px',
+                                '-webkit-box-shadow'    : '4px 4px 10px rgba(0, 0, 0, 0.4)',
+                                '-moz-box-shadow'       : '4px 4px 10px rgba(0, 0, 0, 0.4)',
+                                'box-shadow'            : '4px 4px 10px rgba(0, 0, 0, 0.4)',
+                                'pointer-events'        : 'none',
+                                'display'               : 'none',
+                                'font-family'   : 'sans-serif',
+                                'font-size'     : '12px',
+                                'line-height'   : '20px',
+                                'display'       : 'none',
+                            }
+                        )
+            ;
 
             this.data('D3svg', D3svg);
-            this._rewireIds($elem, this);
+
 
             var regions = [
                 'chart', //add the chart first, because we want it to be at the lowest level.
@@ -605,16 +625,19 @@ define('kbaseVisWidget',
 
         showToolTip : function(args) {
 
-            this.data('tooltip-paragraph')
-                .html(args.label);
-            this.data('tooltip')
-                .css("left", (args.coords[0]+10) + "px")
-                .css("top", (args.coords[1]-10) + "px")
-                .show();
+            if (args.event == undefined) {
+                args.event = d3.event;
+            }
+
+            d3.selectAll('.visToolTip')
+                .style('display','block')
+                .html(args.label)
+                .style("left", (args.event.pageX+10) + "px")
+                .style("top", (args.event.pageY-10) + "px");
         },
 
         hideToolTip : function(args) {
-            this.data('tooltip').hide();
+            d3.selectAll('.visToolTip').style('display', 'none');
         },
 
 

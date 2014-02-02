@@ -309,7 +309,6 @@ define('kbaseHeatmap',
                         $hm.showToolTip(
                             {
                                 label : d.label || 'Value for: ' + xId + ' - ' + yId + '<br>is ' + d.value,
-                                coords : d3.mouse(this),
                             }
                         );
 
@@ -360,6 +359,11 @@ define('kbaseHeatmap',
                     .duration(500)
                         .call(funkyTown)
             ;
+
+            chart
+                .data(this.dataset())
+                .exit()
+                    .remove();
 
         },
 

@@ -1,6 +1,5 @@
 define('kbpaths',[], function (paths) {
  requirejs.config({
-    //baseUrl: 'jquery/FUCK/',
     baseUrl : '../../src/widgets',
     urlArgs: "bust=" + (new Date()).getTime(),
     paths : {
@@ -17,12 +16,16 @@ define('kbpaths',[], function (paths) {
      kbaseBarchart : 'vis/kbaseBarchart',
      kbaseScatterplot : 'vis/kbaseScatterplot',
      kbaseLinechart : 'vis/kbaseLinechart',
+     kbaseLineSerieschart : 'vis/kbaseLineSerieschart',
      kbasePiechart : 'vis/kbasePiechart',
      kbaseForcedNetwork : 'vis/kbaseForcedNetwork',
 
+     kbasePlantsNetworkTable : 'vis/plants/kbasePlantsNetworkTable',
+     kbasePlantsNetworkNarrative : 'vis/plants/kbasePlantsNetworkNarrative',
+
         //iris widgets
         iris              : 'iris/iris',
-        vis              : 'vis/vis',
+        vis               : 'vis/vis',
         kbaseIrisCommands : 'iris/kbaseIrisCommands',
         kbaseIrisContainerWidget : 'iris/kbaseIrisContainerWidget',
         kbaseIrisEchoWidget : 'iris/kbaseIrisEchoWidget',
@@ -42,6 +45,8 @@ define('kbpaths',[], function (paths) {
         geometry_point : '../js/geometry/point',
         geometry_rectangle : '../js/geometry/rectangle',
         geometry_size : '../js/geometry/size',
+
+        KbaseNetworkServiceClient : '../js/KbaseNetworkServiceClient',
     },
     shim: {
         bootstrap:    { deps: ["jquery"] },

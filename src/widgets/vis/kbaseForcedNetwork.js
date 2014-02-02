@@ -5,6 +5,7 @@
 define('kbaseForcedNetwork',
     [
         'jquery',
+        'kbaseSearchControls',
         'd3',
         'kbaseVisWidget',
         'RGBColor',
@@ -27,10 +28,32 @@ define('kbaseForcedNetwork',
             nodeStrokeColor : 'black',
             nodeStrokeWeight : 1,
             nodeRadius : 10,
-            highlightColor : 'yellow',
-            highlightNodeStrokeWeight : 3,
+
+            filteredNodeColor : '#BFBFBF',
+
+            nodeHighlightColor : 'yellow',
+            nodeHighlightStrokeWeight : 3,
+            edgeHighlightColor : 'yellow',
+            edgeHighlightStrokeWeight : 3,
+
+            relatedNodeHighlightColor : 'orange',
+            relatedNodeHighlightStrokeWeight : 2,
+            relatedEdgeHighlightColor : 'orange',
+            relatedEdgeHighlightStrokeWeight : 2,
+
+
             linkDistance : 100,
-            charge : -100,
+            charge : -10,
+
+            xGutter     : 0,
+            xPadding    : 0,
+            yPadding    : 0,
+
+            maxCurveWeight : 100,
+
+            searchBox   : true,
+            filter : false,
+
         },
 
         _accessors : [
@@ -130,10 +153,10 @@ define('kbaseForcedNetwork',
 
                                     if (nodeRect.intersects(boxRect)) {
                                         selectedNodes.push(node);
-                                        node.highlighted = true;
+                                        node.highlighted = 2;
                                     }
                                     else {
-                                        node.highlighted = false;
+                                        node.highlighted = 0;
                                     }
 
                                 }
@@ -180,10 +203,24 @@ define('kbaseForcedNetwork',
                 return;
             }
 
+            if (this.options.filter) {
+                this.$elem.kbaseSearchControls(
+                    {
+                        context : this,
+                        searchCallback : function(e, value, $force) {
+                            $force.options.filterVal = new RegExp(value, 'i');
+                            $force.restart()();
+                        }
+                    }
+                );
+                this.$elem.data('searchControls').addClass('col-md-6');
+            }
+
             var bounds = this.chartBounds();
             var $force  = this;
 
             var nodes = this.data('D3svg').select('.chart').selectAll('.node');
+            var tags  = this.data('D3svg').select('.chart').selectAll('.tag');
             var links = this.data('D3svg').select('.chart').selectAll('.edge');
 
             var forceLayout = this.forceLayout();
@@ -191,13 +228,60 @@ define('kbaseForcedNetwork',
 
                 var tick = function() {
 
-                    links.attr("x1", function(d) { return d.source.x; })
+/*                    links.attr("x1", function(d) { return d.source.x; })
                          .attr("y1", function(d) { return d.source.y; })
                          .attr("x2", function(d) { return d.target.x; })
                          .attr("y2", function(d) { return d.target.y; });
+*/
+
+                      links.attr("d", function(d) {
+
+                            if (d.curveStrength) {
+
+                                var xDelta = d.target.x - d.source.x;
+                                var yDelta = d.target.y - d.source.y;
+
+                                var xCurveScale = d3.scale.linear()
+                                    .domain([-$force.options.maxCurveWeight,$force.options.maxCurveWeight])
+                                    .range([0,xDelta]);
+
+                                var yCurveScale = d3.scale.linear()
+                                    .domain([-$force.options.maxCurveWeight,$force.options.maxCurveWeight])
+                                    .range([0,yDelta]);
+
+                                var ctrlX = d.source.x + xCurveScale(d.curveStrength);
+                                var ctrlY = d.target.y - yCurveScale(d.curveStrength);
+
+                                var curve =
+                                      " M" + d.source.x  + ',' + d.source.y
+                                    + " Q" + ctrlX       + ',' + ctrlY
+                                    + "  " + d.target.x  + ',' + d.target.y;
+
+                                return curve;
+                            }
+                            else {
+                                return "M" + d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y;
+                            }
+                      });
 
                     nodes.attr("cx", function(d) { return d.x; })
                          .attr("cy", function(d) { return d.y; });
+
+                     tags.attr("x", function(d) { return d.x + (d.tagOffsetX || 0); })
+                         .attr("y", function(d) { return d.y + (d.tagOffsetY || 0); });
+
+                     tags.attr(
+                        'fill-opacity',
+                            function(d) {
+                                if ($force.options.filterVal == undefined || d.tag.match($force.options.filterVal)) {
+                                    return '100%';
+                                }
+                                else {
+                                    return '25%';
+                                }
+                            }
+                        )
+                    ;
 
                 };
 
@@ -219,6 +303,12 @@ define('kbaseForcedNetwork',
 
                 this.forceLayout(forceLayout);
             }
+            else {
+                this.forceLayout().nodes(this.dataset().nodes);
+                this.forceLayout().links(this.dataset().edges);
+                $force.restart()();
+                return;
+            }
 
 
             var start = function() {
@@ -227,12 +317,83 @@ define('kbaseForcedNetwork',
                     //function(d) { return d.source.name + "-" + d.target.name }
                 );
 
+                var mouseEdgeAction = function() {
+                    this.on('mouseover', function(d) {
+                        $force.showToolTip(
+                            {
+                                label : d.label || d.source.name + ' to ' + d.target.name,
+                            }
+                        );
+                        d.source.highlighted = 2;
+                        d.target.highlighted = 2;
+                        d.highlighted = 2;
+                        start();
+                    })
+                    .on('mouseout', function(d) {
+                        $force.hideToolTip();
+                        d.source.highlighted = 0;
+                        d.target.highlighted = 0;
+                        d.highlighted = 0;
+                        start();
+                    })
+                    .call(forceLayout.drag);
+                    return this;
+                };
+
+                var edgeTown = function() {
+                    this.attr("class", "edge")
+                    .attr('stroke', function(d) {
+                        if (d.highlighted == 2) {
+                            return $force.options.edgeHighlightColor;
+                        }
+                        else if (d.highlighted == 1) {
+                            return $force.options.relatedEdgeHighlightColor;
+                        }
+                        else {
+                            return d.color || $force.options.lineColor
+                        }
+                    })
+                    .attr('stroke-width', function(d) {
+                        if (d.highlighted == 2) {
+                            return $force.options.edgeHighlightStrokeWeight;
+                        }
+                        else if (d.highlighted == 1) {
+                            return $force.options.relatedEdgeHighlightStrokeWeight;
+                        }
+                        else {
+                            return d.weight || $force.options.lineWeight
+                        }
+                    })
+                    .attr('fill', 'none')
+                    .attr(
+                        'stroke-opacity',
+                        function(d) {
+
+                            if ($force.options.filterVal != undefined) {
+                                if (! d.source.tag.match($force.options.filterVal) || ! d.target.tag.match($force.options.filterVal)) {
+                                    return '25%';
+                                }
+                            }
+
+                            return '100%';
+                        }
+                    )
+                    ;
+                    return this;
+                };
+
                 links
                     .enter()
-                    .insert("line", ".node")
-                    .attr("class", "edge")
-                    .attr('stroke', function(d) { return d.color || $force.options.lineColor })
-                    .attr('stroke-width', function(d) { return d.weight || $force.options.lineWeight });
+                    //.insert("line", ".node")
+                    .insert('path', '.node')
+                    .call(mouseEdgeAction)
+                    .call(edgeTown);
+
+                links
+                    .call(mouseEdgeAction)
+                    .transition()
+                    .duration(100)
+                        .call(edgeTown);
 
                 links
                     .exit()
@@ -248,17 +409,77 @@ define('kbaseForcedNetwork',
                         $force.showToolTip(
                             {
                                 label : d.label || 'Node: ' + d.name,
-                                coords : d3.mouse(this),
                             }
                         );
-                        d.highlighted = true;
+
+                        $force.forceLayout().links().forEach(
+                            function(link, idx) {
+                                if (link.source == d) {
+                                    link.target.highlighted = 1;
+                                    link.highlighted = 1;
+                                }
+                                if (link.target == d) {
+                                    link.source.highlighted = 1;
+                                    link.highlighted = 1;
+                                }
+                            }
+                        );
+
+                        d.highlighted = 2;
+
                         start();
                     })
                     .on('mouseout', function(d) {
                         $force.hideToolTip();
-                        d.highlighted = false;
+                        d.highlighted = 0;
+
+                        $force.forceLayout().links().forEach(
+                            function(link, idx) {
+                                link.highlighted = 0;
+                                link.source.highlighted = 0;
+                                link.target.highlighted = 0;
+                            }
+                        );
+
                         start();
                     })
+                    .on('mousedown', function(d) { d.fixed = false } )
+                    .on('dblclick', function(d) { d.fixed = false } )
+                    .on('mouseup',
+                        function(d) {
+                            if (d.x < bounds.origin.x || d.y < bounds.origin.y
+                                || d.x > bounds.origin.x + bounds.size.width || d.y > bounds.origin.y + bounds.size.height) {
+                                    d.fixed = false;
+                            }
+                            else {
+                                d.fixed = true;
+                            }
+                        }
+                    )
+                    .attr(
+                        'fill-opacity',
+                        function(d) {
+                            if ($force.options.filteredNodeColor != undefined
+                                || $force.options.filterVal == undefined
+                                || d.tag.match($force.options.filterVal)) {
+                                return '100%';
+                            }
+                            else {
+                                return '25%';
+                            }
+                        }
+                    )
+                    .attr(
+                        'stroke-opacity',
+                        function(d) {
+                            if ($force.options.filterVal == undefined || d.tag.match($force.options.filterVal)) {
+                                return '100%';
+                            }
+                            else {
+                                return '25%';
+                            }
+                        }
+                    )
                     .call(forceLayout.drag);
                     return this;
                 };
@@ -266,20 +487,35 @@ define('kbaseForcedNetwork',
                 var nodeTown = function() {
                     this
                         .attr('r', function(d) { return d.radius || $force.options.nodeRadius })
-                        .attr('fill', function(d) {
-                            return d.color || $force.options.nodeColor
+                        .attr('fill', function (d) {
+                            if (
+                                $force.options.filteredNodeColor != undefined
+                                && $force.options.filterVal != undefined
+                                && ! d.tag.match($force.options.filterVal)
+                            ) {
+                                return $force.options.filteredNodeColor;
+                            }
+                            else {
+                                return d.color || $force.options.nodeColor;
+                            }
                         })
                         .attr('stroke', function(d) {
-                            if (d.highlighted) {
-                                return $force.options.highlightColor;
+                            if (d.highlighted == 2) {
+                                return $force.options.nodeHighlightColor;
+                            }
+                            else if (d.highlighted == 1) {
+                                return $force.options.relatedNodeHighlightColor;
                             }
                             else {
                                 return d.stroke || $force.options.nodeStrokeColor
                             }
                         })
                         .attr('stroke-width', function(d) {
-                            if (d.highlighted) {
-                                return $force.options.highlightNodeStrokeWeight;
+                            if (d.highlighted == 2) {
+                                return $force.options.nodeHighlightStrokeWeight;
+                            }
+                            else if (d.highlighted == 1) {
+                                return $force.options.relatedNodeHighlightStrokeWeight;
                             }
                             else {
                                 return d.strokeWidth || $force.options.nodeStrokeWeight;
@@ -304,8 +540,43 @@ define('kbaseForcedNetwork',
                     .duration(100)
                         .call(nodeTown);
 
-
                 nodes
+                    .exit()
+                    .remove();
+
+
+                tags = tags.data(
+                    forceLayout.nodes()
+                );
+
+
+                var tagTown = function() {
+                    this
+                        .text(function (d) { return d.tag })
+                        .attr('text-anchor', 'middle')
+                        .attr('alignment-baseline', 'middle')
+                        .attr('style', function(d) { return d.tagStyle} )
+                    ;
+
+                    return this;
+                };
+
+                tags
+                    .enter()
+                    .append("text")
+                        .attr("text", 'tag')
+                        .call(tagTown)
+                        .call(mouseNodeAction)
+                ;
+
+                tags
+                    .call(mouseNodeAction)
+                    .transition()
+                    .duration(100)
+                        .call(tagTown)
+                ;
+
+                tags
                     .exit()
                     .remove();
 

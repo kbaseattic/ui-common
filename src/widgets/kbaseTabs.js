@@ -32,12 +32,19 @@
 
 */
 
-(function( $, undefined ) {
+define('kbaseTabs',
+    [
+        'jquery',
+        'kbwidget',
+        'kbaseDeletePrompt',
+    ],
+    function ($) {
+
 
 
     $.KBWidget({
 
-		  name: "kbaseTabs",
+		   name: "kbaseTabs",
 
         version: "1.0.0",
 
@@ -69,16 +76,16 @@
             }
 
             var $block =
-                $('<div></div>')
+                $.jqElem('div')
                     .addClass('tabbable')
             ;
 
-            var $tabs = $('<div></div>')
+            var $tabs = $.jqElem('div')
                 .addClass('tab-content')
                 .attr('id', 'tabs-content')
                 .css('height', this.tabsHeight())
             ;
-            var $nav = $('<ul></ul>')
+            var $nav = $.jqElem('ul')
                 .addClass('nav nav-tabs')
                 .attr('id', 'tabs-nav')
             ;
@@ -216,7 +223,7 @@
             }
         },
 
-        closeIcon : function () { return 'icon-remove'; },
+        closeIcon : function () { return 'fa fa-times'; },
 
         deleteTabToolTip : function (tabName) {
             return 'Remove ' + tabName;
@@ -286,4 +293,4 @@
 
     });
 
-}( jQuery ) );
+});

@@ -33,8 +33,7 @@
             <!--
 
                 require(['kbpaths'], function() {
-                    require(['jquery', 'bootstrap',
-                        'vis',
+                    require(['jquery', 'vis',
                         ], function($) {
                         $(function() {
                             $('#linechartWidget').kbaseLinechart(
@@ -95,6 +94,13 @@
                                             bar : 'Bar 4',
                                             value : [10,20,30,40,50],
                                             color : 'purple',
+                                        },
+                                        {
+                                            bar : 'Bar 5',
+                                            value : [10,20,30,40,50],
+                                            color : ['red', 'green', 'blue', 'cyan', 'magenta'],
+                                            label : ['6.67% effort', '13.34% talent', '20% failure', '26.67% determination', '33.33% mustard'],
+                                            stacked : true,
                                         },
 
                                     ],
@@ -213,6 +219,7 @@
                                     yLabel      : 'Wingdings',
 
                                     dataset : heatmap,
+                                    ulIcon : 'labs_icon.png',
 
                                 }
                             );
@@ -253,6 +260,16 @@
                                 }
                             );
 
+                            var $plantsNetwork = $('#plantsNetworkNarrative').kbasePlantsNetworkNarrative();
+                            $plantsNetwork.setInput(
+                                    "kb|g.3899.CDS.35387\nkb|g.3899.CDS.35388\nkb|g.3899.CDS.35389\nkb|g.3899.CDS.35390\nkb|g.3899.CDS.35392\n"
+                                        +"kb|g.3899.CDS.35393\nkb|g.3899.CDS.35395\nkb|g.3899.CDS.35396\nkb|g.3899.CDS.35397\nkb|g.3899.CDS.35398\n"
+                                        + "kb|g.3899.CDS.35399\nkb|g.3899.CDS.35400\nkb|g.3899.CDS.35401\nkb|g.3899.CDS.35402\nkb|g.3899.CDS.35403\n"
+                                        +"kb|g.3899.CDS.35404\nkb|g.3899.CDS.35405\nkb|g.3899.CDS.35406\nkb|g.3899.CDS.35407\nkb|g.3899.CDS.35408\n"
+                                        +"kb|g.3899.CDS.35409\nkb|g.3899.CDS.35410\nkb|g.3899.CDS.35411\nkb|g.3899.CDS.35413\nkb|g.3899.CDS.35414\n"
+                                        +"kb|g.3899.CDS.35415\nkb|g.3899.CDS.35416\nkb|g.3899.CDS.35417\nkb|g.3899.CDS.35419"
+                            );
+
                         });
                     });
                 });
@@ -275,6 +292,8 @@
         <div id = 'piechartWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
         <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
         <div id = 'forcedNetwork' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+
+        <div id = 'plantsNetworkNarrative' style = 'border : 1px solid green;'></div>
 
     </body>
 

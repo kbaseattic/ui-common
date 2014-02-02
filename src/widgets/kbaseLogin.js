@@ -48,7 +48,14 @@
 
 */
 
-(function( $, undefined ) {
+define('kbaseLogin',
+    [
+        'jquery',
+        'kbwidget',
+        'kbasePrompt'
+    ],
+    function ($) {
+
 
     $.KBWidget({
 
@@ -65,7 +72,7 @@
 
         get_kbase_cookie : function (field) {
 
-            var chips = sessionStorage.getItem('kbase_session');
+            var chips = localStorage.getItem('kbase_session');
 
             if (chips != undefined) {
                 chips = JSON.parse(chips);
@@ -240,7 +247,7 @@
                                 .addClass('btn btn-default')
                                 .addClass('btn-xs')
                                 .addClass('dropdown-toggle')
-                                .append($('<span></span>').addClass('glyphicon glyphicon-user'))
+                                .append($('<span></span>').addClass('fa fa-user'))
                                 .append($('<span></span>').addClass('caret'))
                                 .bind('click',
                                 //$.proxy(
@@ -397,7 +404,7 @@
                                         .append(
                                             $('<i></i>')
                                                 .attr('id', 'loginicon')
-                                                .addClass('icon-lock')
+                                                .addClass('fa fa-lock')
                                         )
                                 )
                             )
@@ -426,7 +433,7 @@
                                 .append(
                                     $('<i></i>')
                                         .attr('id', 'logouticon')
-                                        .addClass('icon-signout')
+                                        .addClass('fa fa-signout')
                                 )
                         )
                 );
@@ -449,7 +456,7 @@
             this.registerLogin =
                 function(args) {
 
-                    this.data('loginicon').removeClass().addClass('icon-lock');
+                    this.data('loginicon').removeClass().addClass('fa fa-lock');
 
                     if ( args.success ) {
                         this.data("entrance").hide();
@@ -464,7 +471,7 @@
                             {
                                 title : 'Login failed',
                                 body : $('<div></div>')
-                                    .attr('class', 'alert alert-error')
+                                    .attr('class', 'alert alert-danger')
                                     .append(
                                         $('<div></div>')
                                             .append(
@@ -472,7 +479,7 @@
                                                     .addClass('pull-left')
                                                     .append(
                                                         $('<i></i>')
-                                                            .addClass('icon-warning-sign')
+                                                            .addClass('fa fa-warning-sign')
                                                             .attr('style', 'float: left; margin-right: .3em;')
                                                     )
                                             )
@@ -502,7 +509,7 @@
                 $.proxy(
                     function(evt) {
 
-                        this.data('loginicon').removeClass().addClass('icon-refresh');
+                        this.data('loginicon').removeClass().addClass('fa fa-refresh');
 
                         this.login(
 
@@ -546,7 +553,7 @@
                         .append(
                             $('<i></i>')
                                 .attr('id', 'loginicon')
-                                .addClass('icon-lock')
+                                .addClass('fa fa-lock')
                         )
                 );
 
@@ -578,7 +585,7 @@
                             }
                         );
 
-                        this.data('loginicon').removeClass().addClass('icon-user');
+                        this.data('loginicon').removeClass().addClass('fa fa-user');
 
                         this.data('loginbutton').bind(
                             'click',
@@ -598,7 +605,7 @@
             this.specificLogout =
                 function() {
                     this.data('loginbutton').tooltip('destroy');
-                    this.data('loginicon').removeClass().addClass('icon-lock');
+                    this.data('loginicon').removeClass().addClass('fa fa-lock');
                 };
 
             return $prompt;
@@ -733,7 +740,7 @@
                                         $('<fieldset></fieldset>')
                                             .append(
                                                 $('<div></div>')
-                                                    .attr('class', 'alert alert-error')
+                                                    .attr('class', 'alert alert-danger')
                                                     .attr('id', 'error')
                                                     .attr('style', 'display : none')
                                                     .append(
@@ -743,7 +750,7 @@
                                                                     .addClass('pull-left')
                                                                     .append(
                                                                         $('<i></i>')
-                                                                            .addClass('icon-warning-sign')
+                                                                            .addClass('fa fa-warning-sign')
                                                                             .attr('style', 'float: left; margin-right: .3em;')
                                                                     )
                                                             )
@@ -772,7 +779,7 @@
                                                                     .addClass('pull-left')
                                                                     .append(
                                                                         $('<i></i>')
-                                                                            .addClass('icon-info-sign')
+                                                                            .addClass('fa fa-info-sign')
                                                                             .attr('style', 'float: left; margin-right: .3em;')
                                                                     )
                                                             )*/
@@ -795,14 +802,14 @@
                                                     .append(
                                                         $('<label></label>')
                                                             .addClass('control-label')
-                                                            .addClass('col-lg-2')
+                                                            .addClass('col-md-2')
                                                             .attr('for', 'user_id')
                                                             .css('margin-right', '10px')
                                                             .append('Username:\n')
                                                     )
                                                     .append(
                                                         $.jqElem('div')
-                                                        .addClass('col-lg-9')
+                                                        .addClass('col-md-9')
                                                         .append(
                                                             $('<input>')
                                                                 .addClass('form-control')
@@ -819,14 +826,14 @@
                                                     .append(
                                                         $('<label></label>')
                                                             .addClass('control-label')
-                                                            .addClass('col-lg-2')
+                                                            .addClass('col-md-2')
                                                             .attr('for', 'password')
                                                             .css('margin-right', '10px')
                                                             .append('Password:\n')
                                                     )
                                                     .append(
                                                         $.jqElem('div')
-                                                        .addClass('col-lg-9')
+                                                        .addClass('col-md-9')
                                                         .append(
                                                             $('<input>')
                                                                 .addClass('form-control')
@@ -957,7 +964,7 @@
                                     }
                                     var jsonARGS = JSON.stringify(args);
 
-                                    sessionStorage.setItem('kbase_session', jsonARGS);
+                                    localStorage.setItem('kbase_session', jsonARGS);
 
                                     this.populateLoginInfo(args);
 
@@ -966,7 +973,7 @@
                                     callback.call(this,args);
                                 }
                                 else {
-                                    sessionStorage.removeItem('kbase_session');
+                                    localStorage.removeItem('kbase_session');
                                     this.populateLoginInfo({});
                                     callback.call(this, {status : 0, message : data.error_msg});
 
@@ -982,11 +989,17 @@
                                 // If we have a useless error message, replace with
                                 // friendly, but useless error message
 
-                                if (textStatus == "error") {
-                                    textStatus = "Error connecting to KBase login server";
+                                var errmsg = textStatus;
+                                if (jqXHR.responseJSON) {
+                                    errmsg = jqXHR.responseJSON.error_msg;
                                 }
+
+                                if (errmsg == "error") {
+                                    errmsg = "Error connecting to KBase login server";
+                                }
+
                                 this.populateLoginInfo({});
-                                callback.call(this,{ status : 0, message : textStatus })
+                                callback.call(this,{ status : 0, message : errmsg })
                              },
                              this
                             ),
@@ -1014,7 +1027,7 @@
                 return;
             }
 
-            sessionStorage.removeItem('kbase_session');
+            localStorage.removeItem('kbase_session');
 
             // the rest of this is just housekeeping.
 
@@ -1038,4 +1051,4 @@
 
     });
 
-}( jQuery ) );
+});
