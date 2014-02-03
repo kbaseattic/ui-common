@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+
+        <script type = 'text/javascript'>
+            <!--
+
+                require(['kbpaths'], function() {
+                    require(['jquery', 'kbaseLogin',
+                        ], function($) {
+                        $(function() {
+                            $('#login').kbaseLogin(
+                                {
+                                    login_callback : function(args) {
+                                        this.dbg("I logged in!");
+                                        this.dbg(args);
+                                    },
+                                    prior_login_callback : function(args) {
+                                        this.dbg("I was already logged in!");
+                                        this.dbg(args);
+                                    },
+                                }
+                            )
+                        });
+                    });
+                });
+
+
+            //-->
+        </script>
+    </head>
+
+    <body>
+
+        <div id = 'login' align = 'right'></div>
+
+    </body>
+
+</html>
