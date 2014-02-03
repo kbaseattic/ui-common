@@ -701,7 +701,11 @@ define('kbaseTable',
 
         createRow : function (rowData, headers) {
 
-            var $tr = $.jqElem('tr');
+            var $tr = $.jqElem('tr')
+                //if we don't explicitly set the background color at this level, then
+                //overlapping background elements will occasionally be visible. This is
+                //stupid and seems like a rendering error. Nonetheless, we hack around it.
+                .css('background-color', 'white');
 
             var callback = this.options.row_callback;
 

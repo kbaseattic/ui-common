@@ -230,6 +230,7 @@ define('kbasePlantsNetworkNarrative',
                                     );
 
                                     $self.data('loader').remove();
+                                    $self.data('msgBox').show();
                                     $self.networkTable().setInput(tabularData);
 
                                 }
@@ -259,7 +260,7 @@ define('kbasePlantsNetworkNarrative',
 
             appendUI : function($elem) {
 
-                this.$elem.css('border', '1px solid gray');
+                $elem.css('border', '1px solid gray');
 
                 $elem.empty();
                 var $loader = $.jqElem('div')
@@ -278,30 +279,39 @@ define('kbasePlantsNetworkNarrative',
                 var $networkGraph = $.jqElem('div')
                     .css({width : 700, height : 600})
                     .attr('align', 'center')
-                    .css('display', 'none')
                     .kbaseForcedNetwork({linkDistance : 200, filter : true});
 
                 this.networkGraph($networkGraph);
+
+                var $msgBox = $.jqElem('div')
+                    .attr('align', 'center')
+                    .css('font-style', 'italic')
+                    .html("No datasets with nodes selected");
+                this.data('msgBox', $msgBox);
+
 
 
                 var $networkTable = $.jqElem('div').kbasePlantsNetworkTable(
                     {
                         $terminal       : this.options.$terminal,
                         networkGraph    : $networkGraph,
+                        msgBox          : $msgBox,
                     }
                 );
                 this.networkTable($networkTable);
 
-                this.$elem
+                $msgBox.hide();
+                $networkGraph.$elem.hide();
+
+                $elem
                     .append($networkTable.$elem)
+                    .append($msgBox)
                     .append(
                         $.jqElem('div')
                             .attr('align', 'center')
                             .append($networkGraph.$elem)
                     )
                 ;
-
-                $networkGraph.render();
 
             }
         }

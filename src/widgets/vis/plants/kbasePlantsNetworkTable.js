@@ -21,6 +21,7 @@ define('kbasePlantsNetworkTable',
             _accessors : [
                 'terminal',
                 'networkGraph',
+                'msgBox',
             ],
 
             options: {
@@ -255,7 +256,15 @@ define('kbasePlantsNetworkTable',
                                                         }
                                                     );
 
-                                                    $self.networkGraph().$elem.css('display', '');
+                                                    if (newDataset.nodes.length) {
+                                                        $self.msgBox().hide();
+                                                        $self.networkGraph().$elem.show();
+                                                    }
+                                                    else {
+                                                        $self.msgBox().show();
+                                                        $self.networkGraph().$elem.hide();
+                                                    }
+
                                                     $self.networkGraph().setDataset(newDataset);
                                                     $self.networkGraph().renderChart();
 
