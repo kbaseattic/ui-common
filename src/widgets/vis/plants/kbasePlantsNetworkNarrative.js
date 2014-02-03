@@ -10,7 +10,7 @@ define('kbasePlantsNetworkNarrative',
         'kbaseForcedNetwork',
         'kbaseTable',
         'KbaseNetworkServiceClient',
-        //'IdMapClient',
+        'CDMI_API',
     ],
     function ($) {
         $.KBWidget(
@@ -25,12 +25,14 @@ define('kbasePlantsNetworkNarrative',
                 'networkTable',
                 'networkGraph',
                 'networkClient',
-                'idMapClient',
+                //'idMapClient',
+                'cdmiClient',
             ],
 
             options: {
                 networkClientURL : 'http://140.221.85.171:7064/KBaseNetworksRPC/networks',
-                idmapClientURL : "http://140.221.85.96:7111",
+                //idmapClientURL : "http://140.221.85.96:7111",
+                cdmiClientURL    : 'http://140.221.84.182:7032',
             },
 
             init : function(options) {
@@ -43,7 +45,7 @@ define('kbasePlantsNetworkNarrative',
                     )
                 );
 
-/*                this.idMapClient(
+                /*this.idMapClient(
                     new window.IdMapClient(
                         this.options.idmapClientURL,
                         this.auth()
@@ -51,10 +53,16 @@ define('kbasePlantsNetworkNarrative',
                 );
                 this.idMapClient().longest_cds_from_locus('kb|g.3899.locus.2079')
                 .always(function(res) {
-                    console.log("ID MAP RESULTS");
-                    console.log(res);
-                });
-*/
+                    this.dbg("ID MAP RESULTS");
+                    this.dbg(res);
+                });*/
+
+                this.cdmiClient(
+                    new window.CDMI_API(
+                        this.options.cdmiClientURL,
+                        this.auth()
+                    )
+                );
 
                 if (this.input()) {
                     this.setInput(this.input());
@@ -63,7 +71,79 @@ define('kbasePlantsNetworkNarrative',
                 return this;
             },
 
-            setInput : function(cds_list) {
+            setInput : function(input) {
+                return this.setGwasInput(input);
+            },
+
+            setGwasInput : function (gwasInput) {
+
+                var $self = this;
+
+                if (this.cdmiClient() == undefined) {
+                    return;
+                }
+
+                var locus_ids = [];
+                $.each(
+                    gwasInput.genes,
+                    function (idx, gene) {
+                        locus_ids.push(gene[2]);
+                    }
+                );
+
+
+                this.cdmiClient().fids_to_locations(
+                    locus_ids
+                )
+                .done(
+                    function(res) {
+                        var locations = [];
+                        $.each(
+                            res,
+                            function(key, l) {
+                                $.each(
+                                    l,
+                                    function (idx, location) {
+                                        locations.push(
+                                            [location[0], "_", location[1], location[2], location[3]].join('')
+                                        )
+                                    }
+                                )
+                             }
+                        );
+
+                        //okay. We've got our locations. Go back the other way now.
+
+                        $self.cdmiClient().locations_to_fids(
+                            locations
+                        )
+                        .done(
+                            function(res) {
+                                var cdses = [];
+                                $.each(
+                                    res,
+                                    function (key, ids) {
+                                        $.each(
+                                            ids,
+                                            function (idx, val) {
+                                                if (val.match(/CDS/i)) {
+                                                    cdses.push(val);
+                                                }
+                                            }
+                                        )
+                                    }
+                                );
+
+                                $self.setCDSInput(cdses.join("\n"));
+
+                            }
+                        );
+                    }
+                );
+
+            },
+
+            setCDSInput : function(cds_list) {
 
                 this.setValueForKey('input', cds_list);
 
@@ -80,10 +160,11 @@ define('kbasePlantsNetworkNarrative',
                 $.each(
                     cdses,
                     function(idx, cds) {
+
                         var m;
                         if (m = cds.match(/^(kb\|g\.\d+)/)) {
                             if (m[1]) {
-                                keyedSpecies[m[1]]++;
+                                keyedSpecies[m[1]] = 1;
                             }
                         }
                     }
