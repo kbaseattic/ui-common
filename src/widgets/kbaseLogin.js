@@ -51,6 +51,7 @@
 define('kbaseLogin',
     [
         'jquery',
+        'bootstrap',
         'kbwidget',
         'kbasePrompt'
     ],
