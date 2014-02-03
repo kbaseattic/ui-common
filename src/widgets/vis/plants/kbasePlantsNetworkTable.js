@@ -255,6 +255,7 @@ define('kbasePlantsNetworkTable',
                                                         }
                                                     );
 
+                                                    $self.networkGraph().$elem.css('display', '');
                                                     $self.networkGraph().setDataset(newDataset);
                                                     $self.networkGraph().renderChart();
 

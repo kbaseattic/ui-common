@@ -278,6 +278,7 @@ define('kbasePlantsNetworkNarrative',
                 var $networkGraph = $.jqElem('div')
                     .css({width : 700, height : 600})
                     .attr('align', 'center')
+                    .css('display', 'none')
                     .kbaseForcedNetwork({linkDistance : 200, filter : true});
 
                 this.networkGraph($networkGraph);
