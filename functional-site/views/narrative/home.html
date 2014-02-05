@@ -58,13 +58,8 @@
                 popover-trigger="mouseenter"
                 popover-placement="bottom" 
                     ></span></div>
-                <div class="newsfeed_section">
-                        
-                    <div  class="narr-featured-narrative"  ng-repeat="narr in feed.entries" >
+                <div newsfeed class="newsfeed_section">
 
-                    <div ng-bind-html-unsafe="narr.content"></div>
-                    <a ng-click="copyNarrativeForm(narr.title)">copy narrative</a>
-                    </div>
      
                 </div>	
             </div>

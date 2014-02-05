@@ -225,24 +225,13 @@ app.controller('ModelViewer', function($scope, $stateParams, $location) {
 
 .controller('Narrative', function($scope, $stateParams, $location, kbaseLogin, $modal, FeedLoad) {
     //changeNav('narrative', 'newsfeed');
-    $scope.nar_url = 'http://narrative.kbase.us'; // used for links to narratives    
-    var feedUrl = 'http://yogi.lbl.gov/eprojectbuilder/misc/kbasefeed2.xml';
-
-    FeedLoad.fetch({q: feedUrl, num: 50}, {}, function (data) {
-        $scope.feed = data.responseData.feed;
-    });
-
-    
-    //$scope.narr = {};
-    //$scope.narr.title = "test title";
-    
+    $scope.nar_url = 'http://narrative.kbase.us'; // used for links to narratives        
 
 
     //to open the copy narrative dialog
     $scope.copyNarrativeForm = function (title) {
 
-        //$scope.narr.title = title;
-
+console.log("clicked");
         var modalInstance = $modal.open({
           templateUrl: 'views/narrative/dialogboxes/copynarrative.html',
           controller: CopyNarrativeModalCtrl,
