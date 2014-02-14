@@ -291,6 +291,9 @@ define('kbwidget', ['jquery'], function ($) {
 
 
     var widgetRegistry = {};
+    if (KBase == undefined) {
+        KBase = window.KBase;
+    }
     if (window.KBase === undefined) {
         KBase = window.KBase = {
             _functions : {
