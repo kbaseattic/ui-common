@@ -1,0 +1,18 @@
+/*
+ *  Landing Page App 
+ *
+ *  Right now, this file is responsible for landing page URLs
+ *  and which controllers and templates are used.
+ *
+ *  The app uses angular.js, a MVC front-end framework.
+ *
+ *  -- Some of the critical files --
+ *  App:               js/app.js
+ *  Controllers:       js/controllers.js
+ *  Directives:        js/directives.js 
+ *                     js/card-directives.js 
+ *                     js/iris-directives.js
+ *                     js/mv-directives.js 
+ *  Views (templates): views/* 
+ *
+*/

@@ -31,7 +31,6 @@
         },
 
         cdmiURL: "https://kbase.us/services/cdmi_api",
-        workspaceURL: "https://kbase.us/services/workspace",
         proteinInfoURL: "https://kbase.us/services/protein_info_service",
 
         init: function(options) {
@@ -49,37 +48,9 @@
 
             this.cdmiClient = new CDMI_API(this.cdmiURL);
             this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
-            this.workspaceClient = new workspaceService(this.workspaceURL);
             this.proteinInfoClient = new ProteinInfo(this.proteinInfoURL);
 
             return this.render();
-        },
-
-        renderOld: function(options) {
-            if (this.options.loadingImage)
-                this.showMessage("<img src='" + this.options.loadingImage + "'/>");
-
-            var self = this;
-            this.proteinInfoClient.fids_to_operons([this.options.featureID],
-                function(operons) {
-                    operons = operons[self.options.featureID];
-
-                    var operonStr = "Feature not part of an operon.";
-                    if (operons && operons.length > 1) {
-                        operonStr = "";
-                        for (var i in operons) {
-                            operonStr += operons[i] + " ";
-                        }
-                    }
-                    self.$elem.append(operonStr);
-
-                    self.hideMessage();
-                },
-
-                this.clientError
-            );
-
-            return this;
         },
 
         /**
@@ -88,8 +59,6 @@
         render: function() {
             if (this.options.loadingImage)
                 this.showMessage("<img src='" + this.options.loadingImage + "'/>");
-
-
 
             var self = this;
             this.proteinInfoClient.fids_to_operons([this.options.featureID],

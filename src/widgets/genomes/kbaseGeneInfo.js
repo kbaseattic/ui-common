@@ -14,12 +14,14 @@
 		// the only options are the feature ID, whether it should be embedded in a card, and (optionally) the auth token.
 		options: {
 			featureID: null,
+			genomeID: null,
+			workspaceID: null,
+			kbCache: null,
 			embedInCard: false,
 			auth: null,
 		},
 
 		cdmiURL: "https://kbase.us/services/cdmi_api",
-		workspaceURL: "https://kbase.us/services/workspace",
 
 		/**
 		 * Initializes the widget.
@@ -27,6 +29,7 @@
 		init: function(options) {
 			this._super(options);
 
+			console.log("here!");
 			if (this.options.featureID === null) {
 				//throw an error.
 				return this;
@@ -34,7 +37,6 @@
 
 			this.cdmiClient = new CDMI_API(this.cdmiURL);
 			this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
-			this.workspaceClient = new workspaceService(this.workspaceURL);
 
 			return this.render();
 		},
