@@ -698,41 +698,76 @@
             if (!this.options.template)
                 return;
 
-            if (this.options.template.toLowerCase() === "genome")
-                this.showGenomeCards();
-            else if (this.options.template.toLowerCase() === "gptype")
-                this.showGWASPopCards();
-            else if (this.options.template.toLowerCase() === "gttype")
-                this.showGWASTraitCards();
-            else if (this.options.template.toLowerCase() === "gvtype")
-                this.showGWASVarCards();
-            else if (this.options.template.toLowerCase() === "ggltype")
-                this.showGWASGeneListCards();
-            else if (this.options.template.toLowerCase() === "gtvtype")
-                this.showGWASTopVariationsCards();
-            else if (this.options.template.toLowerCase() === "meme")
-                this.showMemeCards();
-            else if (this.options.template.toLowerCase() === "cmonkey")
-                this.showCmonkeyCards();
-            else if (this.options.template.toLowerCase() === "inferelator")
-                this.showInferelatorCards();
-            else if (this.options.template.toLowerCase() === "regprecise")
-                this.showRegpreciseCards();
-            else if (this.options.template.toLowerCase() === "mak")
-                this.showMAKCards();
-            else if (this.options.template.toLowerCase() === "bambi")
-                this.showBambiCards();
-            else if (this.options.template.toLowerCase() === "gene")
-                this.showGeneCards();
-            else if (this.options.template.toLowerCase() === "model")
-                this.showModelCards();
-            else if (this.options.template.toLowerCase() === "spec")
-                this.showSpecCards();
-            else if (this.options.template.toLowerCase() === "ppid")
-                this.showPPICards();
-            else {
-                // throw an error for an unknown template. modal dialog, maybe?
+            var template = this.options.template.toLowerCase();
+            switch(this.options.template.toLowerCase()) {
+                case "genome":
+                    this.showGenomeCards();
+                    break;
+                case "gptype":
+                    this.showGWASPopCards();
+                    break;
+                case "gttype":
+                    this.showGWASTraitCards();
+                    break;
+                case "gvtype":
+                    this.showGWASVarCards();
+                    break;
+                case "ggltype":
+                    this.showGWASGeneListCards();
+                    break;
+                case "gtvtype":
+                    this.showGWASTopVariationsCards();
+                    break;
+                case "meme":
+                    this.showMemeCards();
+                    break;
+                case "cmonkey":
+                    this.showCmonkeyCards();
+                    break;
+                case "inferelator":
+                    this.showInferelatorCards();
+                    break;
+                case "regprecise":
+                    this.showRegpreciseCards();
+                    break;
+                case "mak":
+                    this.showMAKCards();
+                    break;
+                case "bambi":
+                    this.showBambiCards();
+                    break;
+                case "gene":
+                    this.showGeneCards();
+                    break;
+                case "model":
+                    this.showModelCards();
+                    break;
+                case "spec":
+                    this.showSpecCards();
+                    break;
+                case "ppid":
+                    this.showPPICards();
+                    break;
+                case "usertest":
+                    this.showUserTestCards();
+                    break;
+                default:
+                    // throw an error for an unknown template. modal dialog, maybe?
+                    break;
             }
+        },
+
+        showUserTestCards: function() {
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "http://demo.kbase.us/functional-site/assets/images/doodle.png",
+                },
+                {
+                    my: "left top",
+                    at: "left bottom",
+                    of: "#app"
+                }
+            );
         },
 
         /**
@@ -1741,9 +1776,8 @@
                 var cardTitle = data.title ? data.title : "";
                 var cardSubtitle = data.id ? data.id : "";
                 var cardWidth = newWidget.options.width ? newWidget.options.width : this.defaultWidth;
-                var cardWorkspace = data.workspace ? data.workspace : this.cdmWorkspace;
+                var cardWorkspace = data.workspace ? data.workspace : "";
             } else {
-                console.log('here')
                 var cardTitle = options.title ? options.title : "";
                 var cardSubtitle = options.id ? options.id : "";
                 var cardWidth = options.width ? options.width : this.defaultWidth;                
@@ -1775,8 +1809,6 @@
                 widget: newWidget,
                 name: cardName
             };
-
-            $("#" + newCardId).on("")
 
 
             this.cardIndex++;

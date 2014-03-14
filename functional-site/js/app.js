@@ -55,7 +55,6 @@ var app = angular.module('landing-pages',
           controller: 'NarrativeProjects'
         })
 
-
     $stateProvider
         .state('ws', {
           url: "/ws/",
@@ -132,6 +131,13 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/objects/cpd.html',
              controller: 'CpdDetail'
          })       
+
+    $stateProvider
+        .state('usertest', {
+            url: '/usertest',
+            templateUrl: 'views/objects/usertest.html',
+            controller: 'UserTest',
+        })
 
     $stateProvider
         .state('models', {

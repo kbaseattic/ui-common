@@ -9,6 +9,19 @@
 
 angular.module('card-directives', []);
 angular.module('card-directives')
+    .directive('usertest', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "usertest",
+                    data: scope.params,
+                    auth: $rootScope.USER_TOKEN,
+                    userId: $rootScope.USER_ID
+                })
+            }
+        }
+    })
     .directive('genomecards', function($rootScope) {
         return {
             link: function(scope, element, attrs) {
