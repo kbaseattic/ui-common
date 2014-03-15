@@ -17,7 +17,7 @@
             autoOpen: true,
             closeOnEscape: false,
             position: null,
-            id: 0
+            id: 0,
         },
 
         init: function(options) {

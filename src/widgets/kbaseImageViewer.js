@@ -42,8 +42,8 @@
 
         getData: function() {
             return {
-                id: this.options.featureID,
-                workspace: this.options.workspaceID,
+                id: null,
+                workspace: null,
                 title: "Test Image"
             }
         }

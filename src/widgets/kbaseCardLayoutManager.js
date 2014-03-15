@@ -768,6 +768,20 @@
                     of: "#app"
                 }
             );
+            this.addNewCard("kbaseFrame",
+                {
+                    url: "http://140.221.84.217/glamm",
+                    id: "glamm-frame"
+                },
+                {
+                    my: "left top",
+                    at: "left bottom",
+                    of: "#app"
+                },
+                {
+                    autoResize: true
+                }
+            );
         },
 
         /**
@@ -1714,7 +1728,7 @@
          * 3. position - a jQuery-UI position object for the initial position to put the card.
          *               See the jquery-ui position docs for details.
          */
-        addNewCard: function(cardName, options, position) {
+        addNewCard: function(cardName, widgetOptions, position, cardOptions) {
             /** position = optional. if none given, it puts the new card in the center of the page **/
 
             /* NOTE - later, have it manage where the new card comes in here.
@@ -1767,7 +1781,7 @@
 
             this.$elem.append("<div id='" + newCardId + "'/>");
 
-            var newWidget = $("#" + newCardId)[cardName](options);
+            var newWidget = $("#" + newCardId)[cardName](widgetOptions);
 
             // if widget has getData() method, get panel title stuff,
             // otherwise use options.
@@ -1784,19 +1798,35 @@
                 var cardWorkspace = options.workspace ? options.workspace : this.cdmWorkspace;                
             }
 
-            var cardOptions = {
-                position: position,
-                title: "<div>" + 
-                       cardTitle + 
-                       "</div>" +
-                       "<div class='kblpc-subtitle'>" + 
-                       cardSubtitle + 
-                       "<span class='label label-primary pull-right'>" +
-                       cardWorkspace + 
-                       "</span></div>",
-                width: cardWidth,
-                id: newCardId,
-            };
+            if (!cardOptions)
+                cardOptions = {};
+
+            cardOptions['position'] = position;
+            cardOptions['title'] = "<div>" + 
+                                   cardTitle + 
+                                   "</div>" +
+                                   "<div class='kblpc-subtitle'>" + 
+                                   cardSubtitle + 
+                                   "<span class='label label-primary pull-right'>" +
+                                   cardWorkspace + 
+                                   "</span></div>";
+            cardOptions['width'] = cardWidth;
+            cardOptions['id'] = newCardId;
+
+            // cardOptions = {
+
+            //     position: position,
+            //     title: "<div>" + 
+            //            cardTitle + 
+            //            "</div>" +
+            //            "<div class='kblpc-subtitle'>" + 
+            //            cardSubtitle + 
+            //            "<span class='label label-primary pull-right'>" +
+            //            cardWorkspace + 
+            //            "</span></div>",
+            //     width: cardWidth,
+            //     id: newCardId,
+            // };
 
             if (newWidget.options.height)
                 cardOptions.height = newWidget.options.height;
