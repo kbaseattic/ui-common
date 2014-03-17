@@ -21,10 +21,10 @@
                 this.showError('No URL given!');
             }
             else {
-                var $frame = $('<iframe id="' + this.options.id + '">')
-                           .attr({ 'src' : this.options.url,
-                                   'width' : '100%',
-                                   'height' : '100%'});
+                var $frame = $('<iframe>')
+                             .attr({ 'src' : this.options.url,
+                                     'width' : '100%',
+                                     'height' : '100%'});
 
                 this.$elem.append($frame);
             }
