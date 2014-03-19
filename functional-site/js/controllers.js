@@ -118,6 +118,11 @@ app.controller('ModelViewer', function($scope, $stateParams, $location) {
     });
 })
 
+.controller('TreeDetail',function($scope, $stateParams) {
+    $scope.params = {'treeID' : $stateParams.id,
+                     'workspaceID' : $stateParams.ws,
+                     'kbCache' : kb}
+})
 
 .controller('GenomeDetail', function($scope, $stateParams) {
     $scope.params = {'genomeID' : $stateParams.id,

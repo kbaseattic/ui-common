@@ -210,6 +210,11 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/mv/mv-help.html',
              controller: 'MVHelp'})
 
+    $stateProvider
+        .state('treecards',
+            {url: '/trees/:ws/:id',
+             templateUrl: 'views/objects/treecards.html',
+             controller: 'TreeDetail'})
 
     $stateProvider
         .state('genomes',
