@@ -138,6 +138,9 @@ app.controller('ModelViewer', function($scope, $stateParams, $location) {
                      'kbCache' : kb}
 })
 
+.controller('UserTest', function($scope, $stateParams) {
+    $scope.params = {'kbCache' : kb}
+})
 
 .controller('MediaDetail', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
