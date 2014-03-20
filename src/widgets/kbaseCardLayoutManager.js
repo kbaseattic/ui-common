@@ -766,6 +766,8 @@
                     treeID: this.options.data.treeID,
                     workspaceID: this.options.data.workspaceID,
                     kbCache: this.options.data.kbCache,
+                    width: 500,
+                    height: 500,
                 },
                 {
                     my: "left top",
@@ -773,8 +775,6 @@
                     of: "#app",
                 },
                 {
-                    height: "500",
-                    width: "500"
                 }
             );
         },
