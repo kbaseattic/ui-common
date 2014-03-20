@@ -25,7 +25,8 @@
         cardIndex: 0,
         cards: {},
         cdmWorkspace: "CDS",
-        defaultWidth: 300,
+        defaultWidth: "auto",
+        defaultHeight: "auto",
 
         fbaURL: "https://www.kbase.us/services/fba_model_services",
         workspaceURL: "https://kbase.us/services/ws",
@@ -1979,12 +1980,12 @@
                 var data = newWidget.getData();
                 var cardTitle = data.title ? data.title : "";
                 var cardSubtitle = data.id ? data.id : "";
-                var cardWidth = newWidget.options.width ? newWidget.options.width : this.defaultWidth;
+//                var cardWidth = newWidget.options.width ? newWidget.options.width : this.defaultWidth;
                 var cardWorkspace = data.workspace ? data.workspace : "";
             } else {
                 var cardTitle = options.title ? options.title : "";
                 var cardSubtitle = options.id ? options.id : "";
-                var cardWidth = options.width ? options.width : this.defaultWidth;                
+//                var cardWidth = options.width ? options.width : this.defaultWidth;                
                 var cardWorkspace = options.workspace ? options.workspace : this.cdmWorkspace;                
             }
 
@@ -2000,7 +2001,10 @@
                                    "<span class='label label-primary pull-right'>" +
                                    cardWorkspace + 
                                    "</span></div>";
-            cardOptions['width'] = cardWidth;
+            if (!cardOptions['width'])
+                cardOptions['width'] = this.defaultWidth;
+            if (!cardOptions['height'])
+                cardOptions['height'] = this.defaultHeight;
             cardOptions['id'] = newCardId;
 
             // cardOptions = {
@@ -2018,8 +2022,8 @@
             //     id: newCardId,
             // };
 
-            if (newWidget.options.height)
-                cardOptions.height = newWidget.options.height;
+            // if (newWidget.options.height)
+            //     cardOptions.height = newWidget.options.height;
 
             var self = this;
             var newCard = newWidget.$elem.LandingPageCard(cardOptions); //$("#" + newCardId).LandingPageCard(cardOptions);
