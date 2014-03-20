@@ -758,9 +758,40 @@
         },
 
         showUserTestCards: function() {
+	    /*
             this.addNewCard("kbaseImageViewer",
                 {
                     imageUrl: "http://demo.kbase.us/functional-site/assets/images/doodle.png",
+                },
+                {
+                    my: "left top",
+                    at: "left bottom",
+                    of: "#app"
+                }
+            );*/
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/NarrativePanel.png",
+                },
+                {
+                    my: "left top",
+                    at: "left bottom",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/ServicePanel.png",
+                },
+                {
+                    my: "left top",
+                    at: "left bottom",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/WorkspacePanel.png",
                 },
                 {
                     my: "left top",
