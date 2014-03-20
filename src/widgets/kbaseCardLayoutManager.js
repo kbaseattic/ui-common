@@ -751,37 +751,91 @@
                 case "usertest":
                     this.showUserTestCards();
                     break;
+                case "tree":
+                    this.showTreeCards();
+                    break;
                 default:
                     // throw an error for an unknown template. modal dialog, maybe?
                     break;
             }
         },
 
+        showTreeCards: function() {
+            this.addNewCard("kbaseTree",
+                {
+                    treeID: this.options.data.treeID,
+                    workspaceID: this.options.data.workspaceID,
+                    kbCache: this.options.data.kbCache,
+                },
+                {
+                    my: "left top",
+                    at: "left bottom",
+                    of: "#app",
+                }
+            );
+        },
+
+
         showUserTestCards: function() {
-            this.addNewCard("kbaseImageViewer",
+            var $newDiv = $("<div>");
+            this.$elem.append($newDiv);
+            $newDiv.KBaseCardLayoutManager({
+                template: "tree",
+                treeID: "tree_abcde",
+                workspaceID: "kbasetest:home",
+            });
+
+
+            var imageCard = this.addNewCard("kbaseImageViewer",
                 {
                     imageUrl: "http://demo.kbase.us/functional-site/assets/images/doodle.png",
                 },
                 {
                     my: "left top",
                     at: "left bottom",
-                    of: "#app"
+                    of: this.$elem
                 }
             );
-            this.addNewCard("kbaseFrame",
-                {
-                    url: "http://140.221.84.217/glamm",
-                    id: "glamm-frame"
-                },
-                {
-                    my: "left top",
-                    at: "left bottom",
-                    of: "#app"
-                },
-                {
-                    autoResize: true
-                }
-            );
+
+            this.addNewCard("KBaseCardLayoutManager",
+            {
+                template: "tree",
+                treeID: "tree_xyz",
+                workspaceID: "kbasetest:home",
+            },
+            {
+                my: "left top",
+                at: "left bottom",
+                of: this.$elem
+            });
+            // var glammCard = this.addNewCard("kbaseFrame",
+            //     {
+            //         url: "http://140.221.84.217/glamm",
+            //         id: "glamm-frame"
+            //     },
+            //     {
+            //         my: "left top",
+            //         at: "left bottom",
+            //         of: this.$elem
+            //     },
+            //     {
+            //         autoResize: true
+            //     }
+            // );
+            // this.addNewCard("kbaseFrame",
+            //     {
+            //         url: "http://www.kbase.us",
+            //         id: "kbase-frame",
+            //     },
+            //     {
+            //         my: "left top",
+            //         at: "left bottom",
+            //         of: this.$elem
+            //     },
+            //     {
+            //         autoResize: true
+            //     }
+            // )
         },
 
         /**
@@ -1844,6 +1898,7 @@
             this.cardIndex++;
 
             this.updateDataManager();
+            return newCard;
         },
 
         /**
