@@ -775,8 +775,7 @@
             this.addNewCard("kbaseImageViewer",
                 {
                     imageUrl: "/functional-site/assets/images/NarrativePanel.png",
-		    width: "auto",
-		    height: "auto",
+		    width: "auto"
                 },
                 {
                     my: "left top",
@@ -787,8 +786,7 @@
             this.addNewCard("kbaseImageViewer",
                 {
                     imageUrl: "/functional-site/assets/images/ServicePanel.png",
-		    width: "auto",
-		    height: "auto",
+		    width: "auto"
                 },
                 {
                     my: "left top",
@@ -802,8 +800,7 @@
             this.addNewCard("kbaseImageViewer",
                 {
                     imageUrl: "/functional-site/assets/images/WorkspacePanel.png",
-		    width: "auto",
-		    height: "auto",
+		    width: "auto"
                 },
                 {
                     my: "left top",
@@ -879,14 +876,15 @@
             this.addNewCard("kbaseImageViewer",
                 {
                     imageUrl: "/functional-site/assets/images/NarrativePanel.png",
-		    width: "auto",
-		    height: "auto",
                 },
                 {
                     my: "left top",
                     at: "left top",
                     of: "#app"
-                }
+                },
+		{
+		    width: 600
+		}
             );
 	    /*
             this.addNewCard("kbaseImageViewer",
