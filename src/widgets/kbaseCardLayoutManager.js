@@ -25,7 +25,8 @@
         cardIndex: 0,
         cards: {},
         cdmWorkspace: "CDS",
-        defaultWidth: 300,
+        defaultWidth: "auto",
+        defaultHeight: "auto",
 
         fbaURL: "https://www.kbase.us/services/fba_model_services",
         workspaceURL: "https://kbase.us/services/ws",
@@ -751,6 +752,9 @@
                 case "usertest":
                     this.showUserTestCards();
                     break;
+                case "usertest2":
+                    this.showUserTestCards2();
+                    break;
                 case "tree":
                     this.showTreeCards();
                     break;
@@ -760,14 +764,12 @@
             }
         },
 
-        showTreeCards: function() {
+       showTreeCards: function() {
             this.addNewCard("kbaseTree",
                 {
                     treeID: this.options.data.treeID,
                     workspaceID: this.options.data.workspaceID,
                     kbCache: this.options.data.kbCache,
-                    width: 500,
-                    height: 500,
                 },
                 {
                     my: "left top",
@@ -775,26 +777,226 @@
                     of: "#app",
                 },
                 {
+                    width: 500,
+                    height: 500,
                 }
             );
         },
 
-
         showUserTestCards: function() {
-            var imageCard = this.addNewCard("kbaseImageViewer",
+	    /*
+            this.addNewCard("kbaseImageViewer",
                 {
                     imageUrl: "http://demo.kbase.us/functional-site/assets/images/doodle.png",
                 },
                 {
                     my: "left top",
                     at: "left bottom",
-                    of: this.$elem
+                    of: "#app"
+                }
+            );*/
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/NarrativePanel.png",
+		    width: "auto",
+		    height: "auto",
                 },
                 {
-                    height: 100
+                    my: "left top",
+                    at: "left+275 top",
+                    of: "#app"
                 }
             );
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/ServicePanel.png",
+		    width: "auto",
+		    height: "auto",
+                },
+                {
+                    my: "left top",
+                    at: "left-20 top",
+                    of: "#app"
+                },
+		{
+		    height: 300
+		}
+            );
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/WorkspacePanel.png",
+		    width: "auto",
+		    height: "auto",
+                },
+                {
+                    my: "left top",
+                    at: "left-20 top+300",
+                    of: "#app"
+                }
+            );
+	    /*
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/GLAMM.png",
+		    width: "auto",
+		    height: "auto",
+                },
+                {
+                    my: "left top",
+                    at: "left top",
+                    of: "#app"
+                }
+            );*/
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.39',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+1100 top",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.53',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+1100 top+50",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.15',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+1100 top+100",
+                    of: "#app"
+                }
+            );
+	    /*
+            this.addNewCard("kbaseFrame",
+                {
+                    url: "http://140.221.84.217/glamm",
+                    id: "glamm-frame"
+                },
+                {
+                    my: "left top",
+                    at: "left bottom",
+                    of: "#app"
+                },
+                {
+                    autoResize: true
+                }
+            );
+	    */
+        },
 
+        showUserTestCards2: function() {
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/NarrativePanel.png",
+		    width: "auto",
+		    height: "auto",
+                },
+                {
+                    my: "left top",
+                    at: "left top",
+                    of: "#app"
+                }
+            );
+	    /*
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/ServicePanel.png",
+		    width: "auto",
+		    height: "auto",
+                },
+                {
+                    my: "left top",
+                    at: "left-20 top",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/WorkspacePanel.png",
+		    width: "auto",
+		    height: "auto",
+                },
+                {
+                    my: "left top",
+                    at: "left-20 top+300",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/GLAMM.png",
+		    width: "auto",
+		    height: "auto",
+                },
+                {
+                    my: "left top",
+                    at: "left top",
+                    of: "#app"
+                }
+            );*/
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.39',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+1100 top",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.53',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+1100 top+50",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.15',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+1100 top+100",
+                    of: "#app"
+                }
+            );
+	    /*
+            this.addNewCard("kbaseFrame",
+                {
+                    url: "http://140.221.84.217/glamm",
+                    id: "glamm-frame"
+                },
+                {
+                    my: "left top",
+                    at: "left bottom",
+                    of: "#app"
+                },
+                {
+                    autoResize: true
+                }
+            );
+	    */
         },
 
         /**
@@ -1802,12 +2004,12 @@
                 var data = newWidget.getData();
                 var cardTitle = data.title ? data.title : "";
                 var cardSubtitle = data.id ? data.id : "";
-                var cardWidth = newWidget.options.width ? newWidget.options.width : this.defaultWidth;
+//                var cardWidth = newWidget.options.width ? newWidget.options.width : this.defaultWidth;
                 var cardWorkspace = data.workspace ? data.workspace : "";
             } else {
                 var cardTitle = options.title ? options.title : "";
                 var cardSubtitle = options.id ? options.id : "";
-                var cardWidth = options.width ? options.width : this.defaultWidth;                
+//                var cardWidth = options.width ? options.width : this.defaultWidth;                
                 var cardWorkspace = options.workspace ? options.workspace : this.cdmWorkspace;                
             }
 
@@ -1823,7 +2025,10 @@
                                    "<span class='label label-primary pull-right'>" +
                                    cardWorkspace + 
                                    "</span></div>";
-            cardOptions['width'] = cardWidth;
+            if (!cardOptions['width'])
+                cardOptions['width'] = this.defaultWidth;
+            if (!cardOptions['height'])
+                cardOptions['height'] = this.defaultHeight;
             cardOptions['id'] = newCardId;
 
             // cardOptions = {
@@ -1841,8 +2046,8 @@
             //     id: newCardId,
             // };
 
-            if (newWidget.options.height)
-                cardOptions.height = newWidget.options.height;
+            // if (newWidget.options.height)
+            //     cardOptions.height = newWidget.options.height;
 
             var self = this;
             var newCard = newWidget.$elem.LandingPageCard(cardOptions); //$("#" + newCardId).LandingPageCard(cardOptions);

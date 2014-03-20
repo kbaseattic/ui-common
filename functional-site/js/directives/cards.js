@@ -35,6 +35,19 @@ angular.module('card-directives')
             }
         };
     })
+    .directive('usertest2', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "usertest2",
+                    data: scope.params,
+                    auth: $rootScope.USER_TOKEN,
+                    userId: $rootScope.USER_ID
+                })
+            }
+        }
+    })
     .directive('genomecards', function($rootScope) {
         return {
             link: function(scope, element, attrs) {
