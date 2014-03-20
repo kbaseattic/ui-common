@@ -140,6 +140,13 @@ var app = angular.module('landing-pages',
         })
 
     $stateProvider
+        .state('usertest2', {
+            url: '/usertest2',
+            templateUrl: 'views/objects/usertest2.html',
+            controller: 'UserTest2',
+        })
+
+    $stateProvider
         .state('models', {
              url: '/models',
              templateUrl: 'views/object-list.html',

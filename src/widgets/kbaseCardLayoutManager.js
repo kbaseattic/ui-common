@@ -751,6 +751,9 @@
                 case "usertest":
                     this.showUserTestCards();
                     break;
+                case "usertest2":
+                    this.showUserTestCards2();
+                    break;
                 default:
                     // throw an error for an unknown template. modal dialog, maybe?
                     break;
@@ -772,33 +775,89 @@
             this.addNewCard("kbaseImageViewer",
                 {
                     imageUrl: "/functional-site/assets/images/NarrativePanel.png",
+		    width: "auto",
+		    height: "auto",
                 },
                 {
                     my: "left top",
-                    at: "left bottom",
+                    at: "left+275 top",
                     of: "#app"
                 }
             );
             this.addNewCard("kbaseImageViewer",
                 {
                     imageUrl: "/functional-site/assets/images/ServicePanel.png",
+		    width: "auto",
+		    height: "auto",
                 },
                 {
                     my: "left top",
-                    at: "left bottom",
+                    at: "left-20 top",
                     of: "#app"
-                }
+                },
+		{
+		    height: 300
+		}
             );
             this.addNewCard("kbaseImageViewer",
                 {
                     imageUrl: "/functional-site/assets/images/WorkspacePanel.png",
+		    width: "auto",
+		    height: "auto",
                 },
                 {
                     my: "left top",
-                    at: "left bottom",
+                    at: "left-20 top+300",
                     of: "#app"
                 }
             );
+	    /*
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/GLAMM.png",
+		    width: "auto",
+		    height: "auto",
+                },
+                {
+                    my: "left top",
+                    at: "left top",
+                    of: "#app"
+                }
+            );*/
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.39',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+1100 top",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.53',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+1100 top+50",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.15',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+1100 top+100",
+                    of: "#app"
+                }
+            );
+	    /*
             this.addNewCard("kbaseFrame",
                 {
                     url: "http://140.221.84.217/glamm",
@@ -813,6 +872,108 @@
                     autoResize: true
                 }
             );
+	    */
+        },
+
+        showUserTestCards2: function() {
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/NarrativePanel.png",
+		    width: "auto",
+		    height: "auto",
+                },
+                {
+                    my: "left top",
+                    at: "left top",
+                    of: "#app"
+                }
+            );
+	    /*
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/ServicePanel.png",
+		    width: "auto",
+		    height: "auto",
+                },
+                {
+                    my: "left top",
+                    at: "left-20 top",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/WorkspacePanel.png",
+		    width: "auto",
+		    height: "auto",
+                },
+                {
+                    my: "left top",
+                    at: "left-20 top+300",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("kbaseImageViewer",
+                {
+                    imageUrl: "/functional-site/assets/images/GLAMM.png",
+		    width: "auto",
+		    height: "auto",
+                },
+                {
+                    my: "left top",
+                    at: "left top",
+                    of: "#app"
+                }
+            );*/
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.39',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+1100 top",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.53',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+1100 top+50",
+                    of: "#app"
+                }
+            );
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.15',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+1100 top+100",
+                    of: "#app"
+                }
+            );
+	    /*
+            this.addNewCard("kbaseFrame",
+                {
+                    url: "http://140.221.84.217/glamm",
+                    id: "glamm-frame"
+                },
+                {
+                    my: "left top",
+                    at: "left bottom",
+                    of: "#app"
+                },
+                {
+                    autoResize: true
+                }
+            );
+	    */
         },
 
         /**
