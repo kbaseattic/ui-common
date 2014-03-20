@@ -24,11 +24,11 @@
             }
 
             else {
-                this.$textArea = $('<textarea id="knhx-text">');//.append(this.tempTree);
-                this.$canvas = $('<canvas id="knhx-canvas">');
+                this.$canvas = $('<div>')
+                               .append($('<canvas id="knhx-canvas">'));
                 this.$elem.append(this.$canvas);
 
-                knhx_init('knhx-canvas', 'knhx-text');
+                knhx_init('knhx-canvas', null);
 
                 this.render();
 //                kn_actions.plot(this.tempTree);

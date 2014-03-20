@@ -771,21 +771,16 @@
                     my: "left top",
                     at: "left bottom",
                     of: "#app",
+                },
+                {
+                    height: "500",
+                    width: "500"
                 }
             );
         },
 
 
         showUserTestCards: function() {
-            var $newDiv = $("<div>");
-            this.$elem.append($newDiv);
-            $newDiv.KBaseCardLayoutManager({
-                template: "tree",
-                treeID: "tree_abcde",
-                workspaceID: "kbasetest:home",
-            });
-
-
             var imageCard = this.addNewCard("kbaseImageViewer",
                 {
                     imageUrl: "http://demo.kbase.us/functional-site/assets/images/doodle.png",
@@ -794,48 +789,12 @@
                     my: "left top",
                     at: "left bottom",
                     of: this.$elem
+                },
+                {
+                    height: 100
                 }
             );
 
-            this.addNewCard("KBaseCardLayoutManager",
-            {
-                template: "tree",
-                treeID: "tree_xyz",
-                workspaceID: "kbasetest:home",
-            },
-            {
-                my: "left top",
-                at: "left bottom",
-                of: this.$elem
-            });
-            // var glammCard = this.addNewCard("kbaseFrame",
-            //     {
-            //         url: "http://140.221.84.217/glamm",
-            //         id: "glamm-frame"
-            //     },
-            //     {
-            //         my: "left top",
-            //         at: "left bottom",
-            //         of: this.$elem
-            //     },
-            //     {
-            //         autoResize: true
-            //     }
-            // );
-            // this.addNewCard("kbaseFrame",
-            //     {
-            //         url: "http://www.kbase.us",
-            //         id: "kbase-frame",
-            //     },
-            //     {
-            //         my: "left top",
-            //         at: "left bottom",
-            //         of: this.$elem
-            //     },
-            //     {
-            //         autoResize: true
-            //     }
-            // )
         },
 
         /**
