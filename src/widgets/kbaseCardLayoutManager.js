@@ -831,7 +831,10 @@
                     my: "left top",
                     at: "left+1100 top",
                     of: "#app"
-                }
+                },
+		{
+		    width: 300
+		}
             );
             this.addNewCard("KBaseGenomeOverview",
                 {
@@ -842,7 +845,10 @@
                     my: "left top",
                     at: "left+1100 top+50",
                     of: "#app"
-                }
+                },
+		{
+		    width: 300
+		}
             );
             this.addNewCard("KBaseGenomeOverview",
                 {
@@ -853,7 +859,10 @@
                     my: "left top",
                     at: "left+1100 top+100",
                     of: "#app"
-                }
+                },
+		{
+		    width: 300
+		}
             );
 	    /*
             this.addNewCard("kbaseFrame",
@@ -880,37 +889,54 @@
                 },
                 {
                     my: "left top",
-                    at: "left top",
+                    at: "left-20 top",
                     of: "#app"
                 },
 		{
-		    width: 600
+		    width: 500
 		}
             );
-	    /*
-            this.addNewCard("kbaseImageViewer",
+            this.addNewCard("KBaseGenomeOverview",
                 {
-                    imageUrl: "/functional-site/assets/images/ServicePanel.png",
-		    width: "auto",
-		    height: "auto",
+		    genomeID: 'kb|g.39',
+                    isInCard: true
                 },
                 {
                     my: "left top",
-                    at: "left-20 top",
+                    at: "left+500 top",
                     of: "#app"
-                }
+                },
+		{
+		    width: 300
+		}
             );
-            this.addNewCard("kbaseImageViewer",
+            this.addNewCard("KBaseGenomeOverview",
                 {
-                    imageUrl: "/functional-site/assets/images/WorkspacePanel.png",
-		    width: "auto",
-		    height: "auto",
+		    genomeID: 'kb|g.53',
+                    isInCard: true
                 },
                 {
                     my: "left top",
-                    at: "left-20 top+300",
+                    at: "left+500 top+50",
                     of: "#app"
-                }
+                },
+		{
+		    width: 300
+		}
+            );
+            this.addNewCard("KBaseGenomeOverview",
+                {
+		    genomeID: 'kb|g.15',
+                    isInCard: true
+                },
+                {
+                    my: "left top",
+                    at: "left+500 top+100",
+                    of: "#app"
+                },
+		{
+		    width: 300
+		}
             );
             this.addNewCard("kbaseImageViewer",
                 {
@@ -920,59 +946,21 @@
                 },
                 {
                     my: "left top",
-                    at: "left top",
-                    of: "#app"
-                }
-            );*/
-            this.addNewCard("KBaseGenomeOverview",
-                {
-		    genomeID: 'kb|g.39',
-                    isInCard: true
-                },
-                {
-                    my: "left top",
-                    at: "left+1100 top",
+                    at: "left+805 top",
                     of: "#app"
                 }
             );
-            this.addNewCard("KBaseGenomeOverview",
-                {
-		    genomeID: 'kb|g.53',
-                    isInCard: true
-                },
-                {
-                    my: "left top",
-                    at: "left+1100 top+50",
-                    of: "#app"
-                }
-            );
-            this.addNewCard("KBaseGenomeOverview",
-                {
-		    genomeID: 'kb|g.15',
-                    isInCard: true
-                },
-                {
-                    my: "left top",
-                    at: "left+1100 top+100",
-                    of: "#app"
-                }
-            );
-	    /*
-            this.addNewCard("kbaseFrame",
-                {
-                    url: "http://140.221.84.217/glamm",
-                    id: "glamm-frame"
-                },
-                {
-                    my: "left top",
-                    at: "left bottom",
-                    of: "#app"
-                },
-                {
-                    autoResize: true
-                }
-            );
-	    */
+            this.addNewCard("KBaseContigBrowser",
+			    {
+				contig: "kb|g.15.c.43",
+				genomeId: "kb|g.15",
+				showButtons: true
+			    },
+			    {
+				my: "left top",
+				at: "left+847 top+550",
+			    }
+			   );
         },
 
         /**
