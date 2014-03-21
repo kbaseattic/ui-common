@@ -770,6 +770,7 @@
                     treeID: this.options.data.treeID,
                     workspaceID: this.options.data.workspaceID,
                     kbCache: this.options.data.kbCache,
+                    loadingImage: this.options.loadingImage,
                 },
                 {
                     my: "left top",

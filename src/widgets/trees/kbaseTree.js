@@ -8,6 +8,7 @@
             workspaceID: null,
             kbCache: null,
             treeServiceURL: "http://140.221.85.58:8284/",
+            loadingImage: null,
         },
 
         init: function(options) {
@@ -24,6 +25,10 @@
             }
 
             else {
+                this.$messagePane = $("<div/>")
+                                    .addClass("kbwidget-message-pane kbwidget-hide-message");
+                this.$elem.append(this.$messagePane);
+
                 this.treeClient = new Tree(this.options.treeServiceURL);
                 this.$canvas = $('<div>')
                                .append($('<canvas id="knhx-canvas">'));
@@ -37,6 +42,7 @@
         },
 
         render: function() {
+            this.loading(false);
             var prom = this.options.kbCache.req('ws', 'get_objects', 
                 [this.buildObjectIdentity(this.options.workspaceID, this.options.treeID)]);
 
@@ -44,19 +50,20 @@
                 var tree = objArr[0].data;
                 var idMap = {};
                 $.each(tree.id_map, function(key, value) {
-                    idMap[key] = value[0] + '-' + value[1];
+                    idMap[key] = value[1].replace(/[\(\)]/g, '_');
                 });
 
-                // this.treeClient.replace_node_names(tree.species_tree, idMap, 
-                //     function(relabeledTree) {
-                //         console.log(relabeledTree);
-                //         kn_actions.plot(relabeledTree);
-                //     },
-                //     function(error) {
-                //         console.debug("error");
-                //     }
-                // );
-                kn_actions.plot(tree.species_tree);
+                this.treeClient.replace_node_names(tree.species_tree.trim(), idMap, 
+                    $.proxy(function(relabeledTree) {
+                        kn_actions.plot(relabeledTree);
+                        this.loading(true);
+                    }, this),
+                    $.proxy(function(error) {
+                        this.renderError(error);
+                        console.log(error);
+                    }, this)
+                );
+//                kn_actions.plot(tree.species_tree);
             }, this));
             $.when(prom).fail($.proxy(function(error) { this.renderError(error); }, this));
 
@@ -102,6 +109,24 @@
             return obj;
         },
 
+        loading: function(doneLoading) {
+            if (doneLoading)
+                this.hideMessage();
+            else
+                this.showMessage("<img src='" + this.options.loadingImage + "'/>");
+        },
+
+        showMessage: function(message) {
+            var span = $("<span/>").append(message);
+
+            this.$messagePane.append(span);
+            this.$messagePane.removeClass("kbwidget-hide-message");
+        },
+
+        hideMessage: function() {
+            this.$messagePane.addClass("kbwidget-hide-message");
+            this.$messagePane.empty();
+        },
 
     });
 })( jQuery );

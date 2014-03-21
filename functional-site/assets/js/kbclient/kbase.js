@@ -8615,7 +8615,7 @@ function Tree(url, auth, auth_cb) {
 
 
     this.replace_node_names = function (tree, replacements, _callback, _errorCallback) {
-    return json_call_ajax("Tree.replace_node_names",
+    return json_call_ajax("KBaseTrees.replace_node_names",
         [tree, replacements], 1, _callback, _errorCallback);
 };
 
