@@ -9,7 +9,7 @@ document.write('<style type="text/css"><!-- \
 	  position: absolute; \
 	  background-color: #fcfcfc; \
 	  border: 1px solid #CCC; \
-	  z-index: 100; \
+	  z-index: 10000; \
 	  visibility: hidden; \
 	  font-size: 12px;\
 	} \
