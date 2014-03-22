@@ -1,14 +1,16 @@
 (function($, undefined) {
     $.KBWidget({
         name: 'kbaseTree',
-        parent: 'kbaseWidget',
+        parent: 'kbaseAuthenticatedWidget',
         version: '0.0.1',
         options: {
             treeID: null,
             workspaceID: null,
             kbCache: null,
             treeServiceURL: "http://140.221.85.58:8284/",
-            loadingImage: null,
+            workspaceURL: "http://140.221.84.209:7058/",
+            loadingImage: "static/kbase/images/ajax-loader.gif",
+            height: null,
         },
 
         init: function(options) {
@@ -20,21 +22,29 @@
             else if (!this.options.workspaceID) {
                 this.renderError("No workspace given!");
             }
-            else if (!this.options.kbCache) {
-                this.renderError("No KBase Cache present!");
+            else if (!this.options.kbCache && !this.authToken()) {
+                this.renderError("No cache given, and not logged in!");
             }
 
             else {
+                if (!this.options.kbCache)
+                    this.wsClient = new Workspace(this.options.workspaceURL, {token: this.authToken()});
+
                 this.$messagePane = $("<div/>")
                                     .addClass("kbwidget-message-pane kbwidget-hide-message");
                 this.$elem.append(this.$messagePane);
 
                 this.treeClient = new Tree(this.options.treeServiceURL);
+
+                this.canvasId = "knhx-canvas-" + this.uuid();
                 this.$canvas = $('<div>')
-                               .append($('<canvas id="knhx-canvas">'));
+                               .append($('<canvas id="' + this.canvasId + '">'));
+                if (this.options.height) {
+                    this.$canvas.css({'max-height':this.options.height, 'overflow':'scroll'});
+                }
                 this.$elem.append(this.$canvas);
 
-                knhx_init('knhx-canvas', null);
+                knhx_init(this.canvasId, null);
                 this.render();
             }
 
@@ -43,8 +53,13 @@
 
         render: function() {
             this.loading(false);
-            var prom = this.options.kbCache.req('ws', 'get_objects', 
-                [this.buildObjectIdentity(this.options.workspaceID, this.options.treeID)]);
+            var prom;
+
+            var objId = this.buildObjectIdentity(this.options.workspaceID, this.options.treeID);
+            if (this.options.kbCache)
+                prom = this.options.kbCache.req('ws', 'get_objects', [objId]);
+            else
+                prom = this.wsClient.get_objects([objId]);
 
             $.when(prom).done($.proxy(function(objArr) {
                 var tree = objArr[0].data;
@@ -59,14 +74,13 @@
                         this.loading(true);
                     }, this),
                     $.proxy(function(error) {
-                        this.renderError(error);
-                        console.log(error);
+                        kn_actions.plot(tree.species_tree);
+                        this.loading(true);
+                        this.dbg("error while relabeling tree");
                     }, this)
                 );
-//                kn_actions.plot(tree.species_tree);
             }, this));
             $.when(prom).fail($.proxy(function(error) { this.renderError(error); }, this));
-
         },
 
         renderError: function(error) {
@@ -120,12 +134,28 @@
             var span = $("<span/>").append(message);
 
             this.$messagePane.append(span);
-            this.$messagePane.removeClass("kbwidget-hide-message");
+            this.$messagePane.show();
         },
 
         hideMessage: function() {
-            this.$messagePane.addClass("kbwidget-hide-message");
+            this.$messagePane.hide();
             this.$messagePane.empty();
+        },
+
+        getState: function() {
+            return {};
+        },
+
+        loadState: function(state) {
+            
+        },
+
+        uuid: function() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, 
+                function(c) {
+                    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                    return v.toString(16);
+                });
         },
 
     });
