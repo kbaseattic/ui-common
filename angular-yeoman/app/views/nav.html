@@ -1,0 +1,35 @@
+<div class="nav navbar-kbase navbar-fixed-top nav-collapse nav-collapse-scrollable bs-navbar-scroll-collapse"  style="z-index:1031">
+    <a href="http://www.kbase.us" class="pull-left">
+        <img id="logo" src="images/kbase_logo.png" width="46">
+    </a>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav"> 
+            <li class="dropdown" ng-class="{ active: $state.includes('narrative')}">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Narrative <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#/narrative/">Newsfeed</a></li>                
+                    <li><a href="#/narrative/projects/">Projects</a></li>
+                </ul>
+            </li>
+            <li ng-class="{ active: $state.includes('ws')}"><a href="#/ws/" >Workspaces</a></li>
+            <li><a href="http://kbase.us/services/docs/uploader/uploader.html">Upload</a></li>          
+        </ul>
+
+        <form ng-controller="SearchCtrl" ng-submit="startSearch(searchquery)" class="navbar-form navbar-left" role="search" style="width: 40%">
+            <div class="input-group">
+                <input class="form-control" ng-model="searchquery" name="search" placeholder="Search KBase Data" autocomplete="off" type="text"> 
+                <div class="input-group-btn">
+                    <button class="btn" type="submit" style="background-color: #ebebeb; border-color: #adadad; border-left:none">
+                        <span class="glyphicon glyphicon-search" style="line-height: .9"></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="pull-right" ng-include="'views/auth.html'"></div>
+        <ul class="nav navbar-nav pull-right">
+            <li class="dropdown help-dropdown"></li>
+        </ul>
+    </div> 
+</div>

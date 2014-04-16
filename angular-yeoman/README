@@ -1,0 +1,53 @@
+A strawman for migration to yeoman's generated angular stack.
+This stack includes the following:
+
+1. AngularJS 1.2.15 with standard accessories (angular-resource, angular-cookies, angular-sanitize, angular-route)
+2. jQuery 1.11
+3. Twitter Bootstrap 3.0.3
+4. Bower files for package management (see bower.json)
+5. Karma for testing
+6. Grunt for handling the running parts - compiling, testing, setting up temporary local servers, etc.
+
+
+============
+INSTALLATION
+============
+Using this stack requires the pre-installation of a number of Javascript packages.
+First and foremost, it runs locally using Node.js, available at http://nodejs.org/
+Next, it invokes the node package manager (npm) for many things. If that doesn't come with your node distributions, some information is available at http://npmjs.org.
+
+I found this blog post (and attendant gist) useful as well, if you have issues:
+http://www.joyent.com/blog/installing-node-and-npm/
+https://gist.github.com/isaacs/579814
+
+Mostly, you should NOT install node/npm in such a way that you require sudo access to install node-based packages. This breaks certain tasks that both grunt and bower perform. At the very least, make sure that the path you install npm into is (1) writeable without superuser access and (2) on your execution path.
+
+With node and npm installed, you can then use that package management system to install bower, grunt, and karma.
+> npm install -g bower
+> npm install -g grunt
+> npm install -g karma
+
+[note - I might be missing a package or two here, please add them to the instructions if so!]
+
+This directory already contains the scaffold set up by yeoman, so you shouldn't need to do anything else. BUT, if you need (or want) to install yeoman and its angular startup bindings...
+> npm install -g yo
+> npm install -g generator-angular
+
+You can also install generators through yeoman itself. Run the command "yo" and follow the prompts.
+
+
+=======
+RUNNING
+=======
+To start up a local server for developing, then from *this* directory (<root>/ui-common/angular-yeoman) enter:
+> grunt serve
+
+This will download all registered dependencies listed in bower.json, through bower. It will then initialize a local node server and testing apparatus, and point your default browser to the local starting page.
+
+Note that as you modify and save files, this will automatically update the state of your server - no page reloading necessary in most cases (sometimes it reloads the page for you, otherwise it just integrates the changes). This also involves running your code through jslint and testing.
+
+
+Hope this helps!
+Bill Riehl
+wjriehl@lbl.gov
+April 16, 2014
