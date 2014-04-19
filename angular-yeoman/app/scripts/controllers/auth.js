@@ -24,7 +24,7 @@ app.controller('AuthCtrl', function($scope, $location, Auth) {
         Auth.logIn(user, pw).success(function() {
             $scope.username = Auth.getUsername();
             $scope.password = null;
-            $scope.$broadcast('LOGGED_IN');
+            $scope.$broadcast('loggedIn.kbase');
 
             $location.path('/newsfeed/');
         })

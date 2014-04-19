@@ -6,12 +6,11 @@ app.directive('login', function(Auth) {
         restrict: 'A',
         scope: true,
         link: function($scope, elem, attrs) {
-            $scope.$on('LOGGED_IN', function() {
+            $scope.$on('loggedIn.kbase', function() {
                 $scope.showDialog = false;
             });
-            
+
             $scope.showLoginDialog = function() {
-                console.log('showing dialog');
                 $scope.showDialog = true;
             };
         },
