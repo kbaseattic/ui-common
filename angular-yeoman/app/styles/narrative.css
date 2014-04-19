@@ -116,3 +116,28 @@ ul#narr-sidenav-items li {
 	color: #555;
 }
 
+.nav-login {
+	padding-top: 15px;
+	padding-bottom: 15px;
+	padding-right: 10px;
+	line-height: 20px;
+}
+
+.nav-login-menu {
+	padding: 3px;
+}
+
+.nav-login-menu > li {
+	text-align: right;
+}
+
+.nav-login-menu > li:first-child {
+	border-bottom: 1px solid lightgray;
+	white-space: nowrap;
+}
+
+.nav-login-menu > li:first-child > span > a {
+	font-weight: bold;
+	padding-right: 0px;
+	padding-left: 0px;
+}

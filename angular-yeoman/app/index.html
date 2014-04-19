@@ -17,7 +17,6 @@
         <!-- build:css({.tmp,app}) styles/main.css -->
         <link rel="stylesheet" href="styles/landing-pages.css">
         <link rel="stylesheet" href="styles/narrative.css">
-        <link rel="stylesheet" href="styles/main.css">
 
         <!-- endbuild -->
     </head>
@@ -28,6 +27,7 @@
 
         <!-- Add your site or application content here -->
         <div ng-include="'views/nav.html'"></div>
+        <div id="app" class="wrapper" ui-view></div>
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
         <script>
             (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -53,16 +53,22 @@
         <script src="bower_components/angular-cookies/angular-cookies.js"></script>
         <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
+        <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
         <!-- endbower -->
         <!-- endbuild -->
 
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
         <script src="scripts/app.js"></script>
+
         <script src="scripts/controllers/main.js"></script>
         <script src="scripts/controllers/search.js"></script>
         <script src="scripts/controllers/auth.js"></script>
+        <script src="scripts/controllers/newsfeed.js"></script>
+
         <script src="scripts/services/auth.js"></script>
+
         <script src="scripts/directives/login.js"></script>
+        <script src="scripts/directives/modalShow.js"></script>
         <!-- endbuild -->
     </body>
 </html>

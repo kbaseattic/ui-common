@@ -7,16 +7,17 @@ app.factory('Auth',
                 // do log in, return promise
                 // when login complete, stuff the token
                 // in local storage
-                console.debug('logging in "' + username + '" with pw "' + password + '"');
                 var args = 'status=1&cookie=1&fields=name,kbase_sessionid,user_id,token&user_id=' + username + '&password=' + password;
                 return $http.post(AUTH_URL, args, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
                        .success(function(response) {
                             // should also stuff the token/username into local storage
                             localStorage.setItem('kbUsername', response.user_id);
                             localStorage.setItem('kbAuthToken', response.token);
+                            localStorage.setItem('kbFullUsername', response.name);
                             return {
                                 token: response.token,
-                                username: response.user_id
+                                username: response.user_id,
+                                name: response.name
                             };
                        })
                        .error(function(error) {
@@ -30,6 +31,7 @@ app.factory('Auth',
                 this.username = null;
                 localStorage.removeItem('kbUsername');
                 localStorage.removeItem('kbAuthToken');
+                localStorage.removeItem('kbFullUsername');
             },
 
             getAuthToken: function() {
@@ -39,6 +41,11 @@ app.factory('Auth',
 
             getUsername: function() {
                 return localStorage.getItem('kbUsername');
+            },
+
+            getFullUsername: function() {
+                console.log(localStorage.getItem('kbFullUsername'));
+                return localStorage.getItem('kbFullUsername');
             },
 
             loggedIn: function() {
