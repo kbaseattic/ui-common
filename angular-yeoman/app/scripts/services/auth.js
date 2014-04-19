@@ -44,7 +44,6 @@ app.factory('Auth',
             },
 
             getFullUsername: function() {
-                console.log(localStorage.getItem('kbFullUsername'));
                 return localStorage.getItem('kbFullUsername');
             },
 
