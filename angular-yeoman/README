@@ -9,9 +9,9 @@ This stack includes the following:
 6. Grunt for handling the running parts - compiling, testing, setting up temporary local servers, etc.
 
 
-============
-INSTALLATION
-============
+================
+PRE-INSTALLATION
+================
 Using this stack requires the pre-installation of a number of Javascript packages.
 First and foremost, it runs locally using Node.js, available at http://nodejs.org/
 Next, it invokes the node package manager (npm) for many things. If that doesn't come with your node distributions, some information is available at http://npmjs.org.
@@ -34,6 +34,20 @@ This directory already contains the scaffold set up by yeoman, so you shouldn't 
 > npm install -g generator-angular
 
 You can also install generators through yeoman itself. Run the command "yo" and follow the prompts.
+
+
+======================
+INSTALLATION FROM REPO
+======================
+If this is the first time you've grabbed this repo, there are a couple steps necessary to grab the right packages and make sure they're in the right place.
+
+Fortunately, this is really easy.
+
+From the <root>/ui-common/angular-yeoman/ directory:
+> npm install
+> bower install
+
+If you have npm and bower installed already, this should handle the rest of the local installation.
 
 
 =======
