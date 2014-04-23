@@ -60,6 +60,15 @@ This will download all registered dependencies listed in bower.json, through bow
 
 Note that as you modify and save files, this will automatically update the state of your server - no page reloading necessary in most cases (sometimes it reloads the page for you, otherwise it just integrates the changes). This also involves running your code through jslint and testing.
 
+=======
+TESTING
+=======
+To run through the unit testing cycle, enter:
+> grunt test
+
+This will initialize everything necessary, and run all the tests given in the <root>/ui-common/angular-yeoman/test/ directory. These are not necessarily headless, and will open up (and subsequently close) different browsers. This is all driven by Angular's Karma test runner and can be configured in karma.conf.js.
+
+To perform end-to-end testing, ...
 
 Hope this helps!
 Bill Riehl
