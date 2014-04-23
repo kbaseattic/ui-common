@@ -1,21 +1,16 @@
 'use strict';
 
 describe('Controller: SearchCtrl', function() {
+    var scope, ctrl;
 
-    // load the controller's module
     beforeEach(module('kbaseStrawmanApp'));
 
-    var SearchCtrl, scope;
-
-    // Initialize the controller and a mock scope
-    beforeEach(inject(function ($controller, $rootScope) {
+    beforeEach(inject(function($rootScope, $controller) {
         scope = $rootScope.$new();
-        SearchCtrl = $controller('SearchCtrl', {
-            $scope: scope
-        });
+        ctrl = $controller('SearchCtrl', {$scope: scope});
     }));
 
-    it('should have a startSearch function', function () {
-        
+    it('should have a startSearch function', function() {
+        expect(typeof scope.startSearch).toBe('function');
     });
-})
+});
