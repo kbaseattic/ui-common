@@ -9,6 +9,17 @@ module.exports = function(config) {
     // testing framework to use (jasmine/mocha/qunit/...)
     frameworks: ['jasmine'],
 
+    preprocessors: {
+      'app/scripts/**/*.js': 'coverage'
+    },
+
+    reporters: ['coverage'],
+
+    coverageReporter: {
+      type: 'html',
+      dir: 'coverage/'
+    },
+
     // list of files / patterns to load in the browser
     files: [
       'app/bower_components/angular/angular.js',
