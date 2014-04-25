@@ -15,7 +15,7 @@ describe('Controller: NewsfeedCtrl', function() {
         authService.logOut();
     }));
 
-    it('should have an undefined user in scope', function() {
+    it('should start with an undefined user in scope', function() {
         expect(scope.username).toBeFalsy();
     });
 })
