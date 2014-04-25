@@ -47,8 +47,4 @@ app.controller('AuthCtrl', function($scope, $location, Auth) {
         }
         return isLoggedIn;
     };
-
-    $scope.showLoginDialog = function() {
-        $scope.error = null;
-    };
 });

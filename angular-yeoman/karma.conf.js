@@ -13,7 +13,7 @@ module.exports = function(config) {
       'app/scripts/**/*.js': 'coverage'
     },
 
-    reporters: ['coverage'],
+    reporters: ['progress', 'coverage'],
 
     coverageReporter: {
       type: 'html',
