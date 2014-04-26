@@ -18,4 +18,4 @@ describe('Controller: NewsfeedCtrl', function() {
     it('should start with an undefined user in scope', function() {
         expect(scope.username).toBeFalsy();
     });
-})
+});
