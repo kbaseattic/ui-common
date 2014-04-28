@@ -29,6 +29,41 @@ app.factory('Auth',
                             localStorage.setItem('kbUsername', response.user_id);
                             localStorage.setItem('kbAuthToken', response.token);
                             localStorage.setItem('kbFullUsername', response.name);
+
+                            var authCookie = 'un=' + response.user_id +
+                                             '|kbase_sessionid=' + response.kbase_sessionid +
+                                             '|user_id=' + response.user_id +
+                                             '|token=' + response.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
+
+                            $.cookie('kbase_session', authCookie, { path: '/'});
+                            $.cookie('kbase_session', authCookie, { path: '/', domain: 'kbase.us'});
+
+//                            $cookieStore.put('kbase_session', authCookie);
+
+// function set_cookie() {
+//    var c = $("#signin-button").kbaseLogin('get_kbase_cookie');
+//    console.log( 'Setting kbase_session cookie');
+//    $.cookie('kbase_session',
+//     'un=' + c.user_id
+//     + '|'
+//     + 'kbase_sessionid=' + c.kbase_sessionid
+//     + '|'
+//     + 'user_id=' + c.user_id
+//     + '|'
+//     + 'token=' + c.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g,'PIPESIGN'),
+//     { path: '/'});
+//    $.cookie('kbase_session',
+//     'un=' + c.user_id
+//     + '|'
+//     + 'kbase_sessionid=' + c.kbase_sessionid
+//     + '|'
+//     + 'user_id=' + c.user_id
+//     + '|'
+//     + 'token=' + c.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g,'PIPESIGN'),
+//     { path: '/',
+//       domain: 'kbase.us' });
+// };
+
                             return {
                                 token: response.token,
                                 username: response.user_id,
@@ -51,6 +86,7 @@ app.factory('Auth',
                 localStorage.removeItem('kbUsername');
                 localStorage.removeItem('kbAuthToken');
                 localStorage.removeItem('kbFullUsername');
+                $.removeCookie('kbase_session');
             },
 
             /**

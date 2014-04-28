@@ -96,4 +96,17 @@ describe('Services: Auth', function() {
         $httpBackend.flush();
         expect(Auth.loggedIn()).toBeFalsy();
     }));
+
+    it('should make a cookie on login', inject(function(Auth) {
+        Auth.logIn(goodUid, goodPw);
+        $httpBackend.flush();
+        expect(document.cookie).not.toBe('');
+    }));
+
+    it('should clear cookies after log out', inject(function(Auth) {
+        Auth.logIn(goodUid, goodPw);
+        $httpBackend.flush();
+        Auth.logOut();
+        expect(document.cookie).toBe('');
+    }));
 });

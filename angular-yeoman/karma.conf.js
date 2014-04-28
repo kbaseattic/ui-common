@@ -29,6 +29,8 @@ module.exports = function(config) {
       'app/bower_components/angular-sanitize/angular-sanitize.js',
       'app/bower_components/angular-route/angular-route.js',
       'app/bower_components/angular-ui-router/release/angular-ui-router.js',
+      'app/bower_components/jquery/dist/jquery.js',
+      'app/bower_components/jquery.cookie/jquery.cookie.js',
       'app/scripts/*.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
