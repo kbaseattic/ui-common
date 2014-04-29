@@ -90,7 +90,7 @@ describe('Services: Auth', function() {
 
     it('errors correctly when presented with bad login credentials', inject(function(Auth) {
         Auth.logIn(badUid, badPw).then(
-            function(){}, 
+            function(){},
             function(error) { expect(error.data.error_msg).toBe(badExpectedResponse.error_msg); }
         );
         $httpBackend.flush();

@@ -10,7 +10,9 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
 
     preprocessors: {
-      'app/scripts/**/*.js': 'coverage'
+      'app/scripts/**/*.js': 'coverage',
+      'app/templates/*.html': 'html2js',
+//      'app/views/*.html': 'ng-html2js'
     },
 
     reporters: ['progress', 'coverage'],
@@ -34,7 +36,10 @@ module.exports = function(config) {
       'app/scripts/*.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
-      'test/spec/**/*.js'
+      'test/spec/**/*.js',
+
+      'app/templates/*.html',
+//      'app/views/*.html'
     ],
 
     // list of files / patterns to exclude

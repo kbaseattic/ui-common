@@ -2,7 +2,7 @@
 
 // tests the Auth controller and underlying service.
 describe('Controller: AuthCtrl', function() {
-    var $httpBackend, scope, createController, authUrl, ctrl;
+    var $httpBackend, scope, authUrl, ctrl;
     var goodUid = 'kbasetest';
     var goodPw = 'password';
     var token = 'kb|an_auth_token';
@@ -73,4 +73,4 @@ describe('Controller: AuthCtrl', function() {
         $httpBackend.flush();
         expect(scope.loggedIn()).toBeFalsy();
     });
-})
+});
