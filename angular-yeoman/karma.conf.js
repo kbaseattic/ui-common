@@ -11,8 +11,7 @@ module.exports = function(config) {
 
     preprocessors: {
       'app/scripts/**/*.js': 'coverage',
-      'app/templates/*.html': 'html2js',
-//      'app/views/*.html': 'ng-html2js'
+      'app/templates/*.html': 'html2js'
     },
 
     reporters: ['progress', 'coverage'],
@@ -38,8 +37,7 @@ module.exports = function(config) {
       'test/mock/**/*.js',
       'test/spec/**/*.js',
 
-      'app/templates/*.html',
-//      'app/views/*.html'
+      'app/templates/*.html'
     ],
 
     // list of files / patterns to exclude
@@ -71,6 +69,6 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
-    singleRun: false
+    singleRun: true
   });
 };
