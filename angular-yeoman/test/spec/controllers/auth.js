@@ -5,7 +5,7 @@ describe('Controller: AuthCtrl', function() {
     var $httpBackend, scope, authUrl, ctrl;
     var goodUid = 'kbasetest';
     var goodPw = 'password';
-    var token = 'kb|an_auth_token';
+    var token = 'kb|an_auth_token|expiry=9999999999|';
     var goodExpectedResponse = {user_id: goodUid, token: token, name: goodUid};
 
     var badUid = 'asdf';
@@ -72,5 +72,15 @@ describe('Controller: AuthCtrl', function() {
         scope.logIn(badUid, badPw);
         $httpBackend.flush();
         expect(scope.loggedIn()).toBeFalsy();
+    });
+
+    it('should create an error when logging in without a username', function() {
+        scope.logIn(null, badPw);
+        expect(scope.error).not.toBe(null);
+    });
+
+    it('should create an error when logging in without a password', function() {
+        scope.logIn(badUid, null);
+        expect(scope.error).not.toBe(null);
     });
 });

@@ -18,14 +18,11 @@ app.factory('Auth',
              * kbUsername, kbFullUsername, and kbAuthToken
              * Guess which is which! :D
              */
-            logIn: function(username, password, token) {
+            logIn: function(username, password) {
                 // do log in, return promise
                 // when login complete, stuff the token
                 // in local storage
                 var args = 'status=1&cookie=1&fields=name,kbase_sessionid,user_id,token&user_id=' + username + '&password=' + password;
-                if (token) {
-                    args = 'status=1&cookie=1&token=' + token + '&fields=name,kbase_sessionid,user_id,token';
-                }
                 return $http.post(AUTH_URL, args, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
                        .success(function(response) {
                             // should also stuff the token/username into local storage

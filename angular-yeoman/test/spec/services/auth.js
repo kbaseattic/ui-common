@@ -6,7 +6,7 @@ describe('Services: Auth', function() {
     var goodUid = 'kbasetest';
     var goodPw = 'password';
     var goodFullName = 'KBase Test User';
-    var token = 'kb|an_auth_token';
+    var token = 'kb|an_auth_token|expiry=9999999999|';
     var goodExpectedResponse = {user_id: goodUid, token: token, name: goodFullName};
 
     var badUid = 'asdf';
@@ -108,5 +108,18 @@ describe('Services: Auth', function() {
         $httpBackend.flush();
         Auth.logOut();
         expect(document.cookie).toBe('');
+    }));
+
+    it('should properly state that an old or invalid token has expired', inject(function(Auth) {
+        var badToken = 'token_of_DOOM';
+        expect(Auth.tokenExpired(badToken)).toBe(true);
+        badToken = 'kb|token|expiry=12345|';
+        expect(Auth.tokenExpired(badToken)).toBe(true);
+    }));
+
+    it('should log out and return \'false\' if a logIn check is done with an old token', inject(function(Auth) {
+        // spoof an old token
+        localStorage.setItem('kbAuthToken', 'kb|token|expiry=12345|');
+        expect(Auth.loggedIn()).toBe(false);
     }));
 });
