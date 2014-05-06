@@ -1,57 +1,58 @@
 'use strict';
 
 describe('Directives: login', function() {
-    var elem, scope, $rootScope, $httpBackend, $compile;
+    var elem, $scope, $httpBackend;
 
-    function compileDirective(template) {
-        if (!template) {
-            template = '<div ng-controller="AuthCtrl" login/>';
-        }
-
-        elem = $compile(template)(scope);
-        scope.$digest();
-    }
-
-    beforeEach(module('kbaseStrawmanApp', function($compileProvider) {
-        $compileProvider.directive('modalShow', function() {
-            var def = {
-                priority: 100,
-                terminal: true,
-                restrict: 'EAC',
-                template: '<div class="mock">this is a mock!</div>'
-            };
-            return def;
-        });
-    }));
+    beforeEach(module('kbaseStrawmanApp'));
+    // , function($compileProvider) {
+    //     $compileProvider.directive('modalShow', function() {
+    //         var def = {
+    //             priority: 100,
+    //             terminal: true,
+    //             restrict: 'EAC',
+    //             template: '<div>this is a mock!</div>',
+    //         };
+    //         return def;
+    //     });
+    // }));
 
     beforeEach(module('app/templates/login.html'));
 
-    beforeEach(inject(function($injector) {
-        var $templateCache = $injector.get('$templateCache');
+    beforeEach(inject(function($compile, $rootScope, $templateCache) {
         var template = $templateCache.get('app/templates/login.html');
-        $templateCache.put('templates/login.html', template);
+        $templateCache.put('templates/login.html', '<div>mock mock mock</div>');
 
-        $rootScope = $injector.get('$rootScope');
-        scope = $rootScope.$new();
+        // Make a new scope
+        $scope = $rootScope.$new();
 
-        $compile = $injector.get('$compile');
+        // Make an element to compile the directive into
+        elem = angular.element('<div login></div>');
 
-        compileDirective();
+        // Compile that directive with that element and scope
+        $compile(elem)($scope);
+
+        // This directive makes a new element - grab it and digest it
+        $scope = elem.scope();
+        $scope.$digest();
     }));
 
 
     it('should compile correctly', function() {
-        expect(elem.isolateScope().showDialog).toBe(false);
+        debugger;
+        expect($scope.showDialog).toBe(false);
     });
 
     it('should respond to "loggedIn.kbase" by setting showDialog to false', function() {
-        $rootScope.$broadcast('loggedIn.kbase');
-        expect(elem.isolateScope().showDialog).toBe(false);
+       $scope.showDialog = true;
+       inject(function($rootScope) {
+            $rootScope.$broadcast('loggedIn.kbase');
+       });
+       expect($scope.showDialog).toBe(false);
     });
 
     it('should set showDialog to true when calling showLoginDialog', function() {
-        elem.isolateScope().showLoginDialog();
-        expect(elem.isolateScope().showDialog).toBeTruthy();
+       $scope.showLoginDialog();
+       expect($scope.showDialog).toBe(true);
     });
 
 });

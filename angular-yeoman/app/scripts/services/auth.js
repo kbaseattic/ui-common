@@ -56,7 +56,7 @@ app.factory('Auth',
             logOut: function() {
                 // log out of current session, clear token from storage
                 this.token = null;
-                this.username = null;
+//                this.username = null;
                 localStorage.removeItem('kbUsername');
                 localStorage.removeItem('kbAuthToken');
                 localStorage.removeItem('kbFullUsername');

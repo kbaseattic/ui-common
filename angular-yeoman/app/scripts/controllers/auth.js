@@ -22,11 +22,7 @@ app.controller('AuthCtrl', function($scope, $location, Auth) {
         $scope.error = null;
 
         Auth.logIn(user, pw).success(function() {
-            $scope.username = Auth.getUsername();
-            $scope.password = null;
             $scope.$broadcast('loggedIn.kbase');
-
-            $location.path('/newsfeed/');
         })
         .error(function(error) {
             $scope.error = error.error_msg;
@@ -36,7 +32,6 @@ app.controller('AuthCtrl', function($scope, $location, Auth) {
     $scope.logOut = function() {
         Auth.logOut();
         $scope.username = Auth.getUsername();
-        $scope.password = null;
         $location.path('/');
     };
 

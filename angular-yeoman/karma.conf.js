@@ -32,6 +32,7 @@ module.exports = function(config) {
       'app/bower_components/angular-ui-router/release/angular-ui-router.js',
       'app/bower_components/jquery/dist/jquery.js',
       'app/bower_components/jquery.cookie/jquery.cookie.js',
+      'app/bower_components/bootstrap/dist/js/bootstrap.js',
       'app/scripts/*.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
@@ -69,6 +70,6 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
-    singleRun: true
+    singleRun: false
   });
 };
