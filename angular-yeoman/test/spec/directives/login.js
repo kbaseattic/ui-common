@@ -4,22 +4,8 @@ describe('Directives: login', function() {
     var elem, $scope, $httpBackend;
 
     beforeEach(module('kbaseStrawmanApp'));
-    // , function($compileProvider) {
-    //     $compileProvider.directive('modalShow', function() {
-    //         var def = {
-    //             priority: 100,
-    //             terminal: true,
-    //             restrict: 'EAC',
-    //             template: '<div>this is a mock!</div>',
-    //         };
-    //         return def;
-    //     });
-    // }));
-
-    beforeEach(module('app/templates/login.html'));
 
     beforeEach(inject(function($compile, $rootScope, $templateCache) {
-        var template = $templateCache.get('app/templates/login.html');
         $templateCache.put('templates/login.html', '<div>mock mock mock</div>');
 
         // Make a new scope
@@ -38,7 +24,6 @@ describe('Directives: login', function() {
 
 
     it('should compile correctly', function() {
-        debugger;
         expect($scope.showDialog).toBe(false);
     });
 
