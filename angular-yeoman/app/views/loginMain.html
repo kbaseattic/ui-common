@@ -10,10 +10,10 @@
         </div>
     </div>
     <div class="col-md-4 col-md-offset-1" ng-hide="loggedIn()">
-        <form id="login-form" class="well" ng-submit="loginUser(user)">
+        <form id="login-form" class="well">
             <div>
                 <legend>Please Sign in</legend>
-                <p id="login_error" class="text-danger" style="display:none"></p>
+                <p id="login_error" class="text-danger" ng-show="error">{{ error }}</p>
                 <div class="form-group">
                    
                     <label for="kbase_username">Username:</label>
@@ -25,6 +25,7 @@
                 </div>
 
                 <button id="signinbtn" type="submit" class="btn btn-primary" tabindex="3" ng-click="logIn(username, password)" >Sign In</button> <img src="./images/ajax-loader.gif" id="loading-indicator" style="display: none;"  />
+                <span ng-show="loginPending"><img src="./images/ajax-loader.gif" id="loading-indicator"/></span>
             </div>
             <BR>
             <span>New to KBase? <a target="_blank" href="http://gologin.kbase.us/Signup">Register now</a></span>

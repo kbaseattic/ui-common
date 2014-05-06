@@ -33,6 +33,9 @@
                             </div>
                             {{ error }}
                         </div>
+                        <div class="alert alert-success" ng-show="loginPending">
+                            Logging in as {{ username }}...
+                        </div>
                         <div class="form-group">
                             <label class="control-label col-md-2">Username:</label>
                             <div class="col-md-10">

@@ -1,6 +1,8 @@
 'use strict';
 
 app.controller('AuthCtrl', function($scope, $location, Auth) {
+    $scope.loginPending = false;
+
     $scope.getUsername = function() {
         return Auth.getUsername();
     };
@@ -22,11 +24,14 @@ app.controller('AuthCtrl', function($scope, $location, Auth) {
             $scope.error = 'Please enter your password.';
         }
         else {
+            $scope.loginPending = true;
             // actually perform login here
             Auth.logIn(user, pw).success(function() {
                 $scope.$broadcast('loggedIn.kbase');
+                $scope.loginPending = false;
             })
             .error(function(error) {
+                $scope.loginPending = false;
                 $scope.error = error.error_msg;
             });
         }
