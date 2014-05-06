@@ -26,7 +26,6 @@ app.directive('modalShow', ['$parse', function($parse) {
             });
 
             element.bind('hide.bs.modal', function() {
-                console.log($parse);
                 $parse(attrs.modalShow).assign($scope, false);
                 if (!$scope.$$phase && !$scope.$root.$$phase) {
                     $scope.$apply();

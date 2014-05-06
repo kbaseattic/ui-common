@@ -18,11 +18,14 @@ app.factory('Auth',
              * kbUsername, kbFullUsername, and kbAuthToken
              * Guess which is which! :D
              */
-            logIn: function(username, password) {
+            logIn: function(username, password, token) {
                 // do log in, return promise
                 // when login complete, stuff the token
                 // in local storage
                 var args = 'status=1&cookie=1&fields=name,kbase_sessionid,user_id,token&user_id=' + username + '&password=' + password;
+                if (token) {
+                    args = 'status=1&cookie=1&token=' + token + '&fields=name,kbase_sessionid,user_id,token';
+                }
                 return $http.post(AUTH_URL, args, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
                        .success(function(response) {
                             // should also stuff the token/username into local storage
@@ -56,7 +59,6 @@ app.factory('Auth',
             logOut: function() {
                 // log out of current session, clear token from storage
                 this.token = null;
-//                this.username = null;
                 localStorage.removeItem('kbUsername');
                 localStorage.removeItem('kbAuthToken');
                 localStorage.removeItem('kbFullUsername');
@@ -85,10 +87,38 @@ app.factory('Auth',
             },
 
             /**
-             * This returns true if the user's logged in with a token stored in local storage, false otherwise.
+             * Returns true if the token is not expired, false otherwise.
+             */
+            tokenExpired: function(token) {
+                var expirySec = /\|expiry\=(\d+)\|/.exec(token);
+                if (expirySec) {
+                    expirySec = expirySec[1];
+                    var expiryDate = new Date(expirySec*1000);
+                    return (expiryDate - new Date() < 0);
+                }
+                return true;
+            },
+
+            /**
+             * Checks whether a user is logged in through two steps.
+             * 1. Check if a token is present.
+             * 2. Validate that token using its expiration date.
+             * 3. (later, if needed) validate the token against Globus Online
              */
             loggedIn: function() {
-                return localStorage.getItem('kbAuthToken') !== null;
+                var token = localStorage.getItem('kbAuthToken');
+
+                // If we don't have a token, then it can't be valid, can it?
+                if (!token) {
+                    return false;
+                }
+
+                // If the token is expired, then it's invalid
+                if (this.tokenExpired(token)) {
+                    this.logOut();
+                    return false;
+                }
+                return true;
             },
         };
 

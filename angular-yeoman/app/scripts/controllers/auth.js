@@ -9,29 +9,31 @@ app.controller('AuthCtrl', function($scope, $location, Auth) {
         return Auth.getFullUsername();
     };
 
-    /**
-     * Returns the Auth.logIn promise.
-     * Once logging in occurs, the service will
-     * keep a hold of the token and can be retrieved.
-     */
     $scope.logIn = function(user, pw) {
         // if a user is already logged in, log them out first
         $scope.logOut();
 
-        // actually perform login here
         $scope.error = null;
 
-        Auth.logIn(user, pw).success(function() {
-            $scope.$broadcast('loggedIn.kbase');
-        })
-        .error(function(error) {
-            $scope.error = error.error_msg;
-        });
+        if (!user) {
+            $scope.error = 'Please enter your username.';
+        }
+        else if (!pw) {
+            $scope.error = 'Please enter your password.';
+        }
+        else {
+            // actually perform login here
+            Auth.logIn(user, pw).success(function() {
+                $scope.$broadcast('loggedIn.kbase');
+            })
+            .error(function(error) {
+                $scope.error = error.error_msg;
+            });
+        }
     };
 
     $scope.logOut = function() {
         Auth.logOut();
-        $scope.username = Auth.getUsername();
         $location.path('/');
     };
 
@@ -42,4 +44,6 @@ app.controller('AuthCtrl', function($scope, $location, Auth) {
         }
         return isLoggedIn;
     };
+
+    $scope.loggedIn();
 });
