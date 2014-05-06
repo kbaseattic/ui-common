@@ -1,6 +1,8 @@
 'use strict';
 
-// tests the Auth controller and underlying service.
+/**
+ * A spec for testing the Auth controller and its interactions with the underlying service.
+ */
 describe('Controller: AuthCtrl', function() {
     var $httpBackend, scope, authUrl, ctrl;
     var goodUid = 'kbasetest';
@@ -16,12 +18,17 @@ describe('Controller: AuthCtrl', function() {
         return 'status=1&cookie=1&fields=name,kbase_sessionid,user_id,token&user_id=' + uid + '&password=' + pw;
     };
 
+    // First, initialize the app
     beforeEach(module('kbaseStrawmanApp'));
 
+    // Before each test, initialize the $httpBackend mockup to respond to the expected login attempts
+    // with either good or bad responses.
     beforeEach(inject(function($injector, AUTH_URL) {
         $httpBackend = $injector.get('$httpBackend');
-        $httpBackend.when('POST', AUTH_URL, authArgs(goodUid, goodPw)).respond(goodExpectedResponse);
-        $httpBackend.when('POST', AUTH_URL, authArgs(badUid, badPw)).respond(badExpectedResponse);
+        $httpBackend.when('POST', AUTH_URL, authArgs(goodUid, goodPw))
+                    .respond(goodExpectedResponse);
+        $httpBackend.when('POST', AUTH_URL, authArgs(badUid, badPw))
+                    .respond(badExpectedResponse);
 
         var $rootScope = $injector.get('$rootScope');
         var $controller = $injector.get('$controller');
@@ -32,6 +39,7 @@ describe('Controller: AuthCtrl', function() {
         ctrl = $controller('AuthCtrl', {'$scope': scope});
     }));
 
+    // After each test, flush the $httpBackend, and make sure we're logged out (localStorage is flushed)
     afterEach(function() {
         $httpBackend.verifyNoOutstandingExpectation();
         $httpBackend.verifyNoOutstandingRequest();

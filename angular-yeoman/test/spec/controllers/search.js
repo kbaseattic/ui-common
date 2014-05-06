@@ -1,10 +1,15 @@
 'use strict';
 
+/**
+ * A little test spec for the dummy search controller.
+ */
+
 describe('Controller: SearchCtrl', function() {
     var scope, ctrl;
 
     beforeEach(module('kbaseStrawmanApp'));
 
+    // make a new controller before each test.
     beforeEach(inject(function($rootScope, $controller) {
         scope = $rootScope.$new();
         ctrl = $controller('SearchCtrl', {$scope: scope});

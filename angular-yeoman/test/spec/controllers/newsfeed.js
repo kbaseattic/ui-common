@@ -1,10 +1,14 @@
 'use strict';
 
+/**
+ * A test spec for the dummy newsfeed controller.
+ */
 describe('Controller: NewsfeedCtrl', function() {
     var scope, ctrl, authService;
 
     beforeEach(module('kbaseStrawmanApp'));
 
+    // Make a new controller, and inject the Auth service into it.
     beforeEach(inject(function($rootScope, $controller, Auth) {
         authService = Auth;
         scope = $rootScope.$new();

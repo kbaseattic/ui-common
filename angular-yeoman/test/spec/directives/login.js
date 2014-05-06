@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * A spec to test the login directive.
+ * This directive should, basically, manage the data in its scope correctly.
+ */
 describe('Directives: login', function() {
     var elem, $scope, $httpBackend;
 

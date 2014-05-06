@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * This spec tests the modalShow directive.
+ * This directive mainly wraps around the Bootstrap modal apparatus, and invokes it
+ * when required.
+ */
 describe('Directives: modalShow', function() {
     var elem, $scope, $compile;
 
@@ -29,6 +34,9 @@ describe('Directives: modalShow', function() {
         elem = angular.element(template);
         $scope = $rootScope.$new();
         $compile(elem)($scope);
+
+        // Here, we need to grab the new scope that the directive makes for itself, and digest it
+        // to make sure it's ready to roll.
         $scope = elem.scope();
         $scope.$digest();
     }));
