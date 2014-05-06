@@ -5,7 +5,16 @@ app.directive('login', function() {
         templateUrl: 'templates/login.html',
         restrict: 'A',
         scope: true,
-        link: function($scope) {
+        link: function($scope, elem, attrs) {
+            $scope.keystroke = 0;
+
+            $scope.$watch('keystroke', function() {
+                if ($scope.keystroke === 13) {
+                    $scope.logIn($scope.username, $scope.password);
+                    $scope.keystroke = 0;
+                }
+            });
+
             $scope.showDialog = false;
 
             $scope.showLoginDialog = function() {
