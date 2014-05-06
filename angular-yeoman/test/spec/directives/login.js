@@ -23,7 +23,7 @@ describe('Directives: login', function() {
     }));
 
 
-    it('should compile correctly', function() {
+    it('should initialize with showDialog = false', function() {
         expect($scope.showDialog).toBe(false);
     });
 

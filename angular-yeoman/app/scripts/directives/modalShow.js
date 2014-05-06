@@ -14,10 +14,10 @@ app.directive('modalShow', ['$parse', function($parse) {
                     elem = element;
                 }
                 if (visible) {
-                    elem.modal('show');
+                    $(elem).modal('show');
                 }
                 else {
-                    elem.modal('hide');
+                    $(elem).modal('hide');
                 }
             };
 
@@ -26,6 +26,7 @@ app.directive('modalShow', ['$parse', function($parse) {
             });
 
             element.bind('hide.bs.modal', function() {
+                console.log($parse);
                 $parse(attrs.modalShow).assign($scope, false);
                 if (!$scope.$$phase && !$scope.$root.$$phase) {
                     $scope.$apply();
