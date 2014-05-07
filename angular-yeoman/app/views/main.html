@@ -1,36 +1,44 @@
-<div class="header">
-  <ul class="nav nav-pills pull-right">
-    <li class="active"><a ng-href="#">Home</a></li>
-    <li><a ng-href="#">About</a></li>
-    <li><a ng-href="#">Contact</a></li>
-  </ul>
-  <h3 class="text-muted">KBase Angular-Yeoman Strawman</h3>
-</div>
+<div class="row">
+    <div class="col-md-4 col-md-offset-1">
+        <div>
+            <p id="doodle" class="text-center"><img src="./images/doodle.png" /></p>
+            <div style="padding-left: 30px">
+                <h1 style="font-size: 1.6em">Your science, your way.</h1>
+                <p>Build narratives that capture your analyses, including rich annotations, visualization widgets, reusable workflows, and custom scripts. Share your work and your data with colleagues. Follow the field through the people, organisms, and projects that matter to you. </p>
+                <p>Building narratives not your style? You can still work with KBase tools via <a href="http://www.kbase.us/services/docs/invocation/Iris/">Iris</a>, our web-based command-line interface, or access your workspaces with the <a href="#/ws/">Workspace Browser</a>.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-md-offset-1" ng-hide="loggedIn()">
+        <form class="login-form well">
+            <div>
+                <legend>Please Sign in</legend>
+                <p id="login_error" class="text-danger" ng-show="error">{{ error }}</p>
+                <div class="form-group">
+                    <label for="kbase_username">Username:</label>
+                    <input name="kbase_username" type="text" placeholder="username" id="kbase_username" class=" form-control" tabindex="1" ng-model="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="kbase_password" class="full-width">Password:<span class="pull-right">&nbsp;<a target="_blank" href="http://gologin.kbase.us/ResetPassword" tabindex="4">Forgot password?</a></span></label>
+                    <input type="password" placeholder="password" id="kbase_password" class="form-control" tabindex="2" ng-model="password" required>
+                </div>
 
-<div class="jumbotron">
-  <h1>'Allo, 'Allo!</h1>
-  <p class="lead">
-    <img src="images/yeoman.png" alt="I'm Yeoman"><br>
-    Always a pleasure scaffolding your apps.
-  </p>
-  <p><a class="btn btn-lg btn-success" ng-href="#">Splendid!<span class="glyphicon glyphicon-ok"></span></a></p>
-</div>
-
-<div class="row marketing">
-  <h4>HTML5 Boilerplate</h4>
-  <p>
-    HTML5 Boilerplate is a professional front-end template for building fast, robust, and adaptable web apps or sites.
-  </p>
-
-  <h4>Angular</h4>
-  <p>
-    AngularJS is a toolset for building the framework most suited to your application development.
-  </p>
-
-  <h4>Karma</h4>
-  <p>Spectacular Test Runner for JavaScript.</p>
-</div>
-
-<div class="footer">
-  <p><span class="glyphicon glyphicon-heart"></span> from the Yeoman team</p>
+                <button id="signinbtn" type="submit" class="btn btn-primary" tabindex="3" ng-click="logIn(username, password)" >Sign In</button> <img src="./images/ajax-loader.gif" id="loading-indicator" style="display: none;"  />
+                <span ng-show="loginPending"><img src="./images/ajax-loader.gif" id="loading-indicator"/></span>
+            </div>
+            <BR>
+            <span>New to KBase? <a target="_blank" href="http://gologin.kbase.us/Signup">Register now</a></span>
+        </form>
+    </div>
+    <div class="col-md-4 col-md-offset-1" ng-show="loggedIn()">
+        <form class="login-form well">
+            <div>
+                <legend>Signed in as {{ username }}</legend>
+                <p>
+                    You can access your narratives, workspaces, or upload data using the buttons at the top. The search bar will allow you to find data in KBase.
+                </p>
+                <button class="btn btn-primary" ng-click="logOut()">Sign Out</button>
+            </div>
+        </form>
+    </div>
 </div>

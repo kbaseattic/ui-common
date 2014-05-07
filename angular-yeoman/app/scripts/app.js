@@ -13,17 +13,17 @@ app.config(function ($urlRouterProvider, $stateProvider) {
     $stateProvider
     .state('/', {
         url: '',
-        templateUrl: '/views/loginMain.html',
+        templateUrl: '/views/main.html',
         controller: 'AuthCtrl'
     })
     .state('/#/', {
         url: '/',
-        templateUrl: '/views/loginMain.html',
+        templateUrl: '/views/main.html',
         controller: 'AuthCtrl'
     })
     .state('login', {
         url: '/login/',
-        templateUrl: '/views/loginMain.html',
+        templateUrl: '/views/main.html',
         controller: 'AuthCtrl'
     })
     .state('newsfeed', {
