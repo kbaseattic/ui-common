@@ -7,6 +7,7 @@ define('vis',
         'kbaseScatterplot',
         'kbasePiechart',
         'kbaseForcedNetwork',
+        'kbaseTreechart',
 
         'kbasePlantsNetworkTable',
         'kbasePlantsNetworkNarrative',

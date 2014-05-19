@@ -19,6 +19,7 @@ define('kbpaths',[], function (paths) {
      kbaseLineSerieschart : 'vis/kbaseLineSerieschart',
      kbasePiechart : 'vis/kbasePiechart',
      kbaseForcedNetwork : 'vis/kbaseForcedNetwork',
+     kbaseTreechart : 'vis/kbaseTreechart',
 
      kbasePlantsNetworkTable : 'vis/plants/kbasePlantsNetworkTable',
      kbasePlantsNetworkNarrative : 'vis/plants/kbasePlantsNetworkNarrative',

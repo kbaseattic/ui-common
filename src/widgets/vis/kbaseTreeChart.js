@@ -34,7 +34,7 @@ define('kbaseTreechart',
             red : undefined,
             blue : undefined,
 
-            chartOffset : 0,
+            distance : 100,
 
         },
 
@@ -91,23 +91,27 @@ console.log(source);
 
             var rootOffset = 0;
 
+            var bounds = this.chartBounds();
+
             //okay. This is going to suck. Figure out the appropriate depth of the root element. Create a fake SVG element, toss the root node into there, and yank out its width.
             var fakeDiv = document.createElement('div');
 
+            var root = source;
+            while (root.parent != undefined) {
+                root = root.parent;
+            }
+
             var rootText = chart.append('text')
-                .attr('style', 'font-size : 11px;cursor : pointer;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;')
+                .attr('style', 'visibility : hidden; font-size : 11px;cursor : pointer;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;')
                 .attr('class', 'fake')
-                .text(source.name);
-            rootOffset = rootText[0][0].getBBox().width + 10;
+                .text(root.name);
+            rootOffset = rootText[0][0].getBBox().width - 10 + bounds.origin.x;
 console.log(rootText[0][0]);
 console.log(rootOffset);
-var newHeight = 30 * this.countVisibleNodes(this.dataset());
+var newHeight = 15 * this.countVisibleNodes(this.dataset());
 //this.$elem.animate({'height' : newHeight + this.options.yGutter + this.options.yPadding}, 500);
 //            this.$elem.height(newHeight);
             this.height(this.$elem.height());
-
-
-            var bounds = this.chartBounds();
             bounds.size.height = newHeight;
             this.treeLayout = d3.layout.tree()
                 .size([bounds.size.height, bounds.size.width]);
@@ -119,7 +123,7 @@ var chartOffset = 0;
 
             function depth(d) {
 
-                var distance = 100;
+                var distance = $tree.options.distance;
                 if (d.distance != undefined) {
                     distance *= d.distance;
                 };
@@ -142,17 +146,18 @@ var chartOffset = 0;
                     d.y = depth(d);
 
                     var fakeText = chart.append('text')
-                        .attr('style', 'font-size : 11px;cursor : pointer;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;')
+                        .attr('style', 'visibility : hidden;font-size : 11px;cursor : pointer;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;')
                 .attr('class', 'fake')
                         .text(d.name);
                     var fakeBox = fakeText[0][0].getBBox();
                     var fakeRight = d.children || d._children
-                        ? d.y - 10
+                        ? d.y + 10
                         : d.y + fakeBox.width + 10;
                     var fakeLeft = d.children || d._children
-                        ? d.y - 10 - fakeBox.width
+                        ? d.y + 10 - fakeBox.width
                         : d.y + 10;
 
+                    console.log("NODE POS : " + d.y);
                     console.log(fakeLeft + " TO " + fakeRight + ' for ' + d.name);
                     console.log(fakeBox);
 
@@ -172,10 +177,9 @@ var chartOffset = 0;
 
             var widthDelta = 0;
             if (minOffset < bounds.origin.x) {
-            console.log('min increase');
                 widthDelta += bounds.origin.x - minOffset;
-                //$tree.options.chartOffset = widthDelta;
                 chartOffset = widthDelta;
+            console.log('min increase by ' + widthDelta);
             }
             if (maxOffset > bounds.origin.x + bounds.size.width) {
             console.log('max increase');
@@ -185,16 +189,23 @@ var chartOffset = 0;
             this.nodes.forEach(
                 function(d) {
                     d.y = depth(d);
+                    console.log("2NODE POS : " + d.y + ' for ' + d.name);
                 }
             );
 
             chart.selectAll('.fake').remove();
 
             console.log("INCREASE WIDTH BY " + widthDelta);
+            console.log("NEW WIDTH " + (this.options.xGutter + this.options.yGutter + widthDelta + bounds.size.width));
+
+            var newWidth = this.options.xGutter + this.options.yGutter + widthDelta + bounds.size.width;
+            if (newWidth < $tree.options.originalWidth) {
+                newWidth = $tree.options.originalWidth;
+            }
 
             this.$elem.animate(
                 {
-                    'width' : this.options.xGutter + this.options.yGutter + widthDelta + bounds.size.width,
+                    'width' : newWidth,
                     'height' : newHeight + this.options.yGutter + this.options.yPadding
                 },
                 duration
@@ -208,7 +219,7 @@ var chartOffset = 0;
             // Enter any new nodes at the parent's previous position.
             var nodeEnter = node.enter().append("g")
                 .attr("class", "node")
-                .attr("transform", function(d) { return "translate(" + (source.y0 + $tree.options.chartOffset) + "," + source.x0 + ")"; })
+                .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
             ;
 
             nodeEnter.append("circle")
@@ -289,22 +300,14 @@ console.log(pos);
                         $tree.comparison('');
                     }
                 })
-                //.call(this.wrap, 50, function(d) { return d.children || d._children ? -10 : 10; })
-                //.call($tree.flagResize, $tree)
-            ;
 
-  function endall(transition, callback) {
-    var n = 0;
-    transition
-        .each(function() { ++n; })
-        .each("end", function() { if (!--n) callback.apply(this, arguments); });
-  }
+            ;
 
             // Transition nodes to their new position.
             var nodeUpdate = node.transition()
                 .duration(duration)
-                .attr("transform", function(d) { return "translate(" + (d.y + $tree.options.chartOffset) + "," + d.x + ")"; })
-                .call(endall, function() { chart.selectAll('text').call($tree.flagResize, $tree)  });
+                .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+            ;
 
             nodeUpdate.select("circle")
                 .attr("r", 4.5)
@@ -316,9 +319,8 @@ console.log(pos);
             // Transition exiting nodes to the parent's new position.
             var nodeExit = node.exit().transition()
                 .duration(duration)
-                .attr("transform", function(d) { return "translate(" + (source.y + $tree.options.chartOffset)  + "," + source.x + ")"; })
+                .attr("transform", function(d) { return "translate(" + source.y  + "," + source.x + ")"; })
                 .remove()
-                .call(endall, function() { chart.selectAll('text').call($tree.flagResize, $tree)  })
                 ;
 
             nodeExit.select("circle")
@@ -365,96 +367,6 @@ console.log(pos);
             d.y0 = d.y;
             });
 
-//            setTimeout(function() {chart.selectAll('text')
-//                .call($tree.flagResize, $tree);}, 1000);
-
-        },
-
-        flagResize : function(labels, $tree) {
-return;
-            var bounds = $tree.chartBounds();
-console.log("BOUNDS IS NOW");console.log(bounds);
-            var chartRight = bounds.origin.x + bounds.size.width;
-
-            var xMax = 0;
-            var xMin = 5000000000000;   //Is anybody gonna have a 5 billion pixel wide display? Note - fix in 15 years.
-
-//            console.log("CHART RIGHT IS " + chartRight);
-            needsResize = false;
-//console.log(labels);
-//                console.log('able');
-            labels.each(
-                function() {
-//                console.log('alpha');
-//                console.log(this);
-
-                    var width = this.getComputedTextLength();
-                    var coords = $tree.absPos(this);
-                    var lMax = coords.x + width;
-//console.log(xMax);
-//console.log(coords);console.log(width);
-                    if (lMax > xMax) {
-                    console.log("WIDER" + xMax + " > " + lMax);
-                    console.log(this);
-                        xMax = lMax;
-                        //console.log("NEEDS RESIZE! " + xMax + ' > ' + chartRight);
-                    }
-console.log("COMPARES : " + xMin + " VS " + coords.x);
-                    if (coords.x < xMin) {
-                    console.log(this);
-                        xMin = coords.x;
-                    }
-                }
-            );
-
-            var widthDelta = 0;
-            var oldOffset = $tree.options.chartOffset;
-console.log("WIDE BODY : " + xMax + ', ' + $tree.options.originalWidth + ', ' + chartRight);
-            if (xMax > chartRight) {
-                console.log("NEEDS RESIZE! " + xMax + ' > ' + chartRight);
-                widthDelta = xMax - chartRight;
-            }
-            else if (xMax < $tree.options.originalWidth) {
-                widthDelta = $tree.options.originalWidth - $tree.width();
-                console.log("WD1 : " + widthDelta);
-            }
-
-            if (xMin < bounds.origin.x) {
-                var minBoundsOffset = Math.round(bounds.origin.x - xMin);
-                //widthDelta += minBoundsOffset;
-                if ($tree.options.chartOffset < minBoundsOffset) {
-                    $tree.options.chartOffset = minBoundsOffset;
-                }
-
-                console.log("NEEDS MORE WIDTH + " + minBoundsOffset);
-            }
-            else {
-                //$tree.options.chartOffset = 0;
-            }
-
-console.log("MIN COORDS : " + bounds.origin.x + ' BUT ' + xMin + "WITH OFFSET : " + $tree.options.chartOffset);
-
-            widthDelta = Math.round(widthDelta);
-
-console.log("WD : " + widthDelta);
-
-            if (widthDelta != 0) {
-
-                var newWidth = $tree.width() + widthDelta;
-console.log("NEW WIDTH WILL BE : " + newWidth + " FROM " + $tree.width());
-                //$tree.$elem.width(newWidth);
-                $tree.width(newWidth);
-
-                $tree.$elem.animate({'width' : newWidth}, 500);
-                //$tree.$elem.width(newWidth);
-
-            }
-
-            console.log("OFFSETS : " + $tree.options.chartOffset + " WAS " + oldOffset);
-            if ($tree.options.chartOffset > oldOffset ) {
-                $tree.updateTree($tree.dataset());
-console.log("SHOULD WIDEN HERE!");
-            }
 
         },
 
@@ -468,7 +380,7 @@ console.log("SHOULD WIDEN HERE!");
             this.height(this.$elem.height());
 
             this.options.originalWidth = this.$elem.width();
-
+console.log("ORIGINAL WIDTH " + this.options.originalWidth);
             var i = 0;
             var bounds = this.chartBounds();
 
@@ -480,7 +392,7 @@ console.log("SHOULD WIDEN HERE!");
             var $tree = this;
 
             this.diagonal = d3.svg.diagonal()
-                .projection(function(d) { return [d.y + $tree.options.chartOffset, d.x]; });
+                .projection(function(d) { return [d.y, d.x]; });
 
             // Compute the new tree layout.
             this.nodes = this.treeLayout.nodes(this.dataset()).reverse();
