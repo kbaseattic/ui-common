@@ -1,4 +1,11 @@
-(function( $, undefined ) {
+define('kbaseWSMediaTable',
+    [
+        'jquery',
+	'kbwidget',
+	'kbasePanel'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseWSMediaTable",      
@@ -80,4 +87,4 @@ $.KBWidget({
 
 
 })
-}( jQuery ) );
+});

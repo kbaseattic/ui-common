@@ -1,4 +1,10 @@
-(function($, undefined) {
+define('KBaseCmonkeyRunResultCard',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseCmonkeyRunResultCard",
         parent: "kbaseWidget",
@@ -157,4 +163,4 @@
             };
         },
     });
-})(jQuery);
+});

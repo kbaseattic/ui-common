@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+define('kbaseFbaMeta',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseFbaMeta",     
@@ -37,4 +43,4 @@ $.KBWidget({
     }  //end init
 
 })
-}( jQuery ) );
+});

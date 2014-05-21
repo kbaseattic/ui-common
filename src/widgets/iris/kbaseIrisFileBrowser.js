@@ -3,7 +3,15 @@
 
 */
 
-(function( $, undefined ) {
+define('kbaseIrisFileBrowser',
+    [
+        'jquery',
+        'kbaseDataBrowser',
+        'kbaseButtonControls',
+        'kbaseDeletePrompt',
+        'kbasePrompt',
+    ],
+    function ($) {
 
 
     $.KBWidget({
@@ -12,7 +20,7 @@
 		parent: 'kbaseDataBrowser',
 
         version: "1.0.0",
-        _accessors : ['invocationURL', 'client', 'addFileCallback', 'editFileCallback', 'singleFileSize', 'chunkSize', 'stalledUploads'],
+        _accessors : ['selectedFiles', 'invocationURL', 'client', 'addFileCallback', 'editFileCallback', 'singleFileSize', 'chunkSize', 'stalledUploads'],
         options: {
             stalledUploads : {},
             uploadDir : '.uploads',
@@ -20,13 +28,24 @@
             singleFileSize  : 15000000,
             chunkSize       :  5000000,
             title : 'File Browser',
+
+            pendingUploadJobs : [],
+
             'root' : '/',
             types : {
                 file : {
                     controls :
                     [
                         {
-                            icon : 'icon-minus',
+                            icon : 'fa fa-link',
+                            //tooltip : 'select widget',
+                            callback :
+                                function (e, $fb) {
+                                    $fb.toggleSelection($(this).data('id'));
+                                },
+                        },
+                        {
+                            icon : 'fa fa-minus',
                             callback : function(e, $fb) {
                                 $fb.deleteFile($(this).data('id'), 'file');
                             },
@@ -34,7 +53,7 @@
                             //tooltip : 'delete this file',
                         },
                         {
-                            icon : 'icon-download-alt',
+                            icon : 'fa fa-download',
                             callback : function(e, $fb) {
                                 $fb.openFile($(this).data('id'));
                             },
@@ -42,7 +61,7 @@
                             //'tooltip' : 'download this file',
                         },
                         {
-                            icon : 'icon-pencil',
+                            icon : 'fa fa-pencil',
                             callback : function(e, $fb) {
                                 if ($fb.editFileCallback() != undefined) {
                                     $fb.editFileCallback()($(this).data('id'), $fb);
@@ -63,7 +82,7 @@
                             },
                         },
                         {
-                            icon : 'icon-arrow-right',
+                            icon : 'fa fa-arrow-right',
                             callback : function(e, $fb) {
                                 if ($fb.addFileCallback() != undefined) {
                                     $fb.addFileCallback()($(this).data('id'), $fb);
@@ -77,13 +96,14 @@
                 folder : {
                     childrenCallback : function (path, callback) {
 
-                        this.listDirectory(path, function (results) {
+                        this.listDirectory(path, $.proxy(function (results) {
                             callback(results);
-                        });
+                            this.selectFiles();
+                        }, this));
                     },
                     controls : [
                         {
-                            icon : 'icon-minus',
+                            icon : 'fa fa-minus',
                             //'tooltip' : 'delete this folder',
                             callback : function(e, $fb) {
                                 $fb.deleteFile($(this).data('id'), 'folder');
@@ -91,7 +111,15 @@
                             id : 'removeDirectoryButton'
                         },
                         {
-                            icon : 'icon-plus',
+                            icon : 'fa fa-file',
+                            //'tooltip' : 'add a subdirectory',
+                            callback : function(e, $fb) {
+                                $fb.addNewFile($(this).data('id'));
+                            },
+                            id : 'addFileButton'
+                        },
+                        {
+                            icon : 'fa fa-plus',
                             //'tooltip' : 'add a subdirectory',
                             callback : function(e, $fb) {
                                 $fb.addDirectory($(this).data('id'));
@@ -99,11 +127,11 @@
                             id : 'addDirectoryButton'
                         },
                         {
-                            icon : 'icon-arrow-up',
+                            icon : 'fa fa-arrow-up',
                             //'tooltip' : 'upload a file',
                             callback : function(e, $fb) {
                                 $fb.data('active_directory', $(this).data('id'));
-                                $fb.data('fileInput').trigger('click');
+                                $fb.uploadFile();
                             },
                             id : 'uploadFileButton'
                         },
@@ -113,13 +141,37 @@
             },
         },
 
+        toggleSelection : function(file) {
+
+            this.selectedFiles()[file] = ! this.selectedFiles()[file];
+
+            if (this.selectedFiles()[file]) {
+                this.targets[file].css('border', '1px solid green');
+            }
+            else {
+                this.targets[file].css('border', '');
+            }
+
+        },
+
+        selectFiles : function() {
+            $.each(
+                this.selectedFiles(),
+                $.proxy(function (file, selected) {
+                    if (selected) {
+                        this.targets[file].css('border', '1px solid green');
+                    }
+                }, this)
+            )
+        },
+
         uploadFile : function() {
             this.data('fileInput').trigger('click');
         },
 
         init: function (options) {
 
-            this._super(options);
+            this._super(options)
 
             this.listDirectory(this.options.root, $.proxy(function (results) {
                 this.appendContent(results, this.data('ul-nav'))
@@ -212,7 +264,15 @@
                     context : this,
                     controls : [
                         {
-                            'icon' : 'icon-plus',
+                            icon : 'fa fa-file',
+                            //'tooltip' : 'add a subdirectory',
+                            callback : function(e, $fb) {
+                                $fb.addNewFile('/');
+                            },
+                            id : 'addFileButton'
+                        },
+                        {
+                            'icon' : 'fa fa-plus',
                             //'tooltip' : 'add directory',
                             callback : function(e, $fb) {
                                 $fb.addDirectory('/');
@@ -220,11 +280,11 @@
 
                         },
                         {
-                            'icon' : 'icon-arrow-up',
+                            'icon' : 'fa fa-arrow-up',
                             //'tooltip' : 'upload a file',
                             callback : function(e, $fb) {
                                 $fb.data('active_directory', $(this).data('id'));
-                                $fb.data('fileInput').trigger('click');
+                                $fb.uploadFile();
                             }
                         },
                     ]
@@ -281,7 +341,8 @@
             if (! $target.is(':hidden')) {
                 this.listDirectory(path, $.proxy(function (results) {
                     $target.empty();
-                    this.appendContent(results, $target)
+                    this.appendContent(results, $target);
+                    this.selectFiles();
                 }, this), openTargets);
             }
 
@@ -292,7 +353,8 @@
 
                     this.listDirectory(subPath, $.proxy(function (results) {
                         $target.empty();
-                        this.appendContent(results, $target)
+                        this.appendContent(results, $target);
+                        this.selectFiles();
                         $target.show();
                     }, this));
                 }, this)
@@ -366,239 +428,279 @@
 
             $.each(
                 files,
-                jQuery.proxy(
-                    function (idx, file) {
-
-
-                        var upload_dir = '/';
-                        if (this.data('active_directory')) {
-                            upload_dir = this.data('active_directory');
-                        }
-
-                        var fileName = file.name;
-                        if (this.data('override_filename')) {
-                            fileName = this.data('override_filename');
-                            this.data('override_filename', undefined);
-                        }
-
-                        var fullFilePath     = upload_dir + '/' + fileName;
-                        fullFilePath         = fullFilePath.replace(/\/\/+/g, '/');
-
-                        var pid = this.uuid();
-                        this.trigger(
-                            'updateIrisProcess',
-                            {
-                                pid : pid,
-                                msg : 'Uploading ' + fullFilePath + ' ... 0%',
-                                /*content : $.jqElem('div')
-                                    .addClass('progress')
-                                    .addClass('progress-striped')
-                                    .addClass('active')
-                                    .append(
-                                        $.jqElem('div')
-                                            .addClass('bar')
-                                            .css('width', '0%')
-                                            .css('overflow', 'visible')
-                                            .css('color', '#000')
-                                            .css('white-space', 'nowrap')
-                                            .css('text-align', 'left')
-                                            .css('padding', '2px')
-                                            .text('Uploading ' + upload_dir + '/' + fileName)
-                                    )//*/
-                            }
-                        );
-
-                        if (file.size <= this.singleFileSize() ) {
-
-                            var reader = new FileReader();
-
-                            reader.onprogress = $.proxy(function (e) {
-                                this.trigger(
-                                    'updateIrisProcess',
-                                    {
-                                        pid : pid,
-                                        msg : 'Uploading ' + fullFilePath + ' ... ' + (100 * e.loaded / e.total).toFixed(2) + '%',
-                                        /*content : $.jqElem('div')
-                                            .addClass('progress')
-                                            .addClass('progress-striped')
-                                            .addClass('active')
-                                            .append(
-                                                $.jqElem('div')
-                                                    .addClass('bar')
-                                                    .css('width', (100 * e.loaded / e.total).toFixed(2) + '%')
-                                                    .css('overflow', 'visible')
-                                                    .css('color', '#000')
-                                                    .css('white-space', 'nowrap')
-                                                    .css('text-align', 'left')
-                                                    .css('padding', '2px')
-                                                    .text('Uploading ' + upload_dir + '/' + fileName)
-                                            )//*/
-                                    }
-                                );
-                                this.dbg('progress ' + (e.loaded / e.total));
-                                this.dbg(e);
-                            }, this);
-
-
-                            reader.onload = jQuery.proxy(
-                                function(e) {
-
-                                    this.client().put_file(
-                                        this.sessionId(),
-                                        fileName,
-                                        e.target.result,
-                                        upload_dir,
-                                        jQuery.proxy( function (res) {
-                                            this.trigger('removeIrisProcess', pid);
-                                            this.refreshDirectory(upload_dir)
-                                        }, this),
-                                        jQuery.proxy( function (res) {
-                                            this.trigger('removeIrisProcess', pid);
-                                            this.dbg(res);
-                                        }, this)
-                                    );
-                                },
-                                this
-                            );
-
-                            reader.readAsBinaryString(file);
-                        }
-                        else {
-
-                            var chunkUploadPath     = fullFilePath;
-                            chunkUploadPath         = chunkUploadPath.replace(/\//g, '::');
-
-                            var fileSize = file.size;
-                            var chunkSize = this.chunkSize();
-                            var chunk = 1;
-                            var offset = 0;
-                            var chunkMap = {
-                                chunks              : [],
-                                doneChunks          : [],
-                                chunksByName        : {},
-                                size                : 0,
-                                fileName            : fileName,
-                                upload_dir          : upload_dir,
-                                fullFilePath        : fullFilePath,
-                                chunkUploadPath     : chunkUploadPath,
-                                fullUploadPath      : this.options.uploadDir + '/' + chunkUploadPath,
-                                pid                 : pid
-                            };
-
-                            if (this.stalledUploads()[chunkMap.fullFilePath] != undefined) {
-                                this.data('resumed_chunkMap', this.stalledUploads()[chunkMap.fullFilePath]);
-                                this.stalledUploads()[chunkMap.fullFilePath] = undefined;
-                            }
-
-                            if (this.data('resumed_chunkMap') != undefined) {
-                                chunkMap = this.data('resumed_chunkMap');
-                                //remove the junk status created by the newly manufactured pid.
-                                this.trigger('removeIrisProcess', pid);
-
-                                var percent = (100 * chunkMap.doneChunks.length / (chunkMap.doneChunks.length + chunkMap.chunks.length)).toFixed(2);
-
-                                if (percent >= 100) {
-                                    percent = 99;
-                                }
-
-                                this.trigger(
-                                    'updateIrisProcess',
-                                    {
-                                        pid : chunkMap.pid,
-                                        msg : 'Uploading ' + chunkMap.fullFilePath + ' ... ' + percent + '%',
-                                        /*content : $.jqElem('div')
-                                            .addClass('progress')
-                                            .addClass('progress-striped')
-                                            .addClass('active')
-                                            .append(
-                                                $.jqElem('div')
-                                                    .addClass('bar')
-                                                    .css('width', percent + '%')
-                                                    .css('overflow', 'visible')
-                                                    .css('color', '#000')
-                                                    .css('white-space', 'nowrap')
-                                                    .css('text-align', 'left')
-                                                    .css('padding', '2px')
-                                                    .text('Uploading ' + chunkMap.fullFilePath)
-                                            )//*/
-                                    }
-                                );
-
-                                this.data('resumed_chunkMap', undefined);
-                            }
-                            else {
-
-                                while (fileSize > 0) {
-                                    if (chunkSize > fileSize) {
-                                        chunkSize = fileSize;
-                                    }
-                                    fileSize -= chunkSize;
-
-                                    var pad         = '00000000';
-                                    var paddedChunk = (pad + chunk).slice(-8);
-
-                                    chunkMap.chunks.push(
-                                        {
-                                            chunk : chunk,
-                                            name : 'chunk.' + paddedChunk,
-                                            start : offset,
-                                            end : (offset + chunkSize),
-                                            size : chunkSize,
-                                            complete : false,
-                                        }
-                                    );
-
-                                    chunkMap.size += chunkSize;
-
-                                    offset = offset + chunkSize;
-                                    chunk++;
-
-                                }
-
-                            }
-
-                            var callback = $.proxy(function (res) {
-                                $.each(
-                                    chunkMap.chunks,
-                                    function (idx, chunk) {
-                                        chunkMap.chunksByName[chunk.name] = chunk;
-                                    }
-                                );
-
-                                var chunker = this.makeChunkUploader(file, chunkMap);
-                                for (var i = 0; i < this.options.concurrentUploads; i++) {
-                                    chunker();
-                                }
-
-                            }, this);
-
-                            this.client().make_directory(
-                                this.sessionId(),
-                                '/' + this.options.uploadDir,
-                                chunkMap.chunkUploadPath
-
-                            ).always(
-                                $.proxy(function() {
-                                    this.client().put_file(
-                                        this.sessionId(),
-                                        'chunkMap',
-                                        JSON.stringify(chunkMap, undefined, 2),
-                                        '/' + chunkMap.fullUploadPath
-                                    ).done(callback)
-                                    .fail($.proxy(function (res) {this.dbg(res)}, this))
-                                }, this)
-                            );
-
-                        }
-
-                    },
-                    this
-                )
+                $.proxy( function (idx, file) {
+                    this.doFileUpload(file);
+                }, this)
             );
 
             this.data('fileInput').val('');
 
         },
+
+        fileUploadComplete : function(pid, upload_dir) {
+            this.trigger('removeIrisProcess', pid);
+            if (upload_dir != undefined) {
+                this.refreshDirectory(upload_dir);
+            }
+
+            this.currentUploadJob = undefined;
+console.log('upload job done for ' + pid);
+console.log('check for pending jobs');
+            if (this.options.pendingUploadJobs.length) {
+                var pendingJob = this.options.pendingUploadJobs.shift();
+console.log("found one");console.log(pendingJob);
+                this.trigger('removeIrisProcess', pendingJob.pid)
+                if (pendingJob.name) {
+                    this.data('override_filename', pendingJob.name);
+                }
+                this.doFileUpload( pendingJob.file );
+            }
+
+        },
+
+        doFileUpload : function(file) {
+
+            var upload_dir = '/';
+            if (this.data('active_directory')) {
+                upload_dir = this.data('active_directory');
+            }
+
+            var fileName = file.name;
+            if (this.data('override_filename')) {
+                fileName = this.data('override_filename');
+                this.data('override_filename', undefined);
+            }
+
+            var fullFilePath     = upload_dir + '/' + fileName;
+            fullFilePath         = fullFilePath.replace(/\/\/+/g, '/');
+
+            var pid = this.uuid();
+console.log('uploads file ' + fullFilePath);
+console.log("JOB IS " + this.currentUploadJob);
+            if (this.currentUploadJob != undefined) {
+
+                this.trigger(
+                    'updateIrisProcess',
+                    {
+                        pid : pid,
+                        msg : 'Waiting to upload ' + fullFilePath,
+                    }
+                );
+
+                this.options.pendingUploadJobs.push( {file : file, pid : pid, name : fileName} );
+
+                return;
+            };
+
+
+            this.currentUploadJob = pid;
+console.log('will upload ' + pid + ',' + this.currentUploadJob);
+            this.trigger(
+                'updateIrisProcess',
+                {
+                    pid : pid,
+                    msg : 'Uploading ' + fullFilePath + ' ... 0%',
+                    /*content : $.jqElem('div')
+                        .addClass('progress')
+                        .addClass('progress-striped')
+                        .addClass('active')
+                        .append(
+                            $.jqElem('div')
+                                .addClass('bar')
+                                .css('width', '0%')
+                                .css('overflow', 'visible')
+                                .css('color', '#000')
+                                .css('white-space', 'nowrap')
+                                .css('text-align', 'left')
+                                .css('padding', '2px')
+                                .text('Uploading ' + upload_dir + '/' + fileName)
+                        )//*/
+                }
+            );
+
+            if (file.size <= this.singleFileSize() ) {
+
+                var reader = new FileReader();
+
+                reader.onprogress = $.proxy(function (e) {
+                    this.trigger(
+                        'updateIrisProcess',
+                        {
+                            pid : pid,
+                            msg : 'Uploading ' + fullFilePath + ' ... ' + (100 * e.loaded / e.total).toFixed(2) + '%',
+                            /*content : $.jqElem('div')
+                                .addClass('progress')
+                                .addClass('progress-striped')
+                                .addClass('active')
+                                .append(
+                                    $.jqElem('div')
+                                        .addClass('bar')
+                                        .css('width', (100 * e.loaded / e.total).toFixed(2) + '%')
+                                        .css('overflow', 'visible')
+                                        .css('color', '#000')
+                                        .css('white-space', 'nowrap')
+                                        .css('text-align', 'left')
+                                        .css('padding', '2px')
+                                        .text('Uploading ' + upload_dir + '/' + fileName)
+                                )//*/
+                        }
+                    );
+                    this.dbg('progress ' + (e.loaded / e.total));
+                    this.dbg(e);
+                }, this);
+
+
+                reader.onload = jQuery.proxy(
+                    function(e) {
+
+                        this.client().put_file(
+                            this.sessionId(),
+                            fileName,
+                            e.target.result,
+                            upload_dir,
+                            jQuery.proxy( function (res) {
+                                this.fileUploadComplete(pid, upload_dir);
+                            }, this),
+                            jQuery.proxy( function (res) {
+                                this.fileUploadComplete(pid);
+                            }, this)
+                        );
+                    },
+                    this
+                );
+
+                reader.readAsBinaryString(file);
+            }
+            else {
+
+                var chunkUploadPath     = fullFilePath;
+                chunkUploadPath         = chunkUploadPath.replace(/\//g, '::');
+
+                var fileSize = file.size;
+                var chunkSize = this.chunkSize();
+                var chunk = 1;
+                var offset = 0;
+                var chunkMap = {
+                    chunks              : [],
+                    doneChunks          : [],
+                    chunksByName        : {},
+                    size                : 0,
+                    fileName            : fileName,
+                    upload_dir          : upload_dir,
+                    fullFilePath        : fullFilePath,
+                    chunkUploadPath     : chunkUploadPath,
+                    fullUploadPath      : this.options.uploadDir + '/' + chunkUploadPath,
+                    pid                 : pid
+                };
+
+                if (this.stalledUploads()[chunkMap.fullFilePath] != undefined) {
+                    this.data('resumed_chunkMap', this.stalledUploads()[chunkMap.fullFilePath]);
+                    this.stalledUploads()[chunkMap.fullFilePath] = undefined;
+                }
+
+                if (this.data('resumed_chunkMap') != undefined) {
+                    chunkMap = this.data('resumed_chunkMap');
+                    //remove the junk status created by the newly manufactured pid.
+                    this.trigger('removeIrisProcess', pid)
+
+                    var percent = (100 * chunkMap.doneChunks.length / (chunkMap.doneChunks.length + chunkMap.chunks.length)).toFixed(2);
+
+                    if (percent >= 100) {
+                        percent = 99;
+                    }
+
+                    this.trigger(
+                        'updateIrisProcess',
+                        {
+                            pid : chunkMap.pid,
+                            msg : 'Uploading ' + chunkMap.fullFilePath + ' ... ' + percent + '%',
+                            /*content : $.jqElem('div')
+                                .addClass('progress')
+                                .addClass('progress-striped')
+                                .addClass('active')
+                                .append(
+                                    $.jqElem('div')
+                                        .addClass('bar')
+                                        .css('width', percent + '%')
+                                        .css('overflow', 'visible')
+                                        .css('color', '#000')
+                                        .css('white-space', 'nowrap')
+                                        .css('text-align', 'left')
+                                        .css('padding', '2px')
+                                        .text('Uploading ' + chunkMap.fullFilePath)
+                                )//*/
+                        }
+                    );
+
+                    this.data('resumed_chunkMap', undefined);
+                }
+                else {
+
+                    while (fileSize > 0) {
+                        if (chunkSize > fileSize) {
+                            chunkSize = fileSize;
+                        }
+                        fileSize -= chunkSize;
+
+                        var pad         = '00000000';
+                        var paddedChunk = (pad + chunk).slice(-8);
+
+                        chunkMap.chunks.push(
+                            {
+                                chunk : chunk,
+                                name : 'chunk.' + paddedChunk,
+                                start : offset,
+                                end : (offset + chunkSize),
+                                size : chunkSize,
+                                complete : false,
+                            }
+                        );
+
+                        chunkMap.size += chunkSize;
+
+                        offset = offset + chunkSize;
+                        chunk++;
+
+                    }
+
+                }
+
+                var callback = $.proxy(function (res) {
+                    $.each(
+                        chunkMap.chunks,
+                        function (idx, chunk) {
+                            chunkMap.chunksByName[chunk.name] = chunk;
+                        }
+                    );
+
+                    var chunker = this.makeChunkUploader(file, chunkMap);
+                    for (var i = 0; i < this.options.concurrentUploads; i++) {
+                        chunker();
+                    }
+
+                }, this);
+
+                this.client().make_directory(
+                    this.sessionId(),
+                    '/' + this.options.uploadDir,
+                    chunkMap.chunkUploadPath
+
+                ).always(
+                    $.proxy(function() {
+                        this.client().put_file(
+                            this.sessionId(),
+                            'chunkMap',
+                            JSON.stringify(chunkMap, undefined, 2),
+                            '/' + chunkMap.fullUploadPath
+                        ).done(callback)
+                        .fail($.proxy(function (res) {this.dbg(res)}, this))
+                    }, this)
+                );
+
+            }
+
+        },
+
 
         makeChunkUploader : function(file, chunkMap) {
             chunkMap.jobs = 0;
@@ -789,7 +891,7 @@
                                     context : this,
                                     controls : [
                                         {
-                                            'icon' : 'icon-ban-circle',
+                                            'icon' : 'fa fa-ban',
                                             'tooltip' : 'Cancel',
                                             callback : function(e, $fb) {
 
@@ -798,7 +900,7 @@
                                                     '/',
                                                     '/' + chunkMap.fullUploadPath,
                                                     function () {
-                                                        $fb.trigger('removeIrisProcess', chunkMap.pid);
+                                                        $fb.fileUploadComplete(chunkMap.pid);
                                                     }
                                                 );
 
@@ -858,7 +960,7 @@
                                 context : this,
                                 controls : [
                                     {
-                                        'icon' : 'icon-refresh',
+                                        'icon' : 'fa fa-refresh',
                                         //'tooltip' : 'Resume',
                                         callback : function(e, $fb) {
                                             $fb.data('resumed_chunkMap', chunkMap);
@@ -867,7 +969,7 @@
 
                                     },
                                     {
-                                        'icon' : 'icon-ban-circle',
+                                        'icon' : 'fa fa-ban',
                                         //'tooltip' : 'Cancel',
                                         callback : function(e, $fb) {
 
@@ -876,8 +978,7 @@
                                                 '/',
                                                 '/' + chunkMap.fullUploadPath,
                                                 function () {
-                                                    $fb.trigger('removeIrisProcess', chunkMap.pid);
-                                                    $fb.refreshDirectory('/' + target_dir);
+                                                    $fb.fileUploadComplete(chunkMap.pid);
                                                 }
                                             );
 
@@ -932,8 +1033,7 @@
                                 '/',
                                 chunkMap.fullUploadPath,
                                 function () {
-                                    $fb.trigger('removeIrisProcess', chunkMap.pid);
-                                    $fb.refreshDirectory(chunkMap.upload_dir);
+                                    $fb.fileUploadComplete(chunkMap.pid, chunkMap.upload_dir);
                                 }
                             );
 
@@ -996,9 +1096,12 @@
 
         openFile : function(file) {
 
-            var url = this.options.invocationURL + "/download/" + file + "?session_id=" + this.sessionId();
-            window.location.href = url;
+            window.location.href = this.urlForFile(file);
 
+        },
+
+        urlForFile : function(file) {
+            return this.options.invocationURL + "/download/" + file + "?session_id=" + encodeURIComponent(this.sessionId()) + '&token=' + encodeURIComponent(this.authToken());
         },
 
         deleteFile : function(file, type) {
@@ -1084,9 +1187,77 @@
 
             $addDirectoryModal.openPrompt();
 
+        },
+
+        addNewFile : function(parentDir) {
+            var that = this;
+
+            var displayDir = parentDir.replace(this.options.root, '/');
+
+            var $addDirectoryModal = $.jqElem('div').kbasePrompt(
+                {
+                    title : 'Create a new file',
+                    body : $.jqElem('p')
+                            .append('Create a new file ')
+                            .append(
+                                $.jqElem('span')
+                                    .css('font-weight', 'bold')
+                                    .text(displayDir)
+                            )
+                            .append(' ')
+                            .append(
+                                $.jqElem('input')
+                                    .attr('type', 'text')
+                                    .attr('name', 'file_name')
+                                    .attr('size', '20')
+                            )
+                    ,
+                    controls : [
+                        'cancelButton',
+                        {
+                            name : 'Add and edit file',
+                            callback : $.proxy(function (e, $prompt) {
+                                $prompt.closePrompt();
+                                this.addNewFileCallback($addDirectoryModal.dialogModal().find('input').val(), parentDir, true)
+                            }, this)
+                        },
+                        {
+                            name : 'Add file',
+                            type : 'primary',
+                            callback : $.proxy(function (e, $prompt) {
+                                $prompt.closePrompt();
+                                this.addNewFileCallback($addDirectoryModal.dialogModal().find('input').val(), parentDir, false)
+                            }, this)
+                        },
+                    ]
+                }
+            );
+
+            $addDirectoryModal.openPrompt();
 
         },
 
+        addNewFileCallback : function (file, parentDir, edit) {
+
+            var fileName = parentDir + '/' + file;
+            fileName = fileName.replace(/\/\//, '/');
+
+            this.client().run_pipeline(
+                this.sessionId(),
+                "echo '' > " + file,
+                [],
+                0,
+                parentDir,
+                $.proxy( function (res) {
+                    this.refreshDirectory(parentDir);
+                    if (edit) {
+                        this.editFileCallback()(fileName, this);
+                    }
+                }, this),
+                function() {}
+                );
+        }
+
     });
 
-}( jQuery ) );
+});

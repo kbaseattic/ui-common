@@ -2,7 +2,14 @@
 
 */
 
-(function( $, undefined ) {
+define('kbaseIrisTutorial',
+    [
+        'jquery',
+        'kbwidget',
+        'kbaseIrisConfig',
+    ],
+    function ($) {
+
 
 
     $.KBWidget({
@@ -11,8 +18,8 @@
 
         version: "1.0.0",
         options: {
-            configURL : 'http://www.kbase.us/docs/tutorials.cfg',
-            tutorial : 'http://www.kbase.us/docs/getstarted/getstarted_iris/getstarted_iris.html',
+            config_url          : window.kbaseIrisConfig.tutorial.config_url,
+            default_tutorial    : window.kbaseIrisConfig.tutorial.default_tutorial,
         },
 
         format_tutorial_url : function (doc_format_string, repo, filespec) {
@@ -45,26 +52,27 @@
                 }
             }
 
-            return output.sort(this.sortByKey('title', 'insensitively'));
+            return output; //output.sort(this.sortByKey('title', 'insensitively'));
         },
 
         init : function (options) {
             this._super(options);
 
             this.pages = [];
-            this.currentPage = -1;
+            this._currentPage = -1;
 
             $.getJSON(
-                this.options.configURL,
+                this.options.config_url,
                 $.proxy(function(data) {
+
                     this.repos = data.repos;
                     this.doc_format_string = data.doc_format_string;
-                    if (this.options.tutorial == undefined) {
-                        this.options.tutorial = data.default;
+                    if (this.options.default_tutorial == undefined) {
+                        this.options.default_tutorial = data.default;
                     }
 
-                    if (this.options.tutorial) {
-                        this.retrieveTutorial(this.options.tutorial);
+                    if (this.options.default_tutorial) {
+                        this.retrieveTutorial(this.options.default_tutorial);
                     }
 
                 }, this)
@@ -93,7 +101,7 @@
             		},
             		success: $.proxy(function (data, status, xhr) {
 
-            		    var $resp = $('<div></div>').append(data);
+            		    var $resp = $.jqElem('div').append(data);
 
             		    $.each(
             		        $resp.children(),
@@ -130,44 +138,93 @@
         },
 
         currentPage : function() {
-            page = this.currentPage;
-            if (this.currentPage < 0) {
+            page = this._currentPage;
+            if (this._currentPage < 0) {
                 page = 0;
             }
             return this.pages[page];
         },
 
         goToPrevPage : function () {
-            var page = this.currentPage - 1;
+            var page = this._currentPage - 1;
             if (page < 0) {
                 page = 0;
             }
-            this.currentPage = page;
+            this._currentPage = page;
             return page;
         },
 
         goToNextPage : function () {
-            var page = this.currentPage + 1;
+            var page = this._currentPage + 1;
             if (page >= this.pages.length) {
                 page = this.pages.length - 1;
             }
-            this.currentPage = page;
+            this._currentPage = page;
             return page;
         },
 
-        contentForPage : function(idx) {
+        contentForPage : function(idx, $term) {
             if (this.pages.length == 0) {
                 return undefined;
             }
             else {
-                return this.pages[this.currentPage];
+                var content = this.pages[this._currentPage];
+                content.find('a').attr('target', '_blank');
+
+                //some magic can only happen if we've been given a terminal object.
+                if ($term != undefined) {
+                    content.find('a[data-input-link]').on(
+                        'click',
+                        function(e){
+                            $term.appendAndFocusInput($(this).text());
+                        }
+                    );
+                }
+
+                return content;
             }
         },
 
-        contentForCurrentPage : function () {
-            return this.contentForPage(this.currentPage);
+        contentForCurrentPage : function ($term) {
+            return this.contentForPage(this._currentPage, $term);
+        },
+
+        list_text : function (handler) {
+            return this.command_text('tutorial list', 'tutorial list', 'to see available tutorials.', handler);
+        },
+
+        next_text : function (handler) {
+            return this.command_text('next', 'next', 'to move to the next step in the tutorial.', handler);
+        },
+
+        back_text : function (handler) {
+            return this.command_text('back', 'back', 'to move to the previous step in the tutorial.', handler);
+        },
+
+        command_text : function (link, command, blurb, handler) {
+
+            if (handler == undefined) {
+                throw "Cannot create command_text w/o handler";
+            }
+
+            return $.jqElem('span')
+                .append("<br>")
+                .append("Type ")
+                .append(
+                    $.jqElem('i')
+                        .append(
+                            $.jqElem('a')
+                                .append(link)
+                                .on('click',
+                                    $.proxy(function(e) {
+                                        handler.run(command);
+                                    }, handler)
+                                )
+                        )
+                    )
+                .append(' ' + blurb)
         },
 
     });
 
-}( jQuery ) );
+});

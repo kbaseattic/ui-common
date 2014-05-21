@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+define('kbaseSeqSearch',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseSeqSearch",
@@ -220,4 +226,4 @@ $.KBWidget({
         return this;
     }  //end init
 })
-}( jQuery ) );
+});

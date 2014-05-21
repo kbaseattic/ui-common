@@ -1,4 +1,10 @@
-(function( $, undefined ) { 
+define('KBaseGenomeOverview',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+ 
     $.KBWidget({ 
         name: "KBaseGenomeOverview", 
         parent: "kbaseWidget", 
@@ -326,4 +332,4 @@
         },
 
     });
-})( jQuery );
+});

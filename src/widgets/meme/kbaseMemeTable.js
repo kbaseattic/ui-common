@@ -1,4 +1,11 @@
-(function( $, undefined ) {
+define('kbaseMemeTable',
+    [
+        'jquery',
+	'kbwidget',
+	'kbasePanel'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseMemeTable",      
@@ -106,4 +113,4 @@ $.KBWidget({
 
 
 });
-}( jQuery ) );
+});

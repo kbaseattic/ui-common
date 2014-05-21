@@ -7,9 +7,13 @@
         var modal = this.$elem.kbaseModal({title: 'Model Details', 
                                            rightLabel: 'Super Workspace,
                                            subText: 'kb|g.super.genome '});
-*/
+*/define('kbaseModal',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
 
-(function( $, undefined ) {
 
 $.KBWidget({
     name: "kbaseModal",
@@ -110,4 +114,4 @@ $.KBWidget({
         return this;
     }  //end init
 })
-}( jQuery ) );
+});

@@ -46,9 +46,14 @@
     		console.log("Tried to log in and got back: "); console.log(args);
     	});
 
-*/
+*/define('kbaseLogin',
+    [
+        'jquery',
+	'kbwidget',
+	'kbasePrompt'
+    ],
+    function ($) {
 
-(function( $, undefined ) {
 
     $.KBWidget({
 
@@ -1161,4 +1166,4 @@
 
     });
 
-}( jQuery ) );
+});

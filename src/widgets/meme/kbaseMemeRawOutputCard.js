@@ -1,4 +1,10 @@
-(function($, undefined) {
+define('KBaseMemeRawOutputCard',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseMemeRawOutputCard",
         parent: "kbaseWidget",
@@ -35,4 +41,4 @@
         }
 
     });
-})(jQuery);
+});

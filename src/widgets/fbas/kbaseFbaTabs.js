@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+define('kbaseFbaTabs',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseFbaTabs",
@@ -147,4 +153,4 @@ $.KBWidget({
 
 
 })
-}( jQuery ) );
+});

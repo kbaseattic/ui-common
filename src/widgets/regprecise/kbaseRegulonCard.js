@@ -1,4 +1,10 @@
-(function($, undefined) {
+define('KBaseRegulonCard',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseRegulonCard",
         parent: "kbaseWidget",
@@ -316,6 +322,6 @@
         }
 
     });
-})(jQuery);
+});
 
 

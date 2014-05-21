@@ -3,7 +3,13 @@
 
 */
 
-(function( $, undefined ) {
+define('kbaseIrisFileEditor',
+    [
+        'jquery',
+        'kbaseAuthenticatedWidget',
+        'kbasePrompt',
+    ],
+    function ($) {
 
 
     $.KBWidget({
@@ -76,7 +82,7 @@
                 .append(
                     $.jqElem('div')
                         .attr('align', 'center')
-                        .append($.jqElem('i').addClass('icon-spinner').addClass('icon-spin icon-4x'))
+                        .append($.jqElem('i').addClass('fa fa-spinner').addClass('fa fa-spin fa fa-4x'))
                 )
             ;
 
@@ -106,7 +112,20 @@
                     },
                     this
                 ),
-                $.proxy(function (err) { this.dbg("FILE FAILURE"); this.dbg(err); this.dbg(this);}, this)
+                $.proxy(function (err) {
+                    var $ui = $.jqElem('textarea')
+                        .attr('rows', this.rows())
+                        .attr('cols', this.cols())
+                        .css('width', '720px')
+                        .kb_bind(
+                            this,
+                            'content'
+                        );
+
+                    $elem.empty();
+                    $elem.append($ui);
+
+                }, this)
             );
 
         },
@@ -155,4 +174,4 @@
 
     });
 
-}( jQuery ) );
+});

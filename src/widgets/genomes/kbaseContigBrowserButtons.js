@@ -1,7 +1,12 @@
 /**
  * Requires bootstrap 3 for buttons
- */
-(function( $, undefined ){
+ */define('KBaseContigBrowserButtons',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseContigBrowserButtons", 
         parent: "kbaseWidget", 
@@ -70,4 +75,4 @@
         }
     });
 
-})( jQuery );
+});

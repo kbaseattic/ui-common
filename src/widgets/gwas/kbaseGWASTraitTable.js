@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+define('KBaseGWASTraitTable',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseGWASTraitTable",
         parent: "kbaseWidget",
@@ -72,4 +78,4 @@
             };
         }
     });
-})( jQuery )
+});

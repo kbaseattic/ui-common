@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+define('KBaseGWASVarTable',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseGWASVarTable",
         parent: "kbaseWidget",
@@ -47,4 +53,4 @@
             };
         }
     });
-})( jQuery )
+});

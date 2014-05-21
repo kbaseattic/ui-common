@@ -1,5 +1,10 @@
+define('kbaseWSSelector',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
 
-(function( $, undefined ) {
 
 $.KBWidget({
     name: "kbaseWSSelector",
@@ -1614,4 +1619,4 @@ $.KBWidget({
     } // close init
 })
 
-}( jQuery ) );
+});

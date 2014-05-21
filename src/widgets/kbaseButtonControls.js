@@ -10,15 +10,15 @@
             id: some_id, //arbitrary value to associate with these controls. Each button gets a copy in .data('id')
             controls : [
                 {
-                    icon : 'icon-search',
-                    'icon-alt' : 'icon-search-alt', //optional. Toggle icon between icon and icon-alt when clicked.
+                    icon : 'fa fa-search',
+                    'icon-alt' : 'fa fa-search-o', //optional. Toggle icon between icon and icon-alt when clicked.
                     callback : function(e) {
                         console.log("clicked on search");
                     },
                     id : 'search' //optional. Keys the button to be available via $('#some_div').controls('search')
                 },
                 {
-                    icon : 'icon-minus',
+                    icon : 'fa fa-minus',
                     callback : function(e) {
                         console.log("clicked on delete");
                     }
@@ -28,7 +28,7 @@
     );
 */
 
-(function( $, undefined ) {
+define('kbaseButtonControls', ['jquery', 'bootstrap', 'kbwidget'], function( $ ) {
 
     $.KBWidget({
 
@@ -38,6 +38,8 @@
         options: {
             controls : [],
             onMouseover : true,
+            position : 'top',
+            type : 'floating'
         },
 
         init: function(options) {
@@ -54,22 +56,32 @@
 
         appendUI : function ($elem) {
 
-            $elem
-                .css('position', 'relative')
-                .prepend(
-                    $('<div></div>')
-                        .addClass('btn-group')
-                        .attr('id', 'control-buttons')
-                        .css('right', '0px')
-                        .css('top', '0px')
-                        .css('position', 'absolute')
-                        .css('margin-right', '3px')
-                )
+            if (this.options.type == 'floating') {
+                $elem
+                    .css('position', 'relative');
+            }
+
+           var $controlButtons =
+                $('<div></div>')
+                    .addClass('btn-group btn-group-xs')
+                    .attr('id', 'control-buttons')
             ;
+
+            if (this.options.type == 'floating') {
+                $controlButtons
+                    .css('right', '0px')
+                    .css(this.options.position, '0px')
+                    .css('position', 'absolute')
+                    .css('margin-right', '3px')
+                    .attr('z-index', 10000)
+                ;
+            }
+
+            $elem.prepend($controlButtons);
 
             this._rewireIds($elem, this);
 
-            if (this.options.onMouseover) {
+            if (this.options.onMouseover && this.options.type == 'floating') {
                 $elem
                     .mouseover(
                         function(e) {
@@ -117,7 +129,7 @@
                         }
                     }
 
-                    var btnClass = 'btn btn-default btn-xs';
+                    var btnClass = 'btn btn-default';
                     if (val.type) {
                         btnClass = btnClass + ' btn-' + val.type;
                     }
@@ -168,4 +180,4 @@
 
     });
 
-}( jQuery ) );
+} );

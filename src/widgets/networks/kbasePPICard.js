@@ -1,7 +1,12 @@
 /**
    Create a card with a table showing a PPI dataset
- */
-(function( $, undefined ) {
+ */define('KBasePPICard',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBasePPICard",
         parent: "kbaseWidget",
@@ -438,4 +443,4 @@
 	    self.tableData = state.tableData;
 	}
     });
-})( jQuery )
+});

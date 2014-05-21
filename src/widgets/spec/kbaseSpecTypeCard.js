@@ -1,4 +1,10 @@
-(function( $, undefined ) { 
+define('KBaseSpecTypeCard',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+ 
     $.KBWidget({ 
         name: "KBaseSpecTypeCard", 
         parent: "kbaseWidget", 
@@ -276,4 +282,4 @@
             };
         }
     });
-})( jQuery );
+});

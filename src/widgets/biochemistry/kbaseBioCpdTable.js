@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+define('kbaseBioCpdTable',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseBioCpdTable",
@@ -67,4 +73,4 @@ $.KBWidget({
 
 
 })
-}( jQuery ) );
+});

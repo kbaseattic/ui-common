@@ -1,4 +1,11 @@
-(function( $, undefined ) {
+define('kbaseSimpleWSSelect',
+    [
+        'jquery',
+	'kbwidget',
+	'kbasePrompt'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseSimpleWSSelect",      
@@ -69,4 +76,4 @@ $.KBWidget({
         return this;
     }  //end init
 })
-}( jQuery ) );
+});

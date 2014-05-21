@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+define('kbasePathways',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbasePathways",     
@@ -544,5 +550,5 @@ $.KBWidget({
     }  //end init
 
 })
-}( jQuery ) );
+});
 

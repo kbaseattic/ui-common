@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+define('KBaseGWASPopMaps',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseGWASPopMaps",
         parent: "kbaseWidget",
@@ -140,4 +146,4 @@
             };
         }
     });
-})( jQuery )
+});

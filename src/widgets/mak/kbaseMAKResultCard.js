@@ -1,4 +1,10 @@
-(function( $, undefined ) { 
+define('KBaseMAKResultCard',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+ 
     $.KBWidget({ 
         name: "KBaseMAKResultCard", 
         parent: "kbaseWidget", 
@@ -135,4 +141,4 @@
         }
 	
     });
-})( jQuery );
+});

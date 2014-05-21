@@ -1,4 +1,10 @@
-(function($, undefined) {
+define('KBaseMemeMotifCard',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseMemeMotifCard",
         parent: "kbaseWidget",
@@ -104,6 +110,6 @@
             };
         }
     });
-})(jQuery);
+});
 
 

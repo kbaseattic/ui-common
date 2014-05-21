@@ -1,4 +1,11 @@
-(function( $, undefined ) {
+define('kbaseModelTable',
+    [
+        'jquery',
+	'kbwidget',
+	'kbasePanel'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseModelTable",
@@ -87,4 +94,4 @@ $.KBWidget({
 
 
 })
-}( jQuery ) );
+});

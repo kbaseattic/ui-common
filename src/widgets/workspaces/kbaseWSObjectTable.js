@@ -1,4 +1,11 @@
-(function( $, undefined ) {
+define('kbaseWSObjectTable',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseModelView'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseWSObjectTable",
@@ -1488,6 +1495,6 @@ $.KBWidget({
     }  //end init
 
 })
-}( jQuery ) );
+});
 
 

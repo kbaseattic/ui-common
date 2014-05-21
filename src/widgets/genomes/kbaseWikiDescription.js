@@ -1,8 +1,13 @@
 /**
  * Shows a species description taken from Wikipedia.
  * Also includes a picture, but that'll be under a tab or something.
- */
-(function( $, undefined ) {
+ */define('KBaseWikiDescription',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseWikiDescription",
         parent: "kbaseWidget",
@@ -377,4 +382,4 @@
             });
         },
     })
-})( jQuery );
+});

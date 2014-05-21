@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+define('kbaseWSFbaTable',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseWSFbaTable",
@@ -77,4 +83,4 @@ $.KBWidget({
         return this;
     }  //end init
 })
-}( jQuery ) );
+});

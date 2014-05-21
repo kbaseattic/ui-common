@@ -2,7 +2,13 @@
 
 */
 
-(function( $, undefined ) {
+define('kbaseAuthenticatedWidget',
+    [
+        'jquery',
+        'kbwidget',
+    ],
+    function ($) {
+
 
 
     $.KBWidget({
@@ -16,6 +22,7 @@
             'authToken',
             'user_id',
             'loggedInCallback',
+            'logInCanceledCallback',
             'loggedOutCallback',
             'loggedInQueryCallback'
         ],
@@ -30,7 +37,7 @@
             $(document).on(
                 'loggedIn.kbase',
                 $.proxy(function (e, auth) {
-console.log("LI");
+
                     this.setAuth(auth);
                     if (this.loggedInCallback) {
                         this.loggedInCallback(e, auth);
@@ -41,7 +48,6 @@ console.log("LI");
             $(document).on(
                 'loggedOut.kbase',
                 $.proxy(function (e) {
-console.log("LO");
                     this.setAuth(undefined);
                     if (this.loggedOutCallback) {
                         this.loggedOutCallback(e);
@@ -49,10 +55,20 @@ console.log("LO");
                 }, this)
             );
 
+            $(document).on(
+                'logInCanceled.kbase',
+                $.proxy(function (e) {
+                    this.setAuth(undefined);
+                    if (this.logInCanceledCallback) {
+                        this.logInCanceledCallback(e);
+                    }
+                }, this)
+            );
+
+
             $(document).trigger(
                 'loggedInQuery',
                 $.proxy(function (auth) {
-                console.log("CALLS LIQ");
                     this.setAuth(auth);
 
                     if (auth.kbase_sessionid) {
@@ -79,8 +95,6 @@ console.log("LO");
             this.sessionId(newAuth.kbase_sessionid);
             this.authToken(newAuth.token);
             this.user_id(newAuth.user_id);
-            console.log("SETS AUTH TO "); console.log(newAuth);
-            console.log(this);
         },
 
         loggedInQueryCallback : function(args) {
@@ -91,4 +105,4 @@ console.log("LO");
 
     });
 
-}( jQuery ) );
+});

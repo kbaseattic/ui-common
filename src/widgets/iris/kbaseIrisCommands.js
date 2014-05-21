@@ -22,7 +22,15 @@
 
 */
 
-(function( $, undefined ) {
+define('kbaseIrisCommands',
+    [
+        'jquery',
+        'kbaseAccordion',
+        'kbaseButtonControls',
+        'kbaseBox',
+        'kbaseIrisConfig',
+    ],
+    function ($) {
 
     $.KBWidget({
 
@@ -34,10 +42,13 @@
             link : function (evt) {
                 alert("clicked on " + $(evt.target).text());
             },
-            englishCommands : 0,
+            englishCommands : false,
             fontSize : '90%',
             overflow : true,
             sectionHeight : '300px',
+            order   : window.kbaseIrisConfig.commands.order,
+            include : window.kbaseIrisConfig.commands.include,
+            exclude : window.kbaseIrisConfig.commands.exclude,
         },
 
         init: function(options) {
@@ -45,12 +56,18 @@
             this._super(options);
 
             if (options.client) {
-
                 this.client = options.client;
             }
 
-            this.commands = [];
             this.commandCategories = {};
+            this.knownIrisCommands = {};
+
+            $(document).on(
+                'addedIrisCommand.kbaseIris',
+                $.proxy(function (e, params) {
+                    this.addIrisCommand(e, params.command);
+                }, this)
+            );
 
             return this;
 
@@ -62,9 +79,11 @@
 
             var commandRegex = new RegExp('^' + command + '.*');
 
-            for (var idx = 0; idx < this.commands.length; idx++) {
-                if (this.commands[idx].match(commandRegex)) {
-                    completions.push(this.commands[idx]);
+            for (group in this.commandCategories) {
+                for (var idx = 0; idx < this.commandCategories[group].length; idx++) {
+                    if (this.commandCategories[group][idx].match(commandRegex)) {
+                        completions.push([this.commandCategories[group][idx], group]);
+                    }
                 }
             }
 
@@ -88,6 +107,10 @@
             return prefix;
         },
 
+        // note that 'commands' is assumed to be the array handed back from completeCommand
+        // this returns an array of arrays - first element is the command, second is the
+        // category which contains it
+
         commonCommandPrefix : function (commands) {
 
             var prefix = '';
@@ -95,10 +118,10 @@
             if (commands.length > 1) {
 
             //find the longest common prefix for the first two commands. That's our start.
-                prefix = this.commonPrefix(commands[0], commands[1]);
+                prefix = this.commonPrefix(commands[0][0], commands[1][0]);
 
                 for (var idx = 2; idx < commands.length; idx++) {
-                    prefix = this.commonPrefix(prefix, commands[idx]);
+                    prefix = this.commonPrefix(prefix, commands[idx][0]);
                 }
 
             }
@@ -112,9 +135,11 @@
 
         commandsMatchingRegex : function (regex) {
             var matches =[];
-            for (var idx = 0; idx < this.commands.length; idx++) {
-                if (this.commands[idx].match(regex)) {
-                    matches.push(this.commands[idx]);
+            for (var group in this.commandCategories) {
+                for (var idx = 0; idx < this.commandCategories[group].length; idx++) {
+                    if (this.commandCategories[group][idx].match(regex)) {
+                        matches.push([this.commandCategories[group][idx], group]);
+                    }
                 }
             }
 
@@ -123,19 +148,115 @@
 
 
         appendUI : function($elem) {
+
+            if (this.client == undefined) {
+                return;
+            }
+
             this.client.valid_commands(
                 $.proxy(
                     function (res) {
-var num = 0;
+
+                        //This is a hack. It really should be handed back via the valid_commands call.
+
+                        var shell_commands = ['sort', 'grep', 'cut', 'cat', 'head', 'tail',
+                            'date', 'echo', 'wc', 'diff', 'join', 'uniq', 'tr'].sort();
+                        var shell_tokens = [];
+                        $.each(
+                            shell_commands,
+                            function (idx, command) {
+                                shell_tokens.push(
+                                    { cmd : command, helpFlag : '--help' }
+                                )
+                            }
+                        );
+
+                        res.push(
+                            {
+                                name    : 'shell',
+                                title   : 'Shell commands',
+                                items   : shell_tokens,
+                            },
+                            {
+                                name  : 'iris',
+                                title : 'Iris commands',
+                                items : []
+                            }
+                        );
+
+
+
+                        //okay, now the squirrelly bits. If we've been given an include list, then only use those.
+                        if (this.options.include.length) {
+
+                            var include = {};
+                            $.each(
+                                this.options.include,
+                                function (idx, val) {
+                                    include[val] = 1;
+                                }
+                            )
+
+                            res = $.grep(
+                                res,
+                                function (val, idx) {
+                                    return include[val.name];
+                                }
+                            );
+                        }
+
+                        //BUT, if we've been given an exclude list, then don't include those.
+                        if (this.options.exclude.length) {
+
+                            var exclude = {};
+                            $.each(
+                                this.options.exclude,
+                                function (idx, val) {
+                                    exclude[val] = 1;
+                                }
+                            )
+
+                            res = $.grep(
+                                res,
+                                function (val, idx) {
+                                    return ! exclude[val.name];
+                                }
+                            );
+                        }
+
+                        //finally, we allow sorting.
+
+                        var orderedRes = [];
+                        if (this.options.order.length) {
+                            //this stupid mod is O(n^2). But building up a queryable hash is more trouble than it's worth.
+                            $.each(
+                                this.options.order,
+                                function (idx, key) {
+                                    $.each(
+                                        res,
+                                        function (idx, val) {
+                                            if (val.name == key) {
+                                                orderedRes.push.apply(orderedRes, res.splice(idx, 1));
+                                                return false;
+                                            }
+                                        }
+                                    )
+                                }
+                            )
+                        }
+
+                        res = res.sort(this.sortByKey('title'));
+                        if (orderedRes.length) {
+                            res.unshift.apply(res, orderedRes);
+                        }
+
                         var commands = [];
                         $.each(
                             res,
                             $.proxy(
                                 function (idx, group) {
-num += group.items.length;
-                                    group.title;
 
-                                    var $ul = $('<ul></ul>')
+                                    var $ul = $.jqElem('ul')
                                         .addClass('unstyled')
                                         .css('max-height', this.options.overflow ? this.options.sectionHeight : '5000px')
                                         .css('overflow', this.options.overflow ? 'auto' : 'visible')
@@ -155,11 +276,10 @@ num += group.items.length;
                                                     }
                                                 }
 
-                                                this.commands.push(val.cmd);
-                                                if (this.commandCategories[group.name] == undefined) {
-                                                    this.commandCategories[group.name] = [];
+                                                if (this.commandCategories[group.title] == undefined) {
+                                                    this.commandCategories[group.title] = [];
                                                 }
-                                                this.commandCategories[group.name].push(val.cmd);
+                                                this.commandCategories[group.title].push(val.cmd);
 
                                                 $ul.append(
                                                     this.createLI(val.cmd, label)
@@ -180,7 +300,36 @@ num += group.items.length;
                                 this
                             )
                         );
-console.log("NUM " + num);
+
+                        /*commands.push(
+                            {
+                                'title'     : 'Widgets',
+                                'category'  : 'widgets',
+                                'body'      :
+                                    $.jqElem('ul')
+                                        .addClass('unstyled')
+                                        .css('max-height', this.options.overflow ? this.options.sectionHeight : '5000px')
+                                        .css('overflow', this.options.overflow ? 'auto' : 'visible')
+                                        .append(
+                                            this.createLI(
+                                                'network',
+                                                'Network',
+                                                this.options.addWidget
+                                            )
+                                        )
+                                        .append(
+                                            this.createLI(
+                                                'echo',
+                                                'Echo',
+                                                this.options.addWidget
+                                            )
+                                        )
+                            }
+                        );*/
+
+                        this.commandCategories['Widgets'] = [];
+                        this.commandCategories['Widgets'].push('Network');
+
                         this.loadedCallback($elem, commands);
                     },
                     this
@@ -189,7 +338,7 @@ console.log("NUM " + num);
 
         },
 
-        createLI : function(cmd, label, func) {
+        createLI : function(cmd, label, func, extra) {
 
             if (label == undefined) {
                 label = cmd;
@@ -212,21 +361,30 @@ console.log("NUM " + num);
                 )
             ;
 
-            $li.kbaseButtonControls(
-                {
-                    context : this,
-                    controls : [
+            var controls = [
                         {
-                            icon : 'icon-question',
+                            icon : 'fa fa-question',
                             callback : function(e, $ic) {
                                 if ($ic.options.terminal != undefined) {
-                                    $ic.options.terminal.run(cmd + ' -h');
+                                    $ic.options.terminal.run(cmd + ' --help');
+                                    $ic.options.terminal.scroll();
                                 }
                             },
                             id : 'helpButton',
                            // 'tooltip' : {title : label + ' help', placement : 'bottom'},
                         },
-                    ]
+                    ];
+
+            if (extra != undefined && extra.length) {
+                for (var i = 0; i < extra.length; i++) {
+                    controls.push(extra[i]);
+                }
+            }
+
+            $li.kbaseButtonControls(
+                {
+                    context : this,
+                    controls : controls
                 }
             );
 
@@ -276,6 +434,12 @@ console.log("NUM " + num);
                                                 return;
                                             }
 
+                                            if (e.keyCode == 27) {
+                                                this.data('searchField').val('');
+                                                this.data('searchField').trigger('keyup');
+                                                return;
+                                            }
+
                                             var value = this.data('searchField').val();
 
                                             if (value.length < 3) {
@@ -284,7 +448,7 @@ console.log("NUM " + num);
                                                 }
                                                 return;
                                             }
-
+                                            this.data('command-container').scrollTop('0px');
                                             this.data('test').animate({left : "0px"}, 150);
 
                                             var regex = new RegExp(value, 'i');
@@ -293,7 +457,9 @@ console.log("NUM " + num);
                                             var $ul = $.jqElem('ul')
                                                 .css('font-size', this.options.fontSize)
                                                 .css('padding-left', '15px')
-                                                .addClass('unstyled');
+                                                .addClass('unstyled')
+                                                .css('max-height', this.options.overflow ? this.options.sectionHeight : '5000px')
+                                                .css('overflow', this.options.overflow ? 'auto' : 'visible');
 
 
                                             $.each(
@@ -301,11 +467,38 @@ console.log("NUM " + num);
                                                 $.proxy( function (idx, cmd) {
                                                     $ul.append(
                                                         this.createLI(
-                                                            cmd,
-                                                            cmd,
+                                                            cmd[0],
+                                                            cmd[0],
                                                             function (e) {
                                                                 that.options.link.call(this, e);
-                                                            }
+                                                            },
+                                                            [
+                                                                {
+                                                                    icon : 'fa fa-long-arrow-right',
+                                                                    callback : function(e, $ic) {
+                                                                        $ic.data('searchField').val('');
+                                                                        $ic.data('searchField').trigger('keyup');
+
+                                                                        var $link = $('.panel-heading').find('a[title="' + cmd[1]+'"]');
+                                                                        var $group = $link.parent().parent();
+
+                                                                        var newScrollTop = ($group.offset().top - $ic.data('command-container').offset().top);
+                                                                        $ic.data('command-container').scrollTop(
+                                                                            newScrollTop
+                                                                        );
+
+                                                                        if ($group.find('.in').length == 0) {
+                                                                            $link.trigger('click');
+                                                                            setTimeout(function() {$ic.data('command-container').scrollTop(
+                                                                                newScrollTop
+                                                                            )}, 200);
+                                                                        };
+
+                                                                    },
+                                                                    id : 'linkButton',
+                                                                   // 'tooltip' : {title : label + ' help', placement : 'bottom'},
+                                                                },
+                                                            ]
                                                         )
                                                     );
                                                 }, this)
@@ -330,7 +523,7 @@ console.log("NUM " + num);
                                                     .append(
                                                         $.jqElem('button')
                                                             .addClass('btn btn-default btn-xs')
-                                                            .append($.jqElem('i').addClass('icon-remove'))
+                                                            .append($.jqElem('i').addClass('fa fa-times'))
                                                             .on('click',
                                                                 $.proxy(function(e) {
                                                                     this.data('searchField').val('');
@@ -354,7 +547,7 @@ console.log("NUM " + num);
 //                                                .css('padding-top', '1px')
 //                                                .css('padding-bottom', '1px')
                                                 .attr('id', 'search-button')
-                                                .append($.jqElem('i').attr('id', 'search-button-icon').addClass('icon-search'))
+                                                .append($.jqElem('i').attr('id', 'search-button-icon').addClass('fa fa-search'))
                                                 .on(
                                                     'click',
                                                     $.proxy(function(e) {
@@ -416,12 +609,43 @@ console.log("NUM " + num);
             this._rewireIds($box.$elem, this);
 
             this._superMethod('appendUI', this.data('all-commands'), commands);
+            this.data('commands', commands);
 
             this.data('accordion').css('margin-bottom', '0px');
+
+            this.trigger('requestIrisCommands', {requester : this});
+
+        },
+
+        addIrisCommand : function (command) {
+
+            if (this.knownIrisCommands[command.cmd] != undefined) {
+                return;
+            }
+
+            this.knownIrisCommands[command.cmd] = 1;
+
+            var irisCommandsUL = this.data('irisCommandsUL');
+
+            if (irisCommandsUL == undefined) {
+                $.each(
+                    this.data('commands'),
+                    $.proxy(function (idx, val) {
+                        if (val.category == 'iris') {
+                            irisCommandsUL = this.data('irisCommandsUL', val.body);
+                        }
+                    }, this)
+                )
+            }
+
+            irisCommandsUL.append(
+                this.createLI(command.cmd, command.label)
+            );
+
 
         },
 
 
     });
 
-}( jQuery ) );
+});

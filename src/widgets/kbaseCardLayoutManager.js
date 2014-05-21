@@ -9,8 +9,14 @@
  * username_home workspace. This might change later, dependent on input
  * from the UI and UX teams.
  *
- */
-(function( $, undefined ) {
+ */define('KBaseCardLayoutManager',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseClientError'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseCardLayoutManager",
         parent: "kbaseAuthenticatedWidget",
@@ -1894,4 +1900,4 @@
             this.$controlBox.remove();
         },
     });
-})( jQuery );
+});

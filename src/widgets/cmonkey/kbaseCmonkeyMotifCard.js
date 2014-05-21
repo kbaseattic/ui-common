@@ -1,4 +1,10 @@
-(function($, undefined) {
+define('KBaseCmonkeyMotifCard',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseCmonkeyMotifCard",
         parent: "kbaseWidget",
@@ -201,6 +207,6 @@
         },
 
     });
-})(jQuery);
+});
 
 

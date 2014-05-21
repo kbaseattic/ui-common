@@ -5,8 +5,13 @@
  * These kinds of cards should not be just instantiated on their own, but handled by a
  * manager - either the kbaseCardManager, or a derivative (kbaseGenomeCardManager, etc.).
  * Thus, cards should 
- */
-(function( $, undefined ){
+ */define('LandingPageCard',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
 
     $.KBWidget({
         name: "LandingPageCard", 
@@ -54,4 +59,4 @@
     });
 
 
-})( jQuery );
+});

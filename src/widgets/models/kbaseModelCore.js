@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+define('kbaseModelCore',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseModelCore",
@@ -456,4 +462,4 @@ $.KBWidget({
         return self;
     }  //end init
 })
-}( jQuery ) );
+});

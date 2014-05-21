@@ -1,9 +1,13 @@
 /**
  * Made to work with the landing page.
  * This initializes all card positions relative to the #app div.
- */
+ */define('KBaseGenomeCardManager',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
 
-(function( $, undefined ) {
     $.KBWidget({
         name: "KBaseGenomeCardManager",
         parent: "KBaseCardManager",
@@ -176,4 +180,4 @@
             }
         }
     });
-})( jQuery );
+});

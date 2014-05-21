@@ -8,9 +8,13 @@
         var panel = this.$elem.kbasePanel({title: 'Model Details', 
                                            rightLabel: 'Super Workspace,
                                            subText: 'kb|g.super.genome '});
-*/
+*/define('kbasePanel',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
 
-(function( $, undefined ) {
 
 $.KBWidget({
     name: "kbasePanel",
@@ -139,5 +143,5 @@ $.KBWidget({
         return this;
     }  //end init
 })
-}( jQuery ) );
+});
 

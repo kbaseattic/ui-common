@@ -1,4 +1,11 @@
-(function( $, undefined ) {
+define('kbaseRxnModal',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseModal'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseRxnModal",
@@ -137,4 +144,4 @@ $.KBWidget({
         return this;
     }  //end init
 })
-}( jQuery ) );
+});

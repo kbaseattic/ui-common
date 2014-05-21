@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+define('kbaseRxn',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseRxn",
@@ -140,4 +146,4 @@ $.KBWidget({
         return this;
     }  //end init
 })
-}( jQuery ) );
+});

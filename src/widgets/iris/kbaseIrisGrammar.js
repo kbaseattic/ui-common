@@ -2,7 +2,12 @@
 
 
 */
-(function( $, undefined ) {
+define('kbaseIrisGrammar',
+    [
+        'jquery',
+        'kbwidget',
+    ],
+    function ($) {
 
 
     $.KBWidget({
@@ -11,12 +16,16 @@
 
         version: "1.0.0",
         options: {
-            defaultGrammarURL : 'http://www.prototypesite.net/iris-dev/grammar.json',
+            defaultGrammarURL : document.URL.replace('iris.html', 'grammar.json'),
         },
 
         init: function(options) {
 
             this._super(options);
+
+            if (this.options.defaultGrammarURL.match(/^file:\/\//)) {
+                this.options.defaultGrammarURL = 'grammar.json';
+            }
 
             if (this.options.$loginbox != undefined) {
                 this.$loginbox = this.options.$loginbox;
@@ -34,46 +43,159 @@
 
         },
 
+        detokenize : function (tokens) {
+
+            var detokenized = '';
+
+            //comments are a special case. Parse out nothing.
+            if (tokens.length && ! $.isArray(tokens[0]) && tokens[0].match(/^\s*#/)) {
+                return tokens[0];
+            }
+
+            if (tokens.forceString == undefined) {
+                tokens.forceString = {};
+            }
+
+            for (var idx = 0; idx < tokens.length; idx++) {
+                var token = tokens[idx];
+                if ($.isArray(token)) {
+                    detokenized += this.detokenize(token) + ';';
+                }
+                else {
+                    //pipes are a frustrating special case. Quote the string if it has a pipe, as long as it is not a pipe.
+                    if (token.match(/[\s;|]/) && token != '|' || tokens.forceString[idx]) {
+                        if (token.match(/"/) && ! token.match(/\\"/)) {
+                            detokenized += " '" + token + "'";
+                        }
+                        else {
+                            detokenized += ' "' + token + '"';
+                        }
+                    }
+                    else {
+                        if (token.length) {
+                            detokenized += ' ' + token;
+                        }
+                        else {
+                            detokenized += " ''";
+                        }
+                    }
+                }
+            }
+
+            if (detokenized.match(/;$/)) {
+                detokenized = detokenized.substring(0, detokenized.length - 1);
+            }
+
+            if (detokenized.match(/^ /)) {
+                detokenized = detokenized.substring(1, detokenized.length);
+            }
+
+            return detokenized;
+
+        },
+
         tokenize : function(string) {
 
             var tokens = [];
+            tokens.forceString = {};
             var partial = '';
             var quote = undefined;
             var escaped = false;
+            var tokensList = [];
+            var lastRedirectChar = false;
+            var lastChr = '';
+
+            //nothing given? Nothing returned.
+            if (string == undefined || ! string.length) {
+                return tokens;
+            }
+
+            //comments are a special case. Parse out nothing.
+            if (string.match(/^\s*#/)) {
+                tokens.push(string);
+                return tokens;
+            }
 
             for (var idx = 0; idx < string.length; idx++) {
                 var chr = string.charAt(idx);
+
                 if (quote == undefined) {
-                    //semi colons and question marks will be delimiters...eventually. Just skip 'em for now.
-                    if (chr.match(/[?;]/)) {
+                    if (chr.match(/[?;\n]/)) {
+
+                        if (partial.length) {
+                            tokens.push(partial);
+                            partial = '';
+                        }
+
+                        if (tokens.length) {
+                            tokensList.push(tokens);
+                            tokens = [];
+                            tokens.forceString = {};
+                        }
+                        lastChr = chr;
                         continue;
                     }
                 }
 
                 if (chr.match(/\S/) || quote != undefined) {
-                    partial = partial + chr;
+
+                    var isRedirectChar = chr.match(/[\|><]/)
+                        ? true
+                        : false;
+
+                    var isKBid = false;
+                    if (partial.match(/kb$/) && chr == '|' || partial.match(/kb\|$/)  ) {
+                        isKBid = true;
+                    }
+
+                    //Fine. We need to deal with appending and STDERR redirects.
+                    if (chr == '>' && partial != undefined && partial.match(/((^|\s)2|>)$/)
+                        && ! quote && ! isKBid) {
+                        partial += chr;
+                        lastRedirectChar = isRedirectChar;
+                        continue;
+                    }
+
+                    if ( (isRedirectChar || lastRedirectChar) && ! quote && ! isKBid) {
+                        if (partial.length) {
+                            tokens.push(partial);
+                        }
+                        partial = chr;
+                    }
+                    else {
+                        partial += chr;
+                    }
+
+                    lastRedirectChar = isRedirectChar;
+
                 }
                 else {
                     if (partial.length) {
                         tokens.push(partial);
                         partial = '';
                     }
+                    lastChr = chr;
                     continue;
                 }
 
                 if (quote != undefined) {
 
                     if (chr == quote && ! escaped) {
+                        //I want to revisit commenting this out to potentially add the ability to echo redirect chars
+                        //also not to alter original quotes at all. Or maybe it should be an object with an explicit string
+                        //flag set? I'm not completely sure.
                         partial = partial.substring(1, partial.length - 1);
                         tokens.push(partial);
+                        tokens.forceString[tokens.length - 1] = true;
                         partial = '';
                         quote = undefined;
+                        lastChr = chr;
                         continue;
                     }
 
                 }
 
-                if (quote == undefined) {
+                if (quote == undefined && lastChr.match(/\s/) ) {
                     if (chr == '"' || chr == "'") {
                         quote = chr;
                     }
@@ -86,16 +208,27 @@
                     escaped = false;
                 }
 
+                lastChr = chr;
+
             }
 
             if (partial.length) {
                 tokens.push(partial)
             }
 
-            return tokens;
+            if (tokensList.length && tokens.length) {
+                tokensList.push(tokens);
+            }
+
+            return tokensList.length
+                ? tokensList
+                : tokens;
         },
 
 
+        //IMPORTANT NOTE! WE CAN CURRENTLY -ONLY- EVALUATE SINGLE COMMAND QUESTIONS
+        //IF YOU PASS IN A TOKENIZED LIST OF TOKENS (; or / delimited), IT WILL -ONLY-
+        //EVALUATE THE FIRST ONE
         evaluate : function (string, callback) {
 
             var tokens  = this.tokenize(string);
@@ -118,6 +251,12 @@
                 string : string,
                 grammar : grammar._root,
             };
+
+            // XXX ONLY EVALUATE FIRST QUESTION.
+            if ($.isArray(tokens[0])) {
+                tokens = tokens[0];
+                tokens.forceString = {};
+            }
 
             if (tokens[0] == 'explain') {
                 tokens.shift();
@@ -160,7 +299,7 @@
                         }
 
                         if (returnObj.parsed.length) {
-                            returnObj.parsed = returnObj.parsed + ' ' + token;
+                            returnObj.parsed += ' ' + token;
                         }
                         else {
                             returnObj.parsed = token;
@@ -209,7 +348,7 @@
             if (returnObj.tail) {
                 var m;
                 if (m = returnObj.tail.match(/^into\s+(\S+)/)) {
-                    returnObj.execute = returnObj.execute + ' > ' + m[1];
+                    returnObj.execute += ' > ' + m[1];
                 }
                 else {
                     returnObj.fail = 1;
@@ -377,8 +516,18 @@
 
 		            }, this),
             		error: $.proxy(function(xhr, textStatus, errorThrown) {
-            		    this.dbg(textStatus);
-                        //throw xhr;
+
+            		    try {
+                            var json = JSON.parse(xhr.responseText);
+
+                            this.grammar = json;
+
+                            if (callback) {
+                                callback();
+                            }
+                        }
+                        catch (e) {}
+
 		            }, this),
                     type: 'GET',
     	        }
@@ -389,4 +538,4 @@
 
     });
 
-}( jQuery ) );
+});

@@ -4,8 +4,13 @@
  *
  * Gene "instance" info (e.g. coordinates on a particular strain's genome)
  * is in a different widget.
- */
-(function( $, undefined ) {
+ */define('KBaseGeneBiochemistry',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseGeneBiochemistry",
         parent: "kbaseWidget",
@@ -208,4 +213,4 @@
             this.$elem.append($errorDiv);
         },
     })
-})( jQuery );
+});
