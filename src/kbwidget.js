@@ -18,10 +18,35 @@
  *         init: function () {}
  *     });
  */
-(function ($) {
+
+define('kbwidget', ['jquery', 'handlebars'], function ($) {
+
+    $(document).on(
+        'libsLoaded.kbase',
+        function () {
+            $('[data-kbwidget]').each(function(idx, val) {
+                var $val = $(val);
+                var widget = $val.attr('data-kbwidget');
+
+                var options = $val.attr('data-kbwidget-options');
+                if (options != undefined) {
+                    options = JSON.parse(options);
+                }
+                else {
+                    options = {};
+                }
+
+                $val[widget](options);
+
+            });
+        }
+    );
+
     var KBase;
     var ucfirst = function(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
+        if (string != undefined && string.length) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
     };
 
     var willChangeNoteForName = function(name) {
@@ -51,13 +76,13 @@
         }
         else {
             return {
-                    setter : 'text',
-                    getter : 'text'
+                    setter : 'html',
+                    getter : 'html'
                 }
         }
     };
 
-    makeBindingCallback = function(elem, $target, attribute, transformers, accessors) {
+    var makeBindingCallback = function(elem, $target, attribute, transformers, accessors) {
 
         return $.proxy(function (e, vals) {
             e.preventDefault();
@@ -79,7 +104,7 @@
         }, $(elem))
     };
 
-    makeBindingBlurCallback = function(elem, $target, attribute, transformers, accessors) {
+    var makeBindingBlurCallback = function(elem, $target, attribute, transformers, accessors) {
 
         return $.proxy(function (e, vals) {
 
@@ -136,12 +161,13 @@
                 var setter = $target.__attributes[attribute].setter;
 
                 $target[setter](newVal);
+                this.data('kbase_bindingValue', this[accessors.getter]());
             }
 
         }, $(elem))
     };
 
-    makeBindingFocusCallback = function(elem, transformers, accessors) {
+    var makeBindingFocusCallback = function(elem, transformers, accessors) {
 
         return $.proxy( function (e) {
             e.preventDefault();
@@ -153,8 +179,14 @@
 
     };
 
-    $.fn.kb_bind = function($target, attribute, transformers, accessors) {
+    $.fn.asD3 = function() {
+        if (this.data('d3rep') == undefined) {
+            this.data('d3rep', d3.select(this.get(0)));
+        }
+        return this.data('d3rep')
+    };
 
+    $.fn.kb_bind = function($target, attribute, transformers, accessors) {
         if (this.length > 1) {
             var methodArgs = arguments;
             $.each(
@@ -280,7 +312,10 @@
 
 
     var widgetRegistry = {};
-    if (KBase === undefined) {
+    if (KBase == undefined) {
+        KBase = window.KBase;
+    }
+    if (window.KBase === undefined) {
         KBase = window.KBase = {
             _functions : {
 
@@ -364,6 +399,12 @@
                     $elem = $.jqElem('div');
                 }
                 $w.$elem = $elem;
+
+                if (options == undefined) {
+                    options = {};
+                }
+                options.headless = true;
+
                 $w.init(options);
                 $w._init = true;
                 $w.trigger('initialized');
@@ -384,7 +425,8 @@
         if (parent) {
             var pWidget = widgetRegistry[parent];
             if (pWidget === undefined)
-                throw new Error("Parent widget is not registered");
+                throw new Error("Parent widget is not registered. Cannot find " + parent
+                    + " for " + name);
             subclass(Widget, pWidget);
         }
 
@@ -424,6 +466,7 @@
 
                     }
                     else {
+
                         if (info.type.match(/w/) && info.setter != undefined) {
                             Widget.prototype[info.setter] = KBase._functions.setter(info.name);
                         }
@@ -580,7 +623,7 @@
             return this;
         }
     }
-    
+
     /**
      * @method registry
      * The set of globally-registered widgets.
@@ -598,7 +641,7 @@
         }
         return registry;
     }
-    
+
     /**
      * @method resetRegistry
      * Unregisters all global widgets.
@@ -658,13 +701,59 @@
 
                 for (attribute in this.__attributes) {
                     if (this.options[attribute] != undefined) {
-                        this.setValueForKey(attribute, this.options[attribute]);
+                        var setter = this.__attributes[attribute].setter;
+                        this[setter](this.options[attribute]);
                     }
+                }
+
+                if (this.options.template) {
+                    this.callAfterInit(
+                        $.proxy(function() {
+                            this.appendUI( this.$elem);
+                        }, this)
+                    );
                 }
 
 
                 return this;
             },
+
+            appendUI : function($elem) {
+                if (this.options.template) {
+                    $.ajax(this.options.template)
+                    .done( $.proxy(function(res) { this.templateSuccess.apply(this, arguments) }, this) )
+                    .fail( $.proxy(function(res) { this.templateFailure.apply(this, arguments) }, this) )
+                }
+
+                return $elem;
+            },
+
+            templateSuccess : function(templateString) {
+
+                var template = Handlebars.compile(templateString);
+
+                var html = template();
+
+                var res = template( this.templateContent() );
+
+                var $res = $.jqElem('span').append(res);
+                this._rewireIds($res, this);
+
+                this.$elem.append( $res  );
+
+
+            },
+
+            templateFailure : function(res) {
+                this.dbg("Template load failure");
+                this.dbg(res);
+            },
+
+            templateContent : function() {
+                return this.options.templateContent || {};
+            },
+
+
 
             /**
              * Sets an alert to display
@@ -706,13 +795,28 @@
 
                         if (triggerValues.newValue != oldVal) {
                             var didChangeNote  = didChangeNoteForName(attribute);
-
                             this.trigger(didChangeNote, triggerValues);
                         }
                     }
 
                     return this.valueForKey(attribute);
                 },
+
+            setValuesForKeys : function (obj) {
+
+                var objCopy = $.extend({}, obj);
+
+                for (attribute in this.__attributes) {
+                    if (objCopy[attribute] != undefined) {
+                        var setter = this.__attributes[attribute].setter;
+                        this[setter](objCopy[attribute]);
+                        delete objCopy[attribute];
+                    }
+                }
+
+                this.options = $.extend(this.options, objCopy);
+
+            },
 
             /**
              * Sets data.
@@ -738,7 +842,6 @@
             },
 
             _rewireIds : function($elem, $target) {
-
                 if ($target == undefined) {
                     $target = $elem;
                 }
@@ -752,6 +855,7 @@
                     $elem.find('[id]'),
                     function(idx) {
                         $target.data($(this).attr('id'), $(this));
+                        $(this).attr('data-id', $(this).attr('id'));
                         $(this).removeAttr('id');
                         }
                 );
@@ -858,4 +962,4 @@
 
         }
     );
-})(jQuery);
+});
