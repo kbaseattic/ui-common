@@ -567,8 +567,12 @@ define('kbaseIrisTerminal',
             this.fileBrowsers.push($fb);
         },
 
-        open_file : function(file) {
-            this.fileBrowsers[0].openFile(file);
+        download_file : function(file) {
+            this.fileBrowsers[0].downloadFile(file);
+        },
+
+        view_file : function(file) {
+            this.fileBrowsers[0].viewFile(file);
         },
 
         refreshFileBrowser : function() {

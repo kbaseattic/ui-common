@@ -404,12 +404,12 @@ define('kbaseIrisTerminalDispatchFile',
                     var file = args[0];
 
                     var $img = $.jqElem('img')
-                        .attr('src', this.fileBrowsers[0].urlForFile(file))
+                        .attr('src', this.fileBrowsers[0].downloadUrlForFile(file))
                         .css('max-width', '90%');
 
                     var $link = $.jqElem('a')
                         .append($img)
-                        .attr('href', this.fileBrowsers[0].urlForFile(file))
+                        .attr('href', this.fileBrowsers[0].downloadUrlForFile(file))
                         .css('border', '0px');
 
                     $widget.setOutput(
@@ -508,25 +508,38 @@ define('kbaseIrisTerminalDispatchFile',
                                                 mod_date: val.mod_date,
                                                 name    : val.name,
                                                 nameTD  :
-                                                    $.jqElem('a')
-                                                        .text(val.name)
-                                                        //uncomment these two lines to click and open in new window
-                                                        //.attr('href', url)
-                                                        //.attr('target', '_blank')
-                                                        //comment out this block if you don't want the clicks to pop up via the api
-                                                        //*
-                                                        .attr('href', '#')
-                                                        .on(
-                                                            'click',
-                                                            $.proxy(
-                                                                function (e) {
-                                                                    e.preventDefault();e.stopPropagation();
-                                                                    this.open_file(val['full_path']);
-                                                                    return false;
-                                                                },
-                                                                this
-                                                            )
-                                                        ),
+                                                    $.jqElem('span')
+                                                        .append(
+                                                            $.jqElem('a')
+                                                                .text(' [ VIEW ] ')
+                                                                //uncomment these two lines to click and open in new window
+                                                                .attr('href', this.fileBrowsers[0].viewUrlForFile(val['full_path']))
+                                                                .attr('target', '_blank')
+                                                                //comment out this block if you don't want the clicks to pop up via the api
+                                                                //*
+                                                        )
+                                                        .append(
+                                                            $.jqElem('a')
+                                                                .text(val.name)
+                                                                //uncomment these two lines to click and open in new window
+                                                                //.attr('href', url)
+                                                                //.attr('target', '_blank')
+                                                                //comment out this block if you don't want the clicks to pop up via the api
+                                                                //*
+                                                                .attr('href', '#')
+                                                                .on(
+                                                                    'click',
+                                                                    $.proxy(
+                                                                        function (e) {
+                                                                            e.preventDefault();e.stopPropagation();
+                                                                            this.download_file(val['full_path']);
+                                                                            return false;
+                                                                        },
+                                                                        this
+                                                                    )
+                                                                )
+                                                        )
+                                                        ,
                                                         //*/,
                                                 url     : this.options.invocationURL + "/download/" + val.full_path + "?session_id=" + this.sessionId()
                                             }

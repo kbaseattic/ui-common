@@ -1094,14 +1094,31 @@ console.log('will upload ' + pid + ',' + this.currentUploadJob);
         },
 
 
-        openFile : function(file) {
+        downloadFile : function(file) {
 
-            window.location.href = this.urlForFile(file);
+            window.location.href = this.downloadUrlForFile(file);
 
         },
 
-        urlForFile : function(file) {
-            return this.options.invocationURL + "/download/" + file + "?session_id=" + encodeURIComponent(this.sessionId()) + '&token=' + encodeURIComponent(this.authToken());
+        viewFile : function(file) {
+
+            window.location.href = this.viewUrlForFile(file);
+
+        },
+
+        downloadUrlForFile : function(file) {
+            return this.urlForFile(file, 'download');
+        },
+
+        viewUrlForFile : function(file) {
+            return this.urlForFile(file, 'view');
+        },
+
+        urlForFile : function(file, type) {
+            var url = this.options.invocationURL + "/" + type + "/" + file + "?session_id=" + encodeURIComponent(this.sessionId()) + '&token=' + encodeURIComponent(this.authToken());
+            url = url.replace(new RegExp('/+', 'g'), "/");
+            console.log(url);
+            return url;
         },
 
         deleteFile : function(file, type) {
