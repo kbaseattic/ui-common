@@ -83,9 +83,7 @@ define('kbaseTable',
                 }
             },
 
-            row_callback : function (cell, header, row, $kb) {
-                return $kb.default_row_callback(cell);
-            },
+            row_callback : function (cell, header, row, $kb) {},
             sortButtons : {},
         },
 
@@ -554,13 +552,13 @@ define('kbaseTable',
                             var keyA = a[h];
                             var keyB = b[h];
 
-                            if (keyA.sortValue != undefined) {
+                            if (keyA != undefined && keyA.sortValue != undefined) {
                                 keyA = keyA.sortValue;
                             }
                             else {
                                 keyA = typeof keyA == 'string' ? keyA.toLowerCase() : keyA;
                             }
-                            if (keyB.sortValue != undefined) {
+                            if (keyB != undefined && keyB.sortValue != undefined) {
                                 keyB = keyB.sortValue;
                             }
                             else {
@@ -765,9 +763,12 @@ define('kbaseTable',
                         var $td = $.jqElem(type);
 
                         var label = callback(rowData[h], h, rowData, this);
+                        if (label == undefined) {
+                            label = this.default_row_callback(rowData[h], h, rowData, this);
+                        }
                         filterString += label;
 
-                        if (! rowData[h].externalSortValue) {
+                        if (rowData[h] && ! rowData[h].externalSortValue) {
                             rowData[h].sortValue = label;
                         }
 
