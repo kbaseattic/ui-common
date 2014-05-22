@@ -147,7 +147,7 @@
 				'kbaseLinechart'                    : 'vis/kbaseLinechart',
 				'kbasePiechart'                     : 'vis/kbasePiechart',
 				'kbaseScatterplot'                  : 'vis/kbaseScatterplot',
-				'kbaseTreeChart'                    : 'vis/kbaseTreeChart',
+				'kbaseTreechart'                    : 'vis/kbaseTreechart',
 				'kbasePlantsNetworkNarrative'       : 'vis/plants/kbasePlantsNetworkNarrative',
 				'kbasePlantsNetworkTable'           : 'vis/plants/kbasePlantsNetworkTable',
 				'vis'                               : 'vis/vis',

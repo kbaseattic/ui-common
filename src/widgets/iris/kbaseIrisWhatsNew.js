@@ -28,9 +28,7 @@ define('kbaseIrisWhatsNew',
                         "File Editor can now properly edit files in subdirectories.",
                         "Files can now be created via the <b>edit</b> <i>newfilename</i> command.",
                           "Added visualization widgets. Type <b>widget</b> <i>widgetname</i> <i>jsondata</i> to display. Available visualization widgets are:"
-                            + " <b>barchart</b>, <b>forcednetwork</b>, <b>heatmap</b>, <b>linechart</b>, <b>piechart</b>, <b>scatterplot</b>. To see sample data formats,"
-                            + " type this in any directory: <b>execute @W#sharediris::get_chart_data#i</b>. That command will create 6 json files with sample"
-                            + " data that can be fed into a visualization.",
+                            + " <b>barchart</b>, <b>forcednetwork</b>, <b>heatmap</b>, <b>linechart</b>, <b>piechart</b>, <b>scatterplot</b>, <b>tree</b>.",
                         "Added <b>!!</b> command to repeat last command typed.",
                         "links from tutorials will now automatically appear in a new window.",
                         "Tutorial next/back/list commands are now clickable.",

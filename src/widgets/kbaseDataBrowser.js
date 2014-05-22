@@ -75,7 +75,7 @@ define('kbaseDataBrowser',
             $.each(
                 content,
                 $.proxy( function (idx, val) {
-
+console.log("BUILDS ON VAL " + val.id);console.log(val);
                     var icon = val.icon;
                     var iconOpen = val['fa fa-open'];
 
@@ -96,6 +96,7 @@ define('kbaseDataBrowser',
 
                     var $li = $('<li></li>')
                         .attr('id', val.id)
+                        .css('cursor', 'pointer')
                         .append(
                             $('<a></a>')
                                 .css('padding', '3px 5px 3px 5px')
@@ -173,6 +174,17 @@ define('kbaseDataBrowser',
                             $li.trigger('click');
                         }
 
+                    }
+
+                    var leafCallback = this.options.types[val.type].leafCallback;
+
+                    if (!val.expandable && leafCallback != undefined) {
+                        $li.bind('click',
+                            $.proxy(function(e) {
+                                e.preventDefault(); e.stopPropagation();
+                                leafCallback.call(this, val, $li);
+                            }, this)
+                        );
                     }
 
                     var controls = val.controls;

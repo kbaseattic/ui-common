@@ -84,10 +84,10 @@ define('kbaseIrisTerminalDispatchHistory',
                 regex       : new RegExp(/^!(!|\d+)/),
                 callback : function(args, command, $widget, $deferred) {
                     if (args[0] == '!') {
-                        console.log("bang bang");
-                        console.log(this.commandHistory[this.commandHistory.length]);
-                        console.log(this.commandHistory[this.commandHistory.length - 1]);
-                        console.log(this.commandHistory[this.commandHistory.length - 2]);
+                        this.dbg("bang bang");
+                        this.dbg(this.commandHistory[this.commandHistory.length]);
+                        this.dbg(this.commandHistory[this.commandHistory.length - 1]);
+                        this.dbg(this.commandHistory[this.commandHistory.length - 2]);
                         return this.commandHistory[this.commandHistory.length - 2];
                     }
                     else {

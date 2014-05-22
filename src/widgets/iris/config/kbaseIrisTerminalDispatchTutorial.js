@@ -24,7 +24,6 @@ define('kbaseIrisTerminalDispatchTutorial',
                 },
                 history : false,
                 callback    : function (args, command, $widget, $deferred) {
-                console.log(this.tutorial._currentPage + ' vs ' + this.tutorial.lastPage());
                     if (this.tutorial._currentPage == this.tutorial.lastPage() ) {
                         $widget.setError("You are already at the last page.");
                         return true;

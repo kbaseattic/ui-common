@@ -53,15 +53,15 @@ define('kbaseIrisTerminalDispatchHelp',
 
 
                     if (args[0]) {
-                    console.log("RECENT NOTES");
-                    console.log(this);
+                    this.dbg("RECENT NOTES");
+                    this.dbg(this);
                         $widget.setOutput(this.whatsnew().ulForCurrentRelease());
                     }
                     else {
                         $widget.setOutput(this.whatsnew().ulForAllReleases());
                     };
 
-                    if (! $widget.isHidden()) { this.scroll() ;console.log("SCROLLER");};
+                    if (! $widget.isHidden()) { this.scroll() ;this.dbg("SCROLLER");};
 
                     return true;
 
@@ -118,8 +118,8 @@ define('kbaseIrisTerminalDispatchHelp',
                                 $widget.setOutput($tbl.$elem);
                                 $widget.setValue(cmds);
                                 $deferred.resolve();
-                                console.log("IS HIDDEN : " + $widget.isHidden());
-                                if (! $widget.isHidden()) { console.log("SCROLL IT");this.scroll() };
+                                this.dbg("IS HIDDEN : " + $widget.isHidden());
+                                if (! $widget.isHidden()) { this.dbg("SCROLL IT");this.scroll() };
 
                             },
                            this

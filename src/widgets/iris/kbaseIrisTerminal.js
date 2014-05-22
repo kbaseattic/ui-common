@@ -558,7 +558,6 @@ define('kbaseIrisTerminal',
         },
 
         logInCanceledCallback : function(e) {
-            console.log("LOG IN CANCEL");
             //basically the same as logging out, really.
             this.loggedOutCallback();
         },
@@ -682,9 +681,6 @@ define('kbaseIrisTerminal',
             );
 
             this.resize_contents(this.terminal);
-
-            console.log(navigator.userAgent);
-
 
         },
 
@@ -1566,9 +1562,6 @@ define('kbaseIrisTerminal',
                             var helpValue = dispatch.help || $.jqElem('span').html('help is not available for <i>' + dispatch.name + '</i>');
 
                             if (typeof helpValue == 'function') {
-                            console.log(helpValue);
-                            console.log(helpValue.apply(this));
-                            console.log(helpValue.call(this));
                                 helpValue = helpValue.apply(this);
                             }
 

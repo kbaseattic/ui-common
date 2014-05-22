@@ -34,16 +34,11 @@ define('kbaseIrisFileBrowser',
             'root' : '/',
             types : {
                 file : {
+                    leafCallback : function (val, $li) {
+                        this.viewFile(val.id);
+                    },
                     controls :
                     [
-                        {
-                            icon : 'fa fa-link',
-                            //tooltip : 'select widget',
-                            callback :
-                                function (e, $fb) {
-                                    $fb.toggleSelection($(this).data('id'));
-                                },
-                        },
                         {
                             icon : 'fa fa-minus',
                             callback : function(e, $fb) {
@@ -53,13 +48,29 @@ define('kbaseIrisFileBrowser',
                             //tooltip : 'delete this file',
                         },
                         {
+                            icon : 'fa fa-link',
+                            //tooltip : 'select widget',
+                            callback :
+                                function (e, $fb) {
+                                    $fb.toggleSelection($(this).data('id'));
+                                },
+                        },
+                        {
                             icon : 'fa fa-download',
                             callback : function(e, $fb) {
-                                $fb.openFile($(this).data('id'));
+                                $fb.downloadFile($(this).data('id'));
                             },
-                            id : 'viewButton',
+                            id : 'dlButton',
                             //'tooltip' : 'download this file',
                         },
+                        /*{
+                            icon : 'fa fa-search fa-flip-horizontal',
+                            callback : function(e, $fb) {
+                                $fb.viewFile($(this).data('id'));
+                            },
+                            id : 'viewButton',
+                            //'tooltip' : 'view this file',
+                        },*/
                         {
                             icon : 'fa fa-pencil',
                             callback : function(e, $fb) {
@@ -444,11 +455,11 @@ define('kbaseIrisFileBrowser',
             }
 
             this.currentUploadJob = undefined;
-console.log('upload job done for ' + pid);
-console.log('check for pending jobs');
+this.dbg('upload job done for ' + pid);
+this.dbg('check for pending jobs');
             if (this.options.pendingUploadJobs.length) {
                 var pendingJob = this.options.pendingUploadJobs.shift();
-console.log("found one");console.log(pendingJob);
+this.dbg("found one");this.dbg(pendingJob);
                 this.trigger('removeIrisProcess', pendingJob.pid)
                 if (pendingJob.name) {
                     this.data('override_filename', pendingJob.name);
@@ -475,8 +486,8 @@ console.log("found one");console.log(pendingJob);
             fullFilePath         = fullFilePath.replace(/\/\/+/g, '/');
 
             var pid = this.uuid();
-console.log('uploads file ' + fullFilePath);
-console.log("JOB IS " + this.currentUploadJob);
+this.dbg('uploads file ' + fullFilePath);
+this.dbg("JOB IS " + this.currentUploadJob);
             if (this.currentUploadJob != undefined) {
 
                 this.trigger(
@@ -494,7 +505,7 @@ console.log("JOB IS " + this.currentUploadJob);
 
 
             this.currentUploadJob = pid;
-console.log('will upload ' + pid + ',' + this.currentUploadJob);
+this.dbg('will upload ' + pid + ',' + this.currentUploadJob);
             this.trigger(
                 'updateIrisProcess',
                 {
@@ -1102,7 +1113,7 @@ console.log('will upload ' + pid + ',' + this.currentUploadJob);
 
         viewFile : function(file) {
 
-            window.location.href = this.viewUrlForFile(file);
+            window.open(this.viewUrlForFile(file));
 
         },
 
@@ -1117,7 +1128,7 @@ console.log('will upload ' + pid + ',' + this.currentUploadJob);
         urlForFile : function(file, type) {
             var url = this.options.invocationURL + "/" + type + "/" + file + "?session_id=" + encodeURIComponent(this.sessionId()) + '&token=' + encodeURIComponent(this.authToken());
             url = url.replace(new RegExp('/+', 'g'), "/");
-            console.log(url);
+            this.dbg(url);
             return url;
         },
 

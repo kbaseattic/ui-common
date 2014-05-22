@@ -7,10 +7,7 @@ define('vis',
         'kbaseScatterplot',
         'kbasePiechart',
         'kbaseForcedNetwork',
-        'kbaseTreeChart',
-
-        'kbasePlantsNetworkTable',
-        'kbasePlantsNetworkNarrative',
+        'kbaseTreechart',
     ],
     function() {
 

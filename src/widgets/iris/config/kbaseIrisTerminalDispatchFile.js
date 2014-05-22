@@ -507,20 +507,11 @@ define('kbaseIrisTerminalDispatchFile',
                                                 size    : val.size,
                                                 mod_date: val.mod_date,
                                                 name    : val.name,
-                                                nameTD  :
+                                                dlTD  :
                                                     $.jqElem('span')
                                                         .append(
-                                                            $.jqElem('a')
-                                                                .text(' [ VIEW ] ')
-                                                                //uncomment these two lines to click and open in new window
-                                                                .attr('href', this.fileBrowsers[0].viewUrlForFile(val['full_path']))
-                                                                .attr('target', '_blank')
-                                                                //comment out this block if you don't want the clicks to pop up via the api
-                                                                //*
-                                                        )
-                                                        .append(
-                                                            $.jqElem('a')
-                                                                .text(val.name)
+                                                            $.jqElem('button')
+                                                                .attr('class', 'fa fa-download')
                                                                 //uncomment these two lines to click and open in new window
                                                                 //.attr('href', url)
                                                                 //.attr('target', '_blank')
@@ -538,6 +529,17 @@ define('kbaseIrisTerminalDispatchFile',
                                                                         this
                                                                     )
                                                                 )
+                                                        ),
+                                                nameTD :
+                                                    $.jqElem('span')
+                                                        .append(
+                                                            $.jqElem('a')
+                                                                .text(val.name)
+                                                                //uncomment these two lines to click and open in new window
+                                                                .attr('href', this.fileBrowsers[0].viewUrlForFile(val['full_path']))
+                                                                .attr('target', '_blank')
+                                                                //comment out this block if you don't want the clicks to pop up via the api
+                                                                //*
                                                         )
                                                         ,
                                                         //*/,
@@ -564,7 +566,8 @@ define('kbaseIrisTerminalDispatchFile',
                                             [
                                                 val.size,
                                                 val.mod_date,
-                                                { value : val.nameTD }
+                                                { value : val.nameTD },
+                                                { value : val.dlTD }
                                             ]
                                         );
                                     }, this)
