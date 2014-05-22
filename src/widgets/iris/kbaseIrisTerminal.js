@@ -611,18 +611,11 @@ define('kbaseIrisTerminal',
                         .attr('height', '3')
                         .attr('spellcheck', 'false')
                     )
-                .append(
-                    $('<div></div>')
-                        .attr('id', 'file-uploader')
-                    )
-                .append(
-                    $('<div></div>')
-                        .attr('id', 'panel')
-                        .css('display', 'none')
-                    );
+                ;
             ;
 
             this._rewireIds($block, this);
+            var $term = this.data('terminal');
 
             $elem.append($block);
 
@@ -733,8 +726,12 @@ define('kbaseIrisTerminal',
         },
 
         resize_contents: function($container) {
-            //	var newx = window.getSize().y - document.id(footer).getSize().y - 35;
-            //	container.style.height = newx;
+
+            //magic number is 135 for header and footer!
+            //magic number is 56 less for height of terminal box itself.
+
+            this.data('terminal').css('height', $(window).height() - 135 - 56);
+
         },
 
         keypress: function(event) {

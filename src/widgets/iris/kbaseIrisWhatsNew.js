@@ -35,6 +35,9 @@ define('kbaseIrisWhatsNew',
                         "Disabled spell checking in commands input.",
                         "Internal IRIS commands are explicitly listed in the commands list.",
                         "Magic workspace tokens are no longer supported.",
+                        "Terminal will now resize with the window",
+                        "Clicking on file names in the file browser will now open them in a new tab",
+                        "Clicking on file names after an ls will now open in a new tab; added explicit download button",
                     ]
                 },
                 {
