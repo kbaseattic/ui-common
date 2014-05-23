@@ -79,8 +79,6 @@ define('kbaseTreechart',
         },
 
         updateTree : function(source) {
-this.dbg("DISPLAY ALL");
-this.dbg(source);
             var chart = this.data('D3svg').select('.chart');
 
             var $tree = this;
@@ -106,8 +104,6 @@ this.dbg(source);
                 .attr('class', 'fake')
                 .text(root.name);
             rootOffset = rootText[0][0].getBBox().width - 10 + bounds.origin.x;
-this.dbg(rootText[0][0]);
-this.dbg(rootOffset);
 var newHeight = 15 * this.countVisibleNodes(this.dataset());
 //this.$elem.animate({'height' : newHeight + this.options.yGutter + this.options.yPadding}, 500);
 //            this.$elem.height(newHeight);
@@ -157,9 +153,6 @@ var chartOffset = 0;
                         ? d.y + 10 - fakeBox.width
                         : d.y + 10;
 
-                    this.dbg("NODE POS : " + d.y);
-                    this.dbg(fakeLeft + " TO " + fakeRight + ' for ' + d.name);
-                    this.dbg(fakeBox);
 
                     if (fakeRight > maxOffset) {
                         maxOffset = fakeRight;
@@ -172,31 +165,22 @@ var chartOffset = 0;
                 }
             );
 
-            this.dbg("RESIZE TO " + minOffset + ' ' + maxOffset);
-            this.dbg(bounds);
-
             var widthDelta = 0;
             if (minOffset < bounds.origin.x) {
                 widthDelta += bounds.origin.x - minOffset;
                 chartOffset = widthDelta;
-            this.dbg('min increase by ' + widthDelta);
             }
             if (maxOffset > bounds.origin.x + bounds.size.width) {
-            this.dbg('max increase');
                 widthDelta += maxOffset - bounds.size.width;
             }
 
             this.nodes.forEach(
                 function(d) {
                     d.y = depth(d);
-                    this.dbg("2NODE POS : " + d.y + ' for ' + d.name);
                 }
             );
 
             chart.selectAll('.fake').remove();
-
-            this.dbg("INCREASE WIDTH BY " + widthDelta);
-            this.dbg("NEW WIDTH " + (this.options.xGutter + this.options.yGutter + widthDelta + bounds.size.width));
 
             var newWidth = this.options.xGutter + this.options.yGutter + widthDelta + bounds.size.width;
             if (newWidth < $tree.options.originalWidth) {
@@ -243,14 +227,6 @@ var chartOffset = 0;
                 .style("fill-opacity", 1e-6)
                 .attr('fill', function(d) { return d.fill || 'black'})
                 .on("click", function(d) {
-
-this.dbg(this.getComputedTextLength());
-this.dbg(this.getBBox());
-this.dbg($tree);
-this.dbg($tree.absPos);
-var pos = $tree.absPos(this);
-this.dbg("ABS POS IS");
-this.dbg(pos);
 
                     if ($tree.options.red == d) {
                         $tree.options.red = undefined;
@@ -380,7 +356,7 @@ this.dbg(pos);
             this.height(this.$elem.height());
 
             this.options.originalWidth = this.$elem.width();
-this.dbg("ORIGINAL WIDTH " + this.options.originalWidth);
+
             var i = 0;
             var bounds = this.chartBounds();
 
