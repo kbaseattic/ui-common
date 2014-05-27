@@ -27,8 +27,6 @@ define('kbaseTreechart',
             yGutter     : 20,
             yPadding    : 20,
 
-            ticker      : 0,
-
             bgColor : 'none',
 
             red : undefined,
@@ -39,7 +37,6 @@ define('kbaseTreechart',
         },
 
         _accessors : [
-            'ticker',
             'comparison',
         ],
 
@@ -82,8 +79,6 @@ define('kbaseTreechart',
             var chart = this.data('D3svg').select('.chart');
 
             var $tree = this;
-
-            var i = this.ticker();
 
             var duration = 500;
 
@@ -196,9 +191,7 @@ var chartOffset = 0;
             );
 
             var node = chart.selectAll("g.node")
-                  .data(this.nodes, function(d) { return d.id || (d.id = ++i); });
-
-            this.ticker(i);
+                  .data(this.nodes, this.uniqueID );
 
             // Enter any new nodes at the parent's previous position.
             var nodeEnter = node.enter().append("g")
