@@ -120,9 +120,9 @@ var pieData = this.pieLayout($pie.dataset());
                         })
                         .attrTween('fill-opacity', function (d, idx) {
                             if (this._currentOpacity == undefined) {
-                                this._currentOpacity = $pie.initialized ? 0 : 100;
+                                this._currentOpacity = $pie.initialized ? 0 : 1;
                             }
-                            var interpolate = d3.interpolate(this._currentOpacity, 100);
+                            var interpolate = d3.interpolate(this._currentOpacity, 1);
                             this._currentOpacity = interpolate(0);
                             return interpolate;
                         })
@@ -229,7 +229,18 @@ var pieData = this.pieLayout($pie.dataset());
                     .each('end', function() { this.remove() } )
                     ;
 
-            var labels = pie.selectAll('.label').data(pieData, this.uniqueness());
+            var labelG = this.data('D3svg').select('.chart').selectAll('.labelG').data([0]);
+            labelG.enter().append('g')
+                .attr('class', 'labelG')
+                .attr('transform',
+                    'translate('
+                        + (bounds.size.width / 2 - radius + radius)
+                        + ','
+                        + (bounds.size.height / 2 - radius + radius)
+                        + ')'
+                );
+
+            var labels = labelG.selectAll('.label').data(pieData, this.uniqueness());
 
             labels
                 .enter()
@@ -247,7 +258,36 @@ var pieData = this.pieLayout($pie.dataset());
 
             labels
                 .exit()
-                    .remove();
+                    .transition()
+                    .duration(this.options.transitionTime)
+                    .attrTween('fill-opacity', function (d, idx) {
+                        var interpolate = d3.interpolate(this._currentOpacity, 0);
+                        this._currentOpacity = interpolate(0);
+                        return interpolate;
+                    })
+                    .attrTween("transform", function(d, idx) {
+
+                            var endPoint = {startAngle : d.startAngle, endAngle : d.startAngle};
+                            if (idx > 0) {
+                                endPoint = {startAngle : pieData[idx - 1].endAngle, endAngle : pieData[idx - 1].endAngle};
+                            }
+
+                            var interpolate = d3.interpolate(this._current, endPoint);
+
+                            this._current = interpolate(0);
+                            return function(t) {
+                                var d2 = interpolate(t);
+                                var pos = arcMaker.centroid(d2);
+                            console.log("INT OUT! " + pos);
+                                return "translate("+ pos +")";
+                            };
+                            return function(t) {
+                                return arcMaker(interpolate(t));
+                            };
+                        })
+//                    .call(labelTown)
+//                    .each('end', function() { this.remove() } );
+                    //.remove();
 
         },
 
