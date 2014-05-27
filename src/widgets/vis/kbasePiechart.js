@@ -23,11 +23,26 @@ define('kbasePiechart',
             overColor : 'blue',
             innerRadius : 0,
             outerRadius : 0,
+            startAngle : 0,
+            endAngle : 2 * Math.PI,
         },
 
         _accessors : [
 
         ],
+
+        init : function(options) {
+            this._super(options);
+
+            this.uniqueID = $.proxy( function(d) {
+                if (d.data == undefined) {
+                    d.data = {};
+                }
+                return d.data.id || (d.data.id = this.ticker() );
+            }, this);
+
+            return this;
+        },
 
         renderChart : function() {
 
@@ -43,11 +58,15 @@ define('kbasePiechart',
                 .range([0,360]);
 
 if (this.pieLayout == undefined) {
-    this.pieLayout = d3.layout.pie().sort(null).value(function (d, idx) { return pieScale(d.value) });
+    this.pieLayout = d3.layout.pie()
+        .sort(null)
+        .startAngle(this.options.startAngle)
+        .endAngle(this.options.endAngle)
+        .value(function (d, idx) { return pieScale(d.value) });
 }
 
 var pieData = this.pieLayout($pie.dataset());
-
+console.log(pieData);
 
             var radius = this.options.outerRadius;
             if (radius == 0) {
@@ -79,7 +98,7 @@ var pieData = this.pieLayout($pie.dataset());
                                         this._current = {startAngle : $pie.lastPieData[idx + 1].startAngle, endAngle : $pie.lastPieData[idx + 1].startAngle};
                                     }
                                     else {
-                                        this._current = {startAngle : 2 * Math.PI, endAngle: 2 * Math.PI};
+                                        this._current = {startAngle : $pie.options.endAngle, endAngle: $pie.options.endAngle};
                                     }
                                 }
                                 else {
@@ -122,9 +141,13 @@ var pieData = this.pieLayout($pie.dataset());
                             if (this._currentOpacity == undefined) {
                                 this._currentOpacity = $pie.initialized ? 0 : 1;
                             }
+                            console.log("CO " + this._currentOpacity + " for " + d.data.label);
                             var interpolate = d3.interpolate(this._currentOpacity, 1);
                             this._currentOpacity = interpolate(0);
-                            return interpolate;
+                            var $me = this;
+                            return function (t) {
+                                return $me._currentOpacity = interpolate(t);
+                            }
                         })
                         .attrTween("transform", function(d, idx) {
                             //this._current=  this._current || d;
@@ -135,7 +158,7 @@ var pieData = this.pieLayout($pie.dataset());
                                         this._current = {startAngle : $pie.lastPieData[idx + 1].startAngle, endAngle : $pie.lastPieData[idx + 1].startAngle};
                                     }
                                     else {
-                                        this._current = {startAngle : 2 * Math.PI, endAngle: 2 * Math.PI};
+                                        this._current = {startAngle : $pie.options.endAngle, endAngle: $pie.options.endAngle};
                                     }
                                 }
                                 else {
@@ -261,7 +284,7 @@ var pieData = this.pieLayout($pie.dataset());
                     .transition()
                     .duration(this.options.transitionTime)
                     .attrTween('fill-opacity', function (d, idx) {
-                        var interpolate = d3.interpolate(this._currentOpacity, 0);
+                        var interpolate = d3.interpolate(1, 0);
                         this._currentOpacity = interpolate(0);
                         return interpolate;
                     })
@@ -269,6 +292,9 @@ var pieData = this.pieLayout($pie.dataset());
 
                             var endPoint = {startAngle : d.startAngle, endAngle : d.startAngle};
                             if (idx > 0) {
+                                if (idx > pieData.length) {
+                                    idx = pieData.length;
+                                }
                                 endPoint = {startAngle : pieData[idx - 1].endAngle, endAngle : pieData[idx - 1].endAngle};
                             }
 
@@ -278,7 +304,6 @@ var pieData = this.pieLayout($pie.dataset());
                             return function(t) {
                                 var d2 = interpolate(t);
                                 var pos = arcMaker.centroid(d2);
-                            console.log("INT OUT! " + pos);
                                 return "translate("+ pos +")";
                             };
                             return function(t) {
@@ -286,7 +311,7 @@ var pieData = this.pieLayout($pie.dataset());
                             };
                         })
 //                    .call(labelTown)
-//                    .each('end', function() { this.remove() } );
+                    .each('end', function() { this.remove() } );
                     //.remove();
 
         },
