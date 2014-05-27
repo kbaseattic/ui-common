@@ -36,8 +36,12 @@ define('kbaseVisWidget',
             scaleYAxis : false,
             scaleAxes  : false,
 
-            transitionTime : 100,
+            useUniqueID : false,
+
+            transitionTime : 1750,
             ulIcon         : 'img/labs_icon.png',
+
+            ticker : 0,
         },
 
         shouldScaleAxis : function (axis) {
@@ -192,6 +196,15 @@ define('kbaseVisWidget',
         init: function(options) {
 
             this._super(options);
+
+            this.ticker = function() {
+                return ++this.options.ticker;
+            }
+
+            this.uniqueID = $.proxy( function(d) {
+                return d.id || (d.id = this.ticker() );
+            }, this);
+
 
             this.width(this.$elem.width());
             this.height(this.$elem.height());
@@ -474,9 +487,10 @@ define('kbaseVisWidget',
 
             var D3svg = d3.select($elem.get(0))
                 .append('svg')
-                .attr('width', this.width())
-                .attr('height', this.height())
-                .attr('style', this.options.debug ? 'border : 1px solid blue' : undefined);
+                //.attr('width', this.width())
+                //.attr('height', this.height())
+                //.attr('style', this.options.debug ? 'border : 1px solid blue' : undefined);
+                //.attr('style', 'width : 100%; height : 100%')
 
             var tooltip = d3.select('body').selectAll('.visToolTip')
                 .data([0])
@@ -522,6 +536,7 @@ define('kbaseVisWidget',
                 'purple',   'orange',   'gray'
             ];
 
+            D3svg.selectAll('defs').data([null]).enter().append('defs');
 
             var $vis = this;
 
@@ -640,7 +655,73 @@ define('kbaseVisWidget',
             d3.selectAll('.visToolTip').style('display', 'none');
         },
 
+        wrap : function(text, width, xCoord) {
 
+            if (xCoord == undefined) {
+                xCoord = function() { return 0;}
+            };
+
+
+            text.each(function() {
+                var text = d3.select(this),
+                        words = text.text().split(/\s+/).reverse(),
+                        word,
+                        line = [],
+                        lineNumber = 0,
+                        lineHeight = 1.1, // ems
+                        y = text.attr("y"),
+                        dy = parseFloat(text.attr("dy")) || 0,
+                        tspan = text
+                            .text(null)
+                            .append("tspan")
+                            .attr("x", xCoord)
+                            .attr("y", y)
+                            .attr("dy", dy + "em")
+                        ;
+                        console.log("O DY " + dy);
+                while (word = words.pop()) {
+                    line.push(word);
+                    tspan.text(line.join(" "));
+                    if (tspan.node().getComputedTextLength() > width) {
+                        line.pop();
+                        tspan.text(line.join(" "));
+                        line = [word];
+                        tspan = text.append("tspan")
+                            .attr("x", xCoord)
+                            .attr("y", y).
+                            attr("dy", lineHeight + 'em')//++lineNumber * lineHeight + dy + "em")
+                            .text(word)
+                        ;
+                    }
+                }
+            });
+        },
+
+        absPos : function(obj) {
+
+            var box    = obj.getBBox();
+            var matrix = obj.getScreenCTM();
+
+            return { x : box.x + matrix.e, y : box.y + matrix.f};
+        },
+
+
+        endall : function (transition, callback) {
+            var n = 0;
+            transition
+                .each(function() { ++n; })
+                .each("end", function() { if (!--n) callback.apply(this, arguments); });
+        },
+
+        uniqueness : function(uniqueFunc) {
+            if (uniqueFunc == undefined) {
+                uniqueFunc = this.uniqueID;
+            }
+
+            return this.options.useUniqueID
+                ? uniqueFunc
+                : undefined;
+        },
 
     });
 
