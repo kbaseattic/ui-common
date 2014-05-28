@@ -25,6 +25,7 @@ define('kbasePiechart',
             outerRadius : 0,
             startAngle : 0,
             endAngle : 2 * Math.PI,
+            gradient : true,
         },
 
         _accessors : [
@@ -38,7 +39,8 @@ define('kbasePiechart',
                 if (d.data == undefined) {
                     d.data = {};
                 }
-                return d.data.id || (d.data.id = this.ticker() );
+                var ret = d.data.id || (d.data.id = this.ticker() );
+                return ret;
             }, this);
 
             return this;
@@ -66,7 +68,6 @@ if (this.pieLayout == undefined) {
 }
 
 var pieData = this.pieLayout($pie.dataset());
-console.log(pieData);
 
             var radius = this.options.outerRadius;
             if (radius == 0) {
@@ -82,10 +83,65 @@ console.log(pieData);
 
             var funkyTown = function() {
 
-                this
-                    .attr('fill',   function (d) {return d.data.color } );
+                //this.attr('fill', function (d, idx) { return d.data.color });
+
                 if (this.attrTween) {
                     this
+                        //*
+                        .attrTween('fill',
+                            function (d, idx) {
+                                var uniqueFunc = $pie.uniqueness();
+
+                                var currentID = uniqueFunc == undefined
+                                    ? undefined
+                                    : uniqueFunc(d);
+
+                                var gradID = d.data.gradID;
+                                if (gradID == undefined) {
+
+                                    var newGradID;
+                                    if ($pie.lastPieData != undefined && idx < $pie.lastPieData.length) {
+
+
+                                        //no id? we're using indexes. Easy.
+                                        if (currentID == undefined) {
+                                            newGradID = $pie.lastPieData[idx].data.gradID;
+                                        }
+                                        //id? Shit. Iterate and look up by the id
+                                        else {
+                                            $.each(
+                                                $pie.lastPieData,
+                                                function (idx, val) {
+                                                    var lastID = uniqueFunc(val);
+                                                    if (lastID == currentID) {
+                                                        newGradID = val.data.gradID;
+                                                        return;
+                                                    }
+                                                }
+                                            );
+                                        }
+
+                                    }
+
+                                    if (newGradID == undefined) {
+                                        newGradID = $pie.uuid();
+                                    }
+
+                                    gradID = d.data.gradID = newGradID;
+                                }
+
+                                var gradient = 'url(#'
+                                    + $pie.radialGradient(
+                                        {
+                                            startColor : d.data.color,
+                                            stopColor : $pie.options.gradient ? $pie.options.radialGradientStopColor : d.data.color,
+                                            id : gradID
+                                        }
+                                    ) + ')';
+
+                                return function(t) { return gradient};
+                            }
+                       )//*/
                         .attrTween("d", function(d, idx) {
 
                             //this._current = this._current || d;//{startAngle : 0, endAngle : 0};
@@ -94,7 +150,7 @@ console.log(pieData);
                             if (this._current == undefined) {
                                 if ($pie.initialized) {
 
-                                    if (idx < $pie.lastPieData.length) {
+                                    if (idx < $pie.lastPieData.length - 1) {
                                         this._current = {startAngle : $pie.lastPieData[idx + 1].startAngle, endAngle : $pie.lastPieData[idx + 1].startAngle};
                                     }
                                     else {
@@ -141,7 +197,6 @@ console.log(pieData);
                             if (this._currentOpacity == undefined) {
                                 this._currentOpacity = $pie.initialized ? 0 : 1;
                             }
-                            console.log("CO " + this._currentOpacity + " for " + d.data.label);
                             var interpolate = d3.interpolate(this._currentOpacity, 1);
                             this._currentOpacity = interpolate(0);
                             var $me = this;
@@ -154,7 +209,7 @@ console.log(pieData);
                             if (this._current == undefined) {
                                 if ($pie.initialized) {
 
-                                    if (idx < $pie.lastPieData.length) {
+                                    if (idx < $pie.lastPieData.length - 1) {
                                         this._current = {startAngle : $pie.lastPieData[idx + 1].startAngle, endAngle : $pie.lastPieData[idx + 1].startAngle};
                                     }
                                     else {
@@ -165,8 +220,11 @@ console.log(pieData);
                                     this._current = d;//{startAngle : d.startAngle, endAngle : d.startAngle};
                                 }
                             }
+
                             var interpolate = d3.interpolate(this._current, d);
+
                             this._current = interpolate(0);
+
                             return function(t) {
                                 var d2 = interpolate(t);
                                 var pos = arcMaker.centroid(d2);
@@ -197,7 +255,9 @@ console.log(pieData);
                 $.each(
                     pieData,
                     function (idx, val) {
-                        val.id = val.data.id;
+                        if (val.data.id != undefined) {
+                            val.id = val.data.id;
+                        }
                     }
                 );
 
@@ -206,16 +266,20 @@ console.log(pieData);
             slices
                 .enter()
                     .append('path')
-//                        .attr('fill',   function (d) {return d.data.color } )
                         .attr('class', 'slice')
-                        .call(funkyTown);
+                        .attr('fill', function (d) { return d.data.color } )
+                        //.call(funkyTown);
             ;
+
+    var transitionTime = this.initialized
+        ? this.options.transitionTime
+        : 0;
 
 	slices
 		//.transition().duration(this.options.transitionTime)
 //		.data(pieData)
 .call(mouseAction)
-		.transition().duration(this.options.transitionTime)
+		.transition().duration(transitionTime)
 		.call(funkyTown)
 		.call($pie.endall, function() {
 		    $pie.initialized = true;
@@ -234,7 +298,7 @@ console.log(pieData);
                 .exit()
                     //.remove();
                     .transition()
-                    .duration(this.options.transitionTime)
+                    .duration(transitionTime)
                     .attrTween("d", function(d, idx) {
 
                             var endPoint = {startAngle : d.startAngle, endAngle : d.startAngle};
@@ -275,14 +339,14 @@ console.log(pieData);
             labels
                     .call(mouseAction)
                     .transition()
-                    .duration(this.options.transitionTime)
+                    .duration(transitionTime)
                     .call(labelTown)
             ;
 
             labels
                 .exit()
                     .transition()
-                    .duration(this.options.transitionTime)
+                    .duration(transitionTime)
                     .attrTween('fill-opacity', function (d, idx) {
                         var interpolate = d3.interpolate(1, 0);
                         this._currentOpacity = interpolate(0);

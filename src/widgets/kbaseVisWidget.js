@@ -42,6 +42,9 @@ define('kbaseVisWidget',
             ulIcon         : 'img/labs_icon.png',
 
             ticker : 0,
+
+            radialGradients : {},
+            radialGradientStopColor : 'black',
         },
 
         shouldScaleAxis : function (axis) {
@@ -77,6 +80,7 @@ define('kbaseVisWidget',
             'yHeightScaleType',
             'xIDMap',
             'yIDMap',
+            'radialGradients',
         ],
 
         input : function() {
@@ -536,7 +540,7 @@ define('kbaseVisWidget',
                 'purple',   'orange',   'gray'
             ];
 
-            D3svg.selectAll('defs').data([null]).enter().append('defs');
+            D3svg.selectAll('defs').data([null]).enter().append('defs').attr('class', 'definitions');
 
             var $vis = this;
 
@@ -655,6 +659,99 @@ define('kbaseVisWidget',
             d3.selectAll('.visToolTip').style('display', 'none');
         },
 
+        radialGradient : function(grad) {
+
+            grad = $.extend(
+                true,
+                {
+                    cx : 0,
+                    cy : 0,
+                    stopColor : this.options.radialGradientStopColor,
+                    r : this.chartBounds().size.width / 2,
+                },
+                grad
+            );
+
+            var gradKey = [grad.cx, grad.cy, grad.r, grad.startColor, grad.stopColor].join(',');
+
+            /*$.each(
+                this.radialGradients(),
+                function (key, val) {
+                    if (val == grad.id) {
+                        return val;
+                    }
+                }
+            );*/
+
+            if (this.radialGradients()[gradKey] != undefined && grad.id == undefined) {
+                grad.id = this.radialGradients()[gradKey];
+            }
+
+            if (grad.id == undefined) {
+                grad.id = this.uuid();
+            }
+
+
+            //I'd prefer to .select('.definitions').selectAll('radialGradient') and then just let
+            //d3 figure out the one that appropriately maps to my given grad value...but I couldn't
+            //get that to work for some inexplicable reason.
+            var gradient = this.data('D3svg').select('.definitions').selectAll('#' + grad.id)
+                .data([grad]);
+
+            var newGrad = false;
+
+            gradient
+                .enter()
+                    .append('radialGradient')
+                        .attr('id',
+                            //as brilliant as this hack is, it's also godawful. I might as well put a goto here.
+                            //this just returns the grad's id, as usual. BUT it also invokes a side effect to set
+                            //a global flag (well, enclosing context flag) to say that this is a newly created gradient
+                            //so down below we don't use any transition time to set the values. There's gotta be a better
+                            //way to do this, but I couldn't figure it out.
+                            function(d) {
+                                newGrad = true;
+                                return d.id
+                            }
+                        )
+                        .attr('gradientUnits', 'userSpaceOnUse')
+                        .attr('cx', function (d) {return d.cx})
+                        .attr('cy', function (d) {return d.cy})
+                        .attr('r', function (d) {return 2.5 * d.r})
+                        .attr('spreadMethod', 'pad')
+            ;
+
+            var transitionTime = newGrad
+                ? 0
+                : this.options.transitionTime;
+
+            var stop0 = gradient.selectAll('stop[offset="0%"]').data([grad]);
+            stop0.enter()
+                .append('stop')
+                    .attr('offset', '0%');
+            stop0.transition().duration(transitionTime)
+                    .attr('stop-color', function (d) { return d.startColor});
+
+            var stop30 = gradient.selectAll('stop[offset="30%"]').data([grad]);
+            stop30.enter()
+                .append('stop')
+                    .attr('offset', '30%')
+                    .attr('stop-opacity', 1)
+            stop30.transition().duration(transitionTime)
+                    .attr('stop-color', function (d) { return d.startColor});
+
+            var stop70 = gradient.selectAll('stop[offset="70%"]').data([grad]);
+            stop70.enter()
+                .append('stop')
+                    .attr('stop-opacity', 1)
+                    .attr('offset', '70%');
+            stop70.transition().duration(transitionTime)
+                    .attr('stop-color', function (d) { return d.stopColor});
+
+            return this.radialGradients()[gradKey] = grad.id;
+
+        },
+
         wrap : function(text, width, xCoord) {
 
             if (xCoord == undefined) {
@@ -678,7 +775,7 @@ define('kbaseVisWidget',
                             .attr("y", y)
                             .attr("dy", dy + "em")
                         ;
-                        console.log("O DY " + dy);
+
                 while (word = words.pop()) {
                     line.push(word);
                     tspan.text(line.join(" "));
