@@ -26,6 +26,14 @@ define('kbasePiechart',
             startAngle : 0,
             endAngle : 2 * Math.PI,
             gradient : true,
+            startingPosition : 'final',
+            strokeWidth : 1,
+
+            strokeColor : 'white',
+            highlightColor : 'black',
+            sliceOffset : 10,
+
+            bgColor : 'rgba(0,0,0,0)',
         },
 
         _accessors : [
@@ -44,6 +52,21 @@ define('kbasePiechart',
             }, this);
 
             return this;
+        },
+
+        startingPosition : function(d) {
+
+            //the first line animates the wedges in place, the second animates from the top, the third draws them rendered
+            if (this.options.startingPosition == 'slice') {
+                return {startAngle : d.startAngle, endAngle : d.startAngle};
+            }
+            else if (this.options.startingPosition == 'top') {
+                return {startAngle : this.options.startAngle, endAngle : this.options.startAngle};
+            }
+            else if (this.options.startingPosition == 'final') {
+                return {startAngle : d.startAngle, endAngle : d.endAngle};
+            }
+
         },
 
         renderChart : function() {
@@ -84,6 +107,13 @@ var pieData = this.pieLayout($pie.dataset());
             var funkyTown = function() {
 
                 //this.attr('fill', function (d, idx) { return d.data.color });
+                /*this.attr('transform',
+                    function (d) {
+                        var pos = arcMaker.centroid(d);
+                        console.log(pos);
+                        return "translate(" + pos + ")";
+                    }
+                );*/
 
                 if (this.attrTween) {
                     this
@@ -144,7 +174,7 @@ var pieData = this.pieLayout($pie.dataset());
                        )//*/
                         .attrTween("d", function(d, idx) {
 
-                            //this._current = this._current || d;//{startAngle : 0, endAngle : 0};
+                            //this._current = this._current || d;//{startAngle : this.options.startAngle, endAngle : this.options.startAngle};
                             //this._current = this._current || {startAngle : d.startAngle, endAngle : d.startAngle};
 //$pie.lastPieData = pieData;
                             if (this._current == undefined) {
@@ -158,10 +188,10 @@ var pieData = this.pieLayout($pie.dataset());
                                     }
                                 }
                                 else {
-                                    //the first line animates the wedges in place, the second animates from the top, the third draws them rendered
+                                    this._current = $pie.startingPosition(d);
+                                    console.log("CUR SET TO");console.log(this._current);
+                                    //this._current = {startAngle : $pie.options.startAngle, endAngle : $pie.options.startAngle};
                                     //this._current = {startAngle : d.startAngle, endAngle : d.startAngle};
-                                    //this._current = {startAngle : 0, endAngle : 0};
-                                    this._current = {startAngle : d.startAngle, endAngle : d.endAngle};
                                 }
                             }
 
@@ -217,7 +247,7 @@ var pieData = this.pieLayout($pie.dataset());
                                     }
                                 }
                                 else {
-                                    this._current = d;//{startAngle : d.startAngle, endAngle : d.startAngle};
+                                    this._current = $pie.startingPosition(d);
                                 }
                             }
 
@@ -240,7 +270,35 @@ var pieData = this.pieLayout($pie.dataset());
             }
 
             //there is no mouse action on a pie chart for now.
-            var mouseAction = function() { return this };
+            var sliceAction = function() {
+
+                this.on('mouseover', function(d) {
+
+                    var sliceMover = d3.svg.arc()
+                        .innerRadius($pie.options.innerRadius)
+                        .outerRadius($pie.options.innerRadius + $pie.options.sliceOffset);
+
+                    var pos = sliceMover.centroid(d);
+
+                    d3.select(this)
+                        //.attr('stroke-width', $pie.options.strokeWidth * 2)
+                        //.attr('stroke', $pie.options.highlightColor)
+                        .attr('transform', 'translate(' + pos + ')')
+                    ;
+
+                })
+                .on('mouseout', function(d) {
+                    d3.select(this)
+                        //.attr('stroke-width', $pie.options.strokeWidth)
+                        //.attr('stroke', $pie.options.strokeColor)
+                        .attr('transform', '')
+                    ;
+
+                })
+                return this;
+            };
+
+            var labelAction = function() { return this };
 
             var pie = this.data('D3svg').select('.chart').selectAll('.pie').data([0]);
             pie.enter().append('g')
@@ -268,6 +326,9 @@ var pieData = this.pieLayout($pie.dataset());
                     .append('path')
                         .attr('class', 'slice')
                         .attr('fill', function (d) { return d.data.color } )
+                        .attr('stroke', $pie.options.strokeColor)
+                        .attr('stroke-width', $pie.options.strokeWidth)
+                        .attr('stroke-linejoin', 'bevel')
                         //.call(funkyTown);
             ;
 
@@ -275,10 +336,11 @@ var pieData = this.pieLayout($pie.dataset());
         ? this.options.transitionTime
         : 0;
 
+transitionTime = this.options.transitionTime;
 	slices
 		//.transition().duration(this.options.transitionTime)
 //		.data(pieData)
-.call(mouseAction)
+.call(sliceAction)
 		.transition().duration(transitionTime)
 		.call(funkyTown)
 		.call($pie.endall, function() {
@@ -287,7 +349,7 @@ var pieData = this.pieLayout($pie.dataset());
 		});
 
            /* slices
-                    .call(mouseAction)
+                    .call(sliceAction)
                     .transition()
                     .duration(500)
                     .call(funkyTown)
@@ -337,7 +399,7 @@ var pieData = this.pieLayout($pie.dataset());
             ;
 
             labels
-                    .call(mouseAction)
+                    .call(labelAction)
                     .transition()
                     .duration(transitionTime)
                     .call(labelTown)

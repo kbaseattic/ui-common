@@ -491,6 +491,7 @@ define('kbaseVisWidget',
 
             var D3svg = d3.select($elem.get(0))
                 .append('svg')
+                .attr('style', 'width : 100%; height : 100%')
                 //.attr('width', this.width())
                 //.attr('height', this.height())
                 //.attr('style', this.options.debug ? 'border : 1px solid blue' : undefined);
