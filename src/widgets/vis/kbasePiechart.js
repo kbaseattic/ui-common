@@ -40,6 +40,7 @@ define('kbasePiechart',
 
             outsideLabels : true,
             labels : true,
+            autoEndAngle : true,
         },
 
         _accessors : [
@@ -65,9 +66,11 @@ define('kbasePiechart',
             if (this.initialized) {
 
                 if (idx < this.lastPieData.length - 1) {
+                console.log("START NOT AT END");
                     return {startAngle : this.lastPieData[idx + 1].startAngle, endAngle : this.lastPieData[idx + 1].startAngle};
                 }
                 else {
+                console.log("START AT END");
                     return {startAngle : this.options.endAngle, endAngle: this.options.endAngle};
                 }
             }
@@ -103,19 +106,34 @@ define('kbasePiechart',
             var bounds = this.chartBounds();
             var $pie  = this;
 
-            var pieScale = d3.scale.linear()
-                .domain([0,1])
-                .range([0,360]);
+            if (this.options.autoEndAngle) {
+                var percent = 0;
+                $.each(
+                    $pie.dataset(),
+                    function (idx, val) {
+                        percent += val.value;
+                        console.log("SUM " + val.value);
+                    }
+                );
+                console.log("PERCENT : " + percent);
+                if (percent > 1) {
+                    percent = 1;
+                }
+                this.options.endAngle = percent * 2 * Math.PI;
+                console.log("EA " + this.options.endAngle);
+            }
 
-if (this.pieLayout == undefined) {
-    this.pieLayout = d3.layout.pie()
-        .sort(null)
-        .startAngle(this.options.startAngle)
-        .endAngle(this.options.endAngle)
-        .value(function (d, idx) { return pieScale(d.value) });
-}
+            //if (this.pieLayout == undefined) {
+                this.pieLayout = d3.layout.pie()
+                    .sort(null)
+                    .startAngle(this.options.startAngle)
+                    .endAngle(this.options.endAngle)
+                    .value(function (d, idx) { return d.value ;});
+            //}
 
-var pieData = this.pieLayout($pie.dataset());
+            var pieData = this.pieLayout($pie.dataset());
+            console.log("PIE DATA");console.log(pieData);
+            console.log(this.options.startAngle + ' -> ' + this.options.endAngle);
 
             var radius = this.options.outerRadius;
             if (radius <= 0) {
@@ -170,7 +188,7 @@ var pieData = this.pieLayout($pie.dataset());
                         //*
                         .attrTween('fill',
                             function (d, idx) {
-                            console.log("ATTR TWEEN");
+                            console.log("ATTR TWEEN FOR " + d.data.label);
                                 var uniqueFunc = $pie.uniqueness();
 
                                 var currentID = uniqueFunc == undefined
@@ -232,6 +250,7 @@ var pieData = this.pieLayout($pie.dataset());
                             if (this._current == undefined) {
                             console.log('a');
                                 this._current = $pie.startingPosition(d, idx);
+                                console.log("STARTING AT " + d.data.label);console.log(this._current);
                                 console.log('o');
                                 console.log(this._current);
                             }
