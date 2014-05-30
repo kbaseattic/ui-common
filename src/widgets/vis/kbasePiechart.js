@@ -24,7 +24,7 @@ define('kbasePiechart',
             innerRadius : 0,
             outerRadius : 0,
             startAngle : 0,
-            endAngle : 2 * Math.PI,
+            //endAngle : 2 * Math.PI,
             gradient : true,
             startingPosition : 'final',
             strokeWidth : 1,
@@ -42,6 +42,10 @@ define('kbasePiechart',
             labels : true,
             autoEndAngle : false,
             colorScale : d3.scale.category20(),
+            outerArcOpacity : .4,
+            cornerToolTip : false,
+            draggable : true,
+            toolTips : false,
         },
 
         _accessors : [
@@ -50,6 +54,12 @@ define('kbasePiechart',
 
         init : function(options) {
             this._super(options);
+
+            if (this.options.endAngle == undefined) {
+                this.options.endAngle = this.options.startAngle + 2 * Math.PI;
+            }
+
+            this.pieSize = this.options.endAngle - this.options.startAngle;
 
             this.uniqueID = $.proxy( function(d) {
                 if (d.data == undefined) {
@@ -89,23 +99,25 @@ define('kbasePiechart',
 
         midAngle : function(d){
             var ret =  (d.startAngle + (d.endAngle - d.startAngle)/2);
-            //console.log("MA1 " + ret + ' for ' + d.data.label);
             return ret;
         },
 
         midPosition : function(d) {
         var m1 = (this.midAngle(d)) ;//- this.options.startAngle);
             var midAngle = m1 % (2 * Math.PI);
-//console.log("MA : " + midAngle + ' for ' + d.data.label);
-//console.log(m1);
-//console.log(this.options.startAngle);
-//console.log(2 * Math.PI);
+
             var ret =
-                0 < midAngle && midAngle < Math.PI
+                (0 < midAngle && midAngle < Math.PI) || midAngle < - Math.PI
                     ? 1
                     : -1;
-                    //console.log("RET : " + ret);
-                    return ret;
+            return ret;
+        },
+
+        useOutsideLabels : function(d) {
+            // logic is:
+            // if the global flag is set to true AND we haven't overridden it, then we use them outside
+            // otherwise, if we have set a local value, then that has to be true, regardless of the global flag
+            return (this.options.outsideLabels && d.data.outsideLabel == undefined) || d.data.outsideLabel;
         },
 
         setDataset : function(newDataset) {
@@ -156,6 +168,9 @@ define('kbasePiechart',
                 this.options.endAngle = percent * 2 * Math.PI;
 
             }
+            else {
+                this.options.endAngle = this.options.startAngle + this.pieSize;
+            }
 
             //if (this.pieLayout == undefined) {
                 this.pieLayout = d3.layout.pie()
@@ -192,6 +207,10 @@ define('kbasePiechart',
                 .innerRadius(innerRadius)
                 .outerRadius(radius);
 
+            var outerArcMaker = d3.svg.arc()
+                .innerRadius(radius)
+                .outerRadius(radius + 10);
+
             var textArcMaker = d3.svg.arc()
                 .innerRadius(innerRadius + (radius - innerRadius) * 8 / 10)
                 .outerRadius(innerRadius + (radius - innerRadius) * 8 / 10);
@@ -200,20 +219,28 @@ define('kbasePiechart',
                 .innerRadius(innerRadius + (radius - innerRadius) / 2)
                 .outerRadius(innerRadius + (radius - innerRadius) / 2);
 
-            if (! $pie.options.outsideLabels) {
-                textArcMaker = arcMaker;
-            }
-
             var funkyTown = function() {
 
                 //this.attr('fill', function (d, idx) { return d.data.color });
                 /*this.attr('transform',
                     function (d) {
                         var pos = arcMaker.centroid(d);
-                        console.log(pos);
                         return "translate(" + pos + ")";
                     }
                 );*/
+
+                this
+                    .attr('transform', function(d, idx) {
+                        var sliceMover = d3.svg.arc()
+                            .innerRadius(0)
+                            .outerRadius(d.data.offset || 0);
+
+                        var pos = sliceMover.centroid(d);
+
+                        return 'translate(' + pos + ')';
+
+                    })
+                ;
 
                 if (this.attrTween) {
                     this
@@ -352,11 +379,16 @@ define('kbasePiechart',
 
                             this._current = interpolate(0);
 
+                            var useOutsideLabels = $pie.useOutsideLabels(d);
+
+                            var myArcMaker = useOutsideLabels
+                                ? textArcMaker
+                                : arcMaker;
+
                             return function(t) {
                                 var d2 = interpolate(t);
-                                var pos = textArcMaker.centroid(d2);
-                                if ($pie.options.outsideLabels) {
-                                //console.log(d.data.label + " IS AT " + $pie.midPosition(d2) + ' via ' + $pie.midAngle(d2));
+                                var pos = myArcMaker.centroid(d2);
+                                if (useOutsideLabels) {
                                     pos[0] = radius * 1.05 * $pie.midPosition(d2);
                                 }
                                 return "translate("+ pos +")";
@@ -367,9 +399,12 @@ define('kbasePiechart',
                             this._current = this._current || d;
                             var interpolate = d3.interpolate(this._current, d);
                             this._current = interpolate(0);
+
+                            var useOutsideLabels = $pie.useOutsideLabels(d);
+
                             return function(t) {
                                 var d2 = interpolate(t);
-                                if ($pie.options.outsideLabels) {
+                                if (useOutsideLabels) {
                                     return $pie.midPosition(d2) > 0 ? "start" : "end";
                                 }
                                 else {
@@ -389,6 +424,8 @@ define('kbasePiechart',
                     //d.__dragX = 0;
                     //d.__dragY = 0;
                     this.__delta = 0;
+                    outerArc.attr('fill-opacity', 0);
+                    $pie.dragging = true;
                 })
                 .on('drag', function(d) {
 
@@ -406,7 +443,7 @@ define('kbasePiechart',
                         var proposedStartAngle = currentStartAngle + Math.PI * (distance / 2) / radius;
 
                         $pie.options.startAngle = proposedStartAngle;
-                        $pie.options.endAngle = $pie.options.startAngle + 2 * Math.PI;
+//XXX                        $pie.options.endAngle = $pie.options.startAngle + 2 * Math.PI;
                         $pie.renderChart();
                         this.__delta = 0;
 
@@ -416,6 +453,7 @@ define('kbasePiechart',
                 .on('dragend', function(d) {
                     //delete d.__dragX;
                     delete this.__delta;
+                    $pie.dragging = false;
                 })
                 ;
 
@@ -423,42 +461,57 @@ define('kbasePiechart',
             var sliceAction = function() {
 
 
+                this.on('mouseover', function(d) {
 
-                /*this.on('click', function(d) {
+                    var slice = this;
 
-                    if (this.clicked) {
-
-                        var sliceMover = d3.svg.arc()
-                            .innerRadius(0)
-                            .outerRadius($pie.options.sliceOffset);
-
-                        var pos = sliceMover.centroid(d);
-
-                        d3.select(this)
-                            //.attr('stroke-width', $pie.options.strokeWidth * 2)
-                            //.attr('stroke', $pie.options.highlightColor)
-                            .attr('transform', 'translate(' + pos + ')')
-                        ;
-                    }
-                    else {
-                        d3.select(this)
-                            //.attr('stroke-width', $pie.options.strokeWidth)
-                            //.attr('stroke', $pie.options.strokeColor)
-                            .attr('transform', '')
-                        ;
+                    if ($pie.dragging) {
+                        return;
                     }
 
-                    this.clicked = ! this.clicked;
-
-                })*/
-                /*.on('mouseout', function(d) {
-                    d3.select(this)
-                        //.attr('stroke-width', $pie.options.strokeWidth)
-                        //.attr('stroke', $pie.options.strokeColor)
-                        .attr('transform', '')
+                    outerArc
+                        .transition()
+                        .duration(0)
+                        .attr('fill-opacity', $pie.options.outerArcOpacity)
+                        .attr('fill', function (d2, idx) { return d.data.color || $pie.options.colorScale(idx) })
+                        .attr('transform', function (d2) { return d3.select(slice).attr('transform') } )
+                        .attr('d', function(d2) {
+                            return outerArcMaker({startAngle : d.startAngle, endAngle : d.endAngle});
+                        })
                     ;
 
-                })*/
+                    var coordinates = [0, 0];
+                    coordinates = d3.mouse(this);
+                    var x = coordinates[0];
+                    var y = coordinates[1];
+
+                    if ($pie.options.toolTips) {
+                        $pie.showToolTip(
+                            {
+                                label : d.data.tooltip || d.data.label + ' : ' + d.data.value,
+                                event : {
+                                    pageX : $pie.options.cornerToolTip ? $pie.$elem.prop('offsetLeft') + 5 : d3.event.pageX,
+                                    pageY : $pie.options.cornerToolTip ? $pie.$elem.prop('offsetTop') + 20 : d3.event.pageY
+                                }
+                            }
+                        );
+                    }
+
+                })
+                .on('mouseout', function(d) {
+                    if ($pie.options.toolTips) {
+                        $pie.hideToolTip();
+                    }
+                    outerArc.attr('fill-opacity', 0);
+                })
+                .on('dblclick', function(d) {
+                    if ($pie.options.draggable) {
+
+                        $pie.options.startAngle = $pie.options.startAngle - d.startAngle;
+                        $pie.renderChart();
+                    }
+                })
+                ;
                 return this;
             };
 
@@ -483,6 +536,14 @@ define('kbasePiechart',
                     }
                 );
 
+            var outerArc = pie.selectAll('.outerArc').data([0]);
+
+            outerArc
+                .enter()
+                    .append('path')
+                        .attr('class', 'outerArc')
+            ;
+
             var slices = pie.selectAll('.slice').data(pieData, this.uniqueness());
 
             slices
@@ -505,17 +566,20 @@ define('kbasePiechart',
                 ? this.options.transitionTime
                 : 0;
 
-            transitionTime = this.options.transitionTime;
+            //transitionTime = this.options.transitionTime;
 
             slices
                 .call(sliceAction)
-                .call(drag)
                 .transition().duration(transitionTime)
                 .call(funkyTown)
                 .call($pie.endall, function() {
                     $pie.initialized = true;
                     $pie.lastPieData = pieData;
                 });
+
+            if ($pie.options.draggable) {
+                slices.call(drag);
+            }
 
 
 
@@ -576,88 +640,98 @@ define('kbasePiechart',
                         .call(function() { labelTown.call(this, 0) } )
                         .each('end', function() { this.remove() } );
 
-                if (this.options.outsideLabels) {
-                    var lineTown = function(opacity) {
+                var lineTown = function(opacity) {
 
-                        if (opacity == undefined) {
-                            opacity = 1;
-                        }
+                    if (opacity == undefined) {
+                        opacity = 1;
+                    }
 
-                        if (this.attrTween) {
-                            this
-                                .attrTween('stroke-opacity', function (d, idx) {
-                                    if (this._currentOpacity == undefined) {
-                                        this._currentOpacity = $pie.initialized ? 0 : startingOpacity;
-                                    }
-                                    var interpolate = d3.interpolate(this._currentOpacity, opacity);
-                                    this._currentOpacity = interpolate(0);
-                                    var $me = this;
-                                    return function (t) {
-                                        return $me._currentOpacity = interpolate(t);
-                                    }
-                                })
-                                .attrTween("points", function(d, idx){
-                                    this._current = this._current || $pie.startingPosition(d, idx);
+                    if (this.attrTween) {
+                        this
+                            .attrTween('stroke-opacity', function (d, idx) {
+                                if (this._currentOpacity == undefined) {
+                                    this._currentOpacity = $pie.initialized ? 0 : startingOpacity;
+                                }
+                                var interpolate = d3.interpolate(this._currentOpacity, opacity);
+                                this._currentOpacity = interpolate(0);
+                                var $me = this;
+                                return function (t) {
+                                    return $me._currentOpacity = interpolate(t);
+                                }
+                            })
+                            .attrTween("points", function(d, idx){
+                                this._current = this._current || $pie.startingPosition(d, idx);
 
-                                    var endPoint = d;
-                                    if (opacity == 0) {
-                                        endPoint = {startAngle : d.startAngle, endAngle : d.startAngle};
-                                        if (idx > 0 && pieData.length) {
-                                            if (idx > pieData.length) {
-                                                idx = pieData.length;
-                                            }
-                                            endPoint = {startAngle : pieData[idx - 1].endAngle, endAngle : pieData[idx - 1].endAngle};
+                                var endPoint = d;
+                                if (opacity == 0) {
+                                    endPoint = {startAngle : d.startAngle, endAngle : d.startAngle};
+                                    if (idx > 0 && pieData.length) {
+                                        if (idx > pieData.length) {
+                                            idx = pieData.length;
                                         }
-
+                                        endPoint = {startAngle : pieData[idx - 1].endAngle, endAngle : pieData[idx - 1].endAngle};
                                     }
 
-                                    var interpolate = d3.interpolate(this._current, endPoint);
+                                }
 
-                                    this._current = interpolate(0);
-                                    return function(t) {
-                                        var d2 = interpolate(t);
-                                        var textAnchor = textArcMaker.centroid(d2);
-                                        if ($pie.options.outsideLabels) {
-                                            textAnchor[0] = radius * 1.05 * $pie.midPosition(d2);
-                                        }
-                                        return [smallArcMaker.centroid(d2), textArcMaker.centroid(d2), textAnchor];
-                                    };
-                                });
-                        }
-                        return this;
-                    };
+                                var interpolate = d3.interpolate(this._current, endPoint);
 
-                    var lines = labelG
-                        .selectAll('polyline')
-                        .data(
-                            pieData
-                                .filter( function(d) { return d.data.label != undefined && d.data.label.length } )
-                            ,
-                            this.uniqueness()
-                        );
+                                var useOutsideLabels = $pie.useOutsideLabels(d);
 
-                    lines
-                        .enter()
-                            .append('polyline')
-                                .attr('stroke', 'black')
-                                .attr('stroke-width', 1)
-                                .attr('fill', 'rgba(0,0,0,0)')
-                    ;
+                                var myArcMaker = useOutsideLabels
+                                    ? textArcMaker
+                                    : arcMaker;
 
-                    lines
+                                this._current = interpolate(0);
+                                return function(t) {
+                                    var d2 = interpolate(t);
+                                    var textAnchor = myArcMaker.centroid(d2);
+                                    if (useOutsideLabels) {
+                                        textAnchor[0] = radius * 1.05 * $pie.midPosition(d2);
+                                    }
+                                    return [smallArcMaker.centroid(d2), myArcMaker.centroid(d2), textAnchor];
+                                };
+                            });
+                    }
+                    return this;
+                };
+
+                var lines = labelG
+                    .selectAll('polyline')
+                    .data(
+                        pieData
+                            .filter( function(d) {
+                                return (
+                                       ($pie.options.outsideLabels || d.data.outsideLabel)
+                                    && d.data.label != undefined
+                                    && d.data.label.length
+                                )
+                            })
+                        ,
+                        this.uniqueness()
+                    );
+
+                lines
+                    .enter()
+                        .append('polyline')
+                            .attr('stroke', 'black')
+                            .attr('stroke-width', 1)
+                            .attr('fill', 'rgba(0,0,0,0)')
+                ;
+
+                lines
+                    .transition()
+                    .duration(transitionTime)
+                    .call(function() { lineTown.call(this, 1) } )
+                ;
+
+                lines
+                    .exit()
                         .transition()
                         .duration(transitionTime)
-                        .call(function() { lineTown.call(this, 1) } )
-                    ;
-
-                    lines
-                        .exit()
-                            .transition()
-                            .duration(transitionTime)
-                            .call(function() { lineTown.call(this, 0) } )
-                            .each('end', function() { this.remove() } )
-                    ;
-                }       //end if outsideLabels
+                        .call(function() { lineTown.call(this, 0) } )
+                        .each('end', function() { this.remove() } )
+                ;
             }           //end if labels
 
         },
