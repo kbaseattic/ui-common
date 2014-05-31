@@ -45,7 +45,7 @@ define('kbasePiechart',
             outerArcOpacity : .4,
             cornerToolTip : false,
             draggable : true,
-            toolTips : true,
+            tooltips : true,
         },
 
         _accessors : [
@@ -189,6 +189,11 @@ define('kbasePiechart',
                     : bounds.size.height;
 
                 radius = diameter / 2 + radius;
+
+                if (diameter < 0) {
+                    diameter = 0;
+                }
+
                 if (radius < 0) {
                     radius = diameter / 2;
                 }
@@ -485,7 +490,7 @@ define('kbasePiechart',
                     var x = coordinates[0];
                     var y = coordinates[1];
 
-                    if ($pie.options.toolTips) {
+                    if ($pie.options.tooltips) {
                         $pie.showToolTip(
                             {
                                 label : d.data.tooltip || d.data.label + ' : ' + d.data.value,
@@ -499,7 +504,7 @@ define('kbasePiechart',
 
                 })
                 .on('mouseout', function(d) {
-                    if ($pie.options.toolTips) {
+                    if ($pie.options.tooltips) {
                         $pie.hideToolTip();
                     }
                     outerArc.attr('fill-opacity', 0);
@@ -517,7 +522,7 @@ define('kbasePiechart',
 
             var labelAction = function() { return this };
 
-            var pie = this.data('D3svg').select('.chart').selectAll('.pie').data([0]);
+            var pie = this.data('D3svg').select( this.region('chart') ).selectAll('.pie').data([0]);
             pie.enter().append('g')
                 .attr('class', 'pie')
                 .attr('transform',
@@ -562,7 +567,7 @@ define('kbasePiechart',
                         //.call(funkyTown);
             ;
 
-            var transitionTime = this.initialized
+            var transitionTime = this.initialized || this.options.startingPosition != 'final'
                 ? this.options.transitionTime
                 : 0;
 
@@ -602,10 +607,10 @@ define('kbasePiechart',
                                 return arcMaker(interpolate(t));
                             };
                         })
-                    .each('end', function() { this.remove() } )
+                    .each('end', function(d) { d3.select(this).remove() } )
                     ;
 
-            var labelG = this.data('D3svg').select('.chart').selectAll('.labelG').data([0]);
+            var labelG = this.data('D3svg').select( this.region('chart') ).selectAll('.labelG').data([0]);
             labelG.enter().append('g')
                 .attr('class', 'labelG')
                 .attr('transform',
@@ -649,7 +654,8 @@ define('kbasePiechart',
                     .transition()
                     .duration(transitionTime)
                     .call(function() { labelTown.call(this, 0) } )
-                    .each('end', function() { this.remove() } );
+                    .each('end', function(d) { d3.select(this).remove() } )
+            ;
 
             var lineTown = function(opacity) {
 
@@ -742,7 +748,7 @@ define('kbasePiechart',
                     .transition()
                     .duration(transitionTime)
                     .call(function() { lineTown.call(this, 0) } )
-                    .each('end', function() { this.remove() } )
+                    .each('end', function(d) { d3.select(this).remove() } )
             ;
 
         },
