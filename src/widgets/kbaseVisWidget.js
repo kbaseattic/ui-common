@@ -201,6 +201,10 @@ define('kbaseVisWidget',
 
             this._super(options);
 
+            if (this.options.chartID == undefined) {
+                this.options.chartID = this.uuid();
+            }
+
             this.ticker = function() {
                 return ++this.options.ticker;
             }
@@ -483,49 +487,60 @@ define('kbaseVisWidget',
 
         appendUI : function ($elem) {
 
-            $elem.append(
-                $.jqElem('style')
-                    .html('.axis path, .axis line { fill : none; stroke : black; shape-rendering : crispEdges;} .axis text \
-                        {font-family : sans-serif; font-size : 11px}')
-            );
+            var D3svg;
 
-            var D3svg = d3.select($elem.get(0))
-                .append('svg')
-                .attr('style', 'width : 100%; height : 100%')
-                //.attr('width', this.width())
-                //.attr('height', this.height())
-                //.attr('style', this.options.debug ? 'border : 1px solid blue' : undefined);
-                //.attr('style', 'width : 100%; height : 100%')
+            if (! this.options.parent) {
+                $elem.append(
+                    $.jqElem('style')
+                        .html('.axis path, .axis line { fill : none; stroke : black; shape-rendering : crispEdges;} .axis text \
+                            {font-family : sans-serif; font-size : 11px}')
+                );
 
-            var tooltip = d3.select('body').selectAll('.visToolTip')
-                .data([0])
-                .enter()
-                    .append('div')
-                        .attr('class', 'visToolTip')
-                        .style(
-                            {
-                                position                : 'absolute',
-                                'max-width'             : '300px',
-                                height                  : 'auto',
-                                padding                 : '10px',
-                                'background-color'      : 'white',
-                                '-webkit-border-radius' : '10px',
-                                '-moz-border-radius'    : '10px',
-                                'border-radius'         : '10px',
-                                '-webkit-box-shadow'    : '4px 4px 10px rgba(0, 0, 0, 0.4)',
-                                '-moz-box-shadow'       : '4px 4px 10px rgba(0, 0, 0, 0.4)',
-                                'box-shadow'            : '4px 4px 10px rgba(0, 0, 0, 0.4)',
-                                'pointer-events'        : 'none',
-                                'display'               : 'none',
-                                'font-family'   : 'sans-serif',
-                                'font-size'     : '12px',
-                                'line-height'   : '20px',
-                                'display'       : 'none',
-                            }
-                        )
-            ;
+                D3svg = d3.select($elem.get(0))
+                    .append('svg')
+                    .attr('style', 'width : 100%; height : 100%')
+                    //.attr('width', this.width())
+                    //.attr('height', this.height())
+                    //.attr('style', this.options.debug ? 'border : 1px solid blue' : undefined);
+                    //.attr('style', 'width : 100%; height : 100%')
 
-            this.data('D3svg', D3svg);
+                var tooltip = d3.select('body').selectAll('.visToolTip')
+                    .data([0])
+                    .enter()
+                        .append('div')
+                            .attr('class', 'visToolTip')
+                            .style(
+                                {
+                                    position                : 'absolute',
+                                    'max-width'             : '300px',
+                                    height                  : 'auto',
+                                    padding                 : '10px',
+                                    'background-color'      : 'white',
+                                    '-webkit-border-radius' : '10px',
+                                    '-moz-border-radius'    : '10px',
+                                    'border-radius'         : '10px',
+                                    '-webkit-box-shadow'    : '4px 4px 10px rgba(0, 0, 0, 0.4)',
+                                    '-moz-box-shadow'       : '4px 4px 10px rgba(0, 0, 0, 0.4)',
+                                    'box-shadow'            : '4px 4px 10px rgba(0, 0, 0, 0.4)',
+                                    'pointer-events'        : 'none',
+                                    'display'               : 'none',
+                                    'font-family'           : 'sans-serif',
+                                    'font-size'             : '12px',
+                                    'line-height'           : '20px',
+                                    'display'               : 'none',
+                                }
+                            )
+                ;
+
+                this.data('D3svg', D3svg);
+            }
+            else {
+                this.$elem = this.options.parent.$elem;
+                this.width(this.$elem.width());
+                this.height(this.$elem.height());
+                D3svg = this.options.parent.data('D3svg');
+                this.data('D3svg', D3svg);
+            }
 
 
             var regions = [
@@ -545,7 +560,7 @@ define('kbaseVisWidget',
 
             var $vis = this;
 
-            D3svg.selectAll('g')
+            var regionG = D3svg.selectAll('g')
                 .data(regions)
                 .enter()
                     .append('g')
@@ -560,17 +575,47 @@ define('kbaseVisWidget',
                                     var bounds = this[region + 'Bounds']();
                                     return 'translate(' + bounds.origin.x + ',' + bounds.origin.y + ')';
                                 }, this)
-                        )
-                        .append('rect')
-                            .attr('x', 0 )
-                            .attr('y', 0 )
-                            .attr('width',  $.proxy(function(region) { var bounds = this[region + 'Bounds'](); return bounds.size.width }, this) )
-                            .attr('height', $.proxy(function(region) { var bounds = this[region + 'Bounds'](); return bounds.size.height }, this) )
-                            .attr('fill', function(d) {return $vis.options.debug ? colors.shift() : $vis.options.bgColor})
-                            .attr('class', 'background')
+                        );
 
-            ;
+            regionG
+                .append('rect')
+                    .attr('x', 0 )
+                    .attr('y', 0 )
+                    .attr('width',  $.proxy(function(region) { var bounds = this[region + 'Bounds'](); return bounds.size.width }, this) )
+                    .attr('height', $.proxy(function(region) { var bounds = this[region + 'Bounds'](); return bounds.size.height }, this) )
+                    .attr('fill', function(d) {return $vis.options.debug ? colors.shift() : $vis.options.bgColor})
+                    .attr('class', 'background');
 
+            $.each(
+                regions,
+                function (idx, region) {
+
+                    D3svg.selectAll('.' + region).selectAll('g').data([{region : $vis.region(region, true)}], function (d) { return d.region })
+                        .enter()
+                            .append('g')
+                            .attr('class', function(d) { return d.region})
+                }
+            );
+
+            /*D3svg.selectAll('g').data(regions).selectAll('g')
+                .data( regions.map( function(region) { return $vis.region(region, true) } ) )
+                .enter()
+                .append('g')
+                    .attr('class', function(region) { return region } );
+
+            ;*/
+
+        },
+
+        region : function(region, asName) {
+
+            var dot = '';
+
+            if (! asName) {
+                dot = '.';
+            }
+
+            return dot + region + '-' + this.options.chartID;
         },
 
         ULBounds : function() {
