@@ -32,10 +32,25 @@
         <script type = 'text/javascript'>
             <!--
 
+                function getParameterByName(name) {
+                  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                  var regexS = "[\\?&]" + name + "=([^&#]*)";
+                  var regex = new RegExp(regexS);
+                  var results = regex.exec(window.location.search);
+                  if(results == null)
+                    return "";
+                  else
+                    return decodeURIComponent(results[1].replace(/\+/g, " "));
+                }
+
                 require(['kbpaths'], function() {
                     require(['jquery', 'vis',
                         ], function($) {
                         $(function() {
+
+
+                            var pos = getParameterByName('pos') || 'final';
+
                             $('#linechartWidget').kbaseLinechart(
                                 {
                                     scaleAxes       : true,
@@ -156,11 +171,18 @@
                                 }
                             );
 
-                            $('#piechartWidget').kbasePiechart(
+                            var $pie = $('#piechartWidget').kbasePiechart(
                                 {
                                     scaleAxes   : true,
+                                    useUniqueID : false,
+                                    //transitionTime : 15000,
+                                    gradient : true,
+                                    startingPosition : pos,
 
                                     xLabel      : 'Some useful experiment',
+                                    innerRadius : -100,
+                                    //outerRadius : -105,
+                                    outsideLabels : true,
 
                                     dataset : [
                                         {
@@ -193,6 +215,31 @@
                                 }
                             );
 
+                            $('#random-pie').on('click', function(e) {
+
+                            var randomAngle = Math.random() * 2 * Math.PI;
+                            /*$pie.options.startAngle = randomAngle;
+                            $pie.options.endAngle = randomAngle + 2 * Math.PI;
+                            $pie.renderChart();
+                            return;//*/
+
+                                var numSlices = Math.floor(Math.random() * 20);
+
+                                var newDataset = [];
+                                for (var i = 0; i < numSlices; i++) {
+                                    newDataset.push(
+                                        {
+                                            value : Math.random(),
+                                            //color : 'red',
+                                            label : 'Label ' + (i + 1),
+                                        }
+                                    );
+                                };
+
+                                $pie.setDataset(newDataset);
+
+                            });
+
                             var heatmap = [];
                             var numCells = 20;
                             var colors = ['red', 'green', 'blue', 'purple', 'cyan'];
@@ -219,7 +266,7 @@
                                     yLabel      : 'Wingdings',
 
                                     dataset : heatmap,
-                                    ulIcon : 'labs_icon.png',
+                                    ulIcon : '/root/img/labs_icon.png',
 
                                 }
                             );
@@ -412,7 +459,7 @@ dataset2 :
             <div id = 'linechartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
             <div id = 'barchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
             <div id = 'scatterplotWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
-            <div id = 'piechartWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+            <div id = 'piechartWidget' style = 'border : 1px solid green; width : 1000px; height : 500px'></div>
             <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
             <div id = 'forcedNetwork' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
 
