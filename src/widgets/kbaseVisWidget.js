@@ -45,6 +45,8 @@ define('kbaseVisWidget',
 
             radialGradients : {},
             radialGradientStopColor : 'black',
+
+            children : [],
         },
 
         shouldScaleAxis : function (axis) {
@@ -81,6 +83,7 @@ define('kbaseVisWidget',
             'xIDMap',
             'yIDMap',
             'radialGradients',
+            'children',
         ],
 
         input : function() {
@@ -323,6 +326,44 @@ define('kbaseVisWidget',
             }
 
             this.render('chart');
+        },
+
+        setDatasets : function(newDatasets) {
+
+            if (newDatasets == undefined) {
+                newDatasets = [];
+            }
+
+            var myDataset = newDatasets.shift();
+
+            //first, peel off our dataset
+
+            this.setDataset(myDataset);
+
+            //we start at 1 becase those are the children of this vis
+            for (var i = 0; i < newDatasets.length; i++) {
+                var child;
+
+                if (i < this.children().length) {
+                    child = this.children()[i];
+                }
+                else {
+                    var childOptions = this.childOptions(this.children().length, newDatasets[i]);
+                    childOptions.parent = this;
+                    child = $.jqElem('div')[this.name](childOptions);
+                    this.children().push(child);
+                }
+                child.setDataset(newDatasets[i]);
+            }
+
+            for (var i = newDatasets.length; i < this.children().length; i++) {
+                this.children()[i].setDataset(undefined);
+            }
+
+        },
+
+        childOptions : function(idx, dataset) {
+            return $.extend(true, {}, dataset.options || this.options.childOptions || this.options);
         },
 
         defaultXDomain : function() {
