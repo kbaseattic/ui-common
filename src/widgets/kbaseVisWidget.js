@@ -296,7 +296,7 @@ define('kbaseVisWidget',
             var ulDataset = [this.options.ulIcon];
 
             if (this.options.ulIcon) {
-                var ulLabel = this.data('D3svg').select('.UL').selectAll('.ULLabel');
+                var ulLabel = this.data('D3svg').select( this.region('UL') ).selectAll('.ULLabel');
 
                 ulLabel
                     .data(ulDataset)
@@ -338,7 +338,7 @@ define('kbaseVisWidget',
 
             var xLabeldataset = [this.xLabel()];
 
-            var xLabel = this.data('D3svg').select('.yGutter').selectAll('.xLabel');
+            var xLabel = this.data('D3svg').select( this.region('yGutter') ).selectAll('.xLabel');
             xLabel
                 .data(xLabeldataset)
                     .text( this.xLabel() )
@@ -362,7 +362,7 @@ define('kbaseVisWidget',
 
             var yLabeldataset = [this.yLabel()];
 
-            var xLabel = this.data('D3svg').select('.xGutter').selectAll('.yLabel');
+            var xLabel = this.data('D3svg').select( this.region('xGutter') ).selectAll('.yLabel');
             xLabel
                 .data(yLabeldataset)
                     .text( this.yLabel() )
@@ -416,10 +416,10 @@ define('kbaseVisWidget',
                 ;
             }
 
-            var gxAxis = this.data('D3svg').select('.yPadding').select('.xAxis');
+            var gxAxis = this.data('D3svg').select( this.region('yPadding') ).select('.xAxis');
 
             if (gxAxis[0][0] == undefined) {
-                gxAxis = this.data('D3svg').select('.yPadding')
+                gxAxis = this.data('D3svg').select( this.region('yPadding') )
                     .append('g')
                         .attr('class', 'xAxis axis')
             }
@@ -446,10 +446,10 @@ define('kbaseVisWidget',
                     .scale(this.yScale())
                     .orient('left');
 
-            var gyAxis = this.data('D3svg').select('.xPadding').select('.yAxis');
+            var gyAxis = this.data('D3svg').select( this.region('xPadding') ).select('.yAxis');
 
             if (gyAxis[0][0] == undefined) {
-                gyAxis = this.data('D3svg').select('.xPadding')
+                gyAxis = this.data('D3svg').select( this.region('xPadding') )
                     .append('g')
                         .attr('class', 'yAxis axis')
                         .attr("transform", "translate(" + this.xPaddingBounds().size.width + ",0)")
