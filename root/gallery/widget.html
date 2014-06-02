@@ -240,6 +240,57 @@
 
                             });
 
+
+                            var $hm_c = $('#circularHeatmap').kbaseCircularHeatmap(
+                                {
+
+                                    startingPosition : pos,
+
+                                    xLabel      : 'Some useful experiment',
+                                    labels : false,
+                                    innerRadius : 50,
+
+                                    childOptions :
+                                        {
+
+                                            labels : false,
+                                            startingPosition : pos,
+
+                                        }
+
+                                }
+                            );
+
+                            var numPies = 1 + Math.floor(Math.random() * 30)
+                            var numSlices = 1 + Math.floor(Math.random() * 100);
+
+                            $('#random-hm_c').on('click', function(e) {
+
+                                var newDataset = [];
+                                for (var i = 0; i < numPies; i++) {
+                                    newDataset[i] = [];
+                                }
+                                for (var j = 0; j < newDataset.length; j++) {
+                                    for (var i = 0; i < numSlices; i++) {
+
+                                        var value = Math.random();
+
+                                        newDataset[j].push(
+                                            {
+                                                val : value,
+                                                label : 'Label ' + (i + 1),
+                                                tooltip : 'Ring : ' + (j + 1) + '<br>' + 'Label : ' + (i + 1) + '<br>' + 'Value : ' + value,
+                                            }
+                                        );
+                                    }
+                                };
+
+                                $hm_c.setDatasets(newDataset);
+
+                            });
+
+                            $('#random-hm_c').trigger('click');
+
                             var heatmap = [];
                             var numCells = 20;
                             var colors = ['red', 'green', 'blue', 'purple', 'cyan'];
@@ -461,6 +512,8 @@ dataset2 :
             <div id = 'scatterplotWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
             <div id = 'piechartWidget' style = 'border : 1px solid green; width : 1000px; height : 500px'></div>
             <button id = 'random-pie'>Randomize pie chart</button>
+            <div id = 'circularHeatmap' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+            <button id = 'random-hm_c'>Randomize heatmap</button>
             <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
             <div id = 'forcedNetwork' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
 
