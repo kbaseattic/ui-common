@@ -296,15 +296,19 @@ define('kbasePiechart',
                                     d.data.color = $pie.options.colorScale(idx);
                                 }
 
-                                var gradient = 'url(#'
-                                    + $pie.radialGradient(
-                                        {
-                                            startColor : d.data.color,
-                                            stopColor : $pie.options.gradient ? $pie.options.radialGradientStopColor : d.data.color,
-                                            id : gradID,
-                                            r : radius
-                                        }
-                                    ) + ')';
+                                var gradient = d.data.color;
+
+                                if ($pie.options.gradient) {
+                                    gradient = 'url(#'
+                                        + $pie.radialGradient(
+                                            {
+                                                startColor : d.data.color,
+                                                stopColor : $pie.options.gradient ? $pie.options.radialGradientStopColor : d.data.color,
+                                                id : gradID,
+                                                r : radius
+                                            }
+                                        ) + ')';
+                                }
 
                                 return function(t) { return gradient};
                             }
