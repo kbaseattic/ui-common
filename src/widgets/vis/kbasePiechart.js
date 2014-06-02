@@ -72,6 +72,15 @@ define('kbasePiechart',
             return this;
         },
 
+        childOptions : function(idx, dataset) {
+            var options = this._super(idx, dataset);
+
+            options.outerRadius = this.options.innerRadius * (idx + 1);
+            options.innerRadius = this.options.innerRadius;
+
+            return options;
+        },
+
         startingPosition : function(d, idx) {
 
             if (this.initialized) {
@@ -134,10 +143,97 @@ define('kbasePiechart',
             this._super(newDataset);
         },
 
+        radius : function() {
+
+            var bounds = this.chartBounds();
+
+            var radius = this.options.outerRadius;
+            if (radius <= 0) {
+                var diameter = bounds.size.width < bounds.size.height
+                    ? bounds.size.width
+                    : bounds.size.height;
+
+                radius = diameter / 2 + radius;
+
+                if (diameter < 0) {
+                    diameter = 0;
+                }
+
+                if (radius < 0) {
+                    radius = diameter / 2;
+                }
+            }
+            return radius;
+        },
+
+        sliceAction : function($pie) {
+
+            return function() {
+                var radius = $pie.radius();
+
+                var outerArcMaker = d3.svg.arc()
+                    .innerRadius(radius)
+                    .outerRadius(radius + 10);
+
+                this.on('mouseover', function(d) {
+
+                    var slice = this;
+
+                    if ($pie.dragging) {
+                        return;
+                    }
+
+                    $pie.outerArc
+                        .transition()
+                        .duration(0)
+                        .attr('fill-opacity', $pie.options.outerArcOpacity)
+                        .attr('fill', function (d2, idx) { return d.data.color || $pie.options.colorScale(idx, d.data, $pie) })
+                        .attr('transform', function (d2) { return d3.select(slice).attr('transform') } )
+                        .attr('d', function(d2) {
+                            return outerArcMaker({startAngle : d.startAngle, endAngle : d.endAngle});
+                        })
+                    ;
+
+                    var coordinates = [0, 0];
+                    coordinates = d3.mouse(this);
+                    var x = coordinates[0];
+                    var y = coordinates[1];
+
+                    if ($pie.options.tooltips) {
+                        $pie.showToolTip(
+                            {
+                                label : d.data.tooltip || d.data.label + ' : ' + d.data.value,
+                                event : {
+                                    pageX : $pie.options.cornerToolTip ? $pie.$elem.prop('offsetLeft') + 5 : d3.event.pageX,
+                                    pageY : $pie.options.cornerToolTip ? $pie.$elem.prop('offsetTop') + 20 : d3.event.pageY
+                                }
+                            }
+                        );
+                    }
+
+                })
+                .on('mouseout', function(d) {
+                    if ($pie.options.tooltips) {
+                        $pie.hideToolTip();
+                    }
+                    $pie.outerArc.attr('fill-opacity', 0);
+                })
+                .on('dblclick', function(d) {
+                    if ($pie.options.draggable) {
+
+                        $pie.options.startAngle = $pie.options.startAngle - d.startAngle;
+                        $pie.renderChart();
+                    }
+                })
+                ;
+                return this;
+            }
+        },
+
         renderChart : function() {
 
             if (this.dataset() == undefined) {
-                return;
+                this.setDataset([]);
             }
 
             if (this.dataset().length == 0) {
@@ -182,22 +278,7 @@ define('kbasePiechart',
 
             var pieData = this.pieLayout($pie.dataset());
 
-            var radius = this.options.outerRadius;
-            if (radius <= 0) {
-                var diameter = bounds.size.width < bounds.size.height
-                    ? bounds.size.width
-                    : bounds.size.height;
-
-                radius = diameter / 2 + radius;
-
-                if (diameter < 0) {
-                    diameter = 0;
-                }
-
-                if (radius < 0) {
-                    radius = diameter / 2;
-                }
-            }
+            var radius = this.radius();
 
             var innerRadius = this.options.innerRadius;
             if (innerRadius < 0) {
@@ -211,10 +292,6 @@ define('kbasePiechart',
             var arcMaker = d3.svg.arc()
                 .innerRadius(innerRadius)
                 .outerRadius(radius);
-
-            var outerArcMaker = d3.svg.arc()
-                .innerRadius(radius)
-                .outerRadius(radius + 10);
 
             var textArcMaker = d3.svg.arc()
                 .innerRadius(innerRadius + (radius - innerRadius) * 8 / 10)
@@ -247,58 +324,70 @@ define('kbasePiechart',
                     })
                 ;
 
+
+                if (! $pie.options.gradient) {
+                    this.attr('fill', function(d, idx) {
+
+                        if (d.data.color == undefined) {
+                            d.data.color = $pie.options.colorScale(idx, d.data, $pie);
+                        }
+
+                        return d.data.color
+                    });
+                }
+
                 if (this.attrTween) {
-                    this
-                        //*
-                        .attrTween('fill',
-                            function (d, idx) {
-                                var uniqueFunc = $pie.uniqueness();
+                    if ($pie.options.gradient) {
+                        this
+                            //*
+                            .attrTween('fill',
+                                function (d, idx) {
+                                    var uniqueFunc = $pie.uniqueness();
 
-                                var currentID = uniqueFunc == undefined
-                                    ? undefined
-                                    : uniqueFunc(d);
+                                    var currentID = uniqueFunc == undefined
+                                        ? undefined
+                                        : uniqueFunc(d);
 
-                                var gradID = d.data.gradID;
-                                if (gradID == undefined) {
+                                    var gradID = d.data.gradID;
+                                    if (gradID == undefined) {
 
-                                    var newGradID;
-                                    if ($pie.lastPieData != undefined && idx < $pie.lastPieData.length) {
+                                        var newGradID;
+                                        if ($pie.lastPieData != undefined && idx < $pie.lastPieData.length) {
 
 
-                                        //no id? we're using indexes. Easy.
-                                        if (currentID == undefined) {
-                                            newGradID = $pie.lastPieData[idx].data.gradID;
-                                        }
-                                        //id? Shit. Iterate and look up by the id
-                                        else {
-                                            $.each(
-                                                $pie.lastPieData,
-                                                function (idx, val) {
-                                                    var lastID = uniqueFunc(val);
-                                                    if (lastID == currentID) {
-                                                        newGradID = val.data.gradID;
-                                                        return;
+                                            //no id? we're using indexes. Easy.
+                                            if (currentID == undefined) {
+                                                newGradID = $pie.lastPieData[idx].data.gradID;
+                                            }
+                                            //id? Shit. Iterate and look up by the id
+                                            else {
+                                                $.each(
+                                                    $pie.lastPieData,
+                                                    function (idx, val) {
+                                                        var lastID = uniqueFunc(val);
+                                                        if (lastID == currentID) {
+                                                            newGradID = val.data.gradID;
+                                                            return;
+                                                        }
                                                     }
-                                                }
-                                            );
+                                                );
+                                            }
+
                                         }
 
+                                        if (newGradID == undefined) {
+                                            newGradID = $pie.uuid();
+                                        }
+
+                                        gradID = d.data.gradID = newGradID;
                                     }
 
-                                    if (newGradID == undefined) {
-                                        newGradID = $pie.uuid();
+                                    var gradient = d.data.color;
+
+                                    if (d.data.color == undefined) {
+                                        d.data.color = $pie.options.colorScale(idx, d.data, $pie);
                                     }
 
-                                    gradID = d.data.gradID = newGradID;
-                                }
-
-                                if (d.data.color == undefined) {
-                                    d.data.color = $pie.options.colorScale(idx);
-                                }
-
-                                var gradient = d.data.color;
-
-                                if ($pie.options.gradient) {
                                     gradient = 'url(#'
                                         + $pie.radialGradient(
                                             {
@@ -308,11 +397,12 @@ define('kbasePiechart',
                                                 r : radius
                                             }
                                         ) + ')';
-                                }
 
-                                return function(t) { return gradient};
-                            }
-                       )//*/
+                                    return function(t) { return gradient};
+                                }
+                           )//*/
+                    }
+                    this
                         .attrTween("d", function(d, idx) {
 
                             //this._current = this._current || d;//{startAngle : this.options.startAngle, endAngle : this.options.startAngle};
@@ -433,7 +523,7 @@ define('kbasePiechart',
                     //d.__dragX = 0;
                     //d.__dragY = 0;
                     this.__delta = 0;
-                    outerArc.attr('fill-opacity', 0);
+                    $pie.outerArc.attr('fill-opacity', 0);
                     $pie.dragging = true;
                 })
                 .on('drag', function(d) {
@@ -467,62 +557,6 @@ define('kbasePiechart',
                 ;
 
             //there is no mouse action on a pie chart for now.
-            var sliceAction = function() {
-
-
-                this.on('mouseover', function(d) {
-
-                    var slice = this;
-
-                    if ($pie.dragging) {
-                        return;
-                    }
-
-                    outerArc
-                        .transition()
-                        .duration(0)
-                        .attr('fill-opacity', $pie.options.outerArcOpacity)
-                        .attr('fill', function (d2, idx) { return d.data.color || $pie.options.colorScale(idx) })
-                        .attr('transform', function (d2) { return d3.select(slice).attr('transform') } )
-                        .attr('d', function(d2) {
-                            return outerArcMaker({startAngle : d.startAngle, endAngle : d.endAngle});
-                        })
-                    ;
-
-                    var coordinates = [0, 0];
-                    coordinates = d3.mouse(this);
-                    var x = coordinates[0];
-                    var y = coordinates[1];
-
-                    if ($pie.options.tooltips) {
-                        $pie.showToolTip(
-                            {
-                                label : d.data.tooltip || d.data.label + ' : ' + d.data.value,
-                                event : {
-                                    pageX : $pie.options.cornerToolTip ? $pie.$elem.prop('offsetLeft') + 5 : d3.event.pageX,
-                                    pageY : $pie.options.cornerToolTip ? $pie.$elem.prop('offsetTop') + 20 : d3.event.pageY
-                                }
-                            }
-                        );
-                    }
-
-                })
-                .on('mouseout', function(d) {
-                    if ($pie.options.tooltips) {
-                        $pie.hideToolTip();
-                    }
-                    outerArc.attr('fill-opacity', 0);
-                })
-                .on('dblclick', function(d) {
-                    if ($pie.options.draggable) {
-
-                        $pie.options.startAngle = $pie.options.startAngle - d.startAngle;
-                        $pie.renderChart();
-                    }
-                })
-                ;
-                return this;
-            };
 
             var labelAction = function() { return this };
 
@@ -545,9 +579,35 @@ define('kbasePiechart',
                     }
                 );
 
-            var outerArc = pie.selectAll('.outerArc').data([0]);
+            if ($pie.options.pieColor != undefined) {
+                var chartSelection = this.data('D3svg').select( this.region('chart') ).data([0]);
 
-            outerArc
+                var pieBG = chartSelection.selectAll('.pieBG').data([0]);
+
+                var pieMaker = d3.svg.arc()
+                    .innerRadius(0)
+                    .outerRadius(radius);
+
+                //var pieBG = this.data('D3svg').select( this.region('chart') ).select('.pie').selectAll('.pieBG').data([0]);
+                pieBG.enter().insert('path', '.pie')
+                    .attr('class', 'pieBG')
+                    .attr('transform',
+                        'translate('
+                            + (bounds.size.width / 2 - radius + radius + this.options.xOffset)
+                            + ','
+                            + (bounds.size.height / 2 - radius + radius + this.options.yOffset)
+                            + ')'
+                    )
+                    .attr('d', function(d) { return pieMaker({startAngle : 0, endAngle : 2 * Math.PI}) } )
+                ;
+                pieBG
+                    .attr('fill', $pie.options.pieColor);
+            }
+
+
+            $pie.outerArc = pie.selectAll('.outerArc').data([0]);
+
+            $pie.outerArc
                 .enter()
                     .append('path')
                         .attr('class', 'outerArc')
@@ -561,7 +621,7 @@ define('kbasePiechart',
                         .attr('class', 'slice')
                         .attr('fill', function (d, idx) {
                             if (d.data.color == undefined) {
-                                d.data.color = $pie.options.colorScale(idx);
+                                d.data.color = $pie.options.colorScale(idx, d.data, $pie);
                             }
                             return d.data.color
                         } )
@@ -578,7 +638,7 @@ define('kbasePiechart',
             //transitionTime = this.options.transitionTime;
 
             slices
-                .call(sliceAction)
+                .call($pie.sliceAction($pie))
                 .transition().duration(transitionTime)
                 .call(funkyTown)
                 .call($pie.endall, function() {
