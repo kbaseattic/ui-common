@@ -76,9 +76,14 @@ define('kbaseCircularHeatmap',
                 }
             }
 
-            this.options.innerRadius = 0 - (this.radius() - this.options.innerRadius) / newDatasets.length;
+            if (this.originalInnerRadius == undefined) {
+                this.originalInnerRadius = this.options.innerRadius;
+            }
+
+            this.options.innerRadius = 0 - (this.radius() - this.originalInnerRadius) / newDatasets.length;
 
             return this._super(newDatasets);
+
         },
 
         sliceAction : function($pie) {
