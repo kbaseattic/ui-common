@@ -94,6 +94,10 @@ define('kbaseCircularHeatmap',
 
                 this.on('mouseover', function(d) {
 
+                    if (d.data.gap) {
+                        return;
+                    }
+
                     var highlightColor = $pie.options.highlightColor;
 
                     if (highlightColor == undefined) {
@@ -121,6 +125,11 @@ define('kbaseCircularHeatmap',
 
                 })
                 .on('mouseout', function(d) {
+
+                    if (d.data.gap) {
+                        return;
+                    }
+
                     if ($pie.options.tooltips) {
                         $pie.hideToolTip();
                     }
@@ -128,6 +137,11 @@ define('kbaseCircularHeatmap',
                     d3.select(this).attr('fill', function (d2, idx) { return d.data.color || $pie.options.colorScale(idx, d.data, $pie) })
                 })
                 .on('dblclick', function(d) {
+
+                    if (d.data.gap) {
+                        return;
+                    }
+
                     if ($pie.options.draggable) {
 
                         $pie.options.startAngle = $pie.options.startAngle - d.startAngle;

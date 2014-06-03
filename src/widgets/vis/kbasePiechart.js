@@ -184,6 +184,10 @@ define('kbasePiechart',
 
                 this.on('mouseover', function(d) {
 
+                    if (d.data.gap) {
+                        return;
+                    }
+
                     var slice = this;
 
                     if ($pie.dragging) {
@@ -220,12 +224,18 @@ define('kbasePiechart',
 
                 })
                 .on('mouseout', function(d) {
+                    if (d.data.gap) {
+                        return;
+                    }
                     if ($pie.options.tooltips) {
                         $pie.hideToolTip();
                     }
                     $pie.outerArc.attr('fill-opacity', 0);
                 })
                 .on('dblclick', function(d) {
+                    if (d.data.gap) {
+                        return;
+                    }
                     if ($pie.options.draggable) {
 
                         $pie.options.startAngle = $pie.options.startAngle - d.startAngle;
@@ -329,6 +339,8 @@ define('kbasePiechart',
                         return 'translate(' + pos + ')';
 
                     })
+                    .attr('fill-opacity', function(d) { if (d.data.gap){console.log("HAS GAP")};return d.data.gap ? 0 : 1 })
+                    .attr('stroke-opacity', function(d) { return d.data.gap ? 0 : 1 })
                 ;
 
 
@@ -600,9 +612,9 @@ define('kbasePiechart',
                     .attr('class', 'pieBG')
                     .attr('transform',
                         'translate('
-                            + (bounds.size.width / 2 - radius + radius + this.options.xOffset)
+                            + (bounds.size.width / 2 + this.options.xOffset)
                             + ','
-                            + (bounds.size.height / 2 - radius + radius + this.options.yOffset)
+                            + (bounds.size.height / 2 + this.options.yOffset)
                             + ')'
                     )
                     .attr('d', function(d) { return pieMaker({startAngle : 0, endAngle : 2 * Math.PI}) } )
