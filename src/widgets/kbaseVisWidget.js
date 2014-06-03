@@ -346,6 +346,7 @@ define('kbaseVisWidget',
 
                 if (i < this.children().length) {
                     child = this.children()[i];
+                    child.reenter( i, newDatasets[i], this );
                 }
                 else {
                     var childOptions = this.childOptions(this.children().length, newDatasets[i]);
@@ -353,6 +354,7 @@ define('kbaseVisWidget',
                     child = $.jqElem('div')[this.name](childOptions);
                     this.children().push(child);
                 }
+
                 child.setDataset(newDatasets[i]);
             }
 
@@ -361,6 +363,8 @@ define('kbaseVisWidget',
             }
 
         },
+
+        reenter : function(idx, dataset, $parent) {},
 
         childOptions : function(idx, dataset) {
             return $.extend(true, {}, dataset.options || this.options.childOptions || this.options);
