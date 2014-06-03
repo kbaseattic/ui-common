@@ -137,6 +137,11 @@ define('kbasePiechart',
         },
 
         setDataset : function(newDataset) {
+
+            if (newDataset == undefined) {
+                newDataset = [];
+            }
+
             $.each(
                 newDataset,
                 function (idx, val) {
@@ -248,10 +253,6 @@ define('kbasePiechart',
         },
 
         renderChart : function() {
-
-            if (this.dataset() == undefined) {
-                this.setDataset([]);
-            }
 
             if (this.dataset().length == 0) {
                 this.initialized = false;
