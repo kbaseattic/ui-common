@@ -81,6 +81,13 @@ define('kbasePiechart',
             return options;
         },
 
+        reenter : function(idx, datase, parent) {
+            this.options.outerRadius = parent.options.innerRadius * (idx + 1);
+            this.options.innerRadius = parent.options.innerRadius;
+
+            return this;
+        },
+
         startingPosition : function(d, idx) {
 
             if (this.initialized) {
