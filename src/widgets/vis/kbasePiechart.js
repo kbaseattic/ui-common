@@ -138,24 +138,22 @@ define('kbasePiechart',
 
         setDataset : function(newDataset) {
 
-            if (newDataset == undefined) {
-                newDataset = [];
+            if (newDataset != undefined) {
+                $.each(
+                    newDataset,
+                    function (idx, val) {
+
+                    if (typeof val == 'number') {
+                        newDataset[idx] = {value : val};
+                    }
+                    }
+                );
             }
-
-            $.each(
-                newDataset,
-                function (idx, val) {
-
-                if (typeof val == 'number') {
-                    newDataset[idx] = {value : val};
-                }
-                }
-            );
 
             this._super(newDataset);
         },
 
-        radius : function() {
+        outerRadius : function() {
 
             var bounds = this.chartBounds();
 
@@ -178,10 +176,23 @@ define('kbasePiechart',
             return radius;
         },
 
+        innerRadius : function() {
+            var innerRadius = this.options.innerRadius;
+            if (innerRadius < 0) {
+                innerRadius = this.outerRadius() + this.options.innerRadius;
+            }
+
+            if (innerRadius < 0) {
+                innerRadius = 0;
+            }
+
+            return innerRadius;
+        },
+
         sliceAction : function($pie) {
 
             return function() {
-                var radius = $pie.radius();
+                var radius = $pie.outerRadius();
 
                 var outerArcMaker = d3.svg.arc()
                     .innerRadius(radius)
@@ -216,15 +227,18 @@ define('kbasePiechart',
                     var y = coordinates[1];
 
                     if ($pie.options.tooltips) {
-                        $pie.showToolTip(
-                            {
-                                label : d.data.tooltip || d.data.label + ' : ' + d.data.value,
-                                event : {
-                                    pageX : $pie.options.cornerToolTip ? $pie.$elem.prop('offsetLeft') + 5 : d3.event.pageX,
-                                    pageY : $pie.options.cornerToolTip ? $pie.$elem.prop('offsetTop') + 20 : d3.event.pageY
+                        var tooltip = $pie.tooltip(d);
+                        if (tooltip) {
+                            $pie.showToolTip(
+                                {
+                                    label : tooltip,
+                                    event : {
+                                        pageX : $pie.options.cornerToolTip ? $pie.$elem.prop('offsetLeft') + 5 : d3.event.pageX,
+                                        pageY : $pie.options.cornerToolTip ? $pie.$elem.prop('offsetTop') + 20 : d3.event.pageY
+                                    }
                                 }
-                            }
-                        );
+                            );
+                        }
                     }
 
                 })
@@ -250,6 +264,28 @@ define('kbasePiechart',
                 ;
                 return this;
             }
+        },
+
+        tooltip : function(d) {
+            if (d.data.tooltip != undefined) {
+                return d.data.tooltip;
+            }
+            else if (d.data.label != undefined) {
+                return d.data.label + ' : ' + d.data.value;
+            }
+            else {
+                return undefined;
+            }
+        },
+
+        pieData : function(dataset) {
+            this.pieLayout = d3.layout.pie()
+                .sort(null)
+                .startAngle(this.options.startAngle)
+                .endAngle(this.options.endAngle)
+                .value(function (d, idx) { return d.value ;});
+
+            return this.pieLayout(dataset);
         },
 
         renderChart : function() {
@@ -286,26 +322,10 @@ define('kbasePiechart',
                 this.options.endAngle = this.options.startAngle + this.pieSize;
             }
 
-            //if (this.pieLayout == undefined) {
-                this.pieLayout = d3.layout.pie()
-                    .sort(null)
-                    .startAngle(this.options.startAngle)
-                    .endAngle(this.options.endAngle)
-                    .value(function (d, idx) { return d.value ;});
-            //}
+            var pieData = this.pieData($pie.dataset());
 
-            var pieData = this.pieLayout($pie.dataset());
-
-            var radius = this.radius();
-
-            var innerRadius = this.options.innerRadius;
-            if (innerRadius < 0) {
-                innerRadius = radius + this.options.innerRadius;
-            }
-
-            if (innerRadius < 0) {
-                innerRadius = 0;
-            }
+            var radius = this.outerRadius();
+            var innerRadius = this.innerRadius();
 
             var arcMaker = d3.svg.arc()
                 .innerRadius(innerRadius)
@@ -331,6 +351,10 @@ define('kbasePiechart',
 
                 this
                     .attr('transform', function(d, idx) {
+                        if (d.data.offset == undefined) {
+                            return;
+                        }
+
                         var sliceMover = d3.svg.arc()
                             .innerRadius(0)
                             .outerRadius(d.data.offset || 0);
@@ -340,7 +364,7 @@ define('kbasePiechart',
                         return 'translate(' + pos + ')';
 
                     })
-                    .attr('fill-opacity', function(d) { if (d.data.gap){console.log("HAS GAP")};return d.data.gap ? 0 : 1 })
+                    .attr('fill-opacity', function(d) { return d.data.gap ? 0 : 1 })
                     .attr('stroke-opacity', function(d) { return d.data.gap ? 0 : 1 })
                 ;
 
