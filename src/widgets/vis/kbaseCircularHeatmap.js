@@ -77,10 +77,10 @@ define('kbaseCircularHeatmap',
             }
 
             if (this.originalInnerRadius == undefined) {
-                this.originalInnerRadius = this.options.innerRadius;
+                this.originalInnerRadius = this.innerRadius();
             }
 
-            this.options.innerRadius = 0 - (this.radius() - this.originalInnerRadius) / newDatasets.length;
+            this.options.innerRadius = 0 - (this.outerRadius() - this.originalInnerRadius) / newDatasets.length;
 
             return this._super(newDatasets);
 
@@ -88,9 +88,9 @@ define('kbaseCircularHeatmap',
 
         sliceAction : function($pie) {
 
-            return function() {
+            var radius = $pie.outerRadius();
 
-                var radius = $pie.radius();
+            return function() {
 
                 this.on('mouseover', function(d) {
 
