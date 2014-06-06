@@ -142,6 +142,7 @@
 				'kbaseSpecStorageCard'              : 'spec/kbaseSpecStorageCard',
 				'kbaseSpecTypeCard'                 : 'spec/kbaseSpecTypeCard',
 				'kbaseBarchart'                     : 'vis/kbaseBarchart',
+				'kbaseChordchart'                   : 'vis/kbaseChordchart',
 				'kbaseCircularHeatmap'              : 'vis/kbaseCircularHeatmap',
 				'kbaseForcedNetwork'                : 'vis/kbaseForcedNetwork',
 				'kbaseHeatmap'                      : 'vis/kbaseHeatmap',
