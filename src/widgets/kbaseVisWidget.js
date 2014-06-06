@@ -47,6 +47,7 @@ define('kbaseVisWidget',
             radialGradientStopColor : 'black',
 
             children : [],
+            defaultDataset : function() { return [] },
         },
 
         shouldScaleAxis : function (axis) {
@@ -314,6 +315,10 @@ define('kbaseVisWidget',
         },
 
         setDataset : function(newDataset) {
+
+            if (newDataset == undefined) {
+                newDataset = this.options.defaultDataset();
+            };
 
             this.setValueForKey('dataset', newDataset);
 
