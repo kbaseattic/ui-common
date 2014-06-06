@@ -9,6 +9,7 @@ define('vis',
         'kbaseForcedNetwork',
         'kbaseTreechart',
         'kbaseCircularHeatmap',
+        'kbaseChordchart',
     ],
     function() {
 
