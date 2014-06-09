@@ -699,6 +699,12 @@ define('kbwidget', ['jquery', 'handlebars'], function ($) {
                 var opts = $.extend(true, {}, this.options);
                 this.options = $.extend(true, {}, opts, args);
 
+                for (arg in args) {
+                    if (args[arg] == undefined && this.options[arg] != undefined) {
+                        delete this.options[arg];
+                    }
+                }
+
                 for (attribute in this.__attributes) {
                     if (this.options[attribute] != undefined) {
                         var setter = this.__attributes[attribute].setter;
@@ -713,7 +719,6 @@ define('kbwidget', ['jquery', 'handlebars'], function ($) {
                         }, this)
                     );
                 }
-
 
                 return this;
             },
