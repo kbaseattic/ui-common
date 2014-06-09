@@ -77,7 +77,7 @@ print <<"eKBPaths";
             paths : {
                 'jquery'      : '../../ext/jquery/jquery-1.10.2.min',
                 'jqueryui'    : '../../ext/jquery-ui/1.10.3/js/jquery-ui-1.10.3.custom.min',
-                'bootstrap'   : "../../ext/bootstrap/3.0.3/js/bootstrap.min",
+                'bootstrap'   : "../../ext/bootstrap/3.1.1/js/bootstrap.min",
                 'd3'          : "../../ext/d3/d3.v3.min",
                 'colorbrewer' : "../../ext/colorbrewer/colorbrewer",
                 'handlebars'  : '../../ext/handlebars/handlebars-v1.3.0',
