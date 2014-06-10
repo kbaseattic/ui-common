@@ -371,7 +371,7 @@ define('kbaseIrisCommands',
                                 }
                             },
                             id : 'helpButton',
-                           // 'tooltip' : {title : label + ' help', placement : 'bottom'},
+                            'tooltip' : label + ' help',
                         },
                     ];
 
@@ -496,6 +496,7 @@ define('kbaseIrisCommands',
 
                                                                     },
                                                                     id : 'linkButton',
+                                                                    tooltip : 'Find in command list'
                                                                    // 'tooltip' : {title : label + ' help', placement : 'bottom'},
                                                                 },
                                                             ]
@@ -530,6 +531,7 @@ define('kbaseIrisCommands',
                                                                     this.data('searchField').trigger('keyup');
                                                                 }, this)
                                                             )
+                                                            .tooltip({title : 'Cancel search'})
                                                     )
                                             );
 
@@ -555,6 +557,7 @@ define('kbaseIrisCommands',
                                                         this.data('searchField').trigger('keyup');
                                                     }, this)
                                                 )
+                                                .tooltip({title : 'Search'})
                                         )
                                 )
                             )
