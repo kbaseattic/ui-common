@@ -54,7 +54,7 @@ define('kbaseTable',
         'kbaseDeletePrompt',
         'kbaseButtonControls',
         'kbaseSearchControls',
-        'jqueryui',
+        //'jqueryui',   //XXX - removed. But do I need this? I can't have it in right now because it directly conflicts with bootstrap's tooltip. Need to remember why it's here.
     ],
     function ($) {
 
