@@ -16,6 +16,13 @@ Rectangle.prototype.invert = function() {
     );
 }
 
+Rectangle.prototype.lowerRight = function() {
+    return new Point(
+        this.origin.x + this.size.width,
+        this.origin.y + this.size.height
+    )
+}
+
 Rectangle.prototype.insetRect = function(dx,dy) {
     return new Rectangle(
         new Point(this.origin.x + dx / 2, this.origin.y + dy / 2),
@@ -53,21 +60,18 @@ Rectangle.prototype.intersects = function (r2) {
 Rectangle.prototype.unionRect = function (r2, padding) {
 
     var union = new Rectangle();
-    union.origin.x = this.origin.x < r2.origin.x ? this.origin.x : r2.origin.x;
-    union.origin.y = this.origin.y < r2.origin.y ? this.origin.y : r2.origin.y;
-    var thisx2 = this.origin.x + this.size.width;
-    var r2x2 = r2.origin.x + r2.size.width;
-    
-    var unionx2 = thisx2 > r2x2 ? thisx2 : r2x2;
-    
-    union.size.width = unionx2 - union.origin.x;
-    
-    var thisy2 = this.origin.y + this.size.height;
-    var r2y2 = r2.origin.y + r2.size.height;
-    
-    var uniony2 = thisy2 > r2y2 ? thisy2 : r2y2;
-    
-    union.size.height = uniony2 - union.origin.y;
+
+    var myLL = this.lowerRight();
+    var r2LL = r2.lowerRight();
+
+    union.origin.x = Math.min(this.origin.x, r2.origin.x);
+    union.origin.y = Math.min(this.origin.y, r2.origin.y);
+
+    var rightX = Math.max(myLL.x, r2LL.x);
+    var rightY = Math.max(myLL.y, r2LL.y);
+
+    union.size.width = union.origin.x + rightX;
+    union.size.height = union.origin.Y + rightY;
 
     if (padding != undefined) {
         union.origin.x -= padding;
@@ -77,6 +81,48 @@ Rectangle.prototype.unionRect = function (r2, padding) {
     }
 
     return union;
+
+}
+
+Rectangle.prototype.isValidRect = function() {
+    if (
+           isNaN(this.origin.x)
+        || isNaN(this.origin.y)
+        || isNaN(this.size.width)
+        || isNaN(this.size.height) ) {
+            return false;
+    }
+    else {
+        return true;
+    }
+}
+
+Rectangle.prototype.intersectRect = function(r2) {
+
+    var intersect = new Rectangle();
+
+    var myLL = this.lowerRight();
+    var r2LL = r2.lowerRight();
+
+    intersect.origin.x = Math.max(this.origin.x, r2.origin.x);
+    intersect.origin.y = Math.max(this.origin.y, r2.origin.y);
+
+    var rightX = Math.min(myLL.x, r2LL.x);
+    var rightY = Math.min(myLL.y, r2LL.y);
+
+    intersect.size.width = rightX - intersect.origin.x;
+    intersect.size.height = rightY - intersect.origin.y;
+
+    if (intersect.size.width <= 0) {
+        intersect.size.width = Number.NaN;
+    }
+
+    if (intersect.size.height <= 0) {
+        intersect.size.height = Number.NaN;
+    }
+
+    return intersect;
+
 }
 
 Rectangle.prototype.containsPoint = function (p) {
