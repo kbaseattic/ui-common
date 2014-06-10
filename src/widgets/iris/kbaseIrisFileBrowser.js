@@ -45,11 +45,11 @@ define('kbaseIrisFileBrowser',
                                 $fb.deleteFile($(this).data('id'), 'file');
                             },
                             id : 'removeButton',
-                            //tooltip : 'delete this file',
+                            tooltip : 'delete this file',
                         },
                         {
                             icon : 'fa fa-link',
-                            //tooltip : 'select widget',
+                            tooltip : 'select file',
                             callback :
                                 function (e, $fb) {
                                     $fb.toggleSelection($(this).data('id'));
@@ -61,7 +61,7 @@ define('kbaseIrisFileBrowser',
                                 $fb.downloadFile($(this).data('id'));
                             },
                             id : 'dlButton',
-                            //'tooltip' : 'download this file',
+                            'tooltip' : 'download this file',
                         },
                         /*{
                             icon : 'fa fa-search fa-flip-horizontal',
@@ -69,7 +69,7 @@ define('kbaseIrisFileBrowser',
                                 $fb.viewFile($(this).data('id'));
                             },
                             id : 'viewButton',
-                            //'tooltip' : 'view this file',
+                            'tooltip' : 'view this file',
                         },*/
                         {
                             icon : 'fa fa-pencil',
@@ -79,7 +79,7 @@ define('kbaseIrisFileBrowser',
                                 }
                             },
                             id : 'editButton',
-                            //tooltip : 'edit this file',
+                            tooltip : 'edit this file',
                             condition : function (control, $fb) {
                                 var size = this.$elem.data('data').size;
                                 if (size > $fb.singleFileSize() ) {
@@ -100,7 +100,7 @@ define('kbaseIrisFileBrowser',
                                 }
                             },
                             id : 'addButton',
-                            //'tooltip' : 'add this file to terminal input',
+                            'tooltip' : 'add this file to terminal input',
                         },
                     ],
                 },
@@ -115,7 +115,7 @@ define('kbaseIrisFileBrowser',
                     controls : [
                         {
                             icon : 'fa fa-minus',
-                            //'tooltip' : 'delete this folder',
+                            'tooltip' : 'delete this folder',
                             callback : function(e, $fb) {
                                 $fb.deleteFile($(this).data('id'), 'folder');
                             },
@@ -123,7 +123,7 @@ define('kbaseIrisFileBrowser',
                         },
                         {
                             icon : 'fa fa-file',
-                            //'tooltip' : 'add a subdirectory',
+                            'tooltip' : 'add a subdirectory',
                             callback : function(e, $fb) {
                                 $fb.addNewFile($(this).data('id'));
                             },
@@ -131,7 +131,7 @@ define('kbaseIrisFileBrowser',
                         },
                         {
                             icon : 'fa fa-plus',
-                            //'tooltip' : 'add a subdirectory',
+                            'tooltip' : 'add a subdirectory',
                             callback : function(e, $fb) {
                                 $fb.addDirectory($(this).data('id'));
                             },
@@ -139,7 +139,7 @@ define('kbaseIrisFileBrowser',
                         },
                         {
                             icon : 'fa fa-arrow-up',
-                            //'tooltip' : 'upload a file',
+                            'tooltip' : 'upload a file',
                             callback : function(e, $fb) {
                                 $fb.data('active_directory', $(this).data('id'));
                                 $fb.uploadFile();
@@ -276,7 +276,7 @@ define('kbaseIrisFileBrowser',
                     controls : [
                         {
                             icon : 'fa fa-file',
-                            //'tooltip' : 'add a subdirectory',
+                            'tooltip' : 'add file',
                             callback : function(e, $fb) {
                                 $fb.addNewFile('/');
                             },
@@ -284,7 +284,7 @@ define('kbaseIrisFileBrowser',
                         },
                         {
                             'icon' : 'fa fa-plus',
-                            //'tooltip' : 'add directory',
+                            'tooltip' : 'add directory',
                             callback : function(e, $fb) {
                                 $fb.addDirectory('/');
                             },
@@ -292,7 +292,7 @@ define('kbaseIrisFileBrowser',
                         },
                         {
                             'icon' : 'fa fa-arrow-up',
-                            //'tooltip' : 'upload a file',
+                            'tooltip' : 'upload a file',
                             callback : function(e, $fb) {
                                 $fb.data('active_directory', $(this).data('id'));
                                 $fb.uploadFile();
@@ -972,7 +972,7 @@ this.dbg('will upload ' + pid + ',' + this.currentUploadJob);
                                 controls : [
                                     {
                                         'icon' : 'fa fa-refresh',
-                                        //'tooltip' : 'Resume',
+                                        'tooltip' : 'Resume',
                                         callback : function(e, $fb) {
                                             $fb.data('resumed_chunkMap', chunkMap);
                                             $fb.data('fileInput').trigger('click');
@@ -981,7 +981,7 @@ this.dbg('will upload ' + pid + ',' + this.currentUploadJob);
                                     },
                                     {
                                         'icon' : 'fa fa-ban',
-                                        //'tooltip' : 'Cancel',
+                                        'tooltip' : 'Cancel',
                                         callback : function(e, $fb) {
 
                                             $fb.client().remove_directory(
