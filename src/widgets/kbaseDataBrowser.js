@@ -75,7 +75,7 @@ define('kbaseDataBrowser',
             $.each(
                 content,
                 $.proxy( function (idx, val) {
-console.log("BUILDS ON VAL " + val.id);console.log(val);
+
                     var icon = val.icon;
                     var iconOpen = val['fa fa-open'];
 
