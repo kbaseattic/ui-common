@@ -6,6 +6,7 @@
 define('kbaseIrisTerminal',
     [
         'jquery',
+        'kbwidget',
         'kbaseButtonControls',
         'kbaseIrisTutorial',
         'kbaseIrisFileBrowser',
