@@ -29,6 +29,9 @@ define('kbaseChordchart',
             strokeWidth : .5,
             strokeColor : 'black',
             choppedGroups : false,
+            sortGroups : undefined,
+            drawArcs : true,
+            drawChords : true,
             sortSubgroups : d3.descending,
             chordColorScale : function(idx,data,$chord) {
                 return $chord.options.colorScale(idx, data, $chord);
@@ -41,27 +44,9 @@ define('kbaseChordchart',
 
         init : function(options) {
             this._super(options);
-
+console.log("OPTS : " + options.sortSubgroups);
+console.log("OPTS : " + this.options.sortSubgroups);
             return this;
-        },
-
-        piZZeData : function (dataset) {
-            var chordLayout = d3.layout.chord()
-                .padding( this.options.chordPadding )
-                .sortSubgroups(d3.descending)
-                .matrix( dataset );
-
-            var groups = chordLayout.groups();
-
-            $.each(
-                groups,
-                function (idx, val) {
-                    val.data = {};
-                }
-            );
-
-            return groups;
-
         },
 
         pieData : function() {
@@ -130,6 +115,7 @@ define('kbaseChordchart',
 
             var chordLayout = d3.layout.chord()
                 .padding( this.options.chordPadding )
+                .sortGroups(this.options.sortGroups)
                 .sortSubgroups(this.options.sortSubgroups)
                 .matrix( $chord.dataset() );
 
@@ -155,7 +141,7 @@ define('kbaseChordchart',
 
                         var startAngle = val.startAngle;
 console.log($chord.dataset()[idx]);
-                        var row = $chord.dataset()[idx].slice();;
+                        var row = $chord.dataset()[idx].slice();
 console.log(row);
                         var total = 0;
 
@@ -223,120 +209,125 @@ console.log(row);
             this.calculatedPieData(newChordGroups);
 
             //defer to the super class to draw the wedges. We're going to draw the chords now.
-            this._super();
+            if (this.options.drawArcs) {
+                this._super();
+            }
 
             var fillScale = d3.scale.ordinal()
                 .domain(d3.range(4))
                 .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
 
-            var chordG = this.data('D3svg').select( this.region('chart') ).selectAll('.chords').data([0]);
-            chordG.enter().insert('g', '.labelG')
-                .attr('class', 'chords')
-                .attr('transform',
-                    'translate('
-                        + (bounds.size.width / 2 + this.options.xOffset)
-                        + ','
-                        + (bounds.size.height / 2 + this.options.yOffset)
-                        + ')'
+                if (this.options.drawChords) {
+
+                var chordG = this.data('D3svg').select( this.region('chart') ).selectAll('.chords').data([0]);
+                chordG.enter().insert('g', '.labelG')
+                    .attr('class', 'chords')
+                    .attr('transform',
+                        'translate('
+                            + (bounds.size.width / 2 + this.options.xOffset)
+                            + ','
+                            + (bounds.size.height / 2 + this.options.yOffset)
+                            + ')'
+                    );
+
+                var innerRadius = this.innerRadius();
+                var outerRadius = this.outerRadius();
+
+                var arcMaker = d3.svg.arc()
+                    .innerRadius( innerRadius )
+                    .outerRadius( outerRadius );
+
+                var newChords = [];
+                //$.each(
+                //    chordLayout.chords(),
+
+                chordLayout.chords().forEach(
+                    function(val, idx) {
+                    //function (idx, val) {
+
+                        newVal = $.extend(true, {}, val);
+                        newVal.data = {};
+
+                        newVal.source.startAngle   += $chord.options.startAngle;
+                        newVal.source.endAngle     += $chord.options.startAngle;
+                        newVal.target.startAngle   += $chord.options.startAngle;
+                        newVal.target.endAngle     += $chord.options.startAngle;
+
+
+                        newChords.push( newVal );
+
+                        var colorIdx = newVal.source.index;
+
+                        if (newVal.target.value > newVal.source.value) {
+                            colorIdx = newVal.target.index;
+                        }
+                        newVal.data.colorIdx = colorIdx;
+
+                    }
                 );
 
-            var innerRadius = this.innerRadius();
-            var outerRadius = this.outerRadius();
 
-            var arcMaker = d3.svg.arc()
-                .innerRadius( innerRadius )
-                .outerRadius( outerRadius );
+                var funkyTown = function() {
+                    this
+                        .attr('fill-opacity', .67)
+                        .attr("fill", function(d, idx) { return d.data.color || $chord.options.colorScale(d.data.colorIdx, d.data, $chord) })
+                        .attr('stroke', 'black')
+                        .attr('stroke-width', .5)
+    //                    .attr("d", d3.svg.chord().radius(innerRadius))
+                        .attr("fill-opacity", .5)
+                    //.on("mouseover", fade(.1))
+                    //.on("mouseout", fade(1))
+                    ;
 
-            var newChords = [];
-            //$.each(
-            //    chordLayout.chords(),
+                    if (this.attrTween) {
+                        this
+                            .attrTween("d", function(d, idx) {
 
-            chordLayout.chords().forEach(
-                function(val, idx) {
-                //function (idx, val) {
+                                if (this._current == undefined) {
+                                    this._current = $chord.startingChordPosition(d, idx);
+                                }
 
-                    newVal = $.extend(true, {}, val);
-                    newVal.data = {};
+                                var interpolate = d3.interpolate(this._current, d);
 
-                    newVal.source.startAngle   += $chord.options.startAngle;
-                    newVal.source.endAngle     += $chord.options.startAngle;
-                    newVal.target.startAngle   += $chord.options.startAngle;
-                    newVal.target.endAngle     += $chord.options.startAngle;
-
-
-                    newChords.push( newVal );
-
-                    var colorIdx = newVal.source.index;
-
-                    if (newVal.target.value > newVal.source.value) {
-                        colorIdx = newVal.target.index;
+                                this._current = interpolate(0);
+                                return function(t) {
+                                    var chord = d3.svg.chord().radius(innerRadius)(interpolate(t));
+                                    return chord;
+                                };
+                            })
+                        ;
                     }
-                    newVal.data.colorIdx = colorIdx;
 
-                }
-            );
+                    return this;
+                };
 
+                var transitionTime = this.initialized || this.options.startingPosition != 'final'
+                    ? this.options.transitionTime
+                    : 0;
 
-            var funkyTown = function() {
-                this
-                    .attr('fill-opacity', .67)
-                    .attr("fill", function(d, idx) { return d.data.color || $chord.options.colorScale(d.data.colorIdx, d.data, $chord) })
-                    .attr('stroke', 'black')
-                    .attr('stroke-width', .5)
-//                    .attr("d", d3.svg.chord().radius(innerRadius))
-                    .attr("fill-opacity", .5)
-                //.on("mouseover", fade(.1))
-                //.on("mouseout", fade(1))
+                var chords = chordG
+                //.append("g")
+                  //  .attr("class", "chord")
+                    .selectAll("path")
+                        .data(newChords);
+                chords
+                    .enter()
+                        .append("path")
+                            .attr("fill", function(d) { return fillScale(d.target.index); })
                 ;
 
-                if (this.attrTween) {
-                    this
-                        .attrTween("d", function(d, idx) {
+                chords
+                    .transition().duration(transitionTime)
+                    .call(funkyTown)
+                    .call($chord.endall, function() {
+                        $chord.lastChordData = chordLayout.chords;
+                    });
+                ;
 
-                            if (this._current == undefined) {
-                                this._current = $chord.startingChordPosition(d, idx);
-                            }
-
-                            var interpolate = d3.interpolate(this._current, d);
-
-                            this._current = interpolate(0);
-                            return function(t) {
-                                var chord = d3.svg.chord().radius(innerRadius)(interpolate(t));
-                                return chord;
-                            };
-                        })
-                    ;
-                }
-
-                return this;
-            };
-
-            var transitionTime = this.initialized || this.options.startingPosition != 'final'
-                ? this.options.transitionTime
-                : 0;
-
-            var chords = chordG
-            //.append("g")
-              //  .attr("class", "chord")
-                .selectAll("path")
-                    .data(newChords);
-            chords
-                .enter()
-                    .append("path")
-                        .attr("fill", function(d) { return fillScale(d.target.index); })
-            ;
-
-            chords
-                .transition().duration(transitionTime)
-                .call(funkyTown)
-                .call($chord.endall, function() {
-                    $chord.lastChordData = chordLayout.chords;
-                });
-            ;
-
-            chords
-                .exit()
-                .remove();
+                chords
+                    .exit()
+                    .remove();
+            }
 
             //now we add these MOTHERFUCKING TICK MARKS.
 
