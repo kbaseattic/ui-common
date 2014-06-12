@@ -1,1 +1,1 @@
-../../src/datavis.js
+../ext/kbase-datavis/dist/datavis.js
