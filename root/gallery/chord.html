@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+
+<style>
+.bar {
+
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+</style>
+
+
+        <script type = 'text/javascript'>
+            <!--
+
+                function getParameterByName(name) {
+                  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                  var regexS = "[\\?&]" + name + "=([^&#]*)";
+                  var regex = new RegExp(regexS);
+                  var results = regex.exec(window.location.search);
+                  if(results == null)
+                    return "";
+                  else
+                    return decodeURIComponent(results[1].replace(/\+/g, " "));
+                }
+
+                require(['kbpaths'], function() {
+                    require(['jquery', 'd3', 'vis',
+                        ], function($) {
+                        $(function() {
+
+                            var pos = getParameterByName('pos') || 'final';
+
+                            var $chord = $('#chordChart').kbaseChordchart(
+                                {
+
+                                    startingPosition : pos,
+                                    //choppedGroups : true,
+                                    labels : true,
+
+                                    xLabel      : 'Some useful experiment',
+                                    sortSubgroups:undefined,
+
+                                    dataset :
+                                        [
+                                            [50, 5,0,0],
+                                            [5, 0,5,0],
+                                            [0, 5,50,0],
+                                            [0,0,0,5],
+                                        ]
+
+                                    /*dataset :
+                                        [
+                                            [11975,  5871, 8916, 2868],
+                                            [ 1951, 10048, 2060, 6171],
+                                            [ 8010, 16145, 8090, 8045],
+                                            [ 1013,   990,  940, 6907]
+                                        ]//*/
+
+                                }
+                            );
+
+
+                           $('#random-chord').on('click', function(e) {
+                                var newDataset = [];
+                                var numChords = Math.floor(Math.random() * 10);
+                                for (var i = 0; i < numChords; i++) {
+                                    newDataset[i] = [];
+                                    for (var j = 0; j < numChords; j++) {
+                                        newDataset[i][j] = Math.floor(Math.random() * 12000)
+                                    }
+                                }
+                                console.log(newDataset);
+
+                                $chord.setDataset(newDataset);
+
+
+                            });
+
+
+                            //$('#random-chord').trigger('click');
+
+                    });
+                });});
+
+
+            //-->
+        </script>
+    </head>
+
+    <body>
+
+        <div>
+            Simple demonstrations of visualization widgets. Mouse over the charts, they're all interactive.<br>
+            The force directed graph has draggable nodes, and they can be selected by drawing on the box.
+        </div>
+
+        <!--<div style = 'max-width : 800px; overflow : scroll'>-->
+            <div id = 'chordChart' style = 'border : 1px solid green; width : 1200px; height : 800px'></div>
+            <button id = 'random-chord'>Randomize Chord Chart</button>
+        <!--</div>-->
+
+        <div style = 'display : none'>
+        <div id = 'treeCompare'></div>
+            <div id = 'linechartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            <div id = 'treechartWidget' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+            <div id = 'barchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            <div id = 'scatterplotWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+            <div id = 'forcedNetwork' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+
+            <div id = 'plantsNetworkNarrative' style = 'border : 1px solid green;'></div>
+        </div>
+
+
+    </body>
+
+</html>

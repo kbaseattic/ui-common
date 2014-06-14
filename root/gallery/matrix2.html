@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+
+<style>
+.bar {
+
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+</style>
+
+
+        <script type = 'text/javascript'>
+            <!--
+
+                function getParameterByName(name) {
+                  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                  var regexS = "[\\?&]" + name + "=([^&#]*)";
+                  var regex = new RegExp(regexS);
+                  var results = regex.exec(window.location.search);
+                  if(results == null)
+                    return "";
+                  else
+                    return decodeURIComponent(results[1].replace(/\+/g, " "));
+                }
+
+                require(['kbpaths'], function() {
+                    require(['jquery', 'd3', 'vis',
+                        ], function($) {
+                        $(function() {
+
+                            var matrix = [
+                                [
+                                    ['aaa','bbbb','cccc'],
+                                    ['d','e','f'],
+                                    ['g','h','i']
+                                ],
+                                [
+                                    ['1','2','3'],
+                                    ['4','5','6'],
+                                    ['7','8','9']
+                                ],
+                                [
+                                    ['able','baker','charlie'],
+                                    ['delta','edgar','foxtrot'],
+                                    ['giraffe','hotel','icecream']
+                                ],
+                            ];
+
+                            function doitall() {
+                                var tr = d3.select('table').selectAll('tr').data(matrix);
+                                tr.enter().append('tr');
+                                tr.exit().remove();
+                                var td = tr.selectAll('td')
+                                    .data(function(d) { console.log("TD DATA");console.log(d);return d });
+                                    td.enter().append('td').append('ul');
+                                    td.exit().remove();
+                                var ul = td.select('ul')
+                                    //.data([0]);
+                                   // .data(function(d) { console.log("ULD");console.log(d);return d});
+                                    //ul.enter().append('ul');
+                                    //ul.exit().remove();
+                                console.log("UL IS");console.log(ul);
+                                var li = ul.selectAll('li')
+                                    .data(function(d,i) { console.log("LI DATA IS AT " + i + " - " + d);return d});
+                                    li.enter().append('li');
+                                    li.html(function(d, i, j) {console.log("LI DATA HTML IS " + d + " AT " + i + " IN " + j); return d});
+                                    li.exit().remove();
+                                    //td.html(function(d) { return d});
+                                    //td.exit().remove();
+                            }
+
+                            doitall();
+setTimeout(function(){matrix[1][2][1] = 'NEW'; matrix[2][1].push('FANCY');doitall()}, 2000);
+                            /*matrix[1][0][0] = 'A';
+                            matrix.shift();
+                            matrix.push([['x','y','z']]);
+                            doitall();//*/
+
+                            /*matrix[0][0] = 'A';
+                            matrix[0][1] = 'B';
+                            matrix.push(['w','x','y','z']);
+                            doitall();
+                            matrix.shift();
+                            doitall();*/
+                            console.log(matrix);
+
+/*var tr = d3.selectAll('table').selectAll("tr")
+    .data(matrix)
+  .enter().append("tr");*/
+                                //.data(function(d) { return d})
+                                //    .enter().append('td').html(function(d) { return d});
+
+/*var tr = d3.selectAll('table').selectAll("tr")
+    .data(matrix)
+  .enter().append("tr");
+
+var td = tr.selectAll("td")
+    .data(function(d) { return d; })
+  .enter().append("td")
+    .text(function(d) { return d; });//*/
+
+                            //$('#random-chord').trigger('click');
+
+
+
+                    });
+                });});
+
+
+            //-->
+        </script>
+    </head>
+
+    <body>
+
+        <table></table>
+
+
+    </body>
+
+</html>

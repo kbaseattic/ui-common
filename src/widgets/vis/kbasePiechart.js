@@ -609,9 +609,9 @@ define('kbasePiechart',
                 .attr('class', 'pie')
                 .attr('transform',
                     'translate('
-                        + (bounds.size.width / 2 - radius + radius + this.options.xOffset)
+                        + (bounds.size.width / 2 + this.options.xOffset)
                         + ','
-                        + (bounds.size.height / 2 - radius + radius + this.options.yOffset)
+                        + (bounds.size.height / 2 + this.options.yOffset)
                         + ')'
                 );
                 $.each(
@@ -723,9 +723,9 @@ define('kbasePiechart',
                 .attr('class', 'labelG')
                 .attr('transform',
                     'translate('
-                        + (bounds.size.width / 2 - radius + radius + this.options.xOffset)
+                        + (bounds.size.width / 2 + this.options.xOffset)
                         + ','
-                        + (bounds.size.height / 2 - radius + radius + this.options.yOffset)
+                        + (bounds.size.height / 2 + this.options.yOffset)
                         + ')'
                 );
 

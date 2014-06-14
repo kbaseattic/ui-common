@@ -10,6 +10,7 @@ define('vis',
         'kbaseTreechart',
         'kbaseCircularHeatmap',
         'kbaseChordchart',
+        'kbaseVenndiagram',
     ],
     function() {
 

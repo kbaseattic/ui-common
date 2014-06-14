@@ -214,7 +214,10 @@ define('kbaseVisWidget',
             }
 
             this.uniqueID = $.proxy( function(d) {
-                return d.id || (d.id = this.ticker() );
+                if (d.id == undefined) {
+                    d.id = this.ticker();
+                }
+                return d.id;
             }, this);
 
 
