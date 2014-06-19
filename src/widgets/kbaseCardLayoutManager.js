@@ -1138,7 +1138,43 @@
                                      "showMAKCluster", 
                                      "showBambiMotif",
                                      "showBambiRunParameters", 
-                                     "showBambiRawOutput"];
+                                     "showBambiRawOutput",
+									 "showHeatMap",
+									 "showLineChart"];
+									 
+			/**
+             * Event: showHeatMap
+             * ------------------
+             * Adds new kbaseHeatmap card.
+             */
+			$(document).on("showHeatMap", function(event, data) {
+			self.addNewCard("KBaseHeatMapCard",
+				{
+					bicluster: data.bicluster,
+				},
+				{
+                    my: "left top",
+                    at: "center",
+                    of: data.event
+				});
+			});
+			
+			/**
+             * Event: showLineChart
+             * ------------------
+             * Adds new kbaseLineChart card.
+             */
+			$(document).on("showLineChart", function(event, data) {
+			self.addNewCard("KBaseLineChartCard",
+				{
+					bicluster: data.bicluster,					
+				},
+				{
+                    my: "left top",
+                    at: "center",
+                    of: data.event
+				});
+			});
 
             /**
              * Event: showDomains
