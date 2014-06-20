@@ -1167,12 +1167,12 @@
 			$(document).on("showLineChart", function(event, data) {
 			self.addNewCard("KBaseLineChartCard",
 				{
-					bicluster: data.bicluster,					
+					row: data.row,					
 				},
 				{
-                    my: "left top",
-                    at: "center",
-                    of: data.event
+                    my: "right top",
+                    at: "right+800 bottom",
+                    of: data.row
 				});
 			});
 

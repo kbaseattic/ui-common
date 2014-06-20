@@ -37,19 +37,19 @@
 					dataflat.push(datatable.data[y][x]) //obsolete
 				}
 			}
-					
+			
+			var gene_labels_ids = [];
+			for (var y = 0; y < datatable.gene_ids.length; y+=1) {
+				gene_labels_ids.push({
+					"label": datatable.gene_labels[y],
+					"id": datatable.gene_ids[y]
+				});
+			}
+			
 			var gene_labels = datatable.gene_labels,
 				gene_ids = datatable.gene_ids,
 				conditions = datatable.condition_labels,
 				expression = datatable.data;
-			
-			// var kb_ids = [];
-			// for (var y = 0; y < datatable.gene_ids.length; y+=1) {
-				// kb_ids.push({
-					// "label": datatable.gene_labels[y],
-					// "id": datatable.gene_ids[y]
-				// });
-			// }
 				
 			var margin = { top: 100, right: 0, bottom: 100, left: 200 },
 			  width = conditions.length*100 - margin.left - margin.right,
@@ -74,31 +74,31 @@
 				.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-			var menu = [{
-					name: 'gene info',
-					title: 'gene info button',
-					fun: function () {
-						alert('i am add button')
-					}
-				}, {
-					name: 'line plot',
-					title: 'line plot button',
-					fun: function () {
-						alert('i am update button')
-					}
-				}];			
+			// var menu = [{
+					// name: 'gene info',
+					// title: 'gene info button',
+					// fun: function () {
+						// alert('i am add button')
+					// }
+				// }, {
+					// name: 'line plot',
+					// title: 'line plot button',
+					// fun: function () {
+						// alert('i am update button')
+					// }
+				// }];			
 			
 			var geneLabels = svg.selectAll(".geneLabel")
-				.data(datadict)
+				.data(gene_labels_ids)
 				.enter().append("text")
-				.text(function (d) { return gene_labels[d.gene]; })
+				.text(function (d) { return d.label; })
 				.attr("x", 0)
 				.attr("y", function (d, i) { return i * gridSize; })
 				.style("text-anchor", "end")
 				.attr("transform", "translate(-6," + gridSize / 1.5 + ")")
-				.on("click",function(d,event){
-					if (event == 0) {self.trigger("showFeature", {featureID: gene_ids[d.gene], event: event})}
-					self.trigger("showLineChart", {bicluster: [expression[d.gene],conditions,gene_labels[d.gene]], event: event})
+				.on("click",function(d,i,event){
+					if (event == 0) {self.trigger("showFeature", {featureID: d.id, event: event})}
+					self.trigger("showLineChart", {row: [expression[i],conditions,gene_labels[i]], event: event})
 				})
 				
 			var conditionLabels = svg.selectAll(".conditionLabel")

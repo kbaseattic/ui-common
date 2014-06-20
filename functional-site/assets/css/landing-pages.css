@@ -753,7 +753,7 @@ rect.bordered {
         fill: #000;
       }
 
-/* For D3 Heatmap Modifications */
+/* For D3 Line Chart Modifications */
 path {
 				stroke: steelblue;
 				stroke-width: 1;
