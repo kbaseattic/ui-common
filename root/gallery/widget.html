@@ -492,6 +492,61 @@ dataset2 :
 
                             $('#treeCompare').kb_bind($tree, 'comparison');
 
+                            var $venn = $('#venn').kbaseVenndiagram(
+                                {
+                                //debug : true,
+ZEDo : 2 * Math.PI * 25 / 360,
+transitionTime : 250,
+                                    startingPosition : pos,
+                                    //choppedGroups : true,
+                                    labels : true,
+
+                                    xLabel      : 'Some useful experiment',
+                                    sortSubgroups:undefined,
+
+                                    dataset : {
+
+                                        c1 : {
+                                            label : 'Molecular Function',
+                                            value : 200,
+                                            tooltip : 'c1!',
+                                            action : function(d) { alert('Clicked on ' + d.label) },
+                                            fillColor : 'red',
+                                        },
+                                        c2 : {
+                                            label : 'Biological Process',
+                                            value : 200,
+                                            tooltip : 'c2!'
+                                        },
+                                        c3 : {
+                                            label : 'Cellular Component',
+                                            value : 200,
+                                            tooltip : 'c3!'
+                                        },
+
+                                        c1c2 : {
+                                            value : 23,
+                                            tooltip : 'c1c2!'
+                                        },
+                                        c1c3 : {
+                                            value : 161,
+                                            tooltip : 'c1c3!'
+                                        },
+                                        c2c3 : {
+                                            value : 56,
+                                            tooltip : 'c2c3!'
+                                        },
+                                        c1c2c3 : {
+                                            value : 273,
+                                            tooltip : 'c1c2c3!'
+                                        },
+                                    },
+
+
+
+                                }
+                            );
+
                         });
                     });
                 });
@@ -523,6 +578,8 @@ dataset2 :
             <button id = 'random-hm_c'>Randomize heatmap</button><button id = 'full-random-hm_c'>Fully randomize heatmap</button>
             <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
             <div id = 'forcedNetwork' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+            <div id = 'venn' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+
 
             <div id = 'plantsNetworkNarrative' style = 'border : 1px solid green;'></div>
         </div>

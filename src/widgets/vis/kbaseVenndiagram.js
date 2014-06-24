@@ -39,8 +39,12 @@ define('kbaseVenndiagram',
                     $venn.circleColors = [];
                 }
 
+                if (d.data.fillColor) {
+                    $venn.circleColors[idx] = d.data.fillColor;
+                    return d.data.fillColor;
+                }
+
                 if (d.fillColor) {
-                console.log("RETURN FILL COLOR OF " + d.fillColor);
                     $venn.circleColors[idx] = d.fillColor;
                     return d.fillColor;
                 }
@@ -51,7 +55,6 @@ define('kbaseVenndiagram',
                     $.each(
                         idx,
                         function (idx, val) {
-                        console.log("DESCEND to " + idx);
                             colors.push( d3.rgb($venn.options.fillColor(val, d, $venn) ) );
                         }
                     );
@@ -66,24 +69,14 @@ define('kbaseVenndiagram',
                             blend.b += Math.floor(color.b / diminisher);
                         }
                     );
-console.log("BLENDER");
-console.log(colors);console.log(blend.toString());
+
                     return blend.toString();
-console.log(colors);
 
-                    var colorScale = d3.scale.linear()
-                        .domain([0,1])
-                        .range(colors);
-console.log("SCALE IS " + colorScale(0.5) + ' on ' + colors + ' for ' + idx);
-                    return colorScale(0.5);
-
-                    console.log(colors);
-                    return '#F00';
                 }
                 else {
-                    console.log("FC IS " + idx + ', ' + $venn.fillScale(idx));
+
                     var color = $venn.circleColors[idx];
-                    console.log("FOUND COLOR : " + color);
+
                     if (color == undefined) {
                         color = $venn.circleColors[idx] = $venn.fillScale(idx);
                     }
@@ -122,7 +115,6 @@ console.log("SCALE IS " + colorScale(0.5) + ' on ' + colors + ' for ' + idx);
                 x : Math.cos(c2.angle) * c1.originDistance,
                 y : - Math.sin(c2.angle) * c1.originDistance,
             };
-//            console.log("centers at");console.log(cc1);console.log(cc2);
 
             var lowerLeftPoint = {
                 x : Math.min(cc1.x, cc2.x),
@@ -134,13 +126,9 @@ console.log("SCALE IS " + colorScale(0.5) + ' on ' + colors + ' for ' + idx);
                 y : lowerLeftPoint.y + Math.abs(cc1.y - cc2.y) / 2,
             };
 
-//console.log("MID POINT");console.log(midPoint);
-//console.log(cc1.x + ' -> ' + cc2.x + ' starts at ' + Math.min(cc1.x, cc2.x) + ' for ' + Math.abs(cc1.x - cc2.x));
-
             var width  = (cc1.x - cc2.x);
             var height = (cc1.y - cc2.y);
 
-//            console.log(width + ' x ' + height);
 
             //get the lower right angle. Assume that there is no width by default
             var lowerRightAngle = Math.PI / 2;
@@ -151,14 +139,10 @@ console.log("SCALE IS " + colorScale(0.5) + ' on ' + colors + ' for ' + idx);
             //and the complement, in RADIANS.
             var complementAngle = (Math.PI / 2 - lowerRightAngle);
 
-//            console.log("ANGLES ARE : " + lowerRightAngle + " TO " + complementAngle + ' over ' + c1.r);
-
             var adjacentSide = Math.sqrt( Math.pow(midPoint.x - lowerLeftPoint.x, 2) + Math.pow(midPoint.y - lowerLeftPoint.y, 2) );
 
-            console.log("ADJ : " + adjacentSide + ', ' + c2.r);
-console.log(c2.r/adjacentSide);
+
             var oppSide = Math.sin(Math.acos(adjacentSide / c2.r )) * c2.r;
-            console.log("OPP " + oppSide + ', ' + distance);
             var distance = oppSide;
 
             var i1 = {
@@ -179,9 +163,6 @@ console.log(c2.r/adjacentSide);
                 : [i2, i1, midPoint];
 
             return ret;
-
-//            console.log("INTERSECT AT");
-//            console.log(i1);console.log(i2);
 
             return [i1, i2, midPoint];
 
@@ -210,65 +191,39 @@ console.log(c2.r/adjacentSide);
                         + ')'
                 );
 
-//            console.log(radius);
-
             radius = radius * .5;   //basically just guessing at a magic number that looks reasonably good
-//console.log("RADIUS OPT " + this.options.radius + ',' + radius);
+
             radius = this.options.radius || radius;
             var overlap = this.options.overlap;
 
             var overlapRadius = radius * (1 - overlap);
 
             var numCircles = 3;
-var ZED = 200;
-var ZEDo = $venn.options.ZEDo;//Math.PI * 2 /5;// * 7/16;
+console.log(dataset.c1.fillColor);
             var circleData = [
-                /*{
-                    id : 77,
-                    x : 0,
-                    y : 0,
-                    r : 10,
-                    strokeColor : 'blue',
-                },*/
-//*
+
                 {
                     id : 0,
                     angle : $venn.options.startAngle,
                     r : radius,
                     originDistance : overlapRadius,
-                    fillColor : '#f00',
                 },
                 {
                     id : 1,
                     angle : $venn.options.startAngle + (2 * Math.PI / numCircles),
                     r : radius,
                     originDistance : overlapRadius,
-                    fillColor : '#0f0',
                 },
                 {
                     id : 2,
                     angle : $venn.options.startAngle + 2 * (2 * Math.PI / numCircles),
                     r : radius,
                     originDistance : overlapRadius,
-                    fillColor : '#00f',
                 },
-//*/
 
-/*
-                {angle : ZEDo, r : ZED, originDistance : ZED / 2, id : 3, fillColor : 'green'},
-                {angle : ZEDo + 2 * Math.PI /3, r : ZED, originDistance : ZED / 2, id : 4},//*/
-
-                /*{
-                    id : 3,
-                    angle : $venn.options.startAngle + 3 * (2 * Math.PI / numCircles),
-                    r : radius,
-                    fillColor : '#0ff',
-                },*/
             ];
 
-//            this.intersectCircles(
-//                {angle : 0, radius : 1, originDistance : 0.5},
-
+console.log(circleData);
             var intersects = this.intersectCircles(circleData[0], circleData[1]);
             var intersects2 = this.intersectCircles(circleData[1], circleData[2]);
             var intersects3 = this.intersectCircles(circleData[0], circleData[2]);
@@ -328,15 +283,7 @@ var ZEDo = $venn.options.ZEDo;//Math.PI * 2 /5;// * 7/16;
                     radius : 0,
                     fontSize : this.options.intersectFontSize,
                 },
-            ];//*/
-
-//console.log(circleData);
-            //var filledCircles = venn.selectAll('.filledCircle').data(circleData );
-
-            /*filledCircles.enter()
-                .append('circle')
-                    .attr('class', 'filledCircle')
-            ;*/
+            ];
 
             var transitionTime = this.initialized
                 ? this.options.transitionTime
@@ -346,13 +293,12 @@ var ZEDo = $venn.options.ZEDo;//Math.PI * 2 /5;// * 7/16;
 
                 this
                     .on('mouseover', function(d) {
-                        console.log("OVER IT");
                         d3.select(this).attr('fill-opacity', 1);
 
 
                         if ($venn.options.tooltips) {
                             var tooltip = $venn.tooltip(d);
-                            console.log("TIP ON");console.log(d);console.log(tooltip);
+
                             if (tooltip) {
                                 $venn.showToolTip(
                                     {
@@ -368,11 +314,11 @@ var ZEDo = $venn.options.ZEDo;//Math.PI * 2 /5;// * 7/16;
 
                     })
                     .on('mouseout', function(d) {
-                    console.log(d3.event);
+
                         var target = d3.event.toElement;
 
                         //assume that if we've moused over text, that that means we're over the label.
-                        if (target.tagName != 'text') {
+                        if (target && target.tagName != 'text') {
                             d3.select(this).attr('fill-opacity', d.fillOpacity || $venn.options.fillOpacity);
                             if ($venn.options.tooltips) {
                                 $venn.hideToolTip();
@@ -533,9 +479,6 @@ arcs.exit().remove();
 
                         })
                         .attr('font-size', function(d) { return d.fontSize || '12pt'})
-                        //.attr("font-size", function(d) { var size = Math.min(2 * radius, (2 * radius / 3 - 8) / this.getComputedTextLength() * 24) + "px";
-                        //console.log(size); console.log(this.getComputedTextLength());return size; })
-                        //.attr("text-anchor", function (d) {console.log(d.anchor); return d.anchor || 'middle' } );
 
                     }
 
@@ -563,7 +506,6 @@ arcs.exit().remove();
         },
 
         tooltip : function(d) {
-        console.log("TOOLTIP ON");console.log(d);
             if (d.data.tooltip != undefined) {
                 return d.data.tooltip;
             }
