@@ -84,7 +84,6 @@ function KBCacheClient(token) {
     var self = this;
     var auth = {};
     auth.token = token;
-    console.log(auth)
 
     var setup = configJSON.setup;
     if (setup) {
@@ -707,7 +706,6 @@ function ProjectAPI(ws_url, token) {
                            workspace_id : undefined };
         var p = $.extend( def_params, p_in);
 
-        console.log('calling get projects')
 //        META_ws = ws_client.list_objects( {} );
     
         var prom = ws_client.list_objects({type: 'KBaseNarrative.Metadata', 

@@ -73,7 +73,7 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/ws/manage.html', 
           controller: 'WSManage',
         }).state('ws.id', {
-          url: "objtable/:ws?type",
+          url: "objects/:ws?type",
           templateUrl: 'views/ws/objtable.html',
           controller: 'WB'
         }).state('ws.tour', {
@@ -81,6 +81,18 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/ws/objtable.html',
           controller: 'WBTour'
         })
+
+    $stateProvider
+        .state('narratives', {
+          url: "/narratives/",
+          templateUrl: 'views/ws/narrative.html',
+          controller: 'WB'
+        })     
+        .state('narratives.tab', {
+          url: ":tab",
+          templateUrl: 'views/ws/narrative-table.html',
+          controller: 'WB'
+        })           
 
     // model viewer routing
     $stateProvider
@@ -133,7 +145,15 @@ var app = angular.module('landing-pages',
           url: "json/:ws/:id",
           templateUrl: 'views/ws/json.html',
           controller: 'WBJSON'
-        }) /* model viewer */
+        }).state('ws.phenotype', {
+          url: "phenotype/:ws/:id",
+          templateUrl: 'views/ws/phenotype.html',
+          controller: 'WBLanding'
+        }).state('ws.pangenome', {
+          url: "pangenome/:ws/:id",
+          templateUrl: 'views/ws/sortable/pangenome.html',
+          controller: 'WBLanding'
+        })
 
 
 

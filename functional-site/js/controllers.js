@@ -336,7 +336,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 .controller('Favorites', function($scope, $state, $stateParams, favoriteService, $compile) {
-    console.log('called favorites!')
     $scope.selected = [{workspace: 'chenrydemo', 
                         name: 'kb|g.9.fbamdl.25.fba.55'}];
     //$scope.type = 'FBA';

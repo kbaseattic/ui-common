@@ -10,28 +10,32 @@ var workspace = require('./workspaceDeluxe.js')
 
 
 function respond(req, res, next) {
-    var params = [{}]
-    var method = "Workspace.list_workspace_info"
+    var params = [{workspace: 'KBaseFBA', name: 'D_vulgaris_series_sample_378'}]
+    var method = "Workspace.get_objects"
     var rpc = {
-        params : params,
+        params : [params],
         method : method,
         version: "1.1",
         id: String(Math.random()).slice(2),
     };
 
+    console.log('****:', JSON.stringify(rpc))
 
     var options = {
-        hostname: 'kbase.us',
+        hostname: 'dev04.berkeley.kbase.us',
+        port: 7058,
         method: 'POST',
         path: '/services/ws',
         data: JSON.stringify(rpc)
     };
+
     console.log(JSON.stringify(options))
 
 
     var req = http.request(options, function(res) {
           console.log("statusCode: ", res.statusCode);
           console.log("headers: ", res.headers);
+          console.log("body: ", res.body);
 
           res.on('data', function(d) {
             process.stdout.write(d);

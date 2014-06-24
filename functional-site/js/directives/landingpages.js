@@ -490,6 +490,168 @@ angular.module('lp-directives')
         }
     };
 })
+
+
+.directive('phenotype', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Phenotype ', 
+                                       rightLabel: scope.ws,
+                                       subText: scope.id});
+
+
+            p.loading();
+
+            var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
+            $.when(prom).done(function(data) {
+                console.log(data);
+
+
+
+                $(p.body()).kbaseGenbankImporter({data: data});
+
+            }).fail(function(e){
+                $(ele).rmLoading();
+                $(ele).append('<div class="alert alert-danger">'+
+                                e.error.message+'</div>')
+            });
+        }
+    };
+})
+
+
+.directive('pangenome', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Pangenome ', 
+                                       rightLabel: scope.ws,
+                                       subText: scope.id});
+
+
+            p.loading();
+
+            var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
+            $.when(prom).done(function(data) {
+
+                var data = data[0].data;
+                buildTable(data)
+
+            }).fail(function(e){
+                $(ele).rmLoading();
+                $(ele).append('<div class="alert alert-danger">'+
+                                e.error.message+'</div>')
+            });
+
+
+
+            function buildTable(data) {
+                console.log(data)
+                var container = $(p.body());
+
+                // add area for tabs and tab content
+                var tabs = $('<ul class="nav nav-tabs" id="myTab">');
+                container.append(tabs);
+                var tab_content = $('<div class="tab-content">');
+                container.append(tab_content)
+
+                tabs.append('<li class="active"><a data-id="table" data-toggle="tab">table</a></li>')
+
+                var tableSettings = {
+                    "sPaginationType": "bootstrap",
+                    "iDisplayLength": 10,
+                    "aaData": [],
+                    "aaSorting": [[ 3, "desc" ]],
+                    "aoColumns": [
+                      { "sTitle": "Function", 'mData': 'function'},
+                      { "sTitle": "ID", 'mData': 'id'}, //"sWidth": "10%"
+                      { "sTitle": "Type", 'mData': 'type'},
+                      { "sTitle": "Ortholog Count", 'mData': function(d) {
+                        return '<a class="show-orthologs" data-id="'+d.id+'">'
+                                +d.orthologs.length+'</a>'
+                      }},
+                    ],
+                    "oLanguage": {
+                        "sEmptyTable": "No objects in workspace",
+                        "sSearch": "Search: "
+                    },
+                    'fnDrawCallback': events
+                }
+
+                var orthologs = data.orthologs;
+
+                // not needed
+                var aaData = []
+                for (var i in orthologs) {
+                    aaData.push(orthologs[i])
+                }
+
+                tableSettings.aaData = aaData;
+
+                // add table to tab content for the table tab
+                var table_ele = $('<table class="table table-bordered table-striped pangenome-table"'+
+                                    'style="width: 100%;">');
+                var content = $('<div class="tab-pane active" data-id="table">');
+                content.append(table_ele);
+                tab_content.append(content);
+
+                // create the table
+                table_ele.dataTable(tableSettings);
+
+                events();
+
+
+                function events() {
+                    // event for clicking on ortholog count
+                    $('.show-orthologs').unbind('click');
+                    $('.show-orthologs').click(function() {
+                        var id = $(this).data('id');
+
+                        tabs.append('<li><a data-id="'+id+'" data-toggle="tab">'+id+'</a></li>');
+                        var oth_data =  getOrthologInfo(id);
+
+                        tab_content.append('<div class="tab-pane" data-id="'+id+'">'+
+                                                getOrthologInfo()+
+                                            '</div>');
+
+                        // event for clicking on tabs. 
+                        tabs.find('a').unbind('click')
+                        tabs.find('a').click(function (e) {
+                            e.preventDefault()
+                            $(this).show();
+                            $('.tab-pane').removeClass('active');
+                            var id = $(this).data('id');
+                            $('[data-id="'+id+'"]').addClass('active');
+                        })
+
+                    })
+                }
+
+                // this takes an ort
+                function getOrthologInfo(id) {
+                    console.log(id)
+                    for (var i in data) {
+                        if (data.id == data) {
+                            console.log(data.orthologs)
+                            var ort_list = data.orthlog
+                            return ort_list
+                        }
+
+                    }
+
+
+
+                }
+
+
+
+
+            }
+
+
+        }
+    };
+})
+
 .directive('rxndetail', function() {
     return {
         link: function(scope, ele, attrs) {

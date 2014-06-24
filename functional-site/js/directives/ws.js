@@ -13,85 +13,7 @@ angular.module('ws-directives', []);
 angular.module('ws-directives')
 .directive('wsselector', function($location, $compile, $state, $stateParams) {
     return {
-        template: '<div class="ws-selector">'+
-                    '<div class="ws-selector-header">'+
-                        //'<a class="show-filters">Filter <span class="caret"></span></a>'+
-                        
-
-                        '<div class="btn-toolbar ws-toolbar">'+
-
-
-                            //(USER_ID ? 
-                            //'<div class="btn-group btn-group-sm">'+
-                            //    '<button type="button" class="btn btn-default btn-show-ws active">'+
-                            //        '<span class="glyphicon glyphicon-th-large"></span>'+
-                            //    '</button>'+                            
-                                //'<button type="button" class="btn btn-default btn-show-fav">'+
-                                //    '<span class="glyphicon glyphicon-star"></span> '+
-                                //    '(<span class="favorite-count">0</span>)'+
-                                //'</button>'+
-                            //'</div>' : 
-                            //    ''
-                            //)+
-
-                            '<div class="btn-group btn-group-sm btn-filter-ws">'+
-                                '<div class="dropdown">'+
-                                    '<a type="button" class="" data-toggle="dropdown">'+
-                                        'Filter <span class="caret"></span>'+
-                                    '</a>'+
-                                    '<ul class="dropdown-menu settings-dropdown perm-filters" role="menu">'+
-                                        //'<div class="checkbox pull-left">'+
-                                        //    '<label><input id="ws-filter-projects" type="checkbox" value="">Narrative Projects</label>'+
-                                        //'</div>'+
-                                        //'<br><hr class="hr">'+
-                                        '<div class="checkbox pull-left">'+
-                                            '<label><input id="ws-filter-owner" type="checkbox" value="">Owner</label>'+
-                                        '</div>'+
-                                        '<br><br><hr class="hr">'+
-                                        'Your permission:<br>'+
-                                        '<div class="checkbox">'+
-                                            '<label><input id="ws-filter-admin" type="checkbox" value="" checked>Admin</label>'+
-                                        '</div>'+
-                                        '<div class="checkbox">'+
-                                          '<label><input id="ws-filter-write" type="checkbox" value="" checked>Write</label>'+
-                                        '</div>'+
-                                        '<div class="checkbox">'+
-                                          '<label><input id="ws-filter-read" type="checkbox" value="" checked>Read</label>'+                                                                                          
-                                        '</div>'+
-
-                                    '</ul>'+
-
-                                '</div>'+
-                            '</div>'+                        
-                            
-                            (USER_ID ? 
-                            '<div class="btn-group btn-group-sm pull-right">'+
-                                '<a type="button" class="btn-new-ws">'+
-                                    'New +'+
-                                '</a>'+
-                            '</div>' : '')+
-
-                            '<div class="fav-toolbar" style="display: none;">'+
-                                '<div class="fav-toolbar-title pull-left">Objects</div>'+
-                                '<button type="button" class="btn btn-default pull-right" ng-click="clearList()">Clear</button>'+                                
-                            '</div>'+
-
-                        '</div>'+
-
-                        //(USER_ID ? '<a class="new-ws pull-right">New+</a>' : '')+
-
-                        '<input type="text" class="search-query" placeholder="Search Workspaces">'+
-                    '</div>'+
-
-
-                    '<div id="select-box" class="select-box scroll-pane">'+
-                      '<table class="table table-bordered table-condensed table-hover">'+
-                      '</table>'+
-                    '</div>'+
-                    '<div favoritesidebar style="display: none;" id="favorite-sidebar" class="scroll-pane"></div>'+
-                  '</div>'
-                  ,
-
+        templateUrl: 'views/ws/ws-selector.html',
         link: function(scope, element, attrs) {
             var perm_dict = {'a': 'Admin',
                              'r': 'Read',
@@ -137,7 +59,7 @@ angular.module('ws-directives')
                         var ws = data[i];
                         var user = ws[2];
 
-                        //quick fix to hide search workspaces
+                        // hide search workspaces
                         if (user == "kbasesearch") continue;  
 
                         if (user == USER_ID) {
@@ -145,6 +67,18 @@ angular.module('ws-directives')
                         } else {
                             sorted_ws.push(ws)
                         }
+                    }
+
+                    // sort my last modified
+                    var owned_ws = owned_ws.sort(compare)
+                    var sorted_ws = sorted_ws.sort(compare)                    
+
+                    function compare(a,b) {
+                        var t1 = kb.ui.getTimestamp(b[3]) 
+                        var t2 = kb.ui.getTimestamp(a[3]) 
+                        if (t1 < t2) return -1;
+                        if (t1 > t2) return 1;
+                        return 0;
                     }
 
                     var data = owned_ws.concat(sorted_ws);
@@ -1353,6 +1287,12 @@ angular.module('ws-directives')
                         case 'Media': 
                             route = 'ws.media';
                             break; 
+                        case 'PhenotypeSet':
+                            route = 'ws.phenotype';
+                            break;
+                        case 'Pangenome':
+                            route = 'ws.pangenome';
+                            break;                            
                     }
 
 
