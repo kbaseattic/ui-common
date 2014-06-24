@@ -490,6 +490,29 @@ angular.module('lp-directives')
         }
     };
 })
+
+.directive('phenotype', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Phenotype Set Data', 
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+
+            var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
+			$.when(prom).done(function(data) {
+			
+                $(p.body()).kbasePhenotypeSet({data: data})
+                
+            }).fail(function(e){
+                $(ele).rmLoading();
+                $(ele).append('<div class="alert alert-danger">'+
+                                e.error.message+'</div>')
+            });
+        }
+    };
+})
+
 .directive('rxndetail', function() {
     return {
         link: function(scope, ele, attrs) {

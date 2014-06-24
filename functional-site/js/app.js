@@ -133,6 +133,10 @@ var app = angular.module('landing-pages',
           url: "json/:ws/:id",
           templateUrl: 'views/ws/json.html',
           controller: 'WBJSON'
+        }).state('ws.phenotype', {
+          url: "phenotype/:ws/:id",
+          templateUrl: 'views/ws/phenotype.html',
+          controller: 'WBLanding'
         }) /* model viewer */
 
 
