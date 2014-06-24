@@ -29,11 +29,72 @@ define('kbaseVenndiagram',
 
             strokeWidth : 2,
             strokeColor : function() { return 'black'},
-            fillColor : d3.scale.category20(),
+            //fillColor : d3.scale.category20(),
+            fillColor : function (idx, d, $venn) {
+
+                if ($venn.fillScale == undefined) {
+                    $venn.fillScale = d3.scale.category20();
+                };
+                if ($venn.circleColors == undefined) {
+                    $venn.circleColors = [];
+                }
+
+                if (d.fillColor) {
+                console.log("RETURN FILL COLOR OF " + d.fillColor);
+                    $venn.circleColors[idx] = d.fillColor;
+                    return d.fillColor;
+                }
+
+                if ($.isArray(idx)) {
+
+                    var colors = [];
+                    $.each(
+                        idx,
+                        function (idx, val) {
+                        console.log("DESCEND to " + idx);
+                            colors.push( d3.rgb($venn.options.fillColor(val, d, $venn) ) );
+                        }
+                    );
+
+                    var blend = d3.rgb();
+                    var diminisher = 2;
+                    $.each(
+                        colors,
+                        function (idx, color) {
+                            blend.r += Math.floor(color.r / diminisher);
+                            blend.g += Math.floor(color.g / diminisher);
+                            blend.b += Math.floor(color.b / diminisher);
+                        }
+                    );
+console.log("BLENDER");
+console.log(colors);console.log(blend.toString());
+                    return blend.toString();
+console.log(colors);
+
+                    var colorScale = d3.scale.linear()
+                        .domain([0,1])
+                        .range(colors);
+console.log("SCALE IS " + colorScale(0.5) + ' on ' + colors + ' for ' + idx);
+                    return colorScale(0.5);
+
+                    console.log(colors);
+                    return '#F00';
+                }
+                else {
+                    console.log("FC IS " + idx + ', ' + $venn.fillScale(idx));
+                    var color = $venn.circleColors[idx];
+                    console.log("FOUND COLOR : " + color);
+                    if (color == undefined) {
+                        color = $venn.circleColors[idx] = $venn.fillScale(idx);
+                    }
+                    return color;
+                }
+            },
             circleFontSize : '18pt',
             intersectFontSize : '24pt',
 
             drawLabels : true,
+            tooltips : true,
 
         },
 
@@ -63,18 +124,18 @@ define('kbaseVenndiagram',
             };
 //            console.log("centers at");console.log(cc1);console.log(cc2);
 
-            var midPoint = {
-                x : Math.min(cc1.x, cc2.x) + Math.abs(cc1.x - cc2.x) / 2,
-                y : Math.min(cc1.y, cc2.y) + Math.abs(cc1.y - cc2.y) / 2,
-            };
-
-//console.log("MID POINT");console.log(midPoint);
-//console.log(cc1.x + ' -> ' + cc2.x + ' starts at ' + Math.min(cc1.x, cc2.x) + ' for ' + Math.abs(cc1.x - cc2.x));
-
             var lowerLeftPoint = {
                 x : Math.min(cc1.x, cc2.x),
                 y : Math.min(cc1.y, cc2.y),
             };
+
+            var midPoint = {
+                x : lowerLeftPoint.x + Math.abs(cc1.x - cc2.x) / 2,
+                y : lowerLeftPoint.y + Math.abs(cc1.y - cc2.y) / 2,
+            };
+
+//console.log("MID POINT");console.log(midPoint);
+//console.log(cc1.x + ' -> ' + cc2.x + ' starts at ' + Math.min(cc1.x, cc2.x) + ' for ' + Math.abs(cc1.x - cc2.x));
 
             var width  = (cc1.x - cc2.x);
             var height = (cc1.y - cc2.y);
@@ -87,12 +148,18 @@ define('kbaseVenndiagram',
                 lowerRightAngle = Math.atan(height / width);
             }
 
-            var distance = Math.sqrt( width / 2 * width / 2 + height / 2 * height / 2);
-
             //and the complement, in RADIANS.
             var complementAngle = (Math.PI / 2 - lowerRightAngle);
 
 //            console.log("ANGLES ARE : " + lowerRightAngle + " TO " + complementAngle + ' over ' + c1.r);
+
+            var adjacentSide = Math.sqrt( Math.pow(midPoint.x - lowerLeftPoint.x, 2) + Math.pow(midPoint.y - lowerLeftPoint.y, 2) );
+
+            console.log("ADJ : " + adjacentSide + ', ' + c2.r);
+console.log(c2.r/adjacentSide);
+            var oppSide = Math.sin(Math.acos(adjacentSide / c2.r )) * c2.r;
+            console.log("OPP " + oppSide + ', ' + distance);
+            var distance = oppSide;
 
             var i1 = {
                 x : midPoint.x + Math.cos(complementAngle) * distance,//c1.r * Math.sqrt(3) / 2,
@@ -103,6 +170,15 @@ define('kbaseVenndiagram',
                 x : midPoint.x + Math.cos(complementAngle + Math.PI) * distance,//c1.r * Math.sqrt(3) / 2,
                 y : midPoint.y - Math.sin(complementAngle + Math.PI) * distance,//c1.r * Math.sqrt(3) / 2,
             };
+
+            var mag1 = Math.sqrt(Math.pow(i1.x, 2) + Math.pow(i1.y, 2));
+            var mag2 = Math.sqrt(Math.pow(i2.x, 2) + Math.pow(i2.y, 2));
+
+            var ret = mag1 > mag2
+                ? [i1, i2, midPoint]
+                : [i2, i1, midPoint];
+
+            return ret;
 
 //            console.log("INTERSECT AT");
 //            console.log(i1);console.log(i2);
@@ -115,6 +191,11 @@ define('kbaseVenndiagram',
         renderChart : function() {
             var bounds = this.chartBounds();
             var $venn  = this;
+            var dataset = $venn.dataset();
+
+            if (dataset == undefined) {
+                return;
+            }
 
             var radius = Math.min(bounds.size.width, bounds.size.height) / 2;
 
@@ -149,7 +230,7 @@ var ZEDo = $venn.options.ZEDo;//Math.PI * 2 /5;// * 7/16;
                     r : 10,
                     strokeColor : 'blue',
                 },*/
-/*
+//*
                 {
                     id : 0,
                     angle : $venn.options.startAngle,
@@ -173,7 +254,7 @@ var ZEDo = $venn.options.ZEDo;//Math.PI * 2 /5;// * 7/16;
                 },
 //*/
 
-//*
+/*
                 {angle : ZEDo, r : ZED, originDistance : ZED / 2, id : 3, fillColor : 'green'},
                 {angle : ZEDo + 2 * Math.PI /3, r : ZED, originDistance : ZED / 2, id : 4},//*/
 
@@ -188,90 +269,74 @@ var ZEDo = $venn.options.ZEDo;//Math.PI * 2 /5;// * 7/16;
 //            this.intersectCircles(
 //                {angle : 0, radius : 1, originDistance : 0.5},
 
-var intersects = this.intersectCircles(circleData[0], circleData[1]);
-circleData.push(
-    {
-        cx : intersects[0].x,
-        cy : intersects[0].y,
-        r : 4,
-        strokeWidth : 1,
-        strokeColor : 'red',
-        fillColor : 'none',
-    },
-    {
-        cx : intersects[1].x,
-        cy : intersects[1].y,
-        r : 4,
-        strokeWidth : 1,
-        strokeColor : 'red',
-        fillColor : 'none',
-    },
-    {
-        cx : intersects[2].x,
-        cy : intersects[2].y,
-        r : 4,
-        strokeWidth : 1,
-        strokeColor : 'green',
-        fillColor : 'none',
-    }
-);
+            var intersects = this.intersectCircles(circleData[0], circleData[1]);
+            var intersects2 = this.intersectCircles(circleData[1], circleData[2]);
+            var intersects3 = this.intersectCircles(circleData[0], circleData[2]);
 
-            var labelData = [];/*
+
+            var labelData = [//];/*
                 {
                     angle : circleData[0].angle,
-                    label : 'Molecular Function',
+                    label : dataset.c1.label,
+                    value : dataset.c1.value,
                     radius : overlapRadius * 1.3,
                     anchor : 'end',
                     fontSize : this.options.circleFontSize,
                 },
                 {
                     angle : circleData[1].angle,
-                    label : 'Biological Process',
+                    label : dataset.c2.label,
+                    value : dataset.c2.value,
                     radius : overlapRadius * 1.3,
                     anchor : 'start',
                     fontSize : this.options.circleFontSize,
                 },
                 {
                     angle : circleData[2].angle,
-                    label : 'Cellular Component',
+                    label : dataset.c3.label,
+                    value : dataset.c3.value,
                     radius : overlapRadius * 1.3,
                     anchor : 'middle',
                     fontSize : this.options.circleFontSize,
                 },
                 {
                     angle : 2 * Math.PI * 90 / 360,
-                    label : '161',
+                    //label : dataset.c1c3.label,
+                    value : dataset.c1c3.value,
                     radius : overlapRadius * 0.7,
                     fontSize : this.options.intersectFontSize,
                 },
                 {
                     angle : 2 * Math.PI * 210 / 360,
-                    label : '23',
+                    //label : dataset.c1c2.label,
+                    value : dataset.c1c2.value,
                     radius : overlapRadius * 0.7,
                     fontSize : this.options.intersectFontSize,
                 },
                 {
                     angle : 2 * Math.PI * 330 / 360,
-                    label : '56',
+                    //label : dataset.c2c3.label,
+                    value : dataset.c2c3.value,
                     radius : overlapRadius * 0.7,
                     fontSize : this.options.intersectFontSize,
                 },
 
                 {
                     angle : 0,
-                    label : '273',
+                    //label : dataset.c1c2c3.label,
+                    value : dataset.c1c2c3.value,
                     radius : 0,
                     fontSize : this.options.intersectFontSize,
                 },
             ];//*/
 
 //console.log(circleData);
-            var filledCircles = venn.selectAll('.filledCircle').data(circleData );
+            //var filledCircles = venn.selectAll('.filledCircle').data(circleData );
 
-            filledCircles.enter()
+            /*filledCircles.enter()
                 .append('circle')
                     .attr('class', 'filledCircle')
-            ;
+            ;*/
 
             var transitionTime = this.initialized
                 ? this.options.transitionTime
@@ -283,14 +348,46 @@ circleData.push(
                     .on('mouseover', function(d) {
                         console.log("OVER IT");
                         d3.select(this).attr('fill-opacity', 1);
+
+
+                        if ($venn.options.tooltips) {
+                            var tooltip = $venn.tooltip(d);
+                            console.log("TIP ON");console.log(d);console.log(tooltip);
+                            if (tooltip) {
+                                $venn.showToolTip(
+                                    {
+                                        label : tooltip,
+                                        event : {
+                                            pageX : $venn.options.cornerToolTip ? $venn.$elem.prop('offsetLeft') + 5 : d3.event.pageX,
+                                            pageY : $venn.options.cornerToolTip ? $venn.$elem.prop('offsetTop') + 20 : d3.event.pageY
+                                        }
+                                    }
+                                );
+                            }
+                        }
+
                     })
                     .on('mouseout', function(d) {
-                        d3.select(this).attr('fill-opacity', d.fillOpacity || $venn.options.fillOpacity);
+                    console.log(d3.event);
+                        var target = d3.event.toElement;
+
+                        //assume that if we've moused over text, that that means we're over the label.
+                        if (target.tagName != 'text') {
+                            d3.select(this).attr('fill-opacity', d.fillOpacity || $venn.options.fillOpacity);
+                            if ($venn.options.tooltips) {
+                                $venn.hideToolTip();
+                            }
+                        }
+                    })
+                    .on('click', function(d) {
+                        if (d.data.action) {
+                            d.data.action(d.data);
+                        }
                     })
             };
 
 
-            filledCircles
+            /*filledCircles
                 .call(circleAction)
                 .transition().duration(transitionTime)
                 //.attr('cx', function (d) { var x = return Math.cos(d.angle) * d.originDistance } )
@@ -304,9 +401,74 @@ circleData.push(
                 .call($venn.endall, function() {
                     $venn.initialized = true;
                 })
-            ;
+            ;*/
 
-            filledCircles.exit().remove();
+var arcs = [
+    { d : 'M ' + intersects3[0].x + ' ' + intersects3[0].y
+        + ' A ' + radius + ' ' + radius + ' 0 1 0 ' + intersects[0].x + ' ' + intersects[0].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 1 ' + intersects2[1].x + ' ' + intersects2[1].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 1 ' + intersects3[0].x + ' ' + intersects3[0].y
+        + ' Z',
+    circle : 0, fillColor : '#F00', data : dataset.c1},
+    { d : 'M ' + intersects3[0].x + ' ' + intersects3[0].y
+        + ' A ' + radius + ' ' + radius + ' 0 1 1 ' + intersects2[0].x + ' ' + intersects2[0].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 0 ' + intersects[1].x + ' ' + intersects[1].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 0 ' + intersects3[0].x + ' ' + intersects3[0].y
+        + ' Z',
+    circle : 1, fillColor : '#00F', data : dataset.c2},
+    { d : 'M ' + intersects2[0].x + ' ' + intersects2[0].y
+        + ' A ' + radius + ' ' + radius + ' 0 1 1 ' + intersects[0].x + ' ' + intersects[0].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 0 ' + intersects3[1].x + ' ' + intersects3[1].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 0 ' + intersects2[0].x + ' ' + intersects2[0].y
+        + ' Z',
+    circle : 2, fillColor : '#0F0', data : dataset.c3},
+    { d : 'M ' + intersects[1].x + ' ' + intersects[1].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 0 ' + intersects2[1].x + ' ' + intersects2[1].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 0 ' + intersects3[1].x + ' ' + intersects3[1].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 0 ' + intersects[1].x + ' ' + intersects[1].y
+        + ' Z',
+    circle : [0,1,2], data : dataset.c1c2c3},
+    { d : 'M ' + intersects[0].x + ' ' + intersects[0].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 1 ' + intersects2[1].x + ' ' + intersects2[1].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 0 ' + intersects3[1].x + ' ' + intersects3[1].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 1 ' + intersects[0].x + ' ' + intersects[0].y
+        + ' Z',
+    circle : [0,2], data : dataset.c1c3},
+    { d : 'M ' + intersects3[0].x + ' ' + intersects3[0].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 0 ' + intersects2[1].x + ' ' + intersects2[1].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 1 ' + intersects[1].x + ' ' + intersects[1].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 0 ' + intersects3[0].x + ' ' + intersects3[0].y
+        + ' Z',
+    circle : [0,1], data : dataset.c1c2},
+    { d : 'M ' + intersects2[0].x + ' ' + intersects2[0].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 0 ' + intersects[1].x + ' ' + intersects[1].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 1 ' + intersects3[1].x + ' ' + intersects3[1].y
+        + ' A ' + radius + ' ' + radius + ' 0 0 0 ' + intersects2[0].x + ' ' + intersects2[0].y
+        + ' Z',
+    circle : [1,2], data : dataset.c2c3},
+
+];
+
+var arcs = venn.selectAll('.arc').data(arcs)
+arcs.enter()
+    .append('path')
+        .attr('class', 'arc')
+;
+arcs
+    .call(circleAction)
+    .transition().duration(transitionTime)
+    .attr('d', function(d) { return d.d})
+    .attr('fill', function(d, idx) { var c =  $venn.options.fillColor(d.circle, d, $venn); return c; })
+    .attr('stroke', 'none')
+    .attr('fill-opacity', function (d) { return d.fillOpacity || $venn.options.fillOpacity })
+    .call($venn.endall, function() {
+        $venn.initialized = true;
+    })
+;
+
+arcs.exit().remove();
+
+            //filledCircles.exit().remove();
 
             var strokedCircles = venn.selectAll('.strokedCircle').data(circleData );
 
@@ -316,7 +478,7 @@ circleData.push(
             ;
 
             strokedCircles
-                .call(circleAction)
+                //.call(circleAction)
                 .transition().duration(transitionTime)
                 .attr('cx', function (d) { return d.cx || Math.cos(d.angle) * d.originDistance } )
                 .attr('cy', function (d) { return d.cy || - Math.sin(d.angle) * d.originDistance } )
@@ -339,13 +501,14 @@ circleData.push(
                 this
                     .attr("text-anchor", "middle")
                     .attr('dy', '0.5em')
+                    .attr('cursor', 'default')
                 ;
 
                 if (this.attrTween) {
 
                     this
                         .text(function(d) {
-                            return d.label;
+                            return d.label || d.value;
                         })
                         .attrTween("transform", function(d, idx) {
                             //this._current=  this._current || d;
@@ -370,6 +533,8 @@ circleData.push(
 
                         })
                         .attr('font-size', function(d) { return d.fontSize || '12pt'})
+                        //.attr("font-size", function(d) { var size = Math.min(2 * radius, (2 * radius / 3 - 8) / this.getComputedTextLength() * 24) + "px";
+                        //console.log(size); console.log(this.getComputedTextLength());return size; })
                         //.attr("text-anchor", function (d) {console.log(d.anchor); return d.anchor || 'middle' } );
 
                     }
@@ -378,7 +543,7 @@ circleData.push(
                 return this;
             }
 
-            if ($venn.options.drawLabels) {
+            if ($venn.options.labels) {
 
                 var labels = venn.selectAll('text').data(labelData );
 
@@ -395,9 +560,20 @@ circleData.push(
 
 
 
-
         },
 
+        tooltip : function(d) {
+        console.log("TOOLTIP ON");console.log(d);
+            if (d.data.tooltip != undefined) {
+                return d.data.tooltip;
+            }
+            else if (d.data.label != undefined) {
+                return d.data.label;
+            }
+            else {
+                return undefined;
+            }
+        },
 
         renderXAxis : function() {},
         renderYAxis : function() {},

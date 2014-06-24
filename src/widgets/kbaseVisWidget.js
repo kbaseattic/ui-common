@@ -860,20 +860,20 @@ define('kbaseVisWidget',
 
             text.each(function() {
                 var text = d3.select(this),
-                        words = text.text().split(/\s+/).reverse(),
-                        word,
-                        line = [],
-                        lineNumber = 0,
-                        lineHeight = 1.1, // ems
-                        y = text.attr("y"),
-                        dy = parseFloat(text.attr("dy")) || 0,
-                        tspan = text
-                            .text(null)
-                            .append("tspan")
-                            .attr("x", xCoord)
-                            .attr("y", y)
-                            .attr("dy", dy + "em")
-                        ;
+                    words = text.text().split(/\s+/).reverse(),
+                    word,
+                    line = [],
+                    lineNumber = 0,
+                    lineHeight = 1.1, // ems
+                    y = text.attr("y"),
+                    dy = parseFloat(text.attr("dy")) || 0,
+                    tspan = text
+                        .text(null)
+                        .append("tspan")
+                        .attr("x", xCoord)
+                        .attr("y", y)
+                        .attr("dy", dy + "em")
+                    ;
 
                 while (word = words.pop()) {
                     line.push(word);
