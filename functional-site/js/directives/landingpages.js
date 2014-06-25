@@ -492,33 +492,6 @@ angular.module('lp-directives')
 })
 
 
-.directive('phenotype', function() {
-    return {
-        link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Phenotype ', 
-                                       rightLabel: scope.ws,
-                                       subText: scope.id});
-
-
-            p.loading();
-
-            var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
-            $.when(prom).done(function(data) {
-                console.log(data);
-
-
-
-                $(p.body()).kbaseGenbankImporter({data: data});
-
-            }).fail(function(e){
-                $(ele).rmLoading();
-                $(ele).append('<div class="alert alert-danger">'+
-                                e.error.message+'</div>')
-            });
-        }
-    };
-})
-
 
 .directive('pangenome', function() {
     return {
@@ -527,15 +500,12 @@ angular.module('lp-directives')
                                        rightLabel: scope.ws,
                                        subText: scope.id});
 
-
             p.loading();
 
             var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
             $.when(prom).done(function(data) {
-
                 var data = data[0].data;
                 buildTable(data)
-
             }).fail(function(e){
                 $(ele).rmLoading();
                 $(ele).append('<div class="alert alert-danger">'+
@@ -549,12 +519,20 @@ angular.module('lp-directives')
                 var container = $(p.body());
 
                 // add area for tabs and tab content
+                /*
                 var tabs = $('<ul class="nav nav-tabs" id="myTab">');
                 container.append(tabs);
                 var tab_content = $('<div class="tab-content">');
                 container.append(tab_content)
 
-                tabs.append('<li class="active"><a data-id="table" data-toggle="tab">table</a></li>')
+                tabs.append('<li class="active"><a data-id="table" data-toggle="tab">table</a></li>');
+                */
+
+                var table = $('<table class="table table-bordered table-striped"'+
+                                    'style="width: 100%;">');
+
+                var tabs = container.tabs([{name: 'Table', content: table, active: true}]);
+                 
 
                 var tableSettings = {
                     "sPaginationType": "bootstrap",
@@ -568,7 +546,10 @@ angular.module('lp-directives')
                       { "sTitle": "Ortholog Count", 'mData': function(d) {
                         return '<a class="show-orthologs" data-id="'+d.id+'">'
                                 +d.orthologs.length+'</a>'
-                      }},
+                      },
+
+
+                      },
                     ],
                     "oLanguage": {
                         "sEmptyTable": "No objects in workspace",
@@ -587,17 +568,9 @@ angular.module('lp-directives')
 
                 tableSettings.aaData = aaData;
 
-                // add table to tab content for the table tab
-                var table_ele = $('<table class="table table-bordered table-striped pangenome-table"'+
-                                    'style="width: 100%;">');
-                var content = $('<div class="tab-pane active" data-id="table">');
-                content.append(table_ele);
-                tab_content.append(content);
-
                 // create the table
-                table_ele.dataTable(tableSettings);
-
-                events();
+                table.dataTable(tableSettings);
+                //events();
 
 
                 function events() {
@@ -605,41 +578,28 @@ angular.module('lp-directives')
                     $('.show-orthologs').unbind('click');
                     $('.show-orthologs').click(function() {
                         var id = $(this).data('id');
+                        tabs.addTab({name: id});
 
-                        tabs.append('<li><a data-id="'+id+'" data-toggle="tab">'+id+'</a></li>');
-                        var oth_data =  getOrthologInfo(id);
-
-                        tab_content.append('<div class="tab-pane" data-id="'+id+'">'+
-                                                getOrthologInfo()+
-                                            '</div>');
-
-                        // event for clicking on tabs. 
-                        tabs.find('a').unbind('click')
-                        tabs.find('a').click(function (e) {
-                            e.preventDefault()
-                            $(this).show();
-                            $('.tab-pane').removeClass('active');
-                            var id = $(this).data('id');
-                            $('[data-id="'+id+'"]').addClass('active');
+                        console.log(tabs.tab(id))
+                        tabs.tab(id).click(function() {
+                            var info = getOrthologInfo(id);
+                            console.log(info)
+                            tabs.addContent({name:id, content:info})
                         })
-
                     })
                 }
 
                 // this takes an ort
                 function getOrthologInfo(id) {
-                    console.log(id)
+                    console.log(data)
                     for (var i in data) {
-                        if (data.id == data) {
-                            console.log(data.orthologs)
-                            var ort_list = data.orthlog
+                        if (data[i].id == id) {
+                            console.log('match')
+
+                            var ort_list = data.orthologs
                             return ort_list
                         }
-
                     }
-
-
-
                 }
 
 
