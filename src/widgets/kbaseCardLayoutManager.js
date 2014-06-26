@@ -1165,15 +1165,24 @@
              * Adds new kbaseLineChart card.
              */
 			$(document).on("showLineChart", function(event, data) {
-			self.addNewCard("KBaseLineChartCard",
-				{
-					row: data.row,					
-				},
-				{
-                    my: "right top",
-                    at: "right+800 bottom",
-                    of: data.row
-				});
+				if (!$("#linechart").length) {
+					self.addNewCard("KBaseLineChartCard",
+						{
+							row: data.row,					
+						},
+						{
+							my: "right top",
+							at: "right+800 bottom",
+							of: data.row
+					});
+				}
+				
+				else {
+					console.log($("#linechart").parent().attr("id"))
+					var linechartID = $("#linechart").parent().attr("id")
+					console.log(this)
+					// $("#linechart").parent().remove()
+				}
 			});
 
             /**
@@ -1582,6 +1591,7 @@
                 self.addNewCard("KBaseMAKBiclusterCard",
                     {
                         bicluster: data.bicluster,
+						title: data.title,
                         showButtons: true,
                         centerFeature: data.centerFeature
                     },
@@ -1806,6 +1816,7 @@
             var self = this;
             var newCard = newWidget.$elem.LandingPageCard(cardOptions); //$("#" + newCardId).LandingPageCard(cardOptions);
 
+			console.log(this)
             this.cards[newCardId] = {
                 card: newCard,
                 widget: newWidget,

@@ -22,7 +22,7 @@
 		render: function(options) {
 
             var self = this;			
-			self.$elem.append($("<div id='heatmap'/>"))
+			self.$elem.append($("<div id='heatmap'>"))
 
 			var datatable = self.options.bicluster[1][0]
 
@@ -74,20 +74,6 @@
 				.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-			// var menu = [{
-					// name: 'gene info',
-					// title: 'gene info button',
-					// fun: function () {
-						// alert('i am add button')
-					// }
-				// }, {
-					// name: 'line plot',
-					// title: 'line plot button',
-					// fun: function () {
-						// alert('i am update button')
-					// }
-				// }];			
-			
 			var geneLabels = svg.selectAll(".geneLabel")
 				.data(gene_labels_ids)
 				.enter().append("text")
@@ -97,7 +83,7 @@
 				.style("text-anchor", "end")
 				.attr("transform", "translate(-6," + gridSize / 1.5 + ")")
 				.on("click",function(d,i,event){
-					if (event == 0) {self.trigger("showFeature", {featureID: d.id, event: event})}
+					if (!$("div:contains('"+d.id+"')").length) {self.trigger("showFeature", {featureID: d.id, event: event})}
 					self.trigger("showLineChart", {row: [expression[i],conditions,gene_labels[i]], event: event})
 				})
 				

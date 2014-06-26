@@ -1,34 +1,6 @@
-(function($, undefined) {
-	$.KBWidget({
-		name: "KBaseLineChartCard",
-		parent: "kbaseWidget",
-		version: "1.0.0",
-		options: {
-			title: "LineChart Card",
-			isInCard: false,
-			width: 600,
-			height: 600
-		},
-		
-		init: function(options) {
-			this._super(options);
-
-			if (this.options.row === null) {
-				//throw an error
-				return;
-			}				
-            return this.render();
-		},
-		
-		render: function(options) {
-		
-			var self = this;			
-
-			self.$elem.append($("<div id='linechart' style='position:absolute;top:0px;left:0; float:left;'/>"));
-
-			var values = self.options.row[0],
-				conditions = self.options.row[1],
-				gene_label = self.options.row[2]
+			var values = [0.847005,0.729055,-1.4168,-1.52138,-1.64155,-1.16694],
+				conditions = ["In-frame deletion mutant for ORF SO3389_WT_stationary anoxic_vs._WT_aerobic mid-log","In-frame deletion mutant for ORF SO3389_WT_aerobic biofilm_vs._WT_aerobic mid-log (planktonic)","In-frame deletion mutant for ORF SO3389_Mutant_stationary anoxic (102 h)_vs._Mutant_mid-log anoxic","In-frame deletion mutant for ORF SO3389_WT_stationary anoxic_vs._WT_10 h into anoxic","Salt:NaCl_0.6_120_vs._0_120","BU0_A_BU0_A_null_vs._mean gene expression in 207 S.oneidensis experiments (M3d v4 Build 2)_null"],
+				gene_label = "199208"
 				// All three above variables are passed from the JSON object
 				
 			var datadict = []
@@ -119,18 +91,3 @@
 				.append("title")
 				.text(function(d) {return d.gene_label})
 				
-			return this;
-		},
-		getData: function() {
-			return {
-				type: "LineChartCard",
-				row: this.options.row,
-				id: this.options.id,
-				workspace: this.options.ws,
-				auth: this.options.auth,
-				userId: this.options.userId,
-				title: "LineChart Card",
-			};
-		},
-	});
-})(jQuery);
