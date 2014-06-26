@@ -1,4 +1,4 @@
-define('KBaseMastRunParametersCard',
+kb_define('KBaseMastRunParametersCard',
     [
         'jquery',
 	'kbwidget'

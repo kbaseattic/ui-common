@@ -3,7 +3,7 @@
 
 */
 
-define('IdMapClient',
+kb_define('IdMapClient',
     [
         'jquery',
     ],

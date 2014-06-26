@@ -1,4 +1,4 @@
-define('KBaseTomtomRunParametersCard',
+kb_define('KBaseTomtomRunParametersCard',
     [
         'jquery',
 	'kbwidget'

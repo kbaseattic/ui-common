@@ -3,7 +3,7 @@
 
 */
 
-define('kbaseIrisWorkspace',
+kb_define('kbaseIrisWorkspace',
     [
         'jquery',
         'kbaseTabs',

@@ -32,7 +32,7 @@
 
 */
 
-define('kbaseTabs',
+kb_define('kbaseTabs',
     [
         'jquery',
         'kbwidget',

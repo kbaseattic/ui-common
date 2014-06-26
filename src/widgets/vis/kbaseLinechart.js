@@ -2,7 +2,7 @@
 
 */
 
-define('kbaseLinechart',
+kb_define('kbaseLinechart',
     [
         'jquery',
         'd3',

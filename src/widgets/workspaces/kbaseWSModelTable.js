@@ -1,4 +1,4 @@
-define('kbaseWSModelTable',
+kb_define('kbaseWSModelTable',
     [
         'jquery',
 	'kbwidget'

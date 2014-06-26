@@ -1,8 +1,7 @@
-define('kbaseWSObjectTable',
+kb_define('kbaseWSObjectTable',
     [
         'jquery',
 	'kbwidget',
-	'kbaseModelView'
     ],
     function ($) {
 

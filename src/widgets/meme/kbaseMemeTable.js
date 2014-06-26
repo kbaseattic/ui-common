@@ -1,4 +1,4 @@
-define('kbaseMemeTable',
+kb_define('kbaseMemeTable',
     [
         'jquery',
 	'kbwidget',

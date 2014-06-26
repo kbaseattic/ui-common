@@ -1,6 +1,6 @@
 /**
  * Requires bootstrap 3 for buttons
- */define('KBaseContigBrowserButtons',
+ */kb_define('KBaseContigBrowserButtons',
     [
         'jquery',
 	'kbwidget'

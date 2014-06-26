@@ -1,4 +1,4 @@
-define('kbaseModelCore',
+kb_define('kbaseModelCore',
     [
         'jquery',
 	'kbwidget'

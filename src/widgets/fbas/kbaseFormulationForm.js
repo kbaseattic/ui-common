@@ -1,4 +1,4 @@
-define('kbaseFormulationForm',
+kb_define('kbaseFormulationForm',
     [
         'jquery',
 	'kbwidget'

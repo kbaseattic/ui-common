@@ -2,7 +2,7 @@
 
 */
 
-define('kbaseHeatmap',
+kb_define('kbaseHeatmap',
     [
         'jquery',
         'd3',

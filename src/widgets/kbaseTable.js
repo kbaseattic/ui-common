@@ -47,7 +47,7 @@
 
 */
 
-define('kbaseTable',
+kb_define('kbaseTable',
     [
         'jquery',
         'kbwidget',

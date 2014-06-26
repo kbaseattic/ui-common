@@ -3,7 +3,7 @@
 
 */
 
-define('kbasePlantsNetworkTable',
+kb_define('kbasePlantsNetworkTable',
     [
         'jquery',
         'kbaseIrisWidget',

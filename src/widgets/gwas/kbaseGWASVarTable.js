@@ -1,4 +1,4 @@
-define('KBaseGWASVarTable',
+kb_define('KBaseGWASVarTable',
     [
         'jquery',
 	'kbwidget'

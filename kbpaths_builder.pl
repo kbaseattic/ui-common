@@ -30,6 +30,8 @@ sub wanted {
 
         (my $name = $_) =~ s/\.js$//;
 
+        return if $name =~ /kbpaths|kbaseWidgetTemplate|kbaseGenomeCardManager|kbaseHello|kbaseLandingPageCard|kbaseSpecCommon|sampleMain/;
+
         $paths{$name} = $path;
     }
 
@@ -58,7 +60,7 @@ my $all = join("\n", map {"\t'$_',"} grep {$_ ne 'all'} sort keys %paths);
 
 if (@ARGV) {
     print <<"eKBALL";
-define('all',
+kb_define('all',
     [
 $all
     ],
@@ -70,7 +72,7 @@ eKBALL
 }
 else {
 print <<"eKBPaths";
-    define('kbpaths', [], function(paths) {
+    kb_define('kbpaths', [], function(paths) {
         requirejs.config({
             baseUrl : 'src/widgets',
             urlArgs: "bust=" + (new Date()).getTime(),

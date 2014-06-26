@@ -1,4 +1,4 @@
-define('KBaseMemeRunParametersCard',
+kb_define('KBaseMemeRunParametersCard',
     [
         'jquery',
 	'kbwidget'

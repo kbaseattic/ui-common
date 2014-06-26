@@ -3,7 +3,7 @@
 
 */
 
-define('kbaseIrisTerminalDispatchHistory',
+kb_define('kbaseIrisTerminalDispatchHistory',
     [
         'kbaseIrisConfig'
     ],

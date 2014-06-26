@@ -3,7 +3,7 @@
 
 */
 
-define('kbaseIrisTerminalDispatchAuth',
+kb_define('kbaseIrisTerminalDispatchAuth',
     [
         'kbaseIrisConfig'
     ],

@@ -1,4 +1,4 @@
-define('kbaseFbaTabs',
+kb_define('kbaseFbaTabs',
     [
         'jquery',
 	'kbwidget'

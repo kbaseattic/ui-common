@@ -2,7 +2,7 @@
 
 */
 
-define('kbaseVenndiagram',
+kb_define('kbaseVenndiagram',
     [
         'jquery',
         'd3',
@@ -199,7 +199,7 @@ define('kbaseVenndiagram',
             var overlapRadius = radius * (1 - overlap);
 
             var numCircles = 3;
-console.log(dataset.c1.fillColor);
+
             var circleData = [
 
                 {

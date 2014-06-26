@@ -2,7 +2,7 @@
 
 */
 
-define('kbaseScatterplot',
+kb_define('kbaseScatterplot',
     [
         'jquery',
         'd3',

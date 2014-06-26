@@ -25,7 +25,7 @@ Widget to create an accordion control. Easy to use!
 
 */
 
-define('kbaseAccordion', ['jquery', 'kbwidget'], function( $ ) {
+kb_define('kbaseAccordion', ['jquery', 'kbwidget'], function( $ ) {
 
 
     $.KBWidget({

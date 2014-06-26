@@ -1,4 +1,4 @@
-define('iris',
+kb_define('iris',
     [
         'kbaseIrisConfig',
         'kbaseLogin',
@@ -12,7 +12,6 @@ define('iris',
         'kbaseIrisFileEditor',
         'kbaseIrisConfig',
         'kbaseIrisWhatsNew',
-//        'kbaeIrisTerminalDispatch',
         'vis',
     ],
     function() {

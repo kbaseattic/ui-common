@@ -36,7 +36,7 @@
 
 */
 
-define('kbaseBox', ['jquery', 'kbwidget', 'kbaseButtonControls'], function( $ ) {
+kb_define('kbaseBox', ['jquery', 'kbwidget', 'kbaseButtonControls'], function( $ ) {
 
     $.KBWidget({
 

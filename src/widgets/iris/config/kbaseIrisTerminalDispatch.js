@@ -1,4 +1,4 @@
-define('kbaseIrisTerminalDispatch',
+kb_define('kbaseIrisTerminalDispatch',
     [
         'kbaseIrisConfig',
         'kbaseIrisTerminalDispatchTutorial',

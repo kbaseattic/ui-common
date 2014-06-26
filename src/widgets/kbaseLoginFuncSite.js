@@ -46,7 +46,7 @@
     		console.log("Tried to log in and got back: "); console.log(args);
     	});
 
-*/define('kbaseLogin',
+*/kb_define('kbaseLogin',
     [
         'jquery',
 	'kbwidget',

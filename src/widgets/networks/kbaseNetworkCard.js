@@ -1,6 +1,6 @@
 /**
    Create a card with a cytoscape.js viewer for a network
- */define('KBaseNetworkCard',
+ */kb_define('KBaseNetworkCard',
     [
         'jquery',
 	'kbwidget'

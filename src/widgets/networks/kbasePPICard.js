@@ -1,6 +1,6 @@
 /**
    Create a card with a table showing a PPI dataset
- */define('KBasePPICard',
+ */kb_define('KBasePPICard',
     [
         'jquery',
 	'kbwidget'

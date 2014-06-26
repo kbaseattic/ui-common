@@ -1,4 +1,4 @@
-define('KBaseMAKResultCard',
+kb_define('KBaseMAKResultCard',
     [
         'jquery',
 	'kbwidget'

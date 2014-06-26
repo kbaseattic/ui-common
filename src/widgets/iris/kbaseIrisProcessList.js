@@ -3,7 +3,7 @@
 
 */
 
-define('kbaseIrisProcessList',
+kb_define('kbaseIrisProcessList',
     [
         'jquery',
         'kbwidget',

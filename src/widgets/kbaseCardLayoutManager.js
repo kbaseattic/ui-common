@@ -9,11 +9,10 @@
  * username_home workspace. This might change later, dependent on input
  * from the UI and UX teams.
  *
- */define('KBaseCardLayoutManager',
+ */kb_define('KBaseCardLayoutManager',
     [
         'jquery',
 	'kbwidget',
-	'kbaseClientError'
     ],
     function ($) {
 

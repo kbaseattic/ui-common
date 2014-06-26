@@ -1,4 +1,4 @@
-define('KBaseTomtomHitsCard',
+kb_define('KBaseTomtomHitsCard',
     [
         'jquery',
 	'kbwidget'

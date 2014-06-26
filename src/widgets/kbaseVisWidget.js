@@ -2,7 +2,7 @@
 
 */
 
-define('kbaseVisWidget',
+kb_define('kbaseVisWidget',
     [
         'jquery',
         'd3',

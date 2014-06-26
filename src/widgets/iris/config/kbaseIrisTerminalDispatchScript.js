@@ -3,7 +3,7 @@
 
 */
 
-define('kbaseIrisTerminalDispatchScript',
+kb_define('kbaseIrisTerminalDispatchScript',
     [
         'kbaseIrisConfig'
     ],

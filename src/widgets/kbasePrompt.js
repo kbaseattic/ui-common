@@ -52,7 +52,7 @@
 
 */
 
-define('kbasePrompt',
+kb_define('kbasePrompt',
     [
         'jquery',
         'kbwidget',

@@ -1,4 +1,4 @@
-define('kbaseRxnModal',
+kb_define('kbaseRxnModal',
     [
         'jquery',
 	'kbwidget',

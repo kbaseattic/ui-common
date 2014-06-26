@@ -1,7 +1,7 @@
 /**
  * Made to work with the landing page.
  * This initializes all card positions relative to the #app div.
- */define('KBaseGenomeCardManager',
+ */kb_define('KBaseGenomeCardManager',
     [
         'jquery',
 	'kbwidget'

@@ -2,7 +2,7 @@
 
 
 */
-define('kbaseIrisGrammar',
+kb_define('kbaseIrisGrammar',
     [
         'jquery',
         'kbwidget',

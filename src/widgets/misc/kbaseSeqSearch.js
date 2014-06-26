@@ -1,4 +1,4 @@
-define('kbaseSeqSearch',
+kb_define('kbaseSeqSearch',
     [
         'jquery',
 	'kbwidget'

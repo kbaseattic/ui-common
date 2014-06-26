@@ -22,7 +22,7 @@
 
 */
 
-define('kbaseIrisCommands',
+kb_define('kbaseIrisCommands',
     [
         'jquery',
         'kbaseAccordion',

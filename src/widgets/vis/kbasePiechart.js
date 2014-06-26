@@ -2,7 +2,7 @@
 
 */
 
-define('kbasePiechart',
+kb_define('kbasePiechart',
     [
         'jquery',
         'd3',

@@ -1,4 +1,4 @@
-define('vis',
+kb_define('vis',
     [
         'kbaseBarchart',
         'kbaseHeatmap',

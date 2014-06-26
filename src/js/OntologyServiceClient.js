@@ -3,7 +3,7 @@
 
 */
 
-define('OntologyServiceClient',
+kb_define('OntologyServiceClient',
     [
         'jquery',
     ],

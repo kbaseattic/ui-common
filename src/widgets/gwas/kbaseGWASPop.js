@@ -1,4 +1,4 @@
-define('KBaseGWASPop',
+kb_define('KBaseGWASPop',
     [
         'jquery',
 	'kbwidget'

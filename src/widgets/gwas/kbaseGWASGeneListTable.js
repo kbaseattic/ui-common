@@ -1,4 +1,4 @@
-define('KBaseGWASGeneListTable',
+kb_define('KBaseGWASGeneListTable',
     [
         'jquery',
 	'kbwidget'

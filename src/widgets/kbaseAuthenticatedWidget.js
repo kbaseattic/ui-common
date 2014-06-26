@@ -2,7 +2,7 @@
 
 */
 
-define('kbaseAuthenticatedWidget',
+kb_define('kbaseAuthenticatedWidget',
     [
         'jquery',
         'kbwidget',

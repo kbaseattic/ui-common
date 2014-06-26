@@ -4,10 +4,41 @@
 
     <head>
 
-        <link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <!--<link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
         <link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
 
-        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>-->
+
+<link href="/ext/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="/ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+<script src="/ext/jquery/jquery-1.10.2.min.js"></script>
+<script src="/ext/jquery-ui/1.10.3/js/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="/ext/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="/ext/d3/d3.v3.min.js"></script>
+<script src="/ext/handlebars/handlebars-v1.3.0.js"></script>
+
+<script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+
+<script type = 'text/javascript'>
+    var kb_use_require = true;
+    var kb_norequire = function(deps, callback) {
+        callback(jQuery);
+    };
+    var kb_nodefine = function(module, deps, callback) {
+        callback(jQuery);
+    };
+    if (kb_use_require) {
+        kb_define = define;
+        kb_require = require;
+    }
+    else {
+        kb_define = kb_nodefine;
+        kb_require = kb_norequire;
+    }
+</script>
+
+
+
 
 <style>
 .bar {
@@ -43,17 +74,22 @@
                     return decodeURIComponent(results[1].replace(/\+/g, " "));
                 }
 
-                require(['kbpaths'], function() {
-                    require(['jquery', 'd3', 'vis',
+                kb_require(['kbpaths'], function() {
+                    kb_require(['jquery', 'd3', 'vis',
                         ], function($) {
                         $(function() {
 
                             var pos = getParameterByName('pos') || 'final';
 
+function action(d) {
+    alert(d.label);
+}
+
                             var $venn = $('#venn').kbaseVenndiagram(
                                 {
                                 //debug : true,
-
+ZEDo : 2 * Math.PI * 25 / 360,
+transitionTime : 250,
                                     startingPosition : pos,
                                     //choppedGroups : true,
                                     labels : true,
@@ -61,45 +97,51 @@
                                     xLabel      : 'Some useful experiment',
                                     sortSubgroups:undefined,
 
-                                    dataset :
-                                        [
-                                            [50, 5,0,0],
-                                            [5, 0,5,0],
-                                            [0, 5,50,0],
-                                            [0,0,0,5],
-                                        ]
+                                    dataset : {
 
-                                    /*dataset :
-                                        [
-                                            [11975,  5871, 8916, 2868],
-                                            [ 1951, 10048, 2060, 6171],
-                                            [ 8010, 16145, 8090, 8045],
-                                            [ 1013,   990,  940, 6907]
-                                        ]//*/
+                                        c1 : {
+                                            label : 'Molecular Function',
+                                            value : 200,
+                                            tooltip : 'c1!',
+                                            action : action,
+                                            fillColor : 'purple',
+                                        },
+                                        c2 : {
+                                            label : 'Biological Process',
+                                            value : 200,
+                                            tooltip : 'c2!',
+                                            fillColor : 'cyan',
+                                        },
+                                        c3 : {
+                                            label : 'Cellular Component',
+                                            value : 200,
+                                            tooltip : 'c3!',
+                                            fillColor : 'yellow',
+                                        },
+
+                                        c1c2 : {
+                                            value : 23,
+                                            tooltip : 'c1c2!'
+                                        },
+                                        c1c3 : {
+                                            value : 161,
+                                            tooltip : 'c1c3!'
+                                        },
+                                        c2c3 : {
+                                            value : 56,
+                                            tooltip : 'c2c3!'
+                                        },
+                                        c1c2c3 : {
+                                            value : 273,
+                                            tooltip : 'c1c2c3!'
+                                        },
+                                    },
+
+
 
                                 }
                             );
-//setInterval(function() {$venn.options.ZEDo += Math.PI / 100; $venn.renderChart()}, $venn.options.transitionTime);
 
-                           $('#random-venn').on('click', function(e) {
-                                var newDataset = [];
-                                var numChords = Math.floor(Math.random() * 10);
-                                for (var i = 0; i < numChords; i++) {
-                                    newDataset[i] = [];
-                                    for (var j = 0; j < numChords; j++) {
-                                        newDataset[i][j] = Math.floor(Math.random() * 12000)
-                                    }
-                                }
-                                console.log(newDataset);
-$venn.options.radius = Math.floor(Math.random() * 190);
-$venn.options.overlap = Math.random();
-                                $venn.setDataset(newDataset);
-
-
-                            });
-
-
-                            //$('#random-chord').trigger('click');
 
                     });
                 });});
@@ -118,7 +160,6 @@ $venn.options.overlap = Math.random();
 
         <!--<div style = 'max-width : 800px; overflow : scroll'>-->
             <div id = 'venn' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
-            <button id = 'random-venn'>Randomize Venn Diagram</button>
         <!--</div>-->
 
         <div style = 'display : none'>

@@ -28,7 +28,7 @@
     );
 */
 
-define('kbaseButtonControls',
+kb_define('kbaseButtonControls',
     [
         'jquery',
         'bootstrap',

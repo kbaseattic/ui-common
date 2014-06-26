@@ -2,7 +2,7 @@
 
 */
 
-define('kbaseCircularHeatmap',
+kb_define('kbaseCircularHeatmap',
     [
         'jquery',
         'd3',

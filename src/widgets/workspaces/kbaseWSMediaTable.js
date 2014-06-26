@@ -1,4 +1,4 @@
-define('kbaseWSMediaTable',
+kb_define('kbaseWSMediaTable',
     [
         'jquery',
 	'kbwidget',

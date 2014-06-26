@@ -2,7 +2,7 @@
 
 */
 
-define('kbaseLineSerieschart',
+kb_define('kbaseLineSerieschart',
     [
         'jquery',
         'd3',

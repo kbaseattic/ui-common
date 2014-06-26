@@ -1,4 +1,4 @@
-define('KBaseSpecStorageCard',
+kb_define('KBaseSpecStorageCard',
     [
         'jquery',
 	'kbwidget'

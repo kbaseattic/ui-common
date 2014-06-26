@@ -1,4 +1,4 @@
-define('KBaseSpecFunctionCard',
+kb_define('KBaseSpecFunctionCard',
     [
         'jquery',
 	'kbwidget'

@@ -1,4 +1,4 @@
-define('KBaseCmonkeyClusterCard',
+kb_define('KBaseCmonkeyClusterCard',
     [
         'jquery',
 	'kbwidget'

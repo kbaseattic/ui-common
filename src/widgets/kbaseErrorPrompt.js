@@ -15,7 +15,7 @@
 
 */
 
-define('kbaseErrorPrompt',
+kb_define('kbaseErrorPrompt',
     [
         'jquery',
         'kbasePrompt',
