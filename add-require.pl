@@ -66,7 +66,7 @@ sub rewrite {
     my $deps = join(",\n\t", map {"'$_'"} @deps);
 
 return <<"eDef";
-define('$name',
+kb_define('$name',
     [
         $deps
     ],
