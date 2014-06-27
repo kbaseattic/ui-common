@@ -1356,7 +1356,12 @@ angular.module('ws-directives')
                         case 'PhenotypeSet': 
                             route = 'ws.phenotype';
                             break; 
+                        case 'PhenotypeSimulationSet': 
+                            route = 'ws.simulation';
+                            break;     
                     }
+
+
 
 
                     if (route) {

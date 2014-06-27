@@ -498,10 +498,10 @@ angular.module('lp-directives')
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
-
+            
             var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
 			$.when(prom).done(function(data) {
-			
+			  
                 $(p.body()).kbasePhenotypeSet({data: data})
                 
             }).fail(function(e){
@@ -512,6 +512,31 @@ angular.module('lp-directives')
         }
     };
 })
+
+
+.directive('simulation', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Simulation Set Data', 
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            //console.log("Here 1");
+
+            var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
+            $.when(prom).done(function(data) {
+            
+                $(p.body()).kbaseSimulationSet({data: data})
+                
+            }).fail(function(e){
+                $(ele).rmLoading();
+                $(ele).append('<div class="alert alert-danger">'+
+                                e.error.message+'</div>')
+            });
+        }
+    };
+})
+
 
 .directive('rxndetail', function() {
     return {
