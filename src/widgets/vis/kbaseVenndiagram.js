@@ -239,6 +239,15 @@ console.log(circleData);
                     fontSize : this.options.circleFontSize,
                 },
                 {
+                    angle : circleData[0].angle,
+                    //label : dataset.c1.label,
+                    value : dataset.c1.value,
+                    radius : overlapRadius * 1.3,
+                    anchor : 'end',
+                    fontSize : this.options.circleFontSize,
+                    dy : '1.5em',
+                },
+                {
                     angle : circleData[1].angle,
                     label : dataset.c2.label,
                     value : dataset.c2.value,
@@ -247,12 +256,30 @@ console.log(circleData);
                     fontSize : this.options.circleFontSize,
                 },
                 {
+                    angle : circleData[1].angle,
+                    //label : dataset.c2.label,
+                    value : dataset.c2.value,
+                    radius : overlapRadius * 1.3,
+                    anchor : 'start',
+                    fontSize : this.options.circleFontSize,
+                    dy : '1.5em',
+                },
+                {
                     angle : circleData[2].angle,
                     label : dataset.c3.label,
                     value : dataset.c3.value,
                     radius : overlapRadius * 1.3,
                     anchor : 'middle',
                     fontSize : this.options.circleFontSize,
+                },
+                {
+                    angle : circleData[2].angle,
+                    //label : dataset.c3.label,
+                    value : dataset.c3.value,
+                    radius : overlapRadius * 1.3,
+                    anchor : 'middle',
+                    fontSize : this.options.circleFontSize,
+                    dy : '1.5em',
                 },
                 {
                     angle : 2 * Math.PI * 90 / 360,
@@ -446,7 +473,7 @@ arcs.exit().remove();
 
                 this
                     .attr("text-anchor", "middle")
-                    .attr('dy', '0.5em')
+                    .attr('dy', function (d) { return d.dy || '0.5em'} )
                     .attr('cursor', 'default')
                 ;
 
