@@ -48,15 +48,20 @@ var app = angular.module('landing-pages',
         })
 
     $stateProvider
-        .state('narrative', {
-          url: "/narrative/",
-          templateUrl: 'views/narrative/home.html',
-          controller: 'Narrative'
-        }).state('narrative.projects', {
+        .state('narratives', {
+          url: "/narratives/",
+          templateUrl: 'views/ws/narratives.html',
+          controller: 'NarrativeCtrl'
+        }).state('narratives.table', {
+          url: ":tab",
+          templateUrl: 'views/ws/narrative-table.html',
+          controller: 'NarrativeCtrl'
+        })
+        /*.state('narrative.projects', {
           url: "projects/",
           templateUrl: 'views/narrative/projects.html',
           controller: 'NarrativeProjects'
-        })
+        })*/
 
     // workspace browser routing
     $stateProvider

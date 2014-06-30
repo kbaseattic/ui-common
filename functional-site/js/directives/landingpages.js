@@ -505,6 +505,7 @@ angular.module('lp-directives')
             var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
             $.when(prom).done(function(data) {
                 var data = data[0].data;
+                console.log(data)
                 buildTable(data)
             }).fail(function(e){
                 $(ele).rmLoading();
@@ -513,27 +514,17 @@ angular.module('lp-directives')
             });
 
 
-
             function buildTable(data) {
                 console.log(data)
                 var container = $(p.body());
 
-                // add area for tabs and tab content
-                /*
-                var tabs = $('<ul class="nav nav-tabs" id="myTab">');
-                container.append(tabs);
-                var tab_content = $('<div class="tab-content">');
-                container.append(tab_content)
-
-                tabs.append('<li class="active"><a data-id="table" data-toggle="tab">table</a></li>');
-                */
-
                 var table = $('<table class="table table-bordered table-striped"'+
                                     'style="width: 100%;">');
-
-                var tabs = container.tabs([{name: 'Table', content: table, active: true}]);
+                var tabs = container.tabs({tabs: [{name: 'Table', 
+                                                  content: table, 
+                                                  active: true}]
+                                         });
                  
-
                 var tableSettings = {
                     "sPaginationType": "bootstrap",
                     "iDisplayLength": 10,
@@ -544,11 +535,9 @@ angular.module('lp-directives')
                       { "sTitle": "ID", 'mData': 'id'}, //"sWidth": "10%"
                       { "sTitle": "Type", 'mData': 'type'},
                       { "sTitle": "Ortholog Count", 'mData': function(d) {
-                        return '<a class="show-orthologs" data-id="'+d.id+'">'
-                                +d.orthologs.length+'</a>'
-                      },
-
-
+                            return '<a class="show-orthologs" data-id="'+d.id+'">'
+                                    +d.orthologs.length+'</a>'
+                          },
                       },
                     ],
                     "oLanguage": {
@@ -559,33 +548,19 @@ angular.module('lp-directives')
                 }
 
                 var orthologs = data.orthologs;
+                tableSettings.aaData = orthologs;
 
-                // not needed
-                var aaData = []
-                for (var i in orthologs) {
-                    aaData.push(orthologs[i])
-                }
-
-                tableSettings.aaData = aaData;
 
                 // create the table
                 table.dataTable(tableSettings);
-                //events();
-
 
                 function events() {
                     // event for clicking on ortholog count
                     $('.show-orthologs').unbind('click');
                     $('.show-orthologs').click(function() {
                         var id = $(this).data('id');
-                        tabs.addTab({name: id});
-
-                        console.log(tabs.tab(id))
-                        tabs.tab(id).click(function() {
-                            var info = getOrthologInfo(id);
-                            console.log(info)
-                            tabs.addContent({name:id, content:info})
-                        })
+                        var info = 'blah blah';
+                        tabs.addTab({name: id, content: info, removable: true});
                     })
                 }
 
@@ -601,10 +576,6 @@ angular.module('lp-directives')
                         }
                     }
                 }
-
-
-
-
             }
 
 

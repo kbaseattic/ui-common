@@ -464,6 +464,14 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 
+
+.controller('NarrativeCtrl', function($scope, $stateParams, $location) {
+    $scope.tab = $stateParams.tab;
+
+
+
+})
+
 .controller('Narrative', function($scope, $stateParams, $location, kbaseLogin, $modal, FeedLoad) {
     //changeNav('narrative', 'newsfeed');
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives

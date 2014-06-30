@@ -1,0 +1,77 @@
+
+<div class="row">
+
+    <div class="col-md-3" id="ws-sidebar">
+        <ul class="nav nav-tabs">
+            <li ng-class="{ active: $state.includes('narratives')}">
+                <a ui-sref="narratives()" >Narratives</a>
+            </li>
+            <li ng-class="{ active: $state.includes('ws')}">
+                <a ui-sref="ws">Workspaces</a>
+            </li>
+        </ul>
+        <div class="narrative-sidebar-section">
+            <table class="table narrative-filters" >
+                <tr>
+                    <td class="select-nar">
+                        <div class="badge">12</div> 
+                        <span> My Narratives</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="select-nar">
+                        <div class="badge">2</div> 
+                        <span> Shared Narratives</span>                        
+                    </td>
+                </tr>
+                <tr>
+                    <td class="select-nar">
+                        <div class="badge">43</div> 
+                        <span> Featured Narratives</span>                        
+                    </td>
+                </tr>
+                <tr>
+                    <td class="select-nar">
+                        <div class="badge">23</div> 
+                        <span> Public Narratives</span>                        
+                    </td>
+                </tr>                
+            </table>
+
+            <h3 class="sidebar-header">RECENT NARRATIVES</h3>
+            <div recentnarratives>
+                <ul class="recent-nars" ng-repeat="nar in narratives | orderBy:'timestamp':true | limitTo:5">
+                    <li><a href="{{nar_url}}/ws.{{nar.wsid}}.obj.{{nar.id}}">{{nar.name}}</a><br>
+                        <div class="recent-nar-time text-muted">{{nar.nealtime}}</div>
+                    </li>
+                </ul>
+            </div>
+            <a class="pull-right" href="#/narrative/projects/">View all</a>
+            <br>
+
+            <!--<h3 class="sidebar-header">RECENT PROJECTS</h3>
+            <div recentprojects>
+                <ul class="recent-projects" ng-repeat="nar in projects | orderBy:'timestamp':true | limitTo:5">
+                    <li>{{nar.name}}<span class="text-mutted pull-right">{{nar.nealtime}}</span>
+                    </li>
+                </ul>
+            </div>-->
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="narrative-view" ui-view>
+            <!--<div ng-show="!selected_ws">
+                <span class="text-danger">No Workspace Selected</span><br>
+                <small>Please select a workspace from the left.</small>
+            </div>-->
+
+
+
+
+
+        </div>
+    </div>
+</div>
+
+
