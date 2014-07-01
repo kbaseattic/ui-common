@@ -1412,6 +1412,7 @@ angular.module('ws-directives')
                         case 'Media': 
                             route = 'ws.media';
                             break; 
+
                         case 'PhenotypeSet':
                             route = 'ws.phenotype';
                             break;

@@ -143,8 +143,14 @@ var app = angular.module('landing-pages',
           url: "pangenome/:ws/:id",
           templateUrl: 'views/ws/sortable/pangenome.html',
           controller: 'WBLanding'
+        }).state('ws.phenotype', {
+          url: "phenotype/:ws/:id",
+          templateUrl: 'views/ws/phenotype.html',
+          controller: 'WBLanding'
         }) 
- 
+
+
+
 
 
     // not in use
