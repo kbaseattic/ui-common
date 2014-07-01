@@ -491,7 +491,27 @@ angular.module('lp-directives')
     };
 })
 
-<<<<<<< HEAD
+
+.directive('phenotype', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Phenotype Set Data', 
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+
+            var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
+			$.when(prom).done(function(data) {
+                $(p.body()).kbasePhenotypeSet({data: data})
+            }).fail(function(e){
+                $(ele).rmLoading();
+                $(ele).append('<div class="alert alert-danger">'+
+                                e.error.message+'</div>')
+            });
+        }
+    }
+})
+
 
 
 .directive('pangenome', function() {
@@ -508,28 +528,11 @@ angular.module('lp-directives')
                 var data = data[0].data;
                 console.log(data)
                 buildTable(data)
-=======
-.directive('phenotype', function() {
-    return {
-        link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Phenotype Set Data', 
-                                           rightLabel: scope.ws,
-                                           subText: scope.id});
-            p.loading();
-
-            var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
-			$.when(prom).done(function(data) {
-			
-                $(p.body()).kbasePhenotypeSet({data: data})
-                
->>>>>>> development_csh
             }).fail(function(e){
                 $(ele).rmLoading();
                 $(ele).append('<div class="alert alert-danger">'+
                                 e.error.message+'</div>')
             });
-<<<<<<< HEAD
-
 
             function buildTable(data) {
                 console.log(data)
@@ -537,9 +540,8 @@ angular.module('lp-directives')
 
                 var table = $('<table class="table table-bordered table-striped"'+
                                     'style="width: 100%;">');
-                var tabs = container.tabs({tabs: [{name: 'Table', 
-                                                  content: table, 
-                                                  active: true}]
+                var tabs = container.tabs({tabs: [
+                                            {name: 'Table', content: table, active: true}]
                                          });
                  
                 var tableSettings = {
@@ -566,7 +568,6 @@ angular.module('lp-directives')
 
                 var orthologs = data.orthologs;
                 tableSettings.aaData = orthologs;
-
 
                 // create the table
                 table.dataTable(tableSettings);
@@ -596,8 +597,6 @@ angular.module('lp-directives')
             }
 
 
-=======
->>>>>>> development_csh
         }
     };
 })

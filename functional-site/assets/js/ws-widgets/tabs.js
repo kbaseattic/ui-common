@@ -3,11 +3,11 @@
 
     // Instantiation
     // optional: content, active, removable
-    //      you can make all tabs removable or individual tabs
+    // you can make all tabs removable or individual tabs
 
         var tabs = $('#ele').tabs();
 
-    //or 
+        //or 
 
         var tabs = $('#ele').tabs({tabs: [
                                 {name: 'tab1', content: 'foo text or html', active: true},
@@ -86,13 +86,40 @@
 
             // remove tab and tab content
             this.rmTab = function(name) {
-                tabs.find('a[data-id="'+name+'"]').parent().remove();
-                tab_contents.children('[data-id="'+name+'"]').remove();                
+                var tab = tabs.find('a[data-id="'+name+'"]').parent('li');
+                var tab_content = tab_contents.children('[data-id="'+name+'"]')
+
+                // show the next or prev tab
+                if (tab.next().length > 0) {
+                    var id = tab.next().children('a').data('id');
+                } else {
+                    var id = tab.prev().children('a').data('id');
+                }
+                
+                // effect
+                /*
+                tab.toggle('slide', {
+                         direction: 'left',
+                         duration: 'fast',
+                             complete: function() {
+                                tab.remove();
+                                self.showTab(id);
+                         }
+                     })*/
+
+                // remove the tab
+                tab.remove();
+                tab_content.remove();
             }
 
             // returns tab
             this.tab = function(name) {
                 return tabs.children('[data-id="'+name+'"]');
+            }
+
+            // returns content of tab
+            this.tabContent = function(name) {
+                return tab_contents.children('[data-id="'+name+'"]');
             }
 
             // adds content to existing tab pane; useful for ajax
@@ -108,7 +135,7 @@
                 tabs.find('li').removeClass('active');
                 tab_contents.find('.tab-pane').removeClass('active');
 
-                tabs.children('[data-id="'+id+'"]').addClass('active');
+                tabs.find('a[data-id="'+id+'"]').parent().addClass('active');
                 tab_contents.children('[data-id="'+id+'"]').addClass('active');                
             }
 

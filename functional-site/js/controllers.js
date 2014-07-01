@@ -358,7 +358,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     }
 
     // update on first invocation
-    $scope.updateFavs();    
+    //$scope.updateFavs();    
 
     $scope.processData = function() {
         fav_by_kind = {}
