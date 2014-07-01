@@ -1170,7 +1170,8 @@ angular.module('ws-directives')
 
                 var p = kb.ws.list_objects({workspaces: [ws]});
                 var p2 = kb.ws.list_objects({workspaces: [ws], showOnlyDeleted: 1});
-                var p3 = (USER_ID ? kb.ujs.get_has_state('favorites', 'queue', 0) : undefined);
+                //var p3 = (USER_ID ? kb.ujs.get_has_state('favorites', 'queue', 0) : undefined);
+                var p3 = undefined;
                 var p4 = $.getJSON('landing_page_map.json');
 
                 $.when(p, p2, p3, p4).done(function(objs, deleted_objs, favs, obj_mapping){
@@ -1234,14 +1235,12 @@ angular.module('ws-directives')
             } // end scope.loadObjTable
 
 
-            console.log(scope.tab)
+            console.log('tab!!!!', scope.tab)
+
             if (scope.tab == 'mine') {
                 scope.loadNarTable = loadNarTable();
-                scope.loadNarTable();
             } else {
                 scope.loadObjTable = loadObjTable();
-                scope.loadObjTable();
-
             }
 
             

@@ -62,8 +62,9 @@
                 // tab
                 var tab = $('<li class="'+(p.active ? 'active' :'')+'">')
                 var tab_link = $('<a data-toggle="tab" data-id="'+p.name+'">'+p.name+'</a>')
-                tab.append(tab_link)
+                tab.append(tab_link).hide()
                 tabs.append(tab)
+                tab.toggle('slide', {direction: 'down', duration: 'fast'})
 
                 // add close button if needed
                 if (p.removable || options.removable) {
@@ -96,17 +97,6 @@
                     var id = tab.prev().children('a').data('id');
                 }
                 
-                // effect
-                /*
-                tab.toggle('slide', {
-                         direction: 'left',
-                         duration: 'fast',
-                             complete: function() {
-                                tab.remove();
-                                self.showTab(id);
-                         }
-                     })*/
-
                 // remove the tab
                 tab.remove();
                 tab_content.remove();
