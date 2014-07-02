@@ -67,6 +67,7 @@
             boolean (which is a checkbox)
 
             They all correspond to the same HTML form element
+        placeholder : a placeholder value on a text field. Useful to populate a default.
         value: the value of the input element. NOTE - only applicable to elements with a single value
         values: the possible values of a element which could have multiple values.
                 This can either be a string, in which case it is both the value AND the visible string.
@@ -217,7 +218,7 @@ kb_define('kbaseFormBuilder',
                     fields = [ form[field] ];
                 }
 
-                if (type == 'checkbox') {
+                if (type == 'checkbox' || type == 'boolean') {
                     if (form[field].checked) {
                         ret.push([key]);
                     }
@@ -291,7 +292,10 @@ kb_define('kbaseFormBuilder',
                     for (var i = 0; i < fields.length; i++) {
 
                         if (val.json) {
-                            var json = JSON.parse(fields[i].value);
+                            var json = '';
+                            if (typeof fields[i].value == 'string' && fields[i].value.length) {
+                                json = JSON.parse(fields[i].value);
+                            }
                             if (val.asArray) {
                                 json = [ json ];
                             }
@@ -488,6 +492,10 @@ kb_define('kbaseFormBuilder',
                             ? formInput.label
                             : formInput.name.charAt(0).toUpperCase() + formInput.name.slice(1);
 
+                        if (this.options.rawLabels) {
+                            labelText = formInput.name;
+                        }
+
                         var $label = $.jqElem('label')
                             .addClass('control-label col-sm-4')
                             .append(
@@ -514,6 +522,12 @@ kb_define('kbaseFormBuilder',
                         }
 
                         if (this.options.dispatch[formInput.type]) {
+                            if (formInput.json && formInput.value) {
+                                formInput.value_as_string = JSON.stringify(formInput.value, undefined, 2);
+                            }
+                            else {
+                                formInput.value_as_string = formInput.value;
+                            }
                             $field = this[this.options.dispatch[formInput.type]](formInput);
                         }
                         else {
@@ -768,7 +782,7 @@ kb_define('kbaseFormBuilder',
         buildHiddenField : function(data) {
             return $.jqElem('input')
                     .attr('type', 'hidden')
-                    .attr('value', data.value)
+                    .attr('value', data.value_as_string)
                     .attr('name', data.name)
             ;
         },
@@ -776,7 +790,8 @@ kb_define('kbaseFormBuilder',
         buildTextField : function(data) {
             return $.jqElem('input')
                     .attr('type', 'text')
-                    .attr('value', data.value)
+                    .attr('value', data.value_as_string)
+                    .attr('placeholder', data.placeholder)
                     .attr('name', data.name)
                     .addClass('form-control')
             ;
@@ -785,7 +800,7 @@ kb_define('kbaseFormBuilder',
         buildFileField : function(data) {
             return $.jqElem('input')
                     .attr('type', 'file')
-                    .attr('value', data.value)
+                    .attr('value', data.value_as_string)
                     .attr('name', data.name)
                     .addClass('form-control')
             ;
@@ -795,7 +810,7 @@ kb_define('kbaseFormBuilder',
             var $textArea = $.jqElem('textarea')
                     .attr('name', data.name)
                     .addClass('form-control')
-                    .append(data.value)
+                    .append(data.value_as_string)
             ;
 
             if (data.rows) {
@@ -808,7 +823,7 @@ kb_define('kbaseFormBuilder',
         buildSecureTextField : function(data) {
             return $.jqElem('input')
                     .attr('type', 'password')
-                    .attr('value', data.value)
+                    .attr('value', data.value_as_string)
                     .attr('name', data.name)
                     .addClass('form-control')
             ;
@@ -820,10 +835,10 @@ kb_define('kbaseFormBuilder',
                     .attr('type', 'checkbox')
                     .addClass('form-control')
                     .attr('name', data.name)
-                    .attr('value', data.value);
+                    .attr('value', data.value_as_string);
             ;
 
-            if (data.checked == true) {
+            if (data.checked == true || data.value == true) {
                 $checkbox.prop('checked', true);
             }
 

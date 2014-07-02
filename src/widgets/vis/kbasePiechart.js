@@ -20,6 +20,11 @@ kb_define('kbasePiechart',
 
         version: "1.0.0",
         options: {
+
+            xGutter     : 0,
+            xPadding    : 0,
+            yPadding    : 0,
+
             overColor : 'blue',
             innerRadius : 0,
             outerRadius : 0,
@@ -289,6 +294,10 @@ kb_define('kbasePiechart',
         },
 
         renderChart : function() {
+
+            if (this.dataset() == undefined) {
+                return;
+            }
 
             if (this.dataset().length == 0) {
                 this.initialized = false;
@@ -604,7 +613,7 @@ kb_define('kbasePiechart',
 
             var labelAction = function() { return this };
 
-            var pie = this.data('D3svg').select( this.region('chart') ).selectAll('.pie').data([0]);
+            var pie = this.D3svg().select( this.region('chart') ).selectAll('.pie').data([0]);
             pie.enter().append('g')
                 .attr('class', 'pie')
                 .attr('transform',
@@ -624,7 +633,7 @@ kb_define('kbasePiechart',
                 );
 
             if ($pie.options.pieColor != undefined) {
-                var chartSelection = this.data('D3svg').select( this.region('chart') ).data([0]);
+                var chartSelection = this.D3svg().select( this.region('chart') ).data([0]);
 
                 var pieBG = chartSelection.selectAll('.pieBG').data([0]);
 
@@ -632,7 +641,7 @@ kb_define('kbasePiechart',
                     .innerRadius(0)
                     .outerRadius(radius);
 
-                //var pieBG = this.data('D3svg').select( this.region('chart') ).select('.pie').selectAll('.pieBG').data([0]);
+                //var pieBG = this.D3svg().select( this.region('chart') ).select('.pie').selectAll('.pieBG').data([0]);
                 pieBG.enter().insert('path', '.pie')
                     .attr('class', 'pieBG')
                     .attr('transform',
@@ -718,7 +727,7 @@ kb_define('kbasePiechart',
                     .each('end', function(d) { d3.select(this).remove() } )
                     ;
 
-            var labelG = this.data('D3svg').select( this.region('chart') ).selectAll('.labelG').data([0]);
+            var labelG = this.D3svg().select( this.region('chart') ).selectAll('.labelG').data([0]);
             labelG.enter().append('g')
                 .attr('class', 'labelG')
                 .attr('transform',

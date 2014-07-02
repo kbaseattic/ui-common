@@ -20,6 +20,11 @@ kb_define('kbaseVenndiagram',
 
         version: "1.0.0",
         options: {
+
+            xGutter     : 0,
+            xPadding    : 0,
+            yPadding    : 0,
+
             xOffset : 0,
             yOffset : 0,
             overlap : 0.2,
@@ -354,7 +359,12 @@ console.log(circleData);
                     })
                     .on('click', function(d) {
                         if (d.data.action) {
-                            d.data.action(d.data);
+                            var func = d.data.action;
+                            if (typeof func == 'string') {
+                            console.log("BRING THE FUNC");console.log(func);
+                                func = Function("d", func);
+                            }
+                            func(d.data);
                         }
                     })
             };

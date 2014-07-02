@@ -15,7 +15,9 @@ kb_define('kbaseCircularHeatmap',
 	  parent: "kbasePiechart",
 
         version: "1.0.0",
+
         options: {
+            labels : false,
             draggable : false,
             gradient : false,
             pieColor : 'black',
@@ -46,10 +48,11 @@ kb_define('kbaseCircularHeatmap',
         },
 
         _accessors : [
-
+            {name : 'datasets', setter : 'setDatasets'}
         ],
 
         init : function(options) {
+
             this._super(options);
 
             if (this.options.parent) {
@@ -64,25 +67,32 @@ kb_define('kbaseCircularHeatmap',
 
         setDatasets : function (newDatasets) {
 
-            var standardLength = newDatasets.length ? newDatasets[0] : 0;
+            var $me = this;
+            var _super = $me._super;
+            var sd = function() {
+                var standardLength = newDatasets.length ? newDatasets[0] : 0;
 
-            for (var i = 0; i < newDatasets.length; i++) {
-                if (newDatasets[i].length != standardLength.length) {
-                    throw "Cannot set datasets! Non-standard lengths of circles!";
+                for (var i = 0; i < newDatasets.length; i++) {
+                    if (newDatasets[i].length != standardLength.length) {
+                        throw "Cannot set datasets! Non-standard lengths of circles!";
+                    }
+
+                    for (var j = 0; j < newDatasets[i].length; j++) {
+                        newDatasets[i][j].value = 1 / newDatasets[i].length;
+                    }
                 }
 
-                for (var j = 0; j < newDatasets[i].length; j++) {
-                    newDatasets[i][j].value = 1 / newDatasets[i].length;
+                if ($me.originalInnerRadius == undefined) {
+                    $me.originalInnerRadius = $me.innerRadius();
                 }
-            }
 
-            if (this.originalInnerRadius == undefined) {
-                this.originalInnerRadius = this.innerRadius();
-            }
+                $me.options.innerRadius = 0 - ($me.outerRadius() - $me.originalInnerRadius) / newDatasets.length;
 
-            this.options.innerRadius = 0 - (this.outerRadius() - this.originalInnerRadius) / newDatasets.length;
+                //return $me._super(newDatasets);
+                return _super.call($me, newDatasets);
+            };
 
-            return this._super(newDatasets);
+            $me.callAfterInit(sd);
 
         },
 

@@ -4,10 +4,33 @@
 
     <head>
 
-        <link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <!--<link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
         <link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
 
-        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>-->
+
+<link href="ext/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+<script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+
+<script type = 'text/javascript'>
+    var kb_use_require = true;
+    var kb_norequire = function(deps, callback) {
+        callback(jQuery);
+    };
+    var kb_nodefine = function(module, deps, callback) {
+        callback(jQuery);
+    };
+    if (kb_use_require) {
+        kb_define = define;
+        kb_require = require;
+    }
+    else {
+        kb_define = kb_nodefine;
+        kb_require = kb_norequire;
+    }
+</script>
 
 <style>
 .bar {
@@ -44,11 +67,15 @@
                 }
 
                 require(['kbpaths'], function() {
-                    require(['jquery', 'd3', 'vis',
+                    require(['jquery', 'd3', 'vis', 'kbaseFormBuilder',
                         ], function($) {
                         $(function() {
 
                         var pos = getParameterByName('pos') || 'final';
+
+
+                            var numPies = 30;//Math.floor(Math.random() * 30)
+                            var numSlices = 100;//Math.floor(Math.random() * 100);
 
                             var $hm_c = $('#circularHeatmap').kbaseCircularHeatmap(
                                 {
@@ -66,13 +93,9 @@
                                             startingPosition : pos,
 
                                         }
-
                                 }
                             );
-
-                            var numPies = 30;//Math.floor(Math.random() * 30)
-                            var numSlices = 100;//Math.floor(Math.random() * 100);
-
+//$hm_c.setDatasets($hm_c.options.fudge);
                             $('#full-random-hm_c').on('click', function(e) {
                                 numPies     = Math.floor(Math.random() * 30)
                                 numSlices   = Math.floor(Math.random() * 100);
@@ -103,9 +126,134 @@
                                 };
 
                                 $hm_c.setDatasets(newDataset);
+                                console.log("ND");console.log(newDataset);
+console.log($hmForm.data('datasets-group').find('textarea').val(JSON.stringify(newDataset, undefined, 2)));
 
                             });
 
+                            var $hmForm = $('#heatmapForm').kbaseFormBuilder(
+                                {
+                                    rawLabels : true,
+                                    canSubmit : true,
+                                    canReset : true,
+                                    submitCallback : function(e) {
+                                        if (e) {
+                                            e.preventDefault(); e.stopPropagation();
+                                        }
+                                        var newOptions = $hmForm.getFormValuesAsObject();
+
+                                        $('#circularHeatmap').removeData('kbaseCircularHeatmap');
+                                        $('#circularHeatmap').empty();
+console.log("SETS ON");console.log(newOptions);
+                                        $hm_c = $('#circularHeatmap').kbaseCircularHeatmap(newOptions);
+                                        $('#heatmapInput').text(JSON.stringify(newOptions, undefined, 2));
+
+                                        return false;
+                                    },
+                                    elements : [
+                                        {
+                                            key : 'startingPosition',
+                                            type : 'select',
+                                            values : ['top', 'final', 'slice'],
+                                            selected : pos,
+                                        },
+                                        {
+                                            key : 'innerRadius',
+                                            type : 'string',
+                                            validate : {regex : new RegExp(/^\d*(\.\d+)?$/), msg : 'Must be numeric'},
+                                            placeholder : $hm_c.options.innerRadius,
+                                        },
+                                        {
+                                            key : 'outerRadius',
+                                            type : 'string',
+                                            validate : {regex : new RegExp(/^\d*(\.\d+)?$/), msg : 'Must be numeric'},
+                                            placeholder : $hm_c.options.outerRadius,
+                                        },
+                                        {
+                                            key : 'xGutter',
+                                            type : 'string',
+                                            placeholder : $hm_c.options.xGutter,
+                                        },
+                                        {
+                                            key : 'yGutter',
+                                            type : 'string',
+                                            placeholder : $hm_c.options.yGutter,
+                                        },
+                                        {
+                                            key : 'xPadding',
+                                            type : 'string',
+                                            placeholder : $hm_c.options.xPadding,
+                                        },
+                                        {
+                                            key : 'yPadding',
+                                            type : 'string',
+                                            placeholder : $hm_c.options.yPadding,
+                                        },
+
+                                        {
+                                            key : 'debug',
+                                            type : 'boolean',
+                                        },
+                                        {
+                                            key : 'xLabel',
+                                            type : 'string',
+                                            value : 'Some useful experiment',
+                                        },
+                                        {
+                                            key : 'pieColor',
+                                            type : 'string',
+                                            placeholder : $hm_c.options.pieColor
+                                        },
+                                        {
+                                            key : 'gbgColor',
+                                            type : 'string',
+                                            placeholder : $hm_c.options.gbgColor
+                                        },
+                                        {
+                                            key : 'gmidColor',
+                                            type : 'string',
+                                            placeholder : $hm_c.options.gmidColor
+                                        },
+                                        {
+                                            key : 'gfgColor',
+                                            type : 'string',
+                                            placeholder : $hm_c.options.gfgColor
+                                        },
+                                        {
+                                            key : 'highlightColor',
+                                            type : 'string',
+                                            placeholder : $hm_c.options.highlightColor
+                                        },
+                                        {
+                                            key : 'transitionTime',
+                                            type : 'string',
+                                            validate : {regex : new RegExp(/^\d*(\.\d+)?$/), msg : 'Must be numeric'},
+                                            placeholder : $hm_c.options.transitionTime,
+                                        },
+                                        {
+                                            key : 'childOptions',
+                                            type : 'textarea',
+                                            json : true,
+                                            value :
+                                                {
+
+                                                    'labels' : false,
+                                                    'startingPosition' : pos,
+
+                                                }
+                                        },
+                                        {
+                                            key : 'datasets',
+                                            type : 'textarea',
+                                            json : true,
+                                            value : $hm_c.options.dataset
+                                        },
+
+                                    ]
+                                }
+                            );
+
+                            //$hmForm.options.submitCallback();
                             $('#random-hm_c').trigger('click');
 
                     });
@@ -123,10 +271,19 @@
             The force directed graph has draggable nodes, and they can be selected by drawing on the box.
         </div>
 
-        <!--<div style = 'max-width : 800px; overflow : scroll'>-->
-            <div id = 'circularHeatmap' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+            <div class = 'row'>
+                <div class = 'col-md-6'>
+                    <div id = 'circularHeatmap' style = 'border : 1px solid green; width : 800px; height : 800px; float : left'></div><br clear = 'all'>
             <button id = 'random-hm_c'>Randomize heatmap</button><button id = 'full-random-hm_c'>Fully randomize heatmap</button>
-        <!--</div>-->
+                </div>
+                <div class = 'col-md-5'>
+                    <div style = 'border : 1px solid black' id = 'heatmapForm'></div>
+                </div>
+                <div class = 'col-md-1'>&nbsp;</div>
+                <div class = 'col-md-6' style = 'white-space : pre'>
+                    <div id = 'heatmapInput'></div>
+                </div>
+            </div>
 
         <div style = 'display : none'>
         <div id = 'treeCompare'></div>

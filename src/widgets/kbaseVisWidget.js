@@ -43,10 +43,8 @@ kb_define('kbaseVisWidget',
 
             ticker : 0,
 
-            radialGradients : {},
             radialGradientStopColor : 'black',
 
-            children : [],
             defaultDataset : function() { return [] },
         },
 
@@ -205,6 +203,14 @@ kb_define('kbaseVisWidget',
 
             this._super(options);
 
+            if (this.children() == undefined) {
+                this.children([]);
+            }
+
+            if (this.radialGradients() == undefined) {
+                this.radialGradients({});
+            }
+
             if (this.options.chartID == undefined) {
                 this.options.chartID = this.uuid();
             }
@@ -235,7 +241,7 @@ kb_define('kbaseVisWidget',
 
             this.callAfterInit(
                 $.proxy(function() {
-                    this.render();
+                    //this.render();
                 }, this)
             );
 
@@ -303,7 +309,7 @@ kb_define('kbaseVisWidget',
             var ulDataset = [this.options.ulIcon];
 
             if (this.options.ulIcon) {
-                var ulLabel = this.data('D3svg').select( this.region('UL') ).selectAll('.ULLabel');
+                var ulLabel = this.D3svg().select( this.region('UL') ).selectAll('.ULLabel');
 
                 ulLabel
                     .data(ulDataset)
@@ -342,33 +348,45 @@ kb_define('kbaseVisWidget',
                 newDatasets = [];
             }
 
-            var myDataset = newDatasets.shift();
+            if (this.children() == undefined) {
+                this.children([]);
+            }
 
             //first, peel off our dataset
+            var myDataset = newDatasets.shift();
 
-            this.setDataset(myDataset);
+            var $me = this;
 
-            //we start at 1 becase those are the children of this vis
-            for (var i = 0; i < newDatasets.length; i++) {
-                var child;
+            //the remaining children are datasets of this vis.
+            var initKids = function() {
 
-                if (i < this.children().length) {
-                    child = this.children()[i];
-                    child.reenter( i, newDatasets[i], this );
+                $me.setDataset(myDataset);
+
+                for (var i = 0; i < newDatasets.length; i++) {
+                    var child;
+
+                    if (i < $me.children().length) {
+                        child = $me.children()[i];
+                        child.reenter( i, newDatasets[i], $me );
+                    }
+                    else {
+                        var childOptions = $me.childOptions($me.children().length, newDatasets[i]);
+                        childOptions.parent = $me;
+                        child = $.jqElem('div')[$me.name](childOptions);
+                        $me.children().push(child);
+                    }
+
+                    child.setDataset(newDatasets[i]);
                 }
-                else {
-                    var childOptions = this.childOptions(this.children().length, newDatasets[i]);
-                    childOptions.parent = this;
-                    child = $.jqElem('div')[this.name](childOptions);
-                    this.children().push(child);
+
+                for (var i = newDatasets.length; i < $me.children().length; i++) {
+                    $me.children()[i].setDataset(undefined);
                 }
 
-                child.setDataset(newDatasets[i]);
+                $me.render();
             }
 
-            for (var i = newDatasets.length; i < this.children().length; i++) {
-                this.children()[i].setDataset(undefined);
-            }
+            this.callAfterInit( initKids );
 
         },
 
@@ -391,7 +409,7 @@ kb_define('kbaseVisWidget',
 
             var xLabeldataset = [this.xLabel()];
 
-            var xLabel = this.data('D3svg').select( this.region('yGutter') ).selectAll('.xLabel');
+            var xLabel = this.D3svg().select( this.region('yGutter') ).selectAll('.xLabel');
             xLabel
                 .data(xLabeldataset)
                     .text( this.xLabel() )
@@ -415,7 +433,7 @@ kb_define('kbaseVisWidget',
 
             var yLabeldataset = [this.yLabel()];
 
-            var xLabel = this.data('D3svg').select( this.region('xGutter') ).selectAll('.yLabel');
+            var xLabel = this.D3svg().select( this.region('xGutter') ).selectAll('.yLabel');
             xLabel
                 .data(yLabeldataset)
                     .text( this.yLabel() )
@@ -469,10 +487,10 @@ kb_define('kbaseVisWidget',
                 ;
             }
 
-            var gxAxis = this.data('D3svg').select( this.region('yPadding') ).select('.xAxis');
+            var gxAxis = this.D3svg().select( this.region('yPadding') ).select('.xAxis');
 
             if (gxAxis[0][0] == undefined) {
-                gxAxis = this.data('D3svg').select( this.region('yPadding') )
+                gxAxis = this.D3svg().select( this.region('yPadding') )
                     .append('g')
                         .attr('class', 'xAxis axis')
             }
@@ -499,10 +517,10 @@ kb_define('kbaseVisWidget',
                     .scale(this.yScale())
                     .orient('left');
 
-            var gyAxis = this.data('D3svg').select( this.region('xPadding') ).select('.yAxis');
+            var gyAxis = this.D3svg().select( this.region('xPadding') ).select('.yAxis');
 
             if (gyAxis[0][0] == undefined) {
-                gyAxis = this.data('D3svg').select( this.region('xPadding') )
+                gyAxis = this.D3svg().select( this.region('xPadding') )
                     .append('g')
                         .attr('class', 'yAxis axis')
                         .attr("transform", "translate(" + this.xPaddingBounds().size.width + ",0)")
@@ -587,12 +605,15 @@ kb_define('kbaseVisWidget',
 
                 this.data('D3svg', D3svg);
             }
+
+            //XXX FUCK! D3svg is pointing to a reference to the parent's D3svg, but that might not yet exist. Which means that I need to rewire fucking everything
+            //to use a goddamn method instead. Fuck my life.
+
             else {
                 this.$elem = this.options.parent.$elem;
                 this.width(this.$elem.width());
                 this.height(this.$elem.height());
-                D3svg = this.options.parent.data('D3svg');
-                this.data('D3svg', D3svg);
+                D3svg = this.D3svg();
             }
 
 
@@ -658,6 +679,15 @@ kb_define('kbaseVisWidget',
 
             ;*/
 
+        },
+
+        D3svg : function() {
+            if (this.options.parent) {
+                return this.options.parent.D3svg();
+            }
+            else {
+                return this.data('D3svg');
+            }
         },
 
         region : function(region, asName) {
@@ -794,7 +824,7 @@ kb_define('kbaseVisWidget',
             //I'd prefer to .select('.definitions').selectAll('radialGradient') and then just let
             //d3 figure out the one that appropriately maps to my given grad value...but I couldn't
             //get that to work for some inexplicable reason.
-            var gradient = this.data('D3svg').select('.definitions').selectAll('#' + grad.id)
+            var gradient = this.D3svg().select('.definitions').selectAll('#' + grad.id)
                 .data([grad]);
 
             var newGrad = false;

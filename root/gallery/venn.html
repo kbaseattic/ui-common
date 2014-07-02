@@ -9,13 +9,8 @@
 
         <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>-->
 
-<link href="/ext/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
-<link href="/ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
-<script src="/ext/jquery/jquery-1.10.2.min.js"></script>
-<script src="/ext/jquery-ui/1.10.3/js/jquery-ui-1.10.3.custom.min.js"></script>
-<script src="/ext/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-<script src="/ext/d3/d3.v3.min.js"></script>
-<script src="/ext/handlebars/handlebars-v1.3.0.js"></script>
+<link href="ext/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
 
 <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
 
@@ -75,72 +70,122 @@
                 }
 
                 kb_require(['kbpaths'], function() {
-                    kb_require(['jquery', 'd3', 'vis',
+                    kb_require(['jquery', 'd3', 'vis', 'kbaseFormBuilder',
                         ], function($) {
                         $(function() {
 
-                            var pos = getParameterByName('pos') || 'final';
+                            var $venn = $('#venn').kbaseVenndiagram();
 
-function action(d) {
-    alert(d.label);
-}
-
-                            var $venn = $('#venn').kbaseVenndiagram(
+                            var $vennForm = $('#vennForm').kbaseFormBuilder(
                                 {
-                                //debug : true,
-ZEDo : 2 * Math.PI * 25 / 360,
-transitionTime : 250,
-                                    startingPosition : pos,
-                                    //choppedGroups : true,
-                                    labels : true,
+                                    rawLabels : true,
+                                    canSubmit : true,
+                                    canReset : true,
+                                    submitCallback : function(e) {
+                                        if (e) {
+                                            e.preventDefault(); e.stopPropagation();
+                                        }
+                                        var newOptions = $vennForm.getFormValuesAsObject();
 
-                                    xLabel      : 'Some useful experiment',
-                                    sortSubgroups:undefined,
+                                        $('#venn').removeData('kbaseVenndiagram');
+                                        $('#venn').empty();
 
-                                    dataset : {
+                                        $venn = $('#venn').kbaseVenndiagram(newOptions);
+                                        $('#vennInput').text(JSON.stringify(newOptions, undefined, 2));
 
-                                        c1 : {
-                                            label : 'Molecular Function',
-                                            value : 200,
-                                            tooltip : 'c1!',
-                                            action : action,
-                                            fillColor : 'purple',
-                                        },
-                                        c2 : {
-                                            label : 'Biological Process',
-                                            value : 200,
-                                            tooltip : 'c2!',
-                                            fillColor : 'cyan',
-                                        },
-                                        c3 : {
-                                            label : 'Cellular Component',
-                                            value : 200,
-                                            tooltip : 'c3!',
-                                            fillColor : 'yellow',
-                                        },
-
-                                        c1c2 : {
-                                            value : 23,
-                                            tooltip : 'c1c2!'
-                                        },
-                                        c1c3 : {
-                                            value : 161,
-                                            tooltip : 'c1c3!'
-                                        },
-                                        c2c3 : {
-                                            value : 56,
-                                            tooltip : 'c2c3!'
-                                        },
-                                        c1c2c3 : {
-                                            value : 273,
-                                            tooltip : 'c1c2c3!'
-                                        },
+                                        return false;
                                     },
+                                    elements : [
+                                        {
+                                            key : 'xGutter',
+                                            type : 'string',
+                                            placeholder : $venn.options.xGutter,
+                                        },
+                                        {
+                                            key : 'yGutter',
+                                            type : 'string',
+                                            placeholder : $venn.options.yGutter,
+                                        },
+                                        {
+                                            key : 'xPadding',
+                                            type : 'string',
+                                            placeholder : $venn.options.xPadding,
+                                        },
+                                        {
+                                            key : 'yPadding',
+                                            type : 'string',
+                                            placeholder : $venn.options.yPadding,
+                                        },
 
+                                        {
+                                            key : 'debug',
+                                            type : 'boolean',
+                                        },
+                                        {
+                                            key : 'labels',
+                                            type : 'boolean',
+                                            value : true,
+                                        },
+                                        {
+                                            key : 'xLabel',
+                                            type : 'string',
+                                            value : 'Some useful experiment',
+                                        },
+                                        {
+                                            key : 'transitionTime',
+                                            type : 'string',
+                                            validate : {regex : new RegExp(/^\d*(\.\d+)?$/), msg : 'Must be numeric'},
+                                            placeholder : $venn.options.transitionTime,
+                                        },
+                                        {
+                                            key : 'dataset',
+                                            type : 'textarea',
+                                            json : true,
+                                            value :
+{
+    "c1": {
+      "label": "Molecular Function",
+      "value": 200,
+      "tooltip": "c1!",
+      "action": "alert(d.label);",
+      "fillColor": "purple"
+    },
+    "c2": {
+      "label": "Biological Process",
+      "value": 200,
+      "tooltip": "c2!",
+      "fillColor": "cyan"
+    },
+    "c3": {
+      "label": "Cellular Component",
+      "value": 200,
+      "tooltip": "c3!",
+      "fillColor": "yellow"
+    },
+    "c1c2": {
+      "value": 23,
+      "tooltip": "c1c2!"
+    },
+    "c1c3": {
+      "value": 161,
+      "tooltip": "c1c3!"
+    },
+    "c2c3": {
+      "value": 56,
+      "tooltip": "c2c3!"
+    },
+    "c1c2c3": {
+      "value": 273,
+      "tooltip": "c1c2c3!"
+    }
+  }
+                                        },
 
-
+                                    ]
                                 }
                             );
+
+                            $vennForm.options.submitCallback();
 
 
                     });
@@ -159,7 +204,17 @@ transitionTime : 250,
         </div>
 
         <!--<div style = 'max-width : 800px; overflow : scroll'>-->
-            <div id = 'venn' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+            <div class = 'row'>
+                <div class = 'col-md-6'>
+                    <div id = 'venn' style = 'border : 1px solid green; width : 800px; height : 800px; float : left'></div>
+                </div>
+                <div class = 'col-md-6'>
+                    <div style = 'border : 1px solid black' id = 'vennForm'></div>
+                </div>
+                <div class = 'col-md-6' style = 'white-space : pre'>
+                    <div id = 'vennInput'></div>
+                </div>
+            </div>
         <!--</div>-->
 
         <div style = 'display : none'>
