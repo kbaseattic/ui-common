@@ -241,7 +241,7 @@ kb_define('kbaseVisWidget',
 
             this.callAfterInit(
                 $.proxy(function() {
-                    //this.render();
+                    this.render();
                 }, this)
             );
 
