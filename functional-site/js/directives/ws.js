@@ -25,17 +25,14 @@ angular.module('ws-directives')
             var workspaces = []; 
             scope.workspace_dict = {};
 
-            var nav_height = 100;//238;
+            var nav_height = 150;//238;
 
 
             // This method loads the sidebar data.  
             // Note: this is only called after instantiation when sidebar needs to be refreshed
             scope.loadWSTable = function() {
                 $('#select-box .table').remove();
-                var table = $('<table class="table table-bordered table-condensed table-hover">')
-                //var recent = $('<tr class=""><td><a ui-sref="ws.recent">Recent Narratives</a></td></tr>')
-                //$compile(recent)(scope);
-                //table.append(recent);
+                var table = $('<table class="table table-bordered table-hover ws-selector-table">')
                 $('#select-box').append(table)
 
                 workspaces = []
@@ -95,18 +92,17 @@ angular.module('ws-directives')
                         //var url = "ws.id({ws:'"+name+"'})"
                         var selector = $('<tr data-perm="'+perm+
                                             '" data-global="'+global_perm+
-                                            '" data-owner="'+user+'"><td class="select-ws '
+                                            '" data-owner="'+user+'"><td class="select-ws table-ellipsis '
                                                 +($stateParams.ws == name ? 'selected-ws ' : '' )+
                                                 (name in nar_projs ? 'narrative-project' : '' )+
                                             '" data-ws="'+name+'">'+
-                                            '<div class="badge pull-left">'+obj_count+'</div>'+
-                                            ' &nbsp;<div class="pull-left ellipsis"> '+
-                                            (user == USER_ID ? '<b>'+name+'</b>': name)+'</div></td></tr>');
+                                            '<span class="badge">'+obj_count+'</span> '+
+                                            '<span> '+(user == USER_ID ? '<b>'+name+'</b>': name)+'</span></td></tr>');
                         
 
                         selector.find('td').append('<button type="button" class="btn \
-                                            btn-default btn-xs btn-ws-settings hide pull-right" data-ws="'+name+'">\
-                                            <span class="glyphicon glyphicon-cog"></span></button>');
+                                            btn-default btn-xs btn-ws-settings hide" data-ws="'+name+'">\
+                                            <div class="glyphicon glyphicon-cog"></div></button>');
 
                         // event for showing settings button
                         selector.hover(function() {
@@ -145,7 +141,6 @@ angular.module('ws-directives')
                 // event for clicking on 'create new workspace'
                 $('.btn-new-ws').unbind('click');
                 $('.btn-new-ws').click(function() {
-                    console.log('click')
                     createWorkspaceModal();
                 });
 
@@ -1076,7 +1071,6 @@ angular.module('ws-directives')
                     $compile(table)(scope);
 
                     // reset filter; critical for ignoring cached filter
-                    console.log(scope.type)
                     table.fnFilter((scope.type ? scope.type+'-.*' : ''), getCols(table, 'Type'), true)
 
                     // add trashbin
@@ -1119,8 +1113,7 @@ angular.module('ws-directives')
 
 
 
-            var loadNarTable = function() {
-                console.log('load narrative table')
+            var loadNarTable = function(tab) {
                 var table_id = "nar-table";                 
 
                 var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
@@ -1166,21 +1159,50 @@ angular.module('ws-directives')
 
                 // clear object view every load
                 $(element).html('');
-                $(element).loading('loading '+ws+'...');
+                $(element).loading('loading...');
 
-                var p = kb.ws.list_objects({workspaces: [ws]});
-                var p2 = kb.ws.list_objects({workspaces: [ws], showOnlyDeleted: 1});
+                //var p = kb.narr.list_objects({workspaces: [ws]});
+                //var p2 = kb.ws.list_objects({workspaces: [ws], showOnlyDeleted: 1});
                 //var p3 = (USER_ID ? kb.ujs.get_has_state('favorites', 'queue', 0) : undefined);
-                var p3 = undefined;
-                var p4 = $.getJSON('landing_page_map.json');
+                //var p3 = undefined;
+                //var p4 = $.getJSON('landing_page_map.json');
 
-                $.when(p, p2, p3, p4).done(function(objs, deleted_objs, favs, obj_mapping){
+                function getNars(p, showDeleted) {
+                    var prom = $.when(p).then(function(data){
+                        var proj_ids = []
+                        for (var i in data) {
+                            proj_ids.push(data[i][7])
+                        }
+                        if (showDeleted) {
+                            var prom = kb.nar.get_narratives({project_ids: proj_ids, showOnlyDeleted: 1})
+                        } else {
+                            var prom = kb.nar.get_narratives({project_ids: proj_ids})
+                        }
+
+                        return prom;
+                    })
+                    return prom;
+                }                
+
+                var narProm = kb.ws.list_objects({type: 'KBaseNarrative.Metadata', 
+                                           showHidden: 1, perm: 'a'});
+                //var narPromDeleted = kb.ws.list_objects({type: 'KBaseNarrative.Metadata', 
+                //                           showHidden: 1, perm: 'a', showOnlyDeleted: 1});                
+                var p = getNars(narProm);
+                //var p2 = getNars(narPromDeleted, true);
+
+
+
+                //$.when(p, p2, p3, p4).done(function(objs, deleted_objs, favs, obj_mapping){
+                $.when(p).done(function(narratives){
+                    console.log('narratives', narratives)
+
+                    favs = undefined
                     if (favs) {
                         scope.favs = (favs[0] == 1 ? favs[1] : []);
                     }
 
-                    scope.deleted_objs = deleted_objs;
-                    scope.obj_mapping = obj_mapping[0];
+                    //scope.deleted_objs = deleted_objs;
 
                     $(element).rmLoading();
 
@@ -1188,7 +1210,7 @@ angular.module('ws-directives')
                         class="table table-bordered table-striped" style="width: 100%;"></table>')    
 
                     // format and create object datatable
-                    var tableobjs = formatObjs(objs, obj_mapping);
+                    var tableobjs = formatNarObjs(narratives);
                     var wsobjs = tableobjs[0];
                     var kind_counts = tableobjs[1];
                     tableSettings.aaData = wsobjs;
@@ -1196,12 +1218,12 @@ angular.module('ws-directives')
                     $compile(table)(scope);
 
                     // reset filter; critical for ignoring cached filter
-                    console.log(scope.type);
                     table.fnFilter((scope.type ? scope.type+'-.*' : ''), getCols(table, 'Type'), true);
 
                     // add trashbin
-                    var trash_btn = getTrashBtn();
-                    $('.dataTables_filter').after(trash_btn);
+                    //var trash_btn = getTrashBtn();
+                    //$('.dataTables_filter').after(trash_btn);
+                    // show these options if logged in.
 
                     // add show/hide column settings button
                     var settings_btn = getSettingsBtn(table)
@@ -1210,18 +1232,6 @@ angular.module('ws-directives')
                     $('.settings-dropdown').click(function(e) {
                         e.stopPropagation();
                     });                    
-
-
-                    // show these options if logged in.
-                    if (USER_ID) {
-                        trash_btn.removeClass('hide');
-                    }
-
-                    // if there are objects add type filter,
-                    if (objs.length) {
-                        var type_filter = getTypeFilterBtn(table, kind_counts, scope.type)
-                        $('.table-options').append(type_filter);
-                    }
 
                     //searchColumns()
                     addOptionButtons();
@@ -1237,7 +1247,7 @@ angular.module('ws-directives')
 
             console.log('tab!!!!', scope.tab)
 
-            if (scope.tab == 'mine') {
+            if (scope.tab == 'my-narratives') {
                 scope.loadNarTable = loadNarTable();
             } else {
                 scope.loadObjTable = loadObjTable();
@@ -1328,6 +1338,75 @@ angular.module('ws-directives')
                 }
                 table.fnSetColumnVis( i, bVis ? false : true );
             }
+
+            function formatNarObjs(objs) {
+                var wsobjs = [];
+                var kind_counts = {};
+
+                for (var i in objs) {
+                    var obj = objs[i];
+                    var objid = obj[0]
+                    var id = obj[1];
+                    var full_type = obj[2];
+                    var module = full_type.split('.')[0];
+                    var type = full_type.slice(full_type.indexOf('.')+1);
+                    var kind = type.split('-')[0];
+                    var timestamp = kb.ui.getTimestamp(obj[3].split('+')[0]);
+                    var date = kb.ui.formateDate(timestamp);
+                    var instance = obj[4];
+                    var owner = obj[5];
+                    var wsid = obj[6];
+                    var ws = obj[7];
+                    var bytesize = obj[9];
+                    var size = readableSize(bytesize);
+
+                    var check = '<div class="ncheck obj-check-box check-option"'
+                            + ' data-ws="' + ws + '"'
+                            + ' data-type="' + type + '"'
+                            + ' data-module="' + module + '"'
+                            + ' data-id="' + id + '"></div>';
+
+                    var wsarray = [check, 
+                                   id,
+                                   ws,
+                                   date,
+                                   owner,
+                                   timestamp,
+                                   size,
+                                   bytesize,
+                                   module];
+
+                    if (kind in kind_counts) {
+                        kind_counts[kind] = kind_counts[kind] + 1;
+                    } else {
+                        kind_counts[kind] = 1;
+                    }
+
+                    // determine if saved to favorites
+                    var isFav = false;
+                    for (var i in scope.favs) { 
+                        if (scope.favs[i].ws != ws) continue;
+                        if (scope.favs[i].id == id) {
+                            isFav = true;
+                            break;
+                        } 
+                    }
+
+                    var url = '/narrative/ws.'+wsid+'.obj.'+objid
+                    var new_id = '<a href="'+url+'" target="_blank" class="obj-id nar-id" data-ws="'+ws+'" data-id="'+id+'"'+
+                                    'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
+                                    'ui-sref="'+url+'" >'+
+                                id+'</a> (<a class="show-versions">'+instance+'</a>)'+
+                                (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
+                                '<a class="btn-show-info hide pull-right">More</a>';
+
+
+                    wsarray[1] = new_id;
+                    wsobjs.push(wsarray);
+                }
+                return [wsobjs, kind_counts];
+            }
+
 
             // function that takes json for the object table and formats
             function formatObjs(objs, obj_mapping) {
@@ -1503,6 +1582,7 @@ angular.module('ws-directives')
 
                 // help tooltips
                 $('.show-versions').tooltip({title: 'Show history', placement: 'bottom', delay: {show: 700}});
+                $('.nar-id').tooltip({title: 'Open Narrative', placement: 'bottom', delay: {show: 700}});
                 $('.obj-id').tooltip({title: 'View object', placement: 'bottom', delay: {show: 700}});
                 $('.btn-show-info').tooltip({title: 'Meta data/spec, download, etc.', placement: 'bottom', delay: {show: 700}});
 

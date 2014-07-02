@@ -749,20 +749,9 @@ function ProjectAPI(ws_url, token) {
     // if a specific workspace name is given its metadata will be
     // returned
     this.get_projects = function( p_in ) {
-        var def_params = { perms : ['a'],
-                           workspace_id : undefined };
-        var p = $.extend( def_params, p_in);
-
-        console.log('calling get projects')
-//        META_ws = ws_client.list_objects( {} );
-    
         var prom = ws_client.list_objects({type: 'KBaseNarrative.Metadata', 
                                            showHidden: 1});
-        //var prom = $.when( META_ws).then( function(result) {
-         //               return filter_wsobj( { res: result, perms: p.perms });
-          //         });
-        return prom
-        
+        return prom;
     };
 
 
@@ -947,14 +936,8 @@ function ProjectAPI(ws_url, token) {
     // if no project_ids are given, then all a call will be made to get_projects
     // first - avoid doing this if possible as it will be miserably slow.
     // an array of obj_meta dictionaries will be handed to the callback
-    this.get_narratives = function(p_in) {
-        var def_params = { project_ids : undefined,
-                           error_callback : error_handler,
-                           type: narrative_type,
-                           error_callback: error_handler };
-
-        var p = $.extend( def_params, p_in);
-        
+    this.get_narratives = function(p) {
+        var p = $.extend(p, {project_ids: undefined})
 
         if (p.project_ids) {
             return all_my_narratives( p.project_ids);
@@ -962,7 +945,7 @@ function ProjectAPI(ws_url, token) {
             var proj_prom = self.get_projects().then( function(pdict) {
                 var project_names = []
                 for (var i=0; i <pdict.length;i++) {
-                    project_names.push(pdict[i][7])
+                    project_names.push(pdict[i][7]);
                 }
                 return all_my_narratives(project_names);
             });
@@ -970,8 +953,15 @@ function ProjectAPI(ws_url, token) {
         }
 
         function all_my_narratives(project_ids) {
-            var prom = ws_client.list_objects({
+
+            if (p.showOnlyDeleted) {
+                var prom = ws_client.list_objects({
                      workspaces: project_ids, type: p.type, showHidden: 1});
+            } else {
+                var prom = ws_client.list_objects({
+                     workspaces: project_ids, type: p.type, showHidden: 1});                
+            }
+
             return prom
         };
 

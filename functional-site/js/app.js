@@ -52,16 +52,24 @@ var app = angular.module('landing-pages',
           url: "/narratives/",
           templateUrl: 'views/ws/narratives.html',
           controller: 'NarrativeCtrl'
-        }).state('narratives.table', {
-          url: ":tab",
+        }).state('narratives.mynarratives', {
+          url: "my-narratives",
+          templateUrl: 'views/ws/narrative-table.html',
+          controller: 'NarrativeCtrl'
+        }).state('narratives.shared', {
+          url: "shared",
+          templateUrl: 'views/ws/narrative-table.html',
+          controller: 'NarrativeCtrl'
+        }).state('narratives.public', {
+          url: "public",
+          templateUrl: 'views/ws/narrative-table.html',
+          controller: 'NarrativeCtrl'
+        }).state('narratives.featured', {
+          url: "featured",
           templateUrl: 'views/ws/narrative-table.html',
           controller: 'NarrativeCtrl'
         })
-        /*.state('narrative.projects', {
-          url: "projects/",
-          templateUrl: 'views/narrative/projects.html',
-          controller: 'NarrativeProjects'
-        })*/
+
 
     // workspace browser routing
     $stateProvider

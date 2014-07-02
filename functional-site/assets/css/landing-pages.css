@@ -280,13 +280,31 @@ table {
 
 #select-box tr td{
     padding: 7px;
-
 }
 
+
+.ws-selector-table {
+    background: #fff;    
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0;
+    display: table;
+}
+.ws-selector-table td{
+    width: 100%;
+    position: relative;
+}
+.btn-ws-settings {
+    position: absolute;
+    right: 5px;
+    top: 7px;
+}
 /*#select-box tr :hover {
     background-color: #eee;
 }*/
 
+.narrative-filters .active,
 .selected-ws,
 .selected,
 .selected td{
@@ -294,7 +312,14 @@ table {
     color: #fff;
 }
 
+.narrative-filters a:hover{
+    color: #2a6496;
+    text-decoration: none;
+}
+
+.narrative-filters .active:hover,
 .selected-ws:hover{ /* fixme */
+    color: #fff !important;
     background-color: #428bca !important;
 }
 
@@ -323,7 +348,7 @@ div::-webkit-scrollbar {
 div::-webkit-scrollbar-track {
     /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);*/
     border-radius: 10px;
-    background: #ddd;
+    background: #ececec;
 }
 
 div::-webkit-scrollbar-thumb {
@@ -343,22 +368,12 @@ div::-webkit-scrollbar-thumb {
     height: 31px;
 }
 
-.ws-selector-container {
-    position: fixed;
-    height: 70%;
-
-}
 
 .ws-selector{
-    position: relative;
-    height:100%;
     margin: 10px 0 0 0;
 }
 
-.ws-selector.btn-ws-settings {
-    position: absolute;
-    right: 30px;
-}
+
 
 .object-view {
     margin: 10px 0 0 0;
@@ -371,10 +386,7 @@ div::-webkit-scrollbar-thumb {
 .select-ws .badge {
     margin: 0 4px 0 0 ;
 }
-.select-ws .btn-ws-settings {
-    padding: 3px 7px 0 7px;
-    margin: -3px;
-}
+
 
 .btn-settings-opt {
     width: 80%;
@@ -452,14 +464,51 @@ div::-webkit-scrollbar-thumb {
 
 
 
-/* narrative project page */
+/* narrative page */
+
+.narrative-filters {
+    margin: 5px 0 0 0;
+}
+.narrative-filters a{
+    background: #fff;
+    padding: 10px;
+    display: block;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;    
+    border-left: 2px solid #eee;    
+    border-right: 2px solid #eee;  
+    color: #428bca;
+    font-size: 14px;
+}
+
+.narrative-filters a:last-child {
+    -webkit-border-bottom-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -moz-border-radius-bottomright: 10px;
+    -moz-border-radius-bottomleft: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;    
+}
+
+.narrative-filters a:first-child {
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-top-left-radius: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-topleft: 10px;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;    
+}
+
+
 .recent-nars {
     list-style:  none;
 }
 .recent-nars li {
     margin: 0 0 5px 0;
 }
-.recent-nar-time
+.narrative-feed {
+    margin: 0px 10px;
+}
 
 .narrative-options-container {
     border-bottom: 1px solid #ccc;
@@ -498,11 +547,17 @@ div::-webkit-scrollbar-thumb {
 }
 
 .ellipsis {
-    white-space: nowrap;
+    white-space: nowrap; 
     text-overflow: ellipsis;
-    max-width: 170px;
+    overflow: hidden;
+    max-width: 100%;
     display: inline-block;
-    overflow: hidden
+}
+.table-ellipsis {
+    white-space: nowrap; 
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 95%;  
 }
 
 .ws-descript {
@@ -605,7 +660,7 @@ div::-webkit-scrollbar-thumb {
 }
 .table-hover > tbody > tr:hover > td, 
 .table-hover > tbody > tr:hover > th {
-    background-color: #f9ffff ;
+    background-color: #fcfcfc ;
 }
 
 .proj-opts {
@@ -630,17 +685,49 @@ div::-webkit-scrollbar-thumb {
     height: 44px;
 }
 
+
+
 .narrative-sidebar li {
     list-style: none;
 }
 
+.sidebar .nav-tabs > li.active > a {
+    background: #f9f9f9;
+    border-top: 4px solid #428bca;
+}
+
+@media (min-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 51px;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        display: block;
+        padding: 20px 10px;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        background-color: #f9f9f9;
+        border-right: 2px solid #eee;
+    }
+}
+
+@media (min-width: 768px) {
+    .main {
+    padding-right: 40px;
+    padding-left: 40px;
+    }
+}
+.main {
+padding: 20px;
+}
+/*
 @media (min-width: 960px) {
     .narrative-sidebar {
         position:fixed;
         width: 20%;
-        /*float:left;*/
     }
-}
+}*/
 
 
 .sidebar-header {

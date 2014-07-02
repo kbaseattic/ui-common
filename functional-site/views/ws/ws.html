@@ -1,7 +1,7 @@
 
 <div class="row">
 
-    <div class="col-md-3" id="ws-sidebar">
+    <div class="col-sm-3 col-md-3 sidebar">
         <ul class="nav nav-tabs">
             <li ng-class="{ active: $state.includes('narratives')}">
                 <a ui-sref="narratives" >Narratives</a>
@@ -10,10 +10,10 @@
                 <a ui-sref="ws">Workspaces</a>
             </li>
         </ul>
-        <div class="narrative-sidebar ws-sidebar" wsselector></div>
+        <div class="ws-sidebar" wsselector></div>
     </div>
 
-    <div class="col-md-9">
+    <div class="ccol-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main" >
         <div class="object-view" ui-view>
             <!--<div ng-show="!selected_ws">
                 <span class="text-danger">No Workspace Selected</span><br>
