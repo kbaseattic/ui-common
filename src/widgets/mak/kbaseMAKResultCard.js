@@ -45,6 +45,8 @@
              * Number of motifs
              */
             var self = this;
+			console.log(self.options.id)
+			console.log(self.options.ws)
             this.workspaceClient.get_objects([{workspace: this.options.ws, name: this.options.id}], 
 		    	// function(data){
 					// self.collection = data[0];
@@ -66,7 +68,6 @@
 				function(data){
 					self.collection = data[0];
 					self.$elem.append("<h3>MAK Run Info</h3>");
-					console.log("timepoint")
 			        self.$elem.append($("<div />")
 					.append($("<table/>").addClass("kbgo-table")
 					    .append(self.collection.data.id!=-1 ? $("<tr/>").append("<td>ID</td><td>" + self.collection.data.id + "</td>") : '')
@@ -81,7 +82,6 @@
                         .append(self.collection.data.sets[0].taxon!=-1 ? $("<tr/>").append("<td>NCBI taxonomy id</td><td>" + self.collection.data.sets[0].taxon + "</td>") : '')
                         .append(self.collection.data.sets[0].bicluster_type!=-1 ? $("<tr/>").append("<td>Type of bicluster</td><td>" + self.collection.data.sets[0].bicluster_type + "</td>") : '')
 					));
-					console.log("timepoint")
 				// function(data){
 					// self.collection = data[0];
 					// self.$elem.append("<h3>MAK Run Info</h3>");
@@ -111,7 +111,6 @@
                                             .on("click", 
                                                 function(event) {
                                                     $(self.$elem.selector + " > select option:selected").each(function() {
-    //                                              console.log(event);
                                                     self.trigger("showMAKBicluster", { bicluster: [self.collection.data.sets[0].biclusters[$(this).attr("id")],self.collection.data.sets[0]], title: self.collection.data.sets[0].biclusters[$(this).attr("id")].bicluster_id, event: event });
                                                 });
                                             })

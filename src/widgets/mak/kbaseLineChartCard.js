@@ -25,100 +25,121 @@
 			var self = this;			
 
 			self.$elem.append($("<div id='linechart' style='position:absolute;top:0px;left:0; float:left;'/>"));
-
+			
+			var index = self.options.row[3]
 			var values = self.options.row[0],
 				conditions = self.options.row[1],
 				gene_label = self.options.row[2]
 				// All three above variables are passed from the JSON object
-				
-			var datadict = []
 
-			for (y=0;y<values.length;y++) {
-				datadict.push({
-					"value": values[y],
-					"condition": conditions[y],
-					"gene_label": gene_label
-				})
-			}
+			var merged = [].concat.apply([],values)
+			var count = 1
+			var colorbank = ["#003399","#33CC33","#FF9900","#FF0000","#6600FF","#00FFFF","#993333","#000000","#00CC99","#0000FF"]
+			var colorScale = d3.scale.quantile()
+              .domain([0,gene_label.length-1])
+              .range(colorbank);
+			console.log(colorScale(1))
+			var heatmap = self.options.heatmap
+
+			heatmap.on("click",function(d,i) {
+				if (graph.selectAll("#_"+gene_label[i]).empty() && count<=10) {
+					count++
+					lineDrawer(values[i],conditions,gene_label[i],x,y,i)
+				}
+				else {
+					count--
+					graph.selectAll("#_"+gene_label[i]).remove()
+				}
+			})
 
 			var m = [80, 80, 80, 80]; // margins
 			var w = 600 - m[1] - m[3]; // width
 			var h = 400 - m[0] - m[2]; // height
-					
-			// create a simple data array that we'll plot with a line (this array represents only the Y values, X will just be the index location) 
-			// X scale will fit all values from data[] within pixels 0-w
-			var x = d3.scale.linear().domain([0, values.length-1]).range([0, w]);
-			
-			// Y scale will fit values from 0-10 within pixels h-0 (Note the inverted domain for the y-scale: bigger is up!)
-			
-			var y = d3.scale.linear().domain([d3.min(values), d3.max(values)]).range([h, 0]);
-			// automatically determining max range can work something like this
-			// var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
-			
-			// create a line function that can convert data[] into x and y points
-			var line = d3.svg.line()
-				// assign the X function to plot our line as we wish
-				.x(function(d,i) { 
-					// verbose logging to show what's actually being done
-					// return the X coordinate where we want to plot this datapoint
-					return x(i); 
-				})
-				.y(function(d) { 
-					// verbose logging to show what's actually being done
-					// return the Y coordinate where we want to plot this datapoint
-					return y(d.value); 
-				})
-			 
-				// Add an SVG element with the desired dimensions and margin.
+
 			var graph = d3.select("#linechart")
 				.append("svg")
 				.attr("width", w + m[1] + m[3])
 				.attr("height", h + m[0] + m[2])
 				.append("svg:g")
 				.attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-						
+				
 			var formatAsLabels = function(d,i) {
 				if(conditions[i].length > 10) return conditions[i].substring(0,10)+"...";
 				else return conditions[i];
 			}
-			// create xAxis
-			// var xAxis = d3.svg.axis().scale(x).ticks(conditions.length);
+			
+			var x = d3.scale.linear().domain([0, values[0].length-1]).range([0, w]);
 			var xAxis = d3.svg.axis().scale(x).ticks(conditions.length).tickFormat(formatAsLabels)
 			
 			graph.append("svg:g")
 				.attr("class", "x axis")
 				.attr("transform", "translate(0," + h + ")")
 				.call(xAxis)
-				.selectAll("g.x.axis > g.tick.major > text")
+				.selectAll("g.x.axis > g.tick > text")
 				.append("title")
 				.text(function(i) {return conditions[i]})
-				
-			// graph.select(".xaxis")select("text")
-				// .data(conditions)
-				// .enter()
-				// .append("title")
-				// .text(function(d) {return d})
-			 
-			// create left yAxis
-			var yAxisLeft = d3.svg.axis().scale(y).orient("left");
-			// Add the y-axis to the left
-			graph.append("svg:g")
-				  .attr("class", "y axis")
-				  .attr("transform", "translate(-25,0)")
-				  .call(yAxisLeft);
-						
-			// Add the line by appending an svg:path element with the data line we created above
-			// do this AFTER the axes above so that the line is above the tick-lines
 			
-			graph.append("svg:path")
-				.attr("d", line(datadict))
-				.style("stroke-width",3)
-				.selectAll("line")
-				.data(datadict)
-				.enter()
-				.append("title")
-				.text(function(d) {return d.gene_label})
+			function yAxisMaker(values) {
+			
+				var y = d3.scale.linear().domain([d3.min(values), d3.max(values)]).range([h, 0]);
+				var yAxisLeft = d3.svg.axis().scale(y).orient("left");
+
+				graph.append("svg:g")
+					  .attr("class", "y axis")
+					  .attr("transform", "translate(-25,0)")
+					  .call(yAxisLeft);
 				
+				return y
+				
+			}
+						
+			function lineDrawer(values,conditions,gene_label,x,y,color_ind) {
+			
+				var datadict = []
+
+				for (i=0;i<values.length;i++) {
+					datadict.push({
+						"value": values[i],
+						"condition": conditions[i],
+						"gene_label": gene_label
+					})
+				}
+			
+				var line = d3.svg.line()
+					.defined(function(d) {return d.value!=null})
+					.x(function(d,i) { 
+						return x(i); 
+					})
+					.y(function(d) { 
+						return y(d.value); 
+					})
+					
+				var linePath = graph.append("svg:path")
+					.attr("d", line(datadict))
+					.attr("id","_"+gene_label)
+					.style("stroke-width",3)
+					.style("stroke",colorScale(color_ind))
+					.selectAll("#_"+gene_label)
+					.data(datadict)
+					.enter()
+					.append("title")
+					.text(function(d) {return d.gene_label})
+					
+				var circle = [];
+				for (var i = 0; i < datadict.length; i++) {
+					circle[i] = graph.append("svg:circle")
+						.attr("cx",x(i))
+						.attr("cy",y(datadict[i].value))
+						.attr("r",5)
+						.attr("fill",datadict[i].value!=null?colorScale(color_ind):"white")
+						.attr("id","_"+datadict[i].gene_label)
+						.append("title")
+						.text(datadict[i].gene_label)
+				}
+			}
+			
+			y = yAxisMaker(merged)
+			lineDrawer(values[index],conditions,gene_label[index],x,y,index)
 			return this;
 		},
 		getData: function() {

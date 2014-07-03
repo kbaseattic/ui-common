@@ -1158,32 +1158,6 @@
                     of: data.event
 				});
 			});
-			
-			/**
-             * Event: showLineChart
-             * ------------------
-             * Adds new kbaseLineChart card.
-             */
-			$(document).on("showLineChart", function(event, data) {
-				if (!$("#linechart").length) {
-					self.addNewCard("KBaseLineChartCard",
-						{
-							row: data.row,					
-						},
-						{
-							my: "right top",
-							at: "right+800 bottom",
-							of: data.row
-					});
-				}
-				
-				else {
-					console.log($("#linechart").parent().attr("id"))
-					var linechartID = $("#linechart").parent().attr("id")
-					console.log(this)
-					// $("#linechart").parent().remove()
-				}
-			});
 
             /**
              * Event: showDomains
@@ -1698,20 +1672,46 @@
              * -------------------
              * Adds card with Cytoscape.js view of a network
              */
-        $(document).on("showNetwork", function(event, data) {
-        self.addNewCard("KBaseNetworkCard",
-                {
-                    network: data.network,
-                    netname: data.netname,
-                },
-                {
-                    my: "left top",
-                    at: "left+600 bottom",
-                    of: "#app"
-                }
-                   );
-        });
+			$(document).on("showNetwork", function(event, data) {
+			self.addNewCard("KBaseNetworkCard",
+					{
+						network: data.network,
+						netname: data.netname,
+					},
+					{
+						my: "left top",
+						at: "left+600 bottom",
+						of: "#app"
+					}
+					   );
+			});
+				
+			/**
+             * Event: showLineChart
+             * ------------------
+             * Adds new kbaseLineChart card.
+             */
+			$(document).on("showLineChart", function(event, data) {
 
+				if (!$("#linechart").length) {
+					self.addNewCard("KBaseLineChartCard",
+						{
+							row: data.row,		
+							heatmap: data.heatmap
+						},
+						{
+							my: "right top",
+							at: "right+800 bottom",
+							of: data.row
+					});
+				}
+				else {
+					console.log($("#linechart").parent().attr("id"))
+					var linechartID = $("#linechart").parent().attr("id")
+					// $("#linechart").parent().remove()
+				}
+			});
+		
             $(document).on("helloClick", function(event, data) {
                 window.alert(data.message);
             })
@@ -1789,7 +1789,6 @@
                 var cardWidth = newWidget.options.width ? newWidget.options.width : this.defaultWidth;
                 var cardWorkspace = data.workspace ? data.workspace : this.cdmWorkspace;
             } else {
-                console.log('here')
                 var cardTitle = options.title ? options.title : "";
                 var cardSubtitle = options.id ? options.id : "";
                 var cardWidth = options.width ? options.width : this.defaultWidth;                
@@ -1816,7 +1815,6 @@
             var self = this;
             var newCard = newWidget.$elem.LandingPageCard(cardOptions); //$("#" + newCardId).LandingPageCard(cardOptions);
 
-			console.log(this)
             this.cards[newCardId] = {
                 card: newCard,
                 widget: newWidget,

@@ -80,11 +80,13 @@
 				.text(function (d) { return d.label; })
 				.attr("x", 0)
 				.attr("y", function (d, i) { return i * gridSize; })
+				.attr("class","geneLabel")
 				.style("text-anchor", "end")
 				.attr("transform", "translate(-6," + gridSize / 1.5 + ")")
 				.on("click",function(d,i,event){
-					if (!$("div:contains('"+d.id+"')").length) {self.trigger("showFeature", {featureID: d.id, event: event})}
-					self.trigger("showLineChart", {row: [expression[i],conditions,gene_labels[i]], event: event})
+					if (!$("div.kblpc-subtitle:contains('"+d.id+"')").length) {self.trigger("showFeature", {featureID: d.id, event: event})}
+					// self.trigger("showFeature", {featureID: d.id, event: event})
+					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], heatmap: geneLabels, event: event})
 				})
 				
 			var conditionLabels = svg.selectAll(".conditionLabel")
@@ -102,7 +104,7 @@
 				.attr("transform", function(d, i) { 
 					return "translate(10)rotate(-45 "+(i*gridSize)+",0)" ;
 				} )
-				.attr("class", "conditionLabel mono axis axis-condition-up")
+				.attr("class", "conditionLabel")
 				.append("title").text(function(d) { return d; })
 						
 			  var heatMap = svg.selectAll(".gene")

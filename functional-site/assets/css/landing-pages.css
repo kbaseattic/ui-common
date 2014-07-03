@@ -755,7 +755,6 @@ rect.bordered {
 
 /* For D3 Line Chart Modifications */
 path {
-				stroke: steelblue;
 				stroke-width: 1;
 				fill: none;
 			}
