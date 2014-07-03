@@ -29,15 +29,12 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     });
 })
 
-<<<<<<< HEAD
 .controller('TreeDetail',function($scope, $stateParams) {
     $scope.params = {'treeID' : $stateParams.id,
                      'workspaceID' : $stateParams.ws,
                      'kbCache' : kb}
 })
 
-=======
->>>>>>> master
 .controller('GenomeDetail', function($scope, $stateParams) {
     $scope.params = {'genomeID' : $stateParams.id,
                      'workspaceID' : $stateParams.ws,
@@ -240,6 +237,24 @@ app.controller('RxnDetail', function($scope, $stateParams) {
         },
         stop: function() {
           $(this).find('.panel-body').removeClass('hide');
+        }
+    });
+})
+
+.controller('TreeLanding', function($scope, $stateParams, $location) {
+    $scope.ws = $stateParams.ws;
+    $scope.id = $stateParams.id;
+
+    $( "#sortable-landing" ).sortable({ 
+        placeholder: "drag-placeholder",
+        handle: '.panel-heading',
+        cancel: '.panel-title,.panel-subtitle,.label,.glyphicon',
+        start: function() {
+            $(this).find('.panel-body').addClass('hide');
+            $(this).sortable('refreshPositions');
+        },
+        stop: function() {
+            $(this).find('.panel-body').removeClass('hide');
         }
     });
 })

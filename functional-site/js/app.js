@@ -165,6 +165,18 @@ var app = angular.module('landing-pages',
         });
 
     $stateProvider
+        .state('species-tree', {
+            url: "/species-tree/",
+            templateUrl: 'views/ws/sortable/species_tree.html',
+            controller: 'TreeLanding'
+        })
+        .state('species-treeById', {
+            url: "/species-tree/:id",
+            templateUrl: 'views/ws/sortable/species_tree.html',
+            controller: 'TreeLanding'
+        });
+
+    $stateProvider
         .state('rxns',
             {url:'/rxns', 
              templateUrl: 'views/object-list.html',

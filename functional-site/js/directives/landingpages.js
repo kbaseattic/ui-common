@@ -584,7 +584,7 @@ angular.module('lp-directives')
             // not sure why this isn't loading first.  
             // I'm thinking data should be retrieved here.
 
-            $(p.body()).KBaseGenomeOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb})
+            $(p.body()).KBaseGenomeOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb});
         }
     };
 })
@@ -597,11 +597,21 @@ angular.module('lp-directives')
                                            subText: scope.id,
                                            widget: 'genomewiki'});
             p.loading();
-            $(p.body()).KBaseWikiDescription({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb})
+            $(p.body()).KBaseWikiDescription({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb});
         }
     };
 })
 
-
-
-
+.directive('speciesTree', function($rootScope) {
+    return {
+        link: function($scope, $ele, attrs) {
+            var p = $ele.kbasePanel({ title: 'Species Tree',
+                                      type: 'Tree',
+                                      rightLabel: $scope.ws,
+                                      subText: $scope.id,
+                                      widget: 'tree' });
+            p.loading();
+            $(p.body()).kbaseTree({ treeID: $scope.id, workspaceID: $scope.ws, kbCache: kb, height: 800 });
+        }
+    };
+})

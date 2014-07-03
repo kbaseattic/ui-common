@@ -9,7 +9,8 @@
             kbCache: null,
             treeServiceURL: "http://140.221.85.58:8284/",
             workspaceURL: "http://140.221.84.209:7058/",
-            loadingImage: "static/kbase/images/ajax-loader.gif",
+            loadingImage: "assets/img/ajax-loader.gif",
+            cdmiURL: "http://kbase.us/services/cdmi_api",
             height: null,
         },
 
@@ -19,9 +20,10 @@
             if (!this.options.treeID) {
                 this.renderError("No tree to render!");
             }
-            else if (!this.options.workspaceID) {
-                this.renderError("No workspace given!");
-            }
+            // else if (!this.options.workspaceID) {
+            //     this.renderCDMI();
+            //     this.renderError("No workspace given!");
+            // }
             else if (!this.options.kbCache && !this.authToken()) {
                 this.renderError("No cache given, and not logged in!");
             }
@@ -45,7 +47,10 @@
                 this.$elem.append(this.$canvas);
 
                 knhx_init(this.canvasId, null);
-                this.render();
+                if (this.options.workspaceID)
+                    this.render();
+                else
+                    this.renderCDMI();
             }
 
             return this;
@@ -81,6 +86,19 @@
                 );
             }, this));
             $.when(prom).fail($.proxy(function(error) { this.renderError(error); }, this));
+        },
+
+        renderCDMI: function() {
+//            this.loading(false);
+            var cdmiClient = new CDMI_API(this.options.cdmiURL);
+            console.log("cdmi client");
+            console.log(cdmiClient);
+
+            var prom = cdmiClient.tree_by_id(this.options.treeID);
+            $.when(prom).done($.proxy(function(tree) {
+                kn_actions.plot(tree);
+//                this.loading(true);
+            }));
         },
 
         renderError: function(error) {
