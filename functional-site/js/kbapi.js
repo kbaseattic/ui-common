@@ -475,6 +475,29 @@ function UIUtils() {
     }
            
 
+
+
+    // jQuery plugins that you can use to add and remove a 
+    // loading giff to a dom element.  This is easier to maintain, and likely less 
+    // code than using CSS classes.
+    $.fn.loading = function(text) {
+        $(this).rmLoading()
+
+        if (typeof text != 'undefined') {
+            $(this).append('<p class="text-muted loader">'+
+                 '<img src="assets/img/ajax-loader.gif"> '+text+'</p>');
+        } else {
+            $(this).append('<p class="text-muted loader">'+
+                 '<img src="assets/img/ajax-loader.gif"> loading...</p>')        
+        }
+        return this;
+    }
+
+    $.fn.rmLoading = function() {
+        $(this).find('.loader').remove();
+    }
+
+
 }
 
 

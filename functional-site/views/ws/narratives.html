@@ -2,15 +2,23 @@
 <div class="row">
 
     <div class="col-sm-3 col-md-3 sidebar" id="ws-sidebar">
-        <ul class="nav nav-tabs">
+        <!--<ul class="nav nav-tabs">
             <li ng-class="{ active: $state.includes('narratives')}">
                 <a ui-sref="narratives()" >Narratives</a>
             </li>
             <li ng-class="{ active: $state.includes('ws')}">
                 <a ui-sref="ws">Workspaces</a>
             </li>
-        </ul>
+        </ul>-->
         <div>
+            <div class="narrative-filters">
+                <a ui-sref="narratives.featured" ng-class="{ active: $state.includes('narratives.featured')}" class="select-nar">
+                    <div class="badge">3</div> 
+                    <span> <b>Featured Narratives</b></span>
+                    <span class="glyphicon glyphicon-chevron-right pull-right"></span>
+                </a> 
+            </div>     
+
             <div class="narrative-filters">
                 <a ui-sref="narratives.mynarratives"  ng-class="{ active: $state.includes('narratives.mynarratives')}" class="select-nar">
                     <div class="badge">12</div> 
@@ -22,16 +30,11 @@
                     <span> <b>Shared Narratives</b></span>
                     <span class="glyphicon glyphicon-chevron-right pull-right"></span>
                 </a>
-                <a ui-sref="narratives.featured" ng-class="{ active: $state.includes('narratives.featured')}" class="select-nar">
-                    <div class="badge">43</div> 
-                    <span> <b>Featured Narratives</b></span>
-                    <span class="glyphicon glyphicon-chevron-right pull-right"></span>
-                </a>
                 <a ui-sref="narratives.public" ng-class="{ active: $state.includes('narratives.public')}" class="select-nar">
                     <div class="badge">23</div> 
                     <span> <b>Public Narratives</b></span>  
                     <span class="glyphicon glyphicon-chevron-right pull-right"></span>
-                </a>
+                </a>          
             </div>
 
             <div class="narrative-feed">

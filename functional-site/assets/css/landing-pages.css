@@ -298,7 +298,7 @@ table {
 .btn-ws-settings {
     position: absolute;
     right: 5px;
-    top: 7px;
+    top: 6px;
 }
 /*#select-box tr :hover {
     background-color: #eee;
@@ -557,7 +557,7 @@ div::-webkit-scrollbar-thumb {
     white-space: nowrap; 
     text-overflow: ellipsis;
     overflow: hidden;
-    max-width: 95%;  
+    display: flex;
 }
 
 .ws-descript {

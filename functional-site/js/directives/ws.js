@@ -120,7 +120,6 @@ angular.module('ws-directives')
 
                     workspaces = data;
 
-
                     $('.scroll-pane').css('height', $(window).height()-
                         $('.ws-selector-header').height() - nav_height )
                     events();
@@ -304,406 +303,6 @@ angular.module('ws-directives')
 
             } /* end events */
 
-            function manageModal(ws_name) {
-                var settings = scope.workspace_dict[ws_name];
-
-                var isAdmin;
-                if (settings[5] == 'a') {
-                    isAdmin = true;
-                } else {
-                    isAdmin = false;
-                }
-
-                // table of meta data
-                var table = $('<table class="table table-bordered table-condensed table-striped manage-table">');                
-                var data = [
-                    ['Name', settings[1]],
-                    ['Objects', '~ ' + settings[4] ],
-                    ['Owner', settings[2] ],
-                    ['Your Permission', perm_dict[settings[5]] ],
-                    //['Global Permission', perm_dict[settings[5]] ]
-                ];
-                for (var i=0; i<data.length; i++) {
-                    var row = $('<tr>');
-                    row.append('<td class="manage-modal-attribute"><strong>' + data[i][0] + '</strong></td>'
-                            + '<td class="manage-modal-value">' + data[i][1] + '</td>');
-                    table.append(row);
-                }
-
-                var content = '<div class="ws-description">\
-                                    <h5>Description</h5>\
-                                    <div class="descript-container"></div>\
-                               </div>\
-                               <div class="ws-info">\
-                                    <h5>Info</h5>\
-                               </div>'+
-                               ( (USER_ID && settings[5] != 'n') ?
-                               '<div class="ws-perms">\
-                                    <h5>User Permisions</h5>\
-                                    <div class="perm-container"></div>\
-                               </div>' : '');
-
-                // modal for managing workspace permissions, clone, and delete
-                var permData;
-                var manage_modal = $('<div></div>').kbasePrompt({
-                        title : 'Manage Workspace '+
-                            (USER_ID ? '<a class="btn btn-primary btn-xs btn-edit">Edit <span class="glyphicon glyphicon-pencil"></span></a>' : ''),
-                        body : content,
-                        modalClass : '',
-                        controls : [{
-                            name: 'Close',
-                            type: 'default',
-                            callback: function(e, $prompt) {
-                                    $prompt.closePrompt();
-                                }
-                            }, {
-                            name : 'Save',
-                            type : 'primary',
-                            callback : function(e, $prompt) { //Fixme: yyyeeeahh.
-                                $prompt.addCover();
-                                $prompt.getCover().loading();
-
-                                var prom = savePermissions(ws_name);
-                                prompt = $prompt;
-
-                                // save permissions, then save description, then the global perm //fixme
-                                $.when(prom).done(function() {
-                                    // if description textarea is showing, saving description
-                                    var d = $('.descript-container textarea').val();
-
-                                    // saving description
-                                    var p1 = kb.ws.set_workspace_description({workspace: ws_name, 
-                                        description: d})
-
-                                    $.when(p1).done(function() {
-                                        var new_perm = $('.btn-global-perm option:selected').val();
-                                        // saving global perm
-                                        var p1 = kb.ws.set_global_permission({workspace: ws_name, 
-                                            new_permission: new_perm})
-                                        $.when(p1).done(function() {
-                                            prompt.addCover('Saved.');
-                                            prompt.closePrompt();
-                                            manageModal(ws_name);                                            
-                                        }).fail(function(e){
-                                            prompt.addCover(e.error.message, 'danger');
-                                        })                      
-                                    }).fail(function(e){
-                                        prompt.addCover(e.error.message, 'danger');
-                                    })
-
-                                }).fail(function(e){
-                                    prompt.addCover(e.error.message, 'danger');
-                                })
-                            }
-                        }]
-                    })
-
-                manage_modal.openPrompt();
-                var dialog = manage_modal.data('dialogModal').find('.modal-dialog');
-                dialog.css('width', '500px');
-                var modal_body = dialog.find('.modal-body');  //fixme: an api to the 
-                                                              // widget would be nice for this stuff
-                var modal_footer = dialog.find('.modal-footer');
-                var save_btn = modal_footer.find('.btn-primary');
-                save_btn.attr('disabled', true);
-
-                // add editable global permisssion
-                kb.ws.get_workspace_info({workspace: ws_name}).done(function(data) {
-                    var perm = data[6];
-                    var row = $('<tr>');
-                    row.append('<td class="manage-modal-attribute"><strong>Global Permission</strong></td>'
-                            + '<td class="manage-modal-value btn-global-perm">' + perm_dict[perm] + '</td>');
-                    table.append(row);
-
-                    // event for editable global perm
-                    $('.btn-edit').click(function() {
-                        if ($(this).hasClass('editable')) {
-                            $('.btn-global-perm').html(globalPermDropDown(perm));   
-                        } else {
-                            $('.btn-global-perm').html('')  //fixme: create editable form plugin
-                            $('.btn-global-perm').text(perm_dict[perm]);
-                        }
-                    })
-
-                    modal_body.find('.ws-info').append(table)
-                }).fail(function(e){
-                    modal_body.append('<div class="alert alert-danger">'+
-                            '<b>Error</b> Can not fetch WS info: '+
-                                e.error.message+'</div>');
-                });
-
-
-                // editable status
-                $('.btn-edit').click(function(){
-                    $(this).toggleClass('editable');
-
-                    // if not editable, make editable
-                    if ($(this).hasClass('editable')) {
-                        save_btn.attr('disabled', false);  
-                        $(this).html('Cancel');
-                    } else {
-                        save_btn.attr('disabled', true);                              
-                        $(this).html('Edit');
-                    }
-                })
-
-                var cloneWS = $('<button class="btn btn-link pull-left">Clone</button>');
-                cloneWS.click(function() {
-                    manage_modal.closePrompt();
-                    cloneWorkspace(ws_name);
-                });
-
-                var deleteWS = $('<button class="btn btn-link pull-right">Delete</button>');
-                deleteWS.click(function() {
-                    manage_modal.closePrompt();
-                    deleteWorkspace(ws_name);
-                });
-
-                // get and display editable description
-                var prom = kb.ws.get_workspace_description({workspace:ws_name})
-                $.when(prom).done(function(descript) {
-                    var d = (descript ? descript : '(none)')+'<br>';
-                    modal_body.find('.descript-container')
-                        .append(d);
-
-                    $('.btn-edit').click(function(){
-                        if ($(this).hasClass('editable')) {
-                            var editable = getEditableDescription(descript);
-                            $('.descript-container').html(editable);
-                        } else {
-                            $('.descript-container').html(descript);
-                        }
-                    })
-                }).fail(function(e){
-                    modal_body.append('<div class="alert alert-danger">'+
-                            '<b>Error</b> Can not fetch description: '+
-                                e.error.message+'</div>');
-                });
-
-
-                // if user is logged in and admin
-                if (USER_ID && isAdmin ) {
-                    var params = {workspace: ws_name}
-                    var prom = kb.ws.get_permissions(params);
-
-                    //var newPerms;
-                    var placeholder = $('<div></div>').loading()
-                    modal_body.append(placeholder);                        
-                    $.when(prom).done(function(data) {
-                        permData = data
-
-                        //newPerms = $.extend({},data)
-                        placeholder.rmLoading();
-
-                        perm_container = modal_body.find('.perm-container');
-
-                        var perm_table = getPermTable(data)
-                        perm_container.append(perm_table);
-
-                        $('.btn-edit').click(function() {
-                            if ($(this).hasClass('editable')) {
-                                perm_table.remove();
-                                perm_table = getEditablePermTable(data);
-                                perm_container.html(perm_table);
-                            } else {
-                                perm_table.remove();
-                                perm_table = getPermTable(data);
-                                perm_container.html(perm_table);
-                            }
-                        })
-
-                        modal_body.append(cloneWS);
-                        modal_body.append(deleteWS);
-                    }).fail(function(e){
-                        modal_body.append('<div class="alert alert-danger">'+
-                            '<b>Error:</b> Can not fetch WS permissions: '+
-                                e.error.message+'</div>');
-                });
-                }
-
-
-
-
-                function getEditableDescription(d) {
-                    var d = $('<form role="form">\
-                               <div class="form-group">\
-                                <textarea rows="4" class="form-control" placeholder="Description">'+d+'</textarea>\
-                              </div>\
-                              </form>');
-                    return d;
-                }
-
-                //table for displaying user permissions
-                function getPermTable(data) {
-                    var table = $('<table class="table table-bordered perm-table"></table>');
-                    // if there are no user permissions, display 'none'
-                    // (excluding ~global 'user' and owner)
-                    var perm_count = Object.keys(data).length;
-
-                    if (perm_count <= 1 || (perm_count == 2 && '*' in data)) {
-                        var row = $('<tr><td>(None)</td></tr>');
-                        table.append(row);
-                        return table;
-                    }
-
-
-                    // create table of permissions
-                    for (var key in data) {
-                        // ignore user's perm, ~global, and users with no permissions
-                        if (key == '*' || key == USER_ID || data[key] == 'n') continue;
-                        var row = $('<tr><td class="perm-user" data-user="'+key+'">'+key+'</td><td class="perm-value" data-value="'+data[key]+'">'+
-                                         perm_dict[data[key]]+'</td></tr>');
-
-                        table.append(row);
-                    }
-
-                    return table;
-                }
-
-                // table for editing user permissions
-                function getEditablePermTable(data) {
-                    var table = $('<table class="table table-bordered edit-perm-table"></table>');
-
-                    // create table of permissions
-                    for (var key in data) {
-                        // ignore user's perm, ~global, and users with no permissions
-                        if (key == '*' || key == USER_ID || data[key] == 'n') continue;
-                        var row = $('<tr><td><input type="text" class="form-control perm-user" value="'+key+'"></input></td>\
-                            <td class="perm-value">'+permDropDown(data[key])+'</td>\
-                            <td><button class="form-control rm-perm" data-user="'+key+'">\
-                            <span class="glyphicon glyphicon-trash"></span></button></tr>');
-
-                        row.find('.rm-perm').click(function(){
-                            $(this).closest('tr').remove();                            
-                        });
-
-                        table.append(row);
-                    }
-
-                    // if there are no user permissions, display 'none'
-                    // (excluding ~global 'user' and owner)
-                    var perm_count = Object.keys(data).length;
-                    if (perm_count == 2) {
-                        var row = $('<tr>None</tr>');
-                        table.append(row);
-                    }                    
-
-                    var newrowhtml = '<tr class="perm-row"><td><input type="text" class="form-control perm-user" placeholder="Username"></td><td>'+
-                            permDropDown(data[key])+'</td></tr>'
-                    var row = $(newrowhtml);
-
-                    var addOpt = $('<td><button type="button" class="form-control add-perm">\
-                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button></td>');
-                    row.append(addOpt);
-                    table.append(row);
-                    
-                    table.find('.add-perm').click(function() {
-                        var new_user_id = $(this).parents('tr').find('.perm-user').val();
-                        var new_perm = $(this).parents('tr').find('.create-permission option:selected').val();
-                        //newPerms[new_user_id] = new_perm; //update model
-
-                        newRow(new_user_id, new_perm);
-
-                        $(this).parents('tr').find('.perm-user').val('')
-
-                        if (table.find('tr').length == 0) {
-                           table.append('<tr>None</tr>');
-                        }
-                    });
-
-                    function newRow(new_user_id, new_perm) {  //onchange="newPerms[\''+new_user_id+'\'] = $(this).find(\'option:selected\').val();
-                        var rowToAdd = '<tr><td><input class="form-control perm-user" value="'+new_user_id+'"></input></td>\
-                                <td class="perm-value">'+permDropDown(data[key], new_perm)+'</td>\
-                                <td><button onclick="$(this).closest(&#39;tr&#39).remove();" class="form-control">\
-                                <span class="glyphicon glyphicon-trash"></span></button></tr>';
-
-                        // add new row
-                        table.find('tr:last').before(rowToAdd);
-                    }
-
-                    return table;
-                }
-
-
-                function savePermissions(p_name) {
-                    var newPerms = {};
-                    var table = $('.edit-perm-table');
-                    table.find('tr').each(function() {
-                        var user = $(this).find('.perm-user').val()
-                        var perm = $(this).find('option:selected').val();
-                        if (!user) return;
-                        
-                        newPerms[user] = perm
-                    })
-
-                    // create new permissions for each user that does not currently have 
-                    // permsissions.
-                    var promises = [];
-                    for (var new_user in newPerms) {
-                        // ignore these
-                        if (new_user == '*' || new_user == USER_ID) continue;   
-
-                        // if perms have not change, do not request change
-                        if ( (new_user in permData) && newPerms[new_user] == permData[new_user]) {
-                            continue;
-                        }
-
-
-                        var params = {
-                            workspace: p_name,
-                            new_permission: newPerms[new_user],
-                            users: [new_user],
-                            //auth: USER_TOKEN
-                        };
-
-                        var p = kb.ws.set_permissions(params);
-                        promises.push(p);
-                    };
-
-                    var rm_users = [];
-
-                    // if user was removed from user list, change permission to 'n'
-                    for (var user in permData) {
-                        if (user == '*' || user == USER_ID) continue;                            
-
-                        if ( !(user in newPerms) ) {
-
-                            var params = {
-                                workspace: p_name,
-                                new_permission: 'n',
-                                users: [user],
-                                //auth: USER_TOKEN
-                            };
-
-                            var p = kb.ws.set_permissions(params);
-                            promises.push(p);
-                            rm_users.push(user)
-                        } 
-                    }
-
-                    return $.when.apply($, promises);
-                }                    
-
-                // dropdown for user permissions (used in getPermission Table) //fixme: cleanup
-                function permDropDown(perm) {
-                    var dd = $('<select class="form-control create-permission" data-value="n">\
-                                    <option value="r">read</option>\
-                                    <option value="w">write</option>\
-                                    <option value="a">admin</option></select>\
-                                  </div>');
-
-                    if (perm == 'a') {
-                        dd.find("option[value='a']").attr('selected', 'selected');
-                    } else if (perm == 'w') {
-                        dd.find("option[value='w']").attr('selected', 'selected');                
-                    } else {
-                        dd.find("option[value='r']").attr('selected', 'selected');                           
-                    }
-
-                    return $('<div>').append(dd).html();
-                }
-
-            }  // end manageModal
 
 
             function globalPermDropDown(perm) {
@@ -1112,6 +711,427 @@ angular.module('ws-directives')
             // loadObjTable
 
 
+            function manageModal(ws_name) {
+                var settings = scope.workspace_dict[ws_name];
+                console.log(ws_name, settings)
+
+                var perm_dict = {'a': 'Admin',
+                                 'r': 'Read',
+                                 'w': 'Write',
+                                 'o': 'Owner',
+                                 'n': 'None'};
+
+                var content = $('<div>');
+
+                var infoAJAX = kb.ws.get_workspace_info({workspace: ws_name})
+                
+
+                // modal for managing workspace permissions, clone, and delete
+                var permData;
+                var manage_modal = $('<div></div>').kbasePrompt({
+                        title : 'Manage Workspace '+
+                            (USER_ID ? '<a class="btn btn-primary btn-xs btn-edit">Edit <span class="glyphicon glyphicon-pencil"></span></a>' : ''),
+                        body : content,
+                        modalClass : '',
+                        controls : [{
+                            name: 'Close',
+                            type: 'default',
+                            callback: function(e, $prompt) {
+                                    $prompt.closePrompt();
+                                }
+                            }, {
+                            name : 'Save',
+                            type : 'primary',
+                            callback : function(e, $prompt) { //Fixme: yyyeeeahh.
+                                $prompt.addCover();
+                                $prompt.getCover().loading();
+
+                                var prom = savePermissions(ws_name);
+                                prompt = $prompt;
+
+                                // save permissions, then save description, then the global perm //fixme
+                                $.when(prom).done(function() {
+                                    // if description textarea is showing, saving description
+                                    var d = $('.descript-container textarea').val();
+
+                                    // saving description
+                                    var p1 = kb.ws.set_workspace_description({workspace: ws_name, 
+                                        description: d})
+
+                                    $.when(p1).done(function() {
+                                        var new_perm = $('.btn-global-perm option:selected').val();
+                                        // saving global perm
+                                        var p1 = kb.ws.set_global_permission({workspace: ws_name, 
+                                            new_permission: new_perm})
+                                        $.when(p1).done(function() {
+                                            prompt.addCover('Saved.');
+                                            prompt.closePrompt();
+                                            manageModal(ws_name);                                            
+                                        }).fail(function(e){
+                                            prompt.addCover(e.error.message, 'danger');
+                                        })                      
+                                    }).fail(function(e){
+                                        prompt.addCover(e.error.message, 'danger');
+                                    })
+
+                                }).fail(function(e){
+                                    prompt.addCover(e.error.message, 'danger');
+                                })
+                            }
+                        }]
+                    })
+
+                manage_modal.openPrompt();
+                var dialog = manage_modal.data('dialogModal').find('.modal-dialog');
+                dialog.css('width', '500px');
+                var modal_body = dialog.find('.modal-body');  //fixme: an api to the 
+                                                              // widget would be nice for this stuff
+                var modal_footer = dialog.find('.modal-footer');
+                var save_btn = modal_footer.find('.btn-primary');
+                save_btn.attr('disabled', true);
+
+                // add editable global permisssion
+                kb.ws.get_workspace_info({workspace: ws_name}).done(function(data) {
+
+
+                    var isAdmin;
+                    if (data[5] == 'a') {
+                        isAdmin = true;
+                    } else {
+                        isAdmin = false;
+                    }
+
+                    // table of meta data
+                    var table = $('<table class="table table-bordered table-condensed table-striped manage-table">');                
+                    var data = [
+                        ['Name', data[1]],
+                        ['Objects', '~ ' + data[4] ],
+                        ['Owner', data[2] ],
+                        ['Your Permission', perm_dict[data[5]] ],
+                        //['Global Permission', perm_dict[settings[5]] ]
+                    ];
+                    for (var i=0; i<data.length; i++) {
+                        var row = $('<tr>');
+                        row.append('<td class="manage-modal-attribute"><strong>' + data[i][0] + '</strong></td>'
+                                + '<td class="manage-modal-value">' + data[i][1] + '</td>');
+                        table.append(row);
+                    }
+
+
+                    content.append('<div class="ws-description">\
+                                        <h5>Description</h5>\
+                                        <div class="descript-container"></div>\
+                                   </div>\
+                                   <div class="ws-info">\
+                                        <h5>Info</h5>\
+                                   </div>'+
+                                   ( (USER_ID && data[5] != 'n') ?
+                                   '<div class="ws-perms">\
+                                        <h5>Other User Permissions</h5>\
+                                        <div class="perm-container"></div>\
+                                   </div>' : ''));
+
+
+
+                    var perm = data[6];
+                    var row = $('<tr>');
+                    row.append('<td class="manage-modal-attribute"><strong>Global Permission</strong></td>'
+                            + '<td class="manage-modal-value btn-global-perm">' + perm_dict[perm] + '</td>');
+                    table.append(row);
+
+                    // event for editable global perm
+                    $('.btn-edit').click(function() {
+                        if ($(this).hasClass('editable')) {
+                            $('.btn-global-perm').html(globalPermDropDown(perm));   
+                        } else {
+                            $('.btn-global-perm').html('')  //fixme: create editable form plugin
+                            $('.btn-global-perm').text(perm_dict[perm]);
+                        }
+                    })
+
+                    modal_body.find('.ws-info').append(table)
+
+
+
+                    // if user is logged in and admin
+                    if (USER_ID && isAdmin ) {
+                        var params = {workspace: ws_name}
+                        var prom = kb.ws.get_permissions(params);
+
+                        //var newPerms;
+                        var placeholder = $('<div></div>').loading()
+                        modal_body.append(placeholder);                        
+                        $.when(prom).done(function(data) {
+                            permData = data
+
+                            //newPerms = $.extend({},data)
+                            placeholder.rmLoading();
+
+                            perm_container = modal_body.find('.perm-container');
+
+                            var perm_table = getPermTable(data)
+                            perm_container.append(perm_table);
+
+                            $('.btn-edit').click(function() {
+                                if ($(this).hasClass('editable')) {
+                                    perm_table.remove();
+                                    perm_table = getEditablePermTable(data);
+                                    perm_container.html(perm_table);
+                                } else {
+                                    perm_table.remove();
+                                    perm_table = getPermTable(data);
+                                    perm_container.html(perm_table);
+                                }
+                            })
+
+                            modal_body.append(cloneWS);
+                            modal_body.append(deleteWS);
+                        }).fail(function(e){
+                            modal_body.append('<div class="alert alert-danger">'+
+                                '<b>Error:</b> Can not fetch WS permissions: '+
+                                    e.error.message+'</div>');
+                        });
+                    } 
+
+
+                }).fail(function(e){
+                    modal_body.append('<div class="alert alert-danger">'+
+                            '<b>Error</b> Can not fetch WS info: '+
+                                e.error.message+'</div>');
+                });
+
+
+                // editable status
+                $('.btn-edit').click(function(){
+                    $(this).toggleClass('editable');
+
+                    // if not editable, make editable
+                    if ($(this).hasClass('editable')) {
+                        save_btn.attr('disabled', false);  
+                        $(this).html('Cancel');
+                    } else {
+                        save_btn.attr('disabled', true);                              
+                        $(this).html('Edit');
+                    }
+                })
+
+                var cloneWS = $('<button class="btn btn-link pull-left">Clone</button>');
+                cloneWS.click(function() {
+                    manage_modal.closePrompt();
+                    cloneWorkspace(ws_name);
+                });
+
+                var deleteWS = $('<button class="btn btn-link pull-right">Delete</button>');
+                deleteWS.click(function() {
+                    manage_modal.closePrompt();
+                    deleteWorkspace(ws_name);
+                });
+
+                // get and display editable description
+                var prom = kb.ws.get_workspace_description({workspace:ws_name})
+                $.when(prom).done(function(descript) {
+                    var d = (descript ? descript : '(none)')+'<br>';
+                    modal_body.find('.descript-container')
+                        .append(d);
+
+                    $('.btn-edit').click(function(){
+                        if ($(this).hasClass('editable')) {
+                            var editable = getEditableDescription(descript);
+                            $('.descript-container').html(editable);
+                        } else {
+                            $('.descript-container').html(descript);
+                        }
+                    })
+                }).fail(function(e){
+                    modal_body.append('<div class="alert alert-danger">'+
+                            '<b>Error</b> Can not fetch description: '+
+                                e.error.message+'</div>');
+                });
+
+
+
+                function getEditableDescription(d) {
+                    var d = $('<form role="form">\
+                               <div class="form-group">\
+                                <textarea rows="4" class="form-control" placeholder="Description">'+d+'</textarea>\
+                              </div>\
+                              </form>');
+                    return d;
+                }
+
+                //table for displaying user permissions
+                function getPermTable(data) {
+                    var table = $('<table class="table table-bordered perm-table"></table>');
+                    // if there are no user permissions, display 'none'
+                    // (excluding ~global 'user' and owner)
+                    var perm_count = Object.keys(data).length;
+
+                    if (perm_count <= 1 || (perm_count == 2 && '*' in data)) {
+                        var row = $('<tr><td>(None)</td></tr>');
+                        table.append(row);
+                        return table;
+                    }
+
+
+                    // create table of permissions
+                    for (var key in data) {
+                        // ignore user's perm, ~global, and users with no permissions
+                        if (key == '*' || key == USER_ID || data[key] == 'n') continue;
+                        var row = $('<tr><td class="perm-user" data-user="'+key+'">'+key+'</td><td class="perm-value" data-value="'+data[key]+'">'+
+                                         perm_dict[data[key]]+'</td></tr>');
+
+                        table.append(row);
+                    }
+
+                    return table;
+                }
+
+                // table for editing user permissions
+                function getEditablePermTable(data) {
+                    var table = $('<table class="table table-bordered edit-perm-table"></table>');
+
+                    // create table of permissions
+                    for (var key in data) {
+                        // ignore user's perm, ~global, and users with no permissions
+                        if (key == '*' || key == USER_ID || data[key] == 'n') continue;
+                        var row = $('<tr><td><input type="text" class="form-control perm-user" value="'+key+'"></input></td>\
+                            <td class="perm-value">'+permDropDown(data[key])+'</td>\
+                            <td><button class="form-control rm-perm" data-user="'+key+'">\
+                            <span class="glyphicon glyphicon-trash"></span></button></tr>');
+
+                        row.find('.rm-perm').click(function(){
+                            $(this).closest('tr').remove();                            
+                        });
+
+                        table.append(row);
+                    }
+
+                    // if there are no user permissions, display 'none'
+                    // (excluding ~global 'user' and owner)
+                    var perm_count = Object.keys(data).length;
+                    if (perm_count == 2) {
+                        var row = $('<tr>None</tr>');
+                        table.append(row);
+                    }                    
+
+                    var newrowhtml = '<tr class="perm-row"><td><input type="text" class="form-control perm-user" placeholder="Username"></td><td>'+
+                            permDropDown(data[key])+'</td></tr>'
+                    var row = $(newrowhtml);
+
+                    var addOpt = $('<td><button type="button" class="form-control add-perm">\
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button></td>');
+                    row.append(addOpt);
+                    table.append(row);
+                    
+                    table.find('.add-perm').click(function() {
+                        var new_user_id = $(this).parents('tr').find('.perm-user').val();
+                        var new_perm = $(this).parents('tr').find('.create-permission option:selected').val();
+                        //newPerms[new_user_id] = new_perm; //update model
+
+                        newRow(new_user_id, new_perm);
+
+                        $(this).parents('tr').find('.perm-user').val('')
+
+                        if (table.find('tr').length == 0) {
+                           table.append('<tr>None</tr>');
+                        }
+                    });
+
+                    function newRow(new_user_id, new_perm) {  //onchange="newPerms[\''+new_user_id+'\'] = $(this).find(\'option:selected\').val();
+                        var rowToAdd = '<tr><td><input class="form-control perm-user" value="'+new_user_id+'"></input></td>\
+                                <td class="perm-value">'+permDropDown(data[key], new_perm)+'</td>\
+                                <td><button onclick="$(this).closest(&#39;tr&#39).remove();" class="form-control">\
+                                <span class="glyphicon glyphicon-trash"></span></button></tr>';
+
+                        // add new row
+                        table.find('tr:last').before(rowToAdd);
+                    }
+
+                    return table;
+                }
+
+
+                function savePermissions(p_name) {
+                    var newPerms = {};
+                    var table = $('.edit-perm-table');
+                    table.find('tr').each(function() {
+                        var user = $(this).find('.perm-user').val()
+                        var perm = $(this).find('option:selected').val();
+                        if (!user) return;
+                        
+                        newPerms[user] = perm
+                    })
+
+                    // create new permissions for each user that does not currently have 
+                    // permsissions.
+                    var promises = [];
+                    for (var new_user in newPerms) {
+                        // ignore these
+                        if (new_user == '*' || new_user == USER_ID) continue;   
+
+                        // if perms have not change, do not request change
+                        if ( (new_user in permData) && newPerms[new_user] == permData[new_user]) {
+                            continue;
+                        }
+
+
+                        var params = {
+                            workspace: p_name,
+                            new_permission: newPerms[new_user],
+                            users: [new_user],
+                            //auth: USER_TOKEN
+                        };
+
+                        var p = kb.ws.set_permissions(params);
+                        promises.push(p);
+                    };
+
+                    var rm_users = [];
+
+                    // if user was removed from user list, change permission to 'n'
+                    for (var user in permData) {
+                        if (user == '*' || user == USER_ID) continue;                            
+
+                        if ( !(user in newPerms) ) {
+
+                            var params = {
+                                workspace: p_name,
+                                new_permission: 'n',
+                                users: [user],
+                                //auth: USER_TOKEN
+                            };
+
+                            var p = kb.ws.set_permissions(params);
+                            promises.push(p);
+                            rm_users.push(user)
+                        } 
+                    }
+
+                    return $.when.apply($, promises);
+                }                    
+
+                // dropdown for user permissions (used in getPermission Table) //fixme: cleanup
+                function permDropDown(perm) {
+                    var dd = $('<select class="form-control create-permission" data-value="n">\
+                                    <option value="r">read</option>\
+                                    <option value="w">write</option>\
+                                    <option value="a">admin</option></select>\
+                                  </div>');
+
+                    if (perm == 'a') {
+                        dd.find("option[value='a']").attr('selected', 'selected');
+                    } else if (perm == 'w') {
+                        dd.find("option[value='w']").attr('selected', 'selected');                
+                    } else {
+                        dd.find("option[value='r']").attr('selected', 'selected');                           
+                    }
+
+                    return $('<div>').append(dd).html();
+                }
+
+            }  // end manageModal
+
+
 
             var loadNarTable = function(tab) {
                 var table_id = "nar-table";                 
@@ -1120,10 +1140,10 @@ angular.module('ws-directives')
                                             +'</div>',
                                              bSortable: false, "sWidth": "1%"} 
                                           : { "sTitle": '', bVisible: false, "sWidth": "1%"}),
-                                { "sTitle": "Narrative"}, //"sWidth": "10%"
+                                { "sTitle": "Narrative", "sWidth": "5%"},
                                 { "sTitle": "Workspace"},
                                 { "sTitle": "Last Modified", "iDataSort": 5},
-                                { "sTitle": "Owner", bVisible: true},
+                                { "sTitle": "Modified by", bVisible: true},
                                 { "sTitle": "Timestamp", "bVisible": false, "sType": 'numeric'},
                                 { "sTitle": "Size", iDataSort: 7 },
                                 { "sTitle": "Byte Size", bVisible: false },
@@ -1149,6 +1169,7 @@ angular.module('ws-directives')
                     "aaData": [],
                     "fnDrawCallback": events,
                     "aaSorting": [[ 3, "desc" ]],
+                    "sDom": "R<'row'<'col-xs-12 table-options'f>r>t<'row'<'col-xs-12'ilp>>",
                     "aoColumns": columns,
                     "oLanguage": {
                         "sEmptyTable": "No narratives",
@@ -1161,18 +1182,34 @@ angular.module('ws-directives')
                 $(element).html('');
                 $(element).loading('loading...');
 
-                //var p = kb.narr.list_objects({workspaces: [ws]});
-                //var p2 = kb.ws.list_objects({workspaces: [ws], showOnlyDeleted: 1});
-                //var p3 = (USER_ID ? kb.ujs.get_has_state('favorites', 'queue', 0) : undefined);
-                //var p3 = undefined;
-                //var p4 = $.getJSON('landing_page_map.json');
-
                 function getNars(p, showDeleted) {
                     var prom = $.when(p).then(function(data){
+                        console.log('data', data)
                         var proj_ids = []
-                        for (var i in data) {
-                            proj_ids.push(data[i][7])
+
+                        if (tab == 'my-narratives') {
+                            for (var i in data) {
+                                var name = data[i][7];
+                                var owner = name.split(':')[0];
+
+                                if (owner != USER_ID) continue;
+
+                                proj_ids.push(name);
+                                scope.workspace_dict = data;
+                            }                            
+                        } else if (tab == 'shared') {
+                            for (var i in data) {
+                                var name = data[i][7];
+                                var ws = data[i][7];
+
+                                proj_ids.push(name);
+
+                                scope.workspace_dict = data;
+                            }
+
                         }
+
+                        console.log('proj_ids', proj_ids)
                         if (showDeleted) {
                             var prom = kb.nar.get_narratives({project_ids: proj_ids, showOnlyDeleted: 1})
                         } else {
@@ -1185,7 +1222,9 @@ angular.module('ws-directives')
                 }                
 
                 var narProm = kb.ws.list_objects({type: 'KBaseNarrative.Metadata', 
-                                           showHidden: 1, perm: 'a'});
+                                               showHidden: 1, perm: 'a'});
+
+
                 //var narPromDeleted = kb.ws.list_objects({type: 'KBaseNarrative.Metadata', 
                 //                           showHidden: 1, perm: 'a', showOnlyDeleted: 1});                
                 var p = getNars(narProm);
@@ -1226,7 +1265,7 @@ angular.module('ws-directives')
                     // show these options if logged in.
 
                     // add show/hide column settings button
-                    var settings_btn = getSettingsBtn(table)
+                    var settings_btn = getSettingsBtn(table, 'nar');
                     $('.table-options').append(settings_btn);
                     // ignore close on click inside of *any* settings button
                     $('.settings-dropdown').click(function(e) {
@@ -1236,26 +1275,40 @@ angular.module('ws-directives')
                     //searchColumns()
                     addOptionButtons();
 
+
                     // resinstantiate all events.
                     events();
+
+                    // event for settings (manage modal) button
+                    // this is special to the narrative pages
+                    $('.btn-nar-ws-settings').unbind('click')
+                    $('.btn-nar-ws-settings').click(function(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        var name = $(this).parent('td').find('a').data('ws');
+                        console.log(name)
+                        manageModal(name);
+                    })
+
+
+
 
                 }).fail(function(e){
                     $(element).html('<div class="alert alert-danger">'+e.error.message+'</div>');
                 })
-            } // end scope.loadObjTable
+            } // end scope.loadNarTable
 
 
-            console.log('tab!!!!', scope.tab)
 
-            if (scope.tab == 'my-narratives') {
-                scope.loadNarTable = loadNarTable();
+            if (scope.tab && scope.tab != 'featured') {
+                scope.loadNarTable = loadNarTable(scope.tab);
             } else {
                 scope.loadObjTable = loadObjTable();
             }
 
             
 
-            function getSettingsBtn(table) {
+            function getSettingsBtn(table, nar) {
                 var settings_btn = $('<div class="btn-table-settings dropdown pull-left">'+
                           '<a class="btn btn-default" data-toggle="dropdown">'+
                             '<span class="glyphicon glyphicon-cog"></span> <span class="caret"></span>'+
@@ -1287,7 +1340,13 @@ angular.module('ws-directives')
                 }) 
                 reset_btn.click( function () {
                     reset_dt_view();
-                    scope.loadObjTable();
+                    console.log(scope.loadObjTable, scope.loadNarTable)
+                    if (nar) {
+                        scope.loadNarTable();
+                    } else {
+                        scope.loadObjTable();
+                    }
+
                 } );
 
                 return settings_btn;
@@ -1393,15 +1452,22 @@ angular.module('ws-directives')
                     }
 
                     var url = '/narrative/ws.'+wsid+'.obj.'+objid
-                    var new_id = '<a href="'+url+'" target="_blank" class="obj-id nar-id" data-ws="'+ws+'" data-id="'+id+'"'+
+                    var new_id = '<a href="'+url+'" target="_blank" class="obj-id nar-id table-ellipsis" data-ws="'+ws+'" data-id="'+id+'"'+
                                     'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
-                                    'ui-sref="'+url+'" >'+
-                                id+'</a> (<a class="show-versions">'+instance+'</a>)'+
+                                    'ui-sref="'+url+'" ><b><i>'+
+                                id+'</i></b></a> (<a class="show-versions">'+instance+'</a>)'+
                                 (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
                                 '<a class="btn-show-info hide pull-right">More</a>';
 
-
                     wsarray[1] = new_id;
+                    url = "ws.id({ws:"+"'"+ws+"'})";
+                    ws_link  = $('<div><a data-ws="'+ws+'" ui-sref="'+url+'">'+ws+'</a></div>');
+
+
+                    ws_link.append(' <button type="button" '+
+                            'class="btn btn-default btn-xs btn-nar-ws-settings pull-right" data-ws="'+name+'">'+
+                            '<div class="glyphicon glyphicon-cog"></div></button>');
+                    wsarray[2] = ws_link.html()
                     wsobjs.push(wsarray);
                 }
                 return [wsobjs, kind_counts];
@@ -1490,13 +1556,16 @@ angular.module('ws-directives')
                         case 'Media': 
                             route = 'ws.media';
                             break; 
-
                         case 'PhenotypeSet':
                             route = 'ws.phenotype';
                             break;
                         case 'Pangenome':
                             route = 'ws.pangenome';
                             break;                            
+                        case 'Genome': 
+                            route = 'genomesbyid';
+                            break;                             
+
                     }
 
 
@@ -1567,7 +1636,9 @@ angular.module('ws-directives')
                 $('.btn-show-info').unbind('click');
                 $('.btn-show-info').click(function(e) {
                     e.stopPropagation();
-                    var id = $(this).parent('td').find('.obj-id').data('id');
+                    var link = $(this).parent('td').find('.obj-id');
+                    var id = link.data('id');
+                    var ws = link.data('ws')
                     showObjectInfo(ws, id);
                 })
 
@@ -1575,8 +1646,9 @@ angular.module('ws-directives')
                 $('.show-versions').unbind('click')
                 $('.show-versions').click(function(e) {
                     e.stopPropagation();
-                    var type = $(this).prev('.obj-id').data('type');
-                    var id = $(this).prev('.obj-id').data('id');
+                    var link = $(this).parent('td').find('.obj-id');                    
+                    var ws = link.data('ws');
+                    var id = link.data('id');
                     showObjectVersions(ws, id);
                 })
 
@@ -1628,7 +1700,7 @@ angular.module('ws-directives')
                 })
 
                 // effect for highlighting checkbox on hover
-                $('.obj-table tbody tr').hover(function() {
+                $('table tbody tr').hover(function() {
                     $(this).children('td').eq(0).find('.ncheck').addClass('ncheck-hover');
                     $(this).find('.btn-show-info').removeClass('hide');
                 }, function() {
@@ -1637,8 +1709,8 @@ angular.module('ws-directives')
                 })
 
                 // checkbox click event
-                $('.obj-table tbody tr').unbind('click');
-                $('.obj-table tbody tr').click(function(e) {
+                $('table tbody tr').unbind('click');
+                $('table tbody tr').click(function(e) {
                     if (!USER_ID) return;
                     var checkbox = $(this).children('td').eq(0).find('.ncheck');
                     var id = checkbox.attr('data-id');
@@ -1689,13 +1761,13 @@ angular.module('ws-directives')
 
                 options.append(delete_btn, copy_btn, rename_btn)//, mv_btn);
 
-
+                // narrative home should be 'deprecated'
                 // if user has narrative home workspace, add option to copy there
-                if (scope.workspace_dict[USER_ID+':home']) {
-                    var dd = options.find('.dropdown-menu')
-                    dd.append('<li class="divider"></li>');
-                    dd.append('<li><a class="btn-mv-obj-to-nar">Copy to Narrative Home</a></li>');
-                }
+                //if (scope.workspace_dict[USER_ID+':home']) {
+                //    var dd = options.find('.dropdown-menu')
+                //    dd.append('<li class="divider"></li>');
+                //    dd.append('<li><a class="btn-mv-obj-to-nar">Copy to Narrative Home</a></li>');
+                //}
 
                 //options.find('.btn-mv-obj').on('click', moveObjects);
                 copy_btn.find('.btn-cp-obj').on('click', copyObjects);
@@ -1808,6 +1880,7 @@ angular.module('ws-directives')
             }
 
             function showObjectInfo(ws, id) {
+                console.log(ws,id)
                 var info_modal = $('<div></div>').kbasePrompt({
                         title : id,
                         modalClass : '', 
@@ -1909,7 +1982,7 @@ angular.module('ws-directives')
                       { "sTitle": "Name"}, //"sWidth": "10%"
                       { "sTitle": "Type", "sWidth": "20%"},
                       { "sTitle": "Last Modified", "iDataSort": 5},
-                      { "sTitle": "Owner"},
+                      { "sTitle": "Modified by"},
                       { "sTitle": "Time Stamp", "bVisible": false, "sType": 'numeric'}                   
 
                   ],                         
