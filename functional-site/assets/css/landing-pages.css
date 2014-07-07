@@ -499,13 +499,19 @@ div::-webkit-scrollbar-thumb {
     border-top-left-radius: 10px;    
 }
 
-
-.recent-nars {
-    list-style:  none;
+.recent-nars { 
+    list-style: none;
+    line-height: 1.0;
 }
+
 .recent-nars li {
     margin: 0 0 5px 0;
 }
+
+.recent-nar-time {
+
+}
+
 .narrative-feed {
     margin: 0px 10px;
 }
@@ -557,7 +563,7 @@ div::-webkit-scrollbar-thumb {
     white-space: nowrap; 
     text-overflow: ellipsis;
     overflow: hidden;
-    display: flex;
+
 }
 
 .ws-descript {

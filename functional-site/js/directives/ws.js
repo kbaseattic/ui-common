@@ -23,9 +23,8 @@ angular.module('ws-directives')
 
             // Global list and dict of fetched workspaces
             var workspaces = []; 
-            scope.workspace_dict = {};
 
-            var nav_height = 150;//238;
+            var nav_height = 110;
 
 
             // This method loads the sidebar data.  
@@ -36,7 +35,6 @@ angular.module('ws-directives')
                 $('#select-box').append(table)
 
                 workspaces = []
-                scope.workspace_dict = {}
                 
                 var p = kb.nar.get_projects()
                 var prom = kb.ws.list_workspace_info({});
@@ -111,8 +109,6 @@ angular.module('ws-directives')
                             $(this).find('.btn-ws-settings').addClass('hide');
                         })
                         var blah = $(".select-box table").append(selector);
-
-                        scope.workspace_dict[name] = ws; //store in dictionary for optimization
 
                         // mark as narrative project if it is (used in filtering)
                         ws.push(name in nar_projs ? true : false );
@@ -712,9 +708,6 @@ angular.module('ws-directives')
 
 
             function manageModal(ws_name) {
-                var settings = scope.workspace_dict[ws_name];
-                console.log(ws_name, settings)
-
                 var perm_dict = {'a': 'Admin',
                                  'r': 'Read',
                                  'w': 'Write',
@@ -722,9 +715,6 @@ angular.module('ws-directives')
                                  'n': 'None'};
 
                 var content = $('<div>');
-
-                var infoAJAX = kb.ws.get_workspace_info({workspace: ws_name})
-                
 
                 // modal for managing workspace permissions, clone, and delete
                 var permData;
@@ -830,8 +820,6 @@ angular.module('ws-directives')
                                         <h5>Other User Permissions</h5>\
                                         <div class="perm-container"></div>\
                                    </div>' : ''));
-
-
 
                     var perm = data[6];
                     var row = $('<tr>');
@@ -1185,36 +1173,29 @@ angular.module('ws-directives')
                 function getNars(p, showDeleted) {
                     var prom = $.when(p).then(function(data){
                         console.log('data', data)
+                        var my_proj_ids = []
                         var proj_ids = []
 
-                        if (tab == 'my-narratives') {
-                            for (var i in data) {
-                                var name = data[i][7];
-                                var owner = name.split(':')[0];
+                        var my_nar_count = 0;
+                        var shared_nar_count =  0;
 
-                                if (owner != USER_ID) continue;
+                        for (var i in data) {
+                            var ws = data[i][7];
+                            var owner = ws.split(':')[0];
 
-                                proj_ids.push(name);
-                                scope.workspace_dict = data;
-                            }                            
-                        } else if (tab == 'shared') {
-                            for (var i in data) {
-                                var name = data[i][7];
-                                var ws = data[i][7];
-
-                                proj_ids.push(name);
-
-                                scope.workspace_dict = data;
+                            if (owner == USER_ID) {
+                                my_proj_ids.push(ws)
+                            } else {
+                                proj_ids.push(ws)
                             }
+                        }                            
 
-                        }
-
-                        console.log('proj_ids', proj_ids)
-                        if (showDeleted) {
-                            var prom = kb.nar.get_narratives({project_ids: proj_ids, showOnlyDeleted: 1})
-                        } else {
+                        if (tab == 'my-narratives') {
+                            var prom = kb.nar.get_narratives({project_ids: my_proj_ids});
+                        } else if (tab == 'shared') {
                             var prom = kb.nar.get_narratives({project_ids: proj_ids})
                         }
+
 
                         return prom;
                     })
@@ -1235,6 +1216,7 @@ angular.module('ws-directives')
                 //$.when(p, p2, p3, p4).done(function(objs, deleted_objs, favs, obj_mapping){
                 $.when(p).done(function(narratives){
                     console.log('narratives', narratives)
+
 
                     favs = undefined
                     if (favs) {
@@ -2156,22 +2138,15 @@ angular.module('ws-directives')
             function copyObjects(){
                 var workspace = ws; // just getting current workspace
 
-                var wsSelect = $('<form class="form-horizontal" role="form">\
-                                    <div class="form-group">\
-                                      <label class="col-sm-5 control-label">Destination Workspace</label>\
-                                    </div>\
-                                 </div>');
-
-                var select = $('<select class="form-control select-ws"></select>')
-                for (var key in scope.workspace_dict) {
-                    select.append('<option>'+key+'</option>')
-                }
-                select = $('<div class="col-sm-5">').append(select);
-                wsSelect.find('.form-group').append(select);
+                var content = $('<form class="form-horizontal" role="form">\
+                                        <div class="form-group">\
+                                          <label class="col-sm-5 control-label">Destination Workspace</label>\
+                                        </div>\
+                                     </div>').loading()
 
                 var copyObjectsModal = $('<div></div>').kbasePrompt({
                         title : 'Copy Objects',
-                        body: wsSelect,
+                        body: content,
                         modalClass : '', 
                         controls : ['cancelButton',
                             {name : 'Copy',
@@ -2183,8 +2158,26 @@ angular.module('ws-directives')
                         }]
                     }
                 );
-
                 copyObjectsModal.openPrompt();
+
+                var prom = kb.ws.list_workspace_info({});
+                $.when(prom).done(function(workspaces) {
+                    content.rmLoading();
+                    var wsSelect = $('<form class="form-horizontal" role="form">\
+                                        <div class="form-group">\
+                                          <label class="col-sm-5 control-label">Destination Workspace</label>\
+                                        </div>\
+                                     </div>');
+
+                    var select = $('<select class="form-control select-ws"></select>')
+                    for (var i in workspaces) {
+                        select.append('<option>'+workspaces[i][1]+'</option>')
+                    }
+                    select = $('<div class="col-sm-5">').append(select);
+                    content.find('.form-group').append(select);
+                })
+               
+
             }
 
 
