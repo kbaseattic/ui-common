@@ -781,32 +781,28 @@ angular.module('ws-directives')
                 save_btn.attr('disabled', true);
 
                 // add editable global permisssion
-                kb.ws.get_workspace_info({workspace: ws_name}).done(function(data) {
-
-
-                    var isAdmin;
-                    if (data[5] == 'a') {
-                        isAdmin = true;
+                kb.ws.get_workspace_info({workspace: ws_name}).done(function(info) {
+                    if (info[5] == 'a') {
+                        var isAdmin = true;
                     } else {
-                        isAdmin = false;
+                        var isAdmin = false;
                     }
 
                     // table of meta data
                     var table = $('<table class="table table-bordered table-condensed table-striped manage-table">');                
                     var data = [
-                        ['Name', data[1]],
-                        ['Objects', '~ ' + data[4] ],
-                        ['Owner', data[2] ],
-                        ['Your Permission', perm_dict[data[5]] ],
+                        ['Name', info[1]],
+                        ['Objects', '~ ' + info[4] ],
+                        ['Owner', info[2] ],
+                        ['Your Permission', perm_dict[info[5]] ],
                         //['Global Permission', perm_dict[settings[5]] ]
                     ];
                     for (var i=0; i<data.length; i++) {
                         var row = $('<tr>');
-                        row.append('<td class="manage-modal-attribute"><strong>' + data[i][0] + '</strong></td>'
-                                + '<td class="manage-modal-value">' + data[i][1] + '</td>');
+                        row.append('<td><strong>' + data[i][0] + '</strong></td>'
+                                  +'<td>'+data[i][1]+'</td>');
                         table.append(row);
                     }
-
 
                     content.append('<div class="ws-description">\
                                         <h5>Description</h5>\
@@ -815,16 +811,20 @@ angular.module('ws-directives')
                                    <div class="ws-info">\
                                         <h5>Info</h5>\
                                    </div>'+
-                                   ( (USER_ID && data[5] != 'n') ?
+                                   ( (USER_ID && info[5] != 'n') ?
                                    '<div class="ws-perms">\
                                         <h5>Other User Permissions</h5>\
                                         <div class="perm-container"></div>\
                                    </div>' : ''));
 
-                    var perm = data[6];
+                    var perm = info[6];
+                    console.log('permission!', perm);
+                    console.log('permission2',  perm_dict[perm] );                    
+
+
                     var row = $('<tr>');
-                    row.append('<td class="manage-modal-attribute"><strong>Global Permission</strong></td>'
-                            + '<td class="manage-modal-value btn-global-perm">' + perm_dict[perm] + '</td>');
+                    row.append('<td><strong>Global Permission</strong></td>'
+                            + '<td class="btn-global-perm">' + perm_dict[perm] + '</td>');
                     table.append(row);
 
                     // event for editable global perm
@@ -1170,53 +1170,20 @@ angular.module('ws-directives')
                 $(element).html('');
                 $(element).loading('loading...');
 
-                function getNars(p, showDeleted) {
-                    var prom = $.when(p).then(function(data){
-                        console.log('data', data)
-                        var my_proj_ids = []
-                        var proj_ids = []
 
-                        var my_nar_count = 0;
-                        var shared_nar_count =  0;
-
-                        for (var i in data) {
-                            var ws = data[i][7];
-                            var owner = ws.split(':')[0];
-
-                            if (owner == USER_ID) {
-                                my_proj_ids.push(ws)
-                            } else {
-                                proj_ids.push(ws)
-                            }
-                        }                            
-
-                        if (tab == 'my-narratives') {
-                            var prom = kb.nar.get_narratives({project_ids: my_proj_ids});
-                        } else if (tab == 'shared') {
-                            var prom = kb.nar.get_narratives({project_ids: proj_ids})
-                        }
-
-
-                        return prom;
-                    })
-                    return prom;
-                }                
-
-                var narProm = kb.ws.list_objects({type: 'KBaseNarrative.Metadata', 
-                                               showHidden: 1, perm: 'a'});
-
-
-                //var narPromDeleted = kb.ws.list_objects({type: 'KBaseNarrative.Metadata', 
-                //                           showHidden: 1, perm: 'a', showOnlyDeleted: 1});                
-                var p = getNars(narProm);
-                //var p2 = getNars(narPromDeleted, true);
-
+                var p = getNarratives();
 
 
                 //$.when(p, p2, p3, p4).done(function(objs, deleted_objs, favs, obj_mapping){
-                $.when(p).done(function(narratives){
+                $.when(p).done(function(nars){
                     console.log('narratives', narratives)
-
+                    if (tab == "my-narratives") {
+                        var narratives = nars.my_narratives;
+                    } else if (tab == "shared") {
+                        var narratives = nars.shared_narratives;
+                    } else if (tab == "public") {
+                        var narratives = nars.public_narratives;
+                    }
 
                     favs = undefined
                     if (favs) {
@@ -1268,7 +1235,6 @@ angular.module('ws-directives')
                         e.stopPropagation();
                         e.preventDefault();
                         var name = $(this).parent('td').find('a').data('ws');
-                        console.log(name)
                         manageModal(name);
                     })
 
@@ -1322,7 +1288,6 @@ angular.module('ws-directives')
                 }) 
                 reset_btn.click( function () {
                     reset_dt_view();
-                    console.log(scope.loadObjTable, scope.loadNarTable)
                     if (nar) {
                         scope.loadNarTable();
                     } else {
@@ -1862,7 +1827,6 @@ angular.module('ws-directives')
             }
 
             function showObjectInfo(ws, id) {
-                console.log(ws,id)
                 var info_modal = $('<div></div>').kbasePrompt({
                         title : id,
                         modalClass : '', 
@@ -2423,3 +2387,127 @@ function readableSize(bytes) {
 };
 
 
+// fixme: backend this!
+function getNarratives() {
+    var prom = kb.ws.list_workspace_info({});
+    
+    // get all workspaces, filter by mine, shared, and public
+    var p = $.when(prom).then(function(workspaces) {
+        console.log('list of workspaces', workspaces);
+
+        var my_list = [];
+        var shared_list = [];
+        var public_list = [];
+
+        for (var i in workspaces) {
+            var a = workspaces[i];
+            var ws = a[1];
+            var owner = a[2];
+            var perm = a[5];
+            var global_perm = a[6]
+
+            if (owner == USER_ID) {
+                my_list.push(ws)
+            }
+
+            // shared lists need to be filtered again, as a shared narrative
+            // is any narrative you have 'a' or 'w', but also not your own
+            if ( (perm == 'a' || perm == 'w') && owner != USER_ID) {
+                shared_list.push(ws)
+            }
+            if (perm == 'r' || global_perm == 'r') {
+                public_list.push(ws)
+            }
+        }
+
+        return [my_list, shared_list, public_list];
+    })
+
+
+    // next, get all workspaces that have "_project" object
+    // fixme: backend!
+    var next_prom = $.when(p).then(function(data) {
+        var my_list = data[0];
+        var shared_list = data[1];
+        var public_list = data[2];
+
+        var my_prom = kb.ws.list_objects({workspaces: my_list, 
+                                           type: 'KBaseNarrative.Metadata',
+                                           showHidden: 1});
+
+        var shared_prom = kb.ws.list_objects({workspaces: shared_list, 
+                                           type: 'KBaseNarrative.Metadata',
+                                           showHidden: 1});        
+
+        var public_prom = kb.ws.list_objects({workspaces: public_list, 
+                                           type: 'KBaseNarrative.Metadata',
+                                           showHidden: 1});        
+
+        var p = $.when(my_prom, shared_prom, public_prom).then(function(d1, d2, d3) {
+            console.log(d1, d2, d3)
+
+            var my_nars_ws = [];
+            var shared_nars_ws = [];
+            var public_nars_ws = [];
+
+            for (var i in d1) {
+                var a = d1[i]
+                var ws = a[7];
+                my_nars_ws.push(ws);
+            }
+
+            for (var i in d2) {
+                var a = d2[i]
+                var ws = a[7];
+                shared_nars_ws.push(ws);
+            }
+
+            for (var i in d3) {
+                var a = d3[i]
+                var ws = a[7];
+                public_nars_ws.push(ws);
+            }
+
+            return [my_nars_ws, shared_nars_ws, public_nars_ws];         
+        })
+
+        return p;
+    });
+
+
+    // next get all narratives from these "project" workspaces
+    // fixme: backend!
+    var last_prom = $.when(p).then(function(data) {
+        var mine_ws = data[0];
+        var shared_ws = data[1];
+        var public_ws = data[2];
+
+        var my_prom = kb.ws.list_objects({workspaces: mine_ws, 
+                                           type: 'KBaseNarrative.Narrative',
+                                           showHidden: 1});
+
+        var shared_prom = kb.ws.list_objects({workspaces: shared_ws, 
+                                           type: 'KBaseNarrative.Narrative',
+                                           showHidden: 1});        
+
+        var public_prom = kb.ws.list_objects({workspaces: public_ws, 
+                                           type: 'KBaseNarrative.Narrative',
+                                           showHidden: 1});
+
+        var p = $.when(my_prom, shared_prom, public_prom).then(function(d1, d2, d3) { 
+            // fill counts now (since there's no api for this)
+            $('.my-nar-count').text(d1.length)
+            $('.shared-nar-count').text(d2.length);  
+            $('.public-nar-count').text(d3.length);            
+
+            return {my_narratives: d1, shared_narratives: d2, public_narratives: d3};
+        });
+
+       return p;
+    })
+
+
+    // bam, return promise for [my_nars, shared_nars, public_nars]
+    return last_prom;
+
+}

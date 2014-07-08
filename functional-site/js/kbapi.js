@@ -954,6 +954,59 @@ function ProjectAPI(ws_url, token) {
     };
 
 
+    this.getNarratives = function() {
+
+        function getNars(p, showDeleted) {
+            
+            var prom = $.when(p).then(function(data){
+                console.log('data', data)
+                var my_proj_ids = []
+                var proj_ids = []
+
+                var my_nar_count = 0;
+                var shared_nar_count =  0;
+
+                for (var i in data) {
+                    var ws = data[i][7];
+                    var owner = ws.split(':')[0];
+
+                    if (owner == USER_ID) {
+                        my_proj_ids.push(ws)
+                    } else {
+                        proj_ids.push(ws)
+                    }
+                }                            
+
+                // for addiing counts for the UI 
+                // this is such a hack
+                // fixme: this should be done with a service        
+                var prom1 = kb.nar.get_narratives({project_ids: my_proj_ids});
+                var prom2 = kb.nar.get_narratives({project_ids: proj_ids})
+
+                $.when(prom1, prom2).then(function(nars1, nars2) {
+                    $('.my-nar-count').text(nars1.length)
+                    $('.shared-nar-count').text(nars2.length)    
+                })
+
+
+                if (tab == 'my-narratives') {
+                    return prom1;
+                } else if (tab == 'shared') {
+                    return prom2;
+                }
+            })
+            return prom;
+        }                
+
+        var narProm = kb.ws.list_objects({type: 'KBaseNarrative.Metadata', 
+                                       showHidden: 1});
+
+        var p = getNars(narProm);
+        //var p2 = getNars(narPromDeleted, true);        
+    }
+
+
+
 
     // Will search the given list of project_ids for objects of type narrative
     // if no project_ids are given, then all a call will be made to get_projects
