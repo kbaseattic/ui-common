@@ -453,6 +453,13 @@ div::-webkit-scrollbar-thumb {
 
 
 /* narrative project page */
+.recent-nars {
+    list-style:  none;
+}
+.recent-nars li {
+    margin: 0 0 5px 0;
+}
+.recent-nar-time
 
 .narrative-options-container {
     border-bottom: 1px solid #ccc;
@@ -565,7 +572,7 @@ div::-webkit-scrollbar-thumb {
 }
 
 #narrative-nav,
-.recent-narratives,
+.recent-nars,
 .recent-projects {
     padding: 0;
     margin: 0;

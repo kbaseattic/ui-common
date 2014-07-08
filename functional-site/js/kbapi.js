@@ -84,16 +84,22 @@ function KBCacheClient(token) {
     var self = this;
     var auth = {};
     auth.token = token;
+    console.log(auth)
 
-    var setup = configJSON.setup;
-    if (setup) {
-        fba_url = configJSON[setup].fba_url;
-        ws_url = configJSON[setup].workspace_url;
-        ujs_url = configJSON[setup].user_job_state_url;
+    if (typeof configJSON != 'undefined') {
+        if (configJSON.setup == 'dev') {
+            fba_url = configJSON.dev.fba_url;
+            ws_url = configJSON.dev.workspace_url;
+            ujs_url = configJSON.dev.user_job_state_url;
+        } else if (configJSON.setup == 'prod') {
+            fba_url = configJSON.prod.fba_url;
+            ws_url = configJSON.prod.workspace_url;
+            ujs_url = configJSON.prod.user_job_state_url;
+        }
     } else {
-        fba_url = configJSON.prod.fba_url;
-        ws_url = configJSON.prod.workspace_url;
-        ujs_url = configJSON.prod.user_job_state_url;
+        fba_url = "http://140.221.85.73:4043/"
+        ws_url = "https://kbase.us/services/ws/"
+        ujs_url = "http://140.221.84.180:7083"
     }
 
     console.log('FBA URL is:', fba_url);
@@ -106,16 +112,11 @@ function KBCacheClient(token) {
 
     var cache = new Cache();
 
-
-    // make publically accessible methods that 
     self.fba = fba;
     self.ws = kbws;
     self.ujs = ujs
     self.nar = new ProjectAPI(ws_url, token);
-
     self.token = token;
-
-    // make accesible methods for ui helper functions
     self.ui = new UIUtils();
 
     self.req = function(service, method, params) {
@@ -392,7 +393,7 @@ function UIUtils() {
     }
 
     this.objTable = function(table_id, obj, keys, labels) {
-        var table = $('<table id="'+table_id+'" class="table table-striped table-bordered" \
+        var table = $('<table class="table table-striped table-bordered" \
                               style="margin-left: auto; margin-right: auto;"></table>');
         for (var i in keys) {
             var key = keys[i];
@@ -409,7 +410,6 @@ function UIUtils() {
             row.append(label, value);
 
             table.append(row);
-
         }
 
         return table;
@@ -426,7 +426,54 @@ function UIUtils() {
         return table;
     }
 
+    // this takes a list of refs and creates <workspace_name>/<object_name>
+    // if links is true, hrefs are returned as well
+    this.translateRefs = function(reflist, links) {
+        var obj_refs = []
+        for (var i in reflist) {
+            obj_refs.push({ref: reflist[i]})
+        }
 
+        var prom = kb.ws.get_object_info(obj_refs)
+        var p = $.when(prom).then(function(refinfo) {
+            var refhash = {};
+            for (var i=0; i<refinfo.length; i++) {
+                var item = refinfo[i];
+                var full_type = item[2];
+                var module = full_type.split('.')[0];
+                var type = full_type.slice(full_type.indexOf('.')+1);
+                var kind = type.split('-')[0];
+                var label = item[7]+"/"+item[1];
+
+                switch (kind) {
+                    case 'FBA': 
+                        route = 'ws.fbas';
+                        break;
+                    case 'FBAModel': 
+                        route = 'ws.mv.model';
+                        break;
+                    case 'Media': 
+                        route = 'media/';
+                        break;
+                    case 'Genome': 
+                        route = 'genomes/';
+                        break;
+                    case 'MetabolicMap': 
+                        route = 'ws.maps';
+                        break;
+                    case 'PhenotypeSet': 
+                        route = 'ws.phenotype';
+                        break; 
+                }
+
+                var link = '<a href="#/'+route+label+'">'+label+'</a>'
+                refhash[reflist[i]] = {link: link, label: label};
+            }
+            return refhash
+        })
+        return p;
+    }
+           
 
 }
 
@@ -706,6 +753,7 @@ function ProjectAPI(ws_url, token) {
                            workspace_id : undefined };
         var p = $.extend( def_params, p_in);
 
+        console.log('calling get projects')
 //        META_ws = ws_client.list_objects( {} );
     
         var prom = ws_client.list_objects({type: 'KBaseNarrative.Metadata', 

@@ -48,17 +48,22 @@ var app = angular.module('landing-pages',
         })
 
     $stateProvider
-        .state('narrative', {
-          url: "/narrative/",
-          templateUrl: 'views/narrative/home.html',
-          controller: 'Narrative'
-        }).state('narrative.projects', {
+        .state('narratives', {
+          url: "/narratives/",
+          templateUrl: 'views/ws/narratives.html',
+          controller: 'NarrativeCtrl'
+        }).state('narratives.table', {
+          url: ":tab",
+          templateUrl: 'views/ws/narrative-table.html',
+          controller: 'NarrativeCtrl'
+        })
+        /*.state('narrative.projects', {
           url: "projects/",
           templateUrl: 'views/narrative/projects.html',
           controller: 'NarrativeProjects'
-        })
+        })*/
 
-    // workspace browser routting
+    // workspace browser routing
     $stateProvider
         .state('ws', {
           url: "/ws/",
@@ -82,6 +87,7 @@ var app = angular.module('landing-pages',
           controller: 'WBTour'
         })
 
+
     // model viewer routing
     $stateProvider
         .state('ws.mv', {
@@ -102,7 +108,7 @@ var app = angular.module('landing-pages',
         })
 
 
-
+    // workspace object landing pages
     $stateProvider
         .state('ws.fbas', {
           url: "fbas/:ws/:id?map",
@@ -133,6 +139,10 @@ var app = angular.module('landing-pages',
           url: "json/:ws/:id",
           templateUrl: 'views/ws/json.html',
           controller: 'WBJSON'
+        }).state('ws.pangenome', {
+          url: "pangenome/:ws/:id",
+          templateUrl: 'views/ws/sortable/pangenome.html',
+          controller: 'WBLanding'
         }).state('ws.phenotype', {
           url: "phenotype/:ws/:id",
           templateUrl: 'views/ws/phenotype.html',
@@ -147,6 +157,7 @@ var app = angular.module('landing-pages',
 
 
 
+    // not in use
     $stateProvider
         .state('favorites', {
           url: "/favorites/",
@@ -154,6 +165,8 @@ var app = angular.module('landing-pages',
           controller: 'Favorites'
         })
 
+
+    // other pages
     $stateProvider
         .state('trees', {
           url: "/trees/",
@@ -172,8 +185,6 @@ var app = angular.module('landing-pages',
             controller: 'RxnDetail'
         })
 
-
-
     $stateProvider
         .state('cpds',
             {url:'/cpds', 
@@ -190,10 +201,6 @@ var app = angular.module('landing-pages',
              url: '/models',
              templateUrl: 'views/object-list.html',
              controller: 'WSObjects'})  
-        .state('modelsbyws', {
-             url: '/models/:ws',
-             templateUrl: 'views/object-list.html',
-             controller: 'WSObjects'})
         .state('modelbyid', {
              url: '/models/:ws/:id',
              templateUrl: 'views/objects/model.html',
@@ -258,7 +265,7 @@ var app = angular.module('landing-pages',
 
 
     $stateProvider
-        .state('genomes',
+        .state('genomescds',
             {url: '/genomes/CDS/:id',
              templateUrl: 'views/objects/genome.html',
              controller: 'GenomeDetail'})
@@ -466,14 +473,6 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     // Critical: used for navigation urls and highlighting
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
-
-    // if logged in, display favorite count in navbar
-    //var prom = kb.ujs.get_has_state('favorites', 'queue', 0);
-    //$.when(prom).done(function(q) {
-    //    console.log(q)
-    //    var q_length = q[0] ? q[1].length : 0;
-    //    $('.favorite-count').text(q_length);
-    //});
 });
 
 

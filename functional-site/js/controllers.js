@@ -336,7 +336,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 .controller('Favorites', function($scope, $state, $stateParams, favoriteService, $compile) {
-    console.log('called favorites!')
     $scope.selected = [{workspace: 'chenrydemo', 
                         name: 'kb|g.9.fbamdl.25.fba.55'}];
     //$scope.type = 'FBA';
@@ -359,7 +358,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     }
 
     // update on first invocation
-    $scope.updateFavs();    
+    //$scope.updateFavs();    
 
     $scope.processData = function() {
         fav_by_kind = {}
@@ -464,6 +463,14 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 
 })
 
+
+
+.controller('NarrativeCtrl', function($scope, $stateParams, $location) {
+    $scope.tab = $stateParams.tab;
+
+
+
+})
 
 .controller('Narrative', function($scope, $stateParams, $location, kbaseLogin, $modal, FeedLoad) {
     //changeNav('narrative', 'newsfeed');

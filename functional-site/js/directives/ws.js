@@ -13,85 +13,7 @@ angular.module('ws-directives', []);
 angular.module('ws-directives')
 .directive('wsselector', function($location, $compile, $state, $stateParams) {
     return {
-        template: '<div class="ws-selector">'+
-                    '<div class="ws-selector-header">'+
-                        //'<a class="show-filters">Filter <span class="caret"></span></a>'+
-                        
-
-                        '<div class="btn-toolbar ws-toolbar">'+
-
-
-                            //(USER_ID ? 
-                            //'<div class="btn-group btn-group-sm">'+
-                            //    '<button type="button" class="btn btn-default btn-show-ws active">'+
-                            //        '<span class="glyphicon glyphicon-th-large"></span>'+
-                            //    '</button>'+                            
-                                //'<button type="button" class="btn btn-default btn-show-fav">'+
-                                //    '<span class="glyphicon glyphicon-star"></span> '+
-                                //    '(<span class="favorite-count">0</span>)'+
-                                //'</button>'+
-                            //'</div>' : 
-                            //    ''
-                            //)+
-
-                            '<div class="btn-group btn-group-sm btn-filter-ws">'+
-                                '<div class="dropdown">'+
-                                    '<a type="button" class="" data-toggle="dropdown">'+
-                                        'Filter <span class="caret"></span>'+
-                                    '</a>'+
-                                    '<ul class="dropdown-menu settings-dropdown perm-filters" role="menu">'+
-                                        //'<div class="checkbox pull-left">'+
-                                        //    '<label><input id="ws-filter-projects" type="checkbox" value="">Narrative Projects</label>'+
-                                        //'</div>'+
-                                        //'<br><hr class="hr">'+
-                                        '<div class="checkbox pull-left">'+
-                                            '<label><input id="ws-filter-owner" type="checkbox" value="">Owner</label>'+
-                                        '</div>'+
-                                        '<br><br><hr class="hr">'+
-                                        'Your permission:<br>'+
-                                        '<div class="checkbox">'+
-                                            '<label><input id="ws-filter-admin" type="checkbox" value="" checked>Admin</label>'+
-                                        '</div>'+
-                                        '<div class="checkbox">'+
-                                          '<label><input id="ws-filter-write" type="checkbox" value="" checked>Write</label>'+
-                                        '</div>'+
-                                        '<div class="checkbox">'+
-                                          '<label><input id="ws-filter-read" type="checkbox" value="" checked>Read</label>'+                                                                                          
-                                        '</div>'+
-
-                                    '</ul>'+
-
-                                '</div>'+
-                            '</div>'+                        
-                            
-                            (USER_ID ? 
-                            '<div class="btn-group btn-group-sm pull-right">'+
-                                '<a type="button" class="btn-new-ws">'+
-                                    'New +'+
-                                '</a>'+
-                            '</div>' : '')+
-
-                            '<div class="fav-toolbar" style="display: none;">'+
-                                '<div class="fav-toolbar-title pull-left">Objects</div>'+
-                                '<button type="button" class="btn btn-default pull-right" ng-click="clearList()">Clear</button>'+                                
-                            '</div>'+
-
-                        '</div>'+
-
-                        //(USER_ID ? '<a class="new-ws pull-right">New+</a>' : '')+
-
-                        '<input type="text" class="search-query" placeholder="Search Workspaces">'+
-                    '</div>'+
-
-
-                    '<div id="select-box" class="select-box scroll-pane">'+
-                      '<table class="table table-bordered table-condensed table-hover">'+
-                      '</table>'+
-                    '</div>'+
-                    '<div favoritesidebar style="display: none;" id="favorite-sidebar" class="scroll-pane"></div>'+
-                  '</div>'
-                  ,
-
+        templateUrl: 'views/ws/ws-selector.html',
         link: function(scope, element, attrs) {
             var perm_dict = {'a': 'Admin',
                              'r': 'Read',
@@ -137,7 +59,7 @@ angular.module('ws-directives')
                         var ws = data[i];
                         var user = ws[2];
 
-                        //quick fix to hide search workspaces
+                        // hide search workspaces
                         if (user == "kbasesearch") continue;  
 
                         if (user == USER_ID) {
@@ -145,6 +67,18 @@ angular.module('ws-directives')
                         } else {
                             sorted_ws.push(ws)
                         }
+                    }
+
+                    // sort my last modified
+                    var owned_ws = owned_ws.sort(compare)
+                    var sorted_ws = sorted_ws.sort(compare)                    
+
+                    function compare(a,b) {
+                        var t1 = kb.ui.getTimestamp(b[3]) 
+                        var t2 = kb.ui.getTimestamp(a[3]) 
+                        if (t1 < t2) return -1;
+                        if (t1 > t2) return 1;
+                        return 0;
                     }
 
                     var data = owned_ws.concat(sorted_ws);
@@ -206,12 +140,12 @@ angular.module('ws-directives')
                 var filterAdmin = filterCollapse.find('#ws-filter-admin').change(filter);
                 var filterWrite = filterCollapse.find('#ws-filter-write').change(filter);
                 var filterRead  = filterCollapse.find('#ws-filter-read').change(filter);
-                var filterProjects  = filterCollapse.find('#ws-filter-projects').change(filter);                
-                //var search = filterSearch.val();
+                //var filterProjects  = filterCollapse.find('#ws-filter-projects').change(filter);                
 
                 // event for clicking on 'create new workspace'
                 $('.btn-new-ws').unbind('click');
                 $('.btn-new-ws').click(function() {
+                    console.log('click')
                     createWorkspaceModal();
                 });
 
@@ -1006,12 +940,8 @@ angular.module('ws-directives')
             var ws = scope.selected_ws;
             var showObjOpts = false;
 
-
             var table;
-
-            // stars in table
             scope.favs;
-
             scope.checkedList = [];
 
             scope.updateFavStars = function() {
@@ -1067,7 +997,8 @@ angular.module('ws-directives')
                 }
             }
 
-            scope.loadObjTable = function() {
+
+            var loadObjTable = function() {
                 showObjOpts = false;
                 var table_id = "obj-table-"+ws.replace(':',"_");                    
 
@@ -1117,10 +1048,10 @@ angular.module('ws-directives')
                 $(element).loading('loading '+ws+'...')
 
 
-
                 var p = kb.ws.list_objects({workspaces: [ws]});
                 var p2 = kb.ws.list_objects({workspaces: [ws], showOnlyDeleted: 1});
-                var p3 = (USER_ID ? kb.ujs.get_has_state('favorites', 'queue', 0) : undefined);
+                //var p3 = (USER_ID ? kb.ujs.get_has_state('favorites', 'queue', 0) : undefined);
+                var p3 = undefined;
                 var p4 = $.getJSON('landing_page_map.json');
 
                 $.when(p, p2, p3, p4).done(function(objs, deleted_objs, favs, obj_mapping){
@@ -1182,10 +1113,137 @@ angular.module('ws-directives')
                     $(element).html('<div class="alert alert-danger">'+e.error.message+'</div>');
                 })
 
+            } 
+
+            // loadObjTable
+
+
+
+            var loadNarTable = function() {
+                console.log('load narrative table')
+                var table_id = "nar-table";                 
+
+                var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
+                                            +'</div>',
+                                             bSortable: false, "sWidth": "1%"} 
+                                          : { "sTitle": '', bVisible: false, "sWidth": "1%"}),
+                                { "sTitle": "Narrative"}, //"sWidth": "10%"
+                                { "sTitle": "Workspace"},
+                                { "sTitle": "Last Modified", "iDataSort": 5},
+                                { "sTitle": "Owner", bVisible: true},
+                                { "sTitle": "Timestamp", "bVisible": false, "sType": 'numeric'},
+                                { "sTitle": "Size", iDataSort: 7 },
+                                { "sTitle": "Byte Size", bVisible: false },
+                                { "sTitle": "Module", bVisible: false }];
+
+                var tableSettings = {
+                    "sPaginationType": "bootstrap",
+                    "bStateSave": true,
+                    "fnStateSave": function (oSettings, oData) {
+                        if (USER_ID) {   
+                            save_dt_view(oSettings, oData);
+                        }
+                    },
+                    "fnStateLoad": function (oSettings) {
+                        if (USER_ID) {
+                            return load_dt_view(oSettings);
+                        }
+                    },
+                    "oColReorder": {
+                        "iFixedColumns": (USER_ID ? 1 :0 ),
+                    },
+                    "iDisplayLength": 100,
+                    "aaData": [],
+                    "fnDrawCallback": events,
+                    "aaSorting": [[ 3, "desc" ]],
+                    "aoColumns": columns,
+                    "oLanguage": {
+                        "sEmptyTable": "No narratives",
+                        "sSearch": "Search: "
+                    }
+                }
+
+
+                // clear object view every load
+                $(element).html('');
+                $(element).loading('loading '+ws+'...');
+
+                var p = kb.ws.list_objects({workspaces: [ws]});
+                var p2 = kb.ws.list_objects({workspaces: [ws], showOnlyDeleted: 1});
+                //var p3 = (USER_ID ? kb.ujs.get_has_state('favorites', 'queue', 0) : undefined);
+                var p3 = undefined;
+                var p4 = $.getJSON('landing_page_map.json');
+
+                $.when(p, p2, p3, p4).done(function(objs, deleted_objs, favs, obj_mapping){
+                    if (favs) {
+                        scope.favs = (favs[0] == 1 ? favs[1] : []);
+                    }
+
+                    scope.deleted_objs = deleted_objs;
+                    scope.obj_mapping = obj_mapping[0];
+
+                    $(element).rmLoading();
+
+                    $(element).append('<table id="'+table_id+'" \
+                        class="table table-bordered table-striped" style="width: 100%;"></table>')    
+
+                    // format and create object datatable
+                    var tableobjs = formatObjs(objs, obj_mapping);
+                    var wsobjs = tableobjs[0];
+                    var kind_counts = tableobjs[1];
+                    tableSettings.aaData = wsobjs;
+                    table = $('#'+table_id).dataTable(tableSettings);       
+                    $compile(table)(scope);
+
+                    // reset filter; critical for ignoring cached filter
+                    console.log(scope.type);
+                    table.fnFilter((scope.type ? scope.type+'-.*' : ''), getCols(table, 'Type'), true);
+
+                    // add trashbin
+                    var trash_btn = getTrashBtn();
+                    $('.dataTables_filter').after(trash_btn);
+
+                    // add show/hide column settings button
+                    var settings_btn = getSettingsBtn(table)
+                    $('.table-options').append(settings_btn);
+                    // ignore close on click inside of *any* settings button
+                    $('.settings-dropdown').click(function(e) {
+                        e.stopPropagation();
+                    });                    
+
+
+                    // show these options if logged in.
+                    if (USER_ID) {
+                        trash_btn.removeClass('hide');
+                    }
+
+                    // if there are objects add type filter,
+                    if (objs.length) {
+                        var type_filter = getTypeFilterBtn(table, kind_counts, scope.type)
+                        $('.table-options').append(type_filter);
+                    }
+
+                    //searchColumns()
+                    addOptionButtons();
+
+                    // resinstantiate all events.
+                    events();
+
+                }).fail(function(e){
+                    $(element).html('<div class="alert alert-danger">'+e.error.message+'</div>');
+                })
             } // end scope.loadObjTable
 
-            // call on load
-            scope.loadObjTable();
+
+            console.log('tab!!!!', scope.tab)
+
+            if (scope.tab == 'mine') {
+                scope.loadNarTable = loadNarTable();
+            } else {
+                scope.loadObjTable = loadObjTable();
+            }
+
+            
 
             function getSettingsBtn(table) {
                 var settings_btn = $('<div class="btn-table-settings dropdown pull-left">'+
@@ -1208,17 +1266,17 @@ angular.module('ws-directives')
                                  '> '+cols[i].sTitle+'</label>\
                                </div>');
                 }
-                dd.append('<hr class="hr">')
-                var reset_btn = $('<button class="btn btn-default btn-settings-opt">Default Settings</button>')
+                dd.append('<hr class="hr">');
+                var reset_btn = $('<button class="btn btn-default btn-settings-opt">Default Settings</button>');
 
-                dd.append(reset_btn)
+                dd.append(reset_btn);
 
                 dd.find('input').change(function() {
                     var col_name = $(this).data('col')
                     fnShowHide(table, col_name);
                 }) 
                 reset_btn.click( function () {
-                    reset_dt_view()
+                    reset_dt_view();
                     scope.loadObjTable();
                 } );
 
@@ -1228,7 +1286,7 @@ angular.module('ws-directives')
             function getTypeFilterBtn(table, type_counts, selected) {
                 var type_filter = $('<select class=" type-filter form-control">\
                                     <option selected="selected">All Types</option> \
-                                </select>')
+                                </select>');
                 for (var type in type_counts) {
                     type_filter.append('<option data-type="'+type+'" '+
                                     (type == selected ? 'selected' : '')+
@@ -1238,7 +1296,7 @@ angular.module('ws-directives')
                     var curr = getCols(table, 'Type')
                     if ($(this).val() == "All Types") {
                         // look for type column (init column 2) in current order
-                        table.fnFilter('', curr)
+                        table.fnFilter('', curr);
                     } else {
                         table.fnFilter( $(this).find('option:selected').data('type')+'-.*', curr, true);
                     }    
@@ -1253,7 +1311,7 @@ angular.module('ws-directives')
                 trash_btn.tooltip({title: 'View trash bin', placement: 'bottom', delay: {show: 700}});
 
                 trash_btn.click(function(){
-                    displayTrashBin()
+                    displayTrashBin();
                 })      
 
                 return trash_btn;          
@@ -1273,8 +1331,8 @@ angular.module('ws-directives')
 
             // function that takes json for the object table and formats
             function formatObjs(objs, obj_mapping) {
-                var wsobjs = []
-                var kind_counts = {}
+                var wsobjs = [];
+                var kind_counts = {};
 
                 for (var i in objs) {
                     var obj = objs[i];
@@ -1353,12 +1411,16 @@ angular.module('ws-directives')
                         case 'Media': 
                             route = 'ws.media';
                             break; 
-                        case 'PhenotypeSet': 
+
+                        case 'PhenotypeSet':
                             route = 'ws.phenotype';
                             break; 
                         case 'PhenotypeSimulationSet': 
                             route = 'ws.simulation';
                             break;     
+                        case 'Pangenome':
+                            route = 'ws.pangenome';
+                            break;
                     }
 
 
