@@ -7,7 +7,7 @@
         options: {
             genomeID: null,
             workspaceID: null,
-            loadingImage: "assets/img/loading.gif",
+            loadingImage: "../../widgets/images/ajax-loader.gif",
             kbCache: null,
             isInCard: false,
         },
@@ -58,6 +58,47 @@
                                    );
                                })
                            );
+			
+			this.$infoPanel.append($("<button>")
+                                 .addClass("btn btn-primary")
+                                 .append("Literature Search")
+								 .attr("type", "button")
+								 .on("click",
+									function(event) {
+										self.entityClient = new CDMI_EntityAPI(self.cdmiURL)
+										self.entityClient.get_entity_Genome([self.options.genomeID],
+										['id', 'scientific_name', 'domain', 'complete', 'dna_size', 'source_id', 
+										 'contigs', 'gc_content', 'pegs', 'rnas'],
+
+										$.proxy(function(genome) {
+											genome = genome[self.options.genomeID];
+											self.genome = genome; // store it for now.
+
+											if (!genome) {
+												self.renderError("Genome '" + self.options.genomeID + "' not found in the KBase Central Store.");
+												return;
+											}
+											
+											self.pubmedQuery = genome.scientific_name
+											var literature = $.get('http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+self.pubmedQuery,
+												function(data) {
+													self.trigger("showLitWidget", 
+														{ 
+															literature: data, 
+															workspaceId: self.options.workspaceID,
+															genomeId: self.options.genomeID,
+															kbCache: self.options.kbCache,
+															event: event,
+														}
+													);
+												})
+											
+										}, self),
+										self.renderError
+									);
+                                 })
+							);
+								 
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
             this.$infoPanel.append($("<div>").append(this.$infoTable));
@@ -89,7 +130,7 @@
                                         }
                                     })
                                  });
-
+			
             this.$infoPanel.append($("<div>")
                               .addClass("form-inline")
                               .append(this.$contigSelect)
@@ -97,6 +138,10 @@
 
             this.$infoPanel.hide();
             this.$elem.append(this.$infoPanel);
+			
+			// self.pubmedQuery = ""
+			console.log(self.pubmedQuery)
+
         },
 
         addInfoRow: function(a, b) {
@@ -139,7 +184,9 @@
                         this.renderError("Genome '" + this.options.genomeID + "' not found in the KBase Central Store.");
                         return;
                     }
-
+					
+					self.pubmedQuery = genome.scientific_name
+					
                     this.$infoTable.empty()
                                    .append(this.addInfoRow("ID", genome.id))
                                    .append(this.addInfoRow("Name", genome.scientific_name))

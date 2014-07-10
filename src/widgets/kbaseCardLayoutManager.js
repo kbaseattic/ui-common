@@ -1159,8 +1159,28 @@
                                      "showMAKCluster", 
                                      "showBambiMotif",
                                      "showBambiRunParameters", 
-                                     "showBambiRawOutput"];
+                                     "showBambiRawOutput",
+									 "showLitWidget"];
 
+			/**
+             * Event: showLitWidget
+             * ------------------
+             * Adds new kbaseLitWidget card.
+             */
+			$(document).on("showLitWidget", function(event, data) {
+				self.addNewCard("KBaseLitWidget",
+					{
+						literature: data.literature,
+                        loadingImage: self.options.loadingImage,
+					},
+					{
+						my: "right top",
+						at: "right+800 bottom",
+						of: data.event
+				});
+
+			});
+			
             /**
              * Event: showDomains
              * ------------------
