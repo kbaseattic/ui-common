@@ -338,5 +338,19 @@ angular.module('card-directives')
                 });
             }
         };
+    })
+    .directive('wsrefcards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "wsref", 
+                    data: scope.params,
+                    auth: $rootScope.USER_TOKEN,
+                    userId: $rootScope.USER_ID
+                });
+            }
+        };
     });
+
 

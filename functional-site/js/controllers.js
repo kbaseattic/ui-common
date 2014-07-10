@@ -146,6 +146,10 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
 })
 
+.controller('WsRefViewer', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws, 'version':$stateParams.version }
+})
+
 .controller('Trees', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;

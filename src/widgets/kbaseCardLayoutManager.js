@@ -728,6 +728,8 @@
                 this.showModelCards();
             else if (this.options.template.toLowerCase() === "spec")
                 this.showSpecCards();
+            else if (this.options.template.toLowerCase() === "wsref")
+                this.showRefCards();
             else if (this.options.template.toLowerCase() === "ppid")
                 this.showPPICards();
             else {
@@ -1103,6 +1105,25 @@
                     );
             return this;
         },
+        showRefCards: function() {
+            var x = 2;
+            this.addNewCard("KBaseWSReferenceList",
+                        {
+                            wsNameOrId: this.options.data.ws,
+                            objNameOrId: this.options.data.id,
+                            objVer: this.options.data.version,
+                            authToken: this.options.auth,
+                            userId: this.options.userId
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+            return this;
+        },
+        
 
         /**
          * Registers all events that this manager should know about.

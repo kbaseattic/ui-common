@@ -129,7 +129,7 @@ var app = angular.module('landing-pages',
           controller: 'WBModelLanding'
         }).state('ws.genomes', {
           url: "genomes/:ws/:id",
-          templateUrl: 'views/ws/sortable/genome.html',
+          templateUrl: 'views/objects/genome.html',
           controller: 'WBLanding'
         }).state('ws.media', {
           url: "media/:ws/:id",
@@ -147,7 +147,7 @@ var app = angular.module('landing-pages',
           url: "json/:ws/:id",
           templateUrl: 'views/ws/json.html',
           controller: 'WBJSON'
-        }); /* model viewer */
+        });
 
 
     $stateProvider
@@ -365,6 +365,20 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/objects/spec.html',
              controller: 'SpecDetail'});
 
+    
+    $stateProvider
+        .state('wsref', {
+          url: "/ref/:ws/:id",
+          templateUrl: 'views/ws/ws-ref-list.html',
+          controller: 'WsRefViewer'
+        });
+    $stateProvider
+        .state('wsrefwithversion', {
+          url: "/ref/:ws/:id/:version",
+          templateUrl: 'views/ws/ws-ref-list.html',
+          controller: 'WsRefViewer'
+        });
+             
     $stateProvider
         .state('bambibyid',
             {url: '/bambi/:ws/:id',
