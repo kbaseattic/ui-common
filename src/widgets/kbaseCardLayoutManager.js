@@ -772,6 +772,22 @@
                     of: "#app"
                 }
             );
+            
+            // only add the reference list if this is a WS object
+            if (this.options.data.workspaceID) {
+                this.addNewCard("KBaseWSReferenceList",
+                    {
+                        wsNameOrId: this.options.data.workspaceID,
+                        objNameOrId: this.options.data.genomeID,
+                        objVer: null
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom+570",
+                        of: "#app"
+                    }
+                );
+            }
             return this;
         },
 

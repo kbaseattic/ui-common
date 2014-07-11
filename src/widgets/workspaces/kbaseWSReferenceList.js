@@ -14,7 +14,7 @@
             authToken: null,
             userId: null,
             wsUrl:null,
-            width:700
+            width:900
         },
 
         
@@ -47,7 +47,7 @@
             var objectIdentity = self.getObjectIdentity(options.wsNameOrId, options.objNameOrId, options.objVer);
             kbws.list_referencing_objects([objectIdentity], function(data) {
                     if (data[0].length == 0) {
-                        self.$elem.append("<br>No objects reference this object.<br>");
+                        self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
                     } else {
                         var refList = {};
                         for(var i = 0; i < data[0].length; i++) {
@@ -91,7 +91,7 @@
             				"iDisplayLength": 10,
                                         "sDom": 't<flip>',
             				"aoColumns": [
-            				              {sTitle: "Object Name (reference)", mData: "na"},
+            				              {sTitle: "Object Name (reference)", mData: "na", sWidth:"30%"},
             				              {sTitle: "Type", mData: "ty"},
             				              {sTitle: "Details", mData: "de"}
             				              ],
@@ -109,17 +109,17 @@
                     }
                 }, function(err) {
                     self.$elem.find('#loading-mssg').remove();
-                    self.$elem.append("<br><div><b>Error in finding referencing objects!</b></div>");
-                    console.error("Error in finding referencing objects!");
+                    self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
+                    console.error("Error in finding referencing objects! (note: v0.1.6 throws this error if no referencing objects were found)");
                     console.error(err);
-                    self.$elem.append("<br><div><i>Error was:</i></div><div>"+err['error']['message']+"</div><br>");
+                    //self.$elem.append("<br><div><i>Error was:</i></div><div>"+err['error']['message']+"</div><br>");
                 });
             
             return this;
         },
         
         getData: function() {
-            return {title:"Data objects referencing <b>"+ this.objName+"</b>", workspace:this.wsName};
+            return {title:"Data objects that reference:",id:this.objName, workspace:this.wsName};
         },
         
         
