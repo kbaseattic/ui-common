@@ -1,7 +1,7 @@
 /* Directives */
 
 //app.directive();
-var searchApp = angular.module('search', ['ui.router', 'kbaseLogin']);
+var searchApp = angular.module('search', ['ui.router','kbaseLogin']);
 
 
 // enable CORS for Angular
@@ -42,6 +42,29 @@ searchApp.service('searchCategoryLoadService', function($q, $http, $rootScope) {
 
 searchApp.service('searchOptionsService', function searchOptionsService() {
     // Model data that persists for all searches
+    var _userData = {"token": null,
+                     "selectAll": {},
+                     "selectedWorkspace": null,
+                     "workspaces": null,
+                     "selections": null,
+                     "selectionsLength": 0,
+                     "viewType": "compact",
+                     "loggedIn": false,
+                     "user_id": null,
+                     "carts": {},
+                     "dataTransferred": [],
+                     "dataTransferredLength": 0
+                    };
+
+
+    if (!localStorage.hasOwnProperty("searchUserState")) {
+        localStorage.setItem("searchUserState", _userData);
+    }    
+    
+    if(!localStorage.searchUserState.hasOwnProperty("carts")) {
+        localStorage.searchUserState.carts = {};
+    }
+
     return {
         categoryInfo : {},
         categoryTemplates : {},
@@ -56,18 +79,7 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
         categoryCounts : {},
         searchOptions : this.defaultSearchOptions,                                          
         defaultMessage : "KBase is processing your request...",
-        userState : {"token": null,
-                     "selectAll": {},
-                     "selectedWorkspace": null,
-                     "workspaces": null,
-                     "selections": null,
-                     "selectionsLength": 0,
-                     "viewType": "compact",
-                     "loggedIn": false,
-                     "user_id": null,
-                     "active_facets": {},
-                     "dataTransferred": []
-                    },
+        userState : JSON.parse(localStorage.searchUserState),
         landingPages : {"genome": "/genomes/CDS/",
                         "feature": "/genes/CDS/",
                         "gwasPopulation": "/KBaseGwasData.GwasPopulation/",
@@ -83,6 +95,7 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
         selectedCategory : null,
         pageLinksRange : [],
         facets : null,
+        active_facets: {},
 
         reset : function() {
             this.categoryCounts = {};
@@ -94,19 +107,8 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
             this.pageLinksRange = [];
             this.facets = null;
             this.searchOptions = this.defaultSearchOptions;                                          
-            
-            this.userState = {"token": null,
-                              "selectAll": {},
-                              "selectedWorkspace": null,
-                              "workspaces": null,
-                              "selections": null,
-                              "selectionsLength": 0,
-                              "viewType": "compact",
-                              "loggedIn": false,
-                              "user_id": null,
-                              "active_facets": {},
-                              "dataTransferred": []
-                             };
+
+            this.userState = JSON.parse(localStorage.searchUserState);
         }
     };
 });
@@ -441,9 +443,11 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
     $scope.newSearch = function () {
         if ($scope.options.searchOptions.general.q && $scope.options.searchOptions.general.q.length > 0) {
+            localStorage.setItem("searchUserState", JSON.stringify($scope.options.userState));
+
             // if we are in the category view, update the individual count
             if ($scope.options.selectedCategory) {
-                $scope.getCount({q: $scope.options.searchOptions.general.q}, $scope.options.selectedCategory);
+                $scope.getCount({q: $scope.options.searchOptions.general.q}, $scope.options.selectedCategory);        
                 $state.go('search', {q: $scope.options.searchOptions.general.q, page: 1});
             }
             else {
@@ -500,15 +504,15 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     
             if ($stateParams.facets !== null) {
                   var addFacetParam = function(name, value) {
-                      if (!$scope.options.userState.active_facets.hasOwnProperty($scope.options.selectedCategory)) {        
-                          $scope.options.userState.active_facets[$scope.options.selectedCategory] = {};
+                      if (!$scope.options.active_facets.hasOwnProperty($scope.options.selectedCategory)) {        
+                          $scope.options.active_facets[$scope.options.selectedCategory] = {};
                       }
 
-                      if (!$scope.options.userState.active_facets[$scope.options.selectedCategory].hasOwnProperty(name)) {
-                          $scope.options.userState.active_facets[$scope.options.selectedCategory][name] = {};        
+                      if (!$scope.options.active_facets[$scope.options.selectedCategory].hasOwnProperty(name)) {
+                          $scope.options.active_facets[$scope.options.selectedCategory][name] = {};        
                       }
         
-                      $scope.options.userState.active_facets[$scope.options.selectedCategory][name][value] = true;                                            
+                      $scope.options.active_facets[$scope.options.selectedCategory][name][value] = true;                                            
                   };
             
                   $scope.options.facets = [];                  
@@ -571,6 +575,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         $scope.options.selectedCategory = value;
         
         //console.log("Selected category : " + value);
+        localStorage.setItem("searchUserState", JSON.stringify($scope.options.userState));
         
         if (value === null || value === 'null') {
             $scope.options.reset();
@@ -649,7 +654,9 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     $scope.setResultsPerPage = function (value) {
         $scope.options.searchOptions.general.itemsPerPage = parseInt(value);
 
-        $scope.removeAllSelections();
+        //$scope.removeAllSelections();
+
+        localStorage.setItem("searchUserState", JSON.stringify($scope.options.userState));
     
         //reset the page to 1
         $state.go("search", {itemsPerPage: $scope.options.searchOptions.general.itemsPerPage, page: 1});
@@ -674,6 +681,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 $scope.options.searchOptions.perCategory[category].sort += name + " " + direction;
             }
         }
+
+        localStorage.setItem("searchUserState", JSON.stringify($scope.options.userState));
         
         $state.go("search", {sort: $scope.options.searchOptions.perCategory[category].sort, page: 1});
     };
@@ -683,6 +692,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         $scope.removeSearchFilter(category, "sort", name, null);
         
         if (searchAgain) {
+            localStorage.setItem("searchUserState", JSON.stringify($scope.options.userState));
             $state.go("search", {sort: $scope.options.searchOptions.perCategory[category].sort, page: 1});
         }
     };
@@ -695,6 +705,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         catch(e) {
             $scope.options.searchOptions.perCategory[$scope.options.selectedCategory] = {'page': page};
         }
+
+        localStorage.setItem("searchUserState", JSON.stringify($scope.options.userState));
     
         $state.go("search", {page: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].page});
     };
@@ -721,16 +733,17 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets += "," + name + ":" + value;        
         }        
     
-        if (!$scope.options.userState.active_facets.hasOwnProperty($scope.options.selectedCategory)) {        
-            $scope.options.userState.active_facets[$scope.options.selectedCategory] = {};
+        if (!$scope.options.active_facets.hasOwnProperty($scope.options.selectedCategory)) {        
+            $scope.options.active_facets[$scope.options.selectedCategory] = {};
         }
 
-        if (!$scope.options.userState.active_facets[$scope.options.selectedCategory].hasOwnProperty(name)) {
-            $scope.options.userState.active_facets[$scope.options.selectedCategory][name] = {};        
+        if (!$scope.options.active_facets[$scope.options.selectedCategory].hasOwnProperty(name)) {
+            $scope.options.active_facets[$scope.options.selectedCategory][name] = {};        
         }
         
-        $scope.options.userState.active_facets[$scope.options.selectedCategory][name][value] = true;        
-        
+        $scope.options.active_facets[$scope.options.selectedCategory][name][value] = true;        
+
+        $scope.getCount({q: $scope.options.searchOptions.general.q}, $scope.options.selectedCategory);        
         $state.go("search", {facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
     };
 
@@ -738,19 +751,17 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     $scope.removeFacet = function (name, value) {
         $scope.removeSearchFilter($scope.options.selectedCategory, "facets", name, value);
                 
-        delete $scope.options.userState.active_facets[$scope.options.selectedCategory][name][value];
+        delete $scope.options.active_facets[$scope.options.selectedCategory][name][value];
         
-        if ($.isEmptyObject($scope.options.userState.active_facets[$scope.options.selectedCategory].name)) {
-            delete $scope.options.userState.active_facets[$scope.options.selectedCategory].name;
+        if ($.isEmptyObject($scope.options.active_facets[$scope.options.selectedCategory].name)) {
+            delete $scope.options.active_facets[$scope.options.selectedCategory].name;
         }
     
         if (!$scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
-            $scope.options.userState.active_facets[$scope.options.selectedCategory] = {};
+            $scope.options.active_facets[$scope.options.selectedCategory] = {};
         }
 
-        //console.log($scope.options.userState.active_facets[$scope.options.selectedCategory]);
-    
-        //console.log("Removed filter: " + name);
+        $scope.getCount({q: $scope.options.searchOptions.general.q}, $scope.options.selectedCategory);        
         $state.go("search", {facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
     };
 
@@ -809,6 +820,11 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         else {
             $scope.options.userState.selectedWorkspace = workspace_info[1];
         }
+        
+        // setup a cart for any data to copy or save to this workspace
+        if (!$scope.options.userState.carts.hasOwnProperty($scope.options.userState.selectedWorkspace)) {
+            $scope.options.userState.carts[$scope.options.userState.selectedWorkspace] = {};
+        }
     };
 
 
@@ -827,7 +843,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
         for(var n in $scope.options.userState.selections) {
             if ($scope.options.userState.selections.hasOwnProperty(n)) {
-                if ($scope.options.userState.selections[n]["object_type"].indexOf("KBaseSearch.Genome") > -1) {                    
+                if ($scope.options.userState.selections[n]["object_type"].indexOf("KBaseSearch.Genome") > -1) {
                     $scope.workspace_service.get_object_info([{"name": $scope.options.userState.selections[n]["genome_id"], "workspace": "KBasePublicGenomesLoad"}])
                         .fail(function (xhr, status, error) {
                             console.log(xhr);
@@ -835,19 +851,45 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                             console.log(error);
                         })
                         .done(function (info, status, xhr) {
+                            setTimeout(function() { ; }, 200);                        
+                            
+                            var max_tries = 10;
+                            var tries = 0;
+
+                            var copy_genome = function () {
+                                $scope.workspace_service.copy_object({"from": {"workspace": "KBasePublicGenomesLoad", "name": info[0][1]}, "to": {"workspace": $scope.options.userState.selectedWorkspace, "name": info[0][1]}}, success, error);        
+                            };
+                        
+                        
                             function success(result) {
-                                $scope.options.userState.dataTransferred.push($scope.options.userState.selections[n]);
-                                $scope.removeSelection(n);
+                                console.log("Genome copy success");
+                                $scope.$apply(function () {
+                                    $scope.options.userState.dataTransferred.push($scope.options.userState.selections[n]);
+                                    $scope.options.userState.dataTransferredLength += 1;
+                                });
                             }
     
                             function error(result) {
+                                if (tries < max_tries) {
+                                    tries += 1;
+                                    console.log("Failed save, number of retries : " + (tries - 1));
+                                    copy_genome();
+                                }
+                                else {
+                                    console.log(xhr);
+                                    console.log(status);
+                                    console.log(error);
+                                    console.log(feature_obj);
+                                }
+
+
                                 console.log("Object failed to copy");
                                 console.log(result);
                                 
-                                $scope.transferError($scope.options.userState.selections[n]["object_name"], $scope.options.userState.selections[n]["object_id"], result);
+                                $scope.transferError($scope.options.userState.selections[n]["object_name"], $scope.options.userState.selections[n]["object_id"], result);                            
                             }
-                                                        
-                            $scope.workspace_service.copy_object({"from": {"workspace": "KBasePublicGenomesLoad", "name": info[0][1]}, "to": {"workspace": $scope.options.userState.selectedWorkspace, "name": info[0][1]}}, success, error);        
+                                    
+                            copy_genome();                    
                         });
                 }                    
                 else if ($scope.options.userState.selections[n]["object_type"].indexOf("KBaseSearch.Feature") > -1) {                
@@ -912,8 +954,10 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                                             })
                                             .done(function (info, status, xhr) {
                                                 console.log("Save successful, object info : " + info);
-                                                $scope.options.userState.dataTransferred.push($scope.options.userState.selections[n]);
-                                                $scope.removeSelection(n);
+                                                $scope.$apply(function () {
+                                                    $scope.options.userState.dataTransferred.push($scope.options.userState.selections[n]);
+                                                    $scope.options.userState.dataTransferredLength += 1;
+                                                });
                                             });        
                                             
                                     };
@@ -931,12 +975,11 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                             console.log(error);
                         })
                         .done(function (info, status, xhr) {
-                            console.log(info);
-                            
                             function success(result) {
-                                $scope.options.userState.dataTransferred.push($scope.options.userState.selections[n]);
-                                $(".progress").attr('width',$(".progress").attr('width') + 1);
-                                $scope.removeSelection(n);
+                                $scope.$apply(function () {
+                                    $scope.options.userState.dataTransferred.push($scope.options.userState.selections[n]);
+                                    $scope.options.userState.dataTransferredLength += 1;
+                                });
                             }
     
                             function error(result) {
@@ -963,8 +1006,6 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                                 console.log(error);
                             })
                             .done(function (info, status, xhr) {
-                                console.log(info);
-                                console.log([info[0][0], $scope.options.userState.selections[n]["object_id"], $scope.options.userState.selections[n]["workspace_name"], $scope.options.userState.selectedWorkspace]);
                                 $scope.copyTypedObject(info[0][1], $scope.options.userState.selections[n]["object_id"], $scope.options.userState.selections[n]["workspace_name"], $scope.options.userState.selectedWorkspace);
                             });
                     }
@@ -990,6 +1031,12 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         $scope.options.userState.selectionsLength = 0;
     };
     
+    $scope.emptyTransfers = function() {        
+        $scope.options.userState.dataTransferred = [];
+        $scope.options.userState.dataTransferredLength = 0;
+
+        localStorage.setItem("searchUserState", JSON.stringify($scope.options.userState));        
+    };
     
     $scope.transferError = function(object_name, object_ref, result) {
         if (!$scope.options.userState.transferErrors) {
@@ -1007,8 +1054,10 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
         function success(result) {
             console.log("Object " + object_name + " copied successfully from " + from_workspace_name + " to " + to_workspace_name + " .");
-            console.log(result);
-            $scope.removeSelection(n);
+            $scope.$apply(function () {
+                $scope.options.userState.dataTransferred.push(result);
+                $scope.options.userState.dataTransferredLength += 1;
+            });
         }
     
         function error(result) {

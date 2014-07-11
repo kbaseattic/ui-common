@@ -1,62 +1,98 @@
-<div class="modal fade" id="transferPanel" tabindex="-1" role="dialog" aria-labelledby="transferPanel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+<div class="search-transfer-modal modal fade" id="transferPanel" tabindex="-1" role="dialog" aria-labelledby="transferPanel" aria-hidden="true">
+    <div class="search-transfer-modal modal-dialog">
+        <div class="search-transfer-modal modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <!--<button type="button" class="close" ng-class="{disabled: options.userState.dataTransferredLength > 0 && options.userState.dataTransferredLength/options.userState.selectionsLength * 100 < 100}" data-dismiss="modal" aria-hidden="true" ng-click="emptyTransfers()">&times;</button>-->
                 <h4 class="modal-title search-categories-title text-center">Copy objects to Workspaces</h4>
             </div>
             <div class="modal-body" style="overflow:auto;">
-                <div class='search-transfer-options-panel-anchor'/>
-                <div class='search-transfer-options-panel'>    
-                    <div class="text-center">           
-                        <div class="btn-group">                    
-                            <button ng-class="{'disabled': !options.userState.loggedIn}" type="button" class='btn btn-default dropdown-toggle search-leftarea-size' data-toggle="dropdown" ng-click='listWorkspaces()'>
-                                Select a workspace <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu search-workspace-menu" role="menu" aria-labelledby="workspace-choose">
-                                <div id="workspace-area" class="panel">
-                                    <ul class='nav nav-pills nav-stacked scroll-menu'>
-                                        <li ng-repeat="w in options.userState.workspaces">
-                                            <a ng-click='selectWorkspace(w)'>
-                                                <span class='badge'>{{w[4]}}</span>
-                                                <span>{{w[1]}}</span>
-                                            </a>
-                                        </li>
-                                    </ul>
+                <div class='tab-content'>    
+                    <div class="tab-pane active">
+                        <div class="row">
+                            <div class="col-md-5 text-center">
+                                <div ng-show="options.userState.selectedWorkspace">
+                                    <span><h3>{{options.userState.selectedWorkspace}}</h3></span>
+                                    <table class="search-transfer-table table table-striped table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th class="transfer_object_type">Object Type</th>
+                                                <th class="transfer_object_id">Object Id</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>    
                                 </div>
-                            </ul>
-                        </div>
-                    </div> <!-- end select workspace area -->
+                            </div>
+                            <div class="col-md-2 text-center">                    
+                                <div class="btn-group">                    
+                                    <button ng-class="{'disabled': !options.userState.loggedIn}" type="button" class='btn btn-default dropdown-toggle' data-toggle="dropdown" ng-click='listWorkspaces()'>
+                                        Select a workspace <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu search-workspace-menu" role="menu">
+                                        <div id="workspace-area" class="panel">
+                                            <ul class='nav nav-pills nav-stacked scroll-menu'>
+                                                <li ng-repeat="w in options.userState.workspaces">
+                                                    <a ng-click='selectWorkspace(w)'>
+                                                        <span class='badge'>{{w[4]}}</span>
+                                                        <span>{{w[1]}}</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </ul>
+                                </div> <!-- end select workspace area -->
+                                <div ng-show="options.userState.selectedWorkspace" class="text-center">
+                                    <div class="workspace-title">
+                                        <h3>Selected workspace</h3>
+                                    </div>
+                                    <strong>{{options.userState.selectedWorkspace}}</strong>
+                                </div>
 
-                    <div ng-show="options.userState.selectedWorkspace" class="text-center">
-                        <div class="workspace-title">
-                            <h3>Selected workspace</h3>
+                                <div class="search-stage-transfer-buttons">
+                                    <div class="row">
+                                        <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-arrow-left"></span></button>
+                                    </div>
+                                    <div class="row">
+                                        <button ng-class="{disabled: !options.userState.cart[options.userState.selectedWorkspace]}" class="btn btn-default" type="button"><span class="glyphicon glyphicon-arrow-right"></span></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5 text-center search-transfer-table">
+                                <span><h3>Data Cart</h3></span>
+                                <table class="table table-striped table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" ng-model="options.userState.cart[options.userState.selectedWorkspace].all" ng-true-value="true" ng-false-value="false"></input></th>
+                                            <th class="transfer_object_type">Object Type</th>
+                                            <th class="transfer_object_id">Object Id</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="s in options.userState.selections" ng-click="console.log(s)" ng-class="{'search-transfer-table-row-selected': options.userState.selectedWorkspace}">
+                                            <td><input type="checkbox" ng-model="options.userState.cart[options.userState.selectedWorkspace].s" ng-true-value="{{s}}" ng-false-value="null"></input></td>
+                                            <td class="transfer_object_type text-left" ng-click="console.log(s)">{{s.object_type}}</td>
+                                            <td class="transfer_object_id text-left" ng-click="console.log(s)">{{s.object_id}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>    
+                            </div>
                         </div>
-                        <strong>{{options.userState.selectedWorkspace}}</strong>
-                    </div>
-
-                    <table class="table table-striped table-condensed">
-                        <thead>
-                            <tr>
-                                <th style="column-width:150px;">Object Type</th>
-                                <th style="column-width:400px;">Object Id</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="s in options.userState.selections">
-                                <td style="column-width:150px;">{{s.object_type}}</td>
-                                <td style="column-width:400px;">{{s.object_id}}</td>
-                            </tr>
-                        </tbody>
-                    </table>    
-                    
+                
+                    </div> <!-- end copy tab -->    
                 </div> <!-- end transfer panel -->
             </div> <!-- end modal body --> 
             <div class="modal-footer">
-                <progress ng-value="options.userState.dataTransferred.length" ng-max="100">
-                </progress>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" ng-class="{'disabled': !options.userState.selectedWorkspace}" ng-click="addAllObjects()">Transfer<span class="glyphicon glyphicon-transfer"><span></button>
+                <div ng-show="options.userState.dataTransferredLength > 0 && options.userState.selectionsLength > 0">
+                    <div class="text-center">Transferring</div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{'min-width': (options.userState.dataTransferredLength/options.userState.selectionsLength * 100) + '%'}">
+                            {{options.userState.dataTransferredLength/options.userState.selectionsLength * 100 | number:2}}%
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-default" ng-class="{disabled: options.userState.dataTransferredLength > 0 && options.userState.dataTransferredLength/options.userState.selectionsLength * 100 < 100}" data-dismiss="modal" ng-click="emptyTransfers()">Close</button>
+                <button type="button" class="btn btn-primary" ng-class="{'disabled': !options.userState.selectedWorkspace}" ng-click="transferring = true; addAllObjects(); transferring = false;">Transfer<span class="glyphicon glyphicon-transfer"><span></button>
             </div> <!-- end modal footer -->        
         </div> <!-- end modal-content -->
     </div> <!-- end modal-dialog -->
@@ -88,7 +124,7 @@
                     </div>
 
                     <div class="text-center">
-                        <span class="badge" style="font-size:18px; margin-left: auto; margin-right: auto;">{{options.userState.selectionsLength}}</span>
+                        <span class="badge" style="font-size:18px; margin-left: auto; margin-right: auto;">{{options.userState.selectionsLength | number}}</span>
                         <div>
                             <span class="glyphicon glyphicon-shopping-cart search-cart"></span>
                         </div>
@@ -125,11 +161,11 @@
 
                     <div ng-hide="options.categoryCounts[p.category] < 1 || !isInActiveCategoryTree(p.category)" ng-repeat="p in options.categoryInfo.displayTree.unauthenticated.children">
                         <a id="{{p.category}}" href="" ng-class="{'search-category-link': p.category != options.selectedCategory, 'search-selected-category-link': p.category == options.selectedCategory}" class="btn btn-link" ng-click="$parent.selectCategory(p.category)">
-                            <span>{{p.label}}</span><span class='search-space-left'>(</span>{{options.categoryCounts[p.category]}}<span>)</span>
+                            <span>{{p.label}}</span><span class='search-space-left'>(</span>{{options.categoryCounts[p.category] | number}}<span>)</span>
                         </a>
                         <div ng-hide="options.categoryCounts[k.category] < 1 || !isInActiveCategoryTree(k.category)" class="search-space-left" ng-repeat="k in p.children">
                             <a id="{{k.category}}" href="" ng-class="{'search-category-link': k.category != options.selectedCategory, 'search-selected-category-link': k.category == options.selectedCategory}" class="btn btn-link" ng-click="$parent.$parent.selectCategory(k.category)">
-                                <span>{{k.label}}</span><span class='search-space-left'>(</span>{{options.categoryCounts[k.category]}}<span>)</span>
+                                <span>{{k.label}}</span><span class='search-space-left'>(</span>{{options.categoryCounts[k.category] | number}}<span>)</span>
                             </a>
                         </div>
                     </div> <!-- end children of Public category -->
@@ -149,11 +185,11 @@
                         </div>
                         <div class="col-md-12" ng-repeat="facet_option in facet.value">
                             <div ng-show="facet_option.value > 0" class="col-md-12">
-                                <a href="" ng-click="toggleFacet(facet.key, facet_option.key, options.userState.active_facets[options.selectedCategory][facet.key][facet_option.key])" class="search-checkbox-link">
-                                    <span class="glyphicon" ng-class="{'glyphicon-check': options.userState.active_facets[options.selectedCategory][facet.key][facet_option.key],'glyphicon-unchecked': !options.userState.active_facets[options.selectedCategory][facet.key][facet_option.key]}"/>                    
+                                <a href="" ng-click="toggleFacet(facet.key, facet_option.key, options.active_facets[options.selectedCategory][facet.key][facet_option.key])" class="search-checkbox-link">
+                                    <span class="glyphicon" ng-class="{'glyphicon-check': options.active_facets[options.selectedCategory][facet.key][facet_option.key],'glyphicon-unchecked': !options.active_facets[options.selectedCategory][facet.key][facet_option.key]}"/>                    
                                 </a>
                                 <span class="search-space-left">{{facet_option.key}}</span>
-                                <span class="search-space-left">({{facet_option.value}})</span>
+                                <span class="search-space-left">({{facet_option.value | number}})</span>
                             </div>
                         </div>
                     </div>
@@ -201,7 +237,7 @@
                                 <td class="search-category-title" ng-click="selectCategory(p.category)">
                                     <a><span>{{p.label}}</span></a>
                                 </td>
-                                <td class="search-category-title search-space-left"><span class='search-space-left'>(</span>{{options.categoryCounts[p.category]}}<span>)</span></td>
+                                <td class="search-category-title search-space-left"><span class='search-space-left'>(</span>{{options.categoryCounts[p.category] | number}}<span>)</span></td>
                             </tr>
                         </table>
                     </div>                                    
@@ -210,7 +246,7 @@
                     <div ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0 && options.categoryRelationships[options.selectedCategory].children.length == 0" class="row search-result-set-header"> <!-- result options -->
                         <div class="btn-toolbar row">
                             <div class="btn-group search-results-counter col-sm-5 col-md-7 col-lg-7">
-                                <div><strong>Displaying results {{ 1 + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) }}-{{ options.resultJSON.itemCount + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) }} out of {{ options.resultJSON.totalResults }}.</strong></div>
+                                <div><strong>Displaying results {{ 1 + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }}-{{ options.resultJSON.itemCount + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }} out of {{ options.resultJSON.totalResults | number }}.</strong></div>
                             </div>
                             <div class="btn-group col-md-1 search-view-buttons" data-toggle="buttons">
                                 <label for="list_view" class="control-label input-group">Views</label>

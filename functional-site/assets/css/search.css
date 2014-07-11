@@ -125,6 +125,11 @@ span .badge {
 
 /*** Workspace ***/
 
+.search-workspace-menu {
+    left: -125px;
+    width: 400px;
+}
+
 .workspace-title h3 {
     font-size: 18px;
     color: gray;
@@ -185,32 +190,27 @@ span .badge {
 
 
 /*** Options ***/
-      
-.search-transfer-options-panel-anchor {
-/*
-    position: absolute;
-    left: 80px;
-    top: 310px;
-*/
-    width: 0;
-    height: 0;
-    border-left: 16px solid transparent;
-    border-right: 16px solid transparent;
-    border-bottom: 16px solid white;  
+
+.modal.search-transfer-modal .modal-dialog {
+    width: 90%;
 }
 
+.search-stage-transfer-buttons {
+    position: relative;
+    top: 100px;
+}
 
-.search-transfer-options-panel {
-/*
-    z-index: 1001!important;
-    position: absolute;
-    left: 80px;
-    top: 320px;
-*/
-    min-width: 400px;
-    max-width: 600px;
-    height: 400px;
-    padding: 10px;    
+.search-transfer-table {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.transfer_object_type {
+    column-width: 150px;
+}
+
+.transfer_object_id {
+    column-width: 400px;
 }
 
 .progress-bar {
