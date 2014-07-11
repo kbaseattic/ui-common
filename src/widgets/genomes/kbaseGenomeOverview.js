@@ -34,9 +34,44 @@
                 this.renderCentralStore();
             else
                 this.renderWorkspace();
-
+															
             return this;
         },
+		
+		queryWorkspace: function() {
+			self = this;
+			var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
+
+            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+			
+            $.when(prom).done($.proxy(function(genome) {
+                genome = genome[0];
+				this.pubmedQuery = genome.scientific_name;
+			}, this));
+            $.when(prom).fail($.proxy(function(error) { this.renderError(error); }, this));
+	
+		},
+		
+		queryCentralStore: function() {
+			self = this;
+			self.entityClient = new CDMI_EntityAPI(self.cdmiURL)
+			self.entityClient.get_entity_Genome([self.options.genomeID],
+			['id', 'scientific_name', 'domain', 'complete', 'dna_size', 'source_id', 
+			'contigs', 'gc_content', 'pegs', 'rnas'],
+
+			$.proxy(function(genome) {
+				genome = genome[self.options.genomeID];
+				self.genome = genome; // store it for now.
+				if (!genome) {
+					self.renderError("Genome '" + self.options.genomeID + "' not found in the KBase Central Store.");
+					return;
+				}
+				this.pubmedQuery = genome.scientific_name
+				
+			}, self),
+			self.renderError
+			)
+		},
 
         render: function() {
             var self = this;
@@ -65,39 +100,26 @@
 								 .attr("type", "button")
 								 .on("click",
 									function(event) {
-										self.entityClient = new CDMI_EntityAPI(self.cdmiURL)
-										self.entityClient.get_entity_Genome([self.options.genomeID],
-										['id', 'scientific_name', 'domain', 'complete', 'dna_size', 'source_id', 
-										 'contigs', 'gc_content', 'pegs', 'rnas'],
-
-										$.proxy(function(genome) {
-											genome = genome[self.options.genomeID];
-											self.genome = genome; // store it for now.
-
-											if (!genome) {
-												self.renderError("Genome '" + self.options.genomeID + "' not found in the KBase Central Store.");
-												return;
-											}
-											
-											self.pubmedQuery = genome.scientific_name
-											var literature = $.get('http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+self.pubmedQuery,
-												function(data) {
-													self.trigger("showLitWidget", 
-														{ 
-															literature: data, 
-															workspaceId: self.options.workspaceID,
-															genomeId: self.options.genomeID,
-															kbCache: self.options.kbCache,
-															event: event,
-														}
-													);
-												})
-											
-										}, self),
-										self.renderError
-									);
-                                 })
-							);
+														
+										if (typeof self.pubmedQuery === null) {
+											self.renderError("Genome '" + self.options.genomeID + "' not found in the KBase Central Store.");
+											return;											
+										}
+										else {
+											var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+self.pubmedQuery
+											self.trigger("showLitWidget", 
+												{ 
+												literature: query, 
+												workspaceId: self.options.workspaceID,
+												genomeId: self.options.genomeID,
+												kbCache: self.options.kbCache,
+												event: event,
+												}
+											);
+										}
+										
+									})
+								);
 								 
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
@@ -140,7 +162,6 @@
             this.$elem.append(this.$infoPanel);
 			
 			// self.pubmedQuery = ""
-			console.log(self.pubmedQuery)
 
         },
 
@@ -186,7 +207,7 @@
                     }
 					
 					self.pubmedQuery = genome.scientific_name
-					
+					console.log(self.pubmedQuery)
                     this.$infoTable.empty()
                                    .append(this.addInfoRow("ID", genome.id))
                                    .append(this.addInfoRow("Name", genome.scientific_name))
@@ -244,6 +265,7 @@
         },
 
         renderWorkspace: function() {
+			self = this
             this.showMessage("<img src='" + this.options.loadingImage + "'>");
             this.$infoPanel.hide();
             // console.log("rendering workspace genome");
@@ -259,8 +281,10 @@
             $.when(prom).done($.proxy(function(genome) {
                 // console.log(genome);
                 genome = genome[0].data;
-
-                var gcContent = "Unknown";
+				self.pubmedQuery = genome.scientific_name
+				console.log(self.pubmedQuery)	
+                
+				var gcContent = "Unknown";
                 var dnaLength = "Unknown";
                 if (genome.dna_size && genome.dna_size != 0) {
                     dnaLength = genome.dna_size;

@@ -26,6 +26,10 @@
 			var lit = self.options.literature
 			console.log(lit)
 			
+			var literature = $.get(lit,
+				function(data) {
+					console.log(data)
+				})
 			return this;
 		},
 		
