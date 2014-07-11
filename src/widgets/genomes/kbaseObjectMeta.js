@@ -33,11 +33,15 @@
 			
 			return this.renderWorkspace();
 		},
-			
+		
+		getData: function() {
+			return {};
+		},
 		/**
 		 *Render a table with workspace object meta data.
-		 */		
+		 */
 	renderWorkspace: function() {
+		return this;
             this.$infoPanel.hide();
             this.showMessage("<img src='" + this.options.loadingImage + "'>");
 

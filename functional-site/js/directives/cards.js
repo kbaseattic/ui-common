@@ -345,9 +345,7 @@ angular.module('card-directives')
                 if (cardManager) cardManager.destroy();
                 cardManager = $(element).KBaseCardLayoutManager({
                     template: "wsref", 
-                    data: scope.params,
-                    auth: $rootScope.USER_TOKEN,
-                    userId: $rootScope.USER_ID
+                    data: scope.params
                 });
             }
         };
