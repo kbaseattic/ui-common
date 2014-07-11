@@ -772,21 +772,19 @@
                     of: "#app"
                 }
             );
-		/**
+		
                 this.addNewCard("KBaseObjectMeta",
                 {
-                    genomeID: this.options.data.genomeID,
-                    loadingImage: this.options.loadingImage,
                     workspaceID: this.options.data.workspaceID,
-                    kbCache: this.options.data.kbCache,
+                    objectID: this.options.data.objectID
                 },
                 {
                     my: "left top",
-                    at: "left+600 bottom",
+                    at: "left+500 bottom",
                     of: "#app"
                 }
             );
-                */
+                
             return this;
         },
 
