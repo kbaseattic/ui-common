@@ -58,7 +58,7 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
 
 
     if (!localStorage.hasOwnProperty("searchUserState")) {
-        localStorage.setItem("searchUserState", _userData);
+        localStorage.setItem("searchUserState", JSON.stringify(_userData));
     }    
     
     if(!localStorage.searchUserState.hasOwnProperty("carts")) {
