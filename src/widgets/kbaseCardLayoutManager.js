@@ -1121,7 +1121,6 @@
             return this;
         },
         showRefCards: function() {
-            var x = 2;
             this.addNewCard("KBaseWSReferenceList",
                         {
                             wsNameOrId: this.options.data.ws,
