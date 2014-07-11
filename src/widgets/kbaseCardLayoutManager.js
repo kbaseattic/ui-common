@@ -779,7 +779,8 @@
                     {
                         wsNameOrId: this.options.data.workspaceID,
                         objNameOrId: this.options.data.genomeID,
-                        objVer: null
+                        objVer: null,
+                        kbCache: this.options.data.kbCache
                     },
                     {
                         my: "left top",
@@ -1127,8 +1128,7 @@
                             wsNameOrId: this.options.data.ws,
                             objNameOrId: this.options.data.id,
                             objVer: this.options.data.version,
-                            authToken: this.options.auth,
-                            userId: this.options.userId
+                            kbCache: this.options.data.kbCache
                         },
                         {
                             my: "left top",

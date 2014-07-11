@@ -11,9 +11,7 @@
             wsNameOrId: null,
             objNameOrId: null,
             objVer: null,
-            authToken: null,
-            userId: null,
-            wsUrl:null,
+            kbCache:{},
             width:900
         },
 
@@ -28,14 +26,17 @@
             if (options.wsUrl) {
                 self.wsUrl = options.wsUrl;
             }
-            var tok = ""; // put token here for testing
             var kbws;
-            if (tok) {
-                kbws = new Workspace(self.wsUrl, {token: tok});
+            
+            if (self.options.kbCache.ws_url) {
+                self.wsUrl = self.options.kbCache.ws_url;
+            }
+            if (self.options.kbCache.token) {
+                kbws = new Workspace(self.wsUrl, {token: self.options.kbCache.token});
             } else {
                 kbws = new Workspace(self.wsUrl);
             }
-
+            
             self.objName = options.objNameOrId;
             self.wsName = options.wsNameOrId;
             
