@@ -772,6 +772,11 @@
                     of: "#app"
                 }
             );
+
+	
+
+	// only show meta data if this is a WS object
+            if (this.options.data.workspaceID) {
 		
                 this.addNewCard("KBaseObjectMeta",
                 {
@@ -784,7 +789,26 @@
                     of: "#app"
                 }
             );
+	}
                 
+            
+            // only add the reference list if this is a WS object
+            if (this.options.data.workspaceID) {
+                this.addNewCard("KBaseWSReferenceList",
+                    {
+                        wsNameOrId: this.options.data.workspaceID,
+                        objNameOrId: this.options.data.genomeID,
+                        objVer: null,
+                        kbCache: this.options.data.kbCache
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom+570",
+                        of: "#app"
+                    }
+                );
+            }
+
             return this;
         },
 
@@ -1124,8 +1148,7 @@
                             wsNameOrId: this.options.data.ws,
                             objNameOrId: this.options.data.id,
                             objVer: this.options.data.version,
-                            authToken: this.options.auth,
-                            userId: this.options.userId
+                            kbCache: this.options.data.kbCache
                         },
                         {
                             my: "left top",
