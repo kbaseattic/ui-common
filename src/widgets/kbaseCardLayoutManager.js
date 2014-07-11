@@ -772,7 +772,8 @@
                     of: "#app"
                 }
             );
-		this.addNewCard("KBaseObjectMeta",
+		/**
+                this.addNewCard("KBaseObjectMeta",
                 {
                     genomeID: this.options.data.genomeID,
                     loadingImage: this.options.loadingImage,
@@ -785,6 +786,7 @@
                     of: "#app"
                 }
             );
+                */
             return this;
         },
 
