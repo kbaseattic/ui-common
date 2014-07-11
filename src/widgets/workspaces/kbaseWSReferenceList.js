@@ -88,7 +88,8 @@
 
             		var tblSettings = {
             				"sPaginationType": "full_numbers",
-            				"iDisplayLength": 20,
+            				"iDisplayLength": 10,
+                                        "sDom": 't<flip>',
             				"aoColumns": [
             				              {sTitle: "Object Name (reference)", mData: "na"},
             				              {sTitle: "Type", mData: "ty"},
@@ -111,7 +112,7 @@
                     self.$elem.append("<br><div><b>Error in finding referencing objects!</b></div>");
                     console.error("Error in finding referencing objects!");
                     console.error(err);
-                    self.$elem.append("<br><div><i>Error was:</i></div><div>"+err['error']['message']+"</div>");
+                    self.$elem.append("<br><div><i>Error was:</i></div><div>"+err['error']['message']+"</div><br>");
                 });
             
             return this;
