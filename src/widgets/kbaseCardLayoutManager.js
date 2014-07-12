@@ -780,8 +780,11 @@
 		
                 this.addNewCard("KBaseObjectMeta",
                 {
-                    workspaceID: this.options.data.workspaceID,
-                    objectID: this.options.data.objectID
+                    wsNameOrId: this.options.data.workspaceID,
+                    objNameOrId: this.options.data.genomeID,
+                     objVer: null,
+                      kbCache: this.options.data.kbCache,
+                      loadingImage: this.options.loadingImage,                      
                 },
                 {
                     my: "left top",
