@@ -371,13 +371,21 @@ var app = angular.module('landing-pages',
           url: "/ref/:ws/:id",
           templateUrl: 'views/ws/ws-ref-list.html',
           controller: 'WsRefViewer'
-        });
-    $stateProvider
+        })
         .state('wsrefwithversion', {
           url: "/ref/:ws/:id/:version",
           templateUrl: 'views/ws/ws-ref-list.html',
           controller: 'WsRefViewer'
         });
+      
+    
+    $stateProvider
+        .state('wsobjgraphview', {
+          url: "/objgraphview/:ws",
+          templateUrl: 'views/objects/ws-obj-graph-view.html',
+          controller: 'WsObjGraphView'
+        })
+      
              
     $stateProvider
         .state('bambibyid',
