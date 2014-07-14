@@ -34,7 +34,7 @@
 	    
 	    // load the basic things from the cache and options
             //if (self.options.kbCache.ws_url) { self.wsUrl = self.options.kbCache.ws_url; }
-            if (self.options.kbCache.token) { self.ws = new Workspace(self.wsUrl, {token: self.options.kbCache.token}); }
+            if (self.options.kbCache.token) { alert(self.options.kbCache.token); self.ws = new Workspace(self.wsUrl, {token: self.options.kbCache.token}); }
             else { self.ws = new Workspace(self.wsUrl); }
             self.wsNameOrId = options.wsNameOrId;
 
@@ -367,15 +367,6 @@
 		link.attr("d", path);
 	    };
     
-		
-               // }, function(err) {
-               //     self.$elem.find('#loading-mssg').remove();
-               //     self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
-               //     console.error("Error in finding referencing objects! (note: v0.1.6 throws this error if no referencing objects were found)");
-               //     console.error(err);
-               //     //self.$elem.append("<br><div><i>Error was:</i></div><div>"+err['error']['message']+"</div><br>");
-               // });
-            
             return this;
         },
 	
@@ -409,7 +400,12 @@
 			    }
 			},
 			function(err) {
-			    self.$elem.append(JSON.stringify(err));
+			    self.$elem.find('#loading-mssg').remove();
+			    self.$elem.append("<br><b>Error in building object graph!</b><br>");
+			    self.$elem.append("<i>Error was:</i></b> &nbsp ");
+			    self.$elem.append(err.error.message+"<br>");
+			    console.error("Error in building object graph!");
+			    console.error(err);
 			}
 		    )
 		);
@@ -449,7 +445,12 @@
 			    }
 		    },
 		    function(err) {
-			self.$elem.append(JSON.stringify(err));
+			    self.$elem.find('#loading-mssg').remove();
+			    self.$elem.append("<br><b>Error in building object graph!</b><br>");
+			    self.$elem.append("<i>Error was:</i></b> &nbsp ");
+			    self.$elem.append(err.error.message+"<br>");
+			    console.error("Error in building object graph!");
+			    console.error(err);
 		    }
 		)
 	    );
