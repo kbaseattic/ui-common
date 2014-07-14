@@ -730,6 +730,8 @@
                 this.showSpecCards();
             else if (this.options.template.toLowerCase() === "wsref")
                 this.showRefCards();
+            else if (this.options.template.toLowerCase() === "wsobjgraphview")
+                this.showWsObjGraphCards();
             else if (this.options.template.toLowerCase() === "ppid")
                 this.showPPICards();
             else {
@@ -1151,6 +1153,21 @@
                             wsNameOrId: this.options.data.ws,
                             objNameOrId: this.options.data.id,
                             objVer: this.options.data.version,
+                            kbCache: this.options.data.kbCache
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+            return this;
+        },
+        
+        showWsObjGraphCards: function() {
+            this.addNewCard("KBaseWSObjGraphView",
+                        {
+                            wsNameOrId: this.options.data.ws,
                             kbCache: this.options.data.kbCache
                         },
                         {
