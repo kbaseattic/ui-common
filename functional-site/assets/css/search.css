@@ -201,7 +201,7 @@ span .badge {
 }
 
 .search-transfer-table {
-    max-height: 400px;
+    height: 400px;
     overflow-y: auto;
 }
 

@@ -106,6 +106,7 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
             this.selectedCategory = null;
             this.pageLinksRange = [];
             this.facets = null;
+            this.active_facets = {};
             this.searchOptions = this.defaultSearchOptions;                                          
 
             this.userState = JSON.parse(localStorage.searchUserState);
@@ -275,6 +276,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         queryOptions["itemsPerPage"] = 0;
         queryOptions["category"] = category;
 
+        console.log("getCount : " + JSON.stringify(queryOptions));
+
         $scope.options.userState.ajax_requests.push(
             $http({method: 'GET', 
                    url: $rootScope.kb.search_url + "getResults",
@@ -287,6 +290,11 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                       else {
                           $scope.options.categoryCounts[category] = jsonResult.data.totalResults;                  
                       }
+                      
+                      if ($scope.options.selectedCategory && category === $scope.options.selectedCategory) {                      
+                          $scope.options.countsAvailable = true;
+                      }
+                      console.log($scope.options.categoryCounts);
                   }, function (error) {
                       console.log(error);
                       $scope.options.categoryCounts[category] = 0;
@@ -367,6 +375,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         $("#loading_message_text").html(options.defaultMessage);
         $.blockUI({message: $("#loading_message")});
 
+        console.log("getResults : " + JSON.stringify(queryOptions));
 
         $http({method: 'GET', 
                url: $rootScope.kb.search_url + "getResults",
@@ -428,7 +437,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                       $scope.options.pageLinksRange.push(p);                      
                   }                  
                            
-                  //console.log($scope.options.resultJSON);     
+                  console.log($scope.options.resultJSON);     
                   $.unblockUI();
               }, function (error) {
                   console.log("getResults threw an error!");
@@ -448,7 +457,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             // if we are in the category view, update the individual count
             if ($scope.options.selectedCategory) {
                 $scope.getCount({q: $scope.options.searchOptions.general.q}, $scope.options.selectedCategory);        
-                $state.go('search', {q: $scope.options.searchOptions.general.q, page: 1});
+                $state.go('search', {q: $scope.options.searchOptions.general.q, page: 1, sort: null, facets: null});
             }
             else {
                 $state.go('search', {q: $scope.options.searchOptions.general.q});            
@@ -474,6 +483,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 $scope.options.reset();
             }
 
+            // apply query string
             if ($stateParams.q !== undefined && $stateParams.q !== null && $stateParams.q !== '') {
                 $scope.options.searchOptions.general.q = $stateParams.q;
             }
@@ -481,10 +491,16 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 $scope.options.reset();
             }            
 
+            // apply category selection
             if ($stateParams.category !== null && $stateParams.category in $scope.options.searchCategories) {
-                $scope.selectCategory($stateParams.category);
+                $scope.options.selectedCategory = $stateParams.category;
+                $scope.options.resultsTemplatePath = "views/search/" + $scope.options.selectedCategory + ".html";
+
+                if ($scope.options.selectedCategory && !$scope.options.searchOptions.perCategory.hasOwnProperty($scope.options.selectedCategory)) {
+                    $scope.options.searchOptions.perCategory[$scope.options.selectedCategory] = {"page": 1};
+                }
                 
-                if ($stateParams.page !== undefined) {
+                if ($stateParams.page !== undefined && $stateParams.page !== null) {
                     $scope.setCurrentPage($stateParams.page);
                 }
                 else {
@@ -502,35 +518,49 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 $scope.options.reset();
             }            
     
+            // apply facets
             if ($stateParams.facets !== null) {
-                  var addFacetParam = function(name, value) {
-                      if (!$scope.options.active_facets.hasOwnProperty($scope.options.selectedCategory)) {        
-                          $scope.options.active_facets[$scope.options.selectedCategory] = {};
-                      }
-
-                      if (!$scope.options.active_facets[$scope.options.selectedCategory].hasOwnProperty(name)) {
-                          $scope.options.active_facets[$scope.options.selectedCategory][name] = {};        
-                      }
-        
-                      $scope.options.active_facets[$scope.options.selectedCategory][name][value] = true;                                            
-                  };
-            
-                  $scope.options.facets = [];                  
+                  // clear any cached facets
+                  delete $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets;
+                  $scope.options.active_facets[$scope.options.selectedCategory] = {};
                   
                   var facetSplit = $stateParams.facets.split(",");
                   
-                  var options = {};
-                  var facet_options = [];
                   var facet_keyval = [];
 
                   for (var i = 0; i < facetSplit.length; i++) {
                       facet_keyval = facetSplit[i].split(":");                      
                       
-                      addFacetParam(facet_keyval[0],facet_keyval[1]);
+                      $scope.addFacet(facet_keyval[0],facet_keyval[1], false);
                   }                
             }
             else {
                 $scope.options.facets = null;
+                
+                if ($scope.options.selectedCategory && $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
+                    delete $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets;
+                    $scope.options.active_facets[$scope.options.selectedCategory] = {};
+                }
+            }
+
+            // apply sorting
+            if ($stateParams.sort !== null) {
+                // clear any sort cached
+                $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].sort = "";
+            
+                var sortSplit = $stateParams.sort.split(",");
+                var sort_keyval = [];                
+                
+                for (var i = 0; i < sortSplit.length; i++) {
+                    sort_keyval = sortSplit[i].split(" ");
+                    
+                    $scope.addSort($scope.options.selectedCategory, sort_keyval[0], sort_keyval[1], false);
+                }                
+            }
+            else {
+                if ($scope.options.selectedCategory && $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("sort")) {
+                    delete $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].sort;
+                }
             }
 
             // verify logged in state
@@ -567,6 +597,20 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         else {
             captureState();
             //console.log("No category chosen");
+            
+            var queryOptions = {q: $scope.options.searchOptions.general.q};
+
+            if ($scope.options.selectedCategory) {            
+                if ($scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
+                    queryOptions.facets = $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets;
+                }                
+            
+                if ($scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("sort")) {
+                    queryOptions.sort = $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].sort;
+                }            
+            }
+            
+            $scope.getCount(queryOptions, $scope.options.selectedCategory);
             $scope.getResults($scope.options.selectedCategory, $scope.options.searchOptions);        
         }
     };
@@ -663,7 +707,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     };
 
 
-    $scope.addSort = function (category, name, direction) {
+    $scope.addSort = function (category, name, direction, searchAgain) {
         if (!$scope.options.searchOptions.perCategory[category].hasOwnProperty("sort")) {
             $scope.options.searchOptions.perCategory[category].sort = name + " " + direction;
         }
@@ -682,16 +726,18 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             }
         }
 
-        localStorage.setItem("searchUserState", JSON.stringify($scope.options.userState));
+        if (searchAgain === undefined || searchAgain === true) {
+            localStorage.setItem("searchUserState", JSON.stringify($scope.options.userState));
         
-        $state.go("search", {sort: $scope.options.searchOptions.perCategory[category].sort, page: 1});
+            $state.go("search", {sort: $scope.options.searchOptions.perCategory[category].sort, page: 1});
+        }
     };
 
 
     $scope.removeSort = function (category, name, searchAgain) {
         $scope.removeSearchFilter(category, "sort", name, null);
         
-        if (searchAgain) {
+        if (searchAgain === undefined || searchAgain === true) {
             localStorage.setItem("searchUserState", JSON.stringify($scope.options.userState));
             $state.go("search", {sort: $scope.options.searchOptions.perCategory[category].sort, page: 1});
         }
@@ -700,10 +746,10 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
     $scope.setCurrentPage = function (page) {
         try {
-            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].page = page;
+            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].page = parseInt(page);
         }
         catch(e) {
-            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory] = {'page': page};
+            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory] = {'page': parseInt(page)};
         }
 
         localStorage.setItem("searchUserState", JSON.stringify($scope.options.userState));
@@ -720,12 +766,12 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $scope.removeFacet(name, value);
         }
         else {
-            $scope.addFacet(name, value);
+            $scope.addFacet(name, value, true);
         }                
     };
 
 
-    $scope.addFacet = function (name, value) {        
+    $scope.addFacet = function (name, value, searchAgain) {        
         if (!$scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
             $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets = name + ":" + value;
         }
@@ -743,8 +789,10 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         
         $scope.options.active_facets[$scope.options.selectedCategory][name][value] = true;        
 
-        $scope.getCount({q: $scope.options.searchOptions.general.q}, $scope.options.selectedCategory);        
-        $state.go("search", {facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
+        if (searchAgain === undefined || searchAgain === true) {
+            $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);        
+            $state.go("search", {facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
+        }
     };
 
 
@@ -761,7 +809,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $scope.options.active_facets[$scope.options.selectedCategory] = {};
         }
 
-        $scope.getCount({q: $scope.options.searchOptions.general.q}, $scope.options.selectedCategory);        
+        $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);        
         $state.go("search", {facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
     };
 

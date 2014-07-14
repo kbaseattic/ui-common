@@ -1,27 +1,37 @@
-<div class="search-transfer-modal modal fade" id="transferPanel" tabindex="-1" role="dialog" aria-labelledby="transferPanel" aria-hidden="true">
+<div class="search-transfer-modal modal fade" id="transferPanel" tabindex="-1" role="dialog" aria-labelledby="transferPanel" data-backdrop="static" data-keyboard="false" aria-hidden="true">
     <div class="search-transfer-modal modal-dialog">
         <div class="search-transfer-modal modal-content">
-            <div class="modal-header">
-                <!--<button type="button" class="close" ng-class="{disabled: options.userState.dataTransferredLength > 0 && options.userState.dataTransferredLength/options.userState.selectionsLength * 100 < 100}" data-dismiss="modal" aria-hidden="true" ng-click="emptyTransfers()">&times;</button>-->
-                <h4 class="modal-title search-categories-title text-center">Copy objects to Workspaces</h4>
-            </div>
             <div class="modal-body" style="overflow:auto;">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a>Copy Data to Workspaces</a></li>
+                    <li><a>Download Data to your Computer</a></li>                    
+                    <li><a>Create Sets of Objects</a></li>
+                    <li><a>Create Narratives using this Data</a></li>
+                </ul>
+
                 <div class='tab-content'>    
                     <div class="tab-pane active">
                         <div class="row">
                             <div class="col-md-5 text-center">
                                 <div ng-show="options.userState.selectedWorkspace">
                                     <span><h3>{{options.userState.selectedWorkspace}}</h3></span>
-                                    <table class="search-transfer-table table table-striped table-condensed">
-                                        <thead>
-                                            <tr>
-                                                <th class="transfer_object_type">Object Type</th>
-                                                <th class="transfer_object_id">Object Id</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>    
+                                    <div>
+                                        <table class="search-transfer-table table table-striped table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <th class="transfer_object_type">Object Type</th>
+                                                    <th class="transfer_object_id">Object Id</th>
+                                                </tr>
+                                            </thead>
+                                            <tfoot>
+                                                <tr ng-show="options.userState.carts[options.userState.selectedWorkspace].length > 0">
+                                                    <td><button type="button" class="btn btn-primary" ng-class="{'disabled': !options.userState.selectedWorkspace}" ng-click="transferring = true; addAllObjects(); transferring = false;">Copy<span class="glyphicon glyphicon-transfer"><span></button></td>
+                                                </tr>
+                                            </tfoot>
+                                            <tbody>
+                                            </tbody>
+                                        </table>    
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-2 text-center">                    
@@ -54,7 +64,7 @@
                                         <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-arrow-left"></span></button>
                                     </div>
                                     <div class="row">
-                                        <button ng-class="{disabled: !options.userState.cart[options.userState.selectedWorkspace]}" class="btn btn-default" type="button"><span class="glyphicon glyphicon-arrow-right"></span></button>
+                                        <button ng-class="{disabled: !options.userState.carts[options.userState.selectedWorkspace]}" class="btn btn-default" type="button"><span class="glyphicon glyphicon-arrow-right"></span></button>
                                     </div>
                                 </div>
                             </div>
@@ -63,14 +73,14 @@
                                 <table class="table table-striped table-condensed">
                                     <thead>
                                         <tr>
-                                            <th><input type="checkbox" ng-model="options.userState.cart[options.userState.selectedWorkspace].all" ng-true-value="true" ng-false-value="false"></input></th>
+                                            <th><input type="checkbox" ng-model="options.userState.carts[options.userState.selectedWorkspace].all" ng-true-value="true" ng-false-value="false"></input></th>
                                             <th class="transfer_object_type">Object Type</th>
                                             <th class="transfer_object_id">Object Id</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="s in options.userState.selections" ng-click="console.log(s)" ng-class="{'search-transfer-table-row-selected': options.userState.selectedWorkspace}">
-                                            <td><input type="checkbox" ng-model="options.userState.cart[options.userState.selectedWorkspace].s" ng-true-value="{{s}}" ng-false-value="null"></input></td>
+                                            <td><input type="checkbox" ng-model="options.userState.carts[options.userState.selectedWorkspace].s" ng-true-value="{{s}}" ng-false-value="null"></input></td>
                                             <td class="transfer_object_type text-left" ng-click="console.log(s)">{{s.object_type}}</td>
                                             <td class="transfer_object_id text-left" ng-click="console.log(s)">{{s.object_id}}</td>
                                         </tr>
@@ -92,7 +102,6 @@
                     </div>
                 </div>
                 <button type="button" class="btn btn-default" ng-class="{disabled: options.userState.dataTransferredLength > 0 && options.userState.dataTransferredLength/options.userState.selectionsLength * 100 < 100}" data-dismiss="modal" ng-click="emptyTransfers()">Close</button>
-                <button type="button" class="btn btn-primary" ng-class="{'disabled': !options.userState.selectedWorkspace}" ng-click="transferring = true; addAllObjects(); transferring = false;">Transfer<span class="glyphicon glyphicon-transfer"><span></button>
             </div> <!-- end modal footer -->        
         </div> <!-- end modal-content -->
     </div> <!-- end modal-dialog -->
