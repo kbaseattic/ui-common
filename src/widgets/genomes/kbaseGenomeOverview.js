@@ -212,7 +212,7 @@
                                    .append(this.addInfoRow("ID", genome.id))
                                    .append(this.addInfoRow("Name", genome.scientific_name))
                                    .append(this.addInfoRow("Domain", genome.domain))
-                                   .append(this.addInfoRow("Complete?", (genome.complete ? "Yes" : "No")))
+//                                   .append(this.addInfoRow("Complete?", (genome.complete ? "Yes" : "No")))
                                    .append(this.addInfoRow("DNA Length", genome.dna_size))
                                    .append(this.addInfoRow("Source ID", genome.source_id))
                                    .append(this.addInfoRow("Number of Contigs", genome.contigs))

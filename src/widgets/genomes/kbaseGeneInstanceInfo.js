@@ -30,6 +30,11 @@
                 return this;
             }
 
+            
+            // always setup the cdmi clients, cause for now there is a hack to get domain/operon info if available
+            // from the CDS
+            this.cdmiClient = new CDMI_API(this.cdmiURL);
+            this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
 
             this.render();
             if (this.options.workspaceID)
@@ -94,10 +99,6 @@
             this.showMessage("<img src='" + this.options.loadingImage + "'>");
 
             var self = this;
-
-
-            this.cdmiClient = new CDMI_API(this.cdmiURL);
-            this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
 
             // Data fetching!
             var jobsList = [];
@@ -181,6 +182,7 @@
         },
 
         renderWorkspace: function() {
+            var self = this;
             this.$infoPanel.hide();
             this.showMessage("<img src='" + this.options.loadingImage + "'>");
 
@@ -204,6 +206,7 @@
 
                     if (feature) {
                         // FINALLY we have the feature! Hooray!
+                        console.log(JSON.stringify(feature));
                         this.$infoTable.empty();
                         /* Function
                          * Genome + button
@@ -253,17 +256,43 @@
                         // Protein families list.
                         var proteinFamilies = "None found";
                         if (feature.protein_families) {
-                            proteinFamilies = "";
-                            for (var i=0; i<feature.protein_families.length; i++) {
-                                var fam = feature.protein_families[i];
-                                proteinFamilies += fam.id + ": " + fam.subject_description + "<br>";
+                            if (feature.protein_families.length>0) {
+                                proteinFamilies = "";
+                                for (var i=0; i<feature.protein_families.length; i++) {
+                                    var fam = feature.protein_families[i];
+                                    proteinFamilies += fam.id + ": " + fam.subject_description + "<br>";
+                                }
                             }
                         }
                         this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
 
-                        this.$buttonPanel.find("button#domains").click(function(event) { window.alert("Domain view unavailable for Workspace genes. Sorry!"); });
-                        this.$buttonPanel.find("button#operons").click(function(event) { window.alert("Operon view unavailable for Workspace genes. Sorry!"); });
-
+                        // first add handlers that say we do not have domains or operons for this gene
+                        this.$buttonPanel.find("button#domains").click(function(event) { 
+                            window.alert("No domain assignments available for this gene.  You will be able to compute domain assignments in the Narrative in the future.");
+                        });
+                        this.$buttonPanel.find("button#operons").click(function(event) {
+                            window.alert("No operon assignments available for this gene.  You will be able to compute operon assignments in the Narrative in the future.");
+                        });
+                        
+                        
+                        //determine if a feature id and its protein MD5 translation is found in the CDS- if it is,
+                        //return true.  We use this as a hack to see if we have gene info for this feature for WS objects.
+                        this.cdmiClient.fids_to_proteins([self.options.featureID],
+                                   function(prot) {
+                                        if (prot[self.options.featureID] == feature['md5'] ) {
+                                            //ok the fid and md5 match, so go to the CDS to get domain info...  what a hack!
+                                            self.$buttonPanel.find("button#domains").off("click");
+                                            self.$buttonPanel.find("button#domains").click(function(event) { 
+                                                self.trigger("showDomains", { event: event, featureID: self.options.featureID });
+                                            });
+                                            self.$buttonPanel.find("button#operons").off("click");
+                                            self.$buttonPanel.find("button#operons").click(function(event) { 
+                                                self.trigger("showOperons", { event: event, featureID: self.options.featureID });
+                                            });
+                                        }
+                                   } // we don't add error function- if they don't match or this fails, do nothing.
+                        );
+                        
                         // bind button events
                         this.$buttonPanel.find("button#biochemistry").click(
                             $.proxy(function(event) { 
@@ -369,7 +398,8 @@
             }
             return gc / s.length * 100;            
         },
-
+        
+        
         /**
          * parses out the location into something visible in html, adds a button to open the contig.
          * something like:

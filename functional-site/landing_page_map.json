@@ -125,9 +125,13 @@
         "ExpressionDataSample" : null,
         "ExpressionDataPoint" : null,
         "MAKResult" : "mak",
-        "MAKBicluster" : null,
+        "MAKBicluster" : "mak",
         "ExpressionDataSeries" : null,
-        "MAKBiclusterSet" : null
+        "MAKBiclusterSet" : "mak",
+        "FloatDataTable" : "mak",
+        "FloatDataTableContainer" : null,
+        "StringDataTable" : null,
+        "StringDataTableContainer" : null
     },
 
     "MEME" : {

@@ -728,6 +728,10 @@
                 this.showModelCards();
             else if (this.options.template.toLowerCase() === "spec")
                 this.showSpecCards();
+            else if (this.options.template.toLowerCase() === "wsref")
+                this.showRefCards();
+            else if (this.options.template.toLowerCase() === "wsobjgraphview")
+                this.showWsObjGraphCards();
             else if (this.options.template.toLowerCase() === "ppid")
                 this.showPPICards();
             else {
@@ -770,6 +774,43 @@
                     of: "#app"
                 }
             );
+
+	
+
+	// only show meta data if this is a WS object
+            if (this.options.data.workspaceID) {
+		
+                this.addNewCard("KBaseObjectMeta",
+                {
+                    workspaceID: this.options.data.workspaceID,
+                    objectID: this.options.data.objectID
+                },
+                {
+                    my: "left top",
+                    at: "left+500 bottom",
+                    of: "#app"
+                }
+            );
+	}
+                
+            
+            // only add the reference list if this is a WS object
+            if (this.options.data.workspaceID) {
+                this.addNewCard("KBaseWSReferenceList",
+                    {
+                        wsNameOrId: this.options.data.workspaceID,
+                        objNameOrId: this.options.data.genomeID,
+                        objVer: null,
+                        kbCache: this.options.data.kbCache
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom+570",
+                        of: "#app"
+                    }
+                );
+            }
+
             return this;
         },
 
@@ -1103,6 +1144,38 @@
                     );
             return this;
         },
+        showRefCards: function() {
+            this.addNewCard("KBaseWSReferenceList",
+                        {
+                            wsNameOrId: this.options.data.ws,
+                            objNameOrId: this.options.data.id,
+                            objVer: this.options.data.version,
+                            kbCache: this.options.data.kbCache
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+            return this;
+        },
+        
+        showWsObjGraphCards: function() {
+            this.addNewCard("KBaseWSObjGraphView",
+                        {
+                            wsNameOrId: this.options.data.ws,
+                            kbCache: this.options.data.kbCache
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+            return this;
+        },
+        
 
         /**
          * Registers all events that this manager should know about.
