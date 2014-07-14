@@ -21,18 +21,23 @@
 	//'prov'
 	objData: {},
 	
+	// maps REF to info, ref, prov
+	objDataLookup: {},
+	
         
         init: function(options) {
             this._super(options);
             var self = this;
 
+	    // show loading message
+            self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>building object reference graph...</center></p></div>');
+	    
 	    // load the basic things from the cache and options
             //if (self.options.kbCache.ws_url) { self.wsUrl = self.options.kbCache.ws_url; }
             if (self.options.kbCache.token) { self.ws = new Workspace(self.wsUrl, {token: self.options.kbCache.token}); }
             else { self.ws = new Workspace(self.wsUrl); }
             self.wsNameOrId = options.wsNameOrId;
 
-	    
 	    var listObjParams = { showAllVersions: 1, includeMetadata:1 };
             if (/^\d+$/.exec(options.wsNameOrId))
                 listObjParams['ids'] = [ options.wsNameOrId ];
@@ -45,7 +50,10 @@
 		$.when.apply($, getProvJobs).done(function() {
 		    self.buildGraphData();
 		    self.renderSankeyStyleGraph();
+		    self.addNodeColorKey();
+                    self.$elem.find('#loading-mssg').remove();
 		    //self.$elem.append(JSON.stringify(self.objData));
+		    
 		});
 	    });
 	    
@@ -55,6 +63,10 @@
 	},
 	
 	graph: null,
+	
+	buildNodeData: function(idx, nodeInfo, ref) {
+	    return {node:idx,name:nodeInfo[ref]['name']+" (v"+nodeInfo[ref]['ver']+")", ref:ref};
+	},
 	
 	buildGraphData: function() {
 	    var self = this;
@@ -122,15 +134,15 @@
 	    var nodeList = []; var nodeIdx = 0;
 	    for (var gRef in genomeNodeInfo) {
 		if (genomeNodeInfo[gRef]['modelrefs'].length>0) {
-		    nodeList.push({node:nodeIdx,name:genomeNodeInfo[gRef]['name']+" (v"+genomeNodeInfo[gRef]['ver']+")"});
+		    nodeList.push(self.buildNodeData(nodeIdx,genomeNodeInfo,gRef));
 		    refToNodeIdx[gRef]=Number(nodeIdx);
 		    nodeIdx++;
 		} else if (genomeNodeInfo[gRef]['ver']>1) {
-		    nodeList.push({node:nodeIdx,name:genomeNodeInfo[gRef]['name']+" (v"+genomeNodeInfo[gRef]['ver']+")"});
+		    nodeList.push(self.buildNodeData(nodeIdx,genomeNodeInfo,gRef));
 		    refToNodeIdx[gRef]=Number(nodeIdx);
 		    nodeIdx++;
 		} else if (genomeNodeInfo[gRef]['nextVer']) {
-		    nodeList.push({node:nodeIdx,name:genomeNodeInfo[gRef]['name']+" (v"+genomeNodeInfo[gRef]['ver']+")"});
+		    nodeList.push(self.buildNodeData(nodeIdx,genomeNodeInfo,gRef));
 		    refToNodeIdx[gRef]=Number(nodeIdx);
 		    nodeIdx++;
 		} else {
@@ -139,15 +151,15 @@
 	    }
 	    for (var mRef in modelNodeInfo) {
 		if (modelNodeInfo[mRef]['genomerefs'].length>0 || modelNodeInfo[mRef]['fbarefs'].length>0) {
-		    nodeList.push({node:nodeIdx,name:modelNodeInfo[mRef]['name']+" (v"+modelNodeInfo[mRef]['ver']+")"});
+		    nodeList.push(self.buildNodeData(nodeIdx,modelNodeInfo,mRef));
 		    refToNodeIdx[mRef]=Number(nodeIdx);
 		    nodeIdx++;
 		} else if (modelNodeInfo[mRef]['ver']>1) {
-		    nodeList.push({node:nodeIdx,name:modelNodeInfo[mRef]['name']+" (v"+modelNodeInfo[mRef]['ver']+")"});
+		    nodeList.push(self.buildNodeData(nodeIdx,modelNodeInfo,mRef));
 		    refToNodeIdx[mRef]=Number(nodeIdx);
 		    nodeIdx++;
 		} else if (modelNodeInfo[mRef]['nextVer']) {
-		    nodeList.push({node:nodeIdx,name:modelNodeInfo[mRef]['name']+" (v"+modelNodeInfo[mRef]['ver']+")"});
+		    nodeList.push(self.buildNodeData(nodeIdx,modelNodeInfo,mRef));
 		    refToNodeIdx[mRef]=Number(nodeIdx);
 		    nodeIdx++;
 		} else {
@@ -156,15 +168,15 @@
 	    }
 	    for (var fRef in fbaNodeInfo) {
 		if (fbaNodeInfo[fRef]['modelrefs'].length>0) {
-		    nodeList.push({node:nodeIdx,name:fbaNodeInfo[fRef]['name']+" (v"+fbaNodeInfo[fRef]['ver']+")"});
+		    nodeList.push(self.buildNodeData(nodeIdx,fbaNodeInfo,fRef));
 		    refToNodeIdx[fRef]=Number(nodeIdx);
 		    nodeIdx++;
 		} else if (fbaNodeInfo[fRef]['ver']>1) {
-		    nodeList.push({node:nodeIdx,name:fbaNodeInfo[fRef]['name']+" (v"+fbaNodeInfo[fRef]['ver']+")"});
+		    nodeList.push(self.buildNodeData(nodeIdx,fbaNodeInfo,fRef));
 		    refToNodeIdx[fRef]=Number(nodeIdx);
 		    nodeIdx++;
 		} else if (fbaNodeInfo[fRef]['nextVer']) {
-		    nodeList.push({node:nodeIdx,name:fbaNodeInfo[fRef]['name']+" (v"+fbaNodeInfo[fRef]['ver']+")"});
+		    nodeList.push(self.buildNodeData(nodeIdx,fbaNodeInfo,fRef));
 		    refToNodeIdx[fRef]=Number(nodeIdx);
 		    nodeIdx++;
 		} else {
@@ -176,164 +188,185 @@
 	    var defValue = 1;
 	    for (var gRef in genomeNodeInfo) {
 		if (genomeNodeInfo[gRef]['nextVer']) {
-		    edgeList.push({ source:refToNodeIdx[gRef], target:refToNodeIdx[genomeNodeInfo[gRef]['nextVer']], value:defValue});
+		    edgeList.push({ source:refToNodeIdx[gRef], target:refToNodeIdx[genomeNodeInfo[gRef]['nextVer']], value:defValue,
+				  text:"A new version of this Genome was saved."});
 		}
 		for (var i=0; i<genomeNodeInfo[gRef]['modelrefs'].length; i++) {
-		    edgeList.push({ source:refToNodeIdx[gRef], target:refToNodeIdx[genomeNodeInfo[gRef]['modelrefs'][i]], value:defValue});
+		    //var modelData = self.objDataLookup[genomeNodeInfo[gRef]['modelrefs'][i]];
+		    edgeList.push({ source:refToNodeIdx[gRef], target:refToNodeIdx[genomeNodeInfo[gRef]['modelrefs'][i]], value:defValue,
+				  text:"Genome is referenced by this FBA Model."});
 		}
 	    }
 	    for (var mRef in modelNodeInfo) {
 		if (modelNodeInfo[mRef]['nextVer']) {
-		    edgeList.push({ source:refToNodeIdx[mRef], target:refToNodeIdx[modelNodeInfo[mRef]['nextVer']], value:defValue});
+		    edgeList.push({ source:refToNodeIdx[mRef], target:refToNodeIdx[modelNodeInfo[mRef]['nextVer']], value:defValue,
+				  text:"A new version of this Model was saved."});
 		}
 		for (var i=0; i<modelNodeInfo[mRef]['fbarefs'].length; i++) {
-		    edgeList.push({ source:refToNodeIdx[mRef], target:refToNodeIdx[modelNodeInfo[mRef]['fbarefs'][i]], value:defValue});
+		    edgeList.push({ source:refToNodeIdx[mRef], target:refToNodeIdx[modelNodeInfo[mRef]['fbarefs'][i]], value:defValue,
+				  text:"FBA was run on this Model"});
 		}
 	    }
 	    for (var fRef in fbaNodeInfo) {
 		if (fbaNodeInfo[fRef]['nextVer']) {
-		    edgeList.push({ source:refToNodeIdx[fRef], target:refToNodeIdx[fbaNodeInfo[fRef]['nextVer']], value:defValue});
+		    edgeList.push({ source:refToNodeIdx[fRef], target:refToNodeIdx[fbaNodeInfo[fRef]['nextVer']], value:defValue,
+				  text:"A new version of this FBA was saved."});
 		}
 	    }
 	    
 	    
-	    
-	    
-	    //self.$elem.append(JSON.stringify(genomeNodeInfo)+"<br><br>");
-	    //self.$elem.append(JSON.stringify(modelNodeInfo)+"<br><br>");
+	   // self.$elem.append(JSON.stringify(genomeNodeInfo)+"<br><br>");
+	   // self.$elem.append(JSON.stringify(modelNodeInfo)+"<br><br>");
 	   // self.$elem.append(JSON.stringify(fbaNodeInfo)+"<br><br>");
 	    
-	    self.$elem.append("nodes:<br>"+JSON.stringify(nodeList)+"<br><br>");
-	    self.$elem.append("links:<br>"+JSON.stringify(edgeList)+"<br><br>");
-	    self.$elem.append("lookup:<br>"+JSON.stringify(refToNodeIdx)+"<br><br>");
+	   // self.$elem.append("nodes:<br>"+JSON.stringify(nodeList)+"<br><br>");
+	   // self.$elem.append("links:<br>"+JSON.stringify(edgeList)+"<br><br>");
+	   // self.$elem.append("lookup:<br>"+JSON.stringify(refToNodeIdx)+"<br><br>");
 	    
 	    // set the data
 	    self.graph = { nodes:nodeList, links:edgeList };
-	    
-	    
-	    
-	    
-	    
-	    /*self.graph = {
-	    "nodes":[
-	    {"node":'a',"name":"alpha"},
-	    {"node":1,"name":"node1"},
-	    {"node":0,"name":"node0"},
-	    {"node":2,"name":"node2"},
-	    {"node":3,"name":"node3"},
-	    {"node":4,"name":"node4"}
-	    ],
-	    "links":[
-	    {"source":0,"target":2,"value":2},
-	    {"source":1,"target":2,"value":2},
-	    {"source":1,"target":3,"value":1},
-	    {"source":0,"target":4,"value":2},
-	    {"source":2,"target":3,"value":2},
-	    {"source":2,"target":4,"value":2},
-	    {"source":3,"target":4,"value":4}
-	    ]};*/
+	},
+	
+	
+	typeToColor: {
+	    "KBaseGenomes.Genome":"#00ACE9",
+	    "KBaseFBA.FBAModel":"#D43F3F",
+	    "KBaseFBA.FBA":"#FFE361"
+	},
+	/*
+	    #00ACE9
+	    #D43F3F
+	    #6A9A1F
+	    #F6F6E8
+	    #404040
+	*/
+	addNodeColorKey: function() {
+	    var self = this;
+	    // probably a better jquery way to do this, but this is what I know...
+	    var html = '<table cellpadding="2" cellspacing="0" border="0" id="graphkey vertical-align:middle" \
+                            style="">'
+	    for(var t in self.typeToColor) {
+		html += "<tr><td><svg width=\"40\" height=\"20\"><rect x=\"0\" y=\"0\" width=\"40\" height=\"20\" fill=\""+self.typeToColor[t] +"\" /></svg></td><td valign=\"middle\"><b> \
+		<a href=\"#/spec/type/"+t+"\">"+t+"</a></b></td></tr>";
+	    }
+	    html += "</table>";
+	    self.$elem.append(html);
 	},
 	
 	
 	renderSankeyStyleGraph: function() {
 	    var self = this;
-	    var mymargin = {top: 10, right: 10, bottom: 10, left: 10};
-	    var width = 1100 - mymargin.left - mymargin.right;
-	    var height = 300 - mymargin.top - mymargin.bottom;
+	    var margin = {top: 10, right: 10, bottom: 10, left: 10};
+	    var width = self.options.width - 100 - margin.left - margin.right;
+	    var height = 500 - margin.top - margin.bottom;
 	    
-	    var formatNumber = d3.format(",.0f"),    // zero decimal places
-		format = function(d) { return formatNumber(d) + " refs"; },
-		color = d3.scale.category20();
+	    var color = d3.scale.category20();
 	    
 	    // append the svg canvas to the page
 	    var svg = d3.select("#chart").append("svg")
-		.attr("width", width + mymargin.left + mymargin.right)
-		.attr("height", height + mymargin.top + mymargin.bottom)
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
 	      .append("g")
 		.attr("transform", 
-		      "translate(" + mymargin.left + "," + mymargin.top + ")");
-
-
-
-
-
-    // Set the sankey diagram properties
-    var sankey = d3.sankey()
-	.nodeWidth(36)
-	.nodePadding(40)
-	.size([width, height]);
-    var path = sankey.link();
-    sankey
-	  .nodes(self.graph.nodes)
-	  .links(self.graph.links)
-	  .layout(32);
+		      "translate(" + margin.left + "," + margin.top + ")");
+		
+	    // Set the sankey diagram properties
+	    var sankey = d3.sankey()
+		.nodeWidth(20)
+		.nodePadding(40)
+		.size([width, height]);
+		
+	    var path = sankey.link();
+	    sankey
+		.nodes(self.graph.nodes)
+		.links(self.graph.links)
+		.layout(40);
     
-    // add in the links
-      var link = svg.append("g").selectAll(".link")
-	  .data(self.graph.links)
-	.enter().append("path")
-	  .attr("class", "link")
-	  .attr("d", path)
-	  .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-	  .sort(function(a, b) { return b.dy - a.dy; });
+	    // add in the links
+	    var link = svg.append("g").selectAll(".link")
+		.data(self.graph.links)
+		.enter().append("path")
+		    .attr("class", "sankeylink")
+		    .attr("d", path)
+		    .style("stroke-width", function(d) { return 10; /*Math.max(1, d.dy);*/ })
+		    .sort(function(a, b) { return b.dy - a.dy; });
     
-    // add the link titles
-      link.append("title")
-	    .text(function(d) {
-		return d.source.name + " → " + 
-		    d.target.name + "\n" + format(d.value); });
+	    // add the link titles
+	    link.append("title")
+		.text(function(d) {
+		    return d.text;
+		});
     
-	// add in the nodes
-      var node = svg.append("g").selectAll(".node")
-	  .data(self.graph.nodes)
-	.enter().append("g")
-	  .attr("class", "node")
-	  .attr("transform", function(d) { 
-	      return "translate(" + d.x + "," + d.y + ")"; })
-	.call(d3.behavior.drag()
-	  .origin(function(d) { return d; })
-	  .on("dragstart", function() { 
-	      this.parentNode.appendChild(this); })
-	  .on("drag", dragmove));
+	    // add in the nodes
+	    var node = svg.append("g").selectAll(".node")
+		.data(self.graph.nodes)
+	      .enter().append("g")
+		.attr("class", "sankeynode")
+		.attr("transform", function(d) { 
+		    return "translate(" + d.x + "," + d.y + ")"; })
+	      .call(d3.behavior.drag()
+		.origin(function(d) { return d; })
+		.on("dragstart", function() { 
+		    this.parentNode.appendChild(this); })
+		.on("drag", dragmove));
     
-    // add the rectangles for the nodes
-      node.append("rect")
-	  .attr("height", function(d) { return d.dy; })
-	  .attr("width", sankey.nodeWidth())
-    //      .style("fill", function(d) { 
-    //          return d.color = color(d.name.replace(/ .*/, "")); })
-	  .style("stroke", function(d) { 
-	      return d3.rgb(d.color).darker(2); })
-	.append("title")
-	  .text(function(d) { 
-	      return d.name + "\n" + format(d.value); });
+	    // add the rectangles for the nodes
+	    node.append("rect")
+		.attr("height", function(d) { return d.dy; })
+		.attr("width", sankey.nodeWidth())
+		.style("fill", function(d) {
+		      return d.color = self.typeToColor[self.objDataLookup[d.ref]['info'][2].split('-')[0]];
+		})
+		.style("stroke", function(d) { 
+		    return d3.rgb(d.color).darker(2); })
+		.append("title")
+		    .text(function(d) {
+			  //0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
+			  var info = self.objDataLookup[d.ref]['info'];
+			  var savedate = new Date(info[3]);
+			  var text =
+				  info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")\n"+
+				  "--------------\n"+
+				  "  type:  "+info[2]+"\n"+
+				  "  saved on:  "+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"\n"+
+				  "  saved by:  "+info[5]+"\n";
+			  var found = false; var metadata = "  metadata:\n";
+			  for( var m in info[10]) {
+			      text += "     "+m+" : "+info[10][m]+"\n"
+			      found = true;
+			  }
+			  if (found) {
+			      text += metadata;
+			  }
+			  return text;
+		    });
     
-    // add in the title for the nodes
-      node.append("text")
-	  .attr("x", -6)
-	  .attr("y", function(d) { return d.dy / 2; })
-	  .attr("dy", ".35em")
-	  .attr("text-anchor", "end")
-	  .attr("transform", null)
-	  .text(function(d) { return d.name; })
-	.filter(function(d) { return d.x < width / 2; })
-	  .attr("x", 6 + sankey.nodeWidth())
-	  .attr("text-anchor", "start");
-    
-    // the function for moving the nodes
-      function dragmove(d) {
-	d3.select(this).attr("transform", 
-	    "translate(" + (
-		//d.x = d.x //Math.max(0, Math.min(width - d.dx, d3.event.x))
-		d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
-	    )
-	    + "," + (
-		d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
-	    ) + ")");
-	sankey.relayout();
-	link.attr("d", path);
-      };
+	    // add in the title for the nodes
+	    node.append("text")
+		.attr("x", -6)
+		.attr("y", function(d) { return d.dy / 2; })
+		.attr("dy", ".35em")
+		.attr("text-anchor", "end")
+		.attr("transform", null)
+		.text(function(d) { return d.name; })
+		.filter(function(d) { return d.x < width / 2; })
+		.attr("x", 6 + sankey.nodeWidth())
+		 .attr("text-anchor", "start");
      
+	    // the function for moving the nodes
+	    function dragmove(d) {
+		d3.select(this).attr("transform", 
+		    "translate(" + (
+			//d.x = d.x //Math.max(0, Math.min(width - d.dx, d3.event.x))
+			d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
+		    )
+		    + "," + (
+			d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
+		    ) + ")");
+		sankey.relayout();
+		link.attr("d", path);
+	    };
+    
 		
                // }, function(err) {
                //     self.$elem.find('#loading-mssg').remove();
@@ -346,7 +379,9 @@
             return this;
         },
 	
-	
+	/**
+	 * Get a list of jobs that can be run to get info on all objects in a WS
+	 */
 	getObjInfoJobs: function (listObjParams, typeNames) {
 	    var self = this;
 	    var listObjJobs = [];
@@ -368,7 +403,7 @@
 				if(self.objData[t][data[i][0]]) {
 				    self.objData[t][data[i][0]][data[i][4]] = wsInfo;
 				} else {
-				    self.objData[t][data[i][0]]={}; //todo: make this an array...
+				    self.objData[t][data[i][0]]={}; //todo: make this an array... ?
 				    self.objData[t][data[i][0]][data[i][4]] = wsInfo;
 				}
 			    }
@@ -400,11 +435,17 @@
 		    function(data) {
 			    for(var i = 0; i < data.length; i++) {
 				var info = data[i]['info'];
+				//0:obj_id objid, 1:obj_name name, 2:type_string type,3:timestamp save_date, 4:int version, 5:username saved_by,
+				//6:ws_id wsid, 7:ws_name workspace, 8:string chsum, 9:int size, 10:usermeta meta>
+				//object_info;
 				var t = info[2].split("-")[0];
 				self.objData[t][info[0]][info[4]]['refs'] = data[i]['refs'];
 				self.objData[t][info[0]][info[4]]['prov'] = data[i]['provenance'];
 				self.objData[t][info[0]][info[4]]['creator'] = data[i]['creator'];
 				self.objData[t][info[0]][info[4]]['created'] = data[i]['created'];
+				
+				// also include a fast lookup table
+				self.objDataLookup[info[6]+"/"+info[0]+"/"+info[4]] = self.objData[t][info[0]][info[4]];
 			    }
 		    },
 		    function(err) {
@@ -417,7 +458,7 @@
 	
         
         getData: function() {
-            return {title:"Data Object Reference Graph", workspace:this.wsName};
+            return {title:"Data Object Reference Graph", workspace:this.wsNameOrId, id:"This view highlights the connections between Genome and FBA related data objects in this project."};
         },
         
         
