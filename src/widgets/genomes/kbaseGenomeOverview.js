@@ -37,41 +37,6 @@
 															
             return this;
         },
-		
-		queryWorkspace: function() {
-			self = this;
-			var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
-
-            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-			
-            $.when(prom).done($.proxy(function(genome) {
-                genome = genome[0];
-				this.pubmedQuery = genome.scientific_name;
-			}, this));
-            $.when(prom).fail($.proxy(function(error) { this.renderError(error); }, this));
-	
-		},
-		
-		queryCentralStore: function() {
-			self = this;
-			self.entityClient = new CDMI_EntityAPI(self.cdmiURL)
-			self.entityClient.get_entity_Genome([self.options.genomeID],
-			['id', 'scientific_name', 'domain', 'complete', 'dna_size', 'source_id', 
-			'contigs', 'gc_content', 'pegs', 'rnas'],
-
-			$.proxy(function(genome) {
-				genome = genome[self.options.genomeID];
-				self.genome = genome; // store it for now.
-				if (!genome) {
-					self.renderError("Genome '" + self.options.genomeID + "' not found in the KBase Central Store.");
-					return;
-				}
-				this.pubmedQuery = genome.scientific_name
-				
-			}, self),
-			self.renderError
-			)
-		},
 
         render: function() {
             var self = this;
@@ -106,7 +71,7 @@
 											return;											
 										}
 										else {
-											var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+self.pubmedQuery
+											var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+self.pubmedQuery.replace(/\s+/g, "+")
 											self.trigger("showLitWidget", 
 												{ 
 												literature: query, 
