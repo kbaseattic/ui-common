@@ -27,6 +27,7 @@
 		
 		parseLitSearch: function(query,infoTable) {
 			self = this;
+			console.log(infoTable)
 			$.get(query,
 						function(data) {
 							var htmlJson = self.xmlToJson(data)
@@ -46,7 +47,10 @@
 											}
 											else {infoTable.append(self.addInfoRow(litInfo[i].Item["@attributes"].Name,litInfo[i].Item["#text"]))}
 										}
-										else {infoTable.append(self.addInfoRow(litInfo[i]["@attributes"].Name,litInfo[i]["#text"]))}
+										else {
+											console.log(infoTable)
+											infoTable.append(self.addInfoRow(litInfo[i]["@attributes"].Name,litInfo[i]["#text"]))
+										}
 									}
 								}
 							}
@@ -117,11 +121,11 @@
 						}
 					}
 					else {
-						self.$infoTable = $("<table>")
+						var infoTable = $("<table>")
                             .addClass("table table-striped table-bordered");
 						var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+htmlJson.eSearchResult[1].IdList.Id['#text']
-						self.parseLitSearch(query)
-						self.$infoPanel.append(self.$infoTable)
+						self.parseLitSearch(query,infoTable)
+						self.$infoPanel.append(infoTable)
 						self.$elem.append(self.$infoPanel);			
 
 					}
