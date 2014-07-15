@@ -103,7 +103,6 @@
 			
 			self.$infoPanel = $("<div>");
            
-			lit = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=sphingomonas'
 			$.get(lit,
 				function(data) {
 					var htmlJson = self.xmlToJson(data)
