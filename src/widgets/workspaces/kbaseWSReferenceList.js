@@ -27,7 +27,6 @@
                 self.wsUrl = options.wsUrl;
             }
             var kbws;
-            
             if (self.options.kbCache.ws_url) {
                 self.wsUrl = self.options.kbCache.ws_url;
             }

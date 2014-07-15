@@ -376,6 +376,16 @@ var app = angular.module('landing-pages',
           url: "/ref/:ws/:id/:version",
           templateUrl: 'views/ws/ws-ref-list.html',
           controller: 'WsRefViewer'
+        })
+        .state('wsrefusers', {
+          url: "/refusers/:ws/:id",
+          templateUrl: 'views/objects/ws-obj-ref-users.html',
+          controller: 'WsRefUsersViewer'
+        })
+        .state('wsrefuserswithversion', {
+          url: "/refusers/:ws/:id/:version",
+          templateUrl: 'views/objects/ws-obj-ref-users.html',
+          controller: 'WsRefUsersViewer'
         });
       
     
