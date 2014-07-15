@@ -85,11 +85,12 @@
                         var $maindiv = self.$elem.find('#mainview');
                         $maindiv.append('<table cellpadding="0" cellspacing="0" border="0" id="ref-table" \
                             class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>');
-
+                        var sDom = 't<flip>'
+                        if (refTableData.length<=10) { sDom = 'tfi'; }
             		var tblSettings = {
             				"sPaginationType": "full_numbers",
             				"iDisplayLength": 10,
-                                        "sDom": 't<flip>',
+                                        "sDom": sDom,
             				"aoColumns": [
             				              {sTitle: "Object Name (reference)", mData: "na", sWidth:"30%"},
             				              {sTitle: "Type", mData: "ty"},
@@ -119,7 +120,7 @@
         },
         
         getData: function() {
-            return {title:"Data objects that reference:",id:this.objName, workspace:this.wsName};
+            return {title:"Other data objects that reference this object",id:this.objName, workspace:this.wsName};
         },
         
         

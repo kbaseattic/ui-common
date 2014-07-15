@@ -196,10 +196,12 @@
             $maindiv.append('<table cellpadding="0" cellspacing="0" border="0" id="ref-table" \
                             class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>');
 
+            var sDom = 't<flip>'
+            if (tblData.length<=10) { sDom = 'ti'; }
             var tblSettings = {
             			"sPaginationType": "full_numbers",
             			"iDisplayLength": 10,
-                                "sDom": 't<lip>',
+                                "sDom": sDom,
             			"aoColumns": [
             				{sTitle: "Name", mData: "name", sWidth:"30%"},
             				{sTitle: "User Id", mData: "user_id"},
