@@ -26,7 +26,8 @@
         init: function(options) {
             this._super(options);
             var self = this;
-
+	    self.userList={};
+	    
             if (options.wsUrl) {
                 self.wsUrl = options.wsUrl;
             }
@@ -104,7 +105,7 @@
 					    for(var k=0; k<depList.length; k++) {
 						var name = depList[k].trim().split(/\s+/)[1];
 						if (name) {
-						    if (name === self.objVerifiedName) {
+						    if (name == self.objVerifiedName) {
 							var narName = data[i]['info'][1] + " ("+data[i]['info'][6]+"/"+data[i]['info'][0]+"/"+data[i]['info'][4]+")";
 							if (data[i]['info'][5] in self.userList) {
 							    self.userList[data[i]['info'][5]]['narCount']++;
@@ -114,31 +115,31 @@
 							}
 						    }
 						}
-							
+						
 					    }
 					}
 					// finally, render the table
-					self.renderTable();
+					self.renderTable(); 
 					},
 					function(err) {
 					    // do nothing, this isn't critical to this widget, so we render anyway
-					    self.renderTable();
+					    if(foundAnything) { self.renderTable(); }
+					    else { self.$elem.append("<br><b>There are no other users that have referenced or used this object.</b>"); }
 					});
-				    } else {
-					// no nars here, render now!
-					self.renderTable();
-				    }
-			} else {
-			    if (!foundAnything) {
-				self.$elem.append("<br><b>There are no other users that have referenced or used this object.</b>");
 			    } else {
-				self.renderTable();
+				// no nars here, render now!
+				if(foundAnything) { self.renderTable(); }
+				else { self.$elem.append("<br><b>There are no other users that have referenced or used this object.</b>"); }
 			    }
+			} else {
+			    if(foundAnything) { self.renderTable(); }
+			    else { self.$elem.append("<br><b>There are no other users that have referenced or used this object.</b>"); }
 			}
 		    },
 		    function(err) {
 			// do nothing, this isn't critical to this widget, so we render anyway
-			self.renderTable();
+			if(foundAnything) { self.renderTable(); }
+			 else { self.$elem.append("<br><b>There are no other users that have referenced or used this object.</b>"); }
 		    });
 			
                 }, function(err) {
