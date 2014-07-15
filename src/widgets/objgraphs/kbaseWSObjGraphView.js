@@ -11,7 +11,8 @@
         options: {
             wsNameOrId: null,
             kbCache:{},
-            width:1200
+            width:1200,
+	    height:600
         },
 
         wsNameOrId:"",
@@ -28,13 +29,12 @@
         init: function(options) {
             this._super(options);
             var self = this;
-
 	    // show loading message
             self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>building object reference graph...</center></p></div>');
 	    
 	    // load the basic things from the cache and options
             //if (self.options.kbCache.ws_url) { self.wsUrl = self.options.kbCache.ws_url; }
-            if (self.options.kbCache.token) { alert(self.options.kbCache.token); self.ws = new Workspace(self.wsUrl, {token: self.options.kbCache.token}); }
+            if (self.options.kbCache.token) { self.ws = new Workspace(self.wsUrl, {token: self.options.kbCache.token}); }
             else { self.ws = new Workspace(self.wsUrl); }
             self.wsNameOrId = options.wsNameOrId;
 
@@ -57,7 +57,7 @@
 		});
 	    });
 	    
-	    self.$elem.append("<div id=\"chart\">");
+	    self.$elem.append("<div id=\"objgraphview\">");
 	    
 	    return this;
 	},
@@ -246,7 +246,8 @@
 	    var html = '<table cellpadding="2" cellspacing="0" border="0" id="graphkey vertical-align:middle" \
                             style="">'
 	    for(var t in self.typeToColor) {
-		html += "<tr><td><svg width=\"40\" height=\"20\"><rect x=\"0\" y=\"0\" width=\"40\" height=\"20\" fill=\""+self.typeToColor[t] +"\" /></svg></td><td valign=\"middle\"><b> \
+		html += "<tr><td><svg width=\"40\" height=\"20\"><rect x=\"0\" y=\"0\" width=\"40\" height=\"20\" fill=\""+self.typeToColor[t] +"\" \
+		stroke=\""+ d3.rgb(self.typeToColor[t]).darker(2) +"\" /></svg></td><td valign=\"middle\"><b> \
 		<a href=\"#/spec/type/"+t+"\">"+t+"</a></b></td></tr>";
 	    }
 	    html += "</table>";
@@ -258,12 +259,12 @@
 	    var self = this;
 	    var margin = {top: 10, right: 10, bottom: 10, left: 10};
 	    var width = self.options.width - 100 - margin.left - margin.right;
-	    var height = 500 - margin.top - margin.bottom;
+	    var height = self.graph.nodes.length*35 - margin.top - margin.bottom;
 	    
 	    var color = d3.scale.category20();
 	    
 	    // append the svg canvas to the page
-	    var svg = d3.select("#chart").append("svg")
+	    var svg = d3.select("#objgraphview").append("svg")
 		.attr("width", width + margin.left + margin.right)
 		.attr("height", height + margin.top + margin.bottom)
 	      .append("g")
@@ -312,7 +313,7 @@
     
 	    // add the rectangles for the nodes
 	    node.append("rect")
-		.attr("height", function(d) { return d.dy; })
+		.attr("height", function(d) { return Math.max(10,d.dy); })
 		.attr("width", sankey.nodeWidth())
 		.style("fill", function(d) {
 		      return d.color = self.typeToColor[self.objDataLookup[d.ref]['info'][2].split('-')[0]];
@@ -343,7 +344,6 @@
     
 	    // add in the title for the nodes
 	    node.append("text")
-		.attr("x", -6)
 		.attr("y", function(d) { return d.dy / 2; })
 		.attr("dy", ".35em")
 		.attr("text-anchor", "end")
