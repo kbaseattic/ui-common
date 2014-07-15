@@ -153,6 +153,14 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 	'version':$stateParams.version,
         'kbCache' : kb }
 })
+.controller('WsRefUsersViewer', function($scope, $stateParams) {
+    $scope.params = {
+	'id': $stateParams.id,
+	'ws':$stateParams.ws,
+	'version':$stateParams.version,
+        'kbCache' : kb }
+})
+
 
 .controller('WsObjGraphView', function($scope, $stateParams) {
     $scope.params = { 'ws':$stateParams.ws, 'kbCache' : kb }

@@ -730,6 +730,8 @@
                 this.showSpecCards();
             else if (this.options.template.toLowerCase() === "wsref")
                 this.showRefCards();
+            else if (this.options.template.toLowerCase() === "wsrefusers")
+                this.showRefUsersCards();
             else if (this.options.template.toLowerCase() === "wsobjgraphview")
                 this.showWsObjGraphCards();
             else if (this.options.template.toLowerCase() === "ppid")
@@ -778,7 +780,7 @@
 	
 
 	// only show meta data if this is a WS object
-            if (this.options.data.workspaceID) {
+         /*   if (this.options.data.workspaceID) {
 		
                 this.addNewCard("KBaseObjectMeta",
                 {
@@ -791,7 +793,7 @@
                     of: "#app"
                 }
             );
-	}
+	}*/
                 
             
             // only add the reference list if this is a WS object
@@ -806,6 +808,23 @@
                     {
                         my: "left top",
                         at: "left bottom+570",
+                        of: "#app"
+                    }
+                );
+            }
+            
+            // only add the reference list if this is a WS object
+            if (this.options.data.workspaceID) {
+                this.addNewCard("KBaseWSObjRefUsers",
+                    {
+                        wsNameOrId: this.options.data.workspaceID,
+                        objNameOrId: this.options.data.genomeID,
+                        objVer: null,
+                        kbCache: this.options.data.kbCache
+                    },
+                    {
+                        my: "left top",
+                        at: "left+860 bottom",
                         of: "#app"
                     }
                 );
@@ -1160,6 +1179,23 @@
                     );
             return this;
         },
+        showRefUsersCards: function() {
+            this.addNewCard("KBaseWSObjRefUsers",
+                        {
+                            wsNameOrId: this.options.data.ws,
+                            objNameOrId: this.options.data.id,
+                            objVer: this.options.data.version,
+                            kbCache: this.options.data.kbCache
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+            return this;
+        },
+        
         
         showWsObjGraphCards: function() {
             this.addNewCard("KBaseWSObjGraphView",

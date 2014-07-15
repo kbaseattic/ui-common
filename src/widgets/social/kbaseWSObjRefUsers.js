@@ -1,6 +1,6 @@
 (function( $, undefined ) {
     $.KBWidget({
-        name: "KBaseWSReferenceList",
+        name: "KBaseWSObjRefUsers",
         parent: "kbaseAuthenticatedWidget",
         version: "1.0.0",
         
@@ -12,12 +12,14 @@
             objNameOrId: null,
             objVer: null,
             kbCache:{},
-            width:900
+            width:300
         },
 
         
         objName:"",
         wsName:"",
+        userList:{},
+        
         
         init: function(options) {
             this._super(options);
@@ -27,6 +29,7 @@
                 self.wsUrl = options.wsUrl;
             }
             var kbws;
+            
             if (self.options.kbCache.ws_url) {
                 self.wsUrl = self.options.kbCache.ws_url;
             }
@@ -47,39 +50,25 @@
             var objectIdentity = self.getObjectIdentity(options.wsNameOrId, options.objNameOrId, options.objVer);
             kbws.list_referencing_objects([objectIdentity], function(data) {
                     if (data[0].length == 0) {
-                        self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
+                        self.$elem.append("<br><b>There are no other users that have referenced this object.</b>");
                     } else {
-                        var refList = {};
                         for(var i = 0; i < data[0].length; i++) {
-                            var objInfo = data[0][i];
-                            //0:obj_id objid, 1:obj_name name, 2:type_string type,3:timestamp save_date, 4:int version, 5:username saved_by,
-                            //6:ws_id wsid, 7:ws_name workspace, 8:string chsum, 9:int size, 10:usermeta meta>
-                            //object_info;
-                            if (!(objInfo[6]+"/"+objInfo[1] in refList)) {
-                                refList[objInfo[6]+"/"+objInfo[1]] = objInfo;
-                                
-                            } else {
-                                if (refList[objInfo[6]+"/"+objInfo[1]][4] < objInfo[4]) {
-                                    refList[objInfo[6]+"/"+objInfo[1]] = objInfo;
-                                    
-                            }
+                            //var savedate = new Date(objInfo[3]); // todo: add last save date
+			    if (data[0][i][5] in self.userList) {
+				self.userList[data[0][i][5]]['refCount']++;
+			    } else {
+				self.userList[data[0][i][5]] = {refCount:1};
+			    }
                         }
                         
-                        // load the data into a data object
-                        var refTableData = [];
-                        for(var ref in refList) {
-                            var objInfo = refList[ref];
-                            var savedate = new Date(objInfo[3]);
-                                    refTableData.push({
-                                            na:objInfo[1]+ " ("+objInfo[6]+"/"+objInfo[0]+"/"+objInfo[4]+")",
-                                            ty:objInfo[2],
-                                            de:"saved by "+objInfo[5]+" on "+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()
-                                        })
-                                }
-                            //self.$elem.append("<b>"+objInfo[1]+"</b> <i>"+objInfo[2]+"</i> ("+objInfo[6]+"/"+objInfo[0]+"/"+objInfo[4]+", saved by "
-                            //            +objInfo[5]+" on "+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+")<br>")
-                        }
-                        
+			
+			// todo : use globus to populate user names
+			
+			var tblData = [];
+			for (var ud in self.userList) {
+			    tblData.push({name:"Name G Placeholder",user_id:ud,mentions:self.userList[ud]['refCount']});
+			}
+			
                         self.$elem.find('#loading-mssg').remove();
                         
                         var $maindiv = self.$elem.find('#mainview');
@@ -89,27 +78,19 @@
             		var tblSettings = {
             				"sPaginationType": "full_numbers",
             				"iDisplayLength": 10,
-                                        "sDom": 't<flip>',
+                                        "sDom": 't<lip>',
             				"aoColumns": [
-            				              {sTitle: "Object Name (reference)", mData: "na", sWidth:"30%"},
-            				              {sTitle: "Type", mData: "ty"},
-            				              {sTitle: "Details", mData: "de"}
+            				              {sTitle: "Name", mData: "name", sWidth:"30%"},
+            				              {sTitle: "User Id", mData: "user_id"},
+            				              {sTitle: "Mentions", mData: "mentions"}
             				              ],
-            				              "aaData": refTableData
-            				              
-            				              /*"fnDrawCallback": function() {}
-                                                      	$('.'+pref+'contig-click').unbind('click');
-                                                                $('.'+pref+'contig-click').click(function() {
-                                                                var contigId = [$(this).data('contigname')];
-                                                                showContig(contigId);
-                                                        });            
-                                                        }*/
+            				              "aaData": tblData
             		};
             		var refTable = self.$elem.find('#ref-table').dataTable(tblSettings);
                     }
                 }, function(err) {
                     self.$elem.find('#loading-mssg').remove();
-                    self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
+                    self.$elem.append("<br><b>There are no other users that have referenced this object.</b>");
                     console.error("Error in finding referencing objects! (note: v0.1.6 throws this error if no referencing objects were found)");
                     console.error(err);
                     //self.$elem.append("<br><div><i>Error was:</i></div><div>"+err['error']['message']+"</div><br>");
@@ -119,7 +100,7 @@
         },
         
         getData: function() {
-            return {title:"Data objects that reference:",id:this.objName, workspace:this.wsName};
+            return {title:"People using this data object.",id:this.objName, workspace:this.wsName};
         },
         
         
