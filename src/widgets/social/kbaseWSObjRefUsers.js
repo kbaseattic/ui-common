@@ -19,7 +19,7 @@
         objName:"",
         wsName:"",
         userList:{},
-        
+        loggedIn: false,
         
         init: function(options) {
             this._super(options);
@@ -35,6 +35,7 @@
             }
             if (self.options.kbCache.token) {
                 kbws = new Workspace(self.wsUrl, {token: self.options.kbCache.token});
+		self.loggedIn = true;
             } else {
                 kbws = new Workspace(self.wsUrl);
             }
@@ -57,16 +58,21 @@
 			    if (data[0][i][5] in self.userList) {
 				self.userList[data[0][i][5]]['refCount']++;
 			    } else {
-				self.userList[data[0][i][5]] = {refCount:1};
+				self.userList[data[0][i][5]] = {refCount:1, name:"[Login to view name]"};
 			    }
                         }
-                        
 			
-			// todo : use globus to populate user names
+                        // todo : use globus to populate user names
+			if (self.loggedIn) {
+			    
+			    
+			    
+			    
+			}
 			
 			var tblData = [];
 			for (var ud in self.userList) {
-			    tblData.push({name:"Name G Placeholder",user_id:ud,mentions:self.userList[ud]['refCount']});
+			    tblData.push({name:self.userList[ud]['name'],user_id:ud,mentions:self.userList[ud]['refCount']});
 			}
 			
                         self.$elem.find('#loading-mssg').remove();
@@ -90,10 +96,10 @@
                     }
                 }, function(err) {
                     self.$elem.find('#loading-mssg').remove();
-                    self.$elem.append("<br><b>There are no other users that have referenced this object.</b>");
+                    self.$elem.append("<br><b>Error: Could not access data for this object.</b><br>");
+                    self.$elem.append("<i>Error was:</i><br>"+err['error']['message']+"<br>");
                     console.error("Error in finding referencing objects! (note: v0.1.6 throws this error if no referencing objects were found)");
                     console.error(err);
-                    //self.$elem.append("<br><div><i>Error was:</i></div><div>"+err['error']['message']+"</div><br>");
                 });
             
             return this;
