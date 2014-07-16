@@ -778,10 +778,8 @@
             );
 
 	
-
 	// only show meta data if this is a WS object
-         /*   if (this.options.data.workspaceID) {
-		
+            if (this.options.data.workspaceID) {		
                 this.addNewCard("KBaseObjectMeta",
                 {
                     wsNameOrId: this.options.data.workspaceID,
@@ -796,9 +794,24 @@
                     of: "#app"
                 }
             );
-	}*/
+	}
+
+	//shows taxonomic lineage for this genome
+                this.addNewCard("KBaseGenomeLineage",
+                {
+                    workspaceID: this.options.data.workspaceID,
+                    genomeID: this.options.data.genomeID,
+                     objVer: null,
+                      kbCache: this.options.data.kbCache,
+                      loadingImage: this.options.loadingImage,
+                },
+                {
+                    my: "left top",
+                    at: "left+500 bottom",
+                    of: "#app"
+                }
+            );
                 
-            
             // only add the reference list if this is a WS object
             if (this.options.data.workspaceID) {
                 this.addNewCard("KBaseWSReferenceList",
