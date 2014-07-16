@@ -52,8 +52,6 @@
 		    self.renderSankeyStyleGraph();
 		    self.addNodeColorKey();
                     self.$elem.find('#loading-mssg').remove();
-		    //self.$elem.append(JSON.stringify(self.objData));
-		    
 		});
 	    });
 	    
@@ -133,55 +131,19 @@
 	    var refToNodeIdx = {};
 	    var nodeList = []; var nodeIdx = 0;
 	    for (var gRef in genomeNodeInfo) {
-		if (genomeNodeInfo[gRef]['modelrefs'].length>0) {
-		    nodeList.push(self.buildNodeData(nodeIdx,genomeNodeInfo,gRef));
-		    refToNodeIdx[gRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else if (genomeNodeInfo[gRef]['ver']>1) {
-		    nodeList.push(self.buildNodeData(nodeIdx,genomeNodeInfo,gRef));
-		    refToNodeIdx[gRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else if (genomeNodeInfo[gRef]['nextVer']) {
-		    nodeList.push(self.buildNodeData(nodeIdx,genomeNodeInfo,gRef));
-		    refToNodeIdx[gRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else {
-		    // add to genome no mention list (one version, no model refs)
-		}
+		nodeList.push(self.buildNodeData(nodeIdx,genomeNodeInfo,gRef));
+		refToNodeIdx[gRef]=Number(nodeIdx);
+		nodeIdx++;
 	    }
 	    for (var mRef in modelNodeInfo) {
-		if (modelNodeInfo[mRef]['genomerefs'].length>0 || modelNodeInfo[mRef]['fbarefs'].length>0) {
-		    nodeList.push(self.buildNodeData(nodeIdx,modelNodeInfo,mRef));
-		    refToNodeIdx[mRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else if (modelNodeInfo[mRef]['ver']>1) {
-		    nodeList.push(self.buildNodeData(nodeIdx,modelNodeInfo,mRef));
-		    refToNodeIdx[mRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else if (modelNodeInfo[mRef]['nextVer']) {
-		    nodeList.push(self.buildNodeData(nodeIdx,modelNodeInfo,mRef));
-		    refToNodeIdx[mRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else {
-		    // add to model no mention list
-		}
+		nodeList.push(self.buildNodeData(nodeIdx,modelNodeInfo,mRef));
+		refToNodeIdx[mRef]=Number(nodeIdx);
+		nodeIdx++;
 	    }
 	    for (var fRef in fbaNodeInfo) {
-		if (fbaNodeInfo[fRef]['modelrefs'].length>0) {
-		    nodeList.push(self.buildNodeData(nodeIdx,fbaNodeInfo,fRef));
-		    refToNodeIdx[fRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else if (fbaNodeInfo[fRef]['ver']>1) {
-		    nodeList.push(self.buildNodeData(nodeIdx,fbaNodeInfo,fRef));
-		    refToNodeIdx[fRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else if (fbaNodeInfo[fRef]['nextVer']) {
-		    nodeList.push(self.buildNodeData(nodeIdx,fbaNodeInfo,fRef));
-		    refToNodeIdx[fRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else {
-		    // add to genome no mention list
-		}
+		nodeList.push(self.buildNodeData(nodeIdx,fbaNodeInfo,fRef));
+		refToNodeIdx[fRef]=Number(nodeIdx);
+		nodeIdx++;
 	    }
 	    
 	    var edgeList = [];
@@ -215,13 +177,13 @@
 	    }
 	    
 	    
-	   // self.$elem.append(JSON.stringify(genomeNodeInfo)+"<br><br>");
-	   // self.$elem.append(JSON.stringify(modelNodeInfo)+"<br><br>");
-	   // self.$elem.append(JSON.stringify(fbaNodeInfo)+"<br><br>");
+	    // self.$elem.append(JSON.stringify(genomeNodeInfo)+"<br><br>");
+	    // self.$elem.append(JSON.stringify(modelNodeInfo)+"<br><br>");
+	    // self.$elem.append(JSON.stringify(fbaNodeInfo)+"<br><br>");
 	    
-	   // self.$elem.append("nodes:<br>"+JSON.stringify(nodeList)+"<br><br>");
-	   // self.$elem.append("links:<br>"+JSON.stringify(edgeList)+"<br><br>");
-	   // self.$elem.append("lookup:<br>"+JSON.stringify(refToNodeIdx)+"<br><br>");
+	    // self.$elem.append("nodes:<br>"+JSON.stringify(nodeList)+"<br><br>");
+	    // self.$elem.append("links:<br>"+JSON.stringify(edgeList)+"<br><br>");
+	    // self.$elem.append("lookup:<br>"+JSON.stringify(refToNodeIdx)+"<br><br>");
 	    
 	    // set the data
 	    self.graph = { nodes:nodeList, links:edgeList };
@@ -232,6 +194,7 @@
 	    "KBaseGenomes.Genome":"#00ACE9",
 	    "KBaseFBA.FBAModel":"#D43F3F",
 	    "KBaseFBA.FBA":"#FFE361"
+	    //"KBaseNarratives.Narrative":"#50d07d"
 	},
 	/*
 	    #00ACE9
@@ -369,6 +332,8 @@
     
             return this;
         },
+	
+	
 	
 	/**
 	 * Get a list of jobs that can be run to get info on all objects in a WS

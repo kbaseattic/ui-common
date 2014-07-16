@@ -846,6 +846,24 @@
                 );
             }
 
+            // only add the reference list if this is a WS object
+            if (this.options.data.workspaceID) {
+                this.addNewCard("KBaseNarrativesUsingData",
+                    {
+                        wsNameOrId: this.options.data.workspaceID,
+                        objNameOrId: this.options.data.genomeID,
+                        objVer: null,
+                        kbCache: this.options.data.kbCache
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom+870",
+                        of: "#app"
+                    }
+                );
+            }
+            
+            
             return this;
         },
 
