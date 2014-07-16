@@ -238,7 +238,13 @@
 			dataType:"json",
                         crossDomain : true,
 			success: function(data,res,jqXHR) {
-			    alert(JSON.stringify(data));
+			    for(var u in self.userList) {
+				if (u in data['data'] && data['data'][u]['fullName']) {
+				    self.userList[u]['name'] = data['data'][u]['fullName'];
+				} else {
+				    self.userList[u]['name'] = "Full name not set or found.";
+				}
+			    }
 			    self.renderTable(false);
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
