@@ -13,7 +13,7 @@
             workspaceID: null,
             loadingImage: "../../widgets/images/ajax-loader.gif",
             kbCache: null,
-            width:500
+            width:600
             //isInCard: false,
         },
 
@@ -121,14 +121,22 @@
                 genome = genome[0].data;
                 console.log(genome);
                 
-                var splittax = genome.taxonomy.split(";");
+                console.log(genome.taxonomy);
+                var splittax = genome.taxonomy.replace("/ /g", "");
+                splittax = splittax.split(";");
                 var finaltax = "<pre>";
                 for(a=0;a<splittax.length;a++) {
                     var pad ="";
                     for(b=0;b<a;b++){
                         pad+=" ";
                     }
-                   finaltax+=pad+splittax[a]+"<br>"; 
+                    //http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=drosophila+miranda
+                    var searchtax = splittax[a].replace("/ /g", "+");
+                    console.log(searchtax);
+                    //<a href="#" onclick="myJsFunc();">Run JavaScript Code</a>
+                    var str =pad+'<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name='+searchtax+'">'+splittax[a]+'</a><br>';
+                    console.log(str);
+                   finaltax+=str; 
                 }
                 finaltax += "</pre>";
                 this.$infoTable.empty().append(this.addInfoRow("ID", genome.id)).append(this.addInfoRow("Name", genome.scientific_name)).append(this.addInfoRow("Domain", genome.domain)).append(this.addInfoRow("Taxonomic lineage", finaltax));
