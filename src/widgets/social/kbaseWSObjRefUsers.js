@@ -16,9 +16,9 @@
         },
 
         
-        objVerifiedName:"",
-        objVerifiedVer:"",
-        wsVerifiedName:"",
+        wsName:"",
+	objName:"",
+	kbws:null, //this is the ws client
 	
         userList:{},
         loggedIn: false,
@@ -31,30 +31,30 @@
             if (options.wsUrl) {
                 self.wsUrl = options.wsUrl;
             }
-            var kbws;
             if (self.options.kbCache.ws_url) {
                 self.wsUrl = self.options.kbCache.ws_url;
             }
             if (self.options.kbCache.token) {
-                kbws = new Workspace(self.wsUrl, {token: self.options.kbCache.token});
+                self.kbws = new Workspace(self.wsUrl, {token: self.options.kbCache.token});
 		self.loggedIn = true;
             } else {
-                kbws = new Workspace(self.wsUrl);
+                self.kbws = new Workspace(self.wsUrl);
             }
             
             self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>finding all data that references this object...</center></p></div>');
             self.$elem.append('<div id="mainview">')
             //self.$elem.append(JSON.stringify(options)+"<br>");
             
-	    // get object info first (this one is gonna be blocking on getting everything else...)
-	    
-	    var objectIdentity = self.getObjectIdentity(options.wsNameOrId, options.objNameOrId, options.objVer);
-	    var getInfoJob = [
-		kbws.get_object_info([objectIdentity],0,
+	    // for some reason, I can't get the or operator to work on the regexs...
+	    if ( (/^\d+$/.exec(options.wsNameOrId)) || ( /^\d+$/.exec(options.objNameOrId)) ){
+		// it is an ID, so we need to get the object name
+		// (this one is gonna be blocking on getting everything else...)
+		var objectIdentity = self.getObjectIdentity(options.wsNameOrId, options.objNameOrId, options.objVer);
+		var getInfoJob = [
+		self.kbws.get_object_info([objectIdentity],0,
 		    function(data) {
-			self.objVerifiedName = data[0][1];
-			self.objVerifiedVer = data[0][4];
-			self.wsVerifiedName  = data[0][7];
+			self.objName = data[0][1];
+			self.wsName  = data[0][7];
 		    },
 		    function(err) {
 			self.$elem.find('#loading-mssg').remove();
@@ -64,93 +64,107 @@
 			console.error(err);
 		    })
 		];
-	    $.when.apply($, getInfoJob).done(function() {
-		// get the refs
-		kbws.list_referencing_objects([objectIdentity], function(data) {
-		    var foundAnything = false;
-                    if (data[0].length > 0) {
-			foundAnything = true;
-                        for(var i = 0; i < data[0].length; i++) {
-                            //var savedate = new Date(objInfo[3]); // todo: add last save date
-			    var refName = data[0][i][1] + " ("+data[0][i][6]+"/"+data[0][i][0]+"/"+data[0][i][4]+")";
-			    if (data[0][i][5] in self.userList) {
-				self.userList[data[0][i][5]]['refCount']++;
-				self.userList[data[0][i][5]]['refs'].push(refName);
-			    } else {
-				self.userList[data[0][i][5]] = {refCount:1, name:"[Login to view name]", narCount:0, refs:[refName], nars:{}};
-			    }
-                        }
+		$.when.apply($, getInfoJob).done(function() {
+		    self.getTheRefsAndRender();
+		});
+	    }
+            else {
+		// it is a name already, so we can get right to the fun
+		wsName = options.wsNameOrId;
+		self.getTheRefsAndRender();
+            }
+	    
+	    return this;
+	},
+	
+	getTheRefsAndRender : function () {
+	    var self = this;
+	    var objectIdentity = self.getObjectIdentity(self.options.wsNameOrId, self.options.objNameOrId, self.options.objVer);
+	    // get the refs
+	    self.kbws.list_referencing_objects([objectIdentity], function(data) {
+		var foundAnything = false;
+		if (data[0].length > 0) {
+		    foundAnything = true;
+		    for(var i = 0; i < data[0].length; i++) {
+			//var savedate = new Date(objInfo[3]); // todo: add last save date
+			var refName = data[0][i][1] + " ("+data[0][i][6]+"/"+data[0][i][0]+"/"+data[0][i][4]+")";
+			if (data[0][i][5] in self.userList) {
+			    self.userList[data[0][i][5]]['refCount']++;
+			    self.userList[data[0][i][5]]['refs'].push(refName);
+			} else {
+			    self.userList[data[0][i][5]] = {refCount:1, name:"[Login to view name]", narCount:0, refs:[refName], nars:{}};
+			}
 		    }
-			
-		    // We also need to check if there are narrative references
-		    var narrrativeTypeName = "KBaseNarrative.Narrative"; var dependentDataPath ="/metadata/data_dependencies";
-		    var listObjParams = { includeMetadata:0, type:narrrativeTypeName};
-		    if (/^\d+$/.exec(options.wsNameOrId))
-		        listObjParams['ids'] = [ options.wsNameOrId ];
-		    else
-		        listObjParams['workspaces'] = [ options.wsNameOrId ];
-		    kbws.list_objects( listObjParams, function(data) {
-			if (data.length>0) {
-			    foundAnything = true;
-			    var narList = [];
-			    for(var i = 0; i < data.length; i++) {
-				//0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
-				narList.push({ref:data[i][6]+"/"+data[i][0]+"/"+data[i][4],included:[dependentDataPath]});
-			    }
-			    // then we get subdata containing the data dependencies
-			    if (narList.length>0) {
-				kbws.get_object_subset(narList, function(data) {
-					for(var i = 0; i < data.length; i++) {
-					    var depList = data[i]['data']['metadata']['data_dependencies'];
-					    for(var k=0; k<depList.length; k++) {
-						var name = depList[k].trim().split(/\s+/)[1];
-						if (name) {
-						    if (name == self.objVerifiedName) {
-							var narName = data[i]['info'][1] + " ("+data[i]['info'][6]+"/"+data[i]['info'][0]+"/"+data[i]['info'][4]+")";
-							if (data[i]['info'][5] in self.userList) {
-							    self.userList[data[i]['info'][5]]['narCount']++;
-							    self.userList[data[i]['info'][5]]['nars'][narName]=1;
-							} else {
-							    self.userList[data[i]['info'][5]] = {refCount:0, name:"[Login to view name]", narCount:0, refs:[], nars:{narName:1}};
-							}
+		}
+		    
+		// We also need to check if there are narrative references
+		var narrrativeTypeName = "KBaseNarrative.Narrative"; var dependentDataPath ="/metadata/data_dependencies";
+		var listObjParams = { includeMetadata:0, type:narrrativeTypeName};
+		if (/^\d+$/.exec(self.options.wsNameOrId))
+		    listObjParams['ids'] = [ self.options.wsNameOrId ];
+		else
+		    listObjParams['workspaces'] = [ self.options.wsNameOrId ];
+		self.kbws.list_objects( listObjParams, function(data) {
+		    if (data.length>0) {
+			foundAnything = true;
+			var narList = [];
+			for(var i = 0; i < data.length; i++) {
+			    //0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
+			    narList.push({ref:data[i][6]+"/"+data[i][0]+"/"+data[i][4],included:[dependentDataPath]});
+			}
+			// then we get subdata containing the data dependencies
+			if (narList.length>0) {
+			    self.kbws.get_object_subset(narList, function(data) {
+				    for(var i = 0; i < data.length; i++) {
+					var depList = data[i]['data']['metadata']['data_dependencies'];
+					for(var k=0; k<depList.length; k++) {
+					    var name = depList[k].trim().split(/\s+/)[1];
+					    if (name) {
+						if (name == self.objName) {
+						    var narName = data[i]['info'][1] + " ("+data[i]['info'][6]+"/"+data[i]['info'][0]+"/"+data[i]['info'][4]+")";
+						    if (data[i]['info'][5] in self.userList) {
+							self.userList[data[i]['info'][5]]['narCount']++;
+							self.userList[data[i]['info'][5]]['nars'][narName]=1;
+						    } else {
+							self.userList[data[i]['info'][5]] = {refCount:0, name:"[Login to view name]", narCount:0, refs:[], nars:{narName:1}};
 						    }
 						}
-						
 					    }
+					    
 					}
-					// finally, render the table
-					self.renderTable(); 
-					},
-					function(err) {
-					    // do nothing, this isn't critical to this widget, so we render anyway
-					    if(foundAnything) { self.renderTable(); }
-					    else { self.$elem.append("<br><b>There are no other users that have referenced or used this object.</b>"); }
-					});
-			    } else {
-				// no nars here, render now!
-				if(foundAnything) { self.renderTable(); }
-				else { self.$elem.append("<br><b>There are no other users that have referenced or used this object.</b>"); }
-			    }
+				    }
+				    // finally, render the table
+				    self.renderTable(); 
+				    },
+				    function(err) {
+					// do nothing, this isn't critical to this widget, so we render anyway
+					if(foundAnything) { self.renderTable(); }
+					else { self.$elem.append("<br><b>There are no other users that have referenced or used this object.</b>"); }
+				    });
 			} else {
+			    // no nars here, render now!
 			    if(foundAnything) { self.renderTable(); }
 			    else { self.$elem.append("<br><b>There are no other users that have referenced or used this object.</b>"); }
 			}
-		    },
-		    function(err) {
-			// do nothing, this isn't critical to this widget, so we render anyway
+		    } else {
 			if(foundAnything) { self.renderTable(); }
-			 else { self.$elem.append("<br><b>There are no other users that have referenced or used this object.</b>"); }
-		    });
-			
-                }, function(err) {
-                    self.$elem.find('#loading-mssg').remove();
-                    self.$elem.append("<br><b>Error: Could not access data for this object.</b><br>");
-                    self.$elem.append("<i>Error was:</i><br>"+err['error']['message']+"<br>");
-                    console.error("Error in finding referencing objects! (note: v0.1.6 throws this error if no referencing objects were found)");
-                    console.error(err);
-                });
-            
+			else { self.$elem.append("<br><b>There are no other users that have referenced or used this object.</b>"); }
+		    }
+		},
+		function(err) {
+		    // do nothing, this isn't critical to this widget, so we render anyway
+		    if(foundAnything) { self.renderTable(); }
+		     else { self.$elem.append("<br><b>There are no other users that have referenced or used this object.</b>"); }
+		});
+		    
+	    }, function(err) {
+		self.$elem.find('#loading-mssg').remove();
+		self.$elem.append("<br><b>Error: Could not access data for this object.</b><br>");
+		self.$elem.append("<i>Error was:</i><br>"+err['error']['message']+"<br>");
+		console.error("Error in finding referencing objects! (note: v0.1.6 throws this error if no referencing objects were found)");
+		console.error(err);
 	    });
+            
             return this;
         },
         
@@ -171,7 +185,7 @@
 		    narToolTip += narName+"\n";
 		    count++;
 		}
-		var refToolTip = "Objects:\n";
+		var refToolTip = "Data objects (includes all versions):\n";
 		for(var r=0; r<self.userList[ud]['refs'].length; r++) {
 		    if (r==limit) {
 			refToolTip += "...";
