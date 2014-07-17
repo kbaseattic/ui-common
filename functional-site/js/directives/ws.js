@@ -1489,7 +1489,10 @@ angular.module('ws-directives')
                             break; 
                         case 'PhenotypeSet':
                             route = 'ws.phenotype';
-                            break;
+                            break; 
+                        case 'PhenotypeSimulationSet': 
+                            route = 'ws.simulation';
+                            break;     
                         case 'Pangenome':
                             route = 'ws.pangenome';
                             break;                            
@@ -1497,6 +1500,8 @@ angular.module('ws-directives')
                             route = 'genomesbyid';
                             break;
                     }
+
+
 
 
                     if (route) {
