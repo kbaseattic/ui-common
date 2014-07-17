@@ -165,6 +165,9 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 .controller('WsObjGraphView', function($scope, $stateParams) {
     $scope.params = { 'ws':$stateParams.ws, 'kbCache' : kb }
 })
+.controller('WsObjGraphCenteredView', function($scope, $stateParams) {
+    $scope.params = { 'ws':$stateParams.ws, 'id': $stateParams.id, 'kbCache' : kb }
+})
 
 
 

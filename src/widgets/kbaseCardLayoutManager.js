@@ -734,6 +734,8 @@
                 this.showRefUsersCards();
             else if (this.options.template.toLowerCase() === "wsobjgraphview")
                 this.showWsObjGraphCards();
+            else if (this.options.template.toLowerCase() === "wsobjgraphcenteredview")
+                this.showWsObjGraphCenteredCards();
             else if (this.options.template.toLowerCase() === "ppid")
                 this.showPPICards();
             else {
@@ -1222,6 +1224,21 @@
             this.addNewCard("KBaseWSObjGraphView",
                         {
                             wsNameOrId: this.options.data.ws,
+                            kbCache: this.options.data.kbCache
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+            return this;
+        },
+        showWsObjGraphCenteredCards: function() {
+            this.addNewCard("KBaseWSObjGraphCenteredView",
+                        {
+                            wsNameOrId: this.options.data.ws,
+                            objNameOrId: this.options.data.id,
                             kbCache: this.options.data.kbCache
                         },
                         {

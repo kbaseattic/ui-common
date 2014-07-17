@@ -395,6 +395,11 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/objects/ws-obj-graph-view.html',
           controller: 'WsObjGraphView'
         })
+        .state('wsobjgraphcenteredview', {
+          url: "/objgraphview/:ws/:id",
+          templateUrl: 'views/objects/ws-obj-graph-centered-view.html',
+          controller: 'WsObjGraphCenteredView'
+        });
       
              
     $stateProvider
