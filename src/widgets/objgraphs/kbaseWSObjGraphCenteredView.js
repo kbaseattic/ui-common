@@ -164,8 +164,18 @@
 		    }))
 		    .on('dblclick', function (d) {
 			if (d3.event.defaultPrevented) return;
-			self.$elem.find('#objgraphview').hide();
-			self.buildDataAndRender({ref:d['objId']});
+			// TODO: toggle switch between redirect vs redraw
+			
+			// alternate redraw
+			//self.$elem.find('#objgraphview').hide();
+			//self.buildDataAndRender({ref:d['objId']});
+			
+			//alternate reload page so we can go forward and back
+			if(d['info'][1].indexOf(' ') >= 0) {
+			    window.location.href = "#objgraphview/"+d['info'][7]+"/"+d['info'][0];
+			} else {
+			    window.location.href = "#objgraphview/"+d['info'][7]+"/"+d['info'][1];
+			}
 		    })
 		    .on('mouseover', function(d) {
 			
@@ -516,9 +526,9 @@
 						self.graph['nodes'].push({
 						    node : nodeId,
 						    name : ref,
-						    info : [refTokens[1],"Object could not be retrieved, may be deleted",
+						    info : [refTokens[1],"Data not found, object may be deleted",
 							    "Unknown", "",refTokens[2], "Unknown", refTokens[0],
-							    "id="+refTokens[0], "Unknown", "Unknown", {}],
+							    refTokens[0], "Unknown", "Unknown", {}],
 						    nodeType : uniqueRefs[ref],
 						    objId : ref
 						});
