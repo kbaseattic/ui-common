@@ -79,20 +79,36 @@
             this.entityClient.get_entity_Genome([this.options.genomeID], ['id', 'scientific_name', 'domain', 'taxonomy'],
 
             $.proxy(function (genome) {
-                //genome = genome[this.options.genomeID];
-                genome = genome[self.options.genomeID];
-                this.genome = genome; // store it for now.
-                if (!genome) {
-                    this.renderError("Genome '" + this.options.genomeID + "' not found in the KBase Central Store.");
-                    return;
-                }
-
-                this.$infoTable.empty().append(this.addInfoRow("ID", genome.id)).append(this.addInfoRow("Name", genome.scientific_name)).append(this.addInfoRow("Domain", genome.domain)).append(this.addInfoRow("Taxonomic lineage", genome.taxonomy));
-
-
+                    genome = genome[0].data;
+                console.log(genome);
+                
+                if(genome.taxonomy.length > 0) {
+                    console.log(genome.taxonomy);
+                    var splittax = genome.taxonomy.replace("/ /g", "");
+                    splittax = splittax.split(";");
+                    var finaltax = "<pre>";
+                    for(a=0;a<splittax.length;a++) {
+                        var pad ="";
+                        for(b=0;b<a;b++){
+                            pad+=" ";
+                        }
+                        //http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=drosophila+miranda
+                        var searchtax = splittax[a].replace("/ /g", "+");
+                        console.log(searchtax);
+                        var str =pad+'<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name='+searchtax+'">'+splittax[a]+'</a><br>';
+                        console.log(str);
+                       finaltax+=str; 
+                    }
+                    finaltax += "</pre>";
+                    this.$infoTable.empty().append(this.addInfoRow("ID", genome.id)).append(this.addInfoRow("Name", genome.scientific_name)).append(this.addInfoRow("Taxonomic lineage", finaltax));
+    
+                    self.hideMessage();
+                    this.$infoPanel.show();
+            }
+            else {
                 self.hideMessage();
-                this.$infoPanel.show();
-
+                this.showMessage("No taxonomic data for this genome.");
+            }
             }, this),
 
             this.renderError);
@@ -121,6 +137,7 @@
                 genome = genome[0].data;
                 console.log(genome);
                 
+                if(genome.taxonomy.length > 0) {
                 console.log(genome.taxonomy);
                 var splittax = genome.taxonomy.replace("/ /g", "");
                 splittax = splittax.split(";");
@@ -139,11 +156,15 @@
                    finaltax+=str; 
                 }
                 finaltax += "</pre>";
-                this.$infoTable.empty().append(this.addInfoRow("ID", genome.id)).append(this.addInfoRow("Name", genome.scientific_name)).append(this.addInfoRow("Domain", genome.domain)).append(this.addInfoRow("Taxonomic lineage", finaltax));
+                this.$infoTable.empty().append(this.addInfoRow("ID", genome.id)).append(this.addInfoRow("Name", genome.scientific_name)).append(this.addInfoRow("Taxonomic lineage", finaltax));
 
                 self.hideMessage();
                 this.$infoPanel.show();
-
+            }
+            else {
+                self.hideMessage();
+                this.showMessage("No taxonomic data for this genome.");
+            }
             }, this));
             $.when(prom).fail($.proxy(function (error) {
                 this.renderError(error);
