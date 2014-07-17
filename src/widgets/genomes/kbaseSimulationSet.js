@@ -84,12 +84,10 @@
                          return d.simulatedGrowthFraction
                        }},
                       ],                         
-                     
                 }
 
                 simuTable.dataTable(tableSettings);
             }
-
 
             return this;
             
