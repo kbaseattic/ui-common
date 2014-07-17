@@ -460,6 +460,39 @@ function KBCacheClient(token) {
     }
 
 
+    self.getRoute = function(kind) {
+        switch (kind) {
+            case 'FBA': 
+                route = 'ws.fbas';
+                break;
+            case 'FBAModel': 
+                route = 'ws.mv.model';
+                break;
+            case 'Media': 
+                route = 'ws.media';
+                break;
+            case 'MetabolicMap': 
+                route = 'ws.maps';
+                break;
+            case 'Media': 
+                route = 'ws.media';
+                break; 
+            case 'PhenotypeSet':
+                route = 'ws.phenotype';
+                break; 
+            case 'PhenotypeSimulationSet': 
+                route = 'ws.simulation';
+                break;     
+            case 'Pangenome':
+                route = 'ws.pangenome';
+                break;                            
+            case 'Genome': 
+                route = 'genomesbyid';
+                break;
+        }
+        return route;
+    }
+
     self.getWorkspaceSelector = function(all) {
         if (all) {
             var p = self.ws.list_workspace_info({});
@@ -693,10 +726,10 @@ function UIUtils() {
 
                 switch (kind) {
                     case 'FBA': 
-                        route = 'ws.fbas';
+                        sub = 'fbas/';
                         break;
                     case 'FBAModel': 
-                        route = 'ws.mv.model';
+                        sub = 'models/';
                         break;
                     case 'Media': 
                         route = 'media/';
@@ -705,10 +738,10 @@ function UIUtils() {
                         route = 'genomes/';
                         break;
                     case 'MetabolicMap': 
-                        route = 'ws.maps';
+                        route = 'maps/';
                         break;
                     case 'PhenotypeSet': 
-                        route = 'ws.phenotype';
+                        route = 'phenotype/';
                         break; 
                 }
 
@@ -719,6 +752,7 @@ function UIUtils() {
         })
         return p;
     }
+
            
     this.formatUsers = function(perms, mine) {
         var users = []

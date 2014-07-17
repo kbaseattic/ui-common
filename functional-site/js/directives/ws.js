@@ -1471,37 +1471,8 @@ angular.module('ws-directives')
                     var route = sub;
 
                     // overwrite routes for pages that are displayed in the workspace browser
-                    switch (kind) {
-                        case 'FBA': 
-                            route = 'ws.fbas';
-                            break;
-                        case 'FBAModel': 
-                            route = 'ws.mv.model';
-                            break;
-                        case 'Media': 
-                            route = 'ws.media';
-                            break;
-                        case 'MetabolicMap': 
-                            route = 'ws.maps';
-                            break;
-                        case 'Media': 
-                            route = 'ws.media';
-                            break; 
-                        case 'PhenotypeSet':
-                            route = 'ws.phenotype';
-                            break; 
-                        case 'PhenotypeSimulationSet': 
-                            route = 'ws.simulation';
-                            break;     
-                        case 'Pangenome':
-                            route = 'ws.pangenome';
-                            break;                            
-                        case 'Genome': 
-                            route = 'genomesbyid';
-                            break;
-                    }
-
-
+                    var route = kb.getRoute(kind);
+                                                                                                              
                     if (route) {
                         var url = route+"({ws:'"+ws+"', id:'"+name+"'})";
                         var new_id = '<a class="obj-id" data-ws="'+ws+'" data-wsid="'+wsid+'" data-id="'+id+'" data-name="'+name+'" ' +
@@ -1519,6 +1490,7 @@ angular.module('ws-directives')
                                       name+'</b></i></a> (<a class="show-versions">'+instance+'</a>)'+
                                       (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
                                      '<a class="btn-show-info hide pull-right">More</a>';
+
                     } else {
                         var url = "ws.json({ws:'"+ws+"', id:'"+name+"'})"
                         var new_id = '<a class="obj-id" data-ws="'+ws+'" data-wsid="'+wsid+'" data-id="'+id+'" data-name="'+name+'" '+
