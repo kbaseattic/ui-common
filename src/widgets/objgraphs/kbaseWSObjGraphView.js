@@ -272,7 +272,14 @@
 		.origin(function(d) { return d; })
 		.on("dragstart", function() { 
 		    this.parentNode.appendChild(this); })
-		.on("drag", dragmove));
+		.on("drag", dragmove))
+	      .on('dblclick', function (d) {
+			if (d3.event.defaultPrevented) return;
+			// TODO: toggle switch between redirect vs redraw
+			
+			//alternate reload page so we can go forward and back
+			window.location.href = "#objgraphview/"+self.objDataLookup[d.ref]['info'][7]+"/"+self.objDataLookup[d.ref]['info'][1];
+		    });
     
 	    // add the rectangles for the nodes
 	    node.append("rect")
