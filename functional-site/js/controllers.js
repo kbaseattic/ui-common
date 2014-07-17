@@ -590,6 +590,10 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 
+.controller('TreeDetail', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id,
+                     'ws': $stateParams.ws};
+})
 
 
 /* controller for the copy narrative modal */

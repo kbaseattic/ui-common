@@ -672,6 +672,13 @@
             return [];
         },
 
+        _exportTreeRunResult: function(data, workspace) {
+            this.dbg("Exporting Tree run result");
+            this.dbg(data);
+
+            return [];
+        },
+
         /**
          * Toggles the data manager div
          */
@@ -738,6 +745,8 @@
                 this.showWsObjGraphCenteredCards();
             else if (this.options.template.toLowerCase() === "ppid")
                 this.showPPICards();
+            else if (this.options.template.toLowerCase() === "tree")
+                this.showTreeCards();
             else {
                 // throw an error for an unknown template. modal dialog, maybe?
             }
@@ -1263,6 +1272,22 @@
             return this;
         },
         
+        showTreeCards: function() {
+            this.addNewCard("kbaseTree",
+                    {
+            			treeID: this.options.data.id,
+            			workspaceID: this.options.data.ws,
+                        token: this.options.auth,
+                        isInCard: true
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
 
         /**
          * Registers all events that this manager should know about.
@@ -1299,7 +1324,8 @@
                                      "showBambiMotif",
                                      "showBambiRunParameters", 
                                      "showBambiRawOutput",
-									 "showLitWidget"];
+									 "showLitWidget",
+									 "showTreeCards"];
 
 			/**
              * Event: showLitWidget
@@ -1832,8 +1858,8 @@
              * -------------------
              * Adds card with Cytoscape.js view of a network
              */
-        $(document).on("showNetwork", function(event, data) {
-        self.addNewCard("KBaseNetworkCard",
+            $(document).on("showNetwork", function(event, data) {
+        		self.addNewCard("KBaseNetworkCard",
                 {
                     network: data.network,
                     netname: data.netname,
@@ -1844,7 +1870,22 @@
                     of: "#app"
                 }
                    );
-        });
+            });
+
+            $(document).on("showTree", function(event, data) {
+            	self.addNewCard("kbaseTree",
+            			{
+            				workspaceID: data.workspaceID,
+            				treeID: data.treeID,
+            				token: data.token
+            			},
+            			{
+            				my: "left top",
+            				at: "center",
+            				of: data.event
+            			}
+            	);
+            });
 
             $(document).on("helloClick", function(event, data) {
                 window.alert(data.message);
