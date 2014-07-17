@@ -34,46 +34,10 @@ $.KBWidget({
                 class="table table-bordered table-striped" style="width: 100%;">')
 
 
-        var tabs =  container.tabs({tabs: [{name: 'Overview', content: overviewTable, active: true},
+        var tabs = container.kbTabs({tabs: [{name: 'Overview', content: overviewTable, active: true},
                                            {name: 'Reactions', content: rxnTable},
                                            {name: 'Compounds', content: cpdTable},
                                   ]});        
-
-        // build tabs
-        var tabs = $('<ul id="table-tabs" class="nav nav-tabs"> \
-                        <li class="active" > \
-                        <a href="#'+tableIds[0]+'" data-toggle="tab" >'+tables[0]+'</a> \
-                      </li></ul>')
-        for (var i=1; i<tableIds.length; i++) {
-            tabs.append('<li><a href="#'+tableIds[i]+'" data-toggle="tab">'+tables[i]+'</a></li>');
-        }
-
-        // add tabs
-        container.append(tabs);
-
-        var tab_pane = $('<div id="tab-content" class="tab-content">')
-        // add table views (don't hide first one)
-        tab_pane.append('<div class="tab-pane in active" id="'+tableIds[0]+'"> \
-                            <table cellpadding="0" cellspacing="0" border="0" id="'+tableIds[0]+'-table" \
-                            class="table table-bordered table-striped" style="width: 100%;"></table>\
-                        </div>');
-
-        for (var i=1; i<tableIds.length; i++) {
-            var tableDiv = $('<div class="tab-pane in" id="'+tableIds[i]+'"> ');
-            var table = $('<table cellpadding="0" cellspacing="0" border="0" id="'+tableIds[i]+'-table" \
-                            class="table table-striped table-bordered">');
-            tableDiv.append(table);
-            tab_pane.append(tableDiv);
-        }
-
-        container.append(tab_pane)
-
-        // event for showing tabs
-        $('#table-tabs a').unbind('click')
-        $('#table-tabs a').click(function (e) {
-            e.preventDefault();
-            $(this).tab('show');
-        })
 
         var tableSettings = {
             "sPaginationType": "bootstrap",
@@ -169,7 +133,7 @@ $.KBWidget({
                       'Decompose Reversible Flux'];
 
         var table = kb.ui.objTable('overview-table', fba, keys, labels);
-        container.find('#overview-table').append(table.find('tbody'));
+        overviewTable.append(table);
 
 
         // rxn flux table
@@ -181,8 +145,7 @@ $.KBWidget({
         var rxnTableSettings = $.extend({}, tableSettings, {fnDrawCallback: events});               
         rxnTableSettings.aoColumns = cols;
         rxnTableSettings.aaData = dataDict;
-        container.append('<table id="reaction-table" class="table table-striped table-bordered"></table>');           
-        var table = $('#reaction-table').dataTable(rxnTableSettings);
+        var table = rxnTable.dataTable(rxnTableSettings);
 
         // cpd flux table
         console.log(fba)
@@ -193,8 +156,7 @@ $.KBWidget({
         var cpdTableSettings = $.extend({}, tableSettings, {fnDrawCallback: events});
         cpdTableSettings.aoColumns = cols;
         cpdTableSettings.aaData = dataDict;
-        container.append('<table id="compound-table" class="table table-striped table-bordered"></table>');
-        var table = $('#compound-table').dataTable(cpdTableSettings);
+        var table = cpdTable.dataTable(cpdTableSettings);
         
  
         function formatObjs(objs, type) {

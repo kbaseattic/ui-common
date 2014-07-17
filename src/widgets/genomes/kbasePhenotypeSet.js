@@ -17,6 +17,7 @@
             var ws = options.ws;
             var name = options.name;            
 
+            console.log('ws/name', ws, name)
             var container = this.$elem;
 
             container.loading();

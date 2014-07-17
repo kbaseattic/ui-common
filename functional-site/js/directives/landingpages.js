@@ -596,18 +596,7 @@ angular.module('lp-directives')
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
-            //console.log("Here 1");
-
-            var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
-            $.when(prom).done(function(data) {
-            
-                $(p.body()).kbaseSimulationSet({data: data})
-                
-            }).fail(function(e){
-                $(ele).rmLoading();
-                $(ele).append('<div class="alert alert-danger">'+
-                                e.error.message+'</div>')
-            });
+            $(p.body()).kbaseSimulationSet({ws: scope.ws, name: scope.id})
         }
     };
 })

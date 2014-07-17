@@ -1,7 +1,4 @@
-/**
- * Just a simple example widget - makes a div with "Hello world!"
- * in a user-defined color (must be a css color - 'red' or 'yellow' or '#FF0000')
- */
+
 (function( $, undefined ) {
     $.KBWidget({
         name: "kbaseSimulationSet",
@@ -11,52 +8,54 @@
             color: "black",
         },
 
-init: function(options) {
+    init: function(options) {
             this._super(options);
             var self = this;
-            var data = options.data
-            data = $.extend(data,{});
-            console.log (data[0])
-            //this.$elem.append(JSON.stringify(data))
-            console.log(data[0].data.id, data[0].info[7]);
-            var simu = data[0].data;
-                    
-/*
-                var table = $('<table class="table table-striped table-bordered">');
-                
-                	for (var i = 0; i < data[0].data.phenotypeSimulations.length; i++) {
-                    	 var pheno_id = data[0].data.phenotypeSimulations[i].id;
-                    	  var pheno_class = data[0].data.phenotypeSimulations[i].class;
+            var container = this.$elem
+            var ws = options.ws;
+            var name = options.name;
 
-                    	table.append('<tr><td>'+pheno_id+'</td>'+</tr>')
-               
-                	}
+            console.log('ws/name', ws, name)
 
-                this.$elem.append (table)
-*/
+            container.loading();
+            var p = kb.ws.get_objects([{workspace: ws, name: name}])
+            $.when(p).done(function(data){
+                container.rmLoading();
+                buildTable(data);
+            }).fail(function(e){
+                container.rmLoading();
+                container.append('<div class="alert alert-danger">'+
+                                e.error.message+'</div>')
+            });                    
+
+            function buildTable(data) {
+                var simu = data[0].data;
+                console.log(simu)
+
                 var tableSettings = {
-					 "sPaginationType": "bootstrap",
-					 "iDisplayLength": 10,
-					 "aaData": simu.phenotypeSimulations,
-					 "aaSorting": [[ 3, "desc" ]],
-					 "aoColumns": [
-					   { "sTitle": "Name", 'mData': 'id'},
-					   { "sTitle": "phenoclass", 'mData': function(d) {
-						 return d.phenoclass;
-					   }},
-					   { "sTitle": "Simulated Growth", 'mData': function(d) {
-						 return d.simulatedGrowth
-					   }},
-					   { "sTitle": "Simulated Growth Fraction", 'mData': function(d) {
-						 return d.simulatedGrowthFraction
-					   }},
-					  ],                         
-					 
-				}
+                     "sPaginationType": "bootstrap",
+                     "iDisplayLength": 10,
+                     "aaData": simu.phenotypeSimulations,
+                     "aaSorting": [[ 3, "desc" ]],
+                     "aoColumns": [
+                       { "sTitle": "Name", 'mData': 'id'},
+                       { "sTitle": "phenoclass", 'mData': function(d) {
+                         return d.phenoclass;
+                       }},
+                       { "sTitle": "Simulated Growth", 'mData': function(d) {
+                         return d.simulatedGrowth
+                       }},
+                       { "sTitle": "Simulated Growth Fraction", 'mData': function(d) {
+                         return d.simulatedGrowthFraction
+                       }},
+                      ],                         
+                     
+                }
 
-				var simu_table = $('<table class="table table-striped table-bordered">')
-				this.$elem.append(simu_table)
-				simu_table.dataTable(tableSettings);
+                var simu_table = $('<table class="table table-striped table-bordered">')
+                container.append(simu_table)
+                simu_table.dataTable(tableSettings);
+            }
 
             return this;
             

@@ -1502,8 +1502,6 @@ angular.module('ws-directives')
                     }
 
 
-
-
                     if (route) {
                         var url = route+"({ws:'"+ws+"', id:'"+name+"'})";
                         var new_id = '<a class="obj-id" data-ws="'+ws+'" data-wsid="'+wsid+'" data-id="'+id+'" data-name="'+name+'" ' +

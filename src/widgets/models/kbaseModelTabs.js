@@ -23,7 +23,6 @@ $.KBWidget({
         var data = options.modelsData;
         var token = options.token;
         var fba = new fbaModelServices("http://kbase.us/services/fba_model_services"); //options.api;
-        console.log(data)
 
         var container = this.$elem;
 
@@ -43,9 +42,9 @@ $.KBWidget({
                 class="table table-bordered table-striped" style="width: 100%;">')                                                                       
 
 
-        var tabs =  container.tabs({tabs: [{name: 'Reactions', content: rxnTable, active: true},
-                                           {name: 'Compounds', content: cpdTable},
-                                           {name: 'Compartment', content: compartTable},
+        var tabs = container.kbTabs({tabs: [{name: 'Reactions', content: rxnTable, active: true},
+                                          {name: 'Compounds', content: cpdTable},
+                                          {name: 'Compartment', content: compartTable},
                                            {name: 'Biomass', content: biomassTable},
                                            {name: 'Gapfill', content: gfTable},
                                            {name: 'Gapgen', content: ggTable}
