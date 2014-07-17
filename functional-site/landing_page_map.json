@@ -152,6 +152,10 @@
     "Meta" : {
         "RxnProbs" : null,
         "ProbAnno" : null
-    }    
+    },
+    
+    "KBaseTrees" : {
+    	"Tree" : "tree"
+    }
 
 }

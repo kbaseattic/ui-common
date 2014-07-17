@@ -45,7 +45,13 @@
             
             // get the refs
             var objectIdentity = self.getObjectIdentity(options.wsNameOrId, options.objNameOrId, options.objVer);
-            kbws.list_referencing_objects([objectIdentity], function(data) {
+            
+            var request1 = kbws.list_referencing_objects([objectIdentity]);
+            var request2 = $.getJSON('landing_page_map.json');            
+            
+            //kbws.list_referencing_objects([objectIdentity], function(data) {
+            $.when(request1, request2).done(function(data,typeToUrlMap) {
+            	typeToUrlMap = typeToUrlMap[0];
                     if (data[0].length == 0) {
                         self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
                     } else {
@@ -70,8 +76,18 @@
                         for(var ref in refList) {
                             var objInfo = refList[ref];
                             var savedate = new Date(objInfo[3]);
+                            var objName = objInfo[1];
+                            
+                            var full_type = objInfo[2];
+                            var module = full_type.split('.')[0];
+                            var type = full_type.slice(full_type.indexOf('.')+1);
+                            type = type.split('-')[0];
+                            if (typeToUrlMap && typeToUrlMap[module] && typeToUrlMap[module][type]) {
+                            	objName = '<a href="#/' + typeToUrlMap[module][type] + '/' + objInfo[7] + '/' + objName + '" target="_blank">' + objName + '</a>';
+                            }
+                            
                                     refTableData.push({
-                                            na:objInfo[1]+ " ("+objInfo[6]+"/"+objInfo[0]+"/"+objInfo[4]+")",
+                                            na:objName+ " ("+objInfo[6]+"/"+objInfo[0]+"/"+objInfo[4]+")",
                                             ty:objInfo[2],
                                             de:"saved by "+objInfo[5]+" on "+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()
                                         })
@@ -108,13 +124,13 @@
             		};
             		var refTable = self.$elem.find('#ref-table').dataTable(tblSettings);
                     }
-                }, function(err) {
+            }).fail(function(err){
                     self.$elem.find('#loading-mssg').remove();
                     self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
                     console.error("Error in finding referencing objects! (note: v0.1.6 throws this error if no referencing objects were found)");
                     console.error(err);
                     //self.$elem.append("<br><div><i>Error was:</i></div><div>"+err['error']['message']+"</div><br>");
-                });
+            });
             
             return this;
         },
