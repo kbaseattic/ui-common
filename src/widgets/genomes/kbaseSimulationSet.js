@@ -86,7 +86,7 @@ init: function(options) {
 					   }},
 					  ],                         
 					 
-				}
+				} 
 
 
 				simuTable.dataTable(tableSettings);
