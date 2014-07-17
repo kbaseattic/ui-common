@@ -12,7 +12,7 @@
             wsNameOrId: null,
             kbCache:{},
             width:1200,
-	    height:600
+	    height:700
         },
 
         wsNameOrId:"",
@@ -30,6 +30,7 @@
             this._super(options);
             var self = this;
 	    // show loading message
+	    self.$elem.append("<center><b><i>Mouse over objects to get more info. Double click on an object to select and recenter the graph on that object. </i></b></center><br>");
             self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>building object reference graph...</center></p></div>');
 	    
 	    // load the basic things from the cache and options
@@ -278,7 +279,7 @@
 			// TODO: toggle switch between redirect vs redraw
 			
 			//alternate reload page so we can go forward and back
-			window.location.href = "#objgraphview/"+self.objDataLookup[d.ref]['info'][7]+"/"+self.objDataLookup[d.ref]['info'][1];
+			window.location.href = "#/objgraphview/"+self.objDataLookup[d.ref]['info'][7]+"/"+self.objDataLookup[d.ref]['info'][1];
 		    });
     
 	    // add the rectangles for the nodes

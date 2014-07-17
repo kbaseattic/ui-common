@@ -34,6 +34,7 @@
             this._super(options);
             var self = this;
 	    // show loading message
+	    self.$elem.append("<center><b><i>Mouse over objects to get more info (shown below the graph). Double click on an object to select and recenter the graph on that object. </i></b></center><br>");
             self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>building object reference graph...</center></p></div>');
 	    
 	    // load the basic things from the cache and options
@@ -79,7 +80,7 @@
 	    var self = this;
 	    if(self.needColorKey) {
 		// probably a better jquery way to do this, but this is what I know...
-		var html = '<center><b><i>Mouse over objects to get more info. Double click on an object to select and recenter the graph on that object.</i></b></center><br><br>' +
+		var html = '<br>' +
 			    '<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td valign=\"top\"><table cellpadding="2" cellspacing="0" border="0" id="graphkey" \
 				style="">'
 		for(var t in self.typeToColor) {
@@ -172,9 +173,9 @@
 			
 			//alternate reload page so we can go forward and back
 			if(d['info'][1].indexOf(' ') >= 0) {
-			    window.location.href = "#objgraphview/"+d['info'][7]+"/"+d['info'][0];
+			    window.location.href = "#/objgraphview/"+d['info'][7]+"/"+d['info'][0];
 			} else {
-			    window.location.href = "#objgraphview/"+d['info'][7]+"/"+d['info'][1];
+			    window.location.href = "#/objgraphview/"+d['info'][7]+"/"+d['info'][1];
 			}
 		    })
 		    .on('mouseover', function(d) {
