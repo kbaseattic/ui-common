@@ -339,7 +339,7 @@
 	    }
 	    
 	    if ('time' in provenanceAction) {
-		var savedate = new Date(info[3]);
+		var savedate = new Date(provenanceAction['time']);
 		text += self.getTableRow(prefix+"Timestamp",self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear() );
 	    }
 	    
@@ -348,6 +348,15 @@
 	
 	
 	getTableRow: function(rowTitle, rowContent) {
+	    var title = null;
+	    if (rowContent.length>35) {
+		title = rowContent;
+		rowContent = rowContent.substr(1,35) +" ...";
+	    }
+	    if (title) {
+		title = title.replace(/"/g, '&quot;');
+		return "<tr><td><b>"+rowTitle+'</b></td><td><span title="'+title+'">'+rowContent+"</span></td></tr>";
+	    }
 	    return "<tr><td><b>"+rowTitle+"</b></td><td>"+rowContent+"</td></tr>";
 	},
 	
@@ -497,10 +506,39 @@
 						    value:links[i]['value']
 						});
 					    }
+					},
+					function (err) {
+					    // we couldn't get info for some reason, could be if objects are deleted or not visible
+					    var uniqueRefs = self.tempRefData['uniqueRefs'];
+					    for(var ref in uniqueRefs) {
+						var nodeId = self.graph['nodes'].length;
+						var refTokens =ref.split("/");
+						self.graph['nodes'].push({
+						    node : nodeId,
+						    name : ref,
+						    info : [refTokens[1],"Object could not be retrieved, may be deleted",
+							    "Unknown", "",refTokens[2], "Unknown", refTokens[0],
+							    "id="+refTokens[0], "Unknown", "Unknown", {}],
+						    nodeType : uniqueRefs[ref],
+						    objId : ref
+						});
+						self.objRefToNodeIdx[ref] = nodeId;
+					    }
+					    // add the link info
+					    var links = self.tempRefData['links'];
+					    for(var i=0; i<links.length; i++) {
+						self.graph['links'].push({
+						    source:self.objRefToNodeIdx[links[i]['source']],
+						    target:self.objRefToNodeIdx[links[i]['target']],
+						    value:links[i]['value']
+						});
+					    }
 					}
 				    )
 				];
-				$.when.apply($, getRefInfoJobList).done(function() { self.finishUpAndRender(); });
+				$.when.apply($, getRefInfoJobList)
+				.done(function() { self.finishUpAndRender(); })
+				.fail(function() { self.finishUpAndRender(); });
 			    } else {
 				self.finishUpAndRender();
 			    }
