@@ -31,12 +31,11 @@
             this._super(options);
             var self = this;            
 
-
-/*
             var obj = {"ref" : this.options.wsNameOrId + "/" + this.options.objNameOrId };
+            
 
             var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-          
+        
             $.when(prom).fail($.proxy(function(error) {
                 this.renderError(error);
                 console.log(error);
@@ -45,17 +44,13 @@
             var genomeObj;
             $.when(prom).done($.proxy(function(genome) {
                 genomeObj = genome[0].data;
-                console.log("hey " + genome.data.features.length);
+                console.log("Num Features: " + genomeObj.features.length);
             }, this));
 
-            console.log(genomeObj.features.length);
-*/
             self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>Finding SEED functions for this genome...</center></p></div>');
-            self.$elem.append('<div id="mainview">')
+            self.$elem.append('<div id="mainview">');
 
 
-
-            
             //self.$elem.find('#loading-mssg').remove();
             return this;
         },
