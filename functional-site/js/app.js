@@ -421,6 +421,11 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/landing-pages-help.html',
              controller: LPHelp});
 */
+    $stateProvider
+    	.state('tree',
+    		{url: '/tree/:ws/:id',
+    		templateUrl: 'views/objects/tree.html',
+    		controller: 'TreeDetail'});
 
     $urlRouterProvider.when('', '/login/');
 
