@@ -1,6 +1,6 @@
 /* Set the defaults for DataTables initialisation */
 $.extend( true, $.fn.dataTable.defaults, {
-	"sDom": "R<'row'<'col-xs-12 table-options'f>r>t<'row'<'col-xs-12'ilp>>",
+	"sDom": "R<'row'<'col-md-12 table-options'f>r>t<'row'<'col-md-12'ilp>>",
 	"sPaginationType": "bootstrap",
 	"oLanguage": {
 		"sLengthMenu": "_MENU_ records per page"

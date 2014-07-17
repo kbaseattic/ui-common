@@ -396,13 +396,11 @@ var app = angular.module('landing-pages',
 	    templateUrl: 'views/objects/ppid.html',
 	    controller: 'PPIDetail'});
 
-/*
     $stateProvider
         .state('landing-pages-help',
             {url: '/landing-pages-help',
              templateUrl: 'views/landing-pages-help.html',
              controller: LPHelp});
-*/
 
     $urlRouterProvider.when('', '/login/');
 
@@ -493,6 +491,11 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
     kb = new KBCacheClient(USER_TOKEN);
     kb.nar.ensure_home_project(USER_ID);
+
+    $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
+
+    console.log($rootScope.USER_ID);
+
 
     // global state object to store state
     state = new State();

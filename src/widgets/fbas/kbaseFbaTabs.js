@@ -24,7 +24,20 @@ $.KBWidget({
         var container = this.$elem;
 
         var tables = ['Overview', 'Reactions', 'Compounds'];
-        var tableIds = ['overview', 'reaction', 'compound'];
+
+
+        var overviewTable = $('<table cellpadding="0" cellspacing="0" border="0" \
+                class="table table-bordered table-striped" style="width: 100%;">');
+        var rxnTable = $('<table cellpadding="0" cellspacing="0" border="0" \
+                class="table table-bordered table-striped" style="width: 100%;">')
+        var cpdTable = $('<table cellpadding="0" cellspacing="0" border="0" \
+                class="table table-bordered table-striped" style="width: 100%;">')
+
+
+        var tabs =  container.tabs({tabs: [{name: 'Overview', content: overviewTable, active: true},
+                                           {name: 'Reactions', content: rxnTable},
+                                           {name: 'Compounds', content: cpdTable},
+                                  ]});        
 
         // build tabs
         var tabs = $('<ul id="table-tabs" class="nav nav-tabs"> \

@@ -11,21 +11,26 @@
             </li>
         </ul>-->
         <div>
+            <div ng-show="$root.USER_ID" class="narrative-filters">
+                <div newnarrativebtn></div>
+            </div>
+
+
             <div class="narrative-filters">
                 <a ui-sref="narratives.featured" ng-class="{ active: $state.includes('narratives.featured')}" class="select-nar">
                     <div class="badge">3</div> 
                     <span> <b>Featured Narratives</b></span>
                     <span class="glyphicon glyphicon-chevron-right pull-right"></span>
                 </a> 
-            </div>     
+            </div>
 
             <div class="narrative-filters">
-                <a ui-sref="narratives.mynarratives"  ng-class="{ active: $state.includes('narratives.mynarratives')}" class="select-nar">
+                <a ng-show="$root.USER_ID" ui-sref="narratives.mynarratives"  ng-class="{ active: $state.includes('narratives.mynarratives')}" class="select-nar">
                     <div class="badge my-nar-count">...</div> 
                     <span> <b>My Narratives</b></span>
                     <span class="glyphicon glyphicon-chevron-right pull-right"></span>
                 </a>
-                <a ui-sref="narratives.shared" ng-class="{ active: $state.includes('narratives.shared')}" class="select-nar">
+                <a ng-show="$root.USER_ID" ui-sref="narratives.shared" ng-class="{ active: $state.includes('narratives.shared')}" class="select-nar">
                     <div class="badge shared-nar-count">...</div> 
                     <span> <b>Shared Narratives</b></span>
                     <span class="glyphicon glyphicon-chevron-right pull-right"></span>
@@ -34,14 +39,15 @@
                     <div class="badge public-nar-count">...</div> 
                     <span> <b>Public Narratives</b></span>  
                     <span class="glyphicon glyphicon-chevron-right pull-right"></span>
-                </a>          
+                </a>
             </div>
+
 
             <div class="narrative-feed">
                 <h3 class="sidebar-header">RECENT NARRATIVES</h3>
                 <div recentnarratives>
-                    <ul class="recent-nars nar-id" ng-repeat="nar in narratives | orderBy:'timestamp':true | limitTo:5">
-                        <li><a href="{{nar_url}}/ws.{{nar.wsid}}.obj.{{nar.id}}" class="ellipsis">{{nar.name}}</a><br>
+                    <ul class="recent-nars" ng-repeat="nar in narratives | orderBy:'timestamp':true | limitTo:5">
+                        <li><a href="{{nar_url}}/ws.{{nar.wsid}}.obj.{{nar.id}}" target="_blank" class="ellipsis">{{nar.name}}</a><br>
                             <div class="recent-nar-time text-muted">{{nar.nealtime}}</div>
                         </li>
                         <br>
@@ -62,15 +68,11 @@
     </div>
 
     <div class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main">
-        <div class="narrative-view" ui-view>
+        <div class="obj-table" ui-view>
             <!--<div ng-show="!selected_ws">
                 <span class="text-danger">No Workspace Selected</span><br>
                 <small>Please select a workspace from the left.</small>
             </div>-->
-
-
-
-
 
         </div>
     </div>

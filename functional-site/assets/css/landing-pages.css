@@ -203,7 +203,11 @@ a:hover {
 
 
 /* bootstrap overrides */
-.wrapper { width: 95%; margin-left: auto; margin-right: auto; }
+.wrapper { 
+    width: 95%; 
+    margin-left: auto; 
+    margin-right: auto; 
+}
 /* end bootstrap overrides */
 
 
@@ -358,6 +362,7 @@ div::-webkit-scrollbar-thumb {
 }
 
 
+
 /* ws browser */
 
 .ws-toolbar {
@@ -375,7 +380,7 @@ div::-webkit-scrollbar-thumb {
 
 
 
-.object-view {
+.object-view { 
     margin: 10px 0 0 0;
 }
 
@@ -386,6 +391,22 @@ div::-webkit-scrollbar-thumb {
 .select-ws .badge {
     margin: 0 4px 0 0 ;
 }
+
+.select-ws-dd {
+    max-height: 300px;
+    overflow-x: auto;
+    left: -172px;
+}
+.select-ws-dd::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+}
+.select-ws-dd::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0,0,0,.5);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+
 
 
 .btn-settings-opt {
@@ -466,8 +487,12 @@ div::-webkit-scrollbar-thumb {
 
 /* narrative page */
 
+.btn-new-narrative {
+    width: 150px;
+}
+
 .narrative-filters {
-    margin: 5px 0 0 0;
+    margin: 5px 0;
 }
 .narrative-filters a{
     background: #fff;
@@ -548,6 +573,10 @@ div::-webkit-scrollbar-thumb {
 .dataTables_info {
     margin: 0 10px 0 0;
 }
+.dataTables_filter {
+
+}
+
 .dataTables_length, .dataTables_info {
     float: left;
 }
@@ -685,11 +714,35 @@ div::-webkit-scrollbar-thumb {
 .navbar-fixed-top {
     z-index: 500;
 }
+
+/*
+.table-options{  
+    position: fixed;
+    background-color: white;
+    top: 45px;
+    padding-top: 20px;
+    padding-bottom: 30px;   
+
+}*/
+
+.object-view .dataTable {
+    margin: 10px 0 0 0;
+}
+
+
+div.FixedHeader_Cloned th,
+div.FixedHeader_Cloned td {
+    background-color: white !important;
+    top: 75px;
+}
+/*
 .FixedHeader_Header {
     background: #fff;
-    margin: -6px 0 0px 0;
+    margin: -5px 0 0px 0;
+    top: 75px;
     height: 44px;
-}
+}*/
+
 
 
 
@@ -917,7 +970,7 @@ padding: 20px;
     position: fixed;
     bottom: 0;
     width: 100%;
-    z-index: 1000;
+    z-index: 3000;
 }
 
 

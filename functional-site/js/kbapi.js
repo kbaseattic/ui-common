@@ -84,7 +84,6 @@ function KBCacheClient(token) {
     var self = this;
     var auth = {};
     auth.token = token;
-    console.log(auth)
 
     if (typeof configJSON != 'undefined') {
         if (configJSON.setup == 'dev') {
@@ -148,6 +147,173 @@ function KBCacheClient(token) {
         return prom;
     }
 
+    self.narrative_prom = undefined;
+    self.my_narratives = false;
+    self.shared_narratives = false;
+    self.public_narratives = false;        
+
+    this.getNarratives = function() {
+        // if narratives have been cached, return;
+        //if (self.narratives) {
+        //    return self.narratives;
+        //}
+
+        // get all workspaces, filter by mine, shared, and public
+        var prom = kb.ws.list_workspace_info({});
+        var p = $.when(prom).then(function(workspaces) {
+            var my_list = [];
+            var shared_list = [];
+            var public_list = [];
+
+            for (var i in workspaces) {
+                var a = workspaces[i];
+                var ws = a[1];
+                var owner = a[2];
+                var perm = a[5];
+                var global_perm = a[6]
+
+                if (owner == USER_ID) {
+                    my_list.push(ws)
+                }
+
+                // shared lists need to be filtered again, as a shared narrative
+                // is any narrative you have 'a' or 'w', but also not your own
+                if ( (perm == 'a' || perm == 'w') && owner != USER_ID) {
+                    shared_list.push(ws)
+                }
+                if (global_perm == 'r') {
+                    public_list.push(ws)
+                }
+            }
+
+
+            return [my_list, shared_list, public_list];
+        })
+
+
+        /*
+        var next_prom = $.when(p).then(function(data) {
+            var my_list = data[0];
+            var shared_list = data[1];
+            var public_list = data[2];
+
+            var my_prom = kb.ws.list_objects({workspaces: my_list, 
+                                               type: 'KBaseNarrative.Metadata',
+                                               showHidden: 1});
+
+            var shared_prom = kb.ws.list_objects({workspaces: shared_list, 
+                                               type: 'KBaseNarrative.Metadata',
+                                               showHidden: 1});        
+
+            var public_prom = kb.ws.list_objects({workspaces: public_list, 
+                                               type: 'KBaseNarrative.Metadata',
+                                               showHidden: 1});        
+
+            var p = $.when(my_prom, shared_prom, public_prom).then(function(d1, d2, d3) {
+                var my_nars_ws = [];
+                var shared_nars_ws = [];
+                var public_nars_ws = [];
+
+                for (var i in d1) {
+                    var a = d1[i]
+                    var ws = a[7];
+                    my_nars_ws.push(ws);
+                }
+
+                for (var i in d2) {
+                    var a = d2[i]
+                    var ws = a[7];
+                    shared_nars_ws.push(ws);
+                }
+
+                for (var i in d3) {
+                    var a = d3[i]
+                    var ws = a[7];
+                    public_nars_ws.push(ws);
+                }
+
+                return [my_nars_ws, shared_nars_ws, public_nars_ws];         
+            })
+
+            return p;
+        });*/
+
+
+        // next get all narratives from these "project" workspaces
+        // fixme: backend!
+        var last_prom = $.when(p).then(function(data) {
+            var mine_ws = data[0];
+            var shared_ws = data[1];
+            var public_ws = data[2];
+
+            var my_prom = kb.ws.list_objects({workspaces: mine_ws, 
+                                              type: 'KBaseNarrative.Narrative',
+                                              showHidden: 1});
+
+            var shared_prom = kb.ws.list_objects({workspaces: shared_ws, 
+                                                  type: 'KBaseNarrative.Narrative',
+                                                  showHidden: 1});        
+
+            var public_prom = kb.ws.list_objects({workspaces: public_ws, 
+                                                  type: 'KBaseNarrative.Narrative',
+                                                  showHidden: 1});
+
+            // get permissions on all workspaces if logged in
+            var perm_proms = [];
+            var all_ws = mine_ws.concat(shared_ws, public_ws);
+            if (USER_ID) {
+                for (var i in all_ws) {
+                    var prom =  kb.ws.get_permissions({workspace: all_ws[i]});
+                    perm_proms.push(prom);
+                }
+            } else {
+                for (var i in all_ws) {
+                    perm_proms.push(undefined);
+                }
+            }
+
+
+            var all_proms = [my_prom, shared_prom, public_prom].concat(perm_proms)
+
+            var p = $.when.apply($, all_proms).then(function() { 
+                // fill counts now (since there's no api for this)
+
+                var mine = arguments[0];
+                var shared = arguments[1];
+                var pub = arguments[2];
+
+                var perms = {};
+
+                if (USER_ID) {
+                    for (var i = 0; i<all_ws.length; i++) {
+                        perms[all_ws[i]] = arguments[3+i]
+                    }
+                } else {
+                    for (var i = 0; i<all_ws.length; i++) {
+                        perms[all_ws[i]] = {'Everybody': 'r'}
+                    }                    
+                }
+
+                $('.my-nar-count').text(mine.length)
+                $('.shared-nar-count').text(shared.length);  
+                $('.public-nar-count').text(pub.length);            
+
+                return {my_narratives: mine, 
+                        shared_narratives: shared, 
+                        public_narratives: pub, 
+                        perms: perms};
+            });
+
+           return p;
+        })
+
+        // cache prom
+        //self.narratives = last_prom;
+
+        // bam, return promise for [my_nars, shared_nars, public_nars]
+        self.narrative_prom = last_prom
+        return last_prom;
+    }
 
     // cached objects
     var c = new WSCache();
@@ -294,6 +460,86 @@ function KBCacheClient(token) {
     }
 
 
+    self.getWorkspaceSelector = function(all) {
+        if (all) {
+            var p = self.ws.list_workspace_info({});
+        } else {
+            var p = self.ws.list_workspace_info({perm: 'w'});            
+        }
+        
+        var prom = $.when(p).then(function(workspaces){
+            var workspaces = workspaces.sort(compare)
+
+            function compare(a,b) {
+                var t1 = kb.ui.getTimestamp(b[3]) 
+                var t2 = kb.ui.getTimestamp(a[3]) 
+                if (t1 < t2) return -1;
+                if (t1 > t2) return 1;
+                return 0;
+            }
+
+            var wsSelect = $('<form class="form-horizontal" role="form">'+
+                                '<div class="form-group">'+
+                                    '<label class="col-sm-5 control-label">Destination Workspace</label>'+
+                                    '<div class="input-group col-sm-5">'+
+                                        '<input type="text" class="select-ws-input form-control focusedInput" placeholder="search">'+
+                                        '<span class="input-group-btn">'+
+                                            '<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">'+
+                                                '<span class="caret"></span>'+
+                                            '</button>'+
+                                        '</span>'+
+                                    '</div>'+
+                            '</div>');
+
+            var select = $('<ul class="dropdown-menu select-ws-dd" role="menu">');
+            for (var i in workspaces) {
+                select.append('<li><a>'+workspaces[i][1]+'</a></li>');
+            }
+
+            wsSelect.find('.input-group-btn').append(select);
+
+            var dd = wsSelect.find('.select-ws-dd');
+            var input = wsSelect.find('input');
+
+            var not_found = $('<li class="select-ws-dd-not-found"><a><b>Not Found</b></a></li>');
+            dd.append(not_found);
+            input.keyup(function() {
+                dd.find('li').show();
+
+                wsSelect.find('.input-group-btn').addClass('open');
+
+                var input = $(this).val();
+                dd.find('li').each(function(){
+                    if ($(this).text().toLowerCase().indexOf(input.toLowerCase()) != -1) {
+                        return true;
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                if (dd.find('li').is(':visible') == 1) {
+                    not_found.hide();
+                } else {
+                    not_found.show();
+                }
+            }) 
+
+            dd.find('li').click(function() {
+                dd.find('li').removeClass('active');
+
+                if (!$(this).hasClass('select-ws-dd-not-found')) {
+                    $(this).addClass('active');                    
+
+                    var val = $(this).text();
+                    input.val(val);
+                }
+            })
+
+            return wsSelect;
+        })
+
+        return prom;
+    }
 }
 
 
@@ -474,22 +720,72 @@ function UIUtils() {
         return p;
     }
            
+    this.formatUsers = function(perms, mine) {
+        var users = []
+        for (var user in perms) {
+            if (user == USER_ID && !mine && !('*' in perms)) {
+                users.push('You');
+                continue;
+            } else if (user == USER_ID) {
+                continue;
+            } 
+            users.push(user);
+        }
+
+        // if not shared, return 'nobody'
+        if (users.length == 0) {
+            return 'Nobody';
+        };
+
+        // number of users to show before +x users link
+        var n = 3;
+        var share_str = ''
+        if (users.length > n) {
+            /*if (users.slice(n).length == 1) {*/
+                share_str = users.slice(0, n).join(', ')+', '+
+                        ' <a class="btn-share-with" data-users="'+users+'">+'
+                        +users.slice(n).length+' user</a>';  
+            /*} else if (users.slice(2).length > 1) {
+                share_str = users.slice(0, n).join(', ')+ ', '+
+                        ' <a class="btn-share-with" data-users="'+users+'"> +'
+                        +users.slice(n).length+' users</a>';
+            }*/
+
+        } else if (users.length > 0 && users.length <= n) {
+            share_str = users.slice(0, n).join(', ');
+        }
+        return share_str;
+    }
 
 
 
     // jQuery plugins that you can use to add and remove a 
     // loading giff to a dom element.  This is easier to maintain, and likely less 
     // code than using CSS classes.
-    $.fn.loading = function(text) {
+    $.fn.loading = function(text, big) {
         $(this).rmLoading()
 
-        if (typeof text != 'undefined') {
-            $(this).append('<p class="text-muted loader">'+
-                 '<img src="assets/img/ajax-loader.gif"> '+text+'</p>');
+        if (big) {
+            if (typeof text != 'undefined') {
+                $(this).append('<p class="text-center text-muted loader"><br>'+
+                     '<img src="assets/img/ajax-loader-big.gif"> '+text+'</p>');
+            } else {
+                $(this).append('<p class="text-center text-muted loader"><br>'+
+                     '<img src="assets/img/ajax-loader-big.gif"> loading...</p>')        
+            }
         } else {
-            $(this).append('<p class="text-muted loader">'+
-                 '<img src="assets/img/ajax-loader.gif"> loading...</p>')        
+            if (typeof text != 'undefined') {
+                $(this).append('<p class="text-muted loader">'+
+                     '<img src="assets/img/ajax-loader.gif"> '+text+'</p>');
+            } else {
+                $(this).append('<p class="text-muted loader">'+
+                     '<img src="assets/img/ajax-loader.gif"> loading...</p>')        
+            }
+
         }
+
+
+
         return this;
     }
 
@@ -825,15 +1121,11 @@ function ProjectAPI(ws_url, token) {
     
     };
 
-
-
     // Delete the object in the specified workspace/object id and return a
     // dictionary keyed on the obj_meta_fields for the result
     this.delete_object = function( p_in ) {
         console.error('project.delete_object was removed since due to redundancy . use set_workspace_permissions in workspace api');
     };
-
-
 
     // Create an new workspace and tag it with a project tag. The name
     // *must" conform to the future workspace rules about object naming,
@@ -894,9 +1186,6 @@ function ProjectAPI(ws_url, token) {
     }
 
 
-
-
-
     // Delete a workspace(project)
     // will wipe out everything there, so make sure you prompt "Are you REALLY SURE?"
     // before calling this.
@@ -952,59 +1241,6 @@ function ProjectAPI(ws_url, token) {
         console.error('set_project_perms was removed since due to redundancy . use set_workspace_permissions in workspace api')
 
     };
-
-
-    this.getNarratives = function() {
-
-        function getNars(p, showDeleted) {
-            
-            var prom = $.when(p).then(function(data){
-                console.log('data', data)
-                var my_proj_ids = []
-                var proj_ids = []
-
-                var my_nar_count = 0;
-                var shared_nar_count =  0;
-
-                for (var i in data) {
-                    var ws = data[i][7];
-                    var owner = ws.split(':')[0];
-
-                    if (owner == USER_ID) {
-                        my_proj_ids.push(ws)
-                    } else {
-                        proj_ids.push(ws)
-                    }
-                }                            
-
-                // for addiing counts for the UI 
-                // this is such a hack
-                // fixme: this should be done with a service        
-                var prom1 = kb.nar.get_narratives({project_ids: my_proj_ids});
-                var prom2 = kb.nar.get_narratives({project_ids: proj_ids})
-
-                $.when(prom1, prom2).then(function(nars1, nars2) {
-                    $('.my-nar-count').text(nars1.length)
-                    $('.shared-nar-count').text(nars2.length)    
-                })
-
-
-                if (tab == 'my-narratives') {
-                    return prom1;
-                } else if (tab == 'shared') {
-                    return prom2;
-                }
-            })
-            return prom;
-        }                
-
-        var narProm = kb.ws.list_objects({type: 'KBaseNarrative.Metadata', 
-                                       showHidden: 1});
-
-        var p = getNars(narProm);
-        //var p2 = getNars(narPromDeleted, true);        
-    }
-
 
 
 
