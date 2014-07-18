@@ -80,7 +80,8 @@
                                 .addClass("btn-group")
                                 .append(makeButton("domains"))
                                 .append(makeButton("operons"))
-                                .append(makeButton("biochemistry"));
+                                .append(makeButton("biochemistry"))
+                                .append(makeButton("structure"));
 
             this.$infoPanel.append(this.$infoTable)
                            .append(this.$buttonPanel);
@@ -175,6 +176,12 @@
                         self.trigger("showBiochemistry", { event: event, featureID: self.options.featureID }) 
                     }
                 );
+                self.$buttonPanel.find("button#structure").click(
+                     function(event) { 
+                         self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID }) 
+                     }
+                );
+
                 self.hideMessage();
                 self.$infoPanel.show();
             });
@@ -263,6 +270,7 @@
 
                         this.$buttonPanel.find("button#domains").click(function(event) { window.alert("Domain view unavailable for Workspace genes. Sorry!"); });
                         this.$buttonPanel.find("button#operons").click(function(event) { window.alert("Operon view unavailable for Workspace genes. Sorry!"); });
+                        this.$buttonPanel.find("button#structure").click(function(event) { window.alert("Structural matches not yet available for Workspace genes. Sorry!"); });
 
                         // bind button events
                         this.$buttonPanel.find("button#biochemistry").click(
