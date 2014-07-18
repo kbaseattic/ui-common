@@ -179,11 +179,10 @@
                 self.SEEDTree.children.forEach(function(d) {
                     self.collapse(d)}) 
                 ).done(
-                    self.update(self.SEEDTree)
+                    self.update(self.root = self.SEEDTree)
                 );
-            //this.update(this.root = SEEDTree);
-            }); //).done( $.when( SEEDTree.children.forEach(self.collapse) ).done( self.update(self.SEEDTree)) );
-            //this.update(this.root = SEEDTree);
+            
+            }); 
         },
 
 
@@ -214,7 +213,7 @@
 
             // Update the nodes…
             var node = self.svg.selectAll("g.node")
-                .data(nodes, function(d) { return d.id || (d.id = ++i); });
+                .data(nodes, function(d) { return d.id || (d.id = ++self.i); });
 
             var nodeEnter = node.enter().append("g")
                 .attr("class", "node")
