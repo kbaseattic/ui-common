@@ -396,6 +396,17 @@ angular.module('card-directives')
             }
         };
     })
+    .directive('taxonomyview', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "taxonomy", 
+                    data: scope.params
+                });
+            }
+        };
+    })
 ;
 
 

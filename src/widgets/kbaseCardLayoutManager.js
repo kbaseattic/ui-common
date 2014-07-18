@@ -747,6 +747,8 @@
                 this.showPPICards();
             else if (this.options.template.toLowerCase() === "tree")
                 this.showTreeCards();
+            else if (this.options.template.toLowerCase() === "taxonomy")
+                this.showTaxonomyCards();
             else {
                 // throw an error for an unknown template. modal dialog, maybe?
             }
@@ -1289,6 +1291,24 @@
             return this;
         },
 
+        
+        showTaxonomyCards: function() {
+            this.addNewCard("KBaseTaxonOverview",
+                    {
+            		taxon: this.options.data.taxonname,
+            		wsNameOrID: this.options.data.ws,
+                        kbCache: this.options.data.kbCache,
+                        loadingImage: this.options.loadingImage,
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+        
         /**
          * Registers all events that this manager should know about.
          * Also makes a list of all registered events, stored in this.registeredEvents[], so they

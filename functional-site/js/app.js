@@ -400,6 +400,18 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/objects/ws-obj-graph-centered-view.html',
           controller: 'WsObjGraphCenteredView'
         });
+        
+    $stateProvider
+        .state('taxonomyoverview', {
+          url: "/taxon/:taxonname",
+          templateUrl: 'views/objects/taxonomy.html',
+          controller: 'Taxonomy'
+        })
+        .state('taxonomyinws', {
+          url: "/taxon/:taxonname/:ws",
+          templateUrl: 'views/objects/taxonomy.html',
+          controller: 'Taxonomy'
+        });
       
              
     $stateProvider
