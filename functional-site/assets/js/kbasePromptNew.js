@@ -245,6 +245,7 @@
             var $firstField = undefined;
             var selection = false;
 
+            /*
             $dialogModal.on('shown.bs.modal',
                 $.proxy(
                     function () {
@@ -274,7 +275,7 @@
                     },
                     this
                 )
-            );
+            );*/
 
 
 

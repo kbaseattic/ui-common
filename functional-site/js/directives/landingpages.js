@@ -142,7 +142,7 @@ angular.module('lp-directives')
         link: function(scope, element, attrs) {
             var ws = scope.ws;
             var id = scope.id;
-            var p = $(element).kbasePanel({title: 'Core Metabolic Pathway', 
+            var p = $(element).kbasePanel({title: 'Cocre Metabolic Pathway', 
                                            rightLabel: ws,
                                            subText: id, 
                                            type: 'FBAModel', 
@@ -372,12 +372,7 @@ angular.module('lp-directives')
             })
 
         }
-
-
-
     }
-
-
 })
 .directive('fbacore', function($location) {
     return {
@@ -439,7 +434,6 @@ angular.module('lp-directives')
     }
 })
 
-
 .directive('pathway', function() {
     return {
         link: function(scope, element, attrs) {
@@ -498,16 +492,9 @@ angular.module('lp-directives')
             var p = $(ele).kbasePanel({title: 'Phenotype Set Data', 
                                            rightLabel: scope.ws,
                                            subText: scope.id});
-            p.loading();
-            
-            var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
-			$.when(prom).done(function(data) {
-                $(p.body()).kbasePhenotypeSet({data: data})
-            }).fail(function(e){
-                $(ele).rmLoading();
-                $(ele).append('<div class="alert alert-danger">'+
-                                e.error.message+'</div>')
-            });
+
+            $(p.body()).kbasePhenotypeSet({ws: scope.ws, name: scope.id})
+
         }
     }
 })
@@ -609,18 +596,7 @@ angular.module('lp-directives')
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
-            //console.log("Here 1");
-
-            var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
-            $.when(prom).done(function(data) {
-            
-                $(p.body()).kbaseSimulationSet({data: data})
-                
-            }).fail(function(e){
-                $(ele).rmLoading();
-                $(ele).append('<div class="alert alert-danger">'+
-                                e.error.message+'</div>')
-            });
+            $(p.body()).kbaseSimulationSet({ws: scope.ws, name: scope.id})
         }
     };
 })

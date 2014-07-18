@@ -1,7 +1,4 @@
-/**
- * Just a simple example widget - makes a div with "Hello world!"
- * in a user-defined color (must be a css color - 'red' or 'yellow' or '#FF0000')
- */
+
 (function( $, undefined ) {
     $.KBWidget({
         name: "kbaseSimulationSet",
@@ -11,7 +8,7 @@
             color: "black",
         },
 
-init: function(options) {
+    init: function(options) {
             this._super(options);
             var self = this;
             var data = options.data
@@ -19,7 +16,24 @@ init: function(options) {
             console.log (data[0])
             //this.$elem.append(JSON.stringify(data))
             //console.log(data[0].data.id, data[0].info[7]);
-            var simu = data[0].data;
+            //var simu = data[0].data;
+            
+            var ws = options.ws;
+            var name = options.name;
+
+            console.log('ws/name', ws, name)
+            var container = this.$elem
+            container.loading();
+            var p = kb.ws.get_objects([{workspace: ws, name: name}])
+            $.when(p).done(function(data){
+                container.rmLoading();
+                buildTable(data);
+            }).fail(function(e){
+                container.rmLoading();
+                container.append('<div class="alert alert-danger">'+
+                                e.error.message+'</div>')
+            });                    
+
                     
 /*
                 var table = $('<table class="table table-striped table-bordered">');
@@ -28,19 +42,19 @@ init: function(options) {
                     	 var pheno_id = data[0].data.phenotypeSimulations[i].id;
                     	  var pheno_class = data[0].data.phenotypeSimulations[i].class;
 
-                    	table.append('<tr><td>'+pheno_id+'</td>'+</tr>')
-               
-                	}
-
                 this.$elem.append (table)
 */
-  
-                var container = this.$elem;
+
+            
+            function buildTable(data) {
+                var simu = data[0].data;
+                console.log (data[0])
                 var simuTable = $('<table class="table table-bordered table-striped" style="width: 100%;">');
-                var tabs = container.tabs({tabs: [
+                var tabs = container.kbTabs({tabs: [
                                             {name: 'Overview', active: true},
                                             {name: 'SimulationSet', content: simuTable}]
                                           })
+
 
                 var keys = [
                     {key: 'wsid'},
@@ -91,7 +105,7 @@ init: function(options) {
 
 				simuTable.dataTable(tableSettings);
 
-                       
+            }
 
             return this;
             

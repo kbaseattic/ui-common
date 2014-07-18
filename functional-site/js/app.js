@@ -25,10 +25,14 @@ var app = angular.module('landing-pages',
      'trees-directives', 'fav-directives',
      'ws-directives', 'modeling-directives',
      'narrative-directives', 
-     'ui.router', 'kbaseLogin', 
-     'FeedLoad', 'ui.bootstrap'])
-    .config(['$routeProvider', '$locationProvider', '$stateProvider', '$urlRouterProvider', 
-    function($routeProvider, $locationProvider, $stateProvider, $urlRouterProvider) {
+     'ui.router', 'ngResource', 'kbaseLogin', 
+     'FeedLoad', 'ui.bootstrap', 'search'])
+    .config(['$routeProvider', '$locationProvider', '$stateProvider', '$urlRouterProvider', '$httpProvider',  
+    function($routeProvider, $locationProvider, $stateProvider, $urlRouterProvider, $httpProvider) {
+
+    // enable CORS
+    $httpProvider.defaults.useXDomain = true;
+    delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
     // with some configuration, we can change this in the future.
     $locationProvider.html5Mode(false);  
@@ -38,30 +42,48 @@ var app = angular.module('landing-pages',
           url: "/login/",
           templateUrl: 'views/narrative/login.html',
           controller: 'Narrative'
-        })
+        });
 
     $stateProvider
         .state('search', {
-          url: "/search/?q",
-          templateUrl: 'views/search/search.html',
-          controller: 'Search'
+            url: "/search/?q&category&page&itemsPerPage&sort&facets",
+            templateUrl: 'views/search/search.html',
+            controller: 'searchController'
         })
+        .state('search.recent', {
+            url: "/recent/",
+            templateUrl: 'views/search/recent.html',
+            controller: 'searchController'
+        })
+        .state('search.favorites', {
+            url: "/favorites/",
+            templateUrl: 'views/search/favorites.html',
+            controller: 'searchController'
+        });
 
     $stateProvider
         .state('narratives', {
           url: "/narratives/",
           templateUrl: 'views/ws/narratives.html',
           controller: 'NarrativeCtrl'
-        }).state('narratives.table', {
-          url: ":tab",
+        }).state('narratives.mynarratives', {
+          url: "my-narratives",
           templateUrl: 'views/ws/narrative-table.html',
           controller: 'NarrativeCtrl'
-        })
-        /*.state('narrative.projects', {
-          url: "projects/",
-          templateUrl: 'views/narrative/projects.html',
-          controller: 'NarrativeProjects'
-        })*/
+        }).state('narratives.shared', {
+          url: "shared",
+          templateUrl: 'views/ws/narrative-table.html',
+          controller: 'NarrativeCtrl'
+        }).state('narratives.public', {
+          url: "public",
+          templateUrl: 'views/ws/narrative-table.html',
+          controller: 'NarrativeCtrl'
+        }).state('narratives.featured', {
+          url: "featured",
+          templateUrl: 'views/ws/featured.html',
+          controller: 'NarrativeCtrl'
+        });
+
 
     // workspace browser routing
     $stateProvider
@@ -85,7 +107,7 @@ var app = angular.module('landing-pages',
           url: "tour/",
           templateUrl: 'views/ws/objtable.html',
           controller: 'WBTour'
-        })
+        });
 
 
     // model viewer routing
@@ -105,7 +127,7 @@ var app = angular.module('landing-pages',
           url: "maps/:ws/:id/?fba",
           templateUrl: 'views/ws/maps.html',
           reloadOnSearch: false
-        })
+        });
 
 
     // workspace object landing pages
@@ -154,16 +176,13 @@ var app = angular.module('landing-pages',
         }) /* model viewer */
 
 
-
-
-
     // not in use
     $stateProvider
         .state('favorites', {
           url: "/favorites/",
           templateUrl: 'views/ws/favorites.html',
           controller: 'Favorites'
-        })
+        });
 
 
     // other pages
@@ -172,7 +191,7 @@ var app = angular.module('landing-pages',
           url: "/trees/",
           templateUrl: 'views/trees/trees.html',
           controller: 'Trees'
-        })
+        });
 
     $stateProvider
         .state('rxns',
@@ -183,7 +202,7 @@ var app = angular.module('landing-pages',
             url: "/rxns/:ids",
             templateUrl: 'views/objects/rxn.html',
             controller: 'RxnDetail'
-        })
+        });
 
     $stateProvider
         .state('cpds',
@@ -194,7 +213,7 @@ var app = angular.module('landing-pages',
             {url:'/cpds/:ids', 
              templateUrl: 'views/objects/cpd.html',
              controller: 'CpdDetail'
-         })       
+         });    
 
     $stateProvider
         .state('models', {
@@ -204,13 +223,13 @@ var app = angular.module('landing-pages',
         .state('modelbyid', {
              url: '/models/:ws/:id',
              templateUrl: 'views/objects/model.html',
-             controller: 'ModelDetail'})
+             controller: 'ModelDetail'});
 
     $stateProvider
         .state('modelcards', {
              url: '/cards/models/:ws/:id',
              templateUrl: 'views/objects/modelcards.html',
-             controller: 'ModelDetailCards'})
+             controller: 'ModelDetailCards'});
 
     $stateProvider
        .state('gptype', {
@@ -232,7 +251,7 @@ var app = angular.module('landing-pages',
        .state('gtvtype', {
             url: '/KBaseGwasData.GwasTopVariations/:ws/:id',
             templateUrl: 'views/objects/gtvtype.html',
-            controller: 'GTVTypeDetail'})  
+            controller: 'GTVTypeDetail'});  
 
 
     $stateProvider
@@ -247,7 +266,7 @@ var app = angular.module('landing-pages',
         .state('fbacards', {
                 url: '/cards/fbas/:ws/:id',
                 templateUrl: 'views/objects/fbacards.html',
-                controller: 'FBADetailCards'})
+                controller: 'FBADetailCards'});
 
     $stateProvider
         .state('media',
@@ -261,69 +280,69 @@ var app = angular.module('landing-pages',
         .state('mediabyid',
             {url:'/media/:ws/:id',
              templateUrl: 'views/objects/media.html',
-             controller: 'MediaDetail'})
+             controller: 'MediaDetail'});
 
 
     $stateProvider
         .state('genomescds',
             {url: '/genomes/CDS/:id',
              templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'})
+             controller: 'GenomeDetail'});
 
     $stateProvider
         .state('genomesbyws',
             {url: '/genomes/:ws',
              templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'})
+             controller: 'GenomeDetail'});
 
     $stateProvider
         .state('genomesbyid',
             {url: '/genomes/:ws/:id',
              templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'})
+             controller: 'GenomeDetail'});
 
     $stateProvider
         .state('kbgenomes',
             {url: '/KBaseGenomes.Genome/CDS/:id',
              templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'})
+             controller: 'GenomeDetail'});
 
     $stateProvider
         .state('kbgenomesbyws',
             {url: '/KBaseGenomes.Genome/:ws',
              templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'})
+             controller: 'GenomeDetail'});
 
     $stateProvider
         .state('kbgenomesbyid',
             {url: '/KBaseGenomes.Genome/:ws/:id',
              templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'})
+             controller: 'GenomeDetail'});
 
 
     $stateProvider
         .state('genes',
             {url: '/genes/CDS/:fid',
              templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'})
+             controller: 'GeneDetail'});
 
     $stateProvider
         .state('genesbycdsgenome',
             {url: '/genes/CDS/:gid/:fid',
              templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'})
+             controller: 'GeneDetail'});
 
     $stateProvider
         .state('genesbyws',
             {url: '/genes/:ws/:fid',
              templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'})
+             controller: 'GeneDetail'});
 
     $stateProvider
         .state('genesbywsgenome',
             {url: '/genes/:ws/:gid/:fid',
              templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'})
+             controller: 'GeneDetail'});
 
     $stateProvider
         .state('meme',
@@ -337,66 +356,67 @@ var app = angular.module('landing-pages',
         .state('memebyname',
             {url: '/meme/:ws/:id',
              templateUrl: 'views/objects/meme.html',
-             controller: 'MemeDetail'})
+             controller: 'MemeDetail'});
 
     $stateProvider
         .state('cmonkeybyname',
             {url: '/cmonkey/:ws/:id',
              templateUrl: 'views/objects/cmonkey.html',
-             controller: 'CmonkeyDetail'})
+             controller: 'CmonkeyDetail'});
 
     $stateProvider
         .state('inferelator',
             {url: '/inferelator/:ws/:id',
              templateUrl: 'views/objects/inferelator.html',
-             controller: 'InferelatorDetail'})
+             controller: 'InferelatorDetail'});
 
     $stateProvider
         .state('regprecise',
             {url: '/regprecise/:ws/:id',
              templateUrl: 'views/objects/regprecise.html',
-             controller: 'RegpreciseDetail'})
+             controller: 'RegpreciseDetail'});
 
     $stateProvider
         .state('mak',
             {url: '/mak/:ws/:id',
              templateUrl: 'views/objects/mak.html',
-             controller: 'MAKDetail'})
+             controller: 'MAKDetail'});
 
     $stateProvider
         .state('spec',
             {url: '/spec/:kind/:id',
              templateUrl: 'views/objects/spec.html',
-             controller: 'SpecDetail'})
+             controller: 'SpecDetail'});
 
     $stateProvider
         .state('bambibyid',
             {url: '/bambi/:ws/:id',
             templateUrl: 'views/objects/bambi.html',
-             controller: 'BambiDetail'})
+             controller: 'BambiDetail'});
 
     $stateProvider
 	.state('ppid',
 	   {url: '/ppid/:ws/:id',
 	    templateUrl: 'views/objects/ppid.html',
-	    controller: 'PPIDetail'})
+	    controller: 'PPIDetail'});
 
-/*
     $stateProvider
         .state('landing-pages-help',
             {url: '/landing-pages-help',
              templateUrl: 'views/landing-pages-help.html',
-             controller: LPHelp})
-*/
+             controller: LPHelp});
 
     $urlRouterProvider.when('', '/login/');
 
     $stateProvider
         .state('otherwise', 
             {url: '*path', 
-             templateUrl : 'views/404.html'})
+             templateUrl : 'views/404.html'});
 
-}])
+}]);
+
+
+
 
 //add the login widget as a module
 var kbaseLogin = angular.module('kbaseLogin', []);
@@ -414,7 +434,7 @@ var Feed = angular.module('FeedLoad', ['ngResource'])
 
 configJSON = $.parseJSON( $.ajax({url: "config.json", 
                              async: false, 
-                             dataType: 'json'}).responseText )
+                             dataType: 'json'}).responseText );
 
 
 
@@ -436,7 +456,10 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         removeCards();
     });
 
-    var login_change = function() {
+    var finish_login = function(result) {
+        if (!result.success)
+            return;
+
         var c = $('#signin-button').kbaseLogin('get_kbase_cookie');
         set_cookie(c);
 
@@ -457,9 +480,15 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         window.location.reload();
     };
 
+    var finish_logout = function() {
+        $location.path('/login/');
+//        $rootScope.$apply();
+        window.location.reload();
+    };
+
     // sign in button
-    $('#signin-button').kbaseLogin({login_callback: login_change,
-                                    logout_callback: login_change});
+    $('#signin-button').kbaseLogin({login_callback: finish_login,
+                                    logout_callback: finish_logout});
     $('#signin-button').css('padding', '0');  // Jim!
 
     USER_ID = $("#signin-button").kbaseLogin('session').user_id;
@@ -467,12 +496,20 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     kb = new KBCacheClient(USER_TOKEN);
     kb.nar.ensure_home_project(USER_ID);
 
+    $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
+
+    console.log($rootScope.USER_ID);
+
+
     // global state object to store state
     state = new State();
 
     // Critical: used for navigation urls and highlighting
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
+    $rootScope.kb = kb;     
+    $rootScope.Object = Object;       
+
 });
 
 
@@ -498,41 +535,19 @@ function removeCards() {
 function set_cookie(c) {
     var cookieName = 'kbase_session';
     if (c.kbase_sessionid) {
-        console.log( 'Setting kbase_session cookie');
         var cookieString = 'un=' + c.user_id + 
                            '|kbase_sessionid=' + c.kbase_sessionid +
                            '|user_id=' + c.user_id +
                            '|token=' + c.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
-        $.cookie(cookieName, cookieString, { path: '/', domain: 'kbase.us' });
-        $.cookie(cookieName, cookieString, { path: '/' });
+        $.cookie(cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
+        $.cookie(cookieName, cookieString, { path: '/', expires: 60 });
     }
     else {
-        console.log('Logged out - removing cookie');
-        $.cookie(cookieName, null);
+        $.removeCookie(cookieName, { path: '/', domain: 'kbase.us' });
+        $.removeCookie(cookieName, { path: '/' });
     }
 };
 
-
-
-// These are some jquery plugs that you can use to add and remove a 
-// loading giff to a dom element.  This is easier to maintain, and likely less 
-// code that using CSS classes.
-$.fn.loading = function(text) {
-    $(this).rmLoading()
-
-    if (typeof text != 'undefined') {
-        $(this).append('<p class="text-muted loader"> \
-             <img src="assets/img/ajax-loader.gif"> '+text+'</p>');
-    } else {
-        $(this).append('<p class="text-muted loader"> \
-             <img src="assets/img/ajax-loader.gif"> loading...</p>')        
-    }
-    return this;
-}
-
-$.fn.rmLoading = function() {
-    $(this).find('.loader').remove();
-}
 
 
 
