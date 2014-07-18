@@ -98,8 +98,8 @@
                                         </tr>
                                     </tbody>
                                 </table>    
-                                <div class="btn-group" ng-show="options.userState.workspace_carts[options.userState.selectedWorkspace] && options.userState.workspace_carts[options.userState.selectedWorkspace].size > 0">
-                                    <button type="button" class="btn btn-danger" ng-click="removeSelectedFromWorkspaceCart()">Discard<span class="glyphicon glyphicon-trash"><span></button>
+                                <div class="btn-group" ng-show="options.userState.data_cart && options.userState.data_cart_size > 0">
+                                    <button type="button" class="btn btn-danger" ng-click="removeSelectedFromDataCart()">Discard<span class="glyphicon glyphicon-trash"><span></button>
                                 </div>
                             </div>
                         </div>
