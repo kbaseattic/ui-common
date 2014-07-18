@@ -24,7 +24,7 @@
             width:900         
         },
         
-        SEEDTree:{ "count": 0 },
+        SEEDTree:{ "count": 0, "children":[] },
         subsysToGeneMap:[],
 
         objName:"",
@@ -118,16 +118,45 @@
 
                 for (i = 0; i < data.length; i++) {
                     var geneCount = 0;
+                    var nodeHierarchy = "";
+                    var parentHierarchy = "SEED";
 
                     if (subsysToGeneMap[data[i][3]] === undefined) {
+                        // if barchart needs to only show the subsystems that have genes in this genome,
+                        // uncomment the continue statement.
                         //continue;
                     } else {
-                        //geneCount = subsysToGeneMap[data[i][3]].length;
+                        geneCount = subsysToGeneMap[data[i][3]].length;
                     }
-                    SEEDTree.count += geneCount;
 
                     for (j = 0; j < ontologyDepth; j++) {
 
+                        data[i][j] = (data[i][j] === "") ? "--- " + data[i][j-1] + " ---" : data[i][j]; 
+                        nodeHierarchy = parentHierarchy + ":" + data[i][j];
+
+                        // create new node for top level of hierarcy if it's not already defined.
+                        if (j === 0) {
+                            if (nodeMap[nodeHierarchy] === undefined) {
+                                var node = { "name" : data[i][j], size : 0, "children" : [] };
+                                SEEDTree.children.push(node);
+                                nodeMap[nodeHierarchy] = node;
+                            }
+                        } else {
+                            if (nodeMap[nodeHierarchy] === undefined) {
+                                var node = { "name" : data[i][j], size : 0, "children" : [] };
+                                nodeMap[parentHierarchy].children.push(node);
+                                nodeMap[nodeHierarchy] = node;
+
+                                if ( j === ontologyDepth - 1 && subsysToGeneMap[data[i][j]] !== undefined) {
+                                    subsysToGeneMap[data[i][j]].forEach( function(f){
+                                        var gene = { "name" : f, "size" : 0 };
+                                        node.children.push( gene );
+                                    });
+                                }
+                            } 
+                        }
+                        nodeMap[nodeHierarchy].size += geneCount;
+                        parentHierarchy = nodeHierarchy;
                     }
                 }
                 console.log("Genes in SEED hierarchy: " + SEEDTree.count);
