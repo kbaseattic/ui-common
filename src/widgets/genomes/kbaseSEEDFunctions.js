@@ -82,6 +82,23 @@
             return this;
         },
 
+        /*
+          I need to load the SEED subsystem ontology. I am going to use
+          the "subsys.txt" file I found at: 
+                ftp.theseed.org/subsystems/subsys.txt
+          
+          Note that this file is updated weekly, but not versioned. It's 
+          possible that errors will arise because the subsystems assigned
+          in the genome object are out of date relative to the current
+          subsys.txt file.
+
+          file format is:
+          Level 1 \t Level 2 \t Level 3 \t Level 4\t Optional GO id \t Optional GO desc \n
+        */
+        loadSEEDHierarcy: function() {
+
+        },
+
         getData: function() {
             return {title:"SEED Functional Categories :",id:this.objName, workspace:this.wsName};
         },
