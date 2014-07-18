@@ -78,7 +78,7 @@
 
             this.render();
             this.loadSEEDHierarcy();
-            
+
             return this;
         },
 
@@ -95,14 +95,30 @@
           file format is:
           Level 1 \t Level 2 \t Level 3 \t Level 4\t Optional GO id \t Optional GO desc \n
 
+          ontologyDepth is set to 4 for SEED
+
+          SEED is not a strict heirarchy, some nodes have multiple parents
+          I'm going to keep track of a nodes parents to map things right.
+
           loadSEEDHierarcy() function will parse file and populate the SEEDTree data structure
         */
         loadSEEDHierarcy: function() {
 
+            var ontologyDepth = 4; //this should be moved up to the global variables
+            var nodeMap = {};
+
             d3.text("assets/data/subsys.txt", function(text) {
                 var data = d3.tsv.parseRows(text);
                 console.log("Lines: " + data.length);
+
+                for (i = 0; i < data.length; i++) {
+
+                    for (j = 0; j < ontologyDepth; j++) {
+
+                    }
+                }
             });
+
         },
 
         getData: function() {
