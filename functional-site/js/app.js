@@ -45,23 +45,6 @@ var app = angular.module('landing-pages',
         });
 
     $stateProvider
-        .state('search', {
-            url: "/search/?q&category&page&itemsPerPage&sort&facets",
-            templateUrl: 'views/search/search.html',
-            controller: 'searchController'
-        })
-        .state('search.recent', {
-            url: "/recent/",
-            templateUrl: 'views/search/recent.html',
-            controller: 'searchController'
-        })
-        .state('search.favorites', {
-            url: "/favorites/",
-            templateUrl: 'views/search/favorites.html',
-            controller: 'searchController'
-        });
-
-    $stateProvider
         .state('narrative', {
           url: "/narrative/",
           templateUrl: 'views/narrative/home.html',
