@@ -23,6 +23,8 @@
         objName:"",
         wsName:"",
 
+        SEEDTree : [], 
+
         /**
          * Initialize the widget.
          */
@@ -41,10 +43,31 @@
                 console.log(error);
             }, this));
 
-            var genomeObj;
             $.when(prom).done($.proxy(function(genome) {
-                genomeObj = genome[0].data;
+                var genomeObj = genome[0].data;
                 console.log("Num Features: " + genomeObj.features.length);
+
+                /*
+                    First I am going to iterate over the Genome Typed Object and 
+                    create a mapping of the assigned functional roles (by SEED) to
+                    an array of genes with those roles. 
+
+                    subsysToGeneMap [ SEED Role ] = Array of Gene Ids
+                */
+                var subsysToGeneMap = [];
+
+                genome["data"]["features"].forEach( function(f){
+
+                    // Each function can have multiple genes, creating mapping of function to list of gene ids
+                    if (subsysToGeneMap[f["function"]] === undefined) {subsysToGeneMap[f["function"]] = [];}
+                    subsysToGeneMap[f["function"]].push(f["id"]);
+
+                    // Not sure if this is necessary, but I'm going to keep track of the number of genes with
+                    // SEED assigned functions in this count variable.
+                    SEEDTree.count++; 
+                });
+
+                
             }, this));
 
             self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>Finding SEED functions for this genome...</center></p></div>');
