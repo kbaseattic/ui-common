@@ -4,8 +4,8 @@
         parent: "kbaseAuthenticatedWidget",
         version: "1.0.0",
         
-        wsUrl: "http://dev04.berkeley.kbase.us:7058",
-        //wsUrl:"https://kbase.us/services/ws",
+        //wsUrl: "http://dev04.berkeley.kbase.us:7058",
+        wsUrl:"https://kbase.us/services/ws",
         ws:null, // the ws client
 	
         options: {
@@ -38,7 +38,7 @@
             self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>building object reference graph...</center></p></div>');
 	    
 	    // load the basic things from the cache and options
-            //if (self.options.kbCache.ws_url) { self.wsUrl = self.options.kbCache.ws_url; }
+            if (self.options.kbCache.ws_url) { self.wsUrl = self.options.kbCache.ws_url; }
             if (self.options.kbCache.token) { self.ws = new Workspace(self.wsUrl, {token: self.options.kbCache.token}); }
             else { self.ws = new Workspace(self.wsUrl); }
             self.wsNameOrId = options.wsNameOrId;
