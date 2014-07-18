@@ -24,7 +24,7 @@
             width:900         
         },
         
-        SEEDTree:[],
+        SEEDTree:{ "count": 0 },
         subsysToGeneMap:[],
 
         objName:"",
@@ -73,6 +73,7 @@
                     SEEDTree.count++; 
                 });
 
+                console.log("S: " + SEEDTree.count);
                 this.loadSEEDHierarcy();
 
             }, this));
@@ -121,8 +122,7 @@
                     if (subsysToGeneMap[data[i][3]] === undefined) {
                         //continue;
                     } else {
-                      geneCount = subsysToGeneMap[data[i][3]].length;
-                      console.log("Count: " + geneCount);
+                        //geneCount = subsysToGeneMap[data[i][3]].length;
                     }
                     SEEDTree.count += geneCount;
 
