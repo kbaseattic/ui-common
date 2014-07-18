@@ -191,18 +191,20 @@
 
             //if (this.tree === null) { this.tree = d3.layout.tree().nodeSize([0, 4]);}
             var self = this;
-            var tree = d3.layout.tree().nodeSize([0, 4]);
-            var nodes = tree.nodes(self.SEEDTree);
+            
+            var nodes = self.tree.nodes(self.SEEDTree);
             console.log("Z: " + this.SEEDTree.children.length);
+            console.log("N: " + nodes.length);
+
             var scale = d3.scale.linear().domain([0,400]).range([0,290]);
-            var height = Math.max(500, nodes.length * this.barHeight + this.margin.top + this.margin.bottom);
+            var height = Math.max(500, nodes.length * self.barHeight + self.margin.top + self.margin.bottom);
             var i = self.i;
             d3.select("svg").transition()
-                .duration(this.duration)
+                .duration(self.duration)
                 .attr("height", height);
 
             d3.select(self.frameElement).transition()
-                .duration(this.duration)
+                .duration(self.duration)
                 .style("height", height + "px");
 
             // Compute the "layout".
@@ -211,7 +213,7 @@
             });
 
             // Update the nodes…
-            var node = this.svg.selectAll("g.node")
+            var node = self.svg.selectAll("g.node")
                 .data(nodes, function(d) { return d.id || (d.id = ++i); });
 
             var nodeEnter = node.enter().append("g")
@@ -221,7 +223,7 @@
 
             // Enter any new nodes at the parent's previous position.
             nodeEnter.append("rect")
-                .attr("y", -this.barHeight / 2)
+                .attr("y", -self.barHeight / 2)
                 .attr("x", 300)
                 .attr("height", self.barHeight)
                 .attr("width", self.barWidth)
@@ -248,12 +250,12 @@
 
             // Transition nodes to their new position.
             nodeEnter.transition()
-                .duration(this.duration)
+                .duration(self.duration)
                 .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
                 .style("opacity", 1);
 
             node.transition()
-                .duration(this.duration)
+                .duration(self.duration)
                 .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
                 .style("opacity", 1)
                 .select("rect")
@@ -261,7 +263,7 @@
 
             // Transition exiting nodes to the parent's new position.
             node.exit().transition()
-                .duration(this.duration)
+                .duration(self.duration)
                 .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
                 .style("opacity", 1e-6)
                 .remove();
@@ -313,6 +315,7 @@
                 width = this.width;
                 //svg = this.svg;
 
+            this.tree = d3.layout.tree().nodeSize([0, 4]);
 
             this.$elem.append('<div id="mainview">');
 
