@@ -1,6 +1,10 @@
 /* Shows the SEED functional category hierarchy as a 
  * collapsable/expandable bar chart
- *
+ * 
+ * Found a collapsable hierarcy example from Mike Bostock to follow:
+ * https://gist.github.com/mbostock/1093025
+ * 
+ * will adapt this to work with the KBase SEED annotations
  */
 
  (function( $, undefined ) {
@@ -17,10 +21,12 @@
             objVer: null,
             loadingImage: "assets/img/loading.gif",
             kbCache:{},         
-            width:900,
-            SEEDTree:[]           
+            width:900         
         },
         
+        SEEDTree:[],
+        subsysToGeneMap:[],
+
         objName:"",
         wsName:"",
 
@@ -32,7 +38,8 @@
         init: function(options) {
             this._super(options);          
 
-            var SEEDTree = this.options.SEEDTree;
+            var SEEDTree = this.SEEDTree;
+            var subsysToGeneMap = this.subsysToGeneMap;
 
             var obj = {"ref" : this.options.wsNameOrId + "/" + this.options.objNameOrId };
             
@@ -54,7 +61,6 @@
 
                     subsysToGeneMap [ SEED Role ] = Array of Gene Ids
                 */
-                var subsysToGeneMap = [];
 
                 genomeObj.features.forEach( function(f){
 
