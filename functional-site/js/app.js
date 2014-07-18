@@ -395,6 +395,11 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/objects/ws-obj-graph-view.html',
           controller: 'WsObjGraphView'
         })
+        .state('wsobjgraphcenteredview', {
+          url: "/objgraphview/:ws/:id",
+          templateUrl: 'views/objects/ws-obj-graph-centered-view.html',
+          controller: 'WsObjGraphCenteredView'
+        });
       
              
     $stateProvider
@@ -416,6 +421,11 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/landing-pages-help.html',
              controller: LPHelp});
 */
+    $stateProvider
+    	.state('tree',
+    		{url: '/tree/:ws/:id',
+    		templateUrl: 'views/objects/tree.html',
+    		controller: 'TreeDetail'});
 
     $urlRouterProvider.when('', '/login/');
 

@@ -371,6 +371,31 @@ angular.module('card-directives')
                 });
             }
         };
-    });
+    })
+    .directive('wsobjgraphcenteredview', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "wsobjgraphcenteredview", 
+                    data: scope.params
+                });
+            }
+        };
+    })
+    .directive('treecards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "tree", 
+                    data: scope.params, 
+                    auth: $rootScope.USER_TOKEN,
+                    userId: $rootScope.USER_ID
+                });
+            }
+        };
+    })
+;
 
 

@@ -12,7 +12,7 @@
             wsNameOrId: null,
             kbCache:{},
             width:1200,
-	    height:600
+	    height:700
         },
 
         wsNameOrId:"",
@@ -30,6 +30,7 @@
             this._super(options);
             var self = this;
 	    // show loading message
+	    self.$elem.append("<center><b><i>Mouse over objects to get more info. Double click on an object to select and recenter the graph on that object. </i></b></center><br>");
             self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>building object reference graph...</center></p></div>');
 	    
 	    // load the basic things from the cache and options
@@ -52,8 +53,6 @@
 		    self.renderSankeyStyleGraph();
 		    self.addNodeColorKey();
                     self.$elem.find('#loading-mssg').remove();
-		    //self.$elem.append(JSON.stringify(self.objData));
-		    
 		});
 	    });
 	    
@@ -133,55 +132,19 @@
 	    var refToNodeIdx = {};
 	    var nodeList = []; var nodeIdx = 0;
 	    for (var gRef in genomeNodeInfo) {
-		if (genomeNodeInfo[gRef]['modelrefs'].length>0) {
-		    nodeList.push(self.buildNodeData(nodeIdx,genomeNodeInfo,gRef));
-		    refToNodeIdx[gRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else if (genomeNodeInfo[gRef]['ver']>1) {
-		    nodeList.push(self.buildNodeData(nodeIdx,genomeNodeInfo,gRef));
-		    refToNodeIdx[gRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else if (genomeNodeInfo[gRef]['nextVer']) {
-		    nodeList.push(self.buildNodeData(nodeIdx,genomeNodeInfo,gRef));
-		    refToNodeIdx[gRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else {
-		    // add to genome no mention list (one version, no model refs)
-		}
+		nodeList.push(self.buildNodeData(nodeIdx,genomeNodeInfo,gRef));
+		refToNodeIdx[gRef]=Number(nodeIdx);
+		nodeIdx++;
 	    }
 	    for (var mRef in modelNodeInfo) {
-		if (modelNodeInfo[mRef]['genomerefs'].length>0 || modelNodeInfo[mRef]['fbarefs'].length>0) {
-		    nodeList.push(self.buildNodeData(nodeIdx,modelNodeInfo,mRef));
-		    refToNodeIdx[mRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else if (modelNodeInfo[mRef]['ver']>1) {
-		    nodeList.push(self.buildNodeData(nodeIdx,modelNodeInfo,mRef));
-		    refToNodeIdx[mRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else if (modelNodeInfo[mRef]['nextVer']) {
-		    nodeList.push(self.buildNodeData(nodeIdx,modelNodeInfo,mRef));
-		    refToNodeIdx[mRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else {
-		    // add to model no mention list
-		}
+		nodeList.push(self.buildNodeData(nodeIdx,modelNodeInfo,mRef));
+		refToNodeIdx[mRef]=Number(nodeIdx);
+		nodeIdx++;
 	    }
 	    for (var fRef in fbaNodeInfo) {
-		if (fbaNodeInfo[fRef]['modelrefs'].length>0) {
-		    nodeList.push(self.buildNodeData(nodeIdx,fbaNodeInfo,fRef));
-		    refToNodeIdx[fRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else if (fbaNodeInfo[fRef]['ver']>1) {
-		    nodeList.push(self.buildNodeData(nodeIdx,fbaNodeInfo,fRef));
-		    refToNodeIdx[fRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else if (fbaNodeInfo[fRef]['nextVer']) {
-		    nodeList.push(self.buildNodeData(nodeIdx,fbaNodeInfo,fRef));
-		    refToNodeIdx[fRef]=Number(nodeIdx);
-		    nodeIdx++;
-		} else {
-		    // add to genome no mention list
-		}
+		nodeList.push(self.buildNodeData(nodeIdx,fbaNodeInfo,fRef));
+		refToNodeIdx[fRef]=Number(nodeIdx);
+		nodeIdx++;
 	    }
 	    
 	    var edgeList = [];
@@ -215,13 +178,13 @@
 	    }
 	    
 	    
-	   // self.$elem.append(JSON.stringify(genomeNodeInfo)+"<br><br>");
-	   // self.$elem.append(JSON.stringify(modelNodeInfo)+"<br><br>");
-	   // self.$elem.append(JSON.stringify(fbaNodeInfo)+"<br><br>");
+	    // self.$elem.append(JSON.stringify(genomeNodeInfo)+"<br><br>");
+	    // self.$elem.append(JSON.stringify(modelNodeInfo)+"<br><br>");
+	    // self.$elem.append(JSON.stringify(fbaNodeInfo)+"<br><br>");
 	    
-	   // self.$elem.append("nodes:<br>"+JSON.stringify(nodeList)+"<br><br>");
-	   // self.$elem.append("links:<br>"+JSON.stringify(edgeList)+"<br><br>");
-	   // self.$elem.append("lookup:<br>"+JSON.stringify(refToNodeIdx)+"<br><br>");
+	    // self.$elem.append("nodes:<br>"+JSON.stringify(nodeList)+"<br><br>");
+	    // self.$elem.append("links:<br>"+JSON.stringify(edgeList)+"<br><br>");
+	    // self.$elem.append("lookup:<br>"+JSON.stringify(refToNodeIdx)+"<br><br>");
 	    
 	    // set the data
 	    self.graph = { nodes:nodeList, links:edgeList };
@@ -232,6 +195,7 @@
 	    "KBaseGenomes.Genome":"#00ACE9",
 	    "KBaseFBA.FBAModel":"#D43F3F",
 	    "KBaseFBA.FBA":"#FFE361"
+	    //"KBaseNarratives.Narrative":"#50d07d"
 	},
 	/*
 	    #00ACE9
@@ -309,7 +273,14 @@
 		.origin(function(d) { return d; })
 		.on("dragstart", function() { 
 		    this.parentNode.appendChild(this); })
-		.on("drag", dragmove));
+		.on("drag", dragmove))
+	      .on('dblclick', function (d) {
+			if (d3.event.defaultPrevented) return;
+			// TODO: toggle switch between redirect vs redraw
+			
+			//alternate reload page so we can go forward and back
+			window.location.href = "#/objgraphview/"+self.objDataLookup[d.ref]['info'][7]+"/"+self.objDataLookup[d.ref]['info'][1];
+		    });
     
 	    // add the rectangles for the nodes
 	    node.append("rect")
@@ -369,6 +340,8 @@
     
             return this;
         },
+	
+	
 	
 	/**
 	 * Get a list of jobs that can be run to get info on all objects in a WS
