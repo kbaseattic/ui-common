@@ -74,7 +74,7 @@
                 });
 
                 console.log("S: " + SEEDTree.count);
-                this.loadSEEDHierarcy();
+                this.loadSEEDHierarchy();
 
             }, this));
 
@@ -102,9 +102,9 @@
           SEED is not a strict heirarchy, some nodes have multiple parents
           I'm going to keep track of a nodes parents to map things right.
 
-          loadSEEDHierarcy() function will parse file and populate the SEEDTree data structure
+          loadSEEDHierarchy() function will parse file and populate the SEEDTree data structure
         */
-        loadSEEDHierarcy: function() {
+        loadSEEDHierarchy: function() {
 
             var ontologyDepth = 4; //this should be moved up to the global variables
             var nodeMap = {};
@@ -131,10 +131,12 @@
 
                     for (j = 0; j < ontologyDepth; j++) {
 
+                        // some node names are an empty string "". I'm going to set these to 
+                        // a modified version of their parent node name 
                         data[i][j] = (data[i][j] === "") ? "--- " + data[i][j-1] + " ---" : data[i][j]; 
                         nodeHierarchy = parentHierarchy + ":" + data[i][j];
 
-                        // create new node for top level of hierarcy if it's not already defined.
+                        // create new node for top level of hierarchy if it's not already defined.
                         if (j === 0) {
                             if (nodeMap[nodeHierarchy] === undefined) {
                                 var node = { "name" : data[i][j], size : 0, "children" : [] };
@@ -159,9 +161,18 @@
                         parentHierarchy = nodeHierarchy;
                     }
                 }
-                console.log("Genes in SEED hierarchy: " + SEEDTree.count);
+                
             });
 
+            SEEDTree.children.forEach(this.collapse);
+        },
+
+        collapse: function() {
+            if (d.children) {
+                d._children = d.children;
+                d._children.forEach(collapse);
+                d.children = null;
+            }
         },
 
         getData: function() {
