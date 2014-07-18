@@ -570,6 +570,10 @@ kb_define('kbaseVisWidget',
                 D3svg = d3.select($elem.get(0))
                     .append('svg')
                     .attr('style', 'width : 100%; height : 100%')
+                    //.attr('viewBox', '0 0 1600 1600')
+                    //.attr('preserveAspectRatio', 'mMidYMid mMidYMid')
+                    //.attr('width', 1600)
+                    //.attr('height', 1600)
                     //.attr('width', this.width())
                     //.attr('height', this.height())
                     //.attr('style', this.options.debug ? 'border : 1px solid blue' : undefined);

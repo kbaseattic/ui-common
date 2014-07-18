@@ -94,6 +94,8 @@ kb_define('kbaseVenndiagram',
             drawLabels : true,
             tooltips : true,
 
+            radiusScale : 1.00,
+
         },
 
         _accessors : [
@@ -183,7 +185,8 @@ kb_define('kbaseVenndiagram',
                 return;
             }
 
-            var radius = Math.min(bounds.size.width, bounds.size.height) / 2;
+            var radius = this.options.radius || Math.min(bounds.size.width, bounds.size.height) / 2;
+            radius *= this.options.radiusScale;
 
             var venn = this.data('D3svg').select( this.region('chart') ).selectAll('.venn').data([0]);
             venn.enter().append('g')

@@ -146,6 +146,7 @@
 				'kbaseVenndiagram'                  : 'vis/kbaseVenndiagram',
 				'kbasePlantsNetworkNarrative'       : 'vis/plants/kbasePlantsNetworkNarrative',
 				'kbasePlantsNetworkTable'           : 'vis/plants/kbasePlantsNetworkTable',
+				'kbasePlantsNTO'                    : 'vis/plants/kbasePlantsNTO',
 				'vis'                               : 'vis/vis',
 				'kbaseSimpleWSSelect'               : 'workspaces/kbaseSimpleWSSelect',
 				'kbaseWSFbaTable'                   : 'workspaces/kbaseWSFbaTable',

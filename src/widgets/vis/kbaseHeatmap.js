@@ -22,13 +22,16 @@ kb_define('kbaseHeatmap',
         options: {
             xScaleType  : 'ordinal',
             yScaleType  : 'ordinal',
-            yGutter     : 50,
-            yPadding    : 5,
+            yGutter     : 80,
+            yPadding    : 50,
 
-            xPadding    : 50,
-            xGutter     : 5,
+            xPadding    : 80,
+            xGutter     : 50,
             overColor   : '#999900',
-            overColor   : '#999900',
+            hmBGColor     : 'lightgray',
+
+            rx : 2,
+            ry : 2,
 
         },
 
@@ -111,6 +114,7 @@ kb_define('kbaseHeatmap',
             var $hm = this;
             gxAxis
                 .transition()
+                .duration(0)
                 .call(xAxis)
                 .selectAll("text")
                     .attr("transform", function (d, i) {
@@ -119,7 +123,7 @@ kb_define('kbaseHeatmap',
                         //arbitrarily rotate around -12 because it looks right. I got nothin'.
                         //then we move it 5 pixels to the right, which in our rotate coordinate system is
                         //5 pixels up. Whee!
-                        return "rotate(-90,0,-12) translate(30,0)";// translate(2,3)";
+                        return "rotate(-45,0,-12) translate(25,0)";// translate(2,3)";
                     })
             ;
 
@@ -158,71 +162,6 @@ kb_define('kbaseHeatmap',
                 return;
             }
 
-            var xGridLines = [];
-            $.each(
-                $hm.xScale().domain(),
-                function (idx, xVal) {
-                    xGridLines.push(
-                        {
-                            x : $hm.xScale()(xVal),
-                            y : 0
-                        }
-                    )
-                }
-            );
-            var yGridLines = [];
-            $.each(
-                $hm.yScale().domain(),
-                function (idx, yVal) {
-                    yGridLines.push(
-                        {
-                            x : 0,
-                            y : $hm.yScale()(yVal),
-                        }
-                    )
-                }
-            );
-
-            xGridLines.push(
-                {
-                    x : xGridLines[xGridLines.length - 1].x + $hm.xScale().rangeBand(),
-                    y : 0
-                }
-            );
-
-            yGridLines.push(
-                {
-                    x : 0,
-                    y : yGridLines[yGridLines.length - 1].y + $hm.yScale().rangeBand(),
-                }
-            );
-
-            var grid = this.data('D3svg').select('.chart').selectAll('.grid');
-            grid
-                .data(xGridLines)
-                .enter()
-                    .append('line')
-                        .attr('class', 'grid')
-                        .attr('x1', function (d) { return d.x })
-                        .attr('y1', function (d) { return d.y })
-                        .attr('x2', function (d) { return d.x })
-                        .attr('y2', function (d) { return $hm.yScale().rangeBand() * $hm.yScale().domain().length })
-                        .attr('stroke', 'gray')
-                        .attr('stroke-width', 1)
-            ;
-            grid
-                .data(yGridLines)
-                .enter()
-                    .append('line')
-                        .attr('class', 'grid')
-                        .attr('x1', function (d) { return d.x })
-                        .attr('y1', function (d) { return d.y })
-                        .attr('x2', function (d) { return $hm.xScale().rangeBand() * $hm.xScale().domain().length }) //bounds.size.width })
-                        .attr('y2', function (d) { return d.y})
-                        .attr('stroke', 'gray')
-                        .attr('stroke-width', 1)
-            ;
-
 
         var funkyTown = function() {
             this
@@ -232,7 +171,7 @@ kb_define('kbaseHeatmap',
                         if ($hm.options.useIDMapping) {
                             xId = $hm.xIDMap()[xId];
                         }
-                        return $hm.xScale()(xId)
+                        return $hm.xScale()(xId) + 1
                     }
                 )
                 .attr('y',
@@ -241,13 +180,15 @@ kb_define('kbaseHeatmap',
                         if ($hm.options.useIDMapping) {
                             yId = $hm.yIDMap()[yId];
                         }
-                        return $hm.yScale()(yId)
+                        return $hm.yScale()(yId) + 1
                     }
                 )
                 //.attr('y', function (d) { return $hm.yScale()(d.y) })
                 //.attr('opacity', function (d) { return d.value })
-                .attr('width', $hm.xScale().rangeBand())
-                .attr('height', $hm.yScale().rangeBand())
+                .attr('width', $hm.xScale().rangeBand() - 2)
+                .attr('height', $hm.yScale().rangeBand() - 2)
+                .attr('rx', $hm.options.rx)
+                .attr('ry', $hm.options.ry)
                 .attr('fill',
                     function(d) {
 
@@ -344,21 +285,36 @@ kb_define('kbaseHeatmap',
                 return this;
             };
 
-            var chart = this.data('D3svg').select('.chart').selectAll('.cell');
+            var transitionTime = this.initialized
+                ? this.options.transitionTime
+                : 0;
+
+            var heatmap = this.D3svg().select( this.region('chart') ).selectAll('.hmBG').data([0]);
+
+            heatmap
+                .enter()
+                    .append('rect')
+                        .attr('x', 0 )
+                        .attr('y', 0 )
+                        .attr('width',  bounds.size.width )
+                        .attr('height', bounds.size.height )
+                        .attr('fill', $hm.options.hmBGColor )
+                        .attr('class', 'hmBG');
+
+            var chart = this.D3svg().select( this.region('chart') ).selectAll('.cell').data(this.dataset());
             chart
-                .data(this.dataset())
                 .enter()
                     .append('rect')
                     .attr('class', 'cell')
-                    .call(funkyTown)
-                    .call(mouseAction)
             ;
             chart
-                .data(this.dataset())
-                    .call(mouseAction)
-                    .transition()
-                    .duration(500)
-                        .call(funkyTown)
+                .call(mouseAction)
+                .transition()
+                .duration(transitionTime)
+                .call(funkyTown)
+                .call($hm.endall, function() {
+                    $hm.initialized = true;
+                });
             ;
 
             chart

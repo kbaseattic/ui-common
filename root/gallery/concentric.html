@@ -4,11 +4,33 @@
 
     <head>
 
-        <link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <!--<link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
         <link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
 
-        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>-->
 
+<link href="ext/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+<script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+
+<script type = 'text/javascript'>
+    var kb_use_require = true;
+    var kb_norequire = function(deps, callback) {
+        callback(jQuery);
+    };
+    var kb_nodefine = function(module, deps, callback) {
+        callback(jQuery);
+    };
+    if (kb_use_require) {
+        kb_define = define;
+        kb_require = require;
+    }
+    else {
+        kb_define = kb_nodefine;
+        kb_require = kb_norequire;
+    }
+</script>
 <style>
 .bar {
 

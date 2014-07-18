@@ -9,8 +9,8 @@
 
         <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>-->
 
-<link href="ext/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
-<link href="ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+<link href="../../ext/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
 
 <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
 
@@ -31,6 +31,7 @@
         kb_require = kb_norequire;
     }
 </script>
+
 <style>
 .bar {
 
@@ -66,63 +67,44 @@
                 }
 
                 require(['kbpaths'], function() {
-                    require(['jquery', 'd3', 'vis',
+                    require(['jquery', 'vis',
                         ], function($) {
                         $(function() {
 
-                            var pos = getParameterByName('pos') || 'final';
 
-                            var $chord = $('#chordChart').kbaseChordchart(
+                            var heatmap = [];
+                            var numCells = 20;
+                            var colors = ['red', 'green', 'blue', 'purple', 'cyan'];
+                            for (var idx = 0; idx < numCells; idx++) {
+                                for (var jdx = 0; jdx < numCells; jdx++) {
+                                    heatmap.push(
+                                        {
+                                            x       : 'Frobnoz ' + idx,
+                                            y       : 'Wingding ' + jdx,
+                                            value   : Math.random(),
+                                            color   : d3.shuffle(colors)[0]
+                                        }
+                                    )
+                                }
+                            } //*/
+
+                            $('#heatmapWidget').kbaseHeatmap(
                                 {
+                                    scaleAxes   : true,
+                                    yGutter     : 80,
+                                    xPadding    : 80,
 
-                                    startingPosition : pos,
-                                    //choppedGroups : true,
-                                    labels : true,
+                                    //xLabel      : 'Frobnozes',
+                                    //yLabel      : 'Wingdings',
 
-                                    xLabel      : 'Some useful experiment',
-                                    sortSubgroups:undefined,
-
-                                    dataset :
-                                        [
-                                            [50, 5,0,0],
-                                            [5, 0,5,0],
-                                            [0, 5,50,0],
-                                            [0,0,0,5],
-                                        ]
-
-                                    /*dataset :
-                                        [
-                                            [11975,  5871, 8916, 2868],
-                                            [ 1951, 10048, 2060, 6171],
-                                            [ 8010, 16145, 8090, 8045],
-                                            [ 1013,   990,  940, 6907]
-                                        ]//*/
+                                    dataset : heatmap,
+                                    ulIcon : '/root/img/labs_icon.png',
 
                                 }
                             );
-
-
-                           $('#random-chord').on('click', function(e) {
-                                var newDataset = [];
-                                var numChords = Math.floor(Math.random() * 10);
-                                for (var i = 0; i < numChords; i++) {
-                                    newDataset[i] = [];
-                                    for (var j = 0; j < numChords; j++) {
-                                        newDataset[i][j] = Math.floor(Math.random() * 12000)
-                                    }
-                                }
-                                console.log(newDataset);
-
-                                $chord.setDataset(newDataset);
-
-
-                            });
-
-
-                            //$('#random-chord').trigger('click');
-
-                    });
-                });});
+                        })
+                    })
+                });
 
 
             //-->
@@ -137,18 +119,22 @@
         </div>
 
         <!--<div style = 'max-width : 800px; overflow : scroll'>-->
-            <div id = 'chordChart' style = 'border : 1px solid green; width : 1200px; height : 800px'></div>
-            <button id = 'random-chord'>Randomize Chord Chart</button>
+            <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
         <!--</div>-->
+        <div id = 'treeCompare'></div>
 
         <div style = 'display : none'>
-        <div id = 'treeCompare'></div>
             <div id = 'linechartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
-            <div id = 'treechartWidget' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
             <div id = 'barchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
             <div id = 'scatterplotWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            <div id = 'piechartWidget' style = 'border : 1px solid green; width : 1000px; height : 500px'></div>
+            <button id = 'random-pie'>Randomize pie chart</button>
+            <div id = 'circularHeatmap' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+            <button id = 'random-hm_c'>Randomize heatmap</button><button id = 'full-random-hm_c'>Fully randomize heatmap</button>
             <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
             <div id = 'forcedNetwork' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+            <div id = 'venn' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+
 
             <div id = 'plantsNetworkNarrative' style = 'border : 1px solid green;'></div>
         </div>

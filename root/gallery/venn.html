@@ -138,6 +138,27 @@
                                             placeholder : $venn.options.transitionTime,
                                         },
                                         {
+                                            key : 'radius',
+                                            type : 'string',
+                                            validate : {regex : new RegExp(/^\d*(\.\d+)?$/), msg : 'Must be numeric'},
+                                        },
+                                        {
+                                            key : 'radiusScale',
+                                            type : 'string',
+                                            validate : {regex : new RegExp(/^\d*(\.\d+)?$/), msg : 'Must be numeric'},
+                                            placeholder : $venn.options.radiusScale,
+                                        },
+                                        {
+                                            key : 'circleFontSize',
+                                            type : 'string',
+                                            placeholder : $venn.options.circleFontSize,
+                                        },
+                                        {
+                                            key : 'intersectFontSize',
+                                            type : 'string',
+                                            placeholder : $venn.options.intersectFontSize,
+                                        },
+                                        {
                                             key : 'dataset',
                                             type : 'textarea',
                                             json : true,
