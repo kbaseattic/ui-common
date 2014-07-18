@@ -1280,7 +1280,10 @@
 				self.addNewCard("KBaseLitWidget",
 					{
 						literature: data.literature,
-                        loadingImage: self.options.loadingImage,
+						genomeID: data.genomeID,
+						workspaceID: data.workspaceID,
+						kbCache: data.kbCache,
+						loadingImage: self.options.loadingImage                      
 					},
 					{
 						my: "right top",
