@@ -810,7 +810,7 @@
 	}
 
 	//shows taxonomic lineage for this genome
-          /*      this.addNewCard("KBaseGenomeLineage",
+                this.addNewCard("KBaseGenomeLineage",
                 {
                     workspaceID: this.options.data.workspaceID,
                     genomeID: this.options.data.genomeID,
@@ -823,7 +823,7 @@
                     at: "left+500 bottom",
                     of: "#app"
                 }
-            );*/
+            );
                 
             // only add the reference list if this is a WS object
             if (this.options.data.workspaceID) {
