@@ -105,7 +105,7 @@
 					    if (name == self.objName) {
 						var objInfo = data[i]['info'];
 						var savedate = new Date(objInfo[3]);
-						var narName = niceName + " ("+objInfo[6]+"/"+objInfo[0]+"/"+objInfo[4]+")";
+						var narName = '<a target="_blank" href="/narrative/ws.'+objInfo[6]+'.obj.'+objInfo[0]+'">'+niceName + "</a> ("+objInfo[6]+"/"+objInfo[0]+"/"+objInfo[4]+")";
 					        self.narList.push({
 						    name:narName,
 						    details:"last edited by "+objInfo[5]+" on "+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()
@@ -113,7 +113,6 @@
 					        continue; // we found the narrative, no need to do anything else...
 					    }
 				        }
-				       
 				    }
 			        }
 				if (self.narList.length > 0) {
