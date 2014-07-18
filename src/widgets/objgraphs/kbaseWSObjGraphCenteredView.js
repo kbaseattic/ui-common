@@ -172,79 +172,97 @@
 			//self.buildDataAndRender({ref:d['objId']});
 			
 			//alternate reload page so we can go forward and back
-			if(d['info'][1].indexOf(' ') >= 0) {
-			    window.location.href = "#/objgraphview/"+d['info'][7]+"/"+d['info'][0];
+			if (d['isFake']) {
+			    alert("Cannot expand this node.");
 			} else {
-			    window.location.href = "#/objgraphview/"+d['info'][7]+"/"+d['info'][1];
+			    if(d['info'][1].indexOf(' ') >= 0) {
+				window.location.href = "#/objgraphview/"+d['info'][7]+"/"+d['info'][0];
+			    } else {
+				window.location.href = "#/objgraphview/"+d['info'][7]+"/"+d['info'][1];
+			    }
 			}
 		    })
 		    .on('mouseover', function(d) {
 			
-			self.ws.get_object_provenance(
-			//self.ws.get_objects(
-			    [{ref:d['objId']}],
-			    // should refactor this so there is not all this copy paste...
-			    function(objdata) {
-				    var info = d['info'];
-				    var savedate = new Date(info[3]);
-				    var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
-				    text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
-				    text+= '<tr><td><b>Name</b></td><td>'+info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")</td></tr>";
-				    text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
-				    text+= '<tr><td><b>Workspace</b></td><td>'+info[7]+"</td></tr>";
-				    text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
-				    text+= '<tr><td><b>Saved by</b></td><td>'+info[5]+"</td></tr>";
-				    var found = false; var metadata = "<tr><td><b>Meta data</b></td><td>";
-				    for( var m in info[10]) {
-					found = true;
-					metadata += "<b>"+m+"</b> : "+info[10][m]+"<br>"
-				    }
-				    if (found) { text += metadata +"</td></tr>"; }
-				    text += "</td></tr></table></td><td>";
-				    text+= '<h4>Provenance</h4><table cellpadding="2" cellspacing="0" class="table table-bordered table-striped">'
-				    if (objdata.length>0) {
-					if (objdata[0]['provenance'].length>0) {
-					    var prefix = ""; 
-					    for(var k=0; k<objdata[0]['provenance'].length; k++) {
-						if (objdata[0]['provenance'].length > 1) {
-						    prefix = "Action "+k+": ";
+			if (d['isFake']) {
+			    var info = d['info'];
+			    var savedate = new Date(info[3]);
+			    var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
+			    text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
+			    text+= '<tr><td><b>Name</b></td><td>'+info[1]+ "</td></tr>";
+			    text += "</td></tr></table></td><td>";
+			    text+= '<h4>Provenance</h4><table cellpadding="2" cellspacing="0" class="table table-bordered table-striped">'
+			    text+= '<tr><td><b>N/A</b></td></tr>';
+			    text+='</table>';
+			    text+= "</td></tr></table>";
+			    self.$elem.find('#objdetailsdiv').html(text);
+			} else {
+			    self.ws.get_object_provenance(
+			    //self.ws.get_objects(
+				[{ref:d['objId']}],
+				// should refactor this so there is not all this copy paste...
+				function(objdata) {
+					var info = d['info'];
+					var savedate = new Date(info[3]);
+					var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
+					text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
+					text+= '<tr><td><b>Name</b></td><td>'+info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")</td></tr>";
+					text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
+					text+= '<tr><td><b>Workspace</b></td><td>'+info[7]+"</td></tr>";
+					text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
+					text+= '<tr><td><b>Saved by</b></td><td>'+info[5]+"</td></tr>";
+					var found = false; var metadata = "<tr><td><b>Meta data</b></td><td>";
+					for( var m in info[10]) {
+					    found = true;
+					    metadata += "<b>"+m+"</b> : "+info[10][m]+"<br>"
+					}
+					if (found) { text += metadata +"</td></tr>"; }
+					text += "</td></tr></table></td><td>";
+					text+= '<h4>Provenance</h4><table cellpadding="2" cellspacing="0" class="table table-bordered table-striped">'
+					if (objdata.length>0) {
+					    if (objdata[0]['provenance'].length>0) {
+						var prefix = ""; 
+						for(var k=0; k<objdata[0]['provenance'].length; k++) {
+						    if (objdata[0]['provenance'].length > 1) {
+							prefix = "Action "+k+": ";
+						    }
+						    text+=self.getProvRows(objdata[0]['provenance'][k],prefix);
 						}
-						text+=self.getProvRows(objdata[0]['provenance'][k],prefix);
+					    } else {
+						text+= '<tr><td><b><span style="color:red">No provenance data set.</span></b></td></tr>';
 					    }
 					} else {
 					    text+= '<tr><td><b><span style="color:red">No provenance data set.</span></b></td></tr>';
 					}
-				    } else {
-					text+= '<tr><td><b><span style="color:red">No provenance data set.</span></b></td></tr>';
-				    }
-				    text+='</table>';
-				    text+= "</td></tr></table>";
-				    self.$elem.find('#objdetailsdiv').html(text);
-				
-			    }, function(err) {
-				    var info = d['info'];
-				    var savedate = new Date(info[3]);
-				    var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
-				    text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
-				    text+= '<tr><td><b>Name</b></td><td>'+info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")</td></tr>";
-				    text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
-				    text+= '<tr><td><b>Workspace</b></td><td>'+info[7]+"</td></tr>";
-				    text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
-				    text+= '<tr><td><b>Saved by</b></td><td>'+info[5]+"</td></tr>";
-				    var found = false; var metadata = "<tr><td><b>Meta data</b></td><td>";
-				    for( var m in info[10]) {
-					found = true;
-					metadata += "<b>"+m+"</b> : "+info[10][m]+"<br>"
-				    }
-				    if (found) { text += metadata +"</td></tr>"; }
-				    text += "</td></tr></table></td><td>";
-				    text+= '<h4>Provenance</h4><table cellpadding="2" cellspacing="0" class="table table-bordered table-striped">'
-				    text+= "error in fetching provenance";
-				    text+='</table>';
-				    text+= "</td></tr></table>";
-				    self.$elem.find('#objdetailsdiv').html(text);
-				    console.error(err);
-			    });
+					text+='</table>';
+					text+= "</td></tr></table>";
+					self.$elem.find('#objdetailsdiv').html(text);
+				    
+				}, function(err) {
+					var info = d['info']; 
+					var savedate = new Date(info[3]);
+					var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
+					text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
+					text+= '<tr><td><b>Name</b></td><td>'+info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")</td></tr>";
+					text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
+					text+= '<tr><td><b>Workspace</b></td><td>'+info[7]+"</td></tr>";
+					text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
+					text+= '<tr><td><b>Saved by</b></td><td>'+info[5]+"</td></tr>";
+					var found = false; var metadata = "<tr><td><b>Meta data</b></td><td>";
+					for( var m in info[10]) {
+					    found = true;
+					    metadata += "<b>"+m+"</b> : "+info[10][m]+"<br>"
+					}
+					if (found) { text += metadata +"</td></tr>"; }
+					text += "</td></tr></table></td><td>";
+					text+= '<h4>Provenance</h4><table cellpadding="2" cellspacing="0" class="table table-bordered table-striped">'
+					text+= "error in fetching provenance";
+					text+='</table>';
+					text+= "</td></tr></table>";
+					self.$elem.find('#objdetailsdiv').html(text);
+					console.error(err);
+				});
+			}
 		    });
     
 	
@@ -409,7 +427,31 @@
 			    objIdentities,
 			    function(refData) {
 				for(var i = 0; i < refData.length; i++) {
+				    var limit = 50;
 				    for(var k=0; k<refData[i].length; k++) {
+					if (k>=limit) {
+					    //0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
+					    var nodeId = self.graph['nodes'].length;
+					    var nameStr = refData[i].length-limit + " more ...";
+					    self.graph['nodes'].push({
+						node : nodeId,
+						name : nameStr,
+						info : [-1,nameStr,"Multiple Types",0,0,"N/A",0,"N/A",0,0,{}],
+						nodeType : "ref",
+						objId : "-1",
+						isFake : true
+					    });
+					    self.objRefToNodeIdx[objId] = nodeId;
+					    
+					    // add the link now too
+					    self.graph['links'].push({
+						source:self.objRefToNodeIdx[objIdentities[i]['ref']],
+						target:nodeId,
+						value:1,
+					    });
+					    break;
+					}
+					
 					var refInfo = refData[i][k];
 					//0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
 					var t = refInfo[2].split("-")[0];
