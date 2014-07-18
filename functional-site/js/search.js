@@ -855,71 +855,36 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
     $scope.listWorkspaces = function() {
         try {            
-            if (!$scope.workspace_service) {
-                $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.token);
-            }
-            
+            $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.token);
+            $scope.options.userState.workspaces = [];
 
-            if (!$scope.options.userState.workspaces) {
-                $scope.options.userState.workspaces = [];
-
-                $(".blockMsg").addClass("search-block-element");
-                $("#loading_message_text").html("Looking for workspaces you can copy to...");
-                $("#workspace-area").block({message: $("#loading_message")});
-            
-                console.log("Calling list_workspace_info");
-            
-                $scope.workspace_service.list_workspace_info({"perm": "w"})
-                    .fail(function (xhr, status, error) {
-                        console.log([xhr, status, error]);
+            $(".blockMsg").addClass("search-block-element");
+            $("#loading_message_text").html("Looking for workspaces you can copy to...");
+            $("#workspace-area").block({message: $("#loading_message")});
+        
+            console.log("Calling list_workspace_info");
+        
+            $scope.workspace_service.list_workspace_info({"perm": "w"})
+                .then(function(info, status, xhr) { 
+                    console.log(info);
+                    $scope.$apply(function () {
+                        $scope.options.userState.workspaces = info.sort(function (a,b) {
+                            if (a[1].toLowerCase() < b[1].toLowerCase()) return -1;
+                            if (a[1].toLowerCase() > b[1].toLowerCase()) return 1;
+                            return 0;
+                        });
+                
                         $("#workspace-area").unblock();
                         $(".blockMsg").removeClass("search-block-element");
-                    })                    
-                    .done(function(info, status, xhr) { 
-                        $scope.$apply(function () {
-                            $scope.options.userState.workspaces = info.sort(function (a,b) {
-                                if (a[1].toLowerCase() < b[1].toLowerCase()) return -1;
-                                if (a[1].toLowerCase() > b[1].toLowerCase()) return 1;
-                                return 0;
-                            });
-                    
-                            $("#workspace-area").unblock();
-                            $(".blockMsg").removeClass("search-block-element");
-                        });
-                                    
-                        console.log($scope.options.userState.workspaces);
                     });
-                    
-            }
-            else {
-                console.log("Calling list_workspace_info");
-            
-                $scope.workspace_service.list_workspace_info({"perm": "w"}) 
-                    .fail(function (xhr, status, error) {
-                        console.log([xhr, status, error]);
-                        //$("#workspace-area").unblock();
-                        //$(".blockMsg").removeClass("search-block-element");
-                    })
-                    .done(function (info, status, xhr) {
-                        console.log(info); 
-                        $scope.$apply(function () {
-                            var valid_workspaces = info.sort(function (a,b) {
-                                if (a[1].toLowerCase() < b[1].toLowerCase()) return -1;
-                                if (a[1].toLowerCase() > b[1].toLowerCase()) return 1;
-                                return 0;
-                            });
-                        
-                            if (valid_workspaces.length !== $scope.options.userState.workspaces) {
-                                $scope.options.userState.workspaces = valid_workspaces;
-                            }
-                        
-                            //$("#workspace-area").unblock();
-                            //$(".blockMsg").removeClass("search-block-element");
-                        });
-                                        
-                        console.log($scope.options.userState.workspaces);
-                    }); 
-            }
+                                
+                    console.log($scope.options.userState.workspaces);
+                },
+                function (xhr, status, error) {
+                    console.log([xhr, status, error]);
+                    $("#workspace-area").unblock();
+                    $(".blockMsg").removeClass("search-block-element");
+                });
         }
         catch (e) {
             //var trace = printStackTrace();
@@ -1012,10 +977,6 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     
     
     $scope.copyMetagenome = function(n) {
-        if (!$scope.workspace_service) {
-            $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.token);        
-        }
-    
         return $scope.workspace_service.get_object_info([{"name": $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["metagenome_id"], "workspace": "KBasePublicMetagenomes"}])
             .fail(function (xhr, status, error) {
                 console.log(xhr);
@@ -1044,10 +1005,6 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     
     
     $scope.copyFeature = function(n) {
-        if (!$scope.workspace_service) {
-            $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.token);        
-        }
-    
         // Get the search Genome object
         $scope.workspace_service.get_objects([{"name": $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["genome_id"],"workspace":"KBasePublicRichGenomesLoad"}])
             .fail(function (xhr, status, error) {
@@ -1124,10 +1081,6 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
     // grab a public object and make a copy to a user's workspace
     $scope.copyTypedObject = function(object_name, object_ref, from_workspace_name, to_workspace_name) {
-        if (!$scope.workspace_service) {
-            $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.token);        
-        }
-
         function success(result) {
             console.log("Object " + object_name + " copied successfully from " + from_workspace_name + " to " + to_workspace_name + " .");
             $scope.$apply(function () {
@@ -1158,6 +1111,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             console.log("select a workspace first");
             return;
         }
+
+        $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.token);
 
         var ws_objects = {};
         var max_simultaneous = 10;
@@ -1200,11 +1155,6 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                     else if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n].hasOwnProperty("object_id") === true) {
                         console.log($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]);
 
-                        if (!$scope.workspace_service) {
-                            $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.token);        
-                        }
-
-                
                         $scope.workspace_service.get_object_info([{"name": $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_id"], "workspace": $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["workspace_name"]}])
                             .fail(function (xhr, status, error) {
                                 console.log(xhr);
