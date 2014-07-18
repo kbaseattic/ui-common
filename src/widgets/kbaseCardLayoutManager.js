@@ -1122,7 +1122,7 @@
                                      "showDomains", 
                                      "showOperons", 
                                      "showBiochemistry", 
-                                     "showStructureMatches"
+                                     "showStructureMatches",
                                      "showSpecElement", 
                                      "showMemeMotif", 
                                      "showMemeRunParameters", 
