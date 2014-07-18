@@ -17,29 +17,29 @@
             objVer: null,
             loadingImage: "assets/img/loading.gif",
             kbCache:{},         
-            width:900           
+            width:900,
+            SEEDTree:[]           
         },
         
         objName:"",
         wsName:"",
 
-        SEEDTree : [], 
 
         /**
          * Initialize the widget.
          */
 
         init: function(options) {
-            this._super(options);
-            var self = this;            
+            this._super(options);          
+
+            var SEEDTree = this.options.SEEDTree;
 
             var obj = {"ref" : this.options.wsNameOrId + "/" + this.options.objNameOrId };
             
-
             var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
         
             $.when(prom).fail($.proxy(function(error) {
-                this.renderError(error);
+                //this.renderError(error); Need to define this function when I have time
                 console.log(error);
             }, this));
 
@@ -56,7 +56,7 @@
                 */
                 var subsysToGeneMap = [];
 
-                genome["data"]["features"].forEach( function(f){
+                genomeObj.features.forEach( function(f){
 
                     // Each function can have multiple genes, creating mapping of function to list of gene ids
                     if (subsysToGeneMap[f["function"]] === undefined) {subsysToGeneMap[f["function"]] = [];}
@@ -67,20 +67,30 @@
                     SEEDTree.count++; 
                 });
 
-                
+
             }, this));
 
-            self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>Finding SEED functions for this genome...</center></p></div>');
-            self.$elem.append('<div id="mainview">');
 
+            this.render();
 
-            //self.$elem.find('#loading-mssg').remove();
             return this;
         },
 
-
         getData: function() {
             return {title:"SEED Functional Categories :",id:this.objName, workspace:this.wsName};
+        },
+
+        render: function() {
+            var margin = {top: 30, right: 20, bottom: 30, left: 20},
+                width = 960 - margin.left - margin.right;
+
+            this.$elem.append('<div id="mainview">');
+
+            var svg = d3.select("#mainview").append("svg")
+                        .attr("width", width + margin.left + margin.right)
+                        .append("g")
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
         }
 
     });
