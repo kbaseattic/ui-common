@@ -73,11 +73,12 @@
                     SEEDTree.count++; 
                 });
 
+                this.loadSEEDHierarcy();
 
             }, this));
 
             this.render();
-            this.loadSEEDHierarcy();
+            
 
             return this;
         },
@@ -107,16 +108,29 @@
             var ontologyDepth = 4; //this should be moved up to the global variables
             var nodeMap = {};
 
+            var SEEDTree = this.SEEDTree;
+            var subsysToGeneMap = this.subsysToGeneMap;
+
             d3.text("assets/data/subsys.txt", function(text) {
                 var data = d3.tsv.parseRows(text);
                 console.log("Lines: " + data.length);
 
                 for (i = 0; i < data.length; i++) {
+                    var geneCount = 0;
+
+                    if (subsysToGeneMap[data[i][3]] === undefined) {
+                        //continue;
+                    } else {
+                      geneCount = subsysToGeneMap[data[i][3]].length;
+                      console.log("Count: " + geneCount);
+                    }
+                    SEEDTree.count += geneCount;
 
                     for (j = 0; j < ontologyDepth; j++) {
 
                     }
                 }
+                console.log("Genes in SEED hierarchy: " + SEEDTree.count);
             });
 
         },
