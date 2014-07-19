@@ -160,10 +160,10 @@
             $maindiv.append('<table cellpadding="0" cellspacing="0" border="0" id="ref-table" \
                             class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>');
 
-            var sDom = 't<flip>'
+            var sDom = 't<fip>'
             if (self.narList.length<=10) { sDom = 'ti'; }
             var tblSettings = {
-            			"sPaginationType": "full_numbers",
+            			//"sPaginationType": "full_numbers",
             			"iDisplayLength": 10,
                                 "sDom": sDom,
             			"aoColumns": [

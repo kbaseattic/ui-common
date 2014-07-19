@@ -1293,10 +1293,12 @@
 
         
         showTaxonomyCards: function() {
+            
+            
             this.addNewCard("KBaseTaxonOverview",
                     {
-            		taxon: this.options.data.taxonname,
-            		wsNameOrID: this.options.data.ws,
+                        taxon: this.options.data.taxonname,
+                        wsNameOrID: this.options.data.ws,
                         kbCache: this.options.data.kbCache,
                         loadingImage: this.options.loadingImage,
                     },
@@ -1306,6 +1308,9 @@
                         of: "#app"
                     }
                 );
+            if (this.options.data.ws) {
+                // add other taxa specific cards here
+            }
             return this;
         },
         
