@@ -195,7 +195,7 @@
             console.log("Z: " + this.SEEDTree.children.length);
             console.log("N: " + nodes.length);
 
-            var scale = d3.scale.linear().domain([0,400]).range([0,290]);
+            var scale = d3.scale.linear().domain([0,560]).range([0,290]);
             var height = Math.max(500, nodes.length * self.barHeight + self.margin.top + self.margin.bottom);
             var i = self.i;
             d3.select("svg").transition()

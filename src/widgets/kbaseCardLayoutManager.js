@@ -796,7 +796,7 @@
                     of: "#app"
                 }
             );
-	}
+	       }
 
 	//shows taxonomic lineage for this genome
           /*      this.addNewCard("KBaseGenomeLineage",
@@ -864,6 +864,24 @@
                     }
                 );
             }
+
+            // SEED Funcitons card
+            if (this.options.data.workspaceID) {
+                this.addNewCard("KBaseSEEDFunctions",
+                    {
+                        wsNameOrId: this.options.data.workspaceID,
+                        objNameOrId: this.options.data.genomeID,
+                        objVer: null,
+                        kbCache: this.options.data.kbCache
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom+870",
+                        of: "#app"
+                    }
+                );
+            }
+
             
             
             return this;
