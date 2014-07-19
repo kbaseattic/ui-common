@@ -105,7 +105,7 @@
 					    if (name == self.objName) {
 						var objInfo = data[i]['info'];
 						var savedate = new Date(objInfo[3]);
-						var narName = niceName + " ("+objInfo[6]+"/"+objInfo[0]+"/"+objInfo[4]+")";
+						var narName = '<a target="_blank" href="/narrative/ws.'+objInfo[6]+'.obj.'+objInfo[0]+'">'+niceName + "</a> ("+objInfo[6]+"/"+objInfo[0]+"/"+objInfo[4]+")";
 					        self.narList.push({
 						    name:narName,
 						    details:"last edited by "+objInfo[5]+" on "+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()
@@ -113,7 +113,6 @@
 					        continue; // we found the narrative, no need to do anything else...
 					    }
 				        }
-				       
 				    }
 			        }
 				if (self.narList.length > 0) {
@@ -161,10 +160,10 @@
             $maindiv.append('<table cellpadding="0" cellspacing="0" border="0" id="ref-table" \
                             class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>');
 
-            var sDom = 't<flip>'
+            var sDom = 't<fip>'
             if (self.narList.length<=10) { sDom = 'ti'; }
             var tblSettings = {
-            			"sPaginationType": "full_numbers",
+            			//"sPaginationType": "full_numbers",
             			"iDisplayLength": 10,
                                 "sDom": sDom,
             			"aoColumns": [

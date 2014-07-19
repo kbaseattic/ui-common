@@ -400,6 +400,18 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/objects/ws-obj-graph-centered-view.html',
           controller: 'WsObjGraphCenteredView'
         });
+        
+    $stateProvider
+        .state('taxonomyoverview', {
+          url: "/taxon/:taxonname",
+          templateUrl: 'views/objects/taxonomy.html',
+          controller: 'Taxonomy'
+        })
+        .state('taxonomyinws', {
+          url: "/taxon/:taxonname/:ws",
+          templateUrl: 'views/objects/taxonomy.html',
+          controller: 'Taxonomy'
+        });
       
              
     $stateProvider
@@ -421,6 +433,11 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/landing-pages-help.html',
              controller: LPHelp});
 */
+    $stateProvider
+    	.state('tree',
+    		{url: '/tree/:ws/:id',
+    		templateUrl: 'views/objects/tree.html',
+    		controller: 'TreeDetail'});
 
     $urlRouterProvider.when('', '/login/');
 

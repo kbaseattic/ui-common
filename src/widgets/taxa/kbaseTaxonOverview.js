@@ -4,78 +4,126 @@
  */
 (function( $, undefined ) {
     $.KBWidget({
-        name: "KBaseWikiDescription",
+        name: "KBaseTaxonOverview",
         parent: "kbaseWidget",
         version: "1.0.0",
 
         options: {
-            genomeID: null,
-            workspaceID: null,
+            taxon: null,
+            wsNameOrID: null,
             kbCache: null,
-            title: "Description",
-            maxNumChars: 500,
-            width: 500,
-            loadingImage: null
+            title: "Taxon Overview",
+            maxNumChars: 2000,
+            width: 1000,
+            loadingImage: null,
+            wsDisplayName: "taxonomy",
+            taxonDisplayName: ""
         },
 
-        cdmiURL: "https://kbase.us/services/cdmi_api",
-
+        wsUrl : "https://kbase.us/services/ws",
+        ws : null,
+        
         init: function(options) {
             this._super(options);
-
-            if (this.options.featureID === null) {
-                //throw an error.
-                return this;
-            }
+            var self = this;
+            
+            if (self.options.wsNameOrID) { self.options.wsDisplayName = self.options.wsNameOrID; }
+            self.options.taxonDisplayName = self.options.taxon.replace(/_/g, ' ');
+            
             this.$messagePane = $("<div/>")
                                 .addClass("kbwidget-message-pane")
                                 .addClass("kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
-
-            this.cdmiClient = new CDMI_API(this.cdmiURL);
-            this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
-
-            if (this.options.workspaceID) {
-                this.renderWorkspace();
-            }
-            else
-                this.render();
-            return this;
-        },
-
-        render: function() {
             this.showMessage("<img src='" + this.options.loadingImage + "'/>");
-
-            /*
-             * A couple nested callbacks here.
-             * 1. Run genomes_to_taxonomies
-             * 2. Deal with the taxonomy structure and send it to scrape_first_hit
-             * 3. Print out the output.
-             */
-
-            if (this.options.genomeID === null) {
-                // make an error.
-                this.renderError("Error: no genome identifier given!");
-                return;
+            
+            this.$elem.append('<table cellpadding="5" cellspacing="2" border=0 style="width:100%;">' +
+                              '<tr><td style="vertical-align:top"><div id="taxondescription"></td>'+
+                              '<td style="vertical-align:top"><div id="taxonimage" style="width:400px;"></td></tr><br>');
+            
+            // show the taxonomy information
+            this.renderFromTaxonomy([options.taxon]);
+            
+            if (self.options.wsNameOrID) {
+                
+                // add nothing else..
+                self.$elem.append('<br><br><br><br><center><b> related ws object search not functional yet </b></center><br><br><br><br>');
+                
+            } else {
+                // get the ws client
+                if (self.options.kbCache.ws_url) { self.wsUrl = self.options.kbCache.ws_url; }
+                if (self.options.kbCache.token) { self.ws = new Workspace(self.wsUrl, {token: self.options.kbCache.token}); }
+                else { self.ws = new Workspace(self.wsUrl); }
+                
+                //get the ws selector information
+                self.$elem.append('<br><h4>Select a Workspace to view data associated with this taxon:</h4><div id="taxonmywstitle></div>');
+                if (self.options.kbCache.token) {
+                    self.$elem.append('<div id="taxonwsselectoruser">');
+                    self.$elem.append('<br><br>');
+                    self.$elem.append('<br><h4>Or select a public workspace:</h4>');
+                    self.$elem.append('<div id="taxonwsselectorglobal">');
+                    self.showWsSelector({excludeGlobal:1},this.$elem.find('#taxonwsselectoruser'), "#/taxon/"+self.options.taxon+"/");
+                } 
+                self.$elem.append('<div id="taxonwsselectorglobal">');
+                self.showWsSelector({excludeGlobal:0},this.$elem.find('#taxonwsselectorglobal'), "#/taxon/"+self.options.taxon+"/");
             }
-
-            // step 1: get the taxonomy
-            this.cdmiClient.genomes_to_taxonomies([this.options.genomeID], 
-                $.proxy(function(taxonomy) {
-                    taxonomy = taxonomy[this.options.genomeID];
-                    if (taxonomy) {
-                        this.renderFromTaxonomy(taxonomy.reverse());
-                    }
-                    else {
-                        this.renderError("Genome '" + this.options.genomeID + "' not found in the KBase Central Store.");
-                    }
-                }, this),
-
-                this.renderError
-            );
-
             return this;
         },
+
+        
+        showWsSelector: function(listWsParams, outputDiv, urlbase) {
+            var self = this;
+            
+            self.ws.list_workspace_info(listWsParams,
+                function(data) {
+                    var wsdata = [];
+                    for(var k=0; k<data.length; k++) {
+                        //0: ws_id, 1: ws_name, 2: owner, 3: moddate, 4: n_object, 5: user_permission, 6: globalread,7: lockstat, 8:  metadata
+                        var moddate = new Date(data[k][3]);
+                        var perm = "read";
+                        if (data[k][5]=="n") {
+                            perm = self.permLookup[data[k][6]];
+                        } else {
+                            perm = self.permLookup[data[k][5]];
+                        }
+                        wsdata.push({
+                            name: '<a href="'+urlbase + data[k][1]+'">'+data[k][1]+"</a> ("+data[k][0]+")",
+                            owner: data[k][2],
+                            size: data[k][4],
+                            details: "last modified on "+ self.monthLookup[moddate.getMonth()]+" "+moddate.getDate()+", "+moddate.getFullYear() +
+                                     "; you have "+perm+" access to this workspace"
+                        })
+                    }
+                    
+                    var sDom = 't<fip>'
+                    if (wsdata.length<=5) { sDom = 'tfi'; }
+            	    var tblSettings = {
+            				//"sPaginationType": "full_numbers",
+            				"iDisplayLength": 5,
+                                        "sDom": sDom,
+            				"aoColumns": [
+            				              {sTitle: "WS Name (id)", mData: "name", sWidth:"150"},
+            				              {sTitle: "Owner", mData: "owner"},
+            				              {sTitle: "Size", mData: "size"},
+            				              {sTitle: "Details", mData: "details"}
+            				              ],
+            				              "aaData": wsdata
+            	    };
+                    // probably there is a better way to do this in jquery
+                    var tblid = self.uid();
+                    outputDiv.append('<table cellpadding="0" cellspacing="0" border="0" id="'+tblid+'"  \
+                            class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>')
+                    self.$elem.find("#"+tblid).dataTable(tblSettings);
+                },
+                function(error) {
+                    // do nothing, but log the error
+                    console.error("Error when getting a list of workspaces");
+                    console.error(error);
+                }
+                
+            )
+        },
+        
+        
 
         /**
          * Needs to be given in reverse order. Calling function should handle
@@ -86,12 +134,14 @@
          * This will try to fetch wiki content for the first valid name in that list.
          */
         renderFromTaxonomy: function(taxonomy) {
+            var self = this;
             var searchTerms = taxonomy;
-            var strainName = taxonomy[0];
+            var firstTerm = taxonomy[0];
 
             this.dbpediaLookup(searchTerms, $.proxy(
                 function(desc) {
                     // If we've found something, desc.description will exist and be non-null
+                    
                     if (desc.hasOwnProperty('description') && desc.description != null) {
                         if (desc.description.length > this.options.maxNumChars) {
                             desc.description = desc.description.substr(0, this.options.maxNumChars);
@@ -118,14 +168,14 @@
                         var descStr = "<p style='text-align:justify;'>" + desc.description + "</p>"
 
                         var descHtml;
-                        if (strainName === desc.redirectFrom) {
-                            descHtml = this.redirectHeader(strainName, desc.redirectFrom, desc.searchTerm) + descStr + this.descFooter(desc.wikiUri);
+                        if (firstTerm === desc.redirectFrom) {
+                            descHtml = this.redirectHeader(firstTerm, desc.redirectFrom, desc.searchTerm) + descStr + this.descFooter(desc.wikiUri);
                         }
-                        else if (desc.searchTerm === strainName) {
+                        else if (desc.searchTerm === firstTerm) {
                             descHtml = descStr + this.descFooter(desc.wikiUri);
                         }
                         else {
-                            descHtml = this.notFoundHeader(strainName, desc.searchTerm, desc.redirectFrom) + descStr + this.descFooter(desc.wikiUri);
+                            descHtml = this.notFoundHeader(firstTerm, desc.searchTerm, desc.redirectFrom) + descStr + this.descFooter(desc.wikiUri);
                         }
 
                         var imageHtml = "Unable to find an image. If you have one, you might consider <a href='" + desc.wikiUri + "' target='_new'>adding it to Wikipedia</a>.";
@@ -137,79 +187,21 @@
                         }
                     }
                     else {
-                        descHtml = this.notFoundHeader(strainName);
+                        descHtml = this.notFoundHeader(firstTerm);
                     }
-
 
                     var descId = this.uid();
                     var imageId = this.uid();
+                    self.$elem.find("#taxondescription").append(descHtml);
+                    self.$elem.find("#taxonimage").append(imageHtml);
+                    
+                    this.$elem.append('<div id="taxondescription">');
+                    this.$elem.append('<div id="taxonimage" style="width:400px;">');
 
-
-                    var $contentDiv = $("<div />")
-                                      .addClass("tab-content")
-                                      .append($("<div />")
-                                              .attr("id", descId)
-                                              .addClass("tab-pane fade active in")
-                                              .append(descHtml)
-                                      )
-                                      .append($("<div />")
-                                              .attr("id", imageId)
-                                              .addClass("tab-pane fade")
-                                              .append(imageHtml)
-                                      );
-
-                    var $descTab = $("<a />")
-                                     .attr("href", "#" + descId)
-                                     .attr("data-toggle", "tab")
-                                     .append("Description");
-
-                    var $imageTab = $("<a />")
-                                     .attr("href", "#" + imageId)
-                                     .attr("data-toggle", "tab")
-                                     .append("Image");
-
-                    var $tabSet = $("<ul />")
-                                  .addClass("nav nav-tabs")
-                                  .append($("<li />")
-                                          .addClass("active")
-                                          .append($descTab)
-                                         )
-                                  .append($("<li />")
-                                          .append($imageTab)
-                                         );
-
-                    this.hideMessage();
-                    this.$elem.append($tabSet).append($contentDiv);            
+                    this.hideMessage();         
                 }, this), 
                 $.proxy(this.renderError, this)
             );
-        },
-
-        renderWorkspace: function() {
-            this.showMessage("<img src='" + this.options.loadingImage + "'>");
-            var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
-            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-
-            // if it fails, error out!
-            $.when(prom).fail($.proxy(function(error) {
-                this.renderError(error);
-            }, this));
-            // if it succeeds, grab the taxonomy (or at least the scientific name) and roll out.
-            $.when(prom).done($.proxy(function(genome) {
-                genome = genome[0];
-
-                var tax = genome.data.taxonomy;
-                var taxList = [];
-                var nameTokens = genome.data.scientific_name.split(/\s+/);
-                for (var i=nameTokens.length; i>0; i--) {
-                    taxList.push(nameTokens.slice(0, i).join(' '));
-                }
-                if (taxList && taxList !== "Unknown") {
-                    // parse the taxonomy, however it's munged together. semicolons, i think?
-                    taxList = taxList.concat(tax.split(/\;\s*/).reverse());
-                }
-                this.renderFromTaxonomy(taxList);
-            }, this));
         },
 
         buildObjectIdentity: function(workspaceID, objectID) {
@@ -227,14 +219,6 @@
             return obj;
         },
 
-
-        uid: function() {
-            var id='';
-            for(var i=0; i<32; i++)
-                id += Math.floor(Math.random()*16).toString(16).toUpperCase();
-            return id;
-        },
-
         descFooter: function(wikiUri) {
             return "<p>[<a href='" + wikiUri + "'' target='_new'>more at Wikipedia</a>]</p>";
         },
@@ -243,7 +227,7 @@
             var underscoredName = strainName.replace(/\s+/g, "_");
             var str = "<p><b><i>" +
                       strainName + 
-                      "</i> not found. You can start a new page for this genome on <a href='http://en.wikipedia.org/wiki/" + 
+                      "</i> description not found. You can start a new page for this taxon on <a href='http://en.wikipedia.org/wiki/" + 
                       underscoredName + 
                       "' target='_new'>Wikipedia</a>.</b></p>";
             if (term) {
@@ -282,20 +266,18 @@
         
         getData: function() {
             return {
-                type: "Description",
-                id: this.options.genomeID,
-                workspace: this.options.workspaceID,
-                title: "Organism Description"
+                id: this.options.taxonDisplayName,
+                workspace: this.options.wsDisplayName,
+                title: this.options.title
             };
         },
 
         renderError: function(error) {
-            errString = "Sorry, an unknown error occurred";
+            errString = "An unknown error occurred in fetching the taxon information.";
             if (typeof error === "string")
                 errString = error;
             else if (error && error.error && error.error.message)
                 errString = error.error.message;
-
             
             var $errorDiv = $("<div>")
                             .addClass("alert alert-danger")
@@ -303,15 +285,15 @@
                             .append("<br>" + errString);
             this.$elem.empty();
             this.$elem.append($errorDiv);
+            console.error(error);
         },
 
         dbpediaLookup: function(termList, successCallback, errorCallback, redirectFrom) {
             if (!termList || Object.prototype.toString.call(termList) !== '[object Array]' || termList.length === 0) {
                 if (errorCallback) {
-                    errorCallback("No search term given");
+                    errorCallback("No taxon name given.");
                 }
             }
-
             var searchTerm = termList.shift();
             var usTerm = searchTerm.replace(/\s+/g, '_');
 
@@ -325,7 +307,6 @@
 
             var requestUrl = 'http://dbpedia.org/data/' + usTerm + '.json';
             $.get(requestUrl).then($.proxy(function(data, status) {
-
                 var processedHit = {
                     'searchTerm' : searchTerm
                 };
@@ -367,8 +348,11 @@
                 else {
                     if (termList.length > 0) {
                         this.dbpediaLookup(termList, successCallback, errorCallback);
+                    } else {
+                        errorCallback("Could not find information for "+searchTerm);
                     }
                 }
+                
                 return processedHit;
             }, this),
             function(error) {
@@ -376,5 +360,18 @@
                     errorCallback(error);
             });
         },
+        uid: function() {
+            var id='';
+            for(var i=0; i<32; i++)
+                id += Math.floor(Math.random()*16).toString(16).toUpperCase();
+            return id;
+        },
+        monthLookup : ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep","Oct", "Nov", "Dec"],
+        permLookup : {
+            a : "administrator privileges and read/write",
+            w : "read/write",
+            r : "read only",
+            n : "no"
+        }
     })
 })( jQuery );

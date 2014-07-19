@@ -71,12 +71,12 @@
 											return;											
 										}
 										else {
-											var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+self.pubmedQuery.replace(/\s+/g, "+")
+											var query = self.pubmedQuery
 											self.trigger("showLitWidget", 
 												{ 
 												literature: query, 
-												workspaceId: self.options.workspaceID,
-												genomeId: self.options.genomeID,
+												workspaceID: self.options.workspaceID,
+												genomeID: self.options.genomeID,
 												kbCache: self.options.kbCache,
 												event: event,
 												}
