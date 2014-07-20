@@ -15,11 +15,16 @@
             title: "Taxon Overview",
             maxNumChars: 2000,
             width: 1000,
+	    height: 500,
             loadingImage: null,
             wsDisplayName: "taxonomy",
             taxonDisplayName: ""
         },
 
+	
+	selectedTerm: "",
+	
+	
         wsUrl : "https://kbase.us/services/ws",
         ws : null,
         
@@ -29,7 +34,8 @@
             
             if (self.options.wsNameOrID) { self.options.wsDisplayName = self.options.wsNameOrID; }
             self.options.taxonDisplayName = self.options.taxon.replace(/_/g, ' ');
-            
+            self.selectedTerm = self.options.taxon.replace(/_/g,' ');
+	    
             this.$messagePane = $("<div/>")
                                 .addClass("kbwidget-message-pane")
                                 .addClass("kbwidget-hide-message");
@@ -46,8 +52,13 @@
             if (self.options.wsNameOrID) {
                 
                 // add nothing else..
-                self.$elem.append('<br><br><br><br><center><b> related ws object search not functional yet </b></center><br><br><br><br>');
+                self.$elem.append('<br><br><br><div id="taxondatadiv"></div>');
                 
+		if (options.wsUrl) { self.wsUrl = options.wsUrl; }
+		if (self.options.kbCache.ws_url) { self.wsUrl = self.options.kbCache.ws_url; }
+		if (self.options.kbCache.token) { self.ws = new Workspace(self.wsUrl, {token: self.options.kbCache.token}); }
+		else { self.ws = new Workspace(self.wsUrl); }
+		
             } else {
                 // get the ws client
                 if (self.options.kbCache.ws_url) { self.wsUrl = self.options.kbCache.ws_url; }
@@ -69,10 +80,127 @@
             return this;
         },
 
+ 
         
+	
+	renderTaxonRelatedDataList : function() {
+	    var self = this;
+	    
+	    var contigsDivHTML = '<div id="contigdata"><h4>Related Contig Sequence Data</h4></div><br>';
+	    var genomeDivHTML = '<div id="genomedata"><h4>Related Genome and Gene Annotation Data</h4></div><br>';
+	    var fbamodelDivHTML = '<div id="fbamodeldata"><h4>Related Metabolic Model Data</h4></div><br>';
+	    var fbaResultDivHTML = '<div id="fbaresultdata"><h4>Related Flux Balance Analysis Results</h4></div><br>';
+	    
+	    self.$elem.find("#taxondatadiv")
+		.append(contigsDivHTML)
+		.append(genomeDivHTML)
+		.append(fbamodelDivHTML)
+		.append(fbaResultDivHTML);
+		
+	    // this kicks off the rest of the rendering
+	    self.renderRelatedGenomesTable();
+	},
+	
+	renderRelatedGenomesTable : function () {
+	    var self = this;
+            var genomeTypeName = "KBaseGenomes.Genome"; var genomePaths =["/scientific_name","/taxonomy"];
+	    var listObjParams = { includeMetadata:0, type:genomeTypeName};
+	    if (/^\d+$/.exec(self.options.wsNameOrID))
+	       listObjParams['ids'] = [ self.options.wsNameOrID ];
+	    else
+	       listObjParams['workspaces'] = [ self.options.wsNameOrID ];
+	    self.ws.list_objects( listObjParams, function(data) {
+		if (data.length>0) {
+		    var genomeList = [];
+		    for(var i = 0; i < data.length; i++) {
+		       //0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
+		       genomeList.push({ref:data[i][6]+"/"+data[i][0]+"/"+data[i][4],included:genomePaths});
+		   }
+		   // then we get subdata containing the data dependencies
+		   if (genomeList.length>0) {
+		       self.ws.get_object_subset(genomeList, function(data) {
+			    var genomeData = [];
+			    for(var i = 0; i < data.length; i++) {
+			        var sciName = data[i]['data']['scientific_name'];
+		        	var taxonomy = data[i]['data']['taxonomy'];
+				    
+				if(sciName.slice(0, self.selectedTerm.length).toLowerCase() === self.selectedTerm.toLowerCase() ) {
+				    genomeData.push({
+					name:'<a href="#/genomes/'+self.options.wsNameOrID+'/'+data[i]['info'][1]+'">' +
+					     data[i]['info'][1]+'</a> ('+data[i]['info'][6]+'/'+data[i]['info'][0]+'/'+data[i]['info'][4]+')',
+					sciname:sciName,
+					taxonomy:taxonomy
+				    });
+				} else {
+				    var taxaList = taxonomy.trim().split(',');
+				    for(var t=0; t<taxaList.length; t++) {
+					if(taxaList[t].toLowerCase() === self.selectedTerm.toLowerCase()) {
+					    genomeData.push({
+						name:'<a href="#/genomes/'+self.options.wsNameOrID+'/'+data[i]['info'][1]+'">' +
+						     data[i]['info'][1]+'</a> ('+data[i]['info'][6]+'/'+data[i]['info'][0]+'/'+data[i]['info'][4]+')',
+						sciname:sciName,
+						taxonomy:taxonomy
+					    });
+					}
+				    }
+				}
+			    }
+			    self.renderGenomeTable(genomeData);
+			    
+			},
+			function(err) {
+			    self.$elem.append("<br><b>Error: Could not access data for this object.</b><br>");
+			    self.$elem.append("<i>Error was:</i><br>"+err['error']['message']+"<br>");
+			    console.error("Error in finding narratives!");
+			    console.error(err);
+			});
+		   } else {
+		       // no nars here, render now!
+			self.$elem.append("<br><b>There are no narratives that are using this data object.</b>");
+		   }
+	        } else {
+		    self.$elem.append("<br><b>There are no narratives that are using this data object.</b>");
+	        }
+	    },
+	    function(err) {
+		self.$elem.append("<br><b>Error: Could not access data for this object.</b><br>");
+		self.$elem.append("<i>Error was:</i><br>"+err['error']['message']+"<br>");
+		console.error("Error in finding narratives!");
+		console.error(err);
+	    });
+	    
+	    
+	},
+	
+	
+	renderGenomeTable: function(genomeData) {
+	    var self = this;
+	    var sDom = 't<fip>'
+            if (genomeData.length<=5) { sDom = 'tfi'; }
+            var tblSettings = {
+            				//"sPaginationType": "full_numbers",
+            				"iDisplayLength": 5,
+                                        "sDom": sDom,
+            				"aoColumns": [
+            				              {sTitle: "Scientific Name", mData: "sciname"},
+            				              {sTitle: "Genome WS Name (id)", mData: "name"},
+            				              {sTitle: "Taxonomy", mData: "taxonomy"}
+            				              ],
+            				              "aaData": genomeData
+            };
+                    // probably there is a better way to do this in jquery
+            var tblid = self.uid();
+            self.$elem.find("#genomedata").append('<table cellpadding="0" cellspacing="0" border="0" id="'+tblid+'"  \
+                    class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>')
+            self.$elem.find("#"+tblid).dataTable(tblSettings);
+	    self.$elem.find("#genomedata").append("<br><br>");
+               
+	},
+	
+	
         showWsSelector: function(listWsParams, outputDiv, urlbase) {
             var self = this;
-            
+	    
             self.ws.list_workspace_info(listWsParams,
                 function(data) {
                     var wsdata = [];
@@ -122,8 +250,6 @@
                 
             )
         },
-        
-        
 
         /**
          * Needs to be given in reverse order. Calling function should handle
@@ -198,7 +324,10 @@
                     this.$elem.append('<div id="taxondescription">');
                     this.$elem.append('<div id="taxonimage" style="width:400px;">');
 
-                    this.hideMessage();         
+                    this.hideMessage();
+		    
+		    // only render related objects once we have found the taxon data (so we know what is actually showing)
+		    self.renderTaxonRelatedDataList();
                 }, this), 
                 $.proxy(this.renderError, this)
             );
@@ -224,6 +353,7 @@
         },
 
         notFoundHeader: function(strainName, term, redirectFrom) {
+	    var self = this;
             var underscoredName = strainName.replace(/\s+/g, "_");
             var str = "<p><b><i>" +
                       strainName + 
@@ -238,17 +368,21 @@
                     str += "<br>redirected from <i>" + redirectFrom + "</i>";
                 }
                 str += "</p>";
+		
+		self.selectedTerm = term.replace(/_/g,' ');
             }
             return str;
         },
 
         redirectHeader: function(strainName, redirectFrom, term) {
+	    var self = this;
             var underscoredName = redirectFrom.replace(/\s+/g, "_");
             var str = "<p><b>" +
                       "Showing description for <i>" + term + "</i></b>" +
                       "<br>redirected from <i>" + underscoredName + "</i>" +
                       "</p>";
 
+	    self.selectedTerm = term.replace(/_/g,' ');
             return str;
         },
 
