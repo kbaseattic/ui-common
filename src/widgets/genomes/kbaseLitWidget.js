@@ -95,10 +95,13 @@
 			function parseLitSearchDataTable(query) {
 				var tableInputRow = {}
 					
-				$.get(query,
+				$.ajax({
+					async: false,
+					url: query,
+					type: 'GET',
+					success:
 					function(data) {
 						var htmlJson = self.xmlToJson(data)
-						
 						var litInfo = htmlJson.eSummaryResult[1].DocSum.Item
 						// if (data[0].length == 0) {
 								// self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
@@ -122,18 +125,23 @@
 									tableInputRow["ti"] = "<a href=" + pubmedLink + " target=_blank>" + litInfo[i]["#text"] + "</a>"
 								}
 							}
-						}				
-						
+						}										
 					}
-				)
+				})
 				return tableInputRow
 			}
 			
 			function populateSearch(lit) {
-				$.get('http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+lit.replace(/\s+/g, "+"),
+
+				$.ajax({
+					async: true,
+					url: 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=100000&term='+lit.replace(/\s+/g, "+"),
+					type: 'GET',
+					success: 
 					function(data) {
 						
 						var htmlJson = self.xmlToJson(data)
+						console.log(htmlJson)
 						if ($.isArray(htmlJson.eSearchResult[1].IdList.Id)) {						
 							
 							for (x=0;x<htmlJson.eSearchResult[1].IdList.Id.length;x++) {
@@ -147,25 +155,23 @@
 							tableInput.push(parseLitSearchDataTable(query))																		
 						}				
 						var sDom = 't<flip>'
-						if (tableInput.length<=10) { sDom = 'tfi'; }
+						if (tableInput.length<=10) { sDom = 'tfi'; }					
+						console.log(tableInput)
+						var tableSettings = {
+							"sPaginationType": "full_numbers",
+							"iDisplayLength": 10,
+							"sDom": sDom,
+							"aoColumns": [
+								{sTitle: "Journal", mData: "jo"},
+								{sTitle: "Authors", mData: "au"},
+								{sTitle: "Title", mData: "ti"}
+							],
+							"aaData": tableInput
+						}	
+						litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
 						
-						setTimeout(function(){						
-							litDataTable = self.$elem.find('#literature-table').dataTable(
-								{
-									"sPaginationType": "full_numbers",
-									"iDisplayLength": 10,
-									"sDom": sDom,
-									"aoColumns": [
-										{sTitle: "Journal", mData: "jo"},
-										{sTitle: "Authors", mData: "au"},
-										{sTitle: "Title", mData: "ti"}
-									],
-									"aaData": tableInput
-								}
-							)
-						},1000);
 					}
-				)
+				})
 			}
 				
 			return this;
