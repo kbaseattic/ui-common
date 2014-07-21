@@ -5,9 +5,10 @@
         <link rel="icon" type="image/x-icon" href="assets/img/KBase_favicon.ico">
 
         <!-- Global KBase css -->
+		
         <link rel="stylesheet" type="text/css" href="../ext/bootstrap/3.0.0/css/bootstrap.css" />
         <link rel="stylesheet" type="text/css" href="../ext/jquery-ui/1.10.3/css/custom-theme/jquery-ui-1.10.0.custom.css"> 
-
+		
         <link rel="stylesheet" type="text/css" href="assets/css/dataTables.bootstrap.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/ws-browser.css" />
         <!--<link rel="stylesheet" type="text/css" href="assets/css/scroll.css" />-->
@@ -22,7 +23,7 @@
 
         <!-- KBase widget css -->
         <link rel="stylesheet" type="text/css" href="../widgets/css/kbaseLandingPageCard.css" />
-
+		<link rel='stylesheet prefetch' href='http://s.cdpn.io/4629/animate.css'>
         <!-- External javascript packages -->
 
 
@@ -79,7 +80,8 @@
 
             checkBrowser();
     	</script>
-
+		
+		<script src='http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js'></script>
         <script src="../ext/jquery/jquery-1.10.2.min.js"></script>
        <!-- <script src="../ext/jquery-migrate/jquery-migrate-1.2.1.js"></script> -->
         <script src="../ext/jquery-ui/1.10.3/js/jquery-ui-1.10.3.custom.min.js"></script>
@@ -157,6 +159,7 @@
         <script  src="../src/widgets/genomes/kbaseGeneDomains.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneOperon.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneBiochemistry.js"></script>
+		<script  src="../src/widgets/genomes/kbaseLitWidget.js"></script>
 
         <script  src="../src/widgets/kbaseCardLayoutManager.js"></script>
         <!-- End Genome widgets -->
@@ -194,9 +197,11 @@
 
         <!-- MAK widgets -->
         <script  src="../src/widgets/mak/kbaseMAKResultCard.js"></script>
+        <script  src="../src/widgets/mak/kbaseMAKTilingCard.js"></script>		
         <script  src="../src/widgets/mak/kbaseMAKBiclusterCard.js"></script>
 		<script  src="../src/widgets/mak/kbaseHeatmapCard.js"></script>
 		<script  src="../src/widgets/mak/kbaseLineChartCard.js"></script>
+		<script  src="../src/widgets/mak/kbaseBarChartCard.js"></script>
         <!-- End MAK widgets -->
 
         <!-- Bambi widgets -->

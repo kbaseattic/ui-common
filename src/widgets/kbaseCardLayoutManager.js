@@ -1020,10 +1020,12 @@
         },
 
         showMAKCards: function() {
+			if (this.options.data.workspaceID === "CDS")
+                this.options.data.workspaceID = null;
                 this.addNewCard("KBaseMAKResultCard",
                         {
                             id: this.options.data.id,
-                            ws: this.options.data.ws,
+                            workspaceID: this.options.data.workspaceID,
                             auth: this.options.auth,
                             userId: this.options.userId,
                             loadingImage: this.options.loadingImage,
@@ -1035,6 +1037,21 @@
                             of: "#app"
                         }
                     );
+				this.addNewCard("KBaseMAKTilingCard",
+						{
+							id: this.options.data.id,
+                            workspaceID: this.options.data.workspaceID,
+                            auth: this.options.auth,
+                            userId: this.options.userId,
+                            loadingImage: this.options.loadingImage,
+                            isInCard: true
+						},
+						{
+							my: "right bottom",
+                            at: "left bottom",
+                            of: "#app"
+						}
+					);
                 return this;
         },
 
@@ -1140,8 +1157,67 @@
                                      "showBambiRunParameters", 
                                      "showBambiRawOutput",
 									 "showHeatMap",
-									 "showLineChart"];
-									 
+									 "showLineChart",
+									 "showLitWidget",
+									 "showBarChart"];
+				
+			/**
+             * Event: showBarChart
+             * ------------------
+             * Adds new kbaseMAKBarChart card.
+             */	
+			$(document).on("showBarChart", function(event, data) {
+				console.log(data)
+				self.addNewCard("KBaseBarChartCard",
+					{
+						terms: data.terms,
+					},
+					{
+						my: "left",
+						at: "right bottom",
+						of: "#app"
+				});
+
+			});				
+			
+			/**
+             * Event: showLitWidget
+             * ------------------
+             * Adds new kbaseLitWidget card.
+             */			
+			$(document).on("showLitWidget", function(event, data) {
+				self.addNewCard("KBaseLitWidget",
+					{
+						literature: data.literature,
+                        loadingImage: self.options.loadingImage,
+					},
+					{
+						my: "right top",
+						at: "right+800 bottom",
+						of: data.event
+				});
+
+			});
+			
+			/**
+             * Event: showLineChart
+             * ------------------
+             * Adds new kbaseLineChart card.
+             */
+			$(document).on("showLineChart", function(event, data) {
+				self.addNewCard("KBaseLineChartCard",
+					{
+						row: data.row,		
+						heatmap: data.heatmap
+					},
+					{
+						my: "right top",
+						at: "right+800 bottom",
+						of: data.event
+				});
+
+			});
+			
 			/**
              * Event: showHeatMap
              * ------------------
@@ -1684,32 +1760,6 @@
 						of: "#app"
 					}
 					   );
-			});
-				
-			/**
-             * Event: showLineChart
-             * ------------------
-             * Adds new kbaseLineChart card.
-             */
-			$(document).on("showLineChart", function(event, data) {
-
-				if (!$("#linechart").length) {
-					self.addNewCard("KBaseLineChartCard",
-						{
-							row: data.row,		
-							heatmap: data.heatmap
-						},
-						{
-							my: "right top",
-							at: "right+800 bottom",
-							of: data.row
-					});
-				}
-				else {
-					console.log($("#linechart").parent().attr("id"))
-					var linechartID = $("#linechart").parent().attr("id")
-					// $("#linechart").parent().remove()
-				}
 			});
 		
             $(document).on("helloClick", function(event, data) {
