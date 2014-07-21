@@ -87,15 +87,17 @@
 	    var self = this;
 	    
 	    var contigsDivHTML = '<div id="contigdata"><h4>Related Contig Sequence Data</h4></div><br>';
-	    var genomeDivHTML = '<div id="genomedata"><h4>Related Genome and Gene Annotation Data</h4></div><br>';
+	    var genomeDivHTML = '<div id="genomedata"><h4>Related Genome and Gene Annotation Data</h4><div id="genomeloading"><img src="' + this.options.loadingImage + '"/></div></div><br>';
 	    var fbamodelDivHTML = '<div id="fbamodeldata"><h4>Related Metabolic Model Data</h4></div><br>';
 	    var fbaResultDivHTML = '<div id="fbaresultdata"><h4>Related Flux Balance Analysis Results</h4></div><br>';
+	    var panGenomeDivHTML = '<div id="fbaresultdata"><h4>Related Pan-genome Data</h4></div><br>';
 	    
 	    self.$elem.find("#taxondatadiv")
-		.append(contigsDivHTML)
 		.append(genomeDivHTML)
+		.append(contigsDivHTML)
 		.append(fbamodelDivHTML)
-		.append(fbaResultDivHTML);
+		.append(fbaResultDivHTML)
+                .append(panGenomeDivHTML);
 		
 	    // this kicks off the rest of the rendering
 	    self.renderRelatedGenomesTable();
@@ -111,15 +113,19 @@
 	       listObjParams['workspaces'] = [ self.options.wsNameOrID ];
 	    self.ws.list_objects( listObjParams, function(data) {
 		if (data.length>0) {
-		    var genomeList = [];
+		    var genomeList = []; var contigRefs = [];
 		    for(var i = 0; i < data.length; i++) {
 		       //0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
 		       genomeList.push({ref:data[i][6]+"/"+data[i][0]+"/"+data[i][4],included:genomePaths});
 		   }
 		   // then we get subdata containing the data dependencies
+                   if (genomeList.length>150) {
+                        self.$elem.find("#genomeloading").hide();
+			self.$elem.find("#genomedata").append("<br><b>Error: There are too many genomes in the WS to effeciently retrieve related genomes.  This is a temporary indexing bug and will be fixed soon.</b><br>");
+                   }
 		   if (genomeList.length>0) {
 		       self.ws.get_object_subset(genomeList, function(data) {
-			    var genomeData = [];
+			    var genomeData = []; var contigRefInfo = {objId:[],genome:[]};
 			    for(var i = 0; i < data.length; i++) {
 			        var sciName = data[i]['data']['scientific_name'];
 		        	var taxonomy = data[i]['data']['taxonomy'];
@@ -131,6 +137,10 @@
 					sciname:sciName,
 					taxonomy:taxonomy
 				    });
+                                    for(var r=0; r<data[i]['refs'].length; r++) {
+                                        contigRefInfo['objId'].push({ref:data[i]['refs'][r]});
+                                        contigRefInfo['genome'].push(data[i]['info'][1]);
+                                    }
 				} else {
 				    var taxaList = taxonomy.trim().split(',');
 				    for(var t=0; t<taxaList.length; t++) {
@@ -141,35 +151,42 @@
 						sciname:sciName,
 						taxonomy:taxonomy
 					    });
+                                            for(var r=0; r<data[i]['refs'].length; r++) {
+                                                contigRefInfo['objId'].push({ref:data[i]['refs'][r]});
+                                                contigRefInfo['genome'].push(data[i]['info'][1]);
+                                            }
 					}
 				    }
 				}
 			    }
 			    self.renderGenomeTable(genomeData);
-			    
+                            self.$elem.find("#genomeloading").hide();
+                            self.renderContigData(contigRefInfo);
+                            
 			},
 			function(err) {
-			    self.$elem.append("<br><b>Error: Could not access data for this object.</b><br>");
-			    self.$elem.append("<i>Error was:</i><br>"+err['error']['message']+"<br>");
+                            self.$elem.find("#genomeloading").hide();
+			    self.$elem.find("#genomedata").append("<br><b>Error: Could not access data for this object.</b><br>");
+			    self.$elem.find("#genomedata").append("<i>Error was:</i><br>"+err['error']['message']+"<br>");
 			    console.error("Error in finding narratives!");
 			    console.error(err);
 			});
 		   } else {
-		       // no nars here, render now!
-			self.$elem.append("<br><b>There are no narratives that are using this data object.</b>");
+                        self.$elem.find("#genomeloading").hide();
+			self.$elem.find("#genomedata").append("<br><b>There are no genomes in this Workspace that are related to this taxon.</b>");
 		   }
 	        } else {
-		    self.$elem.append("<br><b>There are no narratives that are using this data object.</b>");
+                    self.$elem.find("#genomeloading").hide();
+		    self.$elem.find("#genomedata").append("<br><b>There are no genomes in this Workspace that are related to this taxon.</b>");
 	        }
 	    },
 	    function(err) {
-		self.$elem.append("<br><b>Error: Could not access data for this object.</b><br>");
-		self.$elem.append("<i>Error was:</i><br>"+err['error']['message']+"<br>");
-		console.error("Error in finding narratives!");
+                self.$elem.find("#genomeloading").hide();
+		self.$elem.find("#genomedata").append("<br><b>Error: Could not access data for this object.</b><br>");
+		self.$elem.find("#genomedata").append("<i>Error was:</i><br>"+err['error']['message']+"<br>");
+		console.error("Error in finding genomes!");
 		console.error(err);
 	    });
-	    
-	    
 	},
 	
 	
@@ -194,9 +211,60 @@
                     class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>')
             self.$elem.find("#"+tblid).dataTable(tblSettings);
 	    self.$elem.find("#genomedata").append("<br><br>");
-               
 	},
 	
+        
+        renderContigData: function (contigRefInfo) {
+            var self = this;
+            
+            self.ws.get_object_provenance( contigRefInfo['objId'],
+                function(data) {
+                    var contigData = [];
+		    for(var i = 0; i < data.length; i++) {
+                        contigData.push({
+                                name:  data[i]['info'][1]+' ('+data[i]['info'][6]+'/'+data[i]['info'][0]+'/'+data[i]['info'][4]+")",
+                                ws:  data[i]['info'][7],
+                                genome: contigRefInfo['genome'][i]
+                            });
+                    }
+                    var sDom = 't<fip>'
+                    if (contigData.length<=5) { sDom = 'tfi'; }
+                    var tblSettings = {
+            				//"sPaginationType": "full_numbers",
+            				"iDisplayLength": 5,
+                                        "sDom": sDom,
+            				"aoColumns": [
+            				              //{sTitle: "Scientific Name", mData: "sciname"},
+            				              {sTitle: "Contig Name (id)", mData: "name"},
+            				              {sTitle: "Workspace", mData: "ws"},
+            				              {sTitle: "Referenced by Genome", mData: "genome"}
+            				              ],
+            				              "aaData": contigData
+                    };
+                    var tblid = self.uid();
+                    self.$elem.find("#contigdata").append('<table cellpadding="0" cellspacing="0" border="0" id="'+tblid+'"  \
+                    class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>')
+                    self.$elem.find("#"+tblid).dataTable(tblSettings);
+                    self.$elem.find("#contigdata").append("<br><br>");
+                },
+                function(err) {
+                    self.$elem.find("#contigdata").append("<br><b>Error: Could not access contig data for this object.</b><br>");
+                    self.$elem.find("#contigdata").append("<i>Error was:</i><br>"+err['error']['message']+"<br>");
+                    console.error("Error in finding contigs!");
+                    console.error(err);
+                });
+            
+        },
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 	
         showWsSelector: function(listWsParams, outputDiv, urlbase) {
             var self = this;
