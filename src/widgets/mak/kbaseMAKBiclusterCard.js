@@ -4,11 +4,14 @@
         parent: "kbaseWidget",
         version: "1.0.0",
         options: {
-            // title: "MAK Bicluster",
+            title: "MAK Bicluster",
             isInCard: false,
             width: 600,
             height: 700
        },
+	   
+	   newWorkspaceServiceUrl: "http://dev04.berkeley.kbase.us:7058",
+	   
         init: function(options) {
             this._super(options);
             if (this.options.bicluster === null) {
@@ -21,6 +24,8 @@
                     .addClass("kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
+			this.workspaceClient = new Workspace(this.newWorkspaceServiceUrl, { 'token' : this.options.auth, 'user_id' : this.options.userId});
+			
             return this.render();
         },
         render: function(options) {
@@ -57,19 +62,22 @@
 					    	append("<td>Fraction of missing data</td><td>" + self.bicluster.miss_frxn + "</td>") : '')
 			));
 
-			//Heatmap
+			//Heatmap			
 			
-			var DataTable = ["DataTable", [{"bicluster_id":"kb|bicluster.4314","num_genes":173,"num_conditions":75,"condition_ids":["29","30","37","38","42","44"],"condition_labels":["In-frame deletion mutant for ORF SO3389_WT_stationary anoxic_vs._WT_aerobic mid-log","In-frame deletion mutant for ORF SO3389_WT_aerobic biofilm_vs._WT_aerobic mid-log (planktonic)","In-frame deletion mutant for ORF SO3389_Mutant_stationary anoxic (102 h)_vs._Mutant_mid-log anoxic","In-frame deletion mutant for ORF SO3389_WT_stationary anoxic_vs._WT_10 h into anoxic","Salt:NaCl_0.6_120_vs._0_120","BU0_A_BU0_A_null_vs._mean gene expression in 207 S.oneidensis experiments (M3d v4 Build 2)_null"],"gene_ids":["kb|g.371.peg.362","kb|g.371.peg.180","kb|g.371.peg.1427","kb|g.371.peg.1854","kb|g.371.peg.1241"],"gene_labels":["199208","199336","199412","199413","199414"],"exp_mean":1.2781754203886797,"score":0.9944320883479909,"miss_frxn":-1.0,"data":[[0.847005,0.729055,-1.4168,-1.52138,-1.64155,-1.16694],[0.817856,1.10411,-2.86187,-2.81284,-1.40497,-1.4577],[0.825148,0.807097,-3.23414,-6.40135,-1.5801,-2.97321],[0.856129,0.865829,-1.16332,-0.509081,-1.93448,-2.32617],[0.856129,0.865829,-1.16332,-0.509081,-1.93448,-2.32617]]}]]
-			
-			self.$elem.append($("<div />")
-                    .append("<h3>heatmap</h3>")
-					.append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
+			this.workspaceClient.get_objects([{workspace: "MAKbiclusters", name: "bicluster.4431"}],
+				function(data){
+					console.log(data)
+					self.$elem.append($("<div />")
+							.append("<h3>heatmap</h3>")
+							.append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
 
-			$("#toggle_heatmap").click(function() {
-				self.trigger("showHeatMap", {bicluster: DataTable, event: event})
-                //$("#heatmap").toggle();
-				
-            });
+					$("#toggle_heatmap").click(function() {
+						self.trigger("showHeatMap", {bicluster: data[0].data, event: event})
+						//$("#heatmap").toggle();
+						
+					});
+				}
+			)
 
             //Genes
             self.$elem.append($("<div />")
@@ -77,10 +85,10 @@
 					.append($("<button />").attr('id', 'toggle_genes').addClass("btn btn-default").append("Toggle")));
 
 			$("#toggle_genes").click(function() {
-                $("#gene_list").toggle();
+                $("#gene_list_"+self.bicluster.bicluster_id.replace( /\D+/g, '')).toggle();
             });
-
-            var $genesTable = '<table id="genes-table' + self.bicluster.id + '" class="kbgo-table">';
+			
+            var $genesTable = '<table id="genes-table-' + self.bicluster.bicluster_id.replace( /\D+/g, '') + '" class="kbgo-table">';
             $genesTable += "<tr><th>Gene ID</th><th>Gene label</th></tr>";
 
             for (var i = 0; i < self.bicluster.num_genes; i++) {
@@ -89,7 +97,7 @@
 
             $genesTable += "</table>";
 			
-            self.$elem.append($("<div id='gene_list' style='display:none'/>").append($genesTable));
+            self.$elem.append($("<div id='gene_list_"+self.bicluster.bicluster_id.replace( /\D+/g, '')+"' style='display:none'/>").append($genesTable));
 			
             //Conditions
             self.$elem.append($("<div />")

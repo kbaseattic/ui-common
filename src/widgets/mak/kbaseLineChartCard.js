@@ -24,8 +24,12 @@
 		
 			var self = this;			
 
-			self.$elem.append($("<div id='linechart' style='position:absolute;top:0px;left:0; float:left;'/>"));
+			self.$elem.append($("<div id='linechart'>"));
 			
+			self.tooltip = d3.select("body")
+                             .append("div")
+                             .classed("kbcb-tooltip", true);
+							 
 			var index = self.options.row[3]
 			var values = self.options.row[0],
 				conditions = self.options.row[1],
@@ -34,26 +38,43 @@
 
 			var merged = [].concat.apply([],values)
 			var count = 1
-			var colorbank = ["#003399","#33CC33","#FF9900","#FF0000","#6600FF","#00FFFF","#993333","#000000","#00CC99","#0000FF"]
+			var colorbank = ["#003399","#33CC33","#FF9900","#FF0000","#6600FF","#00FFFF","#993333","#000000","#00CC99","#0000FF","#999966"]
 			var colorScale = d3.scale.quantile()
               .domain([0,gene_label.length-1])
               .range(colorbank);
-			console.log(colorScale(1))
 			var heatmap = self.options.heatmap
-
+			var mean = JSON.parse(JSON.stringify(values[index]))
 			heatmap.on("click",function(d,i) {
 				if (graph.selectAll("#_"+gene_label[i]).empty() && count<=10) {
 					count++
-					lineDrawer(values[i],conditions,gene_label[i],x,y,i)
+					console.log(count)
+					lineDrawer(values[i],conditions,gene_label[i],x,y,i,true)
+					for (m=0;m<mean.length;m++) {
+						mean[m] = mean[m]*(count-1)
+						mean[m] += JSON.parse(JSON.stringify(values[i][m]))
+						mean[m] = mean[m]/count
+					}
 				}
 				else {
 					count--
+					console.log(count)
 					graph.selectAll("#_"+gene_label[i]).remove()
+					for (m=0;m<mean.length;m++) {
+						mean[m] = mean[m]*(count+1)
+						mean[m] -= JSON.parse(JSON.stringify(values[i][m]))
+						if (count>0) mean[m] = mean[m]/count
+					}
+				}
+				console.log(values)
+				if (!graph.selectAll("#_mean").empty()) {graph.selectAll("#_mean").remove()}
+				if (count > 1) {
+					lineDrawer(mean,conditions,"mean",x,y,10,false)
+					graph.selectAll("#_mean").style("stroke-dasharray",(3,3))
 				}
 			})
 
 			var m = [80, 80, 80, 80]; // margins
-			var w = 600 - m[1] - m[3]; // width
+			var w = conditions.length*100 - m[1] - m[3]; // width
 			var h = 400 - m[0] - m[2]; // height
 
 			var graph = d3.select("#linechart")
@@ -76,8 +97,26 @@
 				.attr("transform", "translate(0," + h + ")")
 				.call(xAxis)
 				.selectAll("g.x.axis > g.tick > text")
-				.append("title")
-				.text(function(i) {return conditions[i]})
+				.on("mouseover", 
+                                function(i) { 
+                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
+                                    self.tooltip = self.tooltip.text(conditions[i]);
+                                    return self.tooltip.style("visibility", "visible"); 
+                                }
+                            )
+                         .on("mouseout", 
+                                function() { 
+                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
+                                    return self.tooltip.style("visibility", "hidden"); 
+                                }
+                            )
+                         .on("mousemove", 
+                                function() { 
+                                    return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+                                }
+                            )
+				// .append("title")
+				// .text(function(i) {return conditions[i]})
 			
 			function yAxisMaker(values) {
 			
@@ -93,7 +132,7 @@
 				
 			}
 						
-			function lineDrawer(values,conditions,gene_label,x,y,color_ind) {
+			function lineDrawer(values,conditions,gene_label,x,y,color_ind,drawCircle) {
 			
 				var datadict = []
 
@@ -114,32 +153,72 @@
 						return y(d.value); 
 					})
 					
-				var linePath = graph.append("svg:path")
+				var linePath = graph.selectAll("#_"+gene_label)
+					.data(datadict)
+					.enter()
+					.append("svg:path")
 					.attr("d", line(datadict))
 					.attr("id","_"+gene_label)
 					.style("stroke-width",3)
 					.style("stroke",colorScale(color_ind))
-					.selectAll("#_"+gene_label)
-					.data(datadict)
-					.enter()
-					.append("title")
-					.text(function(d) {return d.gene_label})
-					
-				var circle = [];
-				for (var i = 0; i < datadict.length; i++) {
-					circle[i] = graph.append("svg:circle")
-						.attr("cx",x(i))
-						.attr("cy",y(datadict[i].value))
-						.attr("r",5)
-						.attr("fill",datadict[i].value!=null?colorScale(color_ind):"white")
-						.attr("id","_"+datadict[i].gene_label)
-						.append("title")
-						.text(datadict[i].gene_label)
+					.on("mouseover", 
+                                function(d) { 
+                                    d3.select(this).style("stroke", d3.rgb(d3.select(this).style("stroke")).darker()); 
+                                    self.tooltip = self.tooltip.text(d.gene_label);
+                                    return self.tooltip.style("visibility", "visible"); 
+                                }
+                            )
+                         .on("mouseout", 
+                                function() { 
+                                    d3.select(this).style("stroke", d3.rgb(d3.select(this).style("stroke")).brighter()); 
+                                    return self.tooltip.style("visibility", "hidden"); 
+                                }
+                            )
+                         .on("mousemove", 
+                                function() { 
+                                    return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+                                }
+                            )
+					// .append("title")
+					// .text(function(d) {return d.gene_label})
+				
+				if (drawCircle) {
+					var circle = [];
+					for (var i = 0; i < datadict.length; i++) {
+						circle[i] = graph.append("svg:circle")
+							.attr("cx",x(i))
+							.attr("cy",y(datadict[i].value))
+							.attr("r",5)
+							.attr("fill",datadict[i].value!=null?colorScale(color_ind):"white")
+							.attr("id","_"+datadict[i].gene_label)
+							.on("mouseover", 
+                                function() { 
+                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
+                                    self.tooltip = self.tooltip.text(datadict[i].gene_label);
+                                    return self.tooltip.style("visibility", "visible"); 
+                                }
+                            )
+								 .on("mouseout", 
+										function() { 
+											d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
+											return self.tooltip.style("visibility", "hidden"); 
+										}
+									)
+								 .on("mousemove", 
+										function() { 
+											return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+										}
+									)
+							// .append("title")
+							// .text(datadict[i].gene_label)
+					}
 				}
 			}
 			
 			y = yAxisMaker(merged)
-			lineDrawer(values[index],conditions,gene_label[index],x,y,index)
+			lineDrawer(values[index],conditions,gene_label[index],x,y,index,true)
+
+				
 			return this;
 		},
 		getData: function() {

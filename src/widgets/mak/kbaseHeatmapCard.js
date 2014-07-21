@@ -24,8 +24,11 @@
             var self = this;			
 			self.$elem.append($("<div id='heatmap'>"))
 
-			var datatable = self.options.bicluster[1][0]
-
+			self.tooltip = d3.select("body")
+                             .append("div")
+                             .classed("kbcb-tooltip", true);
+			
+			var datatable = self.options.bicluster
 			var dataflat = 	[]
 			var datadict = []
 			for (var y = 0; y < datatable.data.length; y+=1) {
@@ -39,24 +42,28 @@
 			}
 			
 			var gene_labels_ids = [];
-			for (var y = 0; y < datatable.gene_ids.length; y+=1) {
+			for (var y = 0; y < datatable.row_ids.length; y+=1) {
 				gene_labels_ids.push({
-					"label": datatable.gene_labels[y],
-					"id": datatable.gene_ids[y]
+					"label": datatable.row_labels[y],
+					"id": datatable.row_ids[y]
 				});
 			}
 			
-			var gene_labels = datatable.gene_labels,
-				gene_ids = datatable.gene_ids,
-				conditions = datatable.condition_labels,
+			var gene_labels = datatable.row_labels,
+				gene_ids = datatable.row_ids,
+				conditions = datatable.column_labels,
 				expression = datatable.data;
-				
+			
+			var $heatmapDiv = $("#heatmap");
+
 			var margin = { top: 100, right: 0, bottom: 100, left: 200 },
-			  width = conditions.length*100 - margin.left - margin.right,
-			  height = gene_labels.length*100 - margin.top - margin.bottom,
-			  gridSize = Math.floor(height / 15),
+			  width = 3000 - margin.left - margin.right,
+			  height = 3000 - margin.top - margin.bottom,
+			  gridSize = Math.floor(Math.min(width/conditions.length,width/gene_labels.length)),
 			  legendElementWidth = gridSize*2,
 			  colors = ["#0000ff","#0066ff","#3399ff","#ffffff","#ff9966","#ff6600","#ff0000"]
+			
+			console.log(gridSize)
 			
 			var colorScale = function(d) {
 				if (d > 2.5) return colors[6]
@@ -105,8 +112,26 @@
 					return "translate(10)rotate(-45 "+(i*gridSize)+",0)" ;
 				} )
 				.attr("class", "conditionLabel")
-				.append("title").text(function(d) { return d; })
-						
+				.on("mouseover", 
+                                function(d) { 
+                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
+                                    self.tooltip = self.tooltip.text(d);
+                                    return self.tooltip.style("visibility", "visible"); 
+                                }
+                            )
+                         .on("mouseout", 
+                                function() { 
+                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
+                                    return self.tooltip.style("visibility", "hidden"); 
+                                }
+                            )
+                         .on("mousemove", 
+                                function() { 
+                                    return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+                                }
+                            )
+				//.append("title").text(function(d) { return d; })
+			
 			  var heatMap = svg.selectAll(".gene")
 				  .data(datadict)
 				  .enter().append("rect")
@@ -118,15 +143,26 @@
 				  .attr("width", gridSize)
 				  .attr("height", gridSize)
 				  .style("fill", colors[3])
-				  // .on("mouseover", function(d) {
-						// this.showToolTip(
-							// {
-								// label: "value: "+d.expression+"\ncondition: "+d.cond_label+"\ngene: "+d.gen_label,
-							// }
-						// )
-				  // })
+				  .on("mouseover", 
+                                function(d) { 
+                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
+                                    self.tooltip = self.tooltip.text("value: "+expression[d.gene][d.condition])
+                                    return self.tooltip.style("visibility", "visible"); 
+                                }
+                            )
+                         .on("mouseout", 
+                                function() { 
+                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
+                                    return self.tooltip.style("visibility", "hidden"); 
+                                }
+                            )
+                         .on("mousemove", 
+                                function() { 
+                                    return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+                                }
+                            )
 			  
-			  heatMap.append("title").text(function(d) { return "value: "+expression[d.gene][d.condition]+"\ncondition: "+conditions[d.condition]+"\ngene: "+gene_labels[d.gene]; });
+			  // heatMap.append("title").text(function(d) { return "value: "+expression[d.gene][d.condition]+"\ncondition: "+conditions[d.condition]+"\ngene: "+gene_labels[d.gene]; });
 			  
 			  heatMap.transition().duration(1000)
 				  .style("fill", function(d) { return colorScale(expression[d.gene][d.condition]); });
@@ -137,18 +173,18 @@
 				  .attr("class", "legend");
 
 			  legend.append("rect")
-				.attr("x", function(d, i) { return legendElementWidth * i; })
-				.attr("y", (datatable.data.length+1)*gridSize)
-				.attr("width", legendElementWidth)
-				.attr("height", gridSize / 2)
+				.attr("y", function(d, i) { return legendElementWidth * i; })
+				.attr("x", (datatable.data[0].length)*gridSize+gridSize)
+				.attr("height", legendElementWidth)
+				.attr("width", gridSize / 2)
 				.style("fill", function(d, i) { return colors[i]; });
 
 			  legend.append("text")
 				.attr("class", "mono")
 				.text(function(d) { return d; })
-				.attr("x", function(d, i) { return (legendElementWidth * i)+legendElementWidth/2; })
-				.attr("y", (datatable.data.length+1)*gridSize)
-				.style("text-anchor","middle")
+				.attr("y", function(d, i) { return (legendElementWidth * i)+legendElementWidth/2; })
+				.attr("x", (datatable.data[0].length)*gridSize+gridSize*1.5)
+				.style("text-anchor","left")
 				
 			return this;
 		},
