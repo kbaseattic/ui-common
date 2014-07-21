@@ -43,7 +43,7 @@
             else { self.ws = new Workspace(self.wsUrl); }
             self.wsNameOrId = options.wsNameOrId;
 
-	    self.$elem.append("<div id=\"objgraphview\">");
+	    self.$elem.append('<div id="objgraphview" style="overflow:auto;height:450px;resize:vertical">');
 	    
 	    // do the stuff
 	    self.needColorKey = true; // so that the key renders
@@ -54,7 +54,8 @@
 	
 	
 	typeToColor: {
-	    "core":"#FFE361",
+	    "selected":"#FFFF33",
+	    "core":"#FFDE88",
 	    "ref":"#D43F3F",
 	    "included":"#00ACE9",
 	    //"prov": "#50d07d"
@@ -62,7 +63,8 @@
 	},
 	
 	typeToName: {
-	    "core":"All versions of the selected data object",
+	    "selected": "Latest version of the data object",
+	    "core":"Previous versions of the data object",
 	    "ref":"Data that references the selected object",
 	    "included":"Data that is referenced by the selected object",
 	    //"prov":"Data that is in the provenance of the selected object"
@@ -98,14 +100,32 @@
 	    var self = this;
 	    if (self.graph.links.length>0) {
 		var margin = {top: 10, right: 10, bottom: 10, left: 10};
-		var width = self.options.width - 100 - margin.left - margin.right;
+		var width = self.options.width - 50 - margin.left - margin.right;
 		var height = self.graph.nodes.length*35 - margin.top - margin.bottom;
 		var color = d3.scale.category20();
-		
+		if (height<450) {
+		    self.$elem.find("#objgraphview").height(height+40);
+		}
+		/*var zoom = d3.behavior.zoom()
+		    .translate([0, 0])
+		    .scale(1)
+		    .scaleExtent([1, 8])
+		    .on("zoom", function() {
+			features.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+			//features.select(".state-border").style("stroke-width", 1.5 / d3.event.scale + "px");
+			//features.select(".county-border").style("stroke-width", .5 / d3.event.scale + "px");
+		    });
+		    */
 		// append the svg canvas to the page
 		d3.select("#objgraphview").html("");
 		self.$elem.find('#objgraphview').show();
-		var svg = d3.select("#objgraphview").append("svg")
+		var svg = d3.select("#objgraphview").append("svg");
+		/*svg.append("rect")
+		    .attr("class", "overlay")
+		    .attr("width",width + margin.left + margin.right)
+		    .attr("height",300)
+		    .call(zoom);*/
+		svg    
 		    .attr("width", width + margin.left + margin.right)
 		    .attr("height", height + margin.top + margin.bottom)
 		  .append("g")
@@ -140,7 +160,8 @@
 		    });
 	
 		// add in the nodes
-		var node = svg.append("g").selectAll(".node")
+		var node = svg.append("g")
+		  .selectAll(".node")
 		    .data(self.graph.nodes)
 		  .enter().append("g")
 		    .attr("class", "sankeynode")
@@ -273,7 +294,7 @@
 		    .style("fill", function(d) {
 			  return d.color = self.typeToColor[d['nodeType']];
 		    })
-		    .style("stroke", function(d) { 
+		    .style("stroke", function(d) {
 			return d3.rgb(d.color).darker(2); })
 		    .append("title")
 			.text(function(d) {
@@ -404,6 +425,7 @@
 		objref,
 		function (data) {
 		    var objIdentities = [];
+		    var latestVersion = 0; var latestObjId = "";
 		    for(var i = 0; i < data.length; i++) {
 			//0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
 			var t = data[i][2].split("-")[0];
@@ -416,8 +438,15 @@
 			    nodeType : "core",
 			    objId : objId
 			});
+			if (data[i][4]>latestVersion) {
+			    latestVersion = data[i][4];
+			    latestObjId = objId;
+			}
 			self.objRefToNodeIdx[objId] = nodeId;
 			objIdentities.push({ref:objId});
+		    }
+		    if (latestObjId.length>0) {
+			self.graph['nodes'][self.objRefToNodeIdx[latestObjId]]['nodeType'] = 'selected';
 		    }
 		    
 		    
