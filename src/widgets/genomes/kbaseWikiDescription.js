@@ -122,7 +122,7 @@
                             descHtml = this.redirectHeader(strainName, desc.redirectFrom, desc.searchTerm) + descStr + this.descFooter(desc.wikiUri);
                         }
                         else if (desc.searchTerm === strainName) {
-                            descHtml = descStr + this.descFooter(desc.wiki_uri);
+                            descHtml = descStr + this.descFooter(desc.wikiUri);
                         }
                         else {
                             descHtml = this.notFoundHeader(strainName, desc.searchTerm, desc.redirectFrom) + descStr + this.descFooter(desc.wikiUri);

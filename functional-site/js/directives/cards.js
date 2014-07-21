@@ -338,5 +338,75 @@ angular.module('card-directives')
                 });
             }
         };
-    });
+    })
+    .directive('wsrefcards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "wsref", 
+                    data: scope.params
+                });
+            }
+        };
+    })
+    .directive('wsrefusers', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "wsrefusers", 
+                    data: scope.params
+                });
+            }
+        };
+    })
+    .directive('wsobjgraphview', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "wsobjgraphview", 
+                    data: scope.params
+                });
+            }
+        };
+    })
+    .directive('wsobjgraphcenteredview', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "wsobjgraphcenteredview", 
+                    data: scope.params
+                });
+            }
+        };
+    })
+    .directive('treecards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "tree", 
+                    data: scope.params, 
+                    auth: $rootScope.USER_TOKEN,
+                    userId: $rootScope.USER_ID
+                });
+            }
+        };
+    })
+    .directive('taxonomyview', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "taxonomy", 
+                    data: scope.params
+                });
+            }
+        };
+    })
+;
+
 

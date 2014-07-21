@@ -672,6 +672,13 @@
             return [];
         },
 
+        _exportTreeRunResult: function(data, workspace) {
+            this.dbg("Exporting Tree run result");
+            this.dbg(data);
+
+            return [];
+        },
+
         /**
          * Toggles the data manager div
          */
@@ -728,8 +735,20 @@
                 this.showModelCards();
             else if (this.options.template.toLowerCase() === "spec")
                 this.showSpecCards();
+            else if (this.options.template.toLowerCase() === "wsref")
+                this.showRefCards();
+            else if (this.options.template.toLowerCase() === "wsrefusers")
+                this.showRefUsersCards();
+            else if (this.options.template.toLowerCase() === "wsobjgraphview")
+                this.showWsObjGraphCards();
+            else if (this.options.template.toLowerCase() === "wsobjgraphcenteredview")
+                this.showWsObjGraphCenteredCards();
             else if (this.options.template.toLowerCase() === "ppid")
                 this.showPPICards();
+            else if (this.options.template.toLowerCase() === "tree")
+                this.showTreeCards();
+            else if (this.options.template.toLowerCase() === "taxonomy")
+                this.showTaxonomyCards();
             else {
                 // throw an error for an unknown template. modal dialog, maybe?
             }
@@ -757,34 +776,125 @@
                 }
             );
 
-		//this.addNewCard("KBaseGenomeSequence",
-                //{
-                //    genomeID: this.options.data.genomeID,
-                //    loadingImage: this.options.loadingImage,
-                //    workspaceID: this.options.data.workspaceID,
-                //    kbCache: this.options.data.kbCache,
-                //},
-                //{
-                //    my: "left top",
-                //    at: "left+330 bottom",
-                //    of: "#app"
-                //}
-		//);
+            this.addNewCard("KBaseWikiDescription",
+                {
+                    genomeID: this.options.data.genomeID,
+                    loadingImage: this.options.loadingImage,
+                    workspaceID: this.options.data.workspaceID,
+                    kbCache: this.options.data.kbCache,
+                },
+                {
+                    my: "left top",
+                    at: "left+330 bottom",
+                    of: "#app"
+                }
+            );
 
-		//this.addNewCard("KBaseWikiDescription",
-                //{
-                //    genomeID: this.options.data.genomeID,
-                //    loadingImage: this.options.loadingImage,
-                //    workspaceID: this.options.data.workspaceID,
-                //    kbCache: this.options.data.kbCache,
-                //},
-                //{
-                //    my: "left top",
-                //    at: "left+660 bottom",
-                //    of: "#app"
-                //}
-		//);
+	
+	// only show meta data if this is a WS object
+            if (this.options.data.workspaceID) {		
+                this.addNewCard("KBaseObjectMeta",
+                {
+                    wsNameOrId: this.options.data.workspaceID,
+                    objNameOrId: this.options.data.genomeID,
+                     objVer: null,
+                      kbCache: this.options.data.kbCache,
+                      loadingImage: this.options.loadingImage,                      
+                },
+                {
+                    my: "left top",
+                    at: "left+500 bottom",
+                    of: "#app"
+                }
+            );
+	       }
 
+	//shows taxonomic lineage for this genome
+                this.addNewCard("KBaseGenomeLineage",
+                {
+                    workspaceID: this.options.data.workspaceID,
+                    genomeID: this.options.data.genomeID,
+                     objVer: null,
+                      kbCache: this.options.data.kbCache,
+                      loadingImage: this.options.loadingImage,
+                },
+                {
+                    my: "left top",
+                    at: "left+500 bottom",
+                    of: "#app"
+                }
+            );
+                
+            // only add the reference list if this is a WS object
+            if (this.options.data.workspaceID) {
+                this.addNewCard("KBaseWSReferenceList",
+                    {
+                        wsNameOrId: this.options.data.workspaceID,
+                        objNameOrId: this.options.data.genomeID,
+                        objVer: null,
+                        kbCache: this.options.data.kbCache
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom+570",
+                        of: "#app"
+                    }
+                );
+            }
+            
+            // only add the reference list if this is a WS object
+            if (this.options.data.workspaceID) {
+                this.addNewCard("KBaseWSObjRefUsers",
+                    {
+                        wsNameOrId: this.options.data.workspaceID,
+                        objNameOrId: this.options.data.genomeID,
+                        objVer: null,
+                        kbCache: this.options.data.kbCache
+                    },
+                    {
+                        my: "left top",
+                        at: "left+860 bottom",
+                        of: "#app"
+                    }
+                );
+            }
+
+            // only add the reference list if this is a WS object
+            if (this.options.data.workspaceID) {
+                this.addNewCard("KBaseNarrativesUsingData",
+                    {
+                        wsNameOrId: this.options.data.workspaceID,
+                        objNameOrId: this.options.data.genomeID,
+                        objVer: null,
+                        kbCache: this.options.data.kbCache
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom+870",
+                        of: "#app"
+                    }
+                );
+            }
+
+            // SEED Funcitons card
+            if (this.options.data.workspaceID) {
+                this.addNewCard("KBaseSEEDFunctions",
+                    {
+                        wsNameOrId: this.options.data.workspaceID,
+                        objNameOrId: this.options.data.genomeID,
+                        objVer: null,
+                        kbCache: this.options.data.kbCache
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom+870",
+                        of: "#app"
+                    }
+                );
+            }
+
+            
+            
             return this;
         },
 
@@ -1118,7 +1228,110 @@
                     );
             return this;
         },
+        showRefCards: function() {
+            this.addNewCard("KBaseWSReferenceList",
+                        {
+                            wsNameOrId: this.options.data.ws,
+                            objNameOrId: this.options.data.id,
+                            objVer: this.options.data.version,
+                            kbCache: this.options.data.kbCache
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+            return this;
+        },
+        showRefUsersCards: function() {
+            this.addNewCard("KBaseWSObjRefUsers",
+                        {
+                            wsNameOrId: this.options.data.ws,
+                            objNameOrId: this.options.data.id,
+                            objVer: this.options.data.version,
+                            kbCache: this.options.data.kbCache
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+            return this;
+        },
+        
+        
+        showWsObjGraphCards: function() {
+            this.addNewCard("KBaseWSObjGraphView",
+                        {
+                            wsNameOrId: this.options.data.ws,
+                            kbCache: this.options.data.kbCache
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+            return this;
+        },
+        showWsObjGraphCenteredCards: function() {
+            this.addNewCard("KBaseWSObjGraphCenteredView",
+                        {
+                            wsNameOrId: this.options.data.ws,
+                            objNameOrId: this.options.data.id,
+                            kbCache: this.options.data.kbCache
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+            return this;
+        },
+        
+        showTreeCards: function() {
+            this.addNewCard("kbaseTree",
+                    {
+            			treeID: this.options.data.id,
+            			workspaceID: this.options.data.ws,
+                        token: this.options.auth,
+                        isInCard: true
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
 
+        
+        showTaxonomyCards: function() {
+            
+            
+            this.addNewCard("KBaseTaxonOverview",
+                    {
+                        taxon: this.options.data.taxonname,
+                        wsNameOrID: this.options.data.ws,
+                        kbCache: this.options.data.kbCache,
+                        loadingImage: this.options.loadingImage,
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            if (this.options.data.ws) {
+                // add other taxa specific cards here
+            }
+            return this;
+        },
+        
         /**
          * Registers all events that this manager should know about.
          * Also makes a list of all registered events, stored in this.registeredEvents[], so they
@@ -1154,8 +1367,32 @@
                                      "showMAKCluster", 
                                      "showBambiMotif",
                                      "showBambiRunParameters", 
-                                     "showBambiRawOutput"];
+                                     "showBambiRawOutput",
+									 "showLitWidget",
+									 "showTreeCards"];
 
+			/**
+             * Event: showLitWidget
+             * ------------------
+             * Adds new kbaseLitWidget card.
+             */
+			$(document).on("showLitWidget", function(event, data) {
+				self.addNewCard("KBaseLitWidget",
+					{
+						literature: data.literature,
+						genomeID: data.genomeID,
+						workspaceID: data.workspaceID,
+						kbCache: data.kbCache,
+						loadingImage: self.options.loadingImage                      
+					},
+					{
+						my: "right top",
+						at: "right+800 bottom",
+						of: data.event
+				});
+
+			});
+			
             /**
              * Event: showDomains
              * ------------------
@@ -1688,8 +1925,8 @@
              * -------------------
              * Adds card with Cytoscape.js view of a network
              */
-        $(document).on("showNetwork", function(event, data) {
-        self.addNewCard("KBaseNetworkCard",
+            $(document).on("showNetwork", function(event, data) {
+        		self.addNewCard("KBaseNetworkCard",
                 {
                     network: data.network,
                     netname: data.netname,
@@ -1700,7 +1937,22 @@
                     of: "#app"
                 }
                    );
-        });
+            });
+
+            $(document).on("showTree", function(event, data) {
+            	self.addNewCard("kbaseTree",
+            			{
+            				workspaceID: data.workspaceID,
+            				treeID: data.treeID,
+            				token: data.token
+            			},
+            			{
+            				my: "left top",
+            				at: "center",
+            				of: data.event
+            			}
+            	);
+            });
 
             $(document).on("helloClick", function(event, data) {
                 window.alert(data.message);
