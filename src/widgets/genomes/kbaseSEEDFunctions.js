@@ -26,6 +26,7 @@
         
         SEEDTree:{ "name":"SEED", "count": 0, "children":[], "size":0, "x0":0, "y0":0 },
         subsysToGeneMap:[],
+        maxCount:0,
 
         margin:{top: 30, right: 20, bottom: 30, left: 20},
         width: 920,
@@ -114,6 +115,11 @@
           SEED is not a strict heirarchy, some nodes have multiple parents
           I'm going to keep track of a nodes parents to map things right.
 
+          to scale the graph, I'm going to keep track of the max count in the Level 1 of the
+          hierarchy.
+
+          maxCount - count in the largest Level 1 category
+
           loadSEEDHierarchy() function will parse file and populate the SEEDTree data structure
         */
         loadSEEDHierarchy: function() {
@@ -123,6 +129,7 @@
 
             var SEEDTree = self.SEEDTree;
             var subsysToGeneMap = self.subsysToGeneMap;
+            var Level1 = [];
 
             d3.text("assets/data/subsys.txt", function(text) {
                 var data = d3.tsv.parseRows(text);
@@ -154,7 +161,10 @@
                                 var node = { "name" : data[i][j], size : 0, "children" : [] };
                                 SEEDTree.children.push(node);
                                 nodeMap[nodeHierarchy] = node;
+                                Level1[data[i][j]] = 0;
                             }
+                            Level1[data[i][j]] += geneCount;
+
                         } else {
                             if (nodeMap[nodeHierarchy] === undefined) {
                                 var node = { "name" : data[i][j], size : 0, "children" : [] };
@@ -173,13 +183,18 @@
                         parentHierarchy = nodeHierarchy;
                     }
                 }
-                
-            console.log("something " + self.SEEDTree.children.length);
+
+            // Set maxCount to scale bars
+            for (k in Level1) {
+                self.maxCount = self.maxCount > Level1[k] ? self.maxCount : Level1[k];
+            }
+
             $.when( 
                 self.SEEDTree.children.forEach(function(d) {
-                    self.collapse(d)}) 
-                ).done(
-                    self.update(self.root = self.SEEDTree)
+                    self.collapse(d) }) 
+                )
+            .done(
+                    self.update( self.root = self.SEEDTree )
                 );
             
             }); 
@@ -192,10 +207,8 @@
             var self = this;
             
             var nodes = self.tree.nodes(self.SEEDTree);
-            console.log("Z: " + this.SEEDTree.children.length);
-            console.log("N: " + nodes.length);
 
-            var scale = d3.scale.linear().domain([0,560]).range([0,290]);
+            var scale = d3.scale.linear().domain([0,this.maxCount]).range([0,275]);
             var height = Math.max(500, nodes.length * self.barHeight + self.margin.top + self.margin.bottom);
             var i = self.i;
             d3.select("svg").transition()
@@ -237,14 +250,14 @@
             nodeEnter.append("rect")
                 .attr("y", -self.barHeight / 2)
                 //.attr("x", function (d) { return 0 - d.depth * 4;} )
-                .attr("x", function (d) { return 0 + 295 - scale(d.size) - d.depth * 4;} )
+                .attr("x", function (d) { return 0 + 275 - scale(d.size) - d.depth * 4;} )
                 .attr("height", self.barHeight)
                 .attr("width", function (d) { return scale(d.size); })
                 .style("fill", self.color);
 
             nodeEnter.append("text")
                 .attr("dy", 3.5)
-                .attr("dx", 5.5)
+                .attr("x", 278)
                 .text(function(d) { return d.size; });
 
             // Transition nodes to their new position.
@@ -306,7 +319,7 @@
         },
 
         getData: function() {
-            return {title:"SEED Functional Categories :",id:this.objName, workspace:this.wsName};
+            return {title:"SEED Functional Categories ",id:this.objName, workspace:this.wsName};
         },
 
         render: function() {
