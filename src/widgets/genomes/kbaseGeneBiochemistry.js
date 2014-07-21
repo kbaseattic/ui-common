@@ -148,7 +148,7 @@
 			for (var i=0; i<feature.subsystem_data.length; i++) {
 			    var subsys = feature.subsystem_data[i];
 			    // typedef tuple<string subsystem, string variant, string role> subsystem_data;
-			    subsysDataStr += "Subsystem: " + subsys[0] + "<br>" + "Variant: " + subsys[1] + "<br>" + "Role: " + subsys[2] + "<p>";
+			    subsysDataStr += "<p>" + "Subsystem: " + subsys[0] + "<br>" + "Variant: " + subsys[1] + "<br>" + "Role: " + subsys[2];
 			}
                     }
                     this.$infoTable.append(this.makeRow("Subsystems", subsysDataStr));
