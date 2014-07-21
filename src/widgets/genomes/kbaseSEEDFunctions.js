@@ -250,7 +250,7 @@
             nodeEnter.append("rect")
                 .attr("y", -self.barHeight / 2)
                 //.attr("x", function (d) { return 0 - d.depth * 4;} )
-                .attr("x", function (d) { return 0 + 275 - scale(d.size) - d.depth * 4;} )
+                .attr("x", function (d) { return 0 + 275 - scale(d.size) - d.depth * 8;} )
                 .attr("height", self.barHeight)
                 .attr("width", function (d) { return scale(d.size); })
                 .style("fill", self.color);
@@ -258,7 +258,7 @@
             nodeEnter.append("text")
                 .attr("dy", 3.5)
                 .attr("x", 278)
-                .text(function(d) { return d.size; });
+                .text(function(d) { return d.name === "SEED" ? "" : d.size; });
 
             // Transition nodes to their new position.
             nodeEnter.transition()
@@ -327,7 +327,7 @@
                 width = this.width;
                 //svg = this.svg;
 
-            this.tree = d3.layout.tree().nodeSize([0, 4]);
+            this.tree = d3.layout.tree().nodeSize([0, 8]);
 
             this.$elem.append('<div id="mainview">');
 
