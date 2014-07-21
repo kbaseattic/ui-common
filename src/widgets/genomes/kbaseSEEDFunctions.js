@@ -208,7 +208,7 @@
             
             var nodes = self.tree.nodes(self.SEEDTree);
 
-            var scale = d3.scale.linear().domain([0,this.maxCount]).range([0,290]);
+            var scale = d3.scale.linear().domain([0,this.maxCount]).range([0,275]);
             var height = Math.max(500, nodes.length * self.barHeight + self.margin.top + self.margin.bottom);
             var i = self.i;
             d3.select("svg").transition()
@@ -250,14 +250,14 @@
             nodeEnter.append("rect")
                 .attr("y", -self.barHeight / 2)
                 //.attr("x", function (d) { return 0 - d.depth * 4;} )
-                .attr("x", function (d) { return 0 + 295 - scale(d.size) - d.depth * 4;} )
+                .attr("x", function (d) { return 0 + 275 - scale(d.size) - d.depth * 4;} )
                 .attr("height", self.barHeight)
                 .attr("width", function (d) { return scale(d.size); })
                 .style("fill", self.color);
 
             nodeEnter.append("text")
                 .attr("dy", 3.5)
-                .attr("dx", 5.5)
+                .attr("x", 278)
                 .text(function(d) { return d.size; });
 
             // Transition nodes to their new position.
