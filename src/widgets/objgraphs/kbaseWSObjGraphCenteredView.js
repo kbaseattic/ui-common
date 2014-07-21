@@ -103,7 +103,9 @@
 		var width = self.options.width - 50 - margin.left - margin.right;
 		var height = self.graph.nodes.length*35 - margin.top - margin.bottom;
 		var color = d3.scale.category20();
-		
+		if (height<450) {
+		    self.$elem.find("#objgraphview").height(height+40);
+		}
 		/*var zoom = d3.behavior.zoom()
 		    .translate([0, 0])
 		    .scale(1)
