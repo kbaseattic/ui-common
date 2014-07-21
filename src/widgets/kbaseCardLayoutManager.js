@@ -757,19 +757,34 @@
                 }
             );
 
-            this.addNewCard("KBaseWikiDescription",
-                {
-                    genomeID: this.options.data.genomeID,
-                    loadingImage: this.options.loadingImage,
-                    workspaceID: this.options.data.workspaceID,
-                    kbCache: this.options.data.kbCache,
-                },
-                {
-                    my: "left top",
-                    at: "left+330 bottom",
-                    of: "#app"
-                }
-            );
+		//this.addNewCard("KBaseGenomeSequence",
+                //{
+                //    genomeID: this.options.data.genomeID,
+                //    loadingImage: this.options.loadingImage,
+                //    workspaceID: this.options.data.workspaceID,
+                //    kbCache: this.options.data.kbCache,
+                //},
+                //{
+                //    my: "left top",
+                //    at: "left+330 bottom",
+                //    of: "#app"
+                //}
+		//);
+
+		//this.addNewCard("KBaseWikiDescription",
+                //{
+                //    genomeID: this.options.data.genomeID,
+                //    loadingImage: this.options.loadingImage,
+                //    workspaceID: this.options.data.workspaceID,
+                //    kbCache: this.options.data.kbCache,
+                //},
+                //{
+                //    my: "left top",
+                //    at: "left+660 bottom",
+                //    of: "#app"
+                //}
+		//);
+
             return this;
         },
 
@@ -1121,6 +1136,7 @@
                                      "showGWASPopCards",
                                      "showDomains", 
                                      "showOperons", 
+                                     "showSequence", 
                                      "showBiochemistry", 
                                      "showSpecElement", 
                                      "showMemeMotif", 
@@ -1167,6 +1183,26 @@
                 {
                     featureID: data.featureID,
                     loadingImage: self.options.loadingImage,
+                },
+                {
+                    my: "left top",
+                    at: "center",
+                    of: data.event
+                });
+            });
+
+            /**
+             * Event: showSequence
+             * -----------------------
+             * Adds new KBaseGeneSequence card, based on a feature ID.
+             */            
+            $(document).on("showSequence", function(event, data) {
+                self.addNewCard("KBaseGeneSequence",
+                {
+                    featureID: data.featureID,
+                    genomeID: data.genomeID,
+                    workspaceID: data.workspaceID,
+                    kbCache: data.kbCache,
                 },
                 {
                     my: "left top",
