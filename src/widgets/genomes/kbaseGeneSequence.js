@@ -155,7 +155,7 @@
 			//this.$infoTable.append(this.makeRow("Gene", dnaSequenceStr));
 			this.$infoTable.append(
 					       this.makeRow("Gene", dnaSequenceStr)
-					       .each(function(){$(this).css('font-family','Courier')})
+					       .each(function(){$(this).css('font-family','Monaco')})
 					       );
 
                     }
