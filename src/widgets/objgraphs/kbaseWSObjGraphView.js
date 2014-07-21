@@ -279,7 +279,7 @@
 			// TODO: toggle switch between redirect vs redraw
 			
 			//alternate reload page so we can go forward and back
-			window.location.href = "#/objgraphview/"+self.objDataLookup[d.ref]['info'][7]+"/"+self.objDataLookup[d.ref]['info'][1];
+			window.location.href = "#/objgraphview/"+encodeURI(self.objDataLookup[d.ref]['info'][7]+"/"+self.objDataLookup[d.ref]['info'][1]);
 		    });
     
 	    // add the rectangles for the nodes

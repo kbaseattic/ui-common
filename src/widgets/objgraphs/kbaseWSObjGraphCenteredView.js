@@ -176,9 +176,9 @@
 			    alert("Cannot expand this node.");
 			} else {
 			    if(d['info'][1].indexOf(' ') >= 0) {
-				window.location.href = "#/objgraphview/"+d['info'][7]+"/"+d['info'][0];
+				window.location.href = "#/objgraphview/"+encodeURI(d['info'][7]+"/"+d['info'][0]);
 			    } else {
-				window.location.href = "#/objgraphview/"+d['info'][7]+"/"+d['info'][1];
+				window.location.href = "#/objgraphview/"+encodeURI(d['info'][7]+"/"+d['info'][1]);
 			    }
 			}
 		    })

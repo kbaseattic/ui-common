@@ -93,7 +93,7 @@
                                  .addClass("btn btn-primary")
                                  .append("View Object Graph").attr("type", "button").on("click",
 							function(event) {
-                                                            window.location.href = "/functional-site/#/objgraphview/"+self.options.workspaceID+"/"+self.options.genomeID;
+                                                            window.location = "/functional-site/#/objgraphview/"+encodeURI(self.options.workspaceID+"/"+self.options.genomeID);
 							}));
                         }
 								 
