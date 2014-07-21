@@ -61,7 +61,7 @@
 			
 			this.$infoPanel.append($("<button>")
                                  .addClass("btn btn-primary")
-                                 .append("Literature Search")
+                                 .append("Related Publications")
 								 .attr("type", "button")
 								 .on("click",
 									function(event) {
@@ -85,6 +85,17 @@
 										
 									})
 								);
+                        if (self.options.workspaceID === null) {
+                            // possibly we show other CDS related buttongs
+                        } else {
+                            // show ws related buttons
+                            self.$infoPanel.append($("<button>")
+                                 .addClass("btn btn-primary")
+                                 .append("View Object Graph").attr("type", "button").on("click",
+							function(event) {
+                                                            window.location.href = "#/objgraphview/"+self.options.workspaceID+"/"+self.options.genomeID;
+							}));
+                        }
 								 
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
