@@ -579,9 +579,6 @@ angular.module('lp-directives')
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading(); 
-            // not sure why this isn't loading first.  
-            // I'm thinking data should be retrieved here.
-
             $(p.body()).KBaseGenomeOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb})
         }
     };
@@ -605,15 +602,10 @@ angular.module('lp-directives')
 .directive('sortablegenomeoverview', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Genome Overview', 
-                                           type: 'Genome',
+            var p = $(ele).kbasePanel({title: 'Genome Overview',
                                            rightLabel: scope.ws,
-                                           subText: scope.id,
-                                           widget: 'genomeoverview'});
+                                           subText: scope.id});
             p.loading(); 
-            // not sure why this isn't loading first.  
-            // I'm thinking data should be retrieved here.
-
             $(p.body()).KBaseGenomeOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb});
         }
     };
@@ -622,36 +614,59 @@ angular.module('lp-directives')
     return {
         link: function(scope, ele, attrs) {
             var p = $(ele).kbasePanel({title: 'Description',
-                                           type: 'Genome',
                                            rightLabel: scope.ws,
-                                           subText: scope.id,
-                                           widget: 'genomewiki'});
+                                           subText: scope.id});
             p.loading();
             $(p.body()).KBaseWikiDescription({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb});
         }
     };
 })
+
+
 .directive('sortableseedannotations', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'SEED Functional Categories',
-                                           type: 'Genome',
+            var p = $(ele).kbasePanel({title: 'Functional Categories',
                                            rightLabel: scope.ws,
-                                           subText: scope.id,
-                                           widget: 'genomeseedannotations'});
+                                           subText: scope.id});
             p.loading();
             $(p.body()).KBaseSEEDFunctions({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb});
         }
     };
 })
+.directive('sortablerelatedpublications', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Related Publications',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            
+            var objId = scope.ws + "/" + scope.id;
+	    kb.ws.get_object_subset( [ {ref:objId, included:["/scientific_name"]} ], function(data) {
+                    var searchTerm = "";
+                    if (data[0]) {
+                        if (data[0]['data']['scientific_name']) {
+                            searchTerm = data[0]['data']['scientific_name'];
+                        }
+                    }
+                    $(p.body()).KBaseLitWidget({literature:searchTerm, kbCache: kb});
+                },
+                function(error) {
+                    alert(JSON.stringify(error));
+                    $(p.body()).KBaseLitWidget({literature:"", kbCache: kb});
+                });
+        }
+    };
+})
+
+
 .directive('sortablenarrativereflist', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
             var p = $(ele).kbasePanel({title: 'Narratives using this Genome',
-                                           type: 'Genome',
                                            rightLabel: scope.ws,
-                                           subText: scope.id,
-                                           widget: 'genomenarrativereflist'});
+                                           subText: scope.id});
             p.loading();
             $(p.body()).KBaseNarrativesUsingData({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb});
         }
@@ -661,10 +676,8 @@ angular.module('lp-directives')
     return {
         link: function(scope, ele, attrs) {
             var p = $(ele).kbasePanel({title: 'People using this Genome',
-                                           type: 'Genome',
                                            rightLabel: scope.ws,
-                                           subText: scope.id,
-                                           widget: 'genomeuserreflist'});
+                                           subText: scope.id});
             p.loading();
             $(p.body()).KBaseWSObjRefUsers({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb});
         }
@@ -674,10 +687,8 @@ angular.module('lp-directives')
     return {
         link: function(scope, ele, attrs) {
             var p = $(ele).kbasePanel({title: 'List of data objects referencing this Genome',
-                                           type: 'Genome',
                                            rightLabel: scope.ws,
-                                           subText: scope.id,
-                                           widget: 'genomereflist'});
+                                           subText: scope.id});
             p.loading();
             $(p.body()).KBaseWSReferenceList({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb });
         }
@@ -687,10 +698,8 @@ angular.module('lp-directives')
     return {
         link: function(scope, ele, attrs) {
             var p = $(ele).kbasePanel({title: 'Object Reference and Provenance Graph',
-                                           type: 'Genome',
                                            rightLabel: scope.ws,
-                                           subText: scope.id,
-                                           widget: 'genomeobjrefgraphview'});
+                                           subText: scope.id});
             p.loading();
             $(p.body()).KBaseWSObjGraphCenteredView({objNameOrId: scope.id, wsNameOrId: scope.ws, kbCache: kb});
         }
