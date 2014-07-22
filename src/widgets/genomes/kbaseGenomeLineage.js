@@ -35,8 +35,8 @@
             
             this.pref = this.uuid();
 
-            this.$messagePane = $("<div/>").addClass("kbwidget-message-pane").hide();
-            this.$elem.append(this.$messagePane);
+            //this.$messagePane = $("<div/>").addClass("kbwidget-message-pane").hide();
+            //this.$elem.append(this.$messagePane);
 
             this.render();
             if (this.options.workspaceID === null) {
@@ -70,7 +70,7 @@
             this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
 
             this.$infoPanel.hide();
-            this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            //this.showMessage("<img src='" + this.options.loadingImage + "'>");
 
             // Fields to show:
             // ID
@@ -96,9 +96,9 @@
         renderWorkspace: function () {
             var self = this;
             //console.log( this.options.loadingImage);
-            this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            //this.showMessage("<img src='" + this.options.loadingImage + "'>");
             this.$infoPanel.hide();
-            console.log("rendering");
+            //console.log("rendering");
             //console.log(this.options.kbCache);
             var isInt = function (n) {
                     return typeof n === 'number' && n % 1 == 0;
@@ -107,7 +107,7 @@
 
             var obj = this.getObjectIdentity(this.options.workspaceID, this.options.genomeID);
 
-            console.log("obj " + obj);
+            //console.log("obj " + obj);
 
             var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
             $.when(prom).done($.proxy(function (genome) {
@@ -121,10 +121,10 @@
 
         showData: function(genome) {
             var self = this;
-            console.log(genome);
+            //console.log(genome);
             
             this.$infoTable.empty()
-            	.append(this.addInfoRow("ID", genome.id))
+            	//.append(this.addInfoRow("ID", genome.id))
             	.append(this.addInfoRow("Name", genome.scientific_name))
             	.append('<tr><td>Taxonomic lineage</td><td id="tax_td_'+this.pref+'"/></tr>');
 
@@ -135,7 +135,7 @@
         
         showLinage: function(taxonomy) {
         	var self = this;
-            console.log("Taxonomy: " + taxonomy);
+            //console.log("Taxonomy: " + taxonomy);
             var finaltax = "";
             var needGuess = this.options.workspaceID != null;
             if (taxonomy) {
@@ -176,12 +176,12 @@
         guessLinage: function() {
         	var self = this;
 			var tdElem = $('#tax_td_'+self.pref);
-			tdElem.html("<img src='" + this.options.loadingImage + "'>");
+			tdElem.html(" guessing based on closest genomes ..."); //<img src='" + this.options.loadingImage + "'>");
         	var treesSrv = new KBaseTrees(this.treesURL, {token: this.authToken()});
-    		console.log("kbaseGenomeLineage: guess_taxonomy_path...");
+    		//console.log("kbaseGenomeLineage: guess_taxonomy_path...");
     		var genomeRef = this.options.workspaceID + "/" + this.options.genomeID;
         	treesSrv.guess_taxonomy_path({query_genome: genomeRef}, function(data) {
-        		console.log(data);
+        		//console.log(data);
         		self.showLinage(data);
         	},
         	function(data) {
@@ -213,15 +213,19 @@
         },
 
         showMessage: function(message) {
+	    /*
             var span = $("<span/>").append(message);
 
             this.$messagePane.empty()
                              .append(span)
                              .show();
+                             */
         },
 
         hideMessage: function() {
+	    /*
             this.$messagePane.hide();
+            */
         },
         
         renderError: function (error) {

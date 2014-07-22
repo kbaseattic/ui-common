@@ -625,7 +625,19 @@ angular.module('lp-directives')
         }
     };
 })
-
+.directive('sortabletaxonomyinfo', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Taxonomy',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseGenomeLineage({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb});
+        }
+    };
+})
 
 .directive('sortableseedannotations', function($rootScope) {
     return {
