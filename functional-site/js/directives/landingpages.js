@@ -512,6 +512,19 @@ angular.module('lp-directives')
     }
 })
 
+.directive('regulome', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Regulome Data', 
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+
+            $(p.body()).kbaseRegulome({ws: scope.ws, name: scope.id})
+
+        }
+    }
+})
+
 
 .directive('pangenome', function() {
     return {
