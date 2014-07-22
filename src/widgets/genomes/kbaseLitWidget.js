@@ -96,7 +96,7 @@
 				loader.show()
 				$.ajax({
 					async: true,
-					url: 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=100000&term='+lit.replace(/\s+/g, "+"),
+					url: 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=500&term='+lit.replace(/\s+/g, "+"),
 					type: 'GET',
 					success: 
 					function(data) {
@@ -125,6 +125,7 @@
 							function(data) {
 								htmlJson = self.xmlToJson(data)
 								var summaries = htmlJson.eSummaryResult[1].DocSum // Add pub date field into table as well.
+								console.log(summaries)
 								for (summary in summaries) {
 									var tableInputRow = {}									
 									var summaryList = summaries[summary].Item
@@ -167,6 +168,7 @@
 								litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
 							},
 							function() {
+								loader.hide()
 								self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
 							}
 						)						
