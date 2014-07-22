@@ -23,12 +23,17 @@ kb_define('kbaseHeatmap',
             xScaleType  : 'ordinal',
             yScaleType  : 'ordinal',
             yGutter     : 80,
-            yPadding    : 50,
+            yPadding    : 20,
 
-            xPadding    : 80,
-            xGutter     : 50,
+            xPadding    : 150,
+            xGutter     : 80,
             overColor   : '#999900',
             hmBGColor     : 'lightgray',
+            colors : ["#0000ff",'#000000', "#ff0000"],
+
+            //clickCallback : function(d, $hm) {
+            //    $hm.debug(d);
+            //},
 
             rx : 2,
             ry : 2,
@@ -41,6 +46,8 @@ kb_define('kbaseHeatmap',
 
         init : function(options) {
             this._super(options);
+
+            this.options.gradientID = this.linearGradient( { colors : this.options.colors });
 
             return this;
         },
@@ -59,7 +66,10 @@ kb_define('kbaseHeatmap',
                 return [0,0];
             }
 
-            return this.dataset().map(function(d) { return d.x });
+            //return this.dataset().map(function(d) { return d.x });
+            //var i = 0;
+            //return this.dataset().data[0].map(function(d) { return i++});
+            return this.dataset().column_labels;
         },
 
         defaultYDomain : function() {
@@ -68,7 +78,10 @@ kb_define('kbaseHeatmap',
                 return [0,0];
             }
 
-            return this.dataset().map(function(d) { return d.y });
+            //return this.dataset().map(function(d) { return d.y });
+            //var i = 0;
+            //return this.dataset().data.map(function(d) { return i++});
+            return this.dataset().row_labels;
         },
 
         setXScaleRange : function(range, xScale) {
@@ -102,17 +115,87 @@ kb_define('kbaseHeatmap',
                     .scale(this.xScale())
                     .orient('top');
 
-            var gxAxis = this.data('D3svg').select('.yGutter').select('.xAxis');
+            xAxis.tickFormat(function(d) {
+                if (d.length > 15) {
+                    return d.substring(0,15) + '...';
+                }
+                return d;
+            });
+
+            var gxAxis = this.D3svg().select('.yGutter').select('.xAxis');
 
             if (gxAxis[0][0] == undefined) {
-                gxAxis = this.data('D3svg').select('.yGutter')
+                gxAxis = this.D3svg().select('.yGutter')
                     .append('g')
                         .attr('class', 'xAxis axis')
                         .attr("transform", "translate(0," + this.yGutterBounds().size.height + ")")
             }
 
             var $hm = this;
+
+            var ma = function() {
+                this.on('mouseover', function(d) {
+
+                    var xSi = 0;
+                    var roundedXScale = d3.scale.linear()
+                        .domain($hm.xScale().range())
+                        .range($hm.xScale().domain().map(function(d) { return xSi++}))
+                    ;
+
+                    var xIdx = Math.floor(roundedXScale(d3.mouse(this)[0]));
+
+                    var xScaleInvert = d3.scale.ordinal()
+                        .domain(roundedXScale.range())
+                        .range($hm.xScale().domain())
+                    ;
+
+                    var xLabels = d3.scale.ordinal()
+                        .domain(roundedXScale.range())
+                        .range($hm.dataset().column_labels);
+
+                    var xm = xScaleInvert(xIdx);
+
+
+                    $hm.D3svg().select('.yGutter').selectAll('g g text')
+                        .attr("fill",
+                            function(r,ri){
+                                var xId = xm;
+
+                                if ($hm.options.useIDMapping) {
+                                    xId = $hm.xIDMap()[xId];
+                                }
+                                if (r == xId) {
+                                    var xLabel = xLabels(xIdx);
+                                    if (xLabel != xm) {
+                                        $hm.showToolTip(
+                                            {
+                                                label : xLabel,
+                                            }
+                                        );
+                                    }
+                                    return $hm.options.overColor;
+                                }
+                            }
+                    );
+
+                    }
+                )
+                .on('mouseout', function(d) {
+                        $hm.D3svg().select('.yGutter').selectAll('g g text')
+                            .attr("fill",
+                                function(r,ri){
+                                   return 'black';
+                                }
+                        );
+                        $hm.hideToolTip();
+                    }
+                )
+                ;
+                return this;
+            };
+
             gxAxis
+                .call(ma)
                 .transition()
                 .duration(0)
                 .call(xAxis)
@@ -123,9 +206,31 @@ kb_define('kbaseHeatmap',
                         //arbitrarily rotate around -12 because it looks right. I got nothin'.
                         //then we move it 5 pixels to the right, which in our rotate coordinate system is
                         //5 pixels up. Whee!
-                        return "rotate(-45,0,-12) translate(25,0)";// translate(2,3)";
+                        var width = d3.select(this).node().getComputedTextLength();
+
+                        return "rotate(-45,0,0) translate(" + (width / 2 + 5) + ",5)";// translate(2,3)";
                     })
             ;
+
+            gxAxis.selectAll('text').each(function(d,i) {
+                d3.select(this).attr('data-id', $hm.dataset().column_ids[i]);
+                d3.select(this)
+                    .on('mouseover', function(d) {
+                        d3.select(this).attr('fill', $hm.options.overColor);
+                        var d3this = d3.select(this);
+                        if (d3this.text() != $hm.dataset().column_labels[i]) {
+                            $hm.showToolTip(
+                                {
+                                    label : $hm.dataset().column_labels[i]
+                                }
+                            );
+                        }
+                    })
+                    .on('mouseout', function(d) {
+                        d3.select(this).attr('fill', 'black');
+                        $hm.hideToolTip();
+                    })
+            });
 
 
         },
@@ -135,7 +240,7 @@ kb_define('kbaseHeatmap',
 
             var xLabeldataset = [this.xLabel()];
 
-            var xLabel = this.data('D3svg').select('.yPadding').selectAll('.xLabel');
+            var xLabel = this.D3svg().select('.yPadding').selectAll('.xLabel');
             xLabel
                 .data(xLabeldataset)
                     .text( this.xLabel() )
@@ -153,6 +258,147 @@ kb_define('kbaseHeatmap',
 
         },
 
+        renderYLabel : function() {
+            var xGutterBounds = this.xGutterBounds();
+
+            var yLabel = this.D3svg().select( this.region('xGutter') ).selectAll('.yLabel').data([0]);
+
+            yLabel.enter()
+                .append('rect')
+                    .attr('x', 5)
+                    .attr('y', 0)
+                    .attr('width',  xGutterBounds.size.width / 3)
+                    .attr('height', xGutterBounds.size.height)
+                    .attr('fill', 'url(#' + this.options.gradientID + ')')
+            ;
+
+            var colorScale = this.colorScale();
+
+            var domain = [ colorScale.domain()[colorScale.domain().length - 1], colorScale.domain()[0] ];
+
+            var tempScale =
+                d3.scale.linear()
+                    .domain( domain )
+                    .range( [0, xGutterBounds.size.height] )
+                    .nice();
+
+            var tempAxis =
+                d3.svg.axis()
+                    .scale(tempScale)
+                    .orient('right');
+
+            var gtempAxis = this.D3svg().select( this.region('xGutter') ).select('.tempAxis');
+
+            var $hm = this;
+
+            if (gtempAxis[0][0] == undefined) {
+                gtempAxis = this.D3svg().select( this.region('xGutter') )
+                    .append('g')
+                        .attr('class', 'tempAxis axis')
+                        .attr("transform", "translate(" + (xGutterBounds.size.width / 3 + 6) + ",0)")
+            }
+
+            tempAxis.tickFormat(function(d) {
+                if (d.length > 23) {
+                    return d.substring(0,20) + '...';
+                }
+                return d;
+            });
+
+            gtempAxis.transition().call(tempAxis);
+
+
+        },
+
+        renderYAxis : function() {
+
+            if (this.yScale() == undefined) {
+                return;
+            }
+            var yAxis =
+                d3.svg.axis()
+                    .scale(this.yScale())
+                    .orient('left');
+
+            var gyAxis = this.D3svg().select( this.region('xPadding') ).select('.yAxis');
+
+            var $hm = this;
+
+            if (gyAxis[0][0] == undefined) {
+                gyAxis = this.D3svg().select( this.region('xPadding') )
+                    .append('g')
+                        .attr('class', 'yAxis axis')
+                        .attr("transform", "translate(" + this.xPaddingBounds().size.width + ",0)")
+            }
+
+            yAxis.tickFormat(function(d) {
+                if (d.length > 23) {
+                    return d.substring(0,20) + '...';
+                }
+                return d;
+            });
+
+            gyAxis.transition().call(yAxis);
+
+            gyAxis.selectAll('text').each(function(d,i) {
+                d3.select(this).attr('data-id', $hm.dataset().row_ids[i]);
+                d3.select(this)
+                    .on('mouseover', function(d) {
+                        d3.select(this).attr('fill', $hm.options.overColor);
+                        var d3this = d3.select(this);
+                        if (d3this.text() != $hm.dataset().row_labels[i]) {
+                            $hm.showToolTip(
+                                {
+                                    label : $hm.dataset().row_labels[i]
+                                }
+                            );
+                        }
+                    })
+                    .on('mouseout', function(d) {
+                        d3.select(this).attr('fill', 'black');
+                        $hm.hideToolTip();
+                    })
+            });
+
+
+        },
+
+        colorScale : function() {
+
+            var colorScale = this.options.colorScale;
+
+            if (colorScale == undefined) {
+
+                var max = this.options.maxValue;
+                var min = this.options.minValue;
+                if (max == undefined || min == undefined) {
+                    max = 0;
+                    min = 0;
+                    for (var i = 0; i < this.dataset().data.length; i++) {
+                        var row = this.dataset().data[i];
+                        for (var j = 0; j < row.length; j++) {
+                            if (row[j] > max) {
+                                max = row[j];
+                            }
+                            if (row[j] < min) {
+                                min = row[j];
+                            }
+                        }
+                    }
+                }
+
+                var domain = d3.range(min, max, Math.floor((max - min) / this.options.colors.length));
+                domain[0] = min;
+                domain[domain.length - 1] = max;
+
+                colorScale = d3.scale.linear()
+                    .domain(domain)
+                    .range(this.options.colors);
+            }
+
+            return colorScale;
+        },
+
         renderChart : function() {
 
             var $hm = this;
@@ -163,6 +409,12 @@ kb_define('kbaseHeatmap',
             }
 
 
+        var yIdScale = this.yScale().copy();
+        yIdScale.domain(this.dataset().row_ids);
+
+        var xIdScale = this.xScale().copy();
+        xIdScale.domain(this.dataset().column_ids);
+
         var funkyTown = function() {
             this
                 .attr('x',
@@ -171,7 +423,9 @@ kb_define('kbaseHeatmap',
                         if ($hm.options.useIDMapping) {
                             xId = $hm.xIDMap()[xId];
                         }
-                        return $hm.xScale()(xId) + 1
+
+                        var scaled = xIdScale(xId) + 1;
+                        return scaled;//$hm.xScale()(xId) + 1
                     }
                 )
                 .attr('y',
@@ -180,7 +434,9 @@ kb_define('kbaseHeatmap',
                         if ($hm.options.useIDMapping) {
                             yId = $hm.yIDMap()[yId];
                         }
-                        return $hm.yScale()(yId) + 1
+
+                        var scaled = yIdScale(yId) + 1;
+                        return scaled;//$hm.yScale()(yId) + 1
                     }
                 )
                 //.attr('y', function (d) { return $hm.yScale()(d.y) })
@@ -192,15 +448,16 @@ kb_define('kbaseHeatmap',
                 .attr('fill',
                     function(d) {
 
-                        var colorScale = d3.scale.linear()
+                        /*var colorScale = d3.scale.linear()
                             .domain([0,1])
                             .range(['white', d.color]);
 
-                        return colorScale(d.value);
+                        return colorScale(d.value);*/
 
                         return d.color;
                     }
-                );
+                )
+                ;
             return this;
         }
 
@@ -213,27 +470,28 @@ kb_define('kbaseHeatmap',
 //                            .attr('opacity', '100%')
                             .attr('stroke-width', 5);
 
-                        $hm.data('D3svg').select('.yGutter').selectAll('g g text')
+                        $hm.D3svg().select('.yGutter').selectAll('g g text')
                             .attr("fill",
                                 function(r,ri){
                                     var xId = d.x;
                                     if ($hm.options.useIDMapping) {
                                         xId = $hm.xIDMap()[xId];
                                     }
-                                    if (r == xId) {
+
+                                    if (d3.select(this).attr('data-id') == xId) {
                                         return $hm.options.overColor;
                                     }
                                 }
                         );
 
-                        $hm.data('D3svg').select('.xPadding').selectAll('g g text')
+                        $hm.D3svg().select('.xPadding').selectAll('g g text')
                             .attr("fill",
                                 function(r,ri){
                                     var yId = d.y;
                                     if ($hm.options.useIDMapping) {
                                         yId = $hm.yIDMap()[yId];
                                     }
-                                    if (r == yId) {
+                                    if (d3.select(this).attr('data-id') == yId) {
                                         return $hm.options.overColor;
                                     }
                                 }
@@ -250,7 +508,7 @@ kb_define('kbaseHeatmap',
 
                         $hm.showToolTip(
                             {
-                                label : d.label || 'Value for: ' + xId + ' - ' + yId + '<br>is ' + d.value,
+                                label : d.label || 'Value for: ' + d.row + ' - ' + d.column + '<br>is ' + d.value,
                             }
                         );
 
@@ -264,14 +522,14 @@ kb_define('kbaseHeatmap',
 //                            .attr('opacity', function (d) { return d.value })
                             .attr('stroke', 0);
 
-                        $hm.data('D3svg').select('.yGutter').selectAll('g g text')
+                        $hm.D3svg().select('.yGutter').selectAll('g g text')
                             .attr("fill",
                                 function(r,ri){
                                    return 'black';
                                 }
                         );
 
-                        $hm.data('D3svg').select('.xPadding').selectAll('g g text')
+                        $hm.D3svg().select('.xPadding').selectAll('g g text')
                             .attr("fill",
                                 function(r,ri){
                                    return 'black';
@@ -280,6 +538,11 @@ kb_define('kbaseHeatmap',
 
                         $hm.hideToolTip();
 
+                    }
+                })
+                .on('click', function(d) {
+                    if ($hm.options.clickCallback) {
+                        $hm.options.clickCallback(d, $hm);
                     }
                 })
                 return this;
@@ -301,12 +564,35 @@ kb_define('kbaseHeatmap',
                         .attr('fill', $hm.options.hmBGColor )
                         .attr('class', 'hmBG');
 
-            var chart = this.D3svg().select( this.region('chart') ).selectAll('.cell').data(this.dataset());
+
+            var oldStyleDataset = [];
+
+            var colorScale = this.colorScale();
+
+            for (var i = 0; i < this.dataset().data.length; i++) {
+                var row = this.dataset().data[i];
+                for (var j = 0; j < row.length; j++) {
+                    oldStyleDataset.push(
+                        {
+                            x : this.dataset().column_ids[j],
+                            y : this.dataset().row_ids[i],
+                            column : this.dataset().column_labels[j],
+                            row : this.dataset().row_labels[i],
+                            value : row[j],//valScale(row[j]),
+                            color : colorScale(row[j]),
+                        }
+                    );
+                }
+            }
+
+
+            var chart = this.D3svg().select( this.region('chart') ).selectAll('.cell').data(oldStyleDataset);
             chart
                 .enter()
                     .append('rect')
                     .attr('class', 'cell')
             ;
+
             chart
                 .call(mouseAction)
                 .transition()
@@ -318,9 +604,10 @@ kb_define('kbaseHeatmap',
             ;
 
             chart
-                .data(this.dataset())
+                .data(oldStyleDataset)
                 .exit()
                     .remove();
+
 
         },
 

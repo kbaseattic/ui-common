@@ -44,6 +44,7 @@ kb_define('kbaseVisWidget',
             ticker : 0,
 
             radialGradientStopColor : 'black',
+            linearGradientStopColor : 'black',
 
             defaultDataset : function() { return [] },
         },
@@ -82,6 +83,7 @@ kb_define('kbaseVisWidget',
             'xIDMap',
             'yIDMap',
             'radialGradients',
+            'linearGradients',
             'children',
         ],
 
@@ -207,8 +209,16 @@ kb_define('kbaseVisWidget',
                 this.children([]);
             }
 
+            if (this.options.transformations == undefined) {
+                this.options.transformations = {};
+            }
+
             if (this.radialGradients() == undefined) {
                 this.radialGradients({});
+            }
+
+            if (this.linearGradients() == undefined) {
+                this.linearGradients({});
             }
 
             if (this.options.chartID == undefined) {
@@ -668,10 +678,22 @@ kb_define('kbaseVisWidget',
                 regions,
                 function (idx, region) {
 
-                    D3svg.selectAll('.' + region).selectAll('g').data([{region : $vis.region(region, true)}], function (d) { return d.region })
+                    D3svg.selectAll('.' + region).selectAll('g').data([{region : $vis.region(region, true), r: region}], function (d) { return d.region })
                         .enter()
                             .append('g')
                             .attr('class', function(d) { return d.region})
+                            .attr('transform', function(d) {
+
+                                var transform = $vis.options.transformations[d.r] || $vis.options.transformations.global;//{ translate : {x : 0, y : 0}, scale : {width : .1, height : 1} };
+                                if (transform == undefined) {
+                                    return;
+                                }
+
+                                transform = $.extend(true, { translate : { x : 0, y : 0}, scale : {width : 1, height : 1} }, transform );
+
+                                return 'translate(' + transform.translate.x + ',' + transform.translate.y + ')'
+                                    + ' scale(' + transform.scale.width + ',' + transform.scale.height + ')';
+                            })
                 }
             );
 
@@ -743,7 +765,7 @@ kb_define('kbaseVisWidget',
         xGutterBounds : function() {
             return new Rectangle(
                 new Point(this.xPadding() + this.chartBounds().size.width, this.yGutter()),
-                new Size(this.xPadding(), this.chartBounds().size.height)
+                new Size(this.xGutter(), this.chartBounds().size.height)
             );
         },
 
@@ -882,6 +904,94 @@ kb_define('kbaseVisWidget',
                     .attr('stop-color', function (d) { return d.stopColor});
 
             return this.radialGradients()[gradKey] = grad.id;
+
+        },
+
+        linearGradient : function(grad) {
+
+            var chartBounds = this.chartBounds();
+
+            grad = $.extend(
+                true,
+                {
+                    x1 : 0,//chartBounds.origin.x,
+                    x2 : 0,//chartBounds.size.width,
+                    y1 : 0,//chartBounds.origin.y,
+                    y2 : chartBounds.size.height,
+                    width : 0,
+                    height : chartBounds.size.height,
+                },
+                grad
+            );
+
+            var gradKey = [grad.cx, grad.cy, grad.r, grad.startColor, grad.stopColor].join(',');
+
+            if (this.linearGradients()[gradKey] != undefined && grad.id == undefined) {
+                grad.id = this.linearGradients()[gradKey];
+            }
+
+            if (grad.id == undefined) {
+                grad.id = this.uuid();
+            }
+
+
+            //I'd prefer to .select('.definitions').selectAll('linearGradient') and then just let
+            //d3 figure out the one that appropriately maps to my given grad value...but I couldn't
+            //get that to work for some inexplicable reason.
+            var gradient = this.D3svg().select('.definitions').selectAll('#' + grad.id)
+                .data([grad]);
+
+            var newGrad = false;
+
+            gradient
+                .enter()
+                    .append('linearGradient')
+                        .attr('id',
+                            //as brilliant as this hack is, it's also godawful. I might as well put a goto here.
+                            //this just returns the grad's id, as usual. BUT it also invokes a side effect to set
+                            //a global flag (well, enclosing context flag) to say that this is a newly created gradient
+                            //so down below we don't use any transition time to set the values. There's gotta be a better
+                            //way to do this, but I couldn't figure it out.
+                            function(d) {
+                                newGrad = true;
+                                return d.id
+                            }
+                        )
+                        .attr('gradientUnits', 'userSpaceOnUse')
+                        .attr('x1', function (d) {return d.x1})
+                        .attr('x2', function (d) {return d.x2})
+                        .attr('y1', function (d) {return d.y1})
+                        .attr('y2', function (d) {return d.y2})
+                        .attr('spreadMethod', 'pad')
+            ;
+
+            var transitionTime = newGrad
+                ? 0
+                : this.options.transitionTime;
+
+            var gradStops = gradient.selectAll('stop').data(grad.colors);
+
+            gradStops
+                .enter()
+                .append('stop')
+            ;
+
+            gradStops
+                .transition().duration(transitionTime)
+                .attr('offset', function(d, i) {
+                    var num = 0;
+                    if (i == grad.colors.length - 1) {
+                        num = 1;
+                    }
+                    else if (i > 0) {
+                        num = i / (grad.colors.length - 1)
+                    }
+
+                 return (Math.round(10000 * num) / 100) + '%' } )
+                .attr('stop-color', function (d) { return d })
+
+
+            return this.linearGradients()[gradKey] = grad.id;
 
         },
 

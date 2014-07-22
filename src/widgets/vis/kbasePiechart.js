@@ -51,6 +51,8 @@ kb_define('kbasePiechart',
             cornerToolTip : false,
             draggable : true,
             tooltips : true,
+
+            rescaleChildren : true,
         },
 
         _accessors : [
@@ -80,15 +82,19 @@ kb_define('kbasePiechart',
         childOptions : function(idx, dataset) {
             var options = this._super(idx, dataset);
 
-            options.outerRadius = this.options.innerRadius * (idx + 1);
-            options.innerRadius = this.options.innerRadius;
+            if (this.options.rescaleChildren) {
+                options.outerRadius = this.options.innerRadius * (idx + 1);
+                options.innerRadius = this.options.innerRadius;
+            }
 
             return options;
         },
 
-        reenter : function(idx, datase, parent) {
-            this.options.outerRadius = parent.options.innerRadius * (idx + 1);
-            this.options.innerRadius = parent.options.innerRadius;
+        reenter : function(idx, dataset, parent) {
+            if (this.options.rescaleChildren) {
+                this.options.outerRadius = parent.options.innerRadius * (idx + 1);
+                this.options.innerRadius = parent.options.innerRadius;
+            }
 
             return this;
         },
