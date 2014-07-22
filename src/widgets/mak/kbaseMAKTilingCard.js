@@ -201,7 +201,7 @@
 													});
 														
 									  
-							setTimeout(function(){ $bin.append($item) }, 10*i);
+							setTimeout(function(){ $bin.append($item) }, 5*i);
 						}
 					});
 						
