@@ -13,7 +13,7 @@
             workspaceID: null,
             kbCache: null,
             title: "Description",
-            maxNumChars: 500,
+            maxNumChars: 1000,
             width: 500,
             loadingImage: null
         },
@@ -44,8 +44,11 @@
         },
 
         render: function() {
-            this.showMessage("<img src='" + this.options.loadingImage + "'/>");
-
+            var self = this;
+            //this.showMessage("<img src='" + this.options.loadingImage + "'/>");
+            //self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>building object reference graph...</center></p></div>');
+	    
+            
             /*
              * A couple nested callbacks here.
              * 1. Run genomes_to_taxonomies
@@ -145,7 +148,8 @@
                     var imageId = this.uid();
 
 
-                    var $contentDiv = $("<div />")
+                    /* This is the tabbed view
+                     var $contentDiv = $("<div />")
                                       .addClass("tab-content")
                                       .append($("<div />")
                                               .attr("id", descId)
@@ -176,17 +180,27 @@
                                          )
                                   .append($("<li />")
                                           .append($imageTab)
-                                         );
+                                         ); */
 
-                    this.hideMessage();
-                    this.$elem.append($tabSet).append($contentDiv);            
+                    //this.hideMessage();  
+                    //this.$elem.append($tabSet).append($contentDiv);
+                    
+                    this.$elem.append('<table cellpadding="4" cellspacing="2" border=0 style="width:100%;">' +
+                              '<tr><td style="vertical-align:top"><div id="taxondescription"></td>'+
+                              '<td style="vertical-align:top"><div id="taxonimage" style="width:400px;"></td></tr><br>');
+                    
+                    
+                    //this.$elem.find('#loading-mssg').hide();
+                    this.$elem.find("#taxondescription").append(descHtml);
+                    this.$elem.find("#taxonimage").append(imageHtml);
+                              
                 }, this), 
                 $.proxy(this.renderError, this)
             );
         },
 
         renderWorkspace: function() {
-            this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            //this.showMessage("<img src='" + this.options.loadingImage + "'>");
             var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
             var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
 
@@ -241,9 +255,9 @@
 
         notFoundHeader: function(strainName, term, redirectFrom) {
             var underscoredName = strainName.replace(/\s+/g, "_");
-            var str = "<p><b><i>" +
+            var str = "<p><b>Note: \"<i>" +
                       strainName + 
-                      "</i> not found. You can start a new page for this genome on <a href='http://en.wikipedia.org/wiki/" + 
+                      "</i>\" not found. You can add a description on <a href='http://en.wikipedia.org/wiki/" + 
                       underscoredName + 
                       "' target='_new'>Wikipedia</a>.</b></p>";
             if (term) {
@@ -269,15 +283,15 @@
         },
 
         showMessage: function(message) {
-            var span = $("<span/>").append(message);
+            /*var span = $("<span/>").append(message);
 
             this.$messagePane.append(span);
-            this.$messagePane.removeClass("kbwidget-hide-message");
+            this.$messagePane.removeClass("kbwidget-hide-message");*/
         },
 
         hideMessage: function() {
-            this.$messagePane.addClass("kbwidget-hide-message");
-            this.$messagePane.empty();
+          /*  this.$messagePane.addClass("kbwidget-hide-message");
+            this.$messagePane.empty();*/
         },
         
         getData: function() {

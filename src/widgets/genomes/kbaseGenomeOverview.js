@@ -24,12 +24,12 @@
                 return;
             }
 
-            this.$messagePane = $("<div/>")
-                                .addClass("kbwidget-message-pane")
-                                .hide();
-            this.$elem.append(this.$messagePane);
+           // this.$messagePane = $("<div/>")
+           //                     .addClass("kbwidget-message-pane")
+           //                     .hide();
+           // this.$elem.append(this.$messagePane);
 
-            this.render();
+            this.render(); // this is moved inside central store and 
             if (this.options.workspaceID === null)
                 this.renderCentralStore();
             else
@@ -42,7 +42,7 @@
             var self = this;
 
             this.$infoPanel = $("<div>");
-            this.$infoPanel.append($("<button>")
+            /*this.$infoPanel.append($("<button>")
                            .addClass("btn btn-primary")
                            .append("Show Description")
                            .attr("type", "button")
@@ -96,11 +96,11 @@
                                                             window.location = "/functional-site/#/objgraphview/"+encodeURI(self.options.workspaceID+"/"+self.options.genomeID);
 							}));
                         }
-								 
+	    */							 
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
             this.$infoPanel.append($("<div>").append(this.$infoTable));
-
+        
             this.$contigSelect = $("<select>")
                                  .addClass("form-control")
                                  .css({"width":"60%", "margin-right":"5px"})
@@ -109,7 +109,7 @@
                                          .append(this.noContigs));
 
             var self = this;
-            this.$contigButton = $("<button>")
+            /*this.$contigButton = $("<button>")
                                  .addClass("btn btn-primary")
                                  .append("Show Contig")
                                  .click(function(event) {
@@ -133,7 +133,7 @@
                               .addClass("form-inline")
                               .append(this.$contigSelect)
                               .append(this.$contigButton));
-
+            */
             this.$infoPanel.hide();
             this.$elem.append(this.$infoPanel);
 			
@@ -330,15 +330,18 @@
         },
 
         showMessage: function(message) {
-            var span = $("<span/>").append(message);
+        // kbase panel now does this for us, should probably remove this
+        /*  var span = $("<span/>").append(message);
 
             this.$messagePane.empty()
                              .append(span)
-                             .show();
+                             .show();*/
         },
 
         hideMessage: function() {
-            this.$messagePane.hide();
+        // kbase panel now does this for us, should probably remove this
+        /*    this.$messagePane.hide();*/
+            
         },
 
         buildObjectIdentity: function(workspaceID, objectID) {
