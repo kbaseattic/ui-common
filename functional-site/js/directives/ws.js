@@ -1140,11 +1140,10 @@ angular.module('ws-directives')
                 })
             } // end scope.loadNarTable
 
-
-
             if (scope.tab && scope.tab != 'featured') {
-                console.log('calling')
                 scope.loadNarTable(scope.tab);
+            } else {
+                scope.loadObjTable();
             }
 
             function getSettingsBtn(table) {
