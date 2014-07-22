@@ -32,6 +32,7 @@
         width: 920,
         barHeight : 20,
         barWidth:400,
+        stepSize:8,
         svg:null,
 
         i : 0,
@@ -66,7 +67,6 @@
 
             $.when(prom).done($.proxy(function(genome) {
                 var genomeObj = genome[0].data;
-                console.log("Num Features: " + genomeObj.features.length);
 
                 /*
                     First I am going to iterate over the Genome Typed Object and 
@@ -90,7 +90,6 @@
                 this.loadSEEDHierarchy();
 
             }, this));
-            
 
             return this;
         },
@@ -132,7 +131,6 @@
 
             d3.text("assets/data/subsys.txt", function(text) {
                 var data = d3.tsv.parseRows(text);
-                console.log("Lines: " + data.length);
 
                 for (i = 0; i < data.length; i++) {
                     var geneCount = 0;
@@ -248,8 +246,7 @@
 
             nodeEnter.append("rect")
                 .attr("y", -self.barHeight / 2)
-                //.attr("x", function (d) { return 0 - d.depth * 4;} )
-                .attr("x", function (d) { return 0 + 275 - scale(d.size) - d.depth * 8;} )
+                .attr("x", function (d) { return 0 + 275 - scale(d.size) - d.depth * self.stepSize;} )
                 .attr("height", self.barHeight)
                 .attr("width", function (d) { return scale(d.size); })
                 .style("fill", self.color);
@@ -309,9 +306,6 @@
             var self = this;
             if (d.children) {
                 d._children = d.children;
-                //for(var i = 0; i < d._children.length; i++) {
-                //    self.collapse(d._children[i]);
-                //}
                 d._children.forEach( function(n) {self.collapse(n)});
                 d.children = null;
             }
@@ -324,9 +318,8 @@
         render: function() {
             var margin =  this.margin,
                 width = this.width;
-                //svg = this.svg;
 
-            this.tree = d3.layout.tree().nodeSize([0, 8]);
+            this.tree = d3.layout.tree().nodeSize([0, this.stepSize]);
 
             this.$elem.append('<div id="mainview">');
 
