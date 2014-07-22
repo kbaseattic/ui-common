@@ -142,7 +142,7 @@
         },
 
         addInfoRow: function(a, b) {
-            return "<tr><td>" + a + "</td><td>" + b + "</td></tr>";
+            return "<tr><th>" + a + "</th><td>" + b + "</td></tr>";
         },
 
         renderCentralStore: function() {
