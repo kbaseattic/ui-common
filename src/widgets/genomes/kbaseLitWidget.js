@@ -71,7 +71,9 @@
 			self = this;
 			
 			var lit = self.options.literature
-			var loader = $("<div style='display:none'><img src='"+self.options.loadingImage+"'/></div>").css({"width":"100%","margin":"0 auto"})
+			// var loader = $("<div style='display:none'><img src='"+self.options.loadingImage+"'/></div>").css({"width":"100%","margin":"0 auto"})
+			var loader = $("<div style='display:none'>LOADING...</div>").css({"width":"100%","margin":"0 auto"})
+
 			var resultsDiv = $("<div>").append('<table cellpadding="0" cellspacing="0" border="0" id="literature-table" \
                             class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>')
 			var searchBarDiv = $("<div>").append("<input type='text' id='lit-query-box'>")
@@ -153,8 +155,8 @@
 								var sDom = 't<flip>'
 								if (tableInput.length<=10) { sDom = 'tfi'; }					
 								var tableSettings = {
-									"sPaginationType": "full_numbers",
-									"iDisplayLength": 10,
+									// "sPaginationType": "full_numbers",
+									"iDisplayLength": 4,
 									"sDom": sDom,
 									"aoColumns": [
 										{sTitle: "Journal", mData: "source"},
