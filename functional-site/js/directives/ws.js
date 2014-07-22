@@ -11,7 +11,7 @@
 
 angular.module('ws-directives', []);
 angular.module('ws-directives')
-.directive('wsselector', function($location, $compile, $state, $stateParams) {
+.directive('wsselector', function($location, $compile, $state, $stateParams, modals) {
     return {
         templateUrl: 'views/ws/ws-selector.html',
         link: function(scope, element, attrs) {
@@ -136,7 +136,7 @@ angular.module('ws-directives')
                 // event for clicking on 'create new workspace'
                 $('.btn-new-ws').unbind('click');
                 $('.btn-new-ws').click(function() {
-                    createWorkspaceModal();
+                    modals.createWorkspace();
                 });
 
                 $('.btn-show-fav').unbind('click');
@@ -302,96 +302,7 @@ angular.module('ws-directives')
 
 
 
-            function createWorkspaceModal() {
-                var body = $('<form class="form-horizontal" role="form">\
-                                  <div class="form-group">\
-                                    <label class="col-sm-4 control-label">Workspace Name</label>'+
-                                    '<div class="col-sm-6">'+                                 
-                                        '<div class="input-group">'+
-                                            '<span class="input-group-addon">'+USER_ID+':</span>'+
-                                            '<input type="text" class="form-control create-id focusedInput">'+
-                                        '</div>'+
-                                    '</div>\
-                                  </div>\
-                                  <div class="form-group">\
-                                    <label class="col-sm-4 control-label">Global Permission</label>\
-                                    <div class="col-sm-3">'+
-                                        globalPermDropDown('n')+
-                                    '</div>\
-                                  </div>\
-                                  <div class="form-group">\
-                                    <label class="col-sm-4 control-label">Description</label>\
-                                    <div class="col-sm-7">\
-                                      <textarea class="form-control create-descript" rows="3"></textarea>\
-                                    </div>\
-                                  </div>\
-                              </div>')
-                
 
-                var createModal = $('<div></div>').kbasePrompt({
-                        title : 'Create Workspace',
-                        body : body,
-                        modalClass : '', 
-                        controls : ['cancelButton', {
-                            name : 'Create',
-                            type : 'primary',
-                            callback : function(e, $prompt) {
-                                    var ws_name = $('.create-id').val();
-                                    var perm = $('.create-permission option:selected').val();
-                                    var descript = $('.create-descript').val();
-
-
-
-                                    if (ws_name === '') {
-                                        $prompt.addAlert('must enter a workspace name');
-                                        $('.create-id').focus();
-                                        return;
-                                    }                   
-
-                                    // check to see if there's a colon in the user project name already
-                                    // if there is and it's the user's username, use it. If it's not throw error.
-                                    // Otherwise, append "username:"
-                                    var s_ws = ws_name.split(':');
-                                    var error;
-                                    if (s_ws.length > 1) {
-                                        if (s_ws[0] == USER_ID) {
-                                            var proj = USER_ID+':'+s_ws[1];
-                                        }  else {
-                                            error = 'Only your username ('+USER_ID+') may be used before a colon';
-                                            
-                                        }
-                                    } else {
-                                        var name = USER_ID+':'+ws_name
-                                    }
-
-                                    if (error) {
-                                        $prompt.addCover(error, 'danger');
-                                    } else {
-                                        var params = {
-                                            workspace: name,
-                                            globalread: perm,
-                                            description: descript
-                                        };                                            
-                                        var prom = kb.ws.create_workspace(params);
-                                        $prompt.data('dialogModal').find('.modal-body').loading()
-                                        $.when(prom).done(function(){                                            
-                                            scope.loadWSTable();
-                                            kb.ui.notify('Created workspace: '+ws_name, 'success');                                            
-                                            $prompt.closePrompt(); 
-
-                                            $prompt.data('dialogModal').find('.modal-footer').html(btn);                                            
-                                        }).fail(function(e) {
-                                            $prompt.data('dialogModal').find('.modal-body').rmLoading()
-                                            $prompt.addCover(e.error.message, 'danger');                                            
-                                        })
-                                    }
-                            }
-                        }]
-                    }
-                );
-
-                createModal.openPrompt();
-            }
 
             function cloneWorkspace(ws_name) {
                 var body = $('<form class="form-horizontal" role="form">\
@@ -2788,7 +2699,7 @@ angular.module('ws-directives')
     };
 })
 
-.directive('newnarrativebtn', function($state) {
+.directive('newnarrativebtn', function($state, modals) {
     return {
         template: '<a class="btn-new-narrative" ng-click="createNewNarrative()">'+
                     '<b><span class="glyphicon glyphicon-plus"></span> New Narrative</b>'+
@@ -2799,37 +2710,6 @@ angular.module('ws-directives')
                 var body = $('<form class="form-horizontal" role="form">');
 
                 body.loading();
-                var p = kb.getWorkspaceSelector()
-                //var prom = kb.ws.list_workspace_info({perm: 'w'});
-                $.when(p).done(function(selector) {
-                    console.log('workspaces', selector)
-                    body.rmLoading();
-
-                    body.append(selector);
-                    body.append('<div class="form-group">'+
-                                    '<label class="col-sm-5 control-label">Narrative Name</label>'+
-                                    '<div class="col-sm-4">'+
-                                        '<input type="text" class="form-control new-nar-id">'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="form-group">'+
-                                    '<label class="col-sm-5 control-label">Global Permission</label>'+
-                                    '<div class="col-sm-3">'+
-                                        '<select class="form-control create-permission" data-value="n">'+
-                                            '<option value="n" selected="selected">none</option>'+
-                                            '<option value="r">read</option>'+
-                                        '</select>'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="form-group">'+
-                                        '<label class="col-sm-5 control-label">Description</label>'+
-                                        '<div class="col-sm-7">'+
-                                            '<textarea class="form-control nar-descript" rows="3"></textarea>'+
-                                        '</div>'+
-                                '</div>');
-
-                });
-
                 var newNarrativeModal = $('<div class="kbase-prompt">').kbasePrompt({
                         title : 'Create New Narrative',
                         body : body,
@@ -2839,7 +2719,7 @@ angular.module('ws-directives')
                             type: 'default',
                             callback: function(e, $prompt) {
                                     $prompt.closePrompt();
-                                    manageModal(ws_name);
+                                    //manageModal(ws_name);
                                 }
                             },
                             {
@@ -2871,7 +2751,7 @@ angular.module('ws-directives')
                                     $state.go('narratives.mynarratives');
 
                                     console.log('tab', scope.tab)
-                                    scope.loadNarTable();
+                                    //ascope.loadNarTable();
                                     kb.ui.notify('Created new narrative: <i>'+name+'</i>');
                                     $prompt.closePrompt();
                                 }).fail(function(e) {
@@ -2881,13 +2761,51 @@ angular.module('ws-directives')
                         }]
                     }
                 )
-
                 newNarrativeModal.openPrompt();
+
+                var p = kb.getWorkspaceSelector()
+                //var prom = kb.ws.list_workspace_info({perm: 'w'});
+                $.when(p).done(function(selector) {
+                    body.rmLoading();
+
+                    var new_ws_btn = $('<a class="btn">New WS</a>');
+                    new_ws_btn.click(function() {
+                        newNarrativeModal.closePrompt();
+                        modals.createWorkspace(function(){
+                            scope.createNewNarrative();
+                        },function() {
+                            scope.createNewNarrative();
+                        });
+                        return;
+                    })
+
+                    selector.find('.form-group').append(new_ws_btn);
+                    body.append(selector);
+
+                    body.append('<div class="form-group">'+
+                                    '<label class="col-sm-5 control-label">Narrative Name</label>'+
+                                    '<div class="col-sm-4">'+
+                                        '<input type="text" class="form-control new-nar-id">'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="form-group">'+
+                                    '<label class="col-sm-5 control-label">Global Permission</label>'+
+                                    '<div class="col-sm-3">'+
+                                        '<select class="form-control create-permission" data-value="n">'+
+                                            '<option value="n" selected="selected">none</option>'+
+                                            '<option value="r">read</option>'+
+                                        '</select>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="form-group">'+
+                                        '<label class="col-sm-5 control-label">Description</label>'+
+                                        '<div class="col-sm-7">'+
+                                            '<textarea class="form-control nar-descript" rows="3"></textarea>'+
+                                        '</div>'+
+                                '</div>');
+                });
+
             }
-
-
-
-
         }
     }
 })

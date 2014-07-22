@@ -127,7 +127,11 @@ var app = angular.module('landing-pages',
           url: "maps/:ws/:id/?fba",
           templateUrl: 'views/ws/maps.html',
           reloadOnSearch: false
+        }).state('ws.mv.modeleditor', {
+          url: "model-editor/:ws/:id/",
+          templateUrl: 'views/ws/model-editor.html',
         });
+
 
 
     // workspace object landing pages
@@ -496,9 +500,10 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     kb = new KBCacheClient(USER_TOKEN);
     kb.nar.ensure_home_project(USER_ID);
 
+
     $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
 
-    console.log($rootScope.USER_ID);
+    console.log(USER_TOKEN);
 
 
     // global state object to store state
@@ -516,9 +521,6 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
 /*
  *   landing page app helper functions
  */ 
-
-
-
 function get_selected_ws() {
     if (state.get('selected')) {
         return state.get('selected')[0];
