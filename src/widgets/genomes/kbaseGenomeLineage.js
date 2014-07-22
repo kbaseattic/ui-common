@@ -35,8 +35,8 @@
             
             this.pref = this.uuid();
 
-            //this.$messagePane = $("<div/>").addClass("kbwidget-message-pane").hide();
-            //this.$elem.append(this.$messagePane);
+            this.$messagePane = $("<div/>").hide();
+            this.$elem.append(this.$messagePane);
 
             this.render();
             if (this.options.workspaceID === null) {
@@ -70,7 +70,7 @@
             this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
 
             this.$infoPanel.hide();
-            //this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
 
             // Fields to show:
             // ID
@@ -96,7 +96,7 @@
         renderWorkspace: function () {
             var self = this;
             //console.log( this.options.loadingImage);
-            //this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
             this.$infoPanel.hide();
             //console.log("rendering");
             //console.log(this.options.kbCache);
@@ -213,19 +213,16 @@
         },
 
         showMessage: function(message) {
-	    /*
+	    
             var span = $("<span/>").append(message);
 
             this.$messagePane.empty()
                              .append(span)
                              .show();
-                             */
         },
 
         hideMessage: function() {
-	    /*
             this.$messagePane.hide();
-            */
         },
         
         renderError: function (error) {

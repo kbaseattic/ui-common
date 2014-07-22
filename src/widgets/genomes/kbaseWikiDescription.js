@@ -28,8 +28,8 @@
                 return this;
             }
             this.$messagePane = $("<div/>")
-                                .addClass("kbwidget-message-pane")
-                                .addClass("kbwidget-hide-message");
+                                //.addClass("kbwidget-message-pane")
+                                //.addClass("kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
             this.cdmiClient = new CDMI_API(this.cdmiURL);
@@ -45,9 +45,7 @@
 
         render: function() {
             var self = this;
-            //this.showMessage("<img src='" + this.options.loadingImage + "'/>");
-            //self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>building object reference graph...</center></p></div>');
-	    
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
             
             /*
              * A couple nested callbacks here.
@@ -182,7 +180,7 @@
                                           .append($imageTab)
                                          ); */
 
-                    //this.hideMessage();  
+                    this.hideMessage();  
                     //this.$elem.append($tabSet).append($contentDiv);
                     
                     this.$elem.append('<table cellpadding="4" cellspacing="2" border=0 style="width:100%;">' +
@@ -200,7 +198,7 @@
         },
 
         renderWorkspace: function() {
-            //this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
             var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
             var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
 
@@ -283,15 +281,15 @@
         },
 
         showMessage: function(message) {
-            /*var span = $("<span/>").append(message);
+            var span = $("<span/>").append(message);
 
             this.$messagePane.append(span);
-            this.$messagePane.removeClass("kbwidget-hide-message");*/
+            this.$messagePane.removeClass("kbwidget-hide-message");
         },
 
         hideMessage: function() {
-          /*  this.$messagePane.addClass("kbwidget-hide-message");
-            this.$messagePane.empty();*/
+            this.$messagePane.addClass("kbwidget-hide-message");
+            this.$messagePane.empty();
         },
         
         getData: function() {

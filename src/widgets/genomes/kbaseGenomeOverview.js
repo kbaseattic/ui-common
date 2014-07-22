@@ -19,21 +19,23 @@
 
         init: function(options) {
             this._super(options);
-            if (this.options.genomeID === null) {
-                //throw an error
-                return;
-            }
+            //if (this.options.genomeID === null) {
+            //    //throw an error
+            //    return;
+            //}
 
-           // this.$messagePane = $("<div/>")
-           //                     .addClass("kbwidget-message-pane")
-           //                     .hide();
-           // this.$elem.append(this.$messagePane);
+            this.$messagePane = $("<div/>")
+                                //.addClass("kbwidget-message-pane")
+                                .hide();
+            this.$elem.append(this.$messagePane);
 
             this.render(); // this is moved inside central store and 
-            if (this.options.workspaceID === null)
+            if (this.options.workspaceID === null) {
                 this.renderCentralStore();
-            else
+            }
+            else {
                 this.renderWorkspace();
+            }
 															
             return this;
         },
@@ -150,7 +152,7 @@
             this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
 
             this.$infoPanel.hide();
-            this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
             /**
              * Fields to show:
              * ID
@@ -242,7 +244,7 @@
 
         renderWorkspace: function() {
 			self = this
-            this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
             this.$infoPanel.hide();
             // console.log("rendering workspace genome");
             // console.log(this.options.kbCache);
@@ -331,16 +333,16 @@
 
         showMessage: function(message) {
         // kbase panel now does this for us, should probably remove this
-        /*  var span = $("<span/>").append(message);
+          var span = $("<span/>").append(message);
 
             this.$messagePane.empty()
                              .append(span)
-                             .show();*/
+                             .show();
         },
 
         hideMessage: function() {
         // kbase panel now does this for us, should probably remove this
-        /*    this.$messagePane.hide();*/
+            this.$messagePane.hide();
             
         },
 
