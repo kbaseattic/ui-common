@@ -482,6 +482,9 @@ function KBCacheClient(token) {
             case 'PromConstraint':
                 route = 'ws.promconstraint';
                 break; 
+            case 'Regulome':
+                route = 'ws.regulome';
+                break; 
             case 'PhenotypeSet':
                 route = 'ws.phenotype';
                 break; 

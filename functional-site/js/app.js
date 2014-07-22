@@ -177,6 +177,10 @@ var app = angular.module('landing-pages',
           url: "promconstraint/:ws/:id",
           templateUrl: 'views/ws/promconstraint.html',
           controller: 'WBLanding'
+        }).state('ws.regulome', {
+          url: "regulome/:ws/:id",
+          templateUrl: 'views/ws/regulome.html',
+          controller: 'WBLanding'
         }).state('ws.simulation', {
           url: "simulation/:ws/:id",
           templateUrl: 'views/ws/simulation.html',
