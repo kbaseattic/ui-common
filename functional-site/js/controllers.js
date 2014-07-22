@@ -151,9 +151,15 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     $scope.id = $stateParams.id;
 })
 
-.controller('WB', function($scope, $stateParams) {
+.controller('WB', function($scope, $stateParams, $location) {
     $scope.selected_ws = $stateParams.ws;
     $scope.type = $stateParams.type;
+
+    var sub = $location.path().split('/')[1]
+    if (sub == 'narratives') {
+        $scope.tab = $location.path().split('/')[2];
+    }
+
 
     $scope.showPreviousChanges = function() {
         $('#previous-changes').slideToggle();

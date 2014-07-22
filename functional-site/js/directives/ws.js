@@ -901,7 +901,7 @@ angular.module('ws-directives')
             }
 
 
-            var loadObjTable = function() {
+            scope.loadObjTable = function() {
                 showObjOpts = false;
                 var table_id = "obj-table-"+ws.replace(':',"_");                    
 
@@ -1143,12 +1143,9 @@ angular.module('ws-directives')
 
 
             if (scope.tab && scope.tab != 'featured') {
+                console.log('calling')
                 scope.loadNarTable(scope.tab);
-            } else {
-                scope.loadObjTable = loadObjTable();
             }
-
-            
 
             function getSettingsBtn(table) {
                 var settings_btn = $('<div class="btn-table-settings dropdown pull-left">'+
@@ -2748,7 +2745,9 @@ angular.module('ws-directives')
                                 $prompt.addCover();
                                 $prompt.getCover().loading();
                                 $.when(p).done(function(){
-                                    $state.go('narratives.mynarratives');
+                                    console.log('transitionging ')
+                                    $state.transitionTo('narratives.mynarratives');
+                                    scope.$apply();
 
                                     console.log('tab', scope.tab)
                                     //ascope.loadNarTable();
@@ -2768,7 +2767,7 @@ angular.module('ws-directives')
                 $.when(p).done(function(selector) {
                     body.rmLoading();
 
-                    var new_ws_btn = $('<a class="btn">New WS</a>');
+                    var new_ws_btn = $('<a class="btn btn-link">New WS</a>');
                     new_ws_btn.click(function() {
                         newNarrativeModal.closePrompt();
                         modals.createWorkspace(function(){
@@ -2786,15 +2785,6 @@ angular.module('ws-directives')
                                     '<label class="col-sm-5 control-label">Narrative Name</label>'+
                                     '<div class="col-sm-4">'+
                                         '<input type="text" class="form-control new-nar-id">'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="form-group">'+
-                                    '<label class="col-sm-5 control-label">Global Permission</label>'+
-                                    '<div class="col-sm-3">'+
-                                        '<select class="form-control create-permission" data-value="n">'+
-                                            '<option value="n" selected="selected">none</option>'+
-                                            '<option value="r">read</option>'+
-                                        '</select>'+
                                     '</div>'+
                                 '</div>'+
                                 '<div class="form-group">'+

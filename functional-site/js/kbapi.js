@@ -160,7 +160,7 @@ function KBCacheClient(token) {
         //}
 
         // get all workspaces, filter by mine, shared, and public
-        var prom = kb.ws.list_workspace_info({});
+        var prom = kb.ws.list_workspace_info({});    
         var p = $.when(prom).then(function(workspaces) {
             var my_list = [];
             var shared_list = [];
@@ -645,7 +645,7 @@ function UIUtils() {
         var seconds = Math.floor(interval / 1000);
 
         if (days == 0 && hours == 0 && minutes == 0) {
-            return seconds + " secs ago.";
+            return seconds + " secs ago";
         } else if (days == 0 && hours == 0) {
             if (minutes == 1) return "1 min ago";
             return  minutes + " mins ago";

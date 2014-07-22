@@ -65,23 +65,23 @@ var app = angular.module('landing-pages',
         .state('narratives', {
           url: "/narratives/",
           templateUrl: 'views/ws/narratives.html',
-          controller: 'NarrativeCtrl'
+          controller: 'WB'
         }).state('narratives.mynarratives', {
           url: "my-narratives",
           templateUrl: 'views/ws/narrative-table.html',
-          controller: 'NarrativeCtrl'
+          controller: 'WB'
         }).state('narratives.shared', {
           url: "shared",
           templateUrl: 'views/ws/narrative-table.html',
-          controller: 'NarrativeCtrl'
+          controller: 'WB'
         }).state('narratives.public', {
           url: "public",
           templateUrl: 'views/ws/narrative-table.html',
-          controller: 'NarrativeCtrl'
+          controller: 'WB'
         }).state('narratives.featured', {
           url: "featured",
           templateUrl: 'views/ws/featured.html',
-          controller: 'NarrativeCtrl'
+          controller: 'WB'
         });
 
 
