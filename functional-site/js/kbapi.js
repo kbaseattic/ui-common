@@ -83,8 +83,7 @@ function WSCache() {
 function KBCacheClient(token) {
     var self = this;
     var auth = {};
-//    auth.token = token;
-    auth.token = "un=nconrad|tokenid=4c2636ee-ea75-11e3-9f1c-123139141556|expiry=1433263526|client_id=nconrad|token_type=Bearer|SigningSubject=https://nexus.api.globusonline.org/goauth/keys/0a96c21c-e821-11e3-ad3f-22000ab68755|sig=e830664e4f752337a8842206b3a2bd414f79034db722d200163619ce48d909a7aef5b3bdc5ddc6f564187fa49b7f052cc60a8fc9a24da09ed00597de75682c8e6c8b10d08bde50f74441a90f4e5aa5ffd04993290bbdc6880be1bb4d853be61aeb192d34445b30d1411e526a3d9d3a42717172b0fe44f995a593bdfebd46cc1f"
+    auth.token = token;
 
     console.log(auth.token)
     if (typeof configJSON != 'undefined') {
@@ -479,6 +478,9 @@ function KBCacheClient(token) {
                 break;
             case 'Media': 
                 route = 'ws.media';
+                break; 
+            case 'PromConstraint':
+                route = 'ws.promconstraint';
                 break; 
             case 'PhenotypeSet':
                 route = 'ws.phenotype';

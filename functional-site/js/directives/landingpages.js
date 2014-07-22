@@ -142,7 +142,7 @@ angular.module('lp-directives')
         link: function(scope, element, attrs) {
             var ws = scope.ws;
             var id = scope.id;
-            var p = $(element).kbasePanel({title: 'Cocre Metabolic Pathway', 
+            var p = $(element).kbasePanel({title: 'Core Metabolic Pathway', 
                                            rightLabel: ws,
                                            subText: id, 
                                            type: 'FBAModel', 
@@ -499,6 +499,18 @@ angular.module('lp-directives')
     }
 })
 
+.directive('promconstraint', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'PROM Constraint Data', 
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+
+            $(p.body()).kbasePromConstraint({ws: scope.ws, name: scope.id})
+
+        }
+    }
+})
 
 
 .directive('pangenome', function() {
@@ -587,7 +599,6 @@ angular.module('lp-directives')
         }
     };
 })
-
 
 .directive('simulation', function() {
     return {

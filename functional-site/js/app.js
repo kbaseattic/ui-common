@@ -173,6 +173,10 @@ var app = angular.module('landing-pages',
           url: "phenotype/:ws/:id",
           templateUrl: 'views/ws/phenotype.html',
           controller: 'WBLanding'
+        }).state('ws.promconstraint', {
+          url: "promconstraint/:ws/:id",
+          templateUrl: 'views/ws/promconstraint.html',
+          controller: 'WBLanding'
         }).state('ws.simulation', {
           url: "simulation/:ws/:id",
           templateUrl: 'views/ws/simulation.html',
