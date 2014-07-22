@@ -841,7 +841,6 @@ angular.module('ws-directives')
     return {
         link: function(scope, element, attrs) {
             var ws = scope.selected_ws;
-            var showObjOpts = false;
 
             var table;
             scope.favs;
@@ -902,7 +901,6 @@ angular.module('ws-directives')
 
 
             scope.loadObjTable = function() {
-                showObjOpts = false;
                 var table_id = "obj-table-"+ws.replace(':',"_");                    
 
                 var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
@@ -934,7 +932,7 @@ angular.module('ws-directives')
                     "oColReorder": {
                         "iFixedColumns": (USER_ID ? 1 :0 ),
                     },
-                    "iDisplayLength": 100,
+                    "iDisplayLength": 10,
                     "aaData": [],
                     "fnDrawCallback": events,
                     "aaSorting": [[ 3, "desc" ]],
@@ -1054,7 +1052,7 @@ angular.module('ws-directives')
                     "oColReorder": {
                         "iFixedColumns": (USER_ID ? 1 :0 ),
                     },
-                    "iDisplayLength": 100,
+                    "iDisplayLength": 10,
                     "aaData": [],
                     "fnDrawCallback": events,
                     "aaSorting": [[ 3, "desc" ]],
@@ -1501,13 +1499,7 @@ angular.module('ws-directives')
                         })
                     }
 
-                    if (!showObjOpts){
-                        //objOptClick();
-                        showObjOpts = true;
-                    }
-                    if (scope.checkedList.length == 0){
-                        showObjOpts = false;                            
-                    } 
+
                 })
 
                 // effect for highlighting checkbox on hover
@@ -1540,15 +1532,6 @@ angular.module('ws-directives')
                         scope.$apply();
                     }
 
-                    if (!showObjOpts) {
-                        objOptClick();
-                        showObjOpts = true;
-                    }
-
-                    if (scope.checkedList.length == 0){
-                        $('.btn-select-all').removeClass('ncheck-checked');                            
-                        showObjOpts = false;
-                    } 
                 })
 
 
@@ -1568,29 +1551,6 @@ angular.module('ws-directives')
                 //    $('.obj-table tr').removeClass('nar-selected');
                 //    new FixedHeader( table , {offsetTop: 50, "zTop": 500});       
                 //})
-
-                // events for top row options on objects, after checked
-                function objOptClick() {
-                    $('.btn-delete-obj').unbind('click')
-                    $('.btn-delete-obj').click(function(){
-                        deleteObjects()
-                    });
-
-                    /*
-                    $('.opt-dropdown ul li').unbind('click')
-                    $('.opt-dropdown ul li').click(function(){
-
-                        if ($(this).attr('opt') == 'copy'){
-                                console.log('clicked copy')
-                            if (scope.tab) {
-                                copyNarObjects()
-                            } else {
-                                copyObjects();
-                            }
-
-                        }
-                    })*/
-                }
             }
 
 
@@ -1599,6 +1559,9 @@ angular.module('ws-directives')
 
                 var delete_btn = $('<button class="btn btn-danger btn-delete-obj">\
                     <span class="glyphicon glyphicon-trash"></span></button>')
+                delete_btn.click(function() {
+                    deleteObjects()
+                })
 
                 var copy_btn = $('<span class="dropdown"><button class="btn btn-default btn-mv-dd" \
                                     data-toggle="dropdown">\
@@ -2037,11 +2000,6 @@ angular.module('ws-directives')
 
             function copyNarObjects(){
                 var workspace = ws; // just getting current workspace
-
-
-
-
-
                 var content = $('<form class="form-horizontal" role="form">\
                                         <div class="form-group">\
                                           <label class="col-sm-5 control-label">Destination Workspace</label>\
@@ -2338,14 +2296,11 @@ angular.module('ws-directives')
                                     e.error.message+'</div>');
                         });
                     //} 
-
-
                 }).fail(function(e){
                     modal_body.append('<div class="alert alert-danger">'+
                             '<b>Error</b> Can not fetch WS info: '+
                                 e.error.message+'</div>');
                 });
-
 
                 // editable status
                 $('.btn-edit').click(function(){
@@ -2715,7 +2670,6 @@ angular.module('ws-directives')
                             type: 'default',
                             callback: function(e, $prompt) {
                                     $prompt.closePrompt();
-                                    //manageModal(ws_name);
                                 }
                             },
                             {
