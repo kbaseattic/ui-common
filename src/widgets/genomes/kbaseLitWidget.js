@@ -6,9 +6,12 @@
 
         options: {
             genomeID: null,
+            workspaceID: null,
+			kbCache: null,
             loadingImage: "../../widgets/images/ajax-loader.gif",
             isInCard: false,
 			width: 600,
+			height: 700,
         },
 
 		init: function(options) {
@@ -24,43 +27,7 @@
 		addInfoRow: function(a, b) {
             return "<tr><td>" + a + "</td><td>" + b + "</td></tr>";
         },
-		
-		parseLitSearch: function(query,infoTable) {
-			self = this;
-			console.log(infoTable)
-			$.get(query,
-						function(data) {
-							var htmlJson = self.xmlToJson(data)
-							console.log(htmlJson)
-							var litInfo = htmlJson.eSummaryResult[1].DocSum.Item
-							for (i=0;i<litInfo.length;i++) {
-								if ("#text" in litInfo[i]) {
-									if (litInfo[i]["@attributes"].Name == "Source" || litInfo[i]["@attributes"].Name == "AuthorList" || litInfo[i]["@attributes"].Name == "Title") {
-										if (litInfo[i]["@attributes"].Type == "List") {
-											if ($.isArray(litInfo[i].Item)) {
-												newRow = "<tr><td>"+litInfo[i]["@attributes"].Name+"</td><td>"
-												for (j=0;j<litInfo[i].Item.length;j++) {
-													newRow+=litInfo[i].Item[j]["#text"]+", "
-												}
-												newRow+="</td></tr>"
-												infoTable.append(newRow)
-											}
-											else {infoTable.append(self.addInfoRow(litInfo[i].Item["@attributes"].Name,litInfo[i].Item["#text"]))}
-										}
-										else {
-											console.log(infoTable)
-											infoTable.append(self.addInfoRow(litInfo[i]["@attributes"].Name,litInfo[i]["#text"]))
-										}
-									}
-								}
-							}
-							var pubmedLink = "http://www.ncbi.nlm.nih.gov/pubmed/"+htmlJson.eSummaryResult[1].DocSum.Id["#text"]
-							// var linkRow = $("<tr>").append("<td>Link</td>").append("<td>" + pubmedLink + "</td>").click(function() {window.open(pubmedLink,'_blank')}).append("</tr>")
-							var linkRow = $("<tr>").append("<td>Link</td>").append("<td><a href=" + pubmedLink + " target=_blank>" + pubmedLink + "</a></td>")
-							infoTable.append(linkRow)
-						})
-		},
-		
+
 		xmlToJson: function(xml) {
 				self = this;
 				// Create the return object
@@ -105,43 +72,117 @@
 			
 			var lit = self.options.literature
 			
-			self.$infoPanel = $("<div>");
-           
-			$.get(lit,
-				function(data) {
-					var htmlJson = self.xmlToJson(data)
-					if ($.isArray(htmlJson.eSearchResult[1].IdList.Id)) {
-						for (x=0;x<htmlJson.eSearchResult[1].IdList.Id.length;x++) {
-							var infoTable = $("<table>")
-								.addClass("table table-striped table-bordered");
-							var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+htmlJson.eSearchResult[1].IdList.Id[x]['#text']
-							self.parseLitSearch(query,infoTable)
-							self.$infoPanel.append(infoTable)
-							self.$elem.append(self.$infoPanel);			
-						}
-					}
-					else {
-						var infoTable = $("<table>")
-                            .addClass("table table-striped table-bordered");
-						var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+htmlJson.eSearchResult[1].IdList.Id['#text']
-						self.parseLitSearch(query,infoTable)
-						self.$infoPanel.append(infoTable)
-						self.$elem.append(self.$infoPanel);			
-
-					}
-					
-				})
+			var resultsDiv = $("<div>").append('<table cellpadding="0" cellspacing="0" border="0" id="literature-table" \
+                            class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>')
+			var searchBarDiv = $("<div>").append("<input type='text' id='lit-query-box'>")
+			var searchBarButton = $("<input type='button' id='lit-search-button' value='Update Search'>")
+									.on("click",function() {
+										lit = $('#lit-query-box').val()
+										tableInput = []
+										litDataTable.fnDestroy()
+										populateSearch(lit)
+									})
+		
+			var tableInput = []
+			var litDataTable;
+		
+			self.$elem.append(searchBarDiv.append(searchBarButton)).append(resultsDiv)
 			
+			$('#lit-query-box').val(lit)
+			$('#lit-query-box').css({"width":"300px"})
+			populateSearch(lit)
+			
+			function parseLitSearchDataTable(query) {
+				var tableInputRow = {}
+					
+				$.ajax({
+					async: false,
+					url: query,
+					type: 'GET',
+					success:
+					function(data) {
+						var htmlJson = self.xmlToJson(data)
+						var litInfo = htmlJson.eSummaryResult[1].DocSum.Item
+						// if (data[0].length == 0) {
+								// self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
+						// } else {
+						for (i=0;i<litInfo.length;i++) {
+							if ("#text" in litInfo[i]) {
+								if (litInfo[i]["@attributes"].Name == "Source") tableInputRow["jo"] = litInfo[i]["#text"]
+								if (litInfo[i]["@attributes"].Name == "AuthorList") {
+									if ($.isArray(litInfo[i].Item)) {
+										var authors = ""
+										for (j=0;j<litInfo[i].Item.length;j++) {
+											authors+=litInfo[i].Item[j]["#text"]
+											if (j!=litInfo[i].Item.length-1) authors+=", "
+										}
+										tableInputRow["au"] = authors													
+									}
+									else {tableInputRow["au"] = litInfo[i].Item["#text"]}
+								}
+								if (litInfo[i]["@attributes"].Name == "Title") {
+									var pubmedLink = "http://www.ncbi.nlm.nih.gov/pubmed/"+htmlJson.eSummaryResult[1].DocSum.Id["#text"]
+									tableInputRow["ti"] = "<a href=" + pubmedLink + " target=_blank>" + litInfo[i]["#text"] + "</a>"
+								}
+							}
+						}										
+					}
+				})
+				return tableInputRow
+			}
+			
+			function populateSearch(lit) {
+
+				$.ajax({
+					async: true,
+					url: 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=100000&term='+lit.replace(/\s+/g, "+"),
+					type: 'GET',
+					success: 
+					function(data) {
+						
+						var htmlJson = self.xmlToJson(data)
+						console.log(htmlJson)
+						if ($.isArray(htmlJson.eSearchResult[1].IdList.Id)) {						
+							
+							for (x=0;x<htmlJson.eSearchResult[1].IdList.Id.length;x++) {
+								var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+htmlJson.eSearchResult[1].IdList.Id[x]['#text']														 
+								tableInput.push(parseLitSearchDataTable(query))
+							}
+						}
+						else {									
+							console.log(htmlJson)
+							var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+htmlJson.eSearchResult[1].IdList.Id['#text']
+							tableInput.push(parseLitSearchDataTable(query))																		
+						}				
+						var sDom = 't<flip>'
+						if (tableInput.length<=10) { sDom = 'tfi'; }					
+						console.log(tableInput)
+						var tableSettings = {
+							"sPaginationType": "full_numbers",
+							"iDisplayLength": 10,
+							"sDom": sDom,
+							"aoColumns": [
+								{sTitle: "Journal", mData: "jo"},
+								{sTitle: "Authors", mData: "au"},
+								{sTitle: "Title", mData: "ti"}
+							],
+							"aaData": tableInput
+						}	
+						litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
+						
+					}
+				})
+			}
 				
 			return this;
-		},
+		},		
 		
 	    getData: function() {
             return {
                 type: "LitWidget",
                 id: this.options.genomeID,
                 workspace: this.options.workspaceID,
-                title: "Literature Widget"
+                title: "Literature"
             };
         },
 	});

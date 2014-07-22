@@ -61,7 +61,7 @@
 			
 			this.$infoPanel.append($("<button>")
                                  .addClass("btn btn-primary")
-                                 .append("Literature Search")
+                                 .append("Related Publications")
 								 .attr("type", "button")
 								 .on("click",
 									function(event) {
@@ -71,12 +71,12 @@
 											return;											
 										}
 										else {
-											var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term='+self.pubmedQuery.replace(/\s+/g, "+")
+											var query = self.pubmedQuery
 											self.trigger("showLitWidget", 
 												{ 
 												literature: query, 
-												workspaceId: self.options.workspaceID,
-												genomeId: self.options.genomeID,
+												workspaceID: self.options.workspaceID,
+												genomeID: self.options.genomeID,
 												kbCache: self.options.kbCache,
 												event: event,
 												}
@@ -85,6 +85,17 @@
 										
 									})
 								);
+                        if (self.options.workspaceID === null) {
+                            // possibly we show other CDS related buttongs
+                        } else {
+                            // show ws related buttons
+                            self.$infoPanel.append($("<button>")
+                                 .addClass("btn btn-primary")
+                                 .append("View Object Graph").attr("type", "button").on("click",
+							function(event) {
+                                                            window.location = "/functional-site/#/objgraphview/"+encodeURI(self.options.workspaceID+"/"+self.options.genomeID);
+							}));
+                        }
 								 
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");

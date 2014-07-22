@@ -161,7 +161,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
         'kbCache' : kb }
 })
 
-
 .controller('WsObjGraphView', function($scope, $stateParams) {
     $scope.params = { 'ws':$stateParams.ws, 'kbCache' : kb }
 })
@@ -175,6 +174,14 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
+
+.controller('Taxonomy', function($scope, $stateParams) {
+    $scope.params = {
+	'taxonname': $stateParams.taxonname,
+	'ws':$stateParams.ws,
+        'kbCache' : kb }
+})
+
 
 .controller('WB', function($scope, $stateParams) {
     $scope.selected_ws = $stateParams.ws;
@@ -590,6 +597,10 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 
+.controller('TreeDetail', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id,
+                     'ws': $stateParams.ws};
+})
 
 
 /* controller for the copy narrative modal */

@@ -83,8 +83,9 @@
             this.$buttonPanel = $("<div>")
                                 .attr("align", "center")
                                 .addClass("btn-group")
-                                .append(makeButton("domains"))
-                                .append(makeButton("operons"))
+		                //.append(makeButton("domains"))
+		                //.append(makeButton("operons"))
+                                .append(makeButton("sequence"))
                                 .append(makeButton("biochemistry"));
 
             this.$infoPanel.append(this.$infoTable)
@@ -125,12 +126,12 @@
                 this.clientError
             ));
             // Fids to protein families job
-            jobsList.push(this.cdmiClient.fids_to_protein_families([this.options.featureID],
-                function(families) {
-                    data.families = families[self.options.featureID];
-                },
-                this.clientError
-            ));
+            //jobsList.push(this.cdmiClient.fids_to_protein_families([this.options.featureID],
+            //    function(families) {
+            //        data.families = families[self.options.featureID];
+            //    },
+            //    this.clientError
+            //));
 
             $.when.apply($, jobsList).done(function() {
                 self.$infoTable.empty();
@@ -144,31 +145,37 @@
                                                             .append(self.parseLocation(data.featureData.feature_location))
                                                             .append(self.makeContigButton(data.featureData.feature_location))));
 
-                self.$infoTable.append(self.makeRow("GC Content", self.calculateGCContent(data.dnaSeq).toFixed(2) + "%"));
+                //self.$infoTable.append(self.makeRow("GC Content", self.calculateGCContent(data.dnaSeq).toFixed(2) + "%"));
 
-                if (data.families && data.families.length != 0) {
-                    self.cdmiClient.protein_families_to_functions(data.families,
-                        function(families) {
-                            var familyStr = '';
-                            for (var fam in families) {
-                                familyStr += fam + ": " + families[fam] + "<br/>";
-                            }
-                            self.$infoTable.append(self.makeRow("Protein Families", familyStr));
-                        },
-                        self.clientError
-                    );
-                }
-                else
-                    self.$infoTable.append(self.makeRow("Protein Families", "None found"));
+                //if (data.families && data.families.length != 0) {
+                //    self.cdmiClient.protein_families_to_functions(data.families,
+                //        function(families) {
+                //            var familyStr = '';
+                //            for (var fam in families) {
+                //                familyStr += fam + ": " + families[fam] + "<br/>";
+                //            }
+                //            self.$infoTable.append(self.makeRow("Protein Families", familyStr));
+                //        },
+                //        self.clientError
+                //    );
+                //}
+                //else
+                //    self.$infoTable.append(self.makeRow("Protein Families", "None found"));
 
-                self.$buttonPanel.find("button#domains").click(
+                //self.$buttonPanel.find("button#domains").click(
+                //    function(event) { 
+                //        self.trigger("showDomains", { event: event, featureID: self.options.featureID }) 
+                //    }
+                //);
+                //self.$buttonPanel.find("button#operons").click(
+                //    function(event) { 
+                //        self.trigger("showOperons", { event: event, featureID: self.options.featureID }) 
+                //    }
+                //);
+
+                self.$buttonPanel.find("button#sequence").click(
                     function(event) { 
-                        self.trigger("showDomains", { event: event, featureID: self.options.featureID }) 
-                    }
-                );
-                self.$buttonPanel.find("button#operons").click(
-                    function(event) { 
-                        self.trigger("showOperons", { event: event, featureID: self.options.featureID }) 
+                        self.trigger("showSequence", { event: event, featureID: self.options.featureID }) 
                     }
                 );
                 self.$buttonPanel.find("button#biochemistry").click(
@@ -248,10 +255,10 @@
                                                             .append(this.makeContigButton(feature.location))));
 
                         // LOL GC content. Does anyone even care these days?
-                        if (feature.dna_sequence) {
-                            var gc = this.calculateGCContent(feature.dna_sequence);
-                            this.$infoTable.append(this.makeRow("GC Content", Number(gc).toFixed(2)));
-                        }
+                        //if (feature.dna_sequence) {
+                        //    var gc = this.calculateGCContent(feature.dna_sequence);
+                        //    this.$infoTable.append(this.makeRow("GC Content", Number(gc).toFixed(2)));
+                        //}
 
                         // Protein families list.
                         var proteinFamilies = "None found";
@@ -294,6 +301,17 @@
                         );
                         
                         // bind button events
+                        this.$buttonPanel.find("button#sequence").click(
+                            $.proxy(function(event) { 
+                                this.trigger("showSequence", { 
+                                    event: event, 
+                                    featureID: this.options.featureID,
+                                    genomeID: this.options.genomeID,
+                                    workspaceID: this.options.workspaceID,
+                                    kbCache: this.options.kbCache 
+                                });
+                            }, this)
+                        );
                         this.$buttonPanel.find("button#biochemistry").click(
                             $.proxy(function(event) { 
                                 this.trigger("showBiochemistry", { 
