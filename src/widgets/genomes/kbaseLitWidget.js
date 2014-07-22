@@ -113,8 +113,26 @@
 								// tableInput.push(parseLitSearchDataTable(query))
 							}
 						}
-						else {									
-							query += htmlJson.eSearchResult[1].IdList.Id['#text']
+						else {
+						    // I think this means no results? So here I just show an empty table--mike				
+								var tableSettings = {
+									// "sPaginationType": "full_numbers",
+									"iDisplayLength": 4,
+									"sDom": "ti",
+									"aoColumns": [
+										{sTitle: "Journal", mData: "source"},
+										{sTitle: "Authors", mData: "author"},
+										{sTitle: "Title", mData: "title"},
+										{sTitle: "Date", mData: "date"}
+									],
+									"aaData": []
+								}	
+								loader.hide()
+								litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
+							loader.hide()
+							return;
+							// this line below was throwing an error:
+							//query += htmlJson.eSearchResult[1].IdList.Id[0]['#text']
 							// tableInput.push(parseLitSearchDataTable(query))																		
 						}				
 						var tableInput = []
