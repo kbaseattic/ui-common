@@ -11,6 +11,7 @@
         options: {
             genomeID: null,
             workspaceID: null,
+            objVer: null,
             loadingImage: "../../widgets/images/ajax-loader.gif",
             kbCache: null,
             width:600
@@ -150,7 +151,6 @@
                     //http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=drosophila+miranda
                     var searchtax = splittax[a].replace("/ /g", "+");
                     console.log(searchtax);
-                    //<a href="#" onclick="myJsFunc();">Run JavaScript Code</a>
                     var str =pad+'<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name='+searchtax+'">'+splittax[a]+'</a><br>';
                     console.log(str);
                    finaltax+=str; 
