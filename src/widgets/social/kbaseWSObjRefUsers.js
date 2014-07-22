@@ -214,6 +214,7 @@
 		if(getNiceNames) { self.getNiceUserNames(); }
 	    } else {
 		var $maindiv = self.$elem.find('#mainview');
+		self.$elem.find('#loading-mssg').remove();
 		$maindiv.append("<br><b>There are no other users that have referenced or used this object.</b>");
 	    }
 	},

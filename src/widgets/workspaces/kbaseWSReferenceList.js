@@ -53,6 +53,7 @@
             $.when(request1, request2).done(function(data,typeToUrlMap) {
             	typeToUrlMap = typeToUrlMap[0];
                     if (data[0].length == 0) {
+                        self.$elem.find('#loading-mssg').remove();
                         self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
                     } else {
                         var refList = {};

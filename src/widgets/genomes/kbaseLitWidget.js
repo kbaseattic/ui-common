@@ -39,7 +39,7 @@
 					obj["@attributes"] = {};
 						for (var j = 0; j < xml.attributes.length; j++) {
 							var attribute = xml.attributes.item(j);
-							obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+							obj["@attributes"][attribute.nodeName] = attribute.value;
 						}
 					}
 				} else if (xml.nodeType == 3) { // text
@@ -71,7 +71,9 @@
 			self = this;
 			
 			var lit = self.options.literature
-			
+			// var loader = $("<div style='display:none'><img src='"+self.options.loadingImage+"'/></div>").css({"width":"100%","margin":"0 auto"})
+			var loader = $("<div style='display:none'>LOADING...</div>").css({"width":"100%","margin":"0 auto"})
+
 			var resultsDiv = $("<div>").append('<table cellpadding="0" cellspacing="0" border="0" id="literature-table" \
                             class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>')
 			var searchBarDiv = $("<div>").append("<input type='text' id='lit-query-box'>")
@@ -86,90 +88,110 @@
 			var tableInput = []
 			var litDataTable;
 		
-			self.$elem.append(searchBarDiv.append(searchBarButton)).append(resultsDiv)
+			self.$elem.append(searchBarDiv.append(searchBarButton)).append(loader).append(resultsDiv)
 			
 			$('#lit-query-box').val(lit)
 			$('#lit-query-box').css({"width":"300px"})
 			populateSearch(lit)
 			
-			function parseLitSearchDataTable(query) {
-				var tableInputRow = {}
-					
-				$.ajax({
-					async: false,
-					url: query,
-					type: 'GET',
-					success:
-					function(data) {
-						var htmlJson = self.xmlToJson(data)
-						var litInfo = htmlJson.eSummaryResult[1].DocSum.Item
-						// if (data[0].length == 0) {
-								// self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
-						// } else {
-						for (i=0;i<litInfo.length;i++) {
-							if ("#text" in litInfo[i]) {
-								if (litInfo[i]["@attributes"].Name == "Source") tableInputRow["jo"] = litInfo[i]["#text"]
-								if (litInfo[i]["@attributes"].Name == "AuthorList") {
-									if ($.isArray(litInfo[i].Item)) {
-										var authors = ""
-										for (j=0;j<litInfo[i].Item.length;j++) {
-											authors+=litInfo[i].Item[j]["#text"]
-											if (j!=litInfo[i].Item.length-1) authors+=", "
-										}
-										tableInputRow["au"] = authors													
-									}
-									else {tableInputRow["au"] = litInfo[i].Item["#text"]}
-								}
-								if (litInfo[i]["@attributes"].Name == "Title") {
-									var pubmedLink = "http://www.ncbi.nlm.nih.gov/pubmed/"+htmlJson.eSummaryResult[1].DocSum.Id["#text"]
-									tableInputRow["ti"] = "<a href=" + pubmedLink + " target=_blank>" + litInfo[i]["#text"] + "</a>"
-								}
-							}
-						}										
-					}
-				})
-				return tableInputRow
-			}
-			
 			function populateSearch(lit) {
-
+				loader.show()
 				$.ajax({
 					async: true,
-					url: 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=100000&term='+lit.replace(/\s+/g, "+"),
+					url: 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=500&term='+lit.replace(/\s+/g, "+"),
 					type: 'GET',
 					success: 
 					function(data) {
 						
 						var htmlJson = self.xmlToJson(data)
-						console.log(htmlJson)
+						var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='
 						if ($.isArray(htmlJson.eSearchResult[1].IdList.Id)) {						
 							
 							for (x=0;x<htmlJson.eSearchResult[1].IdList.Id.length;x++) {
-								var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+htmlJson.eSearchResult[1].IdList.Id[x]['#text']														 
-								tableInput.push(parseLitSearchDataTable(query))
+								query += htmlJson.eSearchResult[1].IdList.Id[x]['#text']
+								if (x != htmlJson.eSearchResult[1].IdList.Id.length-1) query += ','
+								// tableInput.push(parseLitSearchDataTable(query))
 							}
 						}
-						else {									
-							console.log(htmlJson)
-							var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='+htmlJson.eSearchResult[1].IdList.Id['#text']
-							tableInput.push(parseLitSearchDataTable(query))																		
+						else {
+						    // I think this means no results? So here I just show an empty table--mike				
+								var tableSettings = {
+									// "sPaginationType": "full_numbers",
+									"iDisplayLength": 4,
+									"sDom": "ti",
+									"aoColumns": [
+										{sTitle: "Journal", mData: "source"},
+										{sTitle: "Authors", mData: "author"},
+										{sTitle: "Title", mData: "title"},
+										{sTitle: "Date", mData: "date"}
+									],
+									"aaData": []
+								}	
+								loader.hide()
+								litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
+							loader.hide()
+							return;
+							// this line below was throwing an error:
+							//query += htmlJson.eSearchResult[1].IdList.Id[0]['#text']
+							// tableInput.push(parseLitSearchDataTable(query))																		
 						}				
-						var sDom = 't<flip>'
-						if (tableInput.length<=10) { sDom = 'tfi'; }					
-						console.log(tableInput)
-						var tableSettings = {
-							"sPaginationType": "full_numbers",
-							"iDisplayLength": 10,
-							"sDom": sDom,
-							"aoColumns": [
-								{sTitle: "Journal", mData: "jo"},
-								{sTitle: "Authors", mData: "au"},
-								{sTitle: "Title", mData: "ti"}
-							],
-							"aaData": tableInput
-						}	
-						litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
-						
+						var tableInput = []
+						$.when($.ajax({
+							async: true,
+							url: query,
+							type: 'GET'
+						}))
+						.then(
+							function(data) {
+								htmlJson = self.xmlToJson(data)
+								var summaries = htmlJson.eSummaryResult[1].DocSum // Add pub date field into table as well.
+								console.log(summaries)
+								for (summary in summaries) {
+									var tableInputRow = {}									
+									var summaryList = summaries[summary].Item
+									
+									for (item in summaryList) {
+										infoRow = summaryList[item]
+										if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"]
+										if (infoRow["@attributes"].Name == "Source") tableInputRow["source"] = infoRow["#text"]
+										if (infoRow["@attributes"].Name == "Title") tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaries[summary].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"										
+										if (infoRow["@attributes"].Name == "AuthorList") {
+											var authors = ""
+											commaDelay = 1
+											for (author_idx in infoRow.Item) {
+												author = infoRow.Item[author_idx]
+												if (commaDelay == 0) authors+=", "
+												else commaDelay--
+												authors+=author["#text"]													
+											}
+											tableInputRow["author"] = authors
+										}
+									}
+									tableInput.push(tableInputRow)
+								}								
+							
+								var sDom = 't<flip>'
+								if (tableInput.length<=10) { sDom = 'tfi'; }					
+								var tableSettings = {
+									// "sPaginationType": "full_numbers",
+									"iDisplayLength": 4,
+									"sDom": sDom,
+									"aoColumns": [
+										{sTitle: "Journal", mData: "source"},
+										{sTitle: "Authors", mData: "author"},
+										{sTitle: "Title", mData: "title"},
+										{sTitle: "Date", mData: "date"}
+									],
+									"aaData": tableInput
+								}	
+								loader.hide()
+								litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
+							},
+							function() {
+								loader.hide()
+								self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
+							}
+						)						
 					}
 				})
 			}

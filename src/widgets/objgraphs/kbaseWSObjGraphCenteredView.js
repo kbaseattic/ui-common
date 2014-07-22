@@ -58,6 +58,7 @@
 	    "core":"#FFDE88",
 	    "ref":"#D43F3F",
 	    "included":"#00ACE9",
+	    "none":'FFFFFF'
 	    //"prov": "#50d07d"
 	    //"KBaseNarratives.Narrative":"#50d07d"
 	},
@@ -85,7 +86,7 @@
 		var html = '<br>' +
 			    '<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td valign=\"top\"><table cellpadding="2" cellspacing="0" border="0" id="graphkey" \
 				style="">'
-		for(var t in self.typeToColor) {
+		for(var t in self.typeToName) {
 		    html += "<tr><td><svg width=\"40\" height=\"20\"><rect x=\"0\" y=\"0\" width=\"40\" height=\"20\" fill=\""+self.typeToColor[t] +"\" \
 		    stroke=\""+ d3.rgb(self.typeToColor[t]).darker(2) +"\" /></svg></td><td valign=\"middle\"><b> \
 		    "+self.typeToName[t]+"</b></td></tr>";
@@ -98,7 +99,19 @@
 	
 	renderSankeyStyleGraph: function() {
 	    var self = this;
-	    if (self.graph.links.length>0) {
+	    if (self.graph.links.length==0) {
+		// in order to render, we need at least two nodes
+		self.graph['nodes'].push({
+						node : 1,
+						name : "No references found",
+						info : [-1,"No references found","No Type",0,0,"N/A",0,"N/A",0,0,{}],
+						nodeType : "none",
+						objId : "-1",
+						isFake : true
+					    });
+		self.objRefToNodeIdx["-1"] = 1;
+		self.graph.links.push({target:0, source:1, value:1});
+	    }
 		var margin = {top: 10, right: 10, bottom: 10, left: 10};
 		var width = self.options.width - 50 - margin.left - margin.right;
 		var height = self.graph.nodes.length*35 - margin.top - margin.bottom;
@@ -330,10 +343,10 @@
 		    .attr("x", 6 + sankey.nodeWidth())
 		    .attr("text-anchor", "start")
 		    
-	    } else {
-		alert("Cannot recenter on the selected object, as it has no links.");
-		self.$elem.find('#objgraphview').show();
-	    }
+	   // } else {
+	//	alert("Cannot recenter on the selected object, as it has no links.");
+	//	self.$elem.find('#objgraphview').show();
+	//    }
             return this;
         },
 	

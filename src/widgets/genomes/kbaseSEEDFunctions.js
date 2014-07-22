@@ -24,7 +24,7 @@
             width:900         
         },
         
-        SEEDTree:{ "name":"SEED", "count": 0, "children":[], "size":0, "x0":0, "y0":0 },
+        SEEDTree:{ "name":"Functional Categories", "count": 0, "children":[], "size":0, "x0":0, "y0":0 },
         subsysToGeneMap:[],
         maxCount:0,
 
@@ -32,6 +32,7 @@
         width: 920,
         barHeight : 20,
         barWidth:400,
+        stepSize:8,
         svg:null,
 
         i : 0,
@@ -66,7 +67,6 @@
 
             $.when(prom).done($.proxy(function(genome) {
                 var genomeObj = genome[0].data;
-                console.log("Num Features: " + genomeObj.features.length);
 
                 /*
                     First I am going to iterate over the Genome Typed Object and 
@@ -87,11 +87,9 @@
                     SEEDTree.count++; 
                 });
 
-                console.log("S: " + SEEDTree.count);
                 this.loadSEEDHierarchy();
 
             }, this));
-            
 
             return this;
         },
@@ -133,12 +131,11 @@
 
             d3.text("assets/data/subsys.txt", function(text) {
                 var data = d3.tsv.parseRows(text);
-                console.log("Lines: " + data.length);
 
                 for (i = 0; i < data.length; i++) {
                     var geneCount = 0;
                     var nodeHierarchy = "";
-                    var parentHierarchy = "SEED";
+                    var parentHierarchy = "Functional Categories";
 
                     if (subsysToGeneMap[data[i][3]] === undefined) {
                         // if barchart needs to only show the subsystems that have genes in this genome,
@@ -203,7 +200,6 @@
 
         update: function(source) {
 
-            //if (this.tree === null) { this.tree = d3.layout.tree().nodeSize([0, 4]);}
             var self = this;
             
             var nodes = self.tree.nodes(self.SEEDTree);
@@ -211,6 +207,7 @@
             var scale = d3.scale.linear().domain([0,this.maxCount]).range([0,275]);
             var height = Math.max(500, nodes.length * self.barHeight + self.margin.top + self.margin.bottom);
             var i = self.i;
+
             d3.select("svg").transition()
                 .duration(self.duration)
                 .attr("height", height);
@@ -249,8 +246,7 @@
 
             nodeEnter.append("rect")
                 .attr("y", -self.barHeight / 2)
-                //.attr("x", function (d) { return 0 - d.depth * 4;} )
-                .attr("x", function (d) { return 0 + 275 - scale(d.size) - d.depth * 8;} )
+                .attr("x", function (d) { return 0 + 275 - scale(d.size) - d.depth * self.stepSize;} )
                 .attr("height", self.barHeight)
                 .attr("width", function (d) { return scale(d.size); })
                 .style("fill", self.color);
@@ -258,7 +254,7 @@
             nodeEnter.append("text")
                 .attr("dy", 3.5)
                 .attr("x", 278)
-                .text(function(d) { return d.name === "SEED" ? "" : d.size; });
+                .text(function(d) { return d.name === "Functional Categories" ? "" : d.size; });
 
             // Transition nodes to their new position.
             nodeEnter.transition()
@@ -298,7 +294,7 @@
                 d.children = d._children;
                 d._children = null;
             }
-            console.log(this);
+
             this.update(d);
         },
 
@@ -310,24 +306,20 @@
             var self = this;
             if (d.children) {
                 d._children = d.children;
-                //for(var i = 0; i < d._children.length; i++) {
-                //    self.collapse(d._children[i]);
-                //}
                 d._children.forEach( function(n) {self.collapse(n)});
                 d.children = null;
             }
         },
 
         getData: function() {
-            return {title:"SEED Functional Categories ",id:this.objName, workspace:this.wsName};
+            return {title:"Functional Categories ",id:this.options.objNameOrId, workspace:this.options.wsNameOrId};
         },
 
         render: function() {
             var margin =  this.margin,
                 width = this.width;
-                //svg = this.svg;
 
-            this.tree = d3.layout.tree().nodeSize([0, 8]);
+            this.tree = d3.layout.tree().nodeSize([0, this.stepSize]);
 
             this.$elem.append('<div id="mainview">');
 

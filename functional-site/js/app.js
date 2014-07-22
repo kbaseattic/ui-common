@@ -260,41 +260,25 @@ var app = angular.module('landing-pages',
              controller: 'MediaDetail'});
 
 
-    $stateProvider
-        .state('genomes',
-            {url: '/genomes/CDS/:id',
-             templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'});
-
+    // genome state providers
     $stateProvider
         .state('genomesbyws',
             {url: '/genomes/:ws',
-             templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'});
-
-    $stateProvider
+             templateUrl: 'views/genomes/sortable-rows-landing-page.html',
+             controller: 'WBLanding'})
         .state('genomesbyid',
             {url: '/genomes/:ws/:id',
-             templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'});
-
-    $stateProvider
-        .state('kbgenomes',
-            {url: '/KBaseGenomes.Genome/CDS/:id',
-             templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'});
-
-    $stateProvider
+             templateUrl: 'views/genomes/sortable-rows-landing-page.html',
+             //templateUrl: 'views/objects/genome.html',
+             controller: 'WBLanding'})
         .state('kbgenomesbyws',
             {url: '/KBaseGenomes.Genome/:ws',
-             templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'});
-
-    $stateProvider
+             templateUrl: 'views/genomes/sortable-rows-landing-page.html',
+             controller: 'WBLanding'})
         .state('kbgenomesbyid',
             {url: '/KBaseGenomes.Genome/:ws/:id',
-             templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'});
+             templateUrl: 'views/genomes/sortable-rows-landing-page.html',
+             controller: 'WBLanding'});
 
 
     $stateProvider
