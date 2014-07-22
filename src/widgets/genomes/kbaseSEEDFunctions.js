@@ -24,7 +24,7 @@
             width:900         
         },
         
-        SEEDTree:{ "name":"SEED", "count": 0, "children":[], "size":0, "x0":0, "y0":0 },
+        SEEDTree:{ "name":"Functional Categories", "count": 0, "children":[], "size":0, "x0":0, "y0":0 },
         subsysToGeneMap:[],
         maxCount:0,
 
@@ -87,7 +87,6 @@
                     SEEDTree.count++; 
                 });
 
-                console.log("S: " + SEEDTree.count);
                 this.loadSEEDHierarchy();
 
             }, this));
@@ -138,7 +137,7 @@
                 for (i = 0; i < data.length; i++) {
                     var geneCount = 0;
                     var nodeHierarchy = "";
-                    var parentHierarchy = "SEED";
+                    var parentHierarchy = "Functional Categories";
 
                     if (subsysToGeneMap[data[i][3]] === undefined) {
                         // if barchart needs to only show the subsystems that have genes in this genome,
@@ -203,7 +202,6 @@
 
         update: function(source) {
 
-            //if (this.tree === null) { this.tree = d3.layout.tree().nodeSize([0, 4]);}
             var self = this;
             
             var nodes = self.tree.nodes(self.SEEDTree);
@@ -211,6 +209,7 @@
             var scale = d3.scale.linear().domain([0,this.maxCount]).range([0,275]);
             var height = Math.max(500, nodes.length * self.barHeight + self.margin.top + self.margin.bottom);
             var i = self.i;
+
             d3.select("svg").transition()
                 .duration(self.duration)
                 .attr("height", height);
@@ -258,7 +257,7 @@
             nodeEnter.append("text")
                 .attr("dy", 3.5)
                 .attr("x", 278)
-                .text(function(d) { return d.name === "SEED" ? "" : d.size; });
+                .text(function(d) { return d.name === "Functional Categories" ? "" : d.size; });
 
             // Transition nodes to their new position.
             nodeEnter.transition()
@@ -298,7 +297,7 @@
                 d.children = d._children;
                 d._children = null;
             }
-            console.log(this);
+
             this.update(d);
         },
 
@@ -319,7 +318,7 @@
         },
 
         getData: function() {
-            return {title:"SEED Functional Categories ",id:this.objName, workspace:this.wsName};
+            return {title:"Functional Categories ",id:this.options.objNameOrId, workspace:this.options.wsNameOrId};
         },
 
         render: function() {
