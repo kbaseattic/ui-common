@@ -321,9 +321,10 @@
 
             this.tree = d3.layout.tree().nodeSize([0, this.stepSize]);
 
-            this.$elem.append('<div id="mainview">');
+            var $mainview = $('<div id="mainview">').css({'overflow-x' : 'scroll'});
+            this.$elem.append($mainview);
 
-            this.svg = d3.select("#mainview").append("svg")
+            this.svg = d3.select($mainview[0]).append("svg")
                     .attr("width", width + margin.left + margin.right)
                     .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
