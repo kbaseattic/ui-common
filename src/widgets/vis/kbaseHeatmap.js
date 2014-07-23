@@ -115,12 +115,12 @@ kb_define('kbaseHeatmap',
                     .scale(this.xScale())
                     .orient('top');
 
-            xAxis.tickFormat(function(d) {
+            /*xAxis.tickFormat(function(d) {
                 if (d.length > 15) {
                     return d.substring(0,15) + '...';
                 }
                 return d;
-            });
+            });*/
 
             var gxAxis = this.D3svg().select('.yGutter').select('.xAxis');
 
@@ -133,69 +133,7 @@ kb_define('kbaseHeatmap',
 
             var $hm = this;
 
-            var ma = function() {
-                this.on('mouseover', function(d) {
-
-                    var xSi = 0;
-                    var roundedXScale = d3.scale.linear()
-                        .domain($hm.xScale().range())
-                        .range($hm.xScale().domain().map(function(d) { return xSi++}))
-                    ;
-
-                    var xIdx = Math.floor(roundedXScale(d3.mouse(this)[0]));
-
-                    var xScaleInvert = d3.scale.ordinal()
-                        .domain(roundedXScale.range())
-                        .range($hm.xScale().domain())
-                    ;
-
-                    var xLabels = d3.scale.ordinal()
-                        .domain(roundedXScale.range())
-                        .range($hm.dataset().column_labels);
-
-                    var xm = xScaleInvert(xIdx);
-
-
-                    $hm.D3svg().select('.yGutter').selectAll('g g text')
-                        .attr("fill",
-                            function(r,ri){
-                                var xId = xm;
-
-                                if ($hm.options.useIDMapping) {
-                                    xId = $hm.xIDMap()[xId];
-                                }
-                                if (r == xId) {
-                                    var xLabel = xLabels(xIdx);
-                                    if (xLabel != xm) {
-                                        $hm.showToolTip(
-                                            {
-                                                label : xLabel,
-                                            }
-                                        );
-                                    }
-                                    return $hm.options.overColor;
-                                }
-                            }
-                    );
-
-                    }
-                )
-                .on('mouseout', function(d) {
-                        $hm.D3svg().select('.yGutter').selectAll('g g text')
-                            .attr("fill",
-                                function(r,ri){
-                                   return 'black';
-                                }
-                        );
-                        $hm.hideToolTip();
-                    }
-                )
-                ;
-                return this;
-            };
-
             gxAxis
-                .call(ma)
                 .transition()
                 .duration(0)
                 .call(xAxis)
@@ -212,16 +150,54 @@ kb_define('kbaseHeatmap',
                     })
             ;
 
+            /*
+                As is typical, my life is pain. Here's the deal -
+
+                when the axes are updated, d3 is insisting upon dropping the item and adding a new one at the same position.
+                Visually, it looks the same, but it's stored in a different place in the array. So if you have 100 elements and
+                change the label for the 0th element, it actually gets dropped, everything re-indexed, and a new label placed
+                at position 100.
+
+                The problem is that we need to know the associated ID for a given label, so we can no longer just gleefully look up
+                the id at the given index, since the labels and IDs are now at different indexes.
+
+                The "solution" is to no longer format the the label using tickFormat (up above), and instead manually format it within
+                the selection. There may be a slight blink as that updates. We can then use that raw original label to look up the index
+                of that label in the original array, and then use that index to lookup the ID.
+
+                THIS WILL BREAK IF TWO IDs HAVE THE SAME LABEL.
+
+                Of course, you shouldn't be giving two ids the same label, but other than this you -could- do so if you really wanted to.
+
+                But now, because of this, we're boned. Until I can figure out a way to force d3 to keep the labels in the same order as the IDs,
+                there's the potential for a screw up.
+
+                Maybe I'll retool it to have the scale map to the IDs instead of the label and then still lookup by index, because the ID
+                is guaranteed to be unique.
+
+                Sigh.
+
+            */
+
             gxAxis.selectAll('text').each(function(d,i) {
-                d3.select(this).attr('data-id', $hm.dataset().column_ids[i]);
+
+                var label = d3.select(this).text();
+                if (label.length > 15) {
+                    d3.select(this).text(label.substring(0,12) + '...');
+                }
+
+                var label_idx = $hm.dataset().column_labels.indexOf(label);
+
+                d3.select(this).attr('data-id', $hm.dataset().column_ids[label_idx]);
                 d3.select(this)
                     .on('mouseover', function(d) {
                         d3.select(this).attr('fill', $hm.options.overColor);
                         var d3this = d3.select(this);
-                        if (d3this.text() != $hm.dataset().column_labels[i]) {
+
+                        if (d3this.text() != label) {
                             $hm.showToolTip(
                                 {
-                                    label : $hm.dataset().column_labels[i]
+                                    label : label
                                 }
                             );
                         }
@@ -231,7 +207,6 @@ kb_define('kbaseHeatmap',
                         $hm.hideToolTip();
                     })
             });
-
 
         },
 
@@ -331,25 +306,38 @@ kb_define('kbaseHeatmap',
                         .attr("transform", "translate(" + this.xPaddingBounds().size.width + ",0)")
             }
 
-            yAxis.tickFormat(function(d) {
+            /*yAxis.tickFormat(function(d) {
                 if (d.length > 23) {
                     return d.substring(0,20) + '...';
                 }
                 return d;
-            });
+            });*/
+
+            /*
+                XXX - The way this is implemented is stupid and fragile. See notes in renderXAxis.
+            */
 
             gyAxis.transition().call(yAxis);
 
             gyAxis.selectAll('text').each(function(d,i) {
-                d3.select(this).attr('data-id', $hm.dataset().row_ids[i]);
+
+                var label = d3.select(this).text();
+                if (label.length > 23) {
+                    d3.select(this).text(label.substring(0,20) + '...');
+                }
+
+                var label_idx = $hm.dataset().row_labels.indexOf(label);
+
+                d3.select(this).attr('data-id', $hm.dataset().row_ids[label_idx]);
                 d3.select(this)
                     .on('mouseover', function(d) {
                         d3.select(this).attr('fill', $hm.options.overColor);
                         var d3this = d3.select(this);
-                        if (d3this.text() != $hm.dataset().row_labels[i]) {
+
+                        if (d3this.text() != label) {
                             $hm.showToolTip(
                                 {
-                                    label : $hm.dataset().row_labels[i]
+                                    label : label
                                 }
                             );
                         }
@@ -359,7 +347,6 @@ kb_define('kbaseHeatmap',
                         $hm.hideToolTip();
                     })
             });
-
 
         },
 
@@ -430,6 +417,7 @@ kb_define('kbaseHeatmap',
                 )
                 .attr('y',
                     function (d) {
+
                         var yId = d.y;
                         if ($hm.options.useIDMapping) {
                             yId = $hm.yIDMap()[yId];
