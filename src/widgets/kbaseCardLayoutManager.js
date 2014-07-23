@@ -1160,6 +1160,21 @@
                             of: "#app"
                         }
                     );
+				this.addNewCard("KBaseMAKTilingCard",
+					{
+						id: this.options.data.id,
+                           ws: this.options.data.ws,
+                           auth: this.options.auth,
+                           userId: this.options.userId,
+                           loadingImage: this.options.loadingImage,
+                           isInCard: true
+					},
+						{
+						my: "right bottom",
+                           at: "left bottom",
+                           of: "#app"
+					}
+				);
                 return this;
         },
 
