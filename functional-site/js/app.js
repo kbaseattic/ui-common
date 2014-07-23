@@ -27,8 +27,8 @@ var app = angular.module('landing-pages',
      'narrative-directives', 
      'ui.router', 'ngResource', 'kbaseLogin', 
      'FeedLoad', 'ui.bootstrap', 'search'])
-    .config(['$locationProvider', '$stateProvider', '$httpProvider',  
-    function($locationProvider, $stateProvider, $httpProvider) {
+    .config(['$locationProvider', '$stateProvider', '$httpProvider', '$urlRouterProvider',
+    function($locationProvider, $stateProvider, $httpProvider, $urlRouterProvider) {
 
     // enable CORS
     $httpProvider.defaults.useXDomain = true;
@@ -417,6 +417,7 @@ var app = angular.module('landing-pages',
              controller: LPHelp});
 
     //$urlRouterProvider.when('', '/login/');
+    $urlRouterProvider.when('', '/login/');
 
     $stateProvider
         .state('otherwise', 
