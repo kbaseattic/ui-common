@@ -69,8 +69,8 @@
 
             if (!$.cookie(this.cookieName))
                 return {};
-            
-//            var chips = localStorage.getItem('kbase_session');
+
+            var chips = localStorage.getItem('kbase_session');
             // var chips = $.cookie('kbase_session');
 
             if (chips != undefined) {
