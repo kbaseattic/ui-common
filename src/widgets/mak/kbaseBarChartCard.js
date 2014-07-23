@@ -76,11 +76,11 @@
 							function(d) {                            
 								if (!$(this).hasClass('selected')) {
 									for (tile in d.tiles) {
-										if (!d3.select("#MAK_tile_"+tile).empty()) d3.select("#MAK_tile_"+tile).style("background", d3.rgb(d3.select("#MAK_tile_"+tile).style("background")).brighter(3))
+										d3.select("#MAK_tile_"+tile).style("background", "#66FFFF")
 									}
-									d3.select(this).style("background-color", d3.rgb(d3.select(this).style("background-color")).brighter(3)); 
-									self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
+									d3.select(this).style("background-color", "#66FFFF"); 
 								}							
+								self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
 								return self.tooltip.style("visibility", "visible");
 							}
 						)						 
@@ -88,7 +88,7 @@
                             function(d) { 
 								if (!$(this).hasClass('selected')) {
 									for (tile in d.tiles) {
-										if (!d3.select("#MAK_tile_"+tile).empty()) d3.select("#MAK_tile_"+tile).style("background", "steelblue")
+										d3.select("#MAK_tile_"+tile).style("background", "steelblue")
 									}
 									d3.select(this).style("background-color", "steelblue"); 									
 								}
@@ -100,12 +100,22 @@
                                 return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
                             }
                         )
-						.on("click",
-							function() {
-								if ($(this).hasClass('selected')) $(this).removeClass('selected')
-								else $(this).addClass('selected')
-							}
-						)
+						// .on("click",
+							// function(d) {
+								// if ($(this).hasClass('selected')) {
+									// for (tile in d.tiles) {
+										// $("#MAK_tile_"+tile).removeClass('selected')
+									// }
+									// $(this).removeClass('selected')
+								// }
+								// else {
+									// for (tile in d.tiles) {
+										// $("#MAK_tile_"+tile).addClass('selected')
+									// }
+									// $(this).addClass('selected')
+								// }
+							// }
+						// )
 				
 				$sideChart.append($barChartDiv)
 				
