@@ -7,7 +7,7 @@
         options: {
             genomeID: null,
             workspaceID: null,
-            loadingImage: "assets/img/loading.gif",
+            loadingImage: "../../widgets/images/ajax-loader.gif",
             kbCache: null,
             isInCard: false,
         },
@@ -19,22 +19,24 @@
 
         init: function(options) {
             this._super(options);
-            if (this.options.genomeID === null) {
-                //throw an error
-                return;
-            }
+            //if (this.options.genomeID === null) {
+            //    //throw an error
+            //    return;
+            //}
 
             this.$messagePane = $("<div/>")
-                                .addClass("kbwidget-message-pane")
+                                //.addClass("kbwidget-message-pane")
                                 .hide();
             this.$elem.append(this.$messagePane);
 
-            this.render();
-            if (this.options.workspaceID === null)
+            this.render(); // this is moved inside central store and 
+            if (this.options.workspaceID === null) {
                 this.renderCentralStore();
-            else
+            }
+            else {
                 this.renderWorkspace();
-
+            }
+															
             return this;
         },
 
@@ -42,7 +44,7 @@
             var self = this;
 
             this.$infoPanel = $("<div>");
-            this.$infoPanel.append($("<button>")
+            /*this.$infoPanel.append($("<button>")
                            .addClass("btn btn-primary")
                            .append("Show Description")
                            .attr("type", "button")
@@ -58,10 +60,49 @@
                                    );
                                })
                            );
+			
+			this.$infoPanel.append($("<button>")
+                                 .addClass("btn btn-primary")
+                                 .append("Related Publications")
+								 .attr("type", "button")
+								 .on("click",
+									function(event) {
+														
+										if (typeof self.pubmedQuery === null) {
+											self.renderError("Genome '" + self.options.genomeID + "' not found in the KBase Central Store.");
+											return;											
+										}
+										else {
+											var query = self.pubmedQuery
+											self.trigger("showLitWidget", 
+												{ 
+												literature: query, 
+												workspaceID: self.options.workspaceID,
+												genomeID: self.options.genomeID,
+												kbCache: self.options.kbCache,
+												event: event,
+												}
+											);
+										}
+										
+									})
+								);
+                        if (self.options.workspaceID === null) {
+                            // possibly we show other CDS related buttongs
+                        } else {
+                            // show ws related buttons
+                            self.$infoPanel.append($("<button>")
+                                 .addClass("btn btn-primary")
+                                 .append("View Object Graph").attr("type", "button").on("click",
+							function(event) {
+                                                            window.location = "/functional-site/#/objgraphview/"+encodeURI(self.options.workspaceID+"/"+self.options.genomeID);
+							}));
+                        }
+	    */							 
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
             this.$infoPanel.append($("<div>").append(this.$infoTable));
-
+        
             this.$contigSelect = $("<select>")
                                  .addClass("form-control")
                                  .css({"width":"60%", "margin-right":"5px"})
@@ -70,7 +111,7 @@
                                          .append(this.noContigs));
 
             var self = this;
-            this.$contigButton = $("<button>")
+            /*this.$contigButton = $("<button>")
                                  .addClass("btn btn-primary")
                                  .append("Show Contig")
                                  .click(function(event) {
@@ -89,18 +130,21 @@
                                         }
                                     })
                                  });
-
+			
             this.$infoPanel.append($("<div>")
                               .addClass("form-inline")
                               .append(this.$contigSelect)
                               .append(this.$contigButton));
-
+            */
             this.$infoPanel.hide();
             this.$elem.append(this.$infoPanel);
+			
+			// self.pubmedQuery = ""
+
         },
 
         addInfoRow: function(a, b) {
-            return "<tr><td>" + a + "</td><td>" + b + "</td></tr>";
+            return "<tr><th>" + a + "</th><td>" + b + "</td></tr>";
         },
 
         renderCentralStore: function() {
@@ -108,7 +152,7 @@
             this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
 
             this.$infoPanel.hide();
-            this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
             /**
              * Fields to show:
              * ID
@@ -139,12 +183,15 @@
                         this.renderError("Genome '" + this.options.genomeID + "' not found in the KBase Central Store.");
                         return;
                     }
-
+					
+					self.pubmedQuery = genome.scientific_name
+					//console.log(self.pubmedQuery)
+                    
                     this.$infoTable.empty()
                                    .append(this.addInfoRow("ID", genome.id))
                                    .append(this.addInfoRow("Name", genome.scientific_name))
                                    .append(this.addInfoRow("Domain", genome.domain))
-                                   .append(this.addInfoRow("Complete?", (genome.complete ? "Yes" : "No")))
+//                                   .append(this.addInfoRow("Complete?", (genome.complete ? "Yes" : "No")))
                                    .append(this.addInfoRow("DNA Length", genome.dna_size))
                                    .append(this.addInfoRow("Source ID", genome.source_id))
                                    .append(this.addInfoRow("Number of Contigs", genome.contigs))
@@ -197,7 +244,8 @@
         },
 
         renderWorkspace: function() {
-            this.showMessage("<img src='" + this.options.loadingImage + "'>");
+			self = this
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
             this.$infoPanel.hide();
             // console.log("rendering workspace genome");
             // console.log(this.options.kbCache);
@@ -212,8 +260,10 @@
             $.when(prom).done($.proxy(function(genome) {
                 // console.log(genome);
                 genome = genome[0].data;
-
-                var gcContent = "Unknown";
+				self.pubmedQuery = genome.scientific_name
+				console.log(self.pubmedQuery)	
+                
+				var gcContent = "Unknown";
                 var dnaLength = "Unknown";
                 if (genome.dna_size && genome.dna_size != 0) {
                     dnaLength = genome.dna_size;
@@ -228,6 +278,10 @@
                     }
                 }
 
+                var nFeatures = 0;
+                if (genome.features) {
+                    nFeatures = genome.features.length;
+                }
                 this.$infoTable.empty()
                                .append(this.addInfoRow("ID", genome.id))
                                .append(this.addInfoRow("Name", genome.scientific_name))
@@ -237,7 +291,7 @@
                                .append(this.addInfoRow("Number of Contigs", genome.contig_ids ? genome.contig_ids.length : 0))
                                .append(this.addInfoRow("GC Content", gcContent))
                                .append(this.addInfoRow("Genetic Code", genome.genetic_code))
-                               .append(this.addInfoRow("Number of features", genome.features.length));
+                               .append(this.addInfoRow("Number of features", nFeatures));
 
                 var contigsToLengths = {};
                 if (genome.contig_ids && genome.contig_ids.length > 0) {
@@ -283,7 +337,8 @@
         },
 
         showMessage: function(message) {
-            var span = $("<span/>").append(message);
+        // kbase panel now does this for us, should probably remove this
+          var span = $("<span/>").append(message);
 
             this.$messagePane.empty()
                              .append(span)
@@ -291,7 +346,9 @@
         },
 
         hideMessage: function() {
+        // kbase panel now does this for us, should probably remove this
             this.$messagePane.hide();
+            
         },
 
         buildObjectIdentity: function(workspaceID, objectID) {

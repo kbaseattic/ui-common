@@ -7,7 +7,7 @@
  */
 (function( $, undefined ) {
     $.KBWidget({
-        name: "KBaseGeneBiochemistry",
+        name: "KBaseGeneSequence",
         parent: "kbaseWidget",
         version: "1.0.0",
 
@@ -128,53 +128,113 @@
                         }
                     }
 
-		    // Function
-		    var func = feature['function'];
-		    if (!func)
-			func = "Unknown";
-		    this.$infoTable.append(this.makeRow("Function", func));
+		    // Gene sequence
+		    //
+                    var dnaSequenceStr = "No gene sequence found.";
+                    if (feature.dna_sequence) { // get dna_sequence from object
+                        dnaSequenceStr = feature.dna_sequence;
+			// wrap seq
+			var seq_width = 100;
+			if (dnaSequenceStr.length > seq_width) {
+			    var dnaDispStr = "";
+			    var start_pos = 0;
+			    var end_pos = 0;
+			    for (var i=0; (i+1)*seq_width-1 < dnaSequenceStr.length; i++) {
+				start_pos = i*seq_width;
+				end_pos = (i+1)*seq_width - 1;
+				dnaDispStr += dnaSequenceStr.substring(start_pos,end_pos) + '<br>';
+			    }
+			    start_pos += seq_width;
+			    end_pos = dnaSequenceStr.length - 1;
+			    if (start_pos < dnaSequenceStr.length) {
+				dnaDispStr += dnaSequenceStr.substring(start_pos,end_pos) + '<br>';
+			    }
+			    dnaSequenceStr = dnaDispStr;
+			}
 
-		    // Subsystems, single string
-                    //var subsysSumStr = "No subsystem summary found.";
-                    //if (feature.subsystems) {
-		    //subsysSumStr = feature.subsystems;
-                    //}
-                    //this.$infoTable.append(this.makeRow("Subsystems Summary", subsysSumStr));
+			//this.$infoTable.append(this.makeRow("Gene", dnaSequenceStr));
+			this.$infoTable.append(
+					       this.makeRow("Gene", dnaSequenceStr)
+					       .each(function(){$(this).css('font-family','Monaco')})
+					       );
 
-		    // Subsystem, detailed
-                    var subsysDataStr = "No subsystem data found.";
-                    if (feature.subsystem_data) {
-			subsysDataStr = "";
-			for (var i=0; i<feature.subsystem_data.length; i++) {
-			    var subsys = feature.subsystem_data[i];
-			    // typedef tuple<string subsystem, string variant, string role> subsystem_data;
-			    subsysDataStr += "<p>" + "Subsystem: " + subsys[0] + "<br>" + "Variant: " + subsys[1] + "<br>" + "Role: " + subsys[2];
+                    }
+		    else {   // HACK!!! use central store (temporary solution?)
+			var self = this;
+			self.cdmiClient.fids_to_dna_sequences
+			    (
+			     [self.options.featureID],
+			     function(dna_sequences) {
+				 if (dna_sequences[self.options.featureID]) {
+				     dnaSequenceStr = dna_sequences[self.options.featureID];
+				 }
+				 // wrap seq
+				 var seq_width = 100;
+				 if (dnaSequenceStr.length > seq_width) {
+				     var dnaDispStr = "";
+				     var start_pos = 0;
+				     var end_pos = 0;
+				     for (var i=0; (i+1)*seq_width-1 < dnaSequenceStr.length; i++) {
+					 start_pos = i*seq_width;
+					 end_pos = (i+1)*seq_width - 1;
+					 dnaDispStr += dnaSequenceStr.substring(start_pos,end_pos) + '<br>';
+				     }
+				     start_pos += seq_width;
+				     end_pos = dnaSequenceStr.length - 1;
+				     if (start_pos < dnaSequenceStr.length) {
+					 dnaDispStr += dnaSequenceStr.substring(start_pos,end_pos) + '<br>';
+				     }
+				     dnaSequenceStr = dnaDispStr;
+				 }
+
+				 //self.$infoTable.append(self.makeRow("Gene", dnaSequenceStr));
+				 self.$infoTable.append(
+					   self.makeRow("Gene", dnaSequenceStr)
+					   .each(function(){$(this).css('font-family','Courier')})
+					   );
+
+				 //self.hideMessage();
+				 //self.$infoPanel.show();
+			     },
+			     
+			     self.renderError
+			 );
+		    }
+		    // end gene sequence
+
+
+		    // Protein sequence (for peg) (do first for bottom-up table build?)
+		    //
+                    var proteinTranslationStr = "No protein sequence found.";
+                    if (feature.protein_translation) {
+			proteinTranslationStr = feature.protein_translation;
+			// wrap seq
+			var seq_width = 100;
+			if (proteinTranslationStr.length > seq_width) {
+			    var protDispStr = "";
+			    var start_pos = 0;
+			    var end_pos = 0;
+			    for (var i=0; (i+1)*seq_width-1 < proteinTranslationStr.length; i++) {
+				start_pos = i*seq_width;
+				end_pos = (i+1)*seq_width - 1;
+				protDispStr += proteinTranslationStr.substring(start_pos,end_pos) + '<br>';
+			    }
+			    start_pos += seq_width;
+			    end_pos = proteinTranslationStr.length - 1;
+			    if (start_pos < proteinTranslationStr.length) {
+				protDispStr += proteinTranslationStr.substring(start_pos,end_pos) + '<br>';
+			    }
+			    proteinTranslationStr = protDispStr;
 			}
                     }
-                    this.$infoTable.append(this.makeRow("Subsystems", subsysDataStr));
+		    this.$infoTable.append(
+					   this.makeRow("Protein", proteinTranslationStr)
+					   .each(function(){$(this).css('font-family','Courier')})
+					   );
 
-		    // Annotation
-                    var annotationsStr = "No annotation comments found.";
-                    if (feature.annotations) {
-			annotationsStr = "";
-			for (var i=0; i<feature.annotations.length; i++) {
-			    var annot = feature.annotations[i];
-			    // typedef tuple<string comment, string annotator, int annotation_time> annotation;
-			    annotationsStr += annot[0] + " (" + annot[1] + ", timestamp:" + annot[2] + ")" + "<br>";
-			}
-                    }
-                    this.$infoTable.append(this.makeRow("Annotation Comments", annotationsStr));
-
-		    // Protein families list.
-		    //var proteinFamilies = "None found";
-		    //if (feature.protein_families) {
-		    //proteinFamilies = "";
-		    //for (var i=0; i<feature.protein_families.length; i++) {
-		    //    var fam = feature.protein_families[i];
-		    //    proteinFamilies += fam.id + ": " + fam.subject_description + "<br>";
-		    //}
-		    //}
-		    //this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
+                    // SOMETHING SIMILAR, BUT NOT RIGHT this.$infoTable.append(this.makeRow("Protein", proteinTranslationStr).find("td")[1].style="font-family:Courier");
+					   
+		    // end protein sequence
 
                 }
                 else {
@@ -212,7 +272,7 @@
                 type: "Feature",
                 id: this.options.featureID,
                 workspace: this.options.workspaceID,
-                title: "Biochemical Function"
+                title: "Gene Sequence"
             };
         },
 
