@@ -132,17 +132,17 @@
                             )
 				//.append("title").text(function(d) { return d; })
 			
-			  var heatMap = svg.selectAll(".gene")
+			  var heatMap = svg.selectAll(".squares")
 				  .data(datadict)
 				  .enter().append("rect")
 				  .attr("y", function(d) { return (d.gene) * gridSize; })
 				  .attr("x", function(d) { return (d.condition) * gridSize; })
 				  .attr("rx", 0)
 				  .attr("ry", 0)
-				  .attr("class", "gene bordered")
+				  .attr("class", "squares")
 				  .attr("width", gridSize)
 				  .attr("height", gridSize)
-				  .style("fill", colors[3])
+				  .style({"fill": colors[3],"stroke":"#E6E6E6","stroke-width":"2px"})
 				  .on("mouseover", 
                                 function(d) { 
                                     d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 

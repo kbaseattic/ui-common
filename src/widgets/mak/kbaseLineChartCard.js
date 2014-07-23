@@ -118,6 +118,12 @@
 				// .append("title")
 				// .text(function(i) {return conditions[i]})
 			
+			self.$elem.find("g.axis > path").css({"display":"none"})
+			self.$elem.find("g.axis > line").css({"stroke":"lightgrey"})
+			self.$elem.find("g.x.axis > .minor").css({"stroke-opacity":.5})
+			self.$elem.find(".axis").css({"shape-rendering":"crispEdges"})
+			self.$elem.find(".y.axis > .tick.major > line, .y.axis > path").css({"fill":"none","stroke":"#000"})
+			
 			function yAxisMaker(values) {
 			
 				var y = d3.scale.linear().domain([d3.min(values), d3.max(values)]).range([h, 0]);
@@ -159,8 +165,7 @@
 					.append("svg:path")
 					.attr("d", line(datadict))
 					.attr("id","_"+gene_label)
-					.style("stroke-width",3)
-					.style("stroke",colorScale(color_ind))
+					.style({"stroke-width":3,"stroke":colorScale(color_ind),"fill":"none"})
 					.on("mouseover", 
                                 function(d) { 
                                     d3.select(this).style("stroke", d3.rgb(d3.select(this).style("stroke")).darker()); 
