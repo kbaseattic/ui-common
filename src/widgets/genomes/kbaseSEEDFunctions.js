@@ -10,7 +10,7 @@
  (function( $, undefined ) {
     $.KBWidget({
         name: "KBaseSEEDFunctions",
-        parent: "kbaseWidget",
+        parent: "kbaseAuthenticatedWidget",
         version: "1.0.0",
 
         wsUrl:"https://kbase.us/services/ws",
@@ -57,8 +57,15 @@
             var subsysToGeneMap = this.subsysToGeneMap;
 
             var obj = {"ref" : this.options.wsNameOrId + "/" + this.options.objNameOrId };
-            
-            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+            var prom;
+
+            if (this.options.kbCache) {
+                prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+            } else {
+                var workspaceClient = new Workspace(this.wsUrl, this.authToken);
+                prom = workspaceClient.get_objects([obj]);
+            }
+            //var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
         
             $.when(prom).fail($.proxy(function(error) {
                 //this.renderError(error); Need to define this function when I have time
@@ -329,6 +336,18 @@
                     .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+        },
+
+        loggedInCallback: function(event, auth) {
+            this.authToken = auth;
+            this.wsClient = new Workspace(this.wsUrl, this.authToken);
+            return this;
+        },
+
+        loggedOutCallback: function(event, auth) {
+            this.authToken = null;
+            this.wsClient = null;
+            return this;
         }
 
     });
