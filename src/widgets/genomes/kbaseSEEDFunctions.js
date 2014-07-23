@@ -134,7 +134,7 @@
 
                                 if ( j === ontologyDepth - 1 && subsysToGeneMap[data[i][j]] !== undefined) {
                                     subsysToGeneMap[data[i][j]].forEach( function(f){
-                                        var gene = { "name" : f, "size" : 0 };
+                                        var gene = { "name" : f, "size" : "" };
                                         node.children.push( gene );
                                     });
                                 }
