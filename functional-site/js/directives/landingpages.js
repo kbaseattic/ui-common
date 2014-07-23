@@ -608,7 +608,8 @@ angular.module('lp-directives')
             p.loading();
             // hack until search links directly to WS objects
             if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
-            $(p.body()).KBaseGenomeOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb});
+            $(p.body()).KBaseGenomeOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
         }
     };
 })
@@ -621,7 +622,8 @@ angular.module('lp-directives')
             p.loading();
             // hack until search links directly to WS objects
             if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
-            $(p.body()).KBaseWikiDescription({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb});
+            $(p.body()).KBaseWikiDescription({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
         }
     };
 })
@@ -634,7 +636,8 @@ angular.module('lp-directives')
             p.loading();
             // hack until search links directly to WS objects
             if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
-            $(p.body()).KBaseGenomeLineage({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb});
+            $(p.body()).KBaseGenomeLineage({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
         }
     };
 })
@@ -648,7 +651,8 @@ angular.module('lp-directives')
             p.loading();
             // hack until search links directly to WS objects
             if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
-            $(p.body()).KBaseSEEDFunctions({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb});
+            $(p.body()).KBaseSEEDFunctions({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
         }
     };
 })
@@ -670,7 +674,8 @@ angular.module('lp-directives')
                             searchTerm = data[0]['data']['scientific_name'];
                         }
                     }
-                    $(p.body()).KBaseLitWidget({literature:searchTerm, kbCache: kb});
+                    $(p.body()).KBaseLitWidget({literature:searchTerm, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
                 },
                 function(error) {
                     console.error("Trying to get scientific name for genome for related publication widget");
@@ -691,7 +696,8 @@ angular.module('lp-directives')
             p.loading();
             // hack until search links directly to WS objects
             if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
-            $(p.body()).KBaseNarrativesUsingData({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb});
+            $(p.body()).KBaseNarrativesUsingData({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
         }
     };
 })
@@ -704,7 +710,8 @@ angular.module('lp-directives')
             p.loading();
             // hack until search links directly to WS objects
             if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
-            $(p.body()).KBaseWSObjRefUsers({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb});
+            $(p.body()).KBaseWSObjRefUsers({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
         }
     };
 })
@@ -717,7 +724,8 @@ angular.module('lp-directives')
             p.loading();
             // hack until search links directly to WS objects
             if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
-            $(p.body()).KBaseWSReferenceList({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb });
+            $(p.body()).KBaseWSReferenceList({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif" });
         }
     };
 })
