@@ -62,7 +62,7 @@ $.each(
                 {
                     id              : cluster.id,
                     cluster_id      : cluster.entity_id,
-                    styled_cluster_id : {value : cluster.id, style : 'color : ' + colorCats(datasets.length % 20)},
+                    styled_cluster_id : {value : cluster.entity_id, style : 'color : ' + colorCats(datasets.length % 20)},
                     color           : colorCats(datasets.length % 20),
                     num_genes       : 0,
                     num_edges       : 0,
