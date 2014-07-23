@@ -27,8 +27,8 @@ var app = angular.module('landing-pages',
      'narrative-directives', 
      'ui.router', 'ngResource', 'kbaseLogin', 
      'FeedLoad', 'ui.bootstrap', 'search'])
-    .config(['$routeProvider', '$locationProvider', '$stateProvider', '$urlRouterProvider', '$httpProvider',  
-    function($routeProvider, $locationProvider, $stateProvider, $urlRouterProvider, $httpProvider) {
+    .config(['$locationProvider', '$stateProvider', '$httpProvider',  
+    function($locationProvider, $stateProvider, $httpProvider) {
 
     // enable CORS
     $httpProvider.defaults.useXDomain = true;
@@ -66,7 +66,10 @@ var app = angular.module('landing-pages',
           url: "featured",
           templateUrl: 'views/ws/featured.html',
           controller: 'WB'
+        })
 
+    // old narrative pages */
+    /*
     $stateProvider
         .state('narrative', {
           url: "/narrative/",
@@ -77,6 +80,7 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/narrative/projects.html',
           controller: 'NarrativeProjects'
         });
+    */
 
 
     // workspace browser routing
@@ -412,7 +416,7 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/landing-pages-help.html',
              controller: LPHelp});
 
-    $urlRouterProvider.when('', '/login/');
+    //$urlRouterProvider.when('', '/login/');
 
     $stateProvider
         .state('otherwise', 
@@ -515,7 +519,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
             if (c.kbase_sessionid) {
                 // USER_ID = $("#signin-button").kbaseLogin('session').user_id;
                 // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
-                $location.path('/narrative/');
+                $location.path('/narratives/my-narratives/');
             }
             $rootScope.$apply();
         }

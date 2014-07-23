@@ -91,20 +91,24 @@ function KBCacheClient(token) {
             fba_url = configJSON.dev.fba_url;
             ws_url = configJSON.dev.workspace_url;
             ujs_url = configJSON.dev.user_job_state_url;
+            search_url = configJSON.dev.search_url;
         } else if (configJSON.setup == 'prod') {
             fba_url = configJSON.prod.fba_url;
             ws_url = configJSON.prod.workspace_url;
             ujs_url = configJSON.prod.user_job_state_url;
+            search_url = configJSON.prod.search_url;
         }
     } else {
         fba_url = "http://140.221.85.73:4043/"
         ws_url = "https://kbase.us/services/ws/"
         ujs_url = "http://140.221.84.180:7083"
+        search_url = "http://dev07.berkeley.kbase.us/search/"
     }
 
     console.log('FBA URL is:', fba_url);
     console.log('Workspace URL is:', ws_url);
     console.log('User Job State URL is:', ujs_url);
+    console.log('Search Service URL is:', search_url);    
 
     var fba = new fbaModelServices(fba_url, auth);
     var kbws = new Workspace(ws_url, auth);
@@ -116,6 +120,9 @@ function KBCacheClient(token) {
     self.ws = kbws;
     self.ujs = ujs
     self.nar = new ProjectAPI(ws_url, token);
+
+    self.ws_url = ws_url;
+    self.search_url = search_url;    
     self.token = token;
     self.ui = new UIUtils();
 

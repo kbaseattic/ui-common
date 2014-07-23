@@ -2699,8 +2699,14 @@ angular.module('ws-directives')
                                 $prompt.getCover().loading();
                                 $.when(p).done(function(){
                                     console.log('transitionging ')
-                                    $state.transitionTo('narratives.mynarratives');
-                                    scope.$apply();
+                                    if (scope.tab == 'my-narratives') {
+                                        $state.go('narratives.mynarratives', null, {reload: true});
+                                        scope.$apply();
+                                    } else {
+                                        $state.transitionTo('narratives.mynarratives');
+                                        scope.$apply();
+                                    }
+
 
                                     console.log('tab', scope.tab)
                                     //ascope.loadNarTable();
