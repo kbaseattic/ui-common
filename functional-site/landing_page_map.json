@@ -28,11 +28,12 @@
     "KBaseBiochem" : {
         "Biochemistry" : null,
         "Media" : "media",
-        "BiochemistryStructures" : null
+        "BiochemistryStructures" : null,
+        "MetabolicMap": "maps"
     },
 
     "KBaseCommunities" : {
-        "Metagenome" : null
+        "Metagenome" : "metagenome"
     },
 
     "KBaseExpression" : {
@@ -56,7 +57,8 @@
         "ReactionSensitivityAnalysis" : null,
         "FBAModel" : "models",
         "Gapgeneration" : null,
-        "ModelTemplate" : null
+        "ModelTemplate" : null,
+        "ETC" : "etc"
     },
 
     "KBaseGenomes" : {
@@ -123,9 +125,13 @@
         "ExpressionDataSample" : null,
         "ExpressionDataPoint" : null,
         "MAKResult" : "mak",
-        "MAKBicluster" : null,
+        "MAKBicluster" : "mak",
         "ExpressionDataSeries" : null,
-        "MAKBiclusterSet" : null
+        "MAKBiclusterSet" : "mak",
+        "FloatDataTable" : "mak",
+        "FloatDataTableContainer" : null,
+        "StringDataTable" : null,
+        "StringDataTableContainer" : null
     },
 
     "MEME" : {
@@ -141,6 +147,15 @@
     "ProbabilisticAnnotation" : {
         "RxnProbs" : null,
         "ProbAnno" : null
+    },
+
+    "Meta" : {
+        "RxnProbs" : null,
+        "ProbAnno" : null
+    },
+    
+    "KBaseTrees" : {
+    	"Tree" : "tree"
     }
 
 }

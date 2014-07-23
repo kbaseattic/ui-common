@@ -1,36 +1,37 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html ng-app="landing-pages" lang="en">
     <head>
         <title>KBase Narrative Interface (prototype)</title>
         <link rel="icon" type="image/x-icon" href="assets/img/KBase_favicon.ico">
 
         <!-- Global KBase css -->
-		
         <link rel="stylesheet" type="text/css" href="../ext/bootstrap/3.0.0/css/bootstrap.css" />
         <link rel="stylesheet" type="text/css" href="../ext/jquery-ui/1.10.3/css/custom-theme/jquery-ui-1.10.0.custom.css"> 
-		
+
         <link rel="stylesheet" type="text/css" href="assets/css/dataTables.bootstrap.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/ws-browser.css" />
-        <!--<link rel="stylesheet" type="text/css" href="assets/css/scroll.css" />-->
         <link rel="stylesheet" type="text/css" href="assets/css/ng-grid.css" />
 
+        <link rel="stylesheet" type="text/css" href="assets/css/kb-visualizations.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/landing-pages.css" />
         <!-- should probably remove styling from feed xml? -->
         <link rel="stylesheet" type="text/css" href="assets/css/narrative.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/search.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/jquery.jsonview.css" />        
 
         <link rel="stylesheet" type="text/css" href="assets/css/nc-tour.css" />
 
         <!-- KBase widget css -->
-        <link rel="stylesheet" type="text/css" href="../widgets/css/kbaseLandingPageCard.css" />
-		<link rel='stylesheet prefetch' href='http://s.cdpn.io/4629/animate.css'>
+        <link rel="stylesheet" type="text/css" href="assets/css/kbaseLandingPageCard.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/kbaseSEEDFunctions.css" />
+
         <!-- External javascript packages -->
 
 
         <script src="../ext/bowser/bowser.min.js"></script>
 
-    	<!-- Google Analytics -->
-    	<script>
+            <!-- Google Analytics -->
+            <script>
             (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
             (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
             m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -79,18 +80,20 @@
             }
 
             checkBrowser();
-    	</script>
-		
-		<script src='http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js'></script>
+        </script>
+
         <script src="../ext/jquery/jquery-1.10.2.min.js"></script>
        <!-- <script src="../ext/jquery-migrate/jquery-migrate-1.2.1.js"></script> -->
         <script src="../ext/jquery-ui/1.10.3/js/jquery-ui-1.10.3.custom.min.js"></script>
-        <script src="../ext/d3/d3.v3.min.js"></script>
+        <script src="../ext/blockUI/jquery.blockUI.js"></script>
         <script src="../ext/bootstrap/3.0.0/js/bootstrap.js"></script>
+        <script src="../ext/d3/d3.v3.min.js"></script>
         <script src="../ext/dataTables/1.9.4/js/jquery.dataTables.js"></script>
         <script src="assets/js/dataTables.bootstrap.js"></script>
         <script src="assets/js/jquery.dataTables.rowGrouping.js"></script>
         <script src="assets/js/dataTables.colReorder.min.js"></script>
+        <script src="assets/js/dataTable.colVis.js"></script>
+        <script src="assets/js/dataTables.tableTools.js"></script>     
         <script src="assets/js/FixedHeader.min.js"></script> 
         <script src="assets/js/jquery.jsonview.js"></script>         
 
@@ -99,13 +102,14 @@
         <script src="assets/js/jquery.cookie.min.js"></script>
         <script src="assets/js/viz/raphael-min.js"></script>
 
-
         <!-- KBase client library javascript -->
         <script src="assets/js/kbclient/kbase.js"></script>
-        <script src="assets/js/kbclient/workspaceDeluxe1.1.js"></script>
+        <!-- <script src="assets/js/kbclient/workspaceDeluxe.js"></script> -->
+        <script src="assets/js/kbclient/workspaceDeluxe-0.2.1.js"></script>
         <script src="assets/js/kbclient/userandjobstate.js"></script>        
         <!--<script src="assets/js/kbclient/projects.js"></script>        -->
         <script src="assets/js/kbclient/wikiScraper.js"></script>
+        <script src="assets/js/kbclient/kbaseTrees.js"></script>        
 
 
         <!-- widgets -->
@@ -120,7 +124,8 @@
         <!--<script src="../src/widgets/kbaseLogin.js"></script>        -->
 
 
-        <script src="../src/widgets/maps/kbasePathways.js"></script>
+        <!--<script src="../src/widgets/maps/kbasePathways.js"></script>-->
+        <script src="../src/widgets/maps/kbasePathway.js"></script>        
         <script src="../src/widgets/models/kbaseModelMeta.js"></script>
         <script src="../src/widgets/models/kbaseModelTabs.js"></script>
         <script src="../src/widgets/models/kbaseModelCore.js"></script>
@@ -147,6 +152,16 @@
         <script src="../src/widgets/workspaces/kbaseWSObjectTable.js"></script>
         <script src="../src/widgets/biochemistry/kbaseRxn.js"></script>
         <script src="../src/widgets/biochemistry/kbaseCpd.js"></script>
+	
+	<!-- ws obj reference related widgets -->
+        <script src="../ext/d3/sankey.js"></script> <!-- this is a d3 plugin -->
+        <link rel="stylesheet" type="text/css" href="assets/css/sankeystyle.css" />
+        <script src="../src/widgets/workspaces/kbaseWSReferenceList.js"></script>
+        <script src="../src/widgets/objgraphs/kbaseWSObjGraphView.js"></script>
+        <script src="../src/widgets/objgraphs/kbaseWSObjGraphCenteredView.js"></script>
+        <script src="../src/widgets/social/kbaseWSObjRefUsers.js"></script>
+        <script src="../src/widgets/social/kbaseNarrativesUsingData.js"></script>
+	<!-- end ws obj reference related widgets -->
 
         <!-- Genome widgets -->
         <script  src="../src/widgets/kbaseLandingPageCard.js"></script>
@@ -158,11 +173,18 @@
         <script  src="../src/widgets/genomes/kbaseGeneInstanceInfo.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneDomains.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneOperon.js"></script>
+        <script  src="../src/widgets/genomes/kbaseGeneSequence.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneBiochemistry.js"></script>
-		<script  src="../src/widgets/genomes/kbaseLitWidget.js"></script>
-
+        <script  src="../src/widgets/genomes/kbaseLitWidget.js"></script>
+        <script  src="../src/widgets/genomes/kbaseObjectMeta.js"></script>
+	<script  src="../src/widgets/genomes/kbaseGenomeLineage.js"></script>
         <script  src="../src/widgets/kbaseCardLayoutManager.js"></script>
+	    <script  src="../src/widgets/genomes/kbaseSEEDFunctions.js"></script>
         <!-- End Genome widgets -->
+	
+	<!-- Taxonomy widgets -->
+        <script  src="../src/widgets/taxa/kbaseTaxonOverview.js"></script>
+	<!-- end taxonomy widgets -->
         
         <!-- Meme widgets -->
         <script  src="../src/widgets/meme/logo.js"></script>
@@ -197,12 +219,8 @@
 
         <!-- MAK widgets -->
         <script  src="../src/widgets/mak/kbaseMAKResultCard.js"></script>
-        <script  src="../src/widgets/mak/kbaseMAKTilingCard.js"></script>		
         <script  src="../src/widgets/mak/kbaseMAKBiclusterCard.js"></script>
-		<script  src="../src/widgets/mak/kbaseHeatmapCard.js"></script>
-		<script  src="../src/widgets/mak/kbaseLineChartCard.js"></script>
-		<script  src="../src/widgets/mak/kbaseBarChartCard.js"></script>
-        <!-- End MAK widgets -->
+        <!-- End Cmonkey widgets -->
 
         <!-- Bambi widgets -->
         <script  src="../src/widgets/bambi/logo.js"></script>
@@ -216,7 +234,8 @@
         <link rel="stylesheet" type="text/css" href="assets/css/gwas.css" />
         <script src='../src/widgets/kbaseAuthenticatedWidget.js'></script>
         <!-- please don't load external scripts in index.html -->
-        <!--<script src="http://maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>-->
+        <!-- This is the only way currently to load google maps for the GWAS landing pages, if you have another solution, talk to Matt H. -->
+        <script src="http://maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
         <script src='../ext/gmaps/gmap3.js'></script>
         <script src="../src/widgets/gwas/kbaseGWASPop.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASPopTable.js"></script>
@@ -229,6 +248,8 @@
         <script src="../src/widgets/gwas/kbaseGWASTopVariationsTable.js"></script>
 
         <!-- End GWAS widgets -->
+
+        <script src="../src/widgets/trees/kbaseTree.js"></script>
 
         <!-- Iris widgets -->
         <!--
@@ -272,14 +293,16 @@
         <script src="lib/trees/excanvas.js"></script>
         <script src="lib/trees/menu.js"></script>            
         <script src="lib/trees/knhx.js"></script>
+        <script src="lib/trees/easytree.js"></script>
 
 
 	<!-- Network widgets and dependencies -->
-        <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape-panzoom.css" />
-        <script src="ext/cytoscape.js/2.0.4-jmc/arbor.js"></script>
-        <script src="ext/cytoscape.js/2.0.4-jmc/cytoscape.js"></script>
-        <script src="ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape-panzoom.js"></script>
-        <script src="ext/cytoscape.js/2.0.4-jmc/layout.arbor.js"></script>
+	<link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/font-awesome-4.0.3/css/font-awesome.css" />
+        <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.css" />
+        <script src="../ext/cytoscape.js/2.0.4-jmc/arbor.js"></script>
+        <script src="../ext/cytoscape.js/2.0.4-jmc/cytoscape.js"></script>
+        <script src="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.js"></script>
+        <script src="../ext/cytoscape.js/2.0.4-jmc/layout.arbor.js"></script>
         <script  src="../src/widgets/networks/kbasePPICard.js"></script>
         <script  src="../src/widgets/networks/kbaseNetworkCard.js"></script>
         <!-- End Network widgets -->
@@ -291,7 +314,8 @@
         <script src="js/angular-resource.js"></script> 
         <script src="js/ui-bootstrap-tpls-0.10.0.js"></script>
 
-        <script src="js/app.js"></script>
+        <script src="js/app.js"></script>        
+        <script src="js/search.js"></script>
 
         <script src="js/directives/landingpages.js"></script>
         <script src="js/directives/cards.js"></script>
@@ -300,59 +324,53 @@
         <script src="js/directives/trees.js"></script>        
 	    <script src="js/directives/narrative.js"></script>
         <script src="js/directives/autofillFix.js"></script>
+        <script src="js/directives/modeling.js"></script>
         <script src="js/controllers.js"></script>
+        <script src="js/services/favorites.js"></script>
         <script src="js/cacheclient.js"></script>
         <script src="assets/js/header.js"></script>
     </head>
 
     <body>
         <div id="wrap">
+            <div class="nav navbar-kbase navbar-fixed-top nav-collapse nav-collapse-scrollable bs-navbar-scroll-collapse">
+                <a href="http://www.kbase.us" class="pull-left">
+                    <img id="logo" src="assets/img/kbase_logo.png" width="46"/>
+                </a>
 
-        <div class="nav navbar-kbase navbar-fixed-top nav-collapse nav-collapse-scrollable bs-navbar-scroll-collapse">
-            <a href="http://www.kbase.us" class="pull-left">
-                <img id="logo" src="assets/img/kbase_logo.png" width="46">
-            </a>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav"> 
+                        <li class="dropdown" ng-class="{ active: $state.includes('narrative')}">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Narrative <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#/narrative/">Newsfeed</a></li>                
+                                <li><a href="#/narrative/projects/">Projects</a></li>
+                                <!--<li class="divider"></li>     
+                                <li><a href="#">Profile</a></li>-->
+                            </ul>
+                        </li>
+                        <li ng-class="{ active: $state.includes('search')}">
+                            <a ng-click="newSearch()" ng-controller="searchBarController">Search Data</a>
+                        </li>
+                        <li ng-class="{ active: $state.includes('ws')}"><a href="#/ws/" >Workspaces</a></li>
+                        <li><a href="http://kbase.us/services/docs/uploader/uploader.html">Upload</a></li>          
+                    </ul>
 
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-              <ul class="nav navbar-nav"> 
-                <li class="dropdown" ng-class="{ active: $state.includes('narrative')}">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Narrative <b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#/narrative/">Newsfeed</a></li>                
-                    <li><a href="#/narrative/projects/">Projects</a></li>
-                    <!--<li class="divider"></li>     
-                    <li><a href="#">Profile</a></li>-->
-                  </ul>
-                </li>
-                <li ng-class="{ active: $state.includes('ws')}"><a href="#/ws/" >Workspaces</a></li>
-                <li><a href="http://kbase.us/services/docs/uploader/uploader.html">Upload</a></li>          
-              </ul>
-
-              <form ng-controller="Search" ng-submit="startSearch(searchquery)" class="navbar-form navbar-left" role="search" style="width: 40%">
-                <div class="input-group">
-                    <input class="form-control" ng-model="searchquery" name="search" placeholder="Search KBase Data" autocomplete="off" type="text"> 
-                    <div class="input-group-btn">
-                        <button class="btn" type="submit" style="background-color: #ebebeb; border-color: #adadad; border-left:none">
-                            <span class="glyphicon glyphicon-search" style="line-height: .9"></span>
-                        </button>
-                    </div>
-                </div>
-              </form>
-              <!--
-              <ul class="nav navbar-nav"> 
-                <li ng-class="{ active: $state.includes('favorites')}"><a href="#/favorites/all/">Favorites <span class="badge  favorite-count"></span></a></li>
-                <li class="fav-loading"></li>
-              </ul>-->
-
+                    <!--
+                    <ul class="nav navbar-nav"> 
+                        <li ng-class="{ active: $state.includes('favorites')}"><a href="#/favorites/all/">Favorites <span class="badge  favorite-count"></span></a></li>
+                        <li class="fav-loading"></li>
+                    </ul>
+                    -->
              
-              <div id="signin-button" class="pull-right"></div>
-              <ul class="nav navbar-nav pull-right">
-                  <li class="dropdown help-dropdown"></li>
-              </ul>
-            </div> 
-        </div>
+                    <div id="signin-button" class="pull-right"></div>
+                    <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown help-dropdown"></li>
+                    </ul>
+                </div> 
+            </div>
 
-        <div id="app" class="wrapper" ui-view></div>
+            <div id="app" class="wrapper" ui-view></div>
 
         </div> <!-- end wrap, this pushes the footer down -->
         <div id="footer">
