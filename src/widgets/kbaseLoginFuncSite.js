@@ -63,6 +63,8 @@
             fields : ['name', 'kbase_sessionid', 'user_id', 'token'],
         },
 
+        cookieName : 'kbase_session',
+
         get_kbase_cookie : function (field) {
 
             var chips = localStorage.getItem('kbase_session');
@@ -124,8 +126,8 @@
                 if (!this.is_token_valid(this.get_kbase_cookie('token'))) {
                     localStorage.removeItem('kbase_session');
                     // nuke the cookie, too, just in case it's still there.
-                    $.removeCookie(cookieName, { path: '/', domain: 'kbase.us' });
-                    $.removeCookie(cookieName, { path: '/' });
+                    $.removeCookie(this.cookieName, { path: '/', domain: '.kbase.us' });
+                    $.removeCookie(this.cookieName, { path: '/' });
                     // $.cookie('kbase_session', null, { path: '/' });
                     // $.cookie('kbase_session', null, { path: '/', domain: 'kbase.us' });
 //                    $.cookie('kbase_session', null);
@@ -1052,7 +1054,7 @@
 
             localStorage.removeItem('kbase_session');
             $.removeCookie('kbase_session', { path: '/' });
-            $.removeCookie(cookieName, { path: '/', domain: 'kbase.us' });
+            $.removeCookie(this.cookieName, { path: '/', domain: '.kbase.us' });
 
             // the rest of this is just housekeeping.
 
