@@ -105,6 +105,24 @@
 						
 						var htmlJson = self.xmlToJson(data)
 						var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='
+						console.log(htmlJson)
+						if (htmlJson.eSearchResult[1].Count["#text"] == "0") {
+							var tableSettings = {
+								// "sPaginationType": "full_numbers",
+								"iDisplayLength": 4,
+								"sDom": 't<flip>',
+								"aoColumns": [
+									{sTitle: "Journal", mData: "source"},
+									{sTitle: "Authors", mData: "author"},
+									{sTitle: "Title", mData: "title"},
+									{sTitle: "Date", mData: "date"}
+								],
+								"aaData": []
+							}	
+							loader.hide()
+							litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
+							return;
+						}
 						if ($.isArray(htmlJson.eSearchResult[1].IdList.Id)) {						
 							
 							for (x=0;x<htmlJson.eSearchResult[1].IdList.Id.length;x++) {
@@ -147,18 +165,23 @@
 									var tableInputRow = {}									
 									for (item_idx in summary) {
 										infoRow = summary[item_idx]
-										// console.log(infoRow)
+										console.log(infoRow)
 										if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"]
 										if (infoRow["@attributes"].Name == "Source") tableInputRow["source"] = infoRow["#text"]
 										if (infoRow["@attributes"].Name == "Title") tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"										
 										if (infoRow["@attributes"].Name == "AuthorList") {
 											var authors = ""
-											commaDelay = 1
-											for (author_idx in infoRow.Item) {
-												author = infoRow.Item[author_idx]
-												if (commaDelay == 0) authors+=", "
-												else commaDelay--
-												authors+=author["#text"]													
+											if ($.isArray(infoRow.Item)) {
+												commaDelay = 1
+												for (author_idx in infoRow.Item) {
+													author = infoRow.Item[author_idx]
+													if (commaDelay == 0) authors+=", "
+													else commaDelay--
+													authors+=author["#text"]													
+												}												
+											}
+											else {
+												author = infoRow.Item["#text"]
 											}
 											tableInputRow["author"] = authors
 										}
