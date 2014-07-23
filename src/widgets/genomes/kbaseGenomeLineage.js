@@ -126,7 +126,7 @@
             this.$infoTable.empty()
             	//.append(this.addInfoRow("ID", genome.id))
             	.append(this.addInfoRow("Name", genome.scientific_name))
-            	.append('<tr><td>Taxonomic lineage</td><td id="tax_td_'+this.pref+'"/></tr>');
+            	.append('<tr><th>Taxonomic Lineage</th><td id="tax_td_'+this.pref+'"/></tr>');
 
             self.hideMessage();
             this.$infoPanel.show();
@@ -176,7 +176,7 @@
         guessLinage: function() {
         	var self = this;
 			var tdElem = $('#tax_td_'+self.pref);
-			tdElem.html(" guessing based on closest genomes ..."); //<img src='" + this.options.loadingImage + "'>");
+			tdElem.html("<img src='" + this.options.loadingImage + "'>");
         	var treesSrv = new KBaseTrees(this.treesURL, {token: this.authToken()});
     		//console.log("kbaseGenomeLineage: guess_taxonomy_path...");
     		var genomeRef = this.options.workspaceID + "/" + this.options.genomeID;
@@ -240,7 +240,7 @@
         },
 
         addInfoRow: function (a, b) {
-            return "<tr><td>" + a + "</td><td>" + b + "</td></tr>";
+            return "<tr><th>" + a + "</th><td>" + b + "</td></tr>";
         },
 
         uuid: function() {
