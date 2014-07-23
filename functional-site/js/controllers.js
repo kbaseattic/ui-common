@@ -532,7 +532,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                     //kb = new KBCacheClient(USER_TOKEN);
                     kb.nar.ensure_home_project(USER_ID);
 
-                    $location.path('/narrative/');
+                    $location.path('/narratives/featured');
                     $scope.$apply();
                     window.location.reload();
                     

@@ -520,7 +520,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
             if (c.kbase_sessionid) {
                 // USER_ID = $("#signin-button").kbaseLogin('session').user_id;
                 // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
-                $location.path('/narratives/my-narratives/');
+                $location.path('/narratives/featured');
             }
             $rootScope.$apply();
         }
