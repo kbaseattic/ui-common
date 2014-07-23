@@ -103,12 +103,31 @@
             var isInt = function (n) {
                     return typeof n === 'number' && n % 1 == 0;
                 };
-            console.log("renderWorkspace " + this.options.workspaceID + " " + this.options.genomeID);
-
-            var obj = this.getObjectIdentity(this.options.workspaceID, this.options.genomeID);
-
+            //console.log("renderWorkspace " + this.options.workspaceID + " " + this.options.genomeID);
             //console.log("obj " + obj);
 
+	    var obj = this.getObjectIdentity(this.options.workspaceID, this.options.genomeID);
+            obj['included'] = ["/taxonomy","/scientific_name"];
+	    self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
+                    if (data[0]) {
+                        var genome = data[0]['data'];
+			self.showData(genome);
+                    }
+                },
+                function(error) {
+                        var obj = self.buildObjectIdentity(self.options.workspaceID, self.options.genomeID);
+                        obj['included'] = ["/scientific_name"];
+                        self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
+                            if (data[0]) {
+				var genome = data[0]['data'];
+				self.showData(genome);
+			    }
+                        },
+                        function(error) {self.renderError(error);});
+                });
+	    
+	    // old style that waits on entire genome
+	    /*var obj = this.getObjectIdentity(this.options.workspaceID, this.options.genomeID);
             var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
             $.when(prom).done($.proxy(function (genome) {
                 genome = genome[0].data;
@@ -116,7 +135,7 @@
             }, this));
             $.when(prom).fail($.proxy(function (error) {
                 this.renderError(error);
-            }, this));
+            }, this));*/
         },
 
         showData: function(genome) {
@@ -151,9 +170,9 @@
             		}
             		//http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=drosophila+miranda
             		var searchtax = splittax[a].replace("/ /g", "+");
-            		console.log(searchtax);
+            		//console.log(searchtax);
             		var str =pad+'<a href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name='+searchtax+'" target="_blank">'+splittax[a]+'</a><br>';
-            		console.log(str);
+            		//console.log(str);
             		finaltax+=str; 
             	}
             	finaltax += "</pre>";
@@ -201,7 +220,7 @@
          *Returns the full workspace identifier, optionally with the version.
          */
         getObjectIdentity: function (wsNameOrId, objNameOrId, objVer) {
-            console.log(wsNameOrId + " " + objNameOrId + " " + objVer);
+            //console.log(wsNameOrId + " " + objNameOrId + " " + objVer);
             if (objVer) {
                 return {
                     ref: wsNameOrId + "/" + objNameOrId + "/" + objVer

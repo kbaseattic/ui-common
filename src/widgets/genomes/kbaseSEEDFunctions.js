@@ -20,7 +20,7 @@
             wsNameOrId: null,
             objVer: null,
             loadingImage: "assets/img/loading.gif",
-            kbCache:{},         
+            kbCache:null,         
             width:900         
         },
         
@@ -51,52 +51,7 @@
 
         init: function(options) {
             this._super(options);          
-            this.render();
-
-            var SEEDTree = this.SEEDTree;
-            var subsysToGeneMap = this.subsysToGeneMap;
-
-            var obj = {"ref" : this.options.wsNameOrId + "/" + this.options.objNameOrId };
-            var prom;
-
-            if (this.options.kbCache) {
-                prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-            } else {
-                var workspaceClient = new Workspace(this.wsUrl, this.authToken);
-                prom = workspaceClient.get_objects([obj]);
-            }
-            //var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-        
-            $.when(prom).fail($.proxy(function(error) {
-                //this.renderError(error); Need to define this function when I have time
-                console.log(error);
-            }, this));
-
-            $.when(prom).done($.proxy(function(genome) {
-                var genomeObj = genome[0].data;
-
-                /*
-                    First I am going to iterate over the Genome Typed Object and 
-                    create a mapping of the assigned functional roles (by SEED) to
-                    an array of genes with those roles. 
-
-                    subsysToGeneMap [ SEED Role ] = Array of Gene Ids
-                */
-
-                genomeObj.features.forEach( function(f){
-
-                    // Each function can have multiple genes, creating mapping of function to list of gene ids
-                    if (subsysToGeneMap[f["function"]] === undefined) {subsysToGeneMap[f["function"]] = [];}
-                    subsysToGeneMap[f["function"]].push(f["id"]);
-
-                    // Not sure if this is necessary, but I'm going to keep track of the number of genes with
-                    // SEED assigned functions in this count variable.
-                    SEEDTree.count++; 
-                });
-
-                this.loadSEEDHierarchy();
-
-            }, this));
+            //this.render();
 
             return this;
         },
@@ -136,7 +91,9 @@
             var subsysToGeneMap = self.subsysToGeneMap;
             var Level1 = [];
 
-            d3.text("assets/data/subsys.txt", function(text) {
+            //d3.text("assets/data/subsys.txt", function(text) {
+            //d3.text("/static/subsys.txt", function(text) {
+            d3.text("/functional-site/assets/data/subsys.txt", function(text) {
                 var data = d3.tsv.parseRows(text);
 
                 for (i = 0; i < data.length; i++) {
@@ -336,11 +293,57 @@
                     .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+            var SEEDTree = this.SEEDTree;
+            var subsysToGeneMap = this.subsysToGeneMap;
+
+            var obj = {"ref" : this.options.wsNameOrId + "/" + this.options.objNameOrId };
+            var prom;
+
+            if (this.options.kbCache) {
+                prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+            } else {
+                console.log("token: " + this.authToken);
+                prom = this.wsClient.get_objects([obj]);
+            }
+            //var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+        
+            $.when(prom).fail($.proxy(function(error) {
+                //this.renderError(error); Need to define this function when I have time
+                console.log(error);
+            }, this));
+
+            $.when(prom).done($.proxy(function(genome) {
+                var genomeObj = genome[0].data;
+
+                /*
+                    First I am going to iterate over the Genome Typed Object and 
+                    create a mapping of the assigned functional roles (by SEED) to
+                    an array of genes with those roles. 
+
+                    subsysToGeneMap [ SEED Role ] = Array of Gene Ids
+                */
+
+                genomeObj.features.forEach( function(f){
+
+                    // Each function can have multiple genes, creating mapping of function to list of gene ids
+                    if (subsysToGeneMap[f["function"]] === undefined) {subsysToGeneMap[f["function"]] = [];}
+                    subsysToGeneMap[f["function"]].push(f["id"]);
+
+                    // Not sure if this is necessary, but I'm going to keep track of the number of genes with
+                    // SEED assigned functions in this count variable.
+                    SEEDTree.count++; 
+                });
+
+                this.loadSEEDHierarchy();
+
+            }, this));
+
         },
 
         loggedInCallback: function(event, auth) {
             this.authToken = auth;
             this.wsClient = new Workspace(this.wsUrl, this.authToken);
+            this.render();
             return this;
         },
 
