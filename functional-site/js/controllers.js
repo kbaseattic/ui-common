@@ -527,7 +527,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
             user.password,
             function(args) {
                 if (args.success === 1) {
-                        
+
                     this.registerLogin(args);
                     //this.data('_session', kbaseCookie);
 
@@ -553,7 +553,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                     $location.path('/narrative/');
                     $scope.$apply();
                     window.location.reload();
-                    
                 } else {
                     console.log("error logging in");
                     $("#loading-indicator").hide();
