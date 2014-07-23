@@ -12,42 +12,13 @@
                 <div class='tab-content'>    
                     <div class="tab-pane active">
                         <div class="row">
-                            <div class="col-md-5 text-center">
-                                <div ng-show="options.userState.selectedWorkspace">
-                                    <h3>                                    
-                                        <span class="search-cart-label">{{options.userState.selectedWorkspace}}</span>
-                                        <span class="glyphicon glyphicon-hdd"></span>
-                                        <span class="badge search-cart-count">{{options.userState.workspace_carts[options.userState.selectedWorkspace].size | number}}</span>
-                                    </h3>
-                                    <table class="search-transfer-table table table-striped table-condensed">
-                                        <thead>
-                                            <tr>
-                                                <th><input type="checkbox" ng-model="options.userState.workspace_carts[options.userState.selectedWorkspace].all" ng-click="toggleAllWorkspaceCart()"></input></th>                                                
-                                                <th class="transfer_object_type text-left">Object Type</th>
-                                                <th class="transfer_object_id text-left">Object Id</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="search-transfer-table" ng-if="options.userState.workspace_carts[options.userState.selectedWorkspace]">
-                                            <tr ng-repeat="s in options.userState.workspace_carts[options.userState.selectedWorkspace].data">
-                                                <td><input type="checkbox" ng-model="options.userState.workspace_carts[options.userState.selectedWorkspace].data[s.row_id].cart_selected"></input></td>
-                                                <td class="transfer_object_type text-left">{{s.object_type}}</td>
-                                                <td class="transfer_object_id text-left">{{s.object_id}}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <div class="btn-group" ng-show="options.userState.workspace_carts[options.userState.selectedWorkspace] && options.userState.workspace_carts[options.userState.selectedWorkspace].size > 0">
-                                        <button type="button" class="btn btn-primary" ng-click="transferSize = options.userState.workspace_carts[options.userState.selectedWorkspace].size; transferring = true; addAllObjects(); transferring = false; emptyTransfers(); transferSize = 0;">Transfer<span class="glyphicon glyphicon-transfer"><span></button>
-                                        <button type="button" class="btn btn-danger" ng-click="removeSelectedFromWorkspaceCart()">Discard<span class="glyphicon glyphicon-trash"><span></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2 text-center">                    
+                            <div class="col-md-2 text-center">
                                 <div class="btn-group">                    
                                     <button ng-class="{'disabled': !options.userState.loggedIn}" type="button" class='btn btn-default dropdown-toggle' data-toggle="dropdown" ng-click='listWorkspaces()'>
                                         Select a workspace <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu search-workspace-menu" role="menu">
-                                        <div id="workspace-area" class="panel">
+                                        <div id="workspace-area" class="panel" ng-show="options.userState.workspaces">
                                             <ul class='nav nav-pills nav-stacked scroll-menu'>
                                                 <li ng-repeat="w in options.userState.workspaces">
                                                     <a ng-click='selectWorkspace(w)'>
@@ -58,75 +29,208 @@
                                             </ul>
                                         </div>
                                     </ul>
-                                </div> <!-- end select workspace area -->
+                                </div>
+                                <div ng-show="!options.userState.selectedWorkspace">
+                                    <p>Select a workspace above to copy your data.</p>
+                                </div>
                                 <div ng-show="options.userState.selectedWorkspace" class="text-center">
                                     <div class="workspace-title">
                                         <h3>Selected workspace</h3>
                                     </div>
-                                    <strong>{{options.userState.selectedWorkspace}}</strong>
+                                    <h3>                                    
+                                        <span class="search-cart-label">{{options.userState.selectedWorkspace}}</span>
+                                        <span class="glyphicon glyphicon-hdd"></span>
+                                        <span class="badge search-cart-count">{{options.userState.workspace_carts[options.userState.selectedWorkspace].size | number}}</span>
+                                    </h3>
+                                    <div class="text-center">
+                                        <div ng-show="options.userState.workspace_carts[options.userState.selectedWorkspace] && options.userState.workspace_carts[options.userState.selectedWorkspace].size > 0">
+                                            <button type="button" class="btn btn-primary" ng-click="transferring = true; addAllObjects(); transferring = false; emptyTransfers();">Copy<span class="glyphicon glyphicon-transfer"><span></button>
+                                            <button type="button" class="btn btn-danger" ng-click="emptyWorkspaceCart()">Discard<span class="glyphicon glyphicon-trash"><span></button>
+                                        </div>
+                                    </div>
                                 </div>
-
+                            </div>
+                            <div class="col-md-1 text-center">                    
                                 <div class="search-stage-transfer-buttons">
-                                    <div class="text-center"><p>Select items in your data cart and stage them for saving to your workspace.</p></div>
+                                    <div class="text-center"><p>Select items in your data cart to copy to your workspace.</p></div>
                                     <div class="row">
                                         <button class="btn btn-default" ng-class="{disabled: !options.userState.selectedWorkspace}" type="button" ng-click="addSelectedToWorkspaceCart()"><span class="glyphicon glyphicon-arrow-left"></span></button>
                                     </div>
                                 </div>
-                                
                             </div>
-                            <div class="col-md-5 text-center">
+                            <div class="col-md-9 text-center">
                                 <div class="row">
                                     <h3>
                                         <span class="search-cart-label">Data Cart</span>
                                         <span class="space-left glyphicon glyphicon-shopping-cart"></span>
-                                        <span class="badge search-cart-count">{{options.userState.data_cart_size | number}}</span>                                        
+                                        <span class="badge search-cart-count">{{options.userState.data_cart.size | number}}</span>                                        
                                     </h3>
                                 </div>
-                                <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.selectedWorkspace}">
-                                    <thead>
-                                        <tr>
-                                            <th><input type="checkbox" ng-model="options.userState.data_cart.all" ng-click="toggleAllDataCart()"></input></th>
-                                            <th class="transfer_object_type text-left">Object Type</th>
-                                            <th class="transfer_object_id text-left">Object Id</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr ng-repeat="s in options.userState.data_cart.data">
-                                            <td><input type="checkbox" ng-model="options.userState.data_cart.data[s.row_id].cart_selected"></input></td>
-                                            <td class="transfer_object_type text-left">{{s.object_type}}</td>
-                                            <td class="transfer_object_id text-left">{{s.object_id}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>    
-                                <div class="btn-group" ng-show="options.userState.data_cart && options.userState.data_cart_size > 0">
-                                    <button type="button" class="btn btn-danger" ng-click="removeSelectedFromDataCart()">Discard<span class="glyphicon glyphicon-trash"><span></button>
-                                </div>
+
+                                <ul class="nav nav-pills" role="tablist">
+                                    <li class="active"><a href="#transfer_genomes" data-toggle="tab">Genomes<span class="badge">{{options.userState.data_cart.types['genomes'].size}}</span></a></li>
+                                    <li><a href="#transfer_features" data-toggle="tab">Genome Features<span class="badge">{{options.userState.data_cart.types['features'].size}}</span></a></li>
+                                    <li><a href="#transfer_metagenomes" data-toggle="tab">Metagenomes<span class="badge">{{options.userState.data_cart.types['metagenomes'].size}}</span></a></li>
+                                    <li><a href="#transfer_gwas" data-toggle="tab">Genotype-Phenotype<span class="badge">{{options.userState.data_cart.types['gwas'].size}}</span></a></li>
+                                </ul>
+
+
+                                <div class='tab-content'>    
+                                    <div id="transfer_genomes" class="tab-pane active">
+                                        <div class="row">
+                                
+                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.selectedWorkspace}">
+                                                <thead>
+                                                    <tr>
+                                                        <th><input type="checkbox" ng-model="options.userState.data_cart.types['genomes'].all" ng-click="toggleAllDataCart('Genome')"></input></th>
+                                                        <th class="text-left"><strong>Genome Id</strong></th>
+                                                        <th class="text-left"><strong>Scientific Name</strong></th>
+                                                        <th class="text-left"><strong>Domain</strong></th>
+                                                        <th class="text-left"><strong>%GC</strong></th>
+                                                        <th class="text-left"><strong>Contigs</strong></th>
+                                                        <th class="text-left"><strong>DNA Size bp</strong></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="s in options.userState.data_cart.genomes">
+                                                        <td><input type="checkbox" ng-model="options.userState.data_cart.types['genomes'].data[s.row_id].cart_selected"></input></td>
+                                                        <td class="text-left">{{s.genome_id}}</td>
+                                                        <td class="text-left">{{s.scientific_name}}</td>
+                                                        <td class="text-left">{{s.domain}}</td>
+                                                        <td class="text-left">{{s.gc_content}}</td>
+                                                        <td class="text-left">{{s.num_contigs}}</td>
+                                                        <td class="text-left">{{s.genome_dna_size}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>    
+                                            <div class="text-center">
+                                                <div ng-show="options.userState.data_cart && options.userState.data_cart.size > 0">
+                                                    <button type="button" class="btn btn-danger" ng-click="removeSelectedFromDataCart()">Discard<span class="glyphicon glyphicon-trash"><span></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- end first tab -->
+                                    <div id="transfer_features" class="tab-pane active">
+                                        <div class="row">
+                                
+                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.selectedWorkspace}">
+                                                <thead>
+                                                    <tr>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>    
+                                            <div class="text-center">
+                                                <div ng-show="options.userState.data_cart && options.userState.data_cart.size > 0">
+                                                    <button type="button" class="btn btn-danger" ng-click="removeSelectedFromDataCart()">Discard<span class="glyphicon glyphicon-trash"><span></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- end first tab -->
+                                    <div id="transfer_metagenomes" class="tab-pane active">
+                                        <div class="row">
+                                
+                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.selectedWorkspace}">
+                                                <thead>
+                                                    <tr>
+                                                        <th><input type="checkbox" ng-model="options.userState.data_cart.all_genomes" ng-click="toggleAllDataCart('Genome')"></input></th>
+                                                        <th class="text-left"><strong>Genome Id</strong></th>
+                                                        <th class="text-left"><strong>Scientific Name</strong></th>
+                                                        <th class="text-left"><strong>Domain</strong></th>
+                                                        <th class="text-left"><strong>%GC</strong></th>
+                                                        <th class="text-left"><strong>Contigs</strong></th>
+                                                        <th class="text-left"><strong>DNA Size bp</strong></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="s in options.userState.data_cart.genomes">
+                                                        <td><input type="checkbox" ng-model="options.userState.data_cart.data[s.row_id].cart_selected"></input></td>
+                                                        <td class="text-left">{{s.genome_id}}</td>
+                                                        <td class="text-left">{{s.scientific_name}}</td>
+                                                        <td class="text-left">{{s.domain}}</td>
+                                                        <td class="text-left">{{s.gc_content}}</td>
+                                                        <td class="text-left">{{s.num_contigs}}</td>
+                                                        <td class="text-left">{{s.genome_dna_size}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>    
+                                            <div class="text-center">
+                                                <div ng-show="options.userState.data_cart && options.userState.data_cart.size > 0">
+                                                    <button type="button" class="btn btn-danger" ng-click="removeSelectedFromDataCart()">Discard<span class="glyphicon glyphicon-trash"><span></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- end first tab -->
+                                    <div id="transfer_gwas" class="tab-pane active">
+                                        <div class="row">
+                                
+                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.selectedWorkspace}">
+                                                <thead>
+                                                    <tr>
+                                                        <th><input type="checkbox" ng-model="options.userState.data_cart.all_genomes" ng-click="toggleAllDataCart('Genome')"></input></th>
+                                                        <th class="text-left"><strong>Genome Id</strong></th>
+                                                        <th class="text-left"><strong>Scientific Name</strong></th>
+                                                        <th class="text-left"><strong>Domain</strong></th>
+                                                        <th class="text-left"><strong>%GC</strong></th>
+                                                        <th class="text-left"><strong>Contigs</strong></th>
+                                                        <th class="text-left"><strong>DNA Size bp</strong></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="s in options.userState.data_cart.genomes">
+                                                        <td><input type="checkbox" ng-model="options.userState.data_cart.data[s.row_id].cart_selected"></input></td>
+                                                        <td class="text-left">{{s.genome_id}}</td>
+                                                        <td class="text-left">{{s.scientific_name}}</td>
+                                                        <td class="text-left">{{s.domain}}</td>
+                                                        <td class="text-left">{{s.gc_content}}</td>
+                                                        <td class="text-left">{{s.num_contigs}}</td>
+                                                        <td class="text-left">{{s.genome_dna_size}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>    
+                                            <div class="text-center">
+                                                <div ng-show="options.userState.data_cart && options.userState.data_cart.size > 0">
+                                                    <button type="button" class="btn btn-danger" ng-click="removeSelectedFromDataCart()">Discard<span class="glyphicon glyphicon-trash"><span></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- end first tab -->
+                                </div> <!-- end all tabs -->
                             </div>
                         </div>
 
                         <div class="row search-transfer-row" ng-show="options.userState.objectsTransferred > 0 && options.userState.workspace_carts[options.userState.selectedWorkspace].size > 0">
                             <div class="text-center">Transferring</div>
                             <div class="progress">
-                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{'min-width': (options.userState.objectsTransferred/transferSize * 100.0) + '%'}">
+                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-model="transferSize" ng-init="transferSize = options.userState.workspace_carts[options.userState.selectedWorkspace].size" ng-style="{'min-width': (options.userState.objectsTransferred/transferSize * 100.0) + '%'}">
                                     {{options.userState.objectsTransferred}}/{{transferSize}}
                                 </div>
+                            </div>
+                            <div class="alert alert-success" ng-show="options.userState.objectsTransferred ">
+                                Transfer complete.
+                                <button type="button" class="close" data-dismiss="alert">
+                                    <span aria-hidden="true">&times;</span>
+                                    <span class="sr-only">Close</span>
+                                </button>
                             </div>
                         </div>
                 
                     </div> <!-- end copy tab -->    
                 </div> <!-- end transfer panel -->
 
-                <!--<button type="button" class="btn btn-default" ng-class="{disabled: options.userState.objectsTransferred > 0 && options.userState.objectsTransferred/options.userState.data_cart_size * 100 < 100}" data-dismiss="modal" ng-click="emptyTransfers()">Close</button>-->
+                <!--<button type="button" class="btn btn-default" ng-class="{disabled: options.userState.objectsTransferred > 0 && options.userState.objectsTransferred/options.userState.data_cart.size * 100 < 100}" data-dismiss="modal" ng-click="emptyTransfers()">Close</button>-->
 
             </div> <!-- end modal body --> 
 <!--
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" ng-class="{disabled: options.userState.objectsTransferred > 0 && options.userState.objectsTransferred/options.userState.data_cart_size * 100 < 100}" data-dismiss="modal" ng-click="emptyTransfers()">Close</button>
+                <button type="button" class="btn btn-default" ng-class="{disabled: options.userState.objectsTransferred > 0 && options.userState.objectsTransferred/options.userState.data_cart.size * 100 < 100}" data-dismiss="modal" ng-click="emptyTransfers()">Close</button>
             </div>--> <!-- end modal footer -->        
         </div> <!-- end modal-content -->
     </div> <!-- end modal-dialog -->
 </div> <!-- end transfer panel area -->
 
+<div class="container-fluid">
 <div class="row search-sections">
     <div class="col-sm-3 col-md-3 col-lg-3 search-leftarea-size"> <!-- left navigation columns -->
         <div class="search-leftarea-size"> <!-- workspace selected -->                            
@@ -153,18 +257,18 @@
                     </div>
 
                     <div class="text-center">
-                        <span class="badge" style="font-size:18px; margin-left: auto; margin-right: auto;">{{options.userState.data_cart_size | number}}</span>
-                        <div>
+                        <span class="badge" style="font-size:18px; margin-left: auto; margin-right: auto;">{{options.userState.data_cart.size | number}}</span>
+                        <div data-toggle="tooltip" data-placement="top" tooltip="This cart represents your data selections." tooltip-placement="top">
                             <span class="glyphicon glyphicon-shopping-cart search-cart"></span>
                         </div>
                     </div>
                     
                     <div class="text-center">
-                        <div class="btn-group" style="margin-bottom: 5px;">
-                            <button rel="tooltip" tooltip="Transfer my selections to workspaces." tooltip-placement="bottom" data-placement="bottom" data-toggle="modal" data-target="#transferPanel" type="button" ng-class="{'disabled': options.userState.data_cart_size < 1}" class='btn btn-primary'>
+                        <div style="margin-bottom: 5px;">
+                            <button rel="tooltip" tooltip="Transfer my selections to workspaces." tooltip-placement="bottom" data-placement="bottom" data-toggle="modal" data-target="#transferPanel" type="button" ng-class="{'disabled': options.userState.data_cart.size < 1}" class='btn btn-primary'>
                                 <span class="glyphicon glyphicon-hdd"></span><span> </span><span class="glyphicon glyphicon-transfer"></span>
                             </button>
-                            <button data-toggle="tooltip" data-placement="bottom" tooltip="Discard my data selections." tooltip-placement="bottom" type="button" ng-class="{'disabled': options.userState.data_cart_size < 1}" class='btn btn-danger' ng-click='emptyCart()'>
+                            <button data-toggle="tooltip" data-placement="bottom" tooltip="Discard my data selections." tooltip-placement="bottom" type="button" ng-class="{'disabled': options.userState.data_cart.size < 1}" class='btn btn-danger' ng-click='emptyCart()'>
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>              
                         </div> <!-- end workspace send button group -->
@@ -179,8 +283,8 @@
             <div class='text-center search-categories-title'>
                 <h3 data-toggle="tooltip" data-placement="right" tooltip="Navigate between different data types that match your search." tooltip-placement="right">Categories</h3>
             </div>
-            <div class="row">
-                <div class="col-md-12">
+            <div class="col-md-12 search-categories-row">
+                <div class="col-md-12 search-categories-row">
                     <a id="Public" href="" class="search-category-link btn btn-link" ng-click="selectCategory(null)">
                         <strong>All categories</strong>
                     </a>
@@ -226,9 +330,9 @@
 
     <div ng-cloak class="col-sm-9 col-md-9 col-lg-9 search-result-section"> <!-- search results section -->
 
-        <div class="search-bar">
+        <div class="row search-bar">
             <form class="input-group" ng-submit="newSearch()">
-                <input class="form-control" autofocus required ng-model="options.searchOptions.general.q" placeholder="Search KBase Data" autocomplete="off" type="search"/> 
+                <input data-toggle="tooltip" data-placement="bottom" tooltip="getSearchbarTooltipText()" tooltip-placement="bottom" class="form-control" autofocus required ng-model="options.searchOptions.general.q" placeholder="Search KBase Data" autocomplete="off" type="search"/> 
                 <span class="input-group-btn">
                     <button type="submit" class="btn" style="background-color: #ebebeb; border-color: #adadad; border-left:none">
                         <span class="glyphicon glyphicon-search" style="line-height: .9"></span>
@@ -237,22 +341,23 @@
             </form>
         </div>
 
-        <div> <!-- all results -->                            
-            <div ng-show="options.searchOptions.general.q && getTotalCount() < 1 && !options.selectedCategory" class="row">
+        <div class="col-md-12 col-lg-12 search-result-section"> <!-- all results -->                            
+            <div ng-show="options.searchOptions.general.q && getTotalCount() < 1 && !options.selectedCategory" class="search-results-select-category">
                 <div class="alert alert-danger">
                     <strong>No results found for any data type.</strong>
                 </div>
             </div>
 
-            <div ng-show="options.searchOptions.general.q && options.selectedCategory && options.categoryCounts[options.selectedCategory] < 1" class="row search-space-left">
+            <div ng-show="options.searchOptions.general.q && options.selectedCategory && options.categoryCounts[options.selectedCategory] < 1" class="search-results-select-category">
                 <div class="alert alert-danger">
                     <strong>No results found in {{options.searchCategories[options.selectedCategory].label}}.</strong>
                 </div>
             </div>
 
-            <div class="row">
-                <div ng-show="!options.selectedCategory && getTotalCount() > 0" class="row"> <!-- Show this when no category is selected -->
-                    <div class='row'>                        
+            <div class="col-md-12 col-lg-12 search-results">
+                <!-- Show this when no category is selected -->
+                <div ng-show="!options.selectedCategory && getTotalCount() > 0" class="col-md-12 col-lg-12 search-results-select-category"> 
+                    <div class="row">                        
                         <table>
                             <h3>Select a category</h3>
                             <tr>
@@ -268,9 +373,9 @@
                         </table>
                     </div>                                    
                 </div>
-                <div class="row"> 
-                    <div ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0 && options.categoryRelationships[options.selectedCategory].children.length == 0" class="row search-result-set-header"> <!-- result options -->
-                        <div class="btn-toolbar col-md-12">
+                <div class="col-md-12 col-lg-12 search-results"> 
+                    <div ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0 && options.categoryRelationships[options.selectedCategory].children.length == 0" class="col-md-12 col-lg-12 search-result-set-header"> <!-- result options -->
+                        <div class="btn-toolbar col-md-12 search-results-toolbar">
                             <div class="btn-group col-xs-6 search-results-counter">
                                 <div><strong>Displaying results {{ 1 + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }}-{{ options.resultJSON.itemCount + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }} out of {{ options.resultJSON.totalResults | number }}.</strong></div>
                             </div>
@@ -293,7 +398,7 @@
                             </div>
                         </div> <!-- end btn-toolbar row -->
                     </div> <!-- end result options -->
-                    <div ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0" class="row">
+                    <div ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0" class="col-md-12 col-lg-12">
                         <!-- our output should go here normally -->
                         <div ng-include="options.resultsTemplatePath"></div> 
 
@@ -332,3 +437,4 @@
     </div>
 
 </div> <!-- end search sections -->
+</div>
