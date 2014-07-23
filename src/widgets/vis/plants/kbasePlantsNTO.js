@@ -34,6 +34,10 @@ kb_define('kbasePlantsNTO',
                     newInput = JSON.parse(newInput);
                 }
 
+                if (newInput.data) {
+                    newInput = newInput.data;
+                }
+
                 this.setValueForKey('input',  newInput);
                 this.appendUI(this.$elem);
             },
@@ -54,7 +58,7 @@ var datasets = [];
 var colorCats = d3.scale.category20();
 
 $.each(
-    this.input().data.nodes,
+    this.input().nodes,
     function (idx, cluster) {
         if (cluster.type == 'CLUSTER') {
 
@@ -90,7 +94,7 @@ var node_to_cluster = {};
 
 
 $.each(
-    this.input().data.edges,
+    this.input().edges,
     function (eidx, edge) {
         $.each(
             datasets,
@@ -127,7 +131,7 @@ var nodes = {};
 var edges = {};
 
 $.each(
-    this.input().data.nodes,
+    this.input().nodes,
     function (idx, node) {
         $.each(
             edge_ids,
@@ -191,7 +195,7 @@ var linkScale = d3.scale.pow()
 //okay, now we go back through the edges AGAIN and count up the edges. An edge
 //counts if it's between two genes in the same cluster.
 $.each(
-    this.input().data.edges,
+    this.input().edges,
     function (eidx, edge) {
         $.each(
             datasets,

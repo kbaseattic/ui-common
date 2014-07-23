@@ -297,8 +297,6 @@ kb_define('kbasePlantsNetworkTable',
                             this.options.$terminal.scroll();
                         }
 
-                        data.structure.rows[1].checkbox.bingo = 'banana';
-
 
                         this.setValue(input);
 

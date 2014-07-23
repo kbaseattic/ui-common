@@ -40,6 +40,11 @@ kb_define('kbasePlantsNetworkNarrative',
 
             setInput : function(newInput) {
 
+                if (newInput.data) {
+                    newInput = newInput.data;
+                };
+
+
                 var colorCats = d3.scale.category20();
 
                 this.setValueForKey('input', newInput);
@@ -47,7 +52,7 @@ kb_define('kbasePlantsNetworkNarrative',
                 var records = {};
                 var datasets = [];
                 $.each(
-                    newInput.data.datasets,
+                    newInput.datasets,
                     function (idx, rec) {
                         datasets.push(rec.id);
                         records[rec.id] =
@@ -72,7 +77,7 @@ kb_define('kbasePlantsNetworkNarrative',
                 var edges = {};
 
                 $.each(
-                    newInput.data.nodes,
+                    newInput.nodes,
                     function (idx, node) {
 
                         var nodeObj = nodes[node.name];
@@ -108,7 +113,7 @@ kb_define('kbasePlantsNetworkNarrative',
                 );
 
                 $.each(
-                    newInput.data.edges,
+                    newInput.edges,
                     function (idx, edge) {
 
                         var node1 = nodes[edge.node_id1];
