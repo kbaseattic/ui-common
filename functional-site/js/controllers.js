@@ -557,7 +557,11 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                 } else {
                     console.log("error logging in");
                     $("#loading-indicator").hide();
-                    $("#login_error").html(args.message);
+                    var errormsg = args.message;
+                    if (errormsg == "LoginFailure: Authentication failed.") {
+                        errormsg = "Login Failed: your username/password is incorrect.";
+                    }
+                    $("#login_error").html(errormsg);
                     $("#login_error").show();
 
                 }
