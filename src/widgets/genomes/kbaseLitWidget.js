@@ -105,7 +105,6 @@
 						
 						var htmlJson = self.xmlToJson(data)
 						var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='
-						//console.log(htmlJson)
 						if (htmlJson.eSearchResult[1].Count["#text"] == "0") {
 							var tableSettings = {
 								// "sPaginationType": "full_numbers",
@@ -147,8 +146,9 @@
 						.then(
 							function(data) {
 								htmlJson = self.xmlToJson(data)
+								console.log(htmlJson)
 								var summaries = htmlJson.eSummaryResult[1].DocSum // Add pub date field into table as well.
-								// console.log(summaries)
+								
 								if ($.isArray(summaries)) {
 									summaryList = []
 									for (summary in summaries) {
@@ -161,32 +161,52 @@
 								
 								for (summary_idx in summaryList) {
 									summary = summaryList[summary_idx].Item
-									// console.log(summary)
 									var tableInputRow = {}									
+									var isArticle = false
 									for (item_idx in summary) {
 										infoRow = summary[item_idx]
-										//console.log(infoRow)
-										if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"]
-										if (infoRow["@attributes"].Name == "Source") tableInputRow["source"] = infoRow["#text"]
-										if (infoRow["@attributes"].Name == "Title") tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"										
-										if (infoRow["@attributes"].Name == "AuthorList") {
-											var authors = ""
-											if ($.isArray(infoRow.Item)) {
-												commaDelay = 1
-												for (author_idx in infoRow.Item) {
-													author = infoRow.Item[author_idx]
-													if (commaDelay == 0) authors+=", "
-													else commaDelay--
-													authors+=author["#text"]													
+										if (infoRow["@attributes"].Name == "PubTypeList") {
+											var publications = []
+											if ("#text" in infoRow) {
+												if ($.isArray(infoRow.Item)) {
+													for (pub_idx in infoRow.Item) {
+														if (infoRow.Item[pub_idx]["#text"]=="Journal Article") isArticle = true
+													}											
+												}
+												else {
+													if (infoRow.Item["#text"]=="Journal Article") isArticle = true
 												}												
 											}
+										}
+										if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"]
+										if (infoRow["@attributes"].Name == "Source") tableInputRow["source"] = infoRow["#text"]
+										if (infoRow["@attributes"].Name == "Title") {
+											// console.log(infoRow)
+											tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"												
+										}
+										if (infoRow["@attributes"].Name == "AuthorList") {
+											var authors = ""
+											if ("#text" in infoRow) {																					
+												if ($.isArray(infoRow.Item)) {
+													commaDelay = 1
+													for (author_idx in infoRow.Item) {
+														author = infoRow.Item[author_idx]
+														if (commaDelay == 0) authors+=", "
+														else commaDelay--
+														authors+=author["#text"]													
+													}												
+												}											
+												else {
+													authors = infoRow.Item["#text"]
+												}
+											}
 											else {
-												author = infoRow.Item["#text"]
+												authors = "No authors found for this article."
 											}
 											tableInputRow["author"] = authors
 										}
 									}
-									tableInput.push(tableInputRow)
+									if (isArticle) tableInput.push(tableInputRow)
 								}
 								
 								var sDom = 't<flip>'
@@ -203,7 +223,6 @@
 									],
 									"aaData": tableInput
 								}	
-								//console.log(tableSettings)
 								loader.hide()
 								litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
 							},
