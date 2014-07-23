@@ -67,7 +67,7 @@
                 }
 
                 require(['kbpaths'], function() {
-                    require(['jquery', 'vis',
+                    require(['jquery', 'vis', 'kbasePrompt',
                         ], function($) {
                         $(function() {
 
@@ -88,7 +88,7 @@
                                 }
                             } //*/
 
-                            $('#heatmapWidget').kbaseHeatmap(
+                            var $hm = $('#heatmapWidget').kbaseHeatmap(
                                 {
                                     scaleAxes   : true,
                                     //yGutter     : 80,
@@ -103,6 +103,32 @@
 
                                 }
                             );
+
+
+                            var $prompt = $.jqElem('div').kbasePrompt(
+                                {
+                                    title : 'Change dataset',
+                                    body : $.jqElem('form')
+                                        .append(
+                                            $.jqElem('textarea')
+                                                .kb_bind($hm, 'dataset',
+                                                    {
+                                                        transformedValue : function(v) {
+                                                            return JSON.stringify(v, undefined, 2);
+                                                        },
+                                                        reverseTransformedValue : function(v) {
+                                                            return JSON.parse(v);
+                                                        }
+                                                    }
+                                                )
+                                        ),
+                                }
+                            );
+
+                            $('#changeButton').on('click', function(e) {
+                                $prompt.openPrompt();
+                            });
+
                         })
                     })
                 });
@@ -120,6 +146,7 @@
         </div>
 
         <!--<div style = 'max-width : 800px; overflow : scroll'>-->
+        <button class = 'btn btn-default' id = 'changeButton'>Change data</button>
             <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 1500px'></div>
         <!--</div>-->
         <div id = 'treeCompare'></div>

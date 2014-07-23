@@ -31,6 +31,7 @@ kb_define('kbasePlantsNetworkNarrative',
                 'cdmiClient',
                 'ontologyClient',
                 'idmapClient',
+                'tabularData',
             ],
 
             options: {
@@ -180,7 +181,7 @@ kb_define('kbasePlantsNetworkNarrative',
                     }
                 );
 
-                this.setValueForKey('input', tabularData);
+                this.setValueForKey('tabularData', tabularData);
 
                 if (this.networkTable()) {
                     this.data('loader').remove();
@@ -193,6 +194,8 @@ kb_define('kbasePlantsNetworkNarrative',
             },
 
             appendUI : function($elem) {
+
+                $elem.empty();
 
                 $elem.css('border', '1px solid gray');
 
@@ -255,7 +258,7 @@ kb_define('kbasePlantsNetworkNarrative',
                     this.data('loader').remove();
                     this.data('msgBox').show();
 
-                    this.networkTable().setInput(this.input());
+                    this.networkTable().setInput(this.tabularData());
                 }
 
 

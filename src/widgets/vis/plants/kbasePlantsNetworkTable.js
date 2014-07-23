@@ -37,6 +37,8 @@ kb_define('kbasePlantsNetworkTable',
 
             appendUI : function($elem) {
 
+                $elem.empty();
+
                 var $self = this;
 
                 if (this.input() == undefined) {
