@@ -478,7 +478,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
             return;
 
         var c = $('#signin-button').kbaseLogin('get_kbase_cookie');
-        set_cookie(c);
+//        set_cookie(c);
 
         // If we're changing state from the login page, and we have a valid 
         // session (i.e.: we're logging IN and not OUT), then forward us to
