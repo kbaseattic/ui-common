@@ -89,7 +89,6 @@
         renderFromTaxonomy: function(taxonomy) {
             var searchTerms = taxonomy;
             var strainName = taxonomy[0];
-
             this.dbpediaLookup(searchTerms, $.proxy(
                 function(desc) {
                     // If we've found something, desc.description will exist and be non-null
@@ -198,30 +197,70 @@
         },
 
         renderWorkspace: function() {
+            var self = this;
             this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
             var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
-            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-
-            // if it fails, error out!
-            $.when(prom).fail($.proxy(function(error) {
-                this.renderError(error);
-            }, this));
-            // if it succeeds, grab the taxonomy (or at least the scientific name) and roll out.
-            $.when(prom).done($.proxy(function(genome) {
-                genome = genome[0];
-
-                var tax = genome.data.taxonomy;
-                var taxList = [];
-                var nameTokens = genome.data.scientific_name.split(/\s+/);
-                for (var i=nameTokens.length; i>0; i--) {
-                    taxList.push(nameTokens.slice(0, i).join(' '));
-                }
-                if (taxList && taxList !== "Unknown") {
-                    // parse the taxonomy, however it's munged together. semicolons, i think?
-                    taxList = taxList.concat(tax.split(/\;\s*/).reverse());
-                }
-                this.renderFromTaxonomy(taxList);
-            }, this));
+            
+            obj['included'] = ["/taxonomy","/scientific_name"];
+	    self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
+                    if (data[0]) {
+                        if (data[0]['data']['taxonomy']) {
+                            var tax = data[0]['data']['taxonomy'];
+                            var taxList = [];
+                            var nameTokens = data[0]['data']['scientific_name'].split(/\s+/);
+                            for (var i=nameTokens.length; i>0; i--) {
+                                taxList.push(nameTokens.slice(0, i).join(' '));
+                            }
+                            if (taxList && taxList !== "Unknown") {
+                                // parse the taxonomy, however it's munged together. semicolons, i think?
+                                taxList = taxList.concat(tax.split(/\;\s*/).reverse());
+                            }
+                            self.renderFromTaxonomy(taxList);
+                        }
+                    }
+                },
+                function(error) {
+                        
+                        var obj = self.buildObjectIdentity(self.options.workspaceID, self.options.genomeID);
+                        obj['included'] = ["/scientific_name"];
+                        self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
+                            if (data[0]) {
+                                if (data[0]['data']['scientific_name']) {
+                                    var taxList = [];
+                                    var nameTokens = data[0]['data']['scientific_name'].split(/\s+/);
+                                    for (var i=nameTokens.length; i>0; i--) {
+                                        taxList.push(nameTokens.slice(0, i).join(' '));
+                                    }
+                                    self.renderFromTaxonomy(taxList);
+                                }
+                            }
+                        },
+                        function(error) {self.renderError(error);});
+                });
+            
+            // old way that requires the entire object ...
+            //var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+            //
+            //// if it fails, error out!
+            //$.when(prom).fail($.proxy(function(error) {
+            //    this.renderError(error);
+            //}, this));
+            //// if it succeeds, grab the taxonomy (or at least the scientific name) and roll out.
+            //$.when(prom).done($.proxy(function(genome) {
+            //    genome = genome[0];
+            //
+            //    var tax = genome.data.taxonomy;
+            //    var taxList = [];
+            //    var nameTokens = genome.data.scientific_name.split(/\s+/);
+            //    for (var i=nameTokens.length; i>0; i--) {
+            //        taxList.push(nameTokens.slice(0, i).join(' '));
+            //    }
+            //    if (taxList && taxList !== "Unknown") {
+            //        // parse the taxonomy, however it's munged together. semicolons, i think?
+            //        taxList = taxList.concat(tax.split(/\;\s*/).reverse());
+            //    }
+            //    this.renderFromTaxonomy(taxList);
+            //}, this));
         },
 
         buildObjectIdentity: function(workspaceID, objectID) {
@@ -379,6 +418,8 @@
                 else {
                     if (termList.length > 0) {
                         this.dbpediaLookup(termList, successCallback, errorCallback);
+                    } else {
+                        successCallback(processedHit);
                     }
                 }
                 return processedHit;

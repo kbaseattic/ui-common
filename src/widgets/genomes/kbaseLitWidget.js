@@ -79,7 +79,7 @@
 			var searchBarDiv = $("<div>").append("<input type='text' id='lit-query-box'>")
 			var searchBarButton = $("<input type='button' id='lit-search-button' value='Update Search'>")
 									.on("click",function() {
-										lit = $('#lit-query-box').val()
+										lit = self.$elem.find('#lit-query-box').val()
 										tableInput = []
 										litDataTable.fnDestroy()
 										populateSearch(lit)
@@ -90,8 +90,8 @@
 		
 			self.$elem.append(searchBarDiv.append(searchBarButton)).append(loader).append(resultsDiv)
 			
-			$('#lit-query-box').val(lit)
-			$('#lit-query-box').css({"width":"300px"})
+			self.$elem.find('#lit-query-box').val(lit)
+			self.$elem.find('#lit-query-box').css({"width":"300px"})
 			populateSearch(lit)
 			
 			function populateSearch(lit) {
@@ -115,25 +115,10 @@
 						}
 						else {
 						    // I think this means no results? So here I just show an empty table--mike				
-								var tableSettings = {
-									// "sPaginationType": "full_numbers",
-									"iDisplayLength": 4,
-									"sDom": "ti",
-									"aoColumns": [
-										{sTitle: "Journal", mData: "source"},
-										{sTitle: "Authors", mData: "author"},
-										{sTitle: "Title", mData: "title"},
-										{sTitle: "Date", mData: "date"}
-									],
-									"aaData": []
-								}	
-								loader.hide()
-								litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
-							loader.hide()
-							return;
+							
 							// this line below was throwing an error:
-							//query += htmlJson.eSearchResult[1].IdList.Id[0]['#text']
-							// tableInput.push(parseLitSearchDataTable(query))																		
+							
+							query += htmlJson.eSearchResult[1].IdList.Id['#text']
 						}				
 						var tableInput = []
 						$.when($.ajax({
@@ -145,16 +130,27 @@
 							function(data) {
 								htmlJson = self.xmlToJson(data)
 								var summaries = htmlJson.eSummaryResult[1].DocSum // Add pub date field into table as well.
-								console.log(summaries)
-								for (summary in summaries) {
+								// console.log(summaries)
+								if ($.isArray(summaries)) {
+									summaryList = []
+									for (summary in summaries) {
+										summaryList.push(summaries[summary])
+									}
+								}
+								else {
+									summaryList = [summaries]
+								}
+								
+								for (summary_idx in summaryList) {
+									summary = summaryList[summary_idx].Item
+									// console.log(summary)
 									var tableInputRow = {}									
-									var summaryList = summaries[summary].Item
-									
-									for (item in summaryList) {
-										infoRow = summaryList[item]
+									for (item_idx in summary) {
+										infoRow = summary[item_idx]
+										// console.log(infoRow)
 										if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"]
 										if (infoRow["@attributes"].Name == "Source") tableInputRow["source"] = infoRow["#text"]
-										if (infoRow["@attributes"].Name == "Title") tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaries[summary].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"										
+										if (infoRow["@attributes"].Name == "Title") tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"										
 										if (infoRow["@attributes"].Name == "AuthorList") {
 											var authors = ""
 											commaDelay = 1
@@ -168,8 +164,8 @@
 										}
 									}
 									tableInput.push(tableInputRow)
-								}								
-							
+								}
+								
 								var sDom = 't<flip>'
 								if (tableInput.length<=10) { sDom = 'tfi'; }					
 								var tableSettings = {
@@ -184,12 +180,13 @@
 									],
 									"aaData": tableInput
 								}	
+								console.log(tableSettings)
 								loader.hide()
 								litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
 							},
 							function() {
 								loader.hide()
-								self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
+								self.$elem.append("<br><b>Failed to retrieve literature search results. Try again later.</b>");
 							}
 						)						
 					}

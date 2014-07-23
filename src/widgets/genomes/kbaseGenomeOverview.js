@@ -185,7 +185,8 @@
                     }
 					
 					self.pubmedQuery = genome.scientific_name
-					console.log(self.pubmedQuery)
+					//console.log(self.pubmedQuery)
+                    
                     this.$infoTable.empty()
                                    .append(this.addInfoRow("ID", genome.id))
                                    .append(this.addInfoRow("Name", genome.scientific_name))
@@ -277,6 +278,10 @@
                     }
                 }
 
+                var nFeatures = 0;
+                if (genome.features) {
+                    nFeatures = genome.features.length;
+                }
                 this.$infoTable.empty()
                                .append(this.addInfoRow("ID", genome.id))
                                .append(this.addInfoRow("Name", genome.scientific_name))
@@ -286,7 +291,7 @@
                                .append(this.addInfoRow("Number of Contigs", genome.contig_ids ? genome.contig_ids.length : 0))
                                .append(this.addInfoRow("GC Content", gcContent))
                                .append(this.addInfoRow("Genetic Code", genome.genetic_code))
-                               .append(this.addInfoRow("Number of features", genome.features.length));
+                               .append(this.addInfoRow("Number of features", nFeatures));
 
                 var contigsToLengths = {};
                 if (genome.contig_ids && genome.contig_ids.length > 0) {
