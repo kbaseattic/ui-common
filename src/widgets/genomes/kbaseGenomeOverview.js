@@ -261,7 +261,7 @@
                 // console.log(genome);
                 genome = genome[0].data;
 				self.pubmedQuery = genome.scientific_name
-				console.log(self.pubmedQuery)	
+				//console.log(self.pubmedQuery)	
                 
 				var gcContent = "Unknown";
                 var dnaLength = "Unknown";

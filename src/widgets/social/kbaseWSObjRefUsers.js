@@ -6,7 +6,7 @@
         
         //wsUrl: "http://dev04.berkeley.kbase.us:7058",
         wsUrl:"https://kbase.us/services/ws",
-        userNameFetchUrl:"http://dev06.berkeley.kbase.us:8283/users?usernames=",
+        userNameFetchUrl:"https://kbase.us/services/genome_comparison/users?usernames=",
 	
         options: {
             wsNameOrId: null,

@@ -105,7 +105,7 @@
 						
 						var htmlJson = self.xmlToJson(data)
 						var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='
-						console.log(htmlJson)
+						//console.log(htmlJson)
 						if (htmlJson.eSearchResult[1].Count["#text"] == "0") {
 							var tableSettings = {
 								// "sPaginationType": "full_numbers",
@@ -165,7 +165,7 @@
 									var tableInputRow = {}									
 									for (item_idx in summary) {
 										infoRow = summary[item_idx]
-										console.log(infoRow)
+										//console.log(infoRow)
 										if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"]
 										if (infoRow["@attributes"].Name == "Source") tableInputRow["source"] = infoRow["#text"]
 										if (infoRow["@attributes"].Name == "Title") tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"										
@@ -203,7 +203,7 @@
 									],
 									"aaData": tableInput
 								}	
-								console.log(tableSettings)
+								//console.log(tableSettings)
 								loader.hide()
 								litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
 							},
