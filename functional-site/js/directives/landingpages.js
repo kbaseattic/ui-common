@@ -652,13 +652,41 @@ angular.module('lp-directives')
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
-            
-            
-            
-            // hack until search links directly to WS objects
-            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
-           // $(p.body()).KBase({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
-            //                                loadingImage: "assets/img/ajax-loader.gif"});
+
+            if (scope.ws === "CDS") {
+                $(p.body()).append('<b>There are no species trees created for this genome.</b>');
+            	return;
+            }
+
+            var objectIdentity = { ref:scope.ws+"/"+scope.id };
+            kb.ws.list_referencing_objects([objectIdentity], function(data) {
+            	var treeName = null;
+            	for (var i in data[0]) {
+            		var objInfo = data[0][i]
+            		var wsName = objInfo[7];
+                    var objName = objInfo[1];
+                    var type = objInfo[2].split('-')[0];
+                	//console.log("Links: " + wsName + "(" + scope.ws + ")" + "/" + objName + ", " + type);
+                    if (wsName === scope.ws && type === "KBaseTrees.Tree") {
+                    	treeName = objName;
+                    	break;
+                    }
+            	}
+            	if (treeName) {
+                    $(p.body()).kbaseTree({treeID: treeName, workspaceID: scope.ws});           		
+            	} else {
+                    $(p.body()).append('<b>There are no species trees created for this genome.</b>');
+            	}
+            },
+            function(error) {
+        		var err = '<b>Sorry!</b>  Error retreiveing species trees info';
+        		if (typeof error === "string") {
+                    err += ": " + error;
+        		} else if (error.error && error.error.message) {
+                    err += ": " + error.error.message;
+        		}
+                $(p.body()).append(err);
+            });
         }
     };
 })
