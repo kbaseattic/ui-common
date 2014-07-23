@@ -477,8 +477,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         if (!result.success)
             return;
 
-        var c = $('#signin-button').kbaseLogin('get_kbase_cookie');
-        set_cookie(c);
+//        var c = $('#signin-button').kbaseLogin('get_kbase_cookie');
+//        set_cookie(c);
 
         // If we're changing state from the login page, and we have a valid 
         // session (i.e.: we're logging IN and not OUT), then forward us to
@@ -552,21 +552,21 @@ function removeCards() {
 }
 
 
-function set_cookie(c) {
-    var cookieName = 'kbase_session';
-    if (c.kbase_sessionid) {
-        var cookieString = 'un=' + c.user_id + 
-                           '|kbase_sessionid=' + c.kbase_sessionid +
-                           '|user_id=' + c.user_id +
-                           '|token=' + c.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
-        $.cookie(cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
-        $.cookie(cookieName, cookieString, { path: '/', expires: 60 });
-    }
-    else {
-        $.removeCookie(cookieName, { path: '/', domain: 'kbase.us' });
-        $.removeCookie(cookieName, { path: '/' });
-    }
-};
+// function set_cookie(c) {
+//     var cookieName = 'kbase_session';
+//     if (c.kbase_sessionid) {
+//         var cookieString = 'un=' + c.user_id + 
+//                            '|kbase_sessionid=' + c.kbase_sessionid +
+//                            '|user_id=' + c.user_id +
+//                            '|token=' + c.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
+//         $.cookie(cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
+//         $.cookie(cookieName, cookieString, { path: '/', expires: 60 });
+//     }
+//     else {
+//         $.removeCookie(cookieName, { path: '/', domain: 'kbase.us' });
+//         $.removeCookie(cookieName, { path: '/' });
+//     }
+// };
 
 
 
