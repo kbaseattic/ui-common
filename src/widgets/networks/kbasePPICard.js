@@ -313,7 +313,7 @@
 						  ds.interactions[i].description+'</a>';
 					      var conf = 0;
 					      if (ds.interactions[i].hasOwnProperty('confidence'))
-						  conf = ds.interactions[i].confidence;
+						  conf = Math.round(ds.interactions[i].confidence*100.0)/100.0;
 					      if (ds.interactions[i].hasOwnProperty('url'))
 						  description += ' (<a href="'+ds.interactions[i].url+'">link</a>)';
 					      var proteins = '';
