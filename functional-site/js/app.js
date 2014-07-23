@@ -44,22 +44,6 @@ var app = angular.module('landing-pages',
           controller: 'Narrative'
         });
 
-    $stateProvider
-        .state('search', {
-            url: "/search/?q&category&page&itemsPerPage&sort&facets",
-            templateUrl: 'views/search/search.html',
-            controller: 'searchController'
-        })
-        .state('search.recent', {
-            url: "/recent/",
-            templateUrl: 'views/search/recent.html',
-            controller: 'searchController'
-        })
-        .state('search.favorites', {
-            url: "/favorites/",
-            templateUrl: 'views/search/favorites.html',
-            controller: 'searchController'
-        });
 
     $stateProvider
         .state('narratives', {
@@ -82,6 +66,16 @@ var app = angular.module('landing-pages',
           url: "featured",
           templateUrl: 'views/ws/featured.html',
           controller: 'WB'
+
+    $stateProvider
+        .state('narrative', {
+          url: "/narrative/",
+          templateUrl: 'views/narrative/home.html',
+          controller: 'Narrative'
+        }).state('narrative.projects', {
+          url: "projects/",
+          templateUrl: 'views/narrative/projects.html',
+          controller: 'NarrativeProjects'
         });
 
 
@@ -428,6 +422,42 @@ var app = angular.module('landing-pages',
 }]);
 
 
+
+app.service('userState', function userStateService() {
+    var _userData = {"token": null,
+                     "activeNarrative": null,
+                     "lastNarrative": null,
+                     "activeWorkspace": null,
+                     "loggedIn": false,
+                     "user_id": null
+                    };
+
+    if (!localStorage.hasOwnProperty("KBaseUserState")) {
+        localStorage.setItem("KBaseUserState", JSON.stringify(_userData));
+    }    
+
+    for (var p in _userData) {
+        if (_userData.hasOwnProperty(p) && !localStorage.KBaseUserState.hasOwnProperty(p)) {
+            localStorage.KBaseUserState[p] = _userData[p];
+        }    
+    }
+    
+    return {
+        userState : JSON.parse(localStorage.KBaseUserState),
+        landingPages : {"genome": "/genomes/CDS/",
+                        "feature": "/genes/CDS/",
+                        "gwasPopulation": "/KBaseGwasData.GwasPopulation/",
+                        "gwasTrait": "/KBaseGwasData.GwasPopulationTrait/",
+                        "gwasVariation": "/KBaseGwasData.GwasPopulationVariation/",
+                        "gwasGeneList": "/KBaseGwasData.GwasGeneList/",
+                        "metagenome": "http://metagenomics.anl.gov/?page=MetagenomeOverview&metagenome=",
+                       },
+
+        reset : function() {
+            this.userState = JSON.parse(localStorage.KBaseUserState);
+        }
+    };
+});
 
 
 //add the login widget as a module
