@@ -67,10 +67,15 @@
 
         get_kbase_cookie : function (field) {
 
-            var chips = localStorage.getItem('kbase_session');
+            if (!$.cookie(this.cookieName))
+                return {};
+            
+//            var chips = localStorage.getItem('kbase_session');
+            // var chips = $.cookie('kbase_session');
 
             if (chips != undefined) {
-                chips = JSON.parse(chips);
+                // chips = JSON.parse(chips);
+                chips = this.parse_cookie(chips);
             }
             else {
                 chips = {};
@@ -79,6 +84,11 @@
             return field == undefined
                 ? chips
                 : chips[field];
+        },
+
+        parse_cookie : function (cookieStr) {
+            var fields = cookieStr.split('\|');
+
         },
 
         sessionId : function () {
