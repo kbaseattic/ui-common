@@ -36,7 +36,7 @@
             else {
                 this.renderWorkspace();
             }
-															
+            
             return this;
         },
 

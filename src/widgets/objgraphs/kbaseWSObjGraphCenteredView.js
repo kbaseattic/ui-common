@@ -130,9 +130,9 @@
 		    });
 		    */
 		// append the svg canvas to the page
-		d3.select("#objgraphview").html("");
+		d3.select(self.$elem.find("#objgraphview")[0]).html("");
 		self.$elem.find('#objgraphview').show();
-		var svg = d3.select("#objgraphview").append("svg");
+		var svg = d3.select(self.$elem.find("#objgraphview")[0]).append("svg");
 		/*svg.append("rect")
 		    .attr("class", "overlay")
 		    .attr("width",width + margin.left + margin.right)

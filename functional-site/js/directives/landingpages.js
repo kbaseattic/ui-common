@@ -627,6 +627,9 @@ angular.module('lp-directives')
         }
     };
 })
+
+
+
 .directive('sortabletaxonomyinfo', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
@@ -642,6 +645,38 @@ angular.module('lp-directives')
     };
 })
 
+.directive('sortabletree', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Species Tree',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            
+            
+            
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+           // $(p.body()).KBase({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+            //                                loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
+
+.directive('sortablecontigbrowser', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Contig Browser',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseMultiContigBrowser({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
 .directive('sortableseedannotations', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
