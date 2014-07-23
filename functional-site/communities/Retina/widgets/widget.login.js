@@ -18,6 +18,7 @@
 
     widget.helpEnabled = true;
     widget.registerEnabled = false;
+    widget.registerEnabled = false;
     widget.mydataEnabled = false;
     widget.style = "black";
     
@@ -148,7 +149,10 @@
           <tr><th style="vertical-align: top;padding-top: 5px;width: 100px;text-align: left;">login</th><td><input type="text" '+loginStyle+'id="loginWidgetLoginField">'+authResourceSelect+'</td></tr>\
           <tr><th style="vertical-align: top;padding-top: 5px;width: 100px;text-align: left;">password</th><td><input type="password" id="loginWidgetPasswordField" onkeypress="event = event || window.event;if(event.keyCode == 13) { Retina.WidgetInstances.login['+index+'].perform_login('+index+');}"></td></tr>\
         </table>\
-      </div>\
+'+(widget.forgotEnabled ? '         <p style="text-align: right;">\
+          <a href="'+widget.forgotLink+'">I forgot my password</a>\
+        </p>\
+' : '')+'      </div>\
       <div class="modal-footer">\
 	<button class="btn btn-danger pull-left" data-dismiss="modal" aria-hidden="true">cancel</button>\
 	<button class="btn btn-success" onclick="Retina.WidgetInstances.login['+index+'].perform_login('+index+');">log in</button>\
@@ -198,10 +202,10 @@
    <button class="btn'+(widget.style=='black' ? " btn-inverse" : "")+'" style="border-radius: 3px 0px 0px 3px; margin-right: -4px;" onclick="jQuery(\'#loginModal\').modal(\'show\');document.getElementById(\'loginWidgetLoginField\').focus();">\
       Login\
    </button>\
-' + (widget.registerEnabled ? '<button class="btn'+(widget.style=='black' ? " btn-inverse" : "")+'" style="border-radius: 3px 0px 0px 3px; margin-right: -4px;" onclick="alert(\'register\');">\
+' + (widget.registerEnabled ? '<button class="btn'+(widget.style=='black' ? " btn-inverse" : "")+'" style="border-radius: 3px 0px 0px 3px; margin-right: -4px;" onclick="window.location=\''+widget.registerLink+'\';">\
       Register\
 </button>' : '') +(widget.helpEnabled ? '\
-   <button class="btn'+(widget.style=='black' ? " btn-inverse" : "")+'" style="border-radius: 0px 3px 3px 0px;">?</button>\
+   <button class="btn'+(widget.style=='black' ? " btn-inverse" : "")+'" style="border-radius: 0px 3px 3px 0px;" onclick="window.open(\''+widget.helpLink+'\');">?</button>\
 ' : "")+'</div>';
 	}
 	
@@ -212,7 +216,7 @@
 	widget = Retina.WidgetInstances.login[index];
 	var login = document.getElementById('loginWidgetLoginField').value;
 	var pass = document.getElementById('loginWidgetPasswordField').value;
-	var auth_url = stm.Config.mgrast_api+'?auth='+widget.authResources[widget.authResources.default].prefix+Retina.Base64.encode(login+":"+pass);
+	var auth_url = RetinaConfig.mgrast_api+'?auth='+widget.authResources[widget.authResources.default].prefix+Retina.Base64.encode(login+":"+pass);
 	jQuery.get(auth_url, function(d) {
 	    if (d && d.token) {
 		var user = { login: d.login || login,
