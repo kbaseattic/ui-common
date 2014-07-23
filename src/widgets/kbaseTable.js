@@ -85,6 +85,7 @@ kb_define('kbaseTable',
 
             row_callback : function (cell, header, row, $kb) {},
             sortButtons : {},
+
         },
 
         default_row_callback : function (cell) {
@@ -431,7 +432,8 @@ kb_define('kbaseTable',
                                                 )
                                                 .on('click', function(e) {
 
-                                                    var currentVis = $tbl.options.minVisibleRowIndex || 0;
+                                                    var currentVis = $tbl.options.maxVisibleRowIndex || 0;
+
                                                     currentVis--;
 
                                                     if (currentVis < 1) {
