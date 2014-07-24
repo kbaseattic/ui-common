@@ -628,7 +628,22 @@ angular.module('lp-directives')
     };
 })
 
-
+.directive('sortableimport', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Import',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") {
+            	// TODO: it's unsupported yet
+            } else {
+                $(p.body()).KBaseWSButtons({objNameOrId: scope.id, wsNameOrId: scope.ws});
+            }
+        }
+    };
+})
 
 .directive('sortabletaxonomyinfo', function($rootScope) {
     return {
