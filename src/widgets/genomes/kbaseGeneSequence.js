@@ -155,7 +155,7 @@
 			//this.$infoTable.append(this.makeRow("Gene", dnaSequenceStr));
 			this.$infoTable.append(
 					       this.makeRow("Gene", dnaSequenceStr)
-					       .each(function(){$(this).css('font-family','Monaco')})
+					       .each(function(){$(this).css('font-family','monospace')})
 					       );
 
                     }
@@ -190,7 +190,7 @@
 				 //self.$infoTable.append(self.makeRow("Gene", dnaSequenceStr));
 				 self.$infoTable.append(
 					   self.makeRow("Gene", dnaSequenceStr)
-					   .each(function(){$(this).css('font-family','Courier')})
+					   .each(function(){$(this).css('font-family','monospace')})
 					   );
 
 				 //self.hideMessage();
@@ -229,7 +229,7 @@
                     }
 		    this.$infoTable.append(
 					   this.makeRow("Protein", proteinTranslationStr)
-					   .each(function(){$(this).css('font-family','Courier')})
+					   .each(function(){$(this).css('font-family','monospace')})
 					   );
 
                     // SOMETHING SIMILAR, BUT NOT RIGHT this.$infoTable.append(this.makeRow("Protein", proteinTranslationStr).find("td")[1].style="font-family:Courier");

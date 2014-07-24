@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <!-- title and icon -->
+    <title>Metagenome Landing Page</title>
+    <link rel="icon" href="images/MGRAST_favicon.ico" type="image/x-icon">
+
+    <!-- default js -->
+    <script src="Retina/js/jquery.min.js"></script>
+    <script src="Retina/js/stm.js"></script>
+    <script src="Retina/js/retina.js"></script>
+    <script src="Retina/js/bootstrap.min.js"></script>
+
+    <!-- config  -->
+    <script src="js/config.js"></script>
+
+    <!-- bootstrap style -->
+    <link rel="stylesheet" type="text/css" href="Retina/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/kbase.css">
+
+    <!-- webapp initialization -->
+    <script>
+    jQuery( document ).ready(function(){
+	stm.init(RetinaConfig.mgrast_api, true, "MG-RAST");
+	Retina.init( { library_resource: "Retina/js/" } ).then( function() {
+	    Retina.add_widget({"name": "metagenome_overview", "resource": "widgets/",  "filename": "widget.metagenome_overview.js"});
+	    Retina.load_widget("metagenome_overview").then( function() {
+		var mgp = Retina.Widget.create('metagenome_overview', { "main": document.getElementById("content"),
+									"sidebar": document.getElementById("sidebar") });
+	    });
+	});
+    });
+    </script>
+  </head>
+
+  <body>
+
+    <div>
+      <h3>Header</h3>
+    </div>
+
+    <!--border layout -->
+    <div class="borderlayout">
+      
+      <!-- main content -->
+      <div id="content"></div>
+    </div>
+    
+      <!-- sidebar content -->
+      <div id="sidebar" class="sidebar span5"></div>
+      
+  </body>
+</html>

@@ -1160,6 +1160,21 @@
                             of: "#app"
                         }
                     );
+				this.addNewCard("KBaseMAKTilingCard",
+					{
+						id: this.options.data.id,
+                           ws: this.options.data.ws,
+                           auth: this.options.auth,
+                           userId: this.options.userId,
+                           loadingImage: this.options.loadingImage,
+                           isInCard: true
+					},
+						{
+						my: "right bottom",
+                           at: "left bottom",
+                           of: "#app"
+					}
+				);
                 return this;
         },
 
@@ -1368,8 +1383,66 @@
                                      "showBambiMotif",
                                      "showBambiRunParameters", 
                                      "showBambiRawOutput",
+									 "showHeatMap",
+									 "showLineChart",
+									 "showLitWidget",
+									 "showBarChart",
 									 "showLitWidget",
 									 "showTreeCards"];
+
+			/**
+             * Event: showBarChart
+             * ------------------
+             * Adds new kbaseMAKBarChart card.
+             */	
+			$(document).on("showBarChart", function(event, data) {
+				console.log(data)
+				self.addNewCard("KBaseBarChartCard",
+					{
+						terms: data.terms,
+					},
+					{
+						my: "left",
+						at: "right bottom",
+						of: "#app"
+				});
+			});
+			
+			/**
+             * Event: showLineChart
+             * ------------------
+             * Adds new kbaseLineChart card.
+             */
+			$(document).on("showLineChart", function(event, data) {
+				self.addNewCard("KBaseLineChartCard",
+					{
+						row: data.row,		
+						heatmap: data.heatmap
+					},
+					{
+						my: "right top",
+						at: "right+800 bottom",
+						of: data.event
+				});
+
+			});
+			
+			/**
+             * Event: showHeatMap
+             * ------------------
+             * Adds new kbaseHeatmap card.
+             */
+			$(document).on("showHeatMap", function(event, data) {
+			self.addNewCard("KBaseHeatMapCard",
+				{
+					bicluster: data.bicluster,
+				},
+				{
+                    my: "left top",
+                    at: "center",
+                    of: data.event
+				});
+			});
 
 			/**
              * Event: showLitWidget
@@ -1390,7 +1463,6 @@
 						at: "right+800 bottom",
 						of: data.event
 				});
-
 			});
 			
             /**
@@ -1506,7 +1578,7 @@
              * Adds new KBaseContigBrowser card for a given contig ID,
              * and centered on a feature (if one's available).
              */
-            $(document).on("showContig", function(event, data) {
+	    $(document).on("showContig", function(event, data) {
                 self.addNewCard("KBaseContigBrowser",
                     {
                         contig: data.contig,

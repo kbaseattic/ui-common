@@ -414,7 +414,7 @@
 	    var title = null;
 	    if (rowContent.length>35) {
 		title = rowContent;
-		rowContent = rowContent.substr(1,35) +" ...";
+		rowContent = rowContent.substr(0,35) +" ...";
 	    }
 	    if (title) {
 		title = title.replace(/"/g, '&quot;');
