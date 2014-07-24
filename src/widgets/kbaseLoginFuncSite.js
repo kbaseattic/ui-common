@@ -138,9 +138,6 @@
                     // nuke the cookie, too, just in case it's still there.
                     $.removeCookie(this.cookieName, { path: '/', domain: '.kbase.us' });
                     $.removeCookie(this.cookieName, { path: '/' });
-                    // $.cookie('kbase_session', null, { path: '/' });
-                    // $.cookie('kbase_session', null, { path: '/', domain: 'kbase.us' });
-//                    $.cookie('kbase_session', null);
                 }
                 else {
                     if (this.registerLogin) {
