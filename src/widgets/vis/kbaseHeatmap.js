@@ -52,6 +52,14 @@ kb_define('kbaseHeatmap',
             return this;
         },
 
+        setDataset : function(newDataset) {
+            if (newDataset.data) {
+                newDataset = newDataset.data;
+            }
+
+            this._super(newDataset);
+        },
+
         setSpectrum : function(newSpectrum) {
             this.spectrum(
                 d3.scale.ordinal()
