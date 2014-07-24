@@ -179,6 +179,10 @@ var app = angular.module('landing-pages',
           url: "regulome/:ws/:id",
           templateUrl: 'views/ws/regulome.html',
           controller: 'WBLanding'
+        }).state('ws.expression_series', {
+          url: "expression_series/:ws/:id",
+          templateUrl: 'views/ws/expression_series.html',
+          controller: 'WBLanding'
         }).state('ws.simulation', {
           url: "simulation/:ws/:id",
           templateUrl: 'views/ws/simulation.html',

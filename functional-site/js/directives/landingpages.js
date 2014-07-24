@@ -526,6 +526,20 @@ angular.module('lp-directives')
 })
 
 
+.directive('expressionseries', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Expression Series', 
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+
+            $(p.body()).kbaseExpressionSeries({ws: scope.ws, name: scope.id})
+
+        }
+    }
+})
+
+
 .directive('pangenome', function() {
     return {
         link: function(scope, ele, attrs) {

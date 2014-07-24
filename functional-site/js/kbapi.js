@@ -492,6 +492,9 @@ function KBCacheClient(token) {
             case 'Regulome':
                 route = 'ws.regulome';
                 break; 
+            case 'ExpressionSeries':
+                route = 'ws.expression_series';
+                break; 
             case 'PhenotypeSet':
                 route = 'ws.phenotype';
                 break; 
@@ -739,7 +742,7 @@ function UIUtils() {
                 var type = full_type.slice(full_type.indexOf('.')+1);
                 var kind = type.split('-')[0];
                 var label = item[7]+"/"+item[1];
-
+		var route;
                 switch (kind) {
                     case 'FBA': 
                         sub = 'fbas/';
