@@ -461,12 +461,12 @@ var cluster_data = {
                 label : 'Gene List',
                 style: "min-width : 90px; background-color : black; color : white",
             },
-            {
+           /* {
                 value : 'checkbox',
                 label : 'Network comparision',
                 style: "max-width : 125px; background-color : black; color : white",
                 sortable : false,
-            },
+            },*/
         ],
         rows        : datasets,
     },
