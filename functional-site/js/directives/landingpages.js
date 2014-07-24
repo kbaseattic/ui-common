@@ -859,10 +859,9 @@ angular.module('lp-directives')
                           
                           kb.ws.save_objects(saveParams,
                                     function(result) {
-                                        alert('success!');
                                         $(p.body()).empty();
                                         $(p.body()).append("<b> Successfully created a new Narrative named "+result[0][1]+"!<br>");
-                                        window.location.href="http://narrative.kbase.us/ws."+result[0][6]+".obj."+result[0][0];
+                                        window.location.href="http://narrative.kbase.us/narrative/ws."+result[0][6]+".obj."+result[0][0];
                                     },
                                     function(error) {
                                         $(p.body()).empty();
