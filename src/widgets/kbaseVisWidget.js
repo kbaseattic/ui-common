@@ -47,6 +47,9 @@ kb_define('kbaseVisWidget',
             linearGradientStopColor : 'black',
 
             defaultDataset : function() { return [] },
+
+            width: '100%',
+            height : '100%',
         },
 
         shouldScaleAxis : function (axis) {
@@ -579,7 +582,7 @@ kb_define('kbaseVisWidget',
 
                 D3svg = d3.select($elem.get(0))
                     .append('svg')
-                    .attr('style', 'width : 100%; height : 100%')
+                    .attr('style', 'width : ' + this.options.width + '; height : ' + this.options.height)
                     //.attr('viewBox', '0 0 1600 1600')
                     //.attr('preserveAspectRatio', 'mMidYMid mMidYMid')
                     //.attr('width', 1600)
