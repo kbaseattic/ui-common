@@ -44,8 +44,6 @@ kb_define('kbaseChordchart',
 
         init : function(options) {
             this._super(options);
-console.log("OPTS : " + options.sortSubgroups);
-console.log("OPTS : " + this.options.sortSubgroups);
             return this;
         },
 
@@ -140,9 +138,9 @@ console.log("OPTS : " + this.options.sortSubgroups);
                     if ($chord.options.choppedGroups) {
 
                         var startAngle = val.startAngle;
-console.log($chord.dataset()[idx]);
+
                         var row = $chord.dataset()[idx].slice();
-console.log(row);
+
                         var total = 0;
 
                         row.forEach(
@@ -364,7 +362,7 @@ console.log(row);
             var tickGEnter = tickGs.enter().append('g').attr('opacity', 1);
             tickGEnter.append('line');
             tickGEnter.append('text');
-console.log(transitionTime);
+
             tickGs.exit()
             .transition().duration(transitionTime).attr('opacity', 0)
                 .each('end', function(d) { d3.select(this).remove() } )
@@ -374,7 +372,6 @@ console.log(transitionTime);
                 //.each('end', function(d) { d3.select(this).remove() });
 
             /*tickGs.attr('transform', function(d) {
-                //console.log(d);
                 return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
                     + "translate(" + outerRadius + ",0)";
             });*/

@@ -24,9 +24,6 @@ kb_define('kbaseVisWidget',
             yGutter     : 20,
             yPadding    : 30,
 
-            width       : 300,
-            height      : 300,
-
             xScaleType      : 'linear',
             yScaleType      : 'linear',
 
@@ -240,14 +237,14 @@ kb_define('kbaseVisWidget',
                 return d.id;
             }, this);
 
-            if (this.options.width.match('px')) {
+            if (this.options.width != undefined && this.options.width.match(/px/)) {
                 this.width( parseInt( this.options.width ) );
             }
             else {
                 this.width(this.$elem.width());
             }
 
-            if (this.options.height.match('px')) {
+            if (this.options.height != undefined && this.options.height.match(/px/)) {
                 this.height( parseInt( this.options.height ) );
             }
             else {
@@ -356,6 +353,8 @@ kb_define('kbaseVisWidget',
             this.setValueForKey('dataset', newDataset);
 
             if (this.shouldScaleAxis('x')) {
+            console.log("S1");
+            console.log(this.defaultXDomain());
                 this.setXScaleDomain(this.defaultXDomain());
             }
 

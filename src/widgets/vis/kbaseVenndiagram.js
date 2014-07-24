@@ -231,7 +231,7 @@ kb_define('kbaseVenndiagram',
 
             ];
 
-console.log(circleData);
+
             var intersects = this.intersectCircles(circleData[0], circleData[1]);
             var intersects2 = this.intersectCircles(circleData[1], circleData[2]);
             var intersects3 = this.intersectCircles(circleData[0], circleData[2]);
@@ -364,7 +364,6 @@ console.log(circleData);
                         if (d.data.action) {
                             var func = d.data.action;
                             if (typeof func == 'string') {
-                            console.log("BRING THE FUNC");console.log(func);
                                 func = Function("d", func);
                             }
                             func(d.data);

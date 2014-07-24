@@ -321,34 +321,32 @@
 
                             $('#random-hm_c').trigger('click');
 
-                            var heatmap = [];
+                            var heatmap =
+                                {
+                                    row_ids : [],
+                                    row_labels : [],
+                                    column_ids : [],
+                                    column_labels : [],
+                                    data : [],
+                                };
                             var numCells = 20;
                             var colors = ['red', 'green', 'blue', 'purple', 'cyan'];
                             for (var idx = 0; idx < numCells; idx++) {
+                                var row = [];
+                                heatmap.data.push(row);
                                 for (var jdx = 0; jdx < numCells; jdx++) {
-                                    heatmap.push(
-                                        {
-                                            x       : 'Frobnoz ' + idx,
-                                            y       : 'Wingding ' + jdx,
-                                            value   : Math.random(),
-                                            color   : d3.shuffle(colors)[0]
-                                        }
-                                    )
+                                    row.push(Math.random());
                                 }
+                                heatmap.row_ids.push('Wingding' + idx);
+                                heatmap.row_labels.push('Wingding' + idx);
+                                heatmap.column_ids.push('Frobnoz' + idx);
+                                heatmap.column_labels.push('Frobnoz' + idx);
                             } //*/
-
+console.log(heatmap);
                             $('#heatmapWidget').kbaseHeatmap(
                                 {
-                                    scaleAxes   : true,
-                                    yGutter     : 80,
-                                    xPadding    : 80,
-
-                                    xLabel      : 'Frobnozes',
-                                    yLabel      : 'Wingdings',
-
                                     dataset : heatmap,
-                                    ulIcon : '/root/img/labs_icon.png',
-
+                                    ulIcon : '../img/labs_icon.png',
                                 }
                             );
 

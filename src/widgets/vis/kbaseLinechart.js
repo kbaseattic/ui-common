@@ -21,7 +21,7 @@ kb_define('kbaseLinechart',
         version: "1.0.0",
         options: {
             overColor : 'yellow',
-            width : 3,
+            lineWidth : 3,
             lineCap : 'round',
             color : 'black',
 
@@ -95,7 +95,7 @@ kb_define('kbaseLinechart',
                     .attr('d',              function(d) {return lineMaker(d.values) })
                     .attr('stroke',         function (d) { return d.color || $line.options.color } )
                     .attr('fill',           'none')
-                    .attr('stroke-width',   function (d) {return d.width || $line.options.width} )
+                    .attr('stroke-width',   function (d) {return d.width || $line.options.lineWidth} )
                     .attr('stroke-linecap',   function (d) {return d.linecap || $line.options.lineCap} )
                     .attr('stroke-dasharray',   function (d) {return d.dasharray } )
                 ;
@@ -110,7 +110,7 @@ kb_define('kbaseLinechart',
                     if ($line.options.overColor) {
                         d3.select(this)
                             .attr('stroke', $line.options.overColor)
-                            .attr('stroke-width', (d.width || $line.options.width) + 5);
+                            .attr('stroke-width', (d.width || $line.options.lineWidth) + 5);
                     }
 
                     if (d.label) {
@@ -126,7 +126,7 @@ kb_define('kbaseLinechart',
                     if ($line.options.overColor) {
                         d3.select(this)
                             .attr('stroke',         function (d) { return d.color || $line.options.color } )
-                            .attr('stroke-width',   d.width || $line.options.width );
+                            .attr('stroke-width',   d.width || $line.options.lineWidth );
 
                         $line.hideToolTip();
 

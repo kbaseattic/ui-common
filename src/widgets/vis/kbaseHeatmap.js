@@ -56,7 +56,7 @@ kb_define('kbaseHeatmap',
         },
 
         setDataset : function(newDataset) {
-            if (newDataset.data) {
+            if (newDataset.data != undefined && ! $.isArray(newDataset.data) ) {
                 newDataset = newDataset.data;
             }
 
@@ -385,7 +385,7 @@ kb_define('kbaseHeatmap',
                     }
                 }
 
-                var domain = d3.range(min, max, Math.floor((max - min) / this.options.colors.length));
+                var domain = d3.range(min, max, (max - min) / this.options.colors.length);
                 domain[0] = min;
                 domain[domain.length - 1] = max;
 
