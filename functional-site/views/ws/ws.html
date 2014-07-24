@@ -1,27 +1,20 @@
 
 <div class="row">
 
-    <div class="col-md-3" id="ws-sidebar">
-        <!--<button class="btn btn-default" ng-click="hideSidebar()">hide</button>-->
-            <!--<ul class="nav nav-pills nav-stacked nav-sidebar">
-                <li ng-class="{ active: $state.is('narrative')}">
-                    <a class="btn-narr" ui-sref="narrative">
-                    Featured Narratives
-                    <span class="glyphicon glyphicon-chevron-right pull-right"></span>
-                    </a>
-                </li>
-
-                <li ng-class="{ active: $state.is('ws.recent')}">
-                    <a class="btn-narr" ui-sref="ws.recent">
-                    Recent Narratives
-                    <span class="glyphicon glyphicon-chevron-right pull-right"></span>
-                    </a>
-                </li>
-            </ul>-->
-        <div class="narrative-sidebar ws-sidebar" wsselector></div>
+    <div class="col-sm-3 col-md-3 sidebar">
+        
+        <!--<ul class="nav nav-tabs">
+            <li ng-class="{ active: $state.includes('narratives')}">
+                <a ui-sref="narratives" >Narratives</a>
+            </li>
+            <li ng-class="{ active: $state.includes('ws')}">
+                <a ui-sref="ws">Workspaces</a>
+            </li>
+        </ul>-->
+        <div class="ws-sidebar" wsselector></div>
     </div>
 
-    <div class="col-md-9">
+    <div class="col-md-9 col-md-offset-3 main" >
         <div class="object-view" ui-view>
             <!--<div ng-show="!selected_ws">
                 <span class="text-danger">No Workspace Selected</span><br>

@@ -372,12 +372,7 @@ angular.module('lp-directives')
             })
 
         }
-
-
-
     }
-
-
 })
 .directive('fbacore', function($location) {
     return {
@@ -439,7 +434,6 @@ angular.module('lp-directives')
     }
 })
 
-
 .directive('pathway', function() {
     return {
         link: function(scope, element, attrs) {
@@ -490,6 +484,162 @@ angular.module('lp-directives')
         }
     };
 })
+
+
+.directive('phenotype', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Phenotype Set Data', 
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+
+            $(p.body()).kbasePhenotypeSet({ws: scope.ws, name: scope.id})
+
+        }
+    }
+})
+
+.directive('promconstraint', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'PROM Constraint Data', 
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+
+            $(p.body()).kbasePromConstraint({ws: scope.ws, name: scope.id})
+
+        }
+    }
+})
+
+.directive('regulome', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Regulome Data', 
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+
+            $(p.body()).kbaseRegulome({ws: scope.ws, name: scope.id})
+
+        }
+    }
+})
+
+
+.directive('expressionseries', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Expression Series', 
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+
+            $(p.body()).kbaseExpressionSeries({ws: scope.ws, name: scope.id})
+
+        }
+    }
+})
+
+
+.directive('pangenome', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Pangenome ', 
+                                       rightLabel: scope.ws,
+                                       subText: scope.id});
+
+            p.loading();
+
+            var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
+            $.when(prom).done(function(data) {
+                var data = data[0].data;
+                console.log(data)
+                buildTable(data)
+            }).fail(function(e){
+                $(ele).rmLoading();
+                $(ele).append('<div class="alert alert-danger">'+
+                                e.error.message+'</div>')
+            });
+
+            function buildTable(data) {
+                console.log(data)
+                var container = $(p.body());
+
+                var table = $('<table class="table table-bordered table-striped"'+
+                                    'style="width: 100%;">');
+                var tabs = container.tabs({tabs: [
+                                            {name: 'Table', content: table, active: true}]
+                                         });
+                 
+                var tableSettings = {
+                    "sPaginationType": "bootstrap",
+                    "iDisplayLength": 10,
+                    "aaData": [],
+                    "aaSorting": [[ 3, "desc" ]],
+                    "aoColumns": [
+                      { "sTitle": "Function", 'mData': 'function'},
+                      { "sTitle": "ID", 'mData': 'id'}, //"sWidth": "10%"
+                      { "sTitle": "Type", 'mData': 'type'},
+                      { "sTitle": "Ortholog Count", 'mData': function(d) {
+                            return '<a class="show-orthologs" data-id="'+d.id+'">'
+                                    +d.orthologs.length+'</a>'
+                          },
+                      },
+                    ],
+                    "oLanguage": {
+                        "sEmptyTable": "No objects in workspace",
+                        "sSearch": "Search: "
+                    },
+                    'fnDrawCallback': events
+                }
+
+                var orthologs = data.orthologs;
+                tableSettings.aaData = orthologs;
+
+                // create the table
+                table.dataTable(tableSettings);
+
+                function events() {
+                    // event for clicking on ortholog count
+                    $('.show-orthologs').unbind('click');
+                    $('.show-orthologs').click(function() {
+                        var id = $(this).data('id');
+                        var info = 'blah blah';
+                        tabs.addTab({name: id, content: info, removable: true});
+                    })
+                }
+
+                // this takes an ort
+                function getOrthologInfo(id) {
+                    console.log(data)
+                    for (var i in data) {
+                        if (data[i].id == id) {
+                            console.log('match')
+
+                            var ort_list = data.orthologs
+                            return ort_list
+                        }
+                    }
+                }
+            }
+
+
+        }
+    };
+})
+
+.directive('simulation', function() {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Simulation Set Data', 
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            $(p.body()).kbaseSimulationSet({ws: scope.ws, name: scope.id})
+        }
+    };
+})
+
+
 .directive('rxndetail', function() {
     return {
         link: function(scope, ele, attrs) {
@@ -575,15 +725,10 @@ angular.module('lp-directives')
 .directive('genomeoverview', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Genome Overview', 
-                                           type: 'Genome',
+            var p = $(ele).kbasePanel({title: 'Genome Overview',
                                            rightLabel: scope.ws,
-                                           subText: scope.id,
-                                           widget: 'genomeoverview'});
+                                           subText: scope.id});
             p.loading(); 
-            // not sure why this isn't loading first.  
-            // I'm thinking data should be retrieved here.
-
             $(p.body()).KBaseGenomeOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb})
         }
     };
@@ -592,15 +737,228 @@ angular.module('lp-directives')
     return {
         link: function(scope, ele, attrs) {
             var p = $(ele).kbasePanel({title: 'Genome Wiki',
-                                           type: 'Genome',
                                            rightLabel: scope.ws,
-                                           subText: scope.id,
-                                           widget: 'genomewiki'});
+                                           subText: scope.id});
             p.loading();
             $(p.body()).KBaseWikiDescription({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb})
         }
     };
 })
+
+
+
+/* START new placement in sortable rows for genome landing page */
+
+.directive('sortablegenomeoverview', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Genome Overview',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseGenomeOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
+.directive('sortablegenomewikidescription', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Description',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseWikiDescription({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
+
+
+
+.directive('sortabletaxonomyinfo', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Taxonomy',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseGenomeLineage({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
+
+.directive('sortabletree', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Species Tree',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+
+            if (scope.ws === "CDS") {
+                $(p.body()).append('<b>There are no species trees created for this genome.</b>');
+            	return;
+            }
+
+            var objectIdentity = { ref:scope.ws+"/"+scope.id };
+            kb.ws.list_referencing_objects([objectIdentity], function(data) {
+            	var treeName = null;
+            	for (var i in data[0]) {
+            		var objInfo = data[0][i]
+            		var wsName = objInfo[7];
+                    var objName = objInfo[1];
+                    var type = objInfo[2].split('-')[0];
+                	//console.log("Links: " + wsName + "(" + scope.ws + ")" + "/" + objName + ", " + type);
+                    if (wsName === scope.ws && type === "KBaseTrees.Tree") {
+                    	treeName = objName;
+                    	break;
+                    }
+            	}
+            	if (treeName) {
+                    $(p.body()).kbaseTree({treeID: treeName, workspaceID: scope.ws});           		
+            	} else {
+                    $(p.body()).append('<b>There are no species trees created for this genome.  Use the Narrative to build a new species tree.</b>');
+            	}
+            },
+            function(error) {
+        		var err = '<b>Sorry!</b>  Error retreiveing species trees info';
+        		if (typeof error === "string") {
+                    err += ": " + error;
+        		} else if (error.error && error.error.message) {
+                    err += ": " + error.error.message;
+        		}
+                $(p.body()).append(err);
+            });
+        }
+    };
+})
+
+.directive('sortablecontigbrowser', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Contig Browser',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseMultiContigBrowser({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
+.directive('sortableseedannotations', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Functional Categories',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseSEEDFunctions({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
+.directive('sortablerelatedpublications', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Related Publications',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            
+            var objId = scope.ws + "/" + scope.id;
+	    kb.ws.get_object_subset( [ {ref:objId, included:["/scientific_name"]} ], function(data) {
+                    var searchTerm = "";
+                    if (data[0]) {
+                        if (data[0]['data']['scientific_name']) {
+                            searchTerm = data[0]['data']['scientific_name'];
+                        }
+                    }
+                    $(p.body()).KBaseLitWidget({literature:searchTerm, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+                },
+                function(error) {
+                    console.error("Trying to get scientific name for genome for related publication widget");
+                    console.error(error);
+                    $(p.body()).KBaseLitWidget({literature:"", kbCache: kb});
+                });
+        }
+    };
+})
+
+
+.directive('sortablenarrativereflist', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Narratives using this Genome',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseNarrativesUsingData({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
+.directive('sortableuserreflist', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'People using this Genome',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseWSObjRefUsers({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
+.directive('sortablereferencelist', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'List of data objects referencing this Genome',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseWSReferenceList({objNameOrId: scope.id, wsNameOrId: scope.ws, objVer: null, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif" });
+        }
+    };
+})
+.directive('sortableobjrefgraphview', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Object Reference and Provenance Graph',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseWSObjGraphCenteredView({objNameOrId: scope.id, wsNameOrId: scope.ws, kbCache: kb});
+        }
+    };
+})
+
+
+
+/* END new placement in sortable rows for genome landing page */
 
 
 
