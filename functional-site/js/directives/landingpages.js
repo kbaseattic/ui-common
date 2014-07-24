@@ -837,11 +837,10 @@ angular.module('lp-directives')
                           // tree name
                           narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param2'] = scope.id+".tree";
                           narData["metadata"]["data_dependencies"] = [
-                            "KBaseGenomes.Genome "+scope.id,
-                            "KBaseTrees.Tree "+scope.id+".tree"
+                            "KBaseGenomes.Genome "+scope.id
                           ];
                           var metadata = narData["metadata"];
-                          metadata["data_dependencies"] = metadata["data_dependencies"].join(",");
+                          metadata["data_dependencies"] = "";// not sure format of this... JSON.stringify(metadata["data_dependencies"]);
                           var objSaveData = {
                             type:"KBaseNarrative.Narrative",
                             data:narData,

@@ -51,9 +51,9 @@
                         {
                            "time" : 1406177928212,
                            "state" : {
-                              "param0" : "kb|g.0",
-                              "param2" : "MyNewSpeciesTree",
-                              "param1" : "22"
+                              "param0" : "",
+                              "param2" : "",
+                              "param1" : ""
                            }
                         }
                      ]
@@ -73,8 +73,7 @@
       "type" : "Narrative",
       "description" : "",
       "data_dependencies" : [
-         "KBaseGenomes.Genome kb|g.0",
-         "KBaseTrees.Tree MyNewSpeciesTree"
+         "KBaseGenomes.Genome kb|g.0"
       ]
    },
    "nbformat" : 3
