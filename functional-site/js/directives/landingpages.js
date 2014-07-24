@@ -861,7 +861,7 @@ angular.module('lp-directives')
                                     function(result) {
                                         $(p.body()).empty();
                                         $(p.body()).append("<b> Successfully created a new Narrative named "+result[0][1]+"!<br>");
-                                        window.location.href="http://narrative.kbase.us/narrative/ws."+result[0][6]+".obj."+result[0][0];
+                                        window.location.href="/narrative/ws."+result[0][6]+".obj."+result[0][0];
                                     },
                                     function(error) {
                                         $(p.body()).empty();
