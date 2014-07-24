@@ -586,6 +586,17 @@ angular.module('modeling-directives')
     };
 })
 
+.directive('deleterxn', function($location) {
+    return {
+        link: function(scope, ele, attrs) {
+            console.log('here')
+            $(ele).kbaseModelEditor({ws: scope.ws, id: scope.id})
+
+        }
+    }
+})
+
+
 .directive('etcviewer', function($location) {
     return {
         link: function(scope, ele, attrs) {

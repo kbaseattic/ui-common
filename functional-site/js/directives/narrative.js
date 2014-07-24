@@ -1134,12 +1134,6 @@ angular.module('narrative-directives')
                     }
                 }  // end manageProject
 
-
-
-
-
-
-
             } // end link
 
 

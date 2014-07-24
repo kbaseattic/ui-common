@@ -13,7 +13,7 @@
             workspaceID: null,
             kbCache: null,
             title: "Description",
-            maxNumChars: 500,
+            maxNumChars: 1000,
             width: 500,
             loadingImage: null
         },
@@ -28,8 +28,8 @@
                 return this;
             }
             this.$messagePane = $("<div/>")
-                                .addClass("kbwidget-message-pane")
-                                .addClass("kbwidget-hide-message");
+                                //.addClass("kbwidget-message-pane")
+                                //.addClass("kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
             this.cdmiClient = new CDMI_API(this.cdmiURL);
@@ -44,8 +44,9 @@
         },
 
         render: function() {
-            this.showMessage("<img src='" + this.options.loadingImage + "'/>");
-
+            var self = this;
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
+            
             /*
              * A couple nested callbacks here.
              * 1. Run genomes_to_taxonomies
@@ -88,7 +89,6 @@
         renderFromTaxonomy: function(taxonomy) {
             var searchTerms = taxonomy;
             var strainName = taxonomy[0];
-
             this.dbpediaLookup(searchTerms, $.proxy(
                 function(desc) {
                     // If we've found something, desc.description will exist and be non-null
@@ -122,7 +122,7 @@
                             descHtml = this.redirectHeader(strainName, desc.redirectFrom, desc.searchTerm) + descStr + this.descFooter(desc.wikiUri);
                         }
                         else if (desc.searchTerm === strainName) {
-                            descHtml = descStr + this.descFooter(desc.wiki_uri);
+                            descHtml = descStr + this.descFooter(desc.wikiUri);
                         }
                         else {
                             descHtml = this.notFoundHeader(strainName, desc.searchTerm, desc.redirectFrom) + descStr + this.descFooter(desc.wikiUri);
@@ -145,7 +145,8 @@
                     var imageId = this.uid();
 
 
-                    var $contentDiv = $("<div />")
+                    /* This is the tabbed view
+                     var $contentDiv = $("<div />")
                                       .addClass("tab-content")
                                       .append($("<div />")
                                               .attr("id", descId)
@@ -176,40 +177,90 @@
                                          )
                                   .append($("<li />")
                                           .append($imageTab)
-                                         );
+                                         ); */
 
-                    this.hideMessage();
-                    this.$elem.append($tabSet).append($contentDiv);            
+                    this.hideMessage();  
+                    //this.$elem.append($tabSet).append($contentDiv);
+                    
+                    this.$elem.append('<table cellpadding="4" cellspacing="2" border=0 style="width:100%;">' +
+                              '<tr><td style="vertical-align:top"><div id="taxondescription"></td>'+
+                              '<td style="vertical-align:top"><div id="taxonimage" style="width:400px;"></td></tr><br>');
+                    
+                    
+                    //this.$elem.find('#loading-mssg').hide();
+                    this.$elem.find("#taxondescription").append(descHtml);
+                    this.$elem.find("#taxonimage").append(imageHtml);
+                              
                 }, this), 
                 $.proxy(this.renderError, this)
             );
         },
 
         renderWorkspace: function() {
-            this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            var self = this;
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
             var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
-            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-
-            // if it fails, error out!
-            $.when(prom).fail($.proxy(function(error) {
-                this.renderError(error);
-            }, this));
-            // if it succeeds, grab the taxonomy (or at least the scientific name) and roll out.
-            $.when(prom).done($.proxy(function(genome) {
-                genome = genome[0];
-
-                var tax = genome.data.taxonomy;
-                var taxList = [];
-                var nameTokens = genome.data.scientific_name.split(/\s+/);
-                for (var i=nameTokens.length; i>0; i--) {
-                    taxList.push(nameTokens.slice(0, i).join(' '));
-                }
-                if (taxList && taxList !== "Unknown") {
-                    // parse the taxonomy, however it's munged together. semicolons, i think?
-                    taxList = taxList.concat(tax.split(/\;\s*/).reverse());
-                }
-                this.renderFromTaxonomy(taxList);
-            }, this));
+            
+            obj['included'] = ["/taxonomy","/scientific_name"];
+	    self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
+                    if (data[0]) {
+                        if (data[0]['data']['taxonomy']) {
+                            var tax = data[0]['data']['taxonomy'];
+                            var taxList = [];
+                            var nameTokens = data[0]['data']['scientific_name'].split(/\s+/);
+                            for (var i=nameTokens.length; i>0; i--) {
+                                taxList.push(nameTokens.slice(0, i).join(' '));
+                            }
+                            if (taxList && taxList !== "Unknown") {
+                                // parse the taxonomy, however it's munged together. semicolons, i think?
+                                taxList = taxList.concat(tax.split(/\;\s*/).reverse());
+                            }
+                            self.renderFromTaxonomy(taxList);
+                        }
+                    }
+                },
+                function(error) {
+                        
+                        var obj = self.buildObjectIdentity(self.options.workspaceID, self.options.genomeID);
+                        obj['included'] = ["/scientific_name"];
+                        self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
+                            if (data[0]) {
+                                if (data[0]['data']['scientific_name']) {
+                                    var taxList = [];
+                                    var nameTokens = data[0]['data']['scientific_name'].split(/\s+/);
+                                    for (var i=nameTokens.length; i>0; i--) {
+                                        taxList.push(nameTokens.slice(0, i).join(' '));
+                                    }
+                                    self.renderFromTaxonomy(taxList);
+                                }
+                            }
+                        },
+                        function(error) {self.renderError(error);});
+                });
+            
+            // old way that requires the entire object ...
+            //var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+            //
+            //// if it fails, error out!
+            //$.when(prom).fail($.proxy(function(error) {
+            //    this.renderError(error);
+            //}, this));
+            //// if it succeeds, grab the taxonomy (or at least the scientific name) and roll out.
+            //$.when(prom).done($.proxy(function(genome) {
+            //    genome = genome[0];
+            //
+            //    var tax = genome.data.taxonomy;
+            //    var taxList = [];
+            //    var nameTokens = genome.data.scientific_name.split(/\s+/);
+            //    for (var i=nameTokens.length; i>0; i--) {
+            //        taxList.push(nameTokens.slice(0, i).join(' '));
+            //    }
+            //    if (taxList && taxList !== "Unknown") {
+            //        // parse the taxonomy, however it's munged together. semicolons, i think?
+            //        taxList = taxList.concat(tax.split(/\;\s*/).reverse());
+            //    }
+            //    this.renderFromTaxonomy(taxList);
+            //}, this));
         },
 
         buildObjectIdentity: function(workspaceID, objectID) {
@@ -241,9 +292,9 @@
 
         notFoundHeader: function(strainName, term, redirectFrom) {
             var underscoredName = strainName.replace(/\s+/g, "_");
-            var str = "<p><b><i>" +
+            var str = "<p><b>Note: \"<i>" +
                       strainName + 
-                      "</i> not found. You can start a new page for this genome on <a href='http://en.wikipedia.org/wiki/" + 
+                      "</i>\" not found. You can add a description on <a href='http://en.wikipedia.org/wiki/" + 
                       underscoredName + 
                       "' target='_new'>Wikipedia</a>.</b></p>";
             if (term) {
@@ -367,6 +418,8 @@
                 else {
                     if (termList.length > 0) {
                         this.dbpediaLookup(termList, successCallback, errorCallback);
+                    } else {
+                        successCallback(processedHit);
                     }
                 }
                 return processedHit;

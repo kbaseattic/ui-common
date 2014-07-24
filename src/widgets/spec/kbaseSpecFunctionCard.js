@@ -1,7 +1,7 @@
 (function( $, undefined ) { 
     $.KBWidget({ 
         name: "KBaseSpecFunctionCard", 
-        parent: "kbaseWidget", 
+        parent: "kbaseAuthenticatedWidget", 
         version: "1.0.0",
         timer: null,
 
@@ -14,6 +14,8 @@
 
         init: function(options) {
             this._super(options);
+            if (!this.options.token)
+            	this.options.token = this.authToken();
             var self = this;
             var container = this.$elem;
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');

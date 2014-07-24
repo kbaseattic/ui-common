@@ -19,18 +19,21 @@
         <link rel="stylesheet" type="text/css" href="assets/css/search.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/jquery.jsonview.css" />        
 
+        <link rel="stylesheet" type="text/css" href="assets/js/ws-widgets/style.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/nc-tour.css" />
 
         <!-- KBase widget css -->
         <link rel="stylesheet" type="text/css" href="assets/css/kbaseLandingPageCard.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/kbaseSEEDFunctions.css" />
 
         <!-- External javascript packages -->
 
-
+		<link rel='stylesheet prefetch' href='http://s.cdpn.io/4629/animate.css'>
+		<script src='http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js'></script>
         <script src="../ext/bowser/bowser.min.js"></script>
 
-    	<!-- Google Analytics -->
-    	<script>
+            <!-- Google Analytics -->
+            <script>
             (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
             (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
             m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -79,7 +82,7 @@
             }
 
             checkBrowser();
-    	</script>
+        </script>
 
         <script src="../ext/jquery/jquery-1.10.2.min.js"></script>
        <!-- <script src="../ext/jquery-migrate/jquery-migrate-1.2.1.js"></script> -->
@@ -95,7 +98,6 @@
         <script src="assets/js/dataTables.tableTools.js"></script>     
         <script src="assets/js/FixedHeader.min.js"></script> 
         <script src="assets/js/jquery.jsonview.js"></script>         
-
         <script src="assets/js/nc-tour.js"></script>
 
         <script src="assets/js/jquery.cookie.min.js"></script>
@@ -103,10 +105,12 @@
 
         <!-- KBase client library javascript -->
         <script src="assets/js/kbclient/kbase.js"></script>
-        <script src="assets/js/kbclient/workspaceDeluxe.js"></script>
+        <!-- <script src="assets/js/kbclient/workspaceDeluxe.js"></script> -->
+        <script src="assets/js/kbclient/workspaceDeluxe-0.2.1.js"></script>
         <script src="assets/js/kbclient/userandjobstate.js"></script>        
         <!--<script src="assets/js/kbclient/projects.js"></script>        -->
         <script src="assets/js/kbclient/wikiScraper.js"></script>
+        <script src="assets/js/kbclient/kbaseTrees.js"></script>        
 
 
         <!-- widgets -->
@@ -116,7 +120,8 @@
         <script src="../src/widgets/kbaseModal.js"></script>
 
         <!--<script src="../src/widgets/kbasePrompt.js"></script>-->
-        <script src="assets/js/kbasePromptNew.js"></script>       
+        <script src="assets/js/kbasePromptNew.js"></script>
+        <script src="assets/js/ws-widgets/tabs.js"></script>
         <script src="../src/widgets/kbaseLoginFuncSite.js"></script>
         <!--<script src="../src/widgets/kbaseLogin.js"></script>        -->
 
@@ -149,22 +154,57 @@
         <script src="../src/widgets/workspaces/kbaseWSObjectTable.js"></script>
         <script src="../src/widgets/biochemistry/kbaseRxn.js"></script>
         <script src="../src/widgets/biochemistry/kbaseCpd.js"></script>
+	
+	<!-- ws obj reference related widgets -->
+        <script src="../ext/d3/sankey.js"></script> <!-- this is a d3 plugin -->
+        <link rel="stylesheet" type="text/css" href="assets/css/sankeystyle.css" />
+        <script src="../src/widgets/workspaces/kbaseWSReferenceList.js"></script>
+        <script src="../src/widgets/objgraphs/kbaseWSObjGraphView.js"></script>
+        <script src="../src/widgets/objgraphs/kbaseWSObjGraphCenteredView.js"></script>
+        <script src="../src/widgets/social/kbaseWSObjRefUsers.js"></script>
+        <script src="../src/widgets/social/kbaseNarrativesUsingData.js"></script>
+	<!-- end ws obj reference related widgets -->
 
         <!-- Genome widgets -->
         <script  src="../src/widgets/kbaseLandingPageCard.js"></script>
         <script  src="../src/widgets/genomes/kbaseWikiDescription.js"></script>
         <script  src="../src/widgets/genomes/kbaseContigBrowserButtons.js"></script>
         <script  src="../src/widgets/genomes/kbaseContigBrowser.js"></script>
+        <script  src="../src/widgets/genomes/kbaseMultiContigBrowser.js"></script>
         <script  src="../src/widgets/genomes/kbaseGenomeOverview.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneInfo.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneInstanceInfo.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneDomains.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneOperon.js"></script>
+        <script  src="../src/widgets/genomes/kbaseGeneSequence.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneBiochemistry.js"></script>
 
+    	<script  src="../src/widgets/genomes/kbasePhenotypeSet.js"></script>
+        <script  src="../src/widgets/genomes/kbaseSimulationSet.js"></script>
         <script  src="../src/widgets/kbaseCardLayoutManager.js"></script>
+
+        <script  src="../src/widgets/genomes/kbaseLitWidget.js"></script>
+        <script  src="../src/widgets/genomes/kbaseObjectMeta.js"></script>
+    	<script  src="../src/widgets/genomes/kbaseGenomeLineage.js"></script>
+        <script  src="../src/widgets/kbaseCardLayoutManager.js"></script>
+	    <script  src="../src/widgets/genomes/kbaseSEEDFunctions.js"></script>
+
         <!-- End Genome widgets -->
+	
+	<!-- Taxonomy widgets -->
+        <script  src="../src/widgets/taxa/kbaseTaxonOverview.js"></script>
+	<!-- end taxonomy widgets -->
         
+        <!-- Regulation widgets -->
+	<script  src="../src/widgets/regulation/kbasePromConstraint.js"></script>
+	<script  src="../src/widgets/regulation/kbaseRegulome.js"></script>
+        <!-- End Regulation widgets -->
+
+        <!-- Expression widgets -->
+	<script  src="../src/widgets/expression/kbaseExpressionSeries.js"></script>
+        <!-- End Expression widgets -->
+
+
         <!-- Meme widgets -->
         <script  src="../src/widgets/meme/logo.js"></script>
         <script  src="../src/widgets/meme/kbaseMemeTable.js"></script>
@@ -198,8 +238,12 @@
 
         <!-- MAK widgets -->
         <script  src="../src/widgets/mak/kbaseMAKResultCard.js"></script>
+		<script	 src="../src/widgets/mak/kbaseBarChartCard.js"></script>
+        <script  src="../src/widgets/mak/kbaseMAKTilingCard.js"></script>		
         <script  src="../src/widgets/mak/kbaseMAKBiclusterCard.js"></script>
-        <!-- End Cmonkey widgets -->
+		<script  src="../src/widgets/mak/kbaseHeatmapCard.js"></script>
+		<script  src="../src/widgets/mak/kbaseLineChartCard.js"></script>
+        <!-- End MAK widgets -->
 
         <!-- Bambi widgets -->
         <script  src="../src/widgets/bambi/logo.js"></script>
@@ -227,6 +271,8 @@
         <script src="../src/widgets/gwas/kbaseGWASTopVariationsTable.js"></script>
 
         <!-- End GWAS widgets -->
+
+        <script src="../src/widgets/trees/kbaseTree.js"></script>
 
         <!-- Iris widgets -->
         <!--
@@ -270,13 +316,15 @@
         <script src="lib/trees/excanvas.js"></script>
         <script src="lib/trees/menu.js"></script>            
         <script src="lib/trees/knhx.js"></script>
+        <script src="lib/trees/easytree.js"></script>
 
 
-	    <!-- Network widgets and dependencies -->
-        <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape-panzoom.css" />
+	<!-- Network widgets and dependencies -->
+	<link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/font-awesome-4.0.3/css/font-awesome.css" />
+        <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.css" />
         <script src="../ext/cytoscape.js/2.0.4-jmc/arbor.js"></script>
         <script src="../ext/cytoscape.js/2.0.4-jmc/cytoscape.js"></script>
-        <script src="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape-panzoom.js"></script>
+        <script src="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.js"></script>
         <script src="../ext/cytoscape.js/2.0.4-jmc/layout.arbor.js"></script>
         <script  src="../src/widgets/networks/kbasePPICard.js"></script>
         <script  src="../src/widgets/networks/kbaseNetworkCard.js"></script>
@@ -284,8 +332,12 @@
 
         <!--script type="text/javascript" src="assets/js/jsphylosvg-min.js"></script> -->
         <!-- application -->
-        <script src="lib/angular/angular.js"></script>
-        <script src="js/angular-ui-router.js"></script> 
+        <!--<script src="lib/angular/angular.js"></script>-->
+        <script src="lib/angular/angular.min.js"></script>
+        <!--<script src="js/angular-ui-router.js"></script>-->
+        <script src="js/angular-ui-router.min.js"></script>
+
+
         <script src="js/angular-resource.js"></script> 
         <script src="js/ui-bootstrap-tpls-0.10.0.js"></script>
 
@@ -302,7 +354,8 @@
         <script src="js/directives/modeling.js"></script>
         <script src="js/controllers.js"></script>
         <script src="js/services/favorites.js"></script>
-        <script src="js/cacheclient.js"></script>
+        <script src="js/services/workspaceUI.js"></script>
+        <script src="js/kbapi.js"></script>
         <script src="assets/js/header.js"></script>
     </head>
 
@@ -315,19 +368,18 @@
 
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav"> 
-                        <li class="dropdown" ng-class="{ active: $state.includes('narrative')}">
+                        <!--<li class="dropdown" ng-class="{ active: $state.includes('narrative')}">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Narrative <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 <li><a href="#/narrative/">Newsfeed</a></li>                
                                 <li><a href="#/narrative/projects/">Projects</a></li>
-                                <!--<li class="divider"></li>     
-                                <li><a href="#">Profile</a></li>-->
                             </ul>
-                        </li>
+                        </li>-->
+                        <li ng-class="{ active: $state.includes('narratives')}"><a ui-sref="narratives.featured" >Narratives</a></li>
+                        <li ng-class="{ active: $state.includes('ws')}"><a ui-sref="ws" >Workspaces</a></li>
                         <li ng-class="{ active: $state.includes('search')}">
                             <a ng-click="newSearch()" ng-controller="searchBarController">Search Data</a>
                         </li>
-                        <li ng-class="{ active: $state.includes('ws')}"><a href="#/ws/" >Workspaces</a></li>
                         <li><a href="http://kbase.us/services/docs/uploader/uploader.html">Upload</a></li>          
                     </ul>
 
