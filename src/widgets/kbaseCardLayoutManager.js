@@ -1506,7 +1506,7 @@
              * Adds new KBaseContigBrowser card for a given contig ID,
              * and centered on a feature (if one's available).
              */
-            $(document).on("showContig", function(event, data) {
+	    $(document).on("showContig", function(event, data) {
                 self.addNewCard("KBaseContigBrowser",
                     {
                         contig: data.contig,
