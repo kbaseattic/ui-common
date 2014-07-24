@@ -225,7 +225,8 @@
                 .attr("x", function (d) { return 0 + 275 - scale(d.size) - d.depth * self.stepSize;} )
                 .attr("height", self.barHeight)
                 .attr("width", function (d) { return scale(d.size); })
-                .style("fill", self.color);
+                .style("fill", self.color)
+                .on("click", $.proxy(function(d) {self.click(d)}, self));
 
             nodeEnter.append("text")
                 .attr("dy", 3.5)
