@@ -1388,7 +1388,7 @@ angular.module('ws-directives')
                                     '<a class="btn-show-info hide pull-right">More</a>';
 
                     } else if (kind == "Narrative") {
-                        var url = '/narratives/ws.'+wsid+'.obj.'+id;
+                        var url = '/narrative/ws.'+wsid+'.obj.'+id;
                         var new_id = '<a class="obj-id nar-id" data-ws="'+ws+'" data-wsid="'+wsid+'" data-id="'+id+'" data-name="'+name+'" ' +
                                         'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
                                         'data-sub="'+sub+'" href="'+url+'" target="_blank"><i><b>'+
