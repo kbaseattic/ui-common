@@ -675,7 +675,7 @@ angular.module('lp-directives')
             	if (treeName) {
                     $(p.body()).kbaseTree({treeID: treeName, workspaceID: scope.ws});           		
             	} else {
-                    $(p.body()).append('<b>There are no species trees created for this genome.</b>');
+                    $(p.body()).append('<b>There are no species trees created for this genome.  Use the Narrative to build a new species tree.</b>');
             	}
             },
             function(error) {
