@@ -484,18 +484,19 @@ div::-webkit-scrollbar-thumb {
 }
 
 .panel-default > .panel-heading {
-    background-color: #E7EDF2;
+    /*background-color: #E7EDF2;*/
 }
 
 .panel-title {
-    color: #0072AF;
+    /*color: #0072AF;*/
     font-family: 'OxygenBold', Arial, sans-serif; ;
 }
-
+/*
 .panel-subtitle {
     color: #888;
     font-family: 'OxygenBold', Arial, sans-serif; ;
-}
+}*/
+
 
 th {
     font-family: 'OxygenBold', Arial, sans-serif; ;
