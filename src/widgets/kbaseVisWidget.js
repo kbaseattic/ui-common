@@ -39,7 +39,8 @@ kb_define('kbaseVisWidget',
             useUniqueID : false,
 
             transitionTime : 1750,
-            ulIcon         : '/root/img/labs_icon.png',
+            //ulIcon         : '/root/img/labs_icon.png',
+            ulIcon  : '/static/kbase/js/ui-common/root/img/labs_icon.png',
 
             ticker : 0,
 
