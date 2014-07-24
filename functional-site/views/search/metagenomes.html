@@ -139,7 +139,10 @@
         <div ng-class="{'collapse': options.userState.viewType != 'expanded'}" class="search-typedRecord-expanded row">
             <div class="well search-result-column-expanded">
                 <table class="search-result-expanded-entry">
+                    <tr><td class="search-result-column-expanded-entry-cell metagenome_expanded_header"><strong>Biome: </strong></td><td class="search-result-column-expanded-entry-cell">{{item.biome}}</td></tr> 
                     <tr><td class="search-result-column-expanded-entry-cell metagenome_expanded_header"><strong>Sequence Type: </strong></td><td class="search-result-column-expanded-entry-cell">{{item.sequence_type}}</td></tr> 
+                    <tr><td class="search-result-column-expanded-entry-cell metagenome_expanded_header"><strong>Sequence Method: </strong></td><td class="search-result-column-expanded-entry-cell">{{item.seq_method}}</td></tr> 
+                    <tr><td class="search-result-column-expanded-entry-cell metagenome_expanded_header"><strong>Environmental Package Type: </strong></td><td class="search-result-column-expanded-entry-cell">{{item.env_package_type}}</td></tr> 
                     <tr><td class="search-result-column-expanded-entry-cell metagenome_expanded_header"><strong>Location: </strong></td><td class="search-result-column-expanded-entry-cell">{{item.location}}</td></tr>
                     <tr><td class="search-result-column-expanded-entry-cell metagenome_expanded_header"><strong>Feature: </strong></td><td class="search-result-column-expanded-entry-cell">{{item.feature}}</td></tr>
                     <tr><td class="search-result-column-expanded-entry-cell metagenome_expanded_header"><strong>Material: </strong></td><td class="search-result-column-expanded-entry-cell">{{item.material}}</td></tr>

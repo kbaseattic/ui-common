@@ -33,7 +33,7 @@
                 </li>
             </ul>
         </div>
-        <div class="btn-group search-result-column-header col-xs-2 col-sm-2 col-md-4 col-lg-4 scientific-name">
+        <div class="btn-group search-result-column-header col-xs-2 col-sm-2 col-md-4 col-lg-4 genome-scientific-name">
             <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
                 <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['scientific_name']}"><strong>Scientific Name</strong></div>
                 <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['scientific_name'], 'glyphicon-sort-by-alphabet': options.active_sorts[options.selectedCategory].sorts['scientific_name'].direction == 'asc', 'glyphicon-sort-by-alphabet-alt': options.active_sorts[options.selectedCategory].sorts['scientific_name'].direction == 'desc'}"></span>                
@@ -141,35 +141,33 @@
                 </li>
             </ul>
         </div>
-<!--               
-        <div class="btn-group search-result-column-header col-xs-1 col-sm-1 col-md-1 col-lg-1 num_genes">
+        <div class="btn-group search-result-column-header col-xs-1 col-sm-1 col-md-1 col-lg-1 num_cds">
             <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
-                <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['num_genes']}"><strong>Genes</strong></div>
-                <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['num_genes'], 'glyphicon-sort-by-order': options.active_sorts[options.selectedCategory].sorts['num_genes'].direction == 'asc', 'glyphicon-sort-by-order-alt': options.active_sorts[options.selectedCategory].sorts['num_genes'].direction == 'desc'}"></span>                
-                <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['num_genes'].order}}</span>
+                <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['num_cds']}"><strong>Genes</strong></div>
+                <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['num_cds'], 'glyphicon-sort-by-order': options.active_sorts[options.selectedCategory].sorts['num_cds'].direction == 'asc', 'glyphicon-sort-by-order-alt': options.active_sorts[options.selectedCategory].sorts['num_cds'].direction == 'desc'}"></span>                
+                <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['num_cds'].order}}</span>
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li>
-                    <a ng-click="addSort(options.selectedCategory, 'num_genes', 'asc')">
+                    <a ng-click="addSort(options.selectedCategory, 'num_cds', 'asc')">
                         <span class="glyphicon glyphicon-sort-by-order"/>
                         <span>Sort ascending</span>
                     </a>
                 </li>
                 <li>
-                    <a ng-click="addSort(options.selectedCategory, 'num_genes', 'desc')">
+                    <a ng-click="addSort(options.selectedCategory, 'num_cds', 'desc')">
                         <span class="glyphicon glyphicon-sort-by-order-alt"/>
                         <span>Sort descending</span>
                     </a>
                 </li>
                 <li>
-                    <a ng-click="removeSort(options.selectedCategory, 'num_genes', true)">
+                    <a ng-click="removeSort(options.selectedCategory, 'num_cds', true)">
                         <span class="glyphicon glyphicon-remove"/>
                         <span>Clear this sort</span>
                     </a>
                 </li>
             </ul>
         </div>
--->
         <div class="btn-group search-result-column-header col-xs-1 col-sm-1 col-md-1 col-lg-1 genome_dna_size">
             <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
                 <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['genome_dna_size']}"><strong>DNA Size bp</strong></div>
@@ -209,7 +207,7 @@
             </div>
             <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-position">{{item.position}}.</div>
             <div class="col-xs-2 col-sm-2 col-md-1 col-lg-1 search-result-column genome_id">{{item.genome_id}}</div>
-            <div class="col-xs-2 col-sm-2 col-md-4 col-lg-4 search-result-column scientific-name">
+            <div class="col-xs-2 col-sm-2 col-md-4 col-lg-4 search-result-column genome-scientific-name">
                 <span>
                     <a target='_blank' class='scientific-name' href='#{{options.landingPages.genome}}{{item.genome_id}}'>
                         <strong><em>{{item.scientific_name}}</em></strong>
@@ -219,15 +217,14 @@
             <div class="col-xs-2 col-sm-2 col-md-1 col-lg-1 search-result-column domain">{{item.domain}}</div>
             <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column gc_content">{{item.gc_content | number: 2}}</div>
             <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column num_contigs">{{item.num_contigs | number}}</div>
-<!--
-            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column num_genes">{{item.num_genes | number}}</div>
--->
+            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column num_cds">{{item.num_cds | number}}</div>
             <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column genome_dna_size">{{item.genome_dna_size | number}}</div>
         </div>
         <div ng-class="{'collapse': options.userState.viewType != 'expanded'}" class="search-typedRecord-expanded row">
             <div class="well search-result-column-expanded">
                 <table class="search-result-expanded-entry">
                     <tr><td class="search-result-column-expanded-entry-cell genome_expanded_header"><strong>Taxonomy:</strong></td><td class="search-result-column-expanded-entry-cell">{{item.taxonomy}}</td></tr>                    
+                    <tr><td class="search-result-column-expanded-entry-cell genome_expanded_header"><strong>Genome Publications:</strong></td><td class="search-result-column-expanded-entry-cell">{{item.genome_publications}}</td></tr>                    
                 </table>
             </div>
         </div>

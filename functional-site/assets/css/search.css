@@ -492,10 +492,13 @@ table.search-transfer-table {
     padding-bottom: 10px;
 }
 
-.scientific-name {
-    min-width: 200px;
+.feature-scientific-name {
+    width: 120px;
 }
 
+.genome-scientific-name {
+    min-width: 250px;
+}
 
 .toggle-expanded {
     width: 80px;
@@ -543,13 +546,17 @@ table.search-transfer-table {
     width: 140px;
 }
 
+.feature_source_id {
+    width: 160px;
+}
+
 .feature_id_cell {
     width: 155px;
     margin-right: 5px;
 }
 
 .feature_function {
-    min-width: 220px;
+    min-width: 60px;
 }
 
 .feature_function_cell {
@@ -557,9 +564,12 @@ table.search-transfer-table {
     margin-right: 5px;
 }
 
+.dna_sequence_length {
+    width: 60px;
+}
 
 .protein_translation_length {
-    width: 60px;
+    width: 80px;
 }
 
 .protein_translation_length_cell {
@@ -601,7 +611,7 @@ table.search-transfer-table {
 }
 
 .project_name {
-    width: 150px;
+    width: 220px;
 }
 
 .sample_name {
@@ -673,7 +683,7 @@ table.search-transfer-table {
     margin-right: 5px;
 }
 
-.num_contigs {
+.num_cds {
     width: 60px;
 }
 

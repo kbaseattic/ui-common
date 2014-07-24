@@ -191,11 +191,11 @@ searchApp.controller('searchBarController', function searchBarCtrl($rootScope, $
 
     $scope.newSearch = function () {
         if ($scope.query && $scope.query.length > 0) {
-            $rootScope.$state.go('search', {q: $scope.query});
+            //$rootScope.$state.go('search', {q: $scope.query});
             $state.go('search', {q: $scope.query});
         }
         else {
-            $rootScope.$state.go('search', {q: "*"});
+            //$rootScope.$state.go('search', {q: "*"});
             $state.go('search', {q: "*"});        
         }
     };    
@@ -212,6 +212,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
     $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
         if (toState.name === "search") {
+            console.log("state change to search");
             $scope.startSearch();      
         }  
     });
@@ -334,7 +335,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         queryOptions["itemsPerPage"] = 0;
         queryOptions["category"] = category;
 
-        //console.log("getCount : " + JSON.stringify(queryOptions));
+        console.log("getCount : " + JSON.stringify(queryOptions));
 
         if (!$scope.options.userState.hasOwnProperty("ajax_requests") || !$scope.options.userState.ajax_requests) {
             $scope.options.userState.ajax_requests = [];
@@ -392,7 +393,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $.blockUI({message: $("#loading_message")});
             
             for (var p in $scope.options.searchCategories) {
-                if ($scope.options.searchCategories.hasOwnProperty(p)) {
+                if ($scope.options.searchCategories.hasOwnProperty(p) && $scope.options.searchCategories[p].category !== null) {
                     $scope.getCount(queryOptions, $scope.options.searchCategories[p].category);            
                 }
                 else {
@@ -523,7 +524,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             // if we are in the category view, update the individual count
             if ($scope.options.selectedCategory) {
                 $scope.getCount({q: $scope.options.searchOptions.general.q}, $scope.options.selectedCategory);        
-                $state.go('search', {q: $scope.options.searchOptions.general.q, page: 1, sort: null, facets: null});
+                $state.go('search', {q: $scope.options.searchOptions.general.q, category: $scope.options.selectedCategory, page: 1, sort: null, facets: null});
             }
             else {
                 $state.go('search', {q: $scope.options.searchOptions.general.q});            
@@ -567,10 +568,10 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 }
                 
                 if ($stateParams.page !== undefined && $stateParams.page !== null) {
-                    $scope.setCurrentPage($stateParams.page);
+                    $scope.setCurrentPage($stateParams.page, false);
                 }
                 else {
-                    $scope.setCurrentPage(1);
+                    $scope.setCurrentPage(1, false);
                 }
 
                 if ($stateParams.itemsPerPage !== null && $stateParams.itemsPerPage > 0 && $stateParams.itemsPerPage <= 100) {
@@ -632,7 +633,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 }
             }
 
-            // verify logged in state
+            // verify logged in state            
             try {
                 $scope.options.userState.token = $("#signin-button").kbaseLogin("session", "token");
                 $scope.options.userState.user_id = $("#signin-button").kbaseLogin("session", "user_id");
@@ -679,7 +680,10 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 }            
             }
             
-            $scope.getCount(queryOptions, $scope.options.selectedCategory);
+            if ($scope.options.selectedCategory) {
+                $scope.getCount(queryOptions, $scope.options.selectedCategory);
+            }
+            
             $scope.getResults($scope.options.selectedCategory, $scope.options.searchOptions);        
         }
     };
@@ -834,7 +838,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     };
 
 
-    $scope.setCurrentPage = function (page) {
+    $scope.setCurrentPage = function (page, searchAgain) {
         try {
             $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].page = parseInt(page);
         }
@@ -843,7 +847,10 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         }
 
         $scope.saveUserState();
-        $state.go("search", {page: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].page});
+        
+        if (searchAgain === undefined || searchAgain === true) {
+            $state.go("search", {page: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].page});
+        }
     };
     
 
@@ -880,7 +887,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
         if (searchAgain === undefined || searchAgain === true) {
             $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);        
-            $state.go("search", {facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
+            $state.go("search", {category: $scope.options.selectedCategory, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
         }
     };
 
@@ -899,7 +906,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         }
 
         $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);        
-        $state.go("search", {facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
+        $state.go("search", {category: $scope.options.selectedCategory, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
     };
 
 

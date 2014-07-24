@@ -33,7 +33,34 @@
                 </li>
             </ul>
         </div>
-        <div class="btn-group search-result-column-header col-xs-2 col-sm-2 col-md-3 col-lg-3 scientific-name">
+        <div class="btn-group search-result-column-header feature_source_id col-xs-3 col-sm-3 col-md-2 col-lg-2">
+            <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
+                <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['feature_source_id']}"><strong>Feature Source Id</strong></div>
+                <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['feature_source_id'], 'glyphicon-sort-by-order': options.active_sorts[options.selectedCategory].sorts['feature_source_id'].direction == 'asc', 'glyphicon-sort-by-order-alt': options.active_sorts[options.selectedCategory].sorts['feature_source_id'].direction == 'desc'}"></span>                
+                <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['feature_source_id'].order}}</span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li>
+                    <a ng-click="addSort(options.selectedCategory, 'feature_source_id', 'asc')">
+                        <span class="glyphicon glyphicon-sort-by-alphabetical"/>
+                        <span>Sort ascending</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-click="addSort(options.selectedCategory, 'feature_source_id', 'desc')">
+                        <span class="glyphicon glyphicon-sort-by-order-alphabetical-alt"/>
+                        <span>Sort descending</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-click="removeSort(options.selectedCategory, 'feature_source_id', true)">
+                        <span class="glyphicon glyphicon-remove"/>
+                        <span>Clear this sort</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="btn-group search-result-column-header col-xs-2 col-sm-2 col-md-3 col-lg-3 feature-scientific-name">
             <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
                 <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['scientific_name']}"><strong>Scientific Name</strong></div>
                 <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['scientific_name'], 'glyphicon-sort-by-alphabet': options.active_sorts[options.selectedCategory].sorts['scientific_name'].direction == 'asc', 'glyphicon-sort-by-alphabet-alt': options.active_sorts[options.selectedCategory].sorts['scientific_name'].direction == 'desc'}"></span>                
@@ -87,9 +114,36 @@
                 </li>
             </ul>
         </div>
+        <div class="btn-group search-result-column-header dna_sequence_length col-xs-2 col-sm-2 col-md-1 col-lg-1">
+            <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
+                <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['dna_sequence_length']}"><strong>DNA bp</strong></div>
+                <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['dna_sequence_length'], 'glyphicon-sort-by-order': options.active_sorts[options.selectedCategory].sorts['dna_sequence_length'].direction == 'asc', 'glyphicon-sort-by-order-alt': options.active_sorts[options.selectedCategory].sorts['dna_sequence_length'].direction == 'desc'}"></span>                
+                <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['dna_sequence_length'].order}}</span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li>
+                    <a ng-click="addSort(options.selectedCategory, 'dna_sequence_length', 'asc')">
+                        <span class="glyphicon glyphicon-sort-by-order"/>
+                        <span>Sort ascending</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-click="addSort(options.selectedCategory, 'dna_sequence_length', 'desc')">
+                        <span class="glyphicon glyphicon-sort-by-order-alt"/>
+                        <span>Sort descending</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-click="removeSort(options.selectedCategory, 'dna_sequence_length', true)">
+                        <span class="glyphicon glyphicon-remove"/>
+                        <span>Clear this sort</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
         <div class="btn-group search-result-column-header protein_translation_length col-xs-2 col-sm-2 col-md-1 col-lg-1">
             <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
-                <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['protein_translation_length']}"><strong>Length</strong></div>
+                <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['protein_translation_length']}"><strong>Protein aa</strong></div>
                 <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['protein_translation_length'], 'glyphicon-sort-by-order': options.active_sorts[options.selectedCategory].sorts['protein_translation_length'].direction == 'asc', 'glyphicon-sort-by-order-alt': options.active_sorts[options.selectedCategory].sorts['protein_translation_length'].direction == 'desc'}"></span>                
                 <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['protein_translation_length'].order}}</span>
             </button>
@@ -152,30 +206,32 @@
                 </a>
             </div>
             <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-position">{{item.position}}.</div>
-            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 search-result-column feature_id">
+            <div class="col-xs-3 col-sm-3 col-md-2 col-lg-2 search-result-column feature_id">
                 <span>
                     <a target='_blank' data-trigger="hover" class="feature_id" href="#{{options.landingPages.feature}}{{item.feature_id}}">
                         <strong><em>{{item.feature_id}}</em></strong>
                     </a>
                 </span>
             </div>
-            <div class="col-xs-2 col-sm-2 col-md-3 col-lg-3 search-result-column scientific-name">
+            <div class="col-xs-3 col-sm-3 col-md-2 col-lg-2 search-result-column feature_source_id">{{item.feature_source_id}}</div>
+            <div class="col-xs-3 col-sm-3 col-md-2 col-lg-2 search-result-column feature-scientific-name">
                 <span>
                     <a target='_blank' class="scientific-name" href="#{{options.landingPages.genome}}{{item.genome_id}}">
                         <strong><em>{{item.scientific_name}}</em></strong>
                     </a>
                 </span>
             </div>
-            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column feature_type">{{item.feature_type}}</div>
-            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column protein_translation_length">{{item.protein_translation_length}}</div>
-            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 search-result-column feature_function">{{item.function}}</div>
+            <div class="col-xs-1 col-sm-1 col-md-1 lg-1 search-result-column feature_type">{{item.feature_type}}</div>
+            <div class="col-xs-1 col-sm-1 col-md-1 lg-1 search-result-column dna_sequence_length">{{item.dna_sequence_length}}</div>
+            <div class="col-xs-1 col-sm-1 col-md-1 lg-1 search-result-column protein_translation_length">{{item.protein_translation_length}}</div>
+            <div class="col-xs-3 col-sm-3 col-md-2 col-lg-2 search-result-column feature_function">{{item.function}}</div>
         </div>
         <div ng-class="{'collapse': options.userState.viewType != 'expanded'}" class="search-typedRecord-expanded row">
             <div class="well search-result-column-expanded">
                 <table class="search-result-expanded-entry">
-                    <tr><td class="search-result-column-expanded-entry-cell feature_expanded_header"><strong>Annotations:</strong></td><td class="search-result-column-expanded-entry-cell">{{item.annotations}}</td></tr>
-                    <tr><td class="search-result-column-expanded-entry-cell feature_expanded_header"><strong>Subsystem Data:</strong></td><td class="search-result-column-expanded-entry-cell">{{item.subsystem_data}}</td></tr>
-                    <tr><td class="search-result-column-expanded-entry-cell feature_expanded_header"><strong>Regulon Data:</strong></td><td class="search-result-column-expanded-entry-cell">{{item.regulon_data}}</td></tr>
+                    <tr><td class="search-result-column-expanded-entry-cell feature_expanded_header"><strong>Taxonomy:</strong></td><td class="search-result-column-expanded-entry-cell">{{item.taxonomy}}</td></tr>
+                    <tr><td class="search-result-column-expanded-entry-cell feature_expanded_header"><strong>Roles:</strong></td><td class="search-result-column-expanded-entry-cell">{{item.roles}}</td></tr>
+                    <tr><td class="search-result-column-expanded-entry-cell feature_expanded_header"><strong>Protein Families:</strong></td><td class="search-result-column-expanded-entry-cell">{{item.protein_families}}</td></tr>
                 </table>
             </div>
         </div>
