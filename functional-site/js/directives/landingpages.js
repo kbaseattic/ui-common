@@ -409,7 +409,6 @@ angular.module('lp-directives')
 })
 
 
-
 .directive('fbapathways', function($location) {
     return {
         link: function(scope, element, attrs) {
@@ -525,7 +524,6 @@ angular.module('lp-directives')
     }
 })
 
-
 .directive('expressionseries', function() {
     return {
         link: function(scope, ele, attrs) {
@@ -539,7 +537,6 @@ angular.module('lp-directives')
     }
 })
 
-
 .directive('pangenome', function() {
     return {
         link: function(scope, ele, attrs) {
@@ -548,80 +545,8 @@ angular.module('lp-directives')
                                        subText: scope.id});
 
             p.loading();
-
-            var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
-            $.when(prom).done(function(data) {
-                var data = data[0].data;
-                console.log(data)
-                buildTable(data)
-            }).fail(function(e){
-                $(ele).rmLoading();
-                $(ele).append('<div class="alert alert-danger">'+
-                                e.error.message+'</div>')
-            });
-
-            function buildTable(data) {
-                console.log(data)
-                var container = $(p.body());
-
-                var table = $('<table class="table table-bordered table-striped"'+
-                                    'style="width: 100%;">');
-                var tabs = container.tabs({tabs: [
-                                            {name: 'Table', content: table, active: true}]
-                                         });
-                 
-                var tableSettings = {
-                    "sPaginationType": "bootstrap",
-                    "iDisplayLength": 10,
-                    "aaData": [],
-                    "aaSorting": [[ 3, "desc" ]],
-                    "aoColumns": [
-                      { "sTitle": "Function", 'mData': 'function'},
-                      { "sTitle": "ID", 'mData': 'id'}, //"sWidth": "10%"
-                      { "sTitle": "Type", 'mData': 'type'},
-                      { "sTitle": "Ortholog Count", 'mData': function(d) {
-                            return '<a class="show-orthologs" data-id="'+d.id+'">'
-                                    +d.orthologs.length+'</a>'
-                          },
-                      },
-                    ],
-                    "oLanguage": {
-                        "sEmptyTable": "No objects in workspace",
-                        "sSearch": "Search: "
-                    },
-                    'fnDrawCallback': events
-                }
-
-                var orthologs = data.orthologs;
-                tableSettings.aaData = orthologs;
-
-                // create the table
-                table.dataTable(tableSettings);
-
-                function events() {
-                    // event for clicking on ortholog count
-                    $('.show-orthologs').unbind('click');
-                    $('.show-orthologs').click(function() {
-                        var id = $(this).data('id');
-                        var info = 'blah blah';
-                        tabs.addTab({name: id, content: info, removable: true});
-                    })
-                }
-
-                // this takes an ort
-                function getOrthologInfo(id) {
-                    console.log(data)
-                    for (var i in data) {
-                        if (data[i].id == id) {
-                            console.log('match')
-
-                            var ort_list = data.orthologs
-                            return ort_list
-                        }
-                    }
-                }
-            }
-
+            $(p.body()).kbasePanGenome({ws: scope.ws, name:scope.id});
+    
 
         }
     };
@@ -631,8 +556,8 @@ angular.module('lp-directives')
     return {
         link: function(scope, ele, attrs) {
             var p = $(ele).kbasePanel({title: 'Simulation Set Data', 
-                                           rightLabel: scope.ws,
-                                           subText: scope.id});
+                                       rightLabel: scope.ws,
+                                       subText: scope.id});
             p.loading();
             $(p.body()).kbaseSimulationSet({ws: scope.ws, name: scope.id})
         }
