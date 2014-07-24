@@ -146,10 +146,43 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
 })
 
+.controller('WsRefViewer', function($scope, $stateParams) {
+    $scope.params = {
+	'id': $stateParams.id,
+	'ws':$stateParams.ws,
+	'version':$stateParams.version,
+        'kbCache' : kb }
+})
+.controller('WsRefUsersViewer', function($scope, $stateParams) {
+    $scope.params = {
+	'id': $stateParams.id,
+	'ws':$stateParams.ws,
+	'version':$stateParams.version,
+        'kbCache' : kb }
+})
+
+.controller('WsObjGraphView', function($scope, $stateParams) {
+    $scope.params = { 'ws':$stateParams.ws, 'kbCache' : kb }
+})
+.controller('WsObjGraphCenteredView', function($scope, $stateParams) {
+    $scope.params = { 'ws':$stateParams.ws, 'id': $stateParams.id, 'kbCache' : kb }
+})
+
+
+
 .controller('Trees', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
+
+
+.controller('Taxonomy', function($scope, $stateParams) {
+    $scope.params = {
+	'taxonname': $stateParams.taxonname,
+	'ws':$stateParams.ws,
+        'kbCache' : kb }
+})
+
 
 .controller('WB', function($scope, $stateParams, $location) {
     $scope.selected_ws = $stateParams.ws;
@@ -579,6 +612,10 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 
+.controller('TreeDetail', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id,
+                     'ws': $stateParams.ws};
+})
 
 
 /* controller for the copy narrative modal */

@@ -145,7 +145,7 @@ var app = angular.module('landing-pages',
           controller: 'WBModelLanding'
         }).state('ws.genomes', {
           url: "genomes/:ws/:id",
-          templateUrl: 'views/ws/sortable/genome.html',
+          templateUrl: 'views/objects/genome.html',
           controller: 'WBLanding'
         }).state('ws.media', {
           url: "media/:ws/:id",
@@ -183,7 +183,7 @@ var app = angular.module('landing-pages',
           url: "simulation/:ws/:id",
           templateUrl: 'views/ws/simulation.html',
           controller: 'WBLanding'  
-        }) /* model viewer */
+        });
 
 
     // not in use
@@ -302,32 +302,21 @@ var app = angular.module('landing-pages',
     $stateProvider
         .state('genomesbyws',
             {url: '/genomes/:ws',
-             templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'});
-
-    $stateProvider
+             templateUrl: 'views/genomes/sortable-rows-landing-page.html',
+             controller: 'WBLanding'})
         .state('genomesbyid',
             {url: '/genomes/:ws/:id',
-             templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'});
-
-    $stateProvider
-        .state('kbgenomes',
-            {url: '/KBaseGenomes.Genome/CDS/:id',
-             templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'});
-
-    $stateProvider
+             templateUrl: 'views/genomes/sortable-rows-landing-page.html',
+             //templateUrl: 'views/objects/genome.html',
+             controller: 'WBLanding'})
         .state('kbgenomesbyws',
             {url: '/KBaseGenomes.Genome/:ws',
-             templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'});
-
-    $stateProvider
+             templateUrl: 'views/genomes/sortable-rows-landing-page.html',
+             controller: 'WBLanding'})
         .state('kbgenomesbyid',
             {url: '/KBaseGenomes.Genome/:ws/:id',
-             templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'});
+             templateUrl: 'views/genomes/sortable-rows-landing-page.html',
+             controller: 'WBLanding'});
 
 
     $stateProvider
@@ -398,6 +387,55 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/objects/spec.html',
              controller: 'SpecDetail'});
 
+    
+    $stateProvider
+        .state('wsref', {
+          url: "/ref/:ws/:id",
+          templateUrl: 'views/ws/ws-ref-list.html',
+          controller: 'WsRefViewer'
+        })
+        .state('wsrefwithversion', {
+          url: "/ref/:ws/:id/:version",
+          templateUrl: 'views/ws/ws-ref-list.html',
+          controller: 'WsRefViewer'
+        })
+        .state('wsrefusers', {
+          url: "/refusers/:ws/:id",
+          templateUrl: 'views/objects/ws-obj-ref-users.html',
+          controller: 'WsRefUsersViewer'
+        })
+        .state('wsrefuserswithversion', {
+          url: "/refusers/:ws/:id/:version",
+          templateUrl: 'views/objects/ws-obj-ref-users.html',
+          controller: 'WsRefUsersViewer'
+        });
+      
+    
+    $stateProvider
+        .state('wsobjgraphview', {
+          url: "/objgraphview/:ws",
+          templateUrl: 'views/objects/ws-obj-graph-view.html',
+          controller: 'WsObjGraphView'
+        })
+        .state('wsobjgraphcenteredview', {
+          url: "/objgraphview/:ws/:id",
+          templateUrl: 'views/objects/ws-obj-graph-centered-view.html',
+          controller: 'WsObjGraphCenteredView'
+        });
+        
+    $stateProvider
+        .state('taxonomyoverview', {
+          url: "/taxon/:taxonname",
+          templateUrl: 'views/objects/taxonomy.html',
+          controller: 'Taxonomy'
+        })
+        .state('taxonomyinws', {
+          url: "/taxon/:taxonname/:ws",
+          templateUrl: 'views/objects/taxonomy.html',
+          controller: 'Taxonomy'
+        });
+      
+             
     $stateProvider
         .state('bambibyid',
             {url: '/bambi/:ws/:id',
@@ -415,6 +453,12 @@ var app = angular.module('landing-pages',
             {url: '/landing-pages-help',
              templateUrl: 'views/landing-pages-help.html',
              controller: LPHelp});
+
+    $stateProvider
+    	.state('tree',
+    		{url: '/tree/:ws/:id',
+    		templateUrl: 'views/objects/tree.html',
+    		controller: 'TreeDetail'});
 
     //$urlRouterProvider.when('', '/login/');
     $urlRouterProvider.when('', '/login/');
