@@ -47,7 +47,7 @@
                 <h3 class="sidebar-header">RECENT NARRATIVES</h3>
                 <div recentnarratives>
                     <ul class="recent-nars" ng-repeat="nar in narratives | orderBy:'timestamp':true | limitTo:5">
-                        <li><a href="{{nar_url}}/ws.{{nar.wsid}}.obj.{{nar.id}}" target="_blank" class="ellipsis">{{nar.name}}</a><br>
+                        <li><a href="{{nar_url}}/narrative/ws.{{nar.wsid}}.obj.{{nar.id}}" target="_blank" class="ellipsis">{{nar.name}}</a><br>
                             <div class="recent-nar-time text-muted">{{nar.nealtime}}</div>
                         </li>
                         <br>
@@ -55,7 +55,6 @@
                 </div>
                 <!--<a class="pull-right" href="#/narrative/projects/">View all</a>-->
             </div>
-
 
             <!--<h3 class="sidebar-header">RECENT PROJECTS</h3>
             <div recentprojects>
