@@ -803,10 +803,7 @@ angular.module('lp-directives')
                                            subText: scope.id});
             p.loading();
 
-            if (scope.ws === "CDS") {
-                $(p.body()).append('<b>There are no species trees created for this genome.</b>');
-            	return;
-            }
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
 
             var objectIdentity = { ref:scope.ws+"/"+scope.id };
             kb.ws.list_referencing_objects([objectIdentity], function(data) {
@@ -825,7 +822,75 @@ angular.module('lp-directives')
             	if (treeName) {
                     $(p.body()).kbaseTree({treeID: treeName, workspaceID: scope.ws});           		
             	} else {
-                    $(p.body()).append('<b>There are no species trees created for this genome.  Use the Narrative to build a new species tree.</b>');
+                    
+                    var createTreeNar = function() {
+                        $(p.body()).empty();
+                        $(p.body()).append("<b> creating your narrative, please hold on...<br>");
+                                        
+                        $.getJSON( "assets/data/speciesTreeNarrativeTemplate.json", function( data ) {
+                          
+                          var narData = data;
+                          // genome name
+                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param0'] = scope.id;
+                          // number
+                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param0'] = "20";
+                          // tree name
+                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param0'] = scope.id+".tree";
+                          narData["metadata"]["data_dependencies"] = [
+                            "KBaseGenomes.Genome "+scope.id,
+                            "KBaseTrees.Tree "+scope.id+".tree"
+                          ];
+                          var metadata = narData["metadata"];
+                          metadata["data_dependencies"] = metadata["data_dependencies"].join(",");
+                          var objSaveData = {
+                            type:"KBaseNarrative.Narrative",
+                            data:narData,
+                            name:scope.id+".tree.narrative",
+                            meta:metadata,
+                            provenance:[]
+                          };
+                          var saveParams = {
+                            objects:[objSaveData]
+                          };
+                          if (/^\d+$/.exec(scope.ws))
+                            saveParams['id'] = scope.ws;
+                          else
+                            saveParams['workspace'] = scope.ws;
+                          
+                          kb.ws.save_objects(saveParams,
+                                    function(result) {
+                                        alert('success!');
+                                        $(p.body()).empty();
+                                        $(p.body()).append("<b> Successfully created a new Narrative named "+result[0][1]+"!<br>");
+                                        window.location.href="http://narrative.kbase.us/ws."+result[0][6]+".obj."+result[0][0];
+                                    },
+                                    function(error) {
+                                        $(p.body()).empty();
+                                        $(p.body()).append("<b>Unable to create Narrative.</b>  You probably do not have write permissions to this workspace.</b><br><br>");
+                                        
+                                        $(p.body()).append("You should copy this Genome to a workspace that you have access to, and build a species tree there.<br><br>");
+                                        $(p.body()).append("<i>Error was:</i><br>"+error.error.message+"<br><br>");
+                                    });
+                          
+                        });
+                    }
+                    
+                    var $buildNarPanel = $("<div>").append($("<button>")
+                           .addClass("btn btn-primary")
+                           .append("Build Species Tree")
+                           .attr("type", "button")
+                           .on("click", 
+                               function(event) {
+                                   createTreeNar();
+                               })
+                           );
+                    
+                    $(p.body())
+                        .append('<b>There are no species trees created for this genome, but you can use the Narrative to build a new species tree with related genomes.</b>');
+                        
+                    $(p.body()).append("<br><br>");
+                    $(p.body()).append($buildNarPanel);
+                    $(p.body()).append("<br><br>");
             	}
             },
             function(error) {
