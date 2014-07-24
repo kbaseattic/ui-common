@@ -30,7 +30,7 @@ kb_define('kbaseHeatmap',
             xGutter     : 80,
             overColor   : '#999900',
             hmBGColor     : 'lightgray',
-            colors : ["#0000ff",'#000000', "#ff0000"],
+            colors : ["#0000ff","#ff0000"],
 
             //clickCallback : function(d, $hm) {
             //    $hm.debug(d);
