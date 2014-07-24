@@ -49,7 +49,7 @@ kb_define('kbaseVisWidget',
 
             defaultDataset : function() { return [] },
 
-            width: '100%',
+            width  : '100%',
             height : '100%',
         },
 
@@ -240,9 +240,19 @@ kb_define('kbaseVisWidget',
                 return d.id;
             }, this);
 
+            if (this.options.width.match('px')) {
+                this.width( parseInt( this.options.width ) );
+            }
+            else {
+                this.width(this.$elem.width());
+            }
 
-            this.width(this.$elem.width());
-            this.height(this.$elem.height());
+            if (this.options.height.match('px')) {
+                this.height( parseInt( this.options.height ) );
+            }
+            else {
+                this.height(this.$elem.height());
+            }
 
             this.appendUI(this.$elem);
 
