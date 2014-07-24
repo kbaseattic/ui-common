@@ -39,6 +39,8 @@ kb_define('kbaseHeatmap',
             rx : 2,
             ry : 2,
 
+            cellPadding : 1,
+
         },
 
         _accessors : [
@@ -438,8 +440,8 @@ kb_define('kbaseHeatmap',
                 )
                 //.attr('y', function (d) { return $hm.yScale()(d.y) })
                 //.attr('opacity', function (d) { return d.value })
-                .attr('width', $hm.xScale().rangeBand() - 2)
-                .attr('height', $hm.yScale().rangeBand() - 2)
+                .attr('width', $hm.xScale().rangeBand() - $hm.options.cellPadding * 2)
+                .attr('height', $hm.yScale().rangeBand() - $hm.options.cellPadding * 2)
                 .attr('rx', $hm.options.rx)
                 .attr('ry', $hm.options.ry)
                 .attr('fill',
