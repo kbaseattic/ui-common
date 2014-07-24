@@ -192,7 +192,19 @@
             var nodeEnter = node.enter().append("g")
                 .attr("class", "node")
                 .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-                .style("opacity", 1e-6);
+                .style("opacity", 1e-6)
+                .on("mouseover", function(d) {
+                    d3.select(this).selectAll('text, rect')
+                    .style('font-weight', 'bold')
+                    .style('font-size', '90%')
+                    .style('stroke-width', '3px');
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this).selectAll('text, rect')
+                    .style('font-weight', 'normal')
+                    .style('font-size', '80%')
+                    .style('stroke-width', '1.5px');
+                });
 
             // Enter any new nodes at the parent's previous position.
             nodeEnter.append("rect")
