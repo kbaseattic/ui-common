@@ -263,6 +263,15 @@
 	    // load SEED info and render
 	    this.loadSeedOntology(this.wait_for_seed_load);
 
+            return this;
+        },
+
+
+	wait_for_seed_load : function () {
+	    this.assignSeedColors (this.seedTermsUniq);
+	    console.log ("SEED INFO LOADED");
+	    this.render();
+
             var self = this;
             if (this.options.showButtons) {
                 this.$elem.KBaseContigBrowserButtons({ browser: self });
@@ -278,14 +287,6 @@
                 } );
             }
 
-            return this;
-        },
-
-
-	wait_for_seed_load : function () {
-	    this.assignSeedColors (this.seedTermsUniq);
-	    console.log ("SEED INFO LOADED");
-	    this.render();
 	    return true;
 	},
 
