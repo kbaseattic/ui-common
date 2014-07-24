@@ -1982,7 +1982,7 @@ angular.module('ws-directives')
                             {name : 'Copy',
                             type : 'primary',
                             callback : function(e, $prompt) {
-                                var ws = $('.select-ws option:selected').val()
+                                var ws = $('.select-ws-input').val()
                                 confirmCopy(ws, $prompt);
                             }
                         }]
@@ -2024,7 +2024,6 @@ angular.module('ws-directives')
 
 
                 var fq_id =  'ws.'+scope.checkedList[0].wsid+'.obj.'+scope.checkedList[0].id
-                console.log('checked list', {fq_id: fq_id})
 
                 var prom = kb.nar.get_narrative_deps({fq_id: fq_id, 
                         callback: function(results) {
@@ -2265,7 +2264,6 @@ angular.module('ws-directives')
                         var placeholder = $('<div>').loading()
                         modal_body.append(placeholder);                        
                         $.when(prom).done(function(data) {
-                            console.log('permissions', data)
                             permData = data
 
                             //newPerms = $.extend({},data)
@@ -2681,8 +2679,6 @@ angular.module('ws-directives')
                                 var perm = $('.create-permission option:selected').val();
                                 var descript = $('.nar-description option:selected').val();
 
-                                console.log(selected_ws, name, perm, descript)
-
                                 var params = {narrative_id: name, 
                                               project_id: selected_ws, 
                                               description: descript}
@@ -2698,7 +2694,6 @@ angular.module('ws-directives')
                                 $prompt.addCover();
                                 $prompt.getCover().loading();
                                 $.when(p).done(function(){
-                                    console.log('transitionging ')
                                     if (scope.tab == 'my-narratives') {
                                         $state.go('narratives.mynarratives', null, {reload: true});
                                         scope.$apply();
