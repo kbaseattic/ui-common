@@ -27,8 +27,8 @@ var app = angular.module('landing-pages',
      'narrative-directives', 
      'ui.router', 'ngResource', 'kbaseLogin', 
      'FeedLoad', 'ui.bootstrap', 'search'])
-    .config(['$routeProvider', '$locationProvider', '$stateProvider', '$urlRouterProvider', '$httpProvider',  
-    function($routeProvider, $locationProvider, $stateProvider, $urlRouterProvider, $httpProvider) {
+    .config(['$locationProvider', '$stateProvider', '$httpProvider', '$urlRouterProvider',
+    function($locationProvider, $stateProvider, $httpProvider, $urlRouterProvider) {
 
     // enable CORS
     $httpProvider.defaults.useXDomain = true;
@@ -44,23 +44,32 @@ var app = angular.module('landing-pages',
           controller: 'Narrative'
         });
 
-    $stateProvider
-        .state('search', {
-            url: "/search/?q&category&page&itemsPerPage&sort&facets",
-            templateUrl: 'views/search/search.html',
-            controller: 'searchController'
-        })
-        .state('search.recent', {
-            url: "/recent/",
-            templateUrl: 'views/search/recent.html',
-            controller: 'searchController'
-        })
-        .state('search.favorites', {
-            url: "/favorites/",
-            templateUrl: 'views/search/favorites.html',
-            controller: 'searchController'
-        });
 
+    $stateProvider
+        .state('narratives', {
+          url: "/narratives/",
+          templateUrl: 'views/ws/narratives.html',
+          controller: 'WB'
+        }).state('narratives.mynarratives', {
+          url: "my-narratives",
+          templateUrl: 'views/ws/narrative-table.html',
+          controller: 'WB'
+        }).state('narratives.shared', {
+          url: "shared",
+          templateUrl: 'views/ws/narrative-table.html',
+          controller: 'WB'
+        }).state('narratives.public', {
+          url: "public",
+          templateUrl: 'views/ws/narrative-table.html',
+          controller: 'WB'
+        }).state('narratives.featured', {
+          url: "featured",
+          templateUrl: 'views/ws/featured.html',
+          controller: 'WB'
+        })
+
+    // old narrative pages */
+    /*
     $stateProvider
         .state('narrative', {
           url: "/narrative/",
@@ -71,8 +80,10 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/narrative/projects.html',
           controller: 'NarrativeProjects'
         });
+    */
 
-    // workspace browser routting
+
+    // workspace browser routing
     $stateProvider
         .state('ws', {
           url: "/ws/",
@@ -96,6 +107,7 @@ var app = angular.module('landing-pages',
           controller: 'WBTour'
         });
 
+
     // model viewer routing
     $stateProvider
         .state('ws.mv', {
@@ -113,10 +125,14 @@ var app = angular.module('landing-pages',
           url: "maps/:ws/:id/?fba",
           templateUrl: 'views/ws/maps.html',
           reloadOnSearch: false
+        }).state('ws.mv.modeleditor', {
+          url: "model-editor/:ws/:id/",
+          templateUrl: 'views/ws/model-editor.html',
         });
 
 
 
+    // workspace object landing pages
     $stateProvider
         .state('ws.fbas', {
           url: "fbas/:ws/:id?map",
@@ -147,9 +163,34 @@ var app = angular.module('landing-pages',
           url: "json/:ws/:id",
           templateUrl: 'views/ws/json.html',
           controller: 'WBJSON'
+        }).state('ws.pangenome', {
+          url: "pangenome/:ws/:id",
+          templateUrl: 'views/ws/sortable/pangenome.html',
+          controller: 'WBLanding'
+        }).state('ws.phenotype', {
+          url: "phenotype/:ws/:id",
+          templateUrl: 'views/ws/phenotype.html',
+          controller: 'WBLanding'
+        }).state('ws.promconstraint', {
+          url: "promconstraint/:ws/:id",
+          templateUrl: 'views/ws/promconstraint.html',
+          controller: 'WBLanding'
+        }).state('ws.regulome', {
+          url: "regulome/:ws/:id",
+          templateUrl: 'views/ws/regulome.html',
+          controller: 'WBLanding'
+        }).state('ws.expression_series', {
+          url: "expression_series/:ws/:id",
+          templateUrl: 'views/ws/expression_series.html',
+          controller: 'WBLanding'
+        }).state('ws.simulation', {
+          url: "simulation/:ws/:id",
+          templateUrl: 'views/ws/simulation.html',
+          controller: 'WBLanding'  
         });
 
 
+    // not in use
     $stateProvider
         .state('favorites', {
           url: "/favorites/",
@@ -157,6 +198,8 @@ var app = angular.module('landing-pages',
           controller: 'Favorites'
         });
 
+
+    // other pages
     $stateProvider
         .state('trees', {
           url: "/trees/",
@@ -175,8 +218,6 @@ var app = angular.module('landing-pages',
             controller: 'RxnDetail'
         });
 
-
-
     $stateProvider
         .state('cpds',
             {url:'/cpds', 
@@ -193,10 +234,6 @@ var app = angular.module('landing-pages',
              url: '/models',
              templateUrl: 'views/object-list.html',
              controller: 'WSObjects'})  
-        .state('modelsbyws', {
-             url: '/models/:ws',
-             templateUrl: 'views/object-list.html',
-             controller: 'WSObjects'})
         .state('modelbyid', {
              url: '/models/:ws/:id',
              templateUrl: 'views/objects/model.html',
@@ -260,7 +297,12 @@ var app = angular.module('landing-pages',
              controller: 'MediaDetail'});
 
 
-    // genome state providers
+    $stateProvider
+        .state('genomescds',
+            {url: '/genomes/CDS/:id',
+             templateUrl: 'views/objects/genome.html',
+             controller: 'GenomeDetail'});
+
     $stateProvider
         .state('genomesbyws',
             {url: '/genomes/:ws',
@@ -410,19 +452,19 @@ var app = angular.module('landing-pages',
 	    templateUrl: 'views/objects/ppid.html',
 	    controller: 'PPIDetail'});
 
-/*
     $stateProvider
         .state('landing-pages-help',
             {url: '/landing-pages-help',
              templateUrl: 'views/landing-pages-help.html',
              controller: LPHelp});
-*/
+
     $stateProvider
     	.state('tree',
     		{url: '/tree/:ws/:id',
     		templateUrl: 'views/objects/tree.html',
     		controller: 'TreeDetail'});
 
+    //$urlRouterProvider.when('', '/login/');
     $urlRouterProvider.when('', '/login/');
 
     $stateProvider
@@ -433,6 +475,42 @@ var app = angular.module('landing-pages',
 }]);
 
 
+
+app.service('userState', function userStateService() {
+    var _userData = {"token": null,
+                     "activeNarrative": null,
+                     "lastNarrative": null,
+                     "activeWorkspace": null,
+                     "loggedIn": false,
+                     "user_id": null
+                    };
+
+    if (!localStorage.hasOwnProperty("KBaseUserState")) {
+        localStorage.setItem("KBaseUserState", JSON.stringify(_userData));
+    }    
+
+    for (var p in _userData) {
+        if (_userData.hasOwnProperty(p) && !localStorage.KBaseUserState.hasOwnProperty(p)) {
+            localStorage.KBaseUserState[p] = _userData[p];
+        }    
+    }
+    
+    return {
+        userState : JSON.parse(localStorage.KBaseUserState),
+        landingPages : {"genome": "/genomes/CDS/",
+                        "feature": "/genes/CDS/",
+                        "gwasPopulation": "/KBaseGwasData.GwasPopulation/",
+                        "gwasTrait": "/KBaseGwasData.GwasPopulationTrait/",
+                        "gwasVariation": "/KBaseGwasData.GwasPopulationVariation/",
+                        "gwasGeneList": "/KBaseGwasData.GwasGeneList/",
+                        "metagenome": "http://metagenomics.anl.gov/?page=MetagenomeOverview&metagenome=",
+                       },
+
+        reset : function() {
+            this.userState = JSON.parse(localStorage.KBaseUserState);
+        }
+    };
+});
 
 
 //add the login widget as a module
@@ -490,7 +568,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
             if (c.kbase_sessionid) {
                 // USER_ID = $("#signin-button").kbaseLogin('session').user_id;
                 // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
-                $location.path('/narrative/');
+                $location.path('/narratives/featured');
             }
             $rootScope.$apply();
         }
@@ -513,32 +591,27 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     kb = new KBCacheClient(USER_TOKEN);
     kb.nar.ensure_home_project(USER_ID);
 
+
+    $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
+
+    console.log(USER_TOKEN);
+
+
     // global state object to store state
     state = new State();
 
     // Critical: used for navigation urls and highlighting
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
-
     $rootScope.kb = kb;     
     $rootScope.Object = Object;       
 
-    // if logged in, display favorite count in navbar
-    //var prom = kb.ujs.get_has_state('favorites', 'queue', 0);
-    //$.when(prom).done(function(q) {
-    //    console.log(q)
-    //    var q_length = q[0] ? q[1].length : 0;
-    //    $('.favorite-count').text(q_length);
-    //});
 });
 
 
 /*
  *   landing page app helper functions
  */ 
-
-
-
 function get_selected_ws() {
     if (state.get('selected')) {
         return state.get('selected')[0];
@@ -568,27 +641,6 @@ function set_cookie(c) {
     }
 };
 
-
-
-// These are some jquery plugs that you can use to add and remove a 
-// loading giff to a dom element.  This is easier to maintain, and likely less 
-// code that using CSS classes.
-$.fn.loading = function(text) {
-    $(this).rmLoading()
-
-    if (typeof text != 'undefined') {
-        $(this).append('<p class="text-muted loader"> \
-             <img src="assets/img/ajax-loader.gif"> '+text+'</p>');
-    } else {
-        $(this).append('<p class="text-muted loader"> \
-             <img src="assets/img/ajax-loader.gif"> loading...</p>')        
-    }
-    return this;
-}
-
-$.fn.rmLoading = function() {
-    $(this).find('.loader').remove();
-}
 
 
 

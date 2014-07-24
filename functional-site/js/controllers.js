@@ -175,6 +175,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     $scope.id = $stateParams.id;
 })
 
+
 .controller('Taxonomy', function($scope, $stateParams) {
     $scope.params = {
 	'taxonname': $stateParams.taxonname,
@@ -183,9 +184,15 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 
-.controller('WB', function($scope, $stateParams) {
+.controller('WB', function($scope, $stateParams, $location) {
     $scope.selected_ws = $stateParams.ws;
     $scope.type = $stateParams.type;
+
+    var sub = $location.path().split('/')[1]
+    if (sub == 'narratives') {
+        $scope.tab = $location.path().split('/')[2];
+    }
+
 
     $scope.showPreviousChanges = function() {
         $('#previous-changes').slideToggle();
@@ -368,7 +375,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 .controller('Favorites', function($scope, $state, $stateParams, favoriteService, $compile) {
-    console.log('called favorites!')
     $scope.selected = [{workspace: 'chenrydemo', 
                         name: 'kb|g.9.fbamdl.25.fba.55'}];
     //$scope.type = 'FBA';
@@ -497,6 +503,15 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 
+
+.controller('NarrativeCtrl', function($scope, $stateParams, $location) {
+    $scope.tab = $location.path().split('/')[2];
+
+    console.log('TAB in controller ', $scope.tab)
+
+
+})
+
 .controller('Narrative', function($scope, $stateParams, $location, kbaseLogin, $modal, FeedLoad) {
     //changeNav('narrative', 'newsfeed');
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives
@@ -550,7 +565,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                     //kb = new KBCacheClient(USER_TOKEN);
                     kb.nar.ensure_home_project(USER_ID);
 
-                    $location.path('/narrative/');
+                    $location.path('/narratives/featured');
                     $scope.$apply();
                     window.location.reload();
                     

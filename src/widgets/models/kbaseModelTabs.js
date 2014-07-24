@@ -23,47 +23,32 @@ $.KBWidget({
         var data = options.modelsData;
         var token = options.token;
         var fba = new fbaModelServices("http://kbase.us/services/fba_model_services"); //options.api;
-        console.log(data)
 
         var container = this.$elem;
 
         var tables = ['Reactions', 'Compounds', 'Compartment', 'Biomass', 'Gapfill', 'Gapgen'];
-        var tableIds = ['reaction', 'compound', 'compartment', 'biomass', 'gapfill', 'gapgen'];
 
-        // build tabs
-        var tabs = $('<ul id="table-tabs" class="nav nav-tabs"> \
-                        <li class="active" > \
-                        <a href="#'+tableIds[0]+'" data-toggle="tab" >'+tables[0]+'</a> \
-                      </li></ul>');
-        for (var i=1; i<tableIds.length; i++) {
-            tabs.append('<li><a href="#'+tableIds[i]+'" data-toggle="tab">'+tables[i]+'</a></li>');
-        }
+        var rxnTable = $('<table cellpadding="0" cellspacing="0" border="0" \
+                class="table table-bordered table-striped" style="width: 100%;">');
+        var cpdTable = $('<table cellpadding="0" cellspacing="0" border="0" \
+                class="table table-bordered table-striped" style="width: 100%;">')
+        var compartTable = $('<table cellpadding="0" cellspacing="0" border="0" \
+                class="table table-bordered table-striped" style="width: 100%;">')
+        var biomassTable = $('<table cellpadding="0" cellspacing="0" border="0" \
+                class="table table-bordered table-striped" style="width: 100%;">')
+        var gfTable = $('<table cellpadding="0" cellspacing="0" border="0" \
+                class="table table-bordered table-striped" style="width: 100%;">')   
+        var ggTable = $('<table cellpadding="0" cellspacing="0" border="0" \
+                class="table table-bordered table-striped" style="width: 100%;">')                                                                       
 
-        // add tabs
-        container.append(tabs);
 
-        var tab_pane = $('<div id="tab-content" class="tab-content">')
-        // add table views (don't hide first one)
-        tab_pane.append('<div class="tab-pane in active" id="'+tableIds[0]+'"> \
-                            <table cellpadding="0" cellspacing="0" border="0" id="'+tableIds[0]+'-table" \
-                            class="table table-bordered table-striped" style="width: 100%;"></table>\
-                        </div>');
-
-        for (var i=1; i<tableIds.length; i++) {
-            var tableDiv = $('<div class="tab-pane in" id="'+tableIds[i]+'"> ');
-            var table = $('<table cellpadding="0" cellspacing="0" border="0" id="'+tableIds[i]+'-table" \
-                            class="table table-striped table-bordered">');
-            tableDiv.append(table);
-            tab_pane.append(tableDiv);
-        }
-
-        container.append(tab_pane)
-
-        // event for showing tabs
-        $('#table-tabs a').click(function (e) {
-            e.preventDefault();
-            $(this).tab('show');
-        })
+        var tabs = container.kbTabs({tabs: [{name: 'Reactions', content: rxnTable, active: true},
+                                          {name: 'Compounds', content: cpdTable},
+                                          {name: 'Compartment', content: compartTable},
+                                           {name: 'Biomass', content: biomassTable},
+                                           {name: 'Gapfill', content: gfTable},
+                                           {name: 'Gapgen', content: ggTable}
+                                  ]});
 
         var tableSettings = {
             "sPaginationType": "bootstrap",
@@ -75,7 +60,6 @@ $.KBWidget({
             }
         }
 
-
         model = data[0].data;
 
         // compartment table
@@ -84,8 +68,8 @@ $.KBWidget({
         var labels = ["name", "pH", "potential"];
         var cols = getColumns(keys, labels);
         tableSettings.aoColumns = cols;
-        var table = $('#compartment-table').dataTable(tableSettings);
-        table.fnAddData(dataDict);
+        var t = compartTable.dataTable(tableSettings);
+        t.fnAddData(dataDict);
 
         // reaction table
         var dataDict = formatRxnObjs(model.modelreactions);
@@ -94,19 +78,19 @@ $.KBWidget({
         var cols = getColumns(keys, labels);
         var rxnTableSettings = $.extend({}, tableSettings, {fnDrawCallback: rxnEvents});   
         rxnTableSettings.aoColumns = cols;
-        rxnTableSettings.aoColumns[0].sWidth = '15%';        
-        var table = $('#reaction-table').dataTable(rxnTableSettings);
-        table.fnAddData(dataDict);
+        rxnTableSettings.aoColumns[0].sWidth = '15%';
+        var t = rxnTable.dataTable(rxnTableSettings);
+        t.fnAddData(dataDict);
 
         // compound table
         var dataDict = formatCpdObjs(model.modelcompounds);
-        var keys = ["id", "name", "formula"]//["compartment", "compound", "name"];
-        var labels = ["id", "name", "formula"]//["compartment", "compound", "name"];
+        var keys = ["id", "name", "formula"];//["compartment", "compound", "name"];
+        var labels = ["id", "name", "formula"];//["compartment", "compound", "name"];
         var cols = getColumns(keys, labels);
         var cpdTableSettings = $.extend({}, tableSettings, {fnDrawCallback: cpdEvents});           
         cpdTableSettings.aoColumns = cols;
-        var table = $('#compound-table').dataTable(cpdTableSettings);
-        table.fnAddData(dataDict);
+        var t = cpdTable.dataTable(cpdTableSettings);
+        t.fnAddData(dataDict);
 
         // biomass table
         var dataDict = model.biomasses;
@@ -114,11 +98,10 @@ $.KBWidget({
         var labels = ["id", "name", "eq"];
         var cols = getColumns(keys, labels);
         tableSettings.aoColumns = cols;
-        var table = $('#biomass-table').dataTable(tableSettings);
-        table.fnAddData(dataDict);
+        var t = biomassTable.dataTable(tableSettings);
+        t.fnAddData(dataDict);
 
         // gapfilling table
-        
         /*
         var dataDict = model.gapfillings;
         console.log(dataDict)
@@ -201,7 +184,7 @@ $.KBWidget({
                     "sSearch": "Search all:",
                     "sEmptyTable": "No gapfill objects for this model."
                 },
-               "fnDrawCallback": events,                
+               "fnDrawCallback": events,
             }
 
             var data = $.extend(model.gapfillings, {})
@@ -209,7 +192,7 @@ $.KBWidget({
             var labels = ["ID", "Integrated"];
             var cols = getColumns(keys, labels);
             tableSettings.aoColumns = cols;
-            var gapTable = $('#gapfill-table').dataTable(tableSettings);
+            var gapTable = gfTable.dataTable(tableSettings);
 
 
             var refs = []
@@ -363,9 +346,9 @@ $.KBWidget({
 
             var initTable = function(settings){
                 if (settings) {
-                    gapTable = $('#gapfill-table').dataTable(settings);
+                    gapTable = gfTable.dataTable(settings);
                 } else { 
-                    gapTable = $('#gapfill-table').dataTable(init_data);
+                    gapTable = gfTable.dataTable(init_data);
                 }
 
                 //add_search_boxes()
@@ -377,12 +360,12 @@ $.KBWidget({
                                           class="search_init input-mini"> \
                                      </th>';
                 var searches = $('<tr>');
-                $('#gapfill-table thead tr th').each(function(){
+                gfTable.find('thead tr th').each(function(){
                     $(this).css('border-bottom', 'none');
                     searches.append(single_search);
                 })
 
-                $('#gapfill-table thead').append(searches);
+                gfTable.find('thead').append(searches);
                 $("thead input").keyup( function () {
                     gapTable.fnFilter( this.value, $("thead input").index(this) );
                 });

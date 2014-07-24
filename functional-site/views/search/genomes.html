@@ -181,9 +181,9 @@
                 </span>
             </div>
             <div class="col-xs-2 col-sm-2 col-md-1 col-lg-1 search-result-column domain">{{item.domain}}</div>
-            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column gc_content">{{item.gc_content}}</div>
-            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column num_contigs">{{item.num_contigs}}</div>
-            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column genome_dna_size">{{item.genome_dna_size}}</div>
+            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column gc_content">{{item.gc_content | number: 2}}</div>
+            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column num_contigs">{{item.num_contigs | number}}</div>
+            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-result-column genome_dna_size">{{item.genome_dna_size | number}}</div>
         </div>
         <div ng-class="{'collapse': options.userState.viewType != 'expanded'}" class="search-typedRecord-expanded row">
             <div class="well search-result-column-expanded row">
