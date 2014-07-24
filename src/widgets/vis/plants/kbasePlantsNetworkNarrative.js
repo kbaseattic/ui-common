@@ -9,10 +9,6 @@ kb_define('kbasePlantsNetworkNarrative',
         'kbasePlantsNetworkTable',
         'kbaseForcedNetwork',
         'kbaseTable',
-        'KbaseNetworkServiceClient',
-        'CDMI_API',
-        'IdMapClient',
-        'OntologyServiceClient',
     ],
     function ($) {
         $.KBWidget(
