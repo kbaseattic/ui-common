@@ -20,6 +20,7 @@ kb_define('kbaseHeatmap',
 
         version: "1.0.0",
         options: {
+            scaleAxes   : true,
             xScaleType  : 'ordinal',
             yScaleType  : 'ordinal',
             yGutter     : 80,
