@@ -195,36 +195,35 @@
 		var seedColors = this.seedColors;
 		var self = this;
 		// there are 30 top level SEED categories.  Need 30 colors
-		var colorWheel = ["#F00", // red
-				  "#900", // dark red
-				  "#C30", // light brown
-				  "#F60", // orange
-				  "#F90", // pumpkin
-				  "#FC0", // yellow
-				  "#CF3", // yellow green
-				  "#9FC", // aqua
-				  "#0C9", // dark green yellow
-				  "#9F9", // light green 
-				  "#0C0", // green
-				  "#393", // darker green
-				  "#060", // darkest green 
-				  "#0F9", // blue green
-				  "#0CF", // cyan
-				  "#39F", // light blue
-				  "#00F", // blue
-				  "#00C", // darkest blue
-				  "#33C", // dark blue
-				  "#36C", // matte blue
-				  "#69F", // light matte blue
-				  "#60C", // dark violet
-				  "#96F", // violet
-				  "#C9F", // light violet
-				  "#C0C", // magenta 
-				  "#F39", // pink
-				  "#FC9", // tan
-				  "#F99", // light coral
-				  "#F66", // dark coral
-				  "#909"  // deep purple
+		var colorWheel = ["#F00", // red              # carb
+				  "#900", // dark red         # respiration
+				  "#C30", // light brown      # nucleosides
+				  "#F60", // orange           # stress
+				  "#F90", // pumpkin          # protein metab
+				  "#FC0", // yellow           # regulation
+				  "#CF3", // yellow green     # cell wall
+				  "#9FC", // aqua             # misc
+				  "#9F9", // light green      # photosyn
+				  "#0C0", // green            # aromatics
+				  "#393", // darker green     # clust subsys
+				  "#060", // darkest green    # phosporus
+				  "#0F9", // blue green       # mobile elts 1
+				  "#0CF", // cyan             # secondary
+				  "#F39", // pink             # dormancy spore
+				  "#39F", // light blue       # amino acids
+				  "#69F", // light matte blue # iron
+				  "#36C", // matte blue       # mobile elts 2
+				  "#00F", // blue             # cell cycle
+				  "#33C", // dark blue        # membrane trans
+				  "#00C", // darkest blue     # nitrogen
+				  "#FC9", // tan              # sulfur
+				  "#96F", // violet           # dna metabolism
+				  "#C9F", // light violet     # cofactors
+				  "#60C", // dark violet      # fatty acids
+				  "#C0C", // magenta          # vir, dis, def
+				  "#F99", // light coral      # potassium
+				  "#F66", // dark coral       # motility
+				  "#909"  // deep purple      # virulence
 				  ];
 		var maxColor = colorWheel.length;
 		var SEED_LEVELS = 4;    // parents (3) + subsystem role col (1)
@@ -236,6 +235,11 @@
 			//console.log (j + " " + i + " " + seedTermsUniq[j][i] + " " + colorWheel[i % maxColor]);
 			seedColors[j][seedTermsUniq[j][i]] = colorWheel[i % maxColor];
 		    }
+		}
+
+
+		for (var i=0; i < seedTermsUniq[0].length; i++) {
+		    console.log (i + " " + seedColors[0][seedTermsUniq[0][i]] + " " + seedTermsUniq[0][i]);
 		}
 
 		//this.seedColors = seedColors;
@@ -957,8 +961,8 @@
 	    //
 	    // SEED has 4 levels of classification. We are defining 0 as broadest category (e.g. "Carbohydrates") and 3 as the Subsystem Role (e.g. "Beta-galactosidase (EC 3.2.1.23)")
 	    this.options.annot_namespace = "SEED";     // should be input param
-	    //this.options.annot_level = 0;            // should be input param
-	    this.options.annot_level = 3;            // should be input param
+	    //this.options.annot_level = 0;          // should be input param
+	    this.options.annot_level = 3;          // should be input param
 	    return this.colorByAnnot (feature, this.options.annot_namespace, this.options.annot_level, annot_num);
         },
 
