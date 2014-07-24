@@ -142,7 +142,7 @@
             
             // panel where contig browser is defined
             var $contigViewPanelWrapper = $('<div class="col-md-6"/>');
-            this.$contigViewPanel = $('<div align="center"/>').css({'overflow' : 'auto'}).html("<b>Select a contig to browse to the left.</b>");
+            this.$contigViewPanel = $('<div id="contigmainview" align="center"/>').css({'overflow' : 'auto'});
             $contigViewPanelWrapper
                 .append(this.$contigViewPanel)
                 .append("<div>").KBaseContigBrowserButtons({ browser: self });
@@ -195,12 +195,11 @@
                 self.hideMessage();
                 
                 // can't seem to get this working!  it always sizes it wrong, but I don't know why
-                /*if (genome.contig_ids.length>0) {
+                if (genome.contig_ids.length>0) {
                     self.contig =  genome.contig_ids[0];
                     self.options.contig =  genome.contig_ids[0];
                     self.render();
-                    self.svg.attr("height", self.svgHeight);
-                }*/
+                }
                 
 
             }, this));
