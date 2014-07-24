@@ -833,9 +833,9 @@ angular.module('lp-directives')
                           // genome name
                           narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param0'] = scope.id;
                           // number
-                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param0'] = "20";
+                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param1'] = "20";
                           // tree name
-                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param0'] = scope.id+".tree";
+                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param2'] = scope.id+".tree";
                           narData["metadata"]["data_dependencies"] = [
                             "KBaseGenomes.Genome "+scope.id,
                             "KBaseTrees.Tree "+scope.id+".tree"
