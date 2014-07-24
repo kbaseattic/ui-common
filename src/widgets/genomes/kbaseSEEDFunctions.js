@@ -172,7 +172,7 @@
             var height = Math.max(500, nodes.length * self.barHeight + self.margin.top + self.margin.bottom);
             var i = self.i;
 
-            d3.select("svg").transition()
+            d3.selectAll("#mainview").select("svg").transition()
                 .duration(self.duration)
                 .attr("height", height);
 
@@ -315,7 +315,6 @@
             if (this.options.kbCache) {
                 prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
             } else {
-                console.log("token: " + this.authToken);
                 prom = this.wsClient.get_objects([obj]);
             }
             //var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
