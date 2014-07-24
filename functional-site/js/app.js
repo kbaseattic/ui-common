@@ -296,13 +296,8 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/objects/media.html',
              controller: 'MediaDetail'});
 
-
-    $stateProvider
-        .state('genomescds',
-            {url: '/genomes/CDS/:id',
-             templateUrl: 'views/objects/genome.html',
-             controller: 'GenomeDetail'});
-
+    // note: the previous handler for genomes/CDS/:id should simply be
+    // handled by genomes/:ws/:id (treating CDS as the workspace name)
     $stateProvider
         .state('genomesbyws',
             {url: '/genomes/:ws',
