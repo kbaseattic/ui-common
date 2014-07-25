@@ -45,18 +45,19 @@
 			var $sideChart = $("<div>").css({"width":chartWidth,"top":50,"position":"absolute"})
 			var flat = []			
 			var termData = []						
-			var termColors = []
-			for (termType in terms) {				
-				var termColor = '#'+Math.floor(Math.random()*16777215).toString(16);
-				while (termColors.indexOf(termColor)!=-1) '#'+Math.floor(Math.random()*16777215).toString(16);
-				termColors.push(termColor)
+			var termColors = ["#FF0000","#9900FF","#808080","#FF6600","#009900"]
+			var count = 0
+			for (termType in terms) {										
+				var termColor = termColors[count];
+				console.log(termColor)
 				for (term in terms[termType]) {
 					termData.push({"term":term,"tiles":terms[termType][term],"color":termColor,"type":termType})
 					flat.push(terms[termType][term].length)
 				}
+				count++
 				
 			}
-			console.log(termData)
+			
 			var x = d3.scale.linear().domain([0,d3.max(flat)]).range([0,chartWidth])
 			
 			var $barChartDiv = $("<div id='barchart'>").css({"float":"right"})

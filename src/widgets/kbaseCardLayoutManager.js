@@ -1145,37 +1145,55 @@
         },
 
         showMAKCards: function() {
+			console.log(this.options.data.id)
+			if (this.options.data.id.indexOf("makresult")!=-1) {
                 this.addNewCard("KBaseMAKResultCard",
-                        {
-                            id: this.options.data.id,
-                            ws: this.options.data.ws,
-                            auth: this.options.auth,
-                            userId: this.options.userId,
-                            loadingImage: this.options.loadingImage,
-                            isInCard: true
-                        },
-                        {
-                            my: "left top",
-                            at: "left bottom",
-                            of: "#app"
-                        }
-                    );
+                    {
+                        id: this.options.data.id,
+                        ws: this.options.data.ws,
+                        auth: this.options.auth,
+                        userId: this.options.userId,
+                        loadingImage: this.options.loadingImage,
+                        isInCard: true
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                 );
 				this.addNewCard("KBaseMAKTilingCard",
 					{
 						id: this.options.data.id,
-                           ws: this.options.data.ws,
-                           auth: this.options.auth,
-                           userId: this.options.userId,
-                           loadingImage: this.options.loadingImage,
-                           isInCard: true
+                        ws: this.options.data.ws,
+                        auth: this.options.auth,
+                        userId: this.options.userId,
+                        loadingImage: this.options.loadingImage,
+                        isInCard: true
 					},
-						{
+					{
 						my: "right bottom",
-                           at: "left bottom",
-                           of: "#app"
+                        at: "left bottom",
+                        of: "#app"
 					}
 				);
-                return this;
+			}
+			else {			
+				if (this.options.data.id.indexOf("bicluster")!=-1) {
+					self.addNewCard("KBaseHeatMapCard",
+						{
+							bicluster: this.options.data.id,
+							ws: this.options.data.ws
+						},
+						{
+							my: "left top",
+							at: "center",
+							of: data.event
+						}
+					);
+				}
+			}
+            return this;
         },
 
     showPPICards: function() {
@@ -1891,6 +1909,7 @@
                 self.addNewCard("KBaseMAKBiclusterCard",
                     {
                         bicluster: data.bicluster,
+						ws: data.ws,
                         showButtons: true,
                         centerFeature: data.centerFeature
                     },
