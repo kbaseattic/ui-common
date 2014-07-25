@@ -9,7 +9,7 @@
             objNameOrId: null,
             objVer: null,
             kbCache:{},
-            width:900
+            width:200
         },
 
         pref: null,
@@ -21,36 +21,50 @@
             var self = this;
             this.pref = this.uuid();
         	var container = self.$elem;
-        	container.append('' + 
+        	/*container.append('' + 
         			'<table>' +
         			'<tr><td>Source object:</td><td id="td_src_'+this.pref+'"/></tr>' +
         			'<tr><td>Target workspace:</td><td id="td_ws_'+this.pref+'"/></tr>' +
-        			'<tr><td>Target object name:</td><td><input type="text" id="input_target_'+this.pref+'"/></td></tr>' +
+        			'<tr><td>Target object name:</td><td><input type="text" id="input_target_'+this.pref+'" style="width: 150px;"/></td></tr>' +
         			'<tr><td/><td><button id="btn_copy_'+this.pref+'">Copy</button></td></tr>' +
-        			'</table>');
-        	$('#btn_copy_'+this.pref).click(function (e) {
-            	var ws_name = $("#select_ws"+self.pref).val();
-            	var target_obj_name = $("#input_target_"+self.pref).val();
-            	console.log("Copy " + self.options.wsNameOrId + "/" + self.options.objNameOrId + " -> " + 
-            			ws_name + "/" + target_obj_name);
-        	});
+        			'</table>');*/
+        	container.append('' +
+        			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Source object:</b></span> <span id="td_src_'+this.pref+'"/></p>'+
+        			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Target workspace:</b></span><span id="td_ws_'+this.pref+'"/></p>'+
+        			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Target object name:</b></span><input type="text" id="input_target_'+this.pref+'" style="width: 150px;"/></p>'+
+        			'<button id="btn_copy_'+this.pref+'">Copy</button>');
         	
-            // get the refs
             var objectIdentity = self.getObjectIdentity(options.wsNameOrId, options.objNameOrId, options.objVer);
-            
-            var request1 = kb.ws.list_workspace_info({prem: 'w'});
-            var request2 = kb.ws.get_object_info_new({objects: [objectIdentity]});            
+
+        	$('#btn_copy_'+this.pref).click(function (e) {
+            	var ws_name = $("#select_ws_"+self.pref).val();
+            	var target_obj_name = $("#input_target_"+self.pref).val();
+            	if (target_obj_name.length == 0) {
+            		alert("Error: target object name is empty");
+            		return;
+            	}
+            	kb.ws.copy_object({from: objectIdentity, to: {ref: ws_name + "/" + target_obj_name}}, function(data) {
+            		alert("Object was successfuly copied");
+            	},
+            	function(err) {
+            		alert("Error: " + err.error.message);
+            	});
+        	});
+
+            var request1 = kb.ws.list_workspace_info({perm: 'w'});
+            var request2 = kb.ws.get_object_info_new({objects: [objectIdentity]});
             
             //kbws.list_referencing_objects([objectIdentity], function(data) {
             $.when(request1, request2).done(function(ws_list_data,obj_data) {
         		var objInfo = obj_data[0];
 				$('#td_src_'+self.pref).html(objInfo[6]+"/"+objInfo[1]);
+				$("#input_target_"+self.pref).val(objInfo[1]);
 				console.log(ws_list_data);
 				var td_ws = $('#td_ws_'+self.pref);
             	if (ws_list_data.length == 0) {
     				td_ws.html("No workspaces you can have write access");
             	} else {
-            		var drop_down_html = '<select id="select_ws_'+self.pref+'">';
+            		var drop_down_html = '<select id="select_ws_'+self.pref+'" style="width: 150px;">';
             		for (var i in ws_list_data) {
             			var ws_name = ws_list_data[i][1];
             			drop_down_html += '<option value="'+ws_name+'">'+ws_name+'</option>';
@@ -60,14 +74,14 @@
             	}
             }).fail(function(err){
                     self.$elem.empty();
-                    self.$elem.append("<br><b>There are no other data objects (you can access) that reference this object.</b>");
+                    self.$elem.append("Error: " + err.error.message);
             });
             
             return this;
         },
         
         getData: function() {
-            return {title:"Workspace object management",id:this.objName, workspace:this.wsName};
+            return {title:"Storing copy into workspace",id:this.objName, workspace:this.wsName};
         },
         
         uuid: function() {

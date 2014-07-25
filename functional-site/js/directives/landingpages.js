@@ -706,16 +706,14 @@ angular.module('lp-directives')
 .directive('sortableimport', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Import',
+            var p = $(ele).kbasePanel({title: 'Storing copy into workspace',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
             // hack until search links directly to WS objects
-            if (scope.ws === "CDS") {
-            	// TODO: it's unsupported yet
-            } else {
-                $(p.body()).KBaseWSButtons({objNameOrId: scope.id, wsNameOrId: scope.ws});
-            }
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3";}
+
+            $(p.body()).KBaseWSButtons({objNameOrId: scope.id, wsNameOrId: scope.ws});
         }
     };
 })
