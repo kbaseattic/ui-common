@@ -1,5 +1,5 @@
 <div class="row search-result-column-header-row">
-    <div class="btn-group search-result-column-header col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div class="btn-group search-result-column-header-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <div class="btn-group search-result-column-header search-result-select-all col-xs-1 col-sm-1 col-md-1 col-lg-1">
             <button type="button" class="btn btn-default search-result-column-header-toggle" ng-class="{'disabled': !options.userState.loggedIn}" ng-click="toggleAll(options.resultJSON.items)">
                 <div><strong>In Cart</strong></div>
@@ -14,19 +14,19 @@
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li>
-                    <a onclick="addSort(options.selectedCategory, 'object_id', 'asc')">
+                    <a ng-click="addSort(options.selectedCategory, 'object_id', 'asc')">
                         <span class="glyphicon glyphicon-sort-by-alphabet"/>
                         <span>Sort ascending</span>
                     </a>
                 </li>
                 <li>
-                    <a onclick="addSort(options.selectedCategory, 'object_id', 'desc')">
+                    <a ng-click="addSort(options.selectedCategory, 'object_id', 'desc')">
                         <span class="glyphicon glyphicon-sort-by-alphabet-alt"/>
                         <span>Sort descending</span>
                     </a>
                 </li>
                 <li>
-                    <a onclick="removeSort(options.selectedCategory, 'object_id', true)">
+                    <a ng-click="removeSort(options.selectedCategory, 'object_id', true)">
                         <span class="glyphicon glyphicon-remove"/>
                         <span>Clear this sort</span>
                     </a>
@@ -41,19 +41,19 @@
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li>
-                    <a onclick="addSort(options.selectedCategory, 'object_name', 'asc')">
+                    <a ng-click="addSort(options.selectedCategory, 'object_name', 'asc')">
                         <span class="glyphicon glyphicon-sort-by-alphabet"/>
                         <span>Sort ascending</span>
                     </a>
                 </li>
                 <li>
-                    <a onclick="addSort(options.selectedCategory, 'object_name', 'desc')">
+                    <a ng-click="addSort(options.selectedCategory, 'object_name', 'desc')">
                         <span class="glyphicon glyphicon-sort-by-alphabet-alt"/>
                         <span>Sort descending</span>
                     </a>
                 </li>
                 <li>
-                    <a onclick="removeSort(options.selectedCategory, 'object_name', true)">
+                    <a ng-click="removeSort(options.selectedCategory, 'object_name', true)">
                         <span class="glyphicon glyphicon-remove"/>
                         <span>Clear this sort</span>
                     </a>
@@ -68,19 +68,19 @@
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li>
-                    <a onclick="addSort(options.selectedCategory, 'object_type', 'asc')">
+                    <a ng-click="addSort(options.selectedCategory, 'object_type', 'asc')">
                         <span class="glyphicon glyphicon-sort-by-alphabetical"/>
                         <span>Sort ascending</span>
                     </a>
                 </li>
                 <li>
-                    <a onclick="addSort(options.selectedCategory, 'object_type', 'desc')">
+                    <a ng-click="addSort(options.selectedCategory, 'object_type', 'desc')">
                         <span class="glyphicon glyphicon-sort-by-alphabetical-alt"/>
                         <span>Sort descending</span>
                     </a>
                 </li>
                 <li>
-                    <a onclick="removeSort(options.selectedCategory, 'object_type', true)">
+                    <a ng-click="removeSort(options.selectedCategory, 'object_type', true)">
                         <span class="glyphicon glyphicon-remove"/>
                         <span>Clear this sort</span>
                     </a>

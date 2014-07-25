@@ -148,8 +148,9 @@ span .badge {
     max-height: 200px;
 }
 
-#workspace-area {
+.workspace-area {
     height: 400px;
+    bottom: 0px;
 }
 
 .search-leftarea-size {
@@ -223,6 +224,14 @@ span .badge {
     padding: 0px;
 }
 
+.search-transfer-workspace-divider {
+    padding: 0px;
+}
+
+.search-transfer-workspace-select {
+    margin-bottom: 10px;
+}
+
 .search-transfer-modal .modal-content {
     height: 650px;
 }
@@ -238,7 +247,7 @@ span .badge {
 }
 
 .search-transfer-row {
-    margin-top: 10px;
+    margin: 10px;
 }
 
 .search-stage-transfer-buttons {
@@ -805,10 +814,10 @@ ul.scroll-menu {
     overflow-scrolling: touch;
     top: 0 !important;
     left: 0 !important;
-    width: 100%;
+    width: 90%;
     height: auto;
-    max-height: 300px;
     margin: 0;
+    max-height: 400px;
     border-left: none;
     border-right: none;
     -webkit-border-radius: 0 !important;

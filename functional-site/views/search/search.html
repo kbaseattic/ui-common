@@ -13,30 +13,35 @@
                     <div class="tab-pane active">
                         <div class="row">
                             <div class="col-md-4 text-center search-transfer-workspace-area">
+                                <div class="row search-transfer-workspace-select">
+                                    <div ng-show="!options.userState.selectedWorkspace" class="text-center">
+                                        <h3>                                    
+                                            <span class="search-cart-label">Select a workspace to continue.</span>
+                                        </h3>
 
-                                <div ng-show="!options.userState.selectedWorkspace">
-                                    <p>Select a workspace to copy your data.</p>
-                                </div>
-                                <div ng-show="options.userState.selectedWorkspace" class="text-center">
-                                    <h3>                                    
-                                        <span class="search-cart-label">{{options.userState.selectedWorkspace}}</span>
-                                        <span class="glyphicon glyphicon-hdd"></span>
-<!--
-                                        <span class="badge search-cart-count">{{options.userState.workspace_carts[options.userState.selectedWorkspace].size | number}}</span>
--->
-                                    </h3>
+                                        <div class="text-center">
+                                            <div>
+                                                <button type="button" class="btn btn-primary disabled">Copy<span class="glyphicon glyphicon-transfer"><span></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div ng-show="options.userState.selectedWorkspace" class="text-center">
+                                        <h3>                                    
+                                            <span class="search-cart-label">{{options.userState.selectedWorkspace}}</span>
+                                            <span class="glyphicon glyphicon-hdd"></span>
+                                        </h3>
 
-                                    <div class="text-center">
-                                        <div>
-                                            <button type="button" class="btn btn-primary" ng-class="{disabled: !options.userState.selectedWorkspace || options.transferring}" ng-click="addAllObjects(options.active_transfer_type); emptyTransfers(); toggleAllDataCart(options.active_transfer_type);">Copy<span class="glyphicon glyphicon-transfer"><span></button>
-<!--
-                                            <button type="button" class="btn btn-danger" ng-class="{disabled: transferring}" ng-click="emptyWorkspaceCart()">Cancel<span class="glyphicon glyphicon-ban-circle"><span></button>
--->
+                                        <div class="text-center">
+                                            <div>
+                                                <button type="button" class="btn btn-primary" ng-class="{disabled: !options.userState.selectedWorkspace || options.transferring}" ng-click="addAllObjects(options.active_transfer_type); emptyTransfers(); toggleAllDataCart(options.active_transfer_type);">Copy<span class="glyphicon glyphicon-transfer"><span></button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div id="workspace-area" class="panel" ng-show="options.userState.workspaces">
+                                <hr class="search-transfer-workspace-divider"/>
+
+                                <div class="workspace-area" ng-show="options.userState.workspaces">
                                     <ul class='nav nav-pills nav-stacked scroll-menu'>
                                         <li ng-repeat="w in options.userState.workspaces">
                                             <a ng-click='selectWorkspace(w)'>
@@ -57,17 +62,7 @@
                                             {{options.userState.objectsTransferred}}/{{options.transferSize}}
                                         </div>
                                     </div>
-<!--
-                                    <div class="alert alert-success" ng-show="options.userState.objectsTransferred == options.userState.workspace_carts[options.userState.selectedWorkspace].size">
-                                        Transfer complete.
-                                        <button type="button" class="close" data-dismiss="alert">
-                                            <span aria-hidden="true">&times;</span>
-                                            <span class="sr-only">Close</span>
-                                        </button>
-                                    </div>
--->
                                 </div>
-                            
                             </div>
                             <div class="col-md-8 text-center">
                                 <div class="row">
