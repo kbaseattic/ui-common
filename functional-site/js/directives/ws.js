@@ -909,7 +909,7 @@ angular.module('ws-directives')
                                             +'</div>',
                                              bSortable: false, "sWidth": "1%"} 
                                           : { "sTitle": '', bVisible: false, "sWidth": "1%"}),
-                                { "sTitle": "Name", "sContentPadding": " More"}, //"sWidth": "10%"
+                                { "sTitle": "Name", "sContentPadding": "xxxxxxxMore"}, //"sWidth": "10%"
                                 { "sTitle": "Type"},
                                 { "sTitle": "Last Modified", "iDataSort": 5},
                                 { "sTitle": "Modified By", bVisible: true},
@@ -1023,7 +1023,7 @@ angular.module('ws-directives')
 
             scope.loadNarTable = function(tab) {
                 var table_id = "obj-table";                 
-
+                console.log('tab', tab)
                 var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
                                             +'</div>',
                                              bSortable: false, "sWidth": "1%"} 
@@ -1035,8 +1035,12 @@ angular.module('ws-directives')
                                 { "sTitle": "Timestamp", "bVisible": false, "sType": 'numeric'},
                                 { "sTitle": "Size", "bVisible": false, iDataSort: 7 },
                                 { "sTitle": "Byte Size", bVisible: false },
-                                { "sTitle": "Module", bVisible: false },
-                                { "sTitle": "Shared With" }];
+                                { "sTitle": "Module", bVisible: false }
+                                ];
+                if (tab != 'public'){
+                    columns.push({ "sTitle": "Shared With" })
+                }
+
 
                 var tableSettings = {
                     "sPaginationType": "bootstrap",
@@ -1091,7 +1095,12 @@ angular.module('ws-directives')
                     //scope.deleted_objs = deleted_objs;   
 
                     // if not cached. format and create object datatable
-                    var wsobjs = formatNarObjs(narratives, perms, isOwner);
+                    if (tab != 'public') {
+                        var wsobjs = formatNarObjs(narratives, isOwner, perms);
+                    } else {
+                        var wsobjs = formatNarObjs(narratives, isOwner);
+                    }
+
 
 
                     tableSettings.aaData = wsobjs;
@@ -1233,7 +1242,7 @@ angular.module('ws-directives')
                 table.fnSetColumnVis( i, bVis ? false : true );
             }
 
-            function formatNarObjs(objs, perms, isOwner) {
+            function formatNarObjs(objs, isOwner, perms) {
                 var wsobjs = [];
                 var kind_counts = {};
 
@@ -1270,8 +1279,10 @@ angular.module('ws-directives')
                                    timestamp,
                                    size,
                                    bytesize,
-                                   module,
-                                   kb.ui.formatUsers(perms[ws], isOwner)];
+                                   module];
+                    if (perms) {
+                        wsarray.push(kb.ui.formatUsers(perms[ws], isOwner))
+                    }
 
                     // determine if saved to favorites
                     var isFav = false;

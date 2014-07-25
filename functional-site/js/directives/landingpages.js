@@ -603,7 +603,7 @@ angular.module('lp-directives')
 .directive('jsonviewer', function() {
     return {
         link: function(scope, ele, attrs) {
-            $(ele).append('<b>Sorry!</b>  No landing page is availble for this object. \
+            $(ele).append('<b>Sorry!</b>  No landing page is available for this object. \
                             In the meantime, view the JSON below or consider contributing.')
 
             $(ele).loading()
