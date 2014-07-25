@@ -5,7 +5,9 @@
  *   This file has the left hand (wsselector)
  *   and right hand (objtable) directives of the workspace
  *   browser.
- *
+ *      
+ *  Todo: 
+ *      -- refactor all workspace related modals into a service/factory
 */
 
 
@@ -803,12 +805,12 @@ angular.module('ws-directives')
 
                             var p = kb.ws.set_permissions(params);
                             promises.push(p);
-                            rm_users.push(user)
+                            rm_users.push(user);
                         } 
                     }
 
                     return $.when.apply($, promises);
-                }                    
+                }
 
                 // dropdown for user permissions (used in getPermission Table) //fixme: cleanup
                 function permDropDown(perm) {
@@ -1069,11 +1071,8 @@ angular.module('ws-directives')
                 $(element).html('');
                 $(element).loading('<br>Loading<br>Narratives...', 'big');
 
-
                 var p = kb.getNarratives();
 
-
-                //$.when(p, p2, p3, p4).done(function(objs, deleted_objs, favs, obj_mapping){
                 $.when(p).done(function(nars){
                     $(element).rmLoading();   
                     $(element).append('<table id="'+table_id+'" \
@@ -1138,6 +1137,8 @@ angular.module('ws-directives')
                 })
             } // end scope.loadNarTable
 
+
+            // load the appropriate table
             if (scope.tab && scope.tab != 'featured') {
                 scope.loadNarTable(scope.tab);
             } else {
@@ -1181,7 +1182,6 @@ angular.module('ws-directives')
                     } else {
                         scope.loadObjTable();
                     }
-
                 } );
 
                 return settings_btn;
@@ -1284,10 +1284,9 @@ angular.module('ws-directives')
                     }
 
                     var url = '/narrative/ws.'+wsid+'.obj.'+id
-                    var new_id = '<a href="'+url+'" target="_blank" class="obj-id nar-id table-ellipsis" data-ws="'+ws+'"  data-wsid="'+wsid+'" data-id="'+id+'"'+
-                                    ' data-name="'+name+'" data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
-                                    'ui-sref="'+url+'" ><b><i>'+
-                                name+'</i></b></a> (<a class="show-versions">'+instance+'</a>)'+
+                    var new_id = '<a '+(USER_ID ? 'href="'+url+'"' : '')+' target="_blank" class="obj-id nar-id" data-ws="'+ws+'"  data-wsid="'+wsid+'" data-id="'+id+'"'+
+                                    ' data-name="'+name+'" data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" ><b><i>'+
+                                        name+'</i></b></a> (<a class="show-versions">'+instance+'</a>)'+
                                 (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
                                 '<a class="btn-show-info hide pull-right">More</a>';
 
@@ -1391,7 +1390,7 @@ angular.module('ws-directives')
                         var url = '/narrative/ws.'+wsid+'.obj.'+id;
                         var new_id = '<a class="obj-id nar-id" data-ws="'+ws+'" data-wsid="'+wsid+'" data-id="'+id+'" data-name="'+name+'" ' +
                                         'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
-                                        'data-sub="'+sub+'" href="'+url+'" target="_blank"><i><b>'+
+                                        'data-sub="'+sub+'" '+(USER_ID ? 'href="'+url+'"' : '')+' target="_blank"><i><b>'+
                                       name+'</b></i></a> (<a class="show-versions">'+instance+'</a>)'+
                                       (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
                                      '<a class="btn-show-info hide pull-right">More</a>';
@@ -1419,10 +1418,25 @@ angular.module('ws-directives')
                 $compile(table)(scope);
 
                 // ignore other events when clicking landingpage href
+                $('.obj-id').unbind('click');
                 $('.obj-id').click(function(e) {
                     e.stopPropagation();
                 })
 
+                // if not logged in, and a narrative is clickd, display login for narratives
+                $('.nar-id').unbind('click');
+                $('.nar-id').click(function(e) {
+                    e.stopPropagation();
+                    if (!USER_ID) {
+                        var mustLogin = $('<div class="must-login-modal">').kbasePrompt({
+                                    title : 'Please login',
+                                    body : 'You must login to view narratives at this time.',
+                                    modalClass : '', 
+                                    controls : ['closeButton']
+                        })
+                        mustLogin.openPrompt();
+                    }
+                })
 
                 // events for favorite (start) button
                 $('.btn-fav').hover(function() {
