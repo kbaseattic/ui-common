@@ -29,9 +29,9 @@
         			'<tr><td/><td><button id="btn_copy_'+this.pref+'">Copy</button></td></tr>' +
         			'</table>');*/
         	container.append('' +
-        			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Source object:</b></span> <span id="td_src_'+this.pref+'"/></p>'+
-        			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Target workspace:</b></span><span id="td_ws_'+this.pref+'"/></p>'+
-        			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Target object name:</b></span><input type="text" id="input_target_'+this.pref+'" style="width: 150px;"/></p>'+
+        			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Source Data:</b></span> <span id="td_src_'+this.pref+'"/></p>'+
+        			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Target Workspace:</b></span><span id="td_ws_'+this.pref+'"/></p>'+
+        			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Target Data Name:</b></span><input type="text" id="input_target_'+this.pref+'" style="width: 150px;"/></p>'+
         			'<button id="btn_copy_'+this.pref+'" class="btn btn-primary">Copy</button>');
         	
             var objectIdentity = self.getObjectIdentity(options.wsNameOrId, options.objNameOrId, options.objVer);
@@ -57,12 +57,12 @@
             //kbws.list_referencing_objects([objectIdentity], function(data) {
             $.when(request1, request2).done(function(ws_list_data,obj_data) {
         		var objInfo = obj_data[0];
-				$('#td_src_'+self.pref).html(objInfo[6]+"/"+objInfo[1]);
+				$('#td_src_'+self.pref).html(objInfo[7]+"/"+objInfo[1]);
 				$("#input_target_"+self.pref).val(objInfo[1]);
 				console.log(ws_list_data);
 				var td_ws = $('#td_ws_'+self.pref);
             	if (ws_list_data.length == 0) {
-    				td_ws.html("No workspaces you can have write access");
+    				td_ws.html("You do not have write access to any workspaces.");
             	} else {
             		var drop_down_html = '<select id="select_ws_'+self.pref+'" style="width: 150px;">';
             		for (var i in ws_list_data) {
@@ -81,7 +81,7 @@
         },
         
         getData: function() {
-            return {title:"Storing copy into workspace",id:this.objName, workspace:this.wsName};
+            return {title:"Copy To My Workspace",id:this.objName, workspace:this.wsName};
         },
         
         uuid: function() {
