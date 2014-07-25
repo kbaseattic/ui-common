@@ -6,11 +6,12 @@
         options: {
             title: "MAK Bicluster",
             isInCard: false,
+			loadingImage: "assets/img/ajax-loader.gif",
             width: 600,
             height: 700
        },
 	   
-	   newWorkspaceServiceUrl: "http://dev04.berkeley.kbase.us:7058",
+	   newWorkspaceServiceUrl: "https://kbase.us/services/ws",
 	   
         init: function(options) {
             this._super(options);
@@ -33,7 +34,9 @@
             var self = this;
             self.bicluster = this.options.bicluster[0];
             self.bicluster_type = this.options.bicluster[1].bicluster_type;
-            
+			var loader = $("<span style='display:none'><img src='"+self.options.loadingImage+"'/></span>").css({"width":"100%","margin":"0 auto"})            
+			self.$elem.append(loader)
+			loader.show()
             self.$elem.append($("<div />")
 						.append($("<table/>").addClass("kbgo-table")
 					    .append(self.bicluster.bicluster_id!=-1&&self.bicluster.bicluster_id!=0 ? $("<tr/>")
@@ -61,23 +64,29 @@
 					    .append(self.bicluster.miss_frxn!=-1&&self.bicluster.miss_frxn!=0 ? $("<tr/>").
 					    	append("<td>Fraction of missing data</td><td>" + self.bicluster.miss_frxn + "</td>") : '')
 			));
-
-			//Heatmap			
 			
-			this.workspaceClient.get_objects([{workspace: "MAKbiclusters", name: "bicluster.4431"}],
+			//Heatmap			
+					
+								
+			this.workspaceClient.get_objects([{workspace: self.options.ws, name: self.bicluster.bicluster_id}],
 				function(data){
+										
 					console.log(data)
 					self.$elem.append($("<div />")
 							.append("<h3>heatmap</h3>")
 							.append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
 
-					$("#toggle_heatmap").click(function() {
+					self.$elem.find("#toggle_heatmap").click(function() {
+						loader.show()
 						self.trigger("showHeatMap", {bicluster: data[0].data, event: event})
 						//$("#heatmap").toggle();
+						loader.hide()
 						
 					});
+					loader.hide()
 				}
 			)
+			
 
             //Genes
             self.$elem.append($("<div />")

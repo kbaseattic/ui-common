@@ -6,7 +6,7 @@
 
         options: {
             id: null,
-            workspaceID: null,
+            ws: null,
             loadingImage: "assets/img/ajax-loader.gif",
             title: "MAK Result Overview Tiles",
             isInCard: false,
@@ -15,7 +15,7 @@
         },
 
 //        workspaceURL: "https://kbase.us/services/workspace",
-        newWorkspaceServiceUrl: "http://dev04.berkeley.kbase.us:7058", 
+        newWorkspaceServiceUrl: "https://kbase.us/services/ws", 
 		
 		//"http://dev04.berkeley.kbase.us:7058", //"https://kbase.us/services/ws", //http://140.221.84.209:7058/",
 
@@ -38,15 +38,10 @@
         },
 
         render: function(options) {
-            this.showMessage("<img src='" + this.options.loadingImage + "'/>");
 
-            /**
-             * Fields to show:
-             * ID
-             * Timestamp
-             * Number of motifs
-             */
+            
             var self = this;
+			var loader = $("<span style='display:none'><img src='"+self.options.loadingImage+"'/></span>").css({"width":"100%","margin":"0 auto"})
 
 			self.tooltip = d3.select("body")
                              .append("div")
@@ -56,8 +51,11 @@
 			//"SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"
 			//this.options.ws
 			//this.options.id
-			
-            this.workspaceClient.get_objects([{workspace: "MAKbiclusters", name: "SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"}], 
+			console.log(this.options.ws)
+			console.log(this.options.id)
+			self.$elem.append(loader)
+			loader.show()
+            this.workspaceClient.get_objects([{workspace: this.options.ws, name: this.options.id}], 
 				
 				function(data){
 					
@@ -158,7 +156,7 @@
 						binHeight+=500
 						console.log(count)
 					}
-					
+					loader.hide()
 					_.each(blocks, function(o,i){
 						var block = blocks[i];
 						if (block.fit) {
@@ -197,7 +195,7 @@
 													)
 													.on("click", 
 														function(event) {						
-															self.trigger("showMAKBicluster", { bicluster: [biclusters[block.index],bicluster_info], title: biclusters[block.index].bicluster_id, event: event });
+															self.trigger("showMAKBicluster", { bicluster: [biclusters[block.index],bicluster_info], ws: self.options.ws, title: biclusters[block.index].bicluster_id, event: event });
 													});
 														
 									  
@@ -229,7 +227,7 @@
             return {
                 type: "MAKResult Tiles",
                 id: this.options.id,
-                workspaceID: this.options.workspaceID,
+                ws: this.options.ws,
                 title: "MAK Result Overview Tiles"
             };
         },

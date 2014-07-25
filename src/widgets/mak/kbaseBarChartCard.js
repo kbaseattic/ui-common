@@ -43,85 +43,85 @@
 			var chartWidth = self.options.width-50
 					
 			var $sideChart = $("<div>").css({"width":chartWidth,"top":50,"position":"absolute"})
-			var flat = []				
-			for (termType in terms) {
-				var termData = []
-				
+			var flat = []			
+			var termData = []						
+			var termColors = []
+			for (termType in terms) {				
+				var termColor = '#'+Math.floor(Math.random()*16777215).toString(16);
+				while (termColors.indexOf(termColor)!=-1) '#'+Math.floor(Math.random()*16777215).toString(16);
+				termColors.push(termColor)
 				for (term in terms[termType]) {
-					termData.push({"term":term,"tiles":terms[termType][term]})
+					termData.push({"term":term,"tiles":terms[termType][term],"color":termColor,"type":termType})
 					flat.push(terms[termType][term].length)
 				}
+				
 			}
+			console.log(termData)
 			var x = d3.scale.linear().domain([0,d3.max(flat)]).range([0,chartWidth])
-			console.log(flat)
 			
-			for (termType in terms) {
-				var $barChartDiv = $("<div id='barchart'>"+termType+"</div>").css({"float":"right"})
-				var $barChart = d3.select($barChartDiv.get(0))
-					.selectAll("div")
-					.data(termData)
-						.enter()
-					.append("div")
-						.style({
-							"font": "10px sans-serif",
-							"background-color": "steelblue",
-							"text-align": "right",
-							"padding": "3px",
-							"margin": "1px",
-							"color": "white"
-						})
-						.style("width",function(d) {return x(d.tiles.length) + "px"})
-						.text(function (d) {return d.term})
-						.on("mouseover",							
-							function(d) {                            
-								if (!$(this).hasClass('selected')) {
-									for (tile in d.tiles) {
-										d3.select("#MAK_tile_"+tile).style("background", "#66FFFF")
-									}
-									d3.select(this).style("background-color", "#66FFFF"); 
-								}							
-								self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
-								return self.tooltip.style("visibility", "visible");
-							}
-						)						 
-                        .on("mouseout", 
-                            function(d) { 
-								if (!$(this).hasClass('selected')) {
-									for (tile in d.tiles) {
-										d3.select("#MAK_tile_"+tile).style("background", "steelblue")
-									}
-									d3.select(this).style("background-color", "steelblue"); 									
+			var $barChartDiv = $("<div id='barchart'>").css({"float":"right"})
+			var $barChart = d3.select($barChartDiv.get(0))
+				.selectAll("div")
+				.data(termData)
+					.enter()
+				.append("div")
+					.style({
+						"font": "10px sans-serif",						
+						"text-align": "right",
+						"padding": "3px",
+						"margin": "1px",
+						"color": "white"
+					})
+					.style("background-color", function(d) {return d.color})
+					.style("width",function(d) {return x(d.tiles.length) + "px"})
+					.attr("id",function(d) {return d.term})
+					.text(function (d) {return d.type+": "+d.term})
+					.on("mouseover",							
+						function(d) {                            
+							if (!$(this).hasClass('selected')) {
+								for (tile in d.tiles) {
+									d3.select("#MAK_tile_"+tile).style("background", "#66FFFF")
 								}
-								return self.tooltip.style("visibility", "hidden"); 
-                            }
-                        )
-                        .on("mousemove", 
-                            function() { 
-                                return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
-                            }
-                        )
-						// .on("click",
-							// function(d) {
-								// if ($(this).hasClass('selected')) {
-									// for (tile in d.tiles) {
-										// $("#MAK_tile_"+tile).removeClass('selected')
-									// }
-									// $(this).removeClass('selected')
+								d3.select(this).style("background-color", "#66FFFF"); 
+							}							
+							self.tooltip = self.tooltip.text("type: "+d.type+", term: "+d.term+", hits: "+d.tiles.length);
+							return self.tooltip.style("visibility", "visible");
+						}
+					)						 
+                       .on("mouseout", 
+                           function(d) { 
+							if (!$(this).hasClass('selected')) {
+								for (tile in d.tiles) {
+									d3.select("#MAK_tile_"+tile).style("background", "steelblue")
+								}
+								d3.select(this).style("background-color", function(d) {return d.color}); 									
+							}
+							return self.tooltip.style("visibility", "hidden"); 
+                           }
+                       )
+                       .on("mousemove", 
+                           function() { 
+                               return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+                           }
+                       )
+					// .on("click",
+						// function(d) {
+							// if ($(this).hasClass('selected')) {
+								// for (tile in d.tiles) {
+									// $("#MAK_tile_"+tile).removeClass('selected')
 								// }
-								// else {
-									// for (tile in d.tiles) {
-										// $("#MAK_tile_"+tile).addClass('selected')
-									// }
-									// $(this).addClass('selected')
-								// }
+								// $(this).removeClass('selected')
 							// }
-						// )
+							// else {
+								// for (tile in d.tiles) {
+									// $("#MAK_tile_"+tile).addClass('selected')
+								// }
+								// $(this).addClass('selected')
+							// }
+						// }
+					// )
 				
-				$sideChart.append($barChartDiv)
-				
-			}
-				
-			self.$elem.append($sideChart)
+			self.$elem.append($barChartDiv)
 			
 			return this;
 		},

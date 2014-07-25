@@ -6,7 +6,7 @@
 
         options: {
             id: null,
-            workspaceID: null,
+            ws: null,
             loadingImage: "../../widgets/images/ajax-loader.gif",
             title: "MAK Result Overview",
             isInCard: false,
@@ -15,7 +15,7 @@
         },
 
 //        workspaceURL: "https://kbase.us/services/workspace",
-        newWorkspaceServiceUrl: "http://dev04.berkeley.kbase.us:7058", 
+        newWorkspaceServiceUrl: "https://kbase.us/services/ws", 
 		
 		//"http://dev04.berkeley.kbase.us:7058", //"https://kbase.us/services/ws", //http://140.221.84.209:7058/",
 
@@ -50,10 +50,10 @@
 
 			//"MAKbiclusters"
 			//"SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"
-			console.log(this.options.workspaceID)
+			// console.log(this.options.ws)
 			// console.log(this.options.id)
 			
-            this.workspaceClient.get_objects([{workspace: "MAKbiclusters", name: "SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"}], 
+            this.workspaceClient.get_objects([{workspace: this.options.ws, name: this.options.id}], 
 				
 				function(data){
 					self.collection = data[0];
@@ -119,11 +119,10 @@
 
 
         getData: function() {
-			console.log(this.options.workspaceID)
             return {
                 type: "MAKResult",
                 id: this.options.id,
-                workspaceID: this.options.workspaceID,
+                ws: this.options.ws,
                 title: "MAK Result Overview"
             };
         },
