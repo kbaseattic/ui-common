@@ -706,7 +706,7 @@ angular.module('lp-directives')
 .directive('sortableimport', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Storing copy into workspace',
+            var p = $(ele).kbasePanel({title: 'Copy To My Workspace',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -813,7 +813,7 @@ angular.module('lp-directives')
                     
                     var $buildNarPanel = $("<div>").append($("<button>")
                            .addClass("btn btn-primary")
-                           .append("Build Species Tree")
+                           .append("Launch Species Tree Building Narrative")
                            .attr("type", "button")
                            .on("click", 
                                function(event) {
@@ -822,7 +822,7 @@ angular.module('lp-directives')
                            );
                     
                     $(p.body())
-                        .append('<b>There are no species trees created for this genome, but you can use the Narrative to build a new species tree with related genomes.</b>');
+                        .append('<b>There are no species trees created for this genome, but you can use the Narrative to build a new species tree of closely related genomes.</b>');
                         
                     $(p.body()).append("<br><br>");
                     $(p.body()).append($buildNarPanel);
