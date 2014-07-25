@@ -2023,6 +2023,7 @@
                 {
                     network: data.network,
                     netname: data.netname,
+		    ws: data.ws
                 },
                 {
                     my: "left top",
