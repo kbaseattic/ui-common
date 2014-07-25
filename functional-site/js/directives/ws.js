@@ -1430,7 +1430,7 @@ angular.module('ws-directives')
                     if (!USER_ID) {
                         var mustLogin = $('<div class="must-login-modal">').kbasePrompt({
                                     title : 'Please login',
-                                    body : 'You must login to view narratives at this time.',
+                                    body : '<b>You must login to view narratives at this time.</b>',
                                     modalClass : '', 
                                     controls : ['closeButton']
                         })
