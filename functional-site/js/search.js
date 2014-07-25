@@ -335,7 +335,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         queryOptions["itemsPerPage"] = 0;
         queryOptions["category"] = category;
 
-        console.log("getCount : " + JSON.stringify(queryOptions));
+        //console.log("getCount : " + JSON.stringify(queryOptions));
 
         if (!$scope.options.userState.hasOwnProperty("ajax_requests") || !$scope.options.userState.ajax_requests) {
             $scope.options.userState.ajax_requests = [];

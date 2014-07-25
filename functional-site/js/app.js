@@ -459,12 +459,14 @@ var app = angular.module('landing-pages',
     		templateUrl: 'views/objects/tree.html',
     		controller: 'TreeDetail'});
 
-    //$urlRouterProvider.when('', '/login/');
-    $urlRouterProvider.when('', '/login/');
+    $urlRouterProvider.when('', '/login/')
+                      .when('/', '/login/')
+                      .when('#', '/login/');
 
-    $stateProvider
-        .state('otherwise', 
-            {url: '*path', 
+    $urlRouterProvider.otherwise('/404/');
+    
+    $stateProvider.state("404", 
+            {url: '/404/', 
              templateUrl : 'views/404.html'});
 
 }]);
@@ -537,6 +539,21 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
                  <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li> \
               </ul>';
     $('.help-dropdown').html(HELP_DROPDOWN);
+
+    //  Things that need to happen when a view changes.
+    $rootScope.$on('$locationChangeStart', function(event) {
+        var absUrl = $location.absUrl();
+        var begin = absUrl.indexOf('/functional-site/');
+        var offset = '/functional-site/'.length;
+
+        //console.log([absUrl, begin, offset, absUrl.length]);
+    
+        if (absUrl.indexOf('/functional-site/#/') < 0 && begin > 0 && absUrl.length > begin + offset) {
+            event.preventDefault();
+            $location.path('/404/');   
+            $state.go('404');
+        }    
+    });
 
     //  Things that need to happen when a view changes.
     $rootScope.$on('$stateChangeSuccess', function() {
