@@ -130,8 +130,28 @@
             		self.treeWsRef = info[6] + "/" + info[0] + "/" + info[4];
             	}
                 var tree = objArr[0].data;
+                
+                var refToInfoMap = {};
+                var objIdentityList = [];
+                for (var key in tree.ws_refs) {
+                	objIdentityList.push({ref: tree.ws_refs[key]['g'][0]});
+                }
+                self.wsClient.get_object_info_new({objects: objIdentityList}, function(data) {
+                	for (var i in data) {
+                		var objInfo = data[i];
+                		refToInfoMap[objIdentityList[i].ref] = objInfo;
+                	}
+                }, function(data) {
+            		console.log("Error getting genomes info: " + data.error.message);
+            	});
+                
                 new EasyTree(self.canvasId, tree.tree, tree.default_node_labels, function(node) {
-                	alert("Node id: " + node.id);
+                	var ref = tree.ws_refs[node.id]['g'][0];
+                	var objInfo = refToInfoMap[ref];
+                	if (objInfo) {
+                		var url = "/functional-site/#/genomes/" + objInfo[7] + "/" + objInfo[1];
+                        window.open(url, '_blank');
+                	}
                 }, function(node) {
                 	if (node.id && node.id.indexOf("user") == 0)
                 		return "#0000ff";
