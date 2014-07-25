@@ -77,6 +77,12 @@ span .badge {
     padding-left: 160px;
 }
 
+
+.search-left-nav {
+    padding: 0px;
+}
+
+
 /*** Login ***/
 
 .login-text {
@@ -143,8 +149,7 @@ span .badge {
 }
 
 #workspace-area {
-    height: 300px;
-    z-index: 1001 !important;
+    height: 400px;
 }
 
 .search-leftarea-size {
@@ -167,6 +172,11 @@ span .badge {
 
 /*** Categories ***/
 
+.search-categories {
+    padding: 0px;
+    margin-left: 0px;
+}
+
 .search-categories-title h3 {
     font-size: medium;
     color: gray;
@@ -178,6 +188,7 @@ span .badge {
 
 .search-categories-row {
     padding: 0px;
+    word-wrap: break-word;
 }
 
 /*** Filters ***/
@@ -206,6 +217,10 @@ span .badge {
 
 .search-cart-label {
     margin-right: 10px;
+}
+
+.search-transfer-workspace-area {
+    padding: 0px;
 }
 
 .search-transfer-modal .modal-content {
@@ -527,6 +542,14 @@ table.search-transfer-table {
 
 .gwas_expanded_header {
     width: 120px;
+}
+
+.trait_name {
+    width: 120px;
+}
+
+.trait_ontology_id {
+    width: 80px;
 }
 
 .genome_id {
