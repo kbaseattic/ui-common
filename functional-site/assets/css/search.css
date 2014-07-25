@@ -54,6 +54,18 @@ span .badge {
     color: #fff;
 }
 
+.btn-filters {
+    color: #c09853;
+    background-color: #fcf8e3;
+}
+
+.btn-filters:focus,
+.btn-filters:active,
+.btn-filters.active {
+    color: #c09853;
+    background-color: #f6eaac;
+}
+
 .btn-search {
     background-color: #000;
     padding-bottom: 5px;
@@ -722,6 +734,14 @@ table.search-transfer-table {
 .num_contigs_cell {
     width: 60px;
     margin-right: 5px;
+}
+
+
+.facet-scroll {
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    display: block;
 }
 
 

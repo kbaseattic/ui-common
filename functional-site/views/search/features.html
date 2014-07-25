@@ -9,19 +9,19 @@
         <div class="btn-group search-result-column-header feature_id col-xs-3 col-sm-3 col-md-2 col-lg-2">
             <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
                 <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['feature_id']}"><strong>Feature Id</strong></div>
-                <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['feature_id'], 'glyphicon-sort-by-order': options.active_sorts[options.selectedCategory].sorts['feature_id'].direction == 'asc', 'glyphicon-sort-by-order-alt': options.active_sorts[options.selectedCategory].sorts['feature_id'].direction == 'desc'}"></span>                
+                <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['feature_id'], 'glyphicon-sort-by-alphabet': options.active_sorts[options.selectedCategory].sorts['feature_id'].direction == 'asc', 'glyphicon-sort-by-alphabet-alt': options.active_sorts[options.selectedCategory].sorts['feature_id'].direction == 'desc'}"></span>                
                 <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['feature_id'].order}}</span>
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li>
                     <a ng-click="addSort(options.selectedCategory, 'feature_id', 'asc')">
-                        <span class="glyphicon glyphicon-sort-by-alphabetical"/>
+                        <span class="glyphicon glyphicon-sort-by-alphabet"/>
                         <span>Sort ascending</span>
                     </a>
                 </li>
                 <li>
                     <a ng-click="addSort(options.selectedCategory, 'feature_id', 'desc')">
-                        <span class="glyphicon glyphicon-sort-by-order-alphabetical-alt"/>
+                        <span class="glyphicon glyphicon-sort-by-alphabet-alt"/>
                         <span>Sort descending</span>
                     </a>
                 </li>
@@ -36,19 +36,19 @@
         <div class="btn-group search-result-column-header feature_source_id col-xs-3 col-sm-3 col-md-2 col-lg-2">
             <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
                 <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['feature_source_id']}"><strong>Feature Source Id</strong></div>
-                <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['feature_source_id'], 'glyphicon-sort-by-order': options.active_sorts[options.selectedCategory].sorts['feature_source_id'].direction == 'asc', 'glyphicon-sort-by-order-alt': options.active_sorts[options.selectedCategory].sorts['feature_source_id'].direction == 'desc'}"></span>                
+                <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['feature_source_id'], 'glyphicon-sort-by-alphabet': options.active_sorts[options.selectedCategory].sorts['feature_source_id'].direction == 'asc', 'glyphicon-sort-by-alphabet-alt': options.active_sorts[options.selectedCategory].sorts['feature_source_id'].direction == 'desc'}"></span>                
                 <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['feature_source_id'].order}}</span>
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li>
                     <a ng-click="addSort(options.selectedCategory, 'feature_source_id', 'asc')">
-                        <span class="glyphicon glyphicon-sort-by-alphabetical"/>
+                        <span class="glyphicon glyphicon-sort-by-alphabet"/>
                         <span>Sort ascending</span>
                     </a>
                 </li>
                 <li>
                     <a ng-click="addSort(options.selectedCategory, 'feature_source_id', 'desc')">
-                        <span class="glyphicon glyphicon-sort-by-order-alphabetical-alt"/>
+                        <span class="glyphicon glyphicon-sort-by-alphabet-alt"/>
                         <span>Sort descending</span>
                     </a>
                 </li>
@@ -70,13 +70,13 @@
                 <li>
                     <a ng-click="addSort(options.selectedCategory, 'scientific_name', 'asc')">
                         <span class="glyphicon glyphicon-sort-by-alphabet"/>
-                        <span>Sort alphabetical</span>
+                        <span>Sort alphabet</span>
                     </a>
                 </li>
                 <li>
                     <a ng-click="addSort(options.selectedCategory, 'scientific_name', 'desc')">
                         <span class="glyphicon glyphicon-sort-by-alphabet-alt"/>
-                        <span>Sort reverse alphabetical</span>
+                        <span>Sort reverse alphabet</span>
                     </a>
                 </li>
                 <li>

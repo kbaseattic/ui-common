@@ -27,19 +27,20 @@
                                     </div>
                                     <div ng-show="options.userState.selectedWorkspace" class="text-center">
                                         <h3>                                    
-                                            <span class="search-cart-label">{{options.userState.selectedWorkspace}}</span>
                                             <span class="glyphicon glyphicon-hdd"></span>
+                                            <span class="search-cart-label">{{options.userState.selectedWorkspace}}</span>
                                         </h3>
 
                                         <div class="text-center">
-                                            <div>
-                                                <button type="button" class="btn btn-primary" ng-class="{disabled: !options.userState.selectedWorkspace || options.transferring}" ng-click="addAllObjects(options.active_transfer_type); emptyTransfers(); toggleAllDataCart(options.active_transfer_type);">Copy<span class="glyphicon glyphicon-transfer"><span></button>
+                                            <div ng-show="options.userState.workspace_carts[options.userState.selectedWorkspace].size > 0">
+                                                <button type="button" class="btn btn-primary" ng-class="{disabled: !options.userState.selectedWorkspace || options.transferring}" ng-click="addAllObjects(options.active_transfer_type); emptyTransfers(); toggleAllDataCart();">Copy<span class="glyphicon glyphicon-transfer"><span></button>
+                                            </div>
+                                            <div ng-show="options.userState.workspace_carts[options.userState.selectedWorkspace].size == 0">
+                                                <p>Select data from your cart to continue.</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <hr class="search-transfer-workspace-divider"/>
 
                                 <div class="workspace-area" ng-show="options.userState.workspaces">
                                     <ul class='nav nav-pills nav-stacked scroll-menu'>
@@ -98,7 +99,7 @@
                                                 </thead>
                                                 <tbody>
                                                     <tr ng-repeat="s in options.userState.data_cart.types['genome'].markers">
-                                                        <td><input type="checkbox" ng-show="options.userState.selectedWorkspace && !options.transferring" ng-model="options.userState.data_cart.data[s.row_id].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                        <td><input type="checkbox" ng-show="options.userState.selectedWorkspace && !options.transferring" ng-model="options.userState.data_cart.data[s.row_id].cart_selected" ng-click="toggleInCart(s.row_id)"></input></td>
                                                         <td class="text-left">{{s.genome_id}}</td>
                                                         <td class="text-left">{{s.scientific_name}}</td>
                                                         <td class="text-left">{{s.domain}}</td>
@@ -280,16 +281,20 @@
                 </div>
                 <div class="row">
                     <div class="row search-space-top" ng-repeat="facet in options.facets">
-                        <div class="col-md-offset-1 col-md-11">
-                            <strong>{{facet.key}}</strong>
+                        <div id="{{facet.key}}" class="col-md-offset-1 col-md-11">
+                            <button class="btn btn-filters col-md-11" data-toggle="collapse" data-target="#all_{{facet.key}}">
+                                <span><strong>{{facet.key}}</strong></span>
+                            </button>
                         </div>
-                        <div class="col-md-12" ng-repeat="facet_option in facet.value">
-                            <div ng-show="facet_option.value > 0" class="col-md-12">
-                                <a href="" ng-click="toggleFacet(facet.key, facet_option.key, options.active_facets[options.selectedCategory][facet.key][facet_option.key])" class="search-checkbox-link">
-                                    <span class="glyphicon" ng-class="{'glyphicon-check': options.active_facets[options.selectedCategory][facet.key][facet_option.key],'glyphicon-unchecked': !options.active_facets[options.selectedCategory][facet.key][facet_option.key]}"/>                    
-                                </a>
-                                <span class="search-space-left">{{facet_option.key}}</span>
-                                <span class="search-space-left">({{facet_option.value | number}})</span>
+                        <div id="all_{{facet.key}}" class="collapse" data-parent="#{{facet.key}}">
+                            <div class="col-md-offset-1 col-md-11" ng-repeat="facet_option in facet.value">
+                                <div ng-show="facet_option.value > 0" class="col-md-12">
+                                    <a href="" ng-click="toggleFacet(facet.key, facet_option.key, options.active_facets[options.selectedCategory][facet.key][facet_option.key])" class="search-checkbox-link">
+                                        <span class="glyphicon" ng-class="{'glyphicon-check': options.active_facets[options.selectedCategory][facet.key][facet_option.key],'glyphicon-unchecked': !options.active_facets[options.selectedCategory][facet.key][facet_option.key]}"/>                    
+                                    </a>
+                                    <span class="search-space-left">{{facet_option.key}}</span>
+                                    <span class="search-space-left">({{facet_option.value | number}})</span>
+                                </div>
                             </div>
                         </div>
                     </div>

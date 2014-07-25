@@ -1165,7 +1165,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
 
     // grab all selected search results and copy those objects to the user's selected workspace
-    $scope.addAllObjects = function(type) {
+    $scope.addAllObjects = function() {
         if (!$scope.options.userState.selectedWorkspace) {
             console.log("select a workspace first");
             return;
@@ -1178,16 +1178,11 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         var ws_requests = [];
         var batches = 1;
         var total_requests = 0;
+        var types = {};
         
         $scope.options.transferSize = $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].size;
         $scope.options.transferring = true;
         
-        console.log("addAllObjects " + type);
-        
-        if (type) {
-            $scope.options.userState.data_cart.types[type].all = false;
-        }
-
         for(var n in $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data) {        
             if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data.hasOwnProperty(n)) {
                 // if we have maxed out the number of requests, join the tasks and let them finish
@@ -1214,14 +1209,29 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             
                 if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_type"].indexOf("KBaseSearch.Genome") > -1) {
                     ws_requests.push($scope.copyGenome(n).then(function () {;}));
+                    if (!types.hasOwnProperty('genome')) {
+                        types['genome'] = true;
+                    }
                 }                    
                 else if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_type"].indexOf("KBaseSearch.Feature") > -1) {                
                     ws_requests.push($scope.copyFeature(n).then(function () {;}));
+                    if (!types.hasOwnProperty('genome')) {
+                        types['feature'] = true;
+                    }
                 }
                 else if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_type"].indexOf("KBaseCommunities.Metagenome") > -1) {
                     ws_requests.push($scope.copyMetagenome(n).then(function () {;}));
+                    if (!types.hasOwnProperty('genome')) {
+                        types['metagenome'] = true;
+                    }
                 }
                 else {
+                    if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_type"].indexOf("KBaseGwas") > -1) {
+                        if (!types.hasOwnProperty('gwas')) {
+                            types['gwas'] = true;
+                        }                    
+                    }
+                
                     //generic solution for types
                     if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n].hasOwnProperty("object_name") === true) {
                         $scope.copyTypedObject($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_name"], 
@@ -1253,6 +1263,12 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 } // end type if else
             } //end if
         } // for loop
+        
+        for (var t in types) {
+            if (types.hasOwnProperty(t)) {
+                $scope.options.userState.data_cart.types[t].all = false;
+            }
+        }
         
         
         $scope.options.transferring = false;
@@ -1468,7 +1484,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                         $scope.options.userState.data_cart.data[d].cart_selected = false;
                     }
                 }                    
-                $scope.removeSelectedFromWorkspaceCart();
+                $scope.emptyWorkspaceCart();
             }    
         }
         else if ($scope.options.userState.data_cart.types.hasOwnProperty(type)) {
@@ -1486,7 +1502,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                         $scope.options.userState.data_cart.data[d].cart_selected = false;
                     }
                 }                    
-                $scope.removeSelectedFromWorkspaceCart();
+                $scope.emptyWorkspaceCart();
             }    
         }
         else {
@@ -1496,20 +1512,19 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
 
     $scope.toggleInCart = function(id) {
-        console.log($scope.options.userState.data_cart);
-    
+        /*
         if (!$scope.options.userState.data_cart.data.hasOwnProperty(id)) {
-            console.log(id);
             $scope.options.userState.data_cart.data[id].cart_selected = true;            
-            $scope.addSelectedToWorkspaceCart();
+            $scope.addToWorkspaceCart(id);
         }
-        else if($scope.options.userState.data_cart.data[id].cart_selected === false) {
+        */
+        if($scope.options.userState.data_cart.data[id].cart_selected === false) {
             $scope.options.userState.data_cart.data[id].cart_selected = true;
-            $scope.addSelectedToWorkspaceCart();
+            $scope.addToWorkspaceCart(id);
         }
         else {
             $scope.options.userState.data_cart.data[id].cart_selected = false;
-            $scope.removeSelectedFromWorkspaceCart();
+            $scope.removeFromWorkspaceCart(id);
         }            
     };
 
@@ -1557,6 +1572,15 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         console.log($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace]);
     };
 
+
+    $scope.addToWorkspaceCart = function(id) {
+        if ($scope.options.userState.data_cart.data.hasOwnProperty(id) && $scope.options.userState.data_cart.data[id].cart_selected && !$scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data.hasOwnProperty(id)) {
+            $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[id] = {};
+            angular.copy($scope.options.userState.data_cart.data[id], $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[id]);
+            $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[id].cart_selected = false;
+            $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].size += 1;                
+        }
+    };
 
     $scope.removeFromWorkspaceCart = function(id) {
         delete $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[id];
