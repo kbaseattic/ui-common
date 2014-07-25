@@ -1131,15 +1131,6 @@ angular.module('ws-directives')
                     // resinstantiate all events.
                     events();
 
-                    // event for settings (manage modal) button
-                    // this is special to the narrative pages
-                    $('.btn-nar-ws-settings').unbind('click')
-                    $('.btn-nar-ws-settings').click(function(e) {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        var name = $(this).parent('td').find('a').data('ws');
-                        manageModal(name);
-                    })
 
                 }).fail(function(e){
                     $(element).html('<div class="alert alert-danger">'+e.error.message+'</div>');
@@ -1559,6 +1550,16 @@ angular.module('ws-directives')
 
                 })
 
+
+                // event for settings (manage modal) button
+                // this is special to the narrative pages
+                $('.btn-nar-ws-settings').unbind('click')
+                $('.btn-nar-ws-settings').click(function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    var name = $(this).parent('td').find('a').data('ws');
+                    manageModal(name);
+                })
 
                 // help tooltips
                 $('.show-versions').tooltip({title: 'Show history', placement: 'bottom', delay: {show: 700}});
