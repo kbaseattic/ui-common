@@ -560,7 +560,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         // Otherwise, just login in place and reload.
         // We need to reload to make sure the USER_ID and USER_TOKEN get set properly.
         if ($location.path() === '/login/') {
-            if (c.kbase_sessionid) {
+            var kbase_sessionid = $("#signin-button").kbaseLogin('session').kbase_sessionid;
+            if (kbase_sessionid) { 
                 // USER_ID = $("#signin-button").kbaseLogin('session').user_id;
                 // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
                 $location.path('/narratives/featured');
