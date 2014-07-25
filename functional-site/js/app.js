@@ -318,6 +318,7 @@ var app = angular.module('landing-pages',
              controller: 'WBLanding'});
 
 
+/*
     $stateProvider
         .state('genes',
             {url: '/genes/CDS/:fid',
@@ -329,6 +330,7 @@ var app = angular.module('landing-pages',
             {url: '/genes/CDS/:gid/:fid',
              templateUrl: 'views/objects/gene.html',
              controller: 'GeneDetail'});
+*/
 
     $stateProvider
         .state('genesbyws',
@@ -342,6 +344,19 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/objects/gene.html',
              controller: 'GeneDetail'});
 
+    $stateProvider
+        .state('kbgenesbyws',
+            {url: '/genes2/:ws/:fid',
+             templateUrl: 'views/genomes/sortable-rows-landing-page-genes.html',
+             controller: 'WBGeneLanding'})
+        .state('kbgenesbywsgenome',
+            {url: '/genes2/:ws/:gid/:fid',
+             templateUrl: 'views/genomes/sortable-rows-landing-page-genes.html',
+             controller: 'WBGeneLanding'})
+             
+             
+             
+             
     $stateProvider
         .state('meme',
             {url:'/meme',

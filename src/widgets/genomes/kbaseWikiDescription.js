@@ -13,7 +13,7 @@
             workspaceID: null,
             kbCache: null,
             title: "Description",
-            maxNumChars: 1000,
+            maxNumChars: 900,
             width: 500,
             loadingImage: null
         },
@@ -292,9 +292,9 @@
 
         notFoundHeader: function(strainName, term, redirectFrom) {
             var underscoredName = strainName.replace(/\s+/g, "_");
-            var str = "<p><b>Note: \"<i>" +
+            var str = "<p><b>\"<i>" +
                       strainName + 
-                      "</i>\" not found. You can add a description on <a href='http://en.wikipedia.org/wiki/" + 
+                      "</i>\" not found. Add a description on <a href='http://en.wikipedia.org/wiki/" + 
                       underscoredName + 
                       "' target='_new'>Wikipedia</a>.</b></p>";
             if (term) {
