@@ -938,7 +938,7 @@
                 },
                 {
                     my: "left top",
-                    at: "left+200 bottom",
+                    at: "left+350 bottom",
                     of: "#app"
                 }
             );
@@ -952,7 +952,7 @@
                 },
                 {
                     my: "left top",
-                    at: "left bottom+300",
+                    at: "left bottom+450",
                     of: "#app"
                 }
             );
