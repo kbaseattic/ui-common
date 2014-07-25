@@ -233,6 +233,14 @@
 
                 var $ld = this.data('loginDialog');
 
+                /* this is a hack fix to a problem found in kbasePromptNew.js, where the 
+                dialog box was being destroyed after the 2 time it was opened and could no
+                longer be opened ... please make a better fix to this problem. SP 07/25/2014 */
+                if (!$ld.dialogModal().data("user_id")) {
+                    this._createLoginDialog();
+                    $ld = this.data('loginDialog');
+                }
+
                 $('form', $ld.dialogModal()).get(0).reset();
 
 
@@ -244,6 +252,7 @@
                 $ld.dialogModal().trigger('clearMessages');
 
         		this.data('loginDialog').openPrompt();
+
 
         	}
         },
