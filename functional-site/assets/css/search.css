@@ -125,6 +125,11 @@ span .badge {
 
 /*** Workspace ***/
 
+.search-workspace-menu {
+    left: -125px;
+    width: 400px;
+}
+
 .workspace-title h3 {
     font-size: 18px;
     color: gray;
@@ -138,6 +143,7 @@ span .badge {
 
 #workspace-area {
     height: 300px;
+    z-index: 1001 !important;
 }
 
 .search-leftarea-size {
@@ -185,32 +191,58 @@ span .badge {
 
 
 /*** Options ***/
-      
-.search-transfer-options-panel-anchor {
-/*
-    position: absolute;
-    left: 80px;
-    top: 310px;
-*/
-    width: 0;
-    height: 0;
-    border-left: 16px solid transparent;
-    border-right: 16px solid transparent;
-    border-bottom: 16px solid white;  
+
+.modal.search-transfer-modal .modal-dialog {
+    width: 100%;
+    height: 90%;
+    padding: 0;
 }
 
 
-.search-transfer-options-panel {
-/*
-    z-index: 1001!important;
-    position: absolute;
-    left: 80px;
-    top: 320px;
-*/
-    min-width: 400px;
-    max-width: 600px;
+.search-cart-label {
+    margin-right: 10px;
+}
+
+.search-transfer-modal .modal-content {
+    height: 650px;
+}
+
+
+.search-transfer-modal .modal-body {
+    height: 575px;
+}
+
+
+.search-transfer-modal .modal-footer {
+    height: 75px;
+}
+
+.search-transfer-row {
+    margin-top: 10px;
+}
+
+.search-stage-transfer-buttons {
+    position: relative;
+    top: 140px;
+}
+
+table.search-transfer-table {
+    width: 95%;
     height: 400px;
-    padding: 10px;    
+    overflow-y: auto;
+    display: block;
+}
+
+.transfer_object_type {
+    column-width: 150px;
+}
+
+.transfer_object_name {
+    column-width: 150px;
+}
+
+.transfer_object_id {
+    column-width: 400px;
 }
 
 .progress-bar {
@@ -218,9 +250,13 @@ span .badge {
 }
 
 .search-view-buttons {
-    min-width: 80px;
+    width: 80px;
+    margin-left: 100px;
 }
 
+.search-perpage-buttons {
+    width: 140px;
+}
 
 .search-cart {
     font-size: 40px;
@@ -232,6 +268,7 @@ span .badge {
 
 .search-results-counter {
     top: 20px;
+    left: -43px;
 }
 
 .search-results-scrollable {
@@ -587,6 +624,7 @@ span .badge {
 
 .search-result-set-header {
     margin-bottom: 10px;
+    width: 1100px;
 }
 
 
@@ -626,6 +664,30 @@ div.blockMsg {
     font-weight: bold;
     font-size: 24px;
 }
+
+
+div.blockMsg.search-block-element {
+    position: relative;
+    width: 40%;
+    top: 40%;
+    left: 30%;
+    text-align: center;
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    /*
+        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
+    -moz-opacity:.70;
+    opacity:.70;
+    */
+    padding: 15px;
+    color: #000000;
+    font-weight: bold;
+    font-size: 14px;
+}
+
 
 
 ul.scroll-menu {

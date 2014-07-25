@@ -140,7 +140,11 @@
                                                           .append(data.featureData.genome_name)
                                                           .append("<br/>")
                                                           .append(self.makeGenomeButton(data.genome))));
-                self.$infoTable.append(self.makeRow("Length", data.featureData.feature_length + " bp"));
+		var len = data.featureData.feature_length + " bp";
+		if (data.featureData.protein_translation) {
+		    len += ", " + data.featureData.protein_translation.length + " aa";
+		}
+                self.$infoTable.append(self.makeRow("Length", len));
                 self.$infoTable.append(self.makeRow("Location", $("<div/>")
                                                             .append(self.parseLocation(data.featureData.feature_location))
                                                             .append(self.makeContigButton(data.featureData.feature_location))));
@@ -247,6 +251,9 @@
                             }
                             len += " bp";
                         }
+			if (feature.protein_translation) {
+			    len += ", " + feature.protein_translation.length + " aa";
+			}
                         this.$infoTable.append(this.makeRow("Length", len));
 
                         // Make a contig button

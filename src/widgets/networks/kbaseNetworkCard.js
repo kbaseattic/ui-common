@@ -11,6 +11,7 @@
 	    height: 500,
             network: "",
 	    netname: "",
+	    ws: null,
         },
 
         init: function(options) {
@@ -82,6 +83,7 @@
             return {
                 type: "KbaseNetwork",
                 id: this.options.netname,
+                workspace: this.options.ws,
                 title: "Network Card"
             };
         }

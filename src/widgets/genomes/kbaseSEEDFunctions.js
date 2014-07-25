@@ -10,7 +10,7 @@
  (function( $, undefined ) {
     $.KBWidget({
         name: "KBaseSEEDFunctions",
-        parent: "kbaseWidget",
+        parent: "kbaseAuthenticatedWidget",
         version: "1.0.0",
 
         wsUrl:"https://kbase.us/services/ws",
@@ -20,7 +20,7 @@
             wsNameOrId: null,
             objVer: null,
             loadingImage: "assets/img/loading.gif",
-            kbCache:{},         
+            kbCache:null,         
             width:900         
         },
         
@@ -51,45 +51,7 @@
 
         init: function(options) {
             this._super(options);          
-            this.render();
-
-            var SEEDTree = this.SEEDTree;
-            var subsysToGeneMap = this.subsysToGeneMap;
-
-            var obj = {"ref" : this.options.wsNameOrId + "/" + this.options.objNameOrId };
-            
-            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-        
-            $.when(prom).fail($.proxy(function(error) {
-                //this.renderError(error); Need to define this function when I have time
-                console.log(error);
-            }, this));
-
-            $.when(prom).done($.proxy(function(genome) {
-                var genomeObj = genome[0].data;
-
-                /*
-                    First I am going to iterate over the Genome Typed Object and 
-                    create a mapping of the assigned functional roles (by SEED) to
-                    an array of genes with those roles. 
-
-                    subsysToGeneMap [ SEED Role ] = Array of Gene Ids
-                */
-
-                genomeObj.features.forEach( function(f){
-
-                    // Each function can have multiple genes, creating mapping of function to list of gene ids
-                    if (subsysToGeneMap[f["function"]] === undefined) {subsysToGeneMap[f["function"]] = [];}
-                    subsysToGeneMap[f["function"]].push(f["id"]);
-
-                    // Not sure if this is necessary, but I'm going to keep track of the number of genes with
-                    // SEED assigned functions in this count variable.
-                    SEEDTree.count++; 
-                });
-
-                this.loadSEEDHierarchy();
-
-            }, this));
+            //this.render();
 
             return this;
         },
@@ -129,7 +91,9 @@
             var subsysToGeneMap = self.subsysToGeneMap;
             var Level1 = [];
 
-            d3.text("assets/data/subsys.txt", function(text) {
+            //d3.text("assets/data/subsys.txt", function(text) {
+            //d3.text("/static/subsys.txt", function(text) {
+            d3.text("/functional-site/assets/data/subsys.txt", function(text) {
                 var data = d3.tsv.parseRows(text);
 
                 for (i = 0; i < data.length; i++) {
@@ -170,7 +134,7 @@
 
                                 if ( j === ontologyDepth - 1 && subsysToGeneMap[data[i][j]] !== undefined) {
                                     subsysToGeneMap[data[i][j]].forEach( function(f){
-                                        var gene = { "name" : f, "size" : 0 };
+                                        var gene = { "name" : f, "size" : "" };
                                         node.children.push( gene );
                                     });
                                 }
@@ -208,7 +172,7 @@
             var height = Math.max(500, nodes.length * self.barHeight + self.margin.top + self.margin.bottom);
             var i = self.i;
 
-            d3.select("svg").transition()
+            d3.selectAll("#mainview").select("svg").transition()
                 .duration(self.duration)
                 .attr("height", height);
 
@@ -228,7 +192,19 @@
             var nodeEnter = node.enter().append("g")
                 .attr("class", "node")
                 .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-                .style("opacity", 1e-6);
+                .style("opacity", 1e-6)
+                .on("mouseover", function(d) {
+                    d3.select(this).selectAll('text, rect')
+                    .style('font-weight', 'bold')
+                    .style('font-size', '90%')
+                    .style('stroke-width', '3px');
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this).selectAll('text, rect')
+                    .style('font-weight', 'normal')
+                    .style('font-size', '80%')
+                    .style('stroke-width', '1.5px');
+                });
 
             // Enter any new nodes at the parent's previous position.
             nodeEnter.append("rect")
@@ -249,7 +225,8 @@
                 .attr("x", function (d) { return 0 + 275 - scale(d.size) - d.depth * self.stepSize;} )
                 .attr("height", self.barHeight)
                 .attr("width", function (d) { return scale(d.size); })
-                .style("fill", self.color);
+                .style("fill", self.color)
+                .on("click", $.proxy(function(d) {self.click(d)}, self));
 
             nodeEnter.append("text")
                 .attr("dy", 3.5)
@@ -329,6 +306,63 @@
                     .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+            var SEEDTree = this.SEEDTree;
+            var subsysToGeneMap = this.subsysToGeneMap;
+
+            var obj = {"ref" : this.options.wsNameOrId + "/" + this.options.objNameOrId };
+            var prom;
+
+            if (this.options.kbCache) {
+                prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+            } else {
+                prom = this.wsClient.get_objects([obj]);
+            }
+            //var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+        
+            $.when(prom).fail($.proxy(function(error) {
+                //this.renderError(error); Need to define this function when I have time
+                console.log(error);
+            }, this));
+
+            $.when(prom).done($.proxy(function(genome) {
+                var genomeObj = genome[0].data;
+
+                /*
+                    First I am going to iterate over the Genome Typed Object and 
+                    create a mapping of the assigned functional roles (by SEED) to
+                    an array of genes with those roles. 
+
+                    subsysToGeneMap [ SEED Role ] = Array of Gene Ids
+                */
+
+                genomeObj.features.forEach( function(f){
+
+                    // Each function can have multiple genes, creating mapping of function to list of gene ids
+                    if (subsysToGeneMap[f["function"]] === undefined) {subsysToGeneMap[f["function"]] = [];}
+                    subsysToGeneMap[f["function"]].push(f["id"]);
+
+                    // Not sure if this is necessary, but I'm going to keep track of the number of genes with
+                    // SEED assigned functions in this count variable.
+                    SEEDTree.count++; 
+                });
+
+                this.loadSEEDHierarchy();
+
+            }, this));
+
+        },
+
+        loggedInCallback: function(event, auth) {
+            this.authToken = auth;
+            this.wsClient = new Workspace(this.wsUrl, this.authToken);
+            this.render();
+            return this;
+        },
+
+        loggedOutCallback: function(event, auth) {
+            this.authToken = null;
+            this.wsClient = null;
+            return this;
         }
 
     });

@@ -36,7 +36,7 @@
             else {
                 this.renderWorkspace();
             }
-															
+            
             return this;
         },
 
@@ -243,8 +243,9 @@
             }
         },
 
+        alreadyRenderedTable : false,
         renderWorkspace: function() {
-			self = this
+	    var self = this
             this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
             this.$infoPanel.hide();
             // console.log("rendering workspace genome");
@@ -254,14 +255,35 @@
                 return typeof n === 'number' && n % 1 == 0;
             };
             
+            
+            var objForSubset = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
+            // first we try to get just the subdata that should be there
+            objForSubset['included'] = ["/id","/scientific_name","/genetic_code","/domain"];
+	    self.options.kbCache.ws.get_object_subset( [ objForSubset ], function(data) {
+                    if (data[0]) {
+                        if (!self.alreadyRenderedTable) {
+                            self.$infoTable.empty()
+                                   .append(self.addInfoRow("Name", data[0]['data'].scientific_name))
+                                   .append(self.addInfoRow("KBase Genome ID", data[0]['data'].id))
+                                   .append(self.addInfoRow("Domain", data[0]['data'].domain))
+                                   .append(self.addInfoRow("Genetic Code", data[0]['data'].genetic_code));
+                                   
+                            //self.hideMessage();
+                            self.$infoPanel.show();
+                        }
+                    }
+                },
+                function(error) { /* don't worry about it for now, let the other function handle it*/});
+            
+            
+            
             var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
-
             var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
             $.when(prom).done($.proxy(function(genome) {
                 // console.log(genome);
                 genome = genome[0].data;
 				self.pubmedQuery = genome.scientific_name
-				console.log(self.pubmedQuery)	
+				//console.log(self.pubmedQuery)	
                 
 				var gcContent = "Unknown";
                 var dnaLength = "Unknown";
@@ -283,8 +305,8 @@
                     nFeatures = genome.features.length;
                 }
                 this.$infoTable.empty()
-                               .append(this.addInfoRow("ID", genome.id))
                                .append(this.addInfoRow("Name", genome.scientific_name))
+                               .append(this.addInfoRow("KBase Genome ID", genome.id))
                                .append(this.addInfoRow("Domain", genome.domain))
                                .append(this.addInfoRow("DNA Length", dnaLength))
                                .append(this.addInfoRow("Source ID", genome.source + ": " + genome.source_id))
@@ -292,7 +314,7 @@
                                .append(this.addInfoRow("GC Content", gcContent))
                                .append(this.addInfoRow("Genetic Code", genome.genetic_code))
                                .append(this.addInfoRow("Number of features", nFeatures));
-
+                self.alreadyRenderedTable = true;
                 var contigsToLengths = {};
                 if (genome.contig_ids && genome.contig_ids.length > 0) {
                     for (var i=0; i<genome.contig_ids.length; i++) {
@@ -318,7 +340,7 @@
 
                 }
 
-                this.populateContigSelector(contigsToLengths);
+                //this.populateContigSelector(contigsToLengths);
 
                 this.hideMessage();
                 this.$infoPanel.show();
