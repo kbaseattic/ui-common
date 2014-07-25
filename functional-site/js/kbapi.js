@@ -546,6 +546,9 @@ function KBCacheClient(token) {
             case 'Genome': 
                 route = 'genomesbyid';
                 break;
+  	    case 'InteractionDataset':
+	        route = 'ppid';
+	        break;
         }
         return route;
     }
