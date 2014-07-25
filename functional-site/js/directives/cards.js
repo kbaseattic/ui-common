@@ -92,6 +92,11 @@ angular.module('card-directives')
         return {
             link: function(scope, element, attrs) {
                 if (cardManager) cardManager.destroy();
+                
+                if(scope.params.ws == "CDS" ) {
+                        scope.params.ws = "KBasePublicGenomesV3";
+                }
+		
                 cardManager = $(element).KBaseCardLayoutManager({
                     template: "gene", 
                     data: scope.params, 
