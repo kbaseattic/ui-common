@@ -22,8 +22,8 @@
         },
 
         cdmiURL: "https://kbase.us/services/cdmi_api",
-        //kbprotstructURL: "http://140.221.85.122:7088",
-        kbprotstructURL: "http://140.221.67.170:7088",
+        // kbprotstructURL: "http://140.221.67.170:7088",
+        kbprotstructURL: "https://kbase.us/services/protein_structure_service",
 
         init: function(options) {
             this._super(options);
