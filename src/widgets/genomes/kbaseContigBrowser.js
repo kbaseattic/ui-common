@@ -119,6 +119,12 @@
                                 .addClass("kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
+            if (!options.contig) {
+                options.kbCache.ws.get
+            }
+            
+            
+            
             this.cdmiClient = new CDMI_API(this.cdmiURL);
             this.proteinInfoClient = new ProteinInfo(this.proteinInfoURL);
 
@@ -342,6 +348,7 @@
         },
 
         setWorkspaceContig: function(workspaceId, genomeId, contigId) {
+            var self = this;
             if (contigId && this.options.contig !== contigId) {
                 this.options.centerFeature = null;
                 this.operonFeatures = [];
@@ -361,6 +368,25 @@
                 // can fetch the list of features in some range.
                 genome = genome[0];
 
+                if(self.options.centerFeature) {
+                    for (var i=0; i<genome.data.features.length; i++) {
+                        var f = genome.data.features[i];
+                        if (f.feature_id === self.options.centerFeature) {
+                            if (f.location && f.location.length > 0) {
+                                self.options.contig = f.location[0][0];
+                                contigId = f.location[0][0];
+                            }
+                        }
+                    }
+                } else if (!self.options.contig) {
+                     if (genome.data.contig_ids && genome.data.contig_ids.length > 0) {
+                        self.options.contig = genome.data.contig_ids[0];
+                        contigId = self.options.contig;
+                    }
+                }
+                
+                
+                
                 this.contigLength = -1; // LOLOLOL.
                 // figure out contig length here, while cranking out the feature mapping.
                 if (genome.data.contig_ids && genome.data.contig_ids.length > 0) {

@@ -102,7 +102,6 @@ angular.module('card-directives')
                         scope.params.genomeID = temp[0]+"."+temp[1];
                     }
                 }
-		alert(JSON.stringify(scope.params));
                 cardManager = $(element).KBaseCardLayoutManager({
                     template: "gene", 
                     data: scope.params, 

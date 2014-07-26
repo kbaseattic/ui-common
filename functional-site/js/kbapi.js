@@ -85,7 +85,6 @@ function KBCacheClient(token) {
     var auth = {};
     auth.token = token;
 
-    console.log(auth.token)
     if (typeof configJSON != 'undefined') {
         if (configJSON.setup == 'dev') {
             fba_url = configJSON.dev.fba_url;
@@ -199,54 +198,6 @@ function KBCacheClient(token) {
         })
 
 
-        /*
-        var next_prom = $.when(p).then(function(data) {
-            var my_list = data[0];
-            var shared_list = data[1];
-            var public_list = data[2];
-
-            var my_prom = kb.ws.list_objects({workspaces: my_list, 
-                                               type: 'KBaseNarrative.Metadata',
-                                               showHidden: 1});
-
-            var shared_prom = kb.ws.list_objects({workspaces: shared_list, 
-                                               type: 'KBaseNarrative.Metadata',
-                                               showHidden: 1});        
-
-            var public_prom = kb.ws.list_objects({workspaces: public_list, 
-                                               type: 'KBaseNarrative.Metadata',
-                                               showHidden: 1});        
-
-            var p = $.when(my_prom, shared_prom, public_prom).then(function(d1, d2, d3) {
-                var my_nars_ws = [];
-                var shared_nars_ws = [];
-                var public_nars_ws = [];
-
-                for (var i in d1) {
-                    var a = d1[i]
-                    var ws = a[7];
-                    my_nars_ws.push(ws);
-                }
-
-                for (var i in d2) {
-                    var a = d2[i]
-                    var ws = a[7];
-                    shared_nars_ws.push(ws);
-                }
-
-                for (var i in d3) {
-                    var a = d3[i]
-                    var ws = a[7];
-                    public_nars_ws.push(ws);
-                }
-
-                return [my_nars_ws, shared_nars_ws, public_nars_ws];         
-            })
-
-            return p;
-        });*/
-
-
         // next get all narratives from these "project" workspaces
         // fixme: backend!
         var last_prom = $.when(p).then(function(data) {
@@ -254,65 +205,87 @@ function KBCacheClient(token) {
             var shared_ws = data[1];
             var public_ws = data[2];
 
-            var my_prom = kb.ws.list_objects({workspaces: mine_ws, 
+            var my_nar_prom = kb.ws.list_objects({workspaces: mine_ws, 
                                               type: 'KBaseNarrative.Narrative',
                                               showHidden: 1});
 
-            var shared_prom = kb.ws.list_objects({workspaces: shared_ws, 
+            var shared_nar_prom = kb.ws.list_objects({workspaces: shared_ws, 
                                                   type: 'KBaseNarrative.Narrative',
                                                   showHidden: 1});        
 
-            var public_prom = kb.ws.list_objects({workspaces: public_ws, 
+            var public_nar_prom = kb.ws.list_objects({workspaces: public_ws, 
                                                   type: 'KBaseNarrative.Narrative',
                                                   showHidden: 1});
 
-            // get permissions on all workspaces if logged in
-            var perm_proms = [];
-            var all_ws = mine_ws.concat(shared_ws, public_ws);
-            if (USER_ID) {
-                for (var i in all_ws) {
-                    var prom =  kb.ws.get_permissions({workspace: all_ws[i]});
-                    perm_proms.push(prom);
+            // filter down to unique workspaces that have narrative objects, 
+            // and also make get_permissions calls
+            var ws_prom = $.when(my_nar_prom, shared_nar_prom, public_nar_prom)
+                           .then(function(d1, d2, d3) {
+
+                var ws1 = [];
+                for (var i in d1) {
+                    ws1.push(d1[i][7])
                 }
-            } else {
-                for (var i in all_ws) {
-                    perm_proms.push(undefined);
+                var my_ws_list = ws1.filter( unique )
+
+                var ws2 = [];
+                for (var i in d2) {
+                    ws2.push(d2[i][7])
                 }
+                var shared_ws_list = ws2.filter( unique )
+
+                return my_ws_list.concat(shared_ws_list);//[my_ws_list, shared_ws_list];
+            })
+
+
+            function unique(value, index, self) { 
+                return self.indexOf(value) === index;
             }
 
-
-            var all_proms = [my_prom, shared_prom, public_prom].concat(perm_proms)
-
-            var p = $.when.apply($, all_proms).then(function() { 
-                // fill counts now (since there's no api for this)
-
-                var mine = arguments[0];
-                var shared = arguments[1];
-                var pub = arguments[2];
-
-                var perms = {};
-
+            var ws_list;
+            var all_proms = $.when(ws_prom).then(function(ws_list) {
+                ws_list = ws_list;
+                // get permissions on all workspaces if logged in
+                var perm_proms = [];
                 if (USER_ID) {
-                    for (var i = 0; i<all_ws.length; i++) {
-                        perms[all_ws[i]] = arguments[3+i]
+                    for (var i in ws_list) {
+                        var prom =  kb.ws.get_permissions({workspace: ws_list[i]});
+                        perm_proms.push(prom);
                     }
-                } else {
-                    for (var i = 0; i<all_ws.length; i++) {
-                        perms[all_ws[i]] = {'Everybody': 'r'}
-                    }                    
-                }
+                } 
 
-                $('.my-nar-count').text(mine.length)
-                $('.shared-nar-count').text(shared.length);  
-                $('.public-nar-count').text(pub.length);            
+                var all_proms = [my_nar_prom, shared_nar_prom, public_nar_prom].concat(perm_proms)                
 
-                return {my_narratives: mine, 
-                        shared_narratives: shared, 
-                        public_narratives: pub, 
-                        perms: perms};
-            });
+                var p = $.when.apply($, all_proms).then(function() { 
+                    // fill counts now (since there's no api for this)
 
-           return p;
+                    var mine = arguments[0];
+                    var shared = arguments[1];
+                    var pub = arguments[2];
+
+                    var perms = {};
+
+
+                    for (var i = 0; i<ws_list.length; i++) {
+                        perms[ws_list[i]] = arguments[3+i]
+                    }
+
+
+                    $('.my-nar-count').text(mine.length)
+                    $('.shared-nar-count').text(shared.length);  
+                    $('.public-nar-count').text(pub.length);            
+
+                    var all_data = {my_narratives: mine, 
+                                    shared_narratives: shared, 
+                                    public_narratives: pub, 
+                                    perms: perms};
+
+                    return all_data;
+                });
+
+                return p
+            }) 
+            return all_proms
         })
 
         // cache prom
