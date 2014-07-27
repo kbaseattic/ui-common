@@ -44,7 +44,7 @@
 
                                 <div class="workspace-area" ng-show="options.userState.workspaces">
                                     <ul class='nav nav-pills nav-stacked scroll-menu'>
-                                        <li ng-repeat="w in options.userState.workspaces">
+                                        <li ng-repeat="w in options.userState.workspaces" ng-class="{'workspace-chosen': '{{options.userState.selectedWorkspace}}' == '{{w[1]}}'}">
                                             <a ng-click='selectWorkspace(w)'>
                                                 <div class="text-left">
                                                     <span class="glyphicon glyphicon-hdd"></span>
@@ -279,15 +279,11 @@
                 <div class='text-center search-filters-title'>
                     <h3 data-toggle="tooltip" data-placement="right" tooltip="Select options to help narrow your search results." tooltip-placement="right">Filters</h3>                    
                 </div>
-                <div class="row">
-                    <div class="row search-space-top" ng-repeat="facet in options.facets">
-                        <div id="{{facet.key}}" class="col-md-offset-1 col-md-11">
-                            <button class="btn btn-filters col-md-11" data-toggle="collapse" data-target="#all_{{facet.key}}">
-                                <span><strong>{{facet.key}}</strong></span>
-                            </button>
-                        </div>
-                        <div id="all_{{facet.key}}" class="collapse" data-parent="#{{facet.key}}">
-                            <div class="col-md-offset-1 col-md-11" ng-repeat="facet_option in facet.value">
+                <div class="col-xs-offset-1 search-leftarea-size">
+                    <accordion ng-repeat="facet in options.facets">
+                        <accordion-group>
+                            <accordion-heading class="btn-filters">{{facet.key}}</accordion-heading>
+                            <div ng-repeat="facet_option in facet.value" collapse="isCollapsed">
                                 <div ng-show="facet_option.value > 0" class="col-md-12">
                                     <a href="" ng-click="toggleFacet(facet.key, facet_option.key, options.active_facets[options.selectedCategory][facet.key][facet_option.key])" class="search-checkbox-link">
                                         <span class="glyphicon" ng-class="{'glyphicon-check': options.active_facets[options.selectedCategory][facet.key][facet_option.key],'glyphicon-unchecked': !options.active_facets[options.selectedCategory][facet.key][facet_option.key]}"/>                    
@@ -296,8 +292,8 @@
                                     <span class="search-space-left">({{facet_option.value | number}})</span>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </accordion-group>
+                    </accordion>
                 </div>
             </div>
         </div> <!-- end categories -->
@@ -352,7 +348,7 @@
                     <div ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0 && options.categoryRelationships[options.selectedCategory].children.length == 0" class="col-md-12 col-lg-12 search-result-set-header"> <!-- result options -->
                         <div class="btn-toolbar col-md-12 search-results-toolbar">
                             <div class="btn-group col-xs-6 search-results-counter">
-                                <div><strong>Displaying results {{ 1 + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }}-{{ options.resultJSON.itemCount + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }} out of {{ options.resultJSON.totalResults | number }}.</strong></div>
+                                <div><strong>Displaying {{options.searchCategories[options.selectedCategory].label}} {{ 1 + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }}-{{ options.resultJSON.itemCount + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }} out of {{ options.resultJSON.totalResults | number }}.</strong></div>
                             </div>
                             <div class="btn-group btn-group-xs col-xs-offset-3 col-xs-2 search-view-buttons" data-toggle="buttons">
                                 <label for="list_view" class="control-label input-group">Views</label>

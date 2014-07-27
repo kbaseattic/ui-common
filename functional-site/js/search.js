@@ -1,7 +1,7 @@
 /* Directives */
 
 // define Search as its own module, and what it depends on
-var searchApp = angular.module('search', ['ui.router','kbaseLogin']);
+var searchApp = angular.module('search', ['ui.router','ui.bootstrap','kbaseLogin']);
 
 
 // enable CORS for Angular
@@ -324,6 +324,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         }
         
         //console.log($scope.options.related);
+        console.log($scope.options.searchCategories);
     };
 
     $scope.getCount = function(options, category) {
@@ -964,7 +965,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
 
     $scope.selectWorkspace = function(workspace_info) {
-        //console.log(workspace_info);
+        console.log(workspace_info);
         
         if (workspace_info.length === 10) {
             $scope.options.userState.selectedWorkspace = workspace_info[2];
@@ -1173,7 +1174,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
         $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.token);
 
-        var ws_objects = {};
+        var loop_requests = [];
         var max_simultaneous = 10;
         var ws_requests = [];
         var batches = 1;
@@ -1182,67 +1183,47 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         
         $scope.options.transferSize = $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].size;
         $scope.options.transferring = true;
+                
+        var batchCopyRequests = function(ws_objects) {
+            var ws_requests = [];
         
-        for(var n in $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data) {        
-            if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data.hasOwnProperty(n)) {
-                // if we have maxed out the number of requests, join the tasks and let them finish
-                if (ws_requests.length === max_simultaneous) {
-                    console.log("waiting on some requests...");
-                    
-                    console.log(ws_requests);
-                    $timeout(function () {
-                            $q.all(ws_requests).then(function (result) {
-                                    total_requests -= 1;
-                                    return result;
-                                }, 
-                                function (error) {
-                                    total_requests -= 1;
-                                    return error;
-                                });
-                        },
-                        batches * 200);                    
-
-                    ws_requests = [];
-                    batches += 1;
-                    total_requests += 10;
-                }                
-            
-                if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_type"].indexOf("KBaseSearch.Genome") > -1) {
-                    ws_requests.push($scope.copyGenome(n).then(function () {;}));
+            for (var i = 0; i < ws_objects.length; i++) {            
+                if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["object_type"].indexOf("KBaseSearch.Genome") > -1) {
+                    ws_requests.push($scope.copyGenome(ws_objects[i]).then(function () {;}));
                     if (!types.hasOwnProperty('genome')) {
                         types['genome'] = true;
                     }
                 }                    
-                else if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_type"].indexOf("KBaseSearch.Feature") > -1) {                
-                    ws_requests.push($scope.copyFeature(n).then(function () {;}));
+                else if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["object_type"].indexOf("KBaseSearch.Feature") > -1) {                
+                    ws_requests.push($scope.copyFeature(ws_objects[i]).then(function () {;}));
                     if (!types.hasOwnProperty('genome')) {
                         types['feature'] = true;
                     }
                 }
-                else if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_type"].indexOf("KBaseCommunities.Metagenome") > -1) {
-                    ws_requests.push($scope.copyMetagenome(n).then(function () {;}));
+                else if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["object_type"].indexOf("KBaseCommunities.Metagenome") > -1) {
+                    ws_requests.push($scope.copyMetagenome(ws_objects[i]).then(function () {;}));
                     if (!types.hasOwnProperty('genome')) {
                         types['metagenome'] = true;
                     }
                 }
                 else {
-                    if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_type"].indexOf("KBaseGwas") > -1) {
+                    if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["object_type"].indexOf("KBaseGwas") > -1) {
                         if (!types.hasOwnProperty('gwas')) {
                             types['gwas'] = true;
                         }                    
                     }
-                
+            
                     //generic solution for types
-                    if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n].hasOwnProperty("object_name") === true) {
-                        $scope.copyTypedObject($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_name"], 
-                                               $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_id"], 
-                                               $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["workspace_name"], 
+                    if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]].hasOwnProperty("object_name") === true) {
+                        $scope.copyTypedObject($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["object_name"], 
+                                               $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["object_id"], 
+                                               $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["workspace_name"], 
                                                $scope.options.userState.selectedWorkspace);                    
                     }
-                    else if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n].hasOwnProperty("object_id") === true) {
-                        console.log($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]);
+                    else if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]].hasOwnProperty("object_id") === true) {
+                        console.log($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]);
 
-                        $scope.workspace_service.get_object_info([{"name": $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_id"], "workspace": $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["workspace_name"]}])
+                        $scope.workspace_service.get_object_info([{"name": $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["object_id"], "workspace": $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["workspace_name"]}])
                             .fail(function (xhr, status, error) {
                                 console.log(xhr);
                                 console.log(status);
@@ -1250,8 +1231,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                             })
                             .done(function (info, status, xhr) {
                                 $scope.copyTypedObject(info[0][1], 
-                                                       $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_id"], 
-                                                       $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["workspace_name"], 
+                                                       $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["object_id"], 
+                                                       $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["workspace_name"], 
                                                        $scope.options.userState.selectedWorkspace);
                             });
                     }
@@ -1261,8 +1242,31 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                         return;
                     }
                 } // end type if else
-            } //end if
-        } // for loop
+            } // end for loop
+                    
+            $timeout(function () {
+                $q.all(ws_requests).then(function (result) {
+                        total_requests -= 1;
+                        return result;
+                    }, 
+                    function (error) {
+                        total_requests -= 1;
+                        return error;
+                    });
+                },
+                200);                                        
+        }; // end function
+
+        for (var n in $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data) {
+            if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data.hasOwnProperty(n)) {
+                loop_requests.push(n);
+            }
+            
+            if (loop_requests.length === max_simultaneous) {
+                batchCopyRequests(loop_requests);
+                loop_requests = [];
+            }
+        }        
         
         for (var t in types) {
             if (types.hasOwnProperty(t)) {

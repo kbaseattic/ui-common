@@ -54,9 +54,12 @@ span .badge {
     color: #fff;
 }
 
+
 .btn-filters {
     color: #c09853;
     background-color: #fcf8e3;
+    display: block;
+    word-wrap: break-word;
 }
 
 .btn-filters:focus,
@@ -163,6 +166,11 @@ span .badge {
 .workspace-area {
     height: 400px;
     bottom: 0px;
+}
+
+.workspace-chosen {
+    color: #c09853;
+    background-color: #fcf8e3;
 }
 
 .search-leftarea-size {
@@ -738,10 +746,9 @@ table.search-transfer-table {
 
 
 .facet-scroll {
-    width: 100%;
     max-height: 200px;
     overflow-y: auto;
-    display: block;
+    z-index: 1001;
 }
 
 
