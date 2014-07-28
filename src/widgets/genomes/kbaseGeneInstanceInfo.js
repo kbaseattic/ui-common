@@ -297,7 +297,7 @@
                             window.alert("No operon assignments available for this gene.  You will be able to compute operon assignments in the Narrative in the future.");
                         });
                         this.$buttonPanel.find("button#structure").click(function(event) {
-                            window.alert("No structure assignments available for this gene.  You will be able to compute strucutre assignments in the Narrative in the future.");
+                            window.alert("No structure assignments available for this gene.  You will be able to compute structure assignments in the Narrative in the future.");
                         });                        
                         
                         //determine if a feature id and its protein MD5 translation is found in the CDS- if it is,

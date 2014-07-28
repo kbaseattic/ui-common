@@ -22,7 +22,7 @@
         },
 
         cdmiURL: "https://kbase.us/services/cdmi_api",
-        // kbprotstructURL: "http://140.221.67.170:7088",
+        // kbprotstructURL: "http://140.221.67.170:7088",  // test service
         kbprotstructURL: "https://kbase.us/services/protein_structure_service",
 
         init: function(options) {
@@ -37,11 +37,17 @@
 
             this.kbprotstruct = new KBaseProteinStructure( this.kbprotstructURL );
             this.render();
-            if (this.options.workspaceID) {
-                this.renderWorkspace();
-            }
+            if (this.options.workspaceID) 
+               {
+                //this.renderWorkspace();      // I noticed at least one widget had special
+                                               // handling for workspace invocation, so I've put in 
+                                               // this as a reminder.
+                this.renderCentralStore(); 
+               }
             else
+               {
                 this.renderCentralStore();
+               }
 
             return this;
         },
@@ -164,60 +170,8 @@
         },
 
         renderWorkspace: function() {
-            this.showMessage("<img src='" + this.options.loadingImage + "'>");
-            this.$infoPanel.hide();
-
-            if (!this.options.kbCache) {
-                if (kb)
-                    this.options.kbCache = kb;
-                else
-                    console.debug("No cache service found. D'oh!");
-            }
-            var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
-
-            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-            // on ws error
-            $.when(prom).fail($.proxy(function(error) {
-                this.renderError(error);
-            }, this));
-            // on cache success
-            $.when(prom).done($.proxy(function(genome) {
-                genome = genome[0];
-                if (genome.data.features) {
-                    var feature = null;
-                    for (var i=0; i<genome.data.features.length; i++) {
-                        if (genome.data.features[i].id === this.options.featureID) {
-                            feature = genome.data.features[i];
-                            break;
-                        }
-                    }
-
-                    var subsysStr = "No subsystem info found.";
-                    if (feature.subsystems) {
-
-                    }
-                    this.$infoTable.append(this.makeRow("Subsystems", subsysStr));
-
-                    var rolesStr = "No roles info found.";
-                    if (feature.roles) {
-                        
-                    }
-                    this.$infoTable.append(this.makeRow("Roles", rolesStr));
-
-                }
-                else {
-                    this.renderError({ error: "No genetic features found in the genome with object id: " + 
-                                              this.options.workspaceID + "/" + 
-                                              this.options.genomeID });
-                }
-
-                this.hideMessage();
-                this.$infoPanel.show();
-            }, this));
-
-
-
-
+            // at least one widget had special handling for workspace 
+            // so I've put this placeholder as a reminder.  
         },
 
         buildObjectIdentity: function(workspaceID, objectID) {
