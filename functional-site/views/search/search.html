@@ -257,7 +257,7 @@
             <div class="col-md-12 search-categories-row">
                 <div class="col-md-12 search-categories-row">
                     <a id="Public" href="" class="search-category-link btn btn-link" ng-click="selectCategory(null)">
-                        <strong>All categories</strong>
+                        <strong>Return to All categories</strong>
                     </a>
 
                     <div ng-hide="options.categoryCounts[p.category] < 1 || !isInActiveCategoryTree(p.category)" ng-repeat="p in options.categoryInfo.displayTree.unauthenticated.children">
@@ -284,12 +284,12 @@
                         <accordion-group>
                             <accordion-heading class="btn-filters">{{facet.key}}</accordion-heading>
                             <div ng-repeat="facet_option in facet.value" collapse="isCollapsed">
-                                <div ng-show="facet_option.value > 0" class="col-md-12">
+                                <div ng-show="facet_option.value > 0" class="row filter-section">
                                     <a href="" ng-click="toggleFacet(facet.key, facet_option.key, options.active_facets[options.selectedCategory][facet.key][facet_option.key])" class="search-checkbox-link">
                                         <span class="glyphicon" ng-class="{'glyphicon-check': options.active_facets[options.selectedCategory][facet.key][facet_option.key],'glyphicon-unchecked': !options.active_facets[options.selectedCategory][facet.key][facet_option.key]}"/>                    
                                     </a>
-                                    <span class="search-space-left">{{facet_option.key}}</span>
-                                    <span class="search-space-left">({{facet_option.value | number}})</span>
+                                    <span class="search-halfspace-left">{{facet_option.key}}</span>
+                                    <span class="search-halfspace-left">({{facet_option.value | number}})</span>
                                 </div>
                             </div>
                         </accordion-group>

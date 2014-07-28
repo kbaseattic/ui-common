@@ -25,6 +25,14 @@ a.search-checkbox-link.disabled { color: #eee; }
     white-space: nowrap;
 }
 
+.search-halfspace-right {
+    margin-right: 0.5em;
+}
+
+.search-halfspace-left {
+    margin-left: 0.5em;
+}
+
 .search-space-right {
     margin-right: 1em;
 }
@@ -220,7 +228,9 @@ span .badge {
 }
 
 .filter-section {
+    margin-left: 0px;
     margin-right: 0px;
+    padding-left: 0px;
     padding-right: 0px;
     max-width: 240px;
 }
