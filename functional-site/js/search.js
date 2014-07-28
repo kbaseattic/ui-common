@@ -1182,6 +1182,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             return;
         }
 
+        console.log("Copying objects...");
+
         $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.token);
 
         var loop_requests = [];
@@ -1193,6 +1195,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         
         $scope.options.transferSize = $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].size;
         $scope.options.transferring = true;
+
+        console.log($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace]);
                 
         var batchCopyRequests = function(ws_objects) {
             var ws_requests = [];
@@ -1276,14 +1280,18 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 batchCopyRequests(loop_requests);
                 loop_requests = [];
             }
+        }
+        
+        if (loop_requests.length > 0) {
+            batchCopyRequests(loop_requests);
+            loop_requests = [];
         }        
         
         for (var t in types) {
             if (types.hasOwnProperty(t)) {
                 $scope.options.userState.data_cart.types[t].all = false;
             }
-        }
-        
+        }        
         
         $scope.options.transferring = false;
     }; // end function
@@ -1320,9 +1328,9 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     $scope.emptyCart = function() {
         $scope.options.userState.selectAll = {};
         $scope.options.userState.selections = {};
-        $scope.options.userState.data_cart.size = 0;
         $scope.options.userState.data_cart = {
             all: false, 
+            size: 0,
             data: {}, 
             types: {
                 'genome': {all: false, size: 0, markers: {}},
