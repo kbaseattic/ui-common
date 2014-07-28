@@ -1,9 +1,13 @@
 <div class="row search-result-column-header-row">
     <div class="btn-group search-result-column-header-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        <div class="btn-group search-result-column-header search-result-select-all col-xs-1 col-sm-1 col-md-1 col-lg-1">
-            <button type="button" class="btn btn-default search-result-column-header-toggle" ng-class="{'disabled': !options.userState.loggedIn}" ng-click="toggleAll(options.resultJSON.items)">
+        <div class="btn-group search-result-column-header search-result-select-all col-xs-1 col-sm-1 col-md-1 col-lg-1" ng-show="options.userState.loggedIn">
+            <button type="button" class="btn btn-default search-result-column-header-toggle" ng-click="toggleAll(options.resultJSON.items)" data-toggle="tooltip" data-placement="top" tooltip="Select all results on this page." tooltip-placement="top">
+                <div><strong>In Cart</strong></div>
                 <span class="glyphicon" ng-class="{'glyphicon-check': options.userState.selectAll[options.selectedCategory][options.searchOptions.perCategory[options.selectedCategory].page],'glyphicon-unchecked': !options.userState.selectAll[options.selectedCategory][options.searchOptions.perCategory[options.selectedCategory].page]}"></span>
             </button>
+        </div>
+        <div class="btn-group search-result-column-header search-result-select-all-disabled col-xs-1 col-sm-1 col-md-1 col-lg-1" ng-show="!options.userState.loggedIn">
+            <button type="button" class="btn btn-default search-result-column-header-toggle disabled"></button>
         </div>
         <div class="btn-group search-result-column-header col-xs-1 col-sm-1 col-md-1 col-lg-1 object_id">
             <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
@@ -91,8 +95,8 @@
 <section>
     <div class="row" ng-repeat="item in options.resultJSON.items">
         <div class="search-typedRecord row">
-            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-checkbox">
-                <a ng-click="toggleCheckbox(item.row_id, item)" class="search-checkbox-link" ng-class="{'disabled': !options.userState.loggedIn}">
+            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 search-checkbox" ng-show="options.userState.loggedIn">
+                <a ng-click="toggleCheckbox(item.row_id, item)" class="search-checkbox-link" >
                     <span class="glyphicon" ng-class="{'glyphicon-unchecked': !options.userState.selections[item.row_id], 'glyphicon-check': options.userState.selections[item.row_id]}"/>
                 </a>
             </div>

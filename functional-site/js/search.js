@@ -212,6 +212,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
     $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
         if (toState.name === "search") {
+            console.log($scope.options.userState);
             console.log("state change to search");
             $scope.startSearch();      
         }  
@@ -220,11 +221,17 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
     $scope.login = function() {
         $('#signin-button').kbaseLogin('openDialog');
+        $('#signin-button').on('loggedIn', function () {
+            $state.go('search');       
+        });
     };
 
 
     $scope.logout = function() {
-        $('#signin-button').kbaseLogin('logout');        
+        $('#signin-button').kbaseLogin('logout');
+        $('#signin-button').on('loggedOut', function () {
+            $state.go('search');       
+        });
     };
 
 

@@ -378,6 +378,10 @@ table.search-transfer-table {
     width: 80px;
 }
 
+.search-result-select-all-disabled {
+    width: 50px;
+}
+
 .search-result-column {
     top: 1px;
     margin-left: 0px;
