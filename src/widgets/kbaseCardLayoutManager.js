@@ -956,6 +956,21 @@
                     of: "#app"
                 }
             );
+
+            this.addNewCard("KBaseContigBrowser",
+                {
+                    featureID: this.options.data.featureID,
+                    genomeID: this.options.data.genomeID,
+                    workspaceID: this.options.data.workspaceID,
+                    kbCache: this.options.data.kbCache
+                },
+                {
+                    my: "left top",
+                    at: "left bottom+300",
+                    of: "#app"
+                }
+            );
+
         },
 
         /**
