@@ -44,7 +44,7 @@
 
                                 <div class="workspace-area" ng-show="options.userState.workspaces">
                                     <ul class='nav nav-pills nav-stacked scroll-menu'>
-                                        <li ng-repeat="w in options.userState.workspaces" ng-class="{'workspace-chosen': '{{options.userState.selectedWorkspace}}' == '{{w[1]}}'}">
+                                        <li id="{{w[1].replace(':','_')}}_{{w[4]}}" ng-repeat="w in options.userState.workspaces">
                                             <a ng-click='selectWorkspace(w)'>
                                                 <div class="text-left">
                                                     <span class="glyphicon glyphicon-hdd"></span>

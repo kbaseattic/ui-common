@@ -980,12 +980,15 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         else {
             $scope.options.userState.selectedWorkspace = workspace_info[1];
         }
-        
+    
+        $(".workspace-chosen").removeClass("workspace-chosen");
+        $("#" + workspace_info[1].replace(":","_") + "_" + workspace_info[4]).addClass("workspace-chosen");
+    
         // setup a cart for any data to copy or save to this workspace
         if (!$scope.options.userState.workspace_carts.hasOwnProperty($scope.options.userState.selectedWorkspace)) {
             $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace] = {all: false, size: 0, data: {}};
         }
-        
+    
         //$("#workspace-area").hide();
     };
 
