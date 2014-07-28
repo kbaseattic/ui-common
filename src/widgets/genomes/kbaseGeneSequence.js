@@ -19,6 +19,7 @@
             genomeID: null,
             workspaceID: null,
             kbCache: null,
+	    width:950
         },
 
         cdmiURL: "https://kbase.us/services/cdmi_api",
@@ -94,7 +95,7 @@
 
         makeRow: function(name, value) {
             var $row = $("<tr>")
-                       .append($("<td>").append(name))
+                       .append($("<th>").append(name))
                        .append($("<td>").append(value));
             return $row;
         },

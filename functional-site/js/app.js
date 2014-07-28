@@ -345,6 +345,19 @@ var app = angular.module('landing-pages',
              controller: 'GeneDetail'});
 
     $stateProvider
+        .state('kbgenesbyws',
+            {url: '/genes2/:ws/:fid',
+             templateUrl: 'views/genomes/sortable-rows-landing-page-genes.html',
+             controller: 'WBGeneLanding'})
+        .state('kbgenesbywsgenome',
+            {url: '/genes2/:ws/:gid/:fid',
+             templateUrl: 'views/genomes/sortable-rows-landing-page-genes.html',
+             controller: 'WBGeneLanding'})
+             
+             
+             
+             
+    $stateProvider
         .state('meme',
             {url:'/meme',
              templateUrl: 'views/meme-list.html',

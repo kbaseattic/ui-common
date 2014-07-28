@@ -94,7 +94,7 @@
 
         makeRow: function(name, value) {
             var $row = $("<tr>")
-                       .append($("<td>").append(name))
+                       .append($("<th>").append(name))
                        .append($("<td>").append(value));
             return $row;
         },
