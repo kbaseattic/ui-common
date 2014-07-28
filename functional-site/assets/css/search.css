@@ -322,6 +322,10 @@ table.search-transfer-table {
     color: #6f5499;
 }
 
+.search-sort-icon {
+    font-size: large;
+}
+
 .search-sort-icon.glyphicon-sort-by-order {
     color: #6f5499;
 }
