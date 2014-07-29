@@ -986,7 +986,7 @@ angular.module('lp-directives')
                                            subText: scope.fid});
             p.loading();
             $(p.body()).KBaseGeneInstanceInfo(
-                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
+                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb, hideButtons:true,
                                             loadingImage: "assets/img/ajax-loader.gif"});
         }
     };
@@ -1031,6 +1031,22 @@ angular.module('lp-directives')
         }
     };
 })
+.directive('sortablepdbstructure', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Structure',
+                                           rightLabel: scope.ws,
+                                           subText: scope.fid});
+            p.loading();
+            $(p.body()).KBaseGeneStructureMatches(
+                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
+
+
+
 
 
 /* END new placement in sortable rows for gene landing page */

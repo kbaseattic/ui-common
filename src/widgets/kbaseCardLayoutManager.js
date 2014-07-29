@@ -938,7 +938,7 @@
                 },
                 {
                     my: "left top",
-                    at: "left+350 bottom",
+                    at: "left+375 bottom",
                     of: "#app"
                 }
             );

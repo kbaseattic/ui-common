@@ -17,6 +17,8 @@
             genomeID: null,
             kbCache: null,
             auth: null,
+            hideButtons:false,
+            width:350,
             loadingImage: "assets/img/loading.gif",
         },
 
@@ -83,16 +85,17 @@
             this.$buttonPanel = $("<div>")
                                 .attr("align", "center")
                                 .addClass("btn-group")
-
-		                        //.append(makeButton("domains"))
-		                        //.append(makeButton("operons"))
+		                //.append(makeButton("domains"))
+		                 //.append(makeButton("operons"))
                                 .append(makeButton("sequence"))
                                 .append(makeButton("biochemistry"))
                                 .append(makeButton("structure"));
 
 
             this.$infoPanel.append(this.$infoTable)
-                           .append(this.$buttonPanel);
+            if (!this.options.hideButtons) {
+                this.$infoPanel.append(this.$buttonPanel);
+            }
 
             this.$elem.append(this.$infoPanel);
         },
@@ -372,6 +375,9 @@
         },
 
         makeContigButton: function(loc) {
+            if (this.options.hideButtons) {
+                return "";
+            }
             if (loc === null || loc[0][0] === null)
                 return "";
 

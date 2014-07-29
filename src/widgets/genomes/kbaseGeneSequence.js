@@ -50,7 +50,7 @@
                                 .addClass("kbwidget-message-pane kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
-            this.$infoPanel = $("<div>");
+            this.$infoPanel = $("<div>").css("overflow","auto");
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
 
@@ -135,7 +135,7 @@
                     if (feature.dna_sequence) { // get dna_sequence from object
                         dnaSequenceStr = feature.dna_sequence;
 			// wrap seq
-			var seq_width = 100;
+			var seq_width = 70;
 			if (dnaSequenceStr.length > seq_width) {
 			    var dnaDispStr = "";
 			    var start_pos = 0;
@@ -170,7 +170,7 @@
 				     dnaSequenceStr = dna_sequences[self.options.featureID];
 				 }
 				 // wrap seq
-				 var seq_width = 100;
+				 var seq_width = 70;
 				 if (dnaSequenceStr.length > seq_width) {
 				     var dnaDispStr = "";
 				     var start_pos = 0;
@@ -210,7 +210,7 @@
                     if (feature.protein_translation) {
 			proteinTranslationStr = feature.protein_translation;
 			// wrap seq
-			var seq_width = 100;
+			var seq_width = 70;
 			if (proteinTranslationStr.length > seq_width) {
 			    var protDispStr = "";
 			    var start_pos = 0;
