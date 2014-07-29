@@ -57,7 +57,7 @@
             //kbws.list_referencing_objects([objectIdentity], function(data) {
             $.when(request1, request2).done(function(ws_list_data,obj_data) {
         		var objInfo = obj_data[0];
-				$('#td_src_'+self.pref).html(objInfo[7]+"/"+objInfo[1]);
+				$('#td_src_'+self.pref).html('<br><i>ws</i>: '+objInfo[7]+"<br><i>name</i>: "+objInfo[1]);
 				$("#input_target_"+self.pref).val(objInfo[1]);
 				console.log(ws_list_data);
 				var td_ws = $('#td_ws_'+self.pref);
