@@ -48,8 +48,8 @@
             allowResize: true,
 
 	    //svgWidth: 500,              // all numbers = pixels.
-            svgWidth: 1000,              // all numbers = pixels.
-            svgHeight: 100,
+            svgWidth: 700,              // all numbers = pixels.
+            svgHeight: 70,
             trackMargin: 5,
 	    //trackThickness: 15,
             trackThickness: 20,
@@ -74,7 +74,8 @@
             genomeId: null,
             kbCache: null,
         },
-
+        
+        $contigViewPanel : null,
 
 	/** SEED ontology mappings
 	//
@@ -109,8 +110,6 @@
         init: function(options) {
             this._super(options);
 
-            this.$elem.css("overflow","auto")
-            
             // 1. Check that needed options are present (basically contig)
             if (this.options.contig === null) {
                 // throw an error.
@@ -121,6 +120,16 @@
                                 .addClass("kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
+            
+            var $contigViewPanelWrapper = $('<div/>');
+            this.$contigViewPanel = $('<div id="contigmainview" align="center"/>').css({'overflow' : 'auto'});
+            $contigViewPanelWrapper
+                .append(this.$contigViewPanel);
+                //.append("<div>").KBaseContigBrowserButtons({ browser: self });
+            
+            this.$elem.append($contigViewPanelWrapper);
+            
+            
            /* if (!options.contig) {
                 options.kbCache.ws.get
             }*/
@@ -173,7 +182,7 @@
                              .classed("kbcb-tooltip", true);
 
             // Init the SVG container to be the right size.
-            this.svg = d3.select(this.$elem[0])
+            this.svg = d3.select(this.$contigViewPanel[0])
                          .append("svg")
                          .attr("width", this.options.svgWidth)
                          .attr("height", this.options.svgHeight)
