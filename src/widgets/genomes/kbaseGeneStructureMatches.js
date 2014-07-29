@@ -88,6 +88,11 @@
                               //	           pdbid + "'></span>" );
                               return( "<img src='http://www.rcsb.org/pdb/images/" + pdbid + "_bio_r_80.jpg'>");
                              };
+            this.rightj = function( s, width )  // right justify a string to size "width", needed to ensure
+                             {                  // string sorting of numeric columns acts like numeric sort
+                              var t = "              " + s;
+                              return( t.substring( t.length - width, t.length ) );
+                             };
             self = this;
             this.matchtab = [];   // array of row objects to go into the kbaseTable
             $.when(lookup_prom).done(
@@ -96,7 +101,7 @@
                                            var fidkey;
                                            var i;
                                            var nhits;
-                                           var max_show = 5;
+                                           var max_show = 1000;  // 5;
                                            //console.log( "lookup done, lookup_res is " );
                                            //console.log( lookup_res );
 
@@ -117,12 +122,16 @@
                                                      nhits = hits.length;
                                                      for ( i = 0; i < hits.length; i++ )
                                                         {
-                                                         //console.log( hits[i].pdb_id );
+                                                         //console.log( typeof( hits[i].align_length ));
+                                                         //console.log( "[" + hits[i].align_length  + "]" );
+                                                         console.log( typeof( hits[i].percent_id ));
+                                                         console.log( "[" + self.rightj( hits[i].percent_id.toFixed(2), 6 )  + "]" );
                                                          if ( i < max_show )
                                                              self.matchtab.push( { 'image': self.pdbimage( hits[i].pdb_id ),
                                                              	                   'PDB id': self.pdburl( hits[i].pdb_id, hits[i].chains ),
-                                                                                   '% identity': hits[i].percent_id.toString(),
-                                                                                   'align. len.': hits[i].align_length.toString()
+                                                                                   '% identity': self.rightj( hits[i].percent_id.toFixed( 2 ), 6),
+                                                                                   //'align. len.': hits[i].align_length.toString()
+                                                                                   'align. len.': self.rightj( hits[i].align_length.toString(), 5 )
                                                                                   } 
                                                                                 );
                                                         }
@@ -149,10 +158,13 @@
                                                                                              ],
                                                                                     rows : self.matchtab
                                                                                     }
-                                                                            }
+                                                                             }
                                                                           );
                                                 if ( nhits >= max_show )
                                                 	self.$infoPara.append( "<BR>(" + max_show + " of " + nhits + " matches shown)")
+                                                if ( nhits >= 4 )
+                                                    self.$structTable.height( 400 );
+                                                //self.$structTable.addClass( "scroll-pane vertical-only" );
                                                }
                                            self.hideMessage();
                                            self.$infoPanel.show();
