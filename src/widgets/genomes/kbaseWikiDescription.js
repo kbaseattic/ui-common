@@ -182,9 +182,9 @@
                     this.hideMessage();  
                     //this.$elem.append($tabSet).append($contentDiv);
                     
-                    this.$elem.append('<table cellpadding="4" cellspacing="2" border=0 style="width:100%;">' +
+                    this.$elem.append($('<div id="mainview">').css("overflow","auto").append('<table cellpadding="4" cellspacing="2" border=0 style="width:100%;">' +
                               '<tr><td style="vertical-align:top"><div id="taxondescription"></td>'+
-                              '<td style="vertical-align:top"><div id="taxonimage" style="width:400px;"></td></tr><br>');
+                              '<td style="vertical-align:top"><div id="taxonimage" style="width:400px;"></td></tr><br>'));
                     
                     
                     //this.$elem.find('#loading-mssg').hide();

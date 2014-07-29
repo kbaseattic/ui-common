@@ -28,11 +28,11 @@
         			'<tr><td>Target object name:</td><td><input type="text" id="input_target_'+this.pref+'" style="width: 150px;"/></td></tr>' +
         			'<tr><td/><td><button id="btn_copy_'+this.pref+'">Copy</button></td></tr>' +
         			'</table>');*/
-        	container.append('' +
+        	container.append($('<div />').css("overflow","auto").append('' +
         			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Source Data:</b></span> <span id="td_src_'+this.pref+'"/></p>'+
         			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Target Workspace:</b></span><span id="td_ws_'+this.pref+'"/></p>'+
         			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Target Data Name:</b></span><input type="text" id="input_target_'+this.pref+'" style="width: 150px;"/></p>'+
-        			'<button id="btn_copy_'+this.pref+'" class="btn btn-primary">Copy</button>');
+        			'<button id="btn_copy_'+this.pref+'" class="btn btn-primary">Copy</button>'));
         	
             var objectIdentity = self.getObjectIdentity(options.wsNameOrId, options.objNameOrId, options.objVer);
 

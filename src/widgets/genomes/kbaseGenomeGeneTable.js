@@ -47,8 +47,8 @@
             		container.empty();
             		var gnm = data[0].data;
             		////////////////////////////// Genes Tab //////////////////////////////
-            		container.append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'genes-table" \
-            		class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>');
+            		container.append($('<div />').css("overflow","auto").append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'genes-table" \
+            		class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>'));
             		var genesData = [];
             		var geneMap = {};
             		var contigMap = {};
