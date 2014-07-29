@@ -71,6 +71,8 @@
             else {
 		// it is a name already, so we can get right to the fun
 		wsName = options.wsNameOrId;
+		self.objName = options.objNameOrId;
+		self.wsName  = options.wsNameOrId;
 		self.getTheRefsAndRender();
             }
 	    
@@ -181,11 +183,11 @@
 		
 		var mentionStr = ""
 		if (self.userList[ud]['narCount']>0) {
-		    mentionStr += '<span title="'+narToolTip+'">'+self.userList[ud]['narCount']+' in narratives</span>';
+		    mentionStr += '<span style="cursor:help;" title="'+narToolTip+'">'+self.userList[ud]['narCount']+' in narratives</span>';
 		}
 		if (self.userList[ud]['refCount'] > 0) {
 		    if (mentionStr.length>0) { mentionStr += ",<br>"}
-		    mentionStr += '<span title="'+refToolTip+'">'+self.userList[ud]['refCount']+" in data objects</span>";
+		    mentionStr += '<span style="cursor:help;" title="'+refToolTip+'">'+self.userList[ud]['refCount']+" in data objects</span>";
 		}
 		tblData.push({name:self.userList[ud]['name'],user_id:ud,mentions:mentionStr});
 	    }

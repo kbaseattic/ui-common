@@ -69,6 +69,8 @@
             else {
 		// it is a name already, so we can get right to the fun
 		wsName = options.wsNameOrId;
+		self.objName = options.objNameOrId;
+		self.wsName = options.wsNameOrId;
 		self.getTheRefsAndRender();
             }
 	    
