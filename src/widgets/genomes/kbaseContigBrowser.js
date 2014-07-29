@@ -137,7 +137,7 @@
 
 	wait_for_seed_load : function () {
 	    this.assignSeedColors (this.seedTermsUniq);
-	    console.log ("SEED INFO LOADED");
+	    ////.log ("SEED INFO LOADED");
 	    this.render();
 
             var self = this;
@@ -178,7 +178,7 @@
                          .attr("height", this.options.svgHeight)
                          .classed("kbcb-widget", true);
 
-	    console.log ("BUILDING TRACK");   // DEBUG
+	    //console.log ("BUILDING TRACK");   // DEBUG
             this.trackContainer = this.svg.append("g");
 
             this.xScale = d3.scale.linear()
@@ -211,7 +211,7 @@
             if (this.options.centerFeature != null)
                 this.setCenterFeature(this.options.centerFeature);
 
-	    console.log ("RENDER OF CONTIG BROWSER COMPLETE");
+	    //console.log ("RENDER OF CONTIG BROWSER COMPLETE");
 
             return this;
         },
@@ -1026,9 +1026,9 @@
 		}
 
 
-		for (var i=0; i < seedTermsUniq[0].length; i++) {
+		/*for (var i=0; i < seedTermsUniq[0].length; i++) {
 		    console.log (i + " " + seedColors[0][seedTermsUniq[0][i]] + " " + seedTermsUniq[0][i]);
-		}
+		}*/
 
 		//this.seedColors = seedColors;
 		
