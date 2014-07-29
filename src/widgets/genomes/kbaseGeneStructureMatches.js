@@ -95,7 +95,14 @@
                              };
             self = this;
             this.matchtab = [];   // array of row objects to go into the kbaseTable
-            $.when(lookup_prom).done(
+            $.when(lookup_prom).fail(
+				    function(error) {
+					console.log("PDB structure widget could not perform lookup");
+					console.log(error);
+					self.$elem.append("<b>Structure match not yet computed for this feature.  Soon, you will soon be able to compute structure matches for your genome in the Narrative interface.");
+				    }
+				)
+			       .done(
                                       function( lookup_res )
                                          {
                                            var fidkey;

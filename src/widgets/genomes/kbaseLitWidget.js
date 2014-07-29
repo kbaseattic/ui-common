@@ -248,7 +248,7 @@
 											tableInput.push(tableInputRow)
 										}
 										
-										console.log(articleIDs)
+										//console.log(articleIDs)
 										var sDom = 't<flip>'
 										if (tableInput.length<=10) { sDom = 'tfi'; }					
 										var tableSettings = {

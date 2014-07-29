@@ -1139,9 +1139,9 @@
 		}
 
 
-		for (var i=0; i < seedTermsUniq[0].length; i++) {
+		/*for (var i=0; i < seedTermsUniq[0].length; i++) {
 		    console.log (i + " " + seedColors[0][seedTermsUniq[0][i]] + " " + seedTermsUniq[0][i]);
-		}
+		}*/
 
 		//this.seedColors = seedColors;
 		
