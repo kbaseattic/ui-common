@@ -17,6 +17,8 @@
             genomeID: null,
             kbCache: null,
             auth: null,
+            hideButtons:false,
+            width:350,
             loadingImage: "assets/img/loading.gif",
         },
 
@@ -84,12 +86,16 @@
                                 .attr("align", "center")
                                 .addClass("btn-group")
 		                //.append(makeButton("domains"))
-		                //.append(makeButton("operons"))
+		                 //.append(makeButton("operons"))
                                 .append(makeButton("sequence"))
-                                .append(makeButton("biochemistry"));
+                                .append(makeButton("biochemistry"))
+                                .append(makeButton("structure"));
+
 
             this.$infoPanel.append(this.$infoTable)
-                           .append(this.$buttonPanel);
+            if (!this.options.hideButtons) {
+                this.$infoPanel.append(this.$buttonPanel);
+            }
 
             this.$elem.append(this.$infoPanel);
         },
@@ -177,7 +183,7 @@
                 //    }
                 //);
 
-                /*self.$buttonPanel.find("button#sequence").click(
+                self.$buttonPanel.find("button#sequence").click(
                     function(event) { 
                         self.trigger("showSequence", { event: event, featureID: self.options.featureID }) 
                     }
@@ -186,7 +192,12 @@
                     function(event) { 
                         self.trigger("showBiochemistry", { event: event, featureID: self.options.featureID }) 
                     }
-                );*/
+                );
+                self.$buttonPanel.find("button#structure").click(
+                     function(event) { 
+                         self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID }) 
+                     }
+                );
                 self.hideMessage();
                 self.$infoPanel.show();
             });
@@ -287,7 +298,9 @@
                         this.$buttonPanel.find("button#operons").click(function(event) {
                             window.alert("No operon assignments available for this gene.  You will be able to compute operon assignments in the Narrative in the future.");
                         });
-                        
+                        this.$buttonPanel.find("button#structure").click(function(event) {
+                            window.alert("No structure assignments available for this gene.  You will be able to compute structure assignments in the Narrative in the future.");
+                        });                        
                         
                         //determine if a feature id and its protein MD5 translation is found in the CDS- if it is,
                         //return true.  We use this as a hack to see if we have gene info for this feature for WS objects.
@@ -302,6 +315,10 @@
                                             self.$buttonPanel.find("button#operons").off("click");
                                             self.$buttonPanel.find("button#operons").click(function(event) { 
                                                 self.trigger("showOperons", { event: event, featureID: self.options.featureID });
+                                            });
+                                            self.$buttonPanel.find("button#structure").off("click");
+                                            self.$buttonPanel.find("button#structure").click(function(event) { 
+                                                self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID });
                                             });
                                         }
                                    } // we don't add error function- if they don't match or this fails, do nothing.
@@ -358,6 +375,9 @@
         },
 
         makeContigButton: function(loc) {
+            if (this.options.hideButtons) {
+                return "";
+            }
             if (loc === null || loc[0][0] === null)
                 return "";
 

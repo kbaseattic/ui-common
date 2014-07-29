@@ -181,7 +181,20 @@
         <script  src="../src/widgets/genomes/kbaseGeneBiochemistry.js"></script>
         <script  src="../src/widgets/genomes/kbasePanGenome.js"></script>
         <script  src="../src/widgets/genomes/kbasePhenotypeSet.js"></script>
-        <script  src="../src/widgets/genomes/kbaseFunctSeqGenomeComparison.js"></script>        
+        <script  src="../src/widgets/genomes/kbaseFunctSeqGenomeComparison.js"></script>   
+
+
+        <!-- protein structure KB widget and associated needs here -->
+
+        <!-- These are needed for for PDB image widgets - probably should be moved upwards someplace... -->
+        <script type="text/javascript" src="http://www.rcsb.org/pdb/widgets/rcsbPdbImageLib.js"> </script>
+        <!-- not sure if kbaseTable.js is automatically included already-->
+        <script src='../src/widgets/kbaseTable.js'></script>
+        <!-- protein structure service client - maybe this should be moved upwards someplace? -->
+        <script src="assets/js/kbclient/KBaseProteinStructureClient.js"></script>
+        <script  src="../src/widgets/genomes/kbaseGeneStructureMatches.js"></script>
+
+	
         <script  src="../src/widgets/genomes/kbaseSimulationSet.js"></script>
         <script  src="../src/widgets/kbaseCardLayoutManager.js"></script>
 
@@ -191,6 +204,7 @@
         <script  src="../src/widgets/kbaseCardLayoutManager.js"></script>
 	    <script  src="../src/widgets/genomes/kbaseSEEDFunctions.js"></script>
 	    <script  src="../src/widgets/genomes/kbaseGenomeGeneTable.js"></script>
+
 
         <!-- End Genome widgets -->
 	

@@ -109,6 +109,8 @@
         init: function(options) {
             this._super(options);
 
+            this.$elem.css("overflow","auto")
+            
             // 1. Check that needed options are present (basically contig)
             if (this.options.contig === null) {
                 // throw an error.
@@ -119,10 +121,9 @@
                                 .addClass("kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
-            if (!options.contig) {
+           /* if (!options.contig) {
                 options.kbCache.ws.get
-            }
-            
+            }*/
             
             
             this.cdmiClient = new CDMI_API(this.cdmiURL);
@@ -137,7 +138,7 @@
 
 	wait_for_seed_load : function () {
 	    this.assignSeedColors (this.seedTermsUniq);
-	    console.log ("SEED INFO LOADED");
+	    ////.log ("SEED INFO LOADED");
 	    this.render();
 
             var self = this;
@@ -178,7 +179,7 @@
                          .attr("height", this.options.svgHeight)
                          .classed("kbcb-widget", true);
 
-	    console.log ("BUILDING TRACK");   // DEBUG
+	    //console.log ("BUILDING TRACK");   // DEBUG
             this.trackContainer = this.svg.append("g");
 
             this.xScale = d3.scale.linear()
@@ -211,7 +212,7 @@
             if (this.options.centerFeature != null)
                 this.setCenterFeature(this.options.centerFeature);
 
-	    console.log ("RENDER OF CONTIG BROWSER COMPLETE");
+	    //console.log ("RENDER OF CONTIG BROWSER COMPLETE");
 
             return this;
         },
@@ -371,7 +372,7 @@
                 if(self.options.centerFeature) {
                     for (var i=0; i<genome.data.features.length; i++) {
                         var f = genome.data.features[i];
-                        if (f.feature_id === self.options.centerFeature) {
+                        if (f.id === self.options.centerFeature) {
                             if (f.location && f.location.length > 0) {
                                 self.options.contig = f.location[0][0];
                                 contigId = f.location[0][0];
@@ -563,7 +564,7 @@
 
                 if (self.options.centerFeature && useCenter) {
                     // make a region around the center and use it.
-                    var f = this.wsFeatureSet[self.options.centerFeature];
+                    var f = self.wsFeatureSet[self.options.centerFeature];
                     if (f) {
                         self.options.start = Math.max(0, Math.floor(parseInt(f.location[0][1]) + (parseInt(f.location[0][3])/2) - (self.options.length/2)));
                         region = [self.options.start, self.options.start + self.options.length - 1];
@@ -1026,9 +1027,9 @@
 		}
 
 
-		for (var i=0; i < seedTermsUniq[0].length; i++) {
+		/*for (var i=0; i < seedTermsUniq[0].length; i++) {
 		    console.log (i + " " + seedColors[0][seedTermsUniq[0][i]] + " " + seedTermsUniq[0][i]);
-		}
+		}*/
 
 		//this.seedColors = seedColors;
 		
