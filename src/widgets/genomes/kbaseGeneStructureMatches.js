@@ -171,7 +171,7 @@
                                                 	self.$infoPara.append( "<BR>(" + max_show + " of " + nhits + " matches shown)")
                                                 if ( nhits >= 4 )
                                                     self.$structTable.height( 400 );
-                                                //self.$structTable.addClass( "scroll-pane vertical-only" );
+                                                    self.$structTable.addClass( "scroll-pane vertical-only" );
                                                }
                                            self.hideMessage();
                                            self.$infoPanel.show();
