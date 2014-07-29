@@ -103,19 +103,17 @@
 					var terms = {};	  
 					var binWidth   = self.options.width; // This represents the boundary of the div; can be used to set the boundary of the card.
 					var binHeight  = self.options.height;
-					console.log(binWidth)
 					var $bin = $("<div>").css({"float":"left","width":binWidth})
 					
-					console.log(biclusters)
 					
 					for (i=0;i<biclusters.length;i++) {
 						w = Math.floor(biclusters[i].condition_ids.length)>=20?Math.floor(biclusters[i].condition_ids.length):20
-						h = Math.floor(biclusters[i].gene_ids.length/2)>=20?Math.floor(biclusters[i].gene_ids.length/2):20
-						blocks.push( { w: w, h: h, index: i } )
-						
+						h = Math.floor(biclusters[i].gene_ids.length/2)>=20?Math.floor(biclusters[i].gene_ids.length/2):20						
+						var enrichedTerms = []
 						for (var term in biclusters[i].enriched_terms) {
+							
 							if (biclusters[i].enriched_terms[term] != "") {
-								
+								enrichedTerms.push(biclusters[i].enriched_terms[term])
 								if (term in terms) {
 									if (biclusters[i].enriched_terms[term] in terms[term]) {terms[term][biclusters[i].enriched_terms[term]].push(i)}
 									else {terms[term][biclusters[i].enriched_terms[term]] = [i]}
@@ -127,10 +125,22 @@
 								}
 							}
 						}
+						console.log(enrichedTerms)
+						blocks.push( { w: w, h: h, index: i, terms: enrichedTerms, score: biclusters[i].full_crit } )
 					}
 					
-					console.log(terms)
+					console.log(blocks)
 					
+					colors = ["#CCCCCC","#CCA3A3","#CC7A7A","#CC5252","#CC2929","#CC0000"]
+					
+					var colorScale = function(d) {
+						if (d >= 1) return colors[5]						
+						if (d < 1 && d > 0.8) return colors[4]
+						if (d <= 0.6 && d > 0.4) return colors[3]
+						if (d <= 0.4 && d > 0.2) return colors[2]
+						if (d <= 0.2 && d > 0) return colors[1]
+						if (d <= 0) return colors[0]
+					};
 					// Instantiate Packer
 					
 					var count = 0
@@ -140,7 +150,6 @@
 							  
 						// Sort inputs by area for best results.
 						blocks = blocks.sort(function(a,b) { return (a.h*a.w < b.h*b.w); }); 
-						// blocks = _.shuffle(blocks)
 						packer.fit(blocks);
 					
 						// Draw the blocks
@@ -166,8 +175,9 @@
 							var w = block.w - (borderWidth*4);
 							var cssClass = ['fadeInLeftBig','fadeInRightBig'][_.random(0,1)];
 								  
-							var $item = $('<div >', { "id": 'MAK_tile_'+i, class: 'item animated' })
+							var $item = $('<div >', { "id": 'MAK_tile_'+block.index, class: 'item animated' })
 													.css({ height: h, width: w, top: block.fit.y, left: block.fit.x, borderWidth: borderWidth,
+													// "background": colorScale(block.score),
 													"background": "steelblue",
 													"position": "absolute",
 													"border": "solid #1919A3",
@@ -177,14 +187,27 @@
 													.addClass(cssClass)    
 													.on("mouseover", 
 														function() { 
-															d3.select(this).style("background", d3.rgb(d3.select(this).style("background")).darker()); 
+															if (!$(this).hasClass('picked')) {
+																d3.select(this).style("background", "#00FFCC"); 
+																for (term in block.terms) {
+																	barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
+																	d3.select("#"+barChartSelector).style("background", "#00FFCC")
+																}
+															}
 															self.tooltip = self.tooltip.text("bicluster: "+biclusters[block.index].bicluster_id+", rows: "+biclusters[block.index].gene_ids.length+", columns: "+biclusters[block.index].condition_ids.length+", number: "+i);
 															return self.tooltip.style("visibility", "visible"); 
 														}
 													)
 													.on("mouseout", 
 														function() { 
-															d3.select(this).style("background", d3.rgb(d3.select(this).style("background")).brighter()); 
+															if (!$(this).hasClass('picked')) {
+																d3.select(this).style("background", "steelblue");
+																for (term in block.terms) {
+																	barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')																
+																	origColor = d3.select("#"+barChartSelector).attr("class")
+																	d3.select("#"+barChartSelector).style("background", origColor)
+																}
+															}
 															return self.tooltip.style("visibility", "hidden"); 
 														}
 													)
@@ -195,7 +218,7 @@
 													)
 													.on("click", 
 														function(event) {						
-															self.trigger("showMAKBicluster", { bicluster: [biclusters[block.index],bicluster_info], ws: self.options.ws, title: biclusters[block.index].bicluster_id, event: event });
+															self.trigger("showMAKBicluster", { bicluster: [biclusters[block.index],bicluster_info], ws: self.options.ws, event: event });
 													});
 														
 									  
@@ -205,7 +228,7 @@
 						
 					self.$elem.append($bin)
 					
-					self.trigger("showBarChart", {terms: terms, event: event})
+					self.trigger("showBarChart", {terms: terms, ws: self.options.ws, id: self.options.id, event: event})
 					
                 },
 

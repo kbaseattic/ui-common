@@ -78,7 +78,7 @@
 
 					self.$elem.find("#toggle_heatmap").click(function() {
 						loader.show()
-						self.trigger("showHeatMap", {bicluster: data[0].data, event: event})
+						self.trigger("showHeatMap", {bicluster: data[0].data, ws: self.options.ws, id: self.bicluster.bicluster_id, event: event})
 						//$("#heatmap").toggle();
 						loader.hide()
 						
@@ -156,9 +156,9 @@
         getData: function() {
             return {
                 type: "MAKBicluster",
-                id: this.options.bicluster.id,
-                workspace: this.options.workspace_id,
-                title: this.options.title
+                id: this.options.bicluster[0].bicluster_id,
+                ws: this.options.ws,
+                title: "MAK Bicluster"
             };
         },
         showMessage: function(message) {

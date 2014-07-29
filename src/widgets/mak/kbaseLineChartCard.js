@@ -115,8 +115,6 @@
                                     return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
                                 }
                             )
-				// .append("title")
-				// .text(function(i) {return conditions[i]})
 			
 			self.$elem.find("g.axis > path").css({"display":"none"})
 			self.$elem.find("g.axis > line").css({"stroke":"lightgrey"})
@@ -231,7 +229,7 @@
 				type: "LineChartCard",
 				row: this.options.row,
 				id: this.options.id,
-				workspace: this.options.ws,
+				ws: this.options.ws,
 				auth: this.options.auth,
 				userId: this.options.userId,
 				title: "LineChart Card",

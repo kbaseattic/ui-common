@@ -5,8 +5,6 @@
         version: "1.0.0",
 
         options: {
-            id: null,
-            ws: null,
             loadingImage: "../../widgets/images/ajax-loader.gif",
             title: "MAK Result Overview",
             isInCard: false,
@@ -84,7 +82,7 @@
                                             .on("click", 
                                                 function(event) {
                                                     $(self.$elem.selector + " > select option:selected").each(function() {
-                                                    self.trigger("showMAKBicluster", { bicluster: [self.collection.data.sets[0].biclusters[$(this).attr("id")],self.collection.data.sets[0]], ws: self.options.ws, title: self.collection.data.sets[0].biclusters[$(this).attr("id")].bicluster_id, event: event });
+                                                    self.trigger("showMAKBicluster", { bicluster: [self.collection.data.sets[0].biclusters[$(this).attr("id")],self.collection.data.sets[0]], ws: self.options.ws, event: event });
                                                 });
                                             })
                                         );

@@ -131,9 +131,9 @@
 				.style("text-anchor", "end")
 				.attr("transform", "translate(-6," + gridSize / 1.5 + ")")
 				.on("click",function(d,i,event){
-					if (!$("div.kblpc-subtitle:contains('"+d.id+"')").length) {self.trigger("showFeature", {featureID: d.id, event: event})}
+					// if (!$("div.kblpc-subtitle:contains('"+d.id+"')").length) {self.trigger("showFeature", {featureID: d.id, event: event})}
 					// self.trigger("showFeature", {featureID: d.id, event: event})
-					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], heatmap: geneLabels, event: event})
+					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], id: self.options.id, ws: self.options.ws, heatmap: geneLabels, event: event})
 				})
 				
 			var conditionLabels = svg.selectAll(".conditionLabel")
@@ -236,7 +236,7 @@
 			return {
 				type: "HeatMapCard",
 				id: this.options.id,
-				workspace: this.options.ws,
+				ws: this.options.ws,
 				auth: this.options.auth,
 				userId: this.options.userId,
 				title: "HeatMap Card",
