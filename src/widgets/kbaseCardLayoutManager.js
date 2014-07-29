@@ -957,16 +957,17 @@
                 }
             );
 
+
             this.addNewCard("KBaseContigBrowser",
                 {
-                    featureID: this.options.data.featureID,
-                    genomeID: this.options.data.genomeID,
-                    workspaceID: this.options.data.workspaceID,
+                    featureId: this.options.data.featureID,
+                    genomeId: this.options.data.genomeID,
+                    workspaceId: this.options.data.workspaceID,
                     kbCache: this.options.data.kbCache
                 },
                 {
                     my: "left top",
-                    at: "left bottom+300",
+                    at: "left bottom+450",
                     of: "#app"
                 }
             );
