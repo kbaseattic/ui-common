@@ -1380,6 +1380,7 @@
                                      "showOperons", 
                                      "showSequence", 
                                      "showBiochemistry", 
+                                     "showStructureMatches",
                                      "showSpecElement", 
                                      "showMemeMotif", 
                                      "showMemeRunParameters", 
@@ -1484,6 +1485,26 @@
              */            
             $(document).on("showBiochemistry", function(event, data) {
                 self.addNewCard("KBaseGeneBiochemistry",
+                {
+                    featureID: data.featureID,
+                    genomeID: data.genomeID,
+                    workspaceID: data.workspaceID,
+                    kbCache: data.kbCache,
+                },
+                {
+                    my: "left top",
+                    at: "center",
+                    of: data.event
+                });
+            });
+
+            /**
+             * Event: showStructureMatches
+             * -----------------------
+             * Adds new KBaseGeneStructureMatches card, based on a feature ID.
+             */            
+            $(document).on("showStructureMatches", function(event, data) {
+                self.addNewCard("KBaseGeneStructureMatches",
                 {
                     featureID: data.featureID,
                     genomeID: data.genomeID,
@@ -1959,6 +1980,7 @@
                 {
                     network: data.network,
                     netname: data.netname,
+		    ws: data.ws
                 },
                 {
                     my: "left top",
