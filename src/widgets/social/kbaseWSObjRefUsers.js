@@ -132,7 +132,9 @@
 							self.userList[data[i]['info'][5]]['narCount']++;
 							self.userList[data[i]['info'][5]]['nars'][narName]=1;
 						    } else {
-							self.userList[data[i]['info'][5]] = {refCount:0, name:"[Login to view name]", narCount:0, refs:[], nars:{narName:1}};
+							self.userList[data[i]['info'][5]] = {refCount:0, name:"[Login to view name]", narCount:0, refs:[], nars:{}};
+							self.userList[data[i]['info'][5]]['narCount']++;
+							self.userList[data[i]['info'][5]]['nars'][narName]=1;
 						    }
 						}
 					    }
@@ -181,7 +183,7 @@
 		    count++;
 		}
 		
-		var mentionStr = ""
+		var mentionStr = "";
 		if (self.userList[ud]['narCount']>0) {
 		    mentionStr += '<span style="cursor:help;" title="'+narToolTip+'">'+self.userList[ud]['narCount']+' in narratives</span>';
 		}

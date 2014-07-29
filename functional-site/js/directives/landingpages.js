@@ -777,8 +777,13 @@ angular.module('lp-directives')
                           narData["metadata"]["data_dependencies"] = [
                             "KBaseGenomes.Genome "+scope.id
                           ];
-                          var metadata = narData["metadata"];
-                          metadata["data_dependencies"] = "";// not sure format of this... JSON.stringify(metadata["data_dependencies"]);
+                          var metadata = {};
+                          for (var key in narData["metadata"]) {
+                            metadata[key] = narData["metadata"][key];
+                          }
+                          if (metadata["data_dependencies"]) {
+                            metadata["data_dependencies"] = JSON.stringify(metadata["data_dependencies"]);
+                          }
                           var objSaveData = {
                             type:"KBaseNarrative.Narrative",
                             data:narData,
