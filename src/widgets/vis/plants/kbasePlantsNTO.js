@@ -691,7 +691,7 @@ $elem.append($tables);
             style : 'background-color : black; color : white;',
             sortable : true,
         },
-        maxVisibleRowIndex : this.options.maxVisibleRowIndex,
+        //maxVisibleRowIndex : this.options.maxVisibleRowIndex,
         navControls : this.options.navControls,
     };
 
