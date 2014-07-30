@@ -279,7 +279,7 @@
                         //}
 
                         // Protein families list.
-                        var proteinFamilies = "None found";
+                        var proteinFamilies = "";
                         if (feature.protein_families) {
                             if (feature.protein_families.length>0) {
                                 proteinFamilies = "";
@@ -289,7 +289,9 @@
                                 }
                             }
                         }
-                        this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
+                        if (proteinFamilies) {
+                            this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
+                        }
 
                         // first add handlers that say we do not have domains or operons for this gene
                         this.$buttonPanel.find("button#domains").click(function(event) { 
