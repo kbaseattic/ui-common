@@ -115,24 +115,23 @@ function KBCacheClient(token) {
 
     var cache = new Cache();
 
+    // some kbase apis
     self.fba = fba;
     self.ws = kbws;
-    self.ujs = ujs
+    self.ujs = ujs;
     self.nar = new ProjectAPI(ws_url, token);
 
+    // some accessible variables
     self.ws_url = ws_url;
     self.search_url = search_url;    
     self.token = token;
+    self.nar_type = 'KBaseNarrative.Narrative';
+
+    // some accessible helper methods
     self.ui = new UIUtils();
 
+    // this is an experiment in caching promises 
     self.req = function(service, method, params) {
-        if (service == 'fba') { 
-            // use whatever workspace server that was configured.
-            // this makes it possible to use the production workspace server
-            // with the fba server.   Fixme: fix once production fba server is ready.
-            params.wsurl = ws_url;
-        }
-
         // see if api call has already been made        
         var data = cache.get(service, method, params);
 
@@ -206,15 +205,15 @@ function KBCacheClient(token) {
             var public_ws = data[2];
 
             var my_nar_prom = kb.ws.list_objects({workspaces: mine_ws, 
-                                              type: 'KBaseNarrative.Narrative',
+                                              type: self.nar_type,
                                               showHidden: 1});
 
             var shared_nar_prom = kb.ws.list_objects({workspaces: shared_ws, 
-                                                  type: 'KBaseNarrative.Narrative',
+                                                  type: self.nar_type,
                                                   showHidden: 1});        
 
             var public_nar_prom = kb.ws.list_objects({workspaces: public_ws, 
-                                                  type: 'KBaseNarrative.Narrative',
+                                                  type: self.nar_type,
                                                   showHidden: 1});
 
             // filter down to unique workspaces that have narrative objects, 

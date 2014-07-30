@@ -483,24 +483,50 @@ div::-webkit-scrollbar-thumb {
     cursor: default;
 }
 
-.panel-default > .panel-heading {
-    /*background-color: #E7EDF2;*/
+#sortable-landing .panel-default > .panel-heading {
+    background-color: #E7EDF2;
 }
+
+.main #sortable-landing .panel-default > .panel-heading {
+    background-color: #F5F5F5;
+}
+
+#sortable-landing .panel-title {
+     color: #0072AF;
+}
+
+.main #sortable-landing .panel-title {
+     color: #323232;
+}
+
+#sortable-landing .panel-subtitle {
+    color: #888;
+    font-family: 'OxygenBold', Arial, sans-serif;
+}
+
+.main #sortable-landing .panel-subtitle {
+    color: #323232;
+    font-family: 'Oxygen', Arial, sans-serif;
+}
+
+
+#sortable-landing th {
+    font-family: 'OxygenBold', Arial, sans-serif; 
+    font-weight: normal;
+}
+
+.main #sortable-landing th {
+    font-family: 'Oxygen', Arial, sans-serif; 
+    font-weight: normal;
+}
+
 
 .panel-title {
     /*color: #0072AF;*/
-    font-family: 'OxygenBold', Arial, sans-serif; ;
+    font-family: 'OxygenBold', Arial, sans-serif;
 }
-/*
-.panel-subtitle {
-    color: #888;
-    font-family: 'OxygenBold', Arial, sans-serif; ;
-}*/
 
-/*
-th {
-    font-family: 'OxygenBold', Arial, sans-serif; ;
-}*/
+
 
 
 /* narrative page */
