@@ -51,6 +51,12 @@ kb_define('kbasePlantsNetworkNarrative',
                     newInput.datasets,
                     function (idx, rec) {
                         datasets.push(rec.id);
+
+                        var description = rec.description;
+                        if (rec.name != rec.id) {
+                            description = rec.name + ' (' + rec.description + ')';
+                        }
+
                         records[rec.id] =
                             {
                                 nodes       : [],
@@ -60,7 +66,8 @@ kb_define('kbasePlantsNetworkNarrative',
                                 dataset     : rec.id,
                                 type        : rec.network_type,
                                 source      : rec.source_ref,
-                                description : rec.name + ' (' + rec.description + ')',
+                                //description : rec.name + ' (' + rec.description + ')',
+                                description : description,
                             }
                         ;
                     }
@@ -115,6 +122,9 @@ kb_define('kbasePlantsNetworkNarrative',
                         var node1 = nodes[edge.node_id1];
                         var node2 = nodes[edge.node_id2];
                         var datasetRec = records[edge.dataset_id];
+
+                        node1.name = node1.name.replace(/\.CDS$/, '');
+                        node2.name = node2.name.replace(/\.CDS$/, '');
 
                         if (! datasetRec.nodesByName[node1.name]) {
                             datasetRec.nodesByName[node1.name] = 1;

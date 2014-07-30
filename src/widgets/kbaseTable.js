@@ -562,6 +562,7 @@ kb_define('kbaseTable',
                             }
                             if (keyB != undefined && keyB.sortValue != undefined) {
                                 keyB = keyB.sortValue;
+
                             }
                             else {
                                 keyB = typeof keyB == 'string' ? keyB.toLowerCase() : keyB;
@@ -771,7 +772,10 @@ kb_define('kbaseTable',
                         filterString += label;
 
                         if (rowData[h] && ! rowData[h].externalSortValue) {
-                            rowData[h].sortValue = label;
+
+                            rowData[h].sortValue = label instanceof jQuery
+                                ? label.text()
+                                : label;
                         }
 
                         $td.append(label);

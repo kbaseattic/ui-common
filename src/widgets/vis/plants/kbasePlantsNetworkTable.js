@@ -64,7 +64,7 @@ kb_define('kbasePlantsNetworkTable',
                                     {
                                         value : 'description',
                                         label : 'Description',
-                                        style: "min-width : 250px; background-color : black; color : white",
+                                        style: "width : 300px; max-width : 300px;  background-color : black; color : white",
                                     },
                                     {
                                         value : 'num_nodes',
@@ -244,8 +244,9 @@ kb_define('kbasePlantsNetworkTable',
                                                     $.each(
                                                         newDataset.edges,
                                                         function (idx, edge) {
-                                                            edge.label = '<b>' + edge.description + '</b>'
-                                                                + '<hr>'
+                                                            //edge.label = '<b>' + edge.description + '</b>'
+                                                            //    + '<hr>'
+                                                            edge.label = '<b>Dataset source for this edge:</b><br>'
                                                                 + d3.keys(edge.activeDatasets).sort().join('<br>');
                                                                 //edge.weight = d3.keys(edge.activeDatasets).length;
                                                                 edge.weight = 1.5;

@@ -62,6 +62,24 @@ $.each(
     function (idx, cluster) {
         if (cluster.type == 'CLUSTER') {
 
+            var enrichment = cluster.user_annotations.go_enrichnment_annotation;
+
+            var go_id = [];
+            var go_term = [];
+            var p_value = [];
+
+            if (enrichment != undefined) {
+                var enrichments = enrichment.split(/\n/);
+                for (var j = 0; j < enrichments.length; j++) {
+                    var m;
+                    if ( m = enrichments[j].match( /(GO:\d+)\(([\d.]+)\)(.+)/ ) ) {
+                        go_id.push(m[1]);
+                        p_value.push(m[2]);
+                        go_term.push(m[3]);
+                    }
+                }
+            }
+
             datasets.push(
                 {
                     id              : cluster.id,
@@ -71,6 +89,9 @@ $.each(
                     num_genes       : 0,
                     num_edges       : 0,
                     go_enrichment : cluster.user_annotations.go_enrichnment_annotation || 'No enrichment',
+                    go_id       : go_id,
+                    p_value     : p_value,
+                    go_term     : go_term,
 
                     nodes       : [],
                     edges       : [],
@@ -438,28 +459,43 @@ var cluster_data = {
         header      : [
             {
                 value : 'styled_cluster_id',
-                label : 'ID',
-                style: "max-width : 190px; background-color : black; color : white",
+                label : 'Cluster ID',
+                style: "width : 80px; background-color : black; color : white",
             },
             {
                 value : 'num_genes',
                 label : 'No. of genes',
-                style: "min-width : 75px; background-color : black; color : white",
+                style: "min-width : 130px; width : 130px; background-color : black; color : white",
             },
             {
                 value : 'num_edges',
                 label : 'No. of edges',
-                style: "min-width : 75px; background-color : black; color : white",
+                style: "min-width : 130px; width : 130px; background-color : black; color : white",
             },
             {
-                value : 'go_enrichment',
-                label : 'GO enrichment',
-                style: "min-width : 75px; background-color : black; color : white",
+                value : 'go_id',
+                label : 'GO ID',
+                style: "width : 70px; background-color : black; color : white",
             },
+            {
+                value : 'go_term',
+                label : 'GO term',
+                style: "width : 110px; background-color : black; color : white",
+            },
+            {
+                value : 'p_value',
+                label : 'p-value',
+                style: "min-width : 90px; width : 90px; background-color : black; color : white",
+            },
+            /*{
+                value : 'go_enrichment',
+                label : 'GO Enrichment',
+                style: "width : 250px; background-color : black; color : white",
+            },*/
             {
                 value : 'gene_list',
                 label : 'Gene List',
-                style: "min-width : 90px; background-color : black; color : white",
+                style: "width : 250px; background-color : black; color : white",
             },
            /* {
                 value : 'checkbox',
@@ -479,8 +515,10 @@ var cluster_data = {
             var $return = $.jqElem('ul').css('list-style', 'none').css('padding-left', '0px');
 
             for (var i = 0; i < 3 && i < row.gene_data.length; i++) {
+                var label = row.gene_data[i].external_id;
+                label = label.replace(/\.CDS$/, '');
                 $return.append(
-                    $.jqElem('li').append(row.gene_data[i].external_id)
+                    $.jqElem('li').append(label)
                 );
             }
 
@@ -496,6 +534,19 @@ var cluster_data = {
                                     $nto.display_gene_list(row.gene_data);
                             })
                         )
+                );
+            }
+
+            return $return;
+
+        }
+        if ( header.match( /^(go_id|go_term|p_value)$/) ) {
+
+            var $return = $.jqElem('ul').css('list-style', 'none').css('padding-left', '0px');
+
+            for (var i = 0; i < row[header].length; i++) {
+                $return.append(
+                    $.jqElem('li').append(row[header][i])
                 );
             }
 
@@ -555,7 +606,32 @@ var $networkGraph = this.data('network')
 $networkGraph.$elem.hide();
 this.networkGraph($networkGraph);
 
-this.data('cluster_table').kbaseTable(cluster_data);
+var clusterTable = $.jqElem('div').kbaseTable(cluster_data);
+
+// all of this stuff here? This is to hack in a grouped header over the top.
+    var headerRow = clusterTable.data('headerRow');
+    console.log(headerRow.find('th:nth-child(3)'));
+    headerRow.find('th:nth-child(3)').after(
+        $.jqElem('th')
+            .attr('style', "background-color : black; color : white")
+            //.attr('colspan', 2)
+            .append('GO enrichment')
+    );
+
+
+    var hrow2 = $.jqElem('tr');
+    hrow2.append(headerRow.find('th:nth-child(5)'));
+    hrow2.append(headerRow.find('th:nth-child(5)'));
+    hrow2.append(headerRow.find('th:nth-child(5)'));
+
+    clusterTable.data('headerRow').find('th').attr('rowspan', 2);
+    clusterTable.data('headerRow').find('th:nth-child(4)').attr('rowspan', 1).attr('colspan', 3);
+
+    clusterTable.data('thead').append(hrow2);
+//end header hack
+
+
+this.data('cluster_table').append(clusterTable.$elem);//kbaseTable(cluster_data);
 
 $elem.append($tables);
 
@@ -597,6 +673,16 @@ $elem.append($tables);
             ],
             rows        : gene_data,
         },
+
+    row_callback : function (cell, header, row, $kb) {
+
+        if (header == 'external_id') {
+            return cell.replace(/\.CDS$/, '');
+        }
+        else {
+            return $kb.default_row_callback(cell, header, row, $kb);
+        }
+    },
 
         sortable    : true,
         hover       : true,
