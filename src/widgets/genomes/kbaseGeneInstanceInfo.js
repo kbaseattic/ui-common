@@ -177,7 +177,7 @@
                 //    }
                 //);
 
-                self.$buttonPanel.find("button#sequence").click(
+                /*self.$buttonPanel.find("button#sequence").click(
                     function(event) { 
                         self.trigger("showSequence", { event: event, featureID: self.options.featureID }) 
                     }
@@ -186,7 +186,7 @@
                     function(event) { 
                         self.trigger("showBiochemistry", { event: event, featureID: self.options.featureID }) 
                     }
-                );
+                );*/
                 self.hideMessage();
                 self.$infoPanel.show();
             });
@@ -352,7 +352,7 @@
 
         makeRow: function(name, value) {
             var $row = $("<tr/>")
-                       .append($("<td />").append(name))
+                       .append($("<th />").append(name))
                        .append($("<td />").append(value));
             return $row;
         },
@@ -390,6 +390,10 @@
             if (!workspaceID)
                 workspaceID = null;
 
+            return $("<div>")
+                .append('<a href="#/genomes/'+workspaceID+'/'+genomeID+'" target="_blank">'+workspaceID+'/'+genomeID+'</a>');
+                
+                
             var self = this;
             var $genomeBtn = $("<button />")
                              .addClass("btn btn-default")

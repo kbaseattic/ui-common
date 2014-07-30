@@ -237,6 +237,40 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 
+.controller('WBGeneLanding', function($scope, $stateParams) {
+    
+    $scope.ws = $stateParams.ws;
+    $scope.fid = $stateParams.fid;
+    $scope.gid = $stateParams.gid;
+    
+    if($scope.ws == "CDS" ) {
+        $scope.ws = "KBasePublicGenomesV3";
+    }
+    if (!$scope.gid) {
+        var temp = $scope.fid.split(".");
+        if (temp.length>3) {
+            $scope.gid = temp[0]+"."+temp[1];
+        }
+    }
+    $scope.id = $scope.gid;
+    
+    $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder", 
+        handle: '.panel-heading',
+        cancel: '.panel-title,.panel-subtitle,.label,.glyphicon',
+        start: function() {
+          $(this).find('.panel-body').addClass('hide');
+          $(this).sortable('refreshPositions');
+        },
+        stop: function() {
+          $(this).find('.panel-body').removeClass('hide');
+        }
+    });
+
+    //$( "#sortable-landing" ).disableSelection();
+})
+
+
+
 .controller('WBModelLanding', function($scope, $stateParams, $location) {
 
     var type = $location.path().split('/')[2];
@@ -572,7 +606,11 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                 } else {
                     console.log("error logging in");
                     $("#loading-indicator").hide();
-                    $("#login_error").html(args.message);
+                    var errormsg = args.message;
+                    if (errormsg == "LoginFailure: Authentication failed.") {
+                        errormsg = "Login Failed: your username/password is incorrect.";
+                    }
+                    $("#login_error").html(errormsg);
                     $("#login_error").show();
 
                 }

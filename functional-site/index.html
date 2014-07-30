@@ -52,32 +52,11 @@
              * https://github.com/ded/bowser
              */
             function checkBrowser() {
-                var browserCheckItem = 'kbBrowserCheck';
+                var redirectUrl = '//kbase.us/help/messages/unsupported-browser';
 
-                //Just return if we've done this already this session. Seeing the same popup more than once is obnoxious.
-                if (sessionStorage) {
-                    if (sessionStorage.getItem(browserCheckItem))
-                        return;
-                }
-
-                var alertPrefix = 'Unsupported browser detected!\n\n';
-                var alertSuggest = 'For a better experience, we recommend using recent versions of ' + 
-                                   'Safari, Firefox, Chrome, or Internet Explorer.\n\n' +
-                                   'Sorry for any inconvenience!';
-                var alertError = '';
                 if (bowser.msie && bowser.version <= 9) {
-                    var alertError = 'You appear to be using Internet Explorer ' + 
-                                     bowser.version + 
-                                     '. Unfortunately, we don\'t support that web browser. Many ' +
-                                     'functions will be unavailable or have compatibility problems.\n\n';
-                }
-
-                if (alertError) {
-                    alert(alertPrefix + alertError + alertSuggest);
-                }
-
-                if (sessionStorage) {
-                    sessionStorage.setItem(browserCheckItem, '1');
+                    var protocol = window.location.protocol;
+                    window.location = protocol + redirectUrl;
                 }
             }
 
@@ -152,10 +131,11 @@
         <script src="../src/widgets/workspaces/kbaseWSHandler.js"></script>
         <script src="../src/widgets/workspaces/kbaseWSSelector.js"></script>
         <script src="../src/widgets/workspaces/kbaseWSObjectTable.js"></script>
+        <script src="../src/widgets/workspaces/kbaseWSButtons.js"></script>
         <script src="../src/widgets/biochemistry/kbaseRxn.js"></script>
         <script src="../src/widgets/biochemistry/kbaseCpd.js"></script>
 	
-	<!-- ws obj reference related widgets -->
+    	<!-- ws obj reference related widgets -->
         <script src="../ext/d3/sankey.js"></script> <!-- this is a d3 plugin -->
         <link rel="stylesheet" type="text/css" href="assets/css/sankeystyle.css" />
         <script src="../src/widgets/workspaces/kbaseWSReferenceList.js"></script>
@@ -163,7 +143,7 @@
         <script src="../src/widgets/objgraphs/kbaseWSObjGraphCenteredView.js"></script>
         <script src="../src/widgets/social/kbaseWSObjRefUsers.js"></script>
         <script src="../src/widgets/social/kbaseNarrativesUsingData.js"></script>
-	<!-- end ws obj reference related widgets -->
+    	<!-- end ws obj reference related widgets -->
 
         <!-- Genome widgets -->
         <script  src="../src/widgets/kbaseLandingPageCard.js"></script>
@@ -178,8 +158,9 @@
         <script  src="../src/widgets/genomes/kbaseGeneOperon.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneSequence.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneBiochemistry.js"></script>
-
-    	<script  src="../src/widgets/genomes/kbasePhenotypeSet.js"></script>
+        <script  src="../src/widgets/genomes/kbasePanGenome.js"></script>
+        <script  src="../src/widgets/genomes/kbasePhenotypeSet.js"></script>
+        <script  src="../src/widgets/genomes/kbaseFunctSeqGenomeComparison.js"></script>        
         <script  src="../src/widgets/genomes/kbaseSimulationSet.js"></script>
         <script  src="../src/widgets/kbaseCardLayoutManager.js"></script>
 
@@ -407,12 +388,12 @@
             <ul>
                 <li><a href="http://kbase.us/about/about/" target="_blank">About KBase</a></li>
                 <li><a href="http://kbase.us/for-users/user-home/" target="_blank">Documentation</a></li>
-                <li><a href="http://kbase.us/about/kbase-data-policy/" target="_blank">KBase Data Policy</a></li>
+                <li><a href="http://kbase.us/about/terms-and-conditions" target="_blank">Terms and Conditions</a></li>
                 <li><a href="http://kbase.us/contact-us/" target="_blank">Contact Us</a></li>
                 <li><a href="http://science.energy.gov/" target="_blank"><img class="center-block" src="./assets/images/doe_sc_logo.png" /></a></li>
             </ul>
             
-            <div class="disclaimer">This site is for demonstration purposes only.</div>
+            <!-- <div class="disclaimer">This site is for demonstration purposes only.</div> -->
 
         </div>
 

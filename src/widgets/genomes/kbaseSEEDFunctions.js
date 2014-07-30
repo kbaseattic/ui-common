@@ -172,7 +172,7 @@
             var height = Math.max(500, nodes.length * self.barHeight + self.margin.top + self.margin.bottom);
             var i = self.i;
 
-            d3.select("svg").transition()
+            d3.selectAll("#mainview").select("svg").transition()
                 .duration(self.duration)
                 .attr("height", height);
 
@@ -192,7 +192,19 @@
             var nodeEnter = node.enter().append("g")
                 .attr("class", "node")
                 .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-                .style("opacity", 1e-6);
+                .style("opacity", 1e-6)
+                .on("mouseover", function(d) {
+                    d3.select(this).selectAll('text, rect')
+                    .style('font-weight', 'bold')
+                    .style('font-size', '90%')
+                    .style('stroke-width', '3px');
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this).selectAll('text, rect')
+                    .style('font-weight', 'normal')
+                    .style('font-size', '80%')
+                    .style('stroke-width', '1.5px');
+                });
 
             // Enter any new nodes at the parent's previous position.
             nodeEnter.append("rect")
@@ -213,7 +225,8 @@
                 .attr("x", function (d) { return 0 + 275 - scale(d.size) - d.depth * self.stepSize;} )
                 .attr("height", self.barHeight)
                 .attr("width", function (d) { return scale(d.size); })
-                .style("fill", self.color);
+                .style("fill", self.color)
+                .on("click", $.proxy(function(d) {self.click(d)}, self));
 
             nodeEnter.append("text")
                 .attr("dy", 3.5)
@@ -302,7 +315,6 @@
             if (this.options.kbCache) {
                 prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
             } else {
-                console.log("token: " + this.authToken);
                 prom = this.wsClient.get_objects([obj]);
             }
             //var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);

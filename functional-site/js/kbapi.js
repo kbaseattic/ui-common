@@ -85,7 +85,6 @@ function KBCacheClient(token) {
     var auth = {};
     auth.token = token;
 
-    console.log(auth.token)
     if (typeof configJSON != 'undefined') {
         if (configJSON.setup == 'dev') {
             fba_url = configJSON.dev.fba_url;
@@ -199,54 +198,6 @@ function KBCacheClient(token) {
         })
 
 
-        /*
-        var next_prom = $.when(p).then(function(data) {
-            var my_list = data[0];
-            var shared_list = data[1];
-            var public_list = data[2];
-
-            var my_prom = kb.ws.list_objects({workspaces: my_list, 
-                                               type: 'KBaseNarrative.Metadata',
-                                               showHidden: 1});
-
-            var shared_prom = kb.ws.list_objects({workspaces: shared_list, 
-                                               type: 'KBaseNarrative.Metadata',
-                                               showHidden: 1});        
-
-            var public_prom = kb.ws.list_objects({workspaces: public_list, 
-                                               type: 'KBaseNarrative.Metadata',
-                                               showHidden: 1});        
-
-            var p = $.when(my_prom, shared_prom, public_prom).then(function(d1, d2, d3) {
-                var my_nars_ws = [];
-                var shared_nars_ws = [];
-                var public_nars_ws = [];
-
-                for (var i in d1) {
-                    var a = d1[i]
-                    var ws = a[7];
-                    my_nars_ws.push(ws);
-                }
-
-                for (var i in d2) {
-                    var a = d2[i]
-                    var ws = a[7];
-                    shared_nars_ws.push(ws);
-                }
-
-                for (var i in d3) {
-                    var a = d3[i]
-                    var ws = a[7];
-                    public_nars_ws.push(ws);
-                }
-
-                return [my_nars_ws, shared_nars_ws, public_nars_ws];         
-            })
-
-            return p;
-        });*/
-
-
         // next get all narratives from these "project" workspaces
         // fixme: backend!
         var last_prom = $.when(p).then(function(data) {
@@ -270,7 +221,6 @@ function KBCacheClient(token) {
             // and also make get_permissions calls
             var ws_prom = $.when(my_nar_prom, shared_nar_prom, public_nar_prom)
                            .then(function(d1, d2, d3) {
-                console.log(d1, d2, d3)
 
                 var ws1 = [];
                 for (var i in d1) {
@@ -283,13 +233,6 @@ function KBCacheClient(token) {
                     ws2.push(d2[i][7])
                 }
                 var shared_ws_list = ws2.filter( unique )
-
-                var ws3 = [];
-                for (var i in d3) {
-                    ws3.push(d3[i][7])
-                }
-                var public_ws_list = ws3.filter( unique )   
-
 
                 return my_ws_list.concat(shared_ws_list);//[my_ws_list, shared_ws_list];
             })
@@ -310,11 +253,7 @@ function KBCacheClient(token) {
                         perm_proms.push(prom);
                     }
                 } 
-                /*else {
-                    for (var i in ws_list) {
-                        perm_proms.push(undefined);
-                    }
-                }*/
+
                 var all_proms = [my_nar_prom, shared_nar_prom, public_nar_prom].concat(perm_proms)                
 
                 var p = $.when.apply($, all_proms).then(function() { 
@@ -327,15 +266,10 @@ function KBCacheClient(token) {
                     var perms = {};
 
 
-                    if (USER_ID) {
-                        for (var i = 0; i<ws_list.length; i++) {
-                            perms[ws_list[i]] = arguments[3+i]
-                        }
-                    } else {
-                        for (var i = 0; i<ws_list.length; i++) {
-                            perms[ws_list[i]] = {'Everybody': 'r'};
-                        }
+                    for (var i = 0; i<ws_list.length; i++) {
+                        perms[ws_list[i]] = arguments[3+i]
                     }
+
 
                     $('.my-nar-count').text(mine.length)
                     $('.shared-nar-count').text(shared.length);  
@@ -546,9 +480,6 @@ function KBCacheClient(token) {
             case 'Genome': 
                 route = 'genomesbyid';
                 break;
-  	    case 'InteractionDataset':
-	        route = 'ppid';
-	        break;
         }
         return route;
     }
