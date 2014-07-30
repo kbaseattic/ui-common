@@ -5,8 +5,6 @@
         version: "1.0.0",
 
         options: {
-            id: null,
-            workspaceID: null,
             loadingImage: "assets/img/ajax-loader.gif",
             title: "MAK Result Overview Bar Chart",
             isInCard: false,
@@ -33,95 +31,114 @@
         render: function(options) {
 			
 			self = this;
+			console.log(self.options.ws)
 			
 			self.tooltip = d3.select("body")
                              .append("div")
                              .classed("kbcb-tooltip", true);
 							 
-			terms = self.options.terms
-			
+			var terms = self.options.terms
+			console.log(terms)
 			var chartWidth = self.options.width-50
 					
 			var $sideChart = $("<div>").css({"width":chartWidth,"top":50,"position":"absolute"})
-			var flat = []				
-			for (termType in terms) {
-				var termData = []
-				
-				for (term in terms[termType]) {
-					termData.push({"term":term,"tiles":terms[termType][term]})
-					flat.push(terms[termType][term].length)
-				}
-			}
-			var x = d3.scale.linear().domain([0,d3.max(flat)]).range([0,chartWidth])
-			console.log(flat)
+			var flat = []			
+			var termData = []						
+			var termColors = {"TIGRFam":"#CC0000","GO":"#7A00CC","COG":"#666666","SEED":"#CC5200","KEGG":"#007A00"}
+			var count = 0
 			
-			for (termType in terms) {
-				var $barChartDiv = $("<div id='barchart'>"+termType+"</div>").css({"float":"right"})
-				var $barChart = d3.select($barChartDiv.get(0))
-					.selectAll("div")
-					.data(termData)
-						.enter()
-					.append("div")
-						.style({
-							"font": "10px sans-serif",
-							"background-color": "steelblue",
-							"text-align": "right",
-							"padding": "3px",
-							"margin": "1px",
-							"color": "white"
-						})
-						.style("width",function(d) {return x(d.tiles.length) + "px"})
-						.text(function (d) {return d.term})
-						.on("mouseover",							
-							function(d) {                            
-								if (!$(this).hasClass('selected')) {
-									for (tile in d.tiles) {
-										d3.select("#MAK_tile_"+tile).style("background", "#66FFFF")
-									}
-									d3.select(this).style("background-color", "#66FFFF"); 
-								}							
-								self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
-								return self.tooltip.style("visibility", "visible");
-							}
-						)						 
-                        .on("mouseout", 
-                            function(d) { 
-								if (!$(this).hasClass('selected')) {
-									for (tile in d.tiles) {
-										d3.select("#MAK_tile_"+tile).style("background", "steelblue")
-									}
-									d3.select(this).style("background-color", "steelblue"); 									
-								}
-								return self.tooltip.style("visibility", "hidden"); 
-                            }
-                        )
-                        .on("mousemove", 
-                            function() { 
-                                return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
-                            }
-                        )
-						// .on("click",
-							// function(d) {
-								// if ($(this).hasClass('selected')) {
-									// for (tile in d.tiles) {
-										// $("#MAK_tile_"+tile).removeClass('selected')
-									// }
-									// $(this).removeClass('selected')
-								// }
-								// else {
-									// for (tile in d.tiles) {
-										// $("#MAK_tile_"+tile).addClass('selected')
-									// }
-									// $(this).addClass('selected')
-								// }
-							// }
-						// )
-				
-				$sideChart.append($barChartDiv)
-				
+			for (term in terms) {				
+				temp = term.indexOf(":")
+				termType = term.substring(0,temp)
+				var termColor = termColors[termType];
+				termData.push({"term":term,"tiles":terms[term],"color":termColor})
+				flat.push(terms[term].length)
+				count++
 			}
+			
+			console.log(termData)
+			var x = d3.scale.linear().domain([0,d3.max(flat)]).range([0,chartWidth])			
+			var selectionHandler = []
+			var $barChartDiv = $("<div id='barchart'>").css({"float":"right"})
+			var $barChart = d3.select($barChartDiv.get(0))
+				.selectAll("div")
+				.data(termData)
+					.enter()
+				.append("div")
+					.style({
+						"font": "10px sans-serif",						
+						"text-align": "left",
+						"padding": "3px",
+						"margin": "1px",
+						"color": "white"
+					})
+					.attr("class", function(d) {return d.color})
+					.style("background", function(d) {return d.color})
+					.style("width",function(d) {return x(d.tiles.length) + "px"})
+					.attr("id",function(d) {
+						temp = d.term.indexOf(":")
+						term = d.term.substring(temp+1)
+						return term.replace(/\s+/g, '').replace(/,/g,'')
+					})
+					.text(function (d) {return d.term})
+					.on("mouseover",							
+						function(d) {                            
+							if (!$(this).hasClass('picked')) {
+								for (tile in d.tiles) {
+									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')									
+									if (!$("#MAK_tile_"+tileSelector).hasClass('picked')) {
+										d3.select("#MAK_tile_"+tileSelector).style("background", "#00FFCC")
+									}
+								}
+								d3.select(this).style("background", "#00FFCC"); 
+							}							
+							self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
+							return self.tooltip.style("visibility", "visible");
+						}
+					)						 
+                       .on("mouseout", 
+                           function(d) { 
+							if (!$(this).hasClass('picked')) {
+								for (tile in d.tiles) {
+									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
+									if (!$("#MAK_tile_"+tileSelector).hasClass('picked')) {
+										d3.select("#MAK_tile_"+tileSelector).style("background", "steelblue")
+									}
+								}
+								d3.select(this).style("background", d.color);
+							}
+							return self.tooltip.style("visibility", "hidden"); 
+                           }
+                       )
+                       .on("mousemove", 
+                           function() { 
+                               return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+                           }
+                       )
+					.on("click",
+						function(d) {
+							console.log(selectionHandler)
+							if ($(this).hasClass('picked')) {								
+								for (tile in d.tiles) {
+									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
+									temp = selectionHandler.indexOf(tileSelector)
+									selectionHandler.splice(temp,1)
+									if (selectionHandler.indexOf(tileSelector)==-1) $("#MAK_tile_"+tileSelector).removeClass('picked')								
+								}
+								$(this).removeClass('picked')
+							}
+							else {																
+								for (tile in d.tiles) {
+									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
+									selectionHandler.push(tileSelector)
+									$("#MAK_tile_"+tileSelector).addClass('picked')									
+								}
+								$(this).addClass('picked')
+							}
+						}
+					)
 				
-			self.$elem.append($sideChart)
+			self.$elem.append($barChartDiv)
 			
 			return this;
 		},
@@ -130,7 +147,7 @@
             return {
                 type: "MAKResult BarChart",
                 id: this.options.id,
-                workspaceID: this.options.workspaceID,
+                ws: this.options.ws,
                 title: "MAK Result Overview Bar Chart"
             };
         },

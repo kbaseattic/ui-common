@@ -6,7 +6,7 @@
 
         options: {
             id: null,
-            workspaceID: null,
+            ws: null,
             loadingImage: "assets/img/ajax-loader.gif",
             title: "MAK Result Overview Tiles",
             isInCard: false,
@@ -15,7 +15,7 @@
         },
 
 //        workspaceURL: "https://kbase.us/services/workspace",
-        newWorkspaceServiceUrl: "http://dev04.berkeley.kbase.us:7058", 
+        newWorkspaceServiceUrl: "https://kbase.us/services/ws", 
 		
 		//"http://dev04.berkeley.kbase.us:7058", //"https://kbase.us/services/ws", //http://140.221.84.209:7058/",
 
@@ -38,15 +38,10 @@
         },
 
         render: function(options) {
-            this.showMessage("<img src='" + this.options.loadingImage + "'/>");
 
-            /**
-             * Fields to show:
-             * ID
-             * Timestamp
-             * Number of motifs
-             */
+            
             var self = this;
+			var loader = $("<span style='display:none'><img src='"+self.options.loadingImage+"'/></span>").css({"width":"100%","margin":"0 auto"})
 
 			self.tooltip = d3.select("body")
                              .append("div")
@@ -56,8 +51,12 @@
 			//"SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"
 			//this.options.ws
 			//this.options.id
-			
-            this.workspaceClient.get_objects([{workspace: "MAKbiclusters", name: "SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"}], 
+			console.log(this.options.ws)
+			console.log(this.options.id)
+			self.$elem.append(loader)
+			loader.show()
+						
+            this.workspaceClient.get_objects([{workspace: this.options.ws, name: this.options.id}], 
 				
 				function(data){
 					
@@ -105,34 +104,37 @@
 					var terms = {};	  
 					var binWidth   = self.options.width; // This represents the boundary of the div; can be used to set the boundary of the card.
 					var binHeight  = self.options.height;
-					console.log(binWidth)
-					var $bin = $("<div>").css({"float":"left","width":binWidth})
-					
-					console.log(biclusters)
+					var $bin = $("<div>").css({"float":"left","width":binWidth})									
 					
 					for (i=0;i<biclusters.length;i++) {
 						w = Math.floor(biclusters[i].condition_ids.length)>=20?Math.floor(biclusters[i].condition_ids.length):20
-						h = Math.floor(biclusters[i].gene_ids.length/2)>=20?Math.floor(biclusters[i].gene_ids.length/2):20
-						blocks.push( { w: w, h: h, index: i } )
+						h = Math.floor(biclusters[i].gene_ids.length/2)>=20?Math.floor(biclusters[i].gene_ids.length/2):20						
+						var enrichedTerms = []
 						
 						for (var term in biclusters[i].enriched_terms) {
+							
 							if (biclusters[i].enriched_terms[term] != "") {
-								
-								if (term in terms) {
-									if (biclusters[i].enriched_terms[term] in terms[term]) {terms[term][biclusters[i].enriched_terms[term]].push(i)}
-									else {terms[term][biclusters[i].enriched_terms[term]] = [i]}
-								}
-								else {
-									
-									terms[term] = {}
-									terms[term][biclusters[i].enriched_terms[term]] = [i]
-								}
+								enrichedTerms.push(biclusters[i].enriched_terms[term])
+								var termEntry = term+": "+biclusters[i].enriched_terms[term]
+								if (termEntry in terms) terms[termEntry].push(biclusters[i].bicluster_id)
+								else terms[termEntry] = [biclusters[i].bicluster_id]
 							}
 						}
+						blocks.push( { w: w, h: h, index: i, id: biclusters[i].bicluster_id, terms: enrichedTerms, score: biclusters[i].full_crit } )
 					}
 					
-					console.log(terms)
+					// console.log(blocks)
 					
+					colors = ["#CCCCCC","#CCA3A3","#CC7A7A","#CC5252","#CC2929","#CC0000"]
+					
+					var colorScale = function(d) {
+						if (d >= 1) return colors[5]						
+						if (d < 1 && d > 0.8) return colors[4]
+						if (d <= 0.6 && d > 0.4) return colors[3]
+						if (d <= 0.4 && d > 0.2) return colors[2]
+						if (d <= 0.2 && d > 0) return colors[1]
+						if (d <= 0) return colors[0]
+					};
 					// Instantiate Packer
 					
 					var count = 0
@@ -142,7 +144,6 @@
 							  
 						// Sort inputs by area for best results.
 						blocks = blocks.sort(function(a,b) { return (a.h*a.w < b.h*b.w); }); 
-						// blocks = _.shuffle(blocks)
 						packer.fit(blocks);
 					
 						// Draw the blocks
@@ -158,7 +159,7 @@
 						binHeight+=500
 						console.log(count)
 					}
-					
+					loader.hide()
 					_.each(blocks, function(o,i){
 						var block = blocks[i];
 						if (block.fit) {
@@ -167,9 +168,11 @@
 							var h = block.h - (borderWidth*4);
 							var w = block.w - (borderWidth*4);
 							var cssClass = ['fadeInLeftBig','fadeInRightBig'][_.random(0,1)];
-								  
-							var $item = $('<div >', { "id": 'MAK_tile_'+i, class: 'item animated' })
+							var tileID = block.id.replace(/\./g,'').replace(/\|/,'')
+							
+							var $item = $('<div >', { "id": 'MAK_tile_'+tileID, class: 'item animated' })
 													.css({ height: h, width: w, top: block.fit.y, left: block.fit.x, borderWidth: borderWidth,
+													// "background": colorScale(block.score),
 													"background": "steelblue",
 													"position": "absolute",
 													"border": "solid #1919A3",
@@ -179,14 +182,27 @@
 													.addClass(cssClass)    
 													.on("mouseover", 
 														function() { 
-															d3.select(this).style("background", d3.rgb(d3.select(this).style("background")).darker()); 
+															if (!$(this).hasClass('picked')) {
+																d3.select(this).style("background", "#00FFCC"); 
+																for (term in block.terms) {
+																	barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
+																	d3.select("#"+barChartSelector).style("background", "#00FFCC")
+																}
+															}
 															self.tooltip = self.tooltip.text("bicluster: "+biclusters[block.index].bicluster_id+", rows: "+biclusters[block.index].gene_ids.length+", columns: "+biclusters[block.index].condition_ids.length+", number: "+i);
 															return self.tooltip.style("visibility", "visible"); 
 														}
 													)
 													.on("mouseout", 
 														function() { 
-															d3.select(this).style("background", d3.rgb(d3.select(this).style("background")).brighter()); 
+															if (!$(this).hasClass('picked')) {
+																d3.select(this).style("background", "steelblue");
+																for (term in block.terms) {
+																	barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')																
+																	origColor = d3.select("#"+barChartSelector).attr("class")
+																	d3.select("#"+barChartSelector).style("background", origColor)
+																}
+															}
 															return self.tooltip.style("visibility", "hidden"); 
 														}
 													)
@@ -196,8 +212,8 @@
 														}
 													)
 													.on("click", 
-														function(event) {						
-															self.trigger("showMAKBicluster", { bicluster: [biclusters[block.index],bicluster_info], title: biclusters[block.index].bicluster_id, event: event });
+														function(event) {																														
+															self.trigger("showMAKBicluster", { bicluster: [biclusters[block.index],bicluster_info], ws: self.options.ws, event: event });															
 													});
 														
 									  
@@ -207,7 +223,8 @@
 						
 					self.$elem.append($bin)
 					
-					self.trigger("showBarChart", {terms: terms, event: event})
+					self.trigger("showBarChart", {terms: terms, ws: self.options.ws, id: self.options.id})
+					self.trigger("showMAKBicluster", { bicluster: [biclusters[0],bicluster_info], ws: self.options.ws})
 					
                 },
 
@@ -229,7 +246,7 @@
             return {
                 type: "MAKResult Tiles",
                 id: this.options.id,
-                workspaceID: this.options.workspaceID,
+                ws: this.options.ws,
                 title: "MAK Result Overview Tiles"
             };
         },
