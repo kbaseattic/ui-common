@@ -4,7 +4,7 @@
         parent: "kbaseWidget",
         version: "1.0.0",
         options: {
-            title: "Line Chart Card",
+            title: "Gene expression line plot",
             featureID: null,
             row: null,
             isInCard: false,
@@ -250,7 +250,7 @@
                 featureID: this.options.featureID,
                 auth: this.options.auth,
                 userId: this.options.userId,
-                title: "Line Chart Card",
+                title: "Gene expression line plot",
             };
         },
     });
