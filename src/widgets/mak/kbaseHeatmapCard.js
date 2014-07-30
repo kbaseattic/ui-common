@@ -1,4 +1,10 @@
-(function($, undefined) {
+kb_define('KBaseHeatMapCard',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
 	$.KBWidget({
 		name: "KBaseHeatMapCard",
 		parent: "kbaseWidget",
@@ -199,5 +205,5 @@
 			};
 		},
 	});
-})(jQuery);
+});
 

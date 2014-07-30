@@ -1,8 +1,13 @@
 /**
  * Shows a species description taken from Wikipedia.
  * Also includes a picture, but that'll be under a tab or something.
- */
-(function( $, undefined ) {
+ */kb_define('KBaseTaxonOverview',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseTaxonOverview",
         parent: "kbaseWidget",
@@ -576,4 +581,4 @@
             n : "no"
         }
     })
-})( jQuery );
+});

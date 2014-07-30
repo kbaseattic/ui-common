@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+kb_define('KBaseWSObjGraphView',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseWSObjGraphView",
         parent: "kbaseAuthenticatedWidget",
@@ -445,4 +451,4 @@
         monthLookup : ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep","Oct", "Nov", "Dec"]
 
     });
-})( jQuery )
+});

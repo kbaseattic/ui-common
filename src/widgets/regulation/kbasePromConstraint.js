@@ -1,8 +1,13 @@
 /**
  * Just a simple example widget to display promconstraints
  * 
- */
-(function( $, undefined ) {
+ */kb_define('kbasePromConstraint',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "kbasePromConstraint",
         parent: "kbaseWidget",
@@ -118,4 +123,4 @@
             return this;
         }
     });
-})( jQuery )
+});

@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+kb_define('KBaseWSObjGraphCenteredView',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseWSObjGraphCenteredView",
         parent: "kbaseAuthenticatedWidget",
@@ -698,4 +704,4 @@
         monthLookup : ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep","Oct", "Nov", "Dec"]
 
     });
-})( jQuery )
+});

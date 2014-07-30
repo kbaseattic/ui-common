@@ -1,4 +1,10 @@
-(function( $, undefined ) {
+kb_define('kbaseModelTabs',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseModelTabs",    
@@ -45,4 +51,4 @@ $.KBWidget({
         return this;
     }  //end init
 })
-}( jQuery ) );
+});

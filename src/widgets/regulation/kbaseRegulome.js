@@ -1,8 +1,13 @@
 /**
  * Just a simple example widget to display regulomes
  * 
- */
-(function( $, undefined ) {
+ */kb_define('kbaseRegulome',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "kbaseRegulome",
         parent: "kbaseWidget",
@@ -117,4 +122,4 @@
             return this;
         }
     });
-})( jQuery )
+});

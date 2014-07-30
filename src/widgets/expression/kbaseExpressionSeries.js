@@ -1,8 +1,13 @@
 /**
  * Just a simple example widget to display an expression series
  * 
- */
-(function( $, undefined ) {
+ */kb_define('kbaseExpressionSeries',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "kbaseExpressionSeries",
         parent: "kbaseWidget",
@@ -113,4 +118,4 @@
             return this;
         }
     });
-})( jQuery )
+});

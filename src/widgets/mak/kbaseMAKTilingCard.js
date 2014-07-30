@@ -1,4 +1,10 @@
-(function( $, undefined ) { 
+kb_define('KBaseMAKTilingCard',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+ 
     $.KBWidget({ 
         name: "KBaseMAKTilingCard", 
         parent: "kbaseWidget", 
@@ -251,4 +257,4 @@
         }
 	
     });
-})( jQuery );
+});

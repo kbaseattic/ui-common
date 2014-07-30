@@ -1,4 +1,10 @@
-(function( $, undefined ) { 
+kb_define('KBaseLitWidget',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
+ 
     $.KBWidget({ 
         name: "KBaseLitWidget", 
         parent: "kbaseWidget", 
@@ -247,4 +253,4 @@
             };
         },
 	});
-})(jQuery);
+});

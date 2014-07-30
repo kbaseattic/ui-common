@@ -1,5 +1,10 @@
+kb_define('kbaseSimulationSet',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
 
-(function( $, undefined ) {
     $.KBWidget({
         name: "kbaseSimulationSet",
         parent: "kbaseWidget",
@@ -95,4 +100,4 @@
  
 
     });
-})( jQuery )
+});

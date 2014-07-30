@@ -1,8 +1,14 @@
 /**
  * Just a simple example widget to display phenotypedata
  * 
- */
-(function( $, undefined ) {
+ */kb_define('kbasePhenotypeSet',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseMediaEditor'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "kbasePhenotypeSet",
         parent: "kbaseWidget",
@@ -137,4 +143,4 @@
             return this;
         }
     });
-})( jQuery )
+});

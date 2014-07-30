@@ -21,11 +21,18 @@ foreach my $file (@ARGV) {
         push @deps, $1;
     }
 
+    if ($widget =~ /parent\s*:\s*['"](kbase[a-zA-Z]+)/) {
+        push @deps, $1;
+    }
+
     my %seen = ($name => 1);
     @deps = grep {! $seen{$_}++} @deps;
     unshift @deps, 'jquery', 'kbwidget';
 
-
+    if ($widget =~ /kb_define/) {
+        warn "Already has kb_define : $file";
+        next;
+    }
 
     my $s1 = $widget =~ s/\s*\(\s*function\s*\(\s*\$\s*(,\s*undefined)?\s*\)\s*{/rewrite($name, @deps)/e;
 
