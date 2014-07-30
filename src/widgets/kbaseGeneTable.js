@@ -40,7 +40,8 @@
         parent : 'kbaseTable',
         version: "0.1.0",
         options: {
-            table: null
+            table: null,
+            maxVisibleRowIndex : 20,
         },
 
         wsUrl: "https://kbase.us/services/ws/",
@@ -62,7 +63,7 @@
                 style : 'background-color : #EEEEEE; color : #0D7876;',
                 sortable : true,
             };
-
+console.log(options);
             return this._super(options);
         },
 
