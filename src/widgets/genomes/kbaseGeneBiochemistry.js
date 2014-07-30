@@ -49,7 +49,7 @@
                                 .addClass("kbwidget-message-pane kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
-            this.$infoPanel = $("<div>");
+            this.$infoPanel = $("<div>").css("overflow","auto");
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
 

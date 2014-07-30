@@ -16,19 +16,26 @@ angular.module('narrative-directives')
                 $(element).loading()
 
                 scope.loadRecentNarratives = function() {
-                    var p = kb.nar.get_narratives();
+                    var p = kb.ws.list_objects({type: kb.nar_type}).fail(function(e){
+                        $(ele).rmLoading();
+                        $(ele).append('<div class="alert alert-danger">'+
+                                        e.error.message+'</div>')
+                    });
+
                     $.when(p).done(function(results){
                         $(element).rmLoading();
 
                         var narratives = [];
-
                         if (results.length > 0) {
                             for (var i in results) {
                                 var nar = {};
-                                nar.id = results[i][0];
                                 nar.name = results[i][1];
+                                if (nar.name.slice(0,4) == 'auto') continue;
+
+                                nar.id = results[i][0];
                                 nar.wsid = results[i][6]
                                 nar.ws = results[i][7];
+                                nar.owner = results[i][5];
 
                                 nar.timestamp = kb.ui.getTimestamp(results[i][3]);
                                 nar.nealtime = kb.ui.formateDate(nar.timestamp) 
@@ -46,8 +53,6 @@ angular.module('narrative-directives')
                 }
 
                 scope.loadRecentNarratives();
-               
-		
             }  /* end link */
         };
     })

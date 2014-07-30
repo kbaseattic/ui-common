@@ -40,7 +40,7 @@
             self.wsName = options.wsNameOrId;
             
             self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>finding all data that references this object...</center></p></div>');
-            self.$elem.append('<div id="mainview">')
+            self.$elem.append($('<div id="mainview">').css("overflow","auto"));
             //self.$elem.append(JSON.stringify(options)+"<br>");
             
             // get the refs
