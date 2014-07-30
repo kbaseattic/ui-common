@@ -1885,6 +1885,7 @@ angular.module('ws-directives')
                     obj_ids.push(obj);
                 }
 
+                console.log('obj_ids', obj_ids)
                 var prom = kb.ws.delete_objects(obj_ids);
                 $.when(prom).done(function(data) {
                     kb.ui.notify('Moved '+obj_ids.length+' object(s) to trashbin')                     
@@ -2053,6 +2054,7 @@ angular.module('ws-directives')
 
                 var prom = kb.nar.get_narrative_deps({fq_id: fq_id, 
                         callback: function(results) {
+                            console.log('results', results)
                             content.append("<tr><td>" + results.name + "</td><td>Narrative</td></tr>");
                             for (dep in results.deps) {
                                 content.append("<tr><td>" + results.deps[dep].name + "</td><td>" + results.deps[dep].type + "</td></tr>");

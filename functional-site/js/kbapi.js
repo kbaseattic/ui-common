@@ -1473,6 +1473,7 @@ function ProjectAPI(ws_url, token) {
         var self = this;
         var metadata_fn = ws_client.get_object_info([{wsid: p.project_id, objid : p.narrative_id}], 1);
         $.when( metadata_fn).then( function( obj_info) {
+            console.log('object_info', obj_info)
             if (obj_info.length != 1) {
                 p.error_callback( "Error: narrative ws." + p.project_id +
                         ".obj." + p.narrative_id + " not found");
@@ -1493,6 +1494,7 @@ function ProjectAPI(ws_url, token) {
         res.description = meta.description;
         res.name = meta.name;
         var temp = $.parseJSON(meta.data_dependencies);
+        console.log(temp)
         //deps should really be stored as an id, not a name, since names can change
         var deps = temp.reduce( function(prev,curr,index) {
             var dep = curr.split(" ");
