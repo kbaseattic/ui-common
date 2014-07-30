@@ -1,16 +1,10 @@
 /*** link styling ***/
 
-a.search-category-link { color: black; }
-a.search-category-link:link { color: black; }
-a.search-category-link:hover { color: black; }
-a.search-category-link:active { color: black; }
-a.search-category-link:visited { color: black; }
-
-a.search-selected-category-link { color: green; }
-a.search-selected-category-link:link { color: green; }
-a.search-selected-category-link:hover { color: green; }
-a.search-selected-category-link:active { color: green; }
-a.search-selected-category-link:visited { color: green; }
+a.search-selected-category-link { color: #468847; }
+a.search-selected-category-link:link { color: #468847; }
+a.search-selected-category-link:hover { color: #468847; }
+a.search-selected-category-link:active { color: #468847; }
+a.search-selected-category-link:visited { color: #468847; }
 
 a.search-checkbox-link { color: #555; }
 a.search-checkbox-link:link { color: #555; }
@@ -227,14 +221,34 @@ span .badge {
     color: gray;
 }
 
+.search-filter-groups {
+    margin-bottom: 10px;
+}
+
 .filter-section {
-    margin-left: 0px;
-    margin-right: 0px;
+    margin-left: 5px;
+    margin-right: 5px;
     padding-left: 0px;
     padding-right: 0px;
     max-width: 240px;
 }
 
+.panel-filter-heading {
+    background-image: -webkit-linear-gradient(top, #fcf8e3 0%, #fefcf5 100%);
+    background-image: linear-gradient(to bottom, #fcf8e3 0%, #fefcf5 100%);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fcf8e3', endColorstr='#fefcf5', GradientType=0);    
+}
+
+.panel-filter-content {
+    border: 2px solid #fcf8e3;
+}
+
+a.search-filter-link { color: #6f5499; }
+a.search-filter-link:link { color: #6f5499; }
+a.search-filter-link:hover { color: #6f5499; }
+a.search-filter-link:active { color: #6f5499; }
+a.search-filter-link:visited { color: #6f5499; }
 
 
 /*** Options ***/
@@ -278,7 +292,7 @@ span .badge {
 
 .search-transfer-row {
     margin: 10px;
-    width: 360px;
+    width: 85%
 }
 
 .search-stage-transfer-buttons {

@@ -156,6 +156,7 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
         objectCopyInfo : null,
         resultsAvailable : false,
         countsAvailable : false,
+        transferring: false,
         selectedCategory : null,
         pageLinksRange : [],
         facets : null,
@@ -900,7 +901,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     };
 
 
-    $scope.removeFacet = function (name, value) {
+    $scope.removeFacet = function (name, value, searchAgain) {
         $scope.removeSearchFilter($scope.options.selectedCategory, "facets", name, value);
                 
         delete $scope.options.active_facets[$scope.options.selectedCategory][name][value];
@@ -913,8 +914,10 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $scope.options.active_facets[$scope.options.selectedCategory] = {};
         }
 
-        $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);        
-        $state.go("search", {category: $scope.options.selectedCategory, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
+        if (searchAgain === undefined || searchAgain === true) {
+            $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);        
+            $state.go("search", {category: $scope.options.selectedCategory, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
+        }
     };
 
 
@@ -937,8 +940,6 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         
             $scope.workspace_service.list_workspace_info({"perm": "w"})
                 .then(function(info, status, xhr) {
-                    console.log(info);
-                    
                     $scope.$apply(function () {
                         $scope.options.userState.workspaces = info.sort(function (a,b) {
                             if (a[1].toLowerCase() < b[1].toLowerCase()) return -1;
@@ -949,7 +950,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
                     $("#workspace-area").unblock();
                     $(".blockMsg").removeClass("search-block-element");
-                    console.log($scope.options.userState.workspaces);
+                    //console.log($scope.options.userState.workspaces);
                 },
                 function (xhr, status, error) {
                     console.log([xhr, status, error]);
@@ -972,8 +973,6 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
 
     $scope.selectWorkspace = function(workspace_info) {
-        console.log(workspace_info);
-        
         if (workspace_info.length === 10) {
             $scope.options.userState.selectedWorkspace = workspace_info[2];
         }
@@ -1014,7 +1013,9 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 function success(result) {
                     $scope.$apply(function () {
                         $scope.options.userState.objectsTransferred += 1;
-                        //$scope.removeFromWorkspaceCart(n);
+                        if ($scope.options.userState.objectsTransferred === $scope.options.transferSize) {
+                            $scope.completeTransfer();
+                        }
                     });
                 }
 
@@ -1039,6 +1040,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                                          $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_id"], 
                                          result);                            
                 }
+
+                $scope.options.transferRequests += 1;
                     
                 copy_genome();                    
             });
@@ -1057,7 +1060,9 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 function success(result) {
                     $scope.$apply(function () {
                         $scope.options.userState.objectsTransferred += 1;
-                        //$scope.removeFromWorkspaceCart(n);                        
+                        if ($scope.options.userState.objectsTransferred === $scope.options.transferSize) {
+                            $scope.completeTransfer();
+                        }
                     });
                 }
 
@@ -1068,83 +1073,126 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                                          $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_id"], 
                                          result);
                 }
-                                
+                        
+                $scope.options.transferRequests += 1;
+        
                 $scope.workspace_service.copy_object({"from": {"workspace": $scope.options.publicWorkspaces['metagenome'], "name": info[0][1]}, "to": {"workspace": $scope.options.userState.selectedWorkspace, "name": info[0][1]}}, success, error);        
             });                
     };
     
     
     $scope.copyFeature = function(n) {
-        // Get the search Genome object
-        $scope.workspace_service.get_objects([{"name": $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["genome_id"],"workspace": $scope.options.publicWorkspaces['search_genome']}])
+        console.log($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_id"]);
+        var split_id = $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["object_id"].split('/');
+        
+        return $scope.workspace_service.get_object_subset([{"name": $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["genome_id"] + ".featureset",
+                                                            "workspace": $scope.options.publicWorkspaces['search_genome'], 
+                                                            "included": ["/features/" + split_id[2]]
+                                                          }])
             .fail(function (xhr, status, error) {
                 console.log(xhr);
                 console.log(status);
                 console.log(error);
             })
             .done(function (data, status, xhr) {
-                // Get the FeatureSet object
-                $scope.workspace_service.get_objects([{"ref": data[0].data.featureset_ref}])
-                    .fail(function (xhr, status, error) {
-                        console.log(xhr);
-                        console.log(status);
-                        console.log(error);
-                    })
-                    .done(function (data, status, xhr) {
-                        // slow down the save requests to compensate for workspace parse threading issues
-                        setTimeout(function() { ; }, 200);
+                setTimeout(function() { ; }, 100);
                 
-                        try {
-                            var feature_obj = data[0].data.features[$scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["feature_id"]].data;
-                        } 
-                        catch (e) {
-                            console.log(data[0].data.features);
-                            console.log(n);
-                            console.log(e);
+                $scope.options.transferRequests += 1;
+                
+                var feature_source_obj;
+                var feature_dest_obj = {};
+        
+                try {
+                    feature_source_obj = data[0].data.features[$scope.options.userState.data_cart.data[n]["feature_id"]].data;
+                    
+                    for (var p in feature_source_obj) {
+                        if (feature_source_obj.hasOwnProperty(p)) {
+                            if (p === "feature_id") {
+                                feature_dest_obj["id"] = angular.copy(feature_source_obj[p]);
+                            }
+                            else if (p === "feature_type") {
+                                feature_dest_obj["type"] = angular.copy(feature_source_obj[p]);
+                            }
+                            else if (p === "location") {
+                                var sortedOrdinals = feature_source_obj[p].sort(function (a,b) {
+                                                          if (a[4] < b[4]) return -1;
+                                                          if (a[4] > b[4]) return 1;
+                                                          return 0;
+                                                      });         
+                                                      
+                                feature_dest_obj[p] = [];
+                                for (var i = sortedOrdinals.length - 1; i >= 0; i--) {
+                                    feature_dest_obj[p].unshift(sortedOrdinals[i].slice(0,4));
+                                }
+                            }
+                            else if (p === "aliases") {
+                                feature_dest_obj[p] = [];
+                                for (var k in feature_source_obj[p]) {
+                                    if (feature_source_obj[p].hasOwnProperty(k)) {
+                                        feature_dest_obj[p].push(k + ":" + feature_source[p][k])
+                                    }                                
+                                }
+                            }
+                            else {
+                                if (feature_source_obj[p]) {
+                                    feature_dest_obj[p] = angular.copy(feature_source_obj[p]);
+                                }
+                            }                                                                
                         }
+                    }
+                    //console.log(feature_source_obj);
+                    //console.log(feature_dest_obj);
+                } 
+                catch (e) {
+                    console.log(n);
+                    console.log(e);
+                }
+            
+                var max_tries = 10;
+                var tries = 0;
+            
+                // wrap this in a function so that we can retry on failure
+                var save_feature = function () {
+                    $scope.workspace_service.save_objects({"workspace": $scope.options.userState.selectedWorkspace, 
+                                                           "objects": [{"data": feature_dest_obj, 
+                                                                        "type": "KBaseGenomes.Feature", 
+                                                                        "name": feature_source_obj["feature_id"], 
+                                                                        "provenance": [{"time": new Date().toISOString().split('.')[0] + "+0000", 
+                                                                                        "service": "KBase Search", 
+                                                                                        "description": "Created from a Public Genome Feature", 
+                                                                                        "input_ws_objects": []}], 
+                                                                        "meta": {}
+                                                                       }]
+                                                           })
+                        .fail(function (xhr, status, error) {
+                            if (tries < max_tries) {
+                                tries += 1;
+                                console.log("Failed save, number of retries : " + (tries - 1));
+                                save_feature();
+                            }
+                            else {
+                                console.log(xhr);
+                                console.log(status);
+                                console.log(error);
+                                console.log(feature_dest_obj);
+                                return error;
+                            }
+                        })
+                        .done(function (info, status, xhr) {
+                            console.log("Save successful, object info : " + info);
+                            $scope.$apply(function () {
+                                $scope.options.userState.objectsTransferred += 1;
+                                if ($scope.options.userState.objectsTransferred === $scope.options.transferSize) {
+                                    $scope.completeTransfer();
+                                }
+                            });
+                            return info;
+                        });        
                     
-                        var max_tries = 10;
-                        var tries = 0;
-                    
-                        // wrap this in a function so that we can retry on failure
-                        var save_feature = function () {
-                            $scope.workspace_service.save_objects({"workspace": $scope.options.userState.selectedWorkspace, 
-                                                                   "objects": [{"data": feature_obj, 
-                                                                                "type": "KBaseSearch.Feature", 
-                                                                                "name": $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[n]["feature_id"], 
-                                                                                "provenance": [{"time": new Date().toISOString().split('.')[0] + "+0000", 
-                                                                                                "service": "Search", 
-                                                                                                "description": "Created from a Public Genome Feature", 
-                                                                                                "input_ws_objects": []}], 
-                                                                                "meta": {}
-                                                                               }]
-                                                                   })
-                                .fail(function (xhr, status, error) {
-                                    if (tries < max_tries) {
-                                        tries += 1;
-                                        console.log("Failed save, number of retries : " + (tries - 1));
-                                        save_feature();
-                                    }
-                                    else {
-                                        console.log(xhr);
-                                        console.log(status);
-                                        console.log(error);
-                                        console.log(feature_obj);
-                                    }
-                                })
-                                .done(function (info, status, xhr) {
-                                    console.log("Save successful, object info : " + info);
-                                    $scope.$apply(function () {
-                                        $scope.options.userState.objectsTransferred += 1;
-                                        //$scope.removeFromWorkspaceCart(n);
-                                    });
-                                });        
-                            
-                        };
-                    
-                        // start the save
-                        save_feature();                                                                    
-                    });
+                };
+            
+                // start the save
+                save_feature();                                                                    
             });
     };
             
@@ -1155,6 +1203,9 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             console.log("Object " + object_name + " copied successfully from " + from_workspace_name + " to " + to_workspace_name + " .");
             $scope.$apply(function () {
                 $scope.options.userState.objectsTransferred += 1;
+                if ($scope.options.userState.objectsTransferred === $scope.options.transferSize) {
+                    $scope.completeTransfer();
+                }
             });
         }
     
@@ -1163,6 +1214,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             console.log(result);
             $scope.transferError(object_name, object_ref, result);
         }
+
+        $scope.options.transferRequests += 1;
 
         if (object_ref === undefined || object_ref === null) {
             console.log("no object ref for name " + object_name);
@@ -1190,14 +1243,14 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         var max_simultaneous = 10;
         var ws_requests = [];
         var batches = 1;
-        var total_requests = 0;
         var types = {};
         
         $scope.options.transferSize = $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].size;
         $scope.options.transferring = true;
+        $scope.options.transferRequests = 0;
 
         console.log($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace]);
-                
+        
         var batchCopyRequests = function(ws_objects) {
             var ws_requests = [];
         
@@ -1210,13 +1263,13 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 }                    
                 else if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["object_type"].indexOf("KBaseSearch.Feature") > -1) {                
                     ws_requests.push($scope.copyFeature(ws_objects[i]).then(function () {;}));
-                    if (!types.hasOwnProperty('genome')) {
+                    if (!types.hasOwnProperty('feature')) {
                         types['feature'] = true;
                     }
                 }
                 else if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[ws_objects[i]]["object_type"].indexOf("KBaseCommunities.Metagenome") > -1) {
                     ws_requests.push($scope.copyMetagenome(ws_objects[i]).then(function () {;}));
-                    if (!types.hasOwnProperty('genome')) {
+                    if (!types.hasOwnProperty('metagenome')) {
                         types['metagenome'] = true;
                     }
                 }
@@ -1258,17 +1311,30 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 } // end type if else
             } // end for loop
                     
-            $timeout(function () {
-                $q.all(ws_requests).then(function (result) {
-                        total_requests -= 1;
-                        return result;
-                    }, 
-                    function (error) {
-                        total_requests -= 1;
-                        return error;
-                    });
-                },
-                200);                                        
+            $q.all(ws_requests).then(function (result) {
+                    $scope.workspace_service.get_workspace_info({"workspace": $scope.options.userState.selectedWorkspace}).then(
+                        function (info) {
+                            for (var i = $scope.options.userState.workspaces.length - 1; i >= 0; i--) {
+                                if ($scope.options.userState.workspaces[i][1] === $scope.options.userState.selectedWorkspace) {
+                                     $scope.$apply(function () {
+                                         $scope.options.userState.workspaces[i][4] = info[4];
+                                     });
+                                     
+                                     break;
+                                }
+                            }
+                            
+                            console.log([$scope.options.userState.objectsTransferred, $scope.options.transferSize]);
+                        },
+                        function (error) {
+                            console.log(error);
+                        });
+
+                    return result;
+                }, 
+                function (error) {
+                    return error;
+                });
         }; // end function
 
         for (var n in $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data) {
@@ -1278,7 +1344,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             
             if (loop_requests.length === max_simultaneous) {
                 batchCopyRequests(loop_requests);
-                loop_requests = [];
+                loop_requests = [];                
             }
         }
         
@@ -1292,11 +1358,30 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 $scope.options.userState.data_cart.types[t].all = false;
             }
         }        
-        
-        $scope.options.transferring = false;
     }; // end function
 
     
+    $scope.copyData = function(type) {
+        $scope.hideTransferCartCheckboxes();
+        $scope.addAllObjects(type); 
+        $scope.emptyTransfers();
+        $scope.toggleAllDataCart();
+    };
+
+    $scope.hideTransferCartCheckboxes = function () {
+        $("input .search-data-cart-checkbox").addClass("hidden");
+    };
+
+    $scope.showTransferCartCheckboxes = function () {
+        $("input.search-data-cart-checkbox").removeClass("hidden");
+    };
+
+    $scope.completeTransfer = function() {
+        if ($scope.options.transferSize === $scope.options.userState.objectsTransferred) {
+            $scope.options.transferring = false;
+            $scope.showTransferCartCheckboxes();
+        }
+    };
 
     $scope.removeSelection = function(n) {
         if (n.object_type.indexOf(".Genome") > -1) {
@@ -1513,18 +1598,18 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             if ($scope.options.userState.data_cart.types[type].all) {
                 for (var d in $scope.options.userState.data_cart.types[type].markers) {
                     if ($scope.options.userState.data_cart.types[type].markers.hasOwnProperty(d)) {
-                        $scope.options.userState.data_cart.data[d].cart_selected = true;
-                    }
-                }                    
-                $scope.addSelectedToWorkspaceCart();
-            }
-            else {
-                for (var d in $scope.options.userState.data_cart.types[type].markers) {
-                    if ($scope.options.userState.data_cart.types[type].markers.hasOwnProperty(d)) {
                         $scope.options.userState.data_cart.data[d].cart_selected = false;
                     }
                 }                    
                 $scope.emptyWorkspaceCart();
+            }
+            else {
+                for (var d in $scope.options.userState.data_cart.types[type].markers) {
+                    if ($scope.options.userState.data_cart.types[type].markers.hasOwnProperty(d)) {
+                        $scope.options.userState.data_cart.data[d].cart_selected = true;
+                    }
+                }                    
+                $scope.addSelectedToWorkspaceCart();
             }    
         }
         else {
@@ -1533,14 +1618,12 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     };
 
 
-    $scope.toggleInCart = function(id) {
-        /*
+    $scope.toggleInCart = function(id) {        
         if (!$scope.options.userState.data_cart.data.hasOwnProperty(id)) {
             $scope.options.userState.data_cart.data[id].cart_selected = true;            
             $scope.addToWorkspaceCart(id);
         }
-        */
-        if($scope.options.userState.data_cart.data[id].cart_selected === false) {
+        else if(!$scope.options.userState.data_cart.data[id].cart_selected) {
             $scope.options.userState.data_cart.data[id].cart_selected = true;
             $scope.addToWorkspaceCart(id);
         }
@@ -1596,17 +1679,26 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
 
     $scope.addToWorkspaceCart = function(id) {
-        if ($scope.options.userState.data_cart.data.hasOwnProperty(id) && $scope.options.userState.data_cart.data[id].cart_selected && !$scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data.hasOwnProperty(id)) {
+        console.log(id);
+        console.log($scope.options.userState.data_cart.data.hasOwnProperty(id) && $scope.options.userState.data_cart.data[id].cart_selected && !$scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data.hasOwnProperty(id));
+        
+        
+        if ($scope.options.userState.data_cart.data.hasOwnProperty(id) && $scope.options.userState.data_cart.data[id].cart_selected) {
             $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[id] = {};
             angular.copy($scope.options.userState.data_cart.data[id], $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[id]);
-            $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[id].cart_selected = false;
+            $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[id].cart_selected = true;
             $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].size += 1;                
         }
     };
 
     $scope.removeFromWorkspaceCart = function(id) {
-        delete $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[id];
-        $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].size -= 1;
+        console.log(id);
+        console.log($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[id]);
+    
+        if ($scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data.hasOwnProperty(id)) {
+            delete $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].data[id];
+            $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].size -= 1;
+        }
     };
 
 
@@ -1616,13 +1708,28 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         $scope.options.userState.workspace_carts[$scope.options.userState.selectedWorkspace].all = false;
     };
 
+
     $scope.getSearchbarTooltipText = function () {
         if ($scope.options.selectedCategory) {
-            return "Type here to perform a search on " + $scope.options.selectedCategory + ".";
+            return "Type here to perform a search on " + $scope.options.searchCategories[$scope.options.selectedCategory].label + ".";
         }
         else {
             return "Type here to perform a search on all data categories.";
         }    
+    };
+    
+    
+    $scope.doesObjectExistInWorkspace = function(workspace_name, object_id) {
+        $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.token);
+        
+        console.log([workspace_name, object_id]);
+        return $scope.workspace_service.get_object_info([{"workspace": workspace_name, "name": object_id}]).then(
+            function (result) {
+                console.log(result);            
+            },
+            function (error) {
+                console.log(error);
+            });    
     };
 
 });
