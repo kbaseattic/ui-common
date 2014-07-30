@@ -85,6 +85,7 @@ kb_define('kbaseTable',
 
             row_callback : function (cell, header, row, $kb) {},
             sortButtons : {},
+            navControls : false,
 
         },
 

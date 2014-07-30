@@ -102,6 +102,7 @@
 				'kbaseDeletePrompt'                 : 'kbaseDeletePrompt',
 				'kbaseErrorPrompt'                  : 'kbaseErrorPrompt',
 				'kbaseFormBuilder'                  : 'kbaseFormBuilder',
+				'kbaseGeneTable'                    : 'kbaseGeneTable',
 				'kbaseLogin'                        : 'kbaseLogin',
 				'kbaseLoginFuncSite'                : 'kbaseLoginFuncSite',
 				'kbaseModal'                        : 'kbaseModal',
