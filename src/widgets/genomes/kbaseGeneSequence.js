@@ -135,7 +135,7 @@
                     if (feature.dna_sequence) { // get dna_sequence from object
                         dnaSequenceStr = feature.dna_sequence;
 			// wrap seq
-			var seq_width = 70;
+			var seq_width = 50;
 			if (dnaSequenceStr.length > seq_width) {
 			    var dnaDispStr = "";
 			    var start_pos = 0;
@@ -170,7 +170,7 @@
 				     dnaSequenceStr = dna_sequences[self.options.featureID];
 				 }
 				 // wrap seq
-				 var seq_width = 70;
+				 var seq_width = 50;
 				 if (dnaSequenceStr.length > seq_width) {
 				     var dnaDispStr = "";
 				     var start_pos = 0;
@@ -210,7 +210,7 @@
                     if (feature.protein_translation) {
 			proteinTranslationStr = feature.protein_translation;
 			// wrap seq
-			var seq_width = 70;
+			var seq_width = 50;
 			if (proteinTranslationStr.length > seq_width) {
 			    var protDispStr = "";
 			    var start_pos = 0;
