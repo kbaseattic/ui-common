@@ -29,7 +29,7 @@
         			'<tr><td/><td><button id="btn_copy_'+this.pref+'">Copy</button></td></tr>' +
         			'</table>');*/
         	container.append($('<div />').css("overflow","auto").append('' +
-        			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Source Data:</b></span> <span id="td_src_'+this.pref+'"/></p>'+
+        			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Source Data:</b></span><span id="td_src_'+this.pref+'"/></p>'+
         			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Target Workspace:</b></span><span id="td_ws_'+this.pref+'"/></p>'+
         			'<p><span style="white-space: nowrap; display: inline-block; width: 130px;"><b>Target Data Name:</b></span><input type="text" id="input_target_'+this.pref+'" style="width: 150px;"/></p>'+
         			'<button id="btn_copy_'+this.pref+'" class="btn btn-primary">Copy</button>'));
@@ -57,7 +57,7 @@
             //kbws.list_referencing_objects([objectIdentity], function(data) {
             $.when(request1, request2).done(function(ws_list_data,obj_data) {
         		var objInfo = obj_data[0];
-				$('#td_src_'+self.pref).html('<br><i>ws</i>: '+objInfo[7]+"<br><i>name</i>: "+objInfo[1]);
+				$('#td_src_'+self.pref).html('<br>'+objInfo[7]+"/<wbr>"+objInfo[1]);
 				$("#input_target_"+self.pref).val(objInfo[1]);
 				console.log(ws_list_data);
 				var td_ws = $('#td_ws_'+self.pref);
