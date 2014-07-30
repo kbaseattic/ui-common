@@ -11,7 +11,8 @@ kb_define('KBaseGWASPopMaps',
         version: "1.0.0",
         options: {
             type: "KBaseGwasData.GwasPopulation",
-            width: 1200
+            width: window.innerWidth - 60,
+            height: window.innerHeight/2 - 60
         },
         workspaceURL: "https://kbase.us/services/ws",
 
@@ -51,29 +52,25 @@ kb_define('KBaseGWASPopMaps',
                     self.options.allMarkers = allMarkers;
                     self.options.markerCount = cnt;
 
-
-                    return self.render();
-
-                
+                    return self.render(self.options);                
                 },
 
                 self.rpcError
             );
 
-            return this.render();
+            return this.render(this.options);
         },
         render: function(options) {
+            console.log(options);
 
             var mrks = [];
 
             for (var i = 0; i < this.options.markerCount; i++) {
-
                 mrks.push(this.options.allMarkers[i]);
-
             }
 
 
-            $('#mapElement').width('1100px').height('450px').gmap3({
+            $('#mapElement').width(this.options.width - 30).height(options.height - 130).gmap3({
               map:{
                 options:{
                   center:[46.578498,2.457275],

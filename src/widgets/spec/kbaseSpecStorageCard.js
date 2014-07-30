@@ -7,7 +7,7 @@ kb_define('KBaseSpecStorageCard',
  
     $.KBWidget({ 
         name: "KBaseSpecStorageCard", 
-        parent: "kbaseWidget", 
+        parent: "kbaseAuthenticatedWidget", 
         version: "1.0.0",
 
         options: {
@@ -19,6 +19,8 @@ kb_define('KBaseSpecStorageCard',
         init: function(options) {
         	options.id = '';
             this._super(options);
+            if (!this.options.token)
+            	this.options.token = this.authToken();
             var self = this;
         	var pref = generateSpecPrefix();
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');

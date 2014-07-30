@@ -37,7 +37,6 @@ kb_define('kbaseAuthenticatedWidget',
             $(document).on(
                 'loggedIn.kbase',
                 $.proxy(function (e, auth) {
-
                     this.setAuth(auth);
                     if (this.loggedInCallback) {
                         this.loggedInCallback(e, auth);

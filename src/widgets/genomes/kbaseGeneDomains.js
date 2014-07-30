@@ -48,33 +48,43 @@
 					domains = domains[self.options.featureID];
 
 					var domList = [];
-					for (var i=0; i<domains.length; i++) {
-						domList.push(domains[i]);
-					}
-
-					self.proteinInfoClient.domains_to_domain_annotations(domList,
-						function(domainAnnotations) {
-
-							var $domainTable = $("<table/>")
-											   .addClass("table table-bordered table-striped");
-							if (Object.getOwnPropertyNames(domainAnnotations).length > 0) {
-								for (var i=0; i<domains.length; i++) {
-									$domainTable.append($("<tr>")
-														.append($("<td>")
-																.append(domains[i]))
-														.append($("<td>")
-																.append(domainAnnotations[domains[i]])));
-//									domainStr += domains[i] + ": " + domainAnnotations[domains[i]] + "<br/>";
+					if (domains) {
+						for (var i=0; i<domains.length; i++) {
+							domList.push(domains[i]);
+						}
+	
+						self.proteinInfoClient.domains_to_domain_annotations(domList,
+							function(domainAnnotations) {
+	
+								var $domainTable = $("<table/>")
+												   .addClass("table table-bordered table-striped");
+								if (Object.getOwnPropertyNames(domainAnnotations).length > 0) {
+									for (var i=0; i<domains.length; i++) {
+										if (domainAnnotations[domains[i]]) {
+											$domainTable.append($("<tr>")
+															.append($("<td>")
+																	.append(domains[i]))
+															.append($("<td>")
+																	.append(domainAnnotations[domains[i]])));
+										} else {
+											$domainTable.append($("<tr>")
+															.append($("<td>")
+																	.append(domains[i]))
+															.append($("<td>")
+																	.append("No description available")));
+										}
+	//									domainStr += domains[i] + ": " + domainAnnotations[domains[i]] + "<br/>";
+									}
+									self.$elem.append($domainTable);
 								}
-								self.$elem.append($domainTable);
-							}
-							else
-								self.$elem.append("None found");
-
-						},
-
-						self.clientError
-					);
+								else
+									self.$elem.append("No domain assignments found");
+	
+							},
+	
+							self.clientError
+						);
+					} else { self.$elem.append("No domain assignments found"); }
 				},
 
 				this.clientError

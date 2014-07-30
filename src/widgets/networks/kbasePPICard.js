@@ -9,18 +9,17 @@
 
     $.KBWidget({
         name: "KBasePPICard",
-        parent: "kbaseWidget",
-        version: "1.0.0",
+        parent: "kbaseAuthenticatedWidget",
+        version: "1.0.2",
         options: {
 	    id: null,
 	    ws: null,
 	    auth: null,
-	    userId: null,
+	    userID: null,
             width: 700,
             height: 450
         },
 
-        // wsServiceUrl: "http://140.221.84.209:7058/",
 	wsServiceUrl: "https://kbase.us/services/ws",
 
         init: function(options) {
@@ -249,8 +248,8 @@
             });
 */
 
-            this.wsClient = new Workspace(this.wsServiceUrl, { token: this.options.auth,
-							       user_id: this.options.userId});
+            this.wsClient = new Workspace(this.wsServiceUrl, { token: this.authToken(),
+							       user_id: this.options.userID});
 
 	    var container = $('<div id="container" />');
 	    this.$elem.append(container);
@@ -259,7 +258,7 @@
             container.append(this.tableLoading);
 
             this.tableDiv = $('<div id="ppi-table-container" />');
-            this.tableDiv.addClass('hide');                
+            this.tableDiv.addClass('hide');
             container.append(this.tableDiv);
 	    
 	    this.tableHeader = $('<div id="ppi-table-header" />');
@@ -293,6 +292,7 @@
 			var id = $(this).attr("id");
 			self.trigger("showNetwork", { network: self.netdata[id].network,
 						      netname: self.netdata[id].netname,
+						      ws: self.options.ws,
 						      event: e });
 		    });
 
@@ -318,7 +318,7 @@
 						  ds.interactions[i].description+'</a>';
 					      var conf = 0;
 					      if (ds.interactions[i].hasOwnProperty('confidence'))
-						  conf = ds.interactions[i].confidence;
+						  conf = Math.round(ds.interactions[i].confidence*100.0)/100.0;
 					      if (ds.interactions[i].hasOwnProperty('url'))
 						  description += ' (<a href="'+ds.interactions[i].url+'">link</a>)';
 					      var proteins = '';
@@ -426,7 +426,7 @@
             return {
                 type: "KbasePPI",
                 id: this.options.id,
-                ws: this.options.ws,
+                workspace: this.options.ws,
                 title: "PPI Dataset",
             }
         },

@@ -70,7 +70,7 @@
                 function(operon) {
                     operon = operon[self.options.featureID];
 
-                    var operonStr = "Feature not part of an operon.";
+                    var operonStr = "Feature is not part of an operon.";
                     if (operon && operon.length > 1) {
                         // tooltip inspired from
                         // https://gist.github.com/1016860
@@ -110,13 +110,21 @@
                         //     operonStr += operons[i] + " ";
                         // }
                     }
-                    else
+                    else {
                         self.$elem.append(operonStr);
-
+                    }
+                    
                     self.hideMessage();
-                },
 
-                this.clientError
+                },
+                function (err) {
+                    // there is a bug in the protein info service, in which if a fid cannot be mapped to a microbes online ID,
+                    // then the function throws an error.  In this case, we should provide a message, but it shouldn't look like an error
+                    self.hideMessage();
+                    self.$elem.append("Gene cannot be mapped to an operon.  Operons may not be fully computed for this Genome.");
+                    console.log("Caught error in protein info service, which can happen if the fid cannot be mapped to a mo id:"+JSON.stringify(err))
+                }
+                //this.clientError
             );
 
 

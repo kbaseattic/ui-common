@@ -12,8 +12,8 @@ kb_define('KBaseMAKResultCard',
 
         options: {
             id: null,
-            ws: null,
-            loadingImage: "assets/img/ajax-loader.gif",
+            workspaceID: null,
+            loadingImage: "../../widgets/images/ajax-loader.gif",
             title: "MAK Result Overview",
             isInCard: false,
             width: 600,
@@ -21,7 +21,9 @@ kb_define('KBaseMAKResultCard',
         },
 
 //        workspaceURL: "https://kbase.us/services/workspace",
-        newWorkspaceServiceUrl: "https://kbase.us/services/ws", //http://140.221.84.209:7058/",
+        newWorkspaceServiceUrl: "http://dev04.berkeley.kbase.us:7058", 
+		
+		//"http://dev04.berkeley.kbase.us:7058", //"https://kbase.us/services/ws", //http://140.221.84.209:7058/",
 
         init: function(options) {
             this._super(options);
@@ -51,51 +53,58 @@ kb_define('KBaseMAKResultCard',
              * Number of motifs
              */
             var self = this;
-            this.workspaceClient.get_objects([{workspace: this.options.ws, name: this.options.id}], 
-		    	function(data){
+
+			//"MAKbiclusters"
+			//"SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"
+			console.log(this.options.workspaceID)
+			// console.log(this.options.id)
+			
+            this.workspaceClient.get_objects([{workspace: "MAKbiclusters", name: "SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"}], 
+				
+				function(data){
 					self.collection = data[0];
 					self.$elem.append("<h3>MAK Run Info</h3>");
-			        self.$elem.append($("<div />").
-					append($("<table/>").addClass("kbgo-table")
-					    .append($("<tr/>").append("<td>ID</td><td>" + self.collection.data.id + "</td>"))
-					    .append($("<tr/>").append("<td>Run started </td><td>" + self.collection.data.start_time + "</td>"))
-					    .append($("<tr/>").append("<td>Run finished </td><td>" + self.collection.data.finish_time + "</td>"))
-                                            .append($("<tr/>").append("<td>MAK version</td><td>" + self.collection.data.set.version + "</td>"))
-                                            .append($("<tr/>").append("<td>Number of biclusters in set</td><td>" + self.collection.data.set.number + "</td>"))
-                                            .append($("<tr/>").append("<td>Min genes for bicluster in set</td><td>" + self.collection.data.set.min_genes + "</td>"))
-                                            .append($("<tr/>").append("<td>Max genes for bicluster in set</td><td>" + self.collection.data.set.max_genes + "</td>"))
-                                            .append($("<tr/>").append("<td>Min conditions for bicluster in set</td><td>" + self.collection.data.set.min_conditions + "</td>"))
-                                            .append($("<tr/>").append("<td>Max conditions for bicluster in set</td><td>" + self.collection.data.set.max_conditions + "</td>"))
-                                            .append($("<tr/>").append("<td>NCBI taxonomy id</td><td>" + self.collection.data.set.taxon + "</td>"))
-                                            .append($("<tr/>").append("<td>Type of bicluster</td><td>" + self.collection.data.set.bicluster_type + "</td>"))
+			        self.$elem.append($("<div />")
+					.append($("<table/>").addClass("kbgo-table")
+					    .append(self.collection.data.id!=-1 ? $("<tr/>").append("<td>ID</td><td>" + self.collection.data.id + "</td>") : '')
+					    .append(self.collection.data.start_time!=-1 ? $("<tr/>").append("<td>Run started </td><td>" + self.collection.data.start_time + "</td>") : '')
+					    .append(self.collection.data.finish_time!=-1 ? $("<tr/>").append("<td>Run finished </td><td>" + self.collection.data.finish_time + "</td>") : '')
+                        .append(self.collection.data.sets[0].version!=-1 ? $("<tr/>").append("<td>MAK version</td><td>" + self.collection.data.sets[0].version + "</td>") : '')
+                        .append(self.collection.data.sets[0].number!=-1 ? $("<tr/>").append("<td>Number of biclusters in set</td><td>" + self.collection.data.sets[0].number + "</td>") : '')
+                        .append(self.collection.data.sets[0].min_genes!=-1 ? $("<tr/>").append("<td>Min genes for bicluster in set</td><td>" + self.collection.data.sets[0].min_genes + "</td>") : '')
+                        .append(self.collection.data.sets[0].max_genes!=-1 ? $("<tr/>").append("<td>Max genes for bicluster in set</td><td>" + self.collection.data.sets[0].max_genes + "</td>") : '')
+                        .append(self.collection.data.sets[0].min_conditions!=-1 ? $("<tr/>").append("<td>Min conditions for bicluster in set</td><td>" + self.collection.data.sets[0].min_conditions + "</td>") : '')
+                        .append(self.collection.data.sets[0].max_conditions!=-1 ? $("<tr/>").append("<td>Max conditions for bicluster in set</td><td>" + self.collection.data.sets[0].max_conditions + "</td>") : '')
+                        .append(self.collection.data.sets[0].taxon!=-1 ? $("<tr/>").append("<td>NCBI taxonomy id</td><td>" + self.collection.data.sets[0].taxon + "</td>") : '')
+                        .append(self.collection.data.sets[0].bicluster_type!=-1 ? $("<tr/>").append("<td>Type of bicluster</td><td>" + self.collection.data.sets[0].bicluster_type + "</td>") : '')
 					));
+					
 					self.$elem.append("<h3>View biclusters</h3>");
 
 					var $dropdown = $("<select />");
-					for (var bicluster in self.collection.data.set.biclusters) {
-						$dropdown.append("<option id='" + bicluster + "'>"+self.collection.data.set.biclusters[bicluster].id+"; Full Criterion = " + self.collection.data.set.biclusters[bicluster].full_crit.toFixed(4) + "; genes = " + self.collection.data.set.biclusters[bicluster].num_genes + "; conditions = " + self.collection.data.set.biclusters[bicluster].num_conditions + " </option>");
+					for (var bicluster in self.collection.data.sets[0].biclusters) {
+						$dropdown.append("<option id='" + bicluster + "'>"+self.collection.data.sets[0].biclusters[bicluster].bicluster_id+"; Full Criterion = " + self.collection.data.sets[0].biclusters[bicluster].full_crit.toFixed(4) + "; genes = " + self.collection.data.sets[0].biclusters[bicluster].num_genes + "; conditions = " + self.collection.data.sets[0].biclusters[bicluster].num_conditions + " </option>");
 					}
 					self.$elem.append($dropdown);
 					self.$elem.append($("<button class='btn btn-default'>Show Bicluster</button>")
                                             .on("click", 
                                                 function(event) {
                                                     $(self.$elem.selector + " > select option:selected").each(function() {
-    //                                              console.log(event);
-                                                    self.trigger("showMAKBicluster", { bicluster: self.collection.data.set.biclusters[$(this).attr("id")], event: event });
+                                                    self.trigger("showMAKBicluster", { bicluster: [self.collection.data.sets[0].biclusters[$(this).attr("id")],self.collection.data.sets[0]], title: self.collection.data.sets[0].biclusters[$(this).attr("id")].bicluster_id, event: event });
                                                 });
                                             })
                                         );
                                 					self.$elem.append("<h3>MAK Run Parameters</h3>");
 			        self.$elem.append($("<div />").
 					append($("<table/>").addClass("kbgo-table")
-                                            .append($("<tr/>").append("<td>Minimum raw bicluster score</td><td>" + self.collection.data.mak_param.min_raw_bicluster_score + "</td>"))
-                                            .append($("<tr/>").append("<td>Maximum allowed bicluster overlap</td><td>" + self.collection.data.mak_param.max_bicluster_overlap + "</td>"))
-                                            .append($("<tr/>").append("<td>Maximum allowed enrichment p-value</td><td>" + self.collection.data.mak_param.max_enrich_pvalue + "</td>"))
-                                            .append($("<tr/>").append("<td>Number of rounds in discovery strategy</td><td>" + self.collection.data.mak_param.rounds + "</td>"))
-                                            .append($("<tr/>").append("<td>Linkage</td><td>" + self.collection.data.mak_param.linkage + "</td>"))
-                                            .append($("<tr/>").append("<td>Path to null distribution files</td><td>" + self.collection.data.mak_param.null_data_path + "</td>"))
-                                            .append($("<tr/>").append("<td>Path to R code (Miner.R)</td><td>" + self.collection.data.mak_param.Rcodepath + "</td>"))
-                                            .append($("<tr/>").append("<td>Path to Rdata object</td><td>" + self.collection.data.mak_param.Rdatapath + "</td>"))
+                                            .append($("<tr/>").append("<td>Minimum score</td><td>" + self.collection.data.parameters.min_raw_bicluster_score + "</td>"))
+                                            .append($("<tr/>").append("<td>Maximum merging overlap</td><td>" + self.collection.data.parameters.max_bicluster_overlap + "</td>"))
+                                            .append($("<tr/>").append("<td>Maximum enrichment p-value</td><td>" + self.collection.data.parameters.max_enrich_pvalue + "</td>"))
+                                            .append($("<tr/>").append("<td>Discovery rounds</td><td>" + self.collection.data.parameters.rounds + "</td>"))
+                                            .append($("<tr/>").append("<td>Merging linkage</td><td>" + self.collection.data.parameters.linkage + "</td>"))
+                                            .append($("<tr/>").append("<td>Null distributions</td><td>" + self.collection.data.parameters.null_data_path + "</td>"))
+                                            .append($("<tr/>").append("<td>R</td><td>" + self.collection.data.parameters.Rcodepath + "</td>"))
+                                            .append($("<tr/>").append("<td>Rdata</td><td>" + self.collection.data.parameters.Rdatapath + "</td>"))
 					));
                                self.$elem.append($("<div />")
                                        .append("&nbsp;"));
@@ -116,10 +125,11 @@ kb_define('KBaseMAKResultCard',
 
 
         getData: function() {
+			console.log(this.options.workspaceID)
             return {
                 type: "MAKResult",
                 id: this.options.id,
-                ws: this.options.ws,
+                workspaceID: this.options.workspaceID,
                 title: "MAK Result Overview"
             };
         },
