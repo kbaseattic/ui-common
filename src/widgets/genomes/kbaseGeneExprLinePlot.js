@@ -101,6 +101,19 @@
 	self.$elem.append($("<div id='linechart'>"));
 	
 	self.values = self.values.slice(0,300)
+	var values_unsorted = self.values;
+	var conditions_unsorted = self.conditions;
+	self.values.sort(function(a,b){return a - b})
+	
+	var index = [];
+	for (i = 0; i < values_unsorted.length; i++) {
+		var curind = self.values.indexOf(values_unsorted[i]);
+		index[index.length] = curind;
+	}
+	
+	for (i = 0; i <conditions_unsorted.length; i++) {
+		self.conditions[index[i]] = conditions_unsorted[i];
+	}
 	
 	console.log(self.gene_label)
 	
