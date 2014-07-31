@@ -1219,20 +1219,36 @@
 
         showMAKCards: function() {
                 this.addNewCard("KBaseMAKResultCard",
-                        {
-                            id: this.options.data.id,
-                            ws: this.options.data.ws,
-                            auth: this.options.auth,
-                            userId: this.options.userId,
-                            loadingImage: this.options.loadingImage,
-                            isInCard: true
-                        },
-                        {
-                            my: "left top",
-                            at: "left bottom",
-                            of: "#app"
-                        }
-                    );
+                    {
+                        id: this.options.data.id,
+                        ws: this.options.data.ws,
+                        auth: this.options.auth,
+                        userId: this.options.userId,
+                        loadingImage: this.options.loadingImage,
+                        isInCard: true
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                 );
+				 
+				this.addNewCard("KBaseMAKTilingCard",
+					{
+						id: this.options.data.id,
+                        ws: this.options.data.ws,
+                        auth: this.options.auth,
+                        userId: this.options.userId,
+                        loadingImage: this.options.loadingImage,
+                        isInCard: true
+					},
+					{
+						my: "left top",
+                        at: "right bottom",
+                        of: "#app"
+					}
+				);
                 return this;
         },
 
@@ -1443,7 +1459,70 @@
                                      "showBambiRunParameters", 
                                      "showBambiRawOutput",
 									 "showLitWidget",
-									 "showTreeCards"];
+									 "showTreeCards",
+									 "showHeatMap",
+									 "showLineChart",									 
+									 "showBarChart"];
+									 
+			/**
+             * Event: showBarChart
+             * ------------------
+             * Adds new kbaseMAKBarChart card.
+             */	
+			$(document).on("showBarChart", function(event, data) {
+				console.log(data)
+				self.addNewCard("KBaseBarChartCard",
+					{
+						terms: data.terms,
+						id: data.id,
+						ws: data.ws
+					},
+					{
+						my: "left",
+						at: "right bottom",
+						of: "#app"
+				});
+			});
+			
+			/**
+             * Event: showLineChart
+             * ------------------
+             * Adds new kbaseLineChart card.
+             */
+			$(document).on("showLineChart", function(event, data) {
+				self.addNewCard("KBaseLineChartCard",
+					{
+						row: data.row,		
+						heatmap: data.heatmap,
+						id: data.id,
+						ws: data.ws
+					},
+					{
+						my: "right top",
+						at: "right+800 bottom",
+						of: data.event
+				});
+
+			});
+			
+			/**
+             * Event: showHeatMap
+             * ------------------
+             * Adds new kbaseHeatmap card.
+             */
+			$(document).on("showHeatMap", function(event, data) {
+			self.addNewCard("KBaseHeatMapCard",
+				{
+					bicluster: data.bicluster,
+					id: data.id,
+					ws: data.ws
+				},
+				{
+                    my: "left top",
+                    at: "center",
+                    of: data.event
+				});
+			});
 
 			/**
              * Event: showLitWidget
@@ -1913,6 +1992,8 @@
                 self.addNewCard("KBaseMAKBiclusterCard",
                     {
                         bicluster: data.bicluster,
+						id: data.id,
+						ws: data.ws,
                         showButtons: true,
                         centerFeature: data.centerFeature
                     },
