@@ -332,10 +332,37 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         }
         
         //console.log($scope.options.related);
-        console.log($scope.options.searchCategories);
+        //console.log($scope.options.searchCategories);
     };
 
+
+    $scope.sanitizeFacets = function(input_facets) {
+        var encodedFacets = "";
+        var facets = input_facets.split(",");
+        var currentFacet;
+
+        for (var i = 0; i < facets.length; i++) {
+            currentFacet = facets[i].split(":");
+            
+            if (currentFacet[1].indexOf('"') < 0) {
+                encodedFacets += currentFacet[0] + ":" + '"' + currentFacet[1] + '",';
+            }
+            else {
+                encodedFacets += currentFacet[0] + ":" + currentFacet[1] + ',';            
+            }
+        }
+
+        console.log(encodedFacets);
+        return encodedFacets.substring(0,encodedFacets.length-1);
+    };
+
+
+
     $scope.getCount = function(options, category) {
+    
+        console.log("getCount");
+        console.log([options, category]);
+    
         var queryOptions = {};
 
         angular.copy(options, queryOptions);
@@ -345,6 +372,10 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         queryOptions["category"] = category;
 
         //console.log("getCount : " + JSON.stringify(queryOptions));
+
+        if (queryOptions.hasOwnProperty("facets") && queryOptions["facets"]) {
+            queryOptions["facets"] = $scope.sanitizeFacets(options["facets"]);
+        }
 
         if (!$scope.options.userState.hasOwnProperty("ajax_requests") || !$scope.options.userState.ajax_requests) {
             $scope.options.userState.ajax_requests = [];
@@ -403,7 +434,12 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             
             for (var p in $scope.options.searchCategories) {
                 if ($scope.options.searchCategories.hasOwnProperty(p) && $scope.options.searchCategories[p].category !== null) {
+                    if ($scope.options.searchCategories[p].category === $scope.options.selectedCategory && options.perCategory[p].hasOwnProperty("facets") && options.perCategory[p]["facets"]) {
+                        queryOptions["facets"] = $scope.sanitizeFacets(options.perCategory[p]["facets"]);
+                    }
+                    
                     $scope.getCount(queryOptions, $scope.options.searchCategories[p].category);            
+                    queryOptions = {'q': options.general.q};
                 }
                 else {
                     $scope.options.categoryCounts[category] = 0;
@@ -444,17 +480,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             }    
         }
 
-        if (queryOptions.hasOwnProperty("facets")) {
-            var encodedFacets = "";
-            var facets = queryOptions["facets"].split(",");
-            var currentFacet;
-            
-            for (var i = 0; i < facets.length; i++) {
-                currentFacet = facets[i].split(":");
-                encodedFacets += currentFacet[0] + ":" + '"' + currentFacet[1] + '",';
-            }
-            
-            queryOptions["facets"] = encodedFacets.substring(0,encodedFacets.length-1);
+        if (queryOptions.hasOwnProperty("facets") && queryOptions["facets"]) {
+            queryOptions["facets"] = $scope.sanitizeFacets(queryOptions["facets"]);
         }
 
         $("#loading_message_text").html(options.defaultMessage);
@@ -620,7 +647,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                   for (var i = 0; i < facetSplit.length; i++) {
                       facet_keyval = facetSplit[i].split(":");                      
                       
-                      $scope.addFacet(facet_keyval[0],facet_keyval[1], false);
+                      $scope.addFacet(facet_keyval[0],facet_keyval[1].replace("*",","), false);
                   }                
             }
             else {
@@ -748,7 +775,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 oldFilter = $scope.options.searchOptions.perCategory[category][type].indexOf(name);
             }
             else if (type === "facets") {
-                oldFilter = $scope.options.searchOptions.perCategory[category][type].indexOf(name + ":" + value);
+                oldFilter = $scope.options.searchOptions.perCategory[category][type].indexOf(name + ":" + value.replace(",","*"));
             }
         
             var nextComma = $scope.options.searchOptions.perCategory[category][type].indexOf(",");
@@ -891,10 +918,10 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
     $scope.addFacet = function (name, value, searchAgain) {        
         if (!$scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
-            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets = name + ":" + value;
+            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets = name + ":" + value.replace(",","*");
         }
         else {
-            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets += "," + name + ":" + value;        
+            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets += "," + name + ":" + value.replace(",","*");        
         }        
     
         if (!$scope.options.active_facets.hasOwnProperty($scope.options.selectedCategory)) {        
