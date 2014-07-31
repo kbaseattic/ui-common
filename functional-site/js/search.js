@@ -444,6 +444,19 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             }    
         }
 
+        if (queryOptions.hasOwnProperty("facets")) {
+            var encodedFacets = "";
+            var facets = queryOptions["facets"].split(",");
+            var currentFacet;
+            
+            for (var i = 0; i < facets.length; i++) {
+                currentFacet = facets[i].split(":");
+                encodedFacets += currentFacet[0] + ":" + '"' + currentFacet[1] + '",';
+            }
+            
+            queryOptions["facets"] = encodedFacets.substring(0,encodedFacets.length-1);
+        }
+
         $("#loading_message_text").html(options.defaultMessage);
         $.blockUI({message: $("#loading_message")});
 
