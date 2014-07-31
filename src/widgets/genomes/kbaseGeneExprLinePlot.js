@@ -23,8 +23,8 @@
 
 	//console.log("options.id "+options.id);
 
-	this.$messagePane = $("<div/>").hide();
-            this.$elem.append(this.$messagePane);
+	// this.$messagePane = $("<div/>").hide();
+            // this.$elem.append(this.$messagePane);
 	    
             //console.log(options);
             //if (this.options.row === null) {
@@ -48,7 +48,7 @@
                 });
 
 				console.log(this.options.featureID);
-				// this.options.featureID = 'kb|g.3899.CDS.56284';
+				this.options.featureID = 'kb|g.3899.CDS.56284';
                 //get_expression_data_by_samples_and_features([], ['kb|g.3899.CDS.56284''], 'Log2 level intensities');
 		
                 this.expressionClient.get_expression_data_by_samples_and_features([], [this.options.featureID], 'Log2 level intensities', function(data) {
@@ -99,10 +99,12 @@
             //console.log("here");
 
             var self = this;
-			self.values = self.values.slice(0,150)
-			self.conditions = self.conditions.slice(0,150)
+			self.values = self.values.slice(0,1000)
+			self.conditions = self.conditions.slice(0,1000)
 			if(self.values != null && self.values.length > 0) {
+			var header = $("<h3>Hover over ticks for condition label info. Click to go to workspace object.</h3>")
 			var loader = $("<center><img src='" + self.options.loadingImage + "'> loading ...</center>")
+			self.$elem.append(header)
 			self.$elem.append(loader);
 			$mainDiv = $('<div id="exprlineplotview" style="overflow:auto;height:450px;resize:vertical">')
 			
