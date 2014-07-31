@@ -610,7 +610,6 @@ var clusterTable = $.jqElem('div').kbaseTable(cluster_data);
 
 // all of this stuff here? This is to hack in a grouped header over the top.
     var headerRow = clusterTable.data('headerRow');
-    console.log(headerRow.find('th:nth-child(3)'));
     headerRow.find('th:nth-child(3)').after(
         $.jqElem('th')
             .attr('style', "background-color : black; color : white")
