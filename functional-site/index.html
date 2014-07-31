@@ -14,7 +14,6 @@
 
         <link rel="stylesheet" type="text/css" href="assets/css/kb-visualizations.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/landing-pages.css" />
-        <!-- should probably remove styling from feed xml? -->
         <link rel="stylesheet" type="text/css" href="assets/css/narrative.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/search.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/jquery.jsonview.css" />        
@@ -26,14 +25,15 @@
         <link rel="stylesheet" type="text/css" href="assets/css/kbaseLandingPageCard.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/kbaseSEEDFunctions.css" />
 
-        <!-- External javascript packages -->
+        <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/font-awesome-4.0.3/css/font-awesome.css" />
+        <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.css" />
 
-		<link rel='stylesheet prefetch' href='http://s.cdpn.io/4629/animate.css'>
-		<script src='http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js'></script>
+
+        <!-- External javascript packages -->
         <script src="../ext/bowser/bowser.min.js"></script>
 
-            <!-- Google Analytics -->
-            <script>
+        <!-- Google Analytics -->
+        <script>
             (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
             (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
             m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -41,7 +41,7 @@
 
             ga('create', 'UA-48256002-1', 'kbase.us');
             ga('send', 'pageview');
-    	  
+          
 
             /**
              * A snippet of code to check the browser's version and alert the user if they're using IE <= 9.0.
@@ -105,10 +105,8 @@
 
         <!-- KBase client library javascript -->
         <script src="assets/js/kbclient/kbase.js"></script>
-        <!-- <script src="assets/js/kbclient/workspaceDeluxe.js"></script> -->
         <script src="assets/js/kbclient/workspaceDeluxe-0.2.1.js"></script>
         <script src="assets/js/kbclient/userandjobstate.js"></script>        
-        <!--<script src="assets/js/kbclient/projects.js"></script>        -->
         <script src="assets/js/kbclient/wikiScraper.js"></script>
         <script src="assets/js/kbclient/kbaseTrees.js"></script>        
 
@@ -119,14 +117,10 @@
         <script src="../src/widgets/kbasePanel.js"></script>
         <script src="../src/widgets/kbaseModal.js"></script>
 
-        <!--<script src="../src/widgets/kbasePrompt.js"></script>-->
         <script src="assets/js/kbasePromptNew.js"></script>
         <script src="assets/js/ws-widgets/tabs.js"></script>
         <script src="../src/widgets/kbaseLoginFuncSite.js"></script>
-        <!--<script src="../src/widgets/kbaseLogin.js"></script>        -->
 
-
-        <!--<script src="../src/widgets/maps/kbasePathways.js"></script>-->
         <script src="../src/widgets/maps/kbasePathway.js"></script>        
         <script src="../src/widgets/models/kbaseModelMeta.js"></script>
         <script src="../src/widgets/models/kbaseModelTabs.js"></script>
@@ -154,8 +148,8 @@
         <script src="../src/widgets/workspaces/kbaseWSObjectTable.js"></script>
         <script src="../src/widgets/biochemistry/kbaseRxn.js"></script>
         <script src="../src/widgets/biochemistry/kbaseCpd.js"></script>
-	
-    	<!-- ws obj reference related widgets -->
+    
+        <!-- ws obj reference related widgets -->
         <script src="../ext/d3/sankey.js"></script> <!-- this is a d3 plugin -->
         <link rel="stylesheet" type="text/css" href="assets/css/sankeystyle.css" />
         <script src="../src/widgets/workspaces/kbaseWSReferenceList.js"></script>
@@ -163,7 +157,7 @@
         <script src="../src/widgets/objgraphs/kbaseWSObjGraphCenteredView.js"></script>
         <script src="../src/widgets/social/kbaseWSObjRefUsers.js"></script>
         <script src="../src/widgets/social/kbaseNarrativesUsingData.js"></script>
-    	<!-- end ws obj reference related widgets -->
+        <!-- end ws obj reference related widgets -->
 
         <!-- Genome widgets -->
         <script  src="../src/widgets/kbaseLandingPageCard.js"></script>
@@ -186,23 +180,22 @@
 
         <script  src="../src/widgets/genomes/kbaseLitWidget.js"></script>
         <script  src="../src/widgets/genomes/kbaseObjectMeta.js"></script>
-    	<script  src="../src/widgets/genomes/kbaseGenomeLineage.js"></script>
+        <script  src="../src/widgets/genomes/kbaseGenomeLineage.js"></script>
         <script  src="../src/widgets/kbaseCardLayoutManager.js"></script>
-	    <script  src="../src/widgets/genomes/kbaseSEEDFunctions.js"></script>
-
+        <script  src="../src/widgets/genomes/kbaseSEEDFunctions.js"></script>
         <!-- End Genome widgets -->
-	
-	<!-- Taxonomy widgets -->
+    
+        <!-- Taxonomy widgets -->
         <script  src="../src/widgets/taxa/kbaseTaxonOverview.js"></script>
-	<!-- end taxonomy widgets -->
+        <!-- end taxonomy widgets -->
         
         <!-- Regulation widgets -->
-	<script  src="../src/widgets/regulation/kbasePromConstraint.js"></script>
-	<script  src="../src/widgets/regulation/kbaseRegulome.js"></script>
+        <script  src="../src/widgets/regulation/kbasePromConstraint.js"></script>
+        <script  src="../src/widgets/regulation/kbaseRegulome.js"></script>
         <!-- End Regulation widgets -->
 
         <!-- Expression widgets -->
-	<script  src="../src/widgets/expression/kbaseExpressionSeries.js"></script>
+        <script  src="../src/widgets/expression/kbaseExpressionSeries.js"></script>
         <!-- End Expression widgets -->
 
 
@@ -239,11 +232,11 @@
 
         <!-- MAK widgets -->
         <script  src="../src/widgets/mak/kbaseMAKResultCard.js"></script>
-		<script	 src="../src/widgets/mak/kbaseBarChartCard.js"></script>
-        <script  src="../src/widgets/mak/kbaseMAKTilingCard.js"></script>		
+        <script  src="../src/widgets/mak/kbaseBarChartCard.js"></script>
+        <script  src="../src/widgets/mak/kbaseMAKTilingCard.js"></script>       
         <script  src="../src/widgets/mak/kbaseMAKBiclusterCard.js"></script>
-		<script  src="../src/widgets/mak/kbaseHeatmapCard.js"></script>
-		<script  src="../src/widgets/mak/kbaseLineChartCard.js"></script>
+        <script  src="../src/widgets/mak/kbaseHeatmapCard.js"></script>
+        <script  src="../src/widgets/mak/kbaseLineChartCard.js"></script>
         <!-- End MAK widgets -->
 
         <!-- Bambi widgets -->
@@ -257,8 +250,6 @@
         <!-- GWAS widgets -->
         <link rel="stylesheet" type="text/css" href="assets/css/gwas.css" />
         <script src='../src/widgets/kbaseAuthenticatedWidget.js'></script>
-        <!-- please don't load external scripts in index.html -->
-        <!-- This is the only way currently to load google maps for the GWAS landing pages, if you have another solution, talk to Matt H. -->
         <script src="http://maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
         <script src='../ext/gmaps/gmap3.js'></script>
         <script src="../src/widgets/gwas/kbaseGWASPop.js"></script>
@@ -270,34 +261,7 @@
         <script src="../src/widgets/gwas/kbaseGWASGeneListTable.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASTopVariations.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASTopVariationsTable.js"></script>
-
         <!-- End GWAS widgets -->
-
-        <script src="../src/widgets/trees/kbaseTree.js"></script>
-
-        <!-- Iris widgets -->
-        <!--
-        <link href="http://www.kbase.us/services/docs/invocation/Iris/jquery/external/font-awesome/css/font-awesome.min.css">
-        <script src='../src/widgets/kbaseAuthenticatedWidget.js'></script>
-        <script src='../src/widgets/kbaseButtonControls.js'></script>
-        <script src='../src/widgets/kbaseBox.js'></script>
-        <script src='../src/widgets/kbaseDeletePrompt.js'></script>
-        <script src='../src/widgets/kbaseErrorPrompt.js'></script>
-        <script src='../src/widgets/kbaseAccordion.js'></script>
-        <script src='../src/widgets/kbaseTabs.js'></script>
-        <script src='../src/widgets/kbaseTable.js'></script>
-        <script src='../src/widgets/kbaseIrisCommands.js'></script>
-        <script src='../src/widgets/kbaseDataBrowser.js'></script>
-        <script src='../src/widgets/kbaseIrisFileBrowser.js'></script>
-        <script src='../src/widgets/kbaseIrisProcessList.js'></script>
-        <script src='../src/widgets/kbaseIrisTerminal.js'></script>
-        <script src='../src/widgets/kbaseIrisGrammar.js'></script>
-        <script src='../src/widgets/kbaseIrisFileEditor.js'></script>
-        <script src='../src/widgets/kbaseIrisTutorial.js'></script>
-        <script src="http://www.kbase.us/services/docs/invocation/lib/InvocationService.js" 
-        type="text/javascript" charset="utf-8"></script>
-        -->
-        <!-- End Iris widgets -->
 
         <!-- KBase new workspace client library javascript -->
         <!--<script src="assets/js/kbclient/workspaceServiceNew.js"></script>-->
@@ -313,6 +277,7 @@
         <script  src="../src/widgets/spec/kbaseSpecFunctionCard.js"></script>
         <!-- End Spec widgets -->
 
+        <script src="../src/widgets/trees/kbaseTree.js"></script>
         <script src="lib/trees/canvastext.js"></script>
         <script src="lib/trees/excanvas.js"></script>
         <script src="lib/trees/menu.js"></script>            
@@ -320,9 +285,7 @@
         <script src="lib/trees/easytree.js"></script>
 
 
-	<!-- Network widgets and dependencies -->
-	<link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/font-awesome-4.0.3/css/font-awesome.css" />
-        <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.css" />
+        <!-- Network widgets and dependencies -->
         <script src="../ext/cytoscape.js/2.0.4-jmc/arbor.js"></script>
         <script src="../ext/cytoscape.js/2.0.4-jmc/cytoscape.js"></script>
         <script src="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.js"></script>
@@ -331,14 +294,9 @@
         <script  src="../src/widgets/networks/kbaseNetworkCard.js"></script>
         <!-- End Network widgets -->
 
-        <!--script type="text/javascript" src="assets/js/jsphylosvg-min.js"></script> -->
         <!-- application -->
-        <!--<script src="lib/angular/angular.js"></script>-->
         <script src="lib/angular/angular.min.js"></script>
-        <!--<script src="js/angular-ui-router.js"></script>-->
         <script src="js/angular-ui-router.min.js"></script>
-
-
         <script src="js/angular-resource.js"></script> 
         <script src="js/ui-bootstrap-tpls-0.10.0.js"></script>
 
@@ -350,7 +308,7 @@
         <script src="js/directives/fav.js"></script>
         <script src="js/directives/ws.js"></script>           
         <script src="js/directives/trees.js"></script>        
-	    <script src="js/directives/narrative.js"></script>
+        <script src="js/directives/narrative.js"></script>
         <script src="js/directives/autofillFix.js"></script>
         <script src="js/directives/modeling.js"></script>
         <script src="js/controllers.js"></script>
@@ -358,6 +316,7 @@
         <script src="js/services/workspaceUI.js"></script>
         <script src="js/kbapi.js"></script>
         <script src="assets/js/header.js"></script>
+        <!-- end application -->
     </head>
 
     <body>
