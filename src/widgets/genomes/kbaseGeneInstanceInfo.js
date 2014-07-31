@@ -17,6 +17,8 @@
             genomeID: null,
             kbCache: null,
             auth: null,
+            hideButtons:false,
+            width:350,
             loadingImage: "assets/img/loading.gif",
         },
 
@@ -77,19 +79,23 @@
                                 .addClass("kbwidget-message-pane kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
-            this.$infoPanel = $("<div>");
+            this.$infoPanel = $("<div>").css("overflow","auto");
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
             this.$buttonPanel = $("<div>")
                                 .attr("align", "center")
                                 .addClass("btn-group")
 		                //.append(makeButton("domains"))
-		                //.append(makeButton("operons"))
+		                 //.append(makeButton("operons"))
                                 .append(makeButton("sequence"))
-                                .append(makeButton("biochemistry"));
+                                .append(makeButton("biochemistry"))
+                                .append(makeButton("structure"));
+
 
             this.$infoPanel.append(this.$infoTable)
-                           .append(this.$buttonPanel);
+            if (!this.options.hideButtons) {
+                this.$infoPanel.append(this.$buttonPanel);
+            }
 
             this.$elem.append(this.$infoPanel);
         },
@@ -187,6 +193,11 @@
                         self.trigger("showBiochemistry", { event: event, featureID: self.options.featureID }) 
                     }
                 );
+                self.$buttonPanel.find("button#structure").click(
+                     function(event) { 
+                         self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID }) 
+                     }
+                );
                 self.hideMessage();
                 self.$infoPanel.show();
             });
@@ -268,7 +279,7 @@
                         //}
 
                         // Protein families list.
-                        var proteinFamilies = "None found";
+                        var proteinFamilies = "";
                         if (feature.protein_families) {
                             if (feature.protein_families.length>0) {
                                 proteinFamilies = "";
@@ -278,7 +289,9 @@
                                 }
                             }
                         }
-                        this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
+                        if (proteinFamilies) {
+                            this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
+                        }
 
                         // first add handlers that say we do not have domains or operons for this gene
                         this.$buttonPanel.find("button#domains").click(function(event) { 
@@ -287,7 +300,9 @@
                         this.$buttonPanel.find("button#operons").click(function(event) {
                             window.alert("No operon assignments available for this gene.  You will be able to compute operon assignments in the Narrative in the future.");
                         });
-                        
+                        this.$buttonPanel.find("button#structure").click(function(event) {
+                            window.alert("No structure assignments available for this gene.  You will be able to compute structure assignments in the Narrative in the future.");
+                        });                        
                         
                         //determine if a feature id and its protein MD5 translation is found in the CDS- if it is,
                         //return true.  We use this as a hack to see if we have gene info for this feature for WS objects.
@@ -302,6 +317,10 @@
                                             self.$buttonPanel.find("button#operons").off("click");
                                             self.$buttonPanel.find("button#operons").click(function(event) { 
                                                 self.trigger("showOperons", { event: event, featureID: self.options.featureID });
+                                            });
+                                            self.$buttonPanel.find("button#structure").off("click");
+                                            self.$buttonPanel.find("button#structure").click(function(event) { 
+                                                self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID });
                                             });
                                         }
                                    } // we don't add error function- if they don't match or this fails, do nothing.
@@ -352,12 +371,15 @@
 
         makeRow: function(name, value) {
             var $row = $("<tr/>")
-                       .append($("<td />").append(name))
+                       .append($("<th />").append(name))
                        .append($("<td />").append(value));
             return $row;
         },
 
         makeContigButton: function(loc) {
+            if (this.options.hideButtons) {
+                return "";
+            }
             if (loc === null || loc[0][0] === null)
                 return "";
 
@@ -390,6 +412,10 @@
             if (!workspaceID)
                 workspaceID = null;
 
+            return $("<div>")
+                .append('<a href="#/genomes/'+workspaceID+'/'+genomeID+'" target="_blank">'+workspaceID+'/<wbr>'+genomeID+'</a>');
+                
+                
             var self = this;
             var $genomeBtn = $("<button />")
                              .addClass("btn btn-default")

@@ -264,6 +264,13 @@
 
         // Toggle children on click.
         click: function(d) {
+
+	    // open window with gene landing page
+	    if (d._children === null && d.children === null) {
+		var winPop = window.open("/functional-site/#/genes/" + this.options.wsNameOrId + "/" + this.options.objNameOrId + "/" + d.name);
+	    }
+	    
+	    // expand tree
             if (d.children) {
                 d._children = d.children;
                 d.children = null;
@@ -276,7 +283,8 @@
         },
 
         color: function(d) {
-            return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
+	    //return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
+            return d._children ? "#c6dbef" : d.children ? "#3399ff" : "#ffffff";
         },
 
         collapse: function(d) {

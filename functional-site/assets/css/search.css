@@ -1,16 +1,10 @@
 /*** link styling ***/
 
-a.search-category-link { color: black; }
-a.search-category-link:link { color: black; }
-a.search-category-link:hover { color: black; }
-a.search-category-link:active { color: black; }
-a.search-category-link:visited { color: black; }
-
-a.search-selected-category-link { color: green; }
-a.search-selected-category-link:link { color: green; }
-a.search-selected-category-link:hover { color: green; }
-a.search-selected-category-link:active { color: green; }
-a.search-selected-category-link:visited { color: green; }
+a.search-selected-category-link { color: #468847; }
+a.search-selected-category-link:link { color: #468847; }
+a.search-selected-category-link:hover { color: #468847; }
+a.search-selected-category-link:active { color: #468847; }
+a.search-selected-category-link:visited { color: #468847; }
 
 a.search-checkbox-link { color: #555; }
 a.search-checkbox-link:link { color: #555; }
@@ -23,6 +17,14 @@ a.search-checkbox-link.disabled { color: #eee; }
 
 .search-nowrap {
     white-space: nowrap;
+}
+
+.search-halfspace-right {
+    margin-right: 0.5em;
+}
+
+.search-halfspace-left {
+    margin-left: 0.5em;
 }
 
 .search-space-right {
@@ -54,6 +56,21 @@ span .badge {
     color: #fff;
 }
 
+
+.btn-filters {
+    color: #c09853;
+    background-color: #fcf8e3;
+    display: block;
+    word-wrap: break-word;
+}
+
+.btn-filters:focus,
+.btn-filters:active,
+.btn-filters.active {
+    color: #c09853;
+    background-color: #f6eaac;
+}
+
 .btn-search {
     background-color: #000;
     padding-bottom: 5px;
@@ -76,6 +93,12 @@ span .badge {
 .small-pagination {
     padding-left: 160px;
 }
+
+
+.search-left-nav {
+    padding: 0px;
+}
+
 
 /*** Login ***/
 
@@ -119,6 +142,7 @@ span .badge {
 
 .search-bar {
     width: 600px;
+    margin-left: 30px;
     margin-bottom: 10px;
 }
 
@@ -141,13 +165,19 @@ span .badge {
     max-height: 200px;
 }
 
-#workspace-area {
-    height: 300px;
-    z-index: 1001 !important;
+.workspace-area {
+    height: 400px;
+    bottom: 0px;
+}
+
+.workspace-chosen {
+    color: #c09853;
+    background-color: #fcf8e3;
 }
 
 .search-leftarea-size {
     width: 220px;
+    padding: 0px;
 }
 
 
@@ -165,6 +195,11 @@ span .badge {
 
 /*** Categories ***/
 
+.search-categories {
+    padding: 0px;
+    margin-left: 0px;
+}
+
 .search-categories-title h3 {
     font-size: medium;
     color: gray;
@@ -174,6 +209,10 @@ span .badge {
     font-size: large;
 }
 
+.search-categories-row {
+    padding: 0px;
+    word-wrap: break-word;
+}
 
 /*** Filters ***/
 
@@ -182,12 +221,34 @@ span .badge {
     color: gray;
 }
 
+.search-filter-groups {
+    margin-bottom: 10px;
+}
+
 .filter-section {
-    margin-right: 0px;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-left: 0px;
     padding-right: 0px;
     max-width: 240px;
 }
 
+.panel-filter-heading {
+    background-image: -webkit-linear-gradient(top, #fcf8e3 0%, #fefcf5 100%);
+    background-image: linear-gradient(to bottom, #fcf8e3 0%, #fefcf5 100%);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fcf8e3', endColorstr='#fefcf5', GradientType=0);    
+}
+
+.panel-filter-content {
+    border: 2px solid #fcf8e3;
+}
+
+a.search-filter-link { color: #6f5499; }
+a.search-filter-link:link { color: #6f5499; }
+a.search-filter-link:hover { color: #6f5499; }
+a.search-filter-link:active { color: #6f5499; }
+a.search-filter-link:visited { color: #6f5499; }
 
 
 /*** Options ***/
@@ -201,6 +262,18 @@ span .badge {
 
 .search-cart-label {
     margin-right: 10px;
+}
+
+.search-transfer-workspace-area {
+    padding: 0px;
+}
+
+.search-transfer-workspace-divider {
+    padding: 0px;
+}
+
+.search-transfer-workspace-select {
+    margin-bottom: 10px;
 }
 
 .search-transfer-modal .modal-content {
@@ -218,7 +291,8 @@ span .badge {
 }
 
 .search-transfer-row {
-    margin-top: 10px;
+    margin: 10px;
+    width: 85%
 }
 
 .search-stage-transfer-buttons {
@@ -231,18 +305,6 @@ table.search-transfer-table {
     height: 400px;
     overflow-y: auto;
     display: block;
-}
-
-.transfer_object_type {
-    column-width: 150px;
-}
-
-.transfer_object_name {
-    column-width: 150px;
-}
-
-.transfer_object_id {
-    column-width: 400px;
 }
 
 .progress-bar {
@@ -266,9 +328,59 @@ table.search-transfer-table {
 
 /*** Results ***/
 
+.search-column-name {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.search-column-name.search-sort-activated {
+    color: #6f5499;
+}
+
+.search-sort-icon {
+    font-size: large;
+}
+
+.search-sort-icon.glyphicon-sort-by-order {
+    color: #6f5499;
+}
+
+.search-sort-icon.glyphicon-sort-by-order-alt {
+    color: #6f5499;
+}
+
+.search-sort-icon.glyphicon-sort-by-alphabet {
+    color: #6f5499;
+}
+
+.search-sort-icon.glyphicon-sort-by-alphabet-alt {
+    color: #6f5499;
+}
+
+.search-sort-icon.glyphicon-sort-by-attributes {
+    color: #6f5499;
+}
+
+.search-sort-icon.glyphicon-sort-by-attributes-alt {
+    color: #6f5499;
+}
+
+.search-sort-badge {
+    background-color: #6f5499;
+}
+
+.search-results {
+    padding: 0px;
+    margin-left: 15px;
+}
+
+.search-results-toolbar {
+    padding: 0px;
+}
+
 .search-results-counter {
     top: 20px;
-    left: -43px;
+    padding: 0px;
 }
 
 .search-results-scrollable {
@@ -278,26 +390,37 @@ table.search-transfer-table {
 }
 
 .search-result-section {
-    left: 100px;
+    padding: 0px;
+}
+
+.search-results-select-category {
+    margin: 30px;
 }
 
 .search-result-position {
     top: 1px;
-    width: 50px;
+    width: 60px;
     padding-right: 0px;
-    padding-left: 10px;
 }
 
 .search-result-select-all {
-    width: 70px;
+    width: 80px;
+}
+
+.search-result-select-all-disabled {
+    width: 50px;
 }
 
 .search-result-column {
     top: 1px;
-    margin-left: -1px;
+    margin-left: 0px;
     padding-left: 0px;
     padding-right: 0px;
     word-wrap: break-word;
+}
+
+.search-result-column-set {
+    margin-left: -15px;
 }
 
 .search-result-column-expanded {
@@ -305,7 +428,7 @@ table.search-transfer-table {
     background-color: #d9edf7;
     border-color: #bce8f1;
     border-radius: 4px;
-    width: 80%;
+    width: 100%
 }
 
 .search-result-column-expanded-entry table{
@@ -317,7 +440,7 @@ table.search-transfer-table {
     padding-bottom: 10px;
 }
 
-.search-result-column-expanded-entry-cell{
+.search-result-column-expanded-entry-cell {
     color: #3a87ad;
     background-color: #d9edf7;
     padding-bottom: 10px;
@@ -325,8 +448,8 @@ table.search-transfer-table {
 }
 
 .search-result-column-header {
-    margin-left: -1px;
-    margin-right: -1px;
+    margin-left: 0px;
+    margin-right: 0px;
     padding-left: 0px;
     padding-right: 0px;
     display: block;
@@ -334,14 +457,26 @@ table.search-transfer-table {
 
 .search-result-column-header-row {
     min-height: 20px;
-    margin-left: -13px;
+    margin-left: -15px;
     padding-bottom: 20px;
 }
 
-.search-result-column-header-toggle {
+.search-result-column-header-group {
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    display: block;
+    border-radius: 8px;
+}
+
+.search-result-column-header-toggle,
+.search-result-column-header-toggle:focus,
+.search-result-column-header-toggle:active,
+.search-result-column-header-toggle.active {
     width: 100%;
-    height: 30px;
-    padding-left: 6px;
+    height: 50px;
+    padding-left: 3px;
     padding-right: 0px;
     display: block;
     border-width: 0px;
@@ -352,8 +487,8 @@ table.search-transfer-table {
 
 .search-result-column-header-toggle.disabled {
     width: 100%;
-    height: 30px;
-    padding-left: 6px;
+    height: 50px;
+    padding-left: 3px;
     padding-right: 0px;
     display: block;
     border-width: 0px;
@@ -362,10 +497,21 @@ table.search-transfer-table {
     text-align: left;
 }
 
+.search-result-column-header-toggle:hover {
+    width: 100%;
+    height: 50px;
+    padding-left: 3px;
+    padding-right: 0px;
+    display: block;
+    border-width: 0px;
+    color: #c09853;
+    background-color: #F6EAAC;
+    text-align: left;
+}
 
 .search-result-column-header-btn {
     width: 100%;
-    height: 30px;
+    height: 50px;
     padding-left: 0px;
     padding-right: 0px;
     display: block;
@@ -377,7 +523,7 @@ table.search-transfer-table {
 
 .search-result-column-header-btn.disabled {
     width: 100%;
-    height: 30px;
+    height: 50px;
     padding-left: 0px;
     padding-right: 0px;
     display: block;
@@ -387,29 +533,49 @@ table.search-transfer-table {
     text-align: left;
 }
 
+.search-result-column-header-btn:hover, 
+.search-result-column-header-btn:focus,
+.search-result-column-header-btn:active,
+.search-result-column-header-btn.active,
+.open .dropdown-toggle.search-result-column-header-btn {
+    width: 100%;
+    height: 50px;
+    padding-left: 0px;
+    padding-right: 0px;
+    display: block;
+    border-width: 0px;
+    color: #c09853;
+    background-color: #F6EAAC;
+    text-align: left;
+}
+
 .search-checkbox {
     max-width: 14px;
     max-height: 14px;
 }
 
 .search-typedRecord {
-    margin-left: -10px;
+    margin-left: -12px;
     margin-bottom: 10px;
 }
 
 .search-typedRecord-expanded {
     margin-left: 80px;
-    padding-bottom: 10px;
+    margin-top: 15px;
+    padding-bottom: 5px;
 }
 
 .search-typedRecord-expanded-header {
     padding-bottom: 10px;
 }
 
-.scientific-name {
-    width: 300px;
+.feature-scientific-name {
+    width: 120px;
 }
 
+.genome-scientific-name {
+    min-width: 250px;
+}
 
 .toggle-expanded {
     width: 80px;
@@ -421,7 +587,7 @@ table.search-transfer-table {
 }
 
 .search-sections {
-    min-width: 750px;
+    min-width: 400px;
 }
 
 .genome_expanded_header {
@@ -440,8 +606,16 @@ table.search-transfer-table {
     width: 120px;
 }
 
+.trait_name {
+    width: 120px;
+}
+
+.trait_ontology_id {
+    width: 80px;
+}
+
 .genome_id {
-    width: 85px;
+    width: 90px;
 }
 
 .genome_id_cell {
@@ -449,7 +623,15 @@ table.search-transfer-table {
     margin-right: 5px;
 }
 
+.gc_content {
+    width: 50px;
+}
+
 .feature_id {
+    width: 140px;
+}
+
+.feature_source_id {
     width: 160px;
 }
 
@@ -459,7 +641,7 @@ table.search-transfer-table {
 }
 
 .feature_function {
-    min-width: 100px;
+    min-width: 60px;
 }
 
 .feature_function_cell {
@@ -467,9 +649,12 @@ table.search-transfer-table {
     margin-right: 5px;
 }
 
+.dna_sequence_length {
+    width: 60px;
+}
 
 .protein_translation_length {
-    width: 60px;
+    width: 80px;
 }
 
 .protein_translation_length_cell {
@@ -487,12 +672,8 @@ table.search-transfer-table {
 }
 
 
-.complete {
-    width: 80px;
-}
-
 .domain {
-    width: 79px;
+    width: 70px;
 }
 
 .domain_cell {
@@ -511,32 +692,16 @@ table.search-transfer-table {
 }
 
 .metagenome_name {
-    width: 300px;
-}
-
-.metagenome_name_cell {
-    width: 295px;
-    margin-right: 5px;
+    width: 200px;
 }
 
 .project_name {
-    width: 150px;
-}
-
-.project_name_cell {
-    width: 145px;
-    margin-right: 5px;
+    width: 220px;
 }
 
 .sample_name {
     min-width: 80px;
 }
-
-.sample_name_cell {
-    min-width: 75px;
-    margin-right: 5px;
-}
-
 
 .object_id {
     width: 140px;
@@ -549,7 +714,7 @@ table.search-transfer-table {
 
 
 .object_name {
-    width: 320px;
+    width: 240px;
 }
 
 .object_name_cell {
@@ -595,7 +760,7 @@ table.search-transfer-table {
 }
 
 .genome_dna_size {
-    width: 100px;
+    width: 90px;
 }
 
 .genome_dna_size_cell {
@@ -603,13 +768,20 @@ table.search-transfer-table {
     margin-right: 5px;
 }
 
-.num_contigs {
-    width: 65px;
+.num_cds {
+    width: 60px;
 }
 
 .num_contigs_cell {
     width: 60px;
     margin-right: 5px;
+}
+
+
+.facet-scroll {
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1001;
 }
 
 
@@ -625,6 +797,7 @@ table.search-transfer-table {
 .search-result-set-header {
     margin-bottom: 10px;
     width: 1100px;
+    padding: 0px;
 }
 
 
@@ -701,10 +874,10 @@ ul.scroll-menu {
     overflow-scrolling: touch;
     top: 0 !important;
     left: 0 !important;
-    width: 100%;
+    width: 90%;
     height: auto;
-    max-height: 300px;
     margin: 0;
+    max-height: 400px;
     border-left: none;
     border-right: none;
     -webkit-border-radius: 0 !important;

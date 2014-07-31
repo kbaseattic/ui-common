@@ -19,6 +19,7 @@
             genomeID: null,
             workspaceID: null,
             kbCache: null,
+	    width:950
         },
 
         cdmiURL: "https://kbase.us/services/cdmi_api",
@@ -49,7 +50,7 @@
                                 .addClass("kbwidget-message-pane kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
-            this.$infoPanel = $("<div>");
+            this.$infoPanel = $("<div>").css("overflow","auto");
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
 
@@ -94,7 +95,7 @@
 
         makeRow: function(name, value) {
             var $row = $("<tr>")
-                       .append($("<td>").append(name))
+                       .append($("<th>").append(name))
                        .append($("<td>").append(value));
             return $row;
         },
@@ -134,7 +135,7 @@
                     if (feature.dna_sequence) { // get dna_sequence from object
                         dnaSequenceStr = feature.dna_sequence;
 			// wrap seq
-			var seq_width = 100;
+			var seq_width = 50;
 			if (dnaSequenceStr.length > seq_width) {
 			    var dnaDispStr = "";
 			    var start_pos = 0;
@@ -169,7 +170,7 @@
 				     dnaSequenceStr = dna_sequences[self.options.featureID];
 				 }
 				 // wrap seq
-				 var seq_width = 100;
+				 var seq_width = 50;
 				 if (dnaSequenceStr.length > seq_width) {
 				     var dnaDispStr = "";
 				     var start_pos = 0;
@@ -209,7 +210,7 @@
                     if (feature.protein_translation) {
 			proteinTranslationStr = feature.protein_translation;
 			// wrap seq
-			var seq_width = 100;
+			var seq_width = 50;
 			if (proteinTranslationStr.length > seq_width) {
 			    var protDispStr = "";
 			    var start_pos = 0;
