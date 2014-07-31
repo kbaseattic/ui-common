@@ -777,8 +777,13 @@ angular.module('lp-directives')
                           narData["metadata"]["data_dependencies"] = [
                             "KBaseGenomes.Genome "+scope.id
                           ];
-                          var metadata = narData["metadata"];
-                          metadata["data_dependencies"] = "";// not sure format of this... JSON.stringify(metadata["data_dependencies"]);
+                          var metadata = {};
+                          for (var key in narData["metadata"]) {
+                            metadata[key] = narData["metadata"][key];
+                          }
+                          if (metadata["data_dependencies"]) {
+                            metadata["data_dependencies"] = JSON.stringify(metadata["data_dependencies"]);
+                          }
                           var objSaveData = {
                             type:"KBaseNarrative.Narrative",
                             data:narData,
@@ -856,6 +861,22 @@ angular.module('lp-directives')
         }
     };
 })
+
+.directive('sortablegenetable', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Gene list',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseGenomeGeneTable({genome_id: scope.id, ws_name: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
+
 .directive('sortableseedannotations', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
@@ -970,7 +991,7 @@ angular.module('lp-directives')
                                            subText: scope.fid});
             p.loading();
             $(p.body()).KBaseGeneInstanceInfo(
-                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
+                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb, hideButtons:true,
                                             loadingImage: "assets/img/ajax-loader.gif"});
         }
     };
@@ -1015,6 +1036,22 @@ angular.module('lp-directives')
         }
     };
 })
+.directive('sortablepdbstructure', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Structure',
+                                           rightLabel: scope.ws,
+                                           subText: scope.fid});
+            p.loading();
+            $(p.body()).KBaseGeneStructureMatches(
+                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
+
+
+
 
 
 /* END new placement in sortable rows for gene landing page */

@@ -1,5 +1,5 @@
 /**
- * @class KBaseContigBrowser
+ * @CLASS KBaseContigBrowser
  *
  * A KBase widget that displays an interactive view of a single contig. It 
  * comes with hooks for navigating up and downstream, and a number of
@@ -48,8 +48,8 @@
             allowResize: true,
 
 	    //svgWidth: 500,              // all numbers = pixels.
-            svgWidth: 1000,              // all numbers = pixels.
-            svgHeight: 100,
+            svgWidth: 600,              // all numbers = pixels.
+            svgHeight: 70,
             trackMargin: 5,
 	    //trackThickness: 15,
             trackThickness: 20,
@@ -60,21 +60,23 @@
 
             start: 1,                   // except these two - they're contig positions
 	    //length: 10000,
-            length: 21000,
+            length: 16750,
 
             embedInCard: false,
-            showButtons: false,
+	    //showButtons: false,
+            showButtons: true,
             cardContainer: null,
             onClickFunction: null,
 
 	    //width: 550,
-	    width: 1025,
+	    width: 525,
 
             workspaceId: null,
             genomeId: null,
             kbCache: null,
         },
-
+        
+        $contigViewPanel : null,
 
 	/** SEED ontology mappings
 	//
@@ -108,10 +110,13 @@
 
         init: function(options) {
             this._super(options);
+	    var self = this;
 
             // 1. Check that needed options are present (basically contig)
             if (this.options.contig === null) {
                 // throw an error.
+		//console.log ("kbaseContigBrowser.js: FATAL: missing contig");
+		console.log ("kbaseContigBrowser.js: missing contig.  Will set from feature");
             }
 
             this.$messagePane = $("<div/>")
@@ -119,10 +124,19 @@
                                 .addClass("kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
-            if (!options.contig) {
-                options.kbCache.ws.get
-            }
             
+            var $contigViewPanelWrapper = $('<div/>');
+            this.$contigViewPanel = $('<div id="contigmainview" align="center"/>').css({'overflow' : 'auto'});
+            $contigViewPanelWrapper
+                .append(this.$contigViewPanel)
+	        .append("<div>").KBaseContigBrowserButtons({ browser: self });
+	    
+            this.$elem.append($contigViewPanelWrapper);
+            
+            
+           /* if (!options.contig) {
+                options.kbCache.ws.get
+            }*/
             
             
             this.cdmiClient = new CDMI_API(this.cdmiURL);
@@ -131,29 +145,18 @@
 	    // load SEED info and render
 	    this.loadSeedOntology(this.wait_for_seed_load);
 
+
             return this;
         },
 
 
 	wait_for_seed_load : function () {
+
+	    // fill seedColors
 	    this.assignSeedColors (this.seedTermsUniq);
-	    console.log ("SEED INFO LOADED");
+
+	    // display
 	    this.render();
-
-            var self = this;
-            if (this.options.showButtons) {
-                this.$elem.KBaseContigBrowserButtons({ browser: self });
-            }
-
-            this.options.onClickFunction = function(svgElement, feature) {
-                self.trigger("featureClick", { 
-                    feature: feature, 
-                    featureElement: svgElement,
-                    genomeId: self.options.genomeId,
-                    workspaceId: self.options.workspaceId,
-                    kbCache: self.options.kbCache,
-                } );
-            }
 
 	    return true;
 	},
@@ -172,13 +175,13 @@
                              .classed("kbcb-tooltip", true);
 
             // Init the SVG container to be the right size.
-            this.svg = d3.select(this.$elem[0])
+            this.svg = d3.select(this.$contigViewPanel[0])
                          .append("svg")
                          .attr("width", this.options.svgWidth)
                          .attr("height", this.options.svgHeight)
                          .classed("kbcb-widget", true);
 
-	    console.log ("BUILDING TRACK");   // DEBUG
+	    //console.log ("BUILDING TRACK");   // DEBUG
             this.trackContainer = this.svg.append("g");
 
             this.xScale = d3.scale.linear()
@@ -200,18 +203,40 @@
                 self.resize();
             });
 
-            if (this.options.workspaceId && this.options.genomeId) {
-                this.setWorkspaceContig(this.options.workspaceId, this.options.genomeId, this.options.contig);
-            }
-            else {
-                this.setCdmiContig();
-            }
-
             // Kickstart the whole thing
             if (this.options.centerFeature != null)
                 this.setCenterFeature(this.options.centerFeature);
 
-	    console.log ("RENDER OF CONTIG BROWSER COMPLETE");
+            if (this.options.workspaceId && this.options.genomeId) {
+                this.setWorkspaceContig(this.options.workspaceId, this.options.genomeId, this.options.contig);
+		//console.log ("kbaseContigBrowser.js: workspaceId: '" + this.options.workspaceId + "' genomeId: '" + this.options.genomeId +"'");  // DEBUG
+            }
+            else {
+		//console.log ("kbaseContigBrowser.js: WTF?"); // DEBUG
+                this.setCdmiContig();
+            }
+
+
+	    // track click event handling
+	    //
+            this.options.onClickFunction = function(svgElement, feature, workspaceId, genomeId) {
+		var self = this;
+		console.log ("in onClickFunction");  // DEBUG
+		var winPop = window.open("/functional-site/#/genes/" + workspaceId + "/" + genomeId + "/" + feature.feature_id);
+		    //var winPop = window.open("/functional-site/#/genes/" + self.options.workspaceId + "/" + self.options.genomeId + "/" + feature.feature_id);
+
+                /* deprecated
+		self.trigger("featureClick", { 
+                    feature: feature, 
+                    featureElement: svgElement,
+                    genomeId: self.options.genomeId,
+                    workspaceId: self.options.workspaceId,
+                    kbCache: self.options.kbCache,
+                } );
+		*/
+            }
+
+	    //console.log ("RENDER OF CONTIG BROWSER COMPLETE");
 
             return this;
         },
@@ -319,6 +344,7 @@
 
             if (this.options.centerFeature) {
                 this.setCenterFeature();
+                this.update(true);
             }
             else {
                 this.update();
@@ -371,7 +397,7 @@
                 if(self.options.centerFeature) {
                     for (var i=0; i<genome.data.features.length; i++) {
                         var f = genome.data.features[i];
-                        if (f.feature_id === self.options.centerFeature) {
+                        if (f.id === self.options.centerFeature) {
                             if (f.location && f.location.length > 0) {
                                 self.options.contig = f.location[0][0];
                                 contigId = f.location[0][0];
@@ -428,6 +454,7 @@
 
                 if (this.options.centerFeature) {
                     this.setCenterFeature();
+		    this.update(true);
                 }
                 else {
                     this.update();
@@ -441,6 +468,9 @@
             // if we're getting a new center feature, make sure to update the operon features, too.
             if (centerFeature)
                 this.options.centerFeature = centerFeature;
+
+	    // skip rest for now and update above code block
+	    return;
 
             if (this.options.workspaceId && this.options.genomeId) {
                 this.update(true);
@@ -539,10 +569,12 @@
                 else {
                     window.alert("Error: fid '" + self.options.centerFeature + "' not found! Continuing with original range...");
                 }
+		// Um... what is this cdmiClient method doing here?
                 self.cdmiClient.region_to_fids([self.options.contig, self.options.start, '+', self.options.length], getFeatureData);
             };
 
             var getFeatureData = function(fids) {
+		// Um... what is this cdmiClient method doing here?
                 self.cdmiClient.fids_to_feature_data(fids, getOperonData);
             };
 
@@ -563,7 +595,7 @@
 
                 if (self.options.centerFeature && useCenter) {
                     // make a region around the center and use it.
-                    var f = this.wsFeatureSet[self.options.centerFeature];
+                    var f = self.wsFeatureSet[self.options.centerFeature];
                     if (f) {
                         self.options.start = Math.max(0, Math.floor(parseInt(f.location[0][1]) + (parseInt(f.location[0][3])/2) - (self.options.length/2)));
                         region = [self.options.start, self.options.start + self.options.length - 1];
@@ -682,7 +714,12 @@
 		.on("click", 
 		    function(d) { 
 			if (self.options.onClickFunction) {
-			    self.options.onClickFunction(this, d);
+			    if (d.feature_id !== self.options.centerFeature) {
+				self.options.onClickFunction(this, d, self.options.workspaceId, self.options.genomeId);
+			    }
+			    else {
+				self.highlight(this, d); 
+			    }
 			}
 			else {
 			    self.highlight(this, d); 
@@ -1026,9 +1063,9 @@
 		}
 
 
-		for (var i=0; i < seedTermsUniq[0].length; i++) {
+		/*for (var i=0; i < seedTermsUniq[0].length; i++) {
 		    console.log (i + " " + seedColors[0][seedTermsUniq[0][i]] + " " + seedTermsUniq[0][i]);
-		}
+		}*/
 
 		//this.seedColors = seedColors;
 		

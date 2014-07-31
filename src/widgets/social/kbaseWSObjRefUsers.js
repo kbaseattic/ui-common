@@ -43,7 +43,7 @@
             }
             
             self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>finding all data that references this object...</center></p></div>');
-            self.$elem.append('<div id="mainview">')
+            self.$elem.append($('<div id="mainview">').css("overflow","auto"));
             //self.$elem.append(JSON.stringify(options)+"<br>");
             
 	    if ( (/^\d+$/.exec(options.wsNameOrId)) || ( /^\d+$/.exec(options.objNameOrId)) ){
@@ -71,6 +71,8 @@
             else {
 		// it is a name already, so we can get right to the fun
 		wsName = options.wsNameOrId;
+		self.objName = options.objNameOrId;
+		self.wsName  = options.wsNameOrId;
 		self.getTheRefsAndRender();
             }
 	    
@@ -130,7 +132,9 @@
 							self.userList[data[i]['info'][5]]['narCount']++;
 							self.userList[data[i]['info'][5]]['nars'][narName]=1;
 						    } else {
-							self.userList[data[i]['info'][5]] = {refCount:0, name:"[Login to view name]", narCount:0, refs:[], nars:{narName:1}};
+							self.userList[data[i]['info'][5]] = {refCount:0, name:"[Login to view name]", narCount:0, refs:[], nars:{}};
+							self.userList[data[i]['info'][5]]['narCount']++;
+							self.userList[data[i]['info'][5]]['nars'][narName]=1;
 						    }
 						}
 					    }
@@ -179,13 +183,13 @@
 		    count++;
 		}
 		
-		var mentionStr = ""
+		var mentionStr = "";
 		if (self.userList[ud]['narCount']>0) {
-		    mentionStr += '<span title="'+narToolTip+'">'+self.userList[ud]['narCount']+' in narratives</span>';
+		    mentionStr += '<span style="cursor:help;" title="'+narToolTip+'">'+self.userList[ud]['narCount']+' in narratives</span>';
 		}
 		if (self.userList[ud]['refCount'] > 0) {
 		    if (mentionStr.length>0) { mentionStr += ",<br>"}
-		    mentionStr += '<span title="'+refToolTip+'">'+self.userList[ud]['refCount']+" in data objects</span>";
+		    mentionStr += '<span style="cursor:help;" title="'+refToolTip+'">'+self.userList[ud]['refCount']+" in data objects</span>";
 		}
 		tblData.push({name:self.userList[ud]['name'],user_id:ud,mentions:mentionStr});
 	    }
