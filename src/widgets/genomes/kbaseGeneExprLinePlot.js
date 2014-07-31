@@ -6,10 +6,13 @@
         options: {
             title: "Gene expression line plot",
             featureID: null,
+	    	workspaceID: null,
             row: null,
             isInCard: false,
             width: 2000,
-            height: 800
+            height: 600,
+		    kbCache: null,
+
         },
 
         expressionServiceUrl: "http://kbase.us/services/expression",
@@ -39,6 +42,7 @@
                     'token': this.options.auth,
                     'user_id': this.options.userId
                 });
+
 				console.log("input is null");
 				options.featureID = 'kb|g.3899.CDS.56284';
                 //get_expression_data_by_samples_and_features([], ['kb|g.3899.CDS.56284''], 'Log2 level intensities');
@@ -98,10 +102,11 @@
             var self = this;
 
         if(self.values != null) {
+	
 			$lineChartDiv = $("<div id='linechart'>")
 			self.$elem.append($lineChartDiv);
 			
-			// self.values = self.values.slice(0,300)
+			self.values = self.values.slice(0,300)
 			var values_unsorted = self.values;
 			var conditions_unsorted = self.conditions;
 			self.values.sort(function(a,b){return a - b})
@@ -129,29 +134,69 @@
             var h = 300 - m[0] - m[2]; // height
             var graph = d3.select($lineChartDiv.get(0)).append("svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
+
+            var formatAsLabels = function (d, i) {
+		if(self.conditions[i] != null) {
+		//console.log(i);
+		//console.log(self.conditions[i]);
+		//console.log(self.values[i]);
+                    //if (self.conditions[i].length > 10) return self.conditions[i].substring(0, 10) + "...";
+                    //else
+		    return self.conditions[i];
+		}
+                }
+		
+		//console.log(self.values)
+
             var x = d3.scale.linear().domain([0, self.values.length - 1]).range([0, w]);
+            
+	    
+	    if(self.conditions.length < 200) {
+		var xAxis = d3.svg.axis().scale(x).ticks(self.conditions.length).tickFormat(formatAsLabels);
+		
+		graph.append("svg:g").attr("class", "x axis").attr("transform", "translate(0," + h + ")").call(xAxis).selectAll("g.x.axis > g.tick > text").style("text-anchor", "end")
+		.attr("dx", "-.9em")
+		.attr("dy", ".17em")
+		.attr("transform", function(d) {
+		    return "rotate(-80)" 
+		    }).on("mouseover", function (i) {
+		    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker());
+		    self.tooltip = self.tooltip.text(self.conditions[i]);
+		    return self.tooltip.style("visibility", "visible");
+		}).on("mouseout", function () {
+		    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter());
+		    return self.tooltip.style("visibility", "hidden");
+		}).on("mousemove", function () {
+		    return self.tooltip.style("top", (d3.event.pageY + 15) + "px").style("left", (d3.event.pageX - 10) + "px");
+		})
+	    }
+	    
+	    
+            // .append("title")
+            // .text(function(i) {return conditions[i]})
+            self.$elem.find("g.axis > path").css({
+                "display": "none"
+            })
+            self.$elem.find("g.axis > line").css({
+                "stroke": "lightgrey"
+            })
+            self.$elem.find("g.x.axis > .minor").css({
+                "stroke-opacity": 1
+            })
+            self.$elem.find(".axis").css({
+                "shape-rendering": "crispEdges"
+            })
+            self.$elem.find(".y.axis > .tick.major > line, .y.axis > path").css({
+                "fill": "none",
+                "stroke": "#000"
+            })
 
             var y = d3.scale.linear().domain([Math.min.apply(Math,self.values), d3.max(self.values)]).range([h, 0]);
 			
             var yAxisLeft = d3.svg.axis().scale(y).orient("left");				
             graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft);
 			
-            // self.$elem.find("g.axis > path").css({
-                // "display": "none"
-            // })
-            // self.$elem.find("g.axis > line").css({
-                // "stroke": "lightgrey"
-            // })
-            // self.$elem.find("g.x.axis > .minor").css({
-                // "stroke-opacity": .5
-            // })
-            // self.$elem.find(".axis").css({
-                // "shape-rendering": "crispEdges"
-            // })
-            // self.$elem.find(".y.axis > .tick.major > line, .y.axis > path").css({
-                // "fill": "none",
-                // "stroke": "#000"
-            // })
+
 
 			var datadict = [];
 			for (i = 0; i < self.values.length; i++) {
@@ -182,6 +227,7 @@
 				return self.tooltip.style("top", (d3.event.pageY + 15) + "px").style("left", (d3.event.pageX - 10) + "px");
 			})
 
+                graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft);
 			// if (drawCircle) {
 				// var circle = [];
 				// for (var i = 0; i < datadict.length; i++) {
@@ -229,6 +275,7 @@
                 type: "LineChartCard",
                 row: this.options.row,
                 featureID: this.options.featureID,
+		workspaceID: this.options.workspaceId,
                 auth: this.options.auth,
                 userId: this.options.userId,
                 title: "Gene expression line plot",
