@@ -270,9 +270,9 @@ function KBCacheClient(token) {
                     }
 
 
-                    $('.my-nar-count').text(mine.length)
-                    $('.shared-nar-count').text(shared.length);  
-                    $('.public-nar-count').text(pub.length);            
+                    $('.my-nar-count').addClass('badge').text(mine.length)
+                    $('.shared-nar-count').addClass('badge').text(shared.length);  
+                    $('.public-nar-count').addClass('badge').text(pub.length);            
 
                     var all_data = {my_narratives: mine, 
                                     shared_narratives: shared, 

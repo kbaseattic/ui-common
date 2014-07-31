@@ -1022,7 +1022,6 @@ angular.module('ws-directives')
 
 
             scope.loadNarTable = function(tab) {
-                var table_id = "obj-table";                 
                 console.log('tab', tab)
                 var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
                                             +'</div>',
@@ -1078,9 +1077,9 @@ angular.module('ws-directives')
                 var p = kb.getNarratives();
 
                 $.when(p).done(function(nars){
-                    $(element).rmLoading();   
-                    $(element).append('<table id="'+table_id+'" \
-                        class="table table-bordered table-striped" style="width: 100%;">')                     
+                    $(element).rmLoading(); 
+                    var table_ele = $('<table class="table table-bordered table-striped" style="width: 100%;">')
+                    $(element).append(table_ele)                     
 
                     if (tab == "my-narratives") {
                         var narratives = nars.my_narratives;
@@ -1104,7 +1103,7 @@ angular.module('ws-directives')
 
 
                     tableSettings.aaData = wsobjs;
-                    table = $('#'+table_id).dataTable(tableSettings);       
+                    table = table_ele.dataTable(tableSettings);       
                     $compile(table)(scope);
                     //new FixedHeader( table , {offsetTop: 90, "zTop": 500});                    
 

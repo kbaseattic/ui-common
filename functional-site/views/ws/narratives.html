@@ -26,17 +26,17 @@
 
             <div class="narrative-filters">
                 <a ng-show="$root.USER_ID" ui-sref="narratives.mynarratives"  ng-class="{ active: $state.includes('narratives.mynarratives')}" class="select-nar">
-                    <div class="badge my-nar-count">...</div> 
+                    <span class="my-nar-count"></span> 
                     <span> <b>Mine</b></span>
                     <span class="glyphicon glyphicon-chevron-right pull-right"></span>
                 </a>
                 <a ng-show="$root.USER_ID" ui-sref="narratives.shared" ng-class="{ active: $state.includes('narratives.shared')}" class="select-nar">
-                    <div class="badge shared-nar-count">...</div> 
+                    <span class="shared-nar-count"></span>                     
                     <span> <b>Shared With Me</b></span>
                     <span class="glyphicon glyphicon-chevron-right pull-right"></span>
                 </a>
                 <a ui-sref="narratives.public" ng-class="{ active: $state.includes('narratives.public')}" class="select-nar">
-                    <div class="badge public-nar-count">...</div> 
+                    <span class="public-nar-count"></span> 
                     <span> <b>Public</b></span>  
                     <span class="glyphicon glyphicon-chevron-right pull-right"></span>
                 </a>
