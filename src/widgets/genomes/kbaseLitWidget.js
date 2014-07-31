@@ -212,7 +212,8 @@
 										
 										for (summary_idx in summaryList) {
 											summary = summaryList[summary_idx].Item
-											var tableInputRow = {}									
+											var tableInputRow = {}				
+											var isJournal = false;
 											for (item_idx in summary) {
 												infoRow = summary[item_idx]
 												if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"]
@@ -244,8 +245,21 @@
 													}
 													tableInputRow["author"] = authors
 												}
-											}
-											tableInput.push(tableInputRow)
+												if (infoRow["@attributes"].Name == "PubTypeList") {
+													if ("#text" in infoRow) {
+														if ($.isArray(infoRow.Item)) {														
+															for (pub_idx in infoRow.Item) {
+																if (infoRow.Item[pub_idx]["#text"] == "Journal Article") isJournal = true
+															}												
+														}											
+														else {
+															console.log(infoRow)
+															if (infoRow.Item["#text"] == "Journal Article") isJournal = true
+														}
+													}													
+												}
+											}											
+											if (isJournal) tableInput.push(tableInputRow)
 										}
 										
 										//console.log(articleIDs)

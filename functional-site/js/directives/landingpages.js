@@ -1050,7 +1050,19 @@ angular.module('lp-directives')
         }
     };
 })
-
+.directive('sortableexprlineplot', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Gene Expression Line Plot',
+                                           rightLabel: scope.ws,
+                                           subText: scope.fid});
+            p.loading();
+            $(p.body()).KBaseGeneExprLinePlot(
+                            {featureID: scope.fid,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
 
 
 

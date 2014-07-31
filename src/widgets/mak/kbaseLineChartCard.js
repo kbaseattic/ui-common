@@ -143,6 +143,8 @@
 			var mean = JSON.parse(JSON.stringify(values[index]))
 			var heatmap = self.options.heatmap
 			heatmap.on("click",function(d,i) {
+				if ($(this).css("font-weight") == 400) $(this).css({"font-weight":900,"font-size":"medium"})
+				else $(this).css({"font-weight":400,"font-size":"small"})
 				if (graph.selectAll("#_"+gene_label[i]).empty() && count<=10) {
 					count++
 					self.lineDrawer(values[i],conditions,gene_label[i],x,y,(count-1),true,graph,colorScale)
