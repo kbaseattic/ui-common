@@ -333,6 +333,7 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
              controller: 'GeneDetail'});
 
 */
+/*
     $stateProvider
         .state('genesbyws',
             {url: '/genes/:ws/:fid',
@@ -344,8 +345,8 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
             {url: '/genes/:ws/:gid/:fid',
              templateUrl: 'views/objects/gene.html',
              controller: 'GeneDetail'});
+*/
 
-/*
     $stateProvider
         .state('kbgenesbyws',
             {url: '/genes/:ws/:fid',
@@ -354,10 +355,7 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
         .state('kbgenesbywsgenome',
             {url: '/genes/:ws/:gid/:fid',
              templateUrl: 'views/genomes/sortable-rows-landing-page-genes.html',
-             controller: 'WBGeneLanding'})
-*/          
-             
-             
+             controller: 'WBGeneLanding'})                      
              
     $stateProvider
         .state('meme',
