@@ -40,7 +40,7 @@
                     'user_id': this.options.userId
                 });
 		console.log("input is null");
-		options.featureID = 'kb|g.3899.CDS.56284';
+		//options.featureID = 'kb|g.3899.CDS.56284';
                 //get_expression_data_by_samples_and_features([], ['kb|g.3899.CDS.56284''], 'Log2 level intensities');
 		
                 this.expressionClient.get_expression_data_by_samples_and_features([], [options.featureID], 'Log2 level intensities', function(data) {
