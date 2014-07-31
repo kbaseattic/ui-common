@@ -6,8 +6,10 @@
         options: {
             title: "Gene expression line plot",
             featureID: null,
+	    workspaceID: null,
             row: null,
             isInCard: false,
+	    kbCache: null,
             width: 600,
             height: 600
         },
@@ -100,17 +102,15 @@
         if(self.values != null) {
 	self.$elem.append($("<div id='linechart'>"));
 	
-	self.values = self.values.slice(0,300)
+	//self.values = self.values.slice(0,300)
 	var values_unsorted = self.values;
 	var conditions_unsorted = self.conditions;
-	self.values.sort(function(a,b){return a - b})
-	
+	self.values.sort(function(a,b){return a - b})	
 	var index = [];
 	for (i = 0; i < values_unsorted.length; i++) {
 		var curind = self.values.indexOf(values_unsorted[i]);
 		index[index.length] = curind;
-	}
-	
+	}	
 	for (i = 0; i <conditions_unsorted.length; i++) {
 		self.conditions[index[i]] = conditions_unsorted[i];
 	}
@@ -127,39 +127,47 @@
             var count = 1;
             //var colorbank = ["#003399", "#33CC33", "#FF9900", "#FF0000", "#6600FF", "#00FFFF", "#993333", "#000000", "#00CC99", "#0000FF", "#999966"];
             //var colorScale = d3.scale.quantile().domain([0, self.gene_label.length - 1]).range(colorbank);
-            var heatmap = self.options.heatmap;
             console.log(self.options.height)
             var m = [80, 80, 80, 80]; // margins
             var w = self.options.width - m[1] - m[3];//self.conditions.length * 100 - m[1] - m[3]; // width
             var h = 300 - m[0] - m[2]; // height
             var graph = d3.select("#linechart").append("svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-            /*var formatAsLabels = function (d, i) {
+            var formatAsLabels = function (d, i) {
 		if(self.conditions[i] != null) {
 		//console.log(i);
 		//console.log(self.conditions[i]);
 		//console.log(self.values[i]);
-                    if (self.conditions[i].length > 10) return self.conditions[i].substring(0, 10) + "...";
-                    else return self.conditions[i];
+                    //if (self.conditions[i].length > 10) return self.conditions[i].substring(0, 10) + "...";
+                    //else
+		    return self.conditions[i];
 		}
-                }*/
-		console.log(self.values)
+                }
+		
+		//console.log(self.values)
             var x = d3.scale.linear().domain([0, self.values.length - 1]).range([0, w]);
             
-	    /*
-	    var xAxis = d3.svg.axis().scale(x).ticks(self.conditions.length).tickFormat(formatAsLabels);
-
-            graph.append("svg:g").attr("class", "x axis").attr("transform", "translate(0," + h + ")").call(xAxis).selectAll("g.x.axis > g.tick > text").on("mouseover", function (i) {
-                d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker());
-                self.tooltip = self.tooltip.text(self.conditions[i]);
-                return self.tooltip.style("visibility", "visible");
-            }).on("mouseout", function () {
-                d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter());
-                return self.tooltip.style("visibility", "hidden");
-            }).on("mousemove", function () {
-                return self.tooltip.style("top", (d3.event.pageY + 15) + "px").style("left", (d3.event.pageX - 10) + "px");
-            })
-	    */
+	    
+	    if(self.conditions.length < 200) {
+		var xAxis = d3.svg.axis().scale(x).ticks(self.conditions.length).tickFormat(formatAsLabels);
+		
+		graph.append("svg:g").attr("class", "x axis").attr("transform", "translate(0," + h + ")").call(xAxis).selectAll("g.x.axis > g.tick > text").style("text-anchor", "end")
+		.attr("dx", "-.9em")
+		.attr("dy", ".17em")
+		.attr("transform", function(d) {
+		    return "rotate(-80)" 
+		    }).on("mouseover", function (i) {
+		    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker());
+		    self.tooltip = self.tooltip.text(self.conditions[i]);
+		    return self.tooltip.style("visibility", "visible");
+		}).on("mouseout", function () {
+		    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter());
+		    return self.tooltip.style("visibility", "hidden");
+		}).on("mousemove", function () {
+		    return self.tooltip.style("top", (d3.event.pageY + 15) + "px").style("left", (d3.event.pageX - 10) + "px");
+		})
+	    }
+	    
 	    
             // .append("title")
             // .text(function(i) {return conditions[i]})
@@ -170,7 +178,7 @@
                 "stroke": "lightgrey"
             })
             self.$elem.find("g.x.axis > .minor").css({
-                "stroke-opacity": .5
+                "stroke-opacity": 1
             })
             self.$elem.find(".axis").css({
                 "shape-rendering": "crispEdges"
@@ -186,7 +194,7 @@
 		console.log(d3.min(values))
                 var yAxisLeft = d3.svg.axis().scale(y).orient("left");
 
-                graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft);
+                graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(0,0)").call(yAxisLeft);
 
                 return y;
 
@@ -233,7 +241,7 @@
                 if (drawCircle) {
                     var circle = [];
                     for (var i = 0; i < datadict.length; i++) {
-                        circle[i] = graph.append("svg:circle").attr("cx", x(i)).attr("cy", y(datadict[i].value)).attr("r", 5).attr("fill", datadict[i].value != null ? "steelblue" : "white").attr("id", "_" + datadict[i].gene_label).on("mouseover", function () {
+                        circle[i] = graph.append("svg:circle").attr("cx", x(i)).attr("cy", y(datadict[i].value)).attr("r", 5).attr("fill", datadict[i].value != null ? "steelblue" : "red").attr("id", "_" + datadict[i].gene_label).on("mouseover", function () {
                             d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker());
                             self.tooltip = self.tooltip.text(datadict[i].gene_label);
                             return self.tooltip.style("visibility", "visible");
@@ -261,6 +269,7 @@
                 type: "LineChartCard",
                 row: this.options.row,
                 featureID: this.options.featureID,
+		workspaceID: this.options.workspaceId,
                 auth: this.options.auth,
                 userId: this.options.userId,
                 title: "Gene expression line plot",
