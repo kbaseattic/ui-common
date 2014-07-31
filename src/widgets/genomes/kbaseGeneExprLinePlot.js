@@ -106,7 +106,8 @@
 			$lineChartDiv = $("<div id='linechart'>")
 			self.$elem.append($lineChartDiv);
 			
-			self.values = self.values.slice(0,300)
+			self.values = self.values.slice(0,150)
+			self.conditions = self.conditions.slice(0,150)
 			var values_unsorted = self.values;
 			var conditions_unsorted = self.conditions;
 			self.values.sort(function(a,b){return a - b})
@@ -151,7 +152,7 @@
             var x = d3.scale.linear().domain([0, self.values.length - 1]).range([0, w]);
             
 	    
-	    if(self.conditions.length < 200) {
+	    if(self.values.length < 200) {
 		var xAxis = d3.svg.axis().scale(x).ticks(self.conditions.length).tickFormat(formatAsLabels);
 		
 		graph.append("svg:g").attr("class", "x axis").attr("transform", "translate(0," + h + ")").call(xAxis).selectAll("g.x.axis > g.tick > text").style("text-anchor", "end")
@@ -168,6 +169,14 @@
 		    return self.tooltip.style("visibility", "hidden");
 		}).on("mousemove", function () {
 		    return self.tooltip.style("top", (d3.event.pageY + 15) + "px").style("left", (d3.event.pageX - 10) + "px");
+		})
+		.on("click", function (i) {
+			var temp = document.URL.indexOf("/functional-site")
+			var baseURL = document.URL.substring(0,temp)
+			temp1 = self.conditions[i].indexOf("|")
+			temp2 = self.conditions[i].indexOf("_")
+			var sampleID = self.conditions[i].substring((temp1+1),(temp2))
+			window.open(baseURL+"/functional-site/#/ws/json/KBasePublicExpression/kb%7C"+sampleID,'_blank')
 		})
 	    }
 	    
@@ -194,9 +203,7 @@
             var y = d3.scale.linear().domain([Math.min.apply(Math,self.values), d3.max(self.values)]).range([h, 0]);
 			
             var yAxisLeft = d3.svg.axis().scale(y).orient("left");				
-            graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft);
-			
-
+            graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft);			
 
 			var datadict = [];
 			for (i = 0; i < self.values.length; i++) {
@@ -225,8 +232,8 @@
 				return self.tooltip.style("visibility", "hidden");
 			}).on("mousemove", function () {
 				return self.tooltip.style("top", (d3.event.pageY + 15) + "px").style("left", (d3.event.pageX - 10) + "px");
-			})
-
+			})			
+			
                 graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft);
 			// if (drawCircle) {
 				// var circle = [];
@@ -263,6 +270,14 @@
 						return self.tooltip.style("visibility", "hidden");
 					}).on("mousemove", function () {
 						return self.tooltip.style("top", (d3.event.pageY + 15) + "px").style("left", (d3.event.pageX - 10) + "px");
+					})
+					.on("click", function (d) {
+						var temp = document.URL.indexOf("/functional-site")
+						var baseURL = document.URL.substring(0,temp)
+						temp1 = d.condition.indexOf("|")
+						temp2 = d.condition.indexOf("_")
+						var sampleID = d.condition.substring((temp1+1),(temp2))
+						window.open(baseURL+"/functional-site/#/ws/json/KBasePublicExpression/kb%7C"+sampleID,'_blank')
 					})
 			}
 
