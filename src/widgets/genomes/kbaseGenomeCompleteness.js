@@ -8,7 +8,7 @@
         kbCache: null,
 	//width: 550,
         width: 500,
-	table_height: 300,
+	table_height: 676,
         options: {
             genome_id: null,
             ws_name: null,
@@ -177,7 +177,7 @@
 			                               {sTitle: "Count", mData: "num", sWidth: "10%"}, 
 			                               {sTitle: "Gene ID", mData: "id"}, 
 			                               {sTitle: "Group", mData: "group"},
-			                               {sTitle: "Function", mData: "func", sWidth: "45%"}
+			                               {sTitle: "Function", mData: "func", sWidth: "50%"}
             				              ],
             				              "aaData": [],
             				              "oLanguage": {
