@@ -50,10 +50,21 @@
 
             if (options.table) {
                 var headers = options.table.shift();
-                var rows = options.table;
+                var rows = [];
+
+                var i;
+                for (i = 0; i < options.table.length; i++) {
+                    var row = {};
+                    var j;
+                    for (j = 0; j < headers.length; j++) {
+                        row[headers[j]] = options.table[i][j];
+                    }
+                    rows.push(row);
+                }
+
                 options.structure = {
                     header : headers,
-                    rows : rows,
+                    rows   : rows,
                 }
             }
 
@@ -63,7 +74,7 @@
                 style : 'background-color : #EEEEEE; color : #0D7876;',
                 sortable : true,
             };
-console.log(options);
+
             return this._super(options);
         },
 
