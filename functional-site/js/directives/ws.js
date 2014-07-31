@@ -941,7 +941,8 @@ angular.module('ws-directives')
 
 
                 // clear object view every load
-                $(element).loading('<br>loading<br>'+ws+'...', true)
+                $(element).html('');
+                $(element).loading('<br>loading<br>'+ws+'...', true);
 
                 var p = kb.ws.list_objects({workspaces: [ws]});
                 var p2 = kb.ws.list_objects({workspaces: [ws], showOnlyDeleted: 1});
@@ -1055,7 +1056,7 @@ angular.module('ws-directives')
                 }
 
                 // clear object view every load
-                //$(element).html('');
+                $(element).html('');
                 $(element).loading('<br>Loading<br>Narratives...', 'big');
 
                 var p = kb.getNarratives();
