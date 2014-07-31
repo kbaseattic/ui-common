@@ -1,4 +1,4 @@
-kb_define('all',
+kb_define('jim',
     [
 	'geometry_point',
 	'geometry_rectangle',
