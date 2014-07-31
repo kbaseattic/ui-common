@@ -360,8 +360,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
     $scope.getCount = function(options, category) {
     
-        console.log("getCount");
-        console.log([options, category]);
+        //console.log("getCount");
+        //console.log([options, category]);
     
         var queryOptions = {};
 
