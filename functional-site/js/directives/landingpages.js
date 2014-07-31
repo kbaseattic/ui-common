@@ -891,6 +891,7 @@ angular.module('lp-directives')
         }
     };
 })
+
 .directive('sortablerelatedpublications', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
