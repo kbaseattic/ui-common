@@ -479,6 +479,12 @@ function KBCacheClient(token) {
             case 'Genome': 
                 route = 'genomesbyid';
                 break;
+	    case 'MAKResult':
+		route = 'mak';
+		break;
+	    case 'FloatDataTable':
+                route = 'floatdatatable';
+                break;
         }
         return route;
     }
