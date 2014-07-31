@@ -8,8 +8,8 @@
             featureID: null,
 	    	workspaceID: null,
             row: null,
-            isInCard: false,
-            width: 1000,
+            isInCard: true,
+            width: 2000,
             height: 500,
 	     loadingImage: "../../widgets/images/ajax-loader.gif",
 		    kbCache: null,
@@ -34,7 +34,7 @@
 	    
 	    var self = this;
             this.index = [];
-		this.values = [];
+			this.values = [];
              this.conditions = [];
              this.gene_label = [];
 	    
@@ -47,12 +47,12 @@
                     'user_id': this.options.userId
                 });
 
-				console.log("input is null");
-				//options.featureID = 'kb|g.3899.CDS.56284';
+				console.log(this.options.featureID);
+				// this.options.featureID = 'kb|g.3899.CDS.56284';
                 //get_expression_data_by_samples_and_features([], ['kb|g.3899.CDS.56284''], 'Log2 level intensities');
 		
-                this.expressionClient.get_expression_data_by_samples_and_features([], [options.featureID], 'Log2 level intensities', function(data) {
-			
+                this.expressionClient.get_expression_data_by_samples_and_features([], [this.options.featureID], 'Log2 level intensities', function(data) {
+			console.log(data)
 			if (data != null) {				
 				//console.log(data);	
 				var count =1;
@@ -99,14 +99,17 @@
             //console.log("here");
 
             var self = this;
-
-        if(self.values != null && self.values.length > 0) {
-	
-	//self.showMessage("<center><img src='" + self.options.loadingImage + "'> loading ...</center>");
-
-			$lineChartDiv = $("<div id='linechart'>")
-			self.$elem.append($lineChartDiv);
+			self.values = self.values.slice(0,150)
+			self.conditions = self.conditions.slice(0,150)
+			if(self.values != null && self.values.length > 0) {
+			var loader = $("<center><img src='" + self.options.loadingImage + "'> loading ...</center>")
+			self.$elem.append(loader);
+			$mainDiv = $('<div id="exprlineplotview" style="overflow:auto;height:450px;resize:vertical">')
 			
+			$lineChartDiv = $("<div id='linechart'>")
+			
+			$mainDiv.append($lineChartDiv);
+			self.$elem.append($mainDiv.get(0));
 			//self.values = self.values.slice(0,150)
 			//self.conditions = self.conditions.slice(0,150)
 			var values_unsorted = self.values;
@@ -131,55 +134,56 @@
             var count = 1;
 
             console.log(self.options.height)
-            var m = [10, 80, 200, 80]; // margins
+            var m = [40, 80, 80, 80]; // margins
             var w = self.options.width - m[1] - m[3];//self.conditions.length * 100 - m[1] - m[3]; // width
-            var h = 300 - m[0] - m[2]; // height
+            var h = self.options.height - m[0] - m[2]; // height
             var graph = d3.select($lineChartDiv.get(0)).append("svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
 
             var formatAsLabels = function (d, i) {
-		if(self.conditions[i] != null) {
-		//console.log(i);
-		//console.log(self.conditions[i]);
-		//console.log(self.values[i]);
-                    //if (self.conditions[i].length > 10) return self.conditions[i].substring(0, 10) + "...";
-                    //else
-		    return self.conditions[i];
-		}
-                }
+				if(self.conditions[i] != null) {
+				//console.log(i);
+				//console.log(self.conditions[i]);
+				//console.log(self.values[i]);
+							//if (self.conditions[i].length > 10) return self.conditions[i].substring(0, 10) + "...";
+							//else
+					return self.conditions[i];
+				}
+            }
 		
 		//console.log(self.values)
 
             var x = d3.scale.linear().domain([0, self.values.length - 1]).range([0, w]);
             
 	    
-	    if(self.conditions.length < 300) {
-		var xAxis = d3.svg.axis().scale(x).ticks(self.conditions.length).tickFormat(formatAsLabels);
-		
-		graph.append("svg:g").attr("class", "x axis").attr("transform", "translate(0," + h + ")").call(xAxis).selectAll("g.x.axis > g.tick > text").style("text-anchor", "end")
-		.attr("dx", "-.9em")
-		.attr("dy", ".17em")
-		.attr("transform", function(d) {
-		    return "rotate(-80)" 
-		    }).on("mouseover", function (i) {
-		    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker());
-		    self.tooltip = self.tooltip.text(self.conditions[i]);
-		    return self.tooltip.style("visibility", "visible");
-		}).on("mouseout", function () {
-		    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter());
-		    return self.tooltip.style("visibility", "hidden");
-		}).on("mousemove", function () {
-		    return self.tooltip.style("top", (d3.event.pageY + 15) + "px").style("left", (d3.event.pageX - 10) + "px");
-		})
-		.on("click", function (i) {
-			var temp = document.URL.indexOf("/functional-site")
-			var baseURL = document.URL.substring(0,temp)
-			temp1 = self.conditions[i].indexOf("|")
-			temp2 = self.conditions[i].indexOf("_")
-			var sampleID = self.conditions[i].substring((temp1+1),(temp2))
-			window.open(baseURL+"/functional-site/#/ws/json/KBasePublicExpression/kb%7C"+sampleID,'_blank')
-		})
-	    }
+			if(self.conditions.length < 300) {
+				var xAxis = d3.svg.axis().scale(x).ticks(self.conditions.length).tickFormat(formatAsLabels);
+				
+				graph.append("svg:g").attr("class", "x axis").attr("transform", "translate(0," + h + ")").call(xAxis).selectAll("g.x.axis > g.tick > text").style("text-anchor", "end")
+				.attr("dx", "-.9em")
+				.attr("dy", ".17em")
+				.attr("transform", function(d) {
+					return "rotate(-80)" 
+					}).on("mouseover", function (i) {
+					d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker());
+					self.tooltip = self.tooltip.text(self.conditions[i]);
+					return self.tooltip.style("visibility", "visible");
+				}).on("mouseout", function () {
+					d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter());
+					return self.tooltip.style("visibility", "hidden");
+				}).on("mousemove", function () {
+					return self.tooltip.style("top", (d3.event.pageY + 15) + "px").style("left", (d3.event.pageX - 10) + "px");
+				})
+				.on("click", function (i) {
+					var temp = document.URL.indexOf("/functional-site")
+					var baseURL = document.URL.substring(0,temp)
+					temp1 = self.conditions[i].indexOf("|")
+					temp2 = self.conditions[i].indexOf("_")
+					var sampleID = self.conditions[i].substring((temp1+1),(temp2))
+					window.open(baseURL+"/functional-site/#/ws/json/KBasePublicExpression/kb%7C"+sampleID,'_blank')
+				})
+								
+			}
 	    	    
             // .append("title")
             // .text(function(i) {return conditions[i]})
@@ -204,7 +208,7 @@
 			
             var yAxisLeft = d3.svg.axis().scale(y).orient("left");
             graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft).append("text").attr("font-size","large").attr("class", "y label").attr("text-anchor", "end").attr("y", -45).attr("dy", ".75em").attr("transform", "rotate(-90)").text("Log2 level");
-		//graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft);
+			//graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft);
 			
 			var datadict = [];
 			for (i = 0; i < self.values.length; i++) {
@@ -234,7 +238,7 @@
 			}).on("mousemove", function () {
 				return self.tooltip.style("top", (d3.event.pageY + 15) + "px").style("left", (d3.event.pageX - 10) + "px");
 			})			
-			
+			loader.hide()
                 graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft);
 			// if (drawCircle) {
 				// var circle = [];
@@ -281,11 +285,17 @@
 						window.open(baseURL+"/functional-site/#/ws/json/KBasePublicExpression/kb%7C"+sampleID,'_blank')
 					})
 			}
-
-
+				
+			graph.append("text")
+				.attr("class","graph title")
+				.attr("text-anchor","end")
+				.attr("x", (w + m[1] + 2*m[3])/2)
+				.attr("y", -20)
+				.text(self.conditions.length+" gene expression samples");			
+				
 		} else {
 			console.log("here2");
-			self.showMessage("<center>No gene expression data for this gene or species.</center>");
+			self.$elem.append("<center>No gene expression data for this gene or species.</center>");
 		}
             return this;
         },
