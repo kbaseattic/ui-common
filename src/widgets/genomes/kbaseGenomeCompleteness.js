@@ -6,8 +6,7 @@
         genome_id: null,
         ws_name: null,
         kbCache: null,
-	//width: 550,
-        width: 500,
+        width: 800,
 	table_height: 676,
         options: {
             genome_id: null,
