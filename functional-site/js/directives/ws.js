@@ -1158,7 +1158,7 @@ angular.module('ws-directives')
                     fnShowHide(table, col_name);
                 }) 
                 reset_btn.click( function () {
-                    reset_dt_view();
+                    reset_dt_view(table);
                     if (scope.tab) {
                         scope.loadNarTable(scope.tab);
                     } else {
@@ -2886,8 +2886,9 @@ function save_dt_view (oSettings, oData) {
 function load_dt_view (oSettings) {
   return JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
 }
-function reset_dt_view() {
-  localStorage.removeItem('DataTables_'+window.location.pathname);
+function reset_dt_view(table) {
+    var id = 'DataTables_'+table[0].id+'_'+window.location.pathname 
+    localStorage.removeItem(id);
 }
 
 function searchColumns() {
