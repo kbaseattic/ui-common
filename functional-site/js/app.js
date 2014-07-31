@@ -332,7 +332,7 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
              templateUrl: 'views/objects/gene.html',
              controller: 'GeneDetail'});
 
-
+*/
     $stateProvider
         .state('genesbyws',
             {url: '/genes/:ws/:fid',
@@ -344,7 +344,8 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
             {url: '/genes/:ws/:gid/:fid',
              templateUrl: 'views/objects/gene.html',
              controller: 'GeneDetail'});
-*/
+
+/*
     $stateProvider
         .state('kbgenesbyws',
             {url: '/genes/:ws/:fid',
@@ -354,7 +355,7 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
             {url: '/genes/:ws/:gid/:fid',
              templateUrl: 'views/genomes/sortable-rows-landing-page-genes.html',
              controller: 'WBGeneLanding'})
-             
+*/          
              
              
              
@@ -395,6 +396,12 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
             {url: '/mak/:ws/:id',
              templateUrl: 'views/objects/mak.html',
              controller: 'MAKDetail'});
+
+$stateProvider
+        .state('floatdatatable',
+            {url: '/floatdatatable/:ws/:id',
+             templateUrl: 'views/objects/floatdatatable.html',
+             controller: 'FloatDataTable'});
 
     $stateProvider
         .state('spec',

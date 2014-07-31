@@ -9,8 +9,9 @@
 	    	workspaceID: null,
             row: null,
             isInCard: false,
-            width: 2000,
-            height: 600,
+            width: 1000,
+            height: 500,
+	     loadingImage: "../../widgets/images/ajax-loader.gif",
 		    kbCache: null,
 
         },
@@ -20,8 +21,11 @@
         init: function (options) {
             this._super(options);
 
-	console.log("options.id "+options.id);
+	//console.log("options.id "+options.id);
 
+	this.$messagePane = $("<div/>").hide();
+            this.$elem.append(this.$messagePane);
+	    
             //console.log(options);
             //if (this.options.row === null) {
             //throw an error
@@ -44,7 +48,7 @@
                 });
 
 				console.log("input is null");
-				options.featureID = 'kb|g.3899.CDS.56284';
+				//options.featureID = 'kb|g.3899.CDS.56284';
                 //get_expression_data_by_samples_and_features([], ['kb|g.3899.CDS.56284''], 'Log2 level intensities');
 		
                 this.expressionClient.get_expression_data_by_samples_and_features([], [options.featureID], 'Log2 level intensities', function(data) {
@@ -72,12 +76,7 @@
 						}
 					}					
 				    }
-				//self.options.row = data;
-				//self.index = self.options.row[3];
-				//self.values = self.options.row[0];
-				//self.conditions = self.options.row[1];
-				//console.log("options.featureID "+options.featureID);
-				self.gene_label = options.featureID;//self.options.id;
+				self.gene_label = options.featureID;
 				//console.log("self.gene_label "+self.gene_label);
 				//console.log("self.values "+self.values);
 				//console.log("self.conditions "+self.conditions);
@@ -97,17 +96,19 @@
 
         render: function (options) {
 	
-            console.log("here");
+            //console.log("here");
 
             var self = this;
 
-        if(self.values != null) {
+        if(self.values != null && self.values.length > 0) {
 	
+	//self.showMessage("<center><img src='" + self.options.loadingImage + "'> loading ...</center>");
+
 			$lineChartDiv = $("<div id='linechart'>")
 			self.$elem.append($lineChartDiv);
 			
-			self.values = self.values.slice(0,150)
-			self.conditions = self.conditions.slice(0,150)
+			//self.values = self.values.slice(0,150)
+			//self.conditions = self.conditions.slice(0,150)
 			var values_unsorted = self.values;
 			var conditions_unsorted = self.conditions;
 			self.values.sort(function(a,b){return a - b})
@@ -130,7 +131,7 @@
             var count = 1;
 
             console.log(self.options.height)
-            var m = [80, 80, 80, 80]; // margins
+            var m = [10, 80, 200, 80]; // margins
             var w = self.options.width - m[1] - m[3];//self.conditions.length * 100 - m[1] - m[3]; // width
             var h = 300 - m[0] - m[2]; // height
             var graph = d3.select($lineChartDiv.get(0)).append("svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
@@ -152,7 +153,7 @@
             var x = d3.scale.linear().domain([0, self.values.length - 1]).range([0, w]);
             
 	    
-	    if(self.values.length < 200) {
+	    if(self.conditions.length < 300) {
 		var xAxis = d3.svg.axis().scale(x).ticks(self.conditions.length).tickFormat(formatAsLabels);
 		
 		graph.append("svg:g").attr("class", "x axis").attr("transform", "translate(0," + h + ")").call(xAxis).selectAll("g.x.axis > g.tick > text").style("text-anchor", "end")
@@ -179,8 +180,7 @@
 			window.open(baseURL+"/functional-site/#/ws/json/KBasePublicExpression/kb%7C"+sampleID,'_blank')
 		})
 	    }
-	    
-	    
+	    	    
             // .append("title")
             // .text(function(i) {return conditions[i]})
             self.$elem.find("g.axis > path").css({
@@ -202,9 +202,10 @@
 
             var y = d3.scale.linear().domain([Math.min.apply(Math,self.values), d3.max(self.values)]).range([h, 0]);
 			
-            var yAxisLeft = d3.svg.axis().scale(y).orient("left");				
-            graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft);			
-
+            var yAxisLeft = d3.svg.axis().scale(y).orient("left");
+            graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft).append("text").attr("font-size","large").attr("class", "y label").attr("text-anchor", "end").attr("y", -45).attr("dy", ".75em").attr("transform", "rotate(-90)").text("Log2 level");
+		//graph.append("svg:g").attr("class", "y axis").attr("transform", "translate(-25,0)").call(yAxisLeft);
+			
 			var datadict = [];
 			for (i = 0; i < self.values.length; i++) {
 				datadict.push({
@@ -282,6 +283,9 @@
 			}
 
 
+		} else {
+			console.log("here2");
+			self.showMessage("<center>No gene expression data for this gene or species.</center>");
 		}
             return this;
         },

@@ -928,7 +928,7 @@
                 }
             );
 
-		
+	/*	
             this.addNewCard("KBaseGeneBiochemistry",
                 {
                     featureID: this.options.data.featureID,
@@ -957,7 +957,6 @@
                 }
             );
 
-
             this.addNewCard("KBaseContigBrowser",
                 {
                     featureId: this.options.data.featureID,
@@ -972,6 +971,35 @@
                 }
             );
 
+        */
+  
+            this.addNewCard("KBaseGeneExprLinePlot",
+                    {
+                        featureID: this.options.data.featureID,
+                        row: this.options.data.row,//null,//[1],
+                        workspaceId: this.options.data.workspaceID,
+                        kbCache: this.options.data.kbCache
+                    },
+                    {
+                            my: "left top",
+                            at: "left bottom+200",
+                            of: "#app"
+                    }
+            );
+            
+            /*
+            this.addNewCard("KBaseGeneLitWidget",
+                    {
+                    featureID: this.options.data.featureID,
+                    kbCache: this.options.data.kbCache
+                    },
+                    {
+                            my: "left top",
+                            at: "left bottom+200",
+                            of: "#app"
+                    }
+            );
+            */
         },
 
         /**
@@ -1190,144 +1218,22 @@
         },
 
         showMAKCards: function() {
-			var self = this;
-			// if (this.options.data.id.indexOf("makresult")!=-1) {					
-				// newWorkspaceServiceUrl = "https://kbase.us/services/ws"
-				// this.workspaceClient = new Workspace(newWorkspaceServiceUrl, { 'token' : this.options.data.auth, 'user_id' : this.options.data.userId});
-				// this.workspaceClient.get_objects([{workspace: this.options.data.ws, name: this.options.data.id}], 				
-					// function(data){
-						// self.collection = data[0]						
-						// self.addNewCard("KBaseMAKBiclusterCard",
-						// {
-							// bicluster: [self.collection.data.sets[0].biclusters[0],self.collection.data.sets[0]],
-							// ws: self.options.data.ws,
-							// showButtons: true,
-							// centerFeature: data.centerFeature
-						// },
-						// {
-							// my: "left top",
-							// at: "left+600 bottom",
-							// of: "#app"
-						// });
-						// self.workspaceClient.get_objects([{workspace: self.options.data.ws, name: self.collection.data.sets[0].biclusters[0].bicluster_id}],
-						// function(data){
-							// console.log(data)
-							// self.addNewCard("KBaseHeatMapCard",
-							// {
-								// bicluster: data[0].data,
-								// id: data[0].info[1],
-								ws: self.options.data.ws
-							// },
-							// {
-								// my: "left top",
-								// at: "center",
-								// of: data.event
-							// });
-							// var heatmap = d3.selectAll(".geneLabel")
-							// var gene_labels = data[0].data.row_labels,
-								// conditions = data[0].data.column_labels,
-								// expression = data[0].data.data;
-							// self.addNewCard("KBaseLineChartCard",
-							// {
-								// row: [expression,conditions,gene_labels,0],
-								// heatmap: heatmap,
-								// id: data[0].info[1],
-								ws: self.options.data.ws
-							// },
-							// {
-								// my: "right top",
-								// at: "right+800 bottom",
-								// of: data.event
-							// });		
-						// })
-						
-					// }
-				// )				
                 this.addNewCard("KBaseMAKResultCard",
-                    {
-                        id: this.options.data.id,
-                        ws: this.options.data.ws,
-                        auth: this.options.auth,
-                        userId: this.options.userId,
-                        loadingImage: this.options.loadingImage,
-                        isInCard: true
-                    },
-                    {
-                        my: "left top",
-                        at: "left bottom",
-                        of: "#app"
-                    }
-                 );
-				 
-				this.addNewCard("KBaseMAKTilingCard",
-					{
-						id: this.options.data.id,
-                        ws: this.options.data.ws,
-                        auth: this.options.auth,
-                        userId: this.options.userId,
-                        loadingImage: this.options.loadingImage,
-                        isInCard: true
-					},
-					{
-						my: "left top",
-                        at: "right bottom",
-                        of: "#app"
-					}
-				);
-				
-				// self.addNewCard("KBaseLineChartCard",
-					// {
-						// row: data.row,		
-						// heatmap: data.heatmap,
-						// id: data.id,
-						// ws: data.ws
-					// },
-					// {
-						// my: "right top",
-						// at: "right+800 bottom",
-						// of: data.event
-				// });				
-
-				// self.addNewCard("KBaseHeatMapCard",
-					// {
-						// bicluster: data.bicluster,
-						// id: data.id,
-						// ws: data.ws
-					// },
-					// {
-						// my: "left top",
-						// at: "center",
-						// of: data.event
-					// });
-				// self.addNewCard("KBaseMAKBiclusterCard",
-                    // {
-                        // bicluster: data.bicluster,
-						// ws: data.ws,
-                        // showButtons: true,
-                        // centerFeature: data.centerFeature
-                    // },
-                    // {
-                        // my: "left top",
-                        // at: "left+600 bottom",
-                        // of: "#app"
-                    // });
-			// }
-			// else {			
-				// if (this.options.data.id.indexOf("bicluster")!=-1) {
-					// self.addNewCard("KBaseHeatMapCard",
-						// {
-							// bicluster: this.options.data.id,
-							// ws: this.options.data.ws
-						// },
-						// {
-							// my: "left top",
-							// at: "center",
-							// of: data.event
-						// }
-					// );
-				// }
-			// }
-            return this;
+                        {
+                            id: this.options.data.id,
+                            ws: this.options.data.ws,
+                            auth: this.options.auth,
+                            userId: this.options.userId,
+                            loadingImage: this.options.loadingImage,
+                            isInCard: true
+                        },
+                        {
+                            my: "left top",
+                            at: "left bottom",
+                            of: "#app"
+                        }
+                    );
+                return this;
         },
 
     showPPICards: function() {
@@ -1537,9 +1443,6 @@
                                      "showBambiRunParameters", 
                                      "showBambiRawOutput",
 									 "showLitWidget",
-									 "showHeatMap",
-									 "showLineChart",									 
-									 "showBarChart",
 									 "showTreeCards"];
 
 			/**
@@ -1999,66 +1902,6 @@
                     }
                 );
             });
-			
-			/**
-             * Event: showBarChart
-             * ------------------
-             * Adds new kbaseMAKBarChart card.
-             */	
-			$(document).on("showBarChart", function(event, data) {
-				console.log(data)
-				self.addNewCard("KBaseBarChartCard",
-					{
-						terms: data.terms,
-						ws: data.ws,
-						id: data.id
-					},
-					{
-						my: "right top",
-						at: "left bottom",
-						of: "#app"
-				});
-			});
-			
-			/**
-             * Event: showLineChart
-             * ------------------
-             * Adds new kbaseLineChart card.
-             */
-			$(document).on("showLineChart", function(event, data) {
-				self.addNewCard("KBaseLineChartCard",
-					{
-						row: data.row,		
-						heatmap: data.heatmap,
-						id: data.id,
-						ws: data.ws
-					},
-					{
-						my: "right top",
-						at: "right+800 bottom",
-						of: "#app"
-				});
-
-			});
-			
-			/**
-             * Event: showHeatMap
-             * ------------------
-             * Adds new kbaseHeatmap card.
-             */
-			$(document).on("showHeatMap", function(event, data) {
-			self.addNewCard("KBaseHeatMapCard",
-				{
-					bicluster: data.bicluster,
-					id: data.id,
-					ws: data.ws
-				},
-				{
-                    my: "left top",
-                    at: "center",
-                    of: "#app"
-				});
-			});
 
             /**
              * Event: showMAKBicluster
@@ -2071,7 +1914,6 @@
                     {
                         bicluster: data.bicluster,
                         showButtons: true,
-						ws: data.ws,
                         centerFeature: data.centerFeature
                     },
                     {
@@ -2436,4 +2278,3 @@
         },
     });
 })( jQuery );
-
