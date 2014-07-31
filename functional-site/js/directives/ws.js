@@ -903,7 +903,7 @@ angular.module('ws-directives')
 
 
             scope.loadObjTable = function() {
-                var table_id = "obj-table-"+ws.replace(':',"_");                    
+                var table_id = "obj-table";                  
 
                 var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
                                             +'</div>',
@@ -920,16 +920,10 @@ angular.module('ws-directives')
 
                 var tableSettings = {
                     "sPaginationType": "bootstrap",
-                    "bStateSave": true,
-                    "fnStateSave": function (oSettings, oData) {
-                        if (USER_ID) {   
-                            save_dt_view(oSettings, oData);
-                        }
-                    },
-                    "fnStateLoad": function (oSettings) {
-                        if (USER_ID) {
-                            return load_dt_view(oSettings);
-                        }
+                    "stateSave": (USER_ID ? true : false),
+                    "stateSaveParams": function (settings, data) {
+                        //don't save search filter
+                        data.search.search = "";
                     },
                     "oColReorder": {
                         "iFixedColumns": (USER_ID ? 1 :0 ),
@@ -947,9 +941,7 @@ angular.module('ws-directives')
 
 
                 // clear object view every load
-                $(element).html('')
                 $(element).loading('<br>loading<br>'+ws+'...', true)
-
 
                 var p = kb.ws.list_objects({workspaces: [ws]});
                 var p2 = kb.ws.list_objects({workspaces: [ws], showOnlyDeleted: 1});
@@ -967,15 +959,15 @@ angular.module('ws-directives')
 
                     $(element).rmLoading();
 
-                    $(element).append('<table id="'+table_id+'" \
-                        class="table table-bordered table-striped" style="width: 100%;"></table>')    
+                    var table_ele = $('<table id="'+table_id+'" class="table table-bordered table-striped" style="width: 100%;">')
+                    $(element).append(table_ele);
 
                     // format and create object datatable
                     var tableobjs = formatObjs(objs, obj_mapping);
                     var wsobjs = tableobjs[0];
                     var kind_counts = tableobjs[1];
                     tableSettings.aaData = wsobjs;
-                    table = $('#'+table_id).dataTable(tableSettings);       
+                    table = table_ele.dataTable(tableSettings);       
                     $compile(table)(scope);
                     //new FixedHeader( table , {offsetTop: 110, "zTop": 500});
 
@@ -1022,7 +1014,7 @@ angular.module('ws-directives')
 
 
             scope.loadNarTable = function(tab) {
-                console.log('tab', tab)
+                //var table_id = "nar-table";
                 var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
                                             +'</div>',
                                              bSortable: false, "sWidth": "1%"} 
@@ -1034,25 +1026,18 @@ angular.module('ws-directives')
                                 { "sTitle": "Timestamp", "bVisible": false, "sType": 'numeric'},
                                 { "sTitle": "Size", "bVisible": false, iDataSort: 7 },
                                 { "sTitle": "Byte Size", bVisible: false },
-                                { "sTitle": "Module", bVisible: false }
+                                { "sTitle": "Module", bVisible: false },
                                 ];
                 if (tab != 'public'){
                     columns.push({ "sTitle": "Shared With" })
                 }
 
-
                 var tableSettings = {
                     "sPaginationType": "bootstrap",
-                    "bStateSave": true,
-                    "fnStateSave": function (oSettings, oData) {
-                        if (USER_ID) {   
-                            save_dt_view(oSettings, oData);
-                        }
-                    },
-                    "fnStateLoad": function (oSettings) {
-                        if (USER_ID) {
-                            return load_dt_view(oSettings);
-                        }
+                    "stateSave": (USER_ID ? true : false),
+                    "stateSaveParams": function (settings, data) {
+                        //don't save search filter
+                        data.search.search = "";
                     },
                     "oColReorder": {
                         "iFixedColumns": (USER_ID ? 1 :0 ),
@@ -1069,27 +1054,30 @@ angular.module('ws-directives')
                     }
                 }
 
-
                 // clear object view every load
-                $(element).html('');
+                //$(element).html('');
                 $(element).loading('<br>Loading<br>Narratives...', 'big');
 
                 var p = kb.getNarratives();
 
                 $.when(p).done(function(nars){
-                    $(element).rmLoading(); 
-                    var table_ele = $('<table class="table table-bordered table-striped" style="width: 100%;">')
-                    $(element).append(table_ele)                     
+                    $(element).rmLoading();             
 
                     if (tab == "my-narratives") {
                         var narratives = nars.my_narratives;
                         var isOwner = true;
+                        var table_id = 'my-nar-table';
                     } else if (tab == "shared") {
                         var narratives = nars.shared_narratives;
+                        var table_id = 'shared-nar-table';
                     } else if (tab == "public") {
                         var narratives = nars.public_narratives;
+                        var table_id = 'public-nar-table';                        
                     }
                     var perms = nars.perms;
+
+                    var table_ele = $('<table id="'+table_id+'" class="table table-bordered table-striped" style="width: 100%;">')
+                    $(element).append(table_ele);
 
                     //scope.deleted_objs = deleted_objs;   
 
@@ -1100,15 +1088,10 @@ angular.module('ws-directives')
                         var wsobjs = formatNarObjs(narratives, isOwner);
                     }
 
-
-
                     tableSettings.aaData = wsobjs;
                     table = table_ele.dataTable(tableSettings);       
                     $compile(table)(scope);
                     //new FixedHeader( table , {offsetTop: 90, "zTop": 500});                    
-
-                    // reset filter; critical for ignoring cached filter
-                    table.fnFilter((scope.type ? scope.type+'-.*' : ''), getCols(table, 'Type'), true);
 
                     // add trashbin
                     //var trash_btn = getTrashBtn();
@@ -1125,7 +1108,6 @@ angular.module('ws-directives')
 
                     //searchColumns()
                     addOptionButtons();
-
 
                     // resinstantiate all events.
                     events();
