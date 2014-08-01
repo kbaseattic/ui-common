@@ -112,7 +112,13 @@ $.KBWidget({
         var table = $('#gapfill-table').dataTable(tableSettings);
         table.fnAddData(dataDict);
         */
-        gapFillTableWS(model.gapfillings);
+        console.log('model', model)
+        console.log('first', model.gapfillings)
+        if (model.gapfillings.length > 0) {
+            gapFillTableWS(model.gapfillings);
+        } else {
+            gfTable.after('<h5>There are no gapfilling solutions for this model.  Try running gapfill.</h5>')
+        }
 
         // gapgen table
         /*
@@ -186,7 +192,7 @@ $.KBWidget({
                 },
                "fnDrawCallback": events,
             }
-
+            console.log(model.gapfillings)
             var data = $.extend(model.gapfillings, {})
             var keys = ["id", "integrated"];
             var labels = ["ID", "Integrated"];
@@ -196,7 +202,6 @@ $.KBWidget({
 
 
             var refs = []
-            console.log('data', data)
             for (var i in data) {
                 var obj = {}
                 var ref =  data[i].gapfill_ref
@@ -205,7 +210,6 @@ $.KBWidget({
                 obj.name = data[i].id
                 refs.push(obj)
             }
-            console.log(refs)
 
             for (var i in refs) {
                 var ws =  refs[i].wsid;
