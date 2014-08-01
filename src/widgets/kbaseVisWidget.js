@@ -271,25 +271,23 @@ kb_define('kbaseVisWidget',
         },
 
         render : function(field) {
-console.log("RENDERS " + field);
+
             if (! this._init) {
-            console.log("no init");
                 return;
             }
-console.log('going1');
+
             if (field == undefined || field == 'chart') {
                 this.renderChart();
             }
-console.log('a');
+
             if (field == undefined || field == 'xAxis') {
                 this.renderXAxis();
             }
-console.log('a');
+
             if (field == undefined || field == 'yAxis') {
-            console.log("RYA");
                 this.renderYAxis();
             }
-console.log('b');
+
             if (field == undefined || field == 'xLabel') {
                 this.renderXLabel();
             }
@@ -355,16 +353,13 @@ console.log('b');
             this.setValueForKey('dataset', newDataset);
 
             if (this.shouldScaleAxis('x')) {
-            console.log("S1");
-            console.log(this.defaultXDomain());
                 this.setXScaleDomain(this.defaultXDomain());
             }
 
             if (this.shouldScaleAxis('y')) {
-            console.log("sy");
                 this.setYScaleDomain(this.defaultYDomain());
             }
-console.log(this.yScale());
+
             this.render();
         },
 
