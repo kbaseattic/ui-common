@@ -1,3 +1,6 @@
+body {
+    font-family: 'OxygenRegular',Arial,sans-serif;
+}
 .ico {
     padding: 10px;
     border-radius: 10px;
@@ -75,4 +78,39 @@
 
 #content {
     margin-top: 10px;
+}
+
+.kbase_nav {
+    font-family: 'RobotoBlack',Arial,sans-serif;
+    list-style: none outside none;
+    float: left;
+    margin: 0px;
+}
+
+.kbase_nav > li {
+    float: left;
+    padding: 15px;
+}
+
+.kbase_nav a {
+    color: #428bca;
+}
+
+.kbase_nav a:hover {
+    color: #2a6496;
+    text-decoration: none;
+}
+
+@font-face {
+    font-family: "RobotoBlack";
+    font-style: normal;
+    font-weight: normal;
+    src: url("Roboto-Black-webfont.eot?#iefix") format("embedded-opentype"), url("Roboto-Black-webfont.woff") format("woff"), url("Roboto-Black-webfont.ttf") format("truetype"), url("Roboto-Black-webfont.svg#RobotoBlack") format("svg");
+}
+
+@font-face {
+    font-family: "OxygenRegular";
+    font-style: normal;
+    font-weight: normal;
+    src: url("Oxygen-webfont.eot?#iefix") format("embedded-opentype"), url("Oxygen-webfont.woff") format("woff"), url("Oxygen-webfont.ttf") format("truetype"), url("Oxygen-webfont.svg#OxygenRegular") format("svg");
 }

@@ -26,7 +26,7 @@
     
     widget.mg_select_list = undefined;
     widget.curr_mg = undefined;
-    widget.auth = window.USER_TOKEN ? { Authorization: "OAuth "+window.USER_TOKEN } : {};
+    widget.auth = window.auth;
     
     widget.display = function (wparams) {
         widget = this;
@@ -35,6 +35,10 @@
 	wparams.target = wparams.target || wparams.main;
 
 	wparams.target.setAttribute('style', "overflow-x: hidden; padding-right: 20px;");
+
+	if (document.getElementById('sidebar')) {
+	    document.getElementById('sidebar').innerHTML = "";
+	}
 
 	wparams.target.innerHTML = '\
 <div id="mg_modal" class="modal show fade" tabindex="-1" style="width: 500px;" role="dialog">\
@@ -66,9 +70,6 @@
 	            stm.DataStore.metagenome.hasOwnProperty(wparams.id) &&
 	            stm.DataStore.metagenome[wparams.id].hasOwnProperty('statistics') )) {
 		var url = RetinaConfig.mgrast_api + '/metagenome/'+wparams.id+'?verbosity=full';
-		if (stm.Authentication) {
-		    url += "&auth=" + stm.Authentication;
-		}
 	        jQuery.ajax({ data_type: 'json',
 			      url: url,
 			      success: function(data) {
