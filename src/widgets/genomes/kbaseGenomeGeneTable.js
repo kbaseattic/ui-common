@@ -107,15 +107,15 @@
             		var genesSettings = {
             				"sPaginationType": "full_numbers",
             				"iDisplayLength": 10,
-            				"aaSorting" : [[1,'asc'],[2,'asc']],
-					"aoColumns": [
+            				"aaSorting" : [[0,'asc']],  //[1,'asc'],[2,'asc']],
+            				"aoColumns": [
 			                              {sTitle: "Gene ID", mData: "id"}, 
             				              {sTitle: "Contig", mData: "contig"},
-			{sTitle: "Start", mData: "start", sWidth:"7%"},
-			{sTitle: "Strand", mData: "dir", sWidth:"7%"},
-			{sTitle: "Length", mData: "len", sWidth:"7%"},
-			{sTitle: "Type", mData: "type", sWidth:"10%"},
-			{sTitle: "Function", mData: "func", sWidth:"45%"}
+            				              {sTitle: "Start", mData: "start", sWidth:"7%"},
+            				              {sTitle: "Strand", mData: "dir", sWidth:"7%"},
+            				              {sTitle: "Length", mData: "len", sWidth:"7%"},
+            				              {sTitle: "Type", mData: "type", sWidth:"10%"},
+            				              {sTitle: "Function", mData: "func", sWidth:"45%"}
             				              ],
             				              "aaData": [],
             				              "oLanguage": {
