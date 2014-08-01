@@ -151,7 +151,7 @@
 	var html = '\
 	<p style="float: right; right:16px; position: relative;">\
 	        <span  id="login_name_span">\
-	          <a href="#" style="position:relative; bottom: 2px;" onclick="jQuery(\'#loginModal\').modal(\'show\');document.getElementById(\'login\').focus();">Sign In</a>\
+	          <a href="#" style="position:relative; bottom: 2px; top: 15px;" onclick="jQuery(\'#loginModal\').modal(\'show\');document.getElementById(\'login\').focus();">Sign In</a>\
 	        </span>\
 	        <span id="login_name"></span>\
 </p>';
@@ -213,6 +213,7 @@
 	document.getElementById('login_name_span').style.display = "";
 	document.getElementById('login_name').innerHTML = "";
 	stm.Authentication = null;
+	jQuery.cookie(Retina.WidgetInstances.login[index].cookiename, null, { expires: -1, path: '/' });
 	jQuery.removeCookie(Retina.WidgetInstances.login[index].cookiename);
 	if (Retina.WidgetInstances.login[index].callback && typeof(Retina.WidgetInstances.login[index].callback) == 'function') {
 	    Retina.WidgetInstances.login[index].callback.call({ 'action': 'logout'});

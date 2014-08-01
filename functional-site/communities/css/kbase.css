@@ -101,6 +101,54 @@ body {
     text-decoration: none;
 }
 
+.btn-new {
+    -moz-user-select: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857;
+    margin-bottom: 0;
+    padding: 6px 12px;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.btn-primary-new {
+    background-color: #428bca;
+    border-color: #357ebd;
+    color: #ffffff;
+    font-family: 'OxygenRegular',Arial,sans-serif;
+}
+
+.btn-primary-new:hover {
+    background-color: #3267b1;
+    border-color: #285e8e;
+}
+
+.btn-primary-new:active {
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.125) inset;
+}
+
+.btn-default {
+    background-color: #ffffff;
+    border-color: #cccccc;
+    color: #333333;
+    font-family: 'OxygenRegular',Arial,sans-serif;
+}
+
+.btn-default:hover {
+    background-color: #ebebeb;
+    border-color: #adadad;
+}
+
+.btn-default:active {
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.125) inset;
+}
+
 @font-face {
     font-family: "RobotoBlack";
     font-style: normal;
