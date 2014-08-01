@@ -64,6 +64,7 @@
         },
 
         cookieName : 'kbase_session',
+        narrCookieName : 'kbase_narr_session',
 
         get_kbase_cookie : function (field) {
 
@@ -71,11 +72,9 @@
                 return {};
 
             var chips = localStorage.getItem('kbase_session');
-            // var chips = $.cookie('kbase_session');
 
-            if (chips != undefined) {
+            if (chips != undefined  && chips != null) {
                 chips = JSON.parse(chips);
-//                chips = this.parse_cookie(chips);
             }
             else {
                 chips = {};
@@ -85,11 +84,6 @@
                 ? chips
                 : chips[field];
         },
-
-        // parse_cookie : function (cookieStr) {
-        //     var fields = cookieStr.split('\|');
-
-        // },
 
         sessionId : function () {
             return this.get_kbase_cookie('kbase_sessionid');
@@ -233,14 +227,6 @@
 
                 var $ld = this.data('loginDialog');
 
-                /* this is a hack fix to a problem found in kbasePromptNew.js, where the 
-                dialog box was being destroyed after the 2 time it was opened and could no
-                longer be opened ... please make a better fix to this problem. SP 07/25/2014 */
-                if (!$ld.dialogModal().data("user_id")) {
-                    this._createLoginDialog();
-                    $ld = this.data('loginDialog');
-                }
-
                 $('form', $ld.dialogModal()).get(0).reset();
 
 
@@ -252,7 +238,6 @@
                 $ld.dialogModal().trigger('clearMessages');
 
         		this.data('loginDialog').openPrompt();
-
 
         	}
         },
@@ -997,6 +982,7 @@
                                                            '|token=' + data.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
                                         $.cookie(this.cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
                                         $.cookie(this.cookieName, cookieString, { path: '/', expires: 60 });
+                                        $.cookie(this.narrCookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
                                     }
 
 
@@ -1076,8 +1062,9 @@
             }
 
             localStorage.removeItem('kbase_session');
-            $.removeCookie('kbase_session', { path: '/' });
+            $.removeCookie(this.cookieName, { path: '/' });
             $.removeCookie(this.cookieName, { path: '/', domain: 'kbase.us' });
+            $.removeCookie(this.narrCookieName, { path: '/', domain: 'kbase.us' });
 
             // the rest of this is just housekeeping.
 
