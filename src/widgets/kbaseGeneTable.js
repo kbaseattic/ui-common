@@ -3,7 +3,7 @@
  *
  * Expected input data is JSON with one key, 'table', whose value is a list.
  * Each list item is a row, with column values. The first row has column names.
- * For example:
+ * For example :
  {'table':
     [
         [
