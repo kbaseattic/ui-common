@@ -17,6 +17,7 @@ kb_define('kbaseHistogram',
         version: "1.0.0",
         options: {
             scaleAxes : true,
+            height : '500px',
         },
 
         _accessors : [
