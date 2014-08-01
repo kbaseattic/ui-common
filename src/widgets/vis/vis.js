@@ -1,6 +1,7 @@
 kb_define('vis',
     [
         'kbaseBarchart',
+        'kbaseHistogram',
         'kbaseHeatmap',
         'kbaseLinechart',
         'kbaseLineSerieschart',

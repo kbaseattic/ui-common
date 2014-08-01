@@ -22,6 +22,7 @@ kb_define('kbaseBarchart',
         options: {
             xScaleType  : 'ordinal',
             overColor : 'yellow',
+            strokeWidth : '2',
         },
 
         _accessors : [
@@ -121,6 +122,8 @@ kb_define('kbaseBarchart',
                         return $bar.yScale()(Math.max(0,barHeight));
                     } )
                     .attr('fill', function(b,j) { return d.color[ j % d.color.length ] })
+                    .attr('stroke', function(b,j) { return d.stroke ? d.stroke[ j % d.stroke.length ] : 'none' })
+                    .attr('stroke-width', function(b,j) { return d.strokeWidth || $bar.options.strokeWidth })
                     .attr('data-fill', function(b,j) { return d.color[ j % d.color.length ] });
                 return this;
             };
@@ -169,11 +172,12 @@ kb_define('kbaseBarchart',
                         }
                     }
                 })
-                .on('mouseout', function(d) {
+                .on('mouseout', function(b,j) {
                     if ($bar.options.overColor) {
                         d3.select(this)
                             .transition()
-                            .attr('stroke', 'none');
+                            .attr('stroke', function(c) {return d.stroke ? d.stroke[ j % d.stroke.length ] : 'none' })
+                            .attr('stroke-width', function(c) { return d.strokeWidth || $bar.options.strokeWidth })
 
                         $bar.data('D3svg').select('.yPadding').selectAll('g g text')
                             .attr("fill",
@@ -197,6 +201,10 @@ kb_define('kbaseBarchart',
 
                     if (d.color != undefined && ! $.isArray(d.color)) {
                         d.color = [d.color];
+                    }
+
+                    if (d.stroke != undefined && ! $.isArray(d.stroke)) {
+                        d.stroke = [d.stroke];
                     }
 
                     if (d.label != undefined && ! $.isArray(d.label)) {
@@ -231,7 +239,8 @@ kb_define('kbaseBarchart',
                 return this;
             }
 
-            var chart = this.data('D3svg').select('.chart').selectAll('.barGroup');
+            var chart = this.D3svg().select( this.region('chart') ).selectAll('.barGroup');
+
             chart
                 .data(this.dataset())
                 .enter()
@@ -280,7 +289,7 @@ kb_define('kbaseBarchart',
         },
 
         setYScaleRange : function(range, yScale) {
-            return this._super(range.reverse(), yScale);
+            return this._super(range.reverse(), yScale.nice());
         },
 
 

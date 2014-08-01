@@ -160,6 +160,7 @@
 				'kbaseTaxonOverview'                : 'taxa/kbaseTaxonOverview',
 				//'kbaseTree'                         : 'trees/kbaseTree',
 				'kbaseBarchart'                     : 'vis/kbaseBarchart',
+				'kbaseHistogram'                     : 'vis/kbaseHistogram',
 				'kbaseChordchart'                   : 'vis/kbaseChordchart',
 				'kbaseCircularHeatmap'              : 'vis/kbaseCircularHeatmap',
 				'kbaseForcedNetwork'                : 'vis/kbaseForcedNetwork',
