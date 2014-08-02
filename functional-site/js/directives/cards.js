@@ -176,6 +176,19 @@ angular.module('card-directives')
             }
         };
     })
+	.directive('floatmakcards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "floatdatatable", 
+                    data: scope.params, 
+                    auth: $rootScope.USER_TOKEN,
+                    userId: $rootScope.USER_ID
+                });
+            }
+        };
+    })
     .directive('bambicards', function($rootScope) {
         return {
             link: function(scope, element, attrs) {
