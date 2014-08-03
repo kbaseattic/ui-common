@@ -1128,7 +1128,7 @@ this.dbg('will upload ' + pid + ',' + this.currentUploadJob);
         urlForFile : function(file, type) {
             var url = this.options.invocationURL + "/" + type + "/" + file + "?session_id=" + encodeURIComponent(this.sessionId()) + '&token=' + encodeURIComponent(this.authToken());
             url = url.replace(new RegExp('/+', 'g'), "/");
-            this.dbg(url);
+            //this.dbg(url);
             return url;
         },
 

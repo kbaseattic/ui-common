@@ -61,7 +61,7 @@ kb_define('kbaseIrisTerminalDispatchHelp',
                         $widget.setOutput(this.whatsnew().ulForAllReleases());
                     };
 
-                    if (! $widget.isHidden()) { this.scroll() ;this.dbg("SCROLLER");};
+                    if (! $widget.isHidden()) { this.scroll() };
 
                     return true;
 

@@ -509,6 +509,7 @@ kb_define('kbaseIrisTerminal',
 
         loggedInCallback : function(e, args) {
 
+            this.client().setAuth( this.auth() );
 
             if (args.success) {
                 this.client().start_session(
