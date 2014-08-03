@@ -27,7 +27,7 @@ kb_define('kbaseHeatmap',
             yPadding    : 20,
 
             xPadding    : 150,
-            xGutter     : 80,
+            xGutter     : 110,
             overColor   : '#999900',
             hmBGColor     : 'lightgray',
             colors : ["#0000ff","#ff0000"],
