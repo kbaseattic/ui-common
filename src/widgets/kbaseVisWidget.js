@@ -37,7 +37,7 @@ kb_define('kbaseVisWidget',
 
             transitionTime : 1750,
             //ulIcon         : '/root/img/labs_icon.png',
-            ulIcon  : '/static/kbase/js/ui-common/root/img/labs_icon.png',
+            ulIcon  : '/narrative/static/kbase/js/ui-common/root/img/labs_icon.png',
 
             ticker : 0,
 
