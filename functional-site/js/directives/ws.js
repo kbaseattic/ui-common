@@ -2663,6 +2663,7 @@ angular.module('ws-directives')
         template: '<a class="btn-new-narrative" ng-click="createNewNarrative()">'+
                     '<b><span class="glyphicon glyphicon-plus"></span> New Narrative</b>'+
                   '</a>',
+        controller: 'WB',
         link: function(scope, ele, attrs) {
 
             scope.createNewNarrative = function() {
@@ -2712,8 +2713,6 @@ angular.module('ws-directives')
                                         scope.$apply();
                                     }
 
-
-                                    console.log('tab', scope.tab)
                                     //ascope.loadNarTable();
                                     kb.ui.notify('Created new narrative: <i>'+name+'</i>');
                                     $prompt.closePrompt();
