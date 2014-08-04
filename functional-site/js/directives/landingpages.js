@@ -703,20 +703,7 @@ angular.module('lp-directives')
     };
 })
 
-.directive('sortableimport', function($rootScope) {
-    return {
-        link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Copy To My Workspace',
-                                           rightLabel: scope.ws,
-                                           subText: scope.id});
-            p.loading();
-            // hack until search links directly to WS objects
-            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3";}
 
-            $(p.body()).KBaseWSButtons({objNameOrId: scope.id, wsNameOrId: scope.ws});
-        }
-    };
-})
 
 .directive('sortabletaxonomyinfo', function($rootScope) {
     return {
@@ -777,13 +764,8 @@ angular.module('lp-directives')
                           narData["metadata"]["data_dependencies"] = [
                             "KBaseGenomes.Genome "+scope.id
                           ];
-                          var metadata = {};
-                          for (var key in narData["metadata"]) {
-                            metadata[key] = narData["metadata"][key];
-                          }
-                          if (metadata["data_dependencies"]) {
-                            metadata["data_dependencies"] = JSON.stringify(metadata["data_dependencies"]);
-                          }
+                          var metadata = narData["metadata"];
+                          metadata["data_dependencies"] = "";// not sure format of this... JSON.stringify(metadata["data_dependencies"]);
                           var objSaveData = {
                             type:"KBaseNarrative.Narrative",
                             data:narData,
@@ -818,7 +800,7 @@ angular.module('lp-directives')
                     
                     var $buildNarPanel = $("<div>").append($("<button>")
                            .addClass("btn btn-primary")
-                           .append("Launch Species Tree Building Narrative")
+                           .append("Build Species Tree")
                            .attr("type", "button")
                            .on("click", 
                                function(event) {
@@ -827,7 +809,7 @@ angular.module('lp-directives')
                            );
                     
                     $(p.body())
-                        .append('<b>There are no species trees created for this genome, but you can use the Narrative to build a new species tree of closely related genomes.</b>');
+                        .append('<b>There are no species trees created for this genome, but you can use the Narrative to build a new species tree with related genomes.</b>');
                         
                     $(p.body()).append("<br><br>");
                     $(p.body()).append($buildNarPanel);
@@ -861,22 +843,6 @@ angular.module('lp-directives')
         }
     };
 })
-
-.directive('sortablegenetable', function($rootScope) {
-    return {
-        link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Gene list',
-                                           rightLabel: scope.ws,
-                                           subText: scope.id});
-            p.loading();
-            // hack until search links directly to WS objects
-            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
-            $(p.body()).KBaseGenomeGeneTable({genome_id: scope.id, ws_name: scope.ws, kbCache: kb,
-                                            loadingImage: "assets/img/ajax-loader.gif"});
-        }
-    };
-})
-
 .directive('sortableseedannotations', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
@@ -978,82 +944,42 @@ angular.module('lp-directives')
     };
 })
 
+
+
 /* END new placement in sortable rows for genome landing page */
 
 
+.directive('docnav', function($rootScope, $state) {
+    return {
+        templateUrl: "views/docs/nav.html",
+        link: function(scope, ele, attrs) {
 
-/* START new placement in sortable rows for gene landing page */
-.directive('sortablegeneoverview', function($rootScope) {
-    return {
-        link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Gene Overview',
-                                           rightLabel: scope.ws,
-                                           subText: scope.fid});
-            p.loading();
-            $(p.body()).KBaseGeneInstanceInfo(
-                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb, hideButtons:true,
-                                            loadingImage: "assets/img/ajax-loader.gif"});
-        }
-    };
-})
+            $('.doc-nav li a').click(function() {
+                var val = $(this).text();
+                console.log(val);
+                var file = val.replace(/ /g, '_');
 
-.directive('sortablegenecontigbrowser', function($rootScope) {
-    return {
-        link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Contig Location',
-                                           rightLabel: scope.ws,
-                                           subText: scope.fid});
-            p.loading();
-            $(p.body()).KBaseContigBrowser(
-                            {centerFeature: scope.fid, genomeId: scope.gid, workspaceId: scope.ws, kbCache: kb,
-                                            loadingImage: "assets/img/ajax-loader.gif"});
-        }
-    };
-})
-.directive('sortablebiochemistry', function($rootScope) {
-    return {
-        link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Biochemistry',
-                                           rightLabel: scope.ws,
-                                           subText: scope.fid});
-            p.loading();
-            $(p.body()).KBaseGeneBiochemistry(
-                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
-                                            loadingImage: "assets/img/ajax-loader.gif"});
-        }
-    };
-})
-.directive('sortablesequence', function($rootScope) {
-    return {
-        link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Sequence',
-                                           rightLabel: scope.ws,
-                                           subText: scope.fid});
-            p.loading();
-            $(p.body()).KBaseGeneSequence(
-                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
-                                            loadingImage: "assets/img/ajax-loader.gif"});
-        }
-    };
-})
-.directive('sortablepdbstructure', function($rootScope) {
-    return {
-        link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Structure',
-                                           rightLabel: scope.ws,
-                                           subText: scope.fid});
-            p.loading();
-            $(p.body()).KBaseGeneStructureMatches(
-                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
-                                            loadingImage: "assets/img/ajax-loader.gif"});
+                $state.go('doc.cell', {cell: file})
+
+            })
+
         }
     };
 })
 
 
+.directive('doccontent', function($rootScope, $stateParams) {
+    return {
+        link: function(scope, ele, attrs) {
+            $(ele).append($stateParams.cell)
+
+            $(ele).load('views/docs/content/'+$stateParams.cell+'.html', function(){
+
+            })
+
+        }
+    };
+})
 
 
-
-/* END new placement in sortable rows for gene landing page */
-;
 

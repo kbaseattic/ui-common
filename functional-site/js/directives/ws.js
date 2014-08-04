@@ -149,7 +149,6 @@ angular.module('ws-directives')
                         $('.fav-toolbar').show();
                     });
 
-
                     $('#select-box').toggle('slide', {
                                      direction: 'left',
                                      duration: 'fast',
@@ -939,7 +938,8 @@ angular.module('ws-directives')
 
 
                 // clear object view every load
-                $(element).loading('<br>loading<br>'+ws+'...', true)
+                $(element).html('');
+                $(element).loading('<br>loading<br>'+ws+'...', true);
 
                 var p = kb.ws.list_objects({workspaces: [ws]});
                 var p2 = kb.ws.list_objects({workspaces: [ws], showOnlyDeleted: 1});
@@ -1053,7 +1053,7 @@ angular.module('ws-directives')
                 }
 
                 // clear object view every load
-                //$(element).html('');
+                $(element).html('');
                 $(element).loading('<br>Loading<br>Narratives...', 'big');
 
                 var p = kb.getNarratives();
@@ -1155,7 +1155,7 @@ angular.module('ws-directives')
                     fnShowHide(table, col_name);
                 }) 
                 reset_btn.click( function () {
-                    reset_dt_view();
+                    reset_dt_view(table);
                     if (scope.tab) {
                         scope.loadNarTable(scope.tab);
                     } else {
@@ -1594,7 +1594,11 @@ angular.module('ws-directives')
 
                 //options.find('.btn-mv-obj').on('click', moveObjects);
                 if (scope.tab) {
-                    copy_btn.find('.btn-cp-obj').on('click', copyNarObjects);
+
+                    copy_btn.find('.btn-cp-obj').click(function() {
+                        console.log('blah', scope.checkedList)
+                        copyNarObjects(scope.checkedList[0].ws, scope.checkedList[0].name);
+                    })
                 } else {
                     copy_btn.find('.btn-cp-obj').on('click', copyObjects);
                 }
@@ -1984,10 +1988,10 @@ angular.module('ws-directives')
                         modalClass : '', 
                         controls : ['cancelButton',
                             {name : 'Copy',
-                            type : 'primary',
-                            callback : function(e, $prompt) {
-                                var ws = $('.select-ws-input').val()
-                                confirmCopy(ws, $prompt);
+                             type : 'primary',
+                             callback : function(e, $prompt) {
+                                 var ws = $('.select-ws-input').val()
+                                 confirmCopy(ws, $prompt);
                             }
                         }]
                     }
@@ -2001,16 +2005,14 @@ angular.module('ws-directives')
                 })
             }
 
-
-            function copyNarObjects(){
-                var workspace = ws; // just getting current workspace
+            function copyNarObjects(ws, name){
+                console.log('workspace/id', ws, name)
                 var content = $('<form class="form-horizontal" role="form">\
                                         <div class="form-group">\
-                                          <label class="col-sm-5 control-label">Destination Workspace</label>\
                                         </div>\
                                      </div>').loading()
 
-                var copyObjectsModal = $('<div></div>').kbasePrompt({
+                var copyObjectsModal = $('<div>').kbasePrompt({
                         title : 'Copy Objects',
                         body: content,
                         modalClass : '', 
@@ -2018,8 +2020,39 @@ angular.module('ws-directives')
                             {name : 'Copy',
                             type : 'primary',
                             callback : function(e, $prompt) {
-                                var ws = $('.select-ws option:selected').val()
-                                confirmCopy(ws, $prompt);
+                                var new_ws = $('.select-ws-input').val();
+
+
+                                var p = kb.getNarrativeDeps({ws: ws, name: name})
+                                $.when(p).done(function(deps) {
+                                    // copy dependencies
+                                    var proms = [];
+                                    for (var i in deps) {
+                                        var obj_name = deps[i].name
+                                        var params = {from: {workspace: ws, name: obj_name},
+                                                      to: {workspace: new_ws, name: obj_name}}
+
+                                        var p = kb.ws.copy_object(params);
+                                        proms.push(p)
+                                    }
+
+                                   //copy narrative
+                                    var params = {from: {workspace: ws, name: name},
+                                                  to: {workspace: new_ws, name: name}}
+                                    console.log('params', params)
+
+                                    var p = kb.ws.copy_object(params);
+                                    proms.push(p)                                
+
+                                    $.when.apply($, proms).done(function() {
+                                        kb.ui.notify('Copied <i>'+deps.length+1+'</i> objects to: <i>'+new_ws+'</i>');
+                                        $prompt.closePrompt();
+                                    }).fail(function(e) {
+                                        $prompt.addCover('Could not copy some or all of the objects. '
+                                                            +e.error.message, 'danger');
+                                    })
+                                })
+
                             }
                         }]
                     }
@@ -2027,42 +2060,32 @@ angular.module('ws-directives')
                 copyObjectsModal.openPrompt();
 
 
-                var fq_id =  'ws.'+scope.checkedList[0].wsid+'.obj.'+scope.checkedList[0].id
-
-                var prom = kb.nar.get_narrative_deps({fq_id: fq_id, 
-                        callback: function(results) {
-                            content.append("<tr><td>" + results.name + "</td><td>Narrative</td></tr>");
-                            for (dep in results.deps) {
-                                content.append("<tr><td>" + results.deps[dep].name + "</td><td>" + results.deps[dep].type + "</td></tr>");
-                            } 
-
-                        }
+                var prom = kb.getNarrativeDeps({ws: ws, name: name})
+                $.when(prom).done(function(deps) {
+                    content.append('<h5>Objects to be copied:</h5>');
+                    var table = $('<table class="table table-striped table-nar-deps">');
+                    table.append("<tr><th>Name</th><th>Type</th></tr>");
+                    table.append("<tr><td>" + scope.checkedList[0].name + "</td><td>Narrative</td></tr>");
+                    for (var i in deps) {
+                        var d = deps[i];
+                        table.append('<tr data-name="'+d.name+'" data-type="'+d.type+'"><td>'
+                                          + d.name + '</td><td>'
+                                          + d.type +
+                                     '</td></tr>');
+                    }
+                    content.append(table);
                 })
 
-
-                var prom = kb.ws.list_workspace_info({});
-                $.when(prom).done(function(workspaces) {
+                var p = kb.getWorkspaceSelector();
+                $.when(p).done(function(selector) {
                     content.rmLoading();
-                    var wsSelect = $('<form class="form-horizontal" role="form">\
-                                        <div class="form-group">\
-                                          <label class="col-sm-5 control-label">Destination Workspace</label>\
-                                        </div>\
-                                     </div>');
-
-                    var select = $('<select class="form-control select-ws"></select>')
-                    for (var i in workspaces) {
-                        select.append('<option>'+workspaces[i][1]+'</option>')
-                    }
-                    select = $('<div class="col-sm-5">').append(select);
-                    content.find('.form-group').append(select);
+                    content.find('.form-group').append(selector);
                 })
             }
-
 
             function copyObjectsToNarrative() {
                 confirmCopy(USER_ID+':home');
             }
-
 
             function confirmCopy(new_ws, $copyprompt) {
                 var alert = '<div class="alert alert-danger"><strong>Warning</strong> Are you sure you want to copy these <b>'
@@ -2657,6 +2680,7 @@ angular.module('ws-directives')
         template: '<a class="btn-new-narrative" ng-click="createNewNarrative()">'+
                     '<b><span class="glyphicon glyphicon-plus"></span> New Narrative</b>'+
                   '</a>',
+        controller: 'WB',
         link: function(scope, ele, attrs) {
 
             scope.createNewNarrative = function() {
@@ -2698,6 +2722,7 @@ angular.module('ws-directives')
                                 $prompt.addCover();
                                 $prompt.getCover().loading();
                                 $.when(p).done(function(){
+                                    console.log('tab', scope.tab)
                                     if (scope.tab == 'my-narratives') {
                                         $state.go('narratives.mynarratives', null, {reload: true});
                                         scope.$apply();
@@ -2769,6 +2794,7 @@ angular.module('ws-directives')
                     "iDisplayLength": 1000,                    
                     "aoColumns": [
                       { "sTitle": "Workspace"},
+                      { "sTitle": "ID"},                      
                       { "sTitle": "Owner"}, //"sWidth": "10%"
                       { "sTitle": "Last Modified", "iDataSort": 4},
                       { "sTitle": "Count"},
@@ -2800,13 +2826,14 @@ angular.module('ws-directives')
                     var timestamp = kb.ui.getTimestamp(data[i][3].split('+')[0]);
                     var date = kb.ui.formateDate(timestamp);
 
+                    var wsid = row[0]
                     var ws = row[1];
                     var count = row[4];
                     total_count = total_count+count;
 
                     var url = "ws.id({ws:'"+ws+"'})";
                     var link = '<a ui-sref="'+url+'" >'+ws+'</a>';
-                    rows.push([link, owner, date, count, timestamp]);
+                    rows.push([link, wsid, owner, date, count, timestamp]);
                 }
                 tableSettings.aaData = rows;
 
@@ -2868,8 +2895,9 @@ function save_dt_view (oSettings, oData) {
 function load_dt_view (oSettings) {
   return JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
 }
-function reset_dt_view() {
-  localStorage.removeItem('DataTables_'+window.location.pathname);
+function reset_dt_view(table) {
+    var id = 'DataTables_'+table[0].id+'_'+window.location.pathname 
+    localStorage.removeItem(id);
 }
 
 function searchColumns() {
