@@ -169,7 +169,7 @@
 			    }
             		}
             		var genesSettings = {
-            				"sPaginationType": "full_numbers",
+            				//"sPaginationType": "full_numbers",
             				"iDisplayLength": 100,
 					"aaSorting" : [[3, 'asc']],
             				"aoColumns": [
