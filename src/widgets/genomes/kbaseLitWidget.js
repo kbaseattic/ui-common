@@ -124,6 +124,7 @@
 								// "sPaginationType": "full_numbers",
 								"iDisplayLength": 4,
 								"sDom": 't<flip>',
+								"aaSorting" : [[3,'desc']],
 								"aoColumns": [
 									{sTitle: "Journal", mData: "source"},
 									{sTitle: "Authors", mData: "author"},
@@ -269,6 +270,7 @@
 											// "sPaginationType": "full_numbers",
 											"iDisplayLength": 4,
 											"sDom": sDom,
+											"aaSorting" : [[3,'desc']],
 											"aoColumns": [
 												{sTitle: "Journal", mData: "source"},
 												{sTitle: "Authors", mData: "author"},
