@@ -1254,24 +1254,30 @@
                 return this;
         },
 		
-		showFloatMAKCards: function() {
-			console.log(this.options.data)
-			this.addNewCard("KBaseHeatMapCard",
-				{
-					id: this.options.data.id,
-					bicluster: null,
-					ws: this.options.data.ws,
-					auth: this.options.auth,
-					userId: this.options.userId,
-					loadingImage: this.options.loadingImage,
-					isInCard: true
-				},
-				{
-					my: "left top",
-					at: "left bottom",
-					of: "#app"
+		showFloatMAKCards: function() {		
+			self = this;
+			this.workspaceClient = new Workspace(this.newWorkspaceServiceUrl, { 'token' : this.options.data.auth, 'user_id' : this.options.data.userId});
+			this.workspaceClient.get_objects([{workspace: this.options.data.ws, name: this.options.data.id}],
+				function(data) {
+					console.log(data)
+					self.addNewCard("KBaseHeatMapCard",
+						{
+							id: self.options.data.id,
+							bicluster: data[0].data,
+							ws: self.options.data.ws,
+							auth: self.options.auth,
+							userId: self.options.userId,
+							loadingImage: self.options.loadingImage,
+							isInCard: true
+						},
+						{
+							my: "left top",
+							at: "left bottom",
+							of: "#app"
+						}
+					);
 				}
-			 );
+			)			
 			return this;
         },
 
