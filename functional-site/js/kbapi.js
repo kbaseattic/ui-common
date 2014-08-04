@@ -295,6 +295,7 @@ function KBCacheClient(token) {
         return last_prom;
     }
 
+
     self.getNarrativeDeps = function(params) {
         var ws = params.ws;
         var name = params.name;
@@ -317,6 +318,7 @@ function KBCacheClient(token) {
             })
         return p;
     }
+
 
     // cached objects
     var c = new WSCache();
@@ -1508,9 +1510,6 @@ function ProjectAPI(ws_url, token) {
             }
         });
     };
-
-
-
     
     this._get_narrative_deps_from_obj_info = function(p) {
         var res = {};
@@ -1520,6 +1519,7 @@ function ProjectAPI(ws_url, token) {
         res.description = meta.description;
         res.name = meta.name;
         var temp = $.parseJSON(meta.data_dependencies);
+        console.log(temp)
         //deps should really be stored as an id, not a name, since names can change
         var deps = temp.reduce( function(prev,curr,index) {
             var dep = curr.split(" ");

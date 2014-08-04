@@ -470,16 +470,6 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
              controller: LPHelp});
 
     $stateProvider
-        .state('doc',
-            {url: '/documentation',
-             templateUrl: 'views/docs/documentation.html',
-             controller: LPHelp})
-        .state('doc.cell',
-            {url: '/cell/:cell',
-             templateUrl: 'views/docs/doc-content.html',
-             controller: LPHelp});
-
-    $stateProvider
     	.state('tree',
     		{url: '/tree/:ws/:id',
     		templateUrl: 'views/objects/tree.html',
@@ -632,6 +622,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
 
 
     $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
+
+    console.log(USER_TOKEN);
 
 
     // global state object to store state

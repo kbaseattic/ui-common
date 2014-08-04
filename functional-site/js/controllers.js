@@ -541,6 +541,9 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 .controller('NarrativeCtrl', function($scope, $stateParams, $location) {
     $scope.tab = $location.path().split('/')[2];
 
+    console.log('TAB in controller ', $scope.tab)
+
+
 })
 
 .controller('Narrative', function($scope, $stateParams, $location, kbaseLogin, $modal, FeedLoad) {
