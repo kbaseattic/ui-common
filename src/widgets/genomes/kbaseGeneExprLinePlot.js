@@ -47,12 +47,12 @@
                     'user_id': this.options.userId
                 });
 
-				console.log(this.options.featureID);
-				this.options.featureID = 'kb|g.3899.CDS.56284';
+				//console.log(this.options.featureID);
+				//this.options.featureID = 'kb|g.3899.CDS.56284';
                 //get_expression_data_by_samples_and_features([], ['kb|g.3899.CDS.56284''], 'Log2 level intensities');
 		
                 this.expressionClient.get_expression_data_by_samples_and_features([], [this.options.featureID], 'Log2 level intensities', function(data) {
-			console.log(data)
+			//console.log(data)
 			if (data != null) {				
 				//console.log(data);	
 				var count =1;
@@ -99,10 +99,10 @@
             //console.log("here");
 
             var self = this;
-			self.values = self.values.slice(0,1000)
-			self.conditions = self.conditions.slice(0,1000)
+			//self.values = self.values.slice(0,1000)
+			//self.conditions = self.conditions.slice(0,1000)
 			if(self.values != null && self.values.length > 0) {
-			var header = $("<h3>Hover over ticks for condition label info. Click to go to workspace object.</h3>")
+			var header = $("<b><i>Hover over line ticks for condition info. Click on line tick to go to workspace object.</i></b>")
 			var loader = $("<center><img src='" + self.options.loadingImage + "'> loading ...</center>")
 			self.$elem.append(header)
 			self.$elem.append(loader);
@@ -135,8 +135,8 @@
 
             var count = 1;
 
-            console.log(self.options.height)
-            var m = [40, 80, 80, 80]; // margins
+            //console.log(self.options.height)
+            var m = [40, 40, 300, 80]; // margins
             var w = self.options.width - m[1] - m[3];//self.conditions.length * 100 - m[1] - m[3]; // width
             var h = self.options.height - m[0] - m[2]; // height
             var graph = d3.select($lineChartDiv.get(0)).append("svg").attr("width", w + m[1] + m[3]).attr("height", h + m[0] + m[2]).append("svg:g").attr("transform", "translate(" + m[3] + "," + m[0] + ")");
@@ -296,7 +296,7 @@
 				.text(self.conditions.length+" gene expression samples");			
 				
 		} else {
-			console.log("here2");
+			//console.log("here2");
 			self.$elem.append("<center>No gene expression data for this gene or species.</center>");
 		}
             return this;
