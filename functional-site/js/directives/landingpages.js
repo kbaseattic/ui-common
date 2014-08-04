@@ -1068,7 +1068,7 @@ angular.module('lp-directives')
 .directive('sortableexprlineplot', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Gene Expression Line Plot',
+            var p = $(ele).kbasePanel({title: 'Gene Expression Data',
                                            rightLabel: scope.ws,
                                            subText: scope.fid});
             p.loading();
