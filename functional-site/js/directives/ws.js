@@ -150,6 +150,7 @@ angular.module('ws-directives')
                         $('.fav-toolbar').show();
                     });
 
+
                     $('#select-box').toggle('slide', {
                                      direction: 'left',
                                      duration: 'fast',
@@ -1597,11 +1598,7 @@ angular.module('ws-directives')
 
                 //options.find('.btn-mv-obj').on('click', moveObjects);
                 if (scope.tab) {
-
-                    copy_btn.find('.btn-cp-obj').click(function() {
-                        console.log('blah', scope.checkedList)
-                        copyNarObjects(scope.checkedList[0].ws, scope.checkedList[0].name);
-                    })
+                    copy_btn.find('.btn-cp-obj').on('click', copyNarObjects);
                 } else {
                     copy_btn.find('.btn-cp-obj').on('click', copyObjects);
                 }
@@ -1992,10 +1989,10 @@ angular.module('ws-directives')
                         modalClass : '', 
                         controls : ['cancelButton',
                             {name : 'Copy',
-                             type : 'primary',
-                             callback : function(e, $prompt) {
-                                 var ws = $('.select-ws-input').val()
-                                 confirmCopy(ws, $prompt);
+                            type : 'primary',
+                            callback : function(e, $prompt) {
+                                var ws = $('.select-ws-input').val()
+                                confirmCopy(ws, $prompt);
                             }
                         }]
                     }
@@ -2009,14 +2006,16 @@ angular.module('ws-directives')
                 })
             }
 
-            function copyNarObjects(ws, name){
-                console.log('workspace/id', ws, name)
+
+            function copyNarObjects(){
+                var workspace = ws; // just getting current workspace
                 var content = $('<form class="form-horizontal" role="form">\
                                         <div class="form-group">\
+                                          <label class="col-sm-5 control-label">Destination Workspace</label>\
                                         </div>\
                                      </div>').loading()
 
-                var copyObjectsModal = $('<div>').kbasePrompt({
+                var copyObjectsModal = $('<div></div>').kbasePrompt({
                         title : 'Copy Objects',
                         body: content,
                         modalClass : '', 
@@ -2024,71 +2023,52 @@ angular.module('ws-directives')
                             {name : 'Copy',
                             type : 'primary',
                             callback : function(e, $prompt) {
-                                var new_ws = $('.select-ws-input').val();
-
-
-                                var p = kb.getNarrativeDeps({ws: ws, name: name})
-                                $.when(p).done(function(deps) {
-                                    // copy dependencies
-                                    var proms = [];
-                                    for (var i in deps) {
-                                        var obj_name = deps[i].name
-                                        var params = {from: {workspace: ws, name: obj_name},
-                                                      to: {workspace: new_ws, name: obj_name}}
-
-                                        var p = kb.ws.copy_object(params);
-                                        proms.push(p)
-                                    }
-
-                                   //copy narrative
-                                    var params = {from: {workspace: ws, name: name},
-                                                  to: {workspace: new_ws, name: name}}
-                                    console.log('params', params)
-
-                                    var p = kb.ws.copy_object(params);
-                                    proms.push(p)                                
-
-                                    $.when.apply($, proms).done(function() {
-                                        kb.ui.notify('Copied <i>'+deps.length+1+'</i> objects to: <i>'+new_ws+'</i>');
-                                        $prompt.closePrompt();
-                                    }).fail(function(e) {
-                                        $prompt.addCover('Could not copy some or all of the objects. '
-                                                            +e.error.message, 'danger');
-                                    })
-                                })
-
+                                var ws = $('.select-ws option:selected').val()
+                                confirmCopy(ws, $prompt);
                             }
                         }]
                     }
                 );
                 copyObjectsModal.openPrompt();
 
-                var prom = kb.getNarrativeDeps({ws: ws, name: name})
-                $.when(prom).done(function(deps) {
-                    content.append('<h5>Objects to be copied:</h5>');
-                    var table = $('<table class="table table-striped table-nar-deps">');
-                    table.append("<tr><th>Name</th><th>Type</th></tr>");
-                    table.append("<tr><td>" + scope.checkedList[0].name + "</td><td>Narrative</td></tr>");
-                    for (var i in deps) {
-                        var d = deps[i];
-                        table.append('<tr data-name="'+d.name+'" data-type="'+d.type+'"><td>'
-                                          + d.name + '</td><td>'
-                                          + d.type +
-                                     '</td></tr>');
-                    }
-                    content.append(table);
+
+                var fq_id =  'ws.'+scope.checkedList[0].wsid+'.obj.'+scope.checkedList[0].id
+
+                var prom = kb.nar.get_narrative_deps({fq_id: fq_id, 
+                        callback: function(results) {
+                            console.log('results', results)
+                            content.append("<tr><td>" + results.name + "</td><td>Narrative</td></tr>");
+                            for (dep in results.deps) {
+                                content.append("<tr><td>" + results.deps[dep].name + "</td><td>" + results.deps[dep].type + "</td></tr>");
+                            } 
+
+                        }
                 })
 
-                var p = kb.getWorkspaceSelector();
-                $.when(p).done(function(selector) {
+
+                var prom = kb.ws.list_workspace_info({});
+                $.when(prom).done(function(workspaces) {
                     content.rmLoading();
-                    content.find('.form-group').append(selector);
+                    var wsSelect = $('<form class="form-horizontal" role="form">\
+                                        <div class="form-group">\
+                                          <label class="col-sm-5 control-label">Destination Workspace</label>\
+                                        </div>\
+                                     </div>');
+
+                    var select = $('<select class="form-control select-ws"></select>')
+                    for (var i in workspaces) {
+                        select.append('<option>'+workspaces[i][1]+'</option>')
+                    }
+                    select = $('<div class="col-sm-5">').append(select);
+                    content.find('.form-group').append(select);
                 })
             }
+
 
             function copyObjectsToNarrative() {
                 confirmCopy(USER_ID+':home');
             }
+
 
             function confirmCopy(new_ws, $copyprompt) {
                 var alert = '<div class="alert alert-danger"><strong>Warning</strong> Are you sure you want to copy these <b>'
@@ -2683,7 +2663,6 @@ angular.module('ws-directives')
         template: '<a class="btn-new-narrative" ng-click="createNewNarrative()">'+
                     '<b><span class="glyphicon glyphicon-plus"></span> New Narrative</b>'+
                   '</a>',
-        controller: 'WB',
         link: function(scope, ele, attrs) {
 
             scope.createNewNarrative = function() {
@@ -2725,7 +2704,6 @@ angular.module('ws-directives')
                                 $prompt.addCover();
                                 $prompt.getCover().loading();
                                 $.when(p).done(function(){
-                                    console.log('tab', scope.tab)
                                     if (scope.tab == 'my-narratives') {
                                         $state.go('narratives.mynarratives', null, {reload: true});
                                         scope.$apply();
@@ -2734,6 +2712,8 @@ angular.module('ws-directives')
                                         scope.$apply();
                                     }
 
+
+                                    console.log('tab', scope.tab)
                                     //ascope.loadNarTable();
                                     kb.ui.notify('Created new narrative: <i>'+name+'</i>');
                                     $prompt.closePrompt();
@@ -2790,6 +2770,7 @@ angular.module('ws-directives')
         link: function(scope, ele, attrs) {
             $(ele).append('<div class="h3 pull-left" style="margin-right: 30px;">Workspace Inspector</div>')
             var tableSettings = {
+
                     //"sPaginationType": "full_numbers",
                     "aaData": [],
                     //"fnDrawCallback": events,
@@ -2797,7 +2778,6 @@ angular.module('ws-directives')
                     "iDisplayLength": 1000,                    
                     "aoColumns": [
                       { "sTitle": "Workspace"},
-                      { "sTitle": "ID"},                      
                       { "sTitle": "Owner"}, //"sWidth": "10%"
                       { "sTitle": "Last Modified", "iDataSort": 4},
                       { "sTitle": "Count"},
@@ -2832,14 +2812,13 @@ angular.module('ws-directives')
                     var timestamp = kb.ui.getTimestamp(data[i][3].split('+')[0]);
                     var date = kb.ui.formateDate(timestamp);
 
-                    var wsid = row[0]
                     var ws = row[1];
                     var count = row[4];
                     total_count = total_count+count;
 
                     var url = "ws.id({ws:'"+ws+"'})";
                     var link = '<a ui-sref="'+url+'" >'+ws+'</a>';
-                    rows.push([link, wsid, owner, date, count, timestamp]);
+                    rows.push([link, owner, date, count, timestamp]);
                 }
                 tableSettings.aaData = rows;
 

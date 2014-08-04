@@ -295,28 +295,6 @@ function KBCacheClient(token) {
         return last_prom;
     }
 
-    self.getNarrativeDeps = function(params) {
-        var ws = params.ws;
-        var name = params.name;
-
-        var p = self.ws.get_object_info([{workspace: ws, name: name}], 1)
-            .then(function(info) {
-                var deps = JSON.parse(info[0][10].data_dependencies);
-
-                var d = [];
-                for (var i in deps) {
-                    var obj = {};
-                    var o = deps[i].split(' ');
-                    obj.type = o[0];
-                    obj.name = o[1];
-                    d.push(obj)
-                }
-
-                return d;
-            })
-        return p;
-    }
-
     // cached objects
     var c = new WSCache();
     self.get_fba = function(ws, name) {
@@ -1507,9 +1485,6 @@ function ProjectAPI(ws_url, token) {
             }
         });
     };
-
-
-
     
     this._get_narrative_deps_from_obj_info = function(p) {
         var res = {};
@@ -1519,6 +1494,7 @@ function ProjectAPI(ws_url, token) {
         res.description = meta.description;
         res.name = meta.name;
         var temp = $.parseJSON(meta.data_dependencies);
+        console.log(temp)
         //deps should really be stored as an id, not a name, since names can change
         var deps = temp.reduce( function(prev,curr,index) {
             var dep = curr.split(" ");
