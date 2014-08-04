@@ -26,8 +26,7 @@ angular.module('ws-directives')
             // Global list and dict of fetched workspaces
             var workspaces = []; 
 
-            var nav_height = 110;
-
+            var nav_height = 95;
 
             // This method loads the sidebar data.  
             // Note: this is only called after instantiation when sidebar needs to be refreshed
@@ -576,7 +575,6 @@ angular.module('ws-directives')
                         var placeholder = $('<div>').loading()
                         modal_body.append(placeholder);                        
                         $.when(prom).done(function(data) {
-                            console.log('permissions', data)
                             permData = data
 
                             //newPerms = $.extend({},data)
@@ -1519,7 +1517,6 @@ angular.module('ws-directives')
                     var dataWS = checkbox.data('ws');
                     var dataType = checkbox.data('type');
                     var module = checkbox.data('module');
-                    console.log('checkbox', id, name, dataWS, dataType)
 
                     if (checkbox.hasClass('ncheck-checked')) {
                         removeCheck(name, dataWS, dataType)
@@ -1866,7 +1863,6 @@ angular.module('ws-directives')
                     obj_ids.push(obj);
                 }
 
-                console.log('obj_ids', obj_ids)
                 var prom = kb.ws.delete_objects(obj_ids);
                 $.when(prom).done(function(data) {
                     kb.ui.notify('Moved '+obj_ids.length+' object(s) to trashbin')                     
@@ -2035,7 +2031,6 @@ angular.module('ws-directives')
 
                 var prom = kb.nar.get_narrative_deps({fq_id: fq_id, 
                         callback: function(results) {
-                            console.log('results', results)
                             content.append("<tr><td>" + results.name + "</td><td>Narrative</td></tr>");
                             for (dep in results.deps) {
                                 content.append("<tr><td>" + results.deps[dep].name + "</td><td>" + results.deps[dep].type + "</td></tr>");
@@ -2711,8 +2706,6 @@ angular.module('ws-directives')
                                         scope.$apply();
                                     }
 
-
-                                    console.log('tab', scope.tab)
                                     //ascope.loadNarTable();
                                     kb.ui.notify('Created new narrative: <i>'+name+'</i>');
                                     $prompt.closePrompt();
@@ -2735,7 +2728,7 @@ angular.module('ws-directives')
                         newNarrativeModal.closePrompt();
                         modals.createWorkspace(function(){
                             scope.createNewNarrative();
-                        },function() {
+                        }, function() {
                             scope.createNewNarrative();
                         });
                         return;
@@ -2769,7 +2762,6 @@ angular.module('ws-directives')
         link: function(scope, ele, attrs) {
             $(ele).append('<div class="h3 pull-left" style="margin-right: 30px;">Workspace Inspector</div>')
             var tableSettings = {
-
                     //"sPaginationType": "full_numbers",
                     "aaData": [],
                     //"fnDrawCallback": events,
@@ -2792,8 +2784,6 @@ angular.module('ws-directives')
                     }
                 }
 
-
-
             $(ele).loading();
             var prom = kb.ws.list_workspace_info({});
             $.when(prom).done(function(data) {
@@ -2802,7 +2792,6 @@ angular.module('ws-directives')
                 var rows = [];
                 var total_count = 0;
                 for (var i in data) {
-
                     var row = data[i];
                     var owner = row[2];
                     
@@ -2822,7 +2811,6 @@ angular.module('ws-directives')
                 tableSettings.aaData = rows;
 
                 var container = $('<table id="ws-manage" class="table table-bordered" style="width: 100%;"></table>');
-
 
                 $(ele).append(container);
                 var table = $(container).dataTable(tableSettings);
@@ -2851,13 +2839,8 @@ angular.module('ws-directives')
                         table.fnSettings(), $("thead input").index(this) ), true );
                 } );
                         
-            })
-                         
-        }           
-
-
-
-
+            })                
+        }
     }
 })
 
@@ -2865,9 +2848,9 @@ angular.module('ws-directives')
 
 function getEditableDescription(d) {
     var d = $('<form role="form">\
-               <div class="form-group">\
-                <textarea rows="4" class="form-control" placeholder="Description">'+d+'</textarea>\
-              </div>\
+                   <div class="form-group">\
+                    <textarea rows="4" class="form-control" placeholder="Description">'+d+'</textarea>\
+                  </div>\
               </form>');
     return d;
 }
