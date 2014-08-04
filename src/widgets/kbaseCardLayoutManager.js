@@ -1527,9 +1527,9 @@
 						ws: data.ws
 					},
 					{
-						my: "right top",
-						at: "right+800 bottom",
-						of: data.event
+						my: "right bottom",
+						at: "left bottom",
+						of: "#app"
 				});
 
 			});

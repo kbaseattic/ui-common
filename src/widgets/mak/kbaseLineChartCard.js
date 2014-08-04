@@ -31,7 +31,7 @@
 					"gene_label": gene_label
 				})
 			}
-		
+			console.log(datadict)
 			var line = d3.svg.line()
 				.defined(function(d) {return d.value!=null})
 				.x(function(d,i) { 
@@ -66,39 +66,26 @@
 								return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
 							}
 						)
-				// .append("title")
-				// .text(function(d) {return d.gene_label})
 			
 			if (drawCircle) {
-				var circle = [];
-				for (var i = 0; i < datadict.length; i++) {
-					circle[i] = graph.append("svg:circle")
-						.attr("cx",x(i))
-						.attr("cy",y(datadict[i].value))
-						.attr("r",5)
-						.attr("fill",datadict[i].value!=null?colorScale(color_ind):"white")
-						.attr("id","_"+datadict[i].gene_label)
-						.on("mouseover", 
-							function() { 
-								d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
-								self.tooltip = self.tooltip.text(datadict[i].gene_label);
-								return self.tooltip.style("visibility", "visible"); 
-							}
-						)
-							 .on("mouseout", 
-									function() { 
-										d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
-										return self.tooltip.style("visibility", "hidden"); 
-									}
-								)
-							 .on("mousemove", 
-									function() { 
-										return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
-									}
-								)
-						// .append("title")
-						// .text(datadict[i].gene_label)
-				}
+				var circles = graph.selectAll(".selectionCircles")
+					.data(datadict)
+					.enter().append("circle")
+					.attr("cx", function(d,i) {return x(i)})
+					.attr("cy", function(d) {return y(d.value)})
+					.attr("r",5)					
+					.attr("fill", function(d) {return d.value != null ? colorScale(color_ind) : "white"})
+					.attr("id", function(d) {return "_" + d.gene_label})                        
+					.on("mouseover", function (d) {
+						d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker());
+						self.tooltip = self.tooltip.text(d.gene_label);
+						return self.tooltip.style("visibility", "visible");
+					}).on("mouseout", function () {
+						d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter());
+						return self.tooltip.style("visibility", "hidden");
+					}).on("mousemove", function () {
+						return self.tooltip.style("top", (d3.event.pageY + 15) + "px").style("left", (d3.event.pageX - 10) + "px");
+					})								
 			}
 		},
 		
@@ -126,7 +113,8 @@
 			self.tooltip = d3.select("body")
                              .append("div")
                              .classed("kbcb-tooltip", true);
-							 
+			
+			console.log(self.tooltip)
 			var index = self.options.row[3]
 			var values = self.options.row[0],
 				conditions = self.options.row[1],
@@ -171,7 +159,7 @@
 			})
 
 			var m = [80, 80, 80, 80]; // margins
-			var w = conditions.length*100 - m[1] - m[3]; // width
+			var w = conditions.length*150 - m[1] - m[3]; // width
 			var h = 400 - m[0] - m[2]; // height
 
 			var graph = d3.select($lineChartDiv.get(0))
@@ -180,10 +168,16 @@
 				.attr("height", h + m[0] + m[2])
 				.append("svg:g")
 				.attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-				
+			
+			console.log(conditions.length)
+			console.log(values[0].length)
 			var formatAsLabels = function(d,i) {
-				if(conditions[i].length > 10) return conditions[i].substring(0,10)+"...";
-				else return conditions[i];
+				console.log(d)
+				console.log(i)
+				if (i < conditions.length) {
+					if(conditions[i].length > 10) return conditions[i].substring(0,10)+"...";
+					else return conditions[i];
+				}
 			}
 			
 			var x = d3.scale.linear().domain([0, values[0].length-1]).range([0, w]);
@@ -195,7 +189,7 @@
 				.call(xAxis)
 				.selectAll("g.x.axis > g.tick > text")
 				.on("mouseover", 
-                                function(i) { 
+                                function(d,i) { 
                                     d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
                                     self.tooltip = self.tooltip.text(conditions[i]);
                                     return self.tooltip.style("visibility", "visible"); 
