@@ -727,6 +727,8 @@
                 this.showRegpreciseCards();
             else if (this.options.template.toLowerCase() === "mak")
                 this.showMAKCards();
+			else if (this.options.template.toLowerCase() === "floatdatatable")
+                this.showFloatMAKCards();		
             else if (this.options.template.toLowerCase() === "bambi")
                 this.showBambiCards();
             else if (this.options.template.toLowerCase() === "gene")
@@ -1251,25 +1253,46 @@
 				);
                 return this;
         },
+		
+		showFloatMAKCards: function() {
+			console.log(this.options.data)
+			this.addNewCard("KBaseHeatMapCard",
+				{
+					id: this.options.data.id,
+					bicluster: null,
+					ws: this.options.data.ws,
+					auth: this.options.auth,
+					userId: this.options.userId,
+					loadingImage: this.options.loadingImage,
+					isInCard: true
+				},
+				{
+					my: "left top",
+					at: "left bottom",
+					of: "#app"
+				}
+			 );
+			return this;
+        },
 
-    showPPICards: function() {
-        this.addNewCard("KBasePPICard",
-                {
-                id: this.options.data.id,
-                ws: this.options.data.ws,
-                auth: this.options.auth,
-                userId: this.options.userId,
-                loadingImage: this.options.loadingImage,
-                isInCard: true
-                },
-                {
-                my: "left top",
-                at: "left bottom",
-                of: "#app"
-                }
-               );
-        return this;
-    },
+		showPPICards: function() {
+			this.addNewCard("KBasePPICard",
+					{
+					id: this.options.data.id,
+					ws: this.options.data.ws,
+					auth: this.options.auth,
+					userId: this.options.userId,
+					loadingImage: this.options.loadingImage,
+					isInCard: true
+					},
+					{
+					my: "left top",
+					at: "left bottom",
+					of: "#app"
+					}
+				   );
+			return this;
+		},
 
         showBambiCards: function() {
                 this.addNewCard("KBaseBambiRunResultCard",
