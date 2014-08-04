@@ -94,6 +94,8 @@ kb_define('kbasePlantsNetworkNarrative',
 
                             node.associations = "(not sure yet)";
 
+                            node.name = node.name.replace(/\.CDS$/, '');
+
                             nodeObj = nodes[node.id] = {
                                 name : node.name,
                                 func : node.func,
