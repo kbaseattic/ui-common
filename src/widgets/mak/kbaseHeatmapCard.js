@@ -65,13 +65,32 @@
                              .classed("kbcb-tooltip", true);
 			self.tooltip3 = d3.select("body")
                              .append("div")
-                             .classed("kbcb-tooltip", true);
-			console.log(self.tooltip1)								
+                             .classed("kbcb-tooltip", true);			
 			
-			console.log(datatable)
+			// console.log(datatable)
+			
+			// var columnMeans = []
+			// for (var y = 0; y < datatable.data.length; y+=1) {	
+				// var column = []
+				// for (var x = 0; x < datatable.data[0].length; x+=1) {
+					// column.push(datatable[y][x])
+				// }
+				// columnMeans.push(d3.mean(column))
+			// }
+			
+			// columnMeans.sort(function(a,b){return a - b})
+			
+			// for (i = 0; i < datatable_unsorted.length; i++) {
+				// var index = []
+				// var curind = datatable.data[y].indexOf(datatable_unsorted[i]);
+				// index[index.length] = curind;					
+			// }				
+			
 			var dataflat = 	[]
-			var datadict = []
-			for (var y = 0; y < datatable.data.length; y+=1) {
+			var datadict = []			
+			
+			for (var y = 0; y < datatable.data.length; y+=1) {				
+								
 				for (var x = 0; x < datatable.data[0].length; x+=1) {
 					datadict.push({
 						"condition": x,

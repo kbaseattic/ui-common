@@ -54,8 +54,13 @@
             this.workspaceClient.get_objects([{workspace: this.options.ws, name: this.options.id}], 
 				
 				function(data){
+					console.log(data)
 					self.collection = data[0];
 					self.$elem.append("<h3>MAK Run Info</h3>");
+					var temp = document.URL.indexOf("/functional-site")
+					var baseURL = document.URL.substring(0,temp)					
+					temp = self.collection.data.parameters.genome_id.indexOf(".")
+					var genome = self.collection.data.parameters.genome_id.substring(temp+1)
 			        self.$elem.append($("<div />")
 					.append($("<table/>").addClass("kbgo-table")
 					    .append(self.collection.data.id!=-1 ? $("<tr/>").append("<td>ID</td><td>" + self.collection.data.id + "</td>") : '')
@@ -69,7 +74,8 @@
                         .append(self.collection.data.sets[0].max_conditions!=-1 ? $("<tr/>").append("<td>Max conditions for bicluster in set</td><td>" + self.collection.data.sets[0].max_conditions + "</td>") : '')
                         .append(self.collection.data.sets[0].taxon!=-1 ? $("<tr/>").append("<td>NCBI taxonomy id</td><td>" + self.collection.data.sets[0].taxon + "</td>") : '')
                         .append(self.collection.data.sets[0].bicluster_type!=-1 ? $("<tr/>").append("<td>Type of bicluster</td><td>" + self.collection.data.sets[0].bicluster_type + "</td>") : '')
-					));
+						.append("<td>Genome</td><td>" + "<a href=" +baseURL+"/functional-site/#/genomes/KBasePublicGenomesV3/kb%7Cg." + genome + " target=_blank>Link to Genome Landing Page</a>" + "</td>")
+					));														
 					
 					self.$elem.append("<h3>Bicluster List</h3>");
 

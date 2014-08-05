@@ -92,7 +92,8 @@
 								}
 								d3.select(this).style("background", "#00FFCC"); 
 							}							
-							self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
+							// self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
+							self.tooltip = self.tooltip.text(d.term+", hits: "+d.tiles.length);
 							return self.tooltip.style("visibility", "visible");
 						}
 					)						 
