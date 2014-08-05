@@ -94,6 +94,7 @@
 			var markerRolesToGenes = {};
 			var group_tally = {};
 			var group_total = {};
+			var multi_cnts_msg = {};
 
             		if (gnm.contig_ids && gnm.contig_lengths && gnm.contig_ids.length == gnm.contig_lengths.length) {
             			for (var pos in gnm.contig_ids) {
@@ -130,17 +131,18 @@
 				group_tally[tax_group] = 0;
 			    if (group_total[tax_group] === undefined)
 				group_total[tax_group] = 0;
+			    if (multi_cnts_msg[tax_group] === undefined)
+				multi_cnts_msg[tax_group] = "";
 
 			    group_total[tax_group] += 1;
-			    if (markerRolesToGenes[seed_role])
+			    if (markerRolesToGenes[seed_role]) {
 				//group_tally[tax_group] += markerRolesToGenes[seed_role].length;
 				group_tally[tax_group] += 1;
+				if (markerRolesToGenes[seed_role].length !== 1)
+				    multi_cnts_msg[tax_group] = " (Warning: multiple counts)";
+			    }
 			}
 			
-			// DEBUG
-			for (var tax_group in group_total) {
-			    console.log ("kbaseGenomeCompleteness.js: " + tax_group + " tally: " + group_tally[tax_group] + " / " + group_total[tax_group]);
-			}
 
 			// build table
 			for (var i=0; i < self.markerRolesOrder.length; i++) {
@@ -193,7 +195,7 @@
 			for (var tax_group in group_total) {
 			    if (group_tally[tax_group] === 0)
 				continue;
-			    container.append(('<div />'+tax_group+' Single-copy Markers Seen: '+group_tally[tax_group]+' / '+group_total[tax_group]));
+			    container.append(('<div />'+tax_group+' Single-copy Markers Seen: '+group_tally[tax_group]+' / '+group_total[tax_group]+multi_cnts_msg[tax_group]));
 			}
 
 			// show table
