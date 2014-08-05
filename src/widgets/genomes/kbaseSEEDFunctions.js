@@ -154,7 +154,7 @@
 
                 if (totalGenesWithFunctionalRoles < 100) {
                     //console.log("No Functional Categories assigned, you can added them using the Narrative");
-                    self.$elem.find("#mainview").append("<b>No Functional Categories assigned, you can add them using the Narrative.</b>");
+                    self.$elem.find("#mainview").prepend("<b>No Functional Categories assigned, you can add them using the Narrative.</b>");
                 } else {
                     // Set maxCount to scale bars
                     for (k in Level1) {
