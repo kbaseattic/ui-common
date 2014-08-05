@@ -188,7 +188,7 @@ kb_define('kbaseIrisTerminalWidget',
                             {
 
                                 icon : 'fa fa-link',
-                                //tooltip : 'select widget',
+                                tooltip : 'select widget',
                                 callback :
                                     function (e, $it) {
                                         $it.toggleSelection();
@@ -197,7 +197,7 @@ kb_define('kbaseIrisTerminalWidget',
 
                             {
                                 icon : 'fa fa-eye',
-                                //tooltip : 'view output',
+                                tooltip : 'view output',
                                 callback :
                                     function (e, $it) {
                                         $it.viewOutput();
@@ -205,7 +205,7 @@ kb_define('kbaseIrisTerminalWidget',
                             },
                             {
                                 icon : 'fa fa-times',
-                                //tooltip : 'remove command',
+                                tooltip : 'remove command',
                                 callback :
                                     $.proxy( function (e) {
                                         this.removeWidgetPrompt();
@@ -214,7 +214,7 @@ kb_define('kbaseIrisTerminalWidget',
                             {
                                 icon : 'fa fa-caret-up',
                                 'icon-alt' : 'fa fa-caret-down',
-                                //tooltip : {title : 'collapse / expand', placement : 'bottom'},
+                                tooltip : {title : 'collapse / expand', placement : 'bottom'},
                                 callback : $.proxy(function(e) {
                                     this.collapsed( ! this.collapsed() );
                                     this.data('output').toggle();
@@ -236,6 +236,7 @@ kb_define('kbaseIrisTerminalWidget',
                         controls : [
                             {
                                 icon : 'fa fa-link',
+                                tooltip : 'select widget',
                                 callback :
                                     function (e, $it) {
                                         $it.toggleSelection();
@@ -243,6 +244,7 @@ kb_define('kbaseIrisTerminalWidget',
                             },
                             {
                                 icon : 'fa fa-angle-double-up',
+                                tooltip : 'jump to command input',
                                 callback :
                                 function (e, $it) {
                                     $it.trigger('scrollTo', $it.$elem.prop('offsetTop') - 85);
@@ -257,6 +259,7 @@ kb_define('kbaseIrisTerminalWidget',
                             },
                             {
                                 icon : 'fa fa-times',
+                                tooltip : 'remove command',
                                 callback :
                                     function (e, $it) {
                                         $it.removeWidgetPrompt();

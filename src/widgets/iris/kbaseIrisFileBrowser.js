@@ -47,14 +47,14 @@ kb_define('kbaseIrisFileBrowser',
                             id : 'removeButton',
                             tooltip : 'delete this file',
                         },
-                        {
+                        /*{
                             icon : 'fa fa-link',
                             tooltip : 'select file',
                             callback :
                                 function (e, $fb) {
                                     $fb.toggleSelection($(this).data('id'));
                                 },
-                        },
+                        },*/
                         {
                             icon : 'fa fa-download',
                             callback : function(e, $fb) {
