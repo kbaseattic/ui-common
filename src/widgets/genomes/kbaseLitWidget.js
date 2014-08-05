@@ -159,7 +159,7 @@
 						}				
 						var tableInput = []
 						var abstractsDict = {}
-						console.log(abstr)
+						//console.log(abstr)
 						$.when($.ajax({
 							async: true,
 							url: abstr,
@@ -167,9 +167,9 @@
 						}))
 						.then(
 							function(data) {
-								console.log(data)
+								//console.log(data)
 								htmlJson = self.xmlToJson(data)
-								console.log(htmlJson)
+								//console.log(htmlJson)
 								abstracts = htmlJson.PubmedArticleSet[1].PubmedArticle
 								if ($.isArray(abstracts)) {
 									for (abstract_idx in abstracts) {
@@ -196,7 +196,7 @@
 								.then(
 									function(data) {
 										htmlJson = self.xmlToJson(data)
-										console.log(htmlJson)
+										//console.log(htmlJson)
 										var summaries = htmlJson.eSummaryResult[1].DocSum // Add pub date field into table as well.
 										
 										if ($.isArray(summaries)) {
@@ -223,7 +223,7 @@
 													tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"
 													tableInputRow["abstract"] = summaryList[summary_idx].Id["#text"]
 													articleIDs.push(summaryList[summary_idx].Id["#text"])
-													if (infoRow["#text"]=='undefined') console.log(infoRow)
+													//if (infoRow["#text"]=='undefined') console.log(infoRow)
 												}
 												if (infoRow["@attributes"].Name == "AuthorList") {
 													var authors = ""
@@ -254,7 +254,7 @@
 															}												
 														}											
 														else {
-															console.log(infoRow)
+															//console.log(infoRow)
 															if (infoRow.Item["#text"] == "Journal Article") isJournal = true
 														}
 													}													
