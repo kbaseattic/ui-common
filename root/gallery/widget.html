@@ -74,6 +74,35 @@
 
                             var pos = getParameterByName('pos') || 'final';
 
+                            $('#json').kbaseJSONReflector(
+                                {
+                                    scaleAxes       : true,
+
+                                    xLabel      : 'Some useful experiment',
+                                    yLabel      : 'Meaningful data',
+
+                                    dataset : [
+                                        {
+                                            color : 'green',
+                                            label : 'Data set 1',
+                                            values : [{x : 0, y : -1}, {x : 1, y : -0.5}, {x : 2, y : 0}, {x : 3, y : 0.5}, {x : 4, y : 1}],
+                                        },
+                                        {
+                                            color : 'blue',
+                                            label : 'Data set 2',
+                                            values : [{x : 0, y : 0.0001}, {x : 1, y : 100}, {x : 2, y : 0.0001}, {x : 3, y : 500}, {x : 4, y : .0001}],
+                                        },
+                                        {
+                                            color : 'gray',
+                                            label : 'mean line',
+                                            dasharray : 5,
+                                            values : [{x : 0, y : -0.3333}, {x : 1, y : 33.5}, {x : 2, y : 0.6667}, {x : 3, y : 167.833}, {x : 4, y : 1.6667}],
+                                        },
+                                    ],
+
+                                }
+                            );
+
                             $('#linechartWidget').kbaseLinechart(
                                 {
                                     scaleAxes       : true,
@@ -386,18 +415,6 @@ console.log(heatmap);
                                 }
                             );
 
-                            /*var $plantsNetwork = $('#plantsNetworkNarrative').kbasePlantsNetworkNarrative(
-                                {
-                                    external_ids:
-                                        "kb|g.3899.CDS.35387\nkb|g.3899.CDS.35388\nkb|g.3899.CDS.35389\nkb|g.3899.CDS.35390\nkb|g.3899.CDS.35392\n"
-                                            +"kb|g.3899.CDS.35393\nkb|g.3899.CDS.35395\nkb|g.3899.CDS.35396\nkb|g.3899.CDS.35397\nkb|g.3899.CDS.35398\n"
-                                            + "kb|g.3899.CDS.35399\nkb|g.3899.CDS.35400\nkb|g.3899.CDS.35401\nkb|g.3899.CDS.35402\nkb|g.3899.CDS.35403\n"
-                                            +"kb|g.3899.CDS.35404\nkb|g.3899.CDS.35405\nkb|g.3899.CDS.35406\nkb|g.3899.CDS.35407\nkb|g.3899.CDS.35408\n"
-                                            +"kb|g.3899.CDS.35409\nkb|g.3899.CDS.35410\nkb|g.3899.CDS.35411\nkb|g.3899.CDS.35413\nkb|g.3899.CDS.35414\n"
-                                            +"kb|g.3899.CDS.35415\nkb|g.3899.CDS.35416\nkb|g.3899.CDS.35417\nkb|g.3899.CDS.35419"
-                                }
-                            );*/
-
                             var $tree = $('#treechartWidget').kbaseTreechart(
                                 {
                                 debug : false,
@@ -602,7 +619,7 @@ transitionTime : 250,
             <div id = 'venn' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
 
 
-            <div id = 'plantsNetworkNarrative' style = 'border : 1px solid green;'></div>
+            <div id = 'json' style = 'border : 1px solid green;'></div>
         </div>
 
 

@@ -12,6 +12,7 @@ kb_define('vis',
         'kbaseCircularHeatmap',
         'kbaseChordchart',
         'kbaseVenndiagram',
+        'kbaseJSONReflector',
     ],
     function() {
 

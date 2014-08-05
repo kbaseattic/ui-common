@@ -49,6 +49,7 @@
 				'kbaseGeneSequence'                 : 'genomes/kbaseGeneSequence',
 				'kbaseGenomeLineage'                : 'genomes/kbaseGenomeLineage',
 				'kbaseGenomeOverview'               : 'genomes/kbaseGenomeOverview',
+				'kbaseJSONReflector'               : 'kbaseJSONReflector',
 				'kbaseLitWidget'                    : 'genomes/kbaseLitWidget',
 				'kbaseMultiContigBrowser'           : 'genomes/kbaseMultiContigBrowser',
 				'kbaseObjectMeta'                   : 'genomes/kbaseObjectMeta',
