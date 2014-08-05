@@ -347,6 +347,12 @@
                 var genomeObj = genome[0].data;
 		var tax_domain = genomeObj.domain;
 
+		// doesn't work for Euks yet
+		if (tax_domain === "Eukaryota") {
+		    container.prepend(('<b>Functional Categories not yet available for '+tax_domain+'</b>'));
+		    return this;
+		}
+
 		this.tree = d3.layout.tree().nodeSize([0, this.stepSize]);
 		
 		var $mainview = $('<div id="mainview">').css({'overflow-x' : 'scroll'});
@@ -356,12 +362,6 @@
                     .attr("width", width + margin.left + margin.right)
                     .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-		// doesn't work for Euks yet
-		if (tax_domain === "Eukaryota") {
-		    container.prepend(('<b>Functional Categories not yet available for '+tax_domain+'</b>'));
-		    return this;
-		}
 
                 /*
                     First I am going to iterate over the Genome Typed Object and 
