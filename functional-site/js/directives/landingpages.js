@@ -865,7 +865,7 @@ angular.module('lp-directives')
 .directive('sortablegenetable', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Gene list',
+            var p = $(ele).kbasePanel({title: 'Gene List',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();

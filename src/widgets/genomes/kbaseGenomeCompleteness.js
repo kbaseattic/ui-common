@@ -7,7 +7,7 @@
         ws_name: null,
         kbCache: null,
         width: 800,
-	table_height: 676,
+	table_height: 656,
         options: {
             genome_id: null,
             ws_name: null,
@@ -108,10 +108,11 @@
             			var gene = gnm.features[genePos];
             			var geneId = gene.id;
             			var geneFunc = gene['function'];
+				var cleanGeneFunc = geneFunc.replace (/\s*\#.*/, "");
 				// just take first element of subsystem_data list
 				// typedef tuple<string subsystem, string variant, string role> subsystem_data;
 				//var seed_role = gene.subsystem_data[0][2];
-				var seed_role = geneFunc;  // not really, but subsystem_data is not behaving for me for some unknown reason.  furthermore, it's not yet populated for uploaded genomes!!!
+				var seed_role = cleanGeneFunc;  // not really, but subsystem_data is not behaving for me for some unknown reason.  furthermore, it's not yet populated for uploaded genomes!!!
 
 				if (self.markerRoles[seed_role] === undefined)
 				    continue;
@@ -172,6 +173,7 @@
             				//"sPaginationType": "full_numbers",
             				"iDisplayLength": 100,
 					"aaSorting" : [[3, 'asc']],
+					"sDom": 't<fip>',
             				"aoColumns": [
 			                               {sTitle: "Count", mData: "num", sWidth: "10%"}, 
 			                               {sTitle: "Gene ID", mData: "id"}, 
@@ -180,7 +182,7 @@
             				              ],
             				              "aaData": [],
             				              "oLanguage": {
-            				            	  "sSearch": "Search gene:",
+            				            	  "sSearch": "&nbsp&nbsp&nbsp&nbspSearch gene:",
             				            	  "sEmptyTable": "No genes found."
             				              },
             				              "fnDrawCallback": geneEvents
@@ -191,7 +193,7 @@
 			for (var tax_group in group_total) {
 			    if (group_tally[tax_group] === 0)
 				continue;
-			    container.append(('<div />'+tax_group+' Markers Seen: '+group_tally[tax_group]+' / '+group_total[tax_group]));
+			    container.append(('<div />'+tax_group+' Single-copy Markers Seen: '+group_tally[tax_group]+' / '+group_total[tax_group]));
 			}
 
 			// show table
