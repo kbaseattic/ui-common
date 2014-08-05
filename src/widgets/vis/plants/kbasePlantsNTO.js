@@ -646,60 +646,67 @@ $elem.append($tables);
                     return;
                 }
 
-    var table_data = {
-        structure : {
-            header      : [
-                {
-                    value : 'external_id',
-                    label : 'External gene ID',
-                    style: "max-width : 190px; background-color : black; color : white",
+                var table_data = {
+                    structure : {
+                        header      : [
+                            {
+                                value : 'external_id',
+                                label : 'External gene ID',
+                                style: "max-width : 190px; background-color : black; color : white",
+                            },
+                            {
+                                value : 'kbase_id',
+                                label : 'KBase gene ID',
+                                style: "min-width : 250px; background-color : black; color : white",
+                            },
+                            {
+                                value : 'func',
+                                label : 'Gene Function',
+                                style: "min-width : 75px; background-color : black; color : white",
+                            },
+                            {
+                                value : 'cluster',
+                                label : 'Cluster name',
+                                style: "min-width : 75px; background-color : black; color : white",
+                            },
+                        ],
+                        rows        : gene_data,
+                    },
+
+                row_callback : function (cell, header, row, $kb) {
+
+                    if (header == 'external_id') {
+                        return cell.replace(/\.CDS$/, '');
+                    }
+                    else {
+                        return $kb.default_row_callback(cell, header, row, $kb);
+                    }
                 },
-                {
-                    value : 'kbase_id',
-                    label : 'KBase gene ID',
-                    style: "min-width : 250px; background-color : black; color : white",
-                },
-                {
-                    value : 'func',
-                    label : 'Gene Function',
-                    style: "min-width : 75px; background-color : black; color : white",
-                },
-                {
-                    value : 'cluster',
-                    label : 'Cluster name',
-                    style: "min-width : 75px; background-color : black; color : white",
-                },
-            ],
-            rows        : gene_data,
-        },
 
-    row_callback : function (cell, header, row, $kb) {
+                    sortable    : true,
+                    hover       : true,
+                    //resizable   : true,
+                    headerOptions : {
+                        style : 'background-color : black; color : white;',
+                        sortable : true,
+                    },
+                    //maxVisibleRowIndex : this.options.maxVisibleRowIndex,
+                    navControls : this.options.navControls,
+                };
 
-        if (header == 'external_id') {
-            return cell.replace(/\.CDS$/, '');
-        }
-        else {
-            return $kb.default_row_callback(cell, header, row, $kb);
-        }
-    },
+                //damn tables don't update, they're just static. I need to write a new table widget.
+                var $tbl = $.jqElem('div').kbaseTable(table_data);
+                this.data('gene_table').empty();
+                this.data('gene_table').append($tbl.$elem);
 
-        sortable    : true,
-        hover       : true,
-        //resizable   : true,
-        headerOptions : {
-            style : 'background-color : black; color : white;',
-            sortable : true,
-        },
-        //maxVisibleRowIndex : this.options.maxVisibleRowIndex,
-        navControls : this.options.navControls,
-    };
-
-    //damn tables don't update, they're just static. I need to write a new table widget.
-    var $tbl = $.jqElem('div').kbaseTable(table_data);
-    this.data('gene_table').empty();
-    this.data('gene_table').append($tbl.$elem);
-
-    this.data('last_gene_data', gene_data);
+                this.data('last_gene_data', gene_data);
+                var offset = this.data('gene_table').prop('offsetTop');
+                setTimeout(function() {console.log("SCROLL");$('html,body').animate(
+                    {
+                        scrollTop: offset
+                    },
+                    500
+                );},0);
 
 
             },

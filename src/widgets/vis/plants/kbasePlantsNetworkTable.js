@@ -112,7 +112,7 @@ kb_define('kbasePlantsNetworkTable',
                                         return def;
                                     }
 
-                                    var max = '15px';
+                                    var max = '18px';
 
                                     var $div = $.jqElem('div')
                                         .css({'max-height' : max, 'overflow' : 'hidden', display : 'inline-block'})
@@ -314,7 +314,7 @@ kb_define('kbasePlantsNetworkTable',
                         $tbl.sort('num_nodes', -1);
                         $tbl.$elem.css('font-size' , '85%');
 
-                        var max = '15px';
+                        var max = '18px';
                         $tbl.$elem.find('tr')
                             .on('mouseover', function(e) {
                                 $(this).find('.truncated').css('max-height', '');
