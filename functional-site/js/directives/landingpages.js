@@ -677,12 +677,12 @@ angular.module('lp-directives')
 .directive('sortablegenomeoverview', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
             var p = $(ele).kbasePanel({title: 'Genome Overview',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
             // hack until search links directly to WS objects
-            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
             $(p.body()).KBaseGenomeOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
                                             loadingImage: "assets/img/ajax-loader.gif"});
         }
@@ -865,7 +865,7 @@ angular.module('lp-directives')
 .directive('sortablegenetable', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Gene list',
+            var p = $(ele).kbasePanel({title: 'Gene List',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -1075,6 +1075,88 @@ angular.module('lp-directives')
             $(p.body()).KBaseGeneExprLinePlot(
                             {featureID: scope.fid,
                                             loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
+.directive('sortablegenetree', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Gene Tree',
+                                           rightLabel: scope.ws,
+                                           subText: scope.fid});
+            p.loading();
+
+            if (scope.ws === "CDS") { 
+                $(p.body()).empty();
+                $(p.body()).append('<b>There are no gene trees created for this gene.</b>');
+            	return; 
+            }
+
+            var wsName = scope.ws;
+            var genomeId = scope.gid;
+            var featureId = scope.fid;
+            $(p.body()).empty();
+            $(p.body()).append("Object ref: " + wsName + "/" + genomeId + "/" + featureId + "<br>");
+            var expectedGeneFullName = genomeId + "/" + featureId;
+            
+            kb.ws.list_objects({workspaces: [wsName], type: "KBaseTrees.Tree", includeMetadata: 1}, function(data) {
+            	var get_object_subset_params = [];
+            	for (var i in data) {
+            		var objInfo = data[i]
+            		if (objInfo[10].type === 'SpeciesTree')
+            			continue;
+                    var objName = objInfo[1];
+            		get_object_subset_params.push({ref: wsName + "/" + objName, included: ["default_node_labels"]});
+            		if (get_object_subset_params.length > 100)
+            			break;
+            	}
+            	if (get_object_subset_params.length == 0) {
+    				$(p.body()).empty();
+    				$(p.body()).append('<b>There are no gene trees created for this gene.</b>');
+            	} else {
+            		kb.ws.get_object_subset(get_object_subset_params, function(data) {
+            			var treeName = null;
+            			for (var i in data) {
+            				for (var key in data[i].data.default_node_labels) {
+            					var geneFullName = data[i].data.default_node_labels[key];
+            					if (geneFullName === expectedGeneFullName) {
+            						treeName = data[i].info[1];
+            						break;
+            					}
+            				}
+            				if (treeName)
+            					break;
+            			}
+            			if (treeName) {
+            				$(p.body()).empty();
+            				$(p.body()).kbaseTree({treeID: treeName, workspaceID: scope.ws});           		
+            			} else {
+            				$(p.body()).empty();
+            				$(p.body()).append('<b>There are no gene trees created for this gene.</b>');
+            			}
+            		},
+            		function(error) {
+            			var err = '<b>Sorry!</b>  Error retreiveing species trees info';
+            			if (typeof error === "string") {
+            				err += ": " + error;
+            			} else if (error.error && error.error.message) {
+            				err += ": " + error.error.message;
+            			}
+            			$(p.body()).empty();
+            			$(p.body()).append(err);
+            		});
+            	}
+            },
+            function(error) {
+        		var err = '<b>Sorry!</b>  Error retreiveing species trees info';
+        		if (typeof error === "string") {
+                    err += ": " + error;
+        		} else if (error.error && error.error.message) {
+                    err += ": " + error.error.message;
+        		}
+                $(p.body()).empty();
+                $(p.body()).append(err);
+            });
         }
     };
 })

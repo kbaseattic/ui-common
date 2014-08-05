@@ -26,9 +26,32 @@
 		render: function(options) {
 
             var self = this;		
-			var $heatmapDiv = $("<div id='heatmap'>");			
-			self.$elem.append("<h3>Click on a gene for plot of expression values across all conditions. Click another gene to add to the plot.</h3>")
-			self.$elem.append($heatmapDiv)
+
+			var $mainDiv = $("<div id='heatmapDiv'>")
+			var $heatmapDiv = $("<div id='heatmap'>");	
+			
+			var datatable = this.options.bicluster
+			if (this.options.tiles && this.options.mak) { 
+			
+				var tiles = this.options.tiles
+				var mak = this.options.mak						
+			
+				$.each(tiles,function(i,d) {				
+					d.on("click", function() {
+						$mainDiv.empty()					
+						$.when(self.workspaceClient.get_objects([{workspace: self.options.workspace, name: mak[d.val()].bicluster_id}]))
+						.then(function(data) {
+							self.options.bicluster = data[0].data
+							self.render()
+						})					
+					})
+				})
+			}
+				
+			self.$elem.append($mainDiv)
+			$instructions = $("<b><i>Click on a gene for plot of expression values across all conditions. Click another gene to add to the plot.</i></b>")
+			$mainDiv.append($instructions)
+			$mainDiv.append($heatmapDiv)
 			
 			// var $tooltipExpression = $("<div>")
 			// var $tooltipGene = $("<div>")
@@ -46,23 +69,31 @@
                              .classed("kbcb-tooltip", true);
 			self.tooltip3 = d3.select("body")
                              .append("div")
-                             .classed("kbcb-tooltip", true);
-			console.log(self.tooltip1)
-									
-			var datatable = self.options.bicluster
+                             .classed("kbcb-tooltip", true);			
 			
-			if (typeof datatable == "string") {
-				this.workspaceClient.get_objects([{workspace: self.options.ws, name: self.options.bicluster}],
-					function(data){
-						console.log(data)
-					}
-				)
-			}
 			
-			console.log(datatable)
+			// var columnMeans = []
+			// for (var y = 0; y < datatable.data.length; y+=1) {	
+				// var column = []
+				// for (var x = 0; x < datatable.data[0].length; x+=1) {
+					// column.push(datatable[y][x])
+				// }
+				// columnMeans.push(d3.mean(column))
+			// }
+			
+			// columnMeans.sort(function(a,b){return a - b})
+			
+			// for (i = 0; i < datatable_unsorted.length; i++) {
+				// var index = []
+				// var curind = datatable.data[y].indexOf(datatable_unsorted[i]);
+				// index[index.length] = curind;					
+			// }				
+			
 			var dataflat = 	[]
-			var datadict = []
-			for (var y = 0; y < datatable.data.length; y+=1) {
+			var datadict = []			
+
+			for (var y = 0; y < datatable.data.length; y+=1) {				
+								
 				for (var x = 0; x < datatable.data[0].length; x+=1) {
 					datadict.push({
 						"condition": x,
@@ -96,9 +127,7 @@
 			}
 			var legendElementWidth = gridSize*2,
 			colors = ["#0000ff","#0066ff","#66FFFF","#ffffff","#FFC6AA","#ff6600","#ff0000"]
-			
-			console.log(gridSize)
-			
+						
 			var colorScale = function(d) {
 				if (d > 2.5) return colors[6]
 				if (d > 1.5 && d <= 2.5) return colors[5]
@@ -127,8 +156,7 @@
 				.on("click",function(d,i,event){
 					// if (!$("div.kblpc-subtitle:contains('"+d.id+"')").length) {self.trigger("showFeature", {featureID: d.id, event: event})}
 					// self.trigger("showFeature", {featureID: d.id, event: event})
-					console.log(i)
-					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], id: self.options.id, ws: self.options.ws, heatmap: geneLabels, event: event})
+					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], id: self.options.id, workspace: self.options.workspace, heatmap: geneLabels, widget: self, event: event})
 					if ($(this).css("font-weight") == 400) $(this).css({"font-weight":900,"font-size":"medium"})
 					else $(this).css({"font-weight":400,"font-size":"small"})
 				})						
@@ -179,7 +207,8 @@
 				  .attr("class", "squares")
 				  .attr("width", gridSize)
 				  .attr("height", gridSize)
-				  .style({"fill": colors[3],"stroke":"#E6E6E6","stroke-width":"2px"})
+				  .style({"fill":function(d) { return colorScale(expression[d.gene][d.condition]); },"stroke":"#E6E6E6","stroke-width":"2px"})
+				  // .style({"fill": colors[3],"stroke":"#E6E6E6","stroke-width":"2px"})
 				  .on("mouseover", 
                                 function(d) { 
                                     d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
@@ -205,11 +234,18 @@
                                 }
                             )
 			  			  
-			  heatMap.transition().duration(1000)
-				  .style("fill", function(d) { return colorScale(expression[d.gene][d.condition]); });
+			  // heatMap.transition().duration(1000)
+				  // .style("fill", function(d) { return colorScale(expression[d.gene][d.condition]); });
+			  
+			  var gauge = []
+			  gauge.push(d3.min(dataflat))
+			  for (var i = Math.ceil(d3.min(dataflat)); i <= Math.floor(d3.max(dataflat)); i++) {
+				if (i < 3 && i > -3) gauge.push(i)
+			  }
+			  gauge.push(d3.max(dataflat))
 			  
 			  var legend = svg.selectAll(".legend")
-				  .data(["-Inf",-2,-1,0,1,2,"Inf"], function(d) { return d; })
+				  .data(gauge, function(d) { return d; })
 				  .enter().append("g")
 				  .attr("class", "legend");
 
@@ -235,7 +271,7 @@
 			return {
 				type: "HeatMapCard",
 				id: this.options.id,
-				ws: this.options.ws,
+				workspace: this.options.workspace,
 				auth: this.options.auth,
 				userId: this.options.userId,
 				title: "HeatMap Card",

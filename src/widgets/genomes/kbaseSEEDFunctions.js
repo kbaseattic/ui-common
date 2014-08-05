@@ -50,8 +50,13 @@
          */
 
         init: function(options) {
-            this._super(options);          
-            //this.render();
+            this._super(options);
+            if (this.options.kbCache.token) {
+               // if we are logged in, then somehow render gets called later...
+            } else {
+               // if we are not logged in, then render
+               this.render();
+            }
 
             return this;
         },
@@ -149,7 +154,7 @@
 
                 if (totalGenesWithFunctionalRoles < 100) {
                     //console.log("No Functional Categories assigned, you can added them using the Narrative");
-                    self.$elem.find("#mainview").append("No Functional Categories assigned, you can added them using the Narrative");
+                    self.$elem.find("#mainview").prepend("<b>No Functional Categories assigned, you can add them using the Narrative.</b>");
                 } else {
                     // Set maxCount to scale bars
                     for (k in Level1) {

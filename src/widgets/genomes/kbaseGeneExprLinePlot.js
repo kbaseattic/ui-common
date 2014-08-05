@@ -297,7 +297,7 @@
 				
 		} else {
 			//console.log("here2");
-			self.$elem.append("<center>No gene expression data mapped to this gene or genome.</center>");
+			self.$elem.append("<b>No gene expression data mapped to this gene or genome.</b>");
 		}
             return this;
         },

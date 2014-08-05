@@ -111,7 +111,7 @@
 				loader.show()
 				$.ajax({
 					async: true,
-					url: 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=500&term='+lit.replace(/\s+/g, "+"),
+					url: 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=500&sort=pub+date&term='+lit.replace(/\s+/g, "+"),
 					type: 'GET',
 					success: 
 					function(data) {
@@ -159,7 +159,7 @@
 						}				
 						var tableInput = []
 						var abstractsDict = {}
-						console.log(abstr)
+
 						$.when($.ajax({
 							async: true,
 							url: abstr,
@@ -167,9 +167,9 @@
 						}))
 						.then(
 							function(data) {
-								console.log(data)
+
 								htmlJson = self.xmlToJson(data)
-								console.log(htmlJson)
+
 								abstracts = htmlJson.PubmedArticleSet[1].PubmedArticle
 								if ($.isArray(abstracts)) {
 									for (abstract_idx in abstracts) {
@@ -196,7 +196,7 @@
 								.then(
 									function(data) {
 										htmlJson = self.xmlToJson(data)
-										console.log(htmlJson)
+
 										var summaries = htmlJson.eSummaryResult[1].DocSum // Add pub date field into table as well.
 										
 										if ($.isArray(summaries)) {
@@ -217,13 +217,12 @@
 											var isJournal = false;
 											for (item_idx in summary) {
 												infoRow = summary[item_idx]
-												if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"]
+												if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"].substring(0,4)
 												if (infoRow["@attributes"].Name == "Source") tableInputRow["source"] = infoRow["#text"]
 												if (infoRow["@attributes"].Name == "Title") {
 													tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"
 													tableInputRow["abstract"] = summaryList[summary_idx].Id["#text"]
 													articleIDs.push(summaryList[summary_idx].Id["#text"])
-													if (infoRow["#text"]=='undefined') console.log(infoRow)
 												}
 												if (infoRow["@attributes"].Name == "AuthorList") {
 													var authors = ""
@@ -254,7 +253,7 @@
 															}												
 														}											
 														else {
-															console.log(infoRow)
+
 															if (infoRow.Item["#text"] == "Journal Article") isJournal = true
 														}
 													}													
@@ -263,14 +262,12 @@
 											if (isJournal) tableInput.push(tableInputRow)
 										}
 										
-										//console.log(articleIDs)
 										var sDom = 't<flip>'
 										if (tableInput.length<=10) { sDom = 'tfi'; }					
 										var tableSettings = {
-											// "sPaginationType": "full_numbers",
 											"iDisplayLength": 4,
 											"sDom": sDom,
-											"aaSorting" : [[3,'desc']],
+											"aaSorting" : [],
 											"aoColumns": [
 												{sTitle: "Journal", mData: "source"},
 												{sTitle: "Authors", mData: "author"},
@@ -301,26 +298,7 @@
 														return self.tooltip.style("top", (e.pageY+15) + "px").style("left", (e.pageX-10)+"px");
 													}
 											)
-										// for (id in articleIDs) {											
-											// $("#"+articleIDs[id])												
-												// .on("mouseover",
-													// function() {			
-														// console.log("blah")
-														// self.tooltip = self.tooltip.text(abstractsDict[articleIDs[id]]);
-														// return self.tooltip.style("visibility", "visible");
-													// }
-												// )						 
-												// .on("mouseout",
-													// function() { 																					
-														// return self.tooltip.style("visibility", "hidden"); 
-												   // }
-												// )
-												// .on("mousemove",
-													// function(e) { 
-															// return self.tooltip.style("top", (e.pageY+15) + "px").style("left", (e.pageX-10)+"px");
-														// }
-												// )	
-										// }
+
 										
 									},
 									function() {

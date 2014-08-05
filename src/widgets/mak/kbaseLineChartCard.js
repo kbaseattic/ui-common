@@ -22,6 +22,8 @@
 		
 		lineDrawer: function(values,conditions,gene_label,x,y,color_ind,drawCircle,graph,colorScale) {
 			
+			self = this;
+			
 			var datadict = []
 
 			for (i=0;i<values.length;i++) {
@@ -31,7 +33,6 @@
 					"gene_label": gene_label
 				})
 			}
-			console.log(datadict)
 			var line = d3.svg.line()
 				.defined(function(d) {return d.value!=null})
 				.x(function(d,i) { 
@@ -90,7 +91,6 @@
 		},
 		
 		yAxisMaker: function(values,graph,h) {
-			console.log(values)
 			var y = d3.scale.linear().domain([d3.min(values), d3.max(values)]).range([h, 0]);
 			var yAxisLeft = d3.svg.axis().scale(y).orient("left");
 
@@ -114,7 +114,6 @@
                              .append("div")
                              .classed("kbcb-tooltip", true);
 			
-			console.log(self.tooltip)
 			var index = self.options.row[3]
 			var values = self.options.row[0],
 				conditions = self.options.row[1],
@@ -157,7 +156,7 @@
 					graph.selectAll("#_mean").style("stroke-dasharray",(3,3))
 				}
 			})
-
+			
 			var m = [80, 80, 80, 80]; // margins
 			var w = conditions.length*150 - m[1] - m[3]; // width
 			var h = 400 - m[0] - m[2]; // height
@@ -169,11 +168,7 @@
 				.append("svg:g")
 				.attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 			
-			console.log(conditions.length)
-			console.log(values[0].length)
 			var formatAsLabels = function(d,i) {
-				console.log(d)
-				console.log(i)
 				if (i < conditions.length) {
 					if(conditions[i].length > 10) return conditions[i].substring(0,10)+"...";
 					else return conditions[i];
@@ -224,7 +219,7 @@
 				type: "LineChartCard",
 				row: this.options.row,
 				id: this.options.id,
-				ws: this.options.ws,
+				workspace: this.options.workspace,
 				auth: this.options.auth,
 				userId: this.options.userId,
 				title: "LineChart Card",

@@ -30,14 +30,27 @@
             return this.render();
         },
         render: function(options) {
-
+		
             var self = this;
-            self.bicluster = this.options.bicluster[0];
-            self.bicluster_type = this.options.bicluster[1].bicluster_type;
+			self.bicluster_index = this.options.bicluster[1];
+            self.bicluster = this.options.bicluster[0][self.bicluster_index];
+            self.bicluster_type = this.options.bicluster[2].bicluster_type;
+			var tiles = this.options.tiles
+			$.each(tiles,function(i,d) {				
+				d.on("click", function() {
+					self.$elem.empty()
+					self.options.bicluster[1] = d.val()
+					self.render()
+					self.getData()
+				})
+			})
+			
 			var loader = $("<span style='display:none'><img src='"+self.options.loadingImage+"'/></span>").css({"width":"100%","margin":"0 auto"})            
-			self.$elem.append(loader)
+			$biclusterOverview = $("<div id='biclusterOverview'/>")
+			self.$elem.append($biclusterOverview)
+			$biclusterOverview.append(loader)
 			loader.show()
-            self.$elem.append($("<div />")
+            $biclusterOverview.append($("<div />")
 						.append($("<table/>").addClass("kbgo-table")
 					    .append(self.bicluster.bicluster_id!=-1&&self.bicluster.bicluster_id!=0 ? $("<tr/>")
 					    	.append("<td>ID</td><td>" + self.bicluster.bicluster_id + "</td>") : '')
@@ -68,28 +81,28 @@
 			//Heatmap			
 					
 								
-			$.when(this.workspaceClient.get_objects([{workspace: self.options.ws, name: self.bicluster.bicluster_id}]))
+			$.when(this.workspaceClient.get_objects([{workspace: self.options.workspace, name: self.bicluster.bicluster_id}]))
 			.then(
 				function(data){
-					
-					self.$elem.append($("<div />")
-							.append("<h3>heatmap</h3>")
-							.append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
+					// $biclusterOverview.append($("<div />")
+							// .append("<h3>heatmap</h3>")
+							// .append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
 
-					self.$elem.find("#toggle_heatmap").click(function() {
-						loader.show()
-						self.trigger("showHeatMap", {bicluster: data[0].data, ws: self.options.ws, id: self.bicluster.bicluster_id, event: event})
-						//$("#heatmap").toggle();
-						loader.hide()
+					// self.$elem.find("#toggle_heatmap").click(function() {
+						// loader.show()
 						
-					});
-					self.trigger("showHeatMap", {bicluster: data[0].data, ws: self.options.ws, id: self.bicluster.bicluster_id})
+						// if (d3.select("#heatmap").empty()) self.trigger("showHeatMap", {bicluster: data[0].data, ws: self.options.ws, id: self.bicluster.bicluster_id, tiles: tiles, mak: self.options.bicluster[0], event: event})
+						// $("#heatmap").toggle();
+						// loader.hide()
+						
+					// });
+					if (d3.select("#heatmapDiv").empty()) self.trigger("showHeatMap", {bicluster: data[0].data, workspace: self.options.workspace, id: self.bicluster.bicluster_id, tiles: tiles, mak: self.options.bicluster[0]})
 					loader.hide()
 				}
 			)						
 
             //Genes
-            self.$elem.append($("<div />")
+            $biclusterOverview.append($("<div />")
                     .append("<h3>genes</h3>")
 					.append($("<button />").attr('id', 'toggle_genes').addClass("btn btn-default").append("Toggle")));
 
@@ -106,10 +119,10 @@
 
             $genesTable += "</table>";
 			
-            self.$elem.append($("<div id='gene_list_"+self.bicluster.bicluster_id.replace( /\D+/g, '')+"' style='display:none'/>").append($genesTable));
+            $biclusterOverview.append($("<div id='gene_list_"+self.bicluster.bicluster_id.replace( /\D+/g, '')+"' style='display:none'/>").append($genesTable));
 			
             //Conditions
-            self.$elem.append($("<div />")
+            $biclusterOverview.append($("<div />")
                     .append("<h3>conditions</h3>")
 					.append($("<button />").attr('id', 'toggle_conditions').addClass("btn btn-default").append("Toggle")));
 			
@@ -126,10 +139,10 @@
 
             $conditionsTable += "</table>";
 
-            self.$elem.append($("<div id='condition_list' style='display:none'/>").append($conditionsTable));
+            $biclusterOverview.append($("<div id='condition_list' style='display:none'/>").append($conditionsTable));
             
             //Enriched terms
-            self.$elem.append($("<div />")
+            $biclusterOverview.append($("<div />")
                     .append("<h3>enriched terms</h3>")
 					.append($("<button />").attr('id', 'toggle_terms').addClass("btn btn-default").append("Toggle")));
 					
@@ -139,16 +152,15 @@
 			
             var $termsTable = '<table id="terms-table' + self.bicluster.id + '" class="kbgo-table">';
             $termsTable += "<tr><th>Key</th><th>Value</th></tr>";
-
             for (var enrichedTerm in self.bicluster.enriched_terms) {
-                $termsTable += "<tr><td>" + enrichedTerm.key + "</td><td>" + enrichedTerm.value + "</td></tr>";
+                $termsTable += "<tr><td>" + enrichedTerm + "</td><td>" + self.bicluster.enriched_terms[enrichedTerm] + "</td></tr>";
             }
 
             $termsTable += "</table>";
 			
-            self.$elem.append($("<div id='term_list' style='display:none'/>").append($termsTable));
+            $biclusterOverview.append($("<div id='term_list' style='display:none'/>").append($termsTable));
 
-            self.$elem.append($("<div />")
+            $biclusterOverview.append($("<div />")
                     .append("&nbsp;"));
 
             return this;
@@ -156,8 +168,8 @@
         getData: function() {
             return {
                 type: "MAKBicluster",
-                id: this.options.bicluster[0].bicluster_id,
-                ws: this.options.ws,
+                id: this.options.bicluster[0][this.options.bicluster[1]].bicluster_id,
+                workspace: this.options.workspace,
                 title: "MAK Bicluster"
             };
         },
