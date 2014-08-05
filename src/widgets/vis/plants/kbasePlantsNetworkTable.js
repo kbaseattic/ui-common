@@ -312,8 +312,9 @@ kb_define('kbasePlantsNetworkTable',
 
                         var $tbl = $.jqElem('div').kbaseTable(data);
                         $tbl.sort('num_nodes', -1);
-                        $tbl.$elem.css({'font-size' : '85%', 'margin' : '0px !important'});
-var max = '18px';
+                        $tbl.$elem.css('font-size' , '85%');
+                        $tbl.$elem.find('table').css('margin', '0px');
+                        var max = '15px';
                         $tbl.$elem.find('tr')
                             .on('mouseover', function(e) {
                                 $(this).find('.truncated').css('max-height', '');
