@@ -217,7 +217,7 @@
 											var isJournal = false;
 											for (item_idx in summary) {
 												infoRow = summary[item_idx]
-												if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"]
+												if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"].substring(0,4)
 												if (infoRow["@attributes"].Name == "Source") tableInputRow["source"] = infoRow["#text"]
 												if (infoRow["@attributes"].Name == "Title") {
 													tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"
