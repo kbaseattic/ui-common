@@ -71,7 +71,14 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 
 .controller('MAKDetail', function($scope, $stateParams) {
     $scope.params = {'id': $stateParams.id,
-                     'ws': $stateParams.ws};
+                     'workspace': $stateParams.ws,
+					 'kbCache' : kb};
+})
+
+.controller('FloatDataTable', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id,
+                     'workspace': $stateParams.ws,
+					 'kbCache' : kb};
 })
 
 .controller('RegpreciseDetail', function($scope, $stateParams) {

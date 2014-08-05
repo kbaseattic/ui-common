@@ -28,9 +28,9 @@
         <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/font-awesome-4.0.3/css/font-awesome.css" />
         <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.css" />
 
-
         <!-- External javascript packages -->
         <script src="../ext/bowser/bowser.min.js"></script>
+		<script src="../ext/underscore-min/underscore-min.js"></script>
 
         <!-- Google Analytics -->
         <script>
@@ -92,7 +92,8 @@
         <script src="assets/js/kbclient/userandjobstate.js"></script>        
         <script src="assets/js/kbclient/wikiScraper.js"></script>
         <script src="assets/js/kbclient/kbaseTrees.js"></script>        
-
+	<script src="assets/js/kbclient/KBaseExpressionClient.js"></script>
+        <script src="assets/js/widgetMaxWidthCorrection.js"></script>        
 
         <!-- widgets -->
         <script src="../src/kbwidget.js"></script>
@@ -176,8 +177,10 @@
         <script  src="../src/widgets/genomes/kbaseObjectMeta.js"></script>
         <script  src="../src/widgets/genomes/kbaseGenomeLineage.js"></script>
         <script  src="../src/widgets/kbaseCardLayoutManager.js"></script>
-	    <script  src="../src/widgets/genomes/kbaseSEEDFunctions.js"></script>
-	    <script  src="../src/widgets/genomes/kbaseGenomeGeneTable.js"></script>
+	<script  src="../src/widgets/genomes/kbaseGenomeCompleteness.js"></script>
+	<script  src="../src/widgets/genomes/kbaseSEEDFunctions.js"></script>
+	<script  src="../src/widgets/genomes/kbaseGenomeGeneTable.js"></script>
+	<script  src="../src/widgets/genomes/kbaseGeneExprLinePlot.js"></script>
         <!-- End Genome widgets -->
     
         <!-- Taxonomy widgets -->
@@ -371,3 +374,4 @@
     </body>
 
 </html>
+

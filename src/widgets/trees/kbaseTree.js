@@ -118,13 +118,16 @@
                 self.$elem.empty();
 
                 self.canvasId = "knhx-canvas-" + self.pref;
-                self.$canvas = $('<div>')
+                var canvasDivId = "canvas-div-" + self.pref;
+                self.$canvas = $('<div id="'+canvasDivId+'">')
                                .append($('<canvas id="' + self.canvasId + '">'));
                 if (self.options.height) {
                     self.$canvas.css({'max-height':self.options.height - 85, 'overflow':'scroll'});
                 }
                 self.$elem.append(self.$canvas);
 
+                watchForWidgetMaxWidthCorrection(canvasDivId);
+                
             	if (!self.treeWsRef) {
             		var info = objArr[0].info;
             		self.treeWsRef = info[6] + "/" + info[0] + "/" + info[4];

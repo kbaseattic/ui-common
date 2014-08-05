@@ -305,8 +305,8 @@ var app = angular.module('landing-pages',
              controller: 'WBLanding'})
         .state('genomesbyid',
             {url: '/genomes/:ws/:id',
-             templateUrl: 'views/genomes/sortable-rows-landing-page.html',
-             //templateUrl: 'views/objects/genome.html',
+	     templateUrl: 'views/genomes/sortable-rows-landing-page.html',
+	     //templateUrl: 'views/objects/genome.html',
              controller: 'WBLanding'})
         .state('kbgenomesbyws',
             {url: '/KBaseGenomes.Genome/:ws',
@@ -332,7 +332,8 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
              templateUrl: 'views/objects/gene.html',
              controller: 'GeneDetail'});
 
-
+*/
+/*
     $stateProvider
         .state('genesbyws',
             {url: '/genes/:ws/:fid',
@@ -345,6 +346,7 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
              templateUrl: 'views/objects/gene.html',
              controller: 'GeneDetail'});
 */
+
     $stateProvider
         .state('kbgenesbyws',
             {url: '/genes/:ws/:fid',
@@ -353,10 +355,7 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
         .state('kbgenesbywsgenome',
             {url: '/genes/:ws/:gid/:fid',
              templateUrl: 'views/genomes/sortable-rows-landing-page-genes.html',
-             controller: 'WBGeneLanding'})
-             
-             
-             
+             controller: 'WBGeneLanding'})                      
              
     $stateProvider
         .state('meme',
@@ -395,6 +394,12 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
             {url: '/mak/:ws/:id',
              templateUrl: 'views/objects/mak.html',
              controller: 'MAKDetail'});
+
+	$stateProvider
+        .state('floatdatatable',
+            {url: '/floatdatatable/:ws/:id',
+             templateUrl: 'views/objects/floatdatatable.html',
+             controller: 'FloatDataTable'});
 
     $stateProvider
         .state('spec',
