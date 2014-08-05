@@ -138,9 +138,9 @@
 			}
 			
 			// DEBUG
-			for (var tax_group in group_total) {
+			/*for (var tax_group in group_total) {
 			    console.log ("kbaseGenomeCompleteness.js: " + tax_group + " tally: " + group_tally[tax_group] + " / " + group_total[tax_group]);
-			}
+			}*/
 
 			// build table
 			for (var i=0; i < self.markerRolesOrder.length; i++) {
