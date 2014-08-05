@@ -193,11 +193,11 @@
             });
 
             // Update the nodes…
-            var node = self.svg.selectAll("g.node")
+            var node = self.svg.selectAll("g.KBSnode")
                 .data(nodes, function(d) { return d.id || (d.id = ++self.i); });
 
             var nodeEnter = node.enter().append("g")
-                .attr("class", "node")
+                .attr("class", "KBSnode")
                 .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
                 .style("opacity", 1e-6)
                 .on("mouseover", function(d) {
