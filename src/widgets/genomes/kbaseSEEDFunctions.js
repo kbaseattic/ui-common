@@ -95,6 +95,7 @@
             //d3.text("/static/subsys.txt", function(text) {
             d3.text("/functional-site/assets/data/subsys.txt", function(text) {
                 var data = d3.tsv.parseRows(text);
+                var totalGenesWithFunctionalRoles = 0;
 
                 for (i = 0; i < data.length; i++) {
                     var geneCount = 0;
@@ -107,6 +108,7 @@
                         //continue;
                     } else {
                         geneCount = subsysToGeneMap[data[i][3]].length;
+                        totalGenesWithFunctionalRoles += subsysToGeneMap[data[i][3]].length;
                     }
 
                     for (j = 0; j < ontologyDepth; j++) {
@@ -145,18 +147,23 @@
                     }
                 }
 
-            // Set maxCount to scale bars
-            for (k in Level1) {
-                self.maxCount = self.maxCount > Level1[k] ? self.maxCount : Level1[k];
-            }
+                if (totalGenesWithFunctionalRoles < 100) {
+                    console.log("No Functional Categories assigned, you can added them using the Narrative");
+                    self.$elem.find("#mainview").append("No Functional Categories assigned, you can added them using the Narrative");
+                } else {
+                    // Set maxCount to scale bars
+                    for (k in Level1) {
+                        self.maxCount = self.maxCount > Level1[k] ? self.maxCount : Level1[k];
+                    }
 
-            $.when( 
-                self.SEEDTree.children.forEach(function(d) {
-                    self.collapse(d) }) 
-                )
-            .done(
-                    self.update( self.root = self.SEEDTree )
-                );
+                    $.when( 
+                        self.SEEDTree.children.forEach(function(d) {
+                            self.collapse(d) }) 
+                        )
+                    .done(
+                        self.update( self.root = self.SEEDTree )
+                        );
+                }
             
             }); 
         },
