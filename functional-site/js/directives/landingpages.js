@@ -677,12 +677,12 @@ angular.module('lp-directives')
 .directive('sortablegenomeoverview', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
             var p = $(ele).kbasePanel({title: 'Genome Overview',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
             // hack until search links directly to WS objects
-            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
             $(p.body()).KBaseGenomeOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
                                             loadingImage: "assets/img/ajax-loader.gif"});
         }
