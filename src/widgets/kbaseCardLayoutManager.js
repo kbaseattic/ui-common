@@ -1260,6 +1260,7 @@
 			this.workspaceClient.get_objects([{workspace: this.options.data.ws, name: this.options.data.id}],
 				function(data) {
 					console.log(data)
+					console.log(self.options.data)
 					self.addNewCard("KBaseHeatMapCard",
 						{
 							id: self.options.data.id,
@@ -1276,6 +1277,7 @@
 							of: "#app"
 						}
 					);
+					console.log(self.options.data)
 				}
 			)			
 			return this;

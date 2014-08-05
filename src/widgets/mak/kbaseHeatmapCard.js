@@ -26,23 +26,27 @@
 		render: function(options) {
 
             var self = this;		
-			var tiles = this.options.tiles
-			var mak = this.options.mak
-			var datatable = this.options.bicluster
-			var $mainDiv = $("<div>")
+
+			var $mainDiv = $("<div id='heatmapDiv'>")
 			var $heatmapDiv = $("<div id='heatmap'>");	
 			
-			$.each(tiles,function(i,d) {				
-				d.on("click", function() {
-					$instructions.empty()
-					$heatmapDiv.empty()
-					$.when(self.workspaceClient.get_objects([{workspace: self.options.ws, name: mak[d.val()].bicluster_id}]))
-					.then(function(data) {
-						self.options.bicluster = data[0].data
-						self.render()
-					})					
+			var datatable = this.options.bicluster
+			if (this.options.tiles && this.options.mak) { 
+			
+				var tiles = this.options.tiles
+				var mak = this.options.mak						
+			
+				$.each(tiles,function(i,d) {				
+					d.on("click", function() {
+						$mainDiv.empty()					
+						$.when(self.workspaceClient.get_objects([{workspace: self.options.ws, name: mak[d.val()].bicluster_id}]))
+						.then(function(data) {
+							self.options.bicluster = data[0].data
+							self.render()
+						})					
+					})
 				})
-			})
+			}
 				
 			self.$elem.append($mainDiv)
 			$instructions = $("<b><i>Click on a gene for plot of expression values across all conditions. Click another gene to add to the plot.</i></b>")
@@ -88,7 +92,7 @@
 			
 			var dataflat = 	[]
 			var datadict = []			
-			
+
 			for (var y = 0; y < datatable.data.length; y+=1) {				
 								
 				for (var x = 0; x < datatable.data[0].length; x+=1) {
@@ -206,7 +210,8 @@
 				  .attr("class", "squares")
 				  .attr("width", gridSize)
 				  .attr("height", gridSize)
-				  .style({"fill": colors[3],"stroke":"#E6E6E6","stroke-width":"2px"})
+				  .style({"fill":function(d) { return colorScale(expression[d.gene][d.condition]); },"stroke":"#E6E6E6","stroke-width":"2px"})
+				  // .style({"fill": colors[3],"stroke":"#E6E6E6","stroke-width":"2px"})
 				  .on("mouseover", 
                                 function(d) { 
                                     d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
@@ -232,8 +237,8 @@
                                 }
                             )
 			  			  
-			  heatMap.transition().duration(1000)
-				  .style("fill", function(d) { return colorScale(expression[d.gene][d.condition]); });
+			  // heatMap.transition().duration(1000)
+				  // .style("fill", function(d) { return colorScale(expression[d.gene][d.condition]); });
 			  
 			  var gauge = []
 			  gauge.push(d3.min(dataflat))
