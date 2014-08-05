@@ -891,22 +891,6 @@ angular.module('lp-directives')
         }
     };
 })
-
-.directive('sortablegenomecompleteness', function($rootScope) {
-    return {
-        link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Genome Completeness',
-                                           rightLabel: scope.ws,
-                                           subText: scope.id});
-            p.loading();
-            // hack until search links directly to WS objects
-            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
-            $(p.body()).KBaseGenomeCompleteness({genome_id: scope.id, ws_name: scope.ws, objVer: null, kbCache: kb,
-                                            loadingImage: "assets/img/ajax-loader.gif"});
-        }
-    };
-})
-
 .directive('sortablerelatedpublications', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
