@@ -148,7 +148,7 @@
                 }
 
                 if (totalGenesWithFunctionalRoles < 100) {
-                    console.log("No Functional Categories assigned, you can added them using the Narrative");
+                    //console.log("No Functional Categories assigned, you can added them using the Narrative");
                     self.$elem.find("#mainview").append("No Functional Categories assigned, you can added them using the Narrative");
                 } else {
                     // Set maxCount to scale bars
@@ -273,7 +273,7 @@
         click: function(d) {
 
 	    // open window with gene landing page
-	    if (d._children === null && d.children === null) {
+	    if (d.children === undefined || (d._children === null && d.children === null)) {
 		var winPop = window.open("/functional-site/#/genes/" + this.options.wsNameOrId + "/" + this.options.objNameOrId + "/" + d.name);
 	    }
 	    
