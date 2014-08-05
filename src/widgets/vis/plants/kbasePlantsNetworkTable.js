@@ -103,28 +103,28 @@ kb_define('kbasePlantsNetworkTable',
                             },
                             maxVisibleRowIndex : this.options.maxVisibleRowIndex,
                             navControls : this.options.navControls,
-    row_callback : function (cell, header, row, $kb) {
+                            row_callback : function (cell, header, row, $kb) {
 
-        if (header == 'description') {
-            var def = $kb.default_row_callback(cell, header, row, $kb);
+                                if (header == 'description') {
+                                    var def = $kb.default_row_callback(cell, header, row, $kb);
 
-            if (def.length < 12) {
-                return def;
-            }
+                                    if (def.length < 12) {
+                                        return def;
+                                    }
 
-            var max = '15px';
+                                    var max = '15px';
 
-            var $div = $.jqElem('div')
-                .css({'max-height' : max, 'overflow' : 'hidden', display : 'inline-block'})
-                .attr('class', 'truncated')
-                .append(def);
+                                    var $div = $.jqElem('div')
+                                        .css({'max-height' : max, 'overflow' : 'hidden', display : 'inline-block'})
+                                        .attr('class', 'truncated')
+                                        .append(def);
 
-            return $.jqElem('div').append($div).append($.jqElem('div').attr('class', 'dots').css({'font-style' : 'italic', 'text-align' : 'right'}).append('...more'));
-        }
-        else {
-            return $kb.default_row_callback(cell, header, row, $kb);
-        }
-    },
+                                    return $.jqElem('div').append($div).append($.jqElem('div').attr('class', 'dots').css({'font-style' : 'italic', 'text-align' : 'right'}).append('...more'));
+                                }
+                                else {
+                                    return $kb.default_row_callback(cell, header, row, $kb);
+                                }
+                            },
                         };
 
                         if (this.networkGraph() != undefined) {
@@ -312,7 +312,7 @@ kb_define('kbasePlantsNetworkTable',
 
                         var $tbl = $.jqElem('div').kbaseTable(data);
                         $tbl.sort('num_nodes', -1);
-                        $tbl.$elem.css('font-size', '85%');
+                        $tbl.$elem.css({'font-size' : '85%', 'margin' : '0px !important'});
 var max = '18px';
                         $tbl.$elem.find('tr')
                             .on('mouseover', function(e) {
