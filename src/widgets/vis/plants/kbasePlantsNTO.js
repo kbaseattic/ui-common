@@ -531,6 +531,7 @@ var cluster_data = {
                                 .attr('href', '#')
                                 .append('more...')
                                 .on('click', function(e) {
+                                    e.stopPropagation(); e.preventDefault();
                                     $nto.display_gene_list(row.gene_data);
                             })
                         )
@@ -644,14 +645,6 @@ $elem.append($tables);
                     this.data('gene_table').empty();
                     this.data('last_gene_data', undefined);
 
-                    var offset = this.data('cluster_table').prop('offsetTop');
-                    setTimeout(function() {console.log("SCROLL");$('html,body').animate(
-                        {
-                            scrollTop: offset
-                        },
-                        0
-                    );},0);
-
                     return;
                 }
 
@@ -709,14 +702,39 @@ $elem.append($tables);
                 this.data('gene_table').append($tbl.$elem);
 
                 this.data('last_gene_data', gene_data);
-                var offset = this.data('gene_table').prop('offsetTop');
-                setTimeout(function() {console.log("SCROLL");$('html,body').animate(
-                    {
-                        scrollTop: offset
-                    },
-                    500
-                );},0);
 
+                var $self = this;
+
+                setTimeout(function() {
+
+                    /*var $parent = $tbl.$elem.parent();
+                    var throttle = 0;
+                    while ($parent.get(0) != undefined && throttle++ < 1000) {
+                        if ($parent.css('overflow') != undefined && $parent.css('overflow').match(/auto|scroll/)) {
+                            break;
+                        }
+                        else {
+                            $parent = $parent.parent();
+                        }
+                    }
+
+                    if ($parent.get(0) == undefined) {
+                        $parent = $('html,body');
+                    }*/
+
+                    $parent = $('html,body');
+
+                    offset = $self.data('gene_table').prop('offsetTop');
+
+
+                    $parent.animate(
+                        {
+                            scrollTop: offset
+                        },
+                        500
+                    );
+
+                },0);
 
             },
         }
