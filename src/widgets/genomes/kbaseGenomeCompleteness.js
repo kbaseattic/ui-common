@@ -90,7 +90,7 @@
 
 			// doesn't work for Euks yet
 			if (tax_domain === "Eukaryota") {
-			    container.append(('<div />Genome Completeness not yet available for '+tax_domain));
+			    container.prepend(('<b>Genome Completeness not yet available for '+tax_domain+'</b>'));
 			    return this;
 			}
 
