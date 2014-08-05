@@ -643,6 +643,15 @@ $elem.append($tables);
                 if (gene_data == this.data('last_gene_data')) {
                     this.data('gene_table').empty();
                     this.data('last_gene_data', undefined);
+
+                    var offset = this.data('cluster_table').prop('offsetTop');
+                    setTimeout(function() {console.log("SCROLL");$('html,body').animate(
+                        {
+                            scrollTop: offset
+                        },
+                        0
+                    );},0);
+
                     return;
                 }
 
