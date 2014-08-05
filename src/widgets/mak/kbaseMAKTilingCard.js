@@ -6,7 +6,7 @@
 
         options: {
             id: null,
-            ws: null,
+            workspace: null,
             loadingImage: "assets/img/ajax-loader.gif",
             title: "MAK Result Overview Tiles",
             isInCard: false,
@@ -51,12 +51,12 @@
 			//"SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"
 			//this.options.ws
 			//this.options.id
-			console.log(this.options.ws)
+			console.log(this.options.workspace)
 			console.log(this.options.id)
 			self.$elem.append(loader)
 			loader.show()
 						
-            this.workspaceClient.get_objects([{workspace: this.options.ws, name: this.options.id}], 
+            this.workspaceClient.get_objects([{workspace: this.options.workspace, name: this.options.id}], 
 				
 				function(data){
 					
@@ -226,8 +226,8 @@
 						
 					self.$elem.append($bin)
 					
-					self.trigger("showBarChart", {terms: terms, ws: self.options.ws, id: self.options.id})
-					self.trigger("showMAKBicluster", { bicluster: [biclusters,0,bicluster_info], ws: self.options.ws, tiles: tiles})
+					self.trigger("showBarChart", {terms: terms, workspace: self.options.workspace, id: self.options.id})
+					self.trigger("showMAKBicluster", { bicluster: [biclusters,0,bicluster_info], workspace: self.options.workspace, tiles: tiles})
 					
                 },
 
@@ -249,7 +249,7 @@
             return {
                 type: "MAKResult Tiles",
                 id: this.options.id,
-                ws: this.options.ws,
+                workspace: this.options.workspace,
                 title: "MAK Result Overview Tiles"
             };
         },

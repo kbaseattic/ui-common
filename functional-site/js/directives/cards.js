@@ -164,8 +164,9 @@ angular.module('card-directives')
         };
     })
     .directive('makcards', function($rootScope) {
-        return {
+        return {	
             link: function(scope, element, attrs) {
+				console.log(scope.params.ws)
                 if (cardManager) cardManager.destroy();
                 cardManager = $(element).KBaseCardLayoutManager({
                     template: "mak", 
