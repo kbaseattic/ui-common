@@ -108,6 +108,10 @@ kb_define('kbasePlantsNetworkTable',
         if (header == 'description') {
             var def = $kb.default_row_callback(cell, header, row, $kb);
 
+            if (def.length < 12) {
+                return def;
+            }
+
             var max = '15px';
 
             var $div = $.jqElem('div')
