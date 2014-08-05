@@ -160,6 +160,7 @@
 						console.log(count)
 					}
 					loader.hide()
+					var tiles = []
 					_.each(blocks, function(o,i){
 						var block = blocks[i];
 						if (block.fit) {
@@ -171,51 +172,53 @@
 							var tileID = block.id.replace(/\./g,'').replace(/\|/,'')
 							
 							var $item = $('<div >', { "id": 'MAK_tile_'+tileID, class: 'item animated' })
-													.css({ height: h, width: w, top: block.fit.y, left: block.fit.x, borderWidth: borderWidth,
-													// "background": colorScale(block.score),
-													"background": "steelblue",
-													"position": "absolute",
-													"border": "solid #1919A3",
-													"-moz-border-radius": "1px",
-													"-webkit-border-radius": "1px",
-													"border-radius": "1px"})
-													.addClass(cssClass)    
-													.on("mouseover", 
-														function() { 
-															if (!$(this).hasClass('picked')) {
-																d3.select(this).style("background", "#00FFCC"); 
-																for (term in block.terms) {
-																	barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
-																	d3.select("#"+barChartSelector).style("background", "#00FFCC")
-																}
-															}
-															self.tooltip = self.tooltip.text("bicluster: "+biclusters[block.index].bicluster_id+", rows: "+biclusters[block.index].gene_ids.length+", columns: "+biclusters[block.index].condition_ids.length+", number: "+i);
-															return self.tooltip.style("visibility", "visible"); 
-														}
-													)
-													.on("mouseout", 
-														function() { 
-															if (!$(this).hasClass('picked')) {
-																d3.select(this).style("background", "steelblue");
-																for (term in block.terms) {
-																	barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')																
-																	origColor = d3.select("#"+barChartSelector).attr("class")
-																	d3.select("#"+barChartSelector).style("background", origColor)
-																}
-															}
-															return self.tooltip.style("visibility", "hidden"); 
-														}
-													)
-													.on("mousemove", 
-														function(e) { 
-															return self.tooltip.style("top", (e.pageY+15) + "px").style("left", (e.pageX-10)+"px");
-														}
-													)
-													.on("click", 
-														function(event) {																														
-															self.trigger("showMAKBicluster", { bicluster: [biclusters[block.index],bicluster_info], ws: self.options.ws, event: event });															
-													});
-														
+								.css({ height: h, width: w, top: block.fit.y, left: block.fit.x, borderWidth: borderWidth,
+								// "background": colorScale(block.score),
+								"background": "steelblue",
+								"position": "absolute",
+								"border": "solid #1919A3",
+								"-moz-border-radius": "1px",
+								"-webkit-border-radius": "1px",
+								"border-radius": "1px"})
+								.addClass(cssClass)   
+								.val(i)
+								.on("mouseover", 
+									function() { 
+										if (!$(this).hasClass('picked')) {
+											d3.select(this).style("background", "#00FFCC"); 
+											for (term in block.terms) {
+												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
+												d3.select("#"+barChartSelector).style("background", "#00FFCC")
+											}
+										}
+										self.tooltip = self.tooltip.text("bicluster: "+biclusters[block.index].bicluster_id+", rows: "+biclusters[block.index].gene_ids.length+", columns: "+biclusters[block.index].condition_ids.length+", number: "+i);
+										return self.tooltip.style("visibility", "visible"); 
+									}
+								)
+								.on("mouseout", 
+									function() { 
+										if (!$(this).hasClass('picked')) {
+											d3.select(this).style("background", "steelblue");
+											for (term in block.terms) {
+												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')																
+												origColor = d3.select("#"+barChartSelector).attr("class")
+												d3.select("#"+barChartSelector).style("background", origColor)
+											}
+										}
+										return self.tooltip.style("visibility", "hidden"); 
+									}
+								)
+								.on("mousemove", 
+									function(e) { 
+										return self.tooltip.style("top", (e.pageY+15) + "px").style("left", (e.pageX-10)+"px");
+									}
+								)
+								// .on("click", 
+									// function(event) {	
+										// if (d3.select("#biclusterOverview").empty()) self.trigger("showMAKBicluster", { bicluster: [biclusters[block.index],bicluster_info], ws: self.options.ws, event: event });
+										
+								// });
+							tiles.push($item)							
 									  
 							setTimeout(function(){ $bin.append($item) }, 5*i);
 						}
@@ -224,7 +227,7 @@
 					self.$elem.append($bin)
 					
 					self.trigger("showBarChart", {terms: terms, ws: self.options.ws, id: self.options.id})
-					self.trigger("showMAKBicluster", { bicluster: [biclusters[0],bicluster_info], ws: self.options.ws})
+					self.trigger("showMAKBicluster", { bicluster: [biclusters,0,bicluster_info], ws: self.options.ws, tiles: tiles})
 					
                 },
 

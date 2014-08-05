@@ -1263,7 +1263,7 @@
 					self.addNewCard("KBaseHeatMapCard",
 						{
 							id: self.options.data.id,
-							bicluster: data[0].data,
+							bicluster: data[0].data,							
 							ws: self.options.data.ws,
 							auth: self.options.auth,
 							userId: self.options.userId,
@@ -1523,6 +1523,7 @@
 					{
 						row: data.row,		
 						heatmap: data.heatmap,
+						widget: data.widget,
 						id: data.id,
 						ws: data.ws
 					},
@@ -1544,7 +1545,9 @@
 				{
 					bicluster: data.bicluster,
 					id: data.id,
-					ws: data.ws
+					ws: data.ws,
+					tiles: data.tiles,
+					mak: data.mak
 				},
 				{
                     my: "left top",
@@ -2023,6 +2026,7 @@
                         bicluster: data.bicluster,
 						id: data.id,
 						ws: data.ws,
+						tiles: data.tiles,
                         showButtons: true,
                         centerFeature: data.centerFeature
                     },

@@ -26,9 +26,28 @@
 		render: function(options) {
 
             var self = this;		
-			var $heatmapDiv = $("<div id='heatmap'>");			
-			self.$elem.append("<h3>Click on a gene for plot of expression values across all conditions. Click another gene to add to the plot.</h3>")
-			self.$elem.append($heatmapDiv)
+			var tiles = this.options.tiles
+			var mak = this.options.mak
+			var datatable = this.options.bicluster
+			var $mainDiv = $("<div>")
+			var $heatmapDiv = $("<div id='heatmap'>");	
+			
+			$.each(tiles,function(i,d) {				
+				d.on("click", function() {
+					$instructions.empty()
+					$heatmapDiv.empty()
+					$.when(self.workspaceClient.get_objects([{workspace: self.options.ws, name: mak[d.val()].bicluster_id}]))
+					.then(function(data) {
+						self.options.bicluster = data[0].data
+						self.render()
+					})					
+				})
+			})
+				
+			self.$elem.append($mainDiv)
+			$instructions = $("<b><i>Click on a gene for plot of expression values across all conditions. Click another gene to add to the plot.</i></b>")
+			$mainDiv.append($instructions)
+			$mainDiv.append($heatmapDiv)
 			
 			// var $tooltipExpression = $("<div>")
 			// var $tooltipGene = $("<div>")
@@ -47,17 +66,7 @@
 			self.tooltip3 = d3.select("body")
                              .append("div")
                              .classed("kbcb-tooltip", true);
-			console.log(self.tooltip1)
-									
-			var datatable = self.options.bicluster
-			
-			if (typeof datatable == "string") {
-				this.workspaceClient.get_objects([{workspace: self.options.ws, name: self.options.bicluster}],
-					function(data){
-						console.log(data)
-					}
-				)
-			}
+			console.log(self.tooltip1)								
 			
 			console.log(datatable)
 			var dataflat = 	[]
@@ -127,8 +136,7 @@
 				.on("click",function(d,i,event){
 					// if (!$("div.kblpc-subtitle:contains('"+d.id+"')").length) {self.trigger("showFeature", {featureID: d.id, event: event})}
 					// self.trigger("showFeature", {featureID: d.id, event: event})
-					console.log(i)
-					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], id: self.options.id, ws: self.options.ws, heatmap: geneLabels, event: event})
+					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], id: self.options.id, ws: self.options.ws, heatmap: geneLabels, widget: self, event: event})
 					if ($(this).css("font-weight") == 400) $(this).css({"font-weight":900,"font-size":"medium"})
 					else $(this).css({"font-weight":400,"font-size":"small"})
 				})						
@@ -208,8 +216,15 @@
 			  heatMap.transition().duration(1000)
 				  .style("fill", function(d) { return colorScale(expression[d.gene][d.condition]); });
 			  
+			  var gauge = []
+			  gauge.push(d3.min(dataflat))
+			  for (var i = Math.ceil(d3.min(dataflat)); i <= Math.floor(d3.max(dataflat)); i++) {
+				if (i < 3 && i > -3) gauge.push(i)
+			  }
+			  gauge.push(d3.max(dataflat))
+			  
 			  var legend = svg.selectAll(".legend")
-				  .data(["-Inf",-2,-1,0,1,2,"Inf"], function(d) { return d; })
+				  .data(gauge, function(d) { return d; })
 				  .enter().append("g")
 				  .attr("class", "legend");
 

@@ -21,7 +21,7 @@
 		},
 		
 		lineDrawer: function(values,conditions,gene_label,x,y,color_ind,drawCircle,graph,colorScale) {
-			
+						
 			var datadict = []
 
 			for (i=0;i<values.length;i++) {
@@ -157,7 +157,12 @@
 					graph.selectAll("#_mean").style("stroke-dasharray",(3,3))
 				}
 			})
-
+			
+			self.options.widget.on("remove", function() {
+				console.log("here")
+				self.remove()
+			})
+			
 			var m = [80, 80, 80, 80]; // margins
 			var w = conditions.length*150 - m[1] - m[3]; // width
 			var h = 400 - m[0] - m[2]; // height
