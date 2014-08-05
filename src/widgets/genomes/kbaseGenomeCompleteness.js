@@ -112,7 +112,7 @@
 				// just take first element of subsystem_data list
 				// typedef tuple<string subsystem, string variant, string role> subsystem_data;
 				//var seed_role = gene.subsystem_data[0][2];
-				var seed_role = geneFunc;  // not really, but subsystem_data is not behaving for me for some unknown reason.  furthermore, it's not yet populated for uploaded genomes!!!
+				var seed_role = cleanGeneFunc;  // not really, but subsystem_data is not behaving for me for some unknown reason.  furthermore, it's not yet populated for uploaded genomes!!!
 
 				if (self.markerRoles[seed_role] === undefined)
 				    continue;
