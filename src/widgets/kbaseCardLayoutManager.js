@@ -1261,8 +1261,6 @@
 			this.workspaceClient = new Workspace(this.newWorkspaceServiceUrl, { 'token' : this.options.data.auth, 'user_id' : this.options.data.userId});
 			this.workspaceClient.get_objects([{workspace: this.options.data.workspace, name: this.options.data.id}],
 				function(data) {
-					console.log(data)
-					console.log(self.options.data)
 					self.addNewCard("KBaseHeatMapCard",
 						{
 							id: self.options.data.id,
@@ -1279,7 +1277,6 @@
 							of: "#app"
 						}
 					);
-					console.log(self.options.data)
 				}
 			)			
 			return this;
@@ -1503,7 +1500,6 @@
              * Adds new kbaseMAKBarChart card.
              */	
 			$(document).on("showBarChart", function(event, data) {
-				console.log(data)
 				self.addNewCard("KBaseBarChartCard",
 					{
 						terms: data.terms,

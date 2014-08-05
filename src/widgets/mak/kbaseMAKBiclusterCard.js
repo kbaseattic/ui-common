@@ -32,12 +32,10 @@
         render: function(options) {
 		
             var self = this;
-			console.log(self)
 			self.bicluster_index = this.options.bicluster[1];
             self.bicluster = this.options.bicluster[0][self.bicluster_index];
             self.bicluster_type = this.options.bicluster[2].bicluster_type;
 			var tiles = this.options.tiles
-			console.log(self.bicluster)
 			$.each(tiles,function(i,d) {				
 				d.on("click", function() {
 					self.$elem.empty()
@@ -86,7 +84,6 @@
 			$.when(this.workspaceClient.get_objects([{workspace: self.options.workspace, name: self.bicluster.bicluster_id}]))
 			.then(
 				function(data){
-					console.log(data)
 					// $biclusterOverview.append($("<div />")
 							// .append("<h3>heatmap</h3>")
 							// .append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
@@ -155,7 +152,6 @@
 			
             var $termsTable = '<table id="terms-table' + self.bicluster.id + '" class="kbgo-table">';
             $termsTable += "<tr><th>Key</th><th>Value</th></tr>";
-			console.log(self.bicluster)
             for (var enrichedTerm in self.bicluster.enriched_terms) {
                 $termsTable += "<tr><td>" + enrichedTerm + "</td><td>" + self.bicluster.enriched_terms[enrichedTerm] + "</td></tr>";
             }

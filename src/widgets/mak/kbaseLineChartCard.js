@@ -33,7 +33,6 @@
 					"gene_label": gene_label
 				})
 			}
-			console.log(datadict)
 			var line = d3.svg.line()
 				.defined(function(d) {return d.value!=null})
 				.x(function(d,i) { 
@@ -52,7 +51,6 @@
 				.style({"stroke-width":3,"stroke":colorScale(color_ind),"fill":"none"})
 				.on("mouseover", 
 							function(d) { 
-								console.log(self)
 								d3.select(this).style("stroke", d3.rgb(d3.select(this).style("stroke")).darker()); 
 								self.tooltip = self.tooltip.text(d.gene_label);
 								return self.tooltip.style("visibility", "visible"); 
@@ -93,7 +91,6 @@
 		},
 		
 		yAxisMaker: function(values,graph,h) {
-			console.log(values)
 			var y = d3.scale.linear().domain([d3.min(values), d3.max(values)]).range([h, 0]);
 			var yAxisLeft = d3.svg.axis().scale(y).orient("left");
 
@@ -117,7 +114,6 @@
                              .append("div")
                              .classed("kbcb-tooltip", true);
 			
-			console.log(self.tooltip)
 			var index = self.options.row[3]
 			var values = self.options.row[0],
 				conditions = self.options.row[1],
@@ -161,11 +157,6 @@
 				}
 			})
 			
-			self.options.widget.on("remove", function() {
-				console.log("here")
-				self.remove()
-			})
-			
 			var m = [80, 80, 80, 80]; // margins
 			var w = conditions.length*150 - m[1] - m[3]; // width
 			var h = 400 - m[0] - m[2]; // height
@@ -177,11 +168,7 @@
 				.append("svg:g")
 				.attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 			
-			console.log(conditions.length)
-			console.log(values[0].length)
 			var formatAsLabels = function(d,i) {
-				console.log(d)
-				console.log(i)
 				if (i < conditions.length) {
 					if(conditions[i].length > 10) return conditions[i].substring(0,10)+"...";
 					else return conditions[i];
@@ -198,7 +185,6 @@
 				.selectAll("g.x.axis > g.tick > text")
 				.on("mouseover", 
                                 function(d,i) { 
-									console.log(self)
                                     d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
                                     self.tooltip = self.tooltip.text(conditions[i]);
                                     return self.tooltip.style("visibility", "visible"); 

@@ -71,7 +71,6 @@
                              .append("div")
                              .classed("kbcb-tooltip", true);			
 			
-			// console.log(datatable)
 			
 			// var columnMeans = []
 			// for (var y = 0; y < datatable.data.length; y+=1) {	
@@ -128,9 +127,7 @@
 			}
 			var legendElementWidth = gridSize*2,
 			colors = ["#0000ff","#0066ff","#66FFFF","#ffffff","#FFC6AA","#ff6600","#ff0000"]
-			
-			console.log(gridSize)
-			
+						
 			var colorScale = function(d) {
 				if (d > 2.5) return colors[6]
 				if (d > 1.5 && d <= 2.5) return colors[5]

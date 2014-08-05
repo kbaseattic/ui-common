@@ -31,14 +31,12 @@
         render: function(options) {
 			
 			self = this;
-			console.log(self.options.workspace)
 			
 			self.tooltip = d3.select("body")
                              .append("div")
                              .classed("kbcb-tooltip", true);
 							 
 			var terms = self.options.terms
-			console.log(terms)
 			var chartWidth = self.options.width-50
 					
 			var $sideChart = $("<div>").css({"width":chartWidth,"top":50,"position":"absolute"})
@@ -56,7 +54,6 @@
 				count++
 			}
 			
-			console.log(termData)
 			var x = d3.scale.linear().domain([0,d3.max(flat)]).range([0,chartWidth])			
 			var selectionHandler = []
 			var $barChartDiv = $("<div id='barchart'>").css({"float":"right"})
@@ -118,7 +115,6 @@
                        )
 					.on("click",
 						function(d) {
-							console.log(selectionHandler)
 							if ($(this).hasClass('picked')) {								
 								for (tile in d.tiles) {
 									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')

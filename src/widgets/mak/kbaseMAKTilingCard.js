@@ -51,8 +51,6 @@
 			//"SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"
 			//this.options.ws
 			//this.options.id
-			console.log(this.options.workspace)
-			console.log(this.options.id)
 			self.$elem.append(loader)
 			loader.show()
 						
@@ -122,9 +120,7 @@
 						}
 						blocks.push( { w: w, h: h, index: i, id: biclusters[i].bicluster_id, terms: enrichedTerms, score: biclusters[i].full_crit } )
 					}
-					
-					// console.log(blocks)
-					
+										
 					colors = ["#CCCCCC","#CCA3A3","#CC7A7A","#CC5252","#CC2929","#CC0000"]
 					
 					var colorScale = function(d) {
@@ -157,7 +153,6 @@
 							}
 						});
 						binHeight+=500
-						console.log(count)
 					}
 					loader.hide()
 					var tiles = []
