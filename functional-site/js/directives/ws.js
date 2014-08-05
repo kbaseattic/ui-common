@@ -26,8 +26,7 @@ angular.module('ws-directives')
             // Global list and dict of fetched workspaces
             var workspaces = []; 
 
-            var nav_height = 110;
-
+            var nav_height = 95;
 
             // This method loads the sidebar data.  
             // Note: this is only called after instantiation when sidebar needs to be refreshed
@@ -576,7 +575,6 @@ angular.module('ws-directives')
                         var placeholder = $('<div>').loading()
                         modal_body.append(placeholder);                        
                         $.when(prom).done(function(data) {
-                            console.log('permissions', data)
                             permData = data
 
                             //newPerms = $.extend({},data)
@@ -903,7 +901,7 @@ angular.module('ws-directives')
 
 
             scope.loadObjTable = function() {
-                var table_id = "obj-table-"+ws.replace(':',"_");                    
+                var table_id = "obj-table";                  
 
                 var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
                                             +'</div>',
@@ -920,16 +918,10 @@ angular.module('ws-directives')
 
                 var tableSettings = {
                     "sPaginationType": "bootstrap",
-                    "bStateSave": true,
-                    "fnStateSave": function (oSettings, oData) {
-                        if (USER_ID) {   
-                            save_dt_view(oSettings, oData);
-                        }
-                    },
-                    "fnStateLoad": function (oSettings) {
-                        if (USER_ID) {
-                            return load_dt_view(oSettings);
-                        }
+                    "stateSave": (USER_ID ? true : false),
+                    "stateSaveParams": function (settings, data) {
+                        //don't save search filter
+                        data.search.search = "";
                     },
                     "oColReorder": {
                         "iFixedColumns": (USER_ID ? 1 :0 ),
@@ -947,9 +939,8 @@ angular.module('ws-directives')
 
 
                 // clear object view every load
-                $(element).html('')
-                $(element).loading('<br>loading<br>'+ws+'...', true)
-
+                $(element).html('');
+                $(element).loading('<br>loading<br>'+ws+'...', true);
 
                 var p = kb.ws.list_objects({workspaces: [ws]});
                 var p2 = kb.ws.list_objects({workspaces: [ws], showOnlyDeleted: 1});
@@ -967,15 +958,15 @@ angular.module('ws-directives')
 
                     $(element).rmLoading();
 
-                    $(element).append('<table id="'+table_id+'" \
-                        class="table table-bordered table-striped" style="width: 100%;"></table>')    
+                    var table_ele = $('<table id="'+table_id+'" class="table table-bordered table-striped" style="width: 100%;">')
+                    $(element).append(table_ele);
 
                     // format and create object datatable
                     var tableobjs = formatObjs(objs, obj_mapping);
                     var wsobjs = tableobjs[0];
                     var kind_counts = tableobjs[1];
                     tableSettings.aaData = wsobjs;
-                    table = $('#'+table_id).dataTable(tableSettings);       
+                    table = table_ele.dataTable(tableSettings);       
                     $compile(table)(scope);
                     //new FixedHeader( table , {offsetTop: 110, "zTop": 500});
 
@@ -1022,8 +1013,7 @@ angular.module('ws-directives')
 
 
             scope.loadNarTable = function(tab) {
-                var table_id = "obj-table";                 
-                console.log('tab', tab)
+                //var table_id = "nar-table";
                 var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
                                             +'</div>',
                                              bSortable: false, "sWidth": "1%"} 
@@ -1035,25 +1025,18 @@ angular.module('ws-directives')
                                 { "sTitle": "Timestamp", "bVisible": false, "sType": 'numeric'},
                                 { "sTitle": "Size", "bVisible": false, iDataSort: 7 },
                                 { "sTitle": "Byte Size", bVisible: false },
-                                { "sTitle": "Module", bVisible: false }
+                                { "sTitle": "Module", bVisible: false },
                                 ];
                 if (tab != 'public'){
                     columns.push({ "sTitle": "Shared With" })
                 }
 
-
                 var tableSettings = {
                     "sPaginationType": "bootstrap",
-                    "bStateSave": true,
-                    "fnStateSave": function (oSettings, oData) {
-                        if (USER_ID) {   
-                            save_dt_view(oSettings, oData);
-                        }
-                    },
-                    "fnStateLoad": function (oSettings) {
-                        if (USER_ID) {
-                            return load_dt_view(oSettings);
-                        }
+                    "stateSave": (USER_ID ? true : false),
+                    "stateSaveParams": function (settings, data) {
+                        //don't save search filter
+                        data.search.search = "";
                     },
                     "oColReorder": {
                         "iFixedColumns": (USER_ID ? 1 :0 ),
@@ -1070,7 +1053,6 @@ angular.module('ws-directives')
                     }
                 }
 
-
                 // clear object view every load
                 $(element).html('');
                 $(element).loading('<br>Loading<br>Narratives...', 'big');
@@ -1078,19 +1060,23 @@ angular.module('ws-directives')
                 var p = kb.getNarratives();
 
                 $.when(p).done(function(nars){
-                    $(element).rmLoading();   
-                    $(element).append('<table id="'+table_id+'" \
-                        class="table table-bordered table-striped" style="width: 100%;">')                     
+                    $(element).rmLoading();             
 
                     if (tab == "my-narratives") {
                         var narratives = nars.my_narratives;
                         var isOwner = true;
+                        var table_id = 'my-nar-table';
                     } else if (tab == "shared") {
                         var narratives = nars.shared_narratives;
+                        var table_id = 'shared-nar-table';
                     } else if (tab == "public") {
                         var narratives = nars.public_narratives;
+                        var table_id = 'public-nar-table';                        
                     }
                     var perms = nars.perms;
+
+                    var table_ele = $('<table id="'+table_id+'" class="table table-bordered table-striped" style="width: 100%;">')
+                    $(element).append(table_ele);
 
                     //scope.deleted_objs = deleted_objs;   
 
@@ -1101,15 +1087,10 @@ angular.module('ws-directives')
                         var wsobjs = formatNarObjs(narratives, isOwner);
                     }
 
-
-
                     tableSettings.aaData = wsobjs;
-                    table = $('#'+table_id).dataTable(tableSettings);       
+                    table = table_ele.dataTable(tableSettings);       
                     $compile(table)(scope);
                     //new FixedHeader( table , {offsetTop: 90, "zTop": 500});                    
-
-                    // reset filter; critical for ignoring cached filter
-                    table.fnFilter((scope.type ? scope.type+'-.*' : ''), getCols(table, 'Type'), true);
 
                     // add trashbin
                     //var trash_btn = getTrashBtn();
@@ -1126,7 +1107,6 @@ angular.module('ws-directives')
 
                     //searchColumns()
                     addOptionButtons();
-
 
                     // resinstantiate all events.
                     events();
@@ -1176,7 +1156,7 @@ angular.module('ws-directives')
                     fnShowHide(table, col_name);
                 }) 
                 reset_btn.click( function () {
-                    reset_dt_view();
+                    reset_dt_view(table);
                     if (scope.tab) {
                         scope.loadNarTable(scope.tab);
                     } else {
@@ -1538,7 +1518,6 @@ angular.module('ws-directives')
                     var dataWS = checkbox.data('ws');
                     var dataType = checkbox.data('type');
                     var module = checkbox.data('module');
-                    console.log('checkbox', id, name, dataWS, dataType)
 
                     if (checkbox.hasClass('ncheck-checked')) {
                         removeCheck(name, dataWS, dataType)
@@ -2049,16 +2028,21 @@ angular.module('ws-directives')
                 copyObjectsModal.openPrompt();
 
 
-                var fq_id =  'ws.'+scope.checkedList[0].wsid+'.obj.'+scope.checkedList[0].id
+                var prom = kb.getNarrativeDeps({ws: ws, name: name})
+                $.when(prom).done(function(deps) {
+                    content.append('<h5>Objects to be copied:</h5>');
+                    var table = $('<table class="table table-striped table-nar-deps">');
+                    table.append("<tr><th>Name</th><th>Type</th></tr>");
+                    table.append("<tr><td>" + scope.checkedList[0].name + "</td><td>Narrative</td></tr>");
+                    for (var i in deps) {
+                        var d = deps[i];
+                        table.append('<tr data-name="'+d.name+'" data-type="'+d.type+'"><td>'
+                                          + d.name + '</td><td>'
+                                          + d.type +
+                                     '</td></tr>');
+                    }
+                    content.append(table);
 
-                var prom = kb.nar.get_narrative_deps({fq_id: fq_id, 
-                        callback: function(results) {
-                            content.append("<tr><td>" + results.name + "</td><td>Narrative</td></tr>");
-                            for (dep in results.deps) {
-                                content.append("<tr><td>" + results.deps[dep].name + "</td><td>" + results.deps[dep].type + "</td></tr>");
-                            } 
-
-                        }
                 })
 
 
@@ -2679,6 +2663,7 @@ angular.module('ws-directives')
         template: '<a class="btn-new-narrative" ng-click="createNewNarrative()">'+
                     '<b><span class="glyphicon glyphicon-plus"></span> New Narrative</b>'+
                   '</a>',
+        controller: 'WB',
         link: function(scope, ele, attrs) {
 
             scope.createNewNarrative = function() {
@@ -2728,8 +2713,6 @@ angular.module('ws-directives')
                                         scope.$apply();
                                     }
 
-
-                                    console.log('tab', scope.tab)
                                     //ascope.loadNarTable();
                                     kb.ui.notify('Created new narrative: <i>'+name+'</i>');
                                     $prompt.closePrompt();
@@ -2752,7 +2735,7 @@ angular.module('ws-directives')
                         newNarrativeModal.closePrompt();
                         modals.createWorkspace(function(){
                             scope.createNewNarrative();
-                        },function() {
+                        }, function() {
                             scope.createNewNarrative();
                         });
                         return;
@@ -2809,8 +2792,6 @@ angular.module('ws-directives')
                     }
                 }
 
-
-
             $(ele).loading();
             var prom = kb.ws.list_workspace_info({});
             $.when(prom).done(function(data) {
@@ -2819,7 +2800,6 @@ angular.module('ws-directives')
                 var rows = [];
                 var total_count = 0;
                 for (var i in data) {
-
                     var row = data[i];
                     var owner = row[2];
                     
@@ -2839,7 +2819,6 @@ angular.module('ws-directives')
                 tableSettings.aaData = rows;
 
                 var container = $('<table id="ws-manage" class="table table-bordered" style="width: 100%;"></table>');
-
 
                 $(ele).append(container);
                 var table = $(container).dataTable(tableSettings);
@@ -2868,13 +2847,8 @@ angular.module('ws-directives')
                         table.fnSettings(), $("thead input").index(this) ), true );
                 } );
                         
-            })
-                         
-        }           
-
-
-
-
+            })                
+        }
     }
 })
 
@@ -2882,9 +2856,9 @@ angular.module('ws-directives')
 
 function getEditableDescription(d) {
     var d = $('<form role="form">\
-               <div class="form-group">\
-                <textarea rows="4" class="form-control" placeholder="Description">'+d+'</textarea>\
-              </div>\
+                   <div class="form-group">\
+                    <textarea rows="4" class="form-control" placeholder="Description">'+d+'</textarea>\
+                  </div>\
               </form>');
     return d;
 }
@@ -2902,8 +2876,9 @@ function save_dt_view (oSettings, oData) {
 function load_dt_view (oSettings) {
   return JSON.parse( localStorage.getItem('DataTables_'+window.location.pathname) );
 }
-function reset_dt_view() {
-  localStorage.removeItem('DataTables_'+window.location.pathname);
+function reset_dt_view(table) {
+    var id = 'DataTables_'+table[0].id+'_'+window.location.pathname 
+    localStorage.removeItem(id);
 }
 
 function searchColumns() {

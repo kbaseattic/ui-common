@@ -69,12 +69,12 @@
     },
 
     "KBaseGwasData" : {
-        "GwasGeneList" : null,
-        "GwasPopulationVariation" : null,
-        "GwasPopulationVariation" : null,
-        "GwasPopulationTrait" : null,
-        "GwasPopulationKinship" : null,
-        "GwasTopVariations" : null
+        "GwasPopulation" : "KBaseGwasData.GwasPopulation",
+        "GwasPopulationVariation" : "KBaseGwasData.GwasPopulationVariation",
+        "GwasPopulationTrait" : "KBaseGwasData.GwasPopulationTrait",
+        "GwasTopVariation" : "KBaseGwasData.GwasTopVariation",
+        "GwasTopVariations" : "KBaseGwasData.GwasTopVariations",
+        "GwasGeneList" : "KBaseGwasData.GwasGeneList"
     },
 
     "KBaseNarrative" : {

@@ -270,9 +270,9 @@ function KBCacheClient(token) {
                     }
 
 
-                    $('.my-nar-count').text(mine.length)
-                    $('.shared-nar-count').text(shared.length);  
-                    $('.public-nar-count').text(pub.length);            
+                    $('.my-nar-count').addClass('badge').text(mine.length)
+                    $('.shared-nar-count').addClass('badge').text(shared.length);  
+                    $('.public-nar-count').addClass('badge').text(pub.length);            
 
                     var all_data = {my_narratives: mine, 
                                     shared_narratives: shared, 
@@ -294,6 +294,31 @@ function KBCacheClient(token) {
         self.narrative_prom = last_prom
         return last_prom;
     }
+
+
+    self.getNarrativeDeps = function(params) {
+        var ws = params.ws;
+        var name = params.name;
+
+        var p = self.ws.get_object_info([{workspace: ws, name: name}], 1)
+            .then(function(info) {
+                console.log('info', info)
+                var deps = JSON.parse(info[0][10].data_dependencies);
+
+                var d = [];
+                for (var i in deps) {
+                    var obj = {};
+                    var o = deps[i].split(' ');
+                    obj.type = o[0];
+                    obj.name = o[1];
+                    d.push(obj)
+                }
+
+                return d;
+            })
+        return p;
+    }
+
 
     // cached objects
     var c = new WSCache();
@@ -1479,6 +1504,7 @@ function ProjectAPI(ws_url, token) {
         var self = this;
         var metadata_fn = ws_client.get_object_info([{wsid: p.project_id, objid : p.narrative_id}], 1);
         $.when( metadata_fn).then( function( obj_info) {
+            console.log('object_info', obj_info)
             if (obj_info.length != 1) {
                 p.error_callback( "Error: narrative ws." + p.project_id +
                         ".obj." + p.narrative_id + " not found");
@@ -1499,6 +1525,7 @@ function ProjectAPI(ws_url, token) {
         res.description = meta.description;
         res.name = meta.name;
         var temp = $.parseJSON(meta.data_dependencies);
+        console.log(temp)
         //deps should really be stored as an id, not a name, since names can change
         var deps = temp.reduce( function(prev,curr,index) {
             var dep = curr.split(" ");
