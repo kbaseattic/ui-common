@@ -132,6 +132,7 @@ kb_define('kbaseTable',
 
             var $tbl = $('<table></table>')
                 .attr('id', 'table')
+                .css('margin', '0px')
                 .addClass('table');
 
             if (this.options.tblOptions) {
@@ -315,7 +316,6 @@ kb_define('kbaseTable',
 
                 $tbl.append($tfoot);
             }
-
 
             this._rewireIds($tbl, this);
 

@@ -607,7 +607,6 @@ $networkGraph.$elem.hide();
 this.networkGraph($networkGraph);
 
 var clusterTable = $.jqElem('div').kbaseTable(cluster_data);
-clusterTable.$elem.find('table').css('margin', '0px');
 
 // all of this stuff here? This is to hack in a grouped header over the top.
     var headerRow = clusterTable.data('headerRow');
@@ -697,7 +696,6 @@ $elem.append($tables);
 
     //damn tables don't update, they're just static. I need to write a new table widget.
     var $tbl = $.jqElem('div').kbaseTable(table_data);
-    $tbl.$elem.find('table').css('margin', '0px');
     this.data('gene_table').empty();
     this.data('gene_table').append($tbl.$elem);
 
