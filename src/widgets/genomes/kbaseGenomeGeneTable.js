@@ -108,6 +108,7 @@
             				//"sPaginationType": "full_numbers",
             				"iDisplayLength": 10,
             				"aaSorting" : [[1,'asc'],[2,'asc']],  // [[0,'asc']],
+					"sDom": 't<fip>',
             				"aoColumns": [
 			                              {sTitle: "Gene ID", mData: "id"}, 
             				              {sTitle: "Contig", mData: "contig"},
@@ -119,7 +120,7 @@
             				              ],
             				              "aaData": [],
             				              "oLanguage": {
-            				            	  "sSearch": "Search gene:",
+            				            	  "sSearch": "&nbsp&nbspSearch genes:",
             				            	  "sEmptyTable": "No genes found."
             				              },
             				              "fnDrawCallback": geneEvents

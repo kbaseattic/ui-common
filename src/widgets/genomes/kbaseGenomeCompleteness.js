@@ -173,6 +173,7 @@
             				//"sPaginationType": "full_numbers",
             				"iDisplayLength": 100,
 					"aaSorting" : [[3, 'asc']],
+					"sDom": 't<fip>',
             				"aoColumns": [
 			                               {sTitle: "Count", mData: "num", sWidth: "10%"}, 
 			                               {sTitle: "Gene ID", mData: "id"}, 
@@ -181,7 +182,7 @@
             				              ],
             				              "aaData": [],
             				              "oLanguage": {
-            				            	  "sSearch": "Search gene:",
+            				            	  "sSearch": "&nbsp&nbsp&nbsp&nbspSearch gene:",
             				            	  "sEmptyTable": "No genes found."
             				              },
             				              "fnDrawCallback": geneEvents
