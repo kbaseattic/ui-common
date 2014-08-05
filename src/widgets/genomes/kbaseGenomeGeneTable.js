@@ -118,7 +118,7 @@
             				              {sTitle: "Type", mData: "type", sWidth:"10%"},
             				              {sTitle: "Function", mData: "func", sWidth:"45%"}
             				              ],
-            				              "aaData": [],
+            				              "aaData": genesData,
             				              "oLanguage": {
             				            	  "sSearch": "&nbsp&nbspSearch genes:",
             				            	  "sEmptyTable": "No genes found."
@@ -126,7 +126,7 @@
             				              "fnDrawCallback": geneEvents
             		};
             		var genesTable = $('#'+pref+'genes-table').dataTable(genesSettings);
-            		genesTable.fnAddData(genesData);
+            		//genesTable.fnAddData(genesData);
             }, this));
             $.when(prom).fail($.proxy(function(data) {
             		container.empty();
