@@ -86,6 +86,13 @@
             $.when(prom).done($.proxy(function(data) {
             		container.empty();
             		var gnm = data[0].data;
+			var tax_domain = gnm.domain;
+
+			// doesn't work for Euks yet
+			if (tax_domain === "Eukaryota") {
+			    container.append(('<div />Genome Completeness not yet available for '+tax_domain));
+			    return this;
+			}
 
             		////// Genome Completeness Tab //////
             		var genesData = [];
