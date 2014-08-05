@@ -19,7 +19,8 @@
             objNameOrId: null,
             wsNameOrId: null,
             objVer: null,
-            loadingImage: "assets/img/loading.gif",
+	    //loadingImage: "assets/img/loading.gif",
+            loadingImage: "assets/img/ajax-loader.gif",
             kbCache:null,         
             width:900         
         },
@@ -316,15 +317,12 @@
             var margin =  this.margin,
                 width = this.width;
 
-            this.tree = d3.layout.tree().nodeSize([0, this.stepSize]);
+	    //var self = this;
+	    var container = this.$elem;
 
-            var $mainview = $('<div id="mainview">').css({'overflow-x' : 'scroll'});
-            this.$elem.append($mainview);
+	    // spinning wheel
+	    //container.prepend("<div><img src=\""+self.options.loadingImage+"\">&nbsp;&nbsp;loading genes data...</div>");
 
-            this.svg = d3.select($mainview[0]).append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             var SEEDTree = this.SEEDTree;
             var subsysToGeneMap = this.subsysToGeneMap;
@@ -345,7 +343,25 @@
             }, this));
 
             $.when(prom).done($.proxy(function(genome) {
+		container.empty();
                 var genomeObj = genome[0].data;
+		var tax_domain = genomeObj.domain;
+
+		this.tree = d3.layout.tree().nodeSize([0, this.stepSize]);
+		
+		var $mainview = $('<div id="mainview">').css({'overflow-x' : 'scroll'});
+		container.append($mainview);
+		
+		this.svg = d3.select($mainview[0]).append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		// doesn't work for Euks yet
+		if (tax_domain === "Eukaryota") {
+		    container.prepend(('<b>Functional Categories not yet available for '+tax_domain+'</b>'));
+		    return this;
+		}
 
                 /*
                     First I am going to iterate over the Genome Typed Object and 
