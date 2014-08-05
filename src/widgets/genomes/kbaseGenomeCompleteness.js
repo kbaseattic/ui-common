@@ -192,7 +192,7 @@
 			for (var tax_group in group_total) {
 			    if (group_tally[tax_group] === 0)
 				continue;
-			    container.append(('<div />'+tax_group+' Markers Seen: '+group_tally[tax_group]+' / '+group_total[tax_group]));
+			    container.append(('<div />'+tax_group+' Single-copy Markers Seen: '+group_tally[tax_group]+' / '+group_total[tax_group]));
 			}
 
 			// show table
