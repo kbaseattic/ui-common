@@ -270,7 +270,7 @@
 											// "sPaginationType": "full_numbers",
 											"iDisplayLength": 4,
 											"sDom": sDom,
-											"aaSorting" : [[3,'desc']],
+											"aaSorting" : [],
 											"aoColumns": [
 												{sTitle: "Journal", mData: "source"},
 												{sTitle: "Authors", mData: "author"},
