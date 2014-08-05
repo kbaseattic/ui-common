@@ -181,7 +181,7 @@
 								"-webkit-border-radius": "1px",
 								"border-radius": "1px"})
 								.addClass(cssClass)   
-								.val(i)
+								.val(block.index)
 								.on("mouseover", 
 									function() { 
 										if (!$(this).hasClass('picked')) {

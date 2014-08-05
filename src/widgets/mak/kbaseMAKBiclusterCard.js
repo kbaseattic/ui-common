@@ -87,19 +87,19 @@
 			.then(
 				function(data){
 					
-					$biclusterOverview.append($("<div />")
-							.append("<h3>heatmap</h3>")
-							.append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
+					// $biclusterOverview.append($("<div />")
+							// .append("<h3>heatmap</h3>")
+							// .append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
 
-					self.$elem.find("#toggle_heatmap").click(function() {
-						loader.show()
+					// self.$elem.find("#toggle_heatmap").click(function() {
+						// loader.show()
 						
-						if (d3.select("#heatmap").empty()) self.trigger("showHeatMap", {bicluster: data[0].data, ws: self.options.ws, id: self.bicluster.bicluster_id, tiles: tiles, mak: this.options.bicluster[0], event: event})
-						$("#heatmap").toggle();
-						loader.hide()
+						// if (d3.select("#heatmap").empty()) self.trigger("showHeatMap", {bicluster: data[0].data, ws: self.options.ws, id: self.bicluster.bicluster_id, tiles: tiles, mak: self.options.bicluster[0], event: event})
+						// $("#heatmap").toggle();
+						// loader.hide()
 						
-					});
-					if (d3.select("#heatmap").empty()) self.trigger("showHeatMap", {bicluster: data[0].data, ws: self.options.ws, id: self.bicluster.bicluster_id, tiles: tiles, mak: self.options.bicluster[0]})
+					// });
+					if (d3.select("#heatmapDiv").empty()) self.trigger("showHeatMap", {bicluster: data[0].data, ws: self.options.ws, id: self.bicluster.bicluster_id, tiles: tiles, mak: self.options.bicluster[0]})
 					loader.hide()
 				}
 			)						
