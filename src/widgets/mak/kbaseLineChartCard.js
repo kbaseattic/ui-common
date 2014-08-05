@@ -21,7 +21,9 @@
 		},
 		
 		lineDrawer: function(values,conditions,gene_label,x,y,color_ind,drawCircle,graph,colorScale) {
-						
+			
+			self = this;
+			
 			var datadict = []
 
 			for (i=0;i<values.length;i++) {
@@ -50,6 +52,7 @@
 				.style({"stroke-width":3,"stroke":colorScale(color_ind),"fill":"none"})
 				.on("mouseover", 
 							function(d) { 
+								console.log(self)
 								d3.select(this).style("stroke", d3.rgb(d3.select(this).style("stroke")).darker()); 
 								self.tooltip = self.tooltip.text(d.gene_label);
 								return self.tooltip.style("visibility", "visible"); 
@@ -195,6 +198,7 @@
 				.selectAll("g.x.axis > g.tick > text")
 				.on("mouseover", 
                                 function(d,i) { 
+									console.log(self)
                                     d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
                                     self.tooltip = self.tooltip.text(conditions[i]);
                                     return self.tooltip.style("visibility", "visible"); 
@@ -229,7 +233,7 @@
 				type: "LineChartCard",
 				row: this.options.row,
 				id: this.options.id,
-				ws: this.options.ws,
+				workspace: this.options.workspace,
 				auth: this.options.auth,
 				userId: this.options.userId,
 				title: "LineChart Card",

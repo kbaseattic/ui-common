@@ -51,17 +51,19 @@
 			// console.log(this.options.ws)
 			// console.log(this.options.id)
 			
-            this.workspaceClient.get_objects([{workspace: this.options.ws, name: this.options.id}], 
+            this.workspaceClient.get_objects([{workspace: this.options.workspace, name: this.options.id}], 
 				
 				function(data){
 					console.log(data)
 					self.collection = data[0];
 					self.$elem.append("<h3>MAK Run Info</h3>");
+					
 					var temp = document.URL.indexOf("/functional-site")
 					var baseURL = document.URL.substring(0,temp)					
 					temp = self.collection.data.parameters.genome_id.indexOf(".")
-					var genome = self.collection.data.parameters.genome_id.substring(temp+1)
-			        self.$elem.append($("<div />")
+					var genome = self.collection.data.parameters.genome_id.substring(temp+1)			    				
+					
+					self.$elem.append($("<div />")
 					.append($("<table/>").addClass("kbgo-table")
 					    .append(self.collection.data.id!=-1 ? $("<tr/>").append("<td>ID</td><td>" + self.collection.data.id + "</td>") : '')
 					    .append(self.collection.data.start_time!=-1 ? $("<tr/>").append("<td>Run started </td><td>" + self.collection.data.start_time + "</td>") : '')
@@ -74,7 +76,7 @@
                         .append(self.collection.data.sets[0].max_conditions!=-1 ? $("<tr/>").append("<td>Max conditions for bicluster in set</td><td>" + self.collection.data.sets[0].max_conditions + "</td>") : '')
                         .append(self.collection.data.sets[0].taxon!=-1 ? $("<tr/>").append("<td>NCBI taxonomy id</td><td>" + self.collection.data.sets[0].taxon + "</td>") : '')
                         .append(self.collection.data.sets[0].bicluster_type!=-1 ? $("<tr/>").append("<td>Type of bicluster</td><td>" + self.collection.data.sets[0].bicluster_type + "</td>") : '')
-						.append("<td>Genome</td><td>" + "<a href=" +baseURL+"/functional-site/#/genomes/KBasePublicGenomesV3/kb%7Cg." + genome + " target=_blank>Link to Genome Landing Page</a>" + "</td>")
+						.append("<td>Genome</td><td>" + "<a href=" +baseURL+"/functional-site/#/genomes/KBasePublicGenomesV3/kb%7Cg." + genome + " target=_blank>"+self.collection.data.parameters.genome_id+"</a>" + "</td>")
 					));														
 					
 					self.$elem.append("<h3>Bicluster List</h3>");
@@ -141,11 +143,26 @@
             return {
                 type: "MAKResult",
                 id: this.options.id,
-                ws: this.options.ws,
+                workspace: this.options.workspace,
                 title: "MAK Result Overview"
             };
         },
 
+		buildObjectIdentity: function(workspaceID, objectID) {
+            var obj = {};
+            if (/^\d+$/.exec(workspaceID))
+                obj['wsid'] = workspaceID;
+            else
+                obj['workspace'] = workspaceID;
+
+            // same for the id
+            if (/^\d+$/.exec(objectID))
+                obj['objid'] = objectID;
+            else
+                obj['name'] = objectID;
+            return obj;
+        },
+		
         showMessage: function(message) {
             var span = $("<span/>").append(message);
 

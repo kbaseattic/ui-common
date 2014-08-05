@@ -1223,15 +1223,16 @@
                 this.addNewCard("KBaseMAKResultCard",
                     {
                         id: this.options.data.id,
-                        ws: this.options.data.ws,
+                        workspace: this.options.data.workspace,
                         auth: this.options.auth,
                         userId: this.options.userId,
+						kbCache: this.options.data.kbCache,
                         loadingImage: this.options.loadingImage,
                         isInCard: true
                     },
                     {
-                        my: "left top",
-                        at: "left bottom",
+                        my: "bottom",
+                        at: "front",
                         of: "#app"
                     }
                  );
@@ -1239,15 +1240,16 @@
 				this.addNewCard("KBaseMAKTilingCard",
 					{
 						id: this.options.data.id,
-                        ws: this.options.data.ws,
+                        workspace: this.options.data.workspace,
                         auth: this.options.auth,
                         userId: this.options.userId,
+						kbCache: this.options.data.kbCache,
                         loadingImage: this.options.loadingImage,
                         isInCard: true
 					},
 					{
-						my: "left top",
-                        at: "right bottom",
+						my: "right top",
+                        at: "left bottom",
                         of: "#app"
 					}
 				);
@@ -1257,7 +1259,7 @@
 		showFloatMAKCards: function() {		
 			self = this;
 			this.workspaceClient = new Workspace(this.newWorkspaceServiceUrl, { 'token' : this.options.data.auth, 'user_id' : this.options.data.userId});
-			this.workspaceClient.get_objects([{workspace: this.options.data.ws, name: this.options.data.id}],
+			this.workspaceClient.get_objects([{workspace: this.options.data.workspace, name: this.options.data.id}],
 				function(data) {
 					console.log(data)
 					console.log(self.options.data)
@@ -1265,7 +1267,7 @@
 						{
 							id: self.options.data.id,
 							bicluster: data[0].data,							
-							ws: self.options.data.ws,
+							workspace: self.options.data.workspace,
 							auth: self.options.auth,
 							userId: self.options.userId,
 							loadingImage: self.options.loadingImage,
@@ -1506,7 +1508,7 @@
 					{
 						terms: data.terms,
 						id: data.id,
-						ws: data.ws
+						workspace: data.workspace
 					},
 					{
 						my: "left",
@@ -1527,7 +1529,7 @@
 						heatmap: data.heatmap,
 						widget: data.widget,
 						id: data.id,
-						ws: data.ws
+						workspace: data.workspace
 					},
 					{
 						my: "right bottom",
@@ -1547,7 +1549,7 @@
 				{
 					bicluster: data.bicluster,
 					id: data.id,
-					ws: data.ws,
+					workspace: data.workspace,
 					tiles: data.tiles,
 					mak: data.mak
 				},
@@ -2027,7 +2029,7 @@
                     {
                         bicluster: data.bicluster,
 						id: data.id,
-						ws: data.ws,
+						workspace: data.workspace,
 						tiles: data.tiles,
                         showButtons: true,
                         centerFeature: data.centerFeature

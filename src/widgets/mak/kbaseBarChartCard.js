@@ -31,7 +31,7 @@
         render: function(options) {
 			
 			self = this;
-			console.log(self.options.ws)
+			console.log(self.options.workspace)
 			
 			self.tooltip = d3.select("body")
                              .append("div")
@@ -148,7 +148,7 @@
             return {
                 type: "MAKResult BarChart",
                 id: this.options.id,
-                ws: this.options.ws,
+                workspace: this.options.workspace,
                 title: "MAK Result Overview Bar Chart"
             };
         },

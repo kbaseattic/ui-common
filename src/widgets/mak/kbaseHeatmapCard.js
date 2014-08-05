@@ -39,7 +39,7 @@
 				$.each(tiles,function(i,d) {				
 					d.on("click", function() {
 						$mainDiv.empty()					
-						$.when(self.workspaceClient.get_objects([{workspace: self.options.ws, name: mak[d.val()].bicluster_id}]))
+						$.when(self.workspaceClient.get_objects([{workspace: self.options.workspace, name: mak[d.val()].bicluster_id}]))
 						.then(function(data) {
 							self.options.bicluster = data[0].data
 							self.render()
@@ -159,7 +159,7 @@
 				.on("click",function(d,i,event){
 					// if (!$("div.kblpc-subtitle:contains('"+d.id+"')").length) {self.trigger("showFeature", {featureID: d.id, event: event})}
 					// self.trigger("showFeature", {featureID: d.id, event: event})
-					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], id: self.options.id, ws: self.options.ws, heatmap: geneLabels, widget: self, event: event})
+					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], id: self.options.id, workspace: self.options.workspace, heatmap: geneLabels, widget: self, event: event})
 					if ($(this).css("font-weight") == 400) $(this).css({"font-weight":900,"font-size":"medium"})
 					else $(this).css({"font-weight":400,"font-size":"small"})
 				})						
@@ -274,7 +274,7 @@
 			return {
 				type: "HeatMapCard",
 				id: this.options.id,
-				ws: this.options.ws,
+				workspace: this.options.workspace,
 				auth: this.options.auth,
 				userId: this.options.userId,
 				title: "HeatMap Card",

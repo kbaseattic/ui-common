@@ -83,10 +83,10 @@
 			//Heatmap			
 					
 								
-			$.when(this.workspaceClient.get_objects([{workspace: self.options.ws, name: self.bicluster.bicluster_id}]))
+			$.when(this.workspaceClient.get_objects([{workspace: self.options.workspace, name: self.bicluster.bicluster_id}]))
 			.then(
 				function(data){
-					
+					console.log(data)
 					// $biclusterOverview.append($("<div />")
 							// .append("<h3>heatmap</h3>")
 							// .append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
@@ -99,7 +99,7 @@
 						// loader.hide()
 						
 					// });
-					if (d3.select("#heatmapDiv").empty()) self.trigger("showHeatMap", {bicluster: data[0].data, ws: self.options.ws, id: self.bicluster.bicluster_id, tiles: tiles, mak: self.options.bicluster[0]})
+					if (d3.select("#heatmapDiv").empty()) self.trigger("showHeatMap", {bicluster: data[0].data, workspace: self.options.workspace, id: self.bicluster.bicluster_id, tiles: tiles, mak: self.options.bicluster[0]})
 					loader.hide()
 				}
 			)						
@@ -155,9 +155,9 @@
 			
             var $termsTable = '<table id="terms-table' + self.bicluster.id + '" class="kbgo-table">';
             $termsTable += "<tr><th>Key</th><th>Value</th></tr>";
-
+			console.log(self.bicluster)
             for (var enrichedTerm in self.bicluster.enriched_terms) {
-                $termsTable += "<tr><td>" + enrichedTerm.key + "</td><td>" + enrichedTerm.value + "</td></tr>";
+                $termsTable += "<tr><td>" + enrichedTerm + "</td><td>" + self.bicluster.enriched_terms[enrichedTerm] + "</td></tr>";
             }
 
             $termsTable += "</table>";
@@ -173,7 +173,7 @@
             return {
                 type: "MAKBicluster",
                 id: this.options.bicluster[0][this.options.bicluster[1]].bicluster_id,
-                ws: this.options.ws,
+                workspace: this.options.workspace,
                 title: "MAK Bicluster"
             };
         },
