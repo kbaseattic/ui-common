@@ -48,7 +48,8 @@ kb_define('kbaseButtonControls',
             controls : [],
             onMouseover : true,
             position : 'top',
-            type : 'floating'
+            type : 'floating',
+            posOffset : '0px',
         },
 
         init: function(options) {
@@ -117,7 +118,7 @@ kb_define('kbaseButtonControls',
             if (this.options.type == 'floating') {
                 $controlButtons
                     .css('right', '0px')
-                    .css(this.options.position, '0px')
+                    .css(this.options.position, this.options.posOffset)
                     .css('position', 'absolute')
                     .css('margin-right', '3px')
                     .attr('z-index', 10000)

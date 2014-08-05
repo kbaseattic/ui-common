@@ -231,6 +231,7 @@ kb_define('kbaseIrisTerminalWidget',
                 this.data('outputWrapper').kbaseButtonControls(
                     {
                         position : 'bottom',
+                        posOffset : '-20px',
                         context : this,
                         controls : [
                             {

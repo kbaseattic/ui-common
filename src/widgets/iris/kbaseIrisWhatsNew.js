@@ -25,6 +25,7 @@ kb_define('kbaseIrisWhatsNew',
                     notes : [
                         "The <b>view</b> command now scales an image to fit within the terminal window. Click on the image to download it full size.",
                         "Clicking the right arrow button on the file browser now no longer prepends a leading slash to the file name.",
+                        "Clicking the right arrow button on the file browser now properly respects subdirectories",
                         "File Editor can now properly edit files in subdirectories.",
                         "Files can now be created via the <b>edit</b> <i>newfilename</i> command.",
                           "Added visualization widgets. Type <b>widget</b> <i>widgetname</i> <i>jsondata</i> to display. Available visualization widgets are:"
@@ -38,6 +39,8 @@ kb_define('kbaseIrisWhatsNew',
                         "Terminal will now resize with the window",
                         "Clicking on file names in the file browser will now open them in a new tab",
                         "Clicking on file names after an ls will now open in a new tab; added explicit download button",
+                        "Fixed a bug that could cause a blank directory listing upon initial log in",
+                        "Now remembers the last typed unrun command when browsing up and down through command history",
                     ]
                 },
                 {

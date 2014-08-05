@@ -184,6 +184,8 @@ kb_define('kbaseIrisFileBrowser',
 
             this._super(options)
 
+            this.selectedFiles({});
+
             this.listDirectory(this.options.root, $.proxy(function (results) {
                 this.appendContent(results, this.data('ul-nav'))
             }, this));

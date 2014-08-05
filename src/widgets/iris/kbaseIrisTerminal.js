@@ -740,6 +740,8 @@ kb_define('kbaseIrisTerminal',
 
             if (event.which == 13) {
 
+                this.unsubmittedCommand = undefined;
+
                 if (event.metaKey || event.altKey || event.ctrlKey) {
                     return;
                 }
@@ -773,6 +775,11 @@ kb_define('kbaseIrisTerminal',
 
             if (event.which == 38) {
                 event.preventDefault();
+
+                if (this.unsubmittedCommand == undefined) {
+                    this.unsubmittedCommand = this.input_box.val();
+                }
+
                 if (this.commandHistoryPosition > 0) {
                     this.commandHistoryPosition--;
                 }
@@ -780,10 +787,21 @@ kb_define('kbaseIrisTerminal',
             }
             else if (event.which == 40) {
                 event.preventDefault();
+
+                if (this.unsubmittedCommand == undefined) {
+                    this.unsubmittedCommand = this.input_box.val();
+                }
+
                 if (this.commandHistoryPosition < this.commandHistory.length) {
                     this.commandHistoryPosition++;
                 }
-                this.input_box.val(this.commandHistory[this.commandHistoryPosition]);
+
+                if (this.commandHistoryPosition == this.commandHistory.length && this.unsubmittedCommand != undefined) {
+                    this.input_box.val(this.unsubmittedCommand);
+                }
+                else {
+                    this.input_box.val(this.commandHistory[this.commandHistoryPosition]);
+                }
             }
             else if (event.which == 39) {
                 if (this.options.commandsElement) {
@@ -1199,6 +1217,22 @@ kb_define('kbaseIrisTerminal',
         selectWidget : function($widget) {
             this.selectedWidgets.push($widget);
             $widget.setIsSelected(true);
+
+            var newSelection = [];
+
+            $.each(
+                this.subWidgets(),
+                function (idx, $widget) {
+                    if ($widget.isSelected()) {
+                        newSelection.push($widget);
+                    }
+                }
+            );
+
+            this.selectedWidgets = newSelection;
+
+            return $widget;
+
         },
 
         deselectWidget : function ($widget) {

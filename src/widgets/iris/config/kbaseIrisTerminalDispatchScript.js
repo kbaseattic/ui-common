@@ -121,7 +121,6 @@ kb_define('kbaseIrisTerminalDispatchScript',
                     $.each(
                         this.fileBrowsers,
                         function (idx, $fb) {
-
                             $.each(
                                 $fb.selectedFiles(),
                                 function (file, isSelected) {

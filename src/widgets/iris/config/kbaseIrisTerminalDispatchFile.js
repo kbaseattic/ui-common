@@ -36,7 +36,12 @@ kb_define('kbaseIrisTerminalDispatchFile',
                     else if (args[0] == '') {
                         dir = '/';
                     }
-                    dir = args[0];
+                    else if (args[0] == '~') {
+                        dir = '/';
+                    }
+                    else {
+                        dir = args[0];
+                    }
 
                     this.client().change_directory(
                         this.sessionId(),
