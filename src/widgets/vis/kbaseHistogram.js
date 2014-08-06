@@ -19,6 +19,8 @@ kb_define('kbaseHistogram',
             scaleAxes : true,
             height : '500px',
             xPadding : 80,
+
+            yPadding : 40,
         },
 
         _accessors : [
@@ -102,6 +104,59 @@ kb_define('kbaseHistogram',
 
 
         },
+
+        renderXLabel : function() {
+            var yGutterBounds = this.yGutterBounds();
+
+            var xLabeldataset = [this.xLabel()];
+
+            var xLabel = this.D3svg().select( this.region('yPadding') ).selectAll('.xLabel');
+            xLabel
+                .data(xLabeldataset)
+                    .text( this.xLabel() )
+                .enter()
+                    .append('text')
+                        .attr('class', 'xLabel')
+                        .attr('x', yGutterBounds.size.width / 2)
+                        .attr('y', 25 + yGutterBounds.size.height / 2 + 3)
+                        .attr('text-anchor', 'middle')
+                        .attr('font-size', '11px')
+                        .attr('font-family', 'sans-serif')
+                        .attr('fill', 'black')
+                        .text(this.xLabel());
+            ;
+
+        },
+
+        renderYLabel : function() {
+
+            var xGutterBounds = this.xGutterBounds();
+
+            var yLabeldataset = [this.yLabel()];
+
+            var xLabel = this.D3svg().select( this.region('xPadding') ).selectAll('.yLabel');
+            xLabel
+                .data(yLabeldataset)
+                    .text( this.yLabel() )
+                .enter()
+                    .append('text')
+                        .attr('class', 'yLabel')
+                        .attr('x', xGutterBounds.size.width / 2)
+                        .attr('y', 10 + xGutterBounds.size.height / 2 + 3)
+                        .attr('text-anchor', 'middle')
+                        .attr('font-size', '11px')
+                        .attr('font-family', 'sans-serif')
+                        .attr('fill', 'black')
+                        .attr('transform', 'rotate(270,'
+                            + (xGutterBounds.size.width / 2 - 7)
+                            + ','
+                            + xGutterBounds.size.height / 2
+                            + ')')
+                        .text(this.yLabel());
+            ;
+
+        },
+
 
 
 
