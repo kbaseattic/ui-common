@@ -166,13 +166,12 @@ $.each(
 
                     cluster_gene_data.gene_data.push(
                         {
-                            external_id : node.user_annotations.external_id,
+                            external_id : node.user_annotations.external_id || node.entity_id,
                             kbase_id : node.entity_id,
-                            func : node.user_annotations.functions,
+                            func : node.user_annotations.functions || '',
                             cluster : cluster_gene_data.cluster_id,
                         }
                     );
-
 
                     node.func = node.user_annotations.functions;
 
