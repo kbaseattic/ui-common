@@ -1328,6 +1328,7 @@ angular.module('ws-directives')
                     }
 
                     // determine if saved to favorites
+                    /*
                     var isFav = false;
                     for (var i in scope.favs) { 
                         if (scope.favs[i].ws != ws) continue;
@@ -1335,7 +1336,7 @@ angular.module('ws-directives')
                             isFav = true;
                             break;
                         } 
-                    }
+                    }*/
 
                     // get url path specified in landing_page_map.json
                     if (module in scope.obj_mapping && scope.obj_mapping[module] 
@@ -1359,7 +1360,7 @@ angular.module('ws-directives')
                                         'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
                                         'data-sub="'+sub+'" ui-sref="'+url+'" >'+
                                     name+'</a> (<a class="show-versions">'+instance+'</a>)'+
-                                    (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
+                                    //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
                                     '<a class="btn-show-info hide pull-right">More</a>';
 
                     } else if (kind == "Narrative") {
@@ -1368,7 +1369,7 @@ angular.module('ws-directives')
                                         'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
                                         'data-sub="'+sub+'" '+(USER_ID ? 'href="'+url+'"' : '')+' target="_blank"><i><b>'+
                                       name+'</b></i></a> (<a class="show-versions">'+instance+'</a>)'+
-                                      (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
+                                      //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
                                      '<a class="btn-show-info hide pull-right">More</a>';
 
                     } else {
@@ -1377,7 +1378,7 @@ angular.module('ws-directives')
                                         'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
                                         'data-sub="'+sub+'" ui-sref="'+url+'" target="_blank" >'+
                                       name+'</a> (<a class="show-versions">'+instance+'</a>)'+
-                                      (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
+                                      //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
                                      '<a class="btn-show-info hide pull-right">More</a>';
                     }
 
@@ -1577,20 +1578,11 @@ angular.module('ws-directives')
                     <span class="glyphicon glyphicon-star"></span>\
                     <span class="checked-count"></span></button>');                                      
 
-                options.append(delete_btn, copy_btn, rename_btn)//, mv_btn);
-
-                // narrative home should be 'deprecated'
-                // if user has narrative home workspace, add option to copy there
-                //if (scope.workspace_dict[USER_ID+':home']) {
-                //    var dd = options.find('.dropdown-menu')
-                //    dd.append('<li class="divider"></li>');
-                //    dd.append('<li><a class="btn-mv-obj-to-nar">Copy to Narrative Home</a></li>');
-                //}
-
-                //options.find('.btn-mv-obj').on('click', moveObjects);
                 if (scope.tab) {
+                    options.append(delete_btn, rename_btn)
                     copy_btn.find('.btn-cp-obj').on('click', copyNarObjects);
                 } else {
+                    options.append(delete_btn, copy_btn, rename_btn)                    
                     copy_btn.find('.btn-cp-obj').on('click', copyObjects);
                 }
 
@@ -1599,7 +1591,6 @@ angular.module('ws-directives')
                 mv_btn.on('click', addToMV);
 
                 var container = $('.table-options').append(options);
-                //options.addClass('hide')
 
                 delete_btn.tooltip({title: 'Delete selected objects', placement: 'bottom', delay: {show: 700}});
                 //copy_btn.tooltip({title: 'Copy; click for options', placement: 'bottom', delay: {show: 700}});  
