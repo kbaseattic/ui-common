@@ -65,7 +65,8 @@
         "ProbabilisticAnnotation" : null,
         "ContigSet" : null,
         "Genome" : "genomes",
-        "MetagenomeAnnotation" : null
+        "MetagenomeAnnotation" : null,
+        "Pangenome" : "pangenome"
     },
 
     "KBaseGwasData" : {
@@ -155,7 +156,8 @@
     },
     
     "KBaseTrees" : {
-    	"Tree" : "tree"
+    	"Tree" : "tree",
+    	"MSA" : "msa"
     }
 
 }
