@@ -21,7 +21,7 @@ kb_define('kbaseIrisWhatsNew',
             history : [
                 {
                     version : "0.0.8",
-                    date : "XX/XX/2014",
+                    date : "08/06/2014",
                     notes : [
                         "The <b>view</b> command now scales an image to fit within the terminal window. Click on the image to download it full size.",
                         "Clicking the right arrow button on the file browser now no longer prepends a leading slash to the file name.",

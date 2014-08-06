@@ -83,6 +83,7 @@ print <<"eKBPaths";
                 'd3'          : "../../ext/d3/d3.v3.min",
                 'colorbrewer' : "../../ext/colorbrewer/colorbrewer",
                 'handlebars'  : '../../ext/handlebars/handlebars-v1.3.0',
+                'bowser'      : "../../ext/bowser/bowser.min",
 $pathsStr
             },
             shim : {
