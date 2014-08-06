@@ -497,12 +497,19 @@ function KBCacheClient(token) {
                 break; 
             case 'PhenotypeSimulationSet': 
                 route = 'ws.simulation';
-                break;     
-            case 'Pangenome':
-                route = 'ws.pangenome';
-                break;                            
+                break;  
+            // remove next block cause it's described in landing_page_map.json
+            //case 'Pangenome':
+            //    route = 'ws.pangenome';
+            //    break;                            
             case 'Genome': 
                 route = 'genomesbyid';
+                break;
+	    case 'MAKResult':
+		route = 'mak';
+		break;
+	    case 'FloatDataTable':
+                route = 'floatdatatable';
                 break;
         }
         return route;

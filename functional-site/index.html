@@ -28,9 +28,9 @@
         <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/font-awesome-4.0.3/css/font-awesome.css" />
         <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.css" />
 
-
         <!-- External javascript packages -->
         <script src="../ext/bowser/bowser.min.js"></script>
+		<script src="../ext/underscore-min/underscore-min.js"></script>
 
         <!-- Google Analytics -->
         <script>
@@ -92,7 +92,8 @@
         <script src="assets/js/kbclient/userandjobstate.js"></script>        
         <script src="assets/js/kbclient/wikiScraper.js"></script>
         <script src="assets/js/kbclient/kbaseTrees.js"></script>        
-
+	<script src="assets/js/kbclient/KBaseExpressionClient.js"></script>
+        <script src="assets/js/widgetMaxWidthCorrection.js"></script>        
 
         <!-- widgets -->
         <script src="../src/kbwidget.js"></script>
@@ -176,8 +177,10 @@
         <script  src="../src/widgets/genomes/kbaseObjectMeta.js"></script>
         <script  src="../src/widgets/genomes/kbaseGenomeLineage.js"></script>
         <script  src="../src/widgets/kbaseCardLayoutManager.js"></script>
-	    <script  src="../src/widgets/genomes/kbaseSEEDFunctions.js"></script>
-	    <script  src="../src/widgets/genomes/kbaseGenomeGeneTable.js"></script>
+	<script  src="../src/widgets/genomes/kbaseGenomeCompleteness.js"></script>
+	<script  src="../src/widgets/genomes/kbaseSEEDFunctions.js"></script>
+	<script  src="../src/widgets/genomes/kbaseGenomeGeneTable.js"></script>
+	<script  src="../src/widgets/genomes/kbaseGeneExprLinePlot.js"></script>
         <!-- End Genome widgets -->
     
         <!-- Taxonomy widgets -->
@@ -245,7 +248,7 @@
         <!-- GWAS widgets -->
         <link rel="stylesheet" type="text/css" href="assets/css/gwas.css" />
         <script src='../src/widgets/kbaseAuthenticatedWidget.js'></script>
-        <script src="http://maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
+        <script src="//maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
         <script src='../ext/gmaps/gmap3.js'></script>
         <script src="../src/widgets/gwas/kbaseGWASPop.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASPopTable.js"></script>
@@ -273,6 +276,7 @@
         <!-- End Spec widgets -->
 
         <script src="../src/widgets/trees/kbaseTree.js"></script>
+        <script src="../src/widgets/trees/kbaseMSA.js"></script>
         <script src="lib/trees/canvastext.js"></script>
         <script src="lib/trees/excanvas.js"></script>
         <script src="lib/trees/menu.js"></script>            
@@ -335,7 +339,7 @@
                         <li ng-class="{ active: $state.includes('search')}">
                             <a ng-click="newSearch()" ng-controller="searchBarController">Search Data</a>
                         </li>
-                        <li><a href="http://kbase.us/services/docs/uploader/uploader.html">Upload</a></li>          
+                        <li><a href="//kbase.us/services/docs/uploader/uploader.html">Upload</a></li>          
                     </ul>
 
                     <!--
@@ -371,3 +375,4 @@
     </body>
 
 </html>
+

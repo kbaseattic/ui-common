@@ -152,8 +152,12 @@
 		}
                 self.$infoTable.append(self.makeRow("Length", len));
                 self.$infoTable.append(self.makeRow("Location", $("<div/>")
-                                                            .append(self.parseLocation(data.featureData.feature_location))
-                                                            .append(self.makeContigButton(data.featureData.feature_location))));
+                                                            .append(self.parseLocation(data.featureData.feature_location))));
+		                                            //.append(self.parseLocation(data.featureData.feature_location))
+		                                            //.append(self.makeContigButton(data.featureData.feature_location))));
+                self.$infoTable.append(self.makeRow("Aliases", data.featureData.feature_aliases.join(", ")));
+
+
 
                 //self.$infoTable.append(self.makeRow("GC Content", self.calculateGCContent(data.dnaSeq).toFixed(2) + "%"));
 
@@ -231,11 +235,10 @@
                         console.log(JSON.stringify(feature));
                         this.$infoTable.empty();
                         /* Function
-                         * Genome + button
+                         * Genome + link
                          * Length
-                         * Location + button
-                         * GC Content (maybe)
-                         * Protein Families
+                         * Location
+			 * Aliases
                          */
 
                         // Figure out the function.
@@ -267,10 +270,18 @@
 			}
                         this.$infoTable.append(this.makeRow("Length", len));
 
-                        // Make a contig button
                         this.$infoTable.append(this.makeRow("Location", $("<div/>")
-                                                            .append(this.parseLocation(feature.location))
-                                                            .append(this.makeContigButton(feature.location))));
+                                                            .append(this.parseLocation(feature.location))));
+			                                    //.append(this.parseLocation(feature.location))
+			                                    //.append(this.makeContigButton(feature.location))));
+
+			// Aliases
+			var aliasesStr = "No known aliases";
+			if (feature.aliases)
+			    aliasesStr = feature.aliases.join(", ");
+			self.$infoTable.append(self.makeRow("Aliases", aliasesStr));
+			// end Aliases
+
 
                         // LOL GC content. Does anyone even care these days?
                         //if (feature.dna_sequence) {

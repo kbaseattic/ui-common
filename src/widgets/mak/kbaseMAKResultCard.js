@@ -5,8 +5,6 @@
         version: "1.0.0",
 
         options: {
-            id: null,
-            workspaceID: null,
             loadingImage: "../../widgets/images/ajax-loader.gif",
             title: "MAK Result Overview",
             isInCard: false,
@@ -15,7 +13,7 @@
         },
 
 //        workspaceURL: "https://kbase.us/services/workspace",
-        newWorkspaceServiceUrl: "http://dev04.berkeley.kbase.us:7058", 
+        newWorkspaceServiceUrl: "https://kbase.us/services/ws", 
 		
 		//"http://dev04.berkeley.kbase.us:7058", //"https://kbase.us/services/ws", //http://140.221.84.209:7058/",
 
@@ -50,15 +48,22 @@
 
 			//"MAKbiclusters"
 			//"SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"
-			console.log(this.options.workspaceID)
+			// console.log(this.options.ws)
 			// console.log(this.options.id)
 			
-            this.workspaceClient.get_objects([{workspace: "MAKbiclusters", name: "SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"}], 
+            this.workspaceClient.get_objects([{workspace: this.options.workspace, name: this.options.id}], 
 				
 				function(data){
+					console.log(data)
 					self.collection = data[0];
 					self.$elem.append("<h3>MAK Run Info</h3>");
-			        self.$elem.append($("<div />")
+					
+					var temp = document.URL.indexOf("/functional-site")
+					var baseURL = document.URL.substring(0,temp)					
+					temp = self.collection.data.parameters.genome_id.indexOf(".")
+					var genome = self.collection.data.parameters.genome_id.substring(temp+1)			    				
+					
+					self.$elem.append($("<div />")
 					.append($("<table/>").addClass("kbgo-table")
 					    .append(self.collection.data.id!=-1 ? $("<tr/>").append("<td>ID</td><td>" + self.collection.data.id + "</td>") : '')
 					    .append(self.collection.data.start_time!=-1 ? $("<tr/>").append("<td>Run started </td><td>" + self.collection.data.start_time + "</td>") : '')
@@ -71,24 +76,40 @@
                         .append(self.collection.data.sets[0].max_conditions!=-1 ? $("<tr/>").append("<td>Max conditions for bicluster in set</td><td>" + self.collection.data.sets[0].max_conditions + "</td>") : '')
                         .append(self.collection.data.sets[0].taxon!=-1 ? $("<tr/>").append("<td>NCBI taxonomy id</td><td>" + self.collection.data.sets[0].taxon + "</td>") : '')
                         .append(self.collection.data.sets[0].bicluster_type!=-1 ? $("<tr/>").append("<td>Type of bicluster</td><td>" + self.collection.data.sets[0].bicluster_type + "</td>") : '')
-					));
+						.append("<td>Genome</td><td>" + "<a href=" +baseURL+"/functional-site/#/genomes/KBasePublicGenomesV3/kb%7Cg." + genome + " target=_blank>"+self.collection.data.parameters.genome_id+"</a>" + "</td>")
+					));														
 					
-					self.$elem.append("<h3>View biclusters</h3>");
+					self.$elem.append("<h3>Bicluster List</h3>");
 
-					var $dropdown = $("<select />");
+					var $biclusterTable = $("<table/>").addClass("kbgo-table").append($("<td>Bicluster ID</td><td>Full Criterion</td><td>Genes</td><td>Conditions</td>").css("font-weight","bold"));
 					for (var bicluster in self.collection.data.sets[0].biclusters) {
-						$dropdown.append("<option id='" + bicluster + "'>"+self.collection.data.sets[0].biclusters[bicluster].bicluster_id+"; Full Criterion = " + self.collection.data.sets[0].biclusters[bicluster].full_crit.toFixed(4) + "; genes = " + self.collection.data.sets[0].biclusters[bicluster].num_genes + "; conditions = " + self.collection.data.sets[0].biclusters[bicluster].num_conditions + " </option>");
+						// $dropdown.append($("<option id='" + bicluster + "'>"+self.collection.data.sets[0].biclusters[bicluster].bicluster_id+"; Full Criterion = " + self.collection.data.sets[0].biclusters[bicluster].full_crit.toFixed(4) + "; genes = " + self.collection.data.sets[0].biclusters[bicluster].num_genes + "; conditions = " + self.collection.data.sets[0].biclusters[bicluster].num_conditions + " </option>")											
+						$biclusterTable.append($("<tr id='" + bicluster + "'>").append("<td>"+self.collection.data.sets[0].biclusters[bicluster].bicluster_id+"</td><td>" + self.collection.data.sets[0].biclusters[bicluster].full_crit.toFixed(4) + "</td><td>" + self.collection.data.sets[0].biclusters[bicluster].num_genes + "</td><td>" + self.collection.data.sets[0].biclusters[bicluster].num_conditions + "</td>")
+							.on("mouseover",
+								function() {															
+									var tileSelector = self.collection.data.sets[0].biclusters[$(this).attr("id")].bicluster_id.replace(/\./g,'').replace(/\|/,'')
+									if (!$("#MAK_tile_"+tileSelector).hasClass('picked')) d3.select("#MAK_tile_"+tileSelector).style("background", "#00FFCC")			
+								}
+							)
+							.on("mouseout",
+								function() {									
+									var tileSelector = self.collection.data.sets[0].biclusters[$(this).attr("id")].bicluster_id.replace(/\./g,'').replace(/\|/,'')
+									if (!$("#MAK_tile_"+tileSelector).hasClass('picked')) d3.select("#MAK_tile_"+tileSelector).style("background", "steelblue")
+								}
+							)
+						);
 					}
-					self.$elem.append($dropdown);
-					self.$elem.append($("<button class='btn btn-default'>Show Bicluster</button>")
-                                            .on("click", 
-                                                function(event) {
-                                                    $(self.$elem.selector + " > select option:selected").each(function() {
-                                                    self.trigger("showMAKBicluster", { bicluster: [self.collection.data.sets[0].biclusters[$(this).attr("id")],self.collection.data.sets[0]], title: self.collection.data.sets[0].biclusters[$(this).attr("id")].bicluster_id, event: event });
-                                                });
-                                            })
-                                        );
-                                					self.$elem.append("<h3>MAK Run Parameters</h3>");
+					self.$elem.append($biclusterTable);
+					// self.$elem.append($("<button class='btn btn-default'>Show Bicluster</button>")
+                                            // .on("click", 
+                                                // function(event) {
+                                                    // $(self.$elem.selector + " > select option:selected").each(function() {
+                                                    // self.trigger("showMAKBicluster", { bicluster: [self.collection.data.sets[0].biclusters[$(this).attr("id")],self.collection.data.sets[0]], ws: self.options.ws, event: event });
+                                                // });
+                                            // })
+                                        // );
+										
+                    self.$elem.append("<h3>MAK Run Parameters</h3>");
 			        self.$elem.append($("<div />").
 					append($("<table/>").addClass("kbgo-table")
                                             .append($("<tr/>").append("<td>Minimum score</td><td>" + self.collection.data.parameters.min_raw_bicluster_score + "</td>"))
@@ -119,15 +140,29 @@
 
 
         getData: function() {
-			console.log(this.options.workspaceID)
             return {
                 type: "MAKResult",
                 id: this.options.id,
-                workspaceID: this.options.workspaceID,
+                workspace: this.options.workspace,
                 title: "MAK Result Overview"
             };
         },
 
+		buildObjectIdentity: function(workspaceID, objectID) {
+            var obj = {};
+            if (/^\d+$/.exec(workspaceID))
+                obj['wsid'] = workspaceID;
+            else
+                obj['workspace'] = workspaceID;
+
+            // same for the id
+            if (/^\d+$/.exec(objectID))
+                obj['objid'] = objectID;
+            else
+                obj['name'] = objectID;
+            return obj;
+        },
+		
         showMessage: function(message) {
             var span = $("<span/>").append(message);
 

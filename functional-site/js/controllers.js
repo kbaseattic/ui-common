@@ -71,7 +71,14 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 
 .controller('MAKDetail', function($scope, $stateParams) {
     $scope.params = {'id': $stateParams.id,
-                     'ws': $stateParams.ws};
+                     'workspace': $stateParams.ws,
+					 'kbCache' : kb};
+})
+
+.controller('FloatDataTable', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id,
+                     'workspace': $stateParams.ws,
+					 'kbCache' : kb};
 })
 
 .controller('RegpreciseDetail', function($scope, $stateParams) {
@@ -655,6 +662,15 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                      'ws': $stateParams.ws};
 })
 
+.controller('PangenomeDetail', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id,
+                     'ws': $stateParams.ws};
+})
+
+.controller('MSADetail', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id,
+                     'ws': $stateParams.ws};
+})
 
 /* controller for the copy narrative modal */
 var CopyNarrativeModalCtrl = function ($scope, $modalInstance, $location, narr) {

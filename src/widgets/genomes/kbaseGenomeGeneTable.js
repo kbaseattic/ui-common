@@ -105,26 +105,28 @@
             			}
             		}
             		var genesSettings = {
-            				"sPaginationType": "full_numbers",
+            				//"sPaginationType": "full_numbers",
             				"iDisplayLength": 10,
+            				"aaSorting" : [[1,'asc'],[2,'asc']],  // [[0,'asc']],
+					"sDom": 't<fip>',
             				"aoColumns": [
-            				              {sTitle: "Gene ID", mData: "id"}, 
+			                              {sTitle: "Gene ID", mData: "id"}, 
             				              {sTitle: "Contig", mData: "contig"},
-            				              {sTitle: "Start", mData: "start"},
-            				              {sTitle: "Strand", mData: "dir"},
-            				              {sTitle: "Length", mData: "len"},
-            				              {sTitle: "Type", mData: "type"},
-            				              {sTitle: "Function", mData: "func"}
+            				              {sTitle: "Start", mData: "start", sWidth:"7%"},
+            				              {sTitle: "Strand", mData: "dir", sWidth:"7%"},
+            				              {sTitle: "Length", mData: "len", sWidth:"7%"},
+            				              {sTitle: "Type", mData: "type", sWidth:"10%"},
+            				              {sTitle: "Function", mData: "func", sWidth:"45%"}
             				              ],
-            				              "aaData": [],
+            				              "aaData": genesData,
             				              "oLanguage": {
-            				            	  "sSearch": "Search gene:",
+            				            	  "sSearch": "&nbsp&nbspSearch genes:",
             				            	  "sEmptyTable": "No genes found."
             				              },
             				              "fnDrawCallback": geneEvents
             		};
             		var genesTable = $('#'+pref+'genes-table').dataTable(genesSettings);
-            		genesTable.fnAddData(genesData);
+            		//genesTable.fnAddData(genesData);
             }, this));
             $.when(prom).fail($.proxy(function(data) {
             		container.empty();
