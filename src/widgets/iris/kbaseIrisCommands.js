@@ -179,7 +179,7 @@ kb_define('kbaseIrisCommands',
                             },
                             {
                                 name  : 'iris',
-                                title : 'Iris commands',
+                                title : 'IRIS commands',
                                 items : []
                             }
                         );
