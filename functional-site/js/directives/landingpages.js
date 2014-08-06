@@ -191,16 +191,29 @@ angular.module('lp-directives')
         link: function(scope, element, attrs) {
             $(element).loading();
             
+            var run_fba_message = "<h5>There are currently no FBA "+
+                                  "results associated with this model. "+
+                                  "You may want to run FBA analysis.</h5>";
             $.when(scope.ref_obj_prom).done(function() {
                 loadPanel(scope.fba_refs)
-
             }).fail(function() {
-                $(element).html("<h5>There are currently no FBA \
-                                    results associated with this model.\
-                                      You may want to run FBA analysis.</h5>")
+                $(element).html(run_fba_message)
             })
 
             function loadPanel(fba_refs) {
+                // reload table when 
+                console.log('fba_refs', fba_refs)
+                if (fba_refs.length) {
+                    var row = verSelector(fba_refs);
+                    $(element).prepend(row)                    
+                    loadTabs(fba_refs[0].ws, fba_refs[0].name)
+                } else {
+                    $(element).rmLoading();
+                    $(element).html(run_fba_message)                    
+                }
+            }
+
+            function verSelector(fba_refs) {
                 var ver_selector = $('<select class="form-control fba-selector">');
                 for (var i in fba_refs) {
                     var ref = fba_refs[i];
@@ -214,32 +227,24 @@ angular.module('lp-directives')
                     }
                 }
 
-                // set url query string to first 
-                //$location.search({fba: fba_refs[0].name});
-
-                // reload table when 
                 ver_selector.change(function() {
                     var gif_container = $('<div>');
-                    $(this).after(gif_container)
+                    $(this).after(gif_container);
                     gif_container.loading();
 
                     var selected = $(this).find('option:selected')
                     var name = selected.data('name');
                     var ws = selected.data('ws');                    
 
-                    //scope.$apply( $location.search({fba: ws+'/'+name}) ); 
-                    loadTabs(ws, name)                                
+                    loadTabs(ws, name);
                 })
 
                 // form for options on tabs
                 var form = $('<div class="col-xs-5">');
-                form.append(ver_selector)
+                form.append(ver_selector);
                 var row = $('<div class="row">');
-                row.append(form)
-
-                $(element).prepend(row)
-
-                loadTabs(fba_refs[0].ws, fba_refs[0].name)
+                row.append(form);
+                return row;
             }
 
 
@@ -282,10 +287,20 @@ angular.module('lp-directives')
             var fba_id = scope.id;
 
             $(ele).loading();
+
+            console.log(scope.ws+'/'+scope.id)
+
+            var p = kb.ws.get_referenced_objects([scope.ws+'/'+scope.id])
+            $.when(p).done(function(data){
+                console.log('data', data)
+
+
+            })
+
             var prom = kb.get_fba(scope.ws, scope.id);
             $.when(prom).done(function(data) {
-
-                var refs = data[0].refs
+                console.log(data)
+                var refs = data[0].obj_refs
 
                 var obj_refs = []
                 for (var i in refs) {
@@ -365,7 +380,6 @@ angular.module('lp-directives')
                         //row.append(link)
 //
                         //$(ele).append(row);
-
 
                 })
 
