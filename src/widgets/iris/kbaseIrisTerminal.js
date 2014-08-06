@@ -7,7 +7,6 @@ kb_define('kbaseIrisTerminal',
     [
         'jquery',
         'kbwidget',
-        'bowser',
         'kbaseButtonControls',
         'kbaseIrisTutorial',
         'kbaseIrisFileBrowser',
@@ -624,22 +623,6 @@ kb_define('kbaseIrisTerminal',
 
             this.terminal = this.data('terminal');
             this.input_box = this.data('input_box');
-
-            if (window.bowser != undefined && window.bowser.msie && window.bowser.version <= 9) {
-                this.out_text(
-                    $.jqElem('span')
-                        .css('color', 'red')
-                        .append(
-                            "<b>Unsupported browser detected!</b><br><br>\n"
-                            + "For a better experience, we recommend using recent versions of "
-                            + "Safari, Firefox, Chrome, or Internet Explorer."
-                            + "<br><br>"
-                            + "You appear to be using Internet Explorer " + bowser.version + ".<br><br>Unfortunately, we "
-                            + "don't support that web browser. Some functions may behave erractically."
-                    ),
-                    'html'
-                );
-            }
 
             this.out_text(
                 $.jqElem('span')
