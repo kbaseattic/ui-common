@@ -103,6 +103,7 @@
 
             $elem.find('.truncated').each(function(i,v) {
                 if ($(v).height() == v.scrollHeight) {
+                    $(v).css('max-height', '');
                     $(v).next().remove();
                     $(v).toggleClass('truncated');
                 }
