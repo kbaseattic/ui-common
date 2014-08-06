@@ -480,6 +480,18 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
     		templateUrl: 'views/objects/tree.html',
     		controller: 'TreeDetail'});
 
+    $stateProvider
+	.state('pangenome',
+		{url: '/pangenome/:ws/:id',
+		templateUrl: 'views/objects/pangenome.html',
+		controller: 'PangenomeDetail'});
+
+    $stateProvider
+	.state('msa',
+		{url: '/msa/:ws/:id',
+		templateUrl: 'views/objects/msa.html',
+		controller: 'MSADetail'});
+
     $urlRouterProvider.when('', '/login/')
                       .when('/', '/login/')
                       .when('#', '/login/');

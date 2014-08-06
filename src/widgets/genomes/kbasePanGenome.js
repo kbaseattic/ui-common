@@ -13,7 +13,8 @@
         	ws: null,
         	name: null,
             loadingImage: "assets/img/ajax-loader.gif",
-            withExport: false
+            withExport: false,
+            width: 1000
         },
 
         pref: null,
@@ -433,7 +434,7 @@
         },
         
         getData: function() {
-        	return {title:"Pan-genome orthologs",id:this.options.name, workspace:this.options.ws};
+        	return {title:"Pangenome",id:this.options.name, workspace:this.options.ws};
         },
 
         loggedInCallback: function(event, auth) {
