@@ -42,6 +42,26 @@
         options: {
             table: null,
             maxVisibleRowIndex : 20,
+
+            row_callback : function (cell, header, row, $kb) {
+
+                var def = $kb.default_row_callback(cell, header, row, $kb);
+
+                if (def.length < 12) {
+                    return def;
+                }
+
+                var max = '1.5em';
+
+                var $div = $.jqElem('div')
+                    .css({'max-height' : max, 'overflow' : 'hidden', display : 'inline-block'})
+                    .attr('class', 'truncated')
+                    .append(def);
+
+                return $.jqElem('div').append($div).append($.jqElem('div').attr('class', 'dots').css({'font-style' : 'italic', 'text-align' : 'right'}).append('...more'));
+
+            },
+
         },
 
         wsUrl: "https://kbase.us/services/ws/",
@@ -77,6 +97,33 @@
 
             return this._super(options);
         },
+
+        appendUI : function($elem, struct) {
+            this._super($elem, struct);
+
+            $elem.find('.truncated').each(function(i,v) {
+                if ($(v).height() == v.scrollHeight) {
+                    $(v).next().remove();
+                    $(v).toggleClass('truncated');
+                }
+
+            });
+
+            var max = '1.5em';
+            $elem.find('tr')
+                .on('mouseover', function(e) {
+                    $(this).find('.truncated').css('max-height', '');
+                    $(this).find('.dots').css('display', 'none');
+                })
+                .on('mouseout', function(e) {
+                    $(this).find('.truncated').css('max-height', max);
+                    $(this).find('.dots').css('display', '');
+                })
+            ;
+
+            return $elem;
+        },
+
 
     });
 
