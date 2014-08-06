@@ -176,7 +176,7 @@ $.each(
 
                     node.func = node.user_annotations.functions;
 
-                    if (node.func.match(/unknown/i)) {
+                    if (node.func == undefined || node.func.match(/unknown/i)) {
                         node.func = '';
                     }
 
