@@ -38,7 +38,7 @@
 
     "KBaseExpression" : {
         "ExpressionSample" : null,
-        "ExpressionSeries" : null,
+        "ExpressionSeries" : "ws/expression_series",
         "ExpressionReplicateGroup" : null,
         "ExpressionPlatform" : null
     },
@@ -58,7 +58,8 @@
         "FBAModel" : "ws/mv/model",
         "Gapgeneration" : null,
         "ModelTemplate" : null,
-        "ETC" : "etc"
+        "ETC" : "etc",
+        "PromConstraint" : "ws/promconstraint"
     },
 
     "KBaseGenomes" : {
