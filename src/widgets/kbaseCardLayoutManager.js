@@ -1560,7 +1560,6 @@
 				self.addNewCard("KBaseLineChartCard",
 					{
 						row: data.row,		
-						heatmap: data.heatmap,
 						id: data.id,
 						workspace: data.workspace
 					},

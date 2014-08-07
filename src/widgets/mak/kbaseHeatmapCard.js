@@ -135,18 +135,20 @@
 				.attr("height", height + margin.top + margin.bottom)
 				.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-			var geneLabels = svg.selectAll(".geneLabel")
+			
+			console.log(options.count)
+			
+			var geneLabels = svg.selectAll(".geneLabel"+options.count)
 				.data(gene_labels_ids)
 				.enter().append("text")
 				.text(function (d) { return d.label; })
 				.attr("x", 0)
 				.attr("y", function (d, i) { return i * gridSize; })
-				.attr("class","geneLabel")
+				.attr("class","geneLabel"+options.count)
 				.style({"text-anchor":"end","font-size":"small"})
 				.attr("transform", "translate(-6," + gridSize / 1.5 + ")")
 				.on("click",function(d,i,event){
-					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], id: options.id, workspace: options.workspace, heatmap: geneLabels, event: event})
+					// self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], id: options.id, workspace: options.workspace, event: event})
 					if ($(this).css("font-weight") == 400) $(this).css({"font-weight":900,"font-size":"medium"})
 					else $(this).css({"font-weight":400,"font-size":"small"})
 				})						
