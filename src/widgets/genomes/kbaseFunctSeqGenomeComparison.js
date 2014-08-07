@@ -1,8 +1,14 @@
 /**
  * Just a simple example widget to display phenotypedata
  * 
- */
-(function( $, undefined ) {
+ */kb_define('kbaseFunctGenomeComparison',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseWidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "kbaseFunctGenomeComparison",
         parent: "kbaseWidget",
@@ -24,4 +30,4 @@
             return this;
         }
     });
-})( jQuery )
+});

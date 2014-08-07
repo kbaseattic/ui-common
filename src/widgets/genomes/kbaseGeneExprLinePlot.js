@@ -1,4 +1,11 @@
-(function ($, undefined) {
+kb_define('KBaseGeneExprLinePlot',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseWidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseGeneExprLinePlot",
         parent: "kbaseWidget",
@@ -313,4 +320,4 @@
             };
         },
     });
-})(jQuery);
+});

@@ -1,4 +1,11 @@
-(function( $, undefined ) {
+kb_define('KBaseGenomeCompleteness',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseAuthenticatedWidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseGenomeCompleteness",
         parent: "kbaseAuthenticatedWidget",
@@ -246,4 +253,4 @@
                 });
         }
     });
-})( jQuery );
+});

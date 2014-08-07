@@ -1,4 +1,11 @@
-(function( $, undefined ) {
+kb_define('KBaseWSButtons',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseAuthenticatedWidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseWSButtons",
         parent: "kbaseAuthenticatedWidget",
@@ -99,4 +106,4 @@
         }
 
     });
-})( jQuery )
+});
