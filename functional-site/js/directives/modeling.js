@@ -22,7 +22,6 @@ angular.module('modeling-directives')
 
                 var stroke_color = '#666';
 
-
                 var tableSettings = {
                     "sPaginationType": "bootstrap",
                     "iDisplayLength": 10,

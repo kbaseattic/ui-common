@@ -14,7 +14,6 @@ $.KBWidget({
         self.fbas = options.fbaData;
         self.workspace = options.ws;
 
-
         var map = options.mapData;
         var map_id = options.mapID;
 
@@ -245,7 +244,6 @@ $.KBWidget({
                                   .attr('x', x+2)
                                   .attr('y', y+h/2 + 2)
                                   .attr('class', 'rxn-label')
-                                  .style('display', 'none');
 
 
                 //content for tooltip //fixme: need to do tooltips for each model
@@ -766,7 +764,7 @@ $.KBWidget({
 
             var opts = $('<div class="opts-dd">Display:\
                         <div class="checkbox">\
-                            <label><input type="checkbox" data-type="rxn-label" value="">Enzymes Labels</label>\
+                            <label><input type="checkbox" data-type="rxn-label" checked="checked">Enzymes Labels</label>\
                         </div>\
                         <div class="checkbox">\
                             <label><input type="checkbox" data-type="rect" value="" checked="checked">Enzymes</label>\
