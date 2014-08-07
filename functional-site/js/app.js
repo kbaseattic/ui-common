@@ -392,7 +392,8 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
     $stateProvider
         .state('mak',
             {url: '/mak/:ws/:id',
-             templateUrl: 'views/objects/mak.html',
+             // templateUrl: 'views/objects/mak.html',
+			 templateUrl: 'views/genomes/sortable-rows-landing-page-bicluster.html',
              controller: 'MAKDetail'});
 
 	$stateProvider

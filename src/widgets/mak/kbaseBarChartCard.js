@@ -8,7 +8,7 @@
             loadingImage: "assets/img/ajax-loader.gif",
             title: "MAK Result Overview Bar Chart",
             isInCard: false,
-            width: 750,
+            width: 400,
             height: 800
         },
 
@@ -37,9 +37,10 @@
                              .classed("kbcb-tooltip", true);
 							 
 			var terms = self.options.terms
-			var chartWidth = self.options.width-50
-					
-			var $sideChart = $("<div>").css({"width":chartWidth,"top":50,"position":"absolute"})
+			var chartWidth = self.options.width
+			
+			
+			// var $sideChart = $("<div>").css({"width":chartWidth,"top":50,"position":"relative"})
 			var flat = []			
 			var termData = []						
 			var termColors = {"TIGRFam":"#CC0000","GO":"#7A00CC","COG":"#666666","SEED":"#CC5200","KEGG":"#007A00"}
@@ -56,7 +57,9 @@
 			
 			var x = d3.scale.linear().domain([0,d3.max(flat)]).range([0,chartWidth])			
 			var selectionHandler = []
-			var $barChartDiv = $("<div id='barchart'>").css({"float":"right"})
+			var $mainDiv = $("<div id='mainDiv' style='overflow:auto;height:450px;resize:vertical'>")
+			var $barChartDiv = $("<div id='barchart'>")
+			$mainDiv.append($barChartDiv)
 			var $barChart = d3.select($barChartDiv.get(0))
 				.selectAll("div")
 				.data(termData)
@@ -135,8 +138,8 @@
 						}
 					)
 				
-			self.$elem.append($barChartDiv)
-			
+			self.$elem.append($mainDiv)
+			console.log("here")
 			return this;
 		},
 		

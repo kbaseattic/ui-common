@@ -1231,8 +1231,8 @@
                         isInCard: true
                     },
                     {
-                        my: "bottom",
-                        at: "front",
+                        my: "left top",
+                        at: "left-100 top",
                         of: "#app"
                     }
                  );
@@ -1248,8 +1248,8 @@
                         isInCard: true
 					},
 					{
-						my: "right top",
-                        at: "left bottom",
+						my: "center top",
+                        at: "center-150 top",
                         of: "#app"
 					}
 				);
@@ -1273,7 +1273,7 @@
 						},
 						{
 							my: "left top",
-							at: "left bottom",
+							at: "left top",
 							of: "#app"
 						}
 					);
@@ -1507,8 +1507,8 @@
 						workspace: data.workspace
 					},
 					{
-						my: "left",
-						at: "right bottom",
+						my: "right top",
+						at: "right+100 top",
 						of: "#app"
 				});
 			});
@@ -1523,7 +1523,6 @@
 					{
 						row: data.row,		
 						heatmap: data.heatmap,
-						widget: data.widget,
 						id: data.id,
 						workspace: data.workspace
 					},
@@ -2021,6 +2020,8 @@
              */
 
             $(document).on("showMAKBicluster", function(event, data) {
+				console.log("kblpc"+self.cardIndex)
+				console.log(self.cards)
                 self.addNewCard("KBaseMAKBiclusterCard",
                     {
                         bicluster: data.bicluster,
@@ -2032,7 +2033,7 @@
                     },
                     {
                         my: "left top",
-                        at: "left+600 bottom",
+                        at: "left-100 bottom+2000",
                         of: "#app"
                     }
                 );

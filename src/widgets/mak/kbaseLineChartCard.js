@@ -17,7 +17,7 @@
 				//throw an error
 				return;
 			}				
-            return this.render();
+            return this.render(self);
 		},
 		
 		lineDrawer: function(values,conditions,gene_label,x,y,color_ind,drawCircle,graph,colorScale) {
@@ -103,11 +103,9 @@
 			
 		},
 	
-		render: function(options) {
-		
-			var self = this;			
+		render: function(self) {
 
-			$lineChartDiv = $("<div id='linechart'>")
+			$lineChartDiv = $("<div id='linechart' style='overflow:auto;height:450px;resize:vertical'>")
 			self.$elem.append($lineChartDiv);
 			
 			self.tooltip = d3.select("body")

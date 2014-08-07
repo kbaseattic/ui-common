@@ -10,7 +10,7 @@
             loadingImage: "assets/img/ajax-loader.gif",
             title: "MAK Result Overview Tiles",
             isInCard: false,
-            width: 750,
+            width: 1000,
             height: 800
         },
 
@@ -41,6 +41,10 @@
 
             
             var self = this;
+			
+			$tilingDiv = $("<div id='tilingDiv' style='overflow:auto;height:450px;resize:vertical;position:relative'/>")
+			self.$elem.append($tilingDiv)
+			
 			var loader = $("<span style='display:none'><img src='"+self.options.loadingImage+"'/></span>").css({"width":"100%","margin":"0 auto"})
 
 			self.tooltip = d3.select("body")
@@ -51,13 +55,12 @@
 			//"SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"
 			//this.options.ws
 			//this.options.id
-			self.$elem.append(loader)
+			$tilingDiv.append(loader)
 			loader.show()
-						
+			
             this.workspaceClient.get_objects([{workspace: this.options.workspace, name: this.options.id}], 
 				
 				function(data){
-					
 					
 					Packer = function(w, h) {
 					  this.init(w, h);
@@ -176,6 +179,7 @@
 								"-webkit-border-radius": "1px",
 								"border-radius": "1px"})
 								.addClass(cssClass)   
+								.addClass('biclusterTile')
 								.val(block.index)
 								.on("mouseover", 
 									function() { 
@@ -219,16 +223,21 @@
 						}
 					});
 						
-					self.$elem.append($bin)
-					
+					$tilingDiv.append($bin)
+					if (self.options.scope) {
+						self.options.scope.$apply(function() {
+							self.options.scope.terms = terms
+						})
+					}
 					self.trigger("showBarChart", {terms: terms, workspace: self.options.workspace, id: self.options.id})
 					self.trigger("showMAKBicluster", { bicluster: [biclusters,0,bicluster_info], workspace: self.options.workspace, tiles: tiles})
+					
 					
                 },
 
 			    function(data) {
                                 $('.loader-table').remove();
-                                self.$elem.append('<p>[Error] ' + data.error.message + '</p>');
+                                $tilingDiv.append('<p>[Error] ' + data.error.message + '</p>');
                                 return;
                 }
 		    );
