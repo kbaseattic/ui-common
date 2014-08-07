@@ -115,7 +115,9 @@
             		for (var genePos in gnm.features) {
             			var gene = gnm.features[genePos];
             			var geneId = gene.id;
-            			var geneFunc = gene['function'];
+				if (gene['function'] === undefined)
+				    continue;
+				var geneFunc = gene['function'];
 				var cleanGeneFunc = geneFunc.replace(/\s+\/.+/,"").replace(/\s+\#.*/, "");
 				// just take first element of subsystem_data list
 				// typedef tuple<string subsystem, string variant, string role> subsystem_data;
