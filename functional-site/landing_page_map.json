@@ -38,7 +38,7 @@
 
     "KBaseExpression" : {
         "ExpressionSample" : null,
-        "ExpressionSeries" : null,
+        "ExpressionSeries" : "ws/expression_series",
         "ExpressionReplicateGroup" : null,
         "ExpressionPlatform" : null
     },
@@ -55,10 +55,11 @@
         "Gapfilling" : null,
         "FBA" : "fbas",
         "ReactionSensitivityAnalysis" : null,
-        "FBAModel" : "models",
+        "FBAModel" : "ws/mv/model",
         "Gapgeneration" : null,
         "ModelTemplate" : null,
-        "ETC" : "etc"
+        "ETC" : "etc",
+        "PromConstraint" : "ws/promconstraint"
     },
 
     "KBaseGenomes" : {
@@ -96,7 +97,7 @@
     },
 
     "KBasePhenotypes" : {
-        "PhenotypeSet" : null,
+        "PhenotypeSet" : "ws/phenotype",
         "PhenotypeSimulationSet" : null
     },
 
@@ -129,7 +130,7 @@
         "MAKBicluster" : "mak",
         "ExpressionDataSeries" : null,
         "MAKBiclusterSet" : "mak",
-        "FloatDataTable" : "mak",
+        "FloatDataTable" : "floatdatatable",
         "FloatDataTableContainer" : null,
         "StringDataTable" : null,
         "StringDataTableContainer" : null
