@@ -41,12 +41,39 @@
                         window.location.replace(url);
                     },
                     error: function(error) {
+                        console.log(error);
                         // look at error. if it's a 500, probably not allowed to see it (parse error and try)
                         // otherwise, keep trying!
                         if(error.status === 500) {
                             if (interval)
                                 clearInterval(interval);
-                            $('#text').html('<br>Sorry, it looks like you don\'t have permission to view that Narrative.<br>If you see this error after coming through an outside link, <br>please try to access this Narrative through the main site <a href="/">here</a>.');
+
+                            var permErr = '<br>Sorry, it looks like you don\'t have permission to view that Narrative.' +
+                                          '<br>If you see this error after coming through an outside link,' +
+                                          '<br>please try to access this Narrative through the main site <a href="/">here</a>.';
+
+                            var customErr = function(msg) {
+                                return '<br>Sorry, an error occurred while loading your narrative:' +
+                                       '<br>Error message: <b>' + msg + '</b>' +
+                                       '<br>Please try again later, or look <a href="//kbase.us/user-support/report-issue/">here</a> for help!';
+                            };
+
+                            var defaultErr = '<br>Sorry, it appears an error occurred while setting up your narrative.' +
+                                             '<br>Please try again later, or look <a href="//kbase.us/user-support/report-issue/">here</a> help!';
+
+                            var errorMsg = defaultErr;
+
+                            if (error.responseText) {
+                                var $errorHTML = $($.parseHTML(error.responseText));
+                                var msg = $errorHTML.find('#error-message > h3').text();
+                                if (msg.indexOf('may not read workspace') !== -1)
+                                    errorMsg = permErr;
+                                else
+                                    errorMsg = customErr(msg);
+                            }
+
+                            $('#text').html(errorMsg);
+
                         }
                         numTries++;
                     },
