@@ -55,7 +55,7 @@
         "Gapfilling" : null,
         "FBA" : "fbas",
         "ReactionSensitivityAnalysis" : null,
-        "FBAModel" : "models",
+        "FBAModel" : "ws/mv/model",
         "Gapgeneration" : null,
         "ModelTemplate" : null,
         "ETC" : "etc"
@@ -96,7 +96,7 @@
     },
 
     "KBasePhenotypes" : {
-        "PhenotypeSet" : null,
+        "PhenotypeSet" : "phenotype",
         "PhenotypeSimulationSet" : null
     },
 
@@ -129,7 +129,7 @@
         "MAKBicluster" : "mak",
         "ExpressionDataSeries" : null,
         "MAKBiclusterSet" : "mak",
-        "FloatDataTable" : "mak",
+        "FloatDataTable" : "floatdatatable",
         "FloatDataTableContainer" : null,
         "StringDataTable" : null,
         "StringDataTableContainer" : null
