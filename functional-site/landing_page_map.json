@@ -97,7 +97,7 @@
     },
 
     "KBasePhenotypes" : {
-        "PhenotypeSet" : "phenotype",
+        "PhenotypeSet" : "ws/phenotype",
         "PhenotypeSimulationSet" : null
     },
 
