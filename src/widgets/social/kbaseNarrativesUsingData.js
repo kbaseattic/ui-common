@@ -47,7 +47,7 @@ kb_define('KBaseNarrativesUsingData',
             }
             
             self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>finding all data that references this object...</center></p></div>');
-            self.$elem.append('<div id="mainview">')
+            self.$elem.append($('<div id="mainview">').css("overflow","auto"));
             //self.$elem.append(JSON.stringify(options)+"<br>");
             
 	    if ( (/^\d+$/.exec(options.wsNameOrId)) || ( /^\d+$/.exec(options.objNameOrId)) ){
@@ -75,6 +75,8 @@ kb_define('KBaseNarrativesUsingData',
             else {
 		// it is a name already, so we can get right to the fun
 		wsName = options.wsNameOrId;
+		self.objName = options.objNameOrId;
+		self.wsName = options.wsNameOrId;
 		self.getTheRefsAndRender();
             }
 	    

@@ -118,7 +118,12 @@ $.KBWidget({
         var table = $('#gapfill-table').dataTable(tableSettings);
         table.fnAddData(dataDict);
         */
-        gapFillTableWS(model.gapfillings);
+
+        if (model.gapfillings.length > 0) {
+            gapFillTableWS(model.gapfillings);
+        } else {
+            gfTable.after('<h5>There are no gapfilling solutions for this model.  Try running gapfill.</h5>')
+        }
 
         // gapgen table
         /*
@@ -202,7 +207,6 @@ $.KBWidget({
 
 
             var refs = []
-            console.log('data', data)
             for (var i in data) {
                 var obj = {}
                 var ref =  data[i].gapfill_ref
@@ -211,7 +215,6 @@ $.KBWidget({
                 obj.name = data[i].id
                 refs.push(obj)
             }
-            console.log(refs)
 
             for (var i in refs) {
                 var ws =  refs[i].wsid;
@@ -232,7 +235,6 @@ $.KBWidget({
                     var id = $(this).data('id');
                     var ws = $(this).data('ws');
                     var gap_name = $(this).data('name');
-                    console.log('gap name', gap_name)
 
                     var tr = $(this).closest('tr')[0];
                     if ( gapTable.fnIsOpen( tr ) ) {
@@ -252,7 +254,6 @@ $.KBWidget({
             function showGapfillSolutionsWS(tr, id, ws, gap_name){
                 var p = kb.fba.get_gapfills({gapfills: [id], workspaces: [ws]})
                 $.when(p).done(function(data) {
-                    console.log('gapfill solutions ', data)
                     var data = data[0];  // only one gap fill solution at a time is cliclsked
                     var sols = data.solutions;
 
@@ -381,7 +382,6 @@ $.KBWidget({
 
             this.load_table = function(models) {
                 var gaps = [];
-                console.log(models)
                 var ref = models.gapfillings[0].gapfill_ref
 
                 var p = kb.ws.get_object_info([{wsid: ref.split('/')[0], objid: ref.split('/')[1] }])
@@ -391,13 +391,7 @@ $.KBWidget({
 
                 })
 
-                console.log('ref', ref)
                 
-                var p = kb.ws.get_objects([{ref: ref}])
-                $.when(p).done(function(d){
-                    console.log(JSON.stringify(d[0].data))
-                    console.log(d)
-                })
 
                 var intGapfills = models.gapfillings;
 

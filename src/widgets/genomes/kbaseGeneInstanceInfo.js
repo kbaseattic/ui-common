@@ -22,6 +22,8 @@
             genomeID: null,
             kbCache: null,
             auth: null,
+            hideButtons:false,
+            width:350,
             loadingImage: "assets/img/loading.gif",
         },
 
@@ -35,7 +37,7 @@
                 return this;
             }
 
-            
+
             // always setup the cdmi clients, cause for now there is a hack to get domain/operon info if available
             // from the CDS
             this.cdmiClient = new CDMI_API(this.cdmiURL);
@@ -65,7 +67,7 @@
 
             var makeButton = function(btnName) {
                 var id = btnName;
-                btnName = btnName.replace(/\w\S*/g, 
+                btnName = btnName.replace(/\w\S*/g,
                                 function(txt) {
                                     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
                                 });
@@ -82,19 +84,23 @@
                                 .addClass("kbwidget-message-pane kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
-            this.$infoPanel = $("<div>");
+            this.$infoPanel = $("<div>").css("overflow","auto");
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
             this.$buttonPanel = $("<div>")
                                 .attr("align", "center")
                                 .addClass("btn-group")
 		                //.append(makeButton("domains"))
-		                //.append(makeButton("operons"))
+		                 //.append(makeButton("operons"))
                                 .append(makeButton("sequence"))
-                                .append(makeButton("biochemistry"));
+                                .append(makeButton("biochemistry"))
+                                .append(makeButton("structure"));
+
 
             this.$infoPanel.append(this.$infoTable)
-                           .append(this.$buttonPanel);
+            if (!this.options.hideButtons) {
+                this.$infoPanel.append(this.$buttonPanel);
+            }
 
             this.$elem.append(this.$infoPanel);
         },
@@ -151,8 +157,12 @@
 		}
                 self.$infoTable.append(self.makeRow("Length", len));
                 self.$infoTable.append(self.makeRow("Location", $("<div/>")
-                                                            .append(self.parseLocation(data.featureData.feature_location))
-                                                            .append(self.makeContigButton(data.featureData.feature_location))));
+                                                            .append(self.parseLocation(data.featureData.feature_location))));
+		                                            //.append(self.parseLocation(data.featureData.feature_location))
+		                                            //.append(self.makeContigButton(data.featureData.feature_location))));
+                self.$infoTable.append(self.makeRow("Aliases", data.featureData.feature_aliases.join(", ")));
+
+
 
                 //self.$infoTable.append(self.makeRow("GC Content", self.calculateGCContent(data.dnaSeq).toFixed(2) + "%"));
 
@@ -172,25 +182,30 @@
                 //    self.$infoTable.append(self.makeRow("Protein Families", "None found"));
 
                 //self.$buttonPanel.find("button#domains").click(
-                //    function(event) { 
-                //        self.trigger("showDomains", { event: event, featureID: self.options.featureID }) 
+                //    function(event) {
+                //        self.trigger("showDomains", { event: event, featureID: self.options.featureID })
                 //    }
                 //);
                 //self.$buttonPanel.find("button#operons").click(
-                //    function(event) { 
-                //        self.trigger("showOperons", { event: event, featureID: self.options.featureID }) 
+                //    function(event) {
+                //        self.trigger("showOperons", { event: event, featureID: self.options.featureID })
                 //    }
                 //);
 
                 self.$buttonPanel.find("button#sequence").click(
-                    function(event) { 
-                        self.trigger("showSequence", { event: event, featureID: self.options.featureID }) 
+                    function(event) {
+                        self.trigger("showSequence", { event: event, featureID: self.options.featureID })
                     }
                 );
                 self.$buttonPanel.find("button#biochemistry").click(
-                    function(event) { 
-                        self.trigger("showBiochemistry", { event: event, featureID: self.options.featureID }) 
+                    function(event) {
+                        self.trigger("showBiochemistry", { event: event, featureID: self.options.featureID })
                     }
+                );
+                self.$buttonPanel.find("button#structure").click(
+                     function(event) {
+                         self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID })
+                     }
                 );
                 self.hideMessage();
                 self.$infoPanel.show();
@@ -225,16 +240,15 @@
                         console.log(JSON.stringify(feature));
                         this.$infoTable.empty();
                         /* Function
-                         * Genome + button
+                         * Genome + link
                          * Length
-                         * Location + button
-                         * GC Content (maybe)
-                         * Protein Families
+                         * Location
+			 * Aliases
                          */
 
                         // Figure out the function.
                         var func = feature['function'];
-                        if (!func) 
+                        if (!func)
                             func = "Unknown";
                         this.$infoTable.append(this.makeRow("Function", func));
 
@@ -261,10 +275,18 @@
 			}
                         this.$infoTable.append(this.makeRow("Length", len));
 
-                        // Make a contig button
                         this.$infoTable.append(this.makeRow("Location", $("<div/>")
-                                                            .append(this.parseLocation(feature.location))
-                                                            .append(this.makeContigButton(feature.location))));
+                                                            .append(this.parseLocation(feature.location))));
+			                                    //.append(this.parseLocation(feature.location))
+			                                    //.append(this.makeContigButton(feature.location))));
+
+			// Aliases
+			var aliasesStr = "No known aliases";
+			if (feature.aliases)
+			    aliasesStr = feature.aliases.join(", ");
+			self.$infoTable.append(self.makeRow("Aliases", aliasesStr));
+			// end Aliases
+
 
                         // LOL GC content. Does anyone even care these days?
                         //if (feature.dna_sequence) {
@@ -273,7 +295,7 @@
                         //}
 
                         // Protein families list.
-                        var proteinFamilies = "None found";
+                        var proteinFamilies = "";
                         if (feature.protein_families) {
                             if (feature.protein_families.length>0) {
                                 proteinFamilies = "";
@@ -283,17 +305,21 @@
                                 }
                             }
                         }
-                        this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
+                        if (proteinFamilies) {
+                            this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
+                        }
 
                         // first add handlers that say we do not have domains or operons for this gene
-                        this.$buttonPanel.find("button#domains").click(function(event) { 
+                        this.$buttonPanel.find("button#domains").click(function(event) {
                             window.alert("No domain assignments available for this gene.  You will be able to compute domain assignments in the Narrative in the future.");
                         });
                         this.$buttonPanel.find("button#operons").click(function(event) {
                             window.alert("No operon assignments available for this gene.  You will be able to compute operon assignments in the Narrative in the future.");
                         });
-                        
-                        
+                        this.$buttonPanel.find("button#structure").click(function(event) {
+                            window.alert("No structure assignments available for this gene.  You will be able to compute structure assignments in the Narrative in the future.");
+                        });
+
                         //determine if a feature id and its protein MD5 translation is found in the CDS- if it is,
                         //return true.  We use this as a hack to see if we have gene info for this feature for WS objects.
                         this.cdmiClient.fids_to_proteins([self.options.featureID],
@@ -301,52 +327,56 @@
                                         if (prot[self.options.featureID] == feature['md5'] ) {
                                             //ok the fid and md5 match, so go to the CDS to get domain info...  what a hack!
                                             self.$buttonPanel.find("button#domains").off("click");
-                                            self.$buttonPanel.find("button#domains").click(function(event) { 
+                                            self.$buttonPanel.find("button#domains").click(function(event) {
                                                 self.trigger("showDomains", { event: event, featureID: self.options.featureID });
                                             });
                                             self.$buttonPanel.find("button#operons").off("click");
-                                            self.$buttonPanel.find("button#operons").click(function(event) { 
+                                            self.$buttonPanel.find("button#operons").click(function(event) {
                                                 self.trigger("showOperons", { event: event, featureID: self.options.featureID });
+                                            });
+                                            self.$buttonPanel.find("button#structure").off("click");
+                                            self.$buttonPanel.find("button#structure").click(function(event) {
+                                                self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID });
                                             });
                                         }
                                    } // we don't add error function- if they don't match or this fails, do nothing.
                         );
-                        
+
                         // bind button events
                         this.$buttonPanel.find("button#sequence").click(
-                            $.proxy(function(event) { 
-                                this.trigger("showSequence", { 
-                                    event: event, 
+                            $.proxy(function(event) {
+                                this.trigger("showSequence", {
+                                    event: event,
                                     featureID: this.options.featureID,
                                     genomeID: this.options.genomeID,
                                     workspaceID: this.options.workspaceID,
-                                    kbCache: this.options.kbCache 
+                                    kbCache: this.options.kbCache
                                 });
                             }, this)
                         );
                         this.$buttonPanel.find("button#biochemistry").click(
-                            $.proxy(function(event) { 
-                                this.trigger("showBiochemistry", { 
-                                    event: event, 
+                            $.proxy(function(event) {
+                                this.trigger("showBiochemistry", {
+                                    event: event,
                                     featureID: this.options.featureID,
                                     genomeID: this.options.genomeID,
                                     workspaceID: this.options.workspaceID,
-                                    kbCache: this.options.kbCache 
+                                    kbCache: this.options.kbCache
                                 });
                             }, this)
                         );
 
                     }
                     else {
-                        this.renderError({ error: "Gene '" + this.options.featureID + 
+                        this.renderError({ error: "Gene '" + this.options.featureID +
                                                   "' not found in the genome with object id: " +
                                                   this.options.workspaceID + "/" + this.options.genomeID });
                     }
 
                 }
                 else {
-                    this.renderError({ error: "No genetic features found in the genome with object id: " + 
-                                              this.options.workspaceID + "/" + 
+                    this.renderError({ error: "No genetic features found in the genome with object id: " +
+                                              this.options.workspaceID + "/" +
                                               this.options.genomeID });
                 }
 
@@ -357,12 +387,15 @@
 
         makeRow: function(name, value) {
             var $row = $("<tr/>")
-                       .append($("<td />").append(name))
+                       .append($("<th />").append(name))
                        .append($("<td />").append(value));
             return $row;
         },
 
         makeContigButton: function(loc) {
+            if (this.options.hideButtons) {
+                return "";
+            }
             if (loc === null || loc[0][0] === null)
                 return "";
 
@@ -372,10 +405,10 @@
             var $contigBtn = $("<button />")
                              .addClass("btn btn-default")
                              .append("Show Contig")
-                             .on("click", 
+                             .on("click",
                                  function(event) {
-                                    self.trigger("showContig", { 
-                                        contig: contigID, 
+                                    self.trigger("showContig", {
+                                        contig: contigID,
                                         centerFeature: self.options.featureID,
                                         genomeId: self.options.genomeID,
                                         workspaceId: self.options.workspaceID,
@@ -394,6 +427,10 @@
 
             if (!workspaceID)
                 workspaceID = null;
+
+            return $("<div>")
+                .append('<a href="#/genomes/'+workspaceID+'/'+genomeID+'" target="_blank">'+workspaceID+'/<wbr>'+genomeID+'</a>');
+
 
             var self = this;
             var $genomeBtn = $("<button />")
@@ -423,13 +460,13 @@
             s = s.toLowerCase();
             for (var i=0; i<s.length; i++) {
                 var c = s[i];
-                if (c === 'g' || c === 'c') 
+                if (c === 'g' || c === 'c')
                     gc++;
             }
-            return gc / s.length * 100;            
+            return gc / s.length * 100;
         },
-        
-        
+
+
         /**
          * parses out the location into something visible in html, adds a button to open the contig.
          * something like:
@@ -487,7 +524,7 @@
             else if (error.error && error.error.message)
                 errString = error.error.message;
 
-            
+
             var $errorDiv = $("<div>")
                             .addClass("alert alert-danger")
                             .append("<b>Error:</b>")

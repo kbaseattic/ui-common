@@ -23,7 +23,8 @@
             objNameOrId: null,
             wsNameOrId: null,
             objVer: null,
-            loadingImage: "assets/img/loading.gif",
+	    //loadingImage: "assets/img/loading.gif",
+            loadingImage: "assets/img/ajax-loader.gif",
             kbCache:null,         
             width:900         
         },
@@ -54,8 +55,13 @@
          */
 
         init: function(options) {
-            this._super(options);          
-            //this.render();
+            this._super(options);
+            if (this.options.kbCache.token) {
+               // if we are logged in, then somehow render gets called later...
+            } else {
+               // if we are not logged in, then render
+               this.render();
+            }
 
             return this;
         },
@@ -99,6 +105,7 @@
             //d3.text("/static/subsys.txt", function(text) {
             d3.text("/functional-site/assets/data/subsys.txt", function(text) {
                 var data = d3.tsv.parseRows(text);
+                var totalGenesWithFunctionalRoles = 0;
 
                 for (i = 0; i < data.length; i++) {
                     var geneCount = 0;
@@ -111,6 +118,7 @@
                         //continue;
                     } else {
                         geneCount = subsysToGeneMap[data[i][3]].length;
+                        totalGenesWithFunctionalRoles += subsysToGeneMap[data[i][3]].length;
                     }
 
                     for (j = 0; j < ontologyDepth; j++) {
@@ -149,18 +157,23 @@
                     }
                 }
 
-            // Set maxCount to scale bars
-            for (k in Level1) {
-                self.maxCount = self.maxCount > Level1[k] ? self.maxCount : Level1[k];
-            }
+                if (totalGenesWithFunctionalRoles < 100) {
+                    //console.log("No Functional Categories assigned, you can added them using the Narrative");
+                    self.$elem.find("#mainview").prepend("<b>No Functional Categories assigned, you can add them using the Narrative.</b>");
+                } else {
+                    // Set maxCount to scale bars
+                    for (k in Level1) {
+                        self.maxCount = self.maxCount > Level1[k] ? self.maxCount : Level1[k];
+                    }
 
-            $.when( 
-                self.SEEDTree.children.forEach(function(d) {
-                    self.collapse(d) }) 
-                )
-            .done(
-                    self.update( self.root = self.SEEDTree )
-                );
+                    $.when( 
+                        self.SEEDTree.children.forEach(function(d) {
+                            self.collapse(d) }) 
+                        )
+                    .done(
+                        self.update( self.root = self.SEEDTree )
+                        );
+                }
             
             }); 
         },
@@ -176,7 +189,7 @@
             var height = Math.max(500, nodes.length * self.barHeight + self.margin.top + self.margin.bottom);
             var i = self.i;
 
-            d3.select("svg").transition()
+            d3.selectAll("#mainview").select("svg").transition()
                 .duration(self.duration)
                 .attr("height", height);
 
@@ -190,13 +203,25 @@
             });
 
             // Update the nodes…
-            var node = self.svg.selectAll("g.node")
+            var node = self.svg.selectAll("g.KBSnode")
                 .data(nodes, function(d) { return d.id || (d.id = ++self.i); });
 
             var nodeEnter = node.enter().append("g")
-                .attr("class", "node")
+                .attr("class", "KBSnode")
                 .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-                .style("opacity", 1e-6);
+                .style("opacity", 1e-6)
+                .on("mouseover", function(d) {
+                    d3.select(this).selectAll('text, rect')
+                    .style('font-weight', 'bold')
+                    .style('font-size', '90%')
+                    .style('stroke-width', '3px');
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this).selectAll('text, rect')
+                    .style('font-weight', 'normal')
+                    .style('font-size', '80%')
+                    .style('stroke-width', '1.5px');
+                });
 
             // Enter any new nodes at the parent's previous position.
             nodeEnter.append("rect")
@@ -217,7 +242,8 @@
                 .attr("x", function (d) { return 0 + 275 - scale(d.size) - d.depth * self.stepSize;} )
                 .attr("height", self.barHeight)
                 .attr("width", function (d) { return scale(d.size); })
-                .style("fill", self.color);
+                .style("fill", self.color)
+                .on("click", $.proxy(function(d) {self.click(d)}, self));
 
             nodeEnter.append("text")
                 .attr("dy", 3.5)
@@ -255,6 +281,13 @@
 
         // Toggle children on click.
         click: function(d) {
+
+	    // open window with gene landing page
+	    if (d.children === undefined || (d._children === null && d.children === null)) {
+		var winPop = window.open("/functional-site/#/genes/" + this.options.wsNameOrId + "/" + this.options.objNameOrId + "/" + d.name);
+	    }
+	    
+	    // expand tree
             if (d.children) {
                 d._children = d.children;
                 d.children = null;
@@ -267,7 +300,8 @@
         },
 
         color: function(d) {
-            return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
+	    //return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
+            return d._children ? "#c6dbef" : d.children ? "#3399ff" : "#ffffff";
         },
 
         collapse: function(d) {
@@ -287,15 +321,12 @@
             var margin =  this.margin,
                 width = this.width;
 
-            this.tree = d3.layout.tree().nodeSize([0, this.stepSize]);
+	    //var self = this;
+	    var container = this.$elem;
 
-            var $mainview = $('<div id="mainview">').css({'overflow-x' : 'scroll'});
-            this.$elem.append($mainview);
+	    // spinning wheel
+	    //container.prepend("<div><img src=\""+self.options.loadingImage+"\">&nbsp;&nbsp;loading genes data...</div>");
 
-            this.svg = d3.select($mainview[0]).append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             var SEEDTree = this.SEEDTree;
             var subsysToGeneMap = this.subsysToGeneMap;
@@ -306,7 +337,6 @@
             if (this.options.kbCache) {
                 prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
             } else {
-                console.log("token: " + this.authToken);
                 prom = this.wsClient.get_objects([obj]);
             }
             //var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
@@ -317,7 +347,25 @@
             }, this));
 
             $.when(prom).done($.proxy(function(genome) {
+		container.empty();
                 var genomeObj = genome[0].data;
+		var tax_domain = genomeObj.domain;
+
+		// doesn't work for Euks yet
+		if (tax_domain === "Eukaryota") {
+		    container.prepend(('<b>Functional Categories not yet available for '+tax_domain+'</b>'));
+		    return this;
+		}
+
+		this.tree = d3.layout.tree().nodeSize([0, this.stepSize]);
+		
+		var $mainview = $('<div id="mainview">').css({'overflow-x' : 'scroll'});
+		container.append($mainview);
+		
+		this.svg = d3.select($mainview[0]).append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
                 /*
                     First I am going to iterate over the Genome Typed Object and 

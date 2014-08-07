@@ -1,4 +1,4 @@
-.node rect {
+.KBSnode rect {
 	cursor: pointer;
     fill: #fff;
     fill-opacity: .5;
@@ -6,8 +6,8 @@
     stroke-width: 1.5px;
 }
 
-.node text {
-    font: 10px sans-serif;
+.KBSnode text {
+    font: 80% sans-serif;
     pointer-events: none;
 }
 

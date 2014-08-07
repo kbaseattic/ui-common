@@ -25,7 +25,7 @@
 
         token: null,
         cdmiURL: "https://kbase.us/services/cdmi_api",
-        treesURL: "http://dev19.berkeley.kbase.us:7047",
+        treesURL: "https://kbase.us/services/trees",
         $infoTable: null,
         pref: null,
 

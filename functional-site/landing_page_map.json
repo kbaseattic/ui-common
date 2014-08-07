@@ -65,16 +65,17 @@
         "ProbabilisticAnnotation" : null,
         "ContigSet" : null,
         "Genome" : "genomes",
-        "MetagenomeAnnotation" : null
+        "MetagenomeAnnotation" : null,
+        "Pangenome" : "pangenome"
     },
 
     "KBaseGwasData" : {
-        "GwasGeneList" : null,
-        "GwasPopulationVariation" : null,
-        "GwasPopulationVariation" : null,
-        "GwasPopulationTrait" : null,
-        "GwasPopulationKinship" : null,
-        "GwasTopVariations" : null
+        "GwasPopulation" : "KBaseGwasData.GwasPopulation",
+        "GwasPopulationVariation" : "KBaseGwasData.GwasPopulationVariation",
+        "GwasPopulationTrait" : "KBaseGwasData.GwasPopulationTrait",
+        "GwasTopVariation" : "KBaseGwasData.GwasTopVariation",
+        "GwasTopVariations" : "KBaseGwasData.GwasTopVariations",
+        "GwasGeneList" : "KBaseGwasData.GwasGeneList"
     },
 
     "KBaseNarrative" : {
@@ -155,7 +156,8 @@
     },
     
     "KBaseTrees" : {
-    	"Tree" : "tree"
+    	"Tree" : "tree",
+    	"MSA" : "msa"
     }
 
 }

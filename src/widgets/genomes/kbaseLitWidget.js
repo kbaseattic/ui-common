@@ -76,6 +76,11 @@ kb_define('KBaseLitWidget',
 			
 			self = this;
 			
+			self.tooltip = d3.select("body")
+                             .append("div")
+                             .classed("kbcb-tooltip", true)
+							 
+							 
 			var lit = self.options.literature
 			var loader = $("<div style='display:none'><img src='"+self.options.loadingImage+"'/></div>").css({"width":"100%","margin":"0 auto"})
 			//var loader = $("<div style='display:none'>LOADING...</div>").css({"width":"100%","margin":"0 auto"})
@@ -90,6 +95,14 @@ kb_define('KBaseLitWidget',
 										litDataTable.fnDestroy()
 										populateSearch(lit)
 									})
+									// .keydown(function(e) {
+										// if (e.keyCode == 13) {
+											// lit = self.$elem.find('#lit-query-box').val()
+											// tableInput = []
+											// litDataTable.fnDestroy()
+											// populateSearch(lit)
+										// }
+									// })
 		
 			var tableInput = []
 			var litDataTable;
@@ -104,18 +117,20 @@ kb_define('KBaseLitWidget',
 				loader.show()
 				$.ajax({
 					async: true,
-					url: 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=500&term='+lit.replace(/\s+/g, "+"),
+					url: 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=500&sort=pub+date&term='+lit.replace(/\s+/g, "+"),
 					type: 'GET',
 					success: 
 					function(data) {
 						
 						var htmlJson = self.xmlToJson(data)
 						var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='
+						var abstr = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&rettype=abstract&id='
 						if (htmlJson.eSearchResult[1].Count["#text"] == "0") {
 							var tableSettings = {
 								// "sPaginationType": "full_numbers",
 								"iDisplayLength": 4,
 								"sDom": 't<flip>',
+								"aaSorting" : [[3,'desc']],
 								"aoColumns": [
 									{sTitle: "Journal", mData: "source"},
 									{sTitle: "Authors", mData: "author"},
@@ -132,7 +147,11 @@ kb_define('KBaseLitWidget',
 							
 							for (x=0;x<htmlJson.eSearchResult[1].IdList.Id.length;x++) {
 								query += htmlJson.eSearchResult[1].IdList.Id[x]['#text']
-								if (x != htmlJson.eSearchResult[1].IdList.Id.length-1) query += ','
+								abstr += htmlJson.eSearchResult[1].IdList.Id[x]['#text']
+								if (x != htmlJson.eSearchResult[1].IdList.Id.length-1) {
+									query += ','
+									abstr += ','
+								}
 								// tableInput.push(parseLitSearchDataTable(query))
 							}
 						}
@@ -142,99 +161,157 @@ kb_define('KBaseLitWidget',
 							// this line below was throwing an error:
 							
 							query += htmlJson.eSearchResult[1].IdList.Id['#text']
+							abstr += htmlJson.eSearchResult[1].IdList.Id['#text']
 						}				
 						var tableInput = []
+						var abstractsDict = {}
+
 						$.when($.ajax({
 							async: true,
-							url: query,
+							url: abstr,
 							type: 'GET'
 						}))
 						.then(
 							function(data) {
+
 								htmlJson = self.xmlToJson(data)
-								console.log(htmlJson)
-								var summaries = htmlJson.eSummaryResult[1].DocSum // Add pub date field into table as well.
-								
-								if ($.isArray(summaries)) {
-									summaryList = []
-									for (summary in summaries) {
-										summaryList.push(summaries[summary])
+
+								abstracts = htmlJson.PubmedArticleSet[1].PubmedArticle
+								if ($.isArray(abstracts)) {
+									for (abstract_idx in abstracts) {
+										var article = abstracts[abstract_idx].MedlineCitation
+										var articleID = article.PMID["#text"]
+										if (typeof article.Article.Abstract !== 'undefined') var articleAbstract = article.Article.Abstract.AbstractText["#text"]
+										else var articleAbstract = "No abstract found for this article."
+										abstractsDict[articleID] = articleAbstract
 									}
 								}
 								else {
-									summaryList = [summaries]
+									var article = abstracts.MedlineCitation
+									var articleID = article.PMID["#text"]
+									if (typeof article.Article.Abstract !== 'undefined') var articleAbstract = article.Article.Abstract.AbstractText["#text"]
+									else var articleAbstract = "No abstract found for this article."
+									abstractsDict[articleID] = articleAbstract
 								}
-								
-								for (summary_idx in summaryList) {
-									summary = summaryList[summary_idx].Item
-									var tableInputRow = {}									
-									var isArticle = false
-									for (item_idx in summary) {
-										infoRow = summary[item_idx]
-										if (infoRow["@attributes"].Name == "PubTypeList") {
-											var publications = []
-											if ("#text" in infoRow) {
-												if ($.isArray(infoRow.Item)) {
-													for (pub_idx in infoRow.Item) {
-														if (infoRow.Item[pub_idx]["#text"]=="Journal Article") isArticle = true
-													}											
+														
+								$.when($.ajax({
+									async: true,
+									url: query,
+									type: 'GET'
+								}))
+								.then(
+									function(data) {
+										htmlJson = self.xmlToJson(data)
+
+										var summaries = htmlJson.eSummaryResult[1].DocSum // Add pub date field into table as well.
+										
+										if ($.isArray(summaries)) {
+											summaryList = []
+											for (summary in summaries) {
+												summaryList.push(summaries[summary])
+											}
+										}
+										else {
+											summaryList = [summaries]
+										}
+										
+										var articleIDs = []
+										
+										for (summary_idx in summaryList) {
+											summary = summaryList[summary_idx].Item
+											var tableInputRow = {}				
+											var isJournal = false;
+											for (item_idx in summary) {
+												infoRow = summary[item_idx]
+												if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"].substring(0,4)
+												if (infoRow["@attributes"].Name == "Source") tableInputRow["source"] = infoRow["#text"]
+												if (infoRow["@attributes"].Name == "Title") {
+													tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"
+													tableInputRow["abstract"] = summaryList[summary_idx].Id["#text"]
+													articleIDs.push(summaryList[summary_idx].Id["#text"])
 												}
-												else {
-													if (infoRow.Item["#text"]=="Journal Article") isArticle = true
-												}												
-											}
-										}
-										if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"]
-										if (infoRow["@attributes"].Name == "Source") tableInputRow["source"] = infoRow["#text"]
-										if (infoRow["@attributes"].Name == "Title") {
-											// console.log(infoRow)
-											tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"												
-										}
-										if (infoRow["@attributes"].Name == "AuthorList") {
-											var authors = ""
-											if ("#text" in infoRow) {																					
-												if ($.isArray(infoRow.Item)) {
-													commaDelay = 1
-													for (author_idx in infoRow.Item) {
-														author = infoRow.Item[author_idx]
-														if (commaDelay == 0) authors+=", "
-														else commaDelay--
-														authors+=author["#text"]													
-													}												
-												}											
-												else {
-													authors = infoRow.Item["#text"]
+												if (infoRow["@attributes"].Name == "AuthorList") {
+													var authors = ""
+													if ("#text" in infoRow) {																					
+														if ($.isArray(infoRow.Item)) {
+															commaDelay = 1
+															for (author_idx in infoRow.Item) {
+																author = infoRow.Item[author_idx]
+																if (commaDelay == 0) authors+=", "
+																else commaDelay--
+																authors+=author["#text"]													
+															}												
+														}											
+														else {
+															authors = infoRow.Item["#text"]
+														}
+													}
+													else {
+														authors = "No authors found for this article."
+													}
+													tableInputRow["author"] = authors
 												}
-											}
-											else {
-												authors = "No authors found for this article."
-											}
-											tableInputRow["author"] = authors
+												if (infoRow["@attributes"].Name == "PubTypeList") {
+													if ("#text" in infoRow) {
+														if ($.isArray(infoRow.Item)) {														
+															for (pub_idx in infoRow.Item) {
+																if (infoRow.Item[pub_idx]["#text"] == "Journal Article") isJournal = true
+															}												
+														}											
+														else {
+
+															if (infoRow.Item["#text"] == "Journal Article") isJournal = true
+														}
+													}													
+												}
+											}											
+											if (isJournal) tableInput.push(tableInputRow)
 										}
+										
+										var sDom = 't<flip>'
+										if (tableInput.length<=10) { sDom = 'tfi'; }					
+										var tableSettings = {
+											"iDisplayLength": 4,
+											"sDom": sDom,
+											"aaSorting" : [],
+											"aoColumns": [
+												{sTitle: "Journal", mData: "source"},
+												{sTitle: "Authors", mData: "author"},
+												{sTitle: "Title", mData: "title"},
+												{sTitle: "Date", mData: "date"}
+											],
+											"aaData": tableInput,
+											"fnRowCallback": function(nRow, aaData, iDisplayIndex) {
+												nRow.setAttribute('id',aaData["abstract"])	
+											}
+										}											
+										loader.hide()
+										litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
+										self.$elem.find('#literature-table tbody')
+											.on("mouseover", 'tr',
+												function() {														
+													self.tooltip = self.tooltip.text(abstractsDict[$(this).attr('id')]);
+													return self.tooltip.style("visibility", "visible");
+												}
+											)						 
+											.on("mouseout",
+												function() { 																					
+													return self.tooltip.style("visibility", "hidden"); 
+											   }
+											)
+											.on("mousemove",
+												function(e) { 
+														return self.tooltip.style("top", (e.pageY+15) + "px").style("left", (e.pageX-10)+"px");
+													}
+											)
+
+										
+									},
+									function() {
+										loader.hide()
+										self.$elem.append("<br><b>Failed to retrieve literature search results. Try again later.</b>");
 									}
-									if (isArticle) tableInput.push(tableInputRow)
-								}
-								
-								var sDom = 't<flip>'
-								if (tableInput.length<=10) { sDom = 'tfi'; }					
-								var tableSettings = {
-									// "sPaginationType": "full_numbers",
-									"iDisplayLength": 4,
-									"sDom": sDom,
-									"aoColumns": [
-										{sTitle: "Journal", mData: "source"},
-										{sTitle: "Authors", mData: "author"},
-										{sTitle: "Title", mData: "title"},
-										{sTitle: "Date", mData: "date"}
-									],
-									"aaData": tableInput
-								}	
-								loader.hide()
-								litDataTable = self.$elem.find('#literature-table').dataTable(tableSettings)
-							},
-							function() {
-								loader.hide()
-								self.$elem.append("<br><b>Failed to retrieve literature search results. Try again later.</b>");
+								)
 							}
 						)						
 					}

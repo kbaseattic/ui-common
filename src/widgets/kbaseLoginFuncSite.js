@@ -69,6 +69,7 @@
         },
 
         cookieName : 'kbase_session',
+        narrCookieName : 'kbase_narr_session',
 
         get_kbase_cookie : function (field) {
 
@@ -76,11 +77,9 @@
                 return {};
 
             var chips = localStorage.getItem('kbase_session');
-            // var chips = $.cookie('kbase_session');
 
-            if (chips != undefined) {
+            if (chips != undefined  && chips != null) {
                 chips = JSON.parse(chips);
-//                chips = this.parse_cookie(chips);
             }
             else {
                 chips = {};
@@ -90,11 +89,6 @@
                 ? chips
                 : chips[field];
         },
-
-        // parse_cookie : function (cookieStr) {
-        //     var fields = cookieStr.split('\|');
-
-        // },
 
         sessionId : function () {
             return this.get_kbase_cookie('kbase_sessionid');
@@ -993,6 +987,7 @@
                                                            '|token=' + data.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
                                         $.cookie(this.cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
                                         $.cookie(this.cookieName, cookieString, { path: '/', expires: 60 });
+                                        $.cookie(this.narrCookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
                                     }
 
 
@@ -1072,8 +1067,9 @@
             }
 
             localStorage.removeItem('kbase_session');
-            $.removeCookie('kbase_session', { path: '/' });
+            $.removeCookie(this.cookieName, { path: '/' });
             $.removeCookie(this.cookieName, { path: '/', domain: 'kbase.us' });
+            $.removeCookie(this.narrCookieName, { path: '/', domain: 'kbase.us' });
 
             // the rest of this is just housekeeping.
 

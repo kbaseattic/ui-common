@@ -107,7 +107,7 @@ kb_define('KBaseGenomeOverview',
 	    */							 
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
-            this.$infoPanel.append($("<div>").append(this.$infoTable));
+            this.$infoPanel.append($("<div>").css("overflow","auto").append(this.$infoTable));
         
             this.$contigSelect = $("<select>")
                                  .addClass("form-control")

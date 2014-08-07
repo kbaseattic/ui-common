@@ -732,6 +732,8 @@
                 this.showRegpreciseCards();
             else if (this.options.template.toLowerCase() === "mak")
                 this.showMAKCards();
+			else if (this.options.template.toLowerCase() === "floatdatatable")
+                this.showFloatMAKCards();		
             else if (this.options.template.toLowerCase() === "bambi")
                 this.showBambiCards();
             else if (this.options.template.toLowerCase() === "gene")
@@ -754,6 +756,10 @@
                 this.showTreeCards();
             else if (this.options.template.toLowerCase() === "taxonomy")
                 this.showTaxonomyCards();
+            else if (this.options.template.toLowerCase() === "pangenome")
+                this.showPangenomeCards();
+            else if (this.options.template.toLowerCase() === "msa")
+                this.showMSACards();
             else {
                 // throw an error for an unknown template. modal dialog, maybe?
             }
@@ -932,6 +938,79 @@
                     of: "#app"
                 }
             );
+
+	/*	
+            this.addNewCard("KBaseGeneBiochemistry",
+                {
+                    featureID: this.options.data.featureID,
+                    genomeID: this.options.data.genomeID,
+                    workspaceID: this.options.data.workspaceID,
+                    kbCache: this.options.data.kbCache
+                },
+                {
+                    my: "left top",
+                    at: "left+375 bottom",
+                    of: "#app"
+                }
+            );
+
+            this.addNewCard("KBaseGeneSequence",
+                {
+                    featureID: this.options.data.featureID,
+                    genomeID: this.options.data.genomeID,
+                    workspaceID: this.options.data.workspaceID,
+                    kbCache: this.options.data.kbCache
+                },
+                {
+                    my: "left top",
+                    at: "left bottom+450",
+                    of: "#app"
+                }
+            );
+
+            this.addNewCard("KBaseContigBrowser",
+                {
+                    featureId: this.options.data.featureID,
+                    genomeId: this.options.data.genomeID,
+                    workspaceId: this.options.data.workspaceID,
+                    kbCache: this.options.data.kbCache
+                },
+                {
+                    my: "left top",
+                    at: "left bottom+450",
+                    of: "#app"
+                }
+            );
+
+        */
+  
+            this.addNewCard("KBaseGeneExprLinePlot",
+                    {
+                        featureID: this.options.data.featureID,
+                        row: this.options.data.row,//null,//[1],
+                        workspaceId: this.options.data.workspaceID,
+                        kbCache: this.options.data.kbCache
+                    },
+                    {
+                            my: "left top",
+                            at: "left bottom+200",
+                            of: "#app"
+                    }
+            );
+            
+            /*
+            this.addNewCard("KBaseGeneLitWidget",
+                    {
+                    featureID: this.options.data.featureID,
+                    kbCache: this.options.data.kbCache
+                    },
+                    {
+                            my: "left top",
+                            at: "left bottom+200",
+                            of: "#app"
+                    }
+            );
+            */
         },
 
         /**
@@ -1151,56 +1230,85 @@
 
         showMAKCards: function() {
                 this.addNewCard("KBaseMAKResultCard",
-                        {
-                            id: this.options.data.id,
-                            ws: this.options.data.ws,
-                            auth: this.options.auth,
-                            userId: this.options.userId,
-                            loadingImage: this.options.loadingImage,
-                            isInCard: true
-                        },
-                        {
-                            my: "left top",
-                            at: "left bottom",
-                            of: "#app"
-                        }
-                    );
+                    {
+                        id: this.options.data.id,
+                        workspace: this.options.data.workspace,
+                        auth: this.options.auth,
+                        userId: this.options.userId,
+						kbCache: this.options.data.kbCache,
+                        loadingImage: this.options.loadingImage,
+                        isInCard: true
+                    },
+                    {
+                        my: "bottom",
+                        at: "front",
+                        of: "#app"
+                    }
+                 );
+				 
 				this.addNewCard("KBaseMAKTilingCard",
 					{
 						id: this.options.data.id,
-                           ws: this.options.data.ws,
-                           auth: this.options.auth,
-                           userId: this.options.userId,
-                           loadingImage: this.options.loadingImage,
-                           isInCard: true
+                        workspace: this.options.data.workspace,
+                        auth: this.options.auth,
+                        userId: this.options.userId,
+						kbCache: this.options.data.kbCache,
+                        loadingImage: this.options.loadingImage,
+                        isInCard: true
 					},
-						{
-						my: "right bottom",
-                           at: "left bottom",
-                           of: "#app"
+					{
+						my: "right top",
+                        at: "left bottom",
+                        of: "#app"
 					}
 				);
                 return this;
         },
+		
+		showFloatMAKCards: function() {		
+			self = this;
+			this.workspaceClient = new Workspace(this.newWorkspaceServiceUrl, { 'token' : this.options.data.auth, 'user_id' : this.options.data.userId});
+			this.workspaceClient.get_objects([{workspace: this.options.data.workspace, name: this.options.data.id}],
+				function(data) {
+					self.addNewCard("KBaseHeatMapCard",
+						{
+							id: self.options.data.id,
+							bicluster: data[0].data,							
+							workspace: self.options.data.workspace,
+							auth: self.options.auth,
+							userId: self.options.userId,
+							loadingImage: self.options.loadingImage,
+							isInCard: true
+						},
+						{
+							my: "left top",
+							at: "left bottom",
+							of: "#app"
+						}
+					);
+				}
+			)			
+			return this;
+        },
 
-    showPPICards: function() {
-        this.addNewCard("KBasePPICard",
-                {
-                id: this.options.data.id,
-                ws: this.options.data.ws,
-                auth: this.options.auth,
-                userId: this.options.userId,
-                loadingImage: this.options.loadingImage,
-                isInCard: true
-                },
-                {
-                my: "left top",
-                at: "left bottom",
-                of: "#app"
-                }
-               );
-        return this;
-    },
+		showPPICards: function() {
+			this.addNewCard("KBasePPICard",
+					{
+					id: this.options.data.id,
+					ws: this.options.data.ws,
+					auth: this.options.auth,
+					userId: this.options.userId,
+					loadingImage: this.options.loadingImage,
+					isInCard: true
+					},
+					{
+					my: "left top",
+					at: "left bottom",
+					of: "#app"
+					}
+				   );
+			return this;
+		},
 
         showBambiCards: function() {
                 this.addNewCard("KBaseBambiRunResultCard",
@@ -1351,7 +1459,41 @@
             }
             return this;
         },
-        
+
+        showPangenomeCards: function() {
+            this.addNewCard("kbasePanGenome",
+                    {
+            			name: this.options.data.id,
+            			ws: this.options.data.ws,
+                        token: this.options.auth,
+                        isInCard: true
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+
+        showMSACards: function() {
+            this.addNewCard("kbaseMSA",
+                    {
+            			msaID: this.options.data.id,
+            			workspaceID: this.options.data.ws,
+                        token: this.options.auth,
+                        isInCard: true
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+
         /**
          * Registers all events that this manager should know about.
          * Also makes a list of all registered events, stored in this.registeredEvents[], so they
@@ -1371,6 +1513,7 @@
                                      "showOperons", 
                                      "showSequence", 
                                      "showBiochemistry", 
+                                     "showStructureMatches",
                                      "showSpecElement", 
                                      "showMemeMotif", 
                                      "showMemeRunParameters", 
@@ -1388,23 +1531,23 @@
                                      "showBambiMotif",
                                      "showBambiRunParameters", 
                                      "showBambiRawOutput",
+									 "showLitWidget",
+									 "showTreeCards",
 									 "showHeatMap",
-									 "showLineChart",
-									 "showLitWidget",
-									 "showBarChart",
-									 "showLitWidget",
-									 "showTreeCards"];
-
+									 "showLineChart",									 
+									 "showBarChart"];
+									 
 			/**
              * Event: showBarChart
              * ------------------
              * Adds new kbaseMAKBarChart card.
              */	
 			$(document).on("showBarChart", function(event, data) {
-				console.log(data)
 				self.addNewCard("KBaseBarChartCard",
 					{
 						terms: data.terms,
+						id: data.id,
+						workspace: data.workspace
 					},
 					{
 						my: "left",
@@ -1422,12 +1565,15 @@
 				self.addNewCard("KBaseLineChartCard",
 					{
 						row: data.row,		
-						heatmap: data.heatmap
+						heatmap: data.heatmap,
+						widget: data.widget,
+						id: data.id,
+						workspace: data.workspace
 					},
 					{
-						my: "right top",
-						at: "right+800 bottom",
-						of: data.event
+						my: "right bottom",
+						at: "left bottom",
+						of: "#app"
 				});
 
 			});
@@ -1441,6 +1587,10 @@
 			self.addNewCard("KBaseHeatMapCard",
 				{
 					bicluster: data.bicluster,
+					id: data.id,
+					workspace: data.workspace,
+					tiles: data.tiles,
+					mak: data.mak
 				},
 				{
                     my: "left top",
@@ -1468,6 +1618,7 @@
 						at: "right+800 bottom",
 						of: data.event
 				});
+
 			});
 			
             /**
@@ -1546,6 +1697,26 @@
             });
 
             /**
+             * Event: showStructureMatches
+             * -----------------------
+             * Adds new KBaseGeneStructureMatches card, based on a feature ID.
+             */            
+            $(document).on("showStructureMatches", function(event, data) {
+                self.addNewCard("KBaseGeneStructureMatches",
+                {
+                    featureID: data.featureID,
+                    genomeID: data.genomeID,
+                    workspaceID: data.workspaceID,
+                    kbCache: data.kbCache,
+                },
+                {
+                    my: "left top",
+                    at: "center",
+                    of: data.event
+                });
+            });
+
+            /**
              * Event: featureClick
              * -------------------
              * Adds cards based on clicking on a feature.
@@ -1583,7 +1754,7 @@
              * Adds new KBaseContigBrowser card for a given contig ID,
              * and centered on a feature (if one's available).
              */
-	    $(document).on("showContig", function(event, data) {
+            $(document).on("showContig", function(event, data) {
                 self.addNewCard("KBaseContigBrowser",
                     {
                         contig: data.contig,
@@ -1896,6 +2067,9 @@
                 self.addNewCard("KBaseMAKBiclusterCard",
                     {
                         bicluster: data.bicluster,
+						id: data.id,
+						workspace: data.workspace,
+						tiles: data.tiles,
                         showButtons: true,
                         centerFeature: data.centerFeature
                     },
@@ -2022,6 +2196,36 @@
             			{
             				workspaceID: data.workspaceID,
             				treeID: data.treeID,
+            				token: data.token
+            			},
+            			{
+            				my: "left top",
+            				at: "center",
+            				of: data.event
+            			}
+            	);
+            });
+
+            $(document).on("showPangenome", function(event, data) {
+            	self.addNewCard("kbasePanGenome",
+            			{
+            				ws: data.ws,
+            				name: data.name,
+            				token: data.token
+            			},
+            			{
+            				my: "left top",
+            				at: "center",
+            				of: data.event
+            			}
+            	);
+            });
+
+            $(document).on("showMSA", function(event, data) {
+            	self.addNewCard("kbaseMSA",
+            			{
+            				workspaceID: data.workspaceID,
+            				msaID: data.msaID,
             				token: data.token
             			},
             			{

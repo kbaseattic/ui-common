@@ -92,6 +92,16 @@ angular.module('card-directives')
         return {
             link: function(scope, element, attrs) {
                 if (cardManager) cardManager.destroy();
+                
+                if(scope.params.workspaceID == "CDS" ) {
+                    scope.params.workspaceID = "KBasePublicGenomesV3";
+                }
+                if (!scope.params.genomeID) {
+                    var temp = scope.params.featureID.split(".");
+                    if (temp.length>3) {
+                        scope.params.genomeID = temp[0]+"."+temp[1];
+                    }
+                }
                 cardManager = $(element).KBaseCardLayoutManager({
                     template: "gene", 
                     data: scope.params, 
@@ -154,11 +164,25 @@ angular.module('card-directives')
         };
     })
     .directive('makcards', function($rootScope) {
+        return {	
+            link: function(scope, element, attrs) {
+				console.log(scope.params.ws)
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "mak", 
+                    data: scope.params, 
+                    auth: $rootScope.USER_TOKEN,
+                    userId: $rootScope.USER_ID
+                });
+            }
+        };
+    })
+	.directive('floatmakcards', function($rootScope) {
         return {
             link: function(scope, element, attrs) {
                 if (cardManager) cardManager.destroy();
                 cardManager = $(element).KBaseCardLayoutManager({
-                    template: "mak", 
+                    template: "floatdatatable", 
                     data: scope.params, 
                     auth: $rootScope.USER_TOKEN,
                     userId: $rootScope.USER_ID
@@ -403,6 +427,32 @@ angular.module('card-directives')
                 cardManager = $(element).KBaseCardLayoutManager({
                     template: "taxonomy", 
                     data: scope.params
+                });
+            }
+        };
+    })
+    .directive('pangenomecards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "pangenome", 
+                    data: scope.params, 
+                    auth: $rootScope.USER_TOKEN,
+                    userId: $rootScope.USER_ID
+                });
+            }
+        };
+    })
+    .directive('msacards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "msa", 
+                    data: scope.params, 
+                    auth: $rootScope.USER_TOKEN,
+                    userId: $rootScope.USER_ID
                 });
             }
         };

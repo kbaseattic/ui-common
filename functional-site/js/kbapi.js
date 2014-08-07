@@ -85,7 +85,6 @@ function KBCacheClient(token) {
     var auth = {};
     auth.token = token;
 
-    console.log(auth.token)
     if (typeof configJSON != 'undefined') {
         if (configJSON.setup == 'dev') {
             fba_url = configJSON.dev.fba_url;
@@ -116,24 +115,23 @@ function KBCacheClient(token) {
 
     var cache = new Cache();
 
+    // some kbase apis
     self.fba = fba;
     self.ws = kbws;
-    self.ujs = ujs
+    self.ujs = ujs;
     self.nar = new ProjectAPI(ws_url, token);
 
+    // some accessible variables
     self.ws_url = ws_url;
     self.search_url = search_url;    
     self.token = token;
+    self.nar_type = 'KBaseNarrative.Narrative';
+
+    // some accessible helper methods
     self.ui = new UIUtils();
 
+    // this is an experiment in caching promises 
     self.req = function(service, method, params) {
-        if (service == 'fba') { 
-            // use whatever workspace server that was configured.
-            // this makes it possible to use the production workspace server
-            // with the fba server.   Fixme: fix once production fba server is ready.
-            params.wsurl = ws_url;
-        }
-
         // see if api call has already been made        
         var data = cache.get(service, method, params);
 
@@ -199,54 +197,6 @@ function KBCacheClient(token) {
         })
 
 
-        /*
-        var next_prom = $.when(p).then(function(data) {
-            var my_list = data[0];
-            var shared_list = data[1];
-            var public_list = data[2];
-
-            var my_prom = kb.ws.list_objects({workspaces: my_list, 
-                                               type: 'KBaseNarrative.Metadata',
-                                               showHidden: 1});
-
-            var shared_prom = kb.ws.list_objects({workspaces: shared_list, 
-                                               type: 'KBaseNarrative.Metadata',
-                                               showHidden: 1});        
-
-            var public_prom = kb.ws.list_objects({workspaces: public_list, 
-                                               type: 'KBaseNarrative.Metadata',
-                                               showHidden: 1});        
-
-            var p = $.when(my_prom, shared_prom, public_prom).then(function(d1, d2, d3) {
-                var my_nars_ws = [];
-                var shared_nars_ws = [];
-                var public_nars_ws = [];
-
-                for (var i in d1) {
-                    var a = d1[i]
-                    var ws = a[7];
-                    my_nars_ws.push(ws);
-                }
-
-                for (var i in d2) {
-                    var a = d2[i]
-                    var ws = a[7];
-                    shared_nars_ws.push(ws);
-                }
-
-                for (var i in d3) {
-                    var a = d3[i]
-                    var ws = a[7];
-                    public_nars_ws.push(ws);
-                }
-
-                return [my_nars_ws, shared_nars_ws, public_nars_ws];         
-            })
-
-            return p;
-        });*/
-
-
         // next get all narratives from these "project" workspaces
         // fixme: backend!
         var last_prom = $.when(p).then(function(data) {
@@ -255,22 +205,21 @@ function KBCacheClient(token) {
             var public_ws = data[2];
 
             var my_nar_prom = kb.ws.list_objects({workspaces: mine_ws, 
-                                              type: 'KBaseNarrative.Narrative',
+                                              type: self.nar_type,
                                               showHidden: 1});
 
             var shared_nar_prom = kb.ws.list_objects({workspaces: shared_ws, 
-                                                  type: 'KBaseNarrative.Narrative',
+                                                  type: self.nar_type,
                                                   showHidden: 1});        
 
             var public_nar_prom = kb.ws.list_objects({workspaces: public_ws, 
-                                                  type: 'KBaseNarrative.Narrative',
+                                                  type: self.nar_type,
                                                   showHidden: 1});
 
             // filter down to unique workspaces that have narrative objects, 
             // and also make get_permissions calls
             var ws_prom = $.when(my_nar_prom, shared_nar_prom, public_nar_prom)
                            .then(function(d1, d2, d3) {
-                console.log(d1, d2, d3)
 
                 var ws1 = [];
                 for (var i in d1) {
@@ -283,13 +232,6 @@ function KBCacheClient(token) {
                     ws2.push(d2[i][7])
                 }
                 var shared_ws_list = ws2.filter( unique )
-
-                var ws3 = [];
-                for (var i in d3) {
-                    ws3.push(d3[i][7])
-                }
-                var public_ws_list = ws3.filter( unique )   
-
 
                 return my_ws_list.concat(shared_ws_list);//[my_ws_list, shared_ws_list];
             })
@@ -310,11 +252,7 @@ function KBCacheClient(token) {
                         perm_proms.push(prom);
                     }
                 } 
-                /*else {
-                    for (var i in ws_list) {
-                        perm_proms.push(undefined);
-                    }
-                }*/
+
                 var all_proms = [my_nar_prom, shared_nar_prom, public_nar_prom].concat(perm_proms)                
 
                 var p = $.when.apply($, all_proms).then(function() { 
@@ -327,19 +265,14 @@ function KBCacheClient(token) {
                     var perms = {};
 
 
-                    if (USER_ID) {
-                        for (var i = 0; i<ws_list.length; i++) {
-                            perms[ws_list[i]] = arguments[3+i]
-                        }
-                    } else {
-                        for (var i = 0; i<ws_list.length; i++) {
-                            perms[ws_list[i]] = {'Everybody': 'r'};
-                        }
+                    for (var i = 0; i<ws_list.length; i++) {
+                        perms[ws_list[i]] = arguments[3+i]
                     }
 
-                    $('.my-nar-count').text(mine.length)
-                    $('.shared-nar-count').text(shared.length);  
-                    $('.public-nar-count').text(pub.length);            
+
+                    $('.my-nar-count').addClass('badge').text(mine.length)
+                    $('.shared-nar-count').addClass('badge').text(shared.length);  
+                    $('.public-nar-count').addClass('badge').text(pub.length);            
 
                     var all_data = {my_narratives: mine, 
                                     shared_narratives: shared, 
@@ -361,6 +294,31 @@ function KBCacheClient(token) {
         self.narrative_prom = last_prom
         return last_prom;
     }
+
+
+    self.getNarrativeDeps = function(params) {
+        var ws = params.ws;
+        var name = params.name;
+
+        var p = self.ws.get_object_info([{workspace: ws, name: name}], 1)
+            .then(function(info) {
+                console.log('info', info)
+                var deps = JSON.parse(info[0][10].data_dependencies);
+
+                var d = [];
+                for (var i in deps) {
+                    var obj = {};
+                    var o = deps[i].split(' ');
+                    obj.type = o[0];
+                    obj.name = o[1];
+                    d.push(obj)
+                }
+
+                return d;
+            })
+        return p;
+    }
+
 
     // cached objects
     var c = new WSCache();
@@ -539,16 +497,20 @@ function KBCacheClient(token) {
                 break; 
             case 'PhenotypeSimulationSet': 
                 route = 'ws.simulation';
-                break;     
-            case 'Pangenome':
-                route = 'ws.pangenome';
-                break;                            
+                break;  
+            // remove next block cause it's described in landing_page_map.json
+            //case 'Pangenome':
+            //    route = 'ws.pangenome';
+            //    break;                            
             case 'Genome': 
                 route = 'genomesbyid';
                 break;
-  	    case 'InteractionDataset':
-	        route = 'ppid';
-	        break;
+	    case 'MAKResult':
+		route = 'mak';
+		break;
+	    case 'FloatDataTable':
+                route = 'floatdatatable';
+                break;
         }
         return route;
     }
@@ -1543,6 +1505,7 @@ function ProjectAPI(ws_url, token) {
         var self = this;
         var metadata_fn = ws_client.get_object_info([{wsid: p.project_id, objid : p.narrative_id}], 1);
         $.when( metadata_fn).then( function( obj_info) {
+            console.log('object_info', obj_info)
             if (obj_info.length != 1) {
                 p.error_callback( "Error: narrative ws." + p.project_id +
                         ".obj." + p.narrative_id + " not found");
@@ -1563,6 +1526,7 @@ function ProjectAPI(ws_url, token) {
         res.description = meta.description;
         res.name = meta.name;
         var temp = $.parseJSON(meta.data_dependencies);
+        console.log(temp)
         //deps should really be stored as an id, not a name, since names can change
         var deps = temp.reduce( function(prev,curr,index) {
             var dep = curr.split(" ");

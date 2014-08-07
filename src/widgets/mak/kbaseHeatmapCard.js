@@ -11,10 +11,12 @@ kb_define('KBaseHeatMapCard',
 		version: "1.0.0",
 		options: {
 			title: "HeatMap Card",
-			isInCard: false,
-			width: 600,
-			height: 600
+			isInCard: true,
+			width: 1000,
+			height: 1000
 		},
+		
+		newWorkspaceServiceUrl: "https://kbase.us/services/ws",
 		
 		init: function(options) {
 			this._super(options);
@@ -22,22 +24,82 @@ kb_define('KBaseHeatMapCard',
 			if (this.options.bicluster === null) {
 				//throw an error
 				return;
-			}				
+			}		
+			this.workspaceClient = new Workspace(this.newWorkspaceServiceUrl, { 'token' : this.options.auth, 'user_id' : this.options.userId});
+			
             return this.render();
 		},
 		render: function(options) {
 
-            var self = this;			
-			self.$elem.append($("<div id='heatmap'>"))
+            var self = this;		
 
-			self.tooltip = d3.select("body")
+			var $mainDiv = $("<div id='heatmapDiv'>")
+			var $heatmapDiv = $("<div id='heatmap'>");	
+			
+			var datatable = this.options.bicluster
+			if (this.options.tiles && this.options.mak) { 
+			
+				var tiles = this.options.tiles
+				var mak = this.options.mak						
+			
+				$.each(tiles,function(i,d) {				
+					d.on("click", function() {
+						$mainDiv.empty()					
+						$.when(self.workspaceClient.get_objects([{workspace: self.options.workspace, name: mak[d.val()].bicluster_id}]))
+						.then(function(data) {
+							self.options.bicluster = data[0].data
+							self.render()
+						})					
+					})
+				})
+			}
+				
+			self.$elem.append($mainDiv)
+			$instructions = $("<b><i>Click on a gene for plot of expression values across all conditions. Click another gene to add to the plot.</i></b>")
+			$mainDiv.append($instructions)
+			$mainDiv.append($heatmapDiv)
+			
+			// var $tooltipExpression = $("<div>")
+			// var $tooltipGene = $("<div>")
+			// var $tooltipCondition = $("<div>")
+			// self.tooltip = d3.select("body")
+                             // .append($tooltipExpression)
+							 // .append($tooltipGene)
+							 // .append($tooltipCondition)
+                             // .classed("kbcb-tooltip", true);
+			self.tooltip1 = d3.select("body")
                              .append("div")
                              .classed("kbcb-tooltip", true);
+			self.tooltip2 = d3.select("body")
+                             .append("div")
+                             .classed("kbcb-tooltip", true);
+			self.tooltip3 = d3.select("body")
+                             .append("div")
+                             .classed("kbcb-tooltip", true);			
 			
-			var datatable = self.options.bicluster
+			
+			// var columnMeans = []
+			// for (var y = 0; y < datatable.data.length; y+=1) {	
+				// var column = []
+				// for (var x = 0; x < datatable.data[0].length; x+=1) {
+					// column.push(datatable[y][x])
+				// }
+				// columnMeans.push(d3.mean(column))
+			// }
+			
+			// columnMeans.sort(function(a,b){return a - b})
+			
+			// for (i = 0; i < datatable_unsorted.length; i++) {
+				// var index = []
+				// var curind = datatable.data[y].indexOf(datatable_unsorted[i]);
+				// index[index.length] = curind;					
+			// }				
+			
 			var dataflat = 	[]
-			var datadict = []
-			for (var y = 0; y < datatable.data.length; y+=1) {
+			var datadict = []			
+
+			for (var y = 0; y < datatable.data.length; y+=1) {				
+								
 				for (var x = 0; x < datatable.data[0].length; x+=1) {
 					datadict.push({
 						"condition": x,
@@ -46,31 +108,32 @@ kb_define('KBaseHeatMapCard',
 					dataflat.push(datatable.data[y][x]) //obsolete
 				}
 			}
-			
+						
 			var gene_labels_ids = [];
-			for (var y = 0; y < datatable.row_ids.length; y+=1) {
+			for (var y = 0; y < datatable.row_labels.length; y+=1) {
 				gene_labels_ids.push({
 					"label": datatable.row_labels[y],
 					"id": datatable.row_ids[y]
 				});
 			}
-			
+					
 			var gene_labels = datatable.row_labels,
 				gene_ids = datatable.row_ids,
 				conditions = datatable.column_labels,
 				expression = datatable.data;
-			
-			var $heatmapDiv = $("#heatmap");
 
-			var margin = { top: 100, right: 0, bottom: 100, left: 200 },
-			  width = 3000 - margin.left - margin.right,
-			  height = 3000 - margin.top - margin.bottom,
-			  gridSize = Math.floor(Math.min(width/conditions.length,width/gene_labels.length)),
-			  legendElementWidth = gridSize*2,
-			  colors = ["#0000ff","#0066ff","#3399ff","#ffffff","#ff9966","#ff6600","#ff0000"]
-			
-			console.log(gridSize)
-			
+			var margin = { top: 100, right: 50, bottom: 100, left: 200 },
+				width = 2000 - margin.left - margin.right,
+				height = 2000 - margin.top - margin.bottom			 
+			if(Math.floor(Math.min(width/conditions.length,width/gene_labels.length))>15) {gridSize = Math.floor(Math.min(width/conditions.length,width/gene_labels.length))}
+			else {
+				gridSize = 15
+				width = gridSize*conditions.length
+				height = gridSize*gene_labels.length
+			}
+			var legendElementWidth = gridSize*2,
+			colors = ["#0000ff","#0066ff","#66FFFF","#ffffff","#FFC6AA","#ff6600","#ff0000"]
+						
 			var colorScale = function(d) {
 				if (d > 2.5) return colors[6]
 				if (d > 1.5 && d <= 2.5) return colors[5]
@@ -81,7 +144,7 @@ kb_define('KBaseHeatMapCard',
 				if (d <= -2.5) return colors[0]
 			};
 
-			var svg = d3.select("#heatmap").append("svg")
+			var svg = d3.select($heatmapDiv.get(0)).append("svg")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
 				.append("g")
@@ -94,14 +157,16 @@ kb_define('KBaseHeatMapCard',
 				.attr("x", 0)
 				.attr("y", function (d, i) { return i * gridSize; })
 				.attr("class","geneLabel")
-				.style("text-anchor", "end")
+				.style({"text-anchor":"end","font-size":"small"})
 				.attr("transform", "translate(-6," + gridSize / 1.5 + ")")
 				.on("click",function(d,i,event){
-					if (!$("div.kblpc-subtitle:contains('"+d.id+"')").length) {self.trigger("showFeature", {featureID: d.id, event: event})}
+					// if (!$("div.kblpc-subtitle:contains('"+d.id+"')").length) {self.trigger("showFeature", {featureID: d.id, event: event})}
 					// self.trigger("showFeature", {featureID: d.id, event: event})
-					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], heatmap: geneLabels, event: event})
-				})
-				
+					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], id: self.options.id, workspace: self.options.workspace, heatmap: geneLabels, widget: self, event: event})
+					if ($(this).css("font-weight") == 400) $(this).css({"font-weight":900,"font-size":"medium"})
+					else $(this).css({"font-weight":400,"font-size":"small"})
+				})						
+			
 			var conditionLabels = svg.selectAll(".conditionLabel")
 				.data(conditions)
 				.enter().append("text")
@@ -121,19 +186,19 @@ kb_define('KBaseHeatMapCard',
 				.on("mouseover", 
                                 function(d) { 
                                     d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
-                                    self.tooltip = self.tooltip.text(d);
-                                    return self.tooltip.style("visibility", "visible"); 
+                                    self.tooltip1 = self.tooltip1.text(d);									
+                                    return self.tooltip1.style("visibility", "visible"); 
                                 }
                             )
                          .on("mouseout", 
                                 function() { 
                                     d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
-                                    return self.tooltip.style("visibility", "hidden"); 
+                                    return self.tooltip1.style("visibility", "hidden"); 
                                 }
                             )
                          .on("mousemove", 
                                 function() { 
-                                    return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+                                    return self.tooltip1.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
                                 }
                             )
 				//.append("title").text(function(d) { return d; })
@@ -148,39 +213,51 @@ kb_define('KBaseHeatMapCard',
 				  .attr("class", "squares")
 				  .attr("width", gridSize)
 				  .attr("height", gridSize)
-				  .style({"fill": colors[3],"stroke":"#E6E6E6","stroke-width":"2px"})
+				  .style({"fill":function(d) { return colorScale(expression[d.gene][d.condition]); },"stroke":"#E6E6E6","stroke-width":"2px"})
+				  // .style({"fill": colors[3],"stroke":"#E6E6E6","stroke-width":"2px"})
 				  .on("mouseover", 
                                 function(d) { 
                                     d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
-                                    self.tooltip = self.tooltip.text("value: "+expression[d.gene][d.condition])
-                                    return self.tooltip.style("visibility", "visible"); 
+                                    // self.tooltip = self.tooltip.text("value: "+expression[d.gene][d.condition])
+									self.tooltip1 = self.tooltip1.text("value: "+expression[d.gene][d.condition]).style("visibility","visible")
+									self.tooltip2 = self.tooltip2.text("gene: " +gene_labels[d.gene]).style("visibility","visible")
+									self.tooltip3 = self.tooltip3.text("condition: "+conditions[d.condition]).style("visibility","visible")
                                 }
                             )
                          .on("mouseout", 
                                 function() { 
                                     d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
-                                    return self.tooltip.style("visibility", "hidden"); 
+                                    self.tooltip1.style("visibility", "hidden"); 
+									self.tooltip2.style("visibility", "hidden"); 
+									self.tooltip3.style("visibility", "hidden"); 
                                 }
                             )
                          .on("mousemove", 
                                 function() { 
-                                    return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+                                   self.tooltip1.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+								   self.tooltip2.style("top", (d3.event.pageY+15+30) + "px").style("left", (d3.event.pageX-10)+"px");
+								   self.tooltip3.style("top", (d3.event.pageY+15+60) + "px").style("left", (d3.event.pageX-10)+"px");
                                 }
                             )
+			  			  
+			  // heatMap.transition().duration(1000)
+				  // .style("fill", function(d) { return colorScale(expression[d.gene][d.condition]); });
 			  
-			  // heatMap.append("title").text(function(d) { return "value: "+expression[d.gene][d.condition]+"\ncondition: "+conditions[d.condition]+"\ngene: "+gene_labels[d.gene]; });
-			  
-			  heatMap.transition().duration(1000)
-				  .style("fill", function(d) { return colorScale(expression[d.gene][d.condition]); });
+			  var gauge = []
+			  gauge.push(d3.min(dataflat))
+			  for (var i = Math.ceil(d3.min(dataflat)); i <= Math.floor(d3.max(dataflat)); i++) {
+				if (i < 3 && i > -3) gauge.push(i)
+			  }
+			  gauge.push(d3.max(dataflat))
 			  
 			  var legend = svg.selectAll(".legend")
-				  .data(["-Inf",-2,-1,0,1,2,"Inf"], function(d) { return d; })
+				  .data(gauge, function(d) { return d; })
 				  .enter().append("g")
 				  .attr("class", "legend");
 
 			  legend.append("rect")
 				.attr("y", function(d, i) { return legendElementWidth * i; })
-				.attr("x", (datatable.data[0].length)*gridSize+gridSize)
+				.attr("x", -margin.left*0.8 + gridSize)
 				.attr("height", legendElementWidth)
 				.attr("width", gridSize / 2)
 				.style("fill", function(d, i) { return colors[i]; });
@@ -189,8 +266,10 @@ kb_define('KBaseHeatMapCard',
 				.attr("class", "mono")
 				.text(function(d) { return d; })
 				.attr("y", function(d, i) { return (legendElementWidth * i)+legendElementWidth/2; })
-				.attr("x", (datatable.data[0].length)*gridSize+gridSize*1.5)
+				.attr("x", -margin.left*0.8 + gridSize*1.5)
 				.style("text-anchor","left")
+				
+			// self.trigger("showLineChart", {row: [expression,conditions,gene_labels,0], id: self.options.id, ws: self.options.ws, heatmap: geneLabels})
 				
 			return this;
 		},
@@ -198,7 +277,7 @@ kb_define('KBaseHeatMapCard',
 			return {
 				type: "HeatMapCard",
 				id: this.options.id,
-				workspace: this.options.ws,
+				workspace: this.options.workspace,
 				auth: this.options.auth,
 				userId: this.options.userId,
 				title: "HeatMap Card",

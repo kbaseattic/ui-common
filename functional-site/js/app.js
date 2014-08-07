@@ -305,8 +305,8 @@ var app = angular.module('landing-pages',
              controller: 'WBLanding'})
         .state('genomesbyid',
             {url: '/genomes/:ws/:id',
-             templateUrl: 'views/genomes/sortable-rows-landing-page.html',
-             //templateUrl: 'views/objects/genome.html',
+	     templateUrl: 'views/genomes/sortable-rows-landing-page.html',
+	     //templateUrl: 'views/objects/genome.html',
              controller: 'WBLanding'})
         .state('kbgenomesbyws',
             {url: '/KBaseGenomes.Genome/:ws',
@@ -318,6 +318,8 @@ var app = angular.module('landing-pages',
              controller: 'WBLanding'});
 
 
+/*
+OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
     $stateProvider
         .state('genes',
             {url: '/genes/CDS/:fid',
@@ -330,6 +332,8 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/objects/gene.html',
              controller: 'GeneDetail'});
 
+*/
+/*
     $stateProvider
         .state('genesbyws',
             {url: '/genes/:ws/:fid',
@@ -341,7 +345,18 @@ var app = angular.module('landing-pages',
             {url: '/genes/:ws/:gid/:fid',
              templateUrl: 'views/objects/gene.html',
              controller: 'GeneDetail'});
+*/
 
+    $stateProvider
+        .state('kbgenesbyws',
+            {url: '/genes/:ws/:fid',
+             templateUrl: 'views/genomes/sortable-rows-landing-page-genes.html',
+             controller: 'WBGeneLanding'})
+        .state('kbgenesbywsgenome',
+            {url: '/genes/:ws/:gid/:fid',
+             templateUrl: 'views/genomes/sortable-rows-landing-page-genes.html',
+             controller: 'WBGeneLanding'})                      
+             
     $stateProvider
         .state('meme',
             {url:'/meme',
@@ -379,6 +394,12 @@ var app = angular.module('landing-pages',
             {url: '/mak/:ws/:id',
              templateUrl: 'views/objects/mak.html',
              controller: 'MAKDetail'});
+
+	$stateProvider
+        .state('floatdatatable',
+            {url: '/floatdatatable/:ws/:id',
+             templateUrl: 'views/objects/floatdatatable.html',
+             controller: 'FloatDataTable'});
 
     $stateProvider
         .state('spec',
@@ -459,12 +480,26 @@ var app = angular.module('landing-pages',
     		templateUrl: 'views/objects/tree.html',
     		controller: 'TreeDetail'});
 
-    //$urlRouterProvider.when('', '/login/');
-    $urlRouterProvider.when('', '/login/');
+    $stateProvider
+	.state('pangenome',
+		{url: '/pangenome/:ws/:id',
+		templateUrl: 'views/objects/pangenome.html',
+		controller: 'PangenomeDetail'});
 
     $stateProvider
-        .state('otherwise', 
-            {url: '*path', 
+	.state('msa',
+		{url: '/msa/:ws/:id',
+		templateUrl: 'views/objects/msa.html',
+		controller: 'MSADetail'});
+
+    $urlRouterProvider.when('', '/login/')
+                      .when('/', '/login/')
+                      .when('#', '/login/');
+
+    $urlRouterProvider.otherwise('/404/');
+    
+    $stateProvider.state("404", 
+            {url: '/404/', 
              templateUrl : 'views/404.html'});
 
 }]);
@@ -539,6 +574,21 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     $('.help-dropdown').html(HELP_DROPDOWN);
 
     //  Things that need to happen when a view changes.
+    $rootScope.$on('$locationChangeStart', function(event) {
+        var absUrl = $location.absUrl();
+        var begin = absUrl.indexOf('/functional-site/');
+        var offset = '/functional-site/'.length;
+
+        //console.log([absUrl, begin, offset, absUrl.length]);
+    
+        if (absUrl.indexOf('/functional-site/#/') < 0 && begin > 0 && absUrl.length > begin + offset) {
+            event.preventDefault();
+            $location.path('/404/');   
+            $state.go('404');
+        }    
+    });
+
+    //  Things that need to happen when a view changes.
     $rootScope.$on('$stateChangeSuccess', function() {
         $('body').not('#project-table tr').unbind('click');
         $('.fixedHeader').remove(); 
@@ -560,7 +610,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         // Otherwise, just login in place and reload.
         // We need to reload to make sure the USER_ID and USER_TOKEN get set properly.
         if ($location.path() === '/login/') {
-            if (c.kbase_sessionid) {
+            var kbase_sessionid = $("#signin-button").kbaseLogin('session').kbase_sessionid;
+            if (kbase_sessionid) { 
                 // USER_ID = $("#signin-button").kbaseLogin('session').user_id;
                 // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
                 $location.path('/narratives/featured');
