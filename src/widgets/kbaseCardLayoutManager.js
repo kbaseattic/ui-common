@@ -751,6 +751,10 @@
                 this.showTreeCards();
             else if (this.options.template.toLowerCase() === "taxonomy")
                 this.showTaxonomyCards();
+            else if (this.options.template.toLowerCase() === "pangenome")
+                this.showPangenomeCards();
+            else if (this.options.template.toLowerCase() === "msa")
+                this.showMSACards();
             else {
                 // throw an error for an unknown template. modal dialog, maybe?
             }
@@ -1450,7 +1454,41 @@
             }
             return this;
         },
-        
+
+        showPangenomeCards: function() {
+            this.addNewCard("kbasePanGenome",
+                    {
+            			name: this.options.data.id,
+            			ws: this.options.data.ws,
+                        token: this.options.auth,
+                        isInCard: true
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+
+        showMSACards: function() {
+            this.addNewCard("kbaseMSA",
+                    {
+            			msaID: this.options.data.id,
+            			workspaceID: this.options.data.ws,
+                        token: this.options.auth,
+                        isInCard: true
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+
         /**
          * Registers all events that this manager should know about.
          * Also makes a list of all registered events, stored in this.registeredEvents[], so they
@@ -2154,6 +2192,36 @@
             			{
             				workspaceID: data.workspaceID,
             				treeID: data.treeID,
+            				token: data.token
+            			},
+            			{
+            				my: "left top",
+            				at: "center",
+            				of: data.event
+            			}
+            	);
+            });
+
+            $(document).on("showPangenome", function(event, data) {
+            	self.addNewCard("kbasePanGenome",
+            			{
+            				ws: data.ws,
+            				name: data.name,
+            				token: data.token
+            			},
+            			{
+            				my: "left top",
+            				at: "center",
+            				of: data.event
+            			}
+            	);
+            });
+
+            $(document).on("showMSA", function(event, data) {
+            	self.addNewCard("kbaseMSA",
+            			{
+            				workspaceID: data.workspaceID,
+            				msaID: data.msaID,
             				token: data.token
             			},
             			{

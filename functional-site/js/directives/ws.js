@@ -1357,7 +1357,9 @@ angular.module('ws-directives')
                     var route = sub;
 
                     // overwrite routes for pages that are displayed in the workspace browser
-                    var route = kb.getRoute(kind);
+                    var routeInner = kb.getRoute(kind);
+                    if (routeInner)
+                    	route = routeInner;
                                                                                                               
                     if (route) {
                         var url = route+"({ws:'"+ws+"', id:'"+name+"'})";

@@ -13,7 +13,8 @@
         	ws: null,
         	name: null,
             loadingImage: "assets/img/ajax-loader.gif",
-            withExport: false
+            withExport: false,
+            width: 1000
         },
 
         pref: null,
@@ -29,6 +30,9 @@
             this._super(options);
             this.pref = this.genUUID();
             this.token = this.authToken();
+            this.geneIndex = {};
+            this.genomeNames = {};
+            this.genomeRefs = {};
         	var container = this.$elem;
         	container.empty();
         	container.append("<div><img src=\""+this.options.loadingImage+"\">&nbsp;&nbsp;loading pan-genome data...</div>");
@@ -433,7 +437,7 @@
         },
         
         getData: function() {
-        	return {title:"Pan-genome orthologs",id:this.options.name, workspace:this.options.ws};
+        	return {title:"Pangenome",id:this.options.name, workspace:this.options.ws};
         },
 
         loggedInCallback: function(event, auth) {
