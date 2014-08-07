@@ -27,8 +27,9 @@
             var stateFlag = 0;
             var retryTime = 500; //ms
             var numTries = 0;
-            var narrUrl = window.location.href.slice(window.location.href.indexOf('?') + 1);
-            narrUrl = narrUrl.split('=')[1];
+            var narrUrl = window.location.href.slice(window.location.href.indexOf('?n=') + 1);
+            narrUrl = decodeURIComponent(narrUrl);
+
 
             var interval = null;
             var pokeNarrative = function(url) {
