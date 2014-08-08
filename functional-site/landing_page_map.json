@@ -53,7 +53,7 @@
 
     "KBaseFBA" : {
         "Gapfilling" : null,
-        "FBA" : "fbas",
+        "FBA" : "ws/fbas",
         "ReactionSensitivityAnalysis" : null,
         "FBAModel" : "ws/mv/model",
         "Gapgeneration" : null,
