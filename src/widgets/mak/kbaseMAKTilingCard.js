@@ -10,7 +10,7 @@
             loadingImage: "assets/img/ajax-loader.gif",
             title: "MAK Result Overview Tiles",
             isInCard: false,
-            width: 750,
+            width: 1000,
             height: 800
         },
 
@@ -41,6 +41,12 @@
 
             
             var self = this;
+			
+			$instructions = $("<b><i>Click on a tile, selections will be <span style='color:#00CCFF'>cyan</span>.</i></b>")
+			self.$elem.append($instructions)	
+			$tilingDiv = $("<div id='tilingDiv' style='overflow:auto;height:450px;resize:vertical;position:relative'/>")
+			self.$elem.append($tilingDiv)
+			
 			var loader = $("<span style='display:none'><img src='"+self.options.loadingImage+"'/></span>").css({"width":"100%","margin":"0 auto"})
 
 			self.tooltip = d3.select("body")
@@ -51,14 +57,13 @@
 			//"SOMR1_expr_refine_top_0.25_1.0_c_reconstructed.txt_MAKResult"
 			//this.options.ws
 			//this.options.id
-			self.$elem.append(loader)
+			$tilingDiv.append(loader)
 			loader.show()
-						
+			
             this.workspaceClient.get_objects([{workspace: this.options.workspace, name: this.options.id}], 
 				
 				function(data){
-					
-					
+					//console.log(data)
 					Packer = function(w, h) {
 					  this.init(w, h);
 					};
@@ -176,14 +181,15 @@
 								"-webkit-border-radius": "1px",
 								"border-radius": "1px"})
 								.addClass(cssClass)   
+								.addClass('biclusterTile')
 								.val(block.index)
 								.on("mouseover", 
 									function() { 
 										if (!$(this).hasClass('picked')) {
-											d3.select(this).style("background", "#00FFCC"); 
+											d3.select(this).style("background", "#00CCFF"); 
 											for (term in block.terms) {
 												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
-												d3.select("#"+barChartSelector).style("background", "#00FFCC")
+												d3.select("#"+barChartSelector).style("background", "#00CCFF")
 											}
 										}
 										self.tooltip = self.tooltip.text("bicluster: "+biclusters[block.index].bicluster_id+", rows: "+biclusters[block.index].gene_ids.length+", columns: "+biclusters[block.index].condition_ids.length+", number: "+i);
@@ -208,27 +214,48 @@
 										return self.tooltip.style("top", (e.pageY+15) + "px").style("left", (e.pageX-10)+"px");
 									}
 								)
-								// .on("click", 
-									// function(event) {	
-										// if (d3.select("#biclusterOverview").empty()) self.trigger("showMAKBicluster", { bicluster: [biclusters[block.index],bicluster_info], ws: self.options.ws, event: event });
-										
-								// });
+								.on("click",
+									function(d) {
+										if ($(this).hasClass('picked')) {	
+											for (tile in d.tiles) {
+												tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
+												temp = selectionHandler.indexOf(tileSelector)
+												selectionHandler.splice(temp,1)
+												if (selectionHandler.indexOf(tileSelector)==-1) $("#MAK_tile_"+tileSelector).removeClass('picked')	
+											}
+											$(this).removeClass('picked')
+										}
+										else {	
+											for (tile in d.tiles) {
+												tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
+												selectionHandler.push(tileSelector)
+												$("#MAK_tile_"+tileSelector).addClass('picked')	
+											}
+											$(this).addClass('picked')
+										}
+									}
+								)
 							tiles.push($item)							
 									  
 							setTimeout(function(){ $bin.append($item) }, 5*i);
 						}
 					});
 						
-					self.$elem.append($bin)
-					
+					$tilingDiv.append($bin)
+					if (self.options.scope) {
+						self.options.scope.$apply(function() {
+							self.options.scope.terms = terms
+						})
+					}
 					self.trigger("showBarChart", {terms: terms, workspace: self.options.workspace, id: self.options.id})
 					self.trigger("showMAKBicluster", { bicluster: [biclusters,0,bicluster_info], workspace: self.options.workspace, tiles: tiles})
+					
 					
                 },
 
 			    function(data) {
                                 $('.loader-table').remove();
-                                self.$elem.append('<p>[Error] ' + data.error.message + '</p>');
+                                $tilingDiv.append('<p>[Error] ' + data.error.message + '</p>');
                                 return;
                 }
 		    );

@@ -16,149 +16,123 @@ $.KBWidget({
     init: function(options) {
         this._super(options);
         var self = this;        
-        var fbas = options.ids;
-        var workspaces = options.workspaces;
-        var data = options.fbaData;
-        var meta = options.meta;
+
+        var ws = options.ws;
+        var name = options.name;
 
         var container = this.$elem;
-
-        var tables = ['Overview', 'Reactions', 'Compounds'];
-
 
         var overviewTable = $('<table cellpadding="0" cellspacing="0" border="0" \
                 class="table table-bordered table-striped" style="width: 100%;">');
         var rxnTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">')
+                class="table table-bordered table-striped" style="width: 100%;">');
         var cpdTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">')
-
+                class="table table-bordered table-striped" style="width: 100%;">');
+        var mapTable = $('<div>')            
 
         var tabs = container.kbTabs({tabs: [{name: 'Overview', content: overviewTable, active: true},
                                            {name: 'Reactions', content: rxnTable},
                                            {name: 'Compounds', content: cpdTable},
-                                    ]});        
+                                           {name: 'Pathways', content: mapTable},                                               
+                                    ]}); 
 
-        var tableSettings = {
-            "sPaginationType": "bootstrap",
-            "iDisplayLength": 10,
-            "aLengthMenu": [5, 10, 25,50,100],
-            "oLanguage": {
-                "sSearch": "Search:"
+        container.loading();
+        var p = kb.get_fba(ws, name)
+        $.when(p).done(function(data) {
+            container.rmLoading();
+            var data = data[0].data;
+            self.loadTable(data);
+        }).fail(function(e){
+            container.rmLoading();            
+            container.append('<div class="alert alert-danger">'+
+                            e.error.message+'</div>');
+        });
+
+
+        self.loadTable = function(data) {
+
+            mapTable.kbasePathways({fba_ws: ws, fba_name: name});
+
+            var keys = [{key: 'id'},
+                        {key: 'maximizeObjective', type: 'bool'},        
+                        {key: 'drainfluxUseVariables', type: 'bool'},
+                        {key: 'noErrorThermodynamicConstraints', type: 'bool'},
+                        {key: 'objectiveConstraintFraction'},
+                        {key: 'minimizeErrorThermodynamicConstraints', type: 'bool'},
+                        {key: 'allReversible', type: 'bool'},
+                        {key: 'objectiveValue'},
+                        {key: 'numberOfSolutions'},
+                        {key: 'fluxMinimization', type: 'bool'},
+                        {key: 'thermodynamicConstraints', type: 'bool'},
+                        {key: 'defaultMaxDrainFlux'},
+                        {key: 'fluxUseVariables', type: 'bool'},
+                        {key: 'findMinimalMedia', type: 'bool'},
+                        {key: 'PROMKappa'},
+                        {key: 'simpleThermoConstraints', type: 'bool'},
+                        {key: 'comboDeletions', type: 'bool'},
+                        {key: 'defaultMinDrainFlux'},
+                        {key: 'fva', type: 'bool'},
+                        {key: 'decomposeReversibleDrainFlux',type: 'bool'},
+                        {key: 'defaultMaxFlux'},
+                        {key: 'decomposeReversibleFlux', type: 'bool'}];
+
+            var labels = ['Name',
+                          'Maximize Objective',                      
+                          'Drain Flux Use Variables',
+                          'No Error Thermodynamic Constraints',
+                          'Objective Constraint Fraction',
+                          'Minimize Error Thermodynamic Constraints',
+                          'All Reversible',
+                          'Objective Value',
+                          'Number Of Solutions',
+                          'Flux Minimization',
+                          'Thermodynamic Constraints',
+                          'Default Max Drain Flux',
+                          'Flux Use Variables',
+                          'Find Minimal Media',
+                          'PROM Kappa',
+                          'Simple Thermo Constraints',
+                          'Combo Deletions',
+                          'Default Min Drain Flux',
+                          'fva',
+                          'Decompose Reversible Drain Flux',
+                          'Default Max Flux',
+                          'Decompose Reversible Flux'];
+
+            var table = kb.ui.objTable('overview-table', data, keys, labels);
+            overviewTable.append(table);
+
+            var tableSettings = {
+                "sPaginationType": "bootstrap",
+                "iDisplayLength": 10,
+                "aLengthMenu": [5, 10, 25,50,100],
+                "oLanguage": {
+                    "sSearch": "Search:"
+                }
             }
+
+            // rxn flux table
+            var dataDict = formatObjs(data.FBAReactionVariables, 'rxn');
+            var labels = ["ID", "flux", "lower", "upper", "min", "max", "Eq"]; //type
+            var keys = ["modelreaction_ref", "value", "lowerBound", "upperBound", "min", "max", "eq"]; //variableType
+            var cols = getColumnsByKey(keys, labels);
+            cols[0].sWidth = '18%'
+            var rxnTableSettings = $.extend({}, tableSettings, {fnDrawCallback: events});               
+            rxnTableSettings.aoColumns = cols;
+            rxnTableSettings.aaData = dataDict;
+            var table = rxnTable.dataTable(rxnTableSettings);
+
+            // cpd flux table
+            var dataDict = formatObjs(data.FBACompoundVariables, 'cpd');
+            var labels = ["id", "Flux", "lower", "upper", "min", "max"];
+            var keys = ["modelcompound_ref", "value", "lowerBound", "upperBound", "min", "max"]        
+            var cols = getColumnsByKey(keys, labels);
+            var cpdTableSettings = $.extend({}, tableSettings, {fnDrawCallback: events});
+            cpdTableSettings.aoColumns = cols;
+            cpdTableSettings.aaData = dataDict;
+            var table = cpdTable.dataTable(cpdTableSettings);
         }
-
-        var fba = data[0].data;
-        //var meta = meta[0]
-
-        // meta data (overview) table 
-        /*var labels = ['ID', 'Name', 'Type','Moddate','Instance',
-                      'Command','Last Modifier','Owner','Workspace','Ref']
-        kb.ui.listTable('meta-table', meta, labels)
-        container.append(table);*/
-
-
-        /*
-        media_ref
-        maximizeObjective
-        id  Rhodobacter-2.4.1.fbamdl.2.fba.20
-        drainfluxUseVariables
-        __VERSION__
-        noErrorThermodynamicConstraints
-        objectiveConstraintFraction
-        minimizeErrorThermodynamicConstraints
-        allReversible
-        objectiveValue
-        numberOfSolutions
-        fluxMinimization
-        thermodynamicConstraints
-        defaultMaxDrainFlux
-        fbamodel_ref
-        fluxUseVariables
-        findMinimalMedia
-        PROMKappa
-        simpleThermoConstraints
-        comboDeletions
-        defaultMinDrainFlux
-        fva
-        decomposeReversibleDrainFlux
-        defaultMaxFlux
-        decomposeReversibleFlux
-        */
-
-        var keys = [{key: 'id'},
-                    {key: 'maximizeObjective', type: 'bool'},        
-                    {key: 'drainfluxUseVariables', type: 'bool'},
-                    {key: 'noErrorThermodynamicConstraints', type: 'bool'},
-                    {key: 'objectiveConstraintFraction'},
-                    {key: 'minimizeErrorThermodynamicConstraints', type: 'bool'},
-                    {key: 'allReversible', type: 'bool'},
-                    {key: 'objectiveValue'},
-                    {key: 'numberOfSolutions'},
-                    {key: 'fluxMinimization', type: 'bool'},
-                    {key: 'thermodynamicConstraints', type: 'bool'},
-                    {key: 'defaultMaxDrainFlux'},
-                    {key: 'fluxUseVariables', type: 'bool'},
-                    {key: 'findMinimalMedia', type: 'bool'},
-                    {key: 'PROMKappa'},
-                    {key: 'simpleThermoConstraints', type: 'bool'},
-                    {key: 'comboDeletions', type: 'bool'},
-                    {key: 'defaultMinDrainFlux'},
-                    {key: 'fva', type: 'bool'},
-                    {key: 'decomposeReversibleDrainFlux',type: 'bool'},
-                    {key: 'defaultMaxFlux'},
-                    {key: 'decomposeReversibleFlux', type: 'bool'}];
-
-        var labels = ['Name',
-                      'Maximize Objective',                      
-                      'Drain Flux Use Variables',
-                      'No Error Thermodynamic Constraints',
-                      'Objective Constraint Fraction',
-                      'Minimize Error Thermodynamic Constraints',
-                      'All Reversible',
-                      'Objective Value',
-                      'Number Of Solutions',
-                      'Flux Minimization',
-                      'Thermodynamic Constraints',
-                      'Default Max Drain Flux',
-                      'Flux Use Variables',
-                      'Find Minimal Media',
-                      'PROM Kappa',
-                      'Simple Thermo Constraints',
-                      'Combo Deletions',
-                      'Default Min Drain Flux',
-                      'fva',
-                      'Decompose Reversible Drain Flux',
-                      'Default Max Flux',
-                      'Decompose Reversible Flux'];
-
-        var table = kb.ui.objTable('overview-table', fba, keys, labels);
-        overviewTable.append(table);
-
-
-        // rxn flux table
-        var dataDict = formatObjs(fba.FBAReactionVariables, 'rxn');
-        var labels = ["ID", "flux", "lower", "upper", "min", "max", "Eq"]; //type
-        var keys = ["modelreaction_ref", "value", "lowerBound", "upperBound", "min", "max", "eq"]; //variableType
-        var cols = getColumnsByKey(keys, labels);
-        cols[0].sWidth = '18%'
-        var rxnTableSettings = $.extend({}, tableSettings, {fnDrawCallback: events});               
-        rxnTableSettings.aoColumns = cols;
-        rxnTableSettings.aaData = dataDict;
-        var table = rxnTable.dataTable(rxnTableSettings);
-
-        // cpd flux table
-        console.log(fba)
-        var dataDict = formatObjs(fba.FBACompoundVariables, 'cpd');
-        var labels = ["id", "Flux", "lower", "upper", "min", "max"];
-        var keys = ["modelcompound_ref", "value", "lowerBound", "upperBound", "min", "max"]        
-        var cols = getColumnsByKey(keys, labels);
-        var cpdTableSettings = $.extend({}, tableSettings, {fnDrawCallback: events});
-        cpdTableSettings.aoColumns = cols;
-        cpdTableSettings.aaData = dataDict;
-        var table = cpdTable.dataTable(cpdTableSettings);
-        
- 
+            
         function formatObjs(objs, type) {
             var fluxes = []
             if (type == 'rxn') {

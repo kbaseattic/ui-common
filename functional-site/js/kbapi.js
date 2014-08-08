@@ -1,7 +1,5 @@
 
 
-//https://kbase.us/services/fba_model_services/ //production fba service not deployed
-
 // This saves a request by service name, method, params, and promise
 // Todo: Make as module
 function Cache() {
@@ -472,7 +470,7 @@ function KBCacheClient(token) {
                 route = 'ws.fbas';
                 break;
             case 'FBAModel': 
-                route = 'ws.mv.model';
+                route = 'ws.models';
                 break;
             case 'Media': 
                 route = 'ws.media';
@@ -499,16 +497,17 @@ function KBCacheClient(token) {
                 route = 'ws.simulation';
                 break;  
             // remove next block cause it's described in landing_page_map.json
-            //case 'Pangenome':
-            //    route = 'ws.pangenome';
-            //    break;                            
+            // putting back in because there's no link to a pangenome now?
+            case 'Pangenome':
+                route = 'ws.pangenome';
+                break;                            
             case 'Genome': 
                 route = 'genomesbyid';
                 break;
-	    case 'MAKResult':
-		route = 'mak';
-		break;
-	    case 'FloatDataTable':
+            case 'MAKResult':
+                route = 'mak';
+                break;
+            case 'FloatDataTable':
                 route = 'floatdatatable';
                 break;
         }
@@ -746,7 +745,7 @@ function UIUtils() {
                 var type = full_type.slice(full_type.indexOf('.')+1);
                 var kind = type.split('-')[0];
                 var label = item[7]+"/"+item[1];
-		var route;
+        var route;
                 switch (kind) {
                     case 'FBA': 
                         sub = 'fbas/';
@@ -1019,8 +1018,8 @@ function ProjectAPI(ws_url, token) {
         data : { description : '' },
         workspace : undefined,
         meta : {},
-	provenance : [],
-	hidden : 1
+    provenance : [],
+    hidden : 1
     };
 
 

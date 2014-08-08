@@ -131,20 +131,19 @@
             		var funcId = data.using_func_defs[i];
             		var funcName = funcId.substring(0, funcId.indexOf('-'));
             		var funcVer = funcId.substring(funcId.indexOf('-') + 1);
-            		funcsData[funcsData.length] = {name: '<a onclick="specClicks[\''+pref+'funcs-click\'](this,event); return false;" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer};
+            		funcsData.push({name: '<a onclick="specClicks[\''+pref+'funcs-click\'](this,event); return false;" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer});
             	}
                 var funcsSettings = {
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function name", mData: "name"}, {sTitle: "Function version", mData: "ver"}],
-                        "aaData": [],
+                        "aaData": funcsData,
                         "oLanguage": {
                             "sSearch": "Search function:",
                             "sEmptyTable": "No functions use this type."
                         }
                     };
                 var funcsTable = $('#'+pref+'funcs-table').dataTable(funcsSettings);
-                funcsTable.fnAddData(funcsData);
                 specClicks[pref+'funcs-click'] = (function(elem, e) {
                     var funcId = $(elem).data('funcid');
                     self.trigger('showSpecElement', 
@@ -164,20 +163,19 @@
             		var aTypeId = data.using_type_defs[i];
             		var aTypeName = aTypeId.substring(0, aTypeId.indexOf('-'));
             		var aTypeVer = aTypeId.substring(aTypeId.indexOf('-') + 1);
-            		typesData[typesData.length] = {name: '<a onclick="specClicks[\''+pref+'types-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer};
+            		typesData.push({name: '<a onclick="specClicks[\''+pref+'types-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer});
             	}
                 var typesSettings = {
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
-                        "aaData": [],
+                        "aaData": typesData,
                         "oLanguage": {
                             "sSearch": "Search type:",
                             "sEmptyTable": "No types use this type."
                         }
                     };
                 var typesTable = $('#'+pref+'types-table').dataTable(typesSettings);
-                typesTable.fnAddData(typesData);
                 specClicks[pref+'types-click'] = (function(elem, e) {
                     var aTypeId = $(elem).data('typeid');
                     self.trigger('showSpecElement', 
@@ -197,20 +195,19 @@
             		var aTypeId = data.used_type_defs[i];
             		var aTypeName = aTypeId.substring(0, aTypeId.indexOf('-'));
             		var aTypeVer = aTypeId.substring(aTypeId.indexOf('-') + 1);
-            		subsData[subsData.length] = {name: '<a onclick="specClicks[\''+pref+'subs-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer};
+            		subsData.push({name: '<a onclick="specClicks[\''+pref+'subs-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer});
             	}
                 var subsSettings = {
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
-                        "aaData": [],
+                        "aaData": subsData,
                         "oLanguage": {
                             "sSearch": "Search type:",
                             "sEmptyTable": "No types used by this type."
                         }
                     };
                 var subsTable = $('#'+pref+'subs-table').dataTable(subsSettings);
-                subsTable.fnAddData(subsData);
                 specClicks[pref+'subs-click'] = (function(elem, e) {
                     var aTypeId = $(elem).data('typeid');
                     self.trigger('showSpecElement', 
@@ -235,20 +232,19 @@
                 	} else {
                 		link = '<a onclick="specClicks[\''+pref+'vers-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeId+'</a>';
                 	}
-            		versData[versData.length] = {name: link};
+            		versData.push({name: link});
             	}
                 var versSettings = {
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type version", mData: "name"}],
-                        "aaData": [],
+                        "aaData": versData,
                         "oLanguage": {
                             "sSearch": "Search version:",
                             "sEmptyTable": "No versions registered."
                         }
                     };
                 var versTable = $('#'+pref+'vers-table').dataTable(versSettings);
-                versTable.fnAddData(versData);
                 specClicks[pref+'vers-click'] = (function(elem, e) {
                     var aTypeId = $(elem).data('typeid');
                     self.trigger('showSpecElement', 

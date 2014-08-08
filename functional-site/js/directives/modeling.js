@@ -39,7 +39,6 @@ angular.module('modeling-directives')
                 container.find('.pathway-link')
                          .tooltip({title: 'Open path tab', 
                                    placement: 'right', delay: {show: 1000}});
-
             } // end events
 
             function load_map(map, container) {

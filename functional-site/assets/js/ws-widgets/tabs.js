@@ -80,6 +80,7 @@
                 var c = $('<div class="tab-pane '+(p.active ? 'active' :'')+'" data-id="'+p.name+'">')
                 c.append((p.content ? p.content : ''))
                 tab_contents.append(c);
+                
                 events();
 
                 return p.content;
@@ -141,6 +142,7 @@
                 tabs.find('a').unbind('click')
                 tabs.find('a').click(function (e) {
                     e.preventDefault();
+                    e.stopPropagation();
 
                     // show tab and content
                     var id = $(this).data('id');
