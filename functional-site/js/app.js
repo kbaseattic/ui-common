@@ -502,8 +502,7 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
     
     $stateProvider.state("404", 
             {url: '*path', 
-             templateUrl : 'views/404.html',
-             controller: 'ErrorController'});
+             templateUrl : 'views/404.html'});
 
 }]);
 
@@ -586,11 +585,6 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     });
 
 
-    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-        console.log([event, toState, toParams, fromState, fromParams]);
-    });
-
-
     //  Things that need to happen when a view changes.
     $rootScope.$on('$stateChangeSuccess', function() {
         $('body').not('#project-table tr').unbind('click');
@@ -599,18 +593,6 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         removeCards();
     });
 
-
-    //
-    $rootScope.$on('stateNotFound', function(event, unfoundState, fromState, fromParams) {
-        console.log("stateNotFound");
-        console.log([event, unfoundState, fromState, fromParams]);
-    });
-
-    // Intercept state change errors and redirect to a 404 if needed
-    $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
-        console.log("stateChangeError");
-        console.log([event, toState, toParams, fromState, fromParams, error]);        
-    });
 
     var finish_login = function(result) {
         if (!result.success)
