@@ -138,7 +138,7 @@
 						}
 					)
 				
-			$instructions = $("<b><i>Click on a term bar, selections will be in <span style='color:#F08A04'>orange</span>.</i></b>")
+			$instructions = $("<b><i>Click on a term bar, selections will be <span style='color:#F08A04'>orange</span>.</i></b>")
 			self.$elem.append($instructions)	
 			self.$elem.append($mainDiv)
 			
