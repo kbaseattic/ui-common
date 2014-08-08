@@ -21,27 +21,28 @@
 			}		
 			this.workspaceClient = new Workspace(this.newWorkspaceServiceUrl, { 'token' : this.options.auth, 'user_id' : this.options.userId});
 			
-            return this.render();
+            return this.render(this.options,this);
 		},
-		render: function(options) {
-
-            var self = this;		
-
-			var $mainDiv = $("<div id='heatmapDiv'>")
+		render: function(options,self) {
+           
+			var $mainDiv = $("<div id='heatmapDiv' style='overflow:auto;height:450px;resize:vertical'>")
 			var $heatmapDiv = $("<div id='heatmap'>");	
 			
-			var datatable = this.options.bicluster
-			if (this.options.tiles && this.options.mak) { 
+			var datatable = options.bicluster
+			if (options.tiles && options.mak) { 
 			
-				var tiles = this.options.tiles
-				var mak = this.options.mak						
+				var tiles = options.tiles
+				var mak = options.mak						
 			
 				$.each(tiles,function(i,d) {				
 					d.on("click", function() {
-						$mainDiv.empty()					
-						$.when(self.workspaceClient.get_objects([{workspace: self.options.workspace, name: mak[d.val()].bicluster_id}]))
+						self.$elem.empty()			
+						delete $mainDiv
+						delete $heatmapDiv
+						delete $instructions
+						$.when(self.workspaceClient.get_objects([{workspace: options.workspace, name: mak[d.val()].bicluster_id}]))
 						.then(function(data) {
-							self.options.bicluster = data[0].data
+							options.bicluster = data[0].data
 							self.render()
 						})					
 					})
@@ -53,14 +54,6 @@
 			$mainDiv.append($instructions)
 			$mainDiv.append($heatmapDiv)
 			
-			// var $tooltipExpression = $("<div>")
-			// var $tooltipGene = $("<div>")
-			// var $tooltipCondition = $("<div>")
-			// self.tooltip = d3.select("body")
-                             // .append($tooltipExpression)
-							 // .append($tooltipGene)
-							 // .append($tooltipCondition)
-                             // .classed("kbcb-tooltip", true);
 			self.tooltip1 = d3.select("body")
                              .append("div")
                              .classed("kbcb-tooltip", true);
@@ -69,8 +62,7 @@
                              .classed("kbcb-tooltip", true);
 			self.tooltip3 = d3.select("body")
                              .append("div")
-                             .classed("kbcb-tooltip", true);			
-			
+                             .classed("kbcb-tooltip", true);					
 			
 			// var columnMeans = []
 			// for (var y = 0; y < datatable.data.length; y+=1) {	
@@ -126,7 +118,7 @@
 				height = gridSize*gene_labels.length
 			}
 			var legendElementWidth = gridSize*2,
-			colors = ["#0000ff","#0066ff","#66FFFF","#ffffff","#FFC6AA","#ff6600","#ff0000"]
+			colors = ["#0000ff","#0066ff","#99CCFF","#ffffff","#FFC6AA","#ff6600","#ff0000"]
 						
 			var colorScale = function(d) {
 				if (d > 2.5) return colors[6]
@@ -143,20 +135,20 @@
 				.attr("height", height + margin.top + margin.bottom)
 				.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-			var geneLabels = svg.selectAll(".geneLabel")
+			
+			console.log(options.count)
+			
+			var geneLabels = svg.selectAll(".geneLabel"+options.count)
 				.data(gene_labels_ids)
 				.enter().append("text")
 				.text(function (d) { return d.label; })
 				.attr("x", 0)
 				.attr("y", function (d, i) { return i * gridSize; })
-				.attr("class","geneLabel")
+				.attr("class","geneLabel"+options.count)
 				.style({"text-anchor":"end","font-size":"small"})
 				.attr("transform", "translate(-6," + gridSize / 1.5 + ")")
 				.on("click",function(d,i,event){
-					// if (!$("div.kblpc-subtitle:contains('"+d.id+"')").length) {self.trigger("showFeature", {featureID: d.id, event: event})}
-					// self.trigger("showFeature", {featureID: d.id, event: event})
-					self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], id: self.options.id, workspace: self.options.workspace, heatmap: geneLabels, widget: self, event: event})
+					// self.trigger("showLineChart", {row: [expression,conditions,gene_labels,i], id: options.id, workspace: options.workspace, event: event})
 					if ($(this).css("font-weight") == 400) $(this).css({"font-weight":900,"font-size":"medium"})
 					else $(this).css({"font-weight":400,"font-size":"small"})
 				})						
@@ -237,34 +229,25 @@
 			  // heatMap.transition().duration(1000)
 				  // .style("fill", function(d) { return colorScale(expression[d.gene][d.condition]); });
 			  
-			  var gauge = []
-			  gauge.push(d3.min(dataflat))
-			  for (var i = Math.ceil(d3.min(dataflat)); i <= Math.floor(d3.max(dataflat)); i++) {
-				if (i < 3 && i > -3) gauge.push(i)
-			  }
-			  gauge.push(d3.max(dataflat))
-			  
 			  var legend = svg.selectAll(".legend")
-				  .data(gauge, function(d) { return d; })
+				  .data([">2.5",">1.5 and <2.5",">0.5 and <1.5",">-0.5 and <0.5","<-0.5 and >-1.5","<-1.5 and >-2.5","<-2.5"], function(d) { return d; })
 				  .enter().append("g")
 				  .attr("class", "legend");
-
+			
 			  legend.append("rect")
 				.attr("y", function(d, i) { return legendElementWidth * i; })
-				.attr("x", -margin.left*0.8 + gridSize)
+				.attr("x", -margin.left*1 + gridSize)
 				.attr("height", legendElementWidth)
 				.attr("width", gridSize / 2)
-				.style("fill", function(d, i) { return colors[i]; });
+				.style("fill", function(d, i) { return colors[colors.length-i-1]; });
 
 			  legend.append("text")
 				.attr("class", "mono")
 				.text(function(d) { return d; })
 				.attr("y", function(d, i) { return (legendElementWidth * i)+legendElementWidth/2; })
-				.attr("x", -margin.left*0.8 + gridSize*1.5)
+				.attr("x", -margin.left*1 + gridSize*1.5)
 				.style("text-anchor","left")
-				
-			// self.trigger("showLineChart", {row: [expression,conditions,gene_labels,0], id: self.options.id, ws: self.options.ws, heatmap: geneLabels})
-				
+								
 			return this;
 		},
 		getData: function() {
