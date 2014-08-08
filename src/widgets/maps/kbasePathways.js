@@ -99,9 +99,7 @@ $.KBWidget({
                                placement: 'right', delay: {show: 1000}});
         } // end events
 
-        function load_map(map, container) {
-            container.rmLoading();                        
-
+        function load_map(map, container) {                       
             container.kbasePathway({model_ws: model_ws,
                                     model_name: model_name,
                                     fba_ws: fba_ws,

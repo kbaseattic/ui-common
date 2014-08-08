@@ -83,7 +83,6 @@
                 }
 
                 // add content pane
-                console.log('adding:', p.name, p.active)
                 var c = $('<div class="tab-pane '+(p.active ? 'active' :'')+'" data-id="'+p.name+'">')
                 c.append((p.content ? p.content : ''))
                 tab_contents.append(c);

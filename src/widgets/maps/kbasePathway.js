@@ -10,14 +10,14 @@ $.KBWidget({
         var self = this;
         this._super(options);
 
-        //self.models = options.modelData;
-        //self.fbas = options.fbaData;
+
         self.model_ws = options.model_ws;
         self.model_name = options.model_name;        
         self.fba_ws = options.fba_ws;
         self.fba_name = options.fba_name;
         self.map_ws = options.map_ws;
         self.map_name = options.map_name;
+
         console.log('model_ws:', self.model_ws,
                     'model_name:', self.model_name,
                     'fba_ws:', self.fba_ws,
@@ -43,10 +43,10 @@ $.KBWidget({
 
 
 
-
-
         var p1 = kb.ws.get_objects([{workspace: self.map_ws, name: self.map_name}])            
-        var p2 = kb.get_model(self.model_ws, self.model_name);
+        if (self.model_ws && self.model_name) {
+            var p2 = kb.get_model(self.model_ws, self.model_name);
+        }
         if (self.fba_ws && self.fba_name) {
             var p3 = kb.get_fba(self.fba_ws, self.fba_name);
         }        
