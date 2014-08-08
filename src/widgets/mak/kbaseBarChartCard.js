@@ -87,10 +87,10 @@
 								for (tile in d.tiles) {
 									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')									
 									if (!$("#MAK_tile_"+tileSelector).hasClass('picked')) {
-										d3.select("#MAK_tile_"+tileSelector).style("background", "#00FFCC")
+										d3.select("#MAK_tile_"+tileSelector).style("background", "#F08A04")
 									}
 								}
-								d3.select(this).style("background", "#00FFCC"); 
+								d3.select(this).style("background", "#F08A04"); 
 							}							
 							// self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
 							self.tooltip = self.tooltip.text(d.term+", hits: "+d.tiles.length);

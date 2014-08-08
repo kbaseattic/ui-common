@@ -118,7 +118,7 @@
 				height = gridSize*gene_labels.length
 			}
 			var legendElementWidth = gridSize*2,
-			colors = ["#0000ff","#0066ff","#66FFFF","#ffffff","#FFC6AA","#ff6600","#ff0000"]
+			colors = ["#0000ff","#0066ff","#99CCFF","#ffffff","#FFC6AA","#ff6600","#ff0000"]
 						
 			var colorScale = function(d) {
 				if (d > 2.5) return colors[6]

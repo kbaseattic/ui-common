@@ -140,6 +140,9 @@
 				.attr("transform", "translate(0," + h + ")")
 				.call(xAxis)
 				.selectAll("g.x.axis > g.tick > text")
+				.attr("transform", function(d) {
+					return "rotate(-80)translate(-30,0)" 
+				})
 				.on("mouseover", 
 						function(d,i) { 
 							d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 

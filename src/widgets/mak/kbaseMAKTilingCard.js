@@ -184,10 +184,10 @@
 								.on("mouseover", 
 									function() { 
 										if (!$(this).hasClass('picked')) {
-											d3.select(this).style("background", "#00FFCC"); 
+											d3.select(this).style("background", "#00CCFF"); 
 											for (term in block.terms) {
 												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
-												d3.select("#"+barChartSelector).style("background", "#00FFCC")
+												d3.select("#"+barChartSelector).style("background", "#00CCFF")
 											}
 										}
 										self.tooltip = self.tooltip.text("bicluster: "+biclusters[block.index].bicluster_id+", rows: "+biclusters[block.index].gene_ids.length+", columns: "+biclusters[block.index].condition_ids.length+", number: "+i);
@@ -212,11 +212,27 @@
 										return self.tooltip.style("top", (e.pageY+15) + "px").style("left", (e.pageX-10)+"px");
 									}
 								)
-								// .on("click", 
-									// function(event) {	
-										// if (d3.select("#biclusterOverview").empty()) self.trigger("showMAKBicluster", { bicluster: [biclusters[block.index],bicluster_info], ws: self.options.ws, event: event });
-										
-								// });
+								.on("click",
+									function(d) {
+										if ($(this).hasClass('picked')) {	
+											for (tile in d.tiles) {
+												tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
+												temp = selectionHandler.indexOf(tileSelector)
+												selectionHandler.splice(temp,1)
+												if (selectionHandler.indexOf(tileSelector)==-1) $("#MAK_tile_"+tileSelector).removeClass('picked')	
+											}
+											$(this).removeClass('picked')
+										}
+										else {	
+											for (tile in d.tiles) {
+												tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
+												selectionHandler.push(tileSelector)
+												$("#MAK_tile_"+tileSelector).addClass('picked')	
+											}
+											$(this).addClass('picked')
+										}
+									}
+								)
 							tiles.push($item)							
 									  
 							setTimeout(function(){ $bin.append($item) }, 5*i);
