@@ -89,7 +89,14 @@
                 interval = setInterval( function() { 
                     if (siteReady) {
                         clearInterval(interval);
-                        window.location.replace(narrUrl);
+
+                        var ua = navigator.userAgent.toLowerCase();
+                        if (ua.indexOf('safari') != -1 && ua.indexOf('chrome') == -1) {
+                            $('#text').html('<br><a href="' + narrUrl + '">Your Narrative is ready! Click here to go to it.</a>');
+                        }
+                        else {
+                            window.location.replace(narrUrl);
+                        }
                     }
                     else {
                         pokeNarrative(narrUrl); 
