@@ -165,7 +165,7 @@
 			var x = d3.scale.linear().domain([0, values[0].length-1]).range([0, w]);
 			var xAxis = d3.svg.axis().scale(x).ticks(conditions.length).tickFormat(formatAsLabels)
 			
-			if (conditions.length <= 150) {
+			// if (conditions.length <= 150) {
 				graph.append("svg:g")
 					.attr("class", "x axis")
 					.attr("transform", "translate(0," + h + ")")
@@ -192,7 +192,7 @@
 								return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
 							}
 						)
-			}
+			// }
 			
 			return x
 			
