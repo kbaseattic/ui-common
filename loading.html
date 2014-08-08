@@ -35,9 +35,12 @@
             var pokeNarrative = function(url) {
                 $.ajax({
                     type: 'GET',
+                    async: false,
                     url: url,
                     success: function(res) {
                         // on success, take us there!
+                        if (interval)
+                            clearInterval(interval);
                         window.location.replace(url);
                     },
                     error: function(error) {
