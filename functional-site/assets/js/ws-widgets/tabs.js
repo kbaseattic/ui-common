@@ -53,7 +53,7 @@
             container.append(tabs, tab_contents);
 
             // adds a single tab and content
-            this.addTab = function(p) {
+            this.addTab = function(p, animate) {
                 // if tab exists, don't add
                 if ( tabs.find('a[data-id="'+p.name+'"]').length > 0) {
                     return;
@@ -62,9 +62,16 @@
                 // tab
                 var tab = $('<li class="'+(p.active ? 'active' :'')+'">');
                 var tab_link = $('<a data-toggle="tab" data-id="'+p.name+'">'+p.name+'</a>');
-                tab.append(tab_link).hide();
-                tabs.append(tab);
-                tab.toggle('slide', {direction: 'down', duration: 'fast'});
+
+                // animate by sliding tab up
+                if (animate) {
+                    tab.append(tab_link).hide();
+                    tabs.append(tab);
+                    tab.toggle('slide', {direction: 'down', duration: 'fast'});                    
+                } else {
+                    tab.append(tab_link)                    
+                    tabs.append(tab);
+                }
 
                 // add close button if needed
                 if (p.removable || options.removable) {
@@ -133,7 +140,7 @@
             // if tabs are supplied, add them
             if (options.tabs) {
                 for (var i in options.tabs) {
-                    this.addTab(options.tabs[i])
+                    this.addTab(options.tabs[i], false)
                 }
             }
 

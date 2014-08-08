@@ -637,8 +637,6 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
 
     $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
 
-    console.log(USER_TOKEN);
-
 
     // global state object to store state
     state = new State();
