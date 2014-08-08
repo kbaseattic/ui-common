@@ -4,7 +4,7 @@
         parent: "kbaseWidget",
         version: "1.0.0",
         options: {
-            type: "KBaseGwasData.GwasPopulation",
+            type: "KBaseGwasData.GwasPopulation-1.0",
             width: window.innerWidth - 60,
             height: window.innerHeight/2 - 60
         },

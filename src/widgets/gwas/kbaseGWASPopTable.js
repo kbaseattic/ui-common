@@ -7,7 +7,7 @@
         options: {
             width: 780,
             height: 390,
-            type: "KBaseGwasData.GwasPopulation"
+            type: "KBaseGwasData.GwasPopulation-1.0"
         },
         workspaceURL: "https://kbase.us/services/ws",
 

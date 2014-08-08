@@ -5,7 +5,7 @@
         version: "1.0.0",
         options: {
             width: 500,
-            type:"KBaseGwasData.GwasPopulationVariation"
+            type:"KBaseGwasData.GwasPopulationVariation-1.0"
         },
         workspaceURL: "https://kbase.us/services/ws",
 

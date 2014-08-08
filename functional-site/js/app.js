@@ -487,8 +487,9 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
     $urlRouterProvider.otherwise('/404/');
     
     $stateProvider.state("404", 
-            {url: '/404/', 
-             templateUrl : 'views/404.html'});
+            {url: '*path', 
+             templateUrl : 'views/404.html',
+             controller: 'ErrorController'});
 
 }]);
 
@@ -515,14 +516,7 @@ app.service('userState', function userStateService() {
     
     return {
         userState : JSON.parse(localStorage.KBaseUserState),
-        landingPages : {"genome": "/genomes/CDS/",
-                        "feature": "/genes/CDS/",
-                        "gwasPopulation": "/KBaseGwasData.GwasPopulation/",
-                        "gwasTrait": "/KBaseGwasData.GwasPopulationTrait/",
-                        "gwasVariation": "/KBaseGwasData.GwasPopulationVariation/",
-                        "gwasGeneList": "/KBaseGwasData.GwasGeneList/",
-                        "metagenome": "http://metagenomics.anl.gov/?page=MetagenomeOverview&metagenome=",
-                       },
+        landingPages : JSON.parse("landing_pages.json"),
 
         reset : function() {
             this.userState = JSON.parse(localStorage.KBaseUserState);
@@ -553,6 +547,7 @@ configJSON = $.parseJSON( $.ajax({url: "config.json",
 
 
 app.run(function ($rootScope, $state, $stateParams, $location) {
+/*
     var HELP_DROPDOWN = '<a href="#" class="dropdown-toggle" data-toggle="dropdown">Help <b class="caret"></b></a> \
                  <ul class="dropdown-menu"> \
                  <li><a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a></li> \
@@ -560,6 +555,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
                  <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li> \
               </ul>';
     $('.help-dropdown').html(HELP_DROPDOWN);
+*/
 
     //  Things that need to happen when a view changes.
     $rootScope.$on('$locationChangeStart', function(event) {
@@ -571,10 +567,15 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     
         if (absUrl.indexOf('/functional-site/#/') < 0 && begin > 0 && absUrl.length > begin + offset) {
             event.preventDefault();
-            $location.path('/404/');   
-            $state.go('404');
+            $state.go('404', null, {location: false});
         }    
     });
+
+
+    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+        console.log([event, toState, toParams, fromState, fromParams]);
+    });
+
 
     //  Things that need to happen when a view changes.
     $rootScope.$on('$stateChangeSuccess', function() {
@@ -582,6 +583,19 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         $('.fixedHeader').remove(); 
         $('.popover').remove(); // remove any dangling pop overs
         removeCards();
+    });
+
+
+    //
+    $rootScope.$on('stateNotFound', function(event, unfoundState, fromState, fromParams) {
+        console.log("stateNotFound");
+        console.log([event, unfoundState, fromState, fromParams]);
+    });
+
+    // Intercept state change errors and redirect to a 404 if needed
+    $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
+        console.log("stateChangeError");
+        console.log([event, toState, toParams, fromState, fromParams, error]);        
     });
 
     var finish_login = function(result) {
@@ -628,7 +642,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
 
     $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
 
-    console.log(USER_TOKEN);
+    //console.log(USER_TOKEN);
 
 
     // global state object to store state

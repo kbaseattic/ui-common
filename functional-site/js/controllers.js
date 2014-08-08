@@ -731,3 +731,8 @@ function ScrollCtrl($scope, $location, $anchorScroll) {
   }
 }
 
+
+app.controller('ErrorController', function($scope, $state, $stateParams, $location) {
+    console.log([$scope, $state, $stateParams, $location]);
+    $scope.absUrl = $location.absUrl();
+});

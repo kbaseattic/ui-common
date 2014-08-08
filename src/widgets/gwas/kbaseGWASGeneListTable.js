@@ -5,11 +5,11 @@
         version: "1.0.0",
         //width: 600,
         options: {
-            width: 1200,
-            height: 800,
-            type: "KBaseGwasData.GwasGeneList"
+            width: window.innerWidth - 0.05*window.innerWidth,
+            height: window.innerHeight - 80,
+            type: "KBaseGwasData.GwasGeneList-1.0"
         },
-        workspaceURL: "https://kbase.us/services/ws",
+        workspaceURL: "https://kbase.us/services/ws/",
 
 
         init: function(options) {
@@ -25,28 +25,41 @@
                     self.collection = data[0];
                     console.log(self.collection);
 
-                    var $contTable = $("<dir/>").css('height', 'auto').css('overflow-y', 'scroll');
+                    var containerDiv = $("<dir/>").css('height', 'auto').css('overflow-y', 'scroll');                    
+                    var domainTable = $("<table/>").addClass("table table-bordered table-striped").attr("id", "popTable"); 
+                    
+                    var innerHTML = "<thead>" + 
+                                        "<tr>" + 
+                                            "<th>Chromosome Id</th>" + 
+                                            "<th>KBase Chromosome Id</th>" + 
+                                            "<th>Gene Id</th>" + 
+                                            "<th>KBase Gene Id</th>" + 
+                                            "<th>Gene Function</th>" + 
+                                        "</tr>" + 
+                                    "</thead>" + 
+                                    "<tbody>";
 
-                    $contTable.attr('id', 'popTable');
-
-                    var $domainTable = $("<table/>").addClass("table table-bordered table-striped");                        
-                    var genes = self.collection.data.genes;
-                    $domainTable.append('<thead><tr><th>Chromosome Id</th><th>KBase Chromosome Id</th><th>Gene Id</th><th>KBase Gene Id</th><th>Gene Function</th></tr></thead>');
-
-                    for (var i=0; i<genes.length /*&& i < 100*/; i++) {
-                        $domainTable.append($("<tr>")
-                            .append($("<td>").append(genes[i][4]))
-                            .append($("<td>").append(genes[i][0]))
-                            .append($("<td>").append(genes[i][1]))
-                            .append($("<td>").append(genes[i][2]))
-                            .append($("<td>").append(genes[i][3])));
+                    for (var i = 0; i < self.collection.data.genes.length; i++) {
+                        innerHTML += "<tr>" + 
+                                         "<td>" + self.collection.data.genes[i][4] + "</td>" +
+                                         "<td>" + self.collection.data.genes[i][0] + "</td>" +
+                                         "<td>" + self.collection.data.genes[i][1] + "</td>" +
+                                         "<td>" + self.collection.data.genes[i][2] + "</td>" +
+                                         "<td>" + self.collection.data.genes[i][3] + "</td>" +
+                                     "</tr>";
                     }
 
-                    $contTable.append($domainTable);
+                    innerHTML += "</tbody>";
 
-                    $domainTable.dataTable();
+                    //make the table contents what we just created as a string
+                    domainTable.html(innerHTML);
 
-                    self.$elem.append($contTable);
+                    containerDiv.append(domainTable);
+                    self.$elem.append(containerDiv);
+
+                    $("#popTable").dataTable({"iDisplayLength": Math.floor((window.innerHeight - 180)/50), "bLengthChange": false, "sScrollY": false})
+                    $("#popTable_wrapper").css("overflow-x","hidden");
+                    $("#popTable_wrapper").css("overflow-y","hidden");
                 },
 
                 self.rpcError

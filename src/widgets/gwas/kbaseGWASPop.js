@@ -6,7 +6,7 @@
         //width: 600,
         options: {
             width: 400,
-            type: "KBaseGwasData.GwasPopulation"
+            type: "KBaseGwasData.GwasPopulation-1.0"
         },
         workspaceURL: "https://kbase.us/services/ws",
 
