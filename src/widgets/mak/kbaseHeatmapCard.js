@@ -50,7 +50,7 @@
 			}
 				
 			self.$elem.append($mainDiv)
-			$instructions = $("<b><i>Click on a gene for plot of expression values across all conditions. Click another gene to add to the plot.</i></b>")
+			$instructions = $("<b><i>Click on a row label for a line plot of row values. Click another row to add to the line plot. Click again to deselect.</i></b>")
 			$mainDiv.append($instructions)
 			$mainDiv.append($heatmapDiv)
 			
@@ -148,7 +148,7 @@
 				.enter().append("text")
 				.text(function (d) {
 					if(d.label.length > 8)
-						return '...'+d.label.substring(d.label.length-9,d.label.length-1);
+						return d.label.substring(0,9)+'...';//'...'+d.label.substring(d.label.length-9,d.label.length-1);
 					else
 						return d.label;                                      
 				})
@@ -185,7 +185,7 @@
 				.text(function(d) {
 					if(d.length > 10)
 						return d.substring(0,10)+'...';
-					else
+						else
 						return d;                       
                 })
 				.attr("x", function(d, i) { return i * gridSize; })
@@ -275,8 +275,7 @@
 					var text = d.toString()
 					if(text.length > 8)
 						return text.substring(0,8)+'...';
-					else
-						return "> "+text;
+						else return "> "+text;
 				})
 				.attr("y", function(d, i) { return (legendElementWidth * (colors.length-i-1))+legendElementWidth/2; })
 				.attr("x", -margin.left*1 + gridSize*1.5)

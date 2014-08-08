@@ -1326,7 +1326,7 @@ angular.module('lp-directives')
 					
 					scope.params.id = bicluster.id
 							
-					var p = $(ele).kbasePanel({title: 'Bicluster Heatmap View',
+					var p = $(ele).kbasePanel({title: 'Data Table',
 												rightLabel: scope.params.workspace,
 												subText: scope.params.id});					
 										   
@@ -1366,7 +1366,7 @@ angular.module('lp-directives')
 						conditions = bicluster.column_labels,
 						expression = bicluster.data;
 						
-					p = $(ele).kbasePanel({title: 'Expression Line Chart',
+					p = $(ele).kbasePanel({title: 'Line Chart',
 												rightLabel: scope.params.workspace,
 												subText: scope.params.id});					
 					
@@ -1436,7 +1436,7 @@ angular.module('lp-directives')
 								}
 							)
 							
-							var p = $(ele).kbasePanel({title: 'Bicluster Heatmap View',
+							var p = $(ele).kbasePanel({title: 'Data Table',
 														rightLabel: scope.params.workspace,
 														subText: scope.params.id});					
 												   
@@ -1496,7 +1496,7 @@ angular.module('lp-directives')
 												conditions = bicluster.column_labels,
 												expression = bicluster.data;											
 											
-											p = newLineChart.kbasePanel({title: 'Expression Line Chart',
+											p = newLineChart.kbasePanel({title: 'Line Chart',
 																	rightLabel: scope.params.workspace,
 																	subText: scope.params.id})
 											p.loading()
@@ -1521,7 +1521,7 @@ angular.module('lp-directives')
 								conditions = bicluster.column_labels,
 								expression = bicluster.data;
 								
-							p = $(ele).kbasePanel({title: 'Expression Line Chart',
+							p = $(ele).kbasePanel({title: 'Line Chart',
 														rightLabel: scope.params.workspace,
 														subText: scope.params.id});					
 							
