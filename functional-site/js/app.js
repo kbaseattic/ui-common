@@ -392,13 +392,15 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
     $stateProvider
         .state('mak',
             {url: '/mak/:ws/:id',
-             templateUrl: 'views/objects/mak.html',
+             // templateUrl: 'views/objects/mak.html',
+			 templateUrl: 'views/genomes/sortable-rows-landing-page-bicluster.html',
              controller: 'MAKDetail'});
 
 	$stateProvider
         .state('floatdatatable',
             {url: '/floatdatatable/:ws/:id',
-             templateUrl: 'views/objects/floatdatatable.html',
+             // templateUrl: 'views/objects/floatdatatable.html',
+			 templateUrl: 'views/genomes/sortable-rows-landing-page-biclusterfloat.html',			
              controller: 'FloatDataTable'});
 
     $stateProvider
@@ -479,6 +481,18 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
     		{url: '/tree/:ws/:id',
     		templateUrl: 'views/objects/tree.html',
     		controller: 'TreeDetail'});
+
+    $stateProvider
+	.state('pangenome',
+		{url: '/pangenome/:ws/:id',
+		templateUrl: 'views/objects/pangenome.html',
+		controller: 'PangenomeDetail'});
+
+    $stateProvider
+	.state('msa',
+		{url: '/msa/:ws/:id',
+		templateUrl: 'views/objects/msa.html',
+		controller: 'MSADetail'});
 
     $urlRouterProvider.when('', '/login/')
                       .when('/', '/login/')

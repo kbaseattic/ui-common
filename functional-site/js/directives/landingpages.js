@@ -191,16 +191,29 @@ angular.module('lp-directives')
         link: function(scope, element, attrs) {
             $(element).loading();
             
+            var run_fba_message = "<h5>There are currently no FBA "+
+                                  "results associated with this model. "+
+                                  "You may want to run FBA analysis.</h5>";
             $.when(scope.ref_obj_prom).done(function() {
                 loadPanel(scope.fba_refs)
-
             }).fail(function() {
-                $(element).html("<h5>There are currently no FBA \
-                                    results associated with this model.\
-                                      You may want to run FBA analysis.</h5>")
+                $(element).html(run_fba_message)
             })
 
             function loadPanel(fba_refs) {
+                // reload table when 
+                console.log('fba_refs', fba_refs)
+                if (fba_refs.length) {
+                    var row = verSelector(fba_refs);
+                    $(element).prepend(row)                    
+                    loadTabs(fba_refs[0].ws, fba_refs[0].name)
+                } else {
+                    $(element).rmLoading();
+                    $(element).html(run_fba_message)                    
+                }
+            }
+
+            function verSelector(fba_refs) {
                 var ver_selector = $('<select class="form-control fba-selector">');
                 for (var i in fba_refs) {
                     var ref = fba_refs[i];
@@ -214,32 +227,24 @@ angular.module('lp-directives')
                     }
                 }
 
-                // set url query string to first 
-                //$location.search({fba: fba_refs[0].name});
-
-                // reload table when 
                 ver_selector.change(function() {
                     var gif_container = $('<div>');
-                    $(this).after(gif_container)
+                    $(this).after(gif_container);
                     gif_container.loading();
 
                     var selected = $(this).find('option:selected')
                     var name = selected.data('name');
                     var ws = selected.data('ws');                    
 
-                    //scope.$apply( $location.search({fba: ws+'/'+name}) ); 
-                    loadTabs(ws, name)                                
+                    loadTabs(ws, name);
                 })
 
                 // form for options on tabs
                 var form = $('<div class="col-xs-5">');
-                form.append(ver_selector)
+                form.append(ver_selector);
                 var row = $('<div class="row">');
-                row.append(form)
-
-                $(element).prepend(row)
-
-                loadTabs(fba_refs[0].ws, fba_refs[0].name)
+                row.append(form);
+                return row;
             }
 
 
@@ -282,10 +287,20 @@ angular.module('lp-directives')
             var fba_id = scope.id;
 
             $(ele).loading();
+
+            console.log(scope.ws+'/'+scope.id)
+
+            var p = kb.ws.get_referenced_objects([scope.ws+'/'+scope.id])
+            $.when(p).done(function(data){
+                console.log('data', data)
+
+
+            })
+
             var prom = kb.get_fba(scope.ws, scope.id);
             $.when(prom).done(function(data) {
-
-                var refs = data[0].refs
+                console.log(data)
+                var refs = data[0].obj_refs
 
                 var obj_refs = []
                 for (var i in refs) {
@@ -365,7 +380,6 @@ angular.module('lp-directives')
                         //row.append(link)
 //
                         //$(ele).append(row);
-
 
                 })
 
@@ -1165,4 +1179,383 @@ angular.module('lp-directives')
 
 
 /* END new placement in sortable rows for gene landing page */
+
+/* START placement for sortable rows for bicluster landing page */
+
+.directive('sortablemakresult', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }
+            var p = $(ele).kbasePanel({title: 'Bicluster Set Overview',
+                                           rightLabel: scope.params.workspace,
+                                           subText: scope.params.id});
+			
+			p.loading();
+			
+			$(p.body()).KBaseMAKResultCard({
+				id: scope.params.id,
+				workspace: scope.params.workspace,
+				auth: $rootScope.USER_TOKEN, 
+				userId: $rootScope.USER_ID,
+				kbCache: kb,
+				loadingImage: "assets/img/ajax-loader.gif"							
+			});
+
+        }
+    };
+})
+.directive('sortablemaktiles', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }
+            var p = $(ele).kbasePanel({title: 'Bicluster Set Tiles',
+                                           rightLabel: scope.params.workspace,
+                                           subText: scope.params.id});
+
+			p.loading();
+			
+			$(p.body()).KBaseMAKTilingCard({
+				id: scope.params.id,
+				workspace: scope.params.workspace,
+				scope: scope,
+				auth: $rootScope.USER_TOKEN, 
+				userId: $rootScope.USER_ID,
+				kbCache: kb,
+				loadingImage: "assets/img/ajax-loader.gif"							
+			});
+										
+        }
+    };
+})
+
+.directive('sortablemakterms', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }
+            var p = $(ele).kbasePanel({title: 'Bicluster Set Enriched Terms',
+                                           rightLabel: scope.params.workspace,
+                                           subText: scope.params.id});
+			
+			var workspaceClient = new Workspace("https://kbase.us/services/ws", { 'token' : $rootScope.USER_TOKEN, 'user_id' : $rootScope.USER_ID})
+			$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
+			.then(
+				function(data) {
+					var biclusters = data[0].data.sets[0].biclusters
+					var terms = {};
+					for (i=0;i<biclusters.length;i++) {
+						var enrichedTerms = []
+						for (var term in biclusters[i].enriched_terms) {
+							
+							if (biclusters[i].enriched_terms[term] != "") {
+								enrichedTerms.push(biclusters[i].enriched_terms[term])
+								var termEntry = term+": "+biclusters[i].enriched_terms[term]
+								if (termEntry in terms) terms[termEntry].push(biclusters[i].bicluster_id)
+								else terms[termEntry] = [biclusters[i].bicluster_id]
+							}
+						}
+					}
+					p.loading();
+					
+					$(p.body()).KBaseBarChartCard({
+						terms: terms,
+						workspace: scope.params.workspace,
+						auth: $rootScope.USER_TOKEN, 
+						userId: $rootScope.USER_ID,
+						kbCache: kb,
+						loadingImage: "assets/img/ajax-loader.gif"							
+					});
+				}
+			)
+        }
+    };
+})
+.directive('sortablemakbicluster', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }            
+			
+			var workspaceClient = new Workspace("https://kbase.us/services/ws", { 'token' : $rootScope.USER_TOKEN, 'user_id' : $rootScope.USER_ID})
+			$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
+			.then(
+				function(data) {
+					
+					var biclusters = data[0].data.sets[0].biclusters
+					var bicluster_info = data[0].data.sets[0]
+					
+					scope.params.id = biclusters[0].bicluster_id
+					
+					$("body").on("click", ".biclusterTile",
+						function() {							
+							
+							scope.params.id = biclusters[$(this).val()].bicluster_id								
+						
+							p.header()[0].childNodes[6].childNodes[0].data = biclusters[$(this).val()].bicluster_id //very hardcoded. need change in future.							
+																			
+							p.loading()
+							
+							widget.options.bicluster = [biclusters,$(this).val(),bicluster_info]
+							widget.__proto__.render(widget.options,widget)//very hardcoded. need change in future.
+
+							$(p.body()).KBaseMAKBiclusterCard({ // Doesn't actually update the card, only here to remove the loading icon.
+								bicluster: [biclusters,$(this).val(),bicluster_info],
+								workspace: scope.params.workspace,
+								auth: $rootScope.USER_TOKEN, 
+								userId: $rootScope.USER_ID,
+								kbCache: kb,
+								loadingImage: "assets/img/ajax-loader.gif"
+							});
+						}
+					)
+					
+					var p = $(ele).kbasePanel({title: 'Bicluster Overview',
+												rightLabel: scope.params.workspace,
+												subText: scope.params.id});					
+										   
+					p.loading();
+					
+					var widget = $(p.body()).KBaseMAKBiclusterCard({
+						bicluster: [biclusters,0,bicluster_info],
+						workspace: scope.params.workspace,
+						auth: $rootScope.USER_TOKEN, 
+						userId: $rootScope.USER_ID,
+						kbCache: kb,
+						loadingImage: "assets/img/ajax-loader.gif"
+					});
+					
+				}
+			)
+        }
+    };
+})
+
+.directive('floatheatmap', function($rootScope) {
+	return {
+        link: function(scope, ele, attrs) {
+            if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }      
+			var workspaceClient = new Workspace("https://kbase.us/services/ws", { 'token' : $rootScope.USER_TOKEN, 'user_id' : $rootScope.USER_ID})
+			$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
+			.then(
+				function(data) {
+					var bicluster = data[0].data
+					
+					scope.params.id = bicluster.id
+							
+					var p = $(ele).kbasePanel({title: 'Data Table',
+												rightLabel: scope.params.workspace,
+												subText: scope.params.id});					
+										   
+					p.loading();
+					var widget = $(p.body()).KBaseHeatMapCard({			
+						count: 0,
+						bicluster: data[0].data,
+						workspace: scope.params.workspace,
+						auth: $rootScope.USER_TOKEN, 
+						userId: $rootScope.USER_ID,
+						kbCache: kb,
+						loadingImage: "assets/img/ajax-loader.gif"
+					})				
+				}
+			)
+        }
+    }
+})
+.directive('floatlinechart', function($rootScope) {	
+	return {
+		link: function(scope, ele, attrs) {
+		
+			if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }            
+			
+			var workspaceClient = new Workspace("https://kbase.us/services/ws", { 'token' : $rootScope.USER_TOKEN, 'user_id' : $rootScope.USER_ID})
+			$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
+			.then(
+				function(data) {
+					
+					var bicluster = data[0].data
+					scope.params.id = bicluster.id
+						
+					var widget;
+					var p;
+					var gene_index = null
+					var gene_labels = bicluster.row_labels,
+						conditions = bicluster.column_labels,
+						expression = bicluster.data;
+						
+					p = $(ele).kbasePanel({title: 'Line Chart',
+												rightLabel: scope.params.workspace,
+												subText: scope.params.id});					
+					
+					p.loading();
+					
+					widget = $(p.body()).KBaseLineChartCard({
+						count: 0,
+						row: [expression,conditions,gene_labels,gene_index],
+						workspace: scope.params.workspace,
+						auth: $rootScope.USER_TOKEN, 
+						userId: $rootScope.USER_ID,
+						kbCache: kb,
+						loadingImage: "assets/img/ajax-loader.gif"
+					});
+																		
+				}
+			)
+		}
+	};
+})
+.directive('sortableheatmap', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }      
+			var workspaceClient = new Workspace("https://kbase.us/services/ws", { 'token' : $rootScope.USER_TOKEN, 'user_id' : $rootScope.USER_ID})
+			$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
+			.then(
+				function(data) {
+					var biclusters = data[0].data.sets[0].biclusters
+					var bicluster_info = data[0].data.sets[0]
+					
+					scope.params.id = biclusters[0].bicluster_id
+					
+					$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
+					.then(
+						function(data) {
+							
+							$("body").on("click", ".biclusterTile",
+								function() {							
+									
+									scope.params.id = biclusters[$(this).val()].bicluster_id										
+								
+									p.header()[0].childNodes[6].childNodes[0].data = biclusters[$(this).val()].bicluster_id //very hardcoded. need change in future.							
+																					
+									p.loading()
+									
+									$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
+									.then(
+										function(data) {
+											var bicluster = data[0].data
+											widget.options.bicluster = bicluster
+											widget.options.count = bicluster.id.replace(/\./g,'').replace(/\|/,'')
+											
+											widget.__proto__.render(widget.options,widget)//very hardcoded. need change in future.
+											
+											$(p.body()).KBaseHeatMapCard({ // Doesn't actually update the card, only here to remove the loading icon.
+												count: biclusters[0].bicluster_id.replace(/\./g,'').replace(/\|/,''),
+												bicluster: data[0].data,
+												workspace: scope.params.workspace,
+												auth: $rootScope.USER_TOKEN, 
+												userId: $rootScope.USER_ID,
+												kbCache: kb,
+												loadingImage: "assets/img/ajax-loader.gif"
+											});												
+										}
+									)
+								}
+							)
+							
+							var p = $(ele).kbasePanel({title: 'Data Table',
+														rightLabel: scope.params.workspace,
+														subText: scope.params.id});					
+												   
+							p.loading();
+							var widget = $(p.body()).KBaseHeatMapCard({
+								count: biclusters[0].bicluster_id.replace(/\./g,'').replace(/\|/,''), 
+								bicluster: data[0].data,
+								workspace: scope.params.workspace,
+								auth: $rootScope.USER_TOKEN, 
+								userId: $rootScope.USER_ID,
+								kbCache: kb,
+								loadingImage: "assets/img/ajax-loader.gif"
+							});
+						}
+					)
+				}
+			)
+        }
+    };
+})
+.directive('sortablelinechart', function($rootScope) {	
+	return {
+		link: function(scope, ele, attrs) {
+		
+			if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }            
+			
+			var workspaceClient = new Workspace("https://kbase.us/services/ws", { 'token' : $rootScope.USER_TOKEN, 'user_id' : $rootScope.USER_ID})
+			$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
+			.then(
+				function(data) {
+					
+					var biclusters = data[0].data.sets[0].biclusters
+					var bicluster_info = data[0].data.sets[0]
+					
+					scope.params.id = biclusters[0].bicluster_id
+					
+					$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
+					.then(
+						function(data) {
+						
+							var bicluster = data[0].data
+							
+							$("body").on("click", ".biclusterTile",
+								function() {							
+									
+									scope.params.id = biclusters[$(this).val()].bicluster_id									
+									
+									$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
+									.then(
+										function(data) {
+											var newLineChart = $("<div sortablelinechart>")		
+											$("#sortable-landing").append($("<div class='col-md-12'>").append(newLineChart))
+																						
+											var bicluster = data[0].data
+											var gene_index = null
+											var gene_labels = bicluster.row_labels,
+												conditions = bicluster.column_labels,
+												expression = bicluster.data;											
+											
+											p = newLineChart.kbasePanel({title: 'Line Chart',
+																	rightLabel: scope.params.workspace,
+																	subText: scope.params.id})
+											p.loading()
+											$(p.body()).KBaseLineChartCard({ // Doesn't actually update the card, only here to remove the loading icon.
+												count: bicluster.id.replace(/\./g,'').replace(/\|/,''),
+												row: [expression,conditions,gene_labels,gene_index],
+												workspace: scope.params.workspace,
+												auth: $rootScope.USER_TOKEN, 
+												userId: $rootScope.USER_ID,
+												kbCache: kb,
+												loadingImage: "assets/img/ajax-loader.gif"
+											});												
+										}
+									)
+								}
+							)
+							
+							var widget;
+							var p;
+							var gene_index = null
+							var gene_labels = bicluster.row_labels,
+								conditions = bicluster.column_labels,
+								expression = bicluster.data;
+								
+							p = $(ele).kbasePanel({title: 'Line Chart',
+														rightLabel: scope.params.workspace,
+														subText: scope.params.id});					
+							
+							p.loading();
+							
+							widget = $(p.body()).KBaseLineChartCard({
+								count: biclusters[0].bicluster_id.replace(/\./g,'').replace(/\|/,''),
+								row: [expression,conditions,gene_labels,gene_index],
+								workspace: scope.params.workspace,
+								auth: $rootScope.USER_TOKEN, 
+								userId: $rootScope.USER_ID,
+								kbCache: kb,
+								loadingImage: "assets/img/ajax-loader.gif"
+							});
+													
+						}
+					)
+				}
+			)
+		}
+	};
+})
 ;

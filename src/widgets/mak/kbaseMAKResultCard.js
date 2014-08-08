@@ -8,7 +8,7 @@
             loadingImage: "../../widgets/images/ajax-loader.gif",
             title: "MAK Result Overview",
             isInCard: false,
-            width: 600,
+            width: 400,
             height: 700
         },
 
@@ -54,16 +54,19 @@
             this.workspaceClient.get_objects([{workspace: this.options.workspace, name: this.options.id}], 
 				
 				function(data){
-					console.log(data)
+				
 					self.collection = data[0];
-					self.$elem.append("<h3>MAK Run Info</h3>");
+					$makOverview = $("<div id='makOverview' style='overflow:auto;height:450px;resize:vertical'/>")
+					self.$elem.append($makOverview)
+					
+					$makOverview.append("<h3>MAK Run Info</h3>");
 					
 					var temp = document.URL.indexOf("/functional-site")
 					var baseURL = document.URL.substring(0,temp)					
 					temp = self.collection.data.parameters.genome_id.indexOf(".")
 					var genome = self.collection.data.parameters.genome_id.substring(temp+1)			    				
 					
-					self.$elem.append($("<div />")
+					$makOverview.append($("<div />")
 					.append($("<table/>").addClass("kbgo-table")
 					    .append(self.collection.data.id!=-1 ? $("<tr/>").append("<td>ID</td><td>" + self.collection.data.id + "</td>") : '')
 					    .append(self.collection.data.start_time!=-1 ? $("<tr/>").append("<td>Run started </td><td>" + self.collection.data.start_time + "</td>") : '')
@@ -79,7 +82,7 @@
 						.append("<td>Genome</td><td>" + "<a href=" +baseURL+"/functional-site/#/genomes/KBasePublicGenomesV3/kb%7Cg." + genome + " target=_blank>"+self.collection.data.parameters.genome_id+"</a>" + "</td>")
 					));														
 					
-					self.$elem.append("<h3>Bicluster List</h3>");
+					$makOverview.append("<h3>Bicluster List</h3>");
 
 					var $biclusterTable = $("<table/>").addClass("kbgo-table").append($("<td>Bicluster ID</td><td>Full Criterion</td><td>Genes</td><td>Conditions</td>").css("font-weight","bold"));
 					for (var bicluster in self.collection.data.sets[0].biclusters) {
@@ -99,18 +102,18 @@
 							)
 						);
 					}
-					self.$elem.append($biclusterTable);
-					// self.$elem.append($("<button class='btn btn-default'>Show Bicluster</button>")
+					$makOverview.append($biclusterTable);
+					// $makOverview.append($("<button class='btn btn-default'>Show Bicluster</button>")
                                             // .on("click", 
                                                 // function(event) {
-                                                    // $(self.$elem.selector + " > select option:selected").each(function() {
+                                                    // $($makOverview.selector + " > select option:selected").each(function() {
                                                     // self.trigger("showMAKBicluster", { bicluster: [self.collection.data.sets[0].biclusters[$(this).attr("id")],self.collection.data.sets[0]], ws: self.options.ws, event: event });
                                                 // });
                                             // })
                                         // );
 										
-                    self.$elem.append("<h3>MAK Run Parameters</h3>");
-			        self.$elem.append($("<div />").
+                    $makOverview.append("<h3>MAK Run Parameters</h3>");
+			        $makOverview.append($("<div />").
 					append($("<table/>").addClass("kbgo-table")
                                             .append($("<tr/>").append("<td>Minimum score</td><td>" + self.collection.data.parameters.min_raw_bicluster_score + "</td>"))
                                             .append($("<tr/>").append("<td>Maximum merging overlap</td><td>" + self.collection.data.parameters.max_bicluster_overlap + "</td>"))
@@ -121,7 +124,7 @@
                                             .append($("<tr/>").append("<td>R</td><td>" + self.collection.data.parameters.Rcodepath + "</td>"))
                                             .append($("<tr/>").append("<td>Rdata</td><td>" + self.collection.data.parameters.Rdatapath + "</td>"))
 					));
-                               self.$elem.append($("<div />")
+                               $makOverview.append($("<div />")
                                        .append("&nbsp;"));
 
 
@@ -130,7 +133,7 @@
 
 			    function(data) {
                                 $('.loader-table').remove();
-                                self.$elem.append('<p>[Error] ' + data.error.message + '</p>');
+                                $makOverview.append('<p>[Error] ' + data.error.message + '</p>');
                                 return;
                             }
 		    );

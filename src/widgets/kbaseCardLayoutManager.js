@@ -751,6 +751,10 @@
                 this.showTreeCards();
             else if (this.options.template.toLowerCase() === "taxonomy")
                 this.showTaxonomyCards();
+            else if (this.options.template.toLowerCase() === "pangenome")
+                this.showPangenomeCards();
+            else if (this.options.template.toLowerCase() === "msa")
+                this.showMSACards();
             else {
                 // throw an error for an unknown template. modal dialog, maybe?
             }
@@ -1231,8 +1235,8 @@
                         isInCard: true
                     },
                     {
-                        my: "bottom",
-                        at: "front",
+                        my: "left top",
+                        at: "left-100 top",
                         of: "#app"
                     }
                  );
@@ -1248,8 +1252,8 @@
                         isInCard: true
 					},
 					{
-						my: "right top",
-                        at: "left bottom",
+						my: "center top",
+                        at: "center-150 top",
                         of: "#app"
 					}
 				);
@@ -1273,7 +1277,7 @@
 						},
 						{
 							my: "left top",
-							at: "left bottom",
+							at: "left top",
 							of: "#app"
 						}
 					);
@@ -1450,7 +1454,41 @@
             }
             return this;
         },
-        
+
+        showPangenomeCards: function() {
+            this.addNewCard("kbasePanGenome",
+                    {
+            			name: this.options.data.id,
+            			ws: this.options.data.ws,
+                        token: this.options.auth,
+                        isInCard: true
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+
+        showMSACards: function() {
+            this.addNewCard("kbaseMSA",
+                    {
+            			msaID: this.options.data.id,
+            			workspaceID: this.options.data.ws,
+                        token: this.options.auth,
+                        isInCard: true
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+
         /**
          * Registers all events that this manager should know about.
          * Also makes a list of all registered events, stored in this.registeredEvents[], so they
@@ -1507,8 +1545,8 @@
 						workspace: data.workspace
 					},
 					{
-						my: "left",
-						at: "right bottom",
+						my: "right top",
+						at: "right+100 top",
 						of: "#app"
 				});
 			});
@@ -1522,8 +1560,6 @@
 				self.addNewCard("KBaseLineChartCard",
 					{
 						row: data.row,		
-						heatmap: data.heatmap,
-						widget: data.widget,
 						id: data.id,
 						workspace: data.workspace
 					},
@@ -2021,6 +2057,8 @@
              */
 
             $(document).on("showMAKBicluster", function(event, data) {
+				console.log("kblpc"+self.cardIndex)
+				console.log(self.cards)
                 self.addNewCard("KBaseMAKBiclusterCard",
                     {
                         bicluster: data.bicluster,
@@ -2032,7 +2070,7 @@
                     },
                     {
                         my: "left top",
-                        at: "left+600 bottom",
+                        at: "left-100 bottom+2000",
                         of: "#app"
                     }
                 );
@@ -2153,6 +2191,36 @@
             			{
             				workspaceID: data.workspaceID,
             				treeID: data.treeID,
+            				token: data.token
+            			},
+            			{
+            				my: "left top",
+            				at: "center",
+            				of: data.event
+            			}
+            	);
+            });
+
+            $(document).on("showPangenome", function(event, data) {
+            	self.addNewCard("kbasePanGenome",
+            			{
+            				ws: data.ws,
+            				name: data.name,
+            				token: data.token
+            			},
+            			{
+            				my: "left top",
+            				at: "center",
+            				of: data.event
+            			}
+            	);
+            });
+
+            $(document).on("showMSA", function(event, data) {
+            	self.addNewCard("kbaseMSA",
+            			{
+            				workspaceID: data.workspaceID,
+            				msaID: data.msaID,
             				token: data.token
             			},
             			{

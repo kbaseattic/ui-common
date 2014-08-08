@@ -25,7 +25,12 @@
             width:900         
         },
         
-        SEEDTree:{ "name":"Functional Categories", "count": 0, "children":[], "size":0, "x0":0, "y0":0 },
+	/*
+	SEEDTree:{ "name":"Functional Categories", "count": 0, "children":[], "size":0, "x0":0, "y0":0 },
+        subsysToGeneMap:[],
+        maxCount:0,
+	*/
+	SEEDTree:{},
         subsysToGeneMap:[],
         maxCount:0,
 
@@ -52,6 +57,12 @@
 
         init: function(options) {
             this._super(options);
+
+	    // init SEED
+	    this.SEEDTree = { "name":"Functional Categories", "count": 0, "children":[], "size":0, "x0":0, "y0":0 };
+	    this.subsysToGeneMap = [];
+	    this.maxCount = 0;
+
             if (this.options.kbCache.token) {
                // if we are logged in, then somehow render gets called later...
             } else {

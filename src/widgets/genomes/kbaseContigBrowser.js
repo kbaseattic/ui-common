@@ -889,11 +889,15 @@
 
 	colorByAnnot : function(feature,namespace,level,annot_num) {
 	    if (namespace === "SEED") {
-		if (! feature.subsystem_data)
+		//if (! feature.subsystem_data)
+		if (! feature.feature_function)
 		    return "#CCC";
 		//typedef tuple<string subsystem, string variant, string role> subsystem_data;
-		var seed_role_pos = 2;
-		return this.seedColorLookup (feature.subsystem_data[annot_num][seed_role_pos], level);
+		//var seed_role_pos = 2;
+		//return this.seedColorLookup (feature.subsystem_data[annot_num][seed_role_pos], level);
+		var first_feature_function = feature.feature_function.replace(/\s+\/.+/,"").replace(/\s+\#.*/,"");
+
+		return this.seedColorLookup (first_feature_function, level);
 	    }
 
 	    //if (namespace === "COG") {

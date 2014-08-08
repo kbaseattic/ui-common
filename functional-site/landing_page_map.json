@@ -38,7 +38,7 @@
 
     "KBaseExpression" : {
         "ExpressionSample" : null,
-        "ExpressionSeries" : null,
+        "ExpressionSeries" : "ws/expression_series",
         "ExpressionReplicateGroup" : null,
         "ExpressionPlatform" : null
     },
@@ -53,19 +53,21 @@
 
     "KBaseFBA" : {
         "Gapfilling" : null,
-        "FBA" : "fbas",
+        "FBA" : "ws/fbas",
         "ReactionSensitivityAnalysis" : null,
-        "FBAModel" : "models",
+        "FBAModel" : "ws/mv/model",
         "Gapgeneration" : null,
         "ModelTemplate" : null,
-        "ETC" : "etc"
+        "ETC" : "etc",
+        "PromConstraint" : "ws/promconstraint"
     },
 
     "KBaseGenomes" : {
         "ProbabilisticAnnotation" : null,
         "ContigSet" : null,
         "Genome" : "genomes",
-        "MetagenomeAnnotation" : null
+        "MetagenomeAnnotation" : null,
+        "Pangenome" : "pangenome"
     },
 
     "KBaseGwasData" : {
@@ -95,7 +97,7 @@
     },
 
     "KBasePhenotypes" : {
-        "PhenotypeSet" : null,
+        "PhenotypeSet" : "ws/phenotype",
         "PhenotypeSimulationSet" : null
     },
 
@@ -128,7 +130,7 @@
         "MAKBicluster" : "mak",
         "ExpressionDataSeries" : null,
         "MAKBiclusterSet" : "mak",
-        "FloatDataTable" : "mak",
+        "FloatDataTable" : "floatdatatable",
         "FloatDataTableContainer" : null,
         "StringDataTable" : null,
         "StringDataTableContainer" : null
@@ -155,7 +157,8 @@
     },
     
     "KBaseTrees" : {
-    	"Tree" : "tree"
+    	"Tree" : "tree",
+    	"MSA" : "msa"
     }
 
 }
