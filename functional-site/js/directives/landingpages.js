@@ -1328,16 +1328,94 @@ angular.module('lp-directives')
         }
     };
 })
-.directive('sortableheatmap', function($rootScope) {
-    return {
+
+.directive('floatheatmap', function($rootScope) {
+	return {
         link: function(scope, ele, attrs) {
-            if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }            
-			console.log(ele)
+            if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }      
+			console.log($rootScope)
+			var workspaceClient = new Workspace("https://kbase.us/services/ws", { 'token' : $rootScope.USER_TOKEN, 'user_id' : $rootScope.USER_ID})
+			$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
+			.then(
+				function(data) {
+					console.log(data)
+					var bicluster = data[0].data
+					
+					scope.params.id = bicluster.id
+							
+					var p = $(ele).kbasePanel({title: 'Bicluster Heatmap View',
+												rightLabel: scope.params.workspace,
+												subText: scope.params.id});					
+										   
+					p.loading();
+					console.log(p.header())
+					var widget = $(p.body()).KBaseHeatMapCard({			
+						count: 0,
+						bicluster: data[0].data,
+						workspace: scope.params.workspace,
+						auth: $rootScope.USER_TOKEN, 
+						userId: $rootScope.USER_ID,
+						kbCache: kb,
+						loadingImage: "assets/img/ajax-loader.gif"
+					})				
+				}
+			)
+        }
+    }
+})
+.directive('floatlinechart', function($rootScope) {	
+	return {
+		link: function(scope, ele, attrs) {
+		
+			if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }            
+			
 			var workspaceClient = new Workspace("https://kbase.us/services/ws", { 'token' : $rootScope.USER_TOKEN, 'user_id' : $rootScope.USER_ID})
 			$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
 			.then(
 				function(data) {
 					
+					var bicluster = data[0].data
+					
+					scope.params.id = bicluster.id
+						
+					var widget;
+					var p;
+					var gene_index = null
+					var gene_labels = bicluster.row_labels,
+						conditions = bicluster.column_labels,
+						expression = bicluster.data;
+						
+					p = $(ele).kbasePanel({title: 'Expression Line Chart',
+												rightLabel: scope.params.workspace,
+												subText: scope.params.id});					
+					
+					p.loading();
+					
+					widget = $(p.body()).KBaseLineChartCard({
+						count: 0,
+						row: [expression,conditions,gene_labels,gene_index],
+						workspace: scope.params.workspace,
+						auth: $rootScope.USER_TOKEN, 
+						userId: $rootScope.USER_ID,
+						kbCache: kb,
+						loadingImage: "assets/img/ajax-loader.gif"
+					});
+																		
+				}
+			)
+		}
+	};
+})
+.directive('sortableheatmap', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }      
+			console.log($rootScope)
+			var workspaceClient = new Workspace("https://kbase.us/services/ws", { 'token' : $rootScope.USER_TOKEN, 'user_id' : $rootScope.USER_ID})
+			$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
+			.then(
+				function(data) {
+					console.log(data)
 					var biclusters = data[0].data.sets[0].biclusters
 					var bicluster_info = data[0].data.sets[0]
 					
