@@ -37,7 +37,7 @@ $.KBWidget({
         var tabs = container.kbTabs({tabs: [{name: 'Overview', content: overviewTable, active: true},
                                            {name: 'Reactions', content: rxnTable},
                                            {name: 'Compounds', content: cpdTable},
-                                  ]});        
+                                    ]});        
 
         var tableSettings = {
             "sPaginationType": "bootstrap",
