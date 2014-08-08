@@ -26,7 +26,7 @@
 				conditions = this.options.row[1],
 				gene_label = this.options.row[2]
 				
-			var m = [80, 80, 80, 80]; // margins
+			var m = [80, 80, 140, 120]; // margins
 			var w = conditions.length*150 - m[1] - m[3]; // width
 			var h = 400 - m[0] - m[2]; // height
 
@@ -115,7 +115,7 @@
 			self = this;
 			var formatAsLabels = function(d) {				
 				d = d.toString()
-				if(d.length > 5) return d.substring(0,5)+"...";
+				if(d.length > 12) return d.substring(0,12)+"...";
 				else return d;				
 			}
 			
@@ -154,7 +154,7 @@
 
 			var formatAsLabels = function(d,i) {
 				if (i < conditions.length) {
-					if(conditions[i].length > 10) return conditions[i].substring(0,10)+"...";
+					if(conditions[i].length > 20) return conditions[i].substring(0,20)+"...";
 					else return conditions[i];
 				}
 			}
