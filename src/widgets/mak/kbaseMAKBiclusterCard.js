@@ -47,27 +47,27 @@
 					    .append(self.bicluster.bicluster_id!=-1&&self.bicluster.bicluster_id!=0 ? $("<tr/>")
 					    	.append("<td>ID</td><td>" + self.bicluster.bicluster_id + "</td>") : '')
 					    .append(self.bicluster_type!=-1&&self.bicluster_type!=0 ? $("<tr/>").
-					    	append("<td>Cluster type</td><td>" + self.bicluster_type + "</td>") : '')
+					    	append("<td>Bicluster type</td><td>" + self.bicluster_type + "</td>") : '')
 					    .append(self.bicluster.num_genes!=-1&&self.bicluster.num_genes!=0 ? $("<tr/>").
-					    	append("<td>Genes</td><td>" + self.bicluster.num_genes + "</td>") : '')
+					    	append("<td>Rows</td><td>" + self.bicluster.num_genes + "</td>") : '')
 					    .append(self.bicluster.num_conditions!=-1&&self.bicluster.num_conditions!=0 ? $("<tr/>").
-					    	append("<td>Conditions</td><td>" + self.bicluster.num_conditions + "</td>") : '')
+					    	append("<td>Columns</td><td>" + self.bicluster.num_conditions + "</td>") : '')
 					    .append(self.bicluster.exp_mean!=-1&&self.bicluster.exp_mean!=0 ? $("<tr/>").
-					    	append("<td>Expression mean</td><td>" + self.bicluster.exp_mean + "</td>") : '')
+					    	append("<td>Bicluster value mean</td><td>" + Math.round(self.bicluster.exp_mean*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.exp_mean_crit!=-1&&self.bicluster.exp_mean_crit!=0 ? $("<tr/>").
-					    	append("<td>Expression mean criterion</td><td>" + self.bicluster.exp_mean_crit + "</td>") : '')
+					    	append("<td>Mean value criterion</td><td>" + Math.round(self.bicluster.exp_mean_crit*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.exp_crit!=-1&&self.bicluster.exp_crit!=0 ? $("<tr/>").
-					    	append("<td>Expression cohesion criterion</td><td>" + self.bicluster.exp_crit + "</td>") : '')
+					    	append("<td>Bicluster cohesion criterion</td><td>" + Math.round(self.bicluster.exp_crit*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.ppi_crit!=-1&&self.bicluster.ppi_crit!=0 ? $("<tr/>").
-					    	append("<td>PPI criterion</td><td>" + self.bicluster.ppi_crit + "</td>") : '')
+					    	append("<td>PPI criterion</td><td>" + Math.round(self.bicluster.ppi_crit*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.TF_crit!=-1&&self.bicluster.TF_crit!=0 ? $("<tr/>").
-					    	append("<td>TF criterion</td><td>" + self.bicluster.TF_crit + "</td>") : '')
+					    	append("<td>TF criterion</td><td>" + Math.round(self.bicluster.TF_crit*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.ortho_crit!=-1&&self.bicluster.ortho_crit!=0 ? $("<tr/>").
-					    	append("<td>Orthology criterion</td><td>" + self.bicluster.ortho_crit + "</td>") : '')
+					    	append("<td>Orthology criterion</td><td>" + Math.round(self.bicluster.ortho_crit*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.full_crit!=-1&&self.bicluster.full_crit!=0 ? $("<tr/>").
-					    	append("<td>Full criterion</td><td>" + self.bicluster.full_crit + "</td>") : '')
+					    	append("<td>Full criterion</td><td>" + Math.round(self.bicluster.full_crit*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.miss_frxn!=-1&&self.bicluster.miss_frxn!=0 ? $("<tr/>").
-					    	append("<td>Fraction of missing data</td><td>" + self.bicluster.miss_frxn + "</td>") : '')
+					    	append("<td>Fraction of missing data</td><td>" + Math.round(self.bicluster.miss_frxn*1000)/1000 + "</td>") : '')
 			));
 			
 			//Heatmap			
