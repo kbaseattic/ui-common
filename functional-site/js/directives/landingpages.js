@@ -1280,7 +1280,6 @@ angular.module('lp-directives')
 							p.loading()
 							
 							widget.options.bicluster = [biclusters,$(this).val(),bicluster_info]
-							console.log(widget)
 							widget.__proto__.render(widget.options,widget)//very hardcoded. need change in future.
 
 							$(p.body()).KBaseMAKBiclusterCard({ // Doesn't actually update the card, only here to remove the loading icon.
@@ -1319,12 +1318,10 @@ angular.module('lp-directives')
 	return {
         link: function(scope, ele, attrs) {
             if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }      
-			console.log($rootScope)
 			var workspaceClient = new Workspace("https://kbase.us/services/ws", { 'token' : $rootScope.USER_TOKEN, 'user_id' : $rootScope.USER_ID})
 			$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
 			.then(
 				function(data) {
-					console.log(data)
 					var bicluster = data[0].data
 					
 					scope.params.id = bicluster.id
@@ -1334,7 +1331,6 @@ angular.module('lp-directives')
 												subText: scope.params.id});					
 										   
 					p.loading();
-					console.log(p.header())
 					var widget = $(p.body()).KBaseHeatMapCard({			
 						count: 0,
 						bicluster: data[0].data,
@@ -1361,7 +1357,6 @@ angular.module('lp-directives')
 				function(data) {
 					
 					var bicluster = data[0].data
-					
 					scope.params.id = bicluster.id
 						
 					var widget;
@@ -1396,12 +1391,10 @@ angular.module('lp-directives')
     return {
         link: function(scope, ele, attrs) {
             if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }      
-			console.log($rootScope)
 			var workspaceClient = new Workspace("https://kbase.us/services/ws", { 'token' : $rootScope.USER_TOKEN, 'user_id' : $rootScope.USER_ID})
 			$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
 			.then(
 				function(data) {
-					console.log(data)
 					var biclusters = data[0].data.sets[0].biclusters
 					var bicluster_info = data[0].data.sets[0]
 					
@@ -1410,7 +1403,6 @@ angular.module('lp-directives')
 					$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
 					.then(
 						function(data) {
-							console.log(data)
 							
 							$("body").on("click", ".biclusterTile",
 								function() {							
@@ -1449,7 +1441,6 @@ angular.module('lp-directives')
 														subText: scope.params.id});					
 												   
 							p.loading();
-							console.log(p.header())
 							var widget = $(p.body()).KBaseHeatMapCard({
 								count: biclusters[0].bicluster_id.replace(/\./g,'').replace(/\|/,''), 
 								bicluster: data[0].data,
@@ -1497,7 +1488,6 @@ angular.module('lp-directives')
 									.then(
 										function(data) {
 											var newLineChart = $("<div sortablelinechart>")		
-											console.log(newLineChart)
 											$("#sortable-landing").append($("<div class='col-md-12'>").append(newLineChart))
 																						
 											var bicluster = data[0].data

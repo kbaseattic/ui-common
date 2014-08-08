@@ -62,12 +62,12 @@
 					return y(d.value); 
 				})
 				
-			var linePath = graph.selectAll("#_"+gene_label)
+			var linePath = graph.selectAll("#_"+gene_label.replace(/\./g,'').replace(/\|/,''))
 				.data(datadict)
 				.enter()
 				.append("svg:path")
 				.attr("d", line(datadict))
-				.attr("id","_"+gene_label)
+				.attr("id","_"+gene_label.replace(/\./g,'').replace(/\|/,''))
 				.style({"stroke-width":3,"stroke":colorScale(color_ind),"fill":"none"})
 				.on("mouseover", 
 							function(d) { 
@@ -111,13 +111,40 @@
 		},
 		
 		yAxisMaker: function(values,graph,h) {
+		
+			self = this;
+			var formatAsLabels = function(d) {				
+				d = d.toString()
+				if(d.length > 5) return d.substring(0,5)+"...";
+				else return d;				
+			}
+			
 			var y = d3.scale.linear().domain([d3.min(values), d3.max(values)]).range([h, 0]);
-			var yAxisLeft = d3.svg.axis().scale(y).orient("left");
+			var yAxisLeft = d3.svg.axis().scale(y).orient("left").tickFormat(formatAsLabels);
 
 			graph.append("svg:g")
 				  .attr("class", "y axis")
 				  .attr("transform", "translate(-25,0)")
-				  .call(yAxisLeft);
+				  .call(yAxisLeft)			
+				.selectAll("g.y.axis > g.tick > text")
+				.on("mouseover", 
+						function(d,i) { 
+							d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
+							self.tooltip = self.tooltip.text(d);
+							return self.tooltip.style("visibility", "visible"); 
+						}
+					)
+				 .on("mouseout", 
+						function() { 
+							d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
+							return self.tooltip.style("visibility", "hidden"); 
+						}
+					)
+				 .on("mousemove", 
+						function() { 
+							return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+						}
+					)
 			
 			return y
 			
@@ -186,7 +213,7 @@
 			$("body").on("click", ".geneLabel"+self.options.count, function() {
 				var i = $(this).index()
 				
-				if (graph.selectAll("#_"+gene_label[i]).empty() && count<=10) {
+				if (graph.selectAll("#_"+gene_label[i].replace(/\./g,'').replace(/\|/,'')).empty() && count<=10) {
 					count++
 					self.lineDrawer(values[i],conditions,gene_label[i],x,y,(count-1),true,graph,colorScale)
 					if (count == 1) {
@@ -202,7 +229,7 @@
 				}
 				else {
 					count--
-					graph.selectAll("#_"+gene_label[i]).remove()
+					graph.selectAll("#_"+gene_label[i].replace(/\./g,'').replace(/\|/,'')).remove()
 					for (m=0;m<mean.length;m++) {
 						mean[m] = mean[m]*(count+1)
 						mean[m] -= JSON.parse(JSON.stringify(values[i][m]))
