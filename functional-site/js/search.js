@@ -1690,7 +1690,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                     }
                 }
                 
-                $scope.options.userState.session.data_cart.data[i]["cart_selected"] = false;
+                $scope.options.userState.session.data_cart.data[id]["cart_selected"] = false;
             }
             else {
                 throw Error("Trying to add unknown type!");        
