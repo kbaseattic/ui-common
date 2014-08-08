@@ -29,6 +29,7 @@
 			var chartWidth = 1500
 			if (conditions.length <= 10) chartWidth = 1000
 			var m = [80, 80, 140, 120]; // margins
+		
 			var w = chartWidth - m[1] - m[3]; // width			
 			var h = 400 - m[0] - m[2]; // height
 
@@ -127,7 +128,7 @@
 			
 			if (values.length==0) values = [5,-5]
 			else values = [].concat.apply([],values)
-			console.log(values)
+			//console.log(values)
 			var y = d3.scale.linear().domain([d3.min(values), d3.max(values)]).range([h, 0]);
 			var yAxisLeft = d3.svg.axis().scale(y).orient("left").tickFormat(formatAsLabels);
 

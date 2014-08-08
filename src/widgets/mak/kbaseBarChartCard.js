@@ -142,7 +142,7 @@
 			self.$elem.append($instructions)	
 			self.$elem.append($mainDiv)
 			
-			console.log("here")
+			//console.log("here")
 			return this;
 		},
 		

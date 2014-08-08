@@ -63,7 +63,7 @@
             this.workspaceClient.get_objects([{workspace: this.options.workspace, name: this.options.id}], 
 				
 				function(data){
-					console.log(data)
+					//console.log(data)
 					Packer = function(w, h) {
 					  this.init(w, h);
 					};
