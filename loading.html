@@ -29,7 +29,7 @@
             var numTries = 0;
             var narrUrl = window.location.href.slice(window.location.href.indexOf('?') + 1);
             narrUrl = decodeURIComponent(narrUrl.split('=')[1]);
-            narrUrl = narrUrl.replace("http:", "https:"); // in case the server didn't get the memo that this is supposed to be https!
+            narrUrl = narrUrl.replace(/https?\:/, window.location.protocol); // in case the server didn't get the memo that this is supposed to be https!
 
             var interval = null;
             var pokeNarrative = function(url) {
