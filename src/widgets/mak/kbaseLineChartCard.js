@@ -25,9 +25,9 @@
 				values = this.options.row[0],
 				conditions = this.options.row[1],
 				gene_label = this.options.row[2]
-				
+					
 			var m = [80, 80, 140, 120]; // margins
-			var w = conditions.length*150 - m[1] - m[3]; // width
+			var w = conditions.length*100 - m[1] - m[3]; // width			
 			var h = 400 - m[0] - m[2]; // height
 
 			var graph = d3.select($lineChartDiv.get(0))
@@ -119,6 +119,9 @@
 				else return d;				
 			}
 			
+			if (values.length==0) values = [5,-5]
+			else values = [].concat.apply([],values)
+			console.log(values)
 			var y = d3.scale.linear().domain([d3.min(values), d3.max(values)]).range([h, 0]);
 			var yAxisLeft = d3.svg.axis().scale(y).orient("left").tickFormat(formatAsLabels);
 
@@ -154,7 +157,7 @@
 
 			var formatAsLabels = function(d,i) {
 				if (i < conditions.length) {
-					if(conditions[i].length > 20) return conditions[i].substring(0,20)+"...";
+					if(conditions[i].length > 15) return conditions[i].substring(0,15)+"...";
 					else return conditions[i];
 				}
 			}
@@ -162,33 +165,35 @@
 			var x = d3.scale.linear().domain([0, values[0].length-1]).range([0, w]);
 			var xAxis = d3.svg.axis().scale(x).ticks(conditions.length).tickFormat(formatAsLabels)
 			
-			graph.append("svg:g")
-				.attr("class", "x axis")
-				.attr("transform", "translate(0," + h + ")")
-				.call(xAxis)
-				.selectAll("g.x.axis > g.tick > text")
-				.attr("transform", function(d) {
-					return "rotate(-80)translate(-30,0)" 
-				})
-				.on("mouseover", 
-						function(d,i) { 
-							d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
-							self.tooltip = self.tooltip.text(conditions[i]);
-							return self.tooltip.style("visibility", "visible"); 
-						}
-					)
-				 .on("mouseout", 
-						function() { 
-							d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
-							return self.tooltip.style("visibility", "hidden"); 
-						}
-					)
-				 .on("mousemove", 
-						function() { 
-							return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
-						}
-					)
-					
+			if (conditions.length <= 150) {
+				graph.append("svg:g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0," + h + ")")
+					.call(xAxis)
+					.selectAll("g.x.axis > g.tick > text")
+					.attr("transform", function(d) {
+						return "rotate(-80)translate(-30,0)" 
+					})
+					.on("mouseover", 
+							function(d,i) { 
+								d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
+								self.tooltip = self.tooltip.text(conditions[i]);
+								return self.tooltip.style("visibility", "visible"); 
+							}
+						)
+					 .on("mouseout", 
+							function() { 
+								d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
+								return self.tooltip.style("visibility", "hidden"); 
+							}
+						)
+					 .on("mousemove", 
+							function() { 
+								return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+							}
+						)
+			}
+			
 			return x
 			
 		},
@@ -201,7 +206,7 @@
 			
 				// All three above variables are passed from the JSON object
 	
-			var merged = [].concat.apply([],values)
+			var merged = []
 			var count = 0
 			var colorbank = ["#003399","#33CC33","#FF9900","#FF0000","#6600FF","#00FFFF","#993333","#000000","#00CC99","#0000FF","#999966"]
 			var colorScale = d3.scale.quantile()
@@ -213,8 +218,13 @@
 			$("body").on("click", ".geneLabel"+self.options.count, function() {
 				var i = $(this).index()
 				
+				var temp = gene_label[i].indexOf(' ')
+				gene_label[i] = gene_label[i].substring(temp+1)
 				if (graph.selectAll("#_"+gene_label[i].replace(/\./g,'').replace(/\|/,'')).empty() && count<=10) {
+					merged.push(values[i])
 					count++
+					$("g.y.axis").remove()
+					y = self.yAxisMaker(merged,graph,h)
 					self.lineDrawer(values[i],conditions,gene_label[i],x,y,(count-1),true,graph,colorScale)
 					if (count == 1) {
 						mean = JSON.parse(JSON.stringify(values[i]))
@@ -230,6 +240,12 @@
 				else {
 					count--
 					graph.selectAll("#_"+gene_label[i].replace(/\./g,'').replace(/\|/,'')).remove()
+					var temp = merged.indexOf(values[i])
+					merged.splice(temp,1)
+					
+					$("g.y.axis").remove()
+					y = self.yAxisMaker(merged,graph,h)
+					
 					for (m=0;m<mean.length;m++) {
 						mean[m] = mean[m]*(count+1)
 						mean[m] -= JSON.parse(JSON.stringify(values[i][m]))
