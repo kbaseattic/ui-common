@@ -253,7 +253,8 @@
 			  // heatMap.transition().duration(1000)
 				  // .style("fill", function(d) { return colorScale(expression[d.gene][d.condition]); });
 				  
-			var legendRange = [">2.5",">1.5 and <2.5",">0.5 and <1.5",">-0.5 and <0.5","<-0.5 and >-1.5","<-1.5 and >-2.5","<-2.5"]
+			//var legendRange = [">2.5",">1.5 and <2.5",">0.5 and <1.5",">-0.5 and <0.5","<-0.5 and >-1.5","<-1.5 and >-2.5","<-2.5"]
+			var legendRange = ["<-2.5","<-1.5 and >-2.5","<-0.5 and >-1.5",">-0.5 and <0.5",">0.5 and <1.5",">1.5 and <2.5", ">2.5"]
 			if (d3.min(dataflat) >= 0) {			
 				legendRange = [0].concat(colorScale.quantiles())
 			}
@@ -273,9 +274,15 @@
 				.attr("class", "mono")
 				.text(function(d) {
 					var text = d.toString()
-					if(text.length > 8)
-						return text.substring(0,8)+'...';
-						else return "> "+text;
+					
+					if(text.indexOf(">") == -1 && text.indexOf("<") == -1) {
+						d = Math.round(d*1000)/1000;
+						text = d.toString();
+					}
+					//if(text.length > 8)
+						//return text.substring(0,8)+'...';
+						//else return
+						return text;//"> "+
 				})
 				.attr("y", function(d, i) { return (legendElementWidth * (colors.length-i-1))+legendElementWidth/2; })
 				.attr("x", -margin.left*1 + gridSize*1.5)
