@@ -1416,7 +1416,7 @@ angular.module('lp-directives')
 								function() {							
 									
 									d3.select(".currentHeatmap").style("background", "steelblue");
-									if ($(".currentHeatmap").hasClass("picked")) d3.select(".currentHeatmap").style("background", "#00CCFF")
+									if ($(".currentHeatmap").hasClass("pickedFromBar")) d3.select(".currentHeatmap").style("background", "#F08A04")
 									d3.select(this).style("background", "#99FFCC")
 									
 									if ($(".currentHeatmap")==this && $(this).hasClass('picked')) $(this).removeClass('picked')

@@ -202,6 +202,7 @@
 									function() { 
 										if (!$(this).hasClass('picked')) {
 											d3.select(this).style("background", "steelblue");
+											if ($(this).hasClass('pickedFromBar')) d3.select(this).style("background", "#F08A04")									
 											if ($(this).hasClass('currentHeatmap')) d3.select(this).style("background", "#99FFCC")
 											for (term in block.terms) {
 												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')										

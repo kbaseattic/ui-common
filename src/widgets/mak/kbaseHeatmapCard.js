@@ -129,7 +129,7 @@
 				.enter().append("text")
 				.text(function (d) {
 					var temp = d.label.indexOf(' ')
-					d.label = d.label.substring(temp)
+					d.label = d.label.substring(temp+1)
 					if(d.label.length > 8)
 						return d.label.substring(0,9)+'...';//'...'+d.label.substring(d.label.length-9,d.label.length-1);
 					else

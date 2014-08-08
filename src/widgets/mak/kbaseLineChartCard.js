@@ -26,6 +26,11 @@
 				conditions = this.options.row[1],
 				gene_label = this.options.row[2]
 			
+			$.each(gene_label, function(i,d) {
+				var temp = gene_label[i].indexOf(' ')
+				gene_label[i] = gene_label[i].substring(temp+1)
+			})
+				
 			var chartWidth = 1500
 			if (conditions.length <= 10) chartWidth = 1000
 			var m = [80, 80, 140, 120]; // margins
@@ -48,14 +53,18 @@
 			self = this;
 						
 			var datadict = []
-
+			var temp = gene_label.indexOf(' ')
+			gene_label = gene_label.substring(temp+1)
+			
 			for (i=0;i<values.length;i++) {
+
 				datadict.push({
 					"value": values[i],
 					"condition": conditions[i],
 					"gene_label": gene_label
 				})
 			}
+			
 			var line = d3.svg.line()
 				.defined(function(d) {return d.value!=null})
 				.x(function(d,i) { 
@@ -232,9 +241,7 @@
 				var i = $(this).index()
 				colorCount++
 				if (colorCount == 10) colorCount = 0
-				
-				var temp = gene_label[i].indexOf(' ')
-				gene_label[i] = gene_label[i].substring(temp+1)
+								
 				if (graph.selectAll("#_"+gene_label[i].replace(/\./g,'').replace(/\|/,'')).empty()) {					
 					merged.push(values[i])
 					count++
