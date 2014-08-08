@@ -46,7 +46,7 @@
 		lineDrawer: function(values,conditions,gene_label,x,y,color_ind,drawCircle,graph,colorScale) {
 			
 			self = this;
-			
+						
 			var datadict = []
 
 			for (i=0;i<values.length;i++) {
@@ -92,6 +92,7 @@
 								return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
 							}
 						)
+			self.allLines.push(linePath)
 			
 			if (drawCircle) {
 				var circles = graph.selectAll(".selectionCircles")
@@ -113,10 +114,11 @@
 						return self.tooltip.style("visibility", "hidden");
 					}).on("mousemove", function () {
 						return self.tooltip.style("top", (d3.event.pageY + 15) + "px").style("left", (d3.event.pageX - 10) + "px");
-					})								
+					})		
+				self.allCircles.push(circles)
 			}
 		},
-		
+
 		yAxisMaker: function(values,graph,h) {
 		
 			self = this;
@@ -213,25 +215,29 @@
 				// All three above variables are passed from the JSON object
 	
 			var merged = []
+			var colorCount = 0
 			var count = 0
 			var colorbank = ["#003399","#33CC33","#FF9900","#FF0000","#6600FF","#00FFFF","#993333","#000000","#00CC99","#0000FF","#999966"]
 			var colorScale = d3.scale.quantile()
               .domain([0,9])
               .range(colorbank);
-			
+			  
+			self.allLines = []
+			self.allCircles = []
 			var mean;			
 			
 			$("body").on("click", ".geneLabel"+self.options.count, function() {
+				
 				var i = $(this).index()
 				
 				var temp = gene_label[i].indexOf(' ')
 				gene_label[i] = gene_label[i].substring(temp+1)
-				if (graph.selectAll("#_"+gene_label[i].replace(/\./g,'').replace(/\|/,'')).empty() && count<=10) {
+				if (graph.selectAll("#_"+gene_label[i].replace(/\./g,'').replace(/\|/,'')).empty()) {					
 					merged.push(values[i])
 					count++
 					$("g.y.axis").remove()
 					self.y = self.yAxisMaker(merged,graph,h)
-					self.lineDrawer(values[i],conditions,gene_label[i],x,self.y,(count-1),true,graph,colorScale)
+					self.lineDrawer(values[i],conditions,gene_label[i],x,self.y,colorCount,true,graph,colorScale)
 					if (count == 1) {
 						mean = JSON.parse(JSON.stringify(values[i]))
 					}
@@ -263,6 +269,26 @@
 					self.lineDrawer(mean,conditions,"mean",x,self.y,10,false,graph,colorScale)
 					graph.selectAll("#_mean").style("stroke-dasharray",(3,3))
 				}
+				$.each(self.allLines,function(i,linePath) {
+					var datadict = linePath.data()
+					
+					var line = d3.svg.line()
+						.defined(function(d) {return d.value!=null})
+						.x(function(d,i) { 
+							return x(i); 
+						})
+						.y(function(d) { 
+							return self.y(d.value); 
+						})
+					
+					linePath.attr("d", line(datadict))
+				})
+				$.each(self.allCircles,function(i,circles) {
+					circles.attr("cy", function(d) {return self.y(d.value)})
+				})
+				
+				colorCount++
+				if (colorCount == 10) colorCount = 0
 			})
 			
 			x = self.xAxisMaker(values,conditions,graph,w,h)
