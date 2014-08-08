@@ -94,7 +94,6 @@
                     var id = $(this).find('a').data('id');
                     self.showTab(id);
                 })
-                //events();
 
                 return p.content;
             }
@@ -150,18 +149,6 @@
                 }
             }
 
-            // events for showing tabs
-            function events() {
-                tabs.find('a').unbind('click')
-                tabs.find('a').click(function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    // show tab and content
-                    var id = $(this).data('id');
-                    self.showTab(id);
-                })
-            }
 
             return this;
         },
