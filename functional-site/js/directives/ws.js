@@ -302,9 +302,6 @@ angular.module('ws-directives')
 
 
 
-
-
-
             function cloneWorkspace(ws_name) {
                 var body = $('<form class="form-horizontal" role="form">\
                                   <div class="form-group">\
@@ -672,7 +669,6 @@ angular.module('ws-directives')
                         return table;
                     }
 
-
                     // create table of permissions
                     for (var key in data) {
                         // ignore user's perm, ~global, and users with no permissions
@@ -1007,13 +1003,10 @@ angular.module('ws-directives')
                     $(element).html('<div class="alert alert-danger">'+e.error.message+'</div>');
                 })
 
-            } 
-
-            // loadObjTable
+            } // loadObjTable
 
 
             scope.loadNarTable = function(tab) {
-                //var table_id = "nar-table";
                 var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
                                             +'</div>',
                                              bSortable: false, "sWidth": "1%"} 
@@ -1027,6 +1020,7 @@ angular.module('ws-directives')
                                 { "sTitle": "Byte Size", bVisible: false },
                                 { "sTitle": "Module", bVisible: false },
                                 ];
+
                 if (tab != 'public'){
                     columns.push({ "sTitle": "Shared With" })
                 }
@@ -1058,7 +1052,6 @@ angular.module('ws-directives')
                 $(element).loading('<br>Loading<br>Narratives...', 'big');
 
                 var p = kb.getNarratives();
-
                 $.when(p).done(function(nars){
                     $(element).rmLoading();             
 
@@ -1168,7 +1161,7 @@ angular.module('ws-directives')
             }
 
             function getTypeFilterBtn(table, type_counts, selected) {
-                var type_filter = $('<select class=" type-filter form-control">\
+                var type_filter = $('<select class="type-filter form-control">\
                                     <option selected="selected">All Types</option> \
                                 </select>');
                 for (var type in type_counts) {
@@ -1194,9 +1187,10 @@ angular.module('ws-directives')
                             <span class="badge trash-count">'+scope.deleted_objs.length+'</span><a>');
                 trash_btn.tooltip({title: 'View trash bin', placement: 'bottom', delay: {show: 700}});
 
+                trash_btn.unbind('click');
                 trash_btn.click(function(){
                     displayTrashBin();
-                })      
+                });
 
                 return trash_btn;          
             }
@@ -1334,6 +1328,7 @@ angular.module('ws-directives')
                     }
 
                     // determine if saved to favorites
+                    /*
                     var isFav = false;
                     for (var i in scope.favs) { 
                         if (scope.favs[i].ws != ws) continue;
@@ -1341,7 +1336,7 @@ angular.module('ws-directives')
                             isFav = true;
                             break;
                         } 
-                    }
+                    }*/
 
                     // get url path specified in landing_page_map.json
                     if (module in scope.obj_mapping && scope.obj_mapping[module] 
@@ -1367,7 +1362,7 @@ angular.module('ws-directives')
                                         'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
                                         'data-sub="'+sub+'" ui-sref="'+url+'" >'+
                                     name+'</a> (<a class="show-versions">'+instance+'</a>)'+
-                                    (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
+                                    //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
                                     '<a class="btn-show-info hide pull-right">More</a>';
 
                     } else if (kind == "Narrative") {
@@ -1376,7 +1371,7 @@ angular.module('ws-directives')
                                         'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
                                         'data-sub="'+sub+'" '+(USER_ID ? 'href="'+url+'"' : '')+' target="_blank"><i><b>'+
                                       name+'</b></i></a> (<a class="show-versions">'+instance+'</a>)'+
-                                      (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
+                                      //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
                                      '<a class="btn-show-info hide pull-right">More</a>';
 
                     } else {
@@ -1385,7 +1380,7 @@ angular.module('ws-directives')
                                         'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
                                         'data-sub="'+sub+'" ui-sref="'+url+'" target="_blank" >'+
                                       name+'</a> (<a class="show-versions">'+instance+'</a>)'+
-                                      (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
+                                      //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
                                      '<a class="btn-show-info hide pull-right">More</a>';
                     }
 
@@ -1585,20 +1580,11 @@ angular.module('ws-directives')
                     <span class="glyphicon glyphicon-star"></span>\
                     <span class="checked-count"></span></button>');                                      
 
-                options.append(delete_btn, copy_btn, rename_btn)//, mv_btn);
-
-                // narrative home should be 'deprecated'
-                // if user has narrative home workspace, add option to copy there
-                //if (scope.workspace_dict[USER_ID+':home']) {
-                //    var dd = options.find('.dropdown-menu')
-                //    dd.append('<li class="divider"></li>');
-                //    dd.append('<li><a class="btn-mv-obj-to-nar">Copy to Narrative Home</a></li>');
-                //}
-
-                //options.find('.btn-mv-obj').on('click', moveObjects);
                 if (scope.tab) {
+                    options.append(delete_btn, rename_btn)
                     copy_btn.find('.btn-cp-obj').on('click', copyNarObjects);
                 } else {
+                    options.append(delete_btn, copy_btn, rename_btn)                    
                     copy_btn.find('.btn-cp-obj').on('click', copyObjects);
                 }
 
@@ -1607,7 +1593,6 @@ angular.module('ws-directives')
                 mv_btn.on('click', addToMV);
 
                 var container = $('.table-options').append(options);
-                //options.addClass('hide')
 
                 delete_btn.tooltip({title: 'Delete selected objects', placement: 'bottom', delay: {show: 700}});
                 //copy_btn.tooltip({title: 'Copy; click for options', placement: 'bottom', delay: {show: 700}});  
@@ -1806,25 +1791,14 @@ angular.module('ws-directives')
                     }
                 }
 
-                // hide the objecttable, add back button{}
-                var table_id = 'obj-table-'+ws.replace(':','_');
+                // hide the objecttable, add back button
+                var table_id = 'obj-table';
                 $('#'+table_id+'_wrapper').hide();
                 $(element).prepend('<h4 class="trash-header"><a class="btn btn-primary">\
                     <span class="glyphicon glyphicon-circle-arrow-left"></span> Back</a> '+ws+' \
                     <span class="text-danger">Trash Bin</span> <small><span class="text-muted">(Undelete option coming soon)</span></small></h4>');
 
-                // event for back to workspace button
-                $('.trash-header .btn').unbind('click');
-                $('.trash-header .btn').click(function() {
-                    if (typeof trashbin) { // fixme: cleanup
-                        trashbin.fnDestroy();
-                        $('#'+table_id+'-trash').remove();
-                        trashbin = undefined;
-                    }
 
-                    $('.trash-header').remove();
-                    $('#'+table_id+'_wrapper').show();
-                })
 
                 // if trash table hasn't already been rendered, render it
                 if (typeof trashbin == 'undefined') {
@@ -1840,19 +1814,35 @@ angular.module('ws-directives')
                     // load object table
                     trashbin = $('#'+table_id+'-trash').dataTable(tableSettings);
 
+                    /*
                     if (scope.deleted_objs.length) {
                         var type_filter = getTypeFilterBtn(trashbin, kind_counts, scope.type)
                         $('.table-options').append(type_filter);
                     }
-
-                    //searchColumns()
                     addOptionButtons();
+                    */
 
                     // resinstantiate all events.
                     events();                     
                 } else {
                     $('#'+table_id+'-trash_wrapper').show();
                 }
+
+
+                // event for back to workspace button
+                $('.trash-header .btn').unbind('click');
+                $('.trash-header .btn').click(function() {
+
+                    if (typeof trashbin) { // fixme: cleanup
+                        trashbin.find('.table-options').remove()
+                        trashbin.fnDestroy();
+                        $('#'+table_id+'-trash').remove();
+                        trashbin = undefined;
+                    }
+
+                    $('.trash-header').remove();
+                    $('#'+table_id+'_wrapper').show();
+                })                
             }
 
 
@@ -1872,17 +1862,17 @@ angular.module('ws-directives')
                     if (scope.tab) {
                         scope.loadNarTable(scope.tab);
                     } else {
-                        scope.loadObjTable()
+                        scope.loadObjTable();
                     }
                     scope.checkedList = [];
-                    scope.$apply()                                          
+                    scope.$apply();
                 })
                 return prom;
             }
 
             function addToMV() {
                 $('.fav-loading').loading()
-                var count = scope.checkedList.length
+                var count = scope.checkedList.length;
                 var p = favoriteService.addFavs(scope.checkedList);
                 $.when(p).done(function() {
                     scope.updateFavs();
@@ -1906,9 +1896,9 @@ angular.module('ws-directives')
 
                 // uncheck everything that is checked in that table ( this var is watched )
                 scope.checkedList = [];
-                scope.$apply()
+                scope.$apply();
 
-                events()
+                events();
             }
 
             // event for rename object button
@@ -1977,9 +1967,9 @@ angular.module('ws-directives')
                 var workspace = ws; // just getting current workspace
 
                 var content = $('<form class="form-horizontal" role="form">\
-                                        <div class="form-group">\
-                                        </div>\
-                                     </div>').loading()
+                                    <div class="form-group">\
+                                    </div>\
+                                 </div>').loading()
 
                 var copyObjectsModal = $('<div></div>').kbasePrompt({
                         title : 'Copy Objects',
@@ -2021,7 +2011,7 @@ angular.module('ws-directives')
                             {name : 'Copy',
                             type : 'primary',
                             callback : function(e, $prompt) {
-                                var ws = $('.select-ws option:selected').val()
+                                var ws = $('.select-ws option:selected').val();
                                 confirmCopy(ws, $prompt);
                             }
                         }]
@@ -2057,9 +2047,9 @@ angular.module('ws-directives')
                                         </div>\
                                      </div>');
 
-                    var select = $('<select class="form-control select-ws"></select>')
+                    var select = $('<select class="form-control select-ws"></select>');
                     for (var i in workspaces) {
-                        select.append('<option>'+workspaces[i][1]+'</option>')
+                        select.append('<option>'+workspaces[i][1]+'</option>');
                     }
                     select = $('<div class="col-sm-5">').append(select);
                     content.find('.form-group').append(select);

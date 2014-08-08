@@ -184,23 +184,14 @@ angular.module('modeling-directives')
             // fba selector dropdown
             $(ele).loading();            
             $.when(scope.ref_obj_prom).done(function() {
-                console.log('adding dropdown')
-                var fba_selector = get_fba_selector(scope.fba_refs)
-                $('.pathway-tabs').prepend(fba_selector)
+                if (scope.fba_refs.length) {
+                    var fba_selector = get_fba_selector(scope.fba_refs)
+                    $('.pathway-tabs').prepend(fba_selector)
+                    loadMapSelector(scope.fba_refs[0].ws, scope.fba_refs[0].name)                                 
+                } else {
+                    loadMapSelector(scope.selected[0].workspace)                    
+                }
 
-                loadMapSelector(scope.fba_refs[0].ws, scope.fba_refs[0].name)
-
-                fba_selector.find('select').change(function() { 
-                    console.log('change')
-                    // special container for loading notice since floated
-                    var spin = $('<div id="loading pull-right">')
-                    spin.loading();
-                    $('.pathway-options').append(spin);
-                    
-                    var selected_fba = get_selected_fba();
-                    loadMapSelector(selected_fba.ws, selected_fba.name);
-
-                })
 
             }).fail(function() {
                 $(ele).html("<h5>There are currently no FBA \
@@ -251,6 +242,18 @@ angular.module('modeling-directives')
                 form.append(ver_selector)
                 var row = $('<div class="row pathway-options">');
                 row.append(form)
+
+                ver_selector.find('select').change(function() { 
+                    console.log('change')
+                    // special container for loading notice since floated
+                    var spin = $('<div id="loading pull-right">');
+                    spin.loading();
+                    $('.pathway-options').append(spin);
+                    
+                    var selected_fba = get_selected_fba();
+                    console.log(selected_fbga)
+                    loadMapSelector(selected_fba.ws, selected_fba.name);
+                })                
 
                 return row;
             }
