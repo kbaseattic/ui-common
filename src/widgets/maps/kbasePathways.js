@@ -19,7 +19,7 @@ $.KBWidget({
         var selectionTable = $('<table cellpadding="0" cellspacing="0" border="0" \
             class="table table-bordered table-striped">');
         var tabs = container.kbTabs({tabs: [
-                                        {name: 'Selection', content: selectionTable} 
+                                        {name: 'Selection', content: selectionTable, active: true} 
                                     ]});
 
 

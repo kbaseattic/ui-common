@@ -3,7 +3,7 @@
 
     // Instantiation
     // optional: content, active, removable
-    // you can make all tabs removable or individual tabs
+    // you can make all tabs or individual tabs removable
 
         var tabs = $('#ele').tabs();
 
@@ -32,10 +32,9 @@
 
     // manually show a tab
     // Tab panes are shown when clicked automatically.
-    // This programmatic way of showing a tab.
+    // This is a programmatic way of showing a tab.
 
         tabs.showTab('tab_name');
-
 */
 
 (function( $, undefined ) {
@@ -84,11 +83,18 @@
                 }
 
                 // add content pane
+                console.log('adding:', p.name, p.active)
                 var c = $('<div class="tab-pane '+(p.active ? 'active' :'')+'" data-id="'+p.name+'">')
                 c.append((p.content ? p.content : ''))
                 tab_contents.append(c);
                 
-                events();
+                tab.click(function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var id = $(this).find('a').data('id');
+                    self.showTab(id);
+                })
+                //events();
 
                 return p.content;
             }
@@ -130,8 +136,8 @@
 
             // highlights tab and shows content
             this.showTab = function(id) {
-                tabs.find('li').removeClass('active');
-                tab_contents.find('.tab-pane').removeClass('active');
+                tabs.children('li').removeClass('active');
+                tab_contents.children('.tab-pane').removeClass('active');
 
                 tabs.find('a[data-id="'+id+'"]').parent().addClass('active');
                 tab_contents.children('[data-id="'+id+'"]').addClass('active');                
