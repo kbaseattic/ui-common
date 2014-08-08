@@ -104,6 +104,7 @@
 									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
 									if (!$("#MAK_tile_"+tileSelector).hasClass('picked')) {
 										d3.select("#MAK_tile_"+tileSelector).style("background", "steelblue")
+										if ($("#MAK_tile_"+tileSelector).hasClass('currentHeatmap')) d3.select("#MAK_tile_"+tileSelector).style("background", "#99FFCC")
 									}
 								}
 								d3.select(this).style("background", d.color);

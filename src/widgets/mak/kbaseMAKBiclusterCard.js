@@ -35,18 +35,7 @@
 			self.bicluster_index = options.bicluster[1];
             self.bicluster = options.bicluster[0][self.bicluster_index];
             self.bicluster_type = options.bicluster[2].bicluster_type;
-			if (options.tiles) {
-				var tiles = options.tiles
-				$.each(tiles,function(i,d) {				
-					d.on("click", function() {
-						self.$elem.empty()
-						self.options.bicluster[1] = d.val()
-						self.options.id = self.options.bicluster[0][self.options.bicluster[1]].bicluster_id
-						self.getData()
-						self.render()					
-					})
-				})
-			}
+
 			var loader = $("<span style='display:none'><img src='"+options.loadingImage+"'/></span>").css({"width":"100%","margin":"0 auto"})            
 			$biclusterOverview = $("<div id='biclusterOverview' style='overflow:auto;height:450px;resize:vertical'/>")						
 
@@ -99,7 +88,7 @@
 						// loader.hide()
 						
 					// });
-					if (!$("div:contains('HeatMap Card')").length) self.trigger("showHeatMap", {bicluster: data[0].data, workspace: options.workspace, id: self.bicluster.bicluster_id, tiles: tiles, mak: options.bicluster[0]})
+					// if (!$("div:contains('HeatMap Card')").length) self.trigger("showHeatMap", {bicluster: data[0].data, workspace: options.workspace, id: self.bicluster.bicluster_id, tiles: tiles, mak: options.bicluster[0]})
 					loader.hide()
 				}
 			)						

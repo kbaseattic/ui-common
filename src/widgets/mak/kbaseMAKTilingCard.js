@@ -42,7 +42,7 @@
             
             var self = this;
 			
-			$instructions = $("<b><i>Click on a tile, selections will be <span style='color:#00CCFF'>cyan</span>.</i></b>")
+			$instructions = $("<b><i>Click on a tile, selections will be <span style='color:#99FFCC'>aqua</span>.</i></b>")
 			self.$elem.append($instructions)	
 			$tilingDiv = $("<div id='tilingDiv' style='overflow:auto;height:450px;resize:vertical;position:relative'/>")
 			self.$elem.append($tilingDiv)
@@ -139,6 +139,7 @@
 					// Instantiate Packer
 					
 					var count = 0
+					var selectionHandler = []
 					
 					while (count < blocks.length) {
 						var packer = new Packer(binWidth-50, binHeight);
@@ -186,10 +187,11 @@
 								.on("mouseover", 
 									function() { 
 										if (!$(this).hasClass('picked')) {
-											d3.select(this).style("background", "#00CCFF"); 
+											d3.select(this).style("background", "#00CCFF")
+											if ($(this).hasClass('currentHeatmap')) d3.select(this).style("background", "#99FFCC")
 											for (term in block.terms) {
 												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
-												d3.select("#"+barChartSelector).style("background", "#00CCFF")
+												if (!$("#"+barChartSelector).hasClass('picked')) d3.select("#"+barChartSelector).style("background", "#00CCFF")
 											}
 										}
 										self.tooltip = self.tooltip.text("bicluster: "+biclusters[block.index].bicluster_id+", rows: "+biclusters[block.index].gene_ids.length+", columns: "+biclusters[block.index].condition_ids.length+", number: "+i);
@@ -200,10 +202,11 @@
 									function() { 
 										if (!$(this).hasClass('picked')) {
 											d3.select(this).style("background", "steelblue");
+											if ($(this).hasClass('currentHeatmap')) d3.select(this).style("background", "#99FFCC")
 											for (term in block.terms) {
-												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')																
+												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')										
 												origColor = d3.select("#"+barChartSelector).attr("class")
-												d3.select("#"+barChartSelector).style("background", origColor)
+												if (!$("#"+barChartSelector).hasClass('picked')) d3.select("#"+barChartSelector).style("background", origColor)
 											}
 										}
 										return self.tooltip.style("visibility", "hidden"); 
@@ -216,22 +219,22 @@
 								)
 								.on("click",
 									function(d) {
-										if ($(this).hasClass('picked')) {	
-											for (tile in d.tiles) {
-												tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
-												temp = selectionHandler.indexOf(tileSelector)
-												selectionHandler.splice(temp,1)
-												if (selectionHandler.indexOf(tileSelector)==-1) $("#MAK_tile_"+tileSelector).removeClass('picked')	
-											}
+										if ($(this).hasClass('picked')) {
 											$(this).removeClass('picked')
-										}
-										else {	
-											for (tile in d.tiles) {
-												tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
-												selectionHandler.push(tileSelector)
-												$("#MAK_tile_"+tileSelector).addClass('picked')	
+											for (term in block.terms) {
+												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
+												temp = selectionHandler.indexOf(barChartSelector)
+												selectionHandler.splice(temp,1)
+												if (selectionHandler.indexOf(barChartSelector)==-1) $("#"+barChartSelector).removeClass('picked')
 											}
+										}
+										else {
 											$(this).addClass('picked')
+											for (term in block.terms) {
+												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
+												selectionHandler.push(barChartSelector)
+												$("#"+barChartSelector).addClass('picked')		
+											}
 										}
 									}
 								)
