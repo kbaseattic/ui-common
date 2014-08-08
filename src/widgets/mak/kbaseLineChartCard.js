@@ -25,9 +25,11 @@
 				values = this.options.row[0],
 				conditions = this.options.row[1],
 				gene_label = this.options.row[2]
-					
+			
+			var chartWidth = 1500
+			if (conditions.length <= 10) chartWidth = 1000
 			var m = [80, 80, 140, 120]; // margins
-			var w = conditions.length*100 - m[1] - m[3]; // width			
+			var w = chartWidth - m[1] - m[3]; // width			
 			var h = 400 - m[0] - m[2]; // height
 
 			var graph = d3.select($lineChartDiv.get(0))
@@ -72,7 +74,9 @@
 				.on("mouseover", 
 							function(d) { 
 								d3.select(this).style("stroke", d3.rgb(d3.select(this).style("stroke")).darker()); 
-								self.tooltip = self.tooltip.text(d.gene_label);
+								var tooltipText = d.gene_label
+								if (conditions.length > 100) tooltipText += ", condition: "+d.condition
+								self.tooltip = self.tooltip.text(tooltipText);
 								return self.tooltip.style("visibility", "visible"); 
 							}
 						)
@@ -99,7 +103,9 @@
 					.attr("id", function(d) {return "_" + d.gene_label})                        
 					.on("mouseover", function (d) {
 						d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker());
-						self.tooltip = self.tooltip.text(d.gene_label);
+						var tooltipText = d.gene_label
+						if (conditions.length > 100) tooltipText += ", condition: "+d.condition
+						self.tooltip = self.tooltip.text(tooltipText);
 						return self.tooltip.style("visibility", "visible");
 					}).on("mouseout", function () {
 						d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter());
@@ -165,7 +171,7 @@
 			var x = d3.scale.linear().domain([0, values[0].length-1]).range([0, w]);
 			var xAxis = d3.svg.axis().scale(x).ticks(conditions.length).tickFormat(formatAsLabels)
 			
-			// if (conditions.length <= 150) {
+			if (conditions.length <= 100) {
 				graph.append("svg:g")
 					.attr("class", "x axis")
 					.attr("transform", "translate(0," + h + ")")
@@ -192,7 +198,7 @@
 								return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
 							}
 						)
-			// }
+			}
 			
 			return x
 			
@@ -203,7 +209,6 @@
 			self.tooltip = d3.select("body")
                              .append("div")
                              .classed("kbcb-tooltip", true);
-			
 				// All three above variables are passed from the JSON object
 	
 			var merged = []
@@ -213,8 +218,8 @@
               .domain([0,9])
               .range(colorbank);
 			
-			var mean;
-
+			var mean;			
+			
 			$("body").on("click", ".geneLabel"+self.options.count, function() {
 				var i = $(this).index()
 				
@@ -224,8 +229,8 @@
 					merged.push(values[i])
 					count++
 					$("g.y.axis").remove()
-					y = self.yAxisMaker(merged,graph,h)
-					self.lineDrawer(values[i],conditions,gene_label[i],x,y,(count-1),true,graph,colorScale)
+					self.y = self.yAxisMaker(merged,graph,h)
+					self.lineDrawer(values[i],conditions,gene_label[i],x,self.y,(count-1),true,graph,colorScale)
 					if (count == 1) {
 						mean = JSON.parse(JSON.stringify(values[i]))
 					}
@@ -244,7 +249,7 @@
 					merged.splice(temp,1)
 					
 					$("g.y.axis").remove()
-					y = self.yAxisMaker(merged,graph,h)
+					self.y = self.yAxisMaker(merged,graph,h)
 					
 					for (m=0;m<mean.length;m++) {
 						mean[m] = mean[m]*(count+1)
@@ -254,7 +259,7 @@
 				}
 				if (!graph.selectAll("#_mean").empty()) {graph.selectAll("#_mean").remove()}
 				if (count > 1) {
-					self.lineDrawer(mean,conditions,"mean",x,y,10,false,graph,colorScale)
+					self.lineDrawer(mean,conditions,"mean",x,self.y,10,false,graph,colorScale)
 					graph.selectAll("#_mean").style("stroke-dasharray",(3,3))
 				}
 			})
