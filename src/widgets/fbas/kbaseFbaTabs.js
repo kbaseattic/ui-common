@@ -49,7 +49,6 @@ $.KBWidget({
 
 
         self.loadTable = function(data) {
-
             mapTable.kbasePathways({fba_ws: ws, fba_name: name});
 
             var keys = [{key: 'id'},

@@ -28,23 +28,24 @@ $.KBWidget({
         var rxnTable = $('<table cellpadding="0" cellspacing="0" border="0" \
                 class="table table-bordered table-striped" style="width: 100%;">');
         var cpdTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">')
+                class="table table-bordered table-striped" style="width: 100%;">');
         var compartTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">')
+                class="table table-bordered table-striped" style="width: 100%;">');
         var biomassTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">')
+                class="table table-bordered table-striped" style="width: 100%;">');
         var gfTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">')   
+                class="table table-bordered table-striped" style="width: 100%;">');
         var ggTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">')                                                                       
-
+                class="table table-bordered table-striped" style="width: 100%;">');
+        var mapTable = $('<div>');
 
         var tabs = container.kbTabs({tabs: [{name: 'Reactions', content: rxnTable, active: true},
                                             {name: 'Compounds', content: cpdTable},
                                             {name: 'Compartment', content: compartTable},
                                             {name: 'Biomass', content: biomassTable},
                                             {name: 'Gapfill', content: gfTable},
-                                            {name: 'Gapgen', content: ggTable}
+                                            {name: 'Gapgen', content: ggTable}, 
+                                            {name: 'Pathways', content: mapTable}
                                     ]});
 
 
@@ -54,6 +55,7 @@ $.KBWidget({
         $.when(p).done(function(data) {
             container.rmLoading();
             var data = data[0].data;
+            console.log(data)
             self.loadTable(data);
         }).fail(function(e){
             container.rmLoading();            
@@ -63,6 +65,8 @@ $.KBWidget({
 
 
         self.loadTable = function(data) {
+            mapTable.kbasePathways({model_ws: ws, model_name: name});
+
             var tableSettings = {
                 "sPaginationType": "bootstrap",
                 "iDisplayLength": 10,
@@ -72,7 +76,6 @@ $.KBWidget({
                     "sSearch": "Search all:"
                 }
             }
-
 
             // compartment table
             var dataDict = data.modelcompartments;

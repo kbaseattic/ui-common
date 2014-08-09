@@ -637,7 +637,6 @@ $.KBWidget({
         }
 
         function getFbaRxns(rxn_ids) {
-            console.log('rxn_ids', rxn_ids)
             // get a list of fba arrays (or undefined) 
             // for each model supplied          
             var found_rxns = [];
