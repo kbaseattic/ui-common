@@ -42,7 +42,7 @@
             
             var self = this;
 			
-			$instructions = $("<b><i>Click on a tile, selections will be <span style='color:#99FFCC'>aqua</span>.</i></b>")
+			$instructions = $("<b><i>Click on a tile, selection will be <span style='color:#99FFCC'>aqua</span>. Mouse over highlighting is <span style='color:#00CCFF'>light steel blue</span>.</i></b>")
 			self.$elem.append($instructions)	
 			$tilingDiv = $("<div id='tilingDiv' style='overflow:auto;height:450px;resize:vertical;position:relative'/>")
 			self.$elem.append($tilingDiv)
