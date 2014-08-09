@@ -17,9 +17,7 @@ $.KBWidget({
 
     init: function(options) {
         this._super(options);
-        var self = this;        
-
-
+        var self = this;
         var ws = options.ws;
         var name = options.name;
 
@@ -55,7 +53,6 @@ $.KBWidget({
         $.when(p).done(function(data) {
             container.rmLoading();
             var data = data[0].data;
-            console.log(data)
             self.loadTable(data);
         }).fail(function(e){
             container.rmLoading();            
