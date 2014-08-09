@@ -8,7 +8,7 @@
             loadingImage: "assets/img/ajax-loader.gif",
             title: "MAK Result Overview Bar Chart",
             isInCard: false,
-            width: 750,
+            width: 400,
             height: 800
         },
 
@@ -37,9 +37,10 @@
                              .classed("kbcb-tooltip", true);
 							 
 			var terms = self.options.terms
-			var chartWidth = self.options.width-50
-					
-			var $sideChart = $("<div>").css({"width":chartWidth,"top":50,"position":"absolute"})
+			var chartWidth = self.options.width
+			
+			
+			// var $sideChart = $("<div>").css({"width":chartWidth,"top":50,"position":"relative"})
 			var flat = []			
 			var termData = []						
 			var termColors = {"TIGRFam":"#CC0000","GO":"#7A00CC","COG":"#666666","SEED":"#CC5200","KEGG":"#007A00"}
@@ -56,7 +57,9 @@
 			
 			var x = d3.scale.linear().domain([0,d3.max(flat)]).range([0,chartWidth])			
 			var selectionHandler = []
-			var $barChartDiv = $("<div id='barchart'>").css({"float":"right"})
+			var $mainDiv = $("<div id='mainDiv' style='overflow:auto;height:450px;resize:vertical'>")
+			var $barChartDiv = $("<div id='barchart'>")
+			$mainDiv.append($barChartDiv)
 			var $barChart = d3.select($barChartDiv.get(0))
 				.selectAll("div")
 				.data(termData)
@@ -84,10 +87,10 @@
 								for (tile in d.tiles) {
 									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')									
 									if (!$("#MAK_tile_"+tileSelector).hasClass('picked')) {
-										d3.select("#MAK_tile_"+tileSelector).style("background", "#00FFCC")
+										d3.select("#MAK_tile_"+tileSelector).style("background", "#F08A04")
 									}
 								}
-								d3.select(this).style("background", "#00FFCC"); 
+								d3.select(this).style("background", "#F08A04"); 
 							}							
 							// self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
 							self.tooltip = self.tooltip.text(d.term+", hits: "+d.tiles.length);
@@ -135,8 +138,11 @@
 						}
 					)
 				
-			self.$elem.append($barChartDiv)
+			$instructions = $("<b><i>Click on a term bar, selections will be <span style='color:#F08A04'>orange</span>.</i></b>")
+			self.$elem.append($instructions)	
+			self.$elem.append($mainDiv)
 			
+			//console.log("here")
 			return this;
 		},
 		

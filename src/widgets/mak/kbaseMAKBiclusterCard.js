@@ -27,26 +27,29 @@
 
 			this.workspaceClient = new Workspace(this.newWorkspaceServiceUrl, { 'token' : this.options.auth, 'user_id' : this.options.userId});
 			
-            return this.render();
+            return this.render(this.options,this);
         },
-        render: function(options) {
-		
-            var self = this;
-			self.bicluster_index = this.options.bicluster[1];
-            self.bicluster = this.options.bicluster[0][self.bicluster_index];
-            self.bicluster_type = this.options.bicluster[2].bicluster_type;
-			var tiles = this.options.tiles
-			$.each(tiles,function(i,d) {				
-				d.on("click", function() {
-					self.$elem.empty()
-					self.options.bicluster[1] = d.val()
-					self.render()
-					self.getData()
+        render: function(options,self) {
+		            
+			console.log(self)
+			self.bicluster_index = options.bicluster[1];
+            self.bicluster = options.bicluster[0][self.bicluster_index];
+            self.bicluster_type = options.bicluster[2].bicluster_type;
+			if (options.tiles) {
+				var tiles = options.tiles
+				$.each(tiles,function(i,d) {				
+					d.on("click", function() {
+						self.$elem.empty()
+						self.options.bicluster[1] = d.val()
+						self.options.id = self.options.bicluster[0][self.options.bicluster[1]].bicluster_id
+						self.getData()
+						self.render()					
+					})
 				})
-			})
-			
-			var loader = $("<span style='display:none'><img src='"+self.options.loadingImage+"'/></span>").css({"width":"100%","margin":"0 auto"})            
-			$biclusterOverview = $("<div id='biclusterOverview'/>")
+			}
+			var loader = $("<span style='display:none'><img src='"+options.loadingImage+"'/></span>").css({"width":"100%","margin":"0 auto"})            
+			$biclusterOverview = $("<div id='biclusterOverview' style='overflow:auto;height:450px;resize:vertical'/>")						
+
 			self.$elem.append($biclusterOverview)
 			$biclusterOverview.append(loader)
 			loader.show()
@@ -81,7 +84,7 @@
 			//Heatmap			
 					
 								
-			$.when(this.workspaceClient.get_objects([{workspace: self.options.workspace, name: self.bicluster.bicluster_id}]))
+			$.when(self.workspaceClient.get_objects([{workspace: options.workspace, name: self.bicluster.bicluster_id}]))
 			.then(
 				function(data){
 					// $biclusterOverview.append($("<div />")
@@ -96,7 +99,7 @@
 						// loader.hide()
 						
 					// });
-					if (d3.select("#heatmapDiv").empty()) self.trigger("showHeatMap", {bicluster: data[0].data, workspace: self.options.workspace, id: self.bicluster.bicluster_id, tiles: tiles, mak: self.options.bicluster[0]})
+					if (!$("div:contains('HeatMap Card')").length) self.trigger("showHeatMap", {bicluster: data[0].data, workspace: options.workspace, id: self.bicluster.bicluster_id, tiles: tiles, mak: options.bicluster[0]})
 					loader.hide()
 				}
 			)						
@@ -150,18 +153,19 @@
                 $("#term_list").toggle();
             });
 			
-            var $termsTable = '<table id="terms-table' + self.bicluster.id + '" class="kbgo-table">';
-            $termsTable += "<tr><th>Key</th><th>Value</th></tr>";
-            for (var enrichedTerm in self.bicluster.enriched_terms) {
-                $termsTable += "<tr><td>" + enrichedTerm + "</td><td>" + self.bicluster.enriched_terms[enrichedTerm] + "</td></tr>";
-            }
-
-            $termsTable += "</table>";
+			if (Object.keys(self.bicluster.enriched_terms).length) {
+				var $termsTable = '<table id="terms-table' + self.bicluster.id + '" class="kbgo-table">';
+				$termsTable += "<tr><th>Term Type</th><th>Term</th></tr>";			
+				for (var enrichedTerm in self.bicluster.enriched_terms) {
+					$termsTable += "<tr><td>" + enrichedTerm + "</td><td>" + self.bicluster.enriched_terms[enrichedTerm] + "</td></tr>";
+				}
+				$termsTable += "</table>";
+			}
+			else {
+				var $termsTable = "<b><i>No enriched terms for this bicluster.</i></b>";
+			}            
 			
             $biclusterOverview.append($("<div id='term_list' style='display:none'/>").append($termsTable));
-
-            $biclusterOverview.append($("<div />")
-                    .append("&nbsp;"));
 
             return this;
         },
