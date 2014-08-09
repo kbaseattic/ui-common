@@ -9,10 +9,10 @@
     <body>
         <div style="text-align:center;">
             <div style="margin-top: 20%">
-                <img src="functional-site/assets/img/kbase_animated_logo.gif" ></img>
+                <img id="loader" src="functional-site/assets/img/kbase_animated_logo.gif"></img>
                 <div id="text" style="font-size:146.5%; color:#006698; font-family:'OxygenBold', Arial, sans-serif">
                     <br>
-                    Loading your Narrative
+                    Starting a new Narrative session for you
                     <br>
                     Please wait...
                 </div>
@@ -89,7 +89,15 @@
                 interval = setInterval( function() { 
                     if (siteReady) {
                         clearInterval(interval);
-                        window.location.replace(narrUrl);
+
+                        var ua = navigator.userAgent.toLowerCase();
+                        if (ua.indexOf('safari') != -1 && ua.indexOf('chrome') == -1) {
+                            $('#text').html('<br><a href="' + narrUrl + '">Click here to enter the Narrative Interface!</a>');
+                            $('#loader').attr('src', 'functional-site/assets/images/doodle.png')
+                        }
+                        else {
+                            window.location.replace(narrUrl);
+                        }
                     }
                     else {
                         pokeNarrative(narrUrl); 
