@@ -161,20 +161,24 @@ $.KBWidget({
         function rxnEvents() {
             $('.rxn-click').unbind('click');
             $('.rxn-click').click(function() {
-                var rxn = [$(this).data('rxn')];
-                self.trigger('rxnClick', {ids: rxn});
+                var name = $(this).data('rxn');
+                var c = $('<div>');
+                c.kbaseRxn({id: name});
+                tabs.addTab({name: name, content: c,  removable: true});
+                tabs.showTab(name);
             });
         }
 
         function cpdEvents() {
             $('.cpd-click').unbind('click');
             $('.cpd-click').click(function() {
-                var cpd = [$(this).data('cpd')];
-                self.trigger('cpdClick', {ids: cpd});
+                var name = $(this).data('cpd');
+                var c = $('<div>');
+                c.kbaseCpd({id: name});
+                tabs.addTab({name: name, content: c,  removable: true});
+                tabs.showTab(name);
             });
-        }        
-
-
+        }
 
         function gapFillTableWS(gapfillings) {
             var tableSettings = {

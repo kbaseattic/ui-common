@@ -9,7 +9,6 @@ $.KBWidget({
         this._super(options);
         var self = this;
         var id = options.id;
-       
         var container = this.$elem;
 
         container.loading();
@@ -17,29 +16,15 @@ $.KBWidget({
                     {reactions: [id]});
         $.when(prom).done(function(data){
             container.rmLoading();
-            loadTable(data);
+            rxn_tab(data[0]);
         }).fail(function(e){
             container.rmLoading();
             container.append('<div class="alert alert-danger">'+
                             e.error.message+'</div>')
         });
 
-        function loadTable(data) {
-            var rxns = [];
-            for (var i in data) {
-                if (data[i] == null) {
-                    container.append('<div class="alert alert-danger">'
-                        +ids[i]+' not found</div>')
-                    continue;
-                }
-                rxns.push(data[i].id);
-            }
 
-            rxn_tabs(data[0]);
-        }
-   
-
-        function rxn_tabs(rxn, id) {
+        function rxn_tab(rxn, id) {
             var cpds = get_cpds(rxn['equation']);
 
             var panel = $('<div>');

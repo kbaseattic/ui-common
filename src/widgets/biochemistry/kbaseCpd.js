@@ -16,30 +16,14 @@ $.KBWidget({
                     {compounds: [id]});
         $.when(prom).done(function(data){
             container.rmLoading();
-            loadTable(data);
+            cpd_tab(data[0]);
         }).fail(function(e){
             container.rmLoading();
             container.append('<div class="alert alert-danger">'+
                             e.error.message+'</div>')
         });
-
-
-        function loadTable(data) {
-            var cpds = [];
-            for (var i in data) {
-                if (data[i] == null) {
-                    container.append('<div class="alert alert-danger">'
-                        +ids[i]+' not found</div>')
-                    continue;
-                }
-                cpds.push(data[i].id);
-            }
-
-            cpd_tabs(data[0]);
-        }
   
-
-        function cpd_tabs(cpd, id) {
+        function cpd_tab(cpd, id) {
             var panel = $('<div>')
 
             var name = cpd['name'];

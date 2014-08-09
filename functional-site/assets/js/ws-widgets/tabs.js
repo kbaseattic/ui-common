@@ -142,6 +142,10 @@
                 tab_contents.children('[data-id="'+id+'"]').addClass('active');                
             }
 
+            this.getTabNav = function() {
+                return tabs;
+            }
+
             // if tabs are supplied, add them
             // don't animate intial tabs
             if ('tabs' in options) {
