@@ -91,6 +91,7 @@ $.KBWidget({
                 container.loading();
                 tabs.addTab({name: name, removable: true, content: container});
                 load_map(map_id, container);
+                tabs.showTab(name);
             });
 
             // tooltip for hover on pathway name

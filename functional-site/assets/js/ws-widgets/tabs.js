@@ -44,6 +44,7 @@
         version: "1.0.0",
         init: function(options) {
             this._super(options);
+            if (!options) options = {};
             var container = this.$elem;
             var self = this;
 
@@ -52,7 +53,7 @@
             container.append(tabs, tab_contents);
 
             // adds a single tab and content
-            this.addTab = function(p, animate) {
+            this.addTab = function(p) {
                 // if tab exists, don't add
                 if ( tabs.find('a[data-id="'+p.name+'"]').length > 0) {
                     return;
@@ -63,13 +64,13 @@
                 var tab_link = $('<a data-toggle="tab" data-id="'+p.name+'">'+p.name+'</a>');
 
                 // animate by sliding tab up
-                if (animate) {
+                if (p.animate === false) {
+                    tab.append(tab_link)                    
+                    tabs.append(tab);              
+                } else {
                     tab.append(tab_link).hide();
                     tabs.append(tab);
-                    tab.toggle('slide', {direction: 'down', duration: 'fast'});                    
-                } else {
-                    tab.append(tab_link)                    
-                    tabs.append(tab);
+                    tab.toggle('slide', {direction: 'down', duration: 'fast'});
                 }
 
                 // add close button if needed
@@ -142,9 +143,11 @@
             }
 
             // if tabs are supplied, add them
-            if (options.tabs) {
+            // don't animate intial tabs
+            if ('tabs' in options) {
                 for (var i in options.tabs) {
-                    this.addTab(options.tabs[i], false)
+                    var p = $.extend(options.tabs[i], {animate: false})
+                    this.addTab(p)
                 }
             }
 

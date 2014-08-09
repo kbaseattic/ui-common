@@ -22,8 +22,7 @@ $.KBWidget({
 
         var container = this.$elem;
 
-        var overviewTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">');
+        var overviewTable = $('<div>');
         var rxnTable = $('<table cellpadding="0" cellspacing="0" border="0" \
                 class="table table-bordered table-striped" style="width: 100%;">');
         var cpdTable = $('<table cellpadding="0" cellspacing="0" border="0" \

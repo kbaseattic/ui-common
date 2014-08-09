@@ -595,39 +595,43 @@ angular.module('lp-directives')
     };
 })
 
-
 .directive('rxndetail', function() {
     return {
         link: function(scope, ele, attrs) {
-            $(ele).loading()
-            var prom = kb.req('fba', 'get_reactions',
-                        {reactions: scope.ids})
-            $.when(prom).done(function(data){
-                $(ele).rmLoading();
-                $(ele).kbaseRxn({data: data, ids: scope.ids});
-            }).fail(function(e){
-                $(ele).rmLoading();
-                $(ele).append('<div class="alert alert-danger">'+
-                                e.error.message+'</div>')
-            });
+            var ids = scope.ids;
+
+            var tabs = $(ele).kbTabs()
+            for (var i = 0; i < ids.length; i++) {
+                var id = ids[i];
+
+                var content = $('<div>');
+                content.kbaseRxn({id: id});
+                tabs.addTab({name: ids[i], 
+                             content: content, 
+                             active: (i == 0 ? true : false),
+                             animate: false
+                            })
+            }
         }
     };
 })
 .directive('cpddetail', function() {
     return {
         link: function(scope, ele, attrs) {
-            $(ele).loading()
-            var prom = kb.req('fba', 'get_compounds',
-                        {compounds: scope.ids});
+            var ids = scope.ids;
 
-            $.when(prom).done(function(data){
-                $(ele).rmLoading();                     
-                $(ele).kbaseCpd({data: data, ids: scope.ids});
-            }).fail(function(e){
-                $(ele).rmLoading();
-                $(ele).append('<div class="alert alert-danger">'+
-                                e.error.message+'</div>')
-            });
+            var tabs = $(ele).kbTabs()
+            for (var i = 0; i < ids.length; i++) {
+                var id = ids[i];
+
+                var content = $('<div>');
+                content.kbaseCpd({id: id});
+                tabs.addTab({name: ids[i], 
+                             content: content, 
+                             active: (i == 0 ? true : false),
+                             animate: false
+                            })
+            }
         }
     };
 })

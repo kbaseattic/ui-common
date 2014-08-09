@@ -50,13 +50,15 @@ $.KBWidget({
         if (self.fba_ws && self.fba_name) {
             var p3 = kb.get_fba(self.fba_ws, self.fba_name);
         }        
-        $.when(p1, p2, p3).done(function(map_data, d, fba) {
+        $.when(p1, p2, p3).done(function(map_data, models, fbas) {
+            self.models = (models ? [models[0].data] : undefined);
+            self.fbas = (fbas ? [fbas[0].data] : undefined);
 
-            map_data = map_data
-            rxns = map_data.reactions;
-            cpds = map_data.compounds;
-            maplinks = map_data.linkedmaps;
-            groups = map_data.groups;
+            self.map_data = map_data[0].data;
+            rxns = self.map_data.reactions;
+            cpds = self.map_data.compounds;
+            maplinks = self.map_data.linkedmaps;
+            groups = self.map_data.groups;
 
             oset = 12, // off set for arrows
                 threshold = 2, // threshold for deciding if connection is linear
@@ -71,16 +73,17 @@ $.KBWidget({
                 data.push({'products': rxns[i].product_refs, 'substrates': rxns[i].substrate_refs});
             }
 
-            self.drawMap(map_data, d, fba)
+            self.drawMap()
         })
 
 
             
 
-        self.drawMap = function(map_data, models, fba) {
-            container.html('<div id="'+self.map_id+'_pathway" class="pathway"></div>');
+        self.drawMap = function() {
 
-            svg = d3.select('#'+self.map_id+'_pathway').append("svg")
+            container.html('<div id="'+self.map_name+'_pathway" class="pathway"></div>');
+
+            svg = d3.select('#'+self.map_name+'_pathway').append("svg")
                                         .attr("width", 800)
                                        .attr("height", 1000);
 
@@ -216,6 +219,7 @@ $.KBWidget({
 
                 fba_rxns = getFbaRxns(rxn.rxns);
 
+
                 // color flux depending on rxns found for each modle
                 if (self.fbas) {
                     var w = rxn.w / self.fbas.length;
@@ -323,10 +327,9 @@ $.KBWidget({
             var nodes = []
             var links = []
 
-            // draw connections from substrate to producconsole.log(groups)
+            // draw connections from substrate to products
             for (var j in groups) {
                 var group = groups[j];
-
                 var group_rxn_ids = group.rxn_ids;
                 var x = group.x
                 var y = group.y
@@ -634,14 +637,16 @@ $.KBWidget({
         }
 
         function getFbaRxns(rxn_ids) {
+            console.log('rxn_ids', rxn_ids)
             // get a list of fba arrays (or undefined) 
             // for each model supplied          
-
             var found_rxns = [];
 
             // for each model, look for model data
+
             for (var j in self.fbas) {
                 var fba = self.fbas[j];
+                console.log(fba)
                 fba_objs = fba.FBAReactionVariables;
 
                 // see if we can find the rxn in that fbas's list of reactions
@@ -981,7 +986,7 @@ $.KBWidget({
 
 
         function saveMap() {
-            var new_map = $.extend({}, map_data)
+            var new_map = $.extend({}, self.map_data)
 
             // get data on edited lines 
             var g = svg.selectAll('.edited-line');
@@ -1033,13 +1038,13 @@ $.KBWidget({
 
             // have to get meta data to resave object 
             var prom = kb.ws.get_object_info([{workspace: self.workspace, 
-                                               name: self.map_id}], 1)
+                                               name: self.map_name}], 1)
             $.when(prom).done(function(data) {
                 var metadata = data[0][10];
                 // saving object to workspace
                 var p = kb.ws.save_object({'workspace': self.workspace, 
                         'data': new_map, 
-                        'id': self.map_id,
+                        'id': self.map_name,
                         'type': 'KBaseBiochem.MetabolicMap',
                         'metadata': metadata
                         })
