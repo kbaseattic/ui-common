@@ -102,7 +102,6 @@
                 var tab = tabs.find('a[data-id="'+name+'"]').parent('li');
                 var tab_content = tab_contents.children('[data-id="'+name+'"]')
 
-                console.log('tab len', tab.next().length)
                 // get previous or next tab
                 if (tab.next().length > 0) {
                     var id = tab.next().children('a').data('id');

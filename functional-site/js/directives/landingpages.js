@@ -219,7 +219,6 @@ angular.module('lp-directives')
 
             function loadPanel(fba_refs) {
                 // reload table when 
-                console.log('fba_refs', fba_refs)
                 if (fba_refs.length) {
                     var row = verSelector(fba_refs);
                     $(element).prepend(row)                    
@@ -266,7 +265,6 @@ angular.module('lp-directives')
 
 
             function loadTabs(fba_ws, fba_name) {
-                console.log('loading tabs for', fba_ws, fba_name)
                 var p1 = kb.get_fba(fba_ws, fba_name)
                 //var p2 = kb.ws.get_object_info([{workspace: fba_refs[0].ws, 
                 //                                 name: fba_refs[0].name}], 1);
@@ -305,7 +303,6 @@ angular.module('lp-directives')
 
             $(ele).loading();
 
-            console.log(scope.ws+'/'+scope.id)
 
             var p = kb.ws.get_referenced_objects([scope.ws+'/'+scope.id])
             $.when(p).done(function(data){
@@ -316,7 +313,6 @@ angular.module('lp-directives')
 
             var prom = kb.get_fba(scope.ws, scope.id);
             $.when(prom).done(function(data) {
-                console.log(data)
                 var refs = data[0].obj_refs
 
                 var obj_refs = []
