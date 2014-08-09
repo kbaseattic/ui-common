@@ -103,12 +103,13 @@
 								for (tile in d.tiles) {
 									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
 									if (!$("#MAK_tile_"+tileSelector).hasClass('pickedFromBar')) {
-										d3.select("#MAK_tile_"+tileSelector).style("background", "steelblue")
-										if ($("#MAK_tile_"+tileSelector).hasClass('currentHeatmap')) d3.select("#MAK_tile_"+tileSelector).style("background", "#99FFCC")
+										d3.select("#MAK_tile_"+tileSelector).style("background", "steelblue")										
 									}
 								}
-								d3.select(this).style("background", d.color);
+								d3.select(this).style("background", d.color);								
 							}
+							d3.select(".currentHeatmap").style("background", "#99FFCC")
+							if ($(this).hasClass("pickedFromTile")) d3.select(this).style("background", "#99FFCC");
 							return self.tooltip.style("visibility", "hidden"); 
                            }
                        )

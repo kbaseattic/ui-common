@@ -161,6 +161,7 @@
 						binHeight+=500
 					}
 					loader.hide()
+					var previousTerms = []
 					var tiles = []
 					_.each(blocks, function(o,i){
 						var block = blocks[i];
@@ -222,21 +223,26 @@
 									function(d) {
 										if ($(this).hasClass('picked')) {
 											$(this).removeClass('picked')
-											for (term in block.terms) {
-												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
-												temp = selectionHandler.indexOf(barChartSelector)
-												selectionHandler.splice(temp,1)
-												if (selectionHandler.indexOf(barChartSelector)==-1) $("#"+barChartSelector).removeClass('picked')
-											}
 										}
 										else {
 											$(this).addClass('picked')
-											for (term in block.terms) {
-												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
-												selectionHandler.push(barChartSelector)
-												$("#"+barChartSelector).addClass('picked')		
-											}
+											$.each(block.terms, function(i,d) {
+												barChartSelector = d.replace(/\s+/g, '').replace(/,/g,'')
+												if (!$("#"+barChartSelector).hasClass('pickedFromTile')) $("#"+barChartSelector).addClass('pickedFromTile')
+												d3.select("#"+barChartSelector).style("background", "#99FFCC");
+											})
 										}
+
+										if (previousTerms.length) {
+											$.each(previousTerms, function(i,d) {
+												barChartSelector = d.replace(/\s+/g, '').replace(/,/g,'')
+												d3.select("#"+barChartSelector).style("background","steelblue")
+												if ($("#"+barChartSelector).hasClass('picked')) d3.select("#"+barChartSelector).style("background","#F08A04")
+											})
+										}
+										
+										previousTerms = blocks.term
+
 									}
 								)
 							tiles.push($item)							

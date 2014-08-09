@@ -31,7 +31,7 @@
 			var datatable = options.bicluster
 
 			self.$elem.append($mainDiv)
-			$instructions = $("<b><i>Click on a row label for a line plot of row values. Click another row to add to the line plot. Click again to deselect.</i></b>")
+			var $instructions = $("<b><i>Click on a row label for a line plot of row values. Click another row to add to the line plot. Click again to deselect.</i></b>")
 			$mainDiv.append($instructions)
 			$mainDiv.append($heatmapDiv)
 			
