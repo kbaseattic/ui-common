@@ -11,6 +11,12 @@ $.KBWidget({
         var id = options.id;
         var container = this.$elem;
 
+        if ( id.slice(0, 3) != 'rxn' ) {
+            container.append('<div class="alert alert-warning"><b>'
+                            +id+'</b> is a custom reaction.</div>');
+            return this;
+        }
+
         container.loading();
         var prom = kb.req('fba', 'get_reactions',
                     {reactions: [id]});
