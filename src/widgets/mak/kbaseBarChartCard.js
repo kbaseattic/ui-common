@@ -83,35 +83,31 @@
 					.text(function (d) {return d.term})
 					.on("mouseover",							
 						function(d) {                            
-							if (!$(this).hasClass('picked')) {
-								for (tile in d.tiles) {
-									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')									
-									if (!$("#MAK_tile_"+tileSelector).hasClass('pickedFromBar')) {
-										d3.select("#MAK_tile_"+tileSelector).style("background", "#F08A04")
-									}
-								}
-								d3.select(this).style("background", "#F08A04"); 
-							}							
+							for (tile in d.tiles) {
+								tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')	
+								d3.select("#MAK_tile_"+tileSelector).style("background", "#F08A04")
+							}
+							d3.select(this).style("background", "#F08A04"); 
+				
 							// self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
 							self.tooltip = self.tooltip.text(d.term+", hits: "+d.tiles.length);
 							return self.tooltip.style("visibility", "visible");
 						}
 					)						 
                        .on("mouseout", 
-                           function(d) { 
-							if (!$(this).hasClass('picked')) {
+							function(d) {
 								for (tile in d.tiles) {
-									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
-									if (!$("#MAK_tile_"+tileSelector).hasClass('pickedFromBar')) {
-										d3.select("#MAK_tile_"+tileSelector).style("background", "steelblue")										
-									}
+									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')								
+									d3.select("#MAK_tile_"+tileSelector).style("background", "steelblue")
+									if ($("#MAK_tile_"+tileSelector).hasClass('pickedFromBar')) d3.select("#MAK_tile_"+tileSelector).style("background", "#F08A04")
+									if ($("#MAK_tile_"+tileSelector).hasClass('currentHeatmap')) d3.select("#MAK_tile_"+tileSelector).style("background", "#99FFCC")
 								}
 								d3.select(this).style("background", d.color);								
+								if ($(this).hasClass("pickedFromBar")) d3.select(this).style("background", "#F08A04");
+								if ($(this).hasClass("pickedFromTile")) d3.select(this).style("background", "#00CCFF");
+								if ($(this).hasClass("currentTerms")) d3.select(this).style("background", "#99FFCC");
+								return self.tooltip.style("visibility", "hidden"); 
 							}
-							d3.select(".currentHeatmap").style("background", "#99FFCC")
-							if ($(this).hasClass("pickedFromTile")) d3.select(this).style("background", "#99FFCC");
-							return self.tooltip.style("visibility", "hidden"); 
-                           }
                        )
                        .on("mousemove", 
                            function() { 
@@ -120,17 +116,16 @@
                        )
 					.on("click",
 						function(d) {
-							if ($(this).hasClass('picked')) {								
+							if ($(this).hasClass('pickedFromBar')) {								
 								for (tile in d.tiles) {
 									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
 									temp = selectionHandler.indexOf(tileSelector)
 									selectionHandler.splice(temp,1)
 									if (selectionHandler.indexOf(tileSelector)==-1) {
 										$("#MAK_tile_"+tileSelector).removeClass('pickedFromBar')
-										// if($("#MAK_tile_"+tileSelector).hasClass('currentHeatmap')) d3.select("#MAK_tile_"+tileSelector).style("background", "#99FFCC")
 									}
 								}
-								$(this).removeClass('picked')
+								$(this).removeClass('pickedFromBar')
 							}
 							else {																
 								for (tile in d.tiles) {
@@ -138,7 +133,7 @@
 									selectionHandler.push(tileSelector)
 									if (!$("#MAK_tile_"+tileSelector).hasClass('pickedFromBar')) $("#MAK_tile_"+tileSelector).addClass('pickedFromBar')									
 								}
-								$(this).addClass('picked')
+								$(this).addClass('pickedFromBar')
 							}
 						}
 					)
