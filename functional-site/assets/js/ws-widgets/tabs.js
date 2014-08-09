@@ -59,7 +59,6 @@
                     return;
                 }
 
-                // tab
                 var tab = $('<li class="'+(p.active ? 'active' :'')+'">');
                 var tab_link = $('<a data-toggle="tab" data-id="'+p.name+'">'+p.name+'</a>');
 
@@ -103,7 +102,8 @@
                 var tab = tabs.find('a[data-id="'+name+'"]').parent('li');
                 var tab_content = tab_contents.children('[data-id="'+name+'"]')
 
-                // show the next or prev tab
+                console.log('tab len', tab.next().length)
+                // get previous or next tab
                 if (tab.next().length > 0) {
                     var id = tab.next().children('a').data('id');
                 } else {
@@ -113,6 +113,9 @@
                 // remove the tab
                 tab.remove();
                 tab_content.remove();
+
+                // show prev or next tab
+                self.showTab(id);
             }
 
             // returns tab
