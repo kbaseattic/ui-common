@@ -18,7 +18,7 @@
 				return;
 			}				
 			
-			$lineChartDiv = $("<div id='linechart' style='overflow:auto;height:450px;resize:vertical'>")
+			$lineChartDiv = $("<div id='linechart_"+this.options.id+"' style='overflow:auto;height:450px;resize:vertical'>")
 			this.$elem.append($lineChartDiv);
 			
 			var index = this.options.row[3],
@@ -26,6 +26,11 @@
 				conditions = this.options.row[1],
 				gene_label = this.options.row[2]
 			
+			$.each(gene_label, function(i,d) {
+				var temp = gene_label[i].indexOf(' ')
+				gene_label[i] = gene_label[i].substring(temp+1)
+			})
+				
 			var chartWidth = 1500
 			if (conditions.length <= 10) chartWidth = 1000
 			var m = [80, 80, 140, 120]; // margins
@@ -48,14 +53,18 @@
 			self = this;
 						
 			var datadict = []
-
+			var temp = gene_label.indexOf(' ')
+			gene_label = gene_label.substring(temp+1)
+			
 			for (i=0;i<values.length;i++) {
+
 				datadict.push({
 					"value": values[i],
 					"condition": conditions[i],
 					"gene_label": gene_label
 				})
 			}
+			
 			var line = d3.svg.line()
 				.defined(function(d) {return d.value!=null})
 				.x(function(d,i) { 
@@ -76,7 +85,7 @@
 							function(d) { 
 								d3.select(this).style("stroke", d3.rgb(d3.select(this).style("stroke")).darker()); 
 								var tooltipText = d.gene_label
-								if (conditions.length > 100) tooltipText += ", condition: "+d.condition
+								if (conditions.length > 100 || conditions.length == 1) tooltipText += ", condition: "+d.condition
 								self.tooltip = self.tooltip.text(tooltipText);
 								return self.tooltip.style("visibility", "visible"); 
 							}
@@ -106,7 +115,7 @@
 					.on("mouseover", function (d) {
 						d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker());
 						var tooltipText = d.gene_label
-						if (conditions.length > 100) tooltipText += ", condition: "+d.condition
+						if (conditions.length > 100 || conditions.length == 1) tooltipText += ", condition: "+d.condition
 						self.tooltip = self.tooltip.text(tooltipText);
 						return self.tooltip.style("visibility", "visible");
 					}).on("mouseout", function () {
@@ -214,9 +223,9 @@
                              .classed("kbcb-tooltip", true);
 				// All three above variables are passed from the JSON object
 	
-			var merged = []
+			var merged = [values[index]]
 			var colorCount = 0
-			var count = 0
+			var count = 1
 			var colorbank = ["#003399","#33CC33","#FF9900","#FF0000","#6600FF","#00FFFF","#993333","#000000","#00CC99","#0000FF","#999966"]
 			var colorScale = d3.scale.quantile()
               .domain([0,9])
@@ -224,30 +233,31 @@
 			  
 			self.allLines = []
 			self.allCircles = []
-			var mean;			
+			
+			var mean = JSON.parse(JSON.stringify(values[index]))
 			
 			$("body").on("click", ".geneLabel"+self.options.count, function() {
 				
 				var i = $(this).index()
-				
-				var temp = gene_label[i].indexOf(' ')
-				gene_label[i] = gene_label[i].substring(temp+1)
+				colorCount++
+				if (colorCount == 10) colorCount = 0
+								
 				if (graph.selectAll("#_"+gene_label[i].replace(/\./g,'').replace(/\|/,'')).empty()) {					
 					merged.push(values[i])
 					count++
-					$("g.y.axis").remove()
+					self.$elem.find("g.y.axis").remove()
 					self.y = self.yAxisMaker(merged,graph,h)
 					self.lineDrawer(values[i],conditions,gene_label[i],x,self.y,colorCount,true,graph,colorScale)
-					if (count == 1) {
-						mean = JSON.parse(JSON.stringify(values[i]))
-					}
-					else {
+					// if (count == 1) {
+						// mean = JSON.parse(JSON.stringify(values[i]))
+					// }
+					// else {
 						for (m=0;m<mean.length;m++) {
 							mean[m] = mean[m]*(count-1)
 							mean[m] += JSON.parse(JSON.stringify(values[i][m]))
 							mean[m] = mean[m]/count
 						}
-					}
+					// }
 				}
 				else {
 					count--
@@ -255,7 +265,7 @@
 					var temp = merged.indexOf(values[i])
 					merged.splice(temp,1)
 					
-					$("g.y.axis").remove()
+					self.$elem.find("g.y.axis").remove()
 					self.y = self.yAxisMaker(merged,graph,h)
 					
 					for (m=0;m<mean.length;m++) {
@@ -286,9 +296,7 @@
 				$.each(self.allCircles,function(i,circles) {
 					circles.attr("cy", function(d) {return self.y(d.value)})
 				})
-				
-				colorCount++
-				if (colorCount == 10) colorCount = 0
+		
 			})
 			
 			x = self.xAxisMaker(values,conditions,graph,w,h)
@@ -299,9 +307,8 @@
 			self.$elem.find(".axis").css({"shape-rendering":"crispEdges"})
 			self.$elem.find(".y.axis > .tick.major > line, .y.axis > path").css({"fill":"none","stroke":"#000"})
 			
-			y = self.yAxisMaker(merged,graph,h)
-			if (index != null) self.lineDrawer(values[index],conditions,gene_label[index],x,y,0,true,graph,colorScale)
-
+			self.y = self.yAxisMaker(merged,graph,h)
+			self.lineDrawer(values[index],conditions,gene_label[index],x,self.y,colorCount,true,graph,colorScale)
 				
 			return this;
 		},

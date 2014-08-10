@@ -1363,7 +1363,7 @@ angular.module('lp-directives')
 										   
 					p.loading();
 					var widget = $(p.body()).KBaseHeatMapCard({			
-						count: 0,
+						count: bicluster.id.replace(/\./g,'').replace(/\|/,''),
 						bicluster: data[0].data,
 						workspace: scope.params.workspace,
 						auth: $rootScope.USER_TOKEN, 
@@ -1396,23 +1396,31 @@ angular.module('lp-directives')
 					var gene_labels = bicluster.row_labels,
 						conditions = bicluster.column_labels,
 						expression = bicluster.data;
-						
-					p = $(ele).kbasePanel({title: 'Line Chart',
-												rightLabel: scope.params.workspace,
-												subText: scope.params.id});					
-					
-					p.loading();
-					
-					widget = $(p.body()).KBaseLineChartCard({
-						count: 0,
-						row: [expression,conditions,gene_labels,gene_index],
-						workspace: scope.params.workspace,
-						auth: $rootScope.USER_TOKEN, 
-						userId: $rootScope.USER_ID,
-						kbCache: kb,
-						loadingImage: "assets/img/ajax-loader.gif"
-					});
-																		
+					var display = true
+					$("body").on("click",".geneLabel"+bicluster.id.replace(/\./g,'').replace(/\|/,''),
+						function() {
+							gene_index = $(this).index()
+							if (display) {
+								p = $(ele).kbasePanel({title: 'Line Chart',
+															rightLabel: scope.params.workspace,
+															subText: scope.params.id});					
+								
+								p.loading();
+								
+								widget = $(p.body()).KBaseLineChartCard({
+									id: scope.params.id.replace(/\./g,'').replace(/\|/,''),
+									count: bicluster.id.replace(/\./g,'').replace(/\|/,''),
+									row: [expression,conditions,gene_labels,gene_index],
+									workspace: scope.params.workspace,
+									auth: $rootScope.USER_TOKEN, 
+									userId: $rootScope.USER_ID,
+									kbCache: kb,
+									loadingImage: "assets/img/ajax-loader.gif"
+								});
+								display = false
+							}
+						}
+					)																		
 				}
 			)
 		}
@@ -1438,6 +1446,15 @@ angular.module('lp-directives')
 							$("body").on("click", ".biclusterTile",
 								function() {							
 									
+									d3.select(".currentHeatmap").style("background", "steelblue");
+									if ($(".currentHeatmap").hasClass("pickedFromBar")) d3.select(".currentHeatmap").style("background", "#F08A04")
+									d3.select(this).style("background", "#99FFCC")
+									
+									if ($(".currentHeatmap")==this && $(this).hasClass('picked')) $(this).removeClass('picked')
+
+									$(".currentHeatmap").removeClass('currentHeatmap')									
+									$(this).addClass('currentHeatmap') 									
+									
 									scope.params.id = biclusters[$(this).val()].bicluster_id										
 								
 									p.header()[0].childNodes[6].childNodes[0].data = biclusters[$(this).val()].bicluster_id //very hardcoded. need change in future.							
@@ -1451,7 +1468,9 @@ angular.module('lp-directives')
 											widget.options.bicluster = bicluster
 											widget.options.count = bicluster.id.replace(/\./g,'').replace(/\|/,'')
 											
-											widget.__proto__.render(widget.options,widget)//very hardcoded. need change in future.
+											widget.$elem.empty()
+											
+											widget.render(widget.options,widget)//very hardcoded. need change in future.
 											
 											$(p.body()).KBaseHeatMapCard({ // Doesn't actually update the card, only here to remove the loading icon.
 												count: biclusters[0].bicluster_id.replace(/\./g,'').replace(/\|/,''),
@@ -1472,6 +1491,11 @@ angular.module('lp-directives')
 														subText: scope.params.id});					
 												   
 							p.loading();
+							
+							var currentTile = "#MAK_tile_"+biclusters[0].bicluster_id.replace(/\./g,'').replace(/\|/,'')
+							$(currentTile).addClass('currentHeatmap') 
+							d3.select(currentTile).style("background", "#99FFCC")
+							
 							var widget = $(p.body()).KBaseHeatMapCard({
 								count: biclusters[0].bicluster_id.replace(/\./g,'').replace(/\|/,''), 
 								bicluster: data[0].data,
@@ -1511,35 +1535,45 @@ angular.module('lp-directives')
 							var bicluster = data[0].data
 							
 							$("body").on("click", ".biclusterTile",
-								function() {							
+								function() {
 									
 									scope.params.id = biclusters[$(this).val()].bicluster_id									
 									
 									$.when(workspaceClient.get_objects([{workspace: scope.params.workspace, name: scope.params.id}]))
 									.then(
 										function(data) {
-											var newLineChart = $("<div sortablelinechart>")		
-											$("#sortable-landing").append($("<div class='col-md-12'>").append(newLineChart))
-																						
 											var bicluster = data[0].data
 											var gene_index = null
 											var gene_labels = bicluster.row_labels,
 												conditions = bicluster.column_labels,
-												expression = bicluster.data;											
-											
-											p = newLineChart.kbasePanel({title: 'Line Chart',
-																	rightLabel: scope.params.workspace,
-																	subText: scope.params.id})
-											p.loading()
-											$(p.body()).KBaseLineChartCard({ // Doesn't actually update the card, only here to remove the loading icon.
-												count: bicluster.id.replace(/\./g,'').replace(/\|/,''),
-												row: [expression,conditions,gene_labels,gene_index],
-												workspace: scope.params.workspace,
-												auth: $rootScope.USER_TOKEN, 
-												userId: $rootScope.USER_ID,
-												kbCache: kb,
-												loadingImage: "assets/img/ajax-loader.gif"
-											});												
+												expression = bicluster.data;
+											var display = true
+											$("body").on("click",".geneLabel"+bicluster.id.replace(/\./g,'').replace(/\|/,''),
+												function() {
+													gene_index = $(this).index()
+													if (display) {
+														var newLineChart = $("<div sortablelinechart>")		
+														$("#sortable-landing").append($("<div class='col-md-12'>").append(newLineChart))																																												
+														
+														var p = newLineChart.kbasePanel({title: 'Line Chart',
+																				rightLabel: scope.params.workspace,
+																				subText: scope.params.id})
+														p.loading()
+																							
+														$(p.body()).KBaseLineChartCard({
+															id: scope.params.id.replace(/\./g,'').replace(/\|/,''),
+															count: bicluster.id.replace(/\./g,'').replace(/\|/,''),
+															row: [expression,conditions,gene_labels,gene_index],
+															workspace: scope.params.workspace,
+															auth: $rootScope.USER_TOKEN, 
+															userId: $rootScope.USER_ID,
+															kbCache: kb,
+															loadingImage: "assets/img/ajax-loader.gif"
+														});	
+														display = false
+													}
+												}
+											)
 										}
 									)
 								}
@@ -1550,24 +1584,33 @@ angular.module('lp-directives')
 							var gene_index = null
 							var gene_labels = bicluster.row_labels,
 								conditions = bicluster.column_labels,
-								expression = bicluster.data;
-								
-							p = $(ele).kbasePanel({title: 'Line Chart',
-														rightLabel: scope.params.workspace,
-														subText: scope.params.id});					
+								expression = bicluster.data;															
 							
-							p.loading();
+							var display = true
 							
-							widget = $(p.body()).KBaseLineChartCard({
-								count: biclusters[0].bicluster_id.replace(/\./g,'').replace(/\|/,''),
-								row: [expression,conditions,gene_labels,gene_index],
-								workspace: scope.params.workspace,
-								auth: $rootScope.USER_TOKEN, 
-								userId: $rootScope.USER_ID,
-								kbCache: kb,
-								loadingImage: "assets/img/ajax-loader.gif"
-							});
-													
+							$("body").on("click",".geneLabel"+bicluster.id.replace(/\./g,'').replace(/\|/,''),
+								function() {
+									gene_index = $(this).index()
+									if (display) {
+										p = $(ele).kbasePanel({title: 'Line Chart',
+																rightLabel: scope.params.workspace,
+																subText: scope.params.id});					
+							
+										p.loading();
+										widget = $(p.body()).KBaseLineChartCard({
+											id: scope.params.id.replace(/\./g,'').replace(/\|/,''),
+											count: biclusters[0].bicluster_id.replace(/\./g,'').replace(/\|/,''),
+											row: [expression,conditions,gene_labels,gene_index],
+											workspace: scope.params.workspace,
+											auth: $rootScope.USER_TOKEN, 
+											userId: $rootScope.USER_ID,
+											kbCache: kb,
+											loadingImage: "assets/img/ajax-loader.gif"
+										});
+										display = false
+									}
+								}
+							)
 						}
 					)
 				}

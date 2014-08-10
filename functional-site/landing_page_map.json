@@ -55,7 +55,7 @@
         "Gapfilling" : null,
         "FBA" : "ws/fbas",
         "ReactionSensitivityAnalysis" : null,
-        "FBAModel" : "ws/mv/model",
+        "FBAModel" : "ws/models",
         "Gapgeneration" : null,
         "ModelTemplate" : null,
         "ETC" : "etc",
