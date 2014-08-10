@@ -29,28 +29,9 @@
 			var $heatmapDiv = $("<div id='heatmap'>");	
 			
 			var datatable = options.bicluster
-			if (options.tiles && options.mak) { 
-			
-				var tiles = options.tiles
-				var mak = options.mak						
-			
-				$.each(tiles,function(i,d) {				
-					d.on("click", function() {
-						self.$elem.empty()			
-						delete $mainDiv
-						delete $heatmapDiv
-						delete $instructions
-						$.when(self.workspaceClient.get_objects([{workspace: options.workspace, name: mak[d.val()].bicluster_id}]))
-						.then(function(data) {
-							options.bicluster = data[0].data
-							self.render()
-						})					
-					})
-				})
-			}
-				
+
 			self.$elem.append($mainDiv)
-			$instructions = $("<b><i>Click on a row label for a line plot of row values. Click another row to add to the line plot. Click again to deselect.</i></b>")
+			var $instructions = $("<b><i>Click on a row label for a line plot of row values. Click another row to add to the line plot. Click again to deselect.</i></b>")
 			$mainDiv.append($instructions)
 			$mainDiv.append($heatmapDiv)
 			
@@ -148,7 +129,7 @@
 				.enter().append("text")
 				.text(function (d) {
 					var temp = d.label.indexOf(' ')
-					d.label = d.label.substring(temp)
+					d.label = d.label.substring(temp+1)
 					if(d.label.length > 8)
 						return d.label.substring(0,9)+'...';//'...'+d.label.substring(d.label.length-9,d.label.length-1);
 					else

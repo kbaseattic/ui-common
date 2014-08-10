@@ -86,7 +86,7 @@
 							if (!$(this).hasClass('picked')) {
 								for (tile in d.tiles) {
 									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')									
-									if (!$("#MAK_tile_"+tileSelector).hasClass('picked')) {
+									if (!$("#MAK_tile_"+tileSelector).hasClass('pickedFromBar')) {
 										d3.select("#MAK_tile_"+tileSelector).style("background", "#F08A04")
 									}
 								}
@@ -102,12 +102,14 @@
 							if (!$(this).hasClass('picked')) {
 								for (tile in d.tiles) {
 									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
-									if (!$("#MAK_tile_"+tileSelector).hasClass('picked')) {
-										d3.select("#MAK_tile_"+tileSelector).style("background", "steelblue")
+									if (!$("#MAK_tile_"+tileSelector).hasClass('pickedFromBar')) {
+										d3.select("#MAK_tile_"+tileSelector).style("background", "steelblue")										
 									}
 								}
-								d3.select(this).style("background", d.color);
+								d3.select(this).style("background", d.color);								
 							}
+							d3.select(".currentHeatmap").style("background", "#99FFCC")
+							if ($(this).hasClass("pickedFromTile")) d3.select(this).style("background", "#99FFCC");
 							return self.tooltip.style("visibility", "hidden"); 
                            }
                        )
@@ -123,7 +125,10 @@
 									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
 									temp = selectionHandler.indexOf(tileSelector)
 									selectionHandler.splice(temp,1)
-									if (selectionHandler.indexOf(tileSelector)==-1) $("#MAK_tile_"+tileSelector).removeClass('picked')								
+									if (selectionHandler.indexOf(tileSelector)==-1) {
+										$("#MAK_tile_"+tileSelector).removeClass('pickedFromBar')
+										// if($("#MAK_tile_"+tileSelector).hasClass('currentHeatmap')) d3.select("#MAK_tile_"+tileSelector).style("background", "#99FFCC")
+									}
 								}
 								$(this).removeClass('picked')
 							}
@@ -131,7 +136,7 @@
 								for (tile in d.tiles) {
 									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
 									selectionHandler.push(tileSelector)
-									$("#MAK_tile_"+tileSelector).addClass('picked')									
+									if (!$("#MAK_tile_"+tileSelector).hasClass('pickedFromBar')) $("#MAK_tile_"+tileSelector).addClass('pickedFromBar')									
 								}
 								$(this).addClass('picked')
 							}

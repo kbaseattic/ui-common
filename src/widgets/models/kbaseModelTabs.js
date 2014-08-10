@@ -17,117 +17,111 @@ $.KBWidget({
 
     init: function(options) {
         this._super(options);
-        var self = this;        
-        var models = options.id;
-        var ws = options.ws
-        var data = options.modelsData;
-        var token = options.token;
-        var fba = new fbaModelServices("http://kbase.us/services/fba_model_services"); //options.api;
+        var self = this;
+        var ws = options.ws;
+        var name = options.name;
 
         var container = this.$elem;
-
-        var tables = ['Reactions', 'Compounds', 'Compartment', 'Biomass', 'Gapfill', 'Gapgen'];
 
         var rxnTable = $('<table cellpadding="0" cellspacing="0" border="0" \
                 class="table table-bordered table-striped" style="width: 100%;">');
         var cpdTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">')
+                class="table table-bordered table-striped" style="width: 100%;">');
         var compartTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">')
+                class="table table-bordered table-striped" style="width: 100%;">');
         var biomassTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">')
+                class="table table-bordered table-striped" style="width: 100%;">');
         var gfTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">')   
+                class="table table-bordered table-striped" style="width: 100%;">');
         var ggTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">')                                                                       
-
+                class="table table-bordered table-striped" style="width: 100%;">');
+        var mapTable = $('<div>');
 
         var tabs = container.kbTabs({tabs: [{name: 'Reactions', content: rxnTable, active: true},
-                                          {name: 'Compounds', content: cpdTable},
-                                          {name: 'Compartment', content: compartTable},
-                                           {name: 'Biomass', content: biomassTable},
-                                           {name: 'Gapfill', content: gfTable},
-                                           {name: 'Gapgen', content: ggTable}
-                                  ]});
+                                            {name: 'Compounds', content: cpdTable},
+                                            {name: 'Compartment', content: compartTable},
+                                            {name: 'Biomass', content: biomassTable},
+                                            {name: 'Gapfill', content: gfTable},
+                                            {name: 'Gapgen', content: ggTable}, 
+                                            {name: 'Pathways', content: mapTable}
+                                    ]});
 
-        var tableSettings = {
-            "sPaginationType": "bootstrap",
-            "iDisplayLength": 10,
-            "aLengthMenu": [5, 10, 25,50,100],            
-            "aaData": [],
-            "oLanguage": {
-                "sSearch": "Search all:"
+
+
+        container.loading();
+        var p = kb.get_model(ws, name);
+        $.when(p).done(function(data) {
+            container.rmLoading();
+            var data = data[0].data;
+            self.loadTable(data);
+        }).fail(function(e){
+            container.rmLoading();            
+            container.append('<div class="alert alert-danger">'+
+                            e.error.message+'</div>');
+        });
+
+
+        self.loadTable = function(data) {
+            mapTable.kbasePathways({model_ws: ws, model_name: name});
+
+            var tableSettings = {
+                "sPaginationType": "bootstrap",
+                "iDisplayLength": 10,
+                "aLengthMenu": [5, 10, 25,50,100],            
+                "aaData": [],
+                "oLanguage": {
+                    "sSearch": "Search all:"
+                }
+            }
+
+            // compartment table
+            var dataDict = data.modelcompartments;
+            var keys = ["label", "pH", "potential"];
+            var labels = ["name", "pH", "potential"];
+            var cols = getColumns(keys, labels);
+            tableSettings.aoColumns = cols;
+            var t = compartTable.dataTable(tableSettings);
+            t.fnAddData(dataDict);
+
+            // reaction table
+            var dataDict = formatRxnObjs(data.modelreactions);
+            var keys = ["reaction", "name", "eq"]
+            var labels = ["reaction", "name", "eq"]// "equation", features","name"];
+            var cols = getColumns(keys, labels);
+            var rxnTableSettings = $.extend({}, tableSettings, {fnDrawCallback: rxnEvents});   
+            rxnTableSettings.aoColumns = cols;
+            rxnTableSettings.aoColumns[0].sWidth = '15%';
+            var t = rxnTable.dataTable(rxnTableSettings);
+            t.fnAddData(dataDict);
+
+            // compound table
+            var dataDict = formatCpdObjs(data.modelcompounds);
+            var keys = ["id", "name", "formula"];//["compartment", "compound", "name"];
+            var labels = ["id", "name", "formula"];//["compartment", "compound", "name"];
+            var cols = getColumns(keys, labels);
+            var cpdTableSettings = $.extend({}, tableSettings, {fnDrawCallback: cpdEvents});           
+            cpdTableSettings.aoColumns = cols;
+            var t = cpdTable.dataTable(cpdTableSettings);
+            t.fnAddData(dataDict);
+
+            // biomass table
+            var dataDict = data.biomasses;
+            var keys = ["id", "name", "eq"];
+            var labels = ["id", "name", "eq"];
+            var cols = getColumns(keys, labels);
+            tableSettings.aoColumns = cols;
+            var t = biomassTable.dataTable(tableSettings);
+            t.fnAddData(dataDict);
+
+            if (data.gapfillings.length > 0) {
+                gapFillTableWS(data.gapfillings);
+            } else {
+                gfTable.after('<h5>There are no gapfilling solutions for this model.  Try running gapfill.</h5>')
             }
         }
 
-        model = data[0].data;
 
-        // compartment table
-        var dataDict = model.modelcompartments;
-        var keys = ["label", "pH", "potential"];
-        var labels = ["name", "pH", "potential"];
-        var cols = getColumns(keys, labels);
-        tableSettings.aoColumns = cols;
-        var t = compartTable.dataTable(tableSettings);
-        t.fnAddData(dataDict);
 
-        // reaction table
-        var dataDict = formatRxnObjs(model.modelreactions);
-        var keys = ["reaction", "name", "eq"]
-        var labels = ["reaction", "name", "eq"]// "equation", features","name"];
-        var cols = getColumns(keys, labels);
-        var rxnTableSettings = $.extend({}, tableSettings, {fnDrawCallback: rxnEvents});   
-        rxnTableSettings.aoColumns = cols;
-        rxnTableSettings.aoColumns[0].sWidth = '15%';
-        var t = rxnTable.dataTable(rxnTableSettings);
-        t.fnAddData(dataDict);
-
-        // compound table
-        var dataDict = formatCpdObjs(model.modelcompounds);
-        var keys = ["id", "name", "formula"];//["compartment", "compound", "name"];
-        var labels = ["id", "name", "formula"];//["compartment", "compound", "name"];
-        var cols = getColumns(keys, labels);
-        var cpdTableSettings = $.extend({}, tableSettings, {fnDrawCallback: cpdEvents});           
-        cpdTableSettings.aoColumns = cols;
-        var t = cpdTable.dataTable(cpdTableSettings);
-        t.fnAddData(dataDict);
-
-        // biomass table
-        var dataDict = model.biomasses;
-        var keys = ["id", "name", "eq"];
-        var labels = ["id", "name", "eq"];
-        var cols = getColumns(keys, labels);
-        tableSettings.aoColumns = cols;
-        var t = biomassTable.dataTable(tableSettings);
-        t.fnAddData(dataDict);
-
-        // gapfilling table
-        /*
-        var dataDict = model.gapfillings;
-        console.log(dataDict)
-        var keys = ["id", "integrated"];
-        var labels = ["ID", "Integrated"];
-        var cols = getColumns(keys, labels);
-        tableSettings.aoColumns = cols;
-        var table = $('#gapfill-table').dataTable(tableSettings);
-        table.fnAddData(dataDict);
-        */
-
-        if (model.gapfillings.length > 0) {
-            gapFillTableWS(model.gapfillings);
-        } else {
-            gfTable.after('<h5>There are no gapfilling solutions for this model.  Try running gapfill.</h5>')
-        }
-
-        // gapgen table
-        /*
-        var model_gapgen = model.gapgen;
-        var keys = ["id", "index", "name", "pH","potential"];
-        var labels = ["id", "index", "name", "pH","potential"];
-        var cols = getColumns(keys, labels);
-        tableSettings.aoColumns = cols;
-        var table = $('#gapgen-table').dataTable(tableSettings);
-        */
         function formatRxnObjs(rxnObjs) {
             var rxn_objs = []
             for (var i in rxnObjs) {
@@ -164,20 +158,24 @@ $.KBWidget({
         function rxnEvents() {
             $('.rxn-click').unbind('click');
             $('.rxn-click').click(function() {
-                var rxn = [$(this).data('rxn')];
-                self.trigger('rxnClick', {ids: rxn});
+                var name = $(this).data('rxn');
+                var c = $('<div>');
+                c.kbaseRxn({id: name});
+                tabs.addTab({name: name, content: c,  removable: true});
+                tabs.showTab(name);
             });
         }
 
         function cpdEvents() {
             $('.cpd-click').unbind('click');
             $('.cpd-click').click(function() {
-                var cpd = [$(this).data('cpd')];
-                self.trigger('cpdClick', {ids: cpd});
+                var name = $(this).data('cpd');
+                var c = $('<div>');
+                c.kbaseCpd({id: name});
+                tabs.addTab({name: name, content: c,  removable: true});
+                tabs.showTab(name);
             });
-        }        
-
-
+        }
 
         function gapFillTableWS(gapfillings) {
             var tableSettings = {
@@ -192,7 +190,7 @@ $.KBWidget({
                "fnDrawCallback": events,
             }
 
-            var data = $.extend(model.gapfillings, {})
+            var data = $.extend(gapfillings, {})
             var keys = ["id", "integrated"];
             var labels = ["ID", "Integrated"];
             var cols = getColumns(keys, labels);
@@ -321,250 +319,6 @@ $.KBWidget({
 
         }
 
-        
-        function gapFillTable(models) {
-            var gapTable = undefined;
-            var active = false;
-
-            var init_data = {
-             "sPaginationType": "bootstrap",                
-              "fnDrawCallback": events,      
-              "iDisplayLength": 20,
-              "aoColumns": [
-                  { "sTitle": "Integrated", "sWidth": "10%"},
-                  {"bVisible":    false},
-                  { "sTitle": "Ref", "sWidth": "40%"},
-                  { "sTitle": "Media"},
-                  { "sTitle": "Media WS", "sWidth": "20%"},
-                  {"bVisible": false},
-                  {"bVisible": false}
-              ],     
-              "oLanguage": {
-                "sSearch": "Search all:",
-                "sEmptyTable": "No gapfill objects for this model."
-              }
-            }
-
-            var initTable = function(settings){
-                if (settings) {
-                    gapTable = gfTable.dataTable(settings);
-                } else { 
-                    gapTable = gfTable.dataTable(init_data);
-                }
-
-                //add_search_boxes()
-            }
-
-            function add_search_boxes() {
-                var single_search = '<th rowspan="1" colspan="1"><input type="text" \
-                                          name="search_reactions" placeholder="Search" \
-                                          class="search_init input-mini"> \
-                                     </th>';
-                var searches = $('<tr>');
-                gfTable.find('thead tr th').each(function(){
-                    $(this).css('border-bottom', 'none');
-                    searches.append(single_search);
-                })
-
-                gfTable.find('thead').append(searches);
-                $("thead input").keyup( function () {
-                    gapTable.fnFilter( this.value, $("thead input").index(this) );
-                });
-
-                active = true;                
-            }
-
-            this.load_table = function(models) {
-                var gaps = [];
-                var ref = models.gapfillings[0].gapfill_ref
-
-                var p = kb.ws.get_object_info([{wsid: ref.split('/')[0], objid: ref.split('/')[1] }])
-                $.when(p).done(function(info) {
-                    var ws =  info[0][5];
-                    var id = info[0][1];
-
-                })
-
-                
-
-                var intGapfills = models.gapfillings;
-
-
-
-                for (var i in intGapfills) {
-                    var intGap = intGapfills[i];
-                    if (intGap.length == 6) {
-                        intGap.splice(0, 0, "Yes");
-                        intGap.splice(2, 1, '<a class="show-gap" data-ref="'+intGap[2]+'" data-ws="'+ws+'">'
-                            +intGap[2]+'</a>');
-                    }
-                }
-                
-                var unIntGapfills = models.gapfillings;
-                for (var i in unIntGapfills) {
-                    var unIntGap = unIntGapfills[i];
-                    if (unIntGap.length == 6) {            
-                        unIntGap.splice(0, 0, "No")
-                        unIntGap.splice(2, 1, '<a class="show-gap" data-ref="'+unIntGap[2]+'" data-ws="'+ws+'" >'+
-                            unIntGap[2]+'</a>');
-                    }
-                }
-
-                if (unIntGapfills ) {
-                    var gapfills = unIntGapfills.concat(intGapfills)                    
-                }
-                var gapfills = intGapfills;
-
-                init_data.aaData = gapfills;
-                initTable();
-                gapTable.fnSort( [[1,'desc']] );
-                //gapTable.fnAddData(gapfills);
-                //gapTable.fnAdjustColumnSizing()
-            }
-
-            this.load_table(models);
-
-            function events() {
-                // tooltip for version hover
-                $('.show-gap').tooltip({html: true, title:'show more info \
-                    <i class="icon-list-alt icon-white history-icon"></i>'
-                    , placement: 'right'});
-
-                $('.show-gap').unbind('click');
-                $('.show-gap').click(function() {
-                    var gapRef = $(this).data('ref');
-                    var ws = $(this).data('ref');                    
-
-                    var tr = $(this).closest('tr')[0];
-                    if ( gapTable.fnIsOpen( tr ) ) {
-                        gapTable.fnClose( tr );
-                    } else {
-                        gapTable.fnOpen( tr, '', "info_row" );
-                        $(this).closest('tr').next('tr').children('.info_row').append('<p class="muted loader-gap-sol"> \
-                            <img src="assets/img/ajax-loader.gif"> loading possible solutions...</p>')                
-                        showGapfillSolutions(tr, gapRef, ws);
-                    }
-                });
-            }
-
-            function showGapfillSolutions(tr, gapRef) {
-                var gap_id = gapRef.split('/')[1]
-                var gapAJAX = fba.get_gapfills({gapfills: [gap_id], workspaces: [ws]});
-                $.when(gapAJAX).done(function(data) {
-                    var data = data[0];  // only one gap fill solution at a time is cliclsked
-                    var sols = data.solutions;
-
-                    //$(tr).next().children('td').append('<h5>Gapfill Details</h5>');
-
-                    var solList = $('<div class="gap-selection-list">');
-
-                    for (var i in sols) {
-                        var sol = sols[i];
-                        var solID = sol.id;
-
-                        if (sol.integrated == "1") {
-                            solList.append('<div> <a type="button" class="gap-sol"\
-                                data-toggle="collapse" data-target="#'+gap_id+solID.replace(/\./g,'_')+'" >'+
-                                solID+'</a> <span class="caret" style="vertical-align: middle;"></span>\
-                                 </div>');
-                            /*
-                            <div class="radio inline gapfill-radio"> \
-                                    <input type="radio" name="gapfillRadios" id="gapfillRadio'+i+'" value="integrated" checked>\
-                                </div> <span class="label integrated-label">Integrated</span>\
-                                    <button data-gapfill="'+gapRef+solID+'"\
-                                     class="hide btn btn-primary btn-mini integrate-btn">Integrate</button> \
-                            */
-                        } else {
-                            solList.append('<div> <a type="button" class="gap-sol"\
-                                data-toggle="collapse" data-target="#'+gap_id+solID.replace(/\./g,'_')+'" >'+
-                                solID+'</a> <span class="caret" style="vertical-align: middle;"></span>\
-                                </div>');
-
-                            /*
-                                <div class="radio inline gapfill-radio"> \
-                                    <input type="radio" name="gapfillRadios" id="gapfillRadio'+i+'" value="unitegrated">\
-                                </div>\
-                                <button data-gapfill="'+gapRef+solID+'"\
-                                 class="hide btn btn-primary btn-mini integrate-btn">Integrate</button> \
-                            */                            
-                        }
-
-                        var rxnAdditions = sol.reactionAdditions;
-                        if (rxnAdditions.length == 0) {
-                            var rxnInfo = $('<p>No reaction additions in this solution</p>')
-                        } else {
-                            var rxnInfo = $('<table class="gapfill-rxn-info">');
-                            var header = $('<tr><th>Reaction</th>\
-                                                <th>Equation</th></tr>');
-                            rxnInfo.append(header);
-
-                            for (var j in rxnAdditions) {
-                                var rxnArray = rxnAdditions[j];
-                                var row = $('<tr>');
-                                row.append('<td><a class="gap-rxn" data-rxn="'+rxnArray[0]+'" >'+rxnArray[0]+'</a></td>');
-                                row.append('<td>'+rxnArray[4]+'</td>');
-                                rxnInfo.append(row);
-                            }
-                        }
-
-                        var solResults = $('<div id="'+gap_id+solID.replace(/\./g,'_')+'" class="collapse">')
-                        solResults.append(rxnInfo);
-
-                        solList.append(solResults);
-                    }
-
-                    $(tr).next().children('td').append(solList.html());
-                    $('.loader-gap-sol').remove();
-
-
-                    // events for gapfill page
-                    $("input[name='gapfillRadios']").unbind('change');
-                    $("input[name='gapfillRadios']").change(function(){
-                        $('.integrate-btn').hide();
-                        $(this).parent().next('.integrate-btn').show();
-                    });
-
-                    $('.gap-sol').unbind('click')
-                    $('.gap-sol').click(function() {
-                        var caret = $(this).next('span');
-                        if (caret.hasClass('caret')) {
-                            caret.removeClass('caret');
-                            caret.addClass('caret-up');
-                        } else {
-                            caret.removeClass('caret-up');
-                            caret.addClass('caret');                    
-                        }
-
-                    })
-                    $('.integrate-btn').unbind('click');
-                    $('.integrate-btn').click(function() {
-                        $(this).after('<span class="muted loader-integrating" > \
-                              <img src="assets/img/ajax-loader.gif"> loading...</span>')
-                        var gapfill_id = $(this).data('gapfill');
-                        var model = modelspace.active_kbids()[0]
-                        var fbaAJAX = fba.integrate_reconciliation_solutions({model: model,
-                            model_workspace: ws,
-                            gapfillSolutions: [gapfill_id],
-                            gapgenSolutions: [''],
-                            workspace: ws})
-
-                        $.when(fbaAJAX).done(function(data){
-                            alert('NOTE: This functionality is still under development\n', data)
-                            $('.loader-integrating').remove()
-                        })
-                    })
-
-                    $('.gap-rxn').unbind('click');
-                    $('.gap-rxn').click(function() {
-                        var rxn = [$(this).data('rxn')];
-                        self.trigger('rxnClick', {ids: rxn});
-                    });            
-
-                });
-
-            }
-
-        }
         
 
         //this._rewireIds(this.$elem, this);

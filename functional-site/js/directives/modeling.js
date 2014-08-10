@@ -10,6 +10,115 @@ angular.module('modeling-directives')
             console.log('default map', $stateParams.map)
 
 
+            var container = ele;
+
+            var selectionTable = $('<table cellpadding="0" cellspacing="0" border="0" \
+                class="table table-bordered table-striped">');
+            var tabs = container.kbTabs({tabs: [
+                                            {name: 'Selection', content: selectionTable, active: true} 
+                                        ]});
+
+
+            var maps = [];
+
+            function events() {
+                // event for clicking on pathway link
+                container.find('.pathway-link').unbind('click')
+                container.find('.pathway-link').click(function() {
+                    var map_id = $(this).data('map_id');
+                    var name = $(this).text();
+                    var exists;
+
+                    var container = $('<div id="path-'+map_id+'">');
+                    container.loading();
+                    tabs.addTab({name: name, removable: true, content: container});
+                    load_map(map_id, container);
+                });
+
+                // tooltip for hover on pathway name
+                container.find('.pathway-link')
+                         .tooltip({title: 'Open path tab', 
+                                   placement: 'right', delay: {show: 1000}});
+            } // end events
+
+            function load_map(map, container) {
+                container.rmLoading();                        
+
+                container.kbasePathway({model_ws: $stateParams.ws,
+                                        model_name: $stateParams.id,
+                                        map_ws: map_ws,
+                                        map_name: map,
+                                        editable: true,
+                                    })
+            }
+
+            function load_map_list() {
+                // load table for maps
+                var p = kb.ws.list_objects({workspaces: [map_ws], includeMetadata: 1})
+                $.when(p).done(function(d){
+
+                    var tableSettings = {
+                        "sPaginationType": "bootstrap",
+                        "iDisplayLength": 10,
+                        "aaData": d,
+                        "fnDrawCallback": events,
+                        "aaSorting": [[ 1, "asc" ]],
+                        "aoColumns": [
+                            { sTitle: 'Name', mData: function(d) {
+                                return '<a class="pathway-link" data-map_id="'+d[1]+'">'+d[10].name+'</a>';
+                            }}, 
+                            { sTitle: 'Map ID', mData: 1},
+                            { sTitle: 'Rxn Count', sWidth: '10%', mData: function(d){
+                                if ('reaction_ids' in d[10]){
+                                    return d[10].reaction_ids.split(',').length;
+                                } else {
+                                    return 'N/A';
+                                }
+                            }},
+                            { sTitle: 'Cpd Count', sWidth: '10%', mData: function(d) {
+                                if ('compound_ids' in d[10]) {
+                                    return d[10].compound_ids.split(',').length;
+                                } else {
+                                    return 'N/A';
+                                }
+                            }} , 
+                            { sTitle: "Source","sWidth": "10%", mData: function(d) {
+                                return "KEGG";
+                            }},
+                        ],                         
+                        "oLanguage": {
+                            "sEmptyTable": "No objects in workspace",
+                            "sSearch": "Search:"
+                        }
+                    }
+
+
+                    var table = selectionTable.dataTable(tableSettings);  
+                    $compile(table)(scope);
+
+                    if (self.default_map && self.default_map != 'list') {
+                        for (var i in maps) {
+                            map_obj = maps[i]
+                            if (map_obj.id == self.default_map) {
+                                new_map_tab(self.default_map, map_obj.name);
+                                self.loadMap(self.default_map);
+                            }
+                        }
+                    } 
+
+                }).fail(function(e){
+                    container.prepend('<div class="alert alert-danger">'+
+                                e.error.message+'</div>')
+                });
+            }
+
+            load_map_list();
+
+
+
+
+
+
             $.fn.pathways = function(options) {
                 self.models = options.modelData;
                 self.fbas = options.fbaData;
@@ -21,7 +130,6 @@ angular.module('modeling-directives')
                 var container = $(this);
 
                 var stroke_color = '#666';
-
 
                 var tableSettings = {
                     "sPaginationType": "bootstrap",
@@ -101,7 +209,7 @@ angular.module('modeling-directives')
                                     e.error.message+'</div>')
                     });
                 }
-                load_map_list()
+                //load_map_list()
 
                 self.loadMap = function(map) {
                     // there needs to be all this manual tab styling due to 
@@ -145,7 +253,7 @@ angular.module('modeling-directives')
                                 return
                             }          
                         })
-                        console.log('new tab 1', map, name)
+
                         if (!exists) new_map_tab(map, name);
                     });
 
@@ -158,6 +266,7 @@ angular.module('modeling-directives')
 
 
                 function new_map_tab(map, name) {
+
                     var tab = $('<li class="tab pathway-tab" data-map="'+map+'" id="path-tab-'+map+'"><a>'
                                         +name.slice(0, 12)+'...</a>'+
                                 '</li>')          
@@ -212,7 +321,6 @@ angular.module('modeling-directives')
 
                 var p1 = kb.get_model(scope.selected[0].workspace, scope.selected[0].name);
                 $.when(p1, p2 ).done(function(d, fba) {
-                    console.log('reloading pathway with ',fba)
                     var data = [d[0].data];
                     var fba = fba ? [fba[0].data] : null;
 
@@ -244,14 +352,13 @@ angular.module('modeling-directives')
                 row.append(form)
 
                 ver_selector.find('select').change(function() { 
-                    console.log('change')
                     // special container for loading notice since floated
                     var spin = $('<div id="loading pull-right">');
                     spin.loading();
                     $('.pathway-options').append(spin);
                     
                     var selected_fba = get_selected_fba();
-                    console.log(selected_fbga)
+
                     loadMapSelector(selected_fba.ws, selected_fba.name);
                 })                
 

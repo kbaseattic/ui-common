@@ -134,15 +134,20 @@ var app = angular.module('landing-pages',
 
     // workspace object landing pages
     $stateProvider
-        .state('ws.fbas', {
+        .state('ws.models', {
+          url: "models/:ws/:id?map",
+          templateUrl: 'views/ws/sortable/model.html',
+          controller: 'WBLanding',
+          //reloadOnSearch: false
+        }).state('ws.fbas', {
           url: "fbas/:ws/:id?map",
           templateUrl: 'views/ws/sortable/fba.html',
-          controller: 'FBALanding' //'WBModelLanding',
+          controller: 'WBLanding',
           //reloadOnSearch: false
         }).state('ws.etc', {
           url: "etc/:ws/:id",
           templateUrl: 'views/ws/sortable/etc.html',
-          controller: 'WBModelLanding'
+          controller: 'WBLanding'
         }).state('ws.genomes', {
           url: "genomes/:ws/:id",
           templateUrl: 'views/objects/genome.html',
@@ -240,12 +245,6 @@ var app = angular.module('landing-pages',
              controller: 'ModelDetail'});
 
     $stateProvider
-        .state('modelcards', {
-             url: '/cards/models/:ws/:id',
-             templateUrl: 'views/objects/modelcards.html',
-             controller: 'ModelDetailCards'});
-
-    $stateProvider
        .state('gptype', {
             url: '/KBaseGwasData.GwasPopulation/:ws/:id',
             templateUrl: 'views/objects/gptype.html',
@@ -276,11 +275,7 @@ var app = angular.module('landing-pages',
         .state('fbabyid', {
                 url: '/fbas/:ws/:id',
                 templateUrl: 'views/objects/fba.html',
-                controller: 'FBADetail'})
-        .state('fbacards', {
-                url: '/cards/fbas/:ws/:id',
-                templateUrl: 'views/objects/fbacards.html',
-                controller: 'FBADetailCards'});
+                controller: 'FBADetail'});
 
     $stateProvider
         .state('media',
@@ -637,9 +632,6 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
 
 
     $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
-
-    //console.log(USER_TOKEN);
-
 
     // global state object to store state
     state = new State();
