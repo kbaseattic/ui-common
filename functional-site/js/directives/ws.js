@@ -2553,7 +2553,7 @@ angular.module('ws-directives')
                 
 
                 var cloneModal = $('<div class="kbase-prompt">').kbasePrompt({
-                        title : 'Clone Workspace',
+                        title : 'Clone Workspace <i>'+ws_name+'</i>',
                         body : body,
                         modalClass : '', 
                         controls : [{
@@ -2588,7 +2588,11 @@ angular.module('ws-directives')
                                     $prompt.addCover()
                                     $prompt.getCover().loading()
                                     $.when(prom).done(function(){
-                                        scope.loadWSTable();
+                                        if (scope.tab) {
+                                            scope.loadNarTable(scope.tab)
+                                        } else {
+                                            scope.loadWSTable();
+                                        }                                        
                                         kb.ui.notify('Cloned workspace: <i>'+new_ws_id+'</i>');
                                         $prompt.closePrompt();
                                     }).fail(function() {
@@ -2607,8 +2611,8 @@ angular.module('ws-directives')
                 var body = $('<div style="text-align: center;">Are you sure you want to delete this workspace?<h3>'
                                 +ws_name+'</h3>This action is irreversible.</div>');
 
-                var deleteModal = $('<div></div>').kbasePrompt({
-                        title : 'Delete Workspace',
+                var deleteModal = $('<div>').kbasePrompt({
+                        title : 'Delete Workspace <i>'+ws_name+'</i>',
                         body : body,
                         modalClass : '', 
                         controls : [{
@@ -2629,7 +2633,11 @@ angular.module('ws-directives')
                                 $prompt.addCover()
                                 $prompt.getCover().loading()
                                 $.when(prom).done(function(){
-                                    scope.loadWSTable();
+                                    if (scope.tab) {
+                                        scope.loadNarTable(scope.tab)
+                                    } else {
+                                        scope.loadWSTable();
+                                    }
                                     kb.ui.notify('Deleted workspace: <i>'+ws_name+'</i>');
                                     $prompt.closePrompt();
                                 }).fail(function() {
