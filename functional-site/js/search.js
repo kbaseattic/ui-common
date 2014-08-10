@@ -568,6 +568,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                       else {
                           if (jsonResult.data.items[i].hasOwnProperty("feature_id")) {
                               jsonResult.data.items[i].row_id = jsonResult.data.items[i].feature_id.replace(/\||\./g,"_");
+                              console.log(jsonResult.data.items[i].row_id);
                           }
                           else if (jsonResult.data.items[i].hasOwnProperty("genome_id")) {
                               jsonResult.data.items[i].row_id = jsonResult.data.items[i].genome_id.replace(/\||\./g,"_");
@@ -2003,7 +2004,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         
         return $scope.workspace_service.get_object_info_new({"objects": objects, "ignoreErrors": 1})
             .then(
-            function (results) {
+            function (results) {                
                 $scope.$apply(function () {
                     for (var i = object_map.length - 1; i > -1; i--) {
                         if (results[i] !== null) {

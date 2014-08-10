@@ -312,7 +312,7 @@
                                             <span class="search-cart-label">Data Cart</span>
                                             <span class="space-left glyphicon glyphicon-shopping-cart"></span>
                                             <span class="badge search-cart-count">{{options.userState.session.data_cart.size | number}}</span>
-                                            <button type="button" class="btn btn-danger btn-xs" ng-click="removeCartSelected()" data-toggle="tooltip" data-placement="top" tooltip="Remove selected items from your cart." tooltip-placement="top"><span class="glyphicon glyphicon-trash"></span></button>
+                                            <button type="button" class="btn btn-danger btn-xs" ng-click="removeCartSelected()" ng-class="{'disabled': options.userState.session.transfer_cart.size < 0}" data-toggle="tooltip" data-placement="top" tooltip="Remove currently selected items from your cart." tooltip-placement="top"><span class="glyphicon glyphicon-trash"></span></button>
                                         </h3>
                                         <div><span class="search-duplicate-icon"></span> This row color indicates data already present in your selected workspace.</div>    
                                     </div>
@@ -373,7 +373,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['feature'].markers" ng-if="options.duplicates[s]">
+                                                        <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['feature'].markers" class="search-duplicate-row animated fadeInUp" ng-if="options.duplicates[s]">
                                                             <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
                                                             <td class="text-left">{{options.userState.session.data_cart.data[s].feature_id}}</td>
                                                             <td class="text-left">{{options.userState.session.data_cart.data[s].feature_source_id}}</td>
