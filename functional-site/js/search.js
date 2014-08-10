@@ -1145,6 +1145,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 function success(result) {
                     $scope.$apply(function () {
                         $scope.options.objectsTransferred += 1;
+                        $scope.options.duplicates[n] = {};
                         if ($scope.options.objectsTransferred === $scope.options.transferSize) {
                             $scope.completeTransfer();
                         }
@@ -1192,6 +1193,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 function success(result) {
                     $scope.$apply(function () {
                         $scope.options.objectsTransferred += 1;
+                        $scope.options.duplicates[n] = {};
                         if ($scope.options.objectsTransferred === $scope.options.transferSize) {
                             $scope.completeTransfer();
                         }
@@ -1316,6 +1318,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                             console.log("Save successful, object info : " + info);
                             $scope.$apply(function () {
                                 $scope.options.objectsTransferred += 1;
+                                $scope.options.duplicates[n] = {};
                                 if ($scope.options.objectsTransferred === $scope.options.transferSize) {
                                     $scope.completeTransfer();
                                 }
@@ -1332,11 +1335,12 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             
 
     // grab a public object and make a copy to a user's workspace
-    $scope.copyTypedObject = function(object_name, object_ref, from_workspace_name, to_workspace_name) {
+    $scope.copyTypedObject = function(n, object_name, object_ref, from_workspace_name, to_workspace_name) {
         function success(result) {
             console.log("Object " + object_name + " copied successfully from " + from_workspace_name + " to " + to_workspace_name + " .");
             $scope.$apply(function () {
                 $scope.options.objectsTransferred += 1;
+                $scope.options.duplicates[n] = {};
                 if ($scope.options.objectsTransferred === $scope.options.transferSize) {
                     $scope.completeTransfer();
                 }
@@ -1415,10 +1419,12 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                     //generic solution for types
                     if ($scope.options.userState.session.data_cart.data[ws_objects[i]].hasOwnProperty("object_name") === true) {
                         console.log($scope.options.userState.session.data_cart.data[ws_objects[i]]);
-                        $scope.copyTypedObject($scope.options.userState.session.data_cart.data[ws_objects[i]]["object_name"], 
-                                               $scope.options.userState.session.data_cart.data[ws_objects[i]]["object_id"], 
-                                               $scope.options.userState.session.data_cart.data[ws_objects[i]]["workspace_name"], 
-                                               $scope.options.userState.session.selectedWorkspace);                    
+                        ws_requests.push($scope.copyTypedObject(
+                                                ws_objects[i],
+                                                $scope.options.userState.session.data_cart.data[ws_objects[i]]["object_name"], 
+                                                $scope.options.userState.session.data_cart.data[ws_objects[i]]["object_id"], 
+                                                $scope.options.userState.session.data_cart.data[ws_objects[i]]["workspace_name"], 
+                                                $scope.options.userState.session.selectedWorkspace).then(function () {;}));                    
                     }
                     else if ($scope.options.userState.session.data_cart.data[ws_objects[i]].hasOwnProperty("object_id") === true) {
                         console.log($scope.options.userState.session.data_cart.data[ws_objects[i]]);
@@ -1430,10 +1436,12 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                                 console.log(error);
                             })
                             .done(function (info, status, xhr) {
-                                $scope.copyTypedObject(info[0][1], 
-                                                       $scope.options.userState.session.data_cart.data[ws_objects[i]]["object_id"], 
-                                                       $scope.options.userState.session.data_cart.data[ws_objects[i]]["workspace_name"], 
-                                                       $scope.options.userState.session.selectedWorkspace);
+                                ws_requests.push($scope.copyTypedObject(
+                                                    ws_objects[i],
+                                                    info[0][1], 
+                                                    $scope.options.userState.session.data_cart.data[ws_objects[i]]["object_id"], 
+                                                    $scope.options.userState.session.data_cart.data[ws_objects[i]]["workspace_name"], 
+                                                    $scope.options.userState.session.selectedWorkspace).then(function () {;}));
                             });
                     }
                     else {
@@ -1637,7 +1645,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                     "feature_type": item.feature_type,
                     "dna_sequence_length": item.dna_sequence_length,
                     "protein_translation_length": item.protein_translation_length,
-                    "feature_function": item.feature_function,
+                    "function": item.function,
                     "cart_selected": false
                 };
                 $scope.options.userState.session.data_cart.types['feature'].markers[id] = {}; 

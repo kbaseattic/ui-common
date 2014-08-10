@@ -330,6 +330,7 @@
                                                             <th class="text-left"><strong>Domain</strong></th>
                                                             <th class="text-left"><strong>%GC</strong></th>
                                                             <th class="text-left"><strong>Contigs</strong></th>
+                                                            <th class="text-left"><strong>Genes</strong></th>
                                                             <th class="text-left"><strong>DNA Size bp</strong></th>
                                                         </tr>
                                                     </thead>
@@ -341,6 +342,7 @@
                                                             <td class="text-left">{{options.userState.session.data_cart.data[s].domain}}</td>
                                                             <td class="text-left">{{options.userState.session.data_cart.data[s].gc_content | number: 2}}</td>
                                                             <td class="text-left">{{options.userState.session.data_cart.data[s].num_contigs | number}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].num_cds | number}}</td>
                                                             <td class="text-left">{{options.userState.session.data_cart.data[s].genome_dna_size | number}}</td>
                                                         </tr>
                                                         <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['genome'].markers" ng-if="!options.duplicates[s]">
@@ -350,6 +352,7 @@
                                                             <td class="text-left">{{options.userState.session.data_cart.data[s].domain}}</td>
                                                             <td class="text-left">{{options.userState.session.data_cart.data[s].gc_content | number: 2}}</td>
                                                             <td class="text-left">{{options.userState.session.data_cart.data[s].num_contigs | number}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].num_cds | number}}</td>
                                                             <td class="text-left">{{options.userState.session.data_cart.data[s].genome_dna_size | number}}</td>
                                                         </tr>
                                                     </tbody>
@@ -510,6 +513,10 @@
                                                                         <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].all" ng-click="toggleAllDataCart('gwas_top_variations')"></input></th>
                                                                         <th class="text-left"><strong>Object Id</strong></th>
                                                                         <th class="text-left"><strong>Object Name</strong></th>
+                                                                        <th class="text-left"><strong>Trait</strong></th>
+                                                                        <th class="text-left"><strong>Ontology Id</strong></th>
+                                                                        <th class="text-left"><strong>Genome Id</strong></th>
+                                                                        <th class="text-left"><strong>Genome Name</strong></th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -517,11 +524,19 @@
                                                                         <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
                                                                         <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
                                                                         <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_ontology_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_name}}</td>
                                                                     </tr>
                                                                     <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].markers" ng-if="!options.duplicates[s]">
                                                                         <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
                                                                         <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
                                                                         <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_ontology_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_name}}</td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>    
@@ -536,6 +551,10 @@
                                                                         <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].all" ng-click="toggleAllDataCart('gwas_population_traits')"></input></th>
                                                                         <th class="text-left"><strong>Object Id</strong></th>
                                                                         <th class="text-left"><strong>Object Name</strong></th>
+                                                                        <th class="text-left"><strong>Trait</strong></th>
+                                                                        <th class="text-left"><strong>Ontology Id</strong></th>
+                                                                        <th class="text-left"><strong>Genome Id</strong></th>
+                                                                        <th class="text-left"><strong>Genome Name</strong></th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -543,11 +562,19 @@
                                                                         <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
                                                                         <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
                                                                         <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_ontology_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_name}}</td>
                                                                     </tr>
                                                                     <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].markers" ng-if="!options.duplicates[s]">
                                                                         <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
                                                                         <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
                                                                         <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_ontology_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_name}}</td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>    
@@ -562,6 +589,8 @@
                                                                         <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].all" ng-click="toggleAllDataCart('gwas_gene_lists')"></input></th>
                                                                         <th class="text-left"><strong>Object Id</strong></th>
                                                                         <th class="text-left"><strong>Object Name</strong></th>
+                                                                        <th class="text-left"><strong>Genes</strong></th>
+                                                                        <th class="text-left"><strong>SNPs</strong></th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -569,11 +598,15 @@
                                                                         <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
                                                                         <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
                                                                         <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].genes.split("  ").length | number}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].genes_snp_list.split("  ").length | number}}</td>
                                                                     </tr>
                                                                     <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].markers" ng-if="!options.duplicates[s]">
                                                                         <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
                                                                         <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
                                                                         <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].genes.split("  ").length | number}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].genes_snp_list.split("  ").length | number}}</td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>    
