@@ -420,6 +420,11 @@ table.search-transfer-table {
     background-color: #6f5499;
 }
 
+.search-cart-badge {
+    margin-left: 0.5em;
+    margin-bottom: 4px;
+}
+
 .search-results {
     padding: 0px;
     margin-left: 15px;

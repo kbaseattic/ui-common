@@ -319,7 +319,7 @@
 
                                     <tabset type="pills"> 
                                         <tab ng-if="options.userState.session.data_cart.types['genome'].size > 0" active="options.data_tabs['genomes']" select="setActiveTab('genomes')">
-                                            <tab-heading><span>Genomes </span><span class="badge">{{options.userState.session.data_cart.types['genome'].size}}</span></tab-heading>
+                                            <tab-heading><span>Genomes </span><span class="badge search-cart-badge">{{options.userState.session.data_cart.types['genome'].size}}</span></tab-heading>
                                             <div>                            
                                                 <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
                                                     <thead>
@@ -357,7 +357,7 @@
                                             </div>
                                         </tab> 
                                         <tab ng-if="options.userState.session.data_cart.types.feature.size > 0" active="options.data_tabs['features']" select="setActiveTab('features')">
-                                            <tab-heading><span>Genome Features </span><span class="badge space-left">{{options.userState.session.data_cart.types['feature'].size}}</span></tab-heading>
+                                            <tab-heading><span>Genome Features </span><span class="badge search-cart-badge">{{options.userState.session.data_cart.types['feature'].size}}</span></tab-heading>
                                             <div>
                                                 <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
                                                     <thead>
@@ -398,7 +398,7 @@
                                             </div>
                                         </tab> <!-- end second tab -->
                                         <tab ng-if="options.userState.session.data_cart.types['metagenome'].size > 0" active="options.data_tabs['metagenomes']" select="setActiveTab('metagenomes')">
-                                            <tab-heading><span>Metagenomes </span><span class="badge space-left">{{options.userState.session.data_cart.types['metagenome'].size}}</span></tab-heading>
+                                            <tab-heading><span>Metagenomes </span><span class="badge search-cart-badge">{{options.userState.session.data_cart.types['metagenome'].size}}</span></tab-heading>
                                             <div>
                                 
                                                 <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
@@ -431,11 +431,11 @@
                                             </div>
                                         </tab> <!-- end third tab -->
                                         <tab ng-if="options.userState.session.data_cart.types['gwas'].size > 0" active="options.data_tabs['gwas']" select="setActiveTab('gwas')">
-                                            <tab-heading><span>GWAS </span><span class="badge space-left">{{options.userState.session.data_cart.types['gwas'].size}}</span></tab-heading>
+                                            <tab-heading><span>GWAS </span><span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].size}}</span></tab-heading>
                                             <div>
                                                 <tabset>
                                                     <tab ng-if="options.userState.session.data_cart.types['gwas'].subtypes['gwas_populations'].size > 0" active="options.data_tabs['gwas_populations']" select="setActiveTab('gwas_populations')">
-                                                        <tab-heading>GWAS Populations<span class="badge space-left">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_populations'].size}}</span></tab-heading>
+                                                        <tab-heading>GWAS Populations<span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_populations'].size}}</span></tab-heading>
                                                         <div>
                                                             <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
                                                                 <thead>
@@ -470,7 +470,7 @@
                                                         </div>
                                                     </tab>
                                                     <tab ng-if="options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_variations'].size > 0" active="options.data_tabs['gwas_population_variations']" select="setActiveTab('gwas_population_variations')">
-                                                        <tab-heading>GWAS Population Variations<span class="badge space-left">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_varations'].size}}</span></tab-heading>
+                                                        <tab-heading>GWAS Population Variations<span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_variations'].size}}</span></tab-heading>
                                                         <div>
                                                             <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
                                                                 <thead>
@@ -502,7 +502,7 @@
                                                         </div>
                                                     </tab>
                                                     <tab ng-if="options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].size > 0" active="options.data_tabs['gwas_top_variations']" select="setActiveTab('gwas_top_variations')">
-                                                        <tab-heading>GWAS Top Variations<span class="badge space-left">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_varations'].size}}</span></tab-heading>
+                                                        <tab-heading>GWAS Top Variations<span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].size}}</span></tab-heading>
                                                         <div>
                                                             <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
                                                                 <thead>
@@ -528,7 +528,7 @@
                                                         </div>
                                                     </tab>
                                                     <tab ng-if="options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].size > 0" active="options.data_tabs['gwas_population_traits']" select="setActiveTab('gwas_population_traits')">
-                                                        <tab-heading>GWAS Population Traits<span class="badge space-left">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].size}}</span></tab-heading>
+                                                        <tab-heading>GWAS Population Traits<span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].size}}</span></tab-heading>
                                                         <div>
                                                             <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
                                                                 <thead>
@@ -554,7 +554,7 @@
                                                         </div>
                                                     </tab>
                                                     <tab ng-if="options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].size > 0" active="options.data_tabs['gwas_gene_lists']" select="setActiveTab('gwas_gene_lists')">
-                                                        <tab-heading>GWAS Gene Lists<span class="badge space-left">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].size}}</span></tab-heading>
+                                                        <tab-heading>GWAS Gene Lists<span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].size}}</span></tab-heading>
                                                         <div>
                                                             <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
                                                                 <thead>
