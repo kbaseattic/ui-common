@@ -86,14 +86,22 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
                 'genome': {all: false, size: 0, markers: {}},
                 'feature': {all: false, size: 0, markers: {}},
                 'metagenome': {all: false, size: 0, markers: {}},
-                'gwas': {all: false, size: 0, markers: {}}
+                'gwas': {size: 0,
+                         subtypes: {
+                            'gwas_populations': {all: false, size: 0, markers: {}},
+                            'gwas_population_traits': {all: false, size: 0, markers: {}},
+                            'gwas_population_variations': {all: false, size: 0, markers: {}},                            
+                            'gwas_top_variations': {all: false, size: 0, markers: {}},                            
+                            'gwas_gene_lists': {all: false, size: 0, markers: {}}                            
+                            }
+                        }
             }
         },
         "transfer_cart": {
             size: 0,
             items: {}                         
         },
-        "version": 0.4
+        "version": 0.5
     };
     
     // Model data that persists for all searches
@@ -191,6 +199,7 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
         active_sorts: {},
         open_facet_panels: {},
         data_tabs: {},
+        duplicates: {},
 
         reset : function() {
             this.categoryCounts = {};
@@ -208,6 +217,8 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
             this.active_sorts = {};
             this.open_facet_panels = {};
             this.data_tabs = {};
+            this.duplicates = {};
+            
             this.searchOptions = this.defaultSearchOptions;                                          
 
             this.userState = { 
@@ -986,15 +997,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     };
 
     $scope.isFacetPanelCollapsed = function (key) {
-        return !$("#" + key + "_panel").hasClass("in");
+        return !angular.element("#" + key + "_panel").hasClass("in");
     };
-
-    $scope.updateFacetScope = function (key) {
-        $scope.$apply(function () {
-            $("#" + key + "_panel").hasClass("in");
-        });
-    };
-    
 
     $scope.addFacet = function (name, value, searchAgain) {        
         if (!$scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
@@ -1100,12 +1104,13 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $scope.options.userState.session.selectedWorkspace = workspace_info[1];
         }
     
-        $(".workspace-chosen").removeClass("workspace-chosen");
-        $("#" + workspace_info[1].replace(":","_") + "_" + workspace_info[4]).addClass("workspace-chosen");
+        angular.element(".workspace-chosen").removeClass("workspace-chosen");
+        angular.element("#" + workspace_info[1].replace(":","_") + "_" + workspace_info[4]).addClass("workspace-chosen");
         
         $scope.options.objectsTransferred = 0;
         $scope.options.transferRequests = 0;
         $scope.options.transferSize = 0;
+        $scope.options.duplicates = {};
     };
 
 
@@ -1408,13 +1413,14 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             
                     //generic solution for types
                     if ($scope.options.userState.session.data_cart.data[ws_objects[i]].hasOwnProperty("object_name") === true) {
+                        console.log($scope.options.userState.session.data_cart.data[ws_objects[i]]);
                         $scope.copyTypedObject($scope.options.userState.session.data_cart.data[ws_objects[i]]["object_name"], 
                                                $scope.options.userState.session.data_cart.data[ws_objects[i]]["object_id"], 
                                                $scope.options.userState.session.data_cart.data[ws_objects[i]]["workspace_name"], 
-                                               $scope.options.userState.selectedWorkspace);                    
+                                               $scope.options.userState.session.selectedWorkspace);                    
                     }
                     else if ($scope.options.userState.session.data_cart.data[ws_objects[i]].hasOwnProperty("object_id") === true) {
-                        //console.log($scope.options.userState.session.data_cart.data[ws_objects[i]]);
+                        console.log($scope.options.userState.session.data_cart.data[ws_objects[i]]);
 
                         $scope.workspace_service.get_object_info([{"name": $scope.options.userState.session.data_cart.data[ws_objects[i]]["object_id"], "workspace": $scope.options.userState.session.data_cart.data[ws_objects[i]]["workspace_name"]}])
                             .fail(function (xhr, status, error) {
@@ -1430,7 +1436,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                             });
                     }
                     else {
-                        // create  error popover
+                        // create error popover
                         console.log("no object reference found");
                         return;
                     }
@@ -1464,71 +1470,39 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 });
         }; // end function
 
-        var getObjects = function () {
-            var objects = []; 
-            
-            for (var d in $scope.options.userState.session.data_cart.data) {
-                console.log(d);
-                console.log($scope.options.userState.session.data_cart.data[d]);
-                
-                if ($scope.options.userState.session.data_cart.data[d].object_type.indexOf(".Genome") > -1) {
-                    objects.push({"workspace": $scope.options.userState.session.selectedWorkspace,
-                                  "name": $scope.options.userState.session.data_cart.data[d].genome_id});                
-                }
-                else if ($scope.options.userState.session.data_cart.data[d].object_type.indexOf(".Feature") > -1) {
-                    objects.push({"workspace": $scope.options.userState.session.selectedWorkspace,
-                                  "name": $scope.options.userState.session.data_cart.data[d].feature_id});                                
-                }
-                else {                
-                    objects.push({"workspace": $scope.options.userState.session.selectedWorkspace,
-                                  "name": $scope.options.userState.session.data_cart.data[d].object_name});
+        // check for duplicates
+        console.log("Copying objects...");
+
+        for (var n in $scope.options.userState.session.data_cart.data) {
+            if ($scope.options.userState.session.data_cart.data.hasOwnProperty(n)) {
+                loop_requests.push(n);
+            }
+    
+            if (loop_requests.length === max_simultaneous) {
+                batchCopyRequests(loop_requests);
+                loop_requests = [];                
+            }
+        }
+
+        if (loop_requests.length > 0) {
+            batchCopyRequests(loop_requests);
+            loop_requests = [];
+        }        
+
+        console.log(types);
+        
+        for (var t in types) {
+            if (types.hasOwnProperty(t) && $scope.options.userState.session.data_cart.types[t].hasOwnProperty("all")) {
+                $scope.options.userState.session.data_cart.types[t].all = false;
+            }
+            else if (types.hasOwnProperty(t) && $scope.options.userState.session.data_cart.types[t].hasOwnProperty("subtypes")) {
+                for (var s in $scope.options.userState.session.data_cart.types[t].subtypes) {
+                    if ($scope.options.userState.session.data_cart.types[t].subtypes.hasOwnProperty(s)) {
+                        $scope.options.userState.session.data_cart.types[t].subtypes[s].all = false;            
+                    }
                 }
             }
-            
-            return objects;
-        };
-
-        // check for duplicates
-        $scope.workspace_service.get_object_info_new({"objects": getObjects()})
-            .then(
-            function (results) {
-                console.log(results);
-                
-                $scope.$apply(function () {
-                    for (var i = results.length - 1; i > -1; i--) {
-                        if (results[i]) {
-                            $("#" + results[i][1].replace("|","_")).css('color', 'red');
-                        }
-                    }
-                });
-            },
-            function (error) {
-                console.log(error);
-            }).then(function () {
-                console.log("Copying objects...");
-
-                for (var n in $scope.options.userState.session.data_cart.data) {
-                    if ($scope.options.userState.session.data_cart.data.hasOwnProperty(n)) {
-                        loop_requests.push(n);
-                    }
-            
-                    if (loop_requests.length === max_simultaneous) {
-                        batchCopyRequests(loop_requests);
-                        loop_requests = [];                
-                    }
-                }
-        
-                if (loop_requests.length > 0) {
-                    batchCopyRequests(loop_requests);
-                    loop_requests = [];
-                }        
-        
-                for (var t in types) {
-                    if (types.hasOwnProperty(t)) {
-                        $scope.options.userState.session.data_cart.types[t].all = false;
-                    }
-                }        
-            });
+        }        
     }; // end function
 
     
@@ -1540,11 +1514,11 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     };
 
     $scope.hideTransferCartCheckboxes = function () {
-        $("input .search-data-cart-checkbox").addClass("hidden");
+        angular.element("input .search-data-cart-checkbox").addClass("hidden");
     };
 
     $scope.showTransferCartCheckboxes = function () {
-        $("input.search-data-cart-checkbox").removeClass("hidden");
+        angular.element("input.search-data-cart-checkbox").removeClass("hidden");
     };
 
     $scope.completeTransfer = function() {
@@ -1556,29 +1530,28 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
     $scope.removeSelection = function(n) {
         if (n.object_type.indexOf(".Genome") > -1) {
-            delete $scope.options.userState.session.data_cart.types['genome'].markers[n]; 
+            delete $scope.options.userState.session.data_cart.types['genome'].markers[n.row_id]; 
             $scope.options.userState.session.data_cart.types['genome'].size -= 1; 
         }
         else if (n.object_type.indexOf(".Feature") > -1) {
-            delete $scope.options.userState.session.data_cart.types['feature'].markers[n]; 
+            delete $scope.options.userState.session.data_cart.types['feature'].markers[n.row_id]; 
             $scope.options.userState.session.data_cart.types['feature'].size -= 1;         
         }
         else if (n.object_type.indexOf(".Metagenome") > -1) {
-            delete $scope.options.userState.session.data_cart.types['metagenome'].markers[n]; 
+            delete $scope.options.userState.session.data_cart.types['metagenome'].markers[n.row_id]; 
             $scope.options.userState.session.data_cart.types['metagenome'].size -= 1; 
         }
         else if (n.object_type.indexOf("KBaseGwas") > -1) {
-            delete $scope.options.userState.session.data_cart.types['gwas'].markers[n]; 
+            delete $scope.options.userState.session.data_cart.types['gwas'].markers[n.row_id]; 
             $scope.options.userState.session.data_cart.types['gwas'].size -= 1; 
         }
         else {
             throw Error("Trying to delete unknown type!");        
         }
     
-        delete $scope.options.userState.session.data_cart.data[n];
-        $scope.options.userState.session.data_cart.size -= 1;        
+        delete $scope.options.userState.session.data_cart.data[n.row_id];
+        $scope.options.userState.session.data_cart.size -= 1;  
     };
-    
     
     $scope.emptyCart = function() {
         $scope.options.userState.session.selectAll = {};
@@ -1590,7 +1563,15 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 'genome': {all: false, size: 0, markers: {}},
                 'feature': {all: false, size: 0, markers: {}},
                 'metagenome': {all: false, size: 0, markers: {}},
-                'gwas': {all: false, size: 0, markers: {}}
+                'gwas': {size: 0,
+                         subtypes: {
+                            'gwas_populations': {all: false, size: 0, markers: {}},
+                            'gwas_population_traits': {all: false, size: 0, markers: {}},
+                            'gwas_population_variations': {all: false, size: 0, markers: {}},                            
+                            'gwas_top_variations': {all: false, size: 0, markers: {}},                            
+                            'gwas_gene_lists': {all: false, size: 0, markers: {}}                            
+                            }
+                        }
             }
         };
     };
@@ -1603,7 +1584,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     
     $scope.transferError = function(object_name, object_ref, result) {
         if (!$scope.options.userState.session.transferErrors) {
-            $scope.options.userState.session.tansferErrors = {};
+            $scope.options.userState.session.transferErrors = {};
         }
         $scope.options.userState.session.transferErrors[object_name] = {error: result};        
     };
@@ -1679,11 +1660,38 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 $scope.options.userState.session.data_cart.types['metagenome'].size += 1; 
             }
             else if (item.object_type.indexOf("KBaseGwas") > -1) {
+                if (item.object_type.indexOf(".GwasPopulation-") > -1) {
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_populations'].markers[id] = {}; 
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_populations'].size += 1; 
+                    $scope.options.userState.session.data_cart.types['gwas'].size += 1; 
+                }
+                else if (item.object_type.indexOf(".GwasPopulationVariation-") > -1) {
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_variations'].markers[id] = {}; 
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_variations'].size += 1; 
+                    $scope.options.userState.session.data_cart.types['gwas'].size += 1; 
+                }
+                else if (item.object_type.indexOf(".GwasTopVariations-") > -1) {
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].markers[id] = {}; 
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].size += 1; 
+                    $scope.options.userState.session.data_cart.types['gwas'].size += 1; 
+                }
+                else if (item.object_type.indexOf(".GwasPopulationTrait-") > -1) {
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].markers[id] = {}; 
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].size += 1; 
+                    $scope.options.userState.session.data_cart.types['gwas'].size += 1; 
+                }
+                else if (item.object_type.indexOf(".GwasGeneList-") > -1) {
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].markers[id] = {}; 
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].size += 1; 
+                    $scope.options.userState.session.data_cart.types['gwas'].size += 1; 
+                }
+                else {
+                    throw Error("Unknown GWAS type : " + item.object_type);
+                }
+
                 $scope.options.userState.session.data_cart.size += 1;
                 $scope.options.userState.session.data_cart.data[id] = {};
-                $scope.options.userState.session.data_cart.types['gwas'].markers[id] = {}; 
-                $scope.options.userState.session.data_cart.types['gwas'].size += 1; 
-                
+
                 for (var p in item) {
                     if (item.hasOwnProperty(p)) {
                         $scope.options.userState.session.data_cart.data[id][p] = item[p];
@@ -1691,6 +1699,10 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 }
                 
                 $scope.options.userState.session.data_cart.data[id]["cart_selected"] = false;
+
+
+                console.log($scope.options.userState.session.data_cart.data[id]);
+                console.log($scope.options.userState.session.data_cart.types['gwas']);
             }
             else {
                 throw Error("Trying to add unknown type!");        
@@ -1716,8 +1728,34 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 $scope.options.userState.session.data_cart.types['metagenome'].size -= 1; 
             }
             else if (item.object_type.indexOf("KBaseGwas") > -1) {
-                delete $scope.options.userState.session.data_cart.types['gwas'].markers[id]; 
-                $scope.options.userState.session.data_cart.types['gwas'].size -= 1; 
+                if (item.object_type.indexOf(".GwasPopulation-") > -1) {
+                    delete $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_populations'].markers[id];
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_populations'].size -= 1; 
+                    $scope.options.userState.session.data_cart.types['gwas'].size -= 1; 
+                }
+                else if (item.object_type.indexOf(".GwasPopulationVariation-") > -1) {
+                    delete $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_variations'].markers[id];
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_variations'].size -= 1; 
+                    $scope.options.userState.session.data_cart.types['gwas'].size -= 1; 
+                }
+                else if (item.object_type.indexOf(".GwasTopVariations-") > -1) {
+                    delete $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].markers[id];
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].size -= 1; 
+                    $scope.options.userState.session.data_cart.types['gwas'].size -= 1; 
+                }
+                else if (item.object_type.indexOf(".GwasPopulationTrait-") > -1) {
+                    delete $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].markers[id];
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].size -= 1; 
+                    $scope.options.userState.session.data_cart.types['gwas'].size -= 1; 
+                }
+                else if (item.object_type.indexOf(".GwasGeneList-") > -1) {
+                    delete $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].markers[id];
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].size -= 1; 
+                    $scope.options.userState.session.data_cart.types['gwas'].size -= 1; 
+                }
+                else {
+                    throw Error("Unknown GWAS type : " + item.object_type);
+                }
             }
             else {
                 throw Error("Trying to delete unknown type!");        
@@ -1791,6 +1829,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                     }
                 }                    
                 $scope.addSelectedToTransferCart();
+                $scope.isCartInWorkspace();
             }
             else {
                 for (d in $scope.options.userState.session.data_cart.data) {
@@ -1817,26 +1856,54 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                     }
                 }                    
                 $scope.addSelectedToTransferCart();
+                $scope.isCartInWorkspace();
             }    
         }
         else {
-            throw Error("Unrecognized type : " + type);
+            // look for subtypes
+            for (var t in $scope.options.userState.session.data_cart.types) {
+                if ($scope.options.userState.session.data_cart.types.hasOwnProperty(t) && 
+                    $scope.options.userState.session.data_cart.types[t].hasOwnProperty("subtypes") && 
+                    $scope.options.userState.session.data_cart.types[t].subtypes.hasOwnProperty(type)) {
+                    
+                    if ($scope.options.userState.session.data_cart.types[t].subtypes[type].all) {
+                        for (d in $scope.options.userState.session.data_cart.types[t].subtypes[type].markers) {
+                            if ($scope.options.userState.session.data_cart.types[t].subtypes[type].markers.hasOwnProperty(d)) {
+                                $scope.options.userState.session.data_cart.data[d].cart_selected = false;
+                            }
+                        }                    
+                        $scope.emptyTransferCart();
+                        return;
+                    }
+                    else {
+                        for (d in $scope.options.userState.session.data_cart.types[t].subtypes[type].markers) {
+                            if ($scope.options.userState.session.data_cart.types[t].subtypes[type].markers.hasOwnProperty(d)) {
+                                $scope.options.userState.session.data_cart.data[d].cart_selected = true;
+                            }
+                        }                    
+                        $scope.addSelectedToTransferCart();
+                        $scope.isCartInWorkspace();
+                        return;
+                    }                        
+                }
+            }
+            
+            // if we fell through to this point the type specified was not found, throw an error            
+            throw Error("Unrecognized type : " + type);            
         }
     };
 
 
     $scope.toggleInCart = function(id) {
-        //console.log(id);
-        //console.log($scope.options.userState.session.data_cart.data);
-            
         if(!$scope.options.userState.session.data_cart.data[id].cart_selected) {
             $scope.options.userState.session.data_cart.data[id].cart_selected = true;
             $scope.addToTransferCart(id);
+            $scope.isObjectInWorkspace(id);
         }
         else {
             $scope.options.userState.session.data_cart.data[id].cart_selected = false;
             $scope.removeFromTransferCart(id);
-        }            
+        }                    
     };
 
 
@@ -1877,10 +1944,21 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         $scope.options.userState.session.transfer_cart.items = {};
         $scope.options.userState.session.transfer_cart.size = 0;
     };
+    
+    $scope.removeCartSelected = function() {
+        for (var d in $scope.options.userState.session.data_cart.data) {
+            if ($scope.options.userState.session.data_cart.data.hasOwnProperty(d) && $scope.options.userState.session.data_cart.data[d].cart_selected) {
+                //console.log(angular.element("#" + d.replace("|","_").replace(/\./g, "\\\.")));
+                $scope.removeFromTransferCart(d);
+                $scope.removeSelection($scope.options.userState.session.data_cart.data[d]);
+                //angular.element("tr#" + d.replace("|","_").replace(/\./g, "\\\.")).remove();
+            }
+        }
+    };
 
 
     $scope.isActiveTab = function(category) {
-        return ($scope.options.selectedCategory === category) || ($scope.options.data_tabs[category]);
+        return ($scope.options.selectedCategory.indexOf(category) === 0) || ($scope.options.data_tabs[category]);
     };
 
     $scope.setActiveTab = function(category) {
@@ -1895,15 +1973,86 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             return "Type here to perform a search on all data categories.";
         }    
     };
-    
-    
-    $scope.doesObjectExistInWorkspace = function(workspace_name, object_id) {
-        $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.token);
+
+
+    $scope.isCartInWorkspace = function() {
+        $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.longterm.token);
+
+        var objects = []; 
+        var object_map = [];
         
-        //console.log([workspace_name, object_id]);
-        return $scope.workspace_service.get_object_info([{"workspace": workspace_name, "name": object_id}]).then(
-            function (result) {
-                console.log(result);            
+        var i = 0;
+        
+        for (var d in $scope.options.userState.session.data_cart.data) {
+            if ($scope.options.userState.session.data_cart.data[d].object_type.indexOf(".Genome") > -1) {
+                objects.push({"workspace": $scope.options.userState.session.selectedWorkspace,
+                              "name": $scope.options.userState.session.data_cart.data[d].genome_id});                
+            }
+            else if ($scope.options.userState.session.data_cart.data[d].object_type.indexOf(".Feature") > -1) {
+                objects.push({"workspace": $scope.options.userState.session.selectedWorkspace,
+                              "name": $scope.options.userState.session.data_cart.data[d].feature_id});                                
+            }
+            else {                
+                objects.push({"workspace": $scope.options.userState.session.selectedWorkspace,
+                              "name": $scope.options.userState.session.data_cart.data[d].object_name});
+            }
+            
+            object_map[i] = d;
+            i += 1;
+        }
+        
+        return $scope.workspace_service.get_object_info_new({"objects": objects, "ignoreErrors": 1})
+            .then(
+            function (results) {
+                $scope.$apply(function () {
+                    for (var i = object_map.length - 1; i > -1; i--) {
+                        if (results[i] !== null) {
+                            $scope.options.duplicates[object_map[i]] = {};
+                        }
+                        else {
+                            delete $scope.options.duplicates[object_map[i]];
+                        }
+                    }
+                });
+            },
+            function (error) {
+                console.log(error);
+            });
+    };        
+
+
+    
+    
+    $scope.isObjectInWorkspace = function(id) {
+        $scope.workspace_service = searchKBaseClientsService.getWorkspaceClient($scope.options.userState.longterm.token);
+
+        var checkObject;
+
+        if ($scope.options.userState.session.data_cart.data[id].object_type.indexOf(".Genome") > -1) {
+            checkObject = {"workspace": $scope.options.userState.session.selectedWorkspace,
+                           "name": $scope.options.userState.session.data_cart.data[id].genome_id};                
+        }
+        else if ($scope.options.userState.session.data_cart.data[id].object_type.indexOf(".Feature") > -1) {
+            checkObject = {"workspace": $scope.options.userState.session.selectedWorkspace,
+                           "name": $scope.options.userState.session.data_cart.data[id].feature_id};                                
+        }
+        else {                
+            checkObject = {"workspace": $scope.options.userState.session.selectedWorkspace,
+                           "name": $scope.options.userState.session.data_cart.data[id].object_name};
+        }
+        
+        return $scope.workspace_service.get_object_info_new({"objects": [checkObject], "ignoreErrors": 1}).then(
+            function (results) {
+                console.log(results);
+            
+                $scope.$apply(function () {
+                    if (results[0] !== null) {
+                        $scope.options.duplicates[id] = {};
+                    }
+                    else {
+                        delete $scope.options.duplicates[id];
+                    }
+                });
             },
             function (error) {
                 console.log(error);

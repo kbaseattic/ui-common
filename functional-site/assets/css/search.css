@@ -338,6 +338,19 @@ table.search-transfer-table {
     display: block;
 }
 
+.table-striped > tbody > tr.search-duplicate-row > td {
+    background-color: #6f5499;
+    color: white;
+}
+
+.search-duplicate-icon {
+    width: 15px;
+    height: 15px;
+    background-color: #6f5499;
+    display: inline-block;
+    margin-right: 10px;
+}
+
 .progress-bar {
     width: 0%;
 }
@@ -357,6 +370,10 @@ table.search-transfer-table {
     line-height: 1.0;
 }
 
+.search-cart-count {
+    position: relative;
+    bottom: 4px;
+}
 
 /*** Results ***/
 
