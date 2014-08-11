@@ -306,9 +306,12 @@ angular.module('ws-directives')
                 var body = $('<form class="form-horizontal" role="form">\
                                   <div class="form-group">\
                                     <label class="col-sm-5 control-label">New Workspace Name</label>\
-                                    <div class="col-sm-4">\
-                                      <input type="text" class="form-control new-ws-id">\
-                                    </div>\
+                                    <div class="col-sm-6">'+
+                                        '<div class="input-group">'+
+                                            '<span class="input-group-addon">'+USER_ID+':</span>'+
+                                            '<input type="text" class="form-control new-ws-id focusedInput">'+
+                                        '</div>'+
+                                    '</div>\
                                   </div>\
                                   <div class="form-group">\
                                     <label class="col-sm-5 control-label">Global Permission</label>\
@@ -351,7 +354,23 @@ angular.module('ws-directives')
                                         $prompt.addAlert('must enter');
                                         $('.new-ws-id').focus();
                                         return;
-                                    }                   
+                                    }
+
+                                    // check to see if there's a colon in the user project name already
+                                    // if there is and it's the user's username, use it. If it's not throw error.
+                                    // Otherwise, append "username:"
+                                    var s_ws = ws_name.split(':');
+                                    var error;
+                                    if (s_ws.length > 1) {
+                                        if (s_ws[0] == USER_ID) {
+                                            var proj = USER_ID+':'+s_ws[1];
+                                        }  else {
+                                            error = 'Only your username ('+USER_ID+') may be used before a colon';
+                                            
+                                        }
+                                    } else {
+                                        var name = USER_ID+':'+ws_name
+                                    }                                                             
 
                                     var prom = kb.ws.clone_workspace(params);
                                     $prompt.addCover()
@@ -2537,9 +2556,12 @@ angular.module('ws-directives')
                 var body = $('<form class="form-horizontal" role="form">\
                                   <div class="form-group">\
                                     <label class="col-sm-5 control-label">New Workspace Name</label>\
-                                    <div class="col-sm-4">\
-                                      <input type="text" class="form-control new-ws-id">\
-                                    </div>\
+                                    <div class="col-sm-6">'+
+                                        '<div class="input-group">'+
+                                            '<span class="input-group-addon">'+USER_ID+':</span>'+
+                                            '<input type="text" class="form-control new-ws-id focusedInput">'+
+                                        '</div>'+
+                                    '</div>\
                                   </div>\
                                   <div class="form-group">\
                                     <label class="col-sm-5 control-label">Global Permission</label>\
@@ -2582,7 +2604,24 @@ angular.module('ws-directives')
                                         $prompt.addAlert('must enter');
                                         $('.new-ws-id').focus();
                                         return;
-                                    }                   
+                                    }
+
+
+                                    // check to see if there's a colon in the user project name already
+                                    // if there is and it's the user's username, use it. If it's not throw error.
+                                    // Otherwise, append "username:"
+                                    var s_ws = ws_name.split(':');
+                                    var error;
+                                    if (s_ws.length > 1) {
+                                        if (s_ws[0] == USER_ID) {
+                                            var proj = USER_ID+':'+s_ws[1];
+                                        }  else {
+                                            error = 'Only your username ('+USER_ID+') may be used before a colon';
+                                            
+                                        }
+                                    } else {
+                                        var name = USER_ID+':'+ws_name
+                                    }                                                 
 
                                     var prom = kb.ws.clone_workspace(params);
                                     $prompt.addCover()
