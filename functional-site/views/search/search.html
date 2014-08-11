@@ -162,8 +162,8 @@
                             </table>
                         </div>                                    
                     </div>
-                    <div class="col-md-12 col-lg-12 search-results" ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0 && options.categoryRelationships[options.selectedCategory].children.length == 0"> 
-                        <div class="col-md-12 col-lg-12 search-result-set-header" ng-show="options.resultJSON.totalResults > 0"> <!-- result options -->
+                    <div class="col-md-12 col-lg-12 search-results" ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0"> 
+                        <div class="col-md-12 col-lg-12 search-result-set-header" ng-show="options.resultJSON.totalResults > 0 && options.categoryRelationships[options.selectedCategory].children.length == 0"> <!-- result options -->
                             <div class="col-md-12 search-results-counter">
                                 <div>
                                     <span><strong>{{ 1 + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }}-{{ options.resultJSON.itemCount + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }} out of {{ options.resultJSON.totalResults | number }} results for {{options.searchCategories[options.selectedCategory].label}}</strong></span>
@@ -198,7 +198,7 @@
                         </div> <!-- end result options -->
                         <div class="col-md-12 col-lg-12">
                             <!-- our output should go here normally -->
-                            <div ng-show="options.resultJSON.totalResults > 0" class="search-results-content-area" ng-include="options.templates[options.selectedCategory].root"></div> 
+                            <div ng-show="options.resultJSON.totalResults > 0 || options.categoryRelationships[options.selectedCategory].children.length > 0 && getTotalCount() > 0" class="search-results-content-area" ng-include="options.templates[options.selectedCategory].root"></div> 
 
                             <!-- pagination controls should be at the bottom to slow down page requests through the UI -->
                             <div class="text-center search-results-content-area" ng-show="options.categoryRelationships[options.selectedCategory].children.length == 0">

@@ -115,10 +115,6 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
     };
 
 
-    console.log(sessionStorage.searchUserState.prototype);
-    console.log(_sessionUserData.prototype);
-    console.log(sessionStorage.searchUserState.prototype === _sessionUserData.prototype);
-
     if (!sessionStorage.hasOwnProperty("searchUserState") || (!sessionStorage.searchUserState.version || sessionStorage.searchUserState.version < _sessionUserData.version)) {
         sessionStorage.setItem("searchUserState", JSON.stringify(_sessionUserData));
     }    
