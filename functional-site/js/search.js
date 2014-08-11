@@ -1313,7 +1313,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                                 feature_dest_obj[p] = [];
                                 for (var k in feature_source_obj[p]) {
                                     if (feature_source_obj[p].hasOwnProperty(k)) {
-                                        feature_dest_obj[p].push(k + ":" + feature_source[p][k])
+                                        feature_dest_obj[p].push(k + ":" + feature_source_obj[p][k])
                                     }                                
                                 }
                             }
