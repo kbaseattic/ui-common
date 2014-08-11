@@ -229,17 +229,19 @@
 										if ($(this).hasClass('pickedFromTile')) {
 											$(this).removeClass('pickedFromTile')
 											$.each(block.terms, function(i,d) {
-												barChartSelector = d.replace(/\s+/g, '').replace(/,/g,'')											
-												$("#"+barChartSelector).removeClass('pickedFromTile')
+												barChartSelector = d.replace(/\s+/g, '').replace(/,/g,'')	
+												temp = selectionHandler.indexOf(barChartSelector)
+												selectionHandler.splice(temp,1)
+												if (selectionHandler.indexOf(barChartSelector)==-1) $("#"+barChartSelector).removeClass('pickedFromTile')
 												d3.select("#"+barChartSelector).style("background", "steelblue")
 												if (!$("#"+barChartSelector).hasClass('pickedFromBar')) d3.select("#"+barChartSelector).style("background", "#F08A04")
 												if (!$("#"+barChartSelector).hasClass('currentTerms')) d3.select("#"+barChartSelector).style("background", "#99FFCC")
 											})
 										}
 										else {
-											$(this).addClass('pickedFromTile')																			
-										
+											$(this).addClass('pickedFromTile')																													
 											$.each(block.terms, function(i,d) {
+												selectionHandler.push(barChartSelector)
 												if (!$("#"+barChartSelector).hasClass('pickedFromTile')) $("#"+barChartSelector).addClass('pickedFromTile')
 												if (!$("#"+barChartSelector).hasClass('currentTerms')) $("#"+barChartSelector).addClass('currentTerms')
 												else $("#"+barChartSelector).removeClass('currentTerms')
