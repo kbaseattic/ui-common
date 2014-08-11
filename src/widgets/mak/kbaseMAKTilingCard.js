@@ -42,7 +42,7 @@
             
             var self = this;
 			
-			$instructions = $("<b><i>Click on a tile, selection will be <span style='color:#99FFCC'>aqua</span>. Mouse over highlighting is <span style='color:#00CCFF'>light steel blue</span>.</i></b>")
+			$instructions = $("<p><b><i>Click on a tile, selection will be <span style='color:#99FFCC'>aqua</span>. Previously selected tiles will be <span style='color:#00CCFF'>light blue</span>, select them again once to restore them.</i></b></p><p><b><i>Bicluster tiles which contain bar terms that are selected on the right will be <span style='color:#F08A04'>orange</span>.</i></b></p>")
 			self.$elem.append($instructions)	
 			$tilingDiv = $("<div id='tilingDiv' style='overflow:auto;height:450px;resize:vertical;position:relative'/>")
 			self.$elem.append($tilingDiv)
@@ -225,46 +225,51 @@
 									}
 								)
 								.on("click",
-									function(d) {
+									function(d) {										
 										if ($(this).hasClass('pickedFromTile')) {
 											$(this).removeClass('pickedFromTile')
-										}
-										else {
-											$(this).addClass('pickedFromTile')
-										}																				
-										
-										$.each(block.terms, function(i,d) {
-											barChartSelector = d.replace(/\s+/g, '').replace(/,/g,'')
-											if (!$("#"+barChartSelector).hasClass('pickedFromTile')) $("#"+barChartSelector).addClass('pickedFromTile')
-											else $("#"+barChartSelector).removeClass('pickedFromTile')
-											if (!$("#"+barChartSelector).hasClass('currentTerms')) $("#"+barChartSelector).addClass('currentTerms')
-											else $("#"+barChartSelector).removeClass('currentTerms')
-											d3.select("#"+barChartSelector).style("background", "#99FFCC");
-										})
-											
-										d3.select(".currentHeatmap").style("background", "steelblue");
-										if ($(".currentHeatmap").hasClass("pickedFromBar")) d3.select(".currentHeatmap").style("background", "#F08A04")
-										if ($(".currentHeatmap").hasClass("pickedFromTile")) d3.select(".currentHeatmap").style("background", "#00CCFF")
-										d3.select(this).style("background", "#99FFCC")
-										
-										$(".currentHeatmap").removeClass('currentHeatmap')									
-										$(this).addClass('currentHeatmap') 	
-										
-										if (previousTerms.length) {
-											$.each(previousTerms, function(i,d) {
-												barChartSelector = d.replace(/\s+/g, '').replace(/,/g,'')
-												var origColor = d3.select("#"+barChartSelector).attr("class")
-												temp = origColor.indexOf(' ')
-												if (temp != -1) origColor = origColor.substring(0,temp)
-												d3.select("#"+barChartSelector).style("background",origColor)
-												if ($("#"+barChartSelector).hasClass('currentTerms')) $("#"+barChartSelector).removeClass('currentTerms')
-												if ($("#"+barChartSelector).hasClass('pickedFromBar')) d3.select("#"+barChartSelector).style("background","#F08A04")
-												if ($("#"+barChartSelector).hasClass('pickedFromTile')) d3.select("#"+barChartSelector).style("background","#00CCFF")
+											$.each(block.terms, function(i,d) {
+												barChartSelector = d.replace(/\s+/g, '').replace(/,/g,'')											
+												$("#"+barChartSelector).removeClass('pickedFromTile')
+												d3.select("#"+barChartSelector).style("background", "steelblue")
+												if (!$("#"+barChartSelector).hasClass('pickedFromBar')) d3.select("#"+barChartSelector).style("background", "#F08A04")
+												if (!$("#"+barChartSelector).hasClass('currentTerms')) d3.select("#"+barChartSelector).style("background", "#99FFCC")
 											})
 										}
+										else {
+											$(this).addClass('pickedFromTile')																			
 										
-										previousTile = this
-										previousTerms = block.terms
+											$.each(block.terms, function(i,d) {
+												if (!$("#"+barChartSelector).hasClass('pickedFromTile')) $("#"+barChartSelector).addClass('pickedFromTile')
+												if (!$("#"+barChartSelector).hasClass('currentTerms')) $("#"+barChartSelector).addClass('currentTerms')
+												else $("#"+barChartSelector).removeClass('currentTerms')
+												d3.select("#"+barChartSelector).style("background", "#99FFCC");
+											})
+												
+											d3.select(".currentHeatmap").style("background", "steelblue");
+											if ($(".currentHeatmap").hasClass("pickedFromBar")) d3.select(".currentHeatmap").style("background", "#F08A04")
+											if ($(".currentHeatmap").hasClass("pickedFromTile")) d3.select(".currentHeatmap").style("background", "#00CCFF")
+											d3.select(this).style("background", "#99FFCC")
+											
+											$(".currentHeatmap").removeClass('currentHeatmap')									
+											$(this).addClass('currentHeatmap') 	
+											
+											if (previousTerms.length) {
+												$.each(previousTerms, function(i,d) {
+													barChartSelector = d.replace(/\s+/g, '').replace(/,/g,'')
+													var origColor = d3.select("#"+barChartSelector).attr("class")
+													temp = origColor.indexOf(' ')
+													if (temp != -1) origColor = origColor.substring(0,temp)
+													d3.select("#"+barChartSelector).style("background",origColor)
+													if ($("#"+barChartSelector).hasClass('currentTerms')) $("#"+barChartSelector).removeClass('currentTerms')
+													if ($("#"+barChartSelector).hasClass('pickedFromBar')) d3.select("#"+barChartSelector).style("background","#F08A04")
+													if ($("#"+barChartSelector).hasClass('pickedFromTile')) d3.select("#"+barChartSelector).style("background","#00CCFF")
+												})
+											}
+											
+											previousTile = this
+											previousTerms = block.terms
+										}
 
 									}
 								)

@@ -138,7 +138,7 @@
 						}
 					)
 				
-			$instructions = $("<b><i>Click on a term bar, selections will be <span style='color:#F08A04'>orange</span>.</i></b>")
+			$instructions = $("<p><b><i>Click on a term bar, selections will be <span style='color:#F08A04'>orange</span>.</i></b></p><p><b><i>Selections from the bicluster tiles that contain terms in this chart will highlight the corresponding term(s) <span style='color:#00CCFF'>light blue</span>.</i></b></p>")
 			self.$elem.append($instructions)	
 			self.$elem.append($mainDiv)
 			
