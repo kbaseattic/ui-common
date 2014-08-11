@@ -233,6 +233,10 @@ span .badge {
     color: gray;
 }
 
+.search-filter-remove-button {
+    margin-bottom: 10px;
+}
+
 .search-filter-groups {
     margin-bottom: 10px;
 }
@@ -272,6 +276,10 @@ a.search-filter-link:link { color: #6f5499; }
 a.search-filter-link:hover { color: #6f5499; }
 a.search-filter-link:active { color: #6f5499; }
 a.search-filter-link:visited { color: #6f5499; }
+
+.panel-title.search-filter-title {
+    font-size: 12px;
+}
 
 .glyphicon-large {
     font-size: large;

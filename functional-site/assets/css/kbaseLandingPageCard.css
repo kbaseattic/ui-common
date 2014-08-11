@@ -36,6 +36,8 @@
 	background-position: -80px -128px;
 }
 
+.no-close .ui-dialog-titlebar-close { display: none; }
+
 .ui-widget-content a {
 	color: #428bca;
 }

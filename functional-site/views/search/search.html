@@ -80,18 +80,26 @@
                 <div ng-show="options.facets">
                     <div class='text-center search-filters-title'>
                         <h3 data-toggle="tooltip" data-placement="right" tooltip="Select options to help narrow your search results." tooltip-placement="right">Filters</h3>                    
+                        <button type="button" class="btn btn-danger btn-xs search-filter-remove-button" ng-click="removeAllFacets()" ng-if="options.active_facets[options.selectedCategory] && Object.keys(options.active_facets[options.selectedCategory]).length > 0" data-toggle="tooltip" data-placement="top" tooltip="Use this button to remove all the filters you have selected." tooltip-placement="top"><span class="glyphicon glyphicon-remove"></span></button>
                     </div>
                     <div class="col-xs-offset-1 search-leftarea-size search-filter-groups">
                         <div id="{{facet.key}}" class="panel-group" ng-repeat="facet in options.facets">                            
                             <div class="panel panel-filter-content">
                                 <div class="panel-heading panel-filter-heading">
-                                    <h4 class="panel-title" data-toggle="tooltip" data-placement="right" tooltip="{{facet.key}}" tooltip-placement="right>
+                                    <div ng-if="facet.key.length > 23" class="panel-title search-filter-title" data-toggle="tooltip" data-placement="right" tooltip="{{facet.key}}" tooltip-placement="right">
                                         <a type="button" class="search-filter-link" data-toggle="collapse" data-parent="#{{facet.key}}" href="#{{facet.key}}_panel" onclick="return false;" ng-click="toggleFacetPanel(facet.key)">
-                                            <span>{{facet.key | limitTo: 23}}</span>
+                                            <span>{{facet.key | limitTo: 20}}...</span>
                                             <span ng-if="options.searchOptions.perCategory[options.selectedCategory]['facets'] && options.active_facets[options.selectedCategory][facet.key]" class="badge search-filter-count-badge">{{Object.keys(options.active_facets[options.selectedCategory][facet.key]).length}}</span>
                                             <span class="glyphicon glyphicon-large search-filter-collapse-icon pull-right" ng-class="{'glyphicon-collapse-down': !options.open_facet_panels[options.selectedCategory] || !options.open_facet_panels[options.selectedCategory][facet.key], 'glyphicon-collapse-up': options.open_facet_panels[options.selectedCategory][facet.key]}"></span>
                                         </a>                                        
-                                    </h4>                                    
+                                    </div>
+                                    <div ng-if="facet.key.length <= 23" class="panel-title search-filter-title">
+                                        <a type="button" class="search-filter-link" data-toggle="collapse" data-parent="#{{facet.key}}" href="#{{facet.key}}_panel" onclick="return false;" ng-click="toggleFacetPanel(facet.key)">
+                                            <span>{{facet.key}}</span>
+                                            <span ng-if="options.searchOptions.perCategory[options.selectedCategory]['facets'] && options.active_facets[options.selectedCategory][facet.key]" class="badge search-filter-count-badge">{{Object.keys(options.active_facets[options.selectedCategory][facet.key]).length}}</span>
+                                            <span class="glyphicon glyphicon-large search-filter-collapse-icon pull-right" ng-class="{'glyphicon-collapse-down': !options.open_facet_panels[options.selectedCategory] || !options.open_facet_panels[options.selectedCategory][facet.key], 'glyphicon-collapse-up': options.open_facet_panels[options.selectedCategory][facet.key]}"></span>
+                                        </a>                                        
+                                    </div>                                    
                                 </div>
                                 <div id="{{facet.key}}_panel" class="panel-collapse collapse">
                                     <div ng-show="facet_option.value > 0" ng-repeat="facet_option in facet.value" class="row filter-section">
@@ -154,8 +162,8 @@
                             </table>
                         </div>                                    
                     </div>
-                    <div class="col-md-12 col-lg-12 search-results"> 
-                        <div ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0 && options.categoryRelationships[options.selectedCategory].children.length == 0" class="col-md-12 col-lg-12 search-result-set-header"> <!-- result options -->
+                    <div class="col-md-12 col-lg-12 search-results" ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0 && options.categoryRelationships[options.selectedCategory].children.length == 0"> 
+                        <div class="col-md-12 col-lg-12 search-result-set-header" ng-show="options.resultJSON.totalResults > 0"> <!-- result options -->
                             <div class="col-md-12 search-results-counter">
                                 <div>
                                     <span><strong>{{ 1 + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }}-{{ options.resultJSON.itemCount + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }} out of {{ options.resultJSON.totalResults | number }} results for {{options.searchCategories[options.selectedCategory].label}}</strong></span>
@@ -168,7 +176,7 @@
                                     -->
                                 </div>
                             </div>
-                            <div class="colmd-12 search-results-toolbar">
+                            <div class="col-md-12 search-results-toolbar">
                                 <div class="btn-group btn-group-xs col-xs-2 search-view-buttons" data-toggle="buttons">
                                     <label for="list_view" class="control-label input-group">Views</label>
                                     <label data-toggle="tooltip" data-placement="left" tooltip="Compact results" tooltip-placement="left" class="btn btn-xs btn-default" ng-class="{'active': options.userState.session.viewType == 'compact'}" ng-click="setView('compact')">
@@ -188,13 +196,13 @@
                                 </div>
                             </div> <!-- end toolbar row -->
                         </div> <!-- end result options -->
-                        <div ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0" class="col-md-12 col-lg-12">
+                        <div class="col-md-12 col-lg-12">
                             <!-- our output should go here normally -->
-                            <div class="search-results-content-area" ng-include="options.templates[options.selectedCategory].root"></div> 
+                            <div ng-show="options.resultJSON.totalResults > 0" class="search-results-content-area" ng-include="options.templates[options.selectedCategory].root"></div> 
 
                             <!-- pagination controls should be at the bottom to slow down page requests through the UI -->
-                            <div class="text-center search-results-content-area">
-                                <ul ng-show="options.categoryRelationships[options.selectedCategory].children.length == 0" class="pagination" ng-class="{'fixed-pagination': options.resultJSON.totalResults <= options.pageLinksRange.length * options.resultJSON.itemsPerPage,'small-pagination': options.resultJSON.totalResults > options.numPageLinks && options.resultJSON.currentPage - options.numPageLinks <= 0,'large-pagination': options.resultJSON.currentPage - options.numPageLinks > 0 }">
+                            <div class="text-center search-results-content-area" ng-show="options.categoryRelationships[options.selectedCategory].children.length == 0">
+                                <ul class="pagination" ng-class="{'fixed-pagination': options.resultJSON.totalResults <= options.pageLinksRange.length * options.resultJSON.itemsPerPage,'small-pagination': options.resultJSON.totalResults > options.numPageLinks && options.resultJSON.currentPage - options.numPageLinks <= 0,'large-pagination': options.resultJSON.currentPage - options.numPageLinks > 0 }">
                                     <li ng-if="options.resultJSON.currentPage - options.numPageLinks > 0">
                                         <a ng-click="setCurrentPage(options.pageLinksRange[0] - 1)">&larr; Previous {{options.numPageLinks}}</a>
                                     </li>

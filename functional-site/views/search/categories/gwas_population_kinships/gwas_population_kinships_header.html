@@ -52,9 +52,9 @@
         </li>
     </ul>
 </div>
-<div class="btn-group search-result-column-header col-xs-1 col-sm-1 col-md-1 col-lg-1 source_genome_name_header">
+<div class="btn-group search-result-column-header col-xs-1 col-sm-1 col-md-1 col-lg-1 gwas-source-header">
     <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
-        <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['source_genome_name']}"><strong>Trait</strong></div>
+        <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['source_genome_name']}"><strong>Source Name</strong></div>
         <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['source_genome_name'], 'glyphicon-sort-by-order': options.active_sorts[options.selectedCategory].sorts['source_genome_name'].direction == 'asc', 'glyphicon-sort-by-order-alt': options.active_sorts[options.selectedCategory].sorts['source_genome_name'].direction == 'desc'}"></span>                
         <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['source_genome_name'].order}}</span>
     </button>

@@ -619,9 +619,12 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                       $scope.options.pageLinksRange.push(p);                      
                   }                  
 
+                  if ($scope.options.resultJSON.items.length > 0) {
+                      $scope.options.currentItemRange = $scope.options.resultJSON.items[0].position + "-" + $scope.options.resultJSON.items[$scope.options.resultJSON.items.length - 1].position;
+                  }
+
                   $scope.options.currentURL = $state.href("search", $stateParams, {absolute: true});
-                  $scope.options.currentItemRange = $scope.options.resultJSON.items[0].position + "-" + $scope.options.resultJSON.items[$scope.options.resultJSON.items.length - 1].position;
-                           
+
                   console.log($scope.options.resultJSON);     
                   $.unblockUI();
               }, function (error) {
@@ -715,7 +718,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                   for (var i = 0; i < facetSplit.length; i++) {
                       facet_keyval = facetSplit[i].split(":");                      
                       
-                      $scope.addFacet(facet_keyval[0],facet_keyval[1].replace("*",","), false);
+                      $scope.addFacet(facet_keyval[0],facet_keyval[1].replace("*",",").replace('^',':'), false);
                   }                
             }
             else {
@@ -842,7 +845,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 oldFilter = $scope.options.searchOptions.perCategory[category][type].indexOf(name);
             }
             else if (type === "facets") {
-                oldFilter = $scope.options.searchOptions.perCategory[category][type].indexOf(name + ":" + value.replace(",","*"));
+                oldFilter = $scope.options.searchOptions.perCategory[category][type].indexOf(name + ":" + value.replace(",","*").replace(":","^"));
             }
         
             var nextComma = $scope.options.searchOptions.perCategory[category][type].indexOf(",");
@@ -1002,12 +1005,14 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         return !angular.element("#" + key + "_panel").hasClass("in");
     };
 
-    $scope.addFacet = function (name, value, searchAgain) {        
+    $scope.addFacet = function (name, value, searchAgain) {  
+        console.log([name, value]);
+          
         if (!$scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
-            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets = name + ":" + value.replace(",","*");
+            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets = name + ":" + value.replace(",","*").replace(":","^");
         }
         else {
-            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets += "," + name + ":" + value.replace(",","*");        
+            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets += "," + name + ":" + value.replace(",","*").replace(":","^");        
         }        
     
         if (!$scope.options.active_facets.hasOwnProperty($scope.options.selectedCategory)) {        
@@ -1019,6 +1024,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         }
         
         $scope.options.active_facets[$scope.options.selectedCategory][name][value] = true;        
+
+        console.log($scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets);
 
         if (searchAgain === undefined || searchAgain === true) {
             $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);        
@@ -1032,8 +1039,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 
         delete $scope.options.active_facets[$scope.options.selectedCategory][name][value];
         
-        if ($.isEmptyObject($scope.options.active_facets[$scope.options.selectedCategory].name)) {
-            delete $scope.options.active_facets[$scope.options.selectedCategory].name;
+        if ($.isEmptyObject($scope.options.active_facets[$scope.options.selectedCategory][name])) {
+            delete $scope.options.active_facets[$scope.options.selectedCategory][name];
         }
     
         if (!$scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
@@ -1041,6 +1048,42 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         }
 
         if (searchAgain === undefined || searchAgain === true) {
+            $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);        
+            $state.go("search", {category: $scope.options.selectedCategory, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
+        }
+    };
+
+
+    $scope.removeAllFacets = function () {
+        var changed = false;
+    
+        console.log($scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets);
+    
+        for (var name in $scope.options.active_facets[$scope.options.selectedCategory]) {
+            console.log(name);
+        
+            if ($scope.options.active_facets[$scope.options.selectedCategory].hasOwnProperty(name)) {
+                console.log(name);
+                for (var value in $scope.options.active_facets[$scope.options.selectedCategory][name]) {
+                    console.log(value);
+                    if ($scope.options.active_facets[$scope.options.selectedCategory][name].hasOwnProperty(value)) {
+                        console.log(value);
+                        $scope.removeSearchFilter($scope.options.selectedCategory, "facets", name, value);
+                        changed = true;
+                    }
+                }
+                delete $scope.options.active_facets[$scope.options.selectedCategory][name];
+
+                if (!$scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
+                    $scope.options.active_facets[$scope.options.selectedCategory] = {};
+                }
+            }            
+        }
+        
+        console.log(changed);
+        console.log($scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets);
+        
+        if (changed) {
             $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);        
             $state.go("search", {category: $scope.options.selectedCategory, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
         }

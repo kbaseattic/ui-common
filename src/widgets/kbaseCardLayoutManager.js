@@ -1033,16 +1033,16 @@
          * Template to show GWAS traits data
          */
         showGWASTraitCards: function() {
-            this.addNewCard("KBaseGWASTraitMaps",
+            var traitMapCard = this.addNewCard("KBaseGWASTraitMaps",
                 { id: this.options.data.id, ws: this.options.data.ws},
-                { my: "left top",
-                  at: "left bottom",
+                { my: "left top-10",
+                  at: "left-40 bottom",
                   of: "#app"});
-            this.addNewCard("KBaseGWASTraitTable",
+            var traiTableCard = this.addNewCard("KBaseGWASTraitTable",
                 { id: this.options.data.id, ws: this.options.data.ws},
-                { my: "left top",
-                  at: "left bottom+600",
-                  of: "#app"});
+                { my: "left top+15",
+                  at: "left+4 middle",
+                  of: traitMapCard});
         },
 
         /**

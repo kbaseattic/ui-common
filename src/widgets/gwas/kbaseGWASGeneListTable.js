@@ -7,7 +7,7 @@
         options: {
             width: window.innerWidth - 0.05*window.innerWidth,
             height: window.innerHeight - 80,
-            type: "KBaseGwasData.GwasGeneList-1.0"
+            type: "KBaseGwasData.GwasGeneList"
         },
         workspaceURL: "https://kbase.us/services/ws/",
 
