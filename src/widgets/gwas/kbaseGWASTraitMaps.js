@@ -6,7 +6,9 @@
         options: {
             type: "KBaseGwasData.GwasPopulationTrait",
             width: window.innerWidth - 60,
-            height: (window.innerHeight - 80)/2
+            height: (window.innerHeight - 80)/2,
+            resizable: false,
+            draggable: false
         },
 
         workspaceURL: "https://kbase.us/services/ws/",

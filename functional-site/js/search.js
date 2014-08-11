@@ -68,8 +68,8 @@ searchApp.service('searchKBaseClientsService', function($q, $http, $rootScope) {
  *  are housed in local storage for persistence.
  */
 searchApp.service('searchOptionsService', function searchOptionsService() {
-    var genomesWorkspace = "KBasePublicGenomesV3";
-    var searchGenomesWorkspace = "KBasePublicRichGenomesV3";
+    var genomesWorkspace = "KBasePublicGenomesV4";
+    var searchGenomesWorkspace = "KBasePublicRichGenomesV4";
     var metagenomesWorkspace = "KBasePublicMetagenomes";
 
     // Model data that is specific to each search instance
@@ -91,6 +91,7 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
                             'gwas_populations': {all: false, size: 0, markers: {}},
                             'gwas_population_traits': {all: false, size: 0, markers: {}},
                             'gwas_population_variations': {all: false, size: 0, markers: {}},                            
+                            'gwas_population_kinships': {all: false, size: 0, markers: {}},                            
                             'gwas_top_variations': {all: false, size: 0, markers: {}},                            
                             'gwas_gene_lists': {all: false, size: 0, markers: {}}                            
                             }
@@ -101,7 +102,7 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
             size: 0,
             items: {}                         
         },
-        "version": 0.5
+        "version": 0.6
     };
     
     // Model data that persists for all searches
@@ -113,6 +114,10 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
         "version": 0.3
     };
 
+
+    console.log(sessionStorage.searchUserState.prototype);
+    console.log(_sessionUserData.prototype);
+    console.log(sessionStorage.searchUserState.prototype === _sessionUserData.prototype);
 
     if (!sessionStorage.hasOwnProperty("searchUserState") || (!sessionStorage.searchUserState.version || sessionStorage.searchUserState.version < _sessionUserData.version)) {
         sessionStorage.setItem("searchUserState", JSON.stringify(_sessionUserData));
