@@ -180,6 +180,7 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
                         "feature": "/genes/" + genomesWorkspace + "/",
                         "gwasPopulation": "/KBaseGwasData.GwasPopulation/",
                         "gwasTrait": "/KBaseGwasData.GwasPopulationTrait/",
+                        "gwasKinship": "/KBaseGwasData.GwasPopulationKinship/",
                         "gwasTopVariation": "/KBaseGwasData.GwasTopVariations/",
                         "gwasVariation": "/KBaseGwasData.GwasPopulationVariation/",
                         "gwasGeneList": "/KBaseGwasData.GwasGeneList/",
@@ -1577,6 +1578,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                             'gwas_populations': {all: false, size: 0, markers: {}},
                             'gwas_population_traits': {all: false, size: 0, markers: {}},
                             'gwas_population_variations': {all: false, size: 0, markers: {}},                            
+                            'gwas_population_kinships': {all: false, size: 0, markers: {}},                            
                             'gwas_top_variations': {all: false, size: 0, markers: {}},                            
                             'gwas_gene_lists': {all: false, size: 0, markers: {}}                            
                             }
@@ -1689,6 +1691,11 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                     $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].size += 1; 
                     $scope.options.userState.session.data_cart.types['gwas'].size += 1; 
                 }
+                else if (item.object_type.indexOf(".GwasPopulationKinship-") > -1) {
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_kinships'].markers[id] = {}; 
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_kinships'].size += 1; 
+                    $scope.options.userState.session.data_cart.types['gwas'].size += 1; 
+                }
                 else if (item.object_type.indexOf(".GwasGeneList-") > -1) {
                     $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].markers[id] = {}; 
                     $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].size += 1; 
@@ -1755,6 +1762,11 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 else if (item.object_type.indexOf(".GwasPopulationTrait-") > -1) {
                     delete $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].markers[id];
                     $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].size -= 1; 
+                    $scope.options.userState.session.data_cart.types['gwas'].size -= 1; 
+                }
+                else if (item.object_type.indexOf(".GwasPopulationKinship-") > -1) {
+                    delete $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_kinships'].markers[id];
+                    $scope.options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_kinships'].size -= 1; 
                     $scope.options.userState.session.data_cart.types['gwas'].size -= 1; 
                 }
                 else if (item.object_type.indexOf(".GwasGeneList-") > -1) {

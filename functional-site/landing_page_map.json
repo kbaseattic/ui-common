@@ -74,6 +74,7 @@
         "GwasPopulation" : "KBaseGwasData.GwasPopulation",
         "GwasPopulationVariation" : "KBaseGwasData.GwasPopulationVariation",
         "GwasPopulationTrait" : "KBaseGwasData.GwasPopulationTrait",
+        "GwasPopulationKinship" : "KBaseGwasData.GwasPopulationKinship",
         "GwasTopVariation" : "KBaseGwasData.GwasTopVariation",
         "GwasTopVariations" : "KBaseGwasData.GwasTopVariations",
         "GwasGeneList" : "KBaseGwasData.GwasGeneList"
