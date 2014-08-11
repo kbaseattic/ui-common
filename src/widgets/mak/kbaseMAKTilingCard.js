@@ -42,7 +42,7 @@
             
             var self = this;
 			
-			$instructions = $("<p><b><i>Click on a tile, selection will be <span style='color:#99FFCC'>aqua</span>. Previously selected tiles will be <span style='color:#00CCFF'>light blue</span>, select them again once to restore them.</i></b></p><p><b><i>Bicluster tiles which contain bar terms that are selected on the right will be <span style='color:#F08A04'>orange</span>.</i></b></p>")
+			$instructions = $("<p><b><i>Click on a bicluster, the selection will be <span style='color:#99FFCC'>aqua</span>. Previously selected biclusters will be <span style='color:#00CCFF'>light blue</span>. Select them again to deselect.</i></b></p><p><b><i>Selecting terms in the bar chart (right) will color biclusters, which contain the terms <span style='color:#F08A04'>orange</span>.</i></b></p>")
 			self.$elem.append($instructions)	
 			$tilingDiv = $("<div id='tilingDiv' style='overflow:auto;height:450px;resize:vertical;position:relative'/>")
 			self.$elem.append($tilingDiv)
