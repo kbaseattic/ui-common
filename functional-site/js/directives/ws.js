@@ -2777,6 +2777,7 @@ angular.module('ws-directives')
                     "iDisplayLength": 1000,                    
                     "aoColumns": [
                       { "sTitle": "Workspace"},
+                      { "sTitle": "ID"},                      
                       { "sTitle": "Owner"}, //"sWidth": "10%"
                       { "sTitle": "Last Modified", "iDataSort": 4},
                       { "sTitle": "Count"},
@@ -2808,13 +2809,14 @@ angular.module('ws-directives')
                     var timestamp = kb.ui.getTimestamp(data[i][3].split('+')[0]);
                     var date = kb.ui.formateDate(timestamp);
 
+                    var wsid = row[0];
                     var ws = row[1];
                     var count = row[4];
                     total_count = total_count+count;
 
                     var url = "ws.id({ws:'"+ws+"'})";
                     var link = '<a ui-sref="'+url+'" >'+ws+'</a>';
-                    rows.push([link, owner, date, count, timestamp]);
+                    rows.push([link, wsid, owner, date, count, timestamp]);
                 }
                 tableSettings.aaData = rows;
 

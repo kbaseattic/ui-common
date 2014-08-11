@@ -1,75 +1,111 @@
-<div id="newsfeed_inner" >
-    <div id="feed_section" >
-        <div style="overflow: auto;"><h2 class="small pull-left">Featured Narratives </h2>
-            <!-- <span class="glyphicon glyphicon-question-sign pull-left" style="color: #0088CC; font-size: 16px; padding-left: 5px"
-        popover="Featured Narratives are exemplar narratives that demonstrate the types of analyses you can build in the user interface. Click on the title to view a narrative." 
-        popover-trigger="mouseenter"
-        popover-placement="bottom" 
-            ></span> -->
-            </div>
-        <div class="newsfeed_section">
-                
-         <!--   <div newsfeed class="newsfeed_section">
-            </div>
-            -->
-            <p>
-                These Featured Narratives demonstrate some of the types of systems biology questions that can be explored in KBase. The datasets, analyses, and thought processes underlying these computational experiments are captured in the form of an interactive reproducible publication called a Narrative. Click on one of the Featured Narratives to open a read-only version that has already been populated with a summary, input datasets, and output from KBase services that have been run on the input data. </p>
 
-<p>If you'd like to run the steps in these Narratives yourself, or even change them, you can make your own copy of a Narrative. Click on a Narrative name to open it, and then follow the <a target="_blank" href="http://kbase.us/get-started/narrative-quick-start/#copynarrative">instructions here</a> to copy it to your workspace.
 
+<!--<div style="overflow: auto;"><h2 class="small pull-left">Featured Narratives</h2>
+ <span class="glyphicon glyphicon-question-sign pull-left" style="color: #0088CC; font-size: 16px; padding-left: 5px"
+popover="Featured Narratives are exemplar narratives that demonstrate the types of analyses you can build in the user interface. Click on the title to view a narrative." 
+popover-trigger="mouseenter"
+popover-placement="bottom" 
+></span>
+</div>-->
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Featured Narratives</h2>
+        <div copyfeatured>
+            <p>These Featured Narratives demonstrate some of the types of systems biology questions that can be explored in KBase. The datasets, analyses, and thought processes underlying these computational experiments are captured in the form of an interactive reproducible publication called a Narrative. Click on one of the Featured Narratives to open a read-only version that has already been populated with a summary, input datasets, and output from KBase services that have been run on the input data. 
             </p>
-            <BR>
 
+            <p>If you'd like to run the steps in these Narratives yourself, or even change them, you can make your own copy of a Narrative. Click on a Narrative name to open it, and then follow the <a target="_blank" href="http://kbase.us/get-started/narrative-quick-start/#copynarrative">instructions here</a> to copy it to your workspace.
+            </p>
 
+            <br>
+        
             <h4>Microbes</h4>
-            <ul>
-                <li>
-                    <a target="_blank" href="/narrative/ws.2177.obj.8">Genome assembly and annotation</a>
+            <table class="table table-striped featured-nars">
+                <tr>
+                    <td>
+                        <a target="_blank" href="/narrative/ws.2177.obj.8">Genome assembly and annotation</a>
+                    </td>
+                    <td><button class="btn btn-default btn-xs" data-ws="MicrobesFeaturedNarratives" style="visibility: hidden;">Copy</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <a target="_blank" href="/narrative/ws.2177.obj.7">Comparative genomics</a> 
+                    </td>
+                    <td><button class="btn btn-default btn-xs" data-ws="MicrobesFeaturedNarratives" style="visibility: hidden;">Copy</button></td>
                 </li>
-                <li>
-                    <a target="_blank" href="/narrative/ws.2177.obj.7">Comparative genomics</a>
+                <tr>
+                    <td>
+                        <a target="_blank" href="/narrative/ws.2177.obj.9">Metabolic model reconstruction and analysis</a> 
+                    </td>
+                    <td><button class="btn btn-default btn-xs" data-ws="MicrobesFeaturedNarratives" style="visibility: hidden;">Copy</button></td>
                 </li>
-                <li>
-                    <a target="_blank" href="/narrative/ws.2177.obj.9">Metabolic model reconstruction and analysis</a>
+                <tr>
+                    <td>
+                        <a target="_blank" href="/narrative/ws.2177.obj.11">Phenotype simulation and regulatory modeling</a>
+                    </td>
+                    <td><button class="btn btn-default btn-xs" data-ws="MicrobesFeaturedNarratives" style="visibility: hidden;">Copy</button></td>  
                 </li>
-                <li>
-                    <a target="_blank" href="/narrative/ws.2177.obj.11">Phenotype simulation and regulatory modeling</a>
-                </li>
-            </ul>
-<BR>
+            </table>
+
+            <br>
             <h4>Plants</h4>
-            <ul>
-                <li>
-                    <a target="_blank" href="/narrative/ws.2193.obj.86">Discovery of Candidate Genes Regulating Lignin Content in Poplar Using Genome-Wide Association Studies and Network Analysis</a>
-                </li>
-                <li>
-                    <a target="_blank"  href="/narrative/ws.2187.obj.245">Sorghum RNA-Seq Analysis in Response to ABA and Osmotic Stress in Roots and Shoots</a>
-                </li>
-                <li>
-                    <a target="_blank" href="/narrative/ws.2194.obj.1">Coexpression and Network Analysis</a>
-                </li>
-            </ul>
-            <BR>
+            <table class="table table-striped featured-nars">
+                <tr>
+                    <td>
+                        <a target="_blank" href="/narrative/ws.2193.obj.86">Discovery of Candidate Genes Regulating Lignin Content in Poplar Using Genome-Wide Association Studies and Network Analysis</a>
+                    </td>
+                    <td><button class="btn btn-default btn-xs" data-ws="kbasepublic:PlantsGWAS2" style="visibility: hidden;">Copy</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <a target="_blank"  href="/narrative/ws.2187.obj.245">Sorghum RNA-Seq Analysis in Response to ABA and Osmotic Stress in Roots and Shoots</a>
+                    </td>
+                    <td><button class="btn btn-default btn-xs" data-ws="kbasepublic:PlantsGWAS2" style="visibility: hidden;">Copy</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <a target="_blank" href="/narrative/ws.2194.obj.1">Coexpression and Network Analysis</a>
+                    </td>
+                    <td><button class="btn btn-default btn-xs" data-ws="kbasepublic:PlantsGWAS2" style="visibility: hidden;">Copy</button></td>
+                </tr>
+            </table>
+
+            <br>
             <h4>Communities</h4>
-            <ul>
-                <li>
-                    <a target="_blank" href="/narrative/ws.2171.obj.3">Metagenome Shotgun to Functional BIOM Profile</a>
-                </li>
-                <li>
-                    <a target="_blank" href="/narrative/ws.2171.obj.4">Metagenome Shotgun to Taxonomic BIOM Profile</a>
-                </li>
-                <li>
-                    <a target="_blank" href="/narrative/ws.2171.obj.2">Metagenome Shotgun 16Ssubset to Taxonomic BIOM</a>
-                </li>
-                <li>
-                    <a target="_blank" href="/narrative/ws.2171.obj.1">Metagenome Shotgun 16Ssubset PICRUST Function</a>
-                </li>
-            </ul>
-         <!--   <p><b>New Featured Narratives Are Coming Soon!</b></p>
-<p>KBase is currently undergoing a major update. New featured narratives are being developed and will appear here soon.</p>
-<p>In the meantime, you can explore public narratives and narratives that have been shared with you via the tabs to the left. (Tip: Sign in to view the "Mine" and "Shared With Me" tabs.)</p>
-You can also build your own narrative! The <a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start</a> guide, which describes how to create and run narratives, can be found <a href="http://kbase.us/for-users/narrative-quick-start/">here</a>.
--->
-        </div>	
+            <table class="table table-striped featured-nars">
+                <tr>
+                    <td>
+                        <a target="_blank" href="/narrative/ws.2171.obj.3">Metagenome Shotgun to Functional BIOM Profile</a>
+                    </td>
+                    <td><button class="btn btn-default btn-xs" data-ws="kbasepublic:CommunitiesFeaturedNarratives" style="visibility: hidden;">Copy</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <a target="_blank" href="/narrative/ws.2171.obj.4">Metagenome Shotgun to Taxonomic BIOM Profile</a>
+                    </td>
+                    <td><button class="btn btn-default btn-xs" data-ws="kbasepublic:CommunitiesFeaturedNarratives" style="visibility: hidden;">Copy</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <a target="_blank" href="/narrative/ws.2171.obj.2">Metagenome Shotgun 16Ssubset to Taxonomic BIOM</a>
+                    </td>
+                    <td><button class="btn btn-default btn-xs" data-ws="kbasepublic:CommunitiesFeaturedNarratives" style="visibility: hidden;">Copy</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <a target="_blank" href="/narrative/ws.2171.obj.1">Metagenome Shotgun 16Ssubset PICRUST Function</a>
+                    </td>
+                    <td><button class="btn btn-default btn-xs" data-ws="kbasepublic:CommunitiesFeaturedNarratives" style="visibility: hidden;">Copy</button></td>
+                </tr>
+            </table>
+
+
+            <!--   <p><b>New Featured Narratives Are Coming Soon!</b></p>
+            <p>KBase is currently undergoing a major update. New featured narratives are being developed and will appear here soon.</p>
+            <p>In the meantime, you can explore public narratives and narratives that have been shared with you via the tabs to the left. (Tip: Sign in to view the "Mine" and "Shared With Me" tabs.)</p>
+            You can also build your own narrative! The <a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start</a> guide, which describes how to create and run narratives, can be found <a href="http://kbase.us/for-users/narrative-quick-start/">here</a>.
+            -->
+        </div> <!-- end featured narratives -->
     </div>
 </div>

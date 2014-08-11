@@ -1206,3 +1206,26 @@ narrativeDirectives.directive('copyfiles', function($parse) {
         };
     })   
 
+
+narrativeDirectives.directive('copyfeatured', function($state, modals) {
+    return {
+        link: function(scope, element, attrs) {
+            $(element).find('tr').hover(function() {
+                $(this).find('.btn').css('visibility', 'visible');
+            }, function() {
+                $(this).find('.btn').css('visibility', 'hidden');
+            })
+
+            var copyBtns = $(element).find('.btn');
+            copyBtns.unbind('click');
+            copyBtns.click(function() {
+                console.log('click')
+                var ws = $(this).data('ws');
+                modals.copyWorkspace(ws, null, function() {
+                    $state.go('narratives.mynarratives');
+                    kb.ui.notify('Copied Narratives and Objects From: <i>'+ws+'</i>');                    
+                });
+            })
+        }
+    }
+})
