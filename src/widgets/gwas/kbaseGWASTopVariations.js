@@ -4,8 +4,9 @@
         parent: "kbaseWidget",
         version: "1.0.0",
         options: {
-            width: 400,
-            type:"KBaseGwasData.GwasTopVariations-1.0"
+            width: window.innerWidth/4 - 20,
+            height: window.innerHeight - 80,
+            type:"KBaseGwasData.GwasTopVariations"
         },
         workspaceURL: "https://kbase.us/services/ws/",
 
@@ -20,7 +21,6 @@
             this.workspaceClient.get_objects([{name : this.options.id, workspace: this.options.ws}], 
                 function(data){
                     self.collection = data[0];
-                    //console.log(data[0].data);
                     
                     var tableHTML = "<table class='kbgo-table'>" +
                                         "<tbody>" + 
@@ -40,9 +40,7 @@
                                         "</tbody>" +
                                     "</table>";
                     
-                    var containerDiv = $("<div/>");
-                    containerDiv.html(tableHTML);
-                    self.$elem.append(containerDiv);
+                    self.$elem.append(tableHTML);
                 },
 
                 self.rpcError
@@ -56,7 +54,10 @@
                 type:this.options.type,
                 id: this.options.id,
                 workspace: this.options.ws,
-                title: "GWAS Top Variation Details"
+                title: "GWAS Top Variation Details",
+                draggable: false,
+                resizable: false,
+                dialogClass: 'no-close'
             };
         }
     });

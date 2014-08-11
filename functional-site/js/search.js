@@ -623,6 +623,9 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                   if ($scope.options.resultJSON.items.length > 0) {
                       $scope.options.currentItemRange = $scope.options.resultJSON.items[0].position + "-" + $scope.options.resultJSON.items[$scope.options.resultJSON.items.length - 1].position;
                   }
+                  else {
+                      console.log($scope.options);
+                  }
 
                   $scope.options.currentURL = $state.href("search", $stateParams, {absolute: true});
 

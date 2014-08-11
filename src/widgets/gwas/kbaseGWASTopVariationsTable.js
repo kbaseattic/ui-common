@@ -4,8 +4,9 @@
         parent: "kbaseWidget",
         version: "1.0.0",
         options: {
-            width: 800,
-            type:"KBaseGwasData.GwasTopVariations-1.0"
+            width: window.innerWidth/2 + window.innerWidth/6,
+            height: window.innerHeight - 120,
+            type:"KBaseGwasData.GwasTopVariations"
         },
         workspaceURL: "https://kbase.us/services/ws/",
 
@@ -23,7 +24,6 @@
                     var config = self.collection.data.contigs;
                     var variations = self.collection.data.variations;
 
-                    var contTable = $("<dir/>").css('height', 'auto').css('overflow-y', 'scroll');
                     var domainTable = $("<table/>").addClass("table table-bordered table-striped").attr('id', 'popTable');                        
 
                     var innerHTML = "<thead><tr><th>Chromosome Id</th><th>Position</th><th>pvalue</th></tr></thead><tbody>";
@@ -38,9 +38,7 @@
                     innerHTML += "</tbody>";
                     
                     domainTable.html(innerHTML);
-                    contTable.append(domainTable);
-
-                    self.$elem.append(contTable);
+                    self.$elem.append(domainTable);
 
                     $("#popTable").dataTable({"iDisplayLength": Math.floor((window.innerHeight - 180)/50), "bLengthChange": false})
                     $("#popTable_wrapper").css("overflow-x","hidden");                    
@@ -57,7 +55,10 @@
                 type:this.options.type,
                 id: this.options.id,
                 workspace: this.options.ws,
-                title: "GWAS Top Variations"
+                title: "GWAS Top Variations",
+                draggable: false,
+                resizable: false,
+                dialogClass: 'no-close'
             };
         }
     });

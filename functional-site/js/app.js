@@ -261,6 +261,10 @@ var app = angular.module('landing-pages',
             url: '/KBaseGwasData.GwasGeneList/:ws/:id',
             templateUrl: 'views/objects/ggltype.html',
             controller: 'GGLTypeDetail'})  
+       .state('gpktype', {
+            url: '/KBaseGwasData.GwasPopulationKinship/:ws/:id',
+            templateUrl: 'views/objects/gpktype.html',
+            controller: 'GGLTypeDetail'})  
        .state('gtvtype', {
             url: '/KBaseGwasData.GwasTopVariations/:ws/:id',
             templateUrl: 'views/objects/gtvtype.html',

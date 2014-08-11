@@ -5,8 +5,8 @@
         version: "1.0.0",
         options: {
             type: "KBaseGwasData.GwasPopulationTrait",
-            width: window.innerWidth - 60,
-            height: (window.innerHeight - 80)/2,
+            width: window.innerWidth/2 - 20,
+            height: window.innerHeight - 120,
             resizable: false,
             draggable: false
         },
@@ -21,7 +21,7 @@
             var mapDiv = $('<div/>').addClass('gmap3').attr({ id: 'mapElement'});
             self.$elem.append(mapDiv);
 
-            var allMarkers = [];
+            self.options.allMarkers = [];
 
 
             this.workspaceClient = new Workspace(this.workspaceURL);
@@ -58,15 +58,17 @@
                     var iconFile = 'NA';
                     var traitId, traitValue;
                     var printoing = '';
+                    
+                    self.options.markerCount = 0;
 
                     if (self.collection.data.hasOwnProperty("ecotype_details")) {
-                        for (var i = 0, cnt = 0; i < self.collection.data.ecotype_details.length; i++) {
-                            var marker = new Object();
+                        for (var i = self.collection.data.ecotype_details.length - 1; i > -1; i--) {
+                            var marker = {};
                             var lat = parseFloat(self.collection.data.ecotype_details[i].latitude);
                             var lng = parseFloat(self.collection.data.ecotype_details[i].longitude);
 
                             if (lat && lng) {
-                                cnt++; 
+                                self.options.markerCount += 1;
                                 marker.latLng = [ lat, lng ];
 
                                 traitId = self.collection.data.ecotype_details[i].ecotype_id;
@@ -84,22 +86,22 @@
                                 }
 
                                 marker.data = self.collection.data.ecotype_details[i].nativename;
-                                marker.options = new Object();
+                                marker.options = {};
 
                                 marker.options.icon = 'assets/images/' + iconFile + '.svg';
 
-                                allMarkers.push(marker);
+                                self.options.allMarkers.push(marker);
                             }                                                
                         }
                     }
                     else if (self.collection.data.hasOwnProperty("observation_unit_details")) {
-                        for (var i = 0, cnt = 0; i < self.collection.data.observation_unit_details.length; i++) {
-                            var marker = new Object();
+                        for (var i = self.collection.data.observation_unit_details.length - 1; i > -1; i--) {
+                            var marker = {};
                             var lat = parseFloat(self.collection.data.observation_unit_details[i].latitude);
                             var lng = parseFloat(self.collection.data.observation_unit_details[i].longitude);
 
                             if (lat && lng) {
-                                cnt++; 
+                                self.options.markerCount += 1; 
                                 marker.latLng = [ lat, lng ];
                                 
                                 traitId = self.collection.data.observation_unit_details[i].source_id;
@@ -112,26 +114,19 @@
                                 }
 
                                 if (traitValue != 'NA') {
-                                    console.log(Math.round(((traitValue - minValue) / factor)));
-                                
                                     iconFile = bins[Math.round(((traitValue - minValue) / factor))];
                                     printoing = printoing + ', ' + iconFile;
-                                    console.log(iconFile);
                                 }
 
                                 marker.data = self.collection.data.observation_unit_details[i].nativenames;
-                                marker.options = new Object();
+                                marker.options = {};
 
                                 marker.options.icon = 'assets/images/' + iconFile + '.svg';
-                                console.log(marker);
 
-                                allMarkers.push(marker);
+                                self.options.allMarkers.push(marker);
                             }                                                
                         }
                     }
-
-                    self.options.allMarkers = allMarkers;
-                    self.options.markerCount = cnt;
 
                     return self.render();
                 };
@@ -153,17 +148,10 @@
 
             return this.render();
         },
-        render: function(options) {
-
-            var mrks = [];
-
-            for (var i = 0; i < this.options.markerCount; i++) {
-                mrks.push(this.options.allMarkers[i]);
-            }
+        render: function() {
+            var self = this;
             
-            console.log(mrks);
-            
-            $('#mapElement').width(window.innerWidth - 100).height((window.innerHeight)/3 - 10).gmap3({
+            $('#mapElement').width(this.options.width - 60).height(this.options.height - 130).gmap3({
                 map: {
                     options:{
                         center:[46.578498,2.457275],
@@ -171,7 +159,7 @@
                     }
                 },
                 marker: {
-                    values: mrks,
+                    values: self.options.allMarkers,
                     options: {
                         draggable: false
                     },
@@ -209,7 +197,10 @@
                 type: this.options.type,
                 id: this.options.id,
                 workspace: this.options.ws,
-                title: "GWAS Population Trait Distribution"
+                title: "GWAS Population Trait Distribution",
+                draggable: false,
+                resizable: false,
+                dialogClass: 'no-close'
             };
         }
     });

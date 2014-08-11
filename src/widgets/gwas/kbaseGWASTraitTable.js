@@ -5,8 +5,8 @@
         version: "1.0.0",
         options: {
             type: "KBaseGwasData.GwasPopulationTrait",
-            width: window.innerWidth - 60,
-            height: (window.innerHeight - 160)/2
+            width: window.innerWidth/2 - 60,
+            height: window.innerHeight - 120
         },
 
         workspaceURL: "https://kbase.us/services/ws/",
@@ -65,7 +65,7 @@
                     
                     self.$elem.append(domainTable);
 
-                    $("#popTable").dataTable({"iDisplayLength": 4, "bLengthChange": false})
+                    $("#popTable").dataTable({"iDisplayLength": Math.floor(self.options.height/90), "bLengthChange": false})
                     $("#popTable_wrapper").css("overflow-x","hidden");
                 };
 
@@ -91,7 +91,10 @@
                 type:this.options.type,
                 id: this.options.id,
                 workspace: this.options.ws,
-                title: "GWAS Population Trait Distribution"
+                title: "GWAS Population Trait Distribution",
+                draggable: false,
+                resizable: false,
+                dialogClass: 'no-close'
             };
         }
     });

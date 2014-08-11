@@ -6,7 +6,7 @@
         //width: 600,
         options: {
             width: window.innerWidth - 0.05*window.innerWidth,
-            height: window.innerHeight - 80,
+            height: window.innerHeight - 120,
             type: "KBaseGwasData.GwasGeneList"
         },
         workspaceURL: "https://kbase.us/services/ws/",
@@ -23,9 +23,7 @@
             this.workspaceClient.get_objects([{name : this.options.id, workspace: this.options.ws}], 
                 function(data){
                     self.collection = data[0];
-                    console.log(self.collection);
 
-                    var containerDiv = $("<dir/>").css('height', 'auto').css('overflow-y', 'scroll');                    
                     var domainTable = $("<table/>").addClass("table table-bordered table-striped").attr("id", "popTable"); 
                     
                     var innerHTML = "<thead>" + 
@@ -54,10 +52,9 @@
                     //make the table contents what we just created as a string
                     domainTable.html(innerHTML);
 
-                    containerDiv.append(domainTable);
-                    self.$elem.append(containerDiv);
+                    self.$elem.append(domainTable);
 
-                    $("#popTable").dataTable({"iDisplayLength": Math.floor((window.innerHeight - 180)/50), "bLengthChange": false, "sScrollY": false})
+                    $("#popTable").dataTable({"iDisplayLength": Math.floor((self.options.height)/100), "bLengthChange": false, "sScrollY": false})
                     $("#popTable_wrapper").css("overflow-x","hidden");
                     $("#popTable_wrapper").css("overflow-y","hidden");
                 },
@@ -67,13 +64,20 @@
 
             return this;
         },
-
+        render: function () {
+            $('ui-dialog-titlebar-close').addClass('no-close');
+        
+            return this;
+        },
         getData: function() {
             return {
-                type:this.options.type,
+                type: this.options.type,
                 id: this.options.id,
                 workspace: this.options.ws,
-                title: "GWAS Gene List Details"
+                title: "GWAS Gene List Details",
+                draggable: false,
+                resizable: false,
+                dialogClass: 'no-close'
             };
         }
     });
