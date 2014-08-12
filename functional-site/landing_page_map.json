@@ -71,12 +71,12 @@
     },
 
     "KBaseGwasData" : {
-        "GwasPopulation" : "KBaseGwasData.GwasPopulation",
-        "GwasPopulationVariation" : "KBaseGwasData.GwasPopulationVariation",
-        "GwasPopulationTrait" : "KBaseGwasData.GwasPopulationTrait",
-        "GwasTopVariation" : "KBaseGwasData.GwasTopVariation",
-        "GwasTopVariations" : "KBaseGwasData.GwasTopVariations",
-        "GwasGeneList" : "KBaseGwasData.GwasGeneList"
+        "GwasPopulation" : "gptype",
+        "GwasPopulationVariation" : "gvtype",
+        "GwasPopulationTrait" : "gttype",
+        "GwasPopulationKinship" : "gpktype",
+        "GwasTopVariations" : "gtvtype",
+        "GwasGeneList" : "ggltype"
     },
 
     "KBaseNarrative" : {

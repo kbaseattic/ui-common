@@ -31,7 +31,6 @@
         },
         render: function(options,self) {
 		            
-			console.log(self)
 			self.bicluster_index = options.bicluster[1];
             self.bicluster = options.bicluster[0][self.bicluster_index];
             self.bicluster_type = options.bicluster[2].bicluster_type;

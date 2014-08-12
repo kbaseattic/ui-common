@@ -1,13 +1,13 @@
 (function( $, undefined ) {
     $.KBWidget({
         name: "KBaseGWASVarTable",
-        parent: "kbaseWidget",
+        parent: "kbaseAuthenticatedWidget",
         version: "1.0.0",
         options: {
             width: 500,
             type:"KBaseGwasData.GwasPopulationVariation"
         },
-        workspaceURL: "https://kbase.us/services/ws",
+        workspaceURL: "https://kbase.us/services/ws/",
 
 
         init: function(options) {
@@ -15,7 +15,12 @@
 
             var self = this;
 
-            this.workspaceClient = new Workspace(this.workspaceURL);
+            if (!this.options.kbCache && !this.authToken()) {
+                this.renderError("No cache given, and not logged in!");
+            }
+            else {
+                this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
+            }
 
             this.workspaceClient.get_objects([{name : this.options.id, workspace: this.options.ws}], 
                 function(data){
@@ -43,7 +48,10 @@
                 type:this.options.type,
                 id: this.options.id,
                 workspace: this.options.ws,
-                title: "GWAS Variation Details"
+                title: "GWAS Variation Details",
+                draggable: false,
+                resizable: false,
+                dialogClass: 'no-close'
             };
         }
     });

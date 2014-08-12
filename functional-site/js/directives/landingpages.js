@@ -1444,16 +1444,7 @@ angular.module('lp-directives')
 						function(data) {
 							
 							$("body").on("click", ".biclusterTile",
-								function() {							
-									
-									d3.select(".currentHeatmap").style("background", "steelblue");
-									if ($(".currentHeatmap").hasClass("pickedFromBar")) d3.select(".currentHeatmap").style("background", "#F08A04")
-									d3.select(this).style("background", "#99FFCC")
-									
-									if ($(".currentHeatmap")==this && $(this).hasClass('picked')) $(this).removeClass('picked')
-
-									$(".currentHeatmap").removeClass('currentHeatmap')									
-									$(this).addClass('currentHeatmap') 									
+								function() {																																	
 									
 									scope.params.id = biclusters[$(this).val()].bicluster_id										
 								
@@ -1492,10 +1483,6 @@ angular.module('lp-directives')
 												   
 							p.loading();
 							
-							var currentTile = "#MAK_tile_"+biclusters[0].bicluster_id.replace(/\./g,'').replace(/\|/,'')
-							$(currentTile).addClass('currentHeatmap') 
-							d3.select(currentTile).style("background", "#99FFCC")
-							
 							var widget = $(p.body()).KBaseHeatMapCard({
 								count: biclusters[0].bicluster_id.replace(/\./g,'').replace(/\|/,''), 
 								bicluster: data[0].data,
@@ -1504,7 +1491,8 @@ angular.module('lp-directives')
 								userId: $rootScope.USER_ID,
 								kbCache: kb,
 								loadingImage: "assets/img/ajax-loader.gif"
-							});
+							});							
+							
 						}
 					)
 				}

@@ -28,6 +28,8 @@
         <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/font-awesome-4.0.3/css/font-awesome.css" />
         <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.css" />
 
+        <link rel="stylesheet" href="../ext/animate/animate.css" />
+
         <!-- External javascript packages -->
         <script src="../ext/bowser/bowser.min.js"></script>
         <script src="../ext/underscore-min/underscore-min.js"></script>
@@ -257,6 +259,7 @@
         <script src="../src/widgets/gwas/kbaseGWASTraitMaps.js"></script>        
         <script src="../src/widgets/gwas/kbaseGWASTraitTable.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASVarTable.js"></script>
+        <script src="../src/widgets/gwas/kbaseGWASPopKinshipTable.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASGeneListTable.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASTopVariations.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASTopVariationsTable.js"></script>
@@ -297,6 +300,7 @@
         <!-- application -->
         <script src="js/angular-1.2.14/angular.min.js"></script>
         <script src="js/angular-1.2.14/angular-resource.min.js"></script> 
+        <script src="js/angular-1.2.14/angular-animate.min.js"></script> 
         <script src="js/ui-router-0.2.10/angular-ui-router.min.js"></script>
         <script src="js/ui-bootstrap-0.11.0/ui-bootstrap-tpls-0.11.0.min.js"></script>
 
@@ -352,7 +356,15 @@
              
                     <div id="signin-button" class="pull-right"></div>
                     <ul class="nav navbar-nav pull-right">
-                        <li class="dropdown help-dropdown"></li>
+                        <li class="dropdown help-dropdown">
+                            <a id="kbase_help_menu_label" href="#kbase_help_menu" class="dropdown-toggle" data-toggle="dropdown" onclick="return false;">Help <b class="caret"></b></a>
+                            <ul id="kbase_help_menu" class="dropdown-menu" role="menu" aria-labelledby="kbase_help_menu_label">
+                                <li><a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a></li>
+                                <!--<li><a href="#/landing-pages-help">Landing Page Documentation</a></li>-->
+                                <li><a href="http://kbase.us/get-started/data-search-quick-start/">Search Quick Start Guide</a></li>
+                                <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li>
+                            </ul>                        
+                        </li>
                     </ul>
                 </div> 
             </div>

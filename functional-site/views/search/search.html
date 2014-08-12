@@ -1,432 +1,671 @@
-<div class="search-transfer-modal modal fade" id="transferPanel" tabindex="-1" role="dialog" aria-labelledby="transferPanel" data-backdrop="static" data-keyboard="false" aria-hidden="true">
-    <div class="search-transfer-modal modal-dialog">
-        <div class="search-transfer-modal modal-content">
-            <div class="search-transfer-modal modal-body">
-                <button type="button" class="close pull-right" data-dismiss="modal" aria-hidden="true" ng-hide="options.userState.objectsTransferred > 0 && options.userState.objectsTransferred < options.userState.workspace_carts[options.userState.selectedWorkspace].size " ng-click="emptyTransfers()">&times;</button>            
-            
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="active"><a>Copy Data to Workspaces</a></li>
-                    <li class="disabled"><a>Create Sets of Objects</a></li>
-                </ul>
-
-                <div class='tab-content'>    
-                    <div class="tab-pane active">
-                        <div class="row">
-                            <div class="col-md-4 text-center search-transfer-workspace-area">
-                                <div class="row search-transfer-workspace-select">
-                                    <div ng-show="!options.userState.selectedWorkspace" class="text-center">
-                                        <h3>                                    
-                                            <span class="search-cart-label">Select a workspace to continue.</span>
-                                        </h3>
-
-                                        <div class="text-center">
-                                            <div>
-                                                <button type="button" class="btn btn-primary disabled">Copy<span class="glyphicon glyphicon-transfer"><span></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div ng-show="options.userState.selectedWorkspace" class="text-center">
-                                        <h3>                                    
-                                            <span class="glyphicon glyphicon-hdd"></span>
-                                            <span class="search-cart-label">{{options.userState.selectedWorkspace}}</span>
-                                        </h3>
-
-                                        <div class="text-center">
-                                            <div ng-show="options.userState.workspace_carts[options.userState.selectedWorkspace].size > 0">
-                                                <button type="button" class="btn btn-primary" ng-class="{disabled: !options.userState.selectedWorkspace || options.transferring}" ng-click="copyData(options.active_transfer_type)">Copy<span class="glyphicon glyphicon-transfer"><span></button>
-                                            </div>
-                                            <div ng-show="options.userState.workspace_carts[options.userState.selectedWorkspace].size == 0 && !options.transferring">
-                                                <p>Select data from your cart to continue.</p>
-                                            </div>
-                                            <div ng-show="options.userState.workspace_carts[options.userState.selectedWorkspace].size == 0 && options.transferring">
-                                                <p><strong>{{options.transferRequests}}</strong> copy requests are being sent.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="workspace-area" ng-show="options.userState.workspaces">
-                                    <ul class='nav nav-pills nav-stacked scroll-menu'>
-                                        <li id="{{w[1].replace(':','_')}}_{{w[4]}}" ng-repeat="w in options.userState.workspaces" ng-class="{'workspace-chosen': '{{options.userState.selectedWorkspace}}' == '{{w[1]}}'}">
-                                            <a ng-click='selectWorkspace(w)'>
-                                                <div class="text-left">
-                                                    <span class="glyphicon glyphicon-hdd"></span>
-                                                    <span>{{w[1]}}</span>
-                                                    <span class='badge pull-right'>{{w[4]}}</span>
-                                                </div>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div class="row search-transfer-row" ng-show="options.userState.objectsTransferred > 0 && options.transferSize > 0">
-                                    <div class="text-center">Completed</div>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{'min-width': (options.userState.objectsTransferred/options.transferSize * 100.0) + '%'}">
-                                            {{options.userState.objectsTransferred}}/{{options.transferSize}}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-8 text-center">
-                                <div class="row">
-                                    <h3>
-                                        <span class="search-cart-label">Data Cart</span>
-                                        <span class="space-left glyphicon glyphicon-shopping-cart"></span>
-                                        <span class="badge search-cart-count">{{options.userState.data_cart.size | number}}</span>                                        
-                                    </h3>
-                                </div>
-
-                                <ul class="nav nav-pills" role="tablist">
-                                    <li ng-show="options.userState.data_cart.types['genome'].size > 0"><a href="#transfer_genomes" onclick="return false;" data-toggle="tab">Genomes<span class="badge">{{options.userState.data_cart.types['genome'].size}}</span></a></li>
-                                    <li ng-show="options.userState.data_cart.types['feature'].size > 0"><a href="#transfer_features" onclick="return false;" data-toggle="tab">Genome Features<span class="badge">{{options.userState.data_cart.types['feature'].size}}</span></a></li>
-                                    <li ng-show="options.userState.data_cart.types['metagenome'].size > 0"><a href="#transfer_metagenomes" onclick="return false;" data-toggle="tab">Metagenomes<span class="badge">{{options.userState.data_cart.types['metagenome'].size}}</span></a></li>
-                                    <li ng-show="options.userState.data_cart.types['gwas'].size > 0"><a href="#transfer_gwas" onclick="return false;" data-toggle="tab">GWAS<span class="badge">{{options.userState.data_cart.types['gwas'].size}}</span></a></li>
-                                </ul>
-
-
-                                <div class='tab-content'>    
-                                    <div id="transfer_genomes" class="tab-pane">
-                                        <div class="row">                            
-                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.selectedWorkspace}">
-                                                <thead>
-                                                    <tr>
-                                                        <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.selectedWorkspace && !options.transferring" ng-model="options.userState.data_cart.types['genome'].all" ng-click="toggleAllDataCart('genome')"></input></th>
-                                                        <th class="text-left"><strong>Genome Id</strong></th>
-                                                        <th class="text-left"><strong>Scientific Name</strong></th>
-                                                        <th class="text-left"><strong>Domain</strong></th>
-                                                        <th class="text-left"><strong>%GC</strong></th>
-                                                        <th class="text-left"><strong>Contigs</strong></th>
-                                                        <th class="text-left"><strong>DNA Size bp</strong></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr ng-repeat="s in options.userState.data_cart.types['genome'].markers">
-                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.selectedWorkspace && !options.transferring" ng-model="options.userState.data_cart.data[s.row_id].cart_selected" ng-click="toggleInCart(s.row_id)"></input></td>
-                                                        <td class="text-left">{{s.genome_id}}</td>
-                                                        <td class="text-left">{{s.scientific_name}}</td>
-                                                        <td class="text-left">{{s.domain}}</td>
-                                                        <td class="text-left">{{s.gc_content | number: 2}}</td>
-                                                        <td class="text-left">{{s.num_contigs | number}}</td>
-                                                        <td class="text-left">{{s.genome_dna_size | number}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>    
-                                        </div>
-                                    </div> <!-- end first tab -->
-                                    <div id="transfer_features" class="tab-pane">
-                                        <div class="row">
-                                
-                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.selectedWorkspace}">
-                                                <thead>
-                                                    <tr>
-                                                        <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.selectedWorkspace && !options.transferring" ng-model="options.userState.data_cart.types['feature'].all" ng-click="toggleAllDataCart('feature')"></input></th>
-                                                        <th class="text-left"><strong>Feature Id</strong></th>
-                                                        <th class="text-left"><strong>Feature Source Id</strong></th>
-                                                        <th class="text-left"><strong>Scientific Name</strong></th>
-                                                        <th class="text-left"><strong>Type</strong></th>
-                                                        <th class="text-left"><strong>DNA bp</strong></th>
-                                                        <th class="text-left"><strong>Protein aa</strong></th>
-                                                        <th class="text-left"><strong>Function</strong></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr ng-repeat="s in options.userState.data_cart.types['feature'].markers">
-                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.selectedWorkspace && !options.transferring" ng-model="options.userState.data_cart.data[s.row_id].cart_selected" ng-click="toggleInCart(s.row_id)"></input></td>
-                                                        <td class="text-left">{{s.feature_id}}</td>
-                                                        <td class="text-left">{{s.feature_source_id}}</td>
-                                                        <td class="text-left">{{s.scientific_name}}</td>
-                                                        <td class="text-left">{{s.feature_type}}</td>
-                                                        <td class="text-left">{{s.dna_sequence_length | number}}</td>
-                                                        <td class="text-left">{{s.protein_translation_length | number}}</td>
-                                                        <td class="text-left">{{s.function}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>    
-                                        </div>
-                                    </div> <!-- end first tab -->
-                                    <div id="transfer_metagenomes" class="tab-pane">
-                                        <div class="row">
-                                
-                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.selectedWorkspace}">
-                                                <thead>
-                                                    <tr>
-                                                        <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.selectedWorkspace && !options.transferring" ng-model="options.userState.data_cart.types['metagenome'].all" ng-click="toggleAllDataCart('metagenome')"></input></th>
-                                                        <th class="text-left"><strong>MG-RAST Id</strong></th>
-                                                        <th class="text-left"><strong>Metagenome Name</strong></th>
-                                                        <th class="text-left"><strong>Project</strong></th>
-                                                        <th class="text-left"><strong>Sample</strong></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr ng-repeat="s in options.userState.data_cart.types['metagenome'].markers">
-                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.selectedWorkspace && !options.transferring" ng-model="options.userState.data_cart.data[s.row_id].cart_selected" ng-click="toggleInCart(s.row_id)"></input></td>
-                                                        <td class="text-left">{{s.metagenome_id.split('mgm')[1]}}</td>
-                                                        <td class="text-left">{{s.metagenome_name}}</td>
-                                                        <td class="text-left">{{s.project_name}}</td>
-                                                        <td class="text-left">{{s.sample_name}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>    
-                                        </div>
-                                    </div> <!-- end first tab -->
-                                    <div id="transfer_gwas" class="tab-pane">
-                                        <div class="row">
-                                
-                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.selectedWorkspace}">
-                                                <thead>
-                                                    <tr>
-                                                        <th><input type="checkbox" class="search-data-cart-checkbox" ng-model="options.userState.data_cart.all_genomes" ng-click="toggleAllDataCart('Genome')"></input></th>
-                                                        <th class="text-left"><strong>Genome Id</strong></th>
-                                                        <th class="text-left"><strong>Scientific Name</strong></th>
-                                                        <th class="text-left"><strong>Domain</strong></th>
-                                                        <th class="text-left"><strong>%GC</strong></th>
-                                                        <th class="text-left"><strong>Contigs</strong></th>
-                                                        <th class="text-left"><strong>DNA Size bp</strong></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr ng-repeat="s in options.userState.data_cart.genomes">
-                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-model="options.userState.data_cart.data[s.row_id].cart_selected"></input></td>
-                                                        <td class="text-left">{{s.genome_id}}</td>
-                                                        <td class="text-left">{{s.scientific_name}}</td>
-                                                        <td class="text-left">{{s.domain}}</td>
-                                                        <td class="text-left">{{s.gc_content}}</td>
-                                                        <td class="text-left">{{s.num_contigs}}</td>
-                                                        <td class="text-left">{{s.genome_dna_size}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>    
-                                        </div>
-                                    </div> <!-- end first tab -->
-                                </div> <!-- end all tabs -->
-                            </div>
-                        </div>
-
-                
-                    </div> <!-- end copy tab -->    
-                </div> <!-- end transfer panel -->
-
-                <!--<button type="button" class="btn btn-default" ng-class="{disabled: options.userState.objectsTransferred > 0 && options.userState.objectsTransferred/options.userState.data_cart.size * 100 < 100}" data-dismiss="modal" ng-click="emptyTransfers()">Close</button>-->
-
-            </div> <!-- end modal body --> 
-<!--
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" ng-class="{disabled: options.userState.objectsTransferred > 0 && options.userState.objectsTransferred/options.userState.data_cart.size * 100 < 100}" data-dismiss="modal" ng-click="emptyTransfers()">Close</button>
-            </div>--> <!-- end modal footer -->        
-        </div> <!-- end modal-content -->
-    </div> <!-- end modal-dialog -->
-</div> <!-- end transfer panel area -->
-
 <div class="container-fluid">
-<div class="row search-sections">
-    <div class="col-sm-3 col-md-3 col-lg-3 search-left-nav search-leftarea-size"> <!-- left navigation columns -->
-        <div class="search-leftarea-size"> <!-- workspace selected -->                            
-            <div class="col-sm-12 col-md-12 col-lg-12 search-leftarea-size">
-                <div ng-hide="options.userState.loggedIn" class="alert alert-warning search-login">
-                    <div id="login-message" class="text-center">
-                        <a ng-click='login()'>Sign in</a> to select data and send to your workspaces
-                    </div>
-                </div>
-                <div ng-show="options.userState.loggedIn" class="alert alert-success search-logout">
-                    <div id="logout-message" class="text-center">                        
-                        Logged in as <strong>{{options.userState.user_id}}</strong>                                                
-                    </div>
-                    <div class="text-center">
-                        <a ng-click='logout()'>Sign out</a>
-                    </div>
-                </div>
-
-                <div ng-show="options.userState.loggedIn">
-                    <hr class="search-leftarea-size"></hr>
-
-                    <div class='text-center search-selections-title'>
-                        <h3 data-toggle="tooltip" data-placement="right" tooltip="Here you can see what data you have selected, organize it, and send it to workspaces." tooltip-placement="right">Selections</h3>
-                    </div>
-
-                    <div class="text-center">
-                        <span class="badge" style="font-size:18px; margin-left: auto; margin-right: auto;">{{options.userState.data_cart.size | number}}</span>
-                        <div data-toggle="tooltip" data-placement="top" tooltip="This cart represents your data selections." tooltip-placement="top">
-                            <span class="glyphicon glyphicon-shopping-cart search-cart"></span>
+    <div class="row search-sections">
+        <div class="col-sm-3 col-md-3 col-lg-3 search-left-nav search-leftarea-size"> <!-- left navigation columns -->
+            <div class="search-leftarea-size"> <!-- workspace selected -->                            
+                <div class="col-sm-12 col-md-12 col-lg-12 search-leftarea-size">
+                    <div ng-hide="options.userState.longterm.loggedIn" class="alert alert-warning search-login">
+                        <div id="login-message" class="text-center">
+                            <a ng-click='login()'>Sign in</a> to select data and send to your workspaces
                         </div>
                     </div>
-                    
-                    <div class="text-center">
-                        <div style="margin-bottom: 5px;">
-                            <button rel="tooltip" tooltip="Transfer my selections to workspaces." tooltip-placement="bottom" data-placement="bottom" data-toggle="modal" data-target="#transferPanel" type="button" ng-class="{'disabled': options.userState.data_cart.size < 1}" class='btn btn-primary' ng-click="listWorkspaces()">
-                                <span class="glyphicon glyphicon-hdd"></span><span> </span><span class="glyphicon glyphicon-transfer"></span>
-                            </button>
-                            <button data-toggle="tooltip" data-placement="bottom" tooltip="Discard my data selections." tooltip-placement="bottom" type="button" ng-class="{'disabled': options.userState.data_cart.size < 1}" class='btn btn-danger' ng-click='emptyCart()'>
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </button>              
-                        </div> <!-- end workspace send button group -->
-                    </div>
-                </div>
-            </div> <!-- end all workspace button groups -->
-        </div> <!-- end workspace-selected area -->
-        
-        <div ng-show="getTotalCount() > 0 && options.selectedCategory" class="col-sm-12 col-md-12 col-lg-12 search-categories search-leftarea-size"> <!-- categories -->
-            <hr class="search-leftarea-size"></hr>
-
-            <div class='text-center search-categories-title'>
-                <h3 data-toggle="tooltip" data-placement="right" tooltip="Navigate between different data types that match your search." tooltip-placement="right">Categories</h3>
-            </div>
-            <div class="col-md-12 search-categories-row">
-                <div class="col-md-12 search-categories-row">
-                    <a id="Public" href="" class="btn btn-link" ng-click="selectCategory(null)">
-                        <strong>Return to All Categories</strong>
-                    </a>
-
-                    <div ng-hide="options.categoryCounts[p.category] < 1 || !isInActiveCategoryTree(p.category)" ng-repeat="p in options.categoryInfo.displayTree.unauthenticated.children">
-                        <a id="{{p.category}}" href="" ng-class="{'search-selected-category-link': p.category == options.selectedCategory}" class="btn btn-link" ng-click="$parent.selectCategory(p.category)">
-                            <span>{{p.label}}</span><span class='search-space-left'>({{options.categoryCounts[p.category] | number}})</span>
-                        </a>
-                        <div ng-hide="options.categoryCounts[k.category] < 1 || !isInActiveCategoryTree(k.category)" class="search-space-left" ng-repeat="k in p.children">
-                            <a id="{{k.category}}" href="" ng-class="{'search-selected-category-link': k.category == options.selectedCategory}" class="btn btn-link" ng-click="$parent.$parent.selectCategory(k.category)">
-                                <span>{{k.label}}</span><span class='search-space-left'>({{options.categoryCounts[k.category] | number}})</span>
-                            </a>
+                    <div ng-show="options.userState.longterm.loggedIn" class="alert alert-success search-logout">
+                        <div id="logout-message" class="text-center">                        
+                            Logged in as <strong>{{options.userState.longterm.user_id}}</strong>                                                
                         </div>
-                    </div> <!-- end children of Public category -->
-                </div> <!-- end Public category -->
-            </div> <!-- end category hierarchy -->
+                        <div class="text-center">
+                            <a ng-click='logout()'>Sign out</a>
+                        </div>
+                    </div>
 
-            <hr class="search-leftarea-size"></hr>
-    
-            <div ng-show="options.facets">
-                <div class='text-center search-filters-title'>
-                    <h3 data-toggle="tooltip" data-placement="right" tooltip="Select options to help narrow your search results." tooltip-placement="right">Filters</h3>                    
-                </div>
-                <div class="col-xs-offset-1 search-leftarea-size search-filter-groups">
-                    <div id="{{facet.key}}" class="panel-group" ng-repeat="facet in options.facets">
-                        <div class="panel panel-filter-content">
-                            <div class="panel-heading panel-filter-heading">
-                                <h4 class="panel-title">
-                                    <a class="search-filter-link" data-toggle="collapse" data-parent="#{{facet.key}}" href="#{{facet.key}}_panel" onclick="return false;">{{facet.key}}</a>
-                                </h4>
+                    <div ng-show="options.userState.longterm.loggedIn">
+                        <hr class="search-leftarea-size"></hr>
+
+                        <div class='text-center search-selections-title'>
+                            <h3 data-toggle="tooltip" data-placement="right" tooltip="Here you can see what data you have selected, organize it, and send it to workspaces." tooltip-placement="right">Selections</h3>
+                        </div>
+
+                        <div class="text-center">
+                            <span class="badge" style="font-size:18px; margin-left: auto; margin-right: auto;">{{options.userState.session.data_cart.size | number}}</span>
+                            <div data-toggle="tooltip" data-placement="top" tooltip="This cart represents your data selections." tooltip-placement="top">
+                                <span class="glyphicon glyphicon-shopping-cart search-cart"></span>
                             </div>
-                            <div id="{{facet.key}}_panel" class="panel-collapse collapse">
-                                <div ng-show="facet_option.value > 0" ng-repeat="facet_option in facet.value" class="row filter-section">
-                                    <a href="" ng-click="toggleFacet(facet.key, facet_option.key, options.active_facets[options.selectedCategory][facet.key][facet_option.key])" class="search-checkbox-link">
-                                        <span class="glyphicon" ng-class="{'glyphicon-check': options.active_facets[options.selectedCategory][facet.key][facet_option.key],'glyphicon-unchecked': !options.active_facets[options.selectedCategory][facet.key][facet_option.key]}"/>                    
-                                    </a>
-                                    <span class="search-halfspace-left">{{facet_option.key}}</span>
-                                    <span class="search-halfspace-left">({{facet_option.value | number}})</span>
+                        </div>
+                    
+                        <div class="text-center">
+                            <div style="margin-bottom: 5px;">
+                                <button rel="tooltip" tooltip="Transfer my selections to workspaces." tooltip-placement="bottom" data-placement="bottom" data-toggle="modal" data-target="#transferPanel" type="button" ng-class="{'disabled': options.userState.session.data_cart.size < 1}" class='btn btn-primary' ng-click="listWorkspaces()">
+                                    <span class="glyphicon glyphicon-hdd"></span><span> </span><span class="glyphicon glyphicon-transfer"></span>
+                                </button>
+                                <button data-toggle="tooltip" data-placement="bottom" tooltip="Discard my data selections." tooltip-placement="bottom" type="button" ng-class="{'disabled': options.userState.session.data_cart.size < 1}" class='btn btn-danger' ng-click='emptyCart()'>
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </button>              
+                            </div> <!-- end workspace send button group -->
+                        </div>
+                    </div>
+                </div> <!-- end all workspace button groups -->
+            </div> <!-- end workspace-selected area -->
+        
+            <div ng-show="getTotalCount() > 0 && options.selectedCategory" class="col-sm-12 col-md-12 col-lg-12 search-categories search-leftarea-size"> <!-- categories -->
+                <hr class="search-leftarea-size"></hr>
+
+                <div class='text-center search-categories-title'>
+                    <h3 data-toggle="tooltip" data-placement="right" tooltip="Navigate between different data types that match your search." tooltip-placement="right">Categories</h3>
+                </div>
+                <div class="col-md-12 search-categories-row">
+                    <div>
+                        <a id="Public" href="" class="btn btn-link search-category-link" ng-click="selectCategory(null)">
+                            <strong>Return to All Categories</strong>
+                        </a>
+
+                        <div ng-hide="options.categoryCounts[p.category] < 1 || !isInActiveCategoryTree(p.category)" ng-repeat="p in options.categoryInfo.displayTree.unauthenticated.children">
+                            <div class="search-categories-row animated fadeInLeft">
+                                <a ng-show="p.label.length < 23" id="{{p.category}}" href="" ng-class="{'search-selected-category-link': p.category == options.selectedCategory}" class="btn btn-link search-category-link" ng-click="$parent.selectCategory(p.category)">
+                                    {{p.label}}<span class='search-space-left'> </span>({{options.categoryCounts[p.category] | number}})
+                                </a>
+                                <a data-toggle="tooltip" data-placement="right" tooltip="{{p.label}}" tooltip-placement="right" ng-show="p.label.length >= 23" id="{{p.category}}" href="" ng-class="{'search-selected-category-link': p.category == options.selectedCategory}" class="btn btn-link search-category-link" ng-click="$parent.selectCategory(p.category)">
+                                    {{p.label | limitTo: 23}}...<span class='search-space-left'> </span>({{options.categoryCounts[p.category] | number}})
+                                </a>
+                            </div>
+                            <div ng-hide="options.categoryCounts[k.category] < 1 || !isInActiveCategoryTree(k.category)" class="search-space-left animated fadeInLeft" ng-repeat="k in p.children" class="search-categories-row">
+                                <a id="{{k.category}}" href="" ng-class="{'search-selected-category-link': k.category == options.selectedCategory}" class="btn btn-link search-category-link" ng-click="$parent.$parent.selectCategory(k.category)">
+                                    {{k.label}}<span class='search-space-left'> </span>({{options.categoryCounts[k.category] | number}})
+                                </a>
+                            </div>
+                        </div> <!-- end children of Public category -->
+                    </div> <!-- end Public category -->
+                </div> <!-- end category hierarchy -->
+
+                <hr class="search-leftarea-size"></hr>
+    
+                <div ng-show="options.facets">
+                    <div class='text-center search-filters-title'>
+                        <h3 data-toggle="tooltip" data-placement="right" tooltip="Select options to help narrow your search results." tooltip-placement="right">Filters</h3>                    
+                        <button type="button" class="btn btn-danger btn-xs search-filter-remove-button" ng-click="removeAllFacets()" ng-if="options.active_facets[options.selectedCategory] && Object.keys(options.active_facets[options.selectedCategory]).length > 0" data-toggle="tooltip" data-placement="top" tooltip="Use this button to remove all the filters you have selected." tooltip-placement="top"><span class="glyphicon glyphicon-remove"></span></button>
+                    </div>
+                    <div class="col-xs-offset-1 search-leftarea-size search-filter-groups">
+                        <div id="{{facet.key}}" class="panel-group" ng-repeat="facet in options.facets">                            
+                            <div class="panel panel-filter-content">
+                                <div class="panel-heading panel-filter-heading">
+                                    <div ng-if="facet.key.length > 23" class="panel-title search-filter-title" data-toggle="tooltip" data-placement="right" tooltip="{{facet.key}}" tooltip-placement="right">
+                                        <a type="button" class="search-filter-link" data-toggle="collapse" data-parent="#{{facet.key}}" href="#{{facet.key}}_panel" onclick="return false;" ng-click="toggleFacetPanel(facet.key)">
+                                            <span>{{facet.key | limitTo: 20}}...</span>
+                                            <span ng-if="options.searchOptions.perCategory[options.selectedCategory]['facets'] && options.active_facets[options.selectedCategory][facet.key]" class="badge search-filter-count-badge">{{Object.keys(options.active_facets[options.selectedCategory][facet.key]).length}}</span>
+                                            <span class="glyphicon glyphicon-large search-filter-collapse-icon pull-right" ng-class="{'glyphicon-collapse-down': !options.open_facet_panels[options.selectedCategory] || !options.open_facet_panels[options.selectedCategory][facet.key], 'glyphicon-collapse-up': options.open_facet_panels[options.selectedCategory][facet.key]}"></span>
+                                        </a>                                        
+                                    </div>
+                                    <div ng-if="facet.key.length <= 23" class="panel-title search-filter-title">
+                                        <a type="button" class="search-filter-link" data-toggle="collapse" data-parent="#{{facet.key}}" href="#{{facet.key}}_panel" onclick="return false;" ng-click="toggleFacetPanel(facet.key)">
+                                            <span>{{facet.key}}</span>
+                                            <span ng-if="options.searchOptions.perCategory[options.selectedCategory]['facets'] && options.active_facets[options.selectedCategory][facet.key]" class="badge search-filter-count-badge">{{Object.keys(options.active_facets[options.selectedCategory][facet.key]).length}}</span>
+                                            <span class="glyphicon glyphicon-large search-filter-collapse-icon pull-right" ng-class="{'glyphicon-collapse-down': !options.open_facet_panels[options.selectedCategory] || !options.open_facet_panels[options.selectedCategory][facet.key], 'glyphicon-collapse-up': options.open_facet_panels[options.selectedCategory][facet.key]}"></span>
+                                        </a>                                        
+                                    </div>                                    
+                                </div>
+                                <div id="{{facet.key}}_panel" class="panel-collapse collapse">
+                                    <div ng-show="facet_option.value > 0" ng-repeat="facet_option in facet.value" class="row filter-section">
+                                        <a href="" ng-click="toggleFacet(facet.key, facet_option.key, options.active_facets[options.selectedCategory][facet.key][facet_option.key])" class="search-checkbox-link">
+                                            <span class="glyphicon" ng-class="{'glyphicon-check': options.active_facets[options.selectedCategory][facet.key][facet_option.key],'glyphicon-unchecked': !options.active_facets[options.selectedCategory][facet.key][facet_option.key]}"/>                    
+                                        </a>
+                                        <span class="search-halfspace-left">{{facet_option.key}}</span>
+                                        <span class="search-halfspace-left">({{facet_option.value | number}})</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div> <!-- end categories -->
-    </div> <!-- end filter section -->
+            </div> <!-- end categories -->
+        </div> <!-- end filter section -->
 
-    <div ng-cloak class="col-sm-9 col-md-9 col-lg-9 search-result-section"> <!-- search results section -->
+        <div ng-cloak class="col-sm-9 col-md-9 col-lg-9 search-result-section"> <!-- search results section -->
 
-        <div class="row search-bar">
-            <form class="input-group" ng-submit="newSearch()">
-                <input data-toggle="tooltip" data-placement="bottom" tooltip="{{getSearchbarTooltipText()}}" tooltip-placement="bottom" class="form-control" autofocus required ng-model="options.searchOptions.general.q" placeholder="Search KBase Data" autocomplete="off" type="search"/> 
-                <span class="input-group-btn">
-                    <button type="submit" class="btn" style="background-color: #ebebeb; border-color: #adadad; border-left:none">
-                        <span class="glyphicon glyphicon-search" style="line-height: .9"></span>
-                    </button>
-                </span>
-            </form>
-        </div>
-
-        <div class="col-md-12 col-lg-12 search-result-section"> <!-- all results -->                            
-            <div ng-show="options.searchOptions.general.q && getTotalCount() < 1 && !options.selectedCategory" class="search-results-select-category">
-                <div class="alert alert-danger">
-                    <strong>No results found for any data type.</strong>
-                </div>
+            <div class="row search-bar">
+                <form class="input-group" ng-submit="newSearch()">
+                    <input data-toggle="tooltip" data-placement="bottom" tooltip="{{getSearchbarTooltipText()}}" tooltip-placement="bottom" class="form-control" autofocus required ng-model="options.searchOptions.general.q" placeholder="Search KBase Data" autocomplete="off" type="search"/> 
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn" style="background-color: #ebebeb; border-color: #adadad; border-left:none">
+                            <span class="glyphicon glyphicon-search" style="line-height: .9"></span>
+                        </button>
+                    </span>
+                </form>
             </div>
 
-            <div ng-show="options.searchOptions.general.q && options.selectedCategory && options.categoryCounts[options.selectedCategory] < 1" class="search-results-select-category">
-                <div class="alert alert-danger">
-                    <strong>No results found in {{options.searchCategories[options.selectedCategory].label}}.</strong>
-                </div>
-            </div>
-
-            <div class="col-md-12 col-lg-12 search-results">
-                <!-- Show this when no category is selected -->
-                <div ng-show="!options.selectedCategory && getTotalCount() > 0" class="col-md-12 col-lg-12 search-results-select-category"> 
-                    <div class="row">                        
-                        <table>
-                            <h3>Select a category</h3>
-                            <tr>
-                                <th><h4>Category</h4></th>
-                                <th class="search-space-left"><h4 class="search-space-left">Objects found</h4></th>
-                            </tr>
-                            <tr ng-show="options.searchCategories[p.category] && options.categoryCounts[p.category] > 0" ng-repeat="p in options.categoryInfo.displayTree['unauthenticated'].children">
-                                <td class="search-category-title" ng-click="selectCategory(p.category)">
-                                    <a><span>{{p.label}}</span></a>
-                                </td>
-                                <td class="search-category-title search-space-left"><span class='search-space-left'>(</span>{{options.categoryCounts[p.category] | number}}<span>)</span></td>
-                            </tr>
-                        </table>
-                    </div>                                    
-                </div>
-                <div class="col-md-12 col-lg-12 search-results"> 
-                    <div ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0 && options.categoryRelationships[options.selectedCategory].children.length == 0" class="col-md-12 col-lg-12 search-result-set-header"> <!-- result options -->
-                        <div class="btn-toolbar col-md-12 search-results-toolbar">
-                            <div class="btn-group col-xs-6 search-results-counter">
-                                <div><strong>Displaying {{options.searchCategories[options.selectedCategory].label}} {{ 1 + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }}-{{ options.resultJSON.itemCount + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }} out of {{ options.resultJSON.totalResults | number }}.</strong></div>
-                            </div>
-                            <div class="btn-group btn-group-xs col-xs-offset-3 col-xs-2 search-view-buttons" data-toggle="buttons">
-                                <label for="list_view" class="control-label input-group">Views</label>
-                                <label data-toggle="tooltip" data-placement="left" tooltip="Compact results" tooltip-placement="left" class="btn btn-xs btn-default" ng-class="{'active': options.userState.viewType == 'compact'}" ng-click="setView('compact')">
-                                    <input type="radio" name="list_view"/>
-                                    <span class="glyphicon glyphicon-list"></span>
-                                </label>
-                                <label data-toggle="tooltip" data-placement="right" tooltip="Expanded results" tooltip-placement="right" class="btn btn-xs btn-default" ng-class="{'active': options.userState.viewType == 'expanded'}" ng-click="setView('expanded')">
-                                    <input type="radio" name="list_view"/>
-                                    <span class="glyphicon glyphicon-th-list"></span>
-                                </label>
-                            </div>
-                            <div class="btn-group btn-group-xs col-xs-offset-1 col-xs-3 search-perpage-buttons" data-toggle="buttons">
-                                <label for="rpp" class="control-label input-group">Items per page</label>
-                                <label class="btn btn-default" ng-class="{'active': i == options.searchOptions.general.itemsPerPage}" ng-repeat="i in [10,25,50,100]" ng-click="setResultsPerPage(i)">
-                                    <input type="radio" name="rpp" >{{i}}</input>
-                                </label>
-                            </div>
-                        </div> <!-- end btn-toolbar row -->
-                    </div> <!-- end result options -->
-                    <div ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0" class="col-md-12 col-lg-12">
-                        <!-- our output should go here normally -->
-                        <div ng-include="options.resultsTemplatePath"></div> 
-
-                        <!-- pagination controls should be at the bottom to slow down page requests through the UI -->
-                        <ul ng-show="options.categoryRelationships[options.selectedCategory].children.length == 0" class="pagination" ng-class="{'fixed-pagination': options.resultJSON.totalResults <= options.numPageLinks,'small-pagination': options.resultJSON.totalResults > options.numPageLinks && options.resultJSON.currentPage - options.numPageLinks <= 0,'large-pagination': options.resultJSON.currentPage - options.numPageLinks > 0 }">
-                            <li ng-show="options.resultJSON.currentPage - options.numPageLinks > 0">
-                                <a ng-click="setCurrentPage(options.pageLinksRange[0] - 1)">&larr; Previous {{options.numPageLinks}}</a>
-                            </li>
-                            <li ng-class="{'active': p == options.resultJSON.currentPage}" ng-repeat="p in options.pageLinksRange">
-                                <a ng-click="setCurrentPage(p)">{{p}}</a>
-                            </li>
-                            <li ng-show="(options.pageLinksRange[0] + options.numPageLinks) * options.resultJSON.itemsPerPage < options.resultJSON.totalResults">
-                                <a ng-click="setCurrentPage(options.pageLinksRange[0] + options.numPageLinks)">Next {{options.numPageLinks}} &rarr;</a>
-                            </li>
-                        </ul>                        
+            <div class="col-md-12 col-lg-12 search-result-section"> <!-- all results -->                            
+                <div ng-if="options.searchOptions.general.q && getTotalCount() < 1 && !options.selectedCategory" class="search-results-select-category">
+                    <div class="alert alert-danger">
+                        <strong>No results found for any data type.</strong>
                     </div>
-                </div> <!-- end specific category results row -->
-            </div> <!-- end results inner row -->
-        </div> <!-- end results outer row -->
-    </div> <!-- end results section -->
+                </div>
 
-    <div class="hidden">
-        <div id="loading_message">
-            <strong>KBase</strong>
-            <div id="loading_message_icon">
-                <img src="assets/img/kbase_animated_logo.gif" alt="animated_logo"/>
+                <div ng-if="options.searchOptions.general.q && options.selectedCategory && options.categoryCounts[options.selectedCategory] < 1" class="search-results-select-category">
+                    <div class="alert alert-danger">
+                        <strong>No results found in {{options.searchCategories[options.selectedCategory].label}}.</strong>
+                    </div>
+                </div>
+
+                <div class="col-md-12 col-lg-12 search-results">
+                    <!-- Show this when no category is selected -->
+                    <div ng-if="!options.selectedCategory && getTotalCount() > 0" class="col-md-12 col-lg-12 search-results-select-category"> 
+                        <div class="row">                        
+                            <table>
+                                <h3>Select a category</h3>
+                                <tr>
+                                    <th><h4>Category</h4></th>
+                                    <th class="search-space-left"><h4 class="search-space-left">Objects found</h4></th>
+                                </tr>
+                                <tr ng-if="options.searchCategories[p.category] && options.categoryCounts[p.category] > 0" ng-repeat="p in options.categoryInfo.displayTree['unauthenticated'].children">
+                                    <td class="search-category-title" ng-click="selectCategory(p.category)">
+                                        <a><span>{{p.label}}</span></a>
+                                    </td>
+                                    <td class="search-category-title search-space-left animated lightSpeedIn"><span class='search-space-left'>(</span>{{options.categoryCounts[p.category] | number}}<span>)</span></td>
+                                </tr>
+                            </table>
+                        </div>                                    
+                    </div>
+                    <div class="col-md-12 col-lg-12 search-results" ng-show="options.resultsAvailable && options.selectedCategory && getTotalCount() > 0"> 
+                        <div class="col-md-12 col-lg-12 search-result-set-header" ng-show="options.resultJSON.totalResults > 0 && options.categoryRelationships[options.selectedCategory].children.length == 0"> <!-- result options -->
+                            <div class="col-md-12 search-results-counter">
+                                <div>
+                                    <span><strong>{{ 1 + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }}-{{ options.resultJSON.itemCount + ((options.resultJSON.currentPage - 1) * options.resultJSON.itemsPerPage) | number }} out of {{ options.resultJSON.totalResults | number }} results for {{options.searchCategories[options.selectedCategory].label}}</strong></span>
+                                    <!--
+                                    <button class="btn btn-xs btn-primary" type="button" ng-click="trackBreadcrumb(options.searchCategories[options.selectedCategory])"><strong>{{options.searchCategories[options.selectedCategory].label}}</strong></button>
+                                    <div ng-repeat="b on options.userState.session.breadcrumbs">
+                                        <span> : </span>
+                                        <button class="btn btn-xs btn-primary" ng-click="trackBreadcrumb()" class="badge" type="button"><strong>{{b}}</strong></span>
+                                    </div>
+                                    -->
+                                </div>
+                            </div>
+                            <div class="col-md-12 search-results-toolbar">
+                                <div class="btn-group btn-group-xs col-xs-2 search-view-buttons" data-toggle="buttons">
+                                    <label for="list_view" class="control-label input-group">Views</label>
+                                    <label data-toggle="tooltip" data-placement="left" tooltip="Compact results" tooltip-placement="left" class="btn btn-xs btn-default" ng-class="{'active': options.userState.session.viewType == 'compact'}" ng-click="setView('compact')">
+                                        <input type="radio" name="list_view"/>
+                                        <span class="glyphicon glyphicon-list"></span>
+                                    </label>
+                                    <label data-toggle="tooltip" data-placement="right" tooltip="Expanded results" tooltip-placement="right" class="btn btn-xs btn-default" ng-class="{'active': options.userState.session.viewType == 'expanded'}" ng-click="setView('expanded')">
+                                        <input type="radio" name="list_view"/>
+                                        <span class="glyphicon glyphicon-th-list"></span>
+                                    </label>
+                                </div>
+                                <div class="btn-group btn-group-xs col-xs-3 search-perpage-buttons" data-toggle="buttons">
+                                    <label for="rpp" class="control-label input-group">Items per page</label>
+                                    <label class="btn btn-default" ng-class="{'active': i == options.searchOptions.general.itemsPerPage}" ng-repeat="i in [10,25,50,100]" ng-click="setResultsPerPage(i)">
+                                        <input type="radio" name="rpp" >{{i}}</input>
+                                    </label>
+                                </div>
+                            </div> <!-- end toolbar row -->
+                        </div> <!-- end result options -->
+                        <div class="col-md-12 col-lg-12">
+                            <!-- our output should go here normally -->
+                            <div ng-show="options.resultJSON.totalResults > 0 || options.categoryRelationships[options.selectedCategory].children.length > 0 && getTotalCount() > 0" class="search-results-content-area" ng-include="options.templates[options.selectedCategory].root"></div> 
+
+                            <!-- pagination controls should be at the bottom to slow down page requests through the UI -->
+                            <div class="text-center search-results-content-area" ng-show="options.categoryRelationships[options.selectedCategory].children.length == 0">
+                                <ul class="pagination" ng-class="{'fixed-pagination': options.resultJSON.totalResults <= options.pageLinksRange.length * options.resultJSON.itemsPerPage,'small-pagination': options.resultJSON.totalResults > options.numPageLinks && options.resultJSON.currentPage - options.numPageLinks <= 0,'large-pagination': options.resultJSON.currentPage - options.numPageLinks > 0 }">
+                                    <li ng-if="options.resultJSON.currentPage - options.numPageLinks > 0">
+                                        <a ng-click="setCurrentPage(options.pageLinksRange[0] - 1)">&larr; Previous {{options.numPageLinks}}</a>
+                                    </li>
+                                    <li ng-class="{'active': p == options.resultJSON.currentPage}" ng-repeat="p in options.pageLinksRange">
+                                        <a ng-click="setCurrentPage(p)">{{p}}</a>
+                                    </li>
+                                    <li ng-if="(options.pageLinksRange[0] + options.numPageLinks) * options.resultJSON.itemsPerPage < options.resultJSON.totalResults">
+                                        <a ng-click="setCurrentPage(options.pageLinksRange[0] + options.numPageLinks)">Next {{options.numPageLinks}} &rarr;</a>
+                                    </li>
+                                </ul>                        
+                            </div>
+                        </div>
+                    </div> <!-- end specific category results row -->
+                </div> <!-- end results inner row -->
+            </div> <!-- end results outer row -->
+        </div> <!-- end results section -->
+
+        <div class="hidden">
+            <div id="loading_message">
+                <strong>KBase</strong>
+                <div id="loading_message_icon">
+                    <img src="assets/img/kbase_animated_logo.gif" alt="animated_logo"/>
+                </div>
+                <div id="loading_message_text">Searching...</div>
             </div>
-            <div id="loading_message_text">Searching...</div>
         </div>
-    </div>
 
-    <div id="error" class="row hidden">
-        Sorry, an error occurred. Please try again.
-        <hr></hr>
-        <div id="error_text"></div>
-    </div>
+        <div id="error" class="row hidden">
+            Sorry, an error occurred. Please try again.
+            <hr></hr>
+            <div id="error_text"></div>
+        </div>
 
-</div> <!-- end search sections -->
+    </div> <!-- end search sections -->
+
+
+    <div class="search-transfer-modal modal fade" id="transferPanel" tabindex="-1" role="dialog" aria-labelledby="transferPanel" data-backdrop="static" data-keyboard="false" aria-hidden="true">
+        <div class="search-transfer-modal modal-dialog">
+            <div class="search-transfer-modal modal-content">
+                <div class="search-transfer-modal modal-body">
+                    <button type="button" class="close pull-right" data-dismiss="modal" aria-hidden="true" ng-hide="options.objectsTransferred > 0 && options.objectsTransferred < options.transfer_cart.size " ng-click="emptyTransfers()">&times;</button>            
+            
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="active"><a>Copy Data to Workspaces</a></li>
+                        <li class="disabled"><a>Create Sets of Objects</a></li>
+                    </ul>
+
+                    <div class='tab-content'>    
+                        <div class="tab-pane active">
+                            <div class="row">
+                                <div class="col-md-4 text-center">
+                                    <div class="row search-transfer-workspace-select">
+                                        <div ng-show="!options.userState.session.selectedWorkspace" class="text-center">
+                                            <h3>                                    
+                                                <span class="search-cart-label">Select a workspace to continue.</span>
+                                            </h3>
+
+                                            <div class="text-center">
+                                                <div>
+                                                    <button type="button" class="btn btn-primary disabled">Copy<span class="glyphicon glyphicon-transfer"><span></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div ng-show="options.userState.session.selectedWorkspace" class="text-center">
+                                            <div class="search-transfer-row">
+                                                <h3>              
+                                                    <button type="button" class="btn btn-danger" ng-click="options.userState.session.selectedWorkspace = undefined; listWorkspaces();" ng-show="options.userState.session.transfer_cart.size == 0 && !options.transferring"><span class="glyphicon glyphicon-remove-sign"></span></button>
+                                                    <span class="glyphicon glyphicon-hdd"></span>
+                                                    <span class="search-cart-label">{{options.userState.session.selectedWorkspace}}</span>
+                                                    <span class="badge badge-info" ng-repeat="w in options.userState.longterm.workspaces" ng-if="w[1] == options.userState.session.selectedWorkspace">{{w[4]}}</span>
+                                                </h3>
+                                            </div>
+                                            <div class="search-transfer-row" ng-show="options.userState.session.transfer_cart.size > 0">
+                                                <button type="button" class="btn btn-primary" ng-class="{disabled: !options.userState.session.selectedWorkspace || options.transferring}" ng-click="copyData(options.active_transfer_type)">Copy<span class="glyphicon glyphicon-transfer"><span></button>
+                                            </div>
+                                            <div class="search-transfer-row search-transfer-row" ng-show="options.userState.session.transfer_cart.size == 0 && !options.transferring">
+                                                <p>Select data from your cart to copy.</p>
+                                            </div>
+                                            <div class="search-transfer-row search-transfer-progress" ng-show="options.userState.session.transfer_cart.size >= 0 && (options.transferring || options.objectsTransferred > 0)">
+                                                <div class="text-center">Object Copy Requests Sent</div>
+                                                <div class="progress">
+                                                    <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{'min-width': (options.transferRequests/options.transferSize * 100.0) + '%'}">
+                                                        {{options.transferRequests}}/{{options.transferSize}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="search-transfer-row search-transfer-progress" ng-show="options.objectsTransferred > 0 && options.transferSize > 0">
+                                                <div class="text-center">Completed Object Copies</div>
+                                                <div class="progress">
+                                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuemin="0" aria-valuemax="100" ng-style="{'min-width': (options.objectsTransferred/options.transferSize * 100.0) + '%'}">
+                                                        {{options.objectsTransferred}}/{{options.transferSize}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="workspace-area" ng-show="options.userState.longterm.workspaces && !options.userState.session.selectedWorkspace">
+                                        <ul class='nav nav-pills nav-stacked scroll-menu'>
+                                            <li id="{{w[1].replace(':','_')}}_{{w[4]}}" ng-repeat="w in options.userState.longterm.workspaces" ng-class="{'workspace-chosen': '{{options.userState.session.selectedWorkspace}}' == '{{w[1]}}'}">
+                                                <a ng-click='selectWorkspace(w)'>
+                                                    <div class="text-left">
+                                                        <span class="glyphicon glyphicon-hdd"></span>
+                                                        <span>{{w[1]}}</span>
+                                                        <span class='badge pull-right'>{{w[4]}}</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-8 text-center">
+                                    <div class="row">
+                                        <h3>
+                                            <span class="search-cart-label">Data Cart</span>
+                                            <span class="space-left glyphicon glyphicon-shopping-cart"></span>
+                                            <span class="badge search-cart-count">{{options.userState.session.data_cart.size | number}}</span>
+                                            <button type="button" class="btn btn-danger btn-xs" ng-click="removeCartSelected()" ng-class="{'disabled': options.userState.session.transfer_cart.size < 0}" data-toggle="tooltip" data-placement="top" tooltip="Remove currently selected items from your cart." tooltip-placement="top"><span class="glyphicon glyphicon-trash"></span></button>
+                                        </h3>
+                                        <div><span class="search-duplicate-icon"></span> This row color indicates data already present in your selected workspace.</div>    
+                                    </div>
+
+                                    <tabset type="pills"> 
+                                        <tab ng-if="options.userState.session.data_cart.types['genome'].size > 0" active="options.data_tabs['genomes']" select="setActiveTab('genomes')">
+                                            <tab-heading><span>Genomes </span><span class="badge search-cart-badge">{{options.userState.session.data_cart.types['genome'].size}}</span></tab-heading>
+                                            <div>                            
+                                                <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
+                                                    <thead>
+                                                        <tr>
+                                                            <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.types['genome'].all" ng-click="toggleAllDataCart('genome')"></input></th>
+                                                            <th class="text-left"><strong>Genome Id</strong></th>
+                                                            <th class="text-left"><strong>Scientific Name</strong></th>
+                                                            <th class="text-left"><strong>Domain</strong></th>
+                                                            <th class="text-left"><strong>%GC</strong></th>
+                                                            <th class="text-left"><strong>Contigs</strong></th>
+                                                            <th class="text-left"><strong>Genes</strong></th>
+                                                            <th class="text-left"><strong>DNA Size bp</strong></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['genome'].markers" class="search-duplicate-row animated fadeInUp" ng-if="options.duplicates[s]">
+                                                            <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].genome_id}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].scientific_name}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].domain}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].gc_content | number: 2}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].num_contigs | number}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].num_cds | number}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].genome_dna_size | number}}</td>
+                                                        </tr>
+                                                        <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['genome'].markers" ng-if="!options.duplicates[s]">
+                                                            <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].genome_id}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].scientific_name}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].domain}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].gc_content | number: 2}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].num_contigs | number}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].num_cds | number}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].genome_dna_size | number}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </tab> 
+                                        <tab ng-if="options.userState.session.data_cart.types.feature.size > 0" active="options.data_tabs['features']" select="setActiveTab('features')">
+                                            <tab-heading><span>Genome Features </span><span class="badge search-cart-badge">{{options.userState.session.data_cart.types['feature'].size}}</span></tab-heading>
+                                            <div>
+                                                <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
+                                                    <thead>
+                                                        <tr>
+                                                            <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.types['feature'].all" ng-click="toggleAllDataCart('feature')"></input></th>
+                                                            <th class="text-left"><strong>Feature Id</strong></th>
+                                                            <th class="text-left"><strong>Feature Source Id</strong></th>
+                                                            <th class="text-left"><strong>Scientific Name</strong></th>
+                                                            <th class="text-left"><strong>Type</strong></th>
+                                                            <th class="text-left"><strong>DNA bp</strong></th>
+                                                            <th class="text-left"><strong>Protein aa</strong></th>
+                                                            <th class="text-left"><strong>Function</strong></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['feature'].markers" class="search-duplicate-row animated fadeInUp" ng-if="options.duplicates[s]">
+                                                            <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].feature_id}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].feature_source_id}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].scientific_name}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].feature_type}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].dna_sequence_length | number}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].protein_translation_length | number}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].function}}</td>
+                                                        </tr>
+                                                        <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['feature'].markers" ng-if="!options.duplicates[s]">
+                                                            <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].feature_id}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].feature_source_id}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].scientific_name}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].feature_type}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].dna_sequence_length | number}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].protein_translation_length | number}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].function}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>    
+                                            </div>
+                                        </tab> <!-- end second tab -->
+                                        <tab ng-if="options.userState.session.data_cart.types['metagenome'].size > 0" active="options.data_tabs['metagenomes']" select="setActiveTab('metagenomes')">
+                                            <tab-heading><span>Metagenomes </span><span class="badge search-cart-badge">{{options.userState.session.data_cart.types['metagenome'].size}}</span></tab-heading>
+                                            <div>
+                                
+                                                <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
+                                                    <thead>
+                                                        <tr>
+                                                            <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.types['metagenome'].all" ng-click="toggleAllDataCart('metagenome')"></input></th>
+                                                            <th class="text-left"><strong>MG-RAST Id</strong></th>
+                                                            <th class="text-left"><strong>Metagenome Name</strong></th>
+                                                            <th class="text-left"><strong>Project</strong></th>
+                                                            <th class="text-left"><strong>Sample</strong></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['metagenome'].markers" class="search-duplicate-row animated fadeInUp" ng-if="options.duplicates[s]">
+                                                            <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].metagenome_id.split('mgm')[1]}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].metagenome_name}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].project_name}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].sample_name}}</td>
+                                                        </tr>
+                                                        <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['metagenome'].markers" ng-if="!options.duplicates[s]">
+                                                            <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].metagenome_id.split('mgm')[1]}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].metagenome_name}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].project_name}}</td>
+                                                            <td class="text-left">{{options.userState.session.data_cart.data[s].sample_name}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>    
+                                            </div>
+                                        </tab> <!-- end third tab -->
+                                        <tab ng-if="options.userState.session.data_cart.types['gwas'].size > 0" active="options.data_tabs['gwas']" select="setActiveTab('gwas')">
+                                            <tab-heading><span>GWAS </span><span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].size}}</span></tab-heading>
+                                            <div>
+                                                <tabset>
+                                                    <tab ng-if="options.userState.session.data_cart.types['gwas'].subtypes['gwas_populations'].size > 0" active="options.data_tabs['gwas_populations']" select="setActiveTab('gwas_populations')">
+                                                        <tab-heading>GWAS Populations<span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_populations'].size}}</span></tab-heading>
+                                                        <div>
+                                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.types['gwas'].subtypes['gwas_populations'].all" ng-click="toggleAllDataCart('gwas_populations')"></input></th>
+                                                                        <th class="text-left"><strong>Object Id</strong></th>
+                                                                        <th class="text-left"><strong>Object Name</strong></th>
+                                                                        <th class="text-left"><strong>Genome Id</strong></th>
+                                                                        <th class="text-left"><strong>Scientific Name</strong></th>
+                                                                        <th class="text-left"><strong>Source</strong></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_populations'].markers" class="search-duplicate-row animated fadeInUp" ng-if="options.duplicates[s]">
+                                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].source}}</td>
+                                                                    </tr>
+                                                                    <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_populations'].markers" ng-if="!options.duplicates[s]">
+                                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].source}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>    
+                                                        </div>
+                                                    </tab>
+                                                    <tab ng-if="options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_variations'].size > 0" active="options.data_tabs['gwas_population_variations']" select="setActiveTab('gwas_population_variations')">
+                                                        <tab-heading>GWAS Population Variations<span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_variations'].size}}</span></tab-heading>
+                                                        <div>
+                                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_variations'].all" ng-click="toggleAllDataCart('gwas_population_variations')"></input></th>
+                                                                        <th class="text-left"><strong>Object Id</strong></th>
+                                                                        <th class="text-left"><strong>Object Name</strong></th>
+                                                                        <th class="text-left"><strong>Originator</strong></th>
+                                                                        <th class="text-left"><strong>Assay</strong></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_variations'].markers" class="search-duplicate-row animated fadeInUp" ng-if="options.duplicates[s]">
+                                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].originator}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].assay}}</td>
+                                                                    </tr>
+                                                                    <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_variations'].markers" ng-if="!options.duplicates[s]">
+                                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].originator}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].assay}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>    
+                                                        </div>
+                                                    </tab>
+                                                    <tab ng-if="options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].size > 0" active="options.data_tabs['gwas_top_variations']" select="setActiveTab('gwas_top_variations')">
+                                                        <tab-heading>GWAS Top Variations<span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].size}}</span></tab-heading>
+                                                        <div>
+                                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].all" ng-click="toggleAllDataCart('gwas_top_variations')"></input></th>
+                                                                        <th class="text-left"><strong>Object Id</strong></th>
+                                                                        <th class="text-left"><strong>Object Name</strong></th>
+                                                                        <th class="text-left"><strong>Trait</strong></th>
+                                                                        <th class="text-left"><strong>Ontology Id</strong></th>
+                                                                        <th class="text-left"><strong>Genome Id</strong></th>
+                                                                        <th class="text-left"><strong>Genome Name</strong></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].markers" class="search-duplicate-row animated fadeInUp" ng-if="options.duplicates[s]">
+                                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_ontology_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_name}}</td>
+                                                                    </tr>
+                                                                    <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_top_variations'].markers" ng-if="!options.duplicates[s]">
+                                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_ontology_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_name}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>    
+                                                        </div>
+                                                    </tab>
+                                                    <tab ng-if="options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].size > 0" active="options.data_tabs['gwas_population_traits']" select="setActiveTab('gwas_population_traits')">
+                                                        <tab-heading>GWAS Population Traits<span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].size}}</span></tab-heading>
+                                                        <div>
+                                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].all" ng-click="toggleAllDataCart('gwas_population_traits')"></input></th>
+                                                                        <th class="text-left"><strong>Object Id</strong></th>
+                                                                        <th class="text-left"><strong>Object Name</strong></th>
+                                                                        <th class="text-left"><strong>Trait</strong></th>
+                                                                        <th class="text-left"><strong>Ontology Id</strong></th>
+                                                                        <th class="text-left"><strong>Genome Id</strong></th>
+                                                                        <th class="text-left"><strong>Genome Name</strong></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].markers" class="search-duplicate-row animated fadeInUp" ng-if="options.duplicates[s]">
+                                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_ontology_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_name}}</td>
+                                                                    </tr>
+                                                                    <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_traits'].markers" ng-if="!options.duplicates[s]">
+                                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].trait_ontology_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_name}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>    
+                                                        </div>
+                                                    </tab>
+                                                    <tab ng-if="options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_kinships'].size > 0" active="options.data_tabs['gwas_population_kinships']" select="setActiveTab('gwas_population_kinships')">
+                                                        <tab-heading>GWAS Population Kinships<span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_kinships'].size}}</span></tab-heading>
+                                                        <div>
+                                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_kinships'].all" ng-click="toggleAllDataCart('gwas_population_kinships')"></input></th>
+                                                                        <th class="text-left"><strong>Object Id</strong></th>
+                                                                        <th class="text-left"><strong>Object Name</strong></th>
+                                                                        <th class="text-left"><strong>Source Genome Name</strong></th>
+                                                                        <th class="text-left"><strong>Genome Id</strong></th>
+                                                                        <th class="text-left"><strong>Genome Name</strong></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_kinships'].markers" class="search-duplicate-row animated fadeInUp" ng-if="options.duplicates[s]">
+                                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].source_genome_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_name}}</td>
+                                                                    </tr>
+                                                                    <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_population_kinships'].markers" ng-if="!options.duplicates[s]">
+                                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].source_genome_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].kbase_genome_name}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>    
+                                                        </div>
+                                                    </tab>
+                                                    <tab ng-if="options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].size > 0" active="options.data_tabs['gwas_gene_lists']" select="setActiveTab('gwas_gene_lists')">
+                                                        <tab-heading>GWAS Gene Lists<span class="badge search-cart-badge">{{options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].size}}</span></tab-heading>
+                                                        <div>
+                                                            <table class="search-transfer-table table table-striped table-condensed" ng-class="{disabled: !options.userState.session.selectedWorkspace}">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].all" ng-click="toggleAllDataCart('gwas_gene_lists')"></input></th>
+                                                                        <th class="text-left"><strong>Object Id</strong></th>
+                                                                        <th class="text-left"><strong>Object Name</strong></th>
+                                                                        <th class="text-left"><strong>Genes</strong></th>
+                                                                        <th class="text-left"><strong>SNPs</strong></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].markers" class="search-duplicate-row animated fadeInUp" ng-if="options.duplicates[s]">
+                                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].gene_count | number}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].genes_snp_count | number}}</td>
+                                                                    </tr>
+                                                                    <tr ng-repeat="(s,v) in options.userState.session.data_cart.types['gwas'].subtypes['gwas_gene_lists'].markers" ng-if="!options.duplicates[s]">
+                                                                        <td><input type="checkbox" class="search-data-cart-checkbox" ng-show="options.userState.session.selectedWorkspace && !options.transferring" ng-model="options.userState.session.data_cart.data[s].cart_selected" ng-click="toggleInCart(s)"></input></td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_id}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].object_name}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].gene_count | number}}</td>
+                                                                        <td class="text-left">{{options.userState.session.data_cart.data[s].genes_snp_count | number}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>    
+                                                        </div>
+                                                    </tab>
+                                                </tabset>
+                                            </div>
+                                        </tab> <!-- end fourth tab -->
+                                    </tabset> <!-- end all tabs -->
+                                </div>
+                            </div>
+                        </div> <!-- end copy tab -->    
+                    </div> <!-- end transfer panel -->
+                </div> <!-- end modal body --> 
+            </div> <!-- end modal-content -->
+        </div> <!-- end modal-dialog -->
+    </div> <!-- end transfer panel area -->
+
 </div>

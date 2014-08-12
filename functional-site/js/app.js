@@ -246,6 +246,10 @@ var app = angular.module('landing-pages',
             url: '/KBaseGwasData.GwasGeneList/:ws/:id',
             templateUrl: 'views/objects/ggltype.html',
             controller: 'GGLTypeDetail'})  
+       .state('gpktype', {
+            url: '/KBaseGwasData.GwasPopulationKinship/:ws/:id',
+            templateUrl: 'views/objects/gpktype.html',
+            controller: 'GGLTypeDetail'})  
        .state('gtvtype', {
             url: '/KBaseGwasData.GwasTopVariations/:ws/:id',
             templateUrl: 'views/objects/gtvtype.html',
@@ -481,7 +485,7 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
     $urlRouterProvider.otherwise('/404/');
     
     $stateProvider.state("404", 
-            {url: '/404/', 
+            {url: '*path', 
              templateUrl : 'views/404.html'});
 
 }]);
@@ -509,14 +513,7 @@ app.service('userState', function userStateService() {
     
     return {
         userState : JSON.parse(localStorage.KBaseUserState),
-        landingPages : {"genome": "/genomes/CDS/",
-                        "feature": "/genes/CDS/",
-                        "gwasPopulation": "/KBaseGwasData.GwasPopulation/",
-                        "gwasTrait": "/KBaseGwasData.GwasPopulationTrait/",
-                        "gwasVariation": "/KBaseGwasData.GwasPopulationVariation/",
-                        "gwasGeneList": "/KBaseGwasData.GwasGeneList/",
-                        "metagenome": "http://metagenomics.anl.gov/?page=MetagenomeOverview&metagenome=",
-                       },
+        landingPages : JSON.parse("landing_pages.json"),
 
         reset : function() {
             this.userState = JSON.parse(localStorage.KBaseUserState);
@@ -547,6 +544,7 @@ configJSON = $.parseJSON( $.ajax({url: "config.json",
 
 
 app.run(function ($rootScope, $state, $stateParams, $location) {
+/*
     var HELP_DROPDOWN = '<a href="#" class="dropdown-toggle" data-toggle="dropdown">Help <b class="caret"></b></a> \
                  <ul class="dropdown-menu"> \
                  <li><a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a></li> \
@@ -554,6 +552,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
                  <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li> \
               </ul>';
     $('.help-dropdown').html(HELP_DROPDOWN);
+*/
 
     //  Things that need to happen when a view changes.
     $rootScope.$on('$locationChangeStart', function(event) {
@@ -565,10 +564,10 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     
         if (absUrl.indexOf('/functional-site/#/') < 0 && begin > 0 && absUrl.length > begin + offset) {
             event.preventDefault();
-            $location.path('/404/');   
-            $state.go('404');
+            $state.go('404', null, {location: false});
         }    
     });
+
 
     //  Things that need to happen when a view changes.
     $rootScope.$on('$stateChangeSuccess', function() {
@@ -577,6 +576,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         $('.popover').remove(); // remove any dangling pop overs
         removeCards();
     });
+
 
     var finish_login = function(result) {
         if (!result.success)
@@ -621,7 +621,6 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
 
 
     $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
-
 
     // global state object to store state
     state = new State();

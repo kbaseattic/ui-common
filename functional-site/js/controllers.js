@@ -728,4 +728,3 @@ function ScrollCtrl($scope, $location, $anchorScroll) {
     $anchorScroll();
   }
 }
-

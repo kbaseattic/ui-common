@@ -713,6 +713,8 @@
                 this.showGWASTraitCards();
             else if (this.options.template.toLowerCase() === "gvtype")
                 this.showGWASVarCards();
+            else if (this.options.template.toLowerCase() === "gpktype")
+                this.showGWASPopKinshipCards();
             else if (this.options.template.toLowerCase() === "ggltype")
                 this.showGWASGeneListCards();
             else if (this.options.template.toLowerCase() === "gtvtype")
@@ -1017,31 +1019,31 @@
                 { my: "left top",
                   at: "left-30 top",
                   of: "#app"});
-            var populationCard = this.addNewCard("KBaseGWASPop",
-                { id: this.options.data.id, ws: this.options.data.ws},
-                { my: "left top",
-                  at: "left-30 top+550",
-                  of: "#app"});
             var populationTableCard = this.addNewCard("KBaseGWASPopTable",
                 { id: this.options.data.id, ws: this.options.data.ws},
                 { my: "right top",
-                  at: "right-20 top+550",
+                  at: "right-20 top",
                   of: "#app"});
+            var populationCard = this.addNewCard("KBaseGWASPop",
+                { id: this.options.data.id, ws: this.options.data.ws},
+                { my: "left+2 top+45",
+                  at: "center middle",
+                  of: populationMapCard});
         },
 
         /**
          * Template to show GWAS traits data
          */
         showGWASTraitCards: function() {
-            this.addNewCard("KBaseGWASTraitMaps",
+            var traitMapCard = this.addNewCard("KBaseGWASTraitMaps",
                 { id: this.options.data.id, ws: this.options.data.ws},
-                { my: "left top",
-                  at: "left bottom",
+                { my: "left top-10",
+                  at: "left-30 bottom",
                   of: "#app"});
-            this.addNewCard("KBaseGWASTraitTable",
+            var traiTableCard = this.addNewCard("KBaseGWASTraitTable",
                 { id: this.options.data.id, ws: this.options.data.ws},
-                { my: "left top",
-                  at: "left bottom+600",
+                { my: "left top-10",
+                  at: "center middle",
                   of: "#app"});
         },
 
@@ -1057,13 +1059,24 @@
         },
 
         /**
+         * Template to show GWAS kinship data
+         */
+        showGWASPopKinshipCards: function() {
+            this.addNewCard("KBaseGWASPopKinshipTable",
+                { id: this.options.data.id, ws: this.options.data.ws},
+                { my: "left top",
+                  at: "left bottom",
+                  of: "#app"});
+        },
+
+        /**
          * Template for showing GWAS Gene List
          */
          showGWASGeneListCards: function() {
             this.addNewCard("KBaseGWASGeneListTable",
-                { id: this.options.data.id, ws: this.options.data.ws},
+                { id: this.options.data.id, ws: this.options.data.ws, draggable: false},
                 { my: "left top",
-                  at: "left bottom",
+                  at: "left-30 top-10",
                   of: "#app"});
          },
 
@@ -1073,13 +1086,13 @@
          showGWASTopVariationsCards: function() {
             this.addNewCard("KBaseGWASTopVariations",
                 { id: this.options.data.id, ws: this.options.data.ws},
-                { my: "left top",
-                  at: "left bottom",
+                { my: "left top-10",
+                  at: "left top",
                   of: "#app"});
             this.addNewCard("KBaseGWASTopVariationsTable",
                 { id: this.options.data.id, ws: this.options.data.ws},
-                { my: "left top",
-                  at: "left+410 bottom",
+                { my: "right top",
+                  at: "right-20 top-10",
                   of: "#app"});
         },
 
@@ -2303,16 +2316,23 @@
             // otherwise use options.
             if (newWidget.getData) {
                 var data = newWidget.getData();
+                console.log(data);
                 var cardTitle = data.title ? data.title : "";
                 var cardSubtitle = data.id ? data.id : "";
                 var cardWidth = newWidget.options.width ? newWidget.options.width : this.defaultWidth;
                 var cardWorkspace = data.workspace ? data.workspace : this.cdmWorkspace;
+                var cardDrag = data.draggable ? true: data.draggable;
+                var cardResize = data.resizable ? true: data.resizable;
+                var cardClass = data.dialogClass ? data.dialogClass : null;
             } else {
-                console.log('here')
+                console.log(options);
                 var cardTitle = options.title ? options.title : "";
                 var cardSubtitle = options.id ? options.id : "";
                 var cardWidth = options.width ? options.width : this.defaultWidth;                
                 var cardWorkspace = options.workspace ? options.workspace : this.cdmWorkspace;                
+                var cardDrag = options.draggable ? true: options.draggable;
+                var cardResize = options.resizable ? true: options.resizable;
+                var cardClass = options.dialogClass ? options.dialogClass : null;
             }
 
             var cardOptions = {
@@ -2327,10 +2347,14 @@
                        "</span></div>",
                 width: cardWidth,
                 id: newCardId,
+                draggable: cardDrag,
+                resizable: cardResize,
+                dialogClass: cardClass
             };
 
-            if (newWidget.options.height)
+            if (newWidget.options.height) {
                 cardOptions.height = newWidget.options.height;
+            }
 
             var self = this;
             var newCard = newWidget.$elem.LandingPageCard(cardOptions); //$("#" + newCardId).LandingPageCard(cardOptions);
