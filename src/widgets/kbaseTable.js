@@ -727,7 +727,7 @@ kb_define('kbaseTable',
                             return;
                         }
 
-                        filterString += value;
+                        filterString += typeof value == 'object'  && value.text != undefined ? value.text() : value;
 
                         var $td = $.jqElem('td').append(value);
 
@@ -770,7 +770,8 @@ kb_define('kbaseTable',
                         if (label == undefined) {
                             label = this.default_row_callback(rowData[h], h, rowData, this);
                         }
-                        filterString += label;
+
+                        filterString += typeof label == 'object' && label.text != undefined ? label.text() : label;
 
                         if (rowData[h] && ! rowData[h].externalSortValue) {
 

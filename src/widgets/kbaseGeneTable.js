@@ -43,7 +43,7 @@
             table: null,
             maxVisibleRowIndex : 20,
 
-            row_callback : function (cell, header, row, $kb) {
+            /*row_callback : function (cell, header, row, $kb) {
 
                 var def = $kb.default_row_callback(cell, header, row, $kb);
 
@@ -60,7 +60,7 @@
 
                 return $.jqElem('div').append($div).append($.jqElem('div').attr('class', 'dots').css({'font-style' : 'italic', 'text-align' : 'right'}).append('...more'));
 
-            },
+            },*/
 
         },
 
@@ -98,7 +98,7 @@
             return this._super(options);
         },
 
-        appendUI : function($elem, struct) {
+        /*appendUI : function($elem, struct) {
             this._super($elem, struct);
 
             $elem.find('.truncated').each(function(i,v) {
@@ -123,7 +123,7 @@
             ;
 
             return $elem;
-        },
+        },*/
 
 
     });
