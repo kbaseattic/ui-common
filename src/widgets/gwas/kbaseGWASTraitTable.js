@@ -1,7 +1,7 @@
 (function( $, undefined ) {
     $.KBWidget({
         name: "KBaseGWASTraitTable",
-        parent: "kbaseWidget",
+        parent: "kbaseAuthenticatedWidget",
         version: "1.0.0",
         options: {
             type: "KBaseGwasData.GwasPopulationTrait",
@@ -15,7 +15,13 @@
             this._super(options);
 
             var self = this;
-            this.workspaceClient = new Workspace(this.workspaceURL);
+            
+            if (!this.options.kbCache && !this.authToken()) {
+                this.renderError("No cache given, and not logged in!");
+            }
+            else {
+                this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
+            }
 
             var success = function(data) {                    
                 self.collection = data[0];

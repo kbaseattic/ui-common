@@ -1,7 +1,7 @@
 (function( $, undefined ) {
     $.KBWidget({
         name: "KBaseGWASPop",
-        parent: "kbaseWidget",
+        parent: "kbaseAuthenticatedWidget",
         version: "1.0.0",
         //width: 600,
         options: {
@@ -15,7 +15,12 @@
 
             var self = this;
 
-            this.workspaceClient = new Workspace(this.workspaceURL);
+            if (!this.options.kbCache && !this.authToken()) {
+                this.renderError("No cache given, and not logged in!");
+            }
+            else {
+                this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
+            }
 
             this.workspaceClient.get_objects([{name : this.options.id, workspace: this.options.ws}], 
                 function(data){
