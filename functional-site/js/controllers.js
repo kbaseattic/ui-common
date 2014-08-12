@@ -205,23 +205,12 @@ app.controller('RxnDetail', function($scope, $stateParams) {
         $('#previous-changes').slideToggle();
     }
 
-    $scope.hideSidebar = function(route) {
-        $('#ws-sidebar').toggle('slide', {
-                         direction: 'left',
-                         duration: 'fast',
-                             complete: function() {
-                                $state.transitionTo(route,  {ws:ws, id:id})
-                         }
-                     })
-    }
 
 })
 
 .controller('FBALanding', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;  
-
-
 })
 
 .controller('WBLanding', function($scope, $stateParams) {

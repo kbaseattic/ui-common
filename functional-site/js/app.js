@@ -68,21 +68,6 @@ var app = angular.module('landing-pages',
           controller: 'WB'
         })
 
-    // old narrative pages */
-    /*
-    $stateProvider
-        .state('narrative', {
-          url: "/narrative/",
-          templateUrl: 'views/narrative/home.html',
-          controller: 'Narrative'
-        }).state('narrative.projects', {
-          url: "projects/",
-          templateUrl: 'views/narrative/projects.html',
-          controller: 'NarrativeProjects'
-        });
-    */
-
-
     // workspace browser routing
     $stateProvider
         .state('ws', {

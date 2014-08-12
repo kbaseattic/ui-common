@@ -922,7 +922,7 @@ angular.module('ws-directives')
                                             +'</div>',
                                              bSortable: false, "sWidth": "1%"} 
                                           : { "sTitle": '', bVisible: false, "sWidth": "1%"}),
-                                { "sTitle": "Name", "sContentPadding": "xxxxxxxMore"}, //"sWidth": "10%"
+                                { "sTitle": "Name", "contentPadding": "xxxxxxxMore"}, //"sWidth": "10%"
                                 { "sTitle": "Type"},
                                 { "sTitle": "Last Modified", "iDataSort": 5},
                                 { "sTitle": "Modified By", bVisible: true},
@@ -1283,7 +1283,7 @@ angular.module('ws-directives')
                                     ' data-name="'+name+'" data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" ><b><i>'+
                                         name+'</i></b></a> (<a class="show-versions">'+instance+'</a>)'+
                                 (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
-                                '<a class="btn-show-info hide pull-right">More</a>';
+                                '<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>';
 
                     wsarray[1] = new_id;
                     url = "ws.id({ws:"+"'"+ws+"'})";
@@ -1382,7 +1382,7 @@ angular.module('ws-directives')
                                         'data-sub="'+sub+'" ui-sref="'+url+'" >'+
                                     name+'</a> (<a class="show-versions">'+instance+'</a>)'+
                                     //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
-                                    '<a class="btn-show-info hide pull-right">More</a>';
+                                    '<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>';
 
                     } else if (kind == "Narrative") {
                         var url = '/narrative/ws.'+wsid+'.obj.'+id;
@@ -1391,7 +1391,7 @@ angular.module('ws-directives')
                                         'data-sub="'+sub+'" '+(USER_ID ? 'href="'+url+'"' : '')+' target="_blank"><i><b>'+
                                       name+'</b></i></a> (<a class="show-versions">'+instance+'</a>)'+
                                       //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
-                                     '<a class="btn-show-info hide pull-right">More</a>';
+                                     '<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>';
 
                     } else {
                         var url = "ws.json({ws:'"+ws+"', id:'"+name+"'})"
@@ -1400,7 +1400,7 @@ angular.module('ws-directives')
                                         'data-sub="'+sub+'" ui-sref="'+url+'" target="_blank" >'+
                                       name+'</a> (<a class="show-versions">'+instance+'</a>)'+
                                       //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
-                                     '<a class="btn-show-info hide pull-right">More</a>';
+                                     '<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>';
                     }
 
                     wsarray[1] = new_id;
@@ -1517,10 +1517,13 @@ angular.module('ws-directives')
                 // effect for highlighting checkbox on hover
                 $('.obj-table tbody tr').hover(function() {
                     $(this).children('td').eq(0).find('.ncheck').addClass('ncheck-hover');
-                    $(this).find('.btn-show-info').removeClass('hide');
+                    $(this).find('.btn-show-info').css('visibility', 'visible')
+                    //$(this).find('.btn-show-info').removeClass('hide');
                 }, function() {
                     $(this).children('td').eq(0).find('.ncheck').removeClass('ncheck-hover');
-                    $(this).find('.btn-show-info').addClass('hide');
+                    $(this).find('.btn-show-info').css('visibility', 'hidden')                    
+                    //$(this).find('.btn-show-info').addClass('hide');
+
                 })
 
                 // checkbox click event
@@ -2802,6 +2805,63 @@ angular.module('ws-directives')
     }
 })
 
+.directive('showHideSidebar', function($location, $compile, $state, $stateParams) {
+    return {
+        template: '<div class="glyphicon glyphicon-backward pointer"></div>',
+        link: function(scope, ele, attrs) {
+            $(ele).click(function() {
+                if ($('.sidebar').hasClass('col-sm-3') ) {
+                    $(ele).parents('.sidebar').toggle('slide', {
+                        direction: 'left',
+                        duration: 'fast',
+                        complete: function() {
+                            // shide selector part
+                            $('.ws-selector').hide();
+
+                            // add fixed small sidebar
+                            var sidebar = $('.sidebar');
+                            sidebar.removeClass('col-sm-3 col-md-3');
+                            sidebar.addClass('sidebar-minimized');
+                            sidebar.show(); 
+
+                            // adjust main layout
+                            var main = $('.main').addClass('main-fullsize');
+                            main.removeClass('col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main');
+                            main.addClass('col-sm-12 col-md-12 main-fullsize');
+
+                            // change icon
+                            var icon = $(ele).find('.glyphicon');
+                            icon.removeClass('glyphicon-backward');
+                            icon.addClass('glyphicon-forward');                            
+                        }
+                    })
+                } else {
+                    $(ele).parents('.sidebar').toggle('slide', {
+                        direction: 'right',
+                        duration: 'fast',
+                        complete: function() {
+                            $('.ws-selector').show();
+
+                            var sidebar = $('.sidebar');
+                            sidebar.removeClass('sidebar-minimized');
+                            sidebar.addClass('col-sm-3 col-md-3');
+                            sidebar.show(); 
+
+                            var main = $('.main-fullsize');
+                            main.removeClass('col-sm-12 col-md-12');
+                            main.addClass('col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main');
+                            $('.main').removeClass('main-fullsize');
+
+                            var icon = $(ele).find('.glyphicon');
+                            icon.removeClass('glyphicon-forward');
+                            icon.addClass('glyphicon-backward');
+                        }
+                    })                    
+                }
+            })
+        }
+    }
+})
 
 .directive('wsmanage', function($location, $compile, $state, $stateParams) {
     return {
@@ -2892,7 +2952,6 @@ angular.module('ws-directives')
         }
     }
 })
-
 
 
 function getEditableDescription(d) {
