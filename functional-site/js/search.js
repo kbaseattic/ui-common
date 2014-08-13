@@ -263,8 +263,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
     $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
         if (toState.name === "search") {
-            console.log($scope.options.userState);
-            console.log("state change to search");
+            //console.log($scope.options.userState);
+            //console.log("state change to search");
             $scope.startSearch();      
         }  
     });
@@ -570,7 +570,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                       else {
                           if (jsonResult.data.items[i].hasOwnProperty("feature_id")) {
                               jsonResult.data.items[i].row_id = jsonResult.data.items[i].feature_id.replace(/\||\./g,"_");
-                              console.log(jsonResult.data.items[i].row_id);
+                              //console.log(jsonResult.data.items[i].row_id);
                           }
                           else if (jsonResult.data.items[i].hasOwnProperty("genome_id")) {
                               jsonResult.data.items[i].row_id = jsonResult.data.items[i].genome_id.replace(/\||\./g,"_");
@@ -594,12 +594,14 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                       for (var p in $scope.options.resultJSON.facets) {
                           if ($scope.options.resultJSON.facets.hasOwnProperty(p)) {
                               var facet_options = [];
+                              var count = 0;
                       
                               for (var i = 0; i < $scope.options.resultJSON.facets[p].length - 1; i += 2) {
                                   facet_options.push({key: $scope.options.resultJSON.facets[p][i], value: $scope.options.resultJSON.facets[p][i+1]});                              
+                                  count += $scope.options.resultJSON.facets[p][i+1];
                               }
                   
-                              $scope.options.facets.push({key: p, value: facet_options});
+                              $scope.options.facets.push({key: p, value: facet_options, count: count});
                           }
                       }
                   }
@@ -1010,7 +1012,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     };
 
     $scope.addFacet = function (name, value, searchAgain) {  
-        console.log([name, value]);
+        //console.log([name, value]);
           
         if (!$scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
             $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets = name + ":" + value.replace(",","*").replace(":","^");
@@ -1028,8 +1030,6 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         }
         
         $scope.options.active_facets[$scope.options.selectedCategory][name][value] = true;        
-
-        console.log($scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets);
 
         if (searchAgain === undefined || searchAgain === true) {
             $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);        
@@ -1061,17 +1061,15 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     $scope.removeAllFacets = function () {
         var changed = false;
     
-        console.log($scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets);
-    
         for (var name in $scope.options.active_facets[$scope.options.selectedCategory]) {
-            console.log(name);
+            //console.log(name);
         
             if ($scope.options.active_facets[$scope.options.selectedCategory].hasOwnProperty(name)) {
-                console.log(name);
+                //console.log(name);
                 for (var value in $scope.options.active_facets[$scope.options.selectedCategory][name]) {
-                    console.log(value);
+                    //console.log(value);
                     if ($scope.options.active_facets[$scope.options.selectedCategory][name].hasOwnProperty(value)) {
-                        console.log(value);
+                        //console.log(value);
                         $scope.removeSearchFilter($scope.options.selectedCategory, "facets", name, value);
                         changed = true;
                     }
@@ -1083,9 +1081,6 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 }
             }            
         }
-        
-        console.log(changed);
-        console.log($scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets);
         
         if (changed) {
             $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);        
@@ -1109,7 +1104,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $("#loading_message_text").html("Looking for workspaces you can copy to...");
             $("#workspace-area").block({message: $("#loading_message")});
         
-            console.log("Calling list_workspace_info");
+            //console.log("Calling list_workspace_info");
         
             $scope.workspace_service.list_workspace_info({"perm": "w"})
                 .then(function(info, status, xhr) {
@@ -1506,7 +1501,6 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                             for (var i = $scope.options.userState.longterm.workspaces.length - 1; i >= 0; i--) {
                                 if ($scope.options.userState.longterm.workspaces[i][1] === $scope.options.userState.session.selectedWorkspace) {
                                      $scope.$apply(function () {
-                                         console.log(info);
                                          $scope.options.userState.longterm.workspaces[i][4] = info[4];
                                      });
                                      
@@ -1514,7 +1508,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                                 }
                             }
                             
-                            console.log([$scope.options.objectsTransferred, $scope.options.transferSize]);
+                            //console.log([$scope.options.objectsTransferred, $scope.options.transferSize]);
                         },
                         function (error) {
                             console.log(error);
@@ -1546,7 +1540,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             loop_requests = [];
         }        
 
-        console.log(types);
+        //console.log(types);
         
         for (var t in types) {
             if (types.hasOwnProperty(t) && $scope.options.userState.session.data_cart.types[t].hasOwnProperty("all")) {
@@ -1764,8 +1758,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 $scope.options.userState.session.data_cart.data[id]["cart_selected"] = false;
 
 
-                console.log($scope.options.userState.session.data_cart.data[id]);
-                console.log($scope.options.userState.session.data_cart.types['gwas']);
+                //console.log($scope.options.userState.session.data_cart.data[id]);
+                //console.log($scope.options.userState.session.data_cart.types['gwas']);
             }
             else {
                 throw Error("Trying to add unknown type!");        
