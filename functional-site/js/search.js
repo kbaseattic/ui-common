@@ -829,7 +829,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 $scope.options.searchOptions.perCategory[value] = {"page": 1};
             }
             
-            $state.go("search", {category: $scope.options.selectedCategory});
+            $state.go("search", {category: $scope.options.selectedCategory, itemsPerPage: null, facets: null, sort: null});
         }
     };
 
