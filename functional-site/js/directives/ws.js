@@ -26,7 +26,7 @@ angular.module('ws-directives')
             // Global list and dict of fetched workspaces
             var workspaces = []; 
 
-            var nav_height = 95;
+            var nav_height = 90;
 
             // This method loads the sidebar data.  
             // Note: this is only called after instantiation when sidebar needs to be refreshed
@@ -580,10 +580,8 @@ angular.module('ws-directives')
 
                     modal_body.find('.ws-info').append(table)
 
-
-
-                    // if user is logged in and admin
-                    //if (USER_ID && isAdmin ) {
+                    // if user is logged in (going to allow write access viewing soon)
+                    //if (USER_ID ) {
                         var params = {workspace: ws_name}
                         var prom = kb.ws.get_permissions(params);
 
@@ -614,6 +612,7 @@ angular.module('ws-directives')
                             })
 
                         }).fail(function(e){
+                            placeholder.rmLoading();
                             modal_body.append('<div class="alert alert-danger">'+
                                 '<b>Error:</b> Can not fetch WS permissions: '+
                                     e.error.message+'</div>');
@@ -2856,9 +2855,30 @@ angular.module('ws-directives')
                             icon.removeClass('glyphicon-forward');
                             icon.addClass('glyphicon-backward');
                         }
-                    })                    
+                    })
                 }
             })
+        }
+    }
+})
+
+.directive('wsDescription', function($location, $compile, $state, $stateParams) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = kb.ws.get_workspace_description({workspace: $stateParams.ws})
+            $.when(p).done(function(data){
+                if (!data) {
+                    return;
+                }
+                var container = $('<div class="ws-descript">')
+                var descript = $('<div class="ellipsis" title="'+data+'">'+data+'</div>')
+                container.append(descript);
+                $(ele).append(container); 
+
+                //var edit = $('<div class="glyphicon glyphicon-pencil">')
+                //container.append(edit);
+            })
+
         }
     }
 })
