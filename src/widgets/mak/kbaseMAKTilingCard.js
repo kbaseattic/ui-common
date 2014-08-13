@@ -42,7 +42,7 @@
             
             var self = this;
 			
-			$instructions = $("<b><i>Click on a tile, selection will be <span style='color:#99FFCC'>aqua</span>. Mouse over highlighting is <span style='color:#00CCFF'>light steel blue</span>.</i></b>")
+			$instructions = $("<p><b><i>Click on a bicluster, the selection will be <span style='color:#99FFCC'>aqua</span>. Previously selected biclusters will be <span style='color:#00CCFF'>light blue</span>. Select them again to deselect.</i></b></p><p><b><i>Selecting terms in the bar chart (right) will color biclusters, which contain the terms <span style='color:#F08A04'>orange</span>.</i></b></p>")
 			self.$elem.append($instructions)	
 			$tilingDiv = $("<div id='tilingDiv' style='overflow:auto;height:450px;resize:vertical;position:relative'/>")
 			self.$elem.append($tilingDiv)
@@ -162,6 +162,7 @@
 					}
 					loader.hide()
 					var previousTerms = []
+					var previousTile = []
 					var tiles = []
 					_.each(blocks, function(o,i){
 						var block = blocks[i];
@@ -187,30 +188,34 @@
 								.val(block.index)
 								.on("mouseover", 
 									function() { 
-										if (!$(this).hasClass('picked')) {
-											d3.select(this).style("background", "#00CCFF")
-											if ($(this).hasClass('currentHeatmap')) d3.select(this).style("background", "#99FFCC")
-											for (term in block.terms) {
-												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
-												if (!$("#"+barChartSelector).hasClass('picked')) d3.select("#"+barChartSelector).style("background", "#00CCFF")
-											}
+
+										d3.select(this).style("background", "#00CCFF")
+										for (term in block.terms) {
+											barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')
+											d3.select("#"+barChartSelector).style("background", "#00CCFF")
 										}
+
 										self.tooltip = self.tooltip.text("bicluster: "+biclusters[block.index].bicluster_id+", rows: "+biclusters[block.index].gene_ids.length+", columns: "+biclusters[block.index].condition_ids.length+", number: "+i);
 										return self.tooltip.style("visibility", "visible"); 
 									}
 								)
 								.on("mouseout", 
 									function() { 
-										if (!$(this).hasClass('picked')) {
-											d3.select(this).style("background", "steelblue");
-											if ($(this).hasClass('pickedFromBar')) d3.select(this).style("background", "#F08A04")									
-											if ($(this).hasClass('currentHeatmap')) d3.select(this).style("background", "#99FFCC")
-											for (term in block.terms) {
-												barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')										
-												origColor = d3.select("#"+barChartSelector).attr("class")
-												if (!$("#"+barChartSelector).hasClass('picked')) d3.select("#"+barChartSelector).style("background", origColor)
-											}
+										d3.select(this).style("background", "steelblue");
+										if ($(this).hasClass('pickedFromBar')) d3.select(this).style("background", "#F08A04")									
+										if ($(this).hasClass('pickedFromTile')) d3.select(this).style("background", "#00CCFF")
+										if ($(this).hasClass('currentHeatmap')) d3.select(this).style("background", "#99FFCC")
+										for (term in block.terms) {
+											barChartSelector = block.terms[term].replace(/\s+/g, '').replace(/,/g,'')										
+											var origColor = d3.select("#"+barChartSelector).attr("class")
+											temp = origColor.indexOf(' ')
+											if (temp != -1) origColor = origColor.substring(0,temp)
+											d3.select("#"+barChartSelector).style("background", origColor)
+											if ($("#"+barChartSelector).hasClass('pickedFromBar')) d3.select("#"+barChartSelector).style("background", "#F08A04")
+											if ($("#"+barChartSelector).hasClass('pickedFromTile')) d3.select("#"+barChartSelector).style("background", "#00CCFF")
+											if ($("#"+barChartSelector).hasClass('currentTerms')) d3.select("#"+barChartSelector).style("background", "#99FFCC");
 										}
+										
 										return self.tooltip.style("visibility", "hidden"); 
 									}
 								)
@@ -220,46 +225,75 @@
 									}
 								)
 								.on("click",
-									function(d) {
-										if ($(this).hasClass('picked')) {
-											$(this).removeClass('picked')
+									function(d) {										
+										if ($(this).hasClass('pickedFromTile')) {
+											$(this).removeClass('pickedFromTile')
+											$.each(block.terms, function(i,d) {
+												barChartSelector = d.replace(/\s+/g, '').replace(/,/g,'')	
+												temp = selectionHandler.indexOf(barChartSelector)
+												selectionHandler.splice(temp,1)
+												if (selectionHandler.indexOf(barChartSelector)==-1) $("#"+barChartSelector).removeClass('pickedFromTile')
+												d3.select("#"+barChartSelector).style("background", "steelblue")
+												if (!$("#"+barChartSelector).hasClass('pickedFromBar')) d3.select("#"+barChartSelector).style("background", "#F08A04")
+												if (!$("#"+barChartSelector).hasClass('currentTerms')) d3.select("#"+barChartSelector).style("background", "#99FFCC")
+											})
 										}
 										else {
-											$(this).addClass('picked')
+											$(this).addClass('pickedFromTile')																													
 											$.each(block.terms, function(i,d) {
-												barChartSelector = d.replace(/\s+/g, '').replace(/,/g,'')
+												selectionHandler.push(barChartSelector)
 												if (!$("#"+barChartSelector).hasClass('pickedFromTile')) $("#"+barChartSelector).addClass('pickedFromTile')
+												if (!$("#"+barChartSelector).hasClass('currentTerms')) $("#"+barChartSelector).addClass('currentTerms')
+												else $("#"+barChartSelector).removeClass('currentTerms')
 												d3.select("#"+barChartSelector).style("background", "#99FFCC");
 											})
+												
+											d3.select(".currentHeatmap").style("background", "steelblue");
+											if ($(".currentHeatmap").hasClass("pickedFromBar")) d3.select(".currentHeatmap").style("background", "#F08A04")
+											if ($(".currentHeatmap").hasClass("pickedFromTile")) d3.select(".currentHeatmap").style("background", "#00CCFF")
+											d3.select(this).style("background", "#99FFCC")
+											
+											$(".currentHeatmap").removeClass('currentHeatmap')									
+											$(this).addClass('currentHeatmap') 	
+											
+											if (previousTerms.length) {
+												$.each(previousTerms, function(i,d) {
+													barChartSelector = d.replace(/\s+/g, '').replace(/,/g,'')
+													var origColor = d3.select("#"+barChartSelector).attr("class")
+													temp = origColor.indexOf(' ')
+													if (temp != -1) origColor = origColor.substring(0,temp)
+													d3.select("#"+barChartSelector).style("background",origColor)
+													if ($("#"+barChartSelector).hasClass('currentTerms')) $("#"+barChartSelector).removeClass('currentTerms')
+													if ($("#"+barChartSelector).hasClass('pickedFromBar')) d3.select("#"+barChartSelector).style("background","#F08A04")
+													if ($("#"+barChartSelector).hasClass('pickedFromTile')) d3.select("#"+barChartSelector).style("background","#00CCFF")
+												})
+											}
+											
+											previousTile = this
+											previousTerms = block.terms
 										}
-
-										if (previousTerms.length) {
-											$.each(previousTerms, function(i,d) {
-												barChartSelector = d.replace(/\s+/g, '').replace(/,/g,'')
-												d3.select("#"+barChartSelector).style("background","steelblue")
-												if ($("#"+barChartSelector).hasClass('picked')) d3.select("#"+barChartSelector).style("background","#F08A04")
-											})
-										}
-										
-										previousTerms = blocks.term
 
 									}
 								)
 							tiles.push($item)							
-									  
+							var startTile = "MAK_tile_"+biclusters[0].bicluster_id.replace(/\./g,'').replace(/\|/,'')	
+							if ($item.attr("id") == startTile) {
+								console.log($item)
+								$item.addClass('currentHeatmap') 
+								$item.css("background", "#99FFCC")
+							}
 							setTimeout(function(){ $bin.append($item) }, 5*i);
 						}
 					});
-						
+							
 					$tilingDiv.append($bin)
 					if (self.options.scope) {
 						self.options.scope.$apply(function() {
 							self.options.scope.terms = terms
 						})
 					}
-					self.trigger("showBarChart", {terms: terms, workspace: self.options.workspace, id: self.options.id})
-					self.trigger("showMAKBicluster", { bicluster: [biclusters,0,bicluster_info], workspace: self.options.workspace, tiles: tiles})
-					
+					// self.trigger("showBarChart", {terms: terms, workspace: self.options.workspace, id: self.options.id})
+					// self.trigger("showMAKBicluster", { bicluster: [biclusters,0,bicluster_info], workspace: self.options.workspace, tiles: tiles})
 					
                 },
 
