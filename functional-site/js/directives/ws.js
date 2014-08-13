@@ -2877,7 +2877,9 @@ angular.module('ws-directives')
 
                 //var edit = $('<div class="glyphicon glyphicon-pencil">')
                 //container.append(edit);
-            })
+            }).fail(function(e){
+                modal_body.append('<div class="alert alert-danger">'+e.error.message+'</div>');
+            });
 
         }
     }
