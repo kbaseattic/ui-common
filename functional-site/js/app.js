@@ -45,6 +45,7 @@ var app = angular.module('landing-pages',
         });
 
 
+    // narrative pages routing
     $stateProvider
         .state('narratives', {
           url: "/narratives/",
@@ -180,17 +181,18 @@ var app = angular.module('landing-pages',
         });
 
 
+    // communities pages
     $stateProvider
         .state('ws.metagenome', {
-          url: "metagenome/:ws/:name/",
+          url: "metagenome/:ws/:id",
           templateUrl: 'views/ws/objs/metagenome.html',
           controller: 'WBLanding'
         }).state('ws.collection', {
-          url: "collection/:ws/:name/",
+          url: "collection/:ws/:id",
           templateUrl: 'views/ws/objs/collection.html',
           controller: 'WBLanding'
         }).state('ws.profile', {
-          url: "profile/:ws/:name/",
+          url: "profile/:ws/:id",
           templateUrl: 'views/ws/objs/profile.html',
           controller: 'WBLanding'
         });
@@ -202,8 +204,7 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/ws/favorites.html',
           controller: 'Favorites'
         });
-
-
+        
     // other pages
     $stateProvider
         .state('trees', {

@@ -882,7 +882,7 @@ angular.module('ws-directives')
                         kb.ws.get_objects([{wsid: wsid, objid: id}])
                              .done(function(d) {
                                 var metagenome_id = d[0].data.metagenome_id;
-                                window.location = "http://narrative.kbase.us/functional-site/communities/metagenome.html?metagenome="+metagenome_id
+                                window.location = "/functional-site/communities/metagenome.html?metagenome="+metagenome_id
                              })
                     }*/
                 })

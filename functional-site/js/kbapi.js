@@ -46,6 +46,7 @@ function KBCacheClient(token) {
     self.search_url = search_url;    
     self.token = token;
     self.nar_type = 'KBaseNarrative.Narrative';
+    self.metagenome_url = "./communities/metagenome.html?metagenome=";
 
     // some accessible helper methods
     self.ui = new UIUtils();
@@ -418,8 +419,6 @@ function KBCacheClient(token) {
             case 'PhenotypeSimulationSet': 
                 route = 'ws.simulation';
                 break;  
-            // remove next block cause it's described in landing_page_map.json
-            // putting back in because there's no link to a pangenome now?
             case 'Pangenome':
                 route = 'ws.pangenome';
                 break;                            
