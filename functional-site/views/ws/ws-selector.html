@@ -3,10 +3,8 @@
   
 <div class="ws-selector"> 
     <div class="ws-selector-header">
-        <div class="btn-toolbar ws-toolbar">         
-            <div class="dropdown">
-                <a ng-show="$root.USER_ID" class="btn-new-ws">New+</a>
-
+        <div class="btn-toolbar ws-toolbar">
+            <div class="dropdown pull-left">
                 <a ng-show="$root.USER_ID" data-toggle="dropdown">
                     Filter <span class="caret"></span>
                 </a>
@@ -29,8 +27,9 @@
                         <label><input id="ws-filter-read" type="checkbox" value="" checked>Read</label>
                     </div>
                 </ul>                 
-            </div>                        
-            
+            </div>
+            <a ng-show="$root.USER_ID" class="pull-left" class="btn-new-ws">New+</a>
+
             <div class="fav-toolbar" style="display: none;">
                 <div class="fav-toolbar-title pull-left">Objects</div>
                 <button type="button" class="btn btn-default pull-right" ng-click="clearList()">Clear</button>
