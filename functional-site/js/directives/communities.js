@@ -11,8 +11,7 @@ angular.module('communities-directives')
                  $(ele).rmLoading();
 
                  var metagenome_id = d[0].data.metagenome_id;
-
-                 $(ele).append('<a href="'+kb.metagenome_url+'" target="_blank">'+metagenome_id+'</a>')
+                 $(ele).append('<a href="'+kb.metagenome_url+metagenome_id+'" target="_blank">'+metagenome_id+'</a>')
              })
         }
     }
