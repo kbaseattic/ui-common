@@ -849,13 +849,15 @@ angular.module('ws-directives')
                             link.attr('target', '_blank');
                         }
                         var new_id =  $('<div>').append(link, ' (', ver_link, ')', more_link).html();
-                    } else if (kind == 'Metagenome') {
-                        var new_id =  $('<div>').append(link, ' (', ver_link, ')', more_link).html();
                     } else {
                         var url = "ws.json({ws:'"+ws+"', id:'"+name+"'})"
                         link.attr('ui-sref', url).attr('target', '_blank');
                         var new_id =  $('<div>').append(link, ' (', ver_link, ')', more_link).html();
                     }
+
+                    //else if (kind == 'Metagenome') {
+                    //    var new_id =  $('<div>').append(link, ' (', ver_link, ')', more_link).html();
+                    //}
 
                     wsarray[1] = new_id;
                     wsobjs.push(wsarray);
@@ -874,17 +876,15 @@ angular.module('ws-directives')
                     e.stopPropagation();
 
                     // special "link" for metagenome page
-                    var kind = $(this).data('kind');
-                    if (kind == "Metagenome") {
+                    /*if (kind == "Metagenome") {
                         var wsid = $(this).data('wsid');
                         var id = $(this).data('id');
                         kb.ws.get_objects([{wsid: wsid, objid: id}])
                              .done(function(d) {
                                 var metagenome_id = d[0].data.metagenome_id;
                                 window.location = "http://narrative.kbase.us/functional-site/communities/metagenome.html?metagenome="+metagenome_id
-                                //window.open(url+metagenome_id, '_blank');
                              })
-                    }
+                    }*/
                 })
 
                 // if not logged in, and a narrative is clickd, display login for narratives
@@ -1013,7 +1013,6 @@ angular.module('ws-directives')
                     }
 
                 })
-
 
                 // event for settings (manage modal) button
                 // this is special to the narrative pages

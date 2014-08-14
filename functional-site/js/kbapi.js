@@ -1,83 +1,5 @@
 
 
-// This saves a request by service name, method, params, and promise
-// Todo: Make as module
-function Cache() {
-    var cache = [];
-
-    this.get = function(service, method, params) {
-        for (var i in cache) {
-            var obj = cache[i];
-            if (service != obj['service']) continue;
-            if (method != obj['method']) continue;
-            if ( angular.equals(obj['params'], params) ) { return obj; }
-        }
-        return undefined;
-    }
-
-    this.put = function(service, method, params, prom) {
-        var obj = {};
-        obj['service'] = service;    
-        obj['method'] = method;
-        obj['prom'] = prom;
-        obj['params'] = params;
-        cache.push(obj);
-        //console.log('Cache after the last "put"', cache)
-    }
-}
-
-
-// this is another experiment in caching but for particular objects.
-function WSCache() {
-    // Todo: only retrieve and store by object ids.
-
-    // cache object
-    var c = {};
-
-    this.get = function(params) {
-
-        if (params.ref) {
-            return c[params.ref];
-        } else {
-            var ws = params.ws,
-                type = params.type,
-                name = params.name;
-
-            if (ws in c && type in c[ws] && name in c[ws][type]) {
-                return c[ws][type][name];
-            }
-        }
-    }
-
-    this.put = function(params) {
-        // if reference is provided
-        if (params.ref) {
-            if (params.ref in c) {
-                return false;
-            } else {
-                c[params.ref] = params.prom;
-                return true;
-            }
-
-        // else, use strings
-        } else { 
-            var ws = params.ws,
-                name = params.name,
-                type = params.type;
-
-            if (ws in c && type in c[ws] && name in c[ws][type]) {
-                return false;
-            } else {
-                if ( !(ws in c) ) c[ws] = {};                    
-                if ( !(type in c[ws]) ) c[ws][type] = {};
-                c[ws][type][name] = params.prom;
-                return true;
-            }
-        }
-    }
-}
-
-
 function KBCacheClient(token) {
     var self = this;
     var auth = {};
@@ -510,6 +432,15 @@ function KBCacheClient(token) {
             case 'FloatDataTable':
                 route = 'floatdatatable';
                 break;
+            case 'Metagenome':
+                route = 'ws.metagenome';
+                break;
+            case 'Collection':
+                route = 'ws.collection';
+                break;
+            case 'Profile':
+                route = 'ws.profile';
+                break;
         }
         return route;
     }
@@ -869,11 +800,84 @@ function UIUtils() {
     $.fn.rmLoading = function() {
         $(this).find('.loader').remove();
     }
+}
 
+// This saves a request by service name, method, params, and promise
+// Todo: Make as module
+function Cache() {
+    var cache = [];
 
+    this.get = function(service, method, params) {
+        for (var i in cache) {
+            var obj = cache[i];
+            if (service != obj['service']) continue;
+            if (method != obj['method']) continue;
+            if ( angular.equals(obj['params'], params) ) { return obj; }
+        }
+        return undefined;
+    }
+
+    this.put = function(service, method, params, prom) {
+        var obj = {};
+        obj['service'] = service;    
+        obj['method'] = method;
+        obj['prom'] = prom;
+        obj['params'] = params;
+        cache.push(obj);
+        //console.log('Cache after the last "put"', cache)
+    }
 }
 
 
+// this is another experiment in caching but for particular objects.
+function WSCache() {
+    // Todo: only retrieve and store by object ids.
+
+    // cache object
+    var c = {};
+
+    this.get = function(params) {
+
+        if (params.ref) {
+            return c[params.ref];
+        } else {
+            var ws = params.ws,
+                type = params.type,
+                name = params.name;
+
+            if (ws in c && type in c[ws] && name in c[ws][type]) {
+                return c[ws][type][name];
+            }
+        }
+    }
+
+    this.put = function(params) {
+        // if reference is provided
+        if (params.ref) {
+            if (params.ref in c) {
+                return false;
+            } else {
+                c[params.ref] = params.prom;
+                return true;
+            }
+
+        // else, use strings
+        } else { 
+            var ws = params.ws,
+                name = params.name,
+                type = params.type;
+
+            if (ws in c && type in c[ws] && name in c[ws][type]) {
+                return false;
+            } else {
+                if ( !(ws in c) ) c[ws] = {};                    
+                if ( !(type in c[ws]) ) c[ws][type] = {};
+                c[ws][type][name] = params.prom;
+                return true;
+            }
+        }
+    }
+}
 
 function getBio(type, loaderDiv, callback) {
     var fba = new fbaModelServices('https://kbase.us/services/fba_model_services/');

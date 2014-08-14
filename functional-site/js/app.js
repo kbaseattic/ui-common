@@ -23,8 +23,8 @@ var cardManager = undefined;
 var app = angular.module('landing-pages', 
     ['lp-directives', 'card-directives',
      'trees-directives', 'fav-directives',
-     'ws-directives', 'modeling-directives',
-     'narrative-directives', 
+     'ws-directives', 'modeling-directives', 
+     'communities-directives', 'narrative-directives', 
      'ui.router', 'ngResource', 'kbaseLogin', 
      'FeedLoad', 'ui.bootstrap', 'search'])
     .config(['$locationProvider', '$stateProvider', '$httpProvider', '$urlRouterProvider',
@@ -179,6 +179,21 @@ var app = angular.module('landing-pages',
           controller: 'WBLanding'  
         });
 
+
+    $stateProvider
+        .state('ws.metagenome', {
+          url: "metagenome/:ws/:name/",
+          templateUrl: 'views/ws/objs/metagenome.html',
+          controller: 'WBLanding'
+        }).state('ws.collection', {
+          url: "collection/:ws/:name/",
+          templateUrl: 'views/ws/objs/collection.html',
+          controller: 'WBLanding'
+        }).state('ws.profile', {
+          url: "profile/:ws/:name/",
+          templateUrl: 'views/ws/objs/profile.html',
+          controller: 'WBLanding'
+        });
 
     // not in use
     $stateProvider
