@@ -822,7 +822,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         
         if (value === null || value === 'null') {
             $scope.options.reset();
-            $state.go("search", {category: $scope.options.selectedCategory, page: null, itemsPerPage: null, facets: null, sort: null});
+            $state.go("search", {category: null, page: null, itemsPerPage: null, facets: null, sort: null});
         }            
         else {
             if (!$scope.options.searchOptions.perCategory.hasOwnProperty(value)) {
