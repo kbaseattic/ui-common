@@ -39,7 +39,7 @@ angular.module('ws-directives')
                 
                 var prom = kb.ws.list_workspace_info({});
                 $('.select-box').loading();
-                $.when(prom, p).done(function(data) {
+                $.when(prom).done(function(data) {
 
                     $('.select-box').rmLoading();
 
@@ -86,8 +86,7 @@ angular.module('ws-directives')
                         var selector = $('<tr data-perm="'+perm+
                                             '" data-global="'+global_perm+
                                             '" data-owner="'+user+'"><td class="select-ws table-ellipsis '
-                                                +($stateParams.ws == name ? 'selected-ws ' : '' )+
-                                                (name in nar_projs ? 'narrative-project' : '' )+
+                                                +($stateParams.ws == name ? 'selected-ws ' : '' )+ 
                                             '" data-ws="'+name+'">'+
                                             '<span class="badge">'+obj_count+'</span> '+
                                             '<span> '+(user == USER_ID ? '<b>'+name+'</b>': name)+'</span></td></tr>');
@@ -104,9 +103,6 @@ angular.module('ws-directives')
                             $(this).find('.btn-ws-settings').addClass('hide');
                         })
                         var blah = $(".select-box table").append(selector);
-
-                        // mark as narrative project if it is (used in filtering)
-                        ws.push(name in nar_projs ? true : false );
                     }
 
                     workspaces = data;
