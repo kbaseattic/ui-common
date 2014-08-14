@@ -37,15 +37,9 @@ angular.module('ws-directives')
 
                 workspaces = []
                 
-                var p = kb.nar.get_projects()
                 var prom = kb.ws.list_workspace_info({});
                 $('.select-box').loading();
-                $.when(prom, p).done(function(data, projects) {
-                    var nar_projs = {}
-                    for (var i in projects) {
-                        var ws = projects[i][7];
-                        nar_projs[ws] = projects[i]
-                    }
+                $.when(prom, p).done(function(data) {
 
                     $('.select-box').rmLoading();
 
@@ -267,7 +261,7 @@ angular.module('ws-directives')
                     $('.select-box table tr').show();
                     $('.no-ws-alert').remove()
 
-                    var projects_cb  = filterRead.prop('checked');
+                    //var projects_cb  = filterRead.prop('checked');
                     var owner_cb = filterOwner.prop('checked');
                     var admin_cb = filterAdmin.prop('checked');
                     var write_cb = filterWrite.prop('checked');

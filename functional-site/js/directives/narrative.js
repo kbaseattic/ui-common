@@ -54,46 +54,6 @@ angular.module('narrative-directives')
     };
 })
 
-.directive('recentprojects', function($location) {
-    return {
-        link: function(scope, element, attrs) {
-
-            scope.loadRecentProjects= function() {
-                $(element).loading();
-                var prom = kb.nar.get_projects();
-                $.when(prom).done(function(projs){
-
-                    $(element).rmLoading();
-                    if (projs.length > 0) {
-                        var projects = [];
-                        //first sort
-                        for (var i in projs) {
-
-                            var project = {};
-                            project.timestamp = kb.ui.getTimestamp(projs[i][3]); // moddate to timestamp
-                            if (!project.timestamp) continue; //fixme
-                            project.nealtime = kb.ui.formateDate(project.timestamp)
-                                                ? kb.ui.formateDate(project.timestamp) :
-                                                    projs[i][3].replace('T',' ').split('+')[0];
-                            project.name = parse_name(projs[i][7]);
-                            projects.push(project);
-                        }
-
-                        scope.$apply(function() {
-                            scope.projects = projects;
-                        })
-
-                    } else {
-                        $(element).append('no projects');
-                    }
-                })
-            }
-
-            scope.loadRecentProjects();
-        }
-
-    };
-})
 .directive('newsfeed', function(FeedLoad, $compile) {
     return  {
         link: function(scope, element, attrs) {
