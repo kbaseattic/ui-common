@@ -27,7 +27,7 @@
 
                 <div ng-include="options.templates[options.selectedCategory].rows"></div>
             </div>
-            <div collapse="options.userState.session.viewType != 'expanded'" class="search-typedRecord-expanded row">
+            <div ng-if="options.expandedCategories[options.selectedCategory]" collapse="options.userState.session.viewType != 'expanded'" class="search-typedRecord-expanded row">
                 <div class="well search-result-column-expanded">
                     <table class="search-result-expanded-entry" ng-include="options.templates[options.selectedCategory].expanded">                    
                     </table>

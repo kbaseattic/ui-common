@@ -157,6 +157,17 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
         categoryGroups : {},
         searchCategories : {},
         categoryRelationships : {},
+        expandedCategories : { 'genomes': true,
+                               'features': true,
+                               'metagenomes': true,
+                               'gwas': false,
+                               'gwas_populations': false,
+                               'gwas_population_kinships': false,
+                               'gwas_population_variations': false,
+                               'gwas_population_traits': true,
+                               'gwas_gene_lists': false,
+                               'gwas_top_variations': false
+                             },
         related: {},
         numPageLinks : 10,
         defaultSearchOptions : {
