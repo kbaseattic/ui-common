@@ -634,8 +634,6 @@ function UIUtils() {
                         })
     }
 
-
-
     var msecPerMinute = 1000 * 60;
     var msecPerHour = msecPerMinute * 60;
     var msecPerDay = msecPerHour * 24;
@@ -692,6 +690,15 @@ function UIUtils() {
         hms[2] = hms[2].split('+')[0];  
         return Date.UTC(ymd[0],ymd[1]-1,ymd[2],hms[0],hms[1],hms[2]);  
     }
+
+    // interesting solution from http://stackoverflow.com/questions
+    // /15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript 
+    this.readableSize = function(bytes) {
+       var units = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+       if (bytes == 0) return '0 Bytes';
+       var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+       return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + units[i];
+    };    
 
     this.objTable = function(table_id, obj, keys, labels) {
         var table = $('<table class="table table-striped table-bordered" \
@@ -813,7 +820,21 @@ function UIUtils() {
         return share_str;
     }
 
+    this.globalPermDropDown = function(perm) {
+        var dd = $('<select class="form-control create-permission" data-value="n">\
+                        <option value="n">None</option>\
+                        <option value="r">Read</option>\
+                    </select>')
+        if (perm == 'n') {
+            dd.find("option[value='n']").attr('selected', 'selected');
+        } else if (perm == 'r') {
+            dd.find("option[value='r']").attr('selected', 'selected');                        
+        } else {
+            dd.find("option[value='n']").attr('selected', 'selected');
+        }
 
+        return $('<div>').append(dd).html();
+    }
 
     // jQuery plugins that you can use to add and remove a 
     // loading giff to a dom element.  This is easier to maintain, and likely less 
@@ -1092,28 +1113,7 @@ function ProjectAPI(ws_url, token) {
      * If one does not exist, it calls 'new_project' and makes one.
      */
     this.ensure_home_project = function(userId) {
-
-        // if we don't have a userid, don't do anything.
-        if (!userId)
-            return;
-
-        var projId = userId + ":home";
-
-        var prom = ws_client.get_object({ type: ws_tag_type,
-                                          workspace: projId,
-                                          id: ws_tag.project });
-        $.when(prom).then(
-            undefined,                  // don't need to do anything if it already has one. 
-            $.proxy(function(error) {   // if no project USER_ID:home exists, make one
-                this.new_project({
-                    project_id: projId,
-                    error_callback: function(error) {  // Just fails more or less silently for now
-                        console.debug("Error while creating home project!"); 
-                        console.debug(error); 
-                    },
-                });
-            }, this)
-        );
+        alert('ensure_home_project has been removed!')
     };
 
     // Get all the workspaces that match the values of the
