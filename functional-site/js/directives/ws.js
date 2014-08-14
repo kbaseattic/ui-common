@@ -828,33 +828,33 @@ angular.module('ws-directives')
                     var routeInner = kb.getRoute(kind);
                     if (routeInner)
                     	route = routeInner;
-                                                                                                              
+                                                                                 
+
+                    var link = $('<a class="obj-id" data-ws="'+ws+'" data-wsid="'+wsid+
+                                    '" data-id="'+id+'" data-name="'+name+'" ' +
+                                    'data-type="'+type+'" data-kind="'+kind+
+                                    '" data-module="'+module+'" '+'data-sub="'+sub+'">'+
+                                    name+'</a>');
+                    var ver_link = $('<a class="show-versions">'+instance+'</a>');
+                    var more_link = $('<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>');
+
                     if (route) {
                         var url = route+"({ws:'"+ws+"', id:'"+name+"'})";
-                        var new_id = '<a class="obj-id" data-ws="'+ws+'" data-wsid="'+wsid+'" data-id="'+id+'" data-name="'+name+'" ' +
-                                        'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
-                                        'data-sub="'+sub+'" ui-sref="'+url+'" >'+
-                                    name+'</a> (<a class="show-versions">'+instance+'</a>)'+
-                                    //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
-                                    '<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>';
-
+                        link.attr('ui-sref', url);
+                        var new_id =  $('<div>').append(link, ' (', ver_link, ')', more_link).html();
                     } else if (kind == "Narrative") {
                         var url = '/narrative/ws.'+wsid+'.obj.'+id;
-                        var new_id = '<a class="obj-id nar-id" data-ws="'+ws+'" data-wsid="'+wsid+'" data-id="'+id+'" data-name="'+name+'" ' +
-                                        'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
-                                        'data-sub="'+sub+'" '+(USER_ID ? 'href="'+url+'"' : '')+' target="_blank"><i><b>'+
-                                      name+'</b></i></a> (<a class="show-versions">'+instance+'</a>)'+
-                                      //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
-                                     '<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>';
-
+                        if (USER_ID) {
+                            link.attr('href', url);
+                            link.attr('target', '_blank');
+                        }
+                        var new_id =  $('<div>').append(link, ' (', ver_link, ')', more_link).html();
+                    } else if (kind == 'Metagenome') {
+                        var new_id =  $('<div>').append(link, ' (', ver_link, ')', more_link).html();
                     } else {
                         var url = "ws.json({ws:'"+ws+"', id:'"+name+"'})"
-                        var new_id = '<a class="obj-id" data-ws="'+ws+'" data-wsid="'+wsid+'" data-id="'+id+'" data-name="'+name+'" '+
-                                        'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
-                                        'data-sub="'+sub+'" ui-sref="'+url+'" target="_blank" >'+
-                                      name+'</a> (<a class="show-versions">'+instance+'</a>)'+
-                                      //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
-                                     '<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>';
+                        link.attr('ui-sref', url).attr('target', '_blank');
+                        var new_id =  $('<div>').append(link, ' (', ver_link, ')', more_link).html();
                     }
 
                     wsarray[1] = new_id;
@@ -862,7 +862,6 @@ angular.module('ws-directives')
                 }
                 return [wsobjs, kind_counts];
             }
-
 
             // events for object table.  
             // This is reloaded on table change/pagination
@@ -873,6 +872,19 @@ angular.module('ws-directives')
                 $('.obj-id').unbind('click');
                 $('.obj-id').click(function(e) {
                     e.stopPropagation();
+
+                    // special "link" for metagenome page
+                    var kind = $(this).data('kind');
+                    if (kind == "Metagenome") {
+                        var wsid = $(this).data('wsid');
+                        var id = $(this).data('id');
+                        kb.ws.get_objects([{wsid: wsid, objid: id}])
+                             .done(function(d) {
+                                var metagenome_id = d[0].data.metagenome_id;
+                                window.location = "http://narrative.kbase.us/functional-site/communities/metagenome.html?metagenome="+metagenome_id
+                                //window.open(url+metagenome_id, '_blank');
+                             })
+                    }
                 })
 
                 // if not logged in, and a narrative is clickd, display login for narratives

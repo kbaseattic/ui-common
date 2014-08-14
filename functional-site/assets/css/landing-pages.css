@@ -416,9 +416,6 @@ div::-webkit-scrollbar-thumb {
     -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
 }
 
-.obj-table-header h4 {
-    line-height: 1.5;
-}
 
 .btn-settings-opt {
     width: 80%;
