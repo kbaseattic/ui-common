@@ -10,10 +10,9 @@
  *  -- Some of the critical files --
  *  App:               js/app.js
  *  Controllers:       js/controllers.js
- *  Directives:        js/directives.js 
- *                     js/card-directives.js 
- *                     js/iris-directives.js
- *                     js/mv-directives.js 
+ *  Directives:        js/directives/landingpages.js 
+ *                     js/directives/*
+ *
  *  Views (templates): views/* 
  *
 */
@@ -84,7 +83,7 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/ws/manage.html', 
           controller: 'WSManage',
         }).state('ws.id', {
-          url: "objtable/:ws?type",
+          url: "objects/:ws?type",
           templateUrl: 'views/ws/objtable.html',
           controller: 'WB'
         }).state('ws.tour', {
@@ -124,12 +123,10 @@ var app = angular.module('landing-pages',
           url: "models/:ws/:id?map",
           templateUrl: 'views/ws/sortable/model.html',
           controller: 'WBLanding',
-          //reloadOnSearch: false
         }).state('ws.fbas', {
-          url: "fbas/:ws/:id?map",
+          url: "fbas/:ws/:id",
           templateUrl: 'views/ws/sortable/fba.html',
           controller: 'WBLanding',
-          //reloadOnSearch: false
         }).state('ws.etc', {
           url: "etc/:ws/:id",
           templateUrl: 'views/ws/sortable/etc.html',
@@ -204,7 +201,7 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/ws/favorites.html',
           controller: 'Favorites'
         });
-        
+
     // other pages
     $stateProvider
         .state('trees', {
@@ -560,29 +557,19 @@ configJSON = $.parseJSON( $.ajax({url: "config.json",
 
 
 app.run(function ($rootScope, $state, $stateParams, $location) {
-/*
-    var HELP_DROPDOWN = '<a href="#" class="dropdown-toggle" data-toggle="dropdown">Help <b class="caret"></b></a> \
-                 <ul class="dropdown-menu"> \
-                 <li><a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a></li> \
-                 <!--<li><a href="#/landing-pages-help">Landing Page Documentation</a></li>--> \
-                 <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li> \
-              </ul>';
-    $('.help-dropdown').html(HELP_DROPDOWN);
-*/
 
     //  Things that need to happen when a view changes.
+    /*
     $rootScope.$on('$locationChangeStart', function(event) {
         var absUrl = $location.absUrl();
         var begin = absUrl.indexOf('/functional-site/');
         var offset = '/functional-site/'.length;
 
-        //console.log([absUrl, begin, offset, absUrl.length]);
-    
         if (absUrl.indexOf('/functional-site/#/') < 0 && begin > 0 && absUrl.length > begin + offset) {
             event.preventDefault();
             $state.go('404', null, {location: false});
         }    
-    });
+    });*/
 
 
     //  Things that need to happen when a view changes.

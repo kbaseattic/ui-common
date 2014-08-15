@@ -829,7 +829,6 @@ angular.module('ws-directives')
                     if (routeInner)
                     	route = routeInner;
                                                                                  
-
                     var link = $('<a class="obj-id" data-ws="'+ws+'" data-wsid="'+wsid+
                                     '" data-id="'+id+'" data-name="'+name+'" ' +
                                     'data-type="'+type+'" data-kind="'+kind+
