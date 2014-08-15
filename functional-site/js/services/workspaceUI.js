@@ -7,7 +7,7 @@
 app.service('modals', function() {
     var self = this;
 
-    this.createWS = function(cancel_cb, submit_cb) {
+    this.createWS = function(params) {
         var body = $('<form class="form-horizontal" role="form">'+
                         '<div class="form-group">'+
                             '<label class="col-sm-4 control-label">Workspace Name</label>'+
@@ -41,7 +41,7 @@ app.service('modals', function() {
                     name: 'Cancel',
                     callback: function(e, $prompt) {
                             $prompt.closePrompt();
-                            if (cancel_cb) cancel_cb();
+                            if (params.cancel_cb) params.cancel_cb();
                         }
                     },
                     {
@@ -76,15 +76,15 @@ app.service('modals', function() {
                         if (error) {
                             $prompt.addCover(error, 'danger');
                         } else {
-                            var params = {
+                            var args = {
                                 workspace: name,
                                 globalread: perm,
                                 description: descript
                             };                                            
-                            var prom = kb.ws.create_workspace(params);
+                            var prom = kb.ws.create_workspace(args);
                             $prompt.data('dialogModal').find('.modal-body').loading()
                             $.when(prom).done(function(){                                            
-                                if (submit_cb) submit_cb();
+                                if (params.submit_cb) params.submit_cb();
                                 kb.ui.notify('Created workspace: '+new_ws_name, 'success');                                            
                                 $prompt.closePrompt(); 
                             }).fail(function(e) {
