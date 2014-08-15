@@ -387,61 +387,43 @@ function KBCacheClient(token) {
 
 
     self.getRoute = function(kind) {
-        var route;
         switch (kind) {
             case 'FBA': 
-                route = 'ws.fbas';
-                break;
+                return 'ws.fbas';
             case 'FBAModel': 
-                route = 'ws.models';
-                break;
+                return 'ws.models';
             case 'Media': 
-                route = 'ws.media';
-                break;
+                return 'ws.media';
             case 'MetabolicMap': 
-                route = 'ws.maps';
-                break;
+                return 'ws.maps';
             case 'Media': 
-                route = 'ws.media';
-                break; 
+                return 'ws.media';
             case 'PromConstraint':
-                route = 'ws.promconstraint';
-                break; 
+                return 'ws.promconstraint';
             case 'Regulome':
-                route = 'ws.regulome';
-                break; 
+                return 'ws.regulome';
             case 'ExpressionSeries':
-                route = 'ws.expression_series';
-                break; 
+                return 'ws.expression_series';
             case 'PhenotypeSet':
-                route = 'ws.phenotype';
-                break; 
+                return 'ws.phenotype';
             case 'PhenotypeSimulationSet': 
-                route = 'ws.simulation';
-                break;  
+                return 'ws.simulation';
             case 'Pangenome':
-                route = 'ws.pangenome';
-                break;                            
+                return 'ws.pangenome';
             case 'Genome': 
-                route = 'genomesbyid';
-                break;
+                return 'genomesbyid';
             case 'MAKResult':
-                route = 'mak';
-                break;
+                return 'mak';
             case 'FloatDataTable':
-                route = 'floatdatatable';
-                break;
+                return 'floatdatatable';
             case 'Metagenome':
-                route = 'ws.metagenome';
-                break;
+                return 'ws.metagenome';
             case 'Collection':
-                route = 'ws.collection';
-                break;
+                return 'ws.collection';
             case 'Profile':
-                route = 'ws.profile';
-                break;
+                return 'ws.profile';
         }
-        return route;
+        return undefined;
     }
 
     self.getWorkspaceSelector = function(all) {
