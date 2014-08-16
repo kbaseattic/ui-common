@@ -496,7 +496,7 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
                       .when('#', '/login/');
 
     $urlRouterProvider.otherwise('/404/');
-    
+
     $stateProvider.state("404", 
             {url: '*path', 
              templateUrl : 'views/404.html'});
@@ -559,7 +559,6 @@ configJSON = $.parseJSON( $.ajax({url: "config.json",
 app.run(function ($rootScope, $state, $stateParams, $location) {
 
     //  Things that need to happen when a view changes.
-    /*
     $rootScope.$on('$locationChangeStart', function(event) {
         var absUrl = $location.absUrl();
         var begin = absUrl.indexOf('/functional-site/');
@@ -569,7 +568,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
             event.preventDefault();
             $state.go('404', null, {location: false});
         }    
-    });*/
+    });
 
 
     //  Things that need to happen when a view changes.

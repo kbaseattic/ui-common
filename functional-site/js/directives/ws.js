@@ -81,8 +81,6 @@ angular.module('ws-directives')
                         var global_perm = ws[6];
                         //var short_ws = ws[0].slice(0,12) + '...'
 
-
-                        //var url = "ws.id({ws:'"+name+"'})"
                         var selector = $('<tr data-perm="'+perm+
                                             '" data-global="'+global_perm+
                                             '" data-owner="'+user+'"><td class="select-ws table-ellipsis '
@@ -872,7 +870,7 @@ angular.module('ws-directives')
                 // ignore other events when clicking landingpage href
                 $('.obj-id').unbind('click');
                 $('.obj-id').click(function(e) {
-                    e.stopPropagation();
+                    //e.stopPropagation();
 
                     // special "link" for metagenome page
                     /*if (kind == "Metagenome") {
@@ -1786,8 +1784,9 @@ angular.module('ws-directives')
 
 .directive('wsDescription', function($location, $compile, $state, $stateParams) {
     return {
+        controller: 'WBLanding',
         link: function(scope, ele, attrs) {
-            var p = kb.ws.get_workspace_description({workspace: $stateParams.ws})
+            var p = kb.ws.get_workspace_description({workspace: scope.ws})
             $.when(p).done(function(data){
                 if (!data) {
                     return;
@@ -1804,7 +1803,7 @@ angular.module('ws-directives')
                 //var edit = $('<div class="glyphicon glyphicon-pencil">')
                 //container.append(edit);
             }).fail(function(e){
-                modal_body.append('<div class="alert alert-danger">'+e.error.message+'</div>');
+                $(ele).append('<div class="alert alert-danger">'+e.error.message+'</div>');
             });
 
         }
@@ -1861,7 +1860,7 @@ angular.module('ws-directives')
                     var count = row[4];
                     total_count = total_count+count;
 
-                    var url = "ws.id({ws:'"+ws+"'})";
+                    var url = "ws.id({ws:'"+ws +"'})";
                     var link = '<a ui-sref="'+url+'" >'+ws+'</a>';
                     rows.push([link, wsid, owner, date, count, timestamp]);
                 }
