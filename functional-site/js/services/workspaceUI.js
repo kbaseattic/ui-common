@@ -7,6 +7,8 @@
 app.service('modals', function() {
     var self = this;
 
+    //  params.cancel_cb : callback for cancel button
+    //  params.submit_cb : callback for submit button
     this.createWS = function(params) {
         var body = $('<form class="form-horizontal" role="form">'+
                         '<div class="form-group">'+
@@ -200,6 +202,9 @@ app.service('modals', function() {
         copyWSModal.openPrompt();
     }
 
+    //  params.ws : workspace to delete
+    //  params.cancel_cb : callback for cancel button
+    //  params.submit_cb : callback for submit button
     this.deleteWS = function(params) {
         var ws_name = params.ws;
         var body = $('<div style="text-align: center;">Are you sure you want to delete this workspace?<h3>'
@@ -244,9 +249,9 @@ app.service('modals', function() {
 
     // modal for managing workspace permissions, clone, and delete
     // params:
-    //      {ws: name_of_workspace,
-    //       copy_cb: callback for when a copy has finished
-    //       delete_cb: callback for a delete has finished }
+    //      ws: name_of_workspace,
+    //      copy_cb: callback for when a copy has finished
+    //      delete_cb: callback for a delete has finished }
     this.manageWS = function(params) {
         var ws_name = params.ws;
 
@@ -468,7 +473,6 @@ app.service('modals', function() {
                 $(this).html('Edit');
             }
         })
-
 
         // get and display editable description
         var prom = kb.ws.get_workspace_description({workspace:ws_name})

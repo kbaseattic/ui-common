@@ -1462,7 +1462,7 @@ angular.module('ws-directives')
                 );
                 copyObjectsModal.openPrompt();
 
-                var p = kb.ui.getWorkspaceSelector();
+                var p = kb.getWorkspaceSelector();
                 $.when(p).done(function(selector) {
                     content.rmLoading();
                     content.find('.form-group').append(selector);
@@ -1596,7 +1596,7 @@ angular.module('ws-directives')
                   '</a>',
         controller: 'WB',
         link: function(scope, ele, attrs) {
-
+            var self = scope;
             scope.createNewNarrative = function() {
                 var body = $('<form class="form-horizontal" role="form">');
 
@@ -1656,7 +1656,7 @@ angular.module('ws-directives')
                 )
                 newNarrativeModal.openPrompt();
 
-                var p = kb.ui.getWorkspaceSelector()
+                var p = kb.getWorkspaceSelector()
                 //var prom = kb.ws.list_workspace_info({perm: 'w'});
                 $.when(p).done(function(selector) {
                     body.rmLoading();
@@ -1665,9 +1665,9 @@ angular.module('ws-directives')
                     new_ws_btn.click(function() {
                         newNarrativeModal.closePrompt();
                         modals.createWS({cancel_cb: function(){
-                            scope.createNewNarrative();
+                            blah.createNewNarrative();
                         }, submit_cb: function() {
-                            scope.createNewNarrative();
+                            blah.createNewNarrative();
                         }});
                         return;
                     })
@@ -1689,7 +1689,6 @@ angular.module('ws-directives')
                                 '</div>');
                 });
             }
-            scope.$apply();
 
         }
     }

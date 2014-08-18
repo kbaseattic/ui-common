@@ -426,6 +426,89 @@ function KBCacheClient(token) {
         return undefined;
     }
 
+
+    self.getWorkspaceSelector = function(all) {
+        if (all) {
+            var p = self.ws.list_workspace_info({});
+        } else {
+            var p = self.ws.list_workspace_info({perm: 'w'});            
+        }
+        
+        var prom = $.when(p).then(function(workspaces){
+            var workspaces = workspaces.sort(compare)
+
+            function compare(a,b) {
+                var t1 = kb.ui.getTimestamp(b[3]) 
+                var t2 = kb.ui.getTimestamp(a[3]) 
+                if (t1 < t2) return -1;
+                if (t1 > t2) return 1;
+                return 0;
+            }
+
+            var wsSelect = $('<form class="form-horizontal" role="form">'+
+                                '<div class="form-group">'+
+                                    '<label class="col-sm-5 control-label">Destination Workspace</label>'+
+                                    '<div class="input-group col-sm-5">'+
+                                        '<input type="text" class="select-ws-input form-control focusedInput" placeholder="search">'+
+                                        '<span class="input-group-btn">'+
+                                            '<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">'+
+                                                '<span class="caret"></span>'+
+                                            '</button>'+
+                                        '</span>'+
+                                    //'<a class="btn-new-ws pull-right">New WS</a>'+
+                                    '</div>'+
+                            '</div>');
+
+            var select = $('<ul class="dropdown-menu select-ws-dd" role="menu">');
+            for (var i in workspaces) {
+                select.append('<li><a>'+workspaces[i][1]+'</a></li>');
+            }
+
+            wsSelect.find('.input-group-btn').append(select);
+
+            var dd = wsSelect.find('.select-ws-dd');
+            var input = wsSelect.find('input');
+
+            var not_found = $('<li class="select-ws-dd-not-found"><a><b>Not Found</b></a></li>');
+            dd.append(not_found);
+            input.keyup(function() {
+                dd.find('li').show();
+
+                wsSelect.find('.input-group-btn').addClass('open');
+
+                var input = $(this).val();
+                dd.find('li').each(function(){
+                    if ($(this).text().toLowerCase().indexOf(input.toLowerCase()) != -1) {
+                        return true;
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                if (dd.find('li').is(':visible') == 1) {
+                    not_found.hide();
+                } else {
+                    not_found.show();
+                }
+            }) 
+
+            dd.find('li').click(function() {
+                dd.find('li').removeClass('active');
+
+                if (!$(this).hasClass('select-ws-dd-not-found')) {
+                    $(this).addClass('active');                    
+
+                    var val = $(this).text();
+                    input.val(val);
+                }
+            })
+
+            return wsSelect;
+        })
+
+        return prom;
+    }
+
 }
 
 
@@ -707,87 +790,6 @@ function UIUtils() {
     }
 
 
-    self.getWorkspaceSelector = function(all) {
-        if (all) {
-            var p = self.ws.list_workspace_info({});
-        } else {
-            var p = self.ws.list_workspace_info({perm: 'w'});            
-        }
-        
-        var prom = $.when(p).then(function(workspaces){
-            var workspaces = workspaces.sort(compare)
-
-            function compare(a,b) {
-                var t1 = kb.ui.getTimestamp(b[3]) 
-                var t2 = kb.ui.getTimestamp(a[3]) 
-                if (t1 < t2) return -1;
-                if (t1 > t2) return 1;
-                return 0;
-            }
-
-            var wsSelect = $('<form class="form-horizontal" role="form">'+
-                                '<div class="form-group">'+
-                                    '<label class="col-sm-5 control-label">Destination Workspace</label>'+
-                                    '<div class="input-group col-sm-5">'+
-                                        '<input type="text" class="select-ws-input form-control focusedInput" placeholder="search">'+
-                                        '<span class="input-group-btn">'+
-                                            '<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">'+
-                                                '<span class="caret"></span>'+
-                                            '</button>'+
-                                        '</span>'+
-                                    //'<a class="btn-new-ws pull-right">New WS</a>'+
-                                    '</div>'+
-                            '</div>');
-
-            var select = $('<ul class="dropdown-menu select-ws-dd" role="menu">');
-            for (var i in workspaces) {
-                select.append('<li><a>'+workspaces[i][1]+'</a></li>');
-            }
-
-            wsSelect.find('.input-group-btn').append(select);
-
-            var dd = wsSelect.find('.select-ws-dd');
-            var input = wsSelect.find('input');
-
-            var not_found = $('<li class="select-ws-dd-not-found"><a><b>Not Found</b></a></li>');
-            dd.append(not_found);
-            input.keyup(function() {
-                dd.find('li').show();
-
-                wsSelect.find('.input-group-btn').addClass('open');
-
-                var input = $(this).val();
-                dd.find('li').each(function(){
-                    if ($(this).text().toLowerCase().indexOf(input.toLowerCase()) != -1) {
-                        return true;
-                    } else {
-                        $(this).hide();
-                    }
-                });
-
-                if (dd.find('li').is(':visible') == 1) {
-                    not_found.hide();
-                } else {
-                    not_found.show();
-                }
-            }) 
-
-            dd.find('li').click(function() {
-                dd.find('li').removeClass('active');
-
-                if (!$(this).hasClass('select-ws-dd-not-found')) {
-                    $(this).addClass('active');                    
-
-                    var val = $(this).text();
-                    input.val(val);
-                }
-            })
-
-            return wsSelect;
-        })
-
-        return prom;
-    }
 
 
 }
