@@ -1191,7 +1191,7 @@ angular.module('ws-directives')
                     var labels = ['ID', 'Name', 'Type', 'Moddate', 'Instance','Owner',
                                     'Workspace ID', 'Workspace', 'Checksum']
                     modal_body.append('<h4>Object Info</h4>');
-                    var table = kb.ui.listTable('#obj-info-table', data, labels, 'bold')
+                    var table = kb.ui.listTable({array: data, labels: labels, bold: true})
                     table.append('<tr><td><b>Size</b></td><td>'+data[9]+
                                 ' Bytes ('+kb.ui.readableSize(data[9])+')</td></tr>');
                     modal_body.append(table);                        
@@ -1462,7 +1462,7 @@ angular.module('ws-directives')
                 );
                 copyObjectsModal.openPrompt();
 
-                var p = kb.getWorkspaceSelector();
+                var p = kb.ui.getWorkspaceSelector();
                 $.when(p).done(function(selector) {
                     content.rmLoading();
                     content.find('.form-group').append(selector);
@@ -1656,7 +1656,7 @@ angular.module('ws-directives')
                 )
                 newNarrativeModal.openPrompt();
 
-                var p = kb.getWorkspaceSelector()
+                var p = kb.ui.getWorkspaceSelector()
                 //var prom = kb.ws.list_workspace_info({perm: 'w'});
                 $.when(p).done(function(selector) {
                     body.rmLoading();
@@ -1688,8 +1688,9 @@ angular.module('ws-directives')
                                         '</div>'+
                                 '</div>');
                 });
-
             }
+            scope.$apply();
+
         }
     }
 })

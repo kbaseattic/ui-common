@@ -93,11 +93,11 @@ $.KBWidget({
                           'Combo Deletions',
                           'Default Min Drain Flux',
                           'fva',
-                          'Decompose Reversible Drain Flux',
+                          'Decompose Reversible Drain 3Flux',
                           'Default Max Flux',
                           'Decompose Reversible Flux'];
 
-            var table = kb.ui.objTable('overview-table', data, keys, labels);
+            var table = kb.ui.objTable({obj: data, keys: keys, labels: labels});
             overviewTable.append(table);
 
             var tableSettings = {

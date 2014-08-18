@@ -107,6 +107,9 @@ app.service('modals', function() {
                                      })
     */
 
+    //  params.ws : workspace to copy
+    //  params.cancel_cb : callback for cancel button
+    //  params.submit_cb : callback for submit button
     this.copyWS = function(params) {
         var ws_name = params.ws;
         var body = $('<form class="form-horizontal" role="form">'+

@@ -96,10 +96,10 @@ angular.module('narrative-directives')
             copyBtns.click(function() {
                 console.log('click')
                 var ws = $(this).data('ws');
-                modals.copyWorkspace(ws, null, function() {
+                modals.copyWS({ws: ws, submit_cb: function() {
                     $state.go('narratives.mynarratives');
                     kb.ui.notify('Copied Narratives and Objects From: <i>'+ws+'</i>');                    
-                });
+                }});
             })
         }
     }
