@@ -1768,11 +1768,10 @@ angular.module('ws-directives')
     }
 })
 
-.directive('wsDescription', function($location, $compile, $state, $stateParams) {
+.directive('wsDescription', function($location, $compile, $state) {
     return {
-        controller: 'WBLanding',
         link: function(scope, ele, attrs) {
-            var p = kb.ws.get_workspace_description({workspace: scope.ws})
+            var p = kb.ws.get_workspace_description({workspace: scope.selected_ws})
             $.when(p).done(function(data){
                 if (!data) {
                     return;

@@ -205,12 +205,23 @@ app.controller('RxnDetail', function($scope, $stateParams) {
         $('#previous-changes').slideToggle();
     }
 
+    $scope.hideSidebar = function(route) {
+        $('#ws-sidebar').toggle('slide', {
+                         direction: 'left',
+                         duration: 'fast',
+                             complete: function() {
+                                $state.transitionTo(route,  {ws:ws, id:id})
+                         }
+                     })
+    }
 
 })
 
 .controller('FBALanding', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;  
+
+
 })
 
 .controller('WBLanding', function($scope, $stateParams) {
@@ -358,7 +369,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     $scope.id = $stateParams.id;
 })
 
-.controller('WBTour', function($scope, $stateParams, $location) {
+.controller('WBTour', function($scope, $state, $stateParams, $location) {
     $scope.selected_ws = 'chenryExample';  // workspace to use for tour
 
     // if not logged in, prompt for login
@@ -397,7 +408,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                                     Unreferenced objects will be deleted after 30 days.'}]                        
 
         function exit_callback() {
-            $scope.$apply( $location.path( '/ws/' ) );
+            $scope.$apply( $state.go('ws') );
         }
 
         new Tour({tour: tour, exit_callback: exit_callback});
@@ -593,7 +604,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                     USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
 
                     //kb = new KBCacheClient(USER_TOKEN);
-                    //kb.nar.ensure_home_project(USER_ID);
+                    kb.nar.ensure_home_project(USER_ID);
 
                     $location.path('/narratives/featured');
                     $scope.$apply();
