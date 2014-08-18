@@ -44,8 +44,10 @@
             var self = this;
             
             $.when(prom).done($.proxy(function(data) {
+        		var gnm = data[0].data;
+            	
+            	function showGenes() {
             		container.empty();
-            		var gnm = data[0].data;
             		////////////////////////////// Genes Tab //////////////////////////////
             		container.append($('<div />').css("overflow","auto").append('<table cellpadding="0" cellspacing="0" border="0" id="'+pref+'genes-table" \
             		class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>'));
@@ -86,8 +88,8 @@
             			var geneFunc = gene['function'];
             			if (!geneFunc)
             				geneFunc = '-';
-            			genesData[genesData.length] = {id: '<a class="'+pref+'gene-click" data-geneid="'+geneId+'">'+geneId+'</a>', 
-            					contig: contigName, start: geneStart, dir: geneDir, len: geneLen, type: geneType, func: geneFunc};
+            			genesData.push({id: '<a class="'+pref+'gene-click" data-geneid="'+geneId+'">'+geneId+'</a>', 
+            					contig: contigName, start: geneStart, dir: geneDir, len: geneLen, type: geneType, func: geneFunc});
             			geneMap[geneId] = gene;
             			var contig = contigMap[contigName];
             			if (contigName != null && !contig) {
@@ -105,26 +107,43 @@
             			}
             		}
             		var genesSettings = {
-            				"sPaginationType": "full_numbers",
+            				//"sPaginationType": "full_numbers",
             				"iDisplayLength": 10,
+            				"aaSorting" : [[1,'asc'],[2,'asc']],  // [[0,'asc']],
+            				"sDom": 't<fip>',
             				"aoColumns": [
-            				              {sTitle: "Gene ID", mData: "id"}, 
+			                              {sTitle: "Gene ID", mData: "id"}, 
             				              {sTitle: "Contig", mData: "contig"},
-            				              {sTitle: "Start", mData: "start"},
-            				              {sTitle: "Strand", mData: "dir"},
-            				              {sTitle: "Length", mData: "len"},
-            				              {sTitle: "Type", mData: "type"},
-            				              {sTitle: "Function", mData: "func"}
+            				              {sTitle: "Start", mData: "start", sWidth:"7%"},
+            				              {sTitle: "Strand", mData: "dir", sWidth:"7%"},
+            				              {sTitle: "Length", mData: "len", sWidth:"7%"},
+            				              {sTitle: "Type", mData: "type", sWidth:"10%"},
+            				              {sTitle: "Function", mData: "func", sWidth:"45%"}
             				              ],
-            				              "aaData": [],
+            				              "aaData": genesData,
             				              "oLanguage": {
-            				            	  "sSearch": "Search gene:",
+            				            	  "sSearch": "&nbsp&nbspSearch genes:",
             				            	  "sEmptyTable": "No genes found."
             				              },
             				              "fnDrawCallback": geneEvents
             		};
-            		var genesTable = $('#'+pref+'genes-table').dataTable(genesSettings);
-            		genesTable.fnAddData(genesData);
+            		$('#'+pref+'genes-table').dataTable(genesSettings);
+            	}
+            	
+            	if (gnm.features.length > 35000) {
+            		container.empty();
+            		var btnId = "btn_show_genes" + pref;
+            		container.append("There are many features in this genome, so displaying the full, "+
+            				"sortable gene list may cause your web browser to run out of memory and become "+
+            				"temporarily unresponsive.  Click below to attempt to show the gene list anyway.<br>"+
+            				"<button id='"+btnId+"' class='btn btn-primary'>Show Gene List</button>");
+            		$('#' + btnId).click(function(e) {
+            			showGenes();
+            		});
+            	} else {
+            		showGenes();
+            	}
+
             }, this));
             $.when(prom).fail($.proxy(function(data) {
             		container.empty();

@@ -1,7 +1,5 @@
 
 
-//https://kbase.us/services/fba_model_services/ //production fba service not deployed
-
 // This saves a request by service name, method, params, and promise
 // Todo: Make as module
 function Cache() {
@@ -295,6 +293,31 @@ function KBCacheClient(token) {
         return last_prom;
     }
 
+
+    self.getNarrativeDeps = function(params) {
+        var ws = params.ws;
+        var name = params.name;
+
+        var p = self.ws.get_object_info([{workspace: ws, name: name}], 1)
+            .then(function(info) {
+                console.log('info', info)
+                var deps = JSON.parse(info[0][10].data_dependencies);
+
+                var d = [];
+                for (var i in deps) {
+                    var obj = {};
+                    var o = deps[i].split(' ');
+                    obj.type = o[0];
+                    obj.name = o[1];
+                    d.push(obj)
+                }
+
+                return d;
+            })
+        return p;
+    }
+
+
     // cached objects
     var c = new WSCache();
     self.get_fba = function(ws, name) {
@@ -447,7 +470,7 @@ function KBCacheClient(token) {
                 route = 'ws.fbas';
                 break;
             case 'FBAModel': 
-                route = 'ws.mv.model';
+                route = 'ws.models';
                 break;
             case 'Media': 
                 route = 'ws.media';
@@ -472,12 +495,20 @@ function KBCacheClient(token) {
                 break; 
             case 'PhenotypeSimulationSet': 
                 route = 'ws.simulation';
-                break;     
+                break;  
+            // remove next block cause it's described in landing_page_map.json
+            // putting back in because there's no link to a pangenome now?
             case 'Pangenome':
                 route = 'ws.pangenome';
                 break;                            
             case 'Genome': 
                 route = 'genomesbyid';
+                break;
+            case 'MAKResult':
+                route = 'mak';
+                break;
+            case 'FloatDataTable':
+                route = 'floatdatatable';
                 break;
         }
         return route;
@@ -714,7 +745,7 @@ function UIUtils() {
                 var type = full_type.slice(full_type.indexOf('.')+1);
                 var kind = type.split('-')[0];
                 var label = item[7]+"/"+item[1];
-		var route;
+        var route;
                 switch (kind) {
                     case 'FBA': 
                         sub = 'fbas/';
@@ -987,8 +1018,8 @@ function ProjectAPI(ws_url, token) {
         data : { description : '' },
         workspace : undefined,
         meta : {},
-	provenance : [],
-	hidden : 1
+    provenance : [],
+    hidden : 1
     };
 
 

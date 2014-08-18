@@ -117,14 +117,18 @@
             $.when(prom).done($.proxy(function(objArr) {
                 self.$elem.empty();
 
+                var canvasDivId = "knhx-canvas-div-" + self.pref;
                 self.canvasId = "knhx-canvas-" + self.pref;
-                self.$canvas = $('<div>')
+                self.$canvas = $('<div id="'+canvasDivId+'">')
                                .append($('<canvas id="' + self.canvasId + '">'));
+                
                 if (self.options.height) {
                     self.$canvas.css({'max-height':self.options.height - 85, 'overflow':'scroll'});
                 }
                 self.$elem.append(self.$canvas);
 
+                watchForWidgetMaxWidthCorrection(canvasDivId);
+                
             	if (!self.treeWsRef) {
             		var info = objArr[0].info;
             		self.treeWsRef = info[6] + "/" + info[0] + "/" + info[4];
@@ -133,19 +137,31 @@
                 
                 var refToInfoMap = {};
                 var objIdentityList = [];
-                for (var key in tree.ws_refs) {
-                	objIdentityList.push({ref: tree.ws_refs[key]['g'][0]});
-                }
-                self.wsClient.get_object_info_new({objects: objIdentityList}, function(data) {
-                	for (var i in data) {
-                		var objInfo = data[i];
-                		refToInfoMap[objIdentityList[i].ref] = objInfo;
+                if (tree.ws_refs) {
+                	for (var key in tree.ws_refs) {
+                		objIdentityList.push({ref: tree.ws_refs[key]['g'][0]});
                 	}
-                }, function(data) {
-            		console.log("Error getting genomes info: " + data.error.message);
-            	});
-                
+                }
+                if (objIdentityList.length > 0) {
+                	self.wsClient.get_object_info_new({objects: objIdentityList}, function(data) {
+                		for (var i in data) {
+                			var objInfo = data[i];
+                			refToInfoMap[objIdentityList[i].ref] = objInfo;
+                		}
+                	}, function(data) {
+                		console.log("Error getting genomes info:");
+                		console.log(err);
+                	});
+                }
                 new EasyTree(self.canvasId, tree.tree, tree.default_node_labels, function(node) {
+                	if ((!tree.ws_refs) || (!tree.ws_refs[node.id])) {
+                		var node_name = tree.default_node_labels[node.id];
+                		if (node_name.indexOf('/') > 0) {  // Gene label
+                    		var url = "/functional-site/#/genes/" + self.options.workspaceID + "/" + node_name;
+                            window.open(url, '_blank');
+                		}
+                		return;
+                	}
                 	var ref = tree.ws_refs[node.id]['g'][0];
                 	var objInfo = refToInfoMap[ref];
                 	if (objInfo) {
@@ -205,7 +221,6 @@
             	if (objectVer)
             		obj['ver'] = objectVer;
             }
-            console.log(obj);
             return obj;
         },
 

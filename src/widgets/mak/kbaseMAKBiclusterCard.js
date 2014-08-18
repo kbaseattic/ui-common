@@ -6,11 +6,12 @@
         options: {
             title: "MAK Bicluster",
             isInCard: false,
+			loadingImage: "assets/img/ajax-loader.gif",
             width: 600,
             height: 700
        },
 	   
-	   newWorkspaceServiceUrl: "http://dev04.berkeley.kbase.us:7058",
+	   newWorkspaceServiceUrl: "https://kbase.us/services/ws",
 	   
         init: function(options) {
             this._super(options);
@@ -26,61 +27,73 @@
 
 			this.workspaceClient = new Workspace(this.newWorkspaceServiceUrl, { 'token' : this.options.auth, 'user_id' : this.options.userId});
 			
-            return this.render();
+            return this.render(this.options,this);
         },
-        render: function(options) {
+        render: function(options,self) {
+		            
+			self.bicluster_index = options.bicluster[1];
+            self.bicluster = options.bicluster[0][self.bicluster_index];
+            self.bicluster_type = options.bicluster[2].bicluster_type;
 
-            var self = this;
-            self.bicluster = this.options.bicluster[0];
-            self.bicluster_type = this.options.bicluster[1].bicluster_type;
-            
-            self.$elem.append($("<div />")
+			var loader = $("<span style='display:none'><img src='"+options.loadingImage+"'/></span>").css({"width":"100%","margin":"0 auto"})            
+			$biclusterOverview = $("<div id='biclusterOverview' style='overflow:auto;height:450px;resize:vertical'/>")						
+
+			self.$elem.append($biclusterOverview)
+			$biclusterOverview.append(loader)
+			loader.show()
+            $biclusterOverview.append($("<div />")
 						.append($("<table/>").addClass("kbgo-table")
 					    .append(self.bicluster.bicluster_id!=-1&&self.bicluster.bicluster_id!=0 ? $("<tr/>")
 					    	.append("<td>ID</td><td>" + self.bicluster.bicluster_id + "</td>") : '')
 					    .append(self.bicluster_type!=-1&&self.bicluster_type!=0 ? $("<tr/>").
-					    	append("<td>Cluster type</td><td>" + self.bicluster_type + "</td>") : '')
+					    	append("<td>Bicluster type</td><td>" + self.bicluster_type + "</td>") : '')
 					    .append(self.bicluster.num_genes!=-1&&self.bicluster.num_genes!=0 ? $("<tr/>").
-					    	append("<td>Genes</td><td>" + self.bicluster.num_genes + "</td>") : '')
+					    	append("<td>Rows</td><td>" + self.bicluster.num_genes + "</td>") : '')
 					    .append(self.bicluster.num_conditions!=-1&&self.bicluster.num_conditions!=0 ? $("<tr/>").
-					    	append("<td>Conditions</td><td>" + self.bicluster.num_conditions + "</td>") : '')
+					    	append("<td>Columns</td><td>" + self.bicluster.num_conditions + "</td>") : '')
 					    .append(self.bicluster.exp_mean!=-1&&self.bicluster.exp_mean!=0 ? $("<tr/>").
-					    	append("<td>Expression mean</td><td>" + self.bicluster.exp_mean + "</td>") : '')
+					    	append("<td>Bicluster value mean</td><td>" + Math.round(self.bicluster.exp_mean*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.exp_mean_crit!=-1&&self.bicluster.exp_mean_crit!=0 ? $("<tr/>").
-					    	append("<td>Expression mean criterion</td><td>" + self.bicluster.exp_mean_crit + "</td>") : '')
+					    	append("<td>Mean value criterion</td><td>" + Math.round(self.bicluster.exp_mean_crit*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.exp_crit!=-1&&self.bicluster.exp_crit!=0 ? $("<tr/>").
-					    	append("<td>Expression cohesion criterion</td><td>" + self.bicluster.exp_crit + "</td>") : '')
+					    	append("<td>Bicluster cohesion criterion</td><td>" + Math.round(self.bicluster.exp_crit*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.ppi_crit!=-1&&self.bicluster.ppi_crit!=0 ? $("<tr/>").
-					    	append("<td>PPI criterion</td><td>" + self.bicluster.ppi_crit + "</td>") : '')
+					    	append("<td>PPI criterion</td><td>" + Math.round(self.bicluster.ppi_crit*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.TF_crit!=-1&&self.bicluster.TF_crit!=0 ? $("<tr/>").
-					    	append("<td>TF criterion</td><td>" + self.bicluster.TF_crit + "</td>") : '')
+					    	append("<td>TF criterion</td><td>" + Math.round(self.bicluster.TF_crit*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.ortho_crit!=-1&&self.bicluster.ortho_crit!=0 ? $("<tr/>").
-					    	append("<td>Orthology criterion</td><td>" + self.bicluster.ortho_crit + "</td>") : '')
+					    	append("<td>Orthology criterion</td><td>" + Math.round(self.bicluster.ortho_crit*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.full_crit!=-1&&self.bicluster.full_crit!=0 ? $("<tr/>").
-					    	append("<td>Full criterion</td><td>" + self.bicluster.full_crit + "</td>") : '')
+					    	append("<td>Full criterion</td><td>" + Math.round(self.bicluster.full_crit*1000)/1000 + "</td>") : '')
 					    .append(self.bicluster.miss_frxn!=-1&&self.bicluster.miss_frxn!=0 ? $("<tr/>").
-					    	append("<td>Fraction of missing data</td><td>" + self.bicluster.miss_frxn + "</td>") : '')
+					    	append("<td>Fraction of missing data</td><td>" + Math.round(self.bicluster.miss_frxn*1000)/1000 + "</td>") : '')
 			));
-
-			//Heatmap			
 			
-			this.workspaceClient.get_objects([{workspace: "MAKbiclusters", name: "bicluster.4431"}],
+			//Heatmap			
+					
+								
+			$.when(self.workspaceClient.get_objects([{workspace: options.workspace, name: self.bicluster.bicluster_id}]))
+			.then(
 				function(data){
-					console.log(data)
-					self.$elem.append($("<div />")
-							.append("<h3>heatmap</h3>")
-							.append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
+					// $biclusterOverview.append($("<div />")
+							// .append("<h3>heatmap</h3>")
+							// .append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
 
-					$("#toggle_heatmap").click(function() {
-						self.trigger("showHeatMap", {bicluster: data[0].data, event: event})
-						//$("#heatmap").toggle();
+					// self.$elem.find("#toggle_heatmap").click(function() {
+						// loader.show()
 						
-					});
+						// if (d3.select("#heatmap").empty()) self.trigger("showHeatMap", {bicluster: data[0].data, ws: self.options.ws, id: self.bicluster.bicluster_id, tiles: tiles, mak: self.options.bicluster[0], event: event})
+						// $("#heatmap").toggle();
+						// loader.hide()
+						
+					// });
+					// if (!$("div:contains('HeatMap Card')").length) self.trigger("showHeatMap", {bicluster: data[0].data, workspace: options.workspace, id: self.bicluster.bicluster_id, tiles: tiles, mak: options.bicluster[0]})
+					loader.hide()
 				}
-			)
+			)						
 
             //Genes
-            self.$elem.append($("<div />")
+            $biclusterOverview.append($("<div />")
                     .append("<h3>genes</h3>")
 					.append($("<button />").attr('id', 'toggle_genes').addClass("btn btn-default").append("Toggle")));
 
@@ -97,10 +110,10 @@
 
             $genesTable += "</table>";
 			
-            self.$elem.append($("<div id='gene_list_"+self.bicluster.bicluster_id.replace( /\D+/g, '')+"' style='display:none'/>").append($genesTable));
+            $biclusterOverview.append($("<div id='gene_list_"+self.bicluster.bicluster_id.replace( /\D+/g, '')+"' style='display:none'/>").append($genesTable));
 			
             //Conditions
-            self.$elem.append($("<div />")
+            $biclusterOverview.append($("<div />")
                     .append("<h3>conditions</h3>")
 					.append($("<button />").attr('id', 'toggle_conditions').addClass("btn btn-default").append("Toggle")));
 			
@@ -117,10 +130,10 @@
 
             $conditionsTable += "</table>";
 
-            self.$elem.append($("<div id='condition_list' style='display:none'/>").append($conditionsTable));
+            $biclusterOverview.append($("<div id='condition_list' style='display:none'/>").append($conditionsTable));
             
             //Enriched terms
-            self.$elem.append($("<div />")
+            $biclusterOverview.append($("<div />")
                     .append("<h3>enriched terms</h3>")
 					.append($("<button />").attr('id', 'toggle_terms').addClass("btn btn-default").append("Toggle")));
 					
@@ -128,28 +141,28 @@
                 $("#term_list").toggle();
             });
 			
-            var $termsTable = '<table id="terms-table' + self.bicluster.id + '" class="kbgo-table">';
-            $termsTable += "<tr><th>Key</th><th>Value</th></tr>";
-
-            for (var enrichedTerm in self.bicluster.enriched_terms) {
-                $termsTable += "<tr><td>" + enrichedTerm.key + "</td><td>" + enrichedTerm.value + "</td></tr>";
-            }
-
-            $termsTable += "</table>";
+			if (Object.keys(self.bicluster.enriched_terms).length) {
+				var $termsTable = '<table id="terms-table' + self.bicluster.id + '" class="kbgo-table">';
+				$termsTable += "<tr><th>Term Type</th><th>Term</th></tr>";			
+				for (var enrichedTerm in self.bicluster.enriched_terms) {
+					$termsTable += "<tr><td>" + enrichedTerm + "</td><td>" + self.bicluster.enriched_terms[enrichedTerm] + "</td></tr>";
+				}
+				$termsTable += "</table>";
+			}
+			else {
+				var $termsTable = "<b><i>No enriched terms for this bicluster.</i></b>";
+			}            
 			
-            self.$elem.append($("<div id='term_list' style='display:none'/>").append($termsTable));
-
-            self.$elem.append($("<div />")
-                    .append("&nbsp;"));
+            $biclusterOverview.append($("<div id='term_list' style='display:none'/>").append($termsTable));
 
             return this;
         },
         getData: function() {
             return {
                 type: "MAKBicluster",
-                id: this.options.bicluster.id,
-                workspace: this.options.workspace_id,
-                title: this.options.title
+                id: this.options.bicluster[0][this.options.bicluster[1]].bicluster_id,
+                workspace: this.options.workspace,
+                title: "MAK Bicluster"
             };
         },
         showMessage: function(message) {

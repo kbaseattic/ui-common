@@ -26,8 +26,7 @@ angular.module('ws-directives')
             // Global list and dict of fetched workspaces
             var workspaces = []; 
 
-            var nav_height = 110;
-
+            var nav_height = 95;
 
             // This method loads the sidebar data.  
             // Note: this is only called after instantiation when sidebar needs to be refreshed
@@ -303,9 +302,6 @@ angular.module('ws-directives')
 
 
 
-
-
-
             function cloneWorkspace(ws_name) {
                 var body = $('<form class="form-horizontal" role="form">\
                                   <div class="form-group">\
@@ -576,7 +572,6 @@ angular.module('ws-directives')
                         var placeholder = $('<div>').loading()
                         modal_body.append(placeholder);                        
                         $.when(prom).done(function(data) {
-                            console.log('permissions', data)
                             permData = data
 
                             //newPerms = $.extend({},data)
@@ -673,7 +668,6 @@ angular.module('ws-directives')
                         table.append(row);
                         return table;
                     }
-
 
                     // create table of permissions
                     for (var key in data) {
@@ -1009,13 +1003,10 @@ angular.module('ws-directives')
                     $(element).html('<div class="alert alert-danger">'+e.error.message+'</div>');
                 })
 
-            } 
-
-            // loadObjTable
+            } // loadObjTable
 
 
             scope.loadNarTable = function(tab) {
-                //var table_id = "nar-table";
                 var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
                                             +'</div>',
                                              bSortable: false, "sWidth": "1%"} 
@@ -1029,6 +1020,7 @@ angular.module('ws-directives')
                                 { "sTitle": "Byte Size", bVisible: false },
                                 { "sTitle": "Module", bVisible: false },
                                 ];
+
                 if (tab != 'public'){
                     columns.push({ "sTitle": "Shared With" })
                 }
@@ -1060,7 +1052,6 @@ angular.module('ws-directives')
                 $(element).loading('<br>Loading<br>Narratives...', 'big');
 
                 var p = kb.getNarratives();
-
                 $.when(p).done(function(nars){
                     $(element).rmLoading();             
 
@@ -1170,7 +1161,7 @@ angular.module('ws-directives')
             }
 
             function getTypeFilterBtn(table, type_counts, selected) {
-                var type_filter = $('<select class=" type-filter form-control">\
+                var type_filter = $('<select class="type-filter form-control">\
                                     <option selected="selected">All Types</option> \
                                 </select>');
                 for (var type in type_counts) {
@@ -1196,9 +1187,10 @@ angular.module('ws-directives')
                             <span class="badge trash-count">'+scope.deleted_objs.length+'</span><a>');
                 trash_btn.tooltip({title: 'View trash bin', placement: 'bottom', delay: {show: 700}});
 
+                trash_btn.unbind('click');
                 trash_btn.click(function(){
                     displayTrashBin();
-                })      
+                });
 
                 return trash_btn;          
             }
@@ -1336,6 +1328,7 @@ angular.module('ws-directives')
                     }
 
                     // determine if saved to favorites
+                    /*
                     var isFav = false;
                     for (var i in scope.favs) { 
                         if (scope.favs[i].ws != ws) continue;
@@ -1343,7 +1336,7 @@ angular.module('ws-directives')
                             isFav = true;
                             break;
                         } 
-                    }
+                    }*/
 
                     // get url path specified in landing_page_map.json
                     if (module in scope.obj_mapping && scope.obj_mapping[module] 
@@ -1359,7 +1352,9 @@ angular.module('ws-directives')
                     var route = sub;
 
                     // overwrite routes for pages that are displayed in the workspace browser
-                    var route = kb.getRoute(kind);
+                    var routeInner = kb.getRoute(kind);
+                    if (routeInner)
+                    	route = routeInner;
                                                                                                               
                     if (route) {
                         var url = route+"({ws:'"+ws+"', id:'"+name+"'})";
@@ -1367,7 +1362,7 @@ angular.module('ws-directives')
                                         'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
                                         'data-sub="'+sub+'" ui-sref="'+url+'" >'+
                                     name+'</a> (<a class="show-versions">'+instance+'</a>)'+
-                                    (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
+                                    //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
                                     '<a class="btn-show-info hide pull-right">More</a>';
 
                     } else if (kind == "Narrative") {
@@ -1376,7 +1371,7 @@ angular.module('ws-directives')
                                         'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
                                         'data-sub="'+sub+'" '+(USER_ID ? 'href="'+url+'"' : '')+' target="_blank"><i><b>'+
                                       name+'</b></i></a> (<a class="show-versions">'+instance+'</a>)'+
-                                      (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
+                                      //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
                                      '<a class="btn-show-info hide pull-right">More</a>';
 
                     } else {
@@ -1385,7 +1380,7 @@ angular.module('ws-directives')
                                         'data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" '+
                                         'data-sub="'+sub+'" ui-sref="'+url+'" target="_blank" >'+
                                       name+'</a> (<a class="show-versions">'+instance+'</a>)'+
-                                      (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
+                                      //(isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+                                            
                                      '<a class="btn-show-info hide pull-right">More</a>';
                     }
 
@@ -1400,12 +1395,6 @@ angular.module('ws-directives')
             // This is reloaded on table change/pagination
             function events() {
                 $compile(table)(scope);
-
-                // ignore other events when clicking landingpage href
-                $('.obj-id').unbind('click');
-                $('.obj-id').click(function(e) {
-                    e.stopPropagation();
-                })
 
                 // if not logged in, and a narrative is clickd, display login for narratives
                 $('.nar-id').unbind('click');
@@ -1512,6 +1501,9 @@ angular.module('ws-directives')
                 // checkbox click event
                 $('.obj-table tbody tr').unbind('click');
                 $('.obj-table tbody tr').click(function(e) {
+                    // don't select if link is clicked
+                    if ($(e.target).hasClass('obj-id')) return;
+
                     if (!USER_ID) return;
                     var checkbox = $(this).children('td').eq(0).find('.ncheck');
                     var id = checkbox.data('id');
@@ -1520,7 +1512,6 @@ angular.module('ws-directives')
                     var dataWS = checkbox.data('ws');
                     var dataType = checkbox.data('type');
                     var module = checkbox.data('module');
-                    console.log('checkbox', id, name, dataWS, dataType)
 
                     if (checkbox.hasClass('ncheck-checked')) {
                         removeCheck(name, dataWS, dataType)
@@ -1586,20 +1577,11 @@ angular.module('ws-directives')
                     <span class="glyphicon glyphicon-star"></span>\
                     <span class="checked-count"></span></button>');                                      
 
-                options.append(delete_btn, copy_btn, rename_btn)//, mv_btn);
-
-                // narrative home should be 'deprecated'
-                // if user has narrative home workspace, add option to copy there
-                //if (scope.workspace_dict[USER_ID+':home']) {
-                //    var dd = options.find('.dropdown-menu')
-                //    dd.append('<li class="divider"></li>');
-                //    dd.append('<li><a class="btn-mv-obj-to-nar">Copy to Narrative Home</a></li>');
-                //}
-
-                //options.find('.btn-mv-obj').on('click', moveObjects);
                 if (scope.tab) {
+                    options.append(delete_btn, rename_btn)
                     copy_btn.find('.btn-cp-obj').on('click', copyNarObjects);
                 } else {
+                    options.append(delete_btn, copy_btn, rename_btn)                    
                     copy_btn.find('.btn-cp-obj').on('click', copyObjects);
                 }
 
@@ -1608,7 +1590,6 @@ angular.module('ws-directives')
                 mv_btn.on('click', addToMV);
 
                 var container = $('.table-options').append(options);
-                //options.addClass('hide')
 
                 delete_btn.tooltip({title: 'Delete selected objects', placement: 'bottom', delay: {show: 700}});
                 //copy_btn.tooltip({title: 'Copy; click for options', placement: 'bottom', delay: {show: 700}});  
@@ -1807,25 +1788,14 @@ angular.module('ws-directives')
                     }
                 }
 
-                // hide the objecttable, add back button{}
-                var table_id = 'obj-table-'+ws.replace(':','_');
+                // hide the objecttable, add back button
+                var table_id = 'obj-table';
                 $('#'+table_id+'_wrapper').hide();
                 $(element).prepend('<h4 class="trash-header"><a class="btn btn-primary">\
                     <span class="glyphicon glyphicon-circle-arrow-left"></span> Back</a> '+ws+' \
                     <span class="text-danger">Trash Bin</span> <small><span class="text-muted">(Undelete option coming soon)</span></small></h4>');
 
-                // event for back to workspace button
-                $('.trash-header .btn').unbind('click');
-                $('.trash-header .btn').click(function() {
-                    if (typeof trashbin) { // fixme: cleanup
-                        trashbin.fnDestroy();
-                        $('#'+table_id+'-trash').remove();
-                        trashbin = undefined;
-                    }
 
-                    $('.trash-header').remove();
-                    $('#'+table_id+'_wrapper').show();
-                })
 
                 // if trash table hasn't already been rendered, render it
                 if (typeof trashbin == 'undefined') {
@@ -1841,19 +1811,35 @@ angular.module('ws-directives')
                     // load object table
                     trashbin = $('#'+table_id+'-trash').dataTable(tableSettings);
 
+                    /*
                     if (scope.deleted_objs.length) {
                         var type_filter = getTypeFilterBtn(trashbin, kind_counts, scope.type)
                         $('.table-options').append(type_filter);
                     }
-
-                    //searchColumns()
                     addOptionButtons();
+                    */
 
                     // resinstantiate all events.
                     events();                     
                 } else {
                     $('#'+table_id+'-trash_wrapper').show();
                 }
+
+
+                // event for back to workspace button
+                $('.trash-header .btn').unbind('click');
+                $('.trash-header .btn').click(function() {
+
+                    if (typeof trashbin) { // fixme: cleanup
+                        trashbin.find('.table-options').remove()
+                        trashbin.fnDestroy();
+                        $('#'+table_id+'-trash').remove();
+                        trashbin = undefined;
+                    }
+
+                    $('.trash-header').remove();
+                    $('#'+table_id+'_wrapper').show();
+                })                
             }
 
 
@@ -1867,24 +1853,23 @@ angular.module('ws-directives')
                     obj_ids.push(obj);
                 }
 
-                console.log('obj_ids', obj_ids)
                 var prom = kb.ws.delete_objects(obj_ids);
                 $.when(prom).done(function(data) {
                     kb.ui.notify('Moved '+obj_ids.length+' object(s) to trashbin')                     
                     if (scope.tab) {
                         scope.loadNarTable(scope.tab);
                     } else {
-                        scope.loadObjTable()
+                        scope.loadObjTable();
                     }
                     scope.checkedList = [];
-                    scope.$apply()                                          
+                    scope.$apply();
                 })
                 return prom;
             }
 
             function addToMV() {
                 $('.fav-loading').loading()
-                var count = scope.checkedList.length
+                var count = scope.checkedList.length;
                 var p = favoriteService.addFavs(scope.checkedList);
                 $.when(p).done(function() {
                     scope.updateFavs();
@@ -1908,9 +1893,9 @@ angular.module('ws-directives')
 
                 // uncheck everything that is checked in that table ( this var is watched )
                 scope.checkedList = [];
-                scope.$apply()
+                scope.$apply();
 
-                events()
+                events();
             }
 
             // event for rename object button
@@ -1979,9 +1964,9 @@ angular.module('ws-directives')
                 var workspace = ws; // just getting current workspace
 
                 var content = $('<form class="form-horizontal" role="form">\
-                                        <div class="form-group">\
-                                        </div>\
-                                     </div>').loading()
+                                    <div class="form-group">\
+                                    </div>\
+                                 </div>').loading()
 
                 var copyObjectsModal = $('<div></div>').kbasePrompt({
                         title : 'Copy Objects',
@@ -2023,7 +2008,7 @@ angular.module('ws-directives')
                             {name : 'Copy',
                             type : 'primary',
                             callback : function(e, $prompt) {
-                                var ws = $('.select-ws option:selected').val()
+                                var ws = $('.select-ws option:selected').val();
                                 confirmCopy(ws, $prompt);
                             }
                         }]
@@ -2032,17 +2017,21 @@ angular.module('ws-directives')
                 copyObjectsModal.openPrompt();
 
 
-                var fq_id =  'ws.'+scope.checkedList[0].wsid+'.obj.'+scope.checkedList[0].id
+                var prom = kb.getNarrativeDeps({ws: ws, name: name})
+                $.when(prom).done(function(deps) {
+                    content.append('<h5>Objects to be copied:</h5>');
+                    var table = $('<table class="table table-striped table-nar-deps">');
+                    table.append("<tr><th>Name</th><th>Type</th></tr>");
+                    table.append("<tr><td>" + scope.checkedList[0].name + "</td><td>Narrative</td></tr>");
+                    for (var i in deps) {
+                        var d = deps[i];
+                        table.append('<tr data-name="'+d.name+'" data-type="'+d.type+'"><td>'
+                                          + d.name + '</td><td>'
+                                          + d.type +
+                                     '</td></tr>');
+                    }
+                    content.append(table);
 
-                var prom = kb.nar.get_narrative_deps({fq_id: fq_id, 
-                        callback: function(results) {
-                            console.log('results', results)
-                            content.append("<tr><td>" + results.name + "</td><td>Narrative</td></tr>");
-                            for (dep in results.deps) {
-                                content.append("<tr><td>" + results.deps[dep].name + "</td><td>" + results.deps[dep].type + "</td></tr>");
-                            } 
-
-                        }
                 })
 
 
@@ -2055,9 +2044,9 @@ angular.module('ws-directives')
                                         </div>\
                                      </div>');
 
-                    var select = $('<select class="form-control select-ws"></select>')
+                    var select = $('<select class="form-control select-ws"></select>');
                     for (var i in workspaces) {
-                        select.append('<option>'+workspaces[i][1]+'</option>')
+                        select.append('<option>'+workspaces[i][1]+'</option>');
                     }
                     select = $('<div class="col-sm-5">').append(select);
                     content.find('.form-group').append(select);
@@ -2561,7 +2550,7 @@ angular.module('ws-directives')
                 
 
                 var cloneModal = $('<div class="kbase-prompt">').kbasePrompt({
-                        title : 'Clone Workspace',
+                        title : 'Clone Workspace <i>'+ws_name+'</i>',
                         body : body,
                         modalClass : '', 
                         controls : [{
@@ -2596,7 +2585,11 @@ angular.module('ws-directives')
                                     $prompt.addCover()
                                     $prompt.getCover().loading()
                                     $.when(prom).done(function(){
-                                        scope.loadWSTable();
+                                        if (scope.tab) {
+                                            scope.loadNarTable(scope.tab)
+                                        } else {
+                                            scope.loadWSTable();
+                                        }                                        
                                         kb.ui.notify('Cloned workspace: <i>'+new_ws_id+'</i>');
                                         $prompt.closePrompt();
                                     }).fail(function() {
@@ -2615,8 +2608,8 @@ angular.module('ws-directives')
                 var body = $('<div style="text-align: center;">Are you sure you want to delete this workspace?<h3>'
                                 +ws_name+'</h3>This action is irreversible.</div>');
 
-                var deleteModal = $('<div></div>').kbasePrompt({
-                        title : 'Delete Workspace',
+                var deleteModal = $('<div>').kbasePrompt({
+                        title : 'Delete Workspace <i>'+ws_name+'</i>',
                         body : body,
                         modalClass : '', 
                         controls : [{
@@ -2637,7 +2630,11 @@ angular.module('ws-directives')
                                 $prompt.addCover()
                                 $prompt.getCover().loading()
                                 $.when(prom).done(function(){
-                                    scope.loadWSTable();
+                                    if (scope.tab) {
+                                        scope.loadNarTable(scope.tab)
+                                    } else {
+                                        scope.loadWSTable();
+                                    }
                                     kb.ui.notify('Deleted workspace: <i>'+ws_name+'</i>');
                                     $prompt.closePrompt();
                                 }).fail(function() {
@@ -2663,6 +2660,7 @@ angular.module('ws-directives')
         template: '<a class="btn-new-narrative" ng-click="createNewNarrative()">'+
                     '<b><span class="glyphicon glyphicon-plus"></span> New Narrative</b>'+
                   '</a>',
+        controller: 'WB',
         link: function(scope, ele, attrs) {
 
             scope.createNewNarrative = function() {
@@ -2712,8 +2710,6 @@ angular.module('ws-directives')
                                         scope.$apply();
                                     }
 
-
-                                    console.log('tab', scope.tab)
                                     //ascope.loadNarTable();
                                     kb.ui.notify('Created new narrative: <i>'+name+'</i>');
                                     $prompt.closePrompt();
@@ -2736,7 +2732,7 @@ angular.module('ws-directives')
                         newNarrativeModal.closePrompt();
                         modals.createWorkspace(function(){
                             scope.createNewNarrative();
-                        },function() {
+                        }, function() {
                             scope.createNewNarrative();
                         });
                         return;
@@ -2793,8 +2789,6 @@ angular.module('ws-directives')
                     }
                 }
 
-
-
             $(ele).loading();
             var prom = kb.ws.list_workspace_info({});
             $.when(prom).done(function(data) {
@@ -2803,7 +2797,6 @@ angular.module('ws-directives')
                 var rows = [];
                 var total_count = 0;
                 for (var i in data) {
-
                     var row = data[i];
                     var owner = row[2];
                     
@@ -2823,7 +2816,6 @@ angular.module('ws-directives')
                 tableSettings.aaData = rows;
 
                 var container = $('<table id="ws-manage" class="table table-bordered" style="width: 100%;"></table>');
-
 
                 $(ele).append(container);
                 var table = $(container).dataTable(tableSettings);
@@ -2852,13 +2844,8 @@ angular.module('ws-directives')
                         table.fnSettings(), $("thead input").index(this) ), true );
                 } );
                         
-            })
-                         
-        }           
-
-
-
-
+            })                
+        }
     }
 })
 
@@ -2866,9 +2853,9 @@ angular.module('ws-directives')
 
 function getEditableDescription(d) {
     var d = $('<form role="form">\
-               <div class="form-group">\
-                <textarea rows="4" class="form-control" placeholder="Description">'+d+'</textarea>\
-              </div>\
+                   <div class="form-group">\
+                    <textarea rows="4" class="form-control" placeholder="Description">'+d+'</textarea>\
+                  </div>\
               </form>');
     return d;
 }

@@ -59,7 +59,7 @@
         		var objInfo = obj_data[0];
 				$('#td_src_'+self.pref).html('<br>'+objInfo[7]+"/<wbr>"+objInfo[1]);
 				$("#input_target_"+self.pref).val(objInfo[1]);
-				console.log(ws_list_data);
+				//console.log(ws_list_data);
 				var td_ws = $('#td_ws_'+self.pref);
             	if (ws_list_data.length == 0) {
     				td_ws.html("You do not have write access to any workspaces.");

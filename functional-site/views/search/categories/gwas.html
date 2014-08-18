@@ -1,4 +1,4 @@
-<section>
+<section ng-show="options.categoryCounts['gwas']">
     <div class='row'>                        
         <table>
             <h3>Genome-Wide Association Analysis Categories</h3>
@@ -10,7 +10,7 @@
                 <td class="search-category-title" ng-click="selectCategory(p)">
                     <a><span>{{options.searchCategories[p].label}}</span></a>
                 </td>
-                <td class="search-category-title search-space-left"><span class='search-space-left'>(</span>{{options.categoryCounts[p]}}<span>)</span></td>
+                <td class="search-category-title search-space-left animated lightSpeedIn"><span class='search-space-left'>(</span>{{options.categoryCounts[p]}}<span>)</span></td>
             </tr>
         </table>
     </div>                                    

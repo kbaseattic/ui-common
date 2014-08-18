@@ -5,12 +5,10 @@
         version: "1.0.0",
 
         options: {
-            id: null,
-            workspaceID: null,
             loadingImage: "assets/img/ajax-loader.gif",
             title: "MAK Result Overview Bar Chart",
             isInCard: false,
-            width: 750,
+            width: 400,
             height: 800
         },
 
@@ -38,91 +36,113 @@
                              .append("div")
                              .classed("kbcb-tooltip", true);
 							 
-			terms = self.options.terms
+			var terms = self.options.terms
+			var chartWidth = self.options.width
 			
-			var chartWidth = self.options.width-50
-					
-			var $sideChart = $("<div>").css({"width":chartWidth,"top":50,"position":"absolute"})
-			var flat = []				
-			for (termType in terms) {
-				var termData = []
-				
-				for (term in terms[termType]) {
-					termData.push({"term":term,"tiles":terms[termType][term]})
-					flat.push(terms[termType][term].length)
-				}
+			
+			// var $sideChart = $("<div>").css({"width":chartWidth,"top":50,"position":"relative"})
+			var flat = []			
+			var termData = []						
+			var termColors = {"TIGRFam":"#CC0000","GO":"#7A00CC","COG":"#666666","SEED":"#CC5200","KEGG":"#007A00"}
+			var count = 0
+			
+			for (term in terms) {				
+				temp = term.indexOf(":")
+				termType = term.substring(0,temp)
+				var termColor = termColors[termType];
+				termData.push({"term":term,"tiles":terms[term],"color":termColor})
+				flat.push(terms[term].length)
+				count++
 			}
-			var x = d3.scale.linear().domain([0,d3.max(flat)]).range([0,chartWidth])
-			console.log(flat)
 			
-			for (termType in terms) {
-				var $barChartDiv = $("<div id='barchart'>"+termType+"</div>").css({"float":"right"})
-				var $barChart = d3.select($barChartDiv.get(0))
-					.selectAll("div")
-					.data(termData)
-						.enter()
-					.append("div")
-						.style({
-							"font": "10px sans-serif",
-							"background-color": "steelblue",
-							"text-align": "right",
-							"padding": "3px",
-							"margin": "1px",
-							"color": "white"
-						})
-						.style("width",function(d) {return x(d.tiles.length) + "px"})
-						.text(function (d) {return d.term})
-						.on("mouseover",							
-							function(d) {                            
-								if (!$(this).hasClass('selected')) {
-									for (tile in d.tiles) {
-										d3.select("#MAK_tile_"+tile).style("background", "#66FFFF")
-									}
-									d3.select(this).style("background-color", "#66FFFF"); 
-								}							
-								self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
-								return self.tooltip.style("visibility", "visible");
+			var x = d3.scale.linear().domain([0,d3.max(flat)]).range([0,chartWidth])			
+			var selectionHandler = []
+			var $mainDiv = $("<div id='mainDiv' style='overflow:auto;height:450px;resize:vertical'>")
+			var $barChartDiv = $("<div id='barchart'>")
+			$mainDiv.append($barChartDiv)
+			var $barChart = d3.select($barChartDiv.get(0))
+				.selectAll("div")
+				.data(termData)
+					.enter()
+				.append("div")
+					.style({
+						"font": "10px sans-serif",						
+						"text-align": "left",
+						"padding": "3px",
+						"margin": "1px",
+						"color": "white"
+					})
+					.attr("class", function(d) {return d.color})
+					.style("background", function(d) {return d.color})
+					.style("width",function(d) {return x(d.tiles.length) + "px"})
+					.attr("id",function(d) {
+						temp = d.term.indexOf(":")
+						term = d.term.substring(temp+1)
+						return term.replace(/\s+/g, '').replace(/,/g,'')
+					})
+					.text(function (d) {return d.term})
+					.on("mouseover",							
+						function(d) {                            
+							for (tile in d.tiles) {
+								tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')	
+								d3.select("#MAK_tile_"+tileSelector).style("background", "#F08A04")
 							}
-						)						 
-                        .on("mouseout", 
-                            function(d) { 
-								if (!$(this).hasClass('selected')) {
-									for (tile in d.tiles) {
-										d3.select("#MAK_tile_"+tile).style("background", "steelblue")
-									}
-									d3.select(this).style("background-color", "steelblue"); 									
+							d3.select(this).style("background", "#F08A04"); 
+				
+							// self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
+							self.tooltip = self.tooltip.text(d.term+", hits: "+d.tiles.length);
+							return self.tooltip.style("visibility", "visible");
+						}
+					)						 
+                       .on("mouseout", 
+							function(d) {
+								for (tile in d.tiles) {
+									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')								
+									d3.select("#MAK_tile_"+tileSelector).style("background", "steelblue")
+									if ($("#MAK_tile_"+tileSelector).hasClass('pickedFromBar')) d3.select("#MAK_tile_"+tileSelector).style("background", "#F08A04")
+									if ($("#MAK_tile_"+tileSelector).hasClass('currentHeatmap')) d3.select("#MAK_tile_"+tileSelector).style("background", "#99FFCC")
 								}
+								d3.select(this).style("background", d.color);								
+								if ($(this).hasClass("pickedFromBar")) d3.select(this).style("background", "#F08A04");
+								if ($(this).hasClass("pickedFromTile")) d3.select(this).style("background", "#00CCFF");
+								if ($(this).hasClass("currentTerms")) d3.select(this).style("background", "#99FFCC");
 								return self.tooltip.style("visibility", "hidden"); 
-                            }
-                        )
-                        .on("mousemove", 
-                            function() { 
-                                return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
-                            }
-                        )
-						// .on("click",
-							// function(d) {
-								// if ($(this).hasClass('selected')) {
-									// for (tile in d.tiles) {
-										// $("#MAK_tile_"+tile).removeClass('selected')
-									// }
-									// $(this).removeClass('selected')
-								// }
-								// else {
-									// for (tile in d.tiles) {
-										// $("#MAK_tile_"+tile).addClass('selected')
-									// }
-									// $(this).addClass('selected')
-								// }
-							// }
-						// )
+							}
+                       )
+                       .on("mousemove", 
+                           function() { 
+                               return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+                           }
+                       )
+					.on("click",
+						function(d) {
+							if ($(this).hasClass('pickedFromBar')) {								
+								for (tile in d.tiles) {
+									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
+									temp = selectionHandler.indexOf(tileSelector)
+									selectionHandler.splice(temp,1)
+									if (selectionHandler.indexOf(tileSelector)==-1) {
+										$("#MAK_tile_"+tileSelector).removeClass('pickedFromBar')
+									}
+								}
+								$(this).removeClass('pickedFromBar')
+							}
+							else {																
+								for (tile in d.tiles) {
+									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
+									selectionHandler.push(tileSelector)
+									if (!$("#MAK_tile_"+tileSelector).hasClass('pickedFromBar')) $("#MAK_tile_"+tileSelector).addClass('pickedFromBar')									
+								}
+								$(this).addClass('pickedFromBar')
+							}
+						}
+					)
 				
-				$sideChart.append($barChartDiv)
-				
-			}
-				
-			self.$elem.append($sideChart)
+			$instructions = $("<p><b><i>Click on a term bar, selections will be <span style='color:#F08A04'>orange</span>.</i></b></p><p><b><i>Selecting a bicluster (left) that contain terms in this chart will highlight the corresponding term(s) <span style='color:#00CCFF'>light blue</span>.</i></b></p>")
+			self.$elem.append($instructions)	
+			self.$elem.append($mainDiv)
 			
+			//console.log("here")
 			return this;
 		},
 		
@@ -130,7 +150,7 @@
             return {
                 type: "MAKResult BarChart",
                 id: this.options.id,
-                workspaceID: this.options.workspaceID,
+                workspace: this.options.workspace,
                 title: "MAK Result Overview Bar Chart"
             };
         },
