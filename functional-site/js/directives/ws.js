@@ -867,23 +867,6 @@ angular.module('ws-directives')
             function events() {
                 $compile(table)(scope);
 
-                // ignore other events when clicking landingpage href
-                $('.obj-id').unbind('click');
-                $('.obj-id').click(function(e) {
-                    //e.stopPropagation();
-
-                    // special "link" for metagenome page
-                    /*if (kind == "Metagenome") {
-                        var wsid = $(this).data('wsid');
-                        var id = $(this).data('id');
-                        kb.ws.get_objects([{wsid: wsid, objid: id}])
-                             .done(function(d) {
-                                var metagenome_id = d[0].data.metagenome_id;
-                                window.location = "/functional-site/communities/metagenome.html?metagenome="+metagenome_id
-                             })
-                    }*/
-                })
-
                 // if not logged in, and a narrative is clickd, display login for narratives
                 $('.nar-id').unbind('click');
                 $('.nar-id').click(function(e) {
@@ -992,6 +975,9 @@ angular.module('ws-directives')
                 // checkbox click event
                 $('.obj-table tbody tr').unbind('click');
                 $('.obj-table tbody tr').click(function(e) {
+                    // don't select if link is clicked
+                    if ($(e.target).hasClass('obj-id')) return;
+
                     if (!USER_ID) return;
                     var checkbox = $(this).children('td').eq(0).find('.ncheck');
                     var id = checkbox.data('id');
