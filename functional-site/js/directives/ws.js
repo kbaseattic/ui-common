@@ -370,40 +370,39 @@ angular.module('ws-directives')
             scope.loadObjTable = function() {
                 var table_id = "obj-table";                  
 
-                var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
-                                            +'</div>',
-                                             bSortable: false, "sWidth": "1%"} 
-                                          : { "sTitle": '', bVisible: false, "sWidth": "1%"}),
-                                { "sTitle": "Name", "contentPadding": "xxxxxxxMore"}, //"sWidth": "10%"
-                                { "sTitle": "Type"},
-                                { "sTitle": "Last Modified", "iDataSort": 5},
-                                { "sTitle": "Modified By", bVisible: true},
-                                { "sTitle": "Timestamp", "bVisible": false, "sType": 'numeric'},
-                                { "sTitle": "Size", iDataSort: 7 },
-                                { "sTitle": "Byte Size", bVisible: false },
-                                { "sTitle": "Module", bVisible: false }];
+
+                var checkbox = '<div class="ncheck check-option btn-select-all"></div>'
+                var columns =  [ (USER_ID ? { sTitle: checkbox, bSortable: false, "sWidth": "1%"} 
+                                          : { bVisible: false, sWidth: "1%"}),
+                                { sTitle: "Name", sContentPadding: "xxxxxxxMore",}, //"sWidth": "10%"
+                                { sTitle: "Type"},
+                                { sTitle: "Last Modified", iDataSort: 5},
+                                { sTitle: "Modified By", bVisible: true},
+                                { sTitle: "Timestamp", bVisible: false, sType: 'numeric'},
+                                { sTitle: "Size", iDataSort: 7 },
+                                { sTitle: "Byte Size", bVisible: false },
+                                { sTitle: "Module", bVisible: false }];
 
                 var tableSettings = {
-                    "sPaginationType": "bootstrap",
-                    "stateSave": (USER_ID ? true : false),
-                    "stateSaveParams": function (settings, data) {
+                    sPaginationType: "bootstrap",
+                    stateSave: (USER_ID ? true : false),
+                    stateSaveParams: function (settings, data) {
                         //don't save search filter
                         data.search.search = "";
                     },
-                    "oColReorder": {
+                    oColReorder: {
                         "iFixedColumns": (USER_ID ? 1 :0 ),
                     },
-                    "iDisplayLength": 10,
-                    "aaData": [],
-                    "fnDrawCallback": events,
-                    "aaSorting": [[ 3, "desc" ]],
-                    "aoColumns": columns,
-                    "oLanguage": {
-                        "sEmptyTable": "No objects in workspace",
-                        "sSearch": "Search: "
+                    iDisplayLength: 10,
+                    aaData: [],
+                    fnDrawCallback: events,
+                    aaSorting: [[ 3, "desc" ]],
+                    aoColumns: columns,
+                    oLanguage: {
+                        sEmptyTable: "No objects in workspace",
+                        sSearch: "Search: "
                     }
                 }
-
 
                 // clear object view every load
                 $(element).html('');
@@ -452,7 +451,6 @@ angular.module('ws-directives')
                         e.stopPropagation();
                     });                    
 
-
                     // show these options if logged in.
                     if (USER_ID) {
                         trash_btn.removeClass('hide');
@@ -478,18 +476,17 @@ angular.module('ws-directives')
 
 
             scope.loadNarTable = function(tab) {
-                var columns =  [ (USER_ID ? { "sTitle": '<div class="ncheck check-option btn-select-all">'
-                                            +'</div>',
-                                             bSortable: false, "sWidth": "1%"} 
-                                          : { "sTitle": '', bVisible: false, "sWidth": "1%"}),
-                                { "sTitle": "Narrative", "sType": "html", "sContentPadding": "xxxxxxxMore"},
-                                { "sTitle": "Workspace", "sType": "html", "sContentPadding": "btn"},
-                                { "sTitle": "Last Modified", "iDataSort": 5},
-                                { "sTitle": "Modified by", bVisible: true},
-                                { "sTitle": "Timestamp", "bVisible": false, "sType": 'numeric'},
-                                { "sTitle": "Size", "bVisible": false, iDataSort: 7 },
-                                { "sTitle": "Byte Size", bVisible: false },
-                                { "sTitle": "Module", bVisible: false },
+                var checkbox = '<div class="ncheck check-option btn-select-all"></div>'
+                var columns =  [ (USER_ID ? { sTitle: checkbox, bSortable: false, "sWidth": "1%"} 
+                                          : { bVisible: false, "sWidth": "1%"}),
+                                { sTitle: "Narrative", sType: "html", sContentPadding: "xxxxxxxMore"},
+                                { sTitle: "Workspace", sType: "html", sContentPadding: "btn"},
+                                { sTitle: "Last Modified", iDataSort: 5},
+                                { sTitle: "Modified by", bVisible: true},
+                                { sTitle: "Timestamp", bVisible: false, sType: 'numeric'},
+                                { sTitle: "Size", bVisible: false, iDataSort: 7 },
+                                { sTitle: "Byte Size", bVisible: false },
+                                { sTitle: "Module", bVisible: false },
                                 ];
 
                 if (tab != 'public'){
@@ -497,24 +494,24 @@ angular.module('ws-directives')
                 }
 
                 var tableSettings = {
-                    "sPaginationType": "bootstrap",
-                    "stateSave": (USER_ID ? true : false),
-                    "stateSaveParams": function (settings, data) {
+                    sPaginationType: "bootstrap",
+                    stateSave: (USER_ID ? true : false),
+                    stateSaveParams: function (settings, data) {
                         //don't save search filter
                         data.search.search = "";
                     },
-                    "oColReorder": {
-                        "iFixedColumns": (USER_ID ? 1 :0 ),
+                    oColReorder: {
+                        iFixedColumns: (USER_ID ? 1 :0 ),
                     },
-                    "iDisplayLength": 10,
-                    "aaData": [],
-                    "fnDrawCallback": events,
-                    "aaSorting": [[ 3, "desc" ]],
-                    //"sDom": "R<'row'<'col-xs-12 table-options'f>r>t<'row'<'col-xs-12'ilp>>",
-                    "aoColumns": columns,
-                    "oLanguage": {
-                        "sEmptyTable": "No narratives",
-                        "sSearch": "Search: "
+                    iDisplayLength: 10,
+                    aaData: [],
+                    fnDrawCallback: events,
+                    aaSorting: [[ 3, "desc" ]],
+                    //sDom: "R<'row'<'col-xs-12 table-options'f>r>t<'row'<'col-xs-12'ilp>>",
+                    aoColumns: columns,
+                    oLanguage: {
+                        sEmptyTable: "No narratives",
+                        sSearch: "Search: "
                     }
                 }
 
