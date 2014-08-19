@@ -51,7 +51,7 @@
                 <div class='text-center search-categories-title'>
                     <h3 data-toggle="tooltip" data-placement="right" tooltip="Navigate between different data types that match your search." tooltip-placement="right">Categories</h3>
                 </div>
-                <div class="col-md-12 search-categories-row">
+                <div class="col-md-12 search-categories-row search-category-nav">
                     <div>
                         <a id="Public" href="" class="btn btn-link search-category-link" ng-click="selectCategory(null)">
                             <strong>Return to All Categories</strong>
@@ -62,7 +62,7 @@
                                 <a ng-show="p.label.length < 23" id="{{p.category}}" href="" ng-class="{'search-selected-category-link': p.category == options.selectedCategory}" class="btn btn-link search-category-link" ng-click="$parent.selectCategory(p.category)">
                                     {{p.label}}<span class='search-space-left'> </span>({{options.categoryCounts[p.category] | number}})
                                 </a>
-                                <a data-toggle="tooltip" data-placement="right" tooltip="{{p.label}}" tooltip-placement="right" ng-show="p.label.length >= 23" id="{{p.category}}" href="" ng-class="{'search-selected-category-link': p.category == options.selectedCategory}" class="btn btn-link search-category-link" ng-click="$parent.selectCategory(p.category)">
+                                <a viewport=".search-category-nav" data-toggle="tooltip" data-placement="top" tooltip="{{p.label}}" tooltip-placement="top" ng-show="p.label.length >= 23" id="{{p.category}}" href="" ng-class="{'search-selected-category-link': p.category == options.selectedCategory}" class="btn btn-link search-category-link" ng-click="$parent.selectCategory(p.category)">
                                     {{p.label | limitTo: 23}}...<span class='search-space-left'> </span>({{options.categoryCounts[p.category] | number}})
                                 </a>
                             </div>

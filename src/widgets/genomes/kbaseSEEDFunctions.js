@@ -110,7 +110,7 @@
 
             //d3.text("assets/data/subsys.txt", function(text) {
             //d3.text("/static/subsys.txt", function(text) {
-            d3.text("/functional-site/assets/data/subsys.txt", function(text) {
+            d3.text("./assets/data/subsys.txt", function(text) {
                 var data = d3.tsv.parseRows(text);
                 var totalGenesWithFunctionalRoles = 0;
 

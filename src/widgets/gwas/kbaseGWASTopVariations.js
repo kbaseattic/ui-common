@@ -14,14 +14,12 @@
         init: function(options) {
             this._super(options);
 
-            var self = this;
+            this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
 
-            if (!this.options.kbCache && !this.authToken()) {
-                this.renderError("No cache given, and not logged in!");
-            }
-            else {
-                this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
-            }
+            return this.render();
+        },
+        render: function () {
+            var self = this;
 
             this.workspaceClient.get_objects([{name : this.options.id, workspace: this.options.ws}], 
                 function(data){
@@ -47,13 +45,13 @@
                     
                     self.$elem.append(tableHTML);
                 },
-
-                self.rpcError
+                function (e) {
+                    self.$elem.append("<div class='alert alert-danger'>" + e.error.message + "</div>");
+                }
             );
 
             return this;
         },
-
         getData: function() {
             return {
                 type:this.options.type,

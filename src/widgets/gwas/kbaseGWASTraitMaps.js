@@ -16,19 +16,20 @@
         init: function(options) {
             this._super(options);
             
+            this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
+            
+            return this.render();
+        },
+        render: function () {
             var self = this;
 
             var mapDiv = $('<div/>').addClass('gmap3').attr({ id: 'mapElement'});
-            self.$elem.append(mapDiv);
 
             self.options.allMarkers = [];
 
-            if (!this.options.kbCache && !this.authToken()) {
-                this.renderError("No cache given, and not logged in!");
-            }
-            else {
-                this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
-            }
+            var errorFunc = function (e) {
+                self.$elem.append("<div class='alert alert-danger'>" + e.error.message + "</div>");
+            };
 
             var success = function(data) {                    
                 self.collection = data[0];
@@ -132,67 +133,64 @@
                         }
                     }
 
-                    return self.render();
+                    mapDiv.width(self.options.width - 60).height(self.options.height - 130).gmap3({
+                        map: {
+                            options:{
+                                center:[46.578498,2.457275],
+                                zoom: 2 
+                            }
+                        },
+                        marker: {
+                            values: self.options.allMarkers,
+                            options: {
+                                draggable: false
+                            },
+                            events: {
+                                mouseover: function(marker, event, context) {
+                                    var map = $(this).gmap3("get");
+                                    var infowindow = $(this).gmap3({ get: { name: "infowindow"} });
+                      
+                                    if (infowindow) {
+                                        infowindow.open(map, marker);
+                                        infowindow.setContent(context.data);
+                                    } 
+                                    else {
+                                        $(this).gmap3({infowindow: {
+                                            anchor: marker, 
+                                            options: {content: context.data}
+                                        }});
+                                    }
+                                }
+                            },
+                            mouseout: function() {
+                                var infowindow = $(this).gmap3({get:{name:"infowindow"}});
+                                if (infowindow) {
+                                    infowindow.close();
+                                }
+                            }
+                        }
+                    });
+
+
+                    self.$elem.append(mapDiv);
+
+                    return self;
                 };
 
                 if (id.indexOf("/") > -1) {
-                    self.workspaceClient.get_objects([{ref: id}]).then(innerMethod, self.rpcError);
+                    self.workspaceClient.get_objects([{ref: id}]).then(innerMethod, errorFunc);
                 }
                 else {
-                    self.workspaceClient.get_objects([{name: id, workspace: self.options.ws}]).then(innerMethod, self.rpcError);                
+                    self.workspaceClient.get_objects([{name: id, workspace: self.options.ws}]).then(innerMethod, errorFunc);                
                 }
             };
 
             if (this.options.id.indexOf("/") > -1) {
-                this.workspaceClient.get_objects([{ref : this.options.id}]).then(success, self.rpcError);
+                this.workspaceClient.get_objects([{ref : this.options.id}]).then(success, errorFunc);
             }
             else {
-                this.workspaceClient.get_objects([{name : this.options.id, workspace: this.options.ws}]).then(success, self.rpcError);            
+                this.workspaceClient.get_objects([{name : this.options.id, workspace: this.options.ws}]).then(success, errorFunc);            
             }
-
-            return this.render();
-        },
-        render: function() {
-            var self = this;
-            
-            $('#mapElement').width(this.options.width - 60).height(this.options.height - 130).gmap3({
-                map: {
-                    options:{
-                        center:[46.578498,2.457275],
-                        zoom: 2 
-                    }
-                },
-                marker: {
-                    values: self.options.allMarkers,
-                    options: {
-                        draggable: false
-                    },
-                    events: {
-                        mouseover: function(marker, event, context) {
-                            var map = $(this).gmap3("get");
-                            var infowindow = $(this).gmap3({ get: { name: "infowindow"} });
-                      
-                            if (infowindow) {
-                                infowindow.open(map, marker);
-                                infowindow.setContent(context.data);
-                            } 
-                            else {
-                                $(this).gmap3({infowindow: {
-                                    anchor: marker, 
-                                    options: {content: context.data}
-                                }});
-                            }
-                        }
-                    },
-                    mouseout: function() {
-                        var infowindow = $(this).gmap3({get:{name:"infowindow"}});
-                        if (infowindow) {
-                            infowindow.close();
-                        }
-                    }
-                }
-            });
-
 
             return this;
         },

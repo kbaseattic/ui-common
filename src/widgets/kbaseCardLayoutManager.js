@@ -66,7 +66,7 @@
             $(document).on("kbaseCardClosed", function(event, id) {
                 self.cardClosed(id);
             });
-            console.log(this.options);
+            //console.log(this.options);
 
             this.render();
             this.registerEvents();
@@ -2316,7 +2316,7 @@
             // otherwise use options.
             if (newWidget.getData) {
                 var data = newWidget.getData();
-                console.log(data);
+                //console.log(data);
                 var cardTitle = data.title ? data.title : "";
                 var cardSubtitle = data.id ? data.id : "";
                 var cardWidth = newWidget.options.width ? newWidget.options.width : this.defaultWidth;
