@@ -33,7 +33,7 @@
 
             var self = this;
 
-            console.log(options);
+            //console.log(options);
             if (options.hasOwnProperty("dialogClass") && options.dialogClass !== null) {
                 this.options.dialogClass = options.dialogClass;
             }

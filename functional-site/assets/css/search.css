@@ -24,8 +24,8 @@ a.search-checkbox-link.disabled { color: #eee; }
 
 /*** general spacing ***/
 
-.tooltip {
-    z-index: 2000;
+.search-categories-row > .tooltip.top.fade {
+    margin-top: -30px;
 }
 
 .search-nowrap {
