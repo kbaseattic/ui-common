@@ -295,7 +295,7 @@ angular.module('ws-directives')
 
 
                 // help tooltips
-                $('.btn-ws-settings').tooltip({title: 'Workspace Settings', placement: 'right', delay: {show: 800}})                     
+                $('.btn-ws-settings').tooltip({title: 'Workspace Settings', placement: 'left', delay: {show: 800}})                     
 
             } /* end events */
 
@@ -1596,7 +1596,7 @@ angular.module('ws-directives')
                   '</a>',
         controller: 'WB',
         link: function(scope, ele, attrs) {
-            var self = scope;
+
             scope.createNewNarrative = function() {
                 var body = $('<form class="form-horizontal" role="form">');
 
@@ -1665,9 +1665,9 @@ angular.module('ws-directives')
                     new_ws_btn.click(function() {
                         newNarrativeModal.closePrompt();
                         modals.createWS({cancel_cb: function(){
-                            blah.createNewNarrative();
+                            scope.createNewNarrative();
                         }, submit_cb: function() {
-                            blah.createNewNarrative();
+                            scope.createNewNarrative();
                         }});
                         return;
                     })
@@ -1773,14 +1773,19 @@ angular.module('ws-directives')
                 if (!data) {
                     return;
                 }
-                var container = $('<div class="ws-descript">')
-                var descript = $('<div class="ellipsis" data-toggle="popover">'+data+'</div>')
-                container.append(descript);
-                $(ele).append(container); 
-                descript.popover({content: data,
-                                  trigger: 'hover', 
-                                  placement: 'bottom',
-                                  delay: {show: 1500}})
+
+                scope.$apply(function() {
+                    scope.description = data;
+                });
+
+                var container = $(ele);
+                var text = $('<div class="ellipsis" data-toggle="popover">'+scope.description+'</div>')
+                container.append(text);
+                $(ele).append(container);
+                text.popover({content: data,
+                              trigger: 'hover', 
+                              placement: 'bottom',
+                              delay: {show: 1500}})
 
                 //var edit = $('<div class="glyphicon glyphicon-pencil">')
                 //container.append(edit);

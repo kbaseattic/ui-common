@@ -19,6 +19,7 @@ angular.module('narrative-directives')
                                     e.error.message+'</div>')
                 });
 
+                
                 $.when(p).done(function(results){
                     $(element).rmLoading();
 

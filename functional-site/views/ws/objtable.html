@@ -1,7 +1,8 @@
 
 
-<div class="obj-table-header">
-	<div class="h4"><b><i>{{selected_ws}}</i></b></div>
-	<div class="ws-descript" ws-description></div>
+<div>
+	<div class="obj-table-header-title">{{selected_ws}}</div>
+	<div ng-show="description" class="obj-table-header-descript" ws-description>
+	</div>
 </div>
 <div class="obj-table" objtable></div>

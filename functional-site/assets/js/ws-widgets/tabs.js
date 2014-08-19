@@ -48,7 +48,7 @@
             var container = this.$elem;
             var self = this;
 
-            var tabs = $('<ul class="nav nav-tabs">');
+            var tabs = $('<ul class="nav nav-'+(options.pills ? 'pills' : 'tabs')+'">');
             var tab_contents = $('<div class="tab-content">');
             container.append(tabs, tab_contents);
 

@@ -617,19 +617,54 @@ function UIUtils() {
     this.objTable = function(p) {
         var obj = p.obj;
         var keys = p.keys;
-        var labels = p.labels;
 
-        var table = $('<table class="table table-striped table-bordered" \
-                              style="margin-left: auto; margin-right: auto;"></table>');
+        // option to use nicely formated keys as labels
+        if (p.keysAsLabels ) {
+            var labels = []            
+            for (var i in keys) {
+                var str = keys[i].key.replace(/(id|Id)/g, 'ID')
+                var words = str.split(/_/g);
+                for (var j in words) {
+                    words[j] = words[j].charAt(0).toUpperCase() + words[j].slice(1)
+                }
+                var name = words.join(' ')
+                labels.push(name);
+            }
+        } else if ('labels' in p) {
+            var labels = p.labels;
+        } else {
+            // if labels are specified in key objects, use them
+            for (var i in keys) {
+                var key_obj = keys[i];
+                if ('label' in key_obj) {
+                    labels.push(key_obj.label);                    
+                } else {
+                    labels.push(key_obj.key)
+                }   
+
+            }
+        }
+
+
+        var table = $('<table class="table table-striped table-bordered">');
+//        style="margin-left: auto; margin-right: auto;"
 
         for (var i in keys) {
             var key = keys[i];
             var row = $('<tr>');
 
-            var label = $('<td>'+labels[i]+'</td>')
-            var value = $('<td>')
+            if (p.bold) {
+                var label = $('<td><b>'+labels[i]+'</b></td>')
+            } else {
+                var label = $('<td>'+labels[i]+'</td>');
+            }
 
-            if (key.type == 'bool') {
+            var value = $('<td>');
+
+            if ('format' in key) {
+                var val = key.format(obj)
+                value.append(val)
+            } else if (key.type == 'bool') {
                 value.append((obj[key.key] == 1 ? 'True' : 'False'))
             } else {
                 value.append(obj[key.key])

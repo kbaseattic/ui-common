@@ -68,20 +68,17 @@
 h1, .h1 {
     font-family: 'RobotoBlack', Arial, sans-serif;
     letter-spacing: 0;
-    font-weight: normal;
 }
 h2, .h2 {
-    font:  1.5em/1.75em  'RobotoBlack', Arial, sans-serif;
-    font-weight: normal;
+    font: 'RobotoBlack', Arial, sans-serif;
     letter-spacing: 0;
 }
 h3, .h3 {
-    font-family:'RobotoBlack', Arial, sans-serif;
+    font-family: 'RobotoBlack', Arial, sans-serif;
     letter-spacing: 0;
-    font-weight: normal;
 }
 h4, .h4 {
-    font-family:  'RobotoBlack', Arial, sans-serif;
+    font-family: 'RobotoBlack', Arial, sans-serif;
     letter-spacing: 0em;
 }
 
@@ -304,6 +301,9 @@ table {
     position: absolute;
     right: 5px;
     top: 6px;
+}
+.btn-ws-settings .glyphicon{
+    top: 2px; /* just perfect, due to positioning */
 }
 /*#select-box tr :hover {
     background-color: #eee;
@@ -643,16 +643,26 @@ div::-webkit-scrollbar-thumb {
     overflow: hidden;
 }
 
+.obj-table-header-title {
+    font-family: 'RobotoBlack', Arial, sans-serif;
+    font-size: 14pt;
+
+}
+/*
 .ws-descript {
     position: relative;
     padding-right: 15px;
-}
-.ws-descript .glyphicon-pencil {
-    position: absolute;
-    top: 0;
+}*/
+.obj-table-header-descript {
+    margin: -5px 0 0 0;
 }
 
-.ws-descript .popover {
+.obj-table-header-descript .glyphicon-pencil {
+    position: absolute;
+    top: 0;    
+}
+
+.obj-table-header-descript .popover {
     max-width: 1200px;
 }
 
