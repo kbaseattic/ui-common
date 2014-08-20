@@ -34,6 +34,7 @@ $.KBWidget({
                                            {name: 'Compounds', content: cpdTable},
                                            {name: 'Pathways', content: mapTable},                                               
                                     ]}); 
+        tabs.showTab('Reactions');
 
         container.loading();
         var p = kb.get_fba(ws, name)
@@ -93,11 +94,11 @@ $.KBWidget({
                           'Combo Deletions',
                           'Default Min Drain Flux',
                           'fva',
-                          'Decompose Reversible Drain Flux',
+                          'Decompose Reversible Drain 3Flux',
                           'Default Max Flux',
                           'Decompose Reversible Flux'];
 
-            var table = kb.ui.objTable('overview-table', data, keys, labels);
+            var table = kb.ui.objTable({obj: data, keys: keys, labels: labels});
             overviewTable.append(table);
 
             var tableSettings = {

@@ -7,45 +7,11 @@ app.service('favoriteService', function() {
     var status_ele = $('.fav-loading');
     var fav_count_ele = $('.favorite-count');
 
-    this.addDEPRECATED = function(ws, id, type) {
-        console.log('adding', ws, id, type)
-
-        status_ele.loading();
-        var get_state_prom = kb.ujs.get_has_state(state_name, state_key, 0);
-        var prom = $.when(get_state_prom).then(function(q) {
-            var q = (q[0] == 1 ? q[1] : []);
-            if (!q) var q = [];
-
-            var fav = {ws: ws, id: id, type: type}
-
-            var isNew = true;
-            /*for (var i in q) {
-                if (angular.equals(fav, q[i])) {
-                    isNew = false;
-                    break;
-                }
-            }*/
-
-            if (isNew) {
-                q.push(fav);
-
-                set_ui_count(q.length);            
-
-                var p = kb.ujs.set_state(state_name, state_key, q);
-                return p;            
-            }
-
-        }).fail(function() {
-            var p = kb.ujs.set_state(state_name, state_key, []);
-
-        });
-
-        $.when(prom).then(function() {
-            status_ele.rmLoading();
-        })        
-
-        return prom;
-    }
+    this.getFavs = function() {}
+        var service = 'favorites';
+        var key = 'list';
+        var p = (USER_ID ? kb.ujs.get_has_state(service, key , 0) : undefined);
+        return p;
 
     this.addFavs = function(fav_list) {
         console.log('adding fav list', fav_list)

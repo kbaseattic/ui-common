@@ -1,51 +1,34 @@
 
 
-
-
-<div class="ws-selector">
+  
+<div class="ws-selector"> 
     <div class="ws-selector-header">
         <div class="btn-toolbar ws-toolbar">
-
-            <!--<div class="btn-group btn-group-sm">-
-            <div ng-show="USER_ID">
-                <button type="button" class="btn btn-default btn-show-ws active">
-                    <span class="glyphicon glyphicon-th-large"></span>
-                </button>                            
-                <!--<button type="button" class="btn btn-default btn-show-fav">
-                    <span class="glyphicon glyphicon-star"></span> '+
-                    '(<span class="favorite-count">0</span>)'+
-                </button>
-            </div>'-->
-
-            <div class="dropdown">
-                <a ng-show="$root.USER_ID" type="button" class="" data-toggle="dropdown">
+            <div class="dropdown pull-left">
+                <a ng-show="$root.USER_ID" data-toggle="dropdown">
                     Filter <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu settings-dropdown perm-filters" role="menu">
                     <!--<div class="checkbox pull-left">
                         <label><input id="ws-filter-projects" type="checkbox" value="">Narrative Projects</label>
                     </div>-->
-                    <br><hr class="hr">
                     <div class="checkbox pull-left">
                         <label><input id="ws-filter-owner" type="checkbox" value="">Owner</label>
                     </div>
                     <br><br><hr class="hr">
-                    'Your permission:<br>
+                    Your permission:<br>
                     <div class="checkbox">
                         <label><input id="ws-filter-admin" type="checkbox" value="" checked>Admin</label>
                     </div>
                     <div class="checkbox">
-                      <label><input id="ws-filter-write" type="checkbox" value="" checked>Write</label>
+                        <label><input id="ws-filter-write" type="checkbox" value="" checked>Write</label>
                     </div>
                     <div class="checkbox">
-                      <label><input id="ws-filter-read" type="checkbox" value="" checked>Read</label>                                                                                          
+                        <label><input id="ws-filter-read" type="checkbox" value="" checked>Read</label>
                     </div>
-
-                </ul>
-
-                <a ng-show="$root.USER_ID" class="btn-new-ws pull-right">New+</a>
-            </div>                        
-            
+                </ul>                 
+            </div>
+            <a ng-show="$root.USER_ID" class="btn-new-ws pull-left">New+</a>
 
             <div class="fav-toolbar" style="display: none;">
                 <div class="fav-toolbar-title pull-left">Objects</div>

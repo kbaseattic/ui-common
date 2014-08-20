@@ -10,10 +10,9 @@
  *  -- Some of the critical files --
  *  App:               js/app.js
  *  Controllers:       js/controllers.js
- *  Directives:        js/directives.js 
- *                     js/card-directives.js 
- *                     js/iris-directives.js
- *                     js/mv-directives.js 
+ *  Directives:        js/directives/landingpages.js 
+ *                     js/directives/*
+ *
  *  Views (templates): views/* 
  *
 */
@@ -23,8 +22,8 @@ var cardManager = undefined;
 var app = angular.module('landing-pages', 
     ['lp-directives', 'card-directives',
      'trees-directives', 'fav-directives',
-     'ws-directives', 'modeling-directives',
-     'narrative-directives', 
+     'ws-directives', 'modeling-directives', 
+     'communities-directives', 'narrative-directives', 
      'ui.router', 'ngResource', 'kbaseLogin', 
      'FeedLoad', 'ui.bootstrap', 'search'])
     .config(['$locationProvider', '$stateProvider', '$httpProvider', '$urlRouterProvider',
@@ -45,6 +44,7 @@ var app = angular.module('landing-pages',
         });
 
 
+    // narrative pages routing
     $stateProvider
         .state('narratives', {
           url: "/narratives/",
@@ -68,21 +68,6 @@ var app = angular.module('landing-pages',
           controller: 'WB'
         })
 
-    // old narrative pages */
-    /*
-    $stateProvider
-        .state('narrative', {
-          url: "/narrative/",
-          templateUrl: 'views/narrative/home.html',
-          controller: 'Narrative'
-        }).state('narrative.projects', {
-          url: "projects/",
-          templateUrl: 'views/narrative/projects.html',
-          controller: 'NarrativeProjects'
-        });
-    */
-
-
     // workspace browser routing
     $stateProvider
         .state('ws', {
@@ -98,7 +83,7 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/ws/manage.html', 
           controller: 'WSManage',
         }).state('ws.id', {
-          url: "objtable/:ws?type",
+          url: "objects/:ws?type",
           templateUrl: 'views/ws/objtable.html',
           controller: 'WB'
         }).state('ws.tour', {
@@ -138,12 +123,10 @@ var app = angular.module('landing-pages',
           url: "models/:ws/:id?map",
           templateUrl: 'views/ws/sortable/model.html',
           controller: 'WBLanding',
-          //reloadOnSearch: false
         }).state('ws.fbas', {
-          url: "fbas/:ws/:id?map",
+          url: "fbas/:ws/:id",
           templateUrl: 'views/ws/sortable/fba.html',
           controller: 'WBLanding',
-          //reloadOnSearch: false
         }).state('ws.etc', {
           url: "etc/:ws/:id",
           templateUrl: 'views/ws/sortable/etc.html',
@@ -195,6 +178,22 @@ var app = angular.module('landing-pages',
         });
 
 
+    // communities pages
+    $stateProvider
+        .state('ws.metagenome', {
+          url: "metagenome/:ws/:id",
+          templateUrl: 'views/ws/objs/metagenome.html',
+          controller: 'WBLanding'
+        }).state('ws.collection', {
+          url: "collection/:ws/:id",
+          templateUrl: 'views/ws/objs/collection.html',
+          controller: 'WBLanding'
+        }).state('ws.profile', {
+          url: "profile/:ws/:id",
+          templateUrl: 'views/ws/objs/profile.html',
+          controller: 'WBLanding'
+        });
+
     // not in use
     $stateProvider
         .state('favorites', {
@@ -202,7 +201,6 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/ws/favorites.html',
           controller: 'Favorites'
         });
-
 
     // other pages
     $stateProvider
@@ -498,7 +496,7 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
                       .when('#', '/login/');
 
     $urlRouterProvider.otherwise('/404/');
-    
+
     $stateProvider.state("404", 
             {url: '*path', 
              templateUrl : 'views/404.html'});
@@ -559,15 +557,6 @@ configJSON = $.parseJSON( $.ajax({url: "config.json",
 
 
 app.run(function ($rootScope, $state, $stateParams, $location) {
-/*
-    var HELP_DROPDOWN = '<a href="#" class="dropdown-toggle" data-toggle="dropdown">Help <b class="caret"></b></a> \
-                 <ul class="dropdown-menu"> \
-                 <li><a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a></li> \
-                 <!--<li><a href="#/landing-pages-help">Landing Page Documentation</a></li>--> \
-                 <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li> \
-              </ul>';
-    $('.help-dropdown').html(HELP_DROPDOWN);
-*/
 
     //  Things that need to happen when a view changes.
     $rootScope.$on('$locationChangeStart', function(event) {
@@ -575,8 +564,6 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         var begin = absUrl.indexOf('/functional-site/');
         var offset = '/functional-site/'.length;
 
-        //console.log([absUrl, begin, offset, absUrl.length]);
-    
         if (absUrl.indexOf('/functional-site/#/') < 0 && begin > 0 && absUrl.length > begin + offset) {
             event.preventDefault();
             $state.go('404', null, {location: false});
@@ -632,8 +619,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     USER_ID = $("#signin-button").kbaseLogin('session').user_id;
     USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
     kb = new KBCacheClient(USER_TOKEN);
-    kb.nar.ensure_home_project(USER_ID);
-
+    //kb.nar.ensure_home_project(USER_ID);
 
     $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
 

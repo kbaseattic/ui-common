@@ -369,7 +369,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     $scope.id = $stateParams.id;
 })
 
-.controller('WBTour', function($scope, $stateParams, $location) {
+.controller('WBTour', function($scope, $state, $stateParams, $location) {
     $scope.selected_ws = 'chenryExample';  // workspace to use for tour
 
     // if not logged in, prompt for login
@@ -408,7 +408,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                                     Unreferenced objects will be deleted after 30 days.'}]                        
 
         function exit_callback() {
-            $scope.$apply( $location.path( '/ws/' ) );
+            $scope.$apply( $state.go('ws') );
         }
 
         new Tour({tour: tour, exit_callback: exit_callback});

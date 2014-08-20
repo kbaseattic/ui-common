@@ -383,7 +383,7 @@ angular.module('lp-directives')
                         labels.push(kind)
                     }
 
-                    var table = kb.ui.listTable('referenced-objects', data, labels)
+                    var table = kb.ui.listTable({array: data, labels: labels})
                     $compile(table)(scope);
                     $(ele).append(table)
                     //scope.$apply();
