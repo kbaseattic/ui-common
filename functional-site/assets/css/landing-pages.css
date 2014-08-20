@@ -254,6 +254,24 @@ table {
     margin: 0 0 5px 0;
 }
 
+.caret-left {
+    display: inline-block;    
+    width: 0; 
+    height: 0; 
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent; 
+    border-right: 4px solid #444; 
+}
+
+.caret-right {
+    display: inline-block;    
+    width: 0; 
+    height: 0; 
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent; 
+    border-left: 4px solid #444; 
+}
+
 .caret-up {
     display: inline-block;
     width: 0px;
@@ -370,7 +388,7 @@ div::-webkit-scrollbar-thumb {
     margin: 0 0 5px 0;
 }
 .btn-hide-sidebar{
-    margin: 7px 0 0 0;
+    margin: 7px 0 0 7px;
 }
 
 .sidebar .glyphicon-backward {
