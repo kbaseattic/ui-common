@@ -9,18 +9,15 @@
         },
         workspaceURL: "https://kbase.us/services/ws/",
 
-
         init: function(options) {
             this._super(options);
 
+            this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
+        
+            return this.render();
+        },
+        render: function () {
             var self = this;
-
-            if (!this.options.kbCache && !this.authToken()) {
-                this.renderError("No cache given, and not logged in!");
-            }
-            else {
-                this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
-            }
 
             this.workspaceClient.get_objects([{name : this.options.id, workspace: this.options.ws}], 
                 function(data){
@@ -36,16 +33,16 @@
                         .append($("<tr/>").append("<td>source_genome_name</td><td>" + self.collection.data.genome.source_genome_name + "</td>"))
                     ));
                 },
-
-                self.rpcError
+                function (e) {
+                    self.$elem.append("<div class='alert alert-danger'>" + e.error.message + "</div>");
+                }
             );
 
             return this;
         },
-
         getData: function() {
             return {
-                type:this.options.type,
+                type: this.options.type,
                 id: this.options.id,
                 workspace: this.options.ws,
                 title: "GWAS Kinship Details",

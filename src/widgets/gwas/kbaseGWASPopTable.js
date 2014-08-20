@@ -15,16 +15,15 @@
         init: function(options) {
             this._super(options);
 
+            this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
+
+            return this.render();
+        },
+
+        render: function() {
             var self = this;
 
-            if (!this.options.kbCache && !this.authToken()) {
-                this.renderError("No cache given, and not logged in!");
-            }
-            else {
-                this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
-            }
-
-            var success = function(data){
+            var success = function(data) {
                 self.collection = data[0];
 
                 var domainTable = $("<table/>").addClass("table table-bordered table-striped").attr("id", "popTable"); 
@@ -77,16 +76,20 @@
                 $("#popTable_wrapper").css("overflow-x","hidden");
             };
 
+            var errorFunc = function (e) {
+                self.$elem.append("<div class='alert alert-danger'>" + e.error.message + "</div>");
+            };
+
+
             if (this.options.id.indexOf('/') > -1) {
-                this.workspaceClient.get_objects([{ref : this.options.id}]).then(success, self.rpcError);
+                this.workspaceClient.get_objects([{ref : this.options.id}]).then(success, errorFunc);
             }
             else {
-                this.workspaceClient.get_objects([{name : this.options.id, workspace: this.options.ws}]).then(success, self.rpcError);            
+                this.workspaceClient.get_objects([{name : this.options.id, workspace: this.options.ws}]).then(success, errorFunc);            
             }
-
+            
             return this;
         },
-
         getData: function() {
             return {
                 type:this.options.type,
@@ -98,5 +101,28 @@
                 dialogClass: 'no-close'
             };
         }
+/*
+        loggedInCallback: function(event, auth) {
+            this.workspaceClient = new Workspace(this.workspaceURL, auth);
+            
+            return this.render();
+        },
+        loggedOutCallback: function(event, auth) {
+            this.workspaceClient = new Workspace(this.workspaceURL, auth);
+            
+            return this.render();
+        },
+        loggedInQueryCallback: function(args) {
+            console.log(args);
+
+            if (this.loggedInCallback) {
+                this.loggedInCallback(undefined, args);
+            }
+            else {
+                this.loggedOutCallback(undefined, args);
+            }
+        }            
+*/
+        
     });
 })( jQuery )

@@ -15,14 +15,12 @@
         init: function(options) {
             this._super(options);
 
-            var self = this;
+            this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
 
-            if (!this.options.kbCache && !this.authToken()) {
-                this.renderError("No cache given, and not logged in!");
-            }
-            else {
-                this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
-            }
+            return this.render();
+        },
+        render: function () {
+            var self = this;
 
             this.workspaceClient.get_objects([{name : this.options.id, workspace: this.options.ws}], 
                 function(data){
@@ -62,15 +60,11 @@
                     $("#popTable_wrapper").css("overflow-x","hidden");
                     $("#popTable_wrapper").css("overflow-y","hidden");
                 },
-
-                self.rpcError
+                function (e) {
+                    self.$elem.append("<div class='alert alert-danger'>" + e.error.message + "</div>");
+                }
             );
 
-            return this;
-        },
-        render: function () {
-            $('ui-dialog-titlebar-close').addClass('no-close');
-        
             return this;
         },
         getData: function() {

@@ -6,8 +6,6 @@
  *   and right hand (objtable) directives of the workspace
  *   browser.
  *      
- *  Todo: 
- *      -- refactor all workspace related modals into a service/factory
 */
 
 
@@ -1710,7 +1708,8 @@ angular.module('ws-directives')
 .directive('showHideSidebar', function($location, $compile, $state, $stateParams) {
     return {
         template: '<button class="btn btn-default btn-xs btn-hide-sidebar">'+
-                      '<span class="glyphicon glyphicon-backward"></span>'+
+                       '<span class="caret-left"></span> '+
+                       '<span class="glyphicon glyphicon-th-list"></span>'+
                   '</button>',
         link: function(scope, ele, attrs) {
             //$(ele).tooltip({title: 'hide sidebar',
@@ -1738,9 +1737,9 @@ angular.module('ws-directives')
                             main.addClass('col-sm-12 col-md-12 main-fullsize');
 
                             // change icon
-                            var icon = $(ele).find('.glyphicon');
-                            icon.removeClass('glyphicon-backward');
-                            icon.addClass('glyphicon-forward');  
+                            var caret = $(ele).find('.caret-left');
+                            caret.remove();
+                            $(ele).find('.btn-hide-sidebar').append(' <span class="caret-right"></span>');
 
                             // remove tooltip.  need to style
                             //$(ele).tooltip('destroy')                          
@@ -1763,9 +1762,9 @@ angular.module('ws-directives')
                             main.addClass('col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main');
                             $('.main').removeClass('main-fullsize');
 
-                            var icon = $(ele).find('.glyphicon');
-                            icon.removeClass('glyphicon-forward');
-                            icon.addClass('glyphicon-backward');
+                            var caret = $(ele).find('.caret-right');
+                            caret.remove();
+                            $(ele).find('.btn-hide-sidebar').prepend('<span class="caret-left"></span> ');
 
                             //$(ele).tooltip({title: 'hide sidebar',
                             //               placement: 'bottom',
