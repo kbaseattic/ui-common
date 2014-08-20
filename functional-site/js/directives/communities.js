@@ -12,7 +12,6 @@ angular.module('communities-directives')
             $.when(prom).done(function(d) {
                 var metagenome_id = d[0].data.metagenome_id;
                 
-
                 // use metagenome id to fetch metadata on obj
                 var url = 'http://api.metagenomics.anl.gov/metagenome/'+metagenome_id+'?verbosity=mixs';
                 $.get(url, function(data) {
