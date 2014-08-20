@@ -114,6 +114,19 @@ angular.module('ws-directives')
             // load the content of the ws selector
             scope.loadWSTable();
 
+            // move up/down ws selector
+            /*
+            $(document).keydown(function(e) {
+
+                // move down
+                if (e.which == 40) {
+                    $('.selected-ws').parent().next()
+                    alert('move down')
+                }
+
+                e.preventDefault(); // prevent the default action (scroll / move caret)
+            });*/            
+
             function events() {
                 var filterCollapse = $('.perm-filters');
                 var filterOwner = filterCollapse.find('#ws-filter-owner').change(filter);
