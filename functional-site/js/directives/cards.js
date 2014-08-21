@@ -457,6 +457,16 @@ angular.module('card-directives')
             }
         };
     })
-;
+    .directive('foobarcards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "foobar", 
+                    data: scope.params
+                });
+            }
+        };
+    });
 
 

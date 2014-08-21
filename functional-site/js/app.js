@@ -494,6 +494,12 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		templateUrl: 'views/objects/msa.html',
 		controller: 'MSADetail'});
 
+    $stateProvider
+    .state('foobar',
+        {url: '/foobars/:ws/:id',   // here foobars stands for so called "url prefix"
+         templateUrl: 'views/objects/foobar.html',
+         controller: 'FooBarDetail'});
+    
     $urlRouterProvider.when('', '/login/')
                       .when('/', '/login/')
                       .when('#', '/login/');

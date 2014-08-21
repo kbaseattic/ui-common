@@ -755,6 +755,8 @@
                 this.showPangenomeCards();
             else if (this.options.template.toLowerCase() === "msa")
                 this.showMSACards();
+            else if (this.options.template.toLowerCase() === "foobar")
+                this.showFooBarCards();
             else {
                 // throw an error for an unknown template. modal dialog, maybe?
             }
@@ -1489,6 +1491,19 @@
             return this;
         },
 
+        showFooBarCards: function() {
+            this.addNewCard("kbaseFooBar",  // name of widget
+                    {   fooBarID: this.options.data.id,
+                        workspaceID: this.options.data.ws,
+                        isInCard: true
+                    },{ my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+        
         /**
          * Registers all events that this manager should know about.
          * Also makes a list of all registered events, stored in this.registeredEvents[], so they
