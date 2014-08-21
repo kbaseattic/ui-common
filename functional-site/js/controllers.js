@@ -669,6 +669,11 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                      'ws': $stateParams.ws};
 })
 
+.controller('KidlEdtDetail', function($scope, $stateParams) {
+    $scope.params = {'type': $stateParams.type,
+                     'mod': $stateParams.mod};
+})
+
 /* controller for the copy narrative modal */
 var CopyNarrativeModalCtrl = function ($scope, $modalInstance, $location, narr) {
 

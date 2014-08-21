@@ -70,6 +70,15 @@
                                   <td>'+overviewData[i]+'</td></tr>');
                 }
             	overviewTable.append('<tr><td>Description</td><td><textarea style="width:100%;" cols="2" rows="5" readonly>'+data.description+'</textarea></td></tr>');
+            	var openEditorBtn = $('<button class="btn btn-primary">Open in editor</button>');
+            	$('#'+pref+'overview').append(openEditorBtn);
+            	openEditorBtn.click(function (e) {
+            		self.trigger('showKidlEditor', 
+                    		{ mod: moduleName,
+                    		  event: e
+                    		});
+            	});
+
 
             	////////////////////////////// Spec-file Tab //////////////////////////////
             	var specText = $('<div/>').text(data.spec).html();

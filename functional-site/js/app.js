@@ -491,6 +491,18 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		templateUrl: 'views/objects/msa.html',
 		controller: 'MSADetail'});
 
+    $stateProvider
+	.state('kidledttype',
+		{url: '/kidledt/:mod/:type',
+		templateUrl: 'views/objects/kidledt.html',
+		controller: 'KidlEdtDetail'});
+
+    $stateProvider
+	.state('kidledtmod',
+		{url: '/kidledt/:mod',
+		templateUrl: 'views/objects/kidledt.html',
+		controller: 'KidlEdtDetail'});
+
     $urlRouterProvider.when('', '/login/')
                       .when('/', '/login/')
                       .when('#', '/login/');
