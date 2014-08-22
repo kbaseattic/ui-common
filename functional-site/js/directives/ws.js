@@ -1887,6 +1887,24 @@ angular.module('ws-directives')
 })
 
 
+angular.module('ws-directives', []);
+angular.module('ws-directives')
+.directive('wsselector', function($location, $compile, $state, $stateParams, modals) {
+    return {
+        templateUrl: 'views/ws/analysis-tools.html',
+        link: function(scope, element, attrs) {
+            var p = kb.getWorkspaceSelector();
+            $.when(p).done(function(selector) {
+                content.rmLoading();
+                content.find('.form-group').append(selector);
+            })
+
+        }
+    }
+})
+
+
+
 function getEditableDescription(d) {
     var d = $('<form role="form">\
                    <div class="form-group">\

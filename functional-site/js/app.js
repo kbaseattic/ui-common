@@ -92,6 +92,12 @@ var app = angular.module('landing-pages',
           controller: 'WBTour'
         });
 
+    $stateProvider
+        .state('analysis', {
+          url: "/analysis/",
+          templateUrl: 'views/ws/analysis.html',
+          controller: 'WB'})
+
 
     // model viewer routing
     $stateProvider
