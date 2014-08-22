@@ -302,8 +302,7 @@ var app = angular.module('landing-pages',
              controller: 'WBLanding'})
         .state('genomesbyid',
             {url: '/genomes/:ws/:id',
-	     templateUrl: 'views/genomes/sortable-rows-landing-page.html',
-	     //templateUrl: 'views/objects/genome.html',
+      	     templateUrl: 'views/genomes/sortable-rows-landing-page.html',
              controller: 'WBLanding'})
         .state('kbgenomesbyws',
             {url: '/KBaseGenomes.Genome/:ws',
