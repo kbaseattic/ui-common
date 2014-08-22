@@ -603,9 +603,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                     USER_ID = $("#signin-button").kbaseLogin('session').user_id;
                     USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
 
-                    //kb = new KBCacheClient(USER_TOKEN);
-                    kb.nar.ensure_home_project(USER_ID);
-
                     $location.path('/narratives/featured');
                     $scope.$apply();
                     window.location.reload();
