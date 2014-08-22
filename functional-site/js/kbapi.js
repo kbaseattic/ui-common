@@ -294,6 +294,7 @@ function KBCacheClient(token) {
     }
 
     self.get_model = function(ws, name){
+
         if (ws && ws.indexOf('/') != -1) {
             //var prom = c.get({ref: ws});
             //if (prom) return prom; 
@@ -325,12 +326,13 @@ function KBCacheClient(token) {
             }
 
             // add equations to biomasses object
+            /*
             var biomass_objs = m_obj.biomasses;
             var eqs = self.createEQs(cpd_objs, biomass_objs, 'biomasscompounds')
             for (var i in biomass_objs) {
                 var obj = biomass_objs[i];
                 obj.eq = eqs[obj.id];
-            }
+            }*/
 
             return m;
         })
@@ -340,6 +342,8 @@ function KBCacheClient(token) {
 
 
     self.createEQs = function(cpd_objs, rxn_objs, key) {
+        console.log('cpds', cpd_objs)
+        console.log('rxns', rxn_objs)
         // create a mapping of cpd ids to names
         var mapping = {};
         for (var i in cpd_objs) {
@@ -350,8 +354,11 @@ function KBCacheClient(token) {
         for (var i in rxn_objs) {
             var rxn_obj = rxn_objs[i];
             var rxn_id = rxn_obj.id;
+            console.log(rxn_id)
+
             var rxnreagents = rxn_obj[key];
             var direction = rxn_obj.direction;
+            console.log(direction)
 
             var lhs = []
             var rhs = []
@@ -373,14 +380,15 @@ function KBCacheClient(token) {
             }
 
             var arrow;
-            switch (direction) {
-                case '=': arrow = ' <=> ';
-                case '<': arrow = ' <= ';
-                case '>': arrow = ' => ';
-            }
+
+            if (direction === '=') arrow = ' <=> ';
+            if (direction === '<') arrow = ' <= ';
+            if (direction === '>') arrow = ' => ';
 
             var eq = lhs.join(' + ')+arrow+rhs.join(' + ');
             eqs[rxn_id] = eq
+
+            break
         }
         return eqs
     }
