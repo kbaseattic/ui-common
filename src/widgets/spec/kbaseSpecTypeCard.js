@@ -89,7 +89,7 @@
                     			event: e
                     		});
                 });
-            	var openEditorBtn = $('<button class="btn btn-primary">Open in editor</button>');
+            	/*var openEditorBtn = $('<button class="btn btn-primary">Open in editor</button>');
             	$('#'+pref+'overview').append(openEditorBtn);
             	openEditorBtn.click(function (e) {
             		self.trigger('showKidlEditor', 
@@ -97,7 +97,7 @@
             				  type: typeName.substring(typeName.indexOf('.') + 1),
                     		  event: e
                     		});
-            	});
+            	});*/
             	
             	////////////////////////////// Spec-file Tab //////////////////////////////
                 var specText = $('<div/>').text(data.spec_def).html();

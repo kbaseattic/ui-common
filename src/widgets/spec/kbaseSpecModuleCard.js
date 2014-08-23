@@ -16,6 +16,14 @@
             this._super(options);
             if (!this.options.token)
             	this.options.token = this.authToken();
+            //console.log(this.options.token);
+            var userName = null;
+            var tokenParts = this.options.token.split("|");
+            for (var i in tokenParts) {
+            	var keyValue = tokenParts[i].split("=");
+            	if (keyValue.length == 2 && keyValue[0] === "un")
+            		userName = keyValue[1];
+            }
             var self = this;
             var container = this.$elem;
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
@@ -70,15 +78,23 @@
                                   <td>'+overviewData[i]+'</td></tr>');
                 }
             	overviewTable.append('<tr><td>Description</td><td><textarea style="width:100%;" cols="2" rows="5" readonly>'+data.description+'</textarea></td></tr>');
-            	var openEditorBtn = $('<button class="btn btn-primary">Open in editor</button>');
-            	$('#'+pref+'overview').append(openEditorBtn);
-            	openEditorBtn.click(function (e) {
-            		self.trigger('showKidlEditor', 
-                    		{ mod: moduleName,
-                    		  event: e
-                    		});
-            	});
-
+            	var isOwner = false;
+            	for (var j in data.owners) {
+            		if (userName && data.owners[j] === userName) {
+            			isOwner = true;
+            			break;
+            		}
+            	}
+            	if (isOwner) {
+            		var openEditorBtn = $('<button class="btn btn-primary">Open in editor</button>');
+            		$('#'+pref+'overview').append(openEditorBtn);
+            		openEditorBtn.click(function (e) {
+            			self.trigger('showKidlEditor', 
+            					{	mod: moduleName,
+            						event: e
+            					});
+            		});
+            	}
 
             	////////////////////////////// Spec-file Tab //////////////////////////////
             	var specText = $('<div/>').text(data.spec).html();
