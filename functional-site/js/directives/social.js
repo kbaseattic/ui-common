@@ -36,42 +36,23 @@ angular.module('social-directives')
             var objectIds = [{ref:userId+":userinfo/info"}];
             ws.get_objects(objectIds,
                 function(data) {
-                    $(p.body()).append("gots some data");
-                    console.log(data);
-                    
-                    // create the widget
-                    // hack until search links directly to WS objects
-                   // $(p.body()).KBaseGenomeOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
-                   //                                 loadingImage: "assets/img/ajax-loader.gif"});
-                    
-                    /*
-			        for(var i = 0; i < data.length; i++) {
-				    var depList = data[i]['data']['metadata']['data_dependencies'];
-				    var niceName = data[i]['data']['metadata']['name'];
-				    for(var k=0; k<depList.length; k++) {
-				       var name = depList[k].trim().split(/\s+/)[1];
-				        if (name) {
-					    if (name == self.objName) {
-						var objInfo = data[i]['info'];
-						var savedate = new Date(objInfo[3]);
-						var narName = '<a target="_blank" href="/narrative/ws.'+objInfo[6]+'.obj.'+objInfo[0]+'">'+niceName + "</a> ("+objInfo[6]+"/"+objInfo[0]+"/"+objInfo[4]+")";
-					        self.narList.push({
-						    name:narName,
-						    details:"last edited by "+objInfo[5]+" on "+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()
-					        });
-					        continue; // we found the narrative, no need to do anything else...
-					    }
-				        }
-				    }
-			        }
-				if (self.narList.length > 0) {
-				    // finally, render the table
-				    self.renderTable();
-				} else {
-				    self.$elem.find('#loading-mssg').remove();
-				    self.$elem.append("<br><b>There are no narratives that are using this data object.</b>");
-				}*/
-			       
+                    $(p.body()).KBaseUserOverview({
+                                        userInfo:data[0],
+                                        wsUserInfoUrl:peopleWsUrl,
+                                        wsUserInfoRef:userId+":userinfo/info",
+                                        kbCache:scope.params.kbCache
+                                    });
+                    var isYou = false;
+                    if (isLoggedIn) {
+                        if (loggedInUserId === userId) {
+                            // is this really the only way to change the title?!?!  seems like we should extend the kbasepanel...
+                            $(ele).find(".panel-title").html("You - "+loggedInName + " ("+userId+")");
+                            isYou=true;
+                        }
+                    }
+                    if (!isYou) {
+                        $(ele).find(".panel-title").html( data[0]['data']['basic_personal_info']['real_name'] + " ("+userId+")");
+                    }
 		},
 		function(err) {
                     // if we get an error, then no workspace or no profile exists (or is readable by this user...)
@@ -134,8 +115,7 @@ angular.module('social-directives')
                                                     function(data) {
                                                         // great, it worked.  let's just redirect to this page to refresh the elements...
                                                         $(p.body()).remove("#creatingloader");
-                                                        console.log("created new user info");
-                                                        console.log(data);
+                                                        location.reload();
                                                     },
                                                     function(err) {
                                                         $(p.body()).remove("#creatingloader");
