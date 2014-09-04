@@ -175,7 +175,9 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     $scope.params = { 'ws':$stateParams.ws, 'id': $stateParams.id, 'kbCache' : kb }
 })
 
-
+.controller('People', function($scope, $stateParams) {
+    $scope.params = { 'userid':$stateParams.userid, 'kbCache' : kb }
+})
 
 .controller('Trees', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
