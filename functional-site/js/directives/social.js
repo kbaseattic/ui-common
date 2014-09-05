@@ -36,12 +36,6 @@ angular.module('social-directives')
             var objectIds = [{ref:userId+":userinfo/info"}];
             ws.get_objects(objectIds,
                 function(data) {
-                    $(p.body()).KBaseUserOverview({
-                                        userInfo:data[0],
-                                        wsUserInfoUrl:peopleWsUrl,
-                                        wsUserInfoRef:userId+":userinfo/info",
-                                        kbCache:scope.params.kbCache
-                                    });
                     var isYou = false;
                     if (isLoggedIn) {
                         if (loggedInUserId === userId) {
@@ -53,6 +47,12 @@ angular.module('social-directives')
                     if (!isYou) {
                         $(ele).find(".panel-title").html( data[0]['data']['basic_personal_info']['real_name'] + " ("+userId+")");
                     }
+                    $(p.body()).KBaseUserOverview({
+                                        userInfo:data[0],
+                                        wsUserInfoUrl:peopleWsUrl,
+                                        wsUserInfoRef:userId+":userinfo/info",
+                                        kbCache:scope.params.kbCache
+                                    });
 		},
 		function(err) {
                     // if we get an error, then no workspace or no profile exists (or is readable by this user...)
