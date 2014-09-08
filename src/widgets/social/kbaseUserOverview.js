@@ -20,6 +20,8 @@
 	userInfoData:null,
 	isMe:false,
 	
+	alertPanel:null,
+	
         init: function(options) {
             this._super(options);
             var self = this;
@@ -39,7 +41,10 @@
 		    self.isMe = true;
 		}
 	    }
-            
+	    // setup the alert panel
+            self.alertPanel = $("<div></div>");
+	    self.$elem.append(self.alertPanel);
+	    
             self.setupOverallStructure();
 	    self.setupPicture();
 	    self.showInfoView();
@@ -155,8 +160,6 @@
 			  '<input id="pEmail" type="text" class="form-control" value="'+email+'"></div>'+
 			'</div>' +
 		    '</div>'+
-		    
-		    
 		'</div></div>';
 	    $infoPanel.append(nameTitleGroup);
 	    self.$elem.find('#pTitleList li > a').click(function(e){
@@ -164,19 +167,31 @@
 	    });
 	    
 	    // this is not the right jquery way to do this!  but it is just a prototype and i can do this faster...
+	    
 	    var affiliations =
-	    '<div><br></div><div class="panel panel-default">'+
-		'<div class="panel-heading">'+
-		  '<h3 class="panel-title">Affiliations</h3>'+
-		'</div>'+
-		'<div id="affiliationPanel" class="panel-body">' +
-		'</div><div class="row"><div class="col-md-1"></div><div class="col-md-11">'+
-		'<button id="addAffiliation" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add Affiliation</button>' +
-		'</div></div><div><br></div>'+
+		'<div><br></div><div class="panel panel-default">'+
+		    '<div class="panel-heading">'+
+		      '<h3 class="panel-title">Affiliations</h3>'+
+		    '</div>'+
+		    '<div id="affiliationPanel" class="panel-body"></div>' +
+		    '<div class="row"><div class="col-md-1"></div><div class="col-md-11">'+
+		      '<button id="addAffiliation" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add Affiliation</button>' +
+		    '</div></div>'+
+		    '<div><br></div>'+
 		'</div></div>';
 	    $infoPanel.append(affiliations);
-	    var newAfflication = 
-		    '<div class="panel panel-default"><div class="panel-body"><div class="row">' +
+	    
+	    var $aff = self.$elem.find('#addAffiliation');
+	    var $affPanel = self.$elem.find('#affiliationPanel');
+	    $aff.click(function(e){
+		console.log($affPanel);
+		var $removeAff = $('<button type="button" class="btn btn-danger">Remove</button>')
+		    .bind("click", function() {
+			$(this).parent().parent().parent().parent().removeClass();
+			$(this).parent().parent().parent().parent().empty();
+		    });
+		var $newAffliation = 
+		    $('<div class="panel panel-default">').append($('<div class="affiliation-input-group panel-body">').append('<div class="row">'+
 			'<div class="col-md-12"><div class="input-group">'+
 			  '<span class="input-group-addon">Title</span>'+
 			  '<input id="affTitle" type="text" class="form-control" value=""></div>'+
@@ -187,27 +202,94 @@
 			  '<span class="input-group-addon">Institution</span>'+
 			  '<input id="affInstitution" type="text" class="form-control" value=""></div>'+
 			'</div>' +
-		    '</div>'+
-		    '</div></div>';
-	    var $aff = self.$elem.find('#addAffiliation');
-	    $aff.click(function(e){
-	        self.$elem.find('#affiliationPanel').append(newAfflication);
+		    '</div>').append(
+		    $('<div class="row">').append(
+			'<div class="col-md-3"><div class="input-group">'+
+			  '<span class="input-group-addon">Starting in Year</span>'+
+			  '<input id="affStart" type="text" class="form-control" value=""></div>'+
+			'</div>' +
+			'<div class="col-md-1"></div>' +
+			'<div class="col-md-3"><div class="input-group">'+
+			  '<span class="input-group-addon">Ending in Year</span>'+
+			  '<input id="affEnd" type="text" class="form-control" value=""></div>'+
+			'</div>' +
+		    '</div><div class="col-md-3"></div>').append($('<div class="col-md-2">').append($removeAff)))
+		    );
+	        $affPanel.append($newAffliation);
 	    });
 	    for (var i = 0; i < bioInfo['affiliations'].length; i++) {
-		$aff.append('<div class="panel panel-default"><div class="panel-body"><div class="row">' +
+		if (!bioInfo['affiliations'][i]['start_year']) {
+		    bioInfo['affiliations'][i]['start_year'] = "";
+		}
+		if (!bioInfo['affiliations'][i]['end_year']) {
+		    bioInfo['affiliations'][i]['end_year'] = "";
+		}
+		var $removeAff = $('<button type="button" class="btn btn-danger">Remove</button>')
+		    .bind("click", function() {
+			$(this).parent().parent().parent().parent().removeClass();
+			$(this).parent().parent().parent().parent().empty();
+		    });
+		$affPanel.append(
+		    $('<div class="panel panel-default">').append($('<div class="affiliation-input-group panel-body">').append('<div class="row">'+
 			'<div class="col-md-12"><div class="input-group">'+
 			  '<span class="input-group-addon">Title</span>'+
-			  '<input id="affTitle" type="text" class="form-control" value="'+bioInfo['affiliations'][0]['title']+'"></div>'+
+			  '<input id="affTitle" type="text" class="form-control" value="'+bioInfo['affiliations'][i]['title']+'"></div>'+
 			'</div>' +
 		    '</div>'+
 		    '<div class="row">' +
 			'<div class="col-md-12"><div class="input-group">'+
 			  '<span class="input-group-addon">Institution</span>'+
-			  '<input id="affInstitution" type="text" class="form-control" value="'+bioInfo['affiliations'][0]['institution']+'"></div>'+
+			  '<input id="affInstitution" type="text" class="form-control" value="'+bioInfo['affiliations'][i]['institution']+'"></div>'+
+			'</div>' +
+		    '</div>').append(
+		    $('<div class="row">').append(
+			'<div class="col-md-3"><div class="input-group">'+
+			  '<span class="input-group-addon">Starting in Year</span>'+
+			  '<input id="affStart" type="text" class="form-control" value="'+bioInfo['affiliations'][i]['start_year']+'"></div>'+
+			'</div>' +
+			'<div class="col-md-1"></div>' +
+			'<div class="col-md-3"><div class="input-group">'+
+			  '<span class="input-group-addon">Ending in Year</span>'+
+			  '<input id="affEnd" type="text" class="form-control" value="'+bioInfo['affiliations'][i]['end_year']+'"></div>'+
+			'</div><div class="col-md-3"></div>').append($('<div class="col-md-2">').append($removeAff)))
+		    ));
+	    }
+	    
+	    var personalStatement =
+	    '<div><br></div><div class="panel panel-default">'+
+		'<div class="panel-heading">'+
+		  '<h3 class="panel-title">Personal or Research Statement</h3>'+
+		'</div>'+
+		'<div class="panel-body">'+
+		    '<div class="row">' +
+			'<div class="col-md-12">'+
+			  '<textarea id="personalStatement" class="form-control" rows="8" style="resize:vertical;">'+info["personal_statement"]+'</textarea>' +
 			'</div>' +
 		    '</div>'+
-		    '</div></div>');
+		'</div></div>';
+	    $infoPanel.append(personalStatement);
+	    
+	    
+	    // for some reason, this only works if I create another copy of teh save/cancel buttons!   I don't get jquery.
+	    var $controlButtons2;
+	    if (self.isMe) {
+		var $save = $('<button type="button" class="btn btn-success">Save</button>')
+				.bind("click", function() {
+				    self.saveData();
+				    self.showInfoView();
+				});
+		var $cancel = $('<button type="button" class="btn btn-danger">Cancel</button>')
+				.bind("click", function() {
+				    self.showInfoView();
+				});
+		
+		$controlButtons2 = $('<span></span>').append($save).append($cancel);
 	    }
+	    var $footer = $('<div class="row">')
+				.append('<div class="col-md-9"></div>')
+				.append($('<div class="col-md-3">').css("text-align","right").append($controlButtons2));
+	    $infoPanel.append($footer);
+	    
 	},
 	
 	showInfoView: function() {
@@ -228,12 +310,38 @@
 	    if (pInfo["suffix"]) { nameStr += ", "+pInfo["suffix"]; }
 	    
 	    var $header = $('<div class="row">')
-				.append('<div class="col-md-9"><h2>'+nameStr+'</h2></div>')
+				.append('<div class="col-md-9"><h2><strong>'+nameStr+'</strong></h2></div>')
 				.append($('<div class="col-md-3">').css("text-align","right").append($editButton));
 	    $infoPanel.append($header);
 	   
-	  
-	   
+	    
+	    if (self.userInfoData['basic_personal_info']['location']) {
+		$infoPanel.append('<i>'+self.userInfoData['basic_personal_info']['location']+'</i><br>');
+	    }
+	    if (self.userInfoData['basic_personal_info']['email_addresses'].length>=1) {
+		$infoPanel.append('<p><a href="'+self.userInfoData['basic_personal_info']['email_addresses'][0]+'">'+
+				  self.userInfoData['basic_personal_info']['email_addresses'][0]+'</a></p>');
+	    }
+	    
+	    var aff = self.userInfoData['bio']['affiliations'];
+	    for (var a=0; a<aff.length; a++) {
+		var start = ""; var end="present";
+		if (aff[a].start_year) {  start= aff[a].start_year; }
+		if (aff[a].end_year) {  end= aff[a].end_year; }
+		$infoPanel.append('<p><strong>'+aff[a].title+'</strong> ('+start+'-'+end+')<br><i>'+aff[a].institution+'</i></p>');
+	    }
+	    
+	    
+	    if (self.userInfoData['personal_statement']) {
+		$infoPanel.append('<p>'+self.userInfoData['personal_statement']+'</p>');
+	    }
+	    
+	   /*var pLoc = self.$elem.find("#pLocation").val();
+	    self.userInfoData['basic_personal_info']['location']=pLoc;
+	    var pEmail = self.$elem.find("#pEmail").val();
+	    if (pEmail) {
+		self.userInfoData['basic_personal_info']['email_addresses']=[pEmail];
+	    }*/
 	    
 	    
 	},
@@ -260,25 +368,46 @@
 		self.userInfoData['basic_personal_info']['email_addresses']=[pEmail];
 	    }
 	    
-	
-	// step 2: save this object to the workspace
-	var newObjSaveData = {
-	    name:"info",
-	    type:"UserInfo.UserInfoSimple-0.1",
-	    data:self.userInfoData,
-	    provenance:[{description:"created by the KBase functional site, edited by the user"}]
-	};
-	self.wsUserInfoClient.save_objects({workspace:self.loggedInUserId+":userinfo",objects:[newObjSaveData]},
-	    function(data) {
-		// great, it worked.  let's just redirect to this page to refresh the elements...
-					    
-	    },
-	    function(err) {
-		// we couldn't create it- this is an error - probably the object or ws existed before and was deleted
-		console.log("couldn't create user info ");
-		console.log(err);
-	    });
+	    var bioAff = self.$elem.find(".affiliation-input-group");
+	    var affiliations = [];
+	    for(var ba=0; ba<bioAff.length; ba++) {
+		var newAff = {
+			title:$(bioAff[ba]).find("#affTitle").val(),
+			institution :$(bioAff[ba]).find("#affInstitution").val(),
+			start_year:parseInt($(bioAff[ba]).find("#affStart").val()),
+			end_year:parseInt($(bioAff[ba]).find("#affEnd").val())
+		    };
+		if (newAff['title'] && newAff['institution']) {
+		    affiliations.push(newAff);
+		}
+	    }
+	    self.userInfoData['bio']['affiliations'] = affiliations;
 	    
+	    self.userInfoData['personal_statement'] = self.$elem.find("#personalStatement").val();
+	
+	    // step 2: save this object to the workspace
+	    var newObjSaveData = {
+		name:"info",
+		type:"UserInfo.UserInfoSimple",
+		data:self.userInfoData,
+		provenance:[{description:"created by the KBase functional site, edited by the user"}]
+	    };
+	    self.wsUserInfoClient.save_objects({workspace:self.loggedInUserId+":userinfo",objects:[newObjSaveData]},
+		function(data) {
+		    // great, it worked.  let's just redirect to this page to refresh the elements...
+		   self.alertPanel.append(
+			'<div class="alert alert-success alert-dismissible" role="alert">'+
+			  '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
+			  '<strong>Success!</strong> Your user profile has been updated.</div>');
+		},
+		function(err) {
+		    // we couldn't create it- this is an error - probably the object or ws existed before and was deleted
+		    self.alertPanel.append(
+			'<div class="alert alert-danger alert-dismissible" role="alert">'+
+			  '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
+			  '<strong>Error!</strong> Your user profile could not be saved: '+err.error.message+'</div>');
+		    console.log(err);
+		});
 	},
     
 	setupPicture: function() {

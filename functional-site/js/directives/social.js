@@ -107,7 +107,7 @@ angular.module('social-directives')
                                                 };
                                                 var newObjSaveData = {
                                                     name:"info",
-                                                    type:"UserInfo.UserInfoSimple-0.1",
+                                                    type:"UserInfo.UserInfoSimple",
                                                     data:userInfoData,
                                                     provenance:[{description:"created by the KBase functional site"}]
                                                     };
