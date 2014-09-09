@@ -177,6 +177,17 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 
 .controller('People', function($scope, $stateParams) {
     $scope.params = { 'userid':$stateParams.userid, 'kbCache' : kb }
+    $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder", 
+        handle: '.panel-heading',
+        cancel: '.panel-title,.panel-subtitle,.label,.glyphicon',
+        start: function() {
+          $(this).find('.panel-body').addClass('hide');
+          $(this).sortable('refreshPositions');
+        },
+        stop: function() {
+          $(this).find('.panel-body').removeClass('hide');
+        }
+    });
 })
 
 .controller('Trees', function($scope, $stateParams) {
