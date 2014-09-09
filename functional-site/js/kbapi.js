@@ -372,12 +372,9 @@ function KBCacheClient(token) {
                 }
             }
 
-            var arrow;
-            switch (direction) {
-                case '=': arrow = ' <=> ';
-                case '<': arrow = ' <= ';
-                case '>': arrow = ' => ';
-            }
+            if (direction === '=') arrow = ' <=> ';
+            if (direction === '<') arrow = ' <= ';
+            if (direction === '>') arrow = ' => ';
 
             var eq = lhs.join(' + ')+arrow+rhs.join(' + ');
             eqs[rxn_id] = eq
