@@ -212,7 +212,7 @@ hr.ws-hr {
     /*width: 95%; 
     margin-left: auto; 
     margin-right: auto; */
-    min-height:100%;
+    min-height: 100%;
     position:relative;   
 }
 /* end bootstrap overrides */
@@ -986,7 +986,7 @@ div.FixedHeader_Cloned td {
 }
 
 #content {
-    padding: 60px 20px 80px 20px;
+    padding: 60px 20px 50px 20px;
 }
 /* for the footer */
 #footer {
@@ -1000,7 +1000,7 @@ div.FixedHeader_Cloned td {
 }
 
 #footer ul {
-    padding: 4px 0 0 0;
+    margin: 4px 0 0 0;
     text-align: right;
 }
 
