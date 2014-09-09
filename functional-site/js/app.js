@@ -78,10 +78,6 @@ var app = angular.module('landing-pages',
           url: "recent",
           templateUrl: 'views/ws/recent.html',
           controller: 'WB'
-        }).state('ws-manage', {
-          url: "/ws/manage",
-          templateUrl: 'views/ws/manage.html', 
-          controller: 'WSManage',
         }).state('ws.id', {
           url: "objects/:ws?type",
           templateUrl: 'views/ws/objtable.html',
@@ -90,6 +86,10 @@ var app = angular.module('landing-pages',
           url: "tour/",
           templateUrl: 'views/ws/objtable.html',
           controller: 'WBTour'
+        }).state('ws-manage', {
+          url: "/ws/manage",
+          templateUrl: 'views/ws/manage.html', 
+          controller: 'WSManage',
         });
 
     $stateProvider
