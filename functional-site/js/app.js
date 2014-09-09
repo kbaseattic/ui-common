@@ -94,7 +94,7 @@ var app = angular.module('landing-pages',
 
     $stateProvider
         .state('analysis', {
-          url: "/analysis/",
+          url: "/analysis/:ws",
           templateUrl: 'views/ws/analysis.html',
           controller: 'WB'})
 

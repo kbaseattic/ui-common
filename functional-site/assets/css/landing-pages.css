@@ -290,8 +290,11 @@ table {
 .scroll-pane {
     overflow-y: scroll;
 }
-.scroll-pane.overflow-x {
+.overflow-x {
     overflow-x: scroll;
+}
+.overflow-y {
+    overflow-y: scroll;
 }
 
 #select-box {
@@ -1046,4 +1049,12 @@ div.DTCR_pointer {
     width: 1px;
     background-color: #0259C4;
     z-index: 201;
+}
+
+
+
+/* analysis stuff */
+
+.mini-obj-table {
+    max-height: 500px;
 }

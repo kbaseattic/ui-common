@@ -455,8 +455,7 @@ function KBCacheClient(token) {
 
             var wsSelect = $('<form class="form-horizontal" role="form">'+
                                 '<div class="form-group">'+
-                                    '<label class="col-sm-5 control-label">Destination Workspace</label>'+
-                                    '<div class="input-group col-sm-5">'+
+                                    '<div class="input-group col-sm-12">'+
                                         '<input type="text" class="select-ws-input form-control focusedInput" placeholder="search">'+
                                         '<span class="input-group-btn">'+
                                             '<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">'+

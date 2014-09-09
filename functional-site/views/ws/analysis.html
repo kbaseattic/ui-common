@@ -2,7 +2,12 @@
 <div class="row">
     <div class="col-sm-3 col-md-3 sidebar">
         <div class="pull-right" show-hide-sidebar></div>
-        <div class="ws-sidebar" wsselector></div>
+        <div class="btn-toolbar ws-toolbar">
+            <a class="btn-analysis pull-left" ui-sref="ws.id({ws:ws})">ws</a>
+            <a ng-click="browser()" class="pull-left">data</a>    
+            <a ng-click="tools()" class="pull-left">tools</a>    
+        </div>        
+        <div class="ws-sidebar" analysis-tools></div>
     </div>
 
     <div class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main" >
@@ -14,7 +19,7 @@
                 <h4 class="text-muted">Workspace inspired, rough prototype of how modeling could be done.</h4>
             </div>
 
-            <h5>Version Alpha?</h5>
+            <h5>Version Alpha:</h5>
             <ul>
                 <li>Just getting started</li>
             </ul>

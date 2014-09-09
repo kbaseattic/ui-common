@@ -305,7 +305,7 @@ angular.module('ws-directives')
 .directive('objtable', function($location, $compile, modals, favoriteService) {
     return {
         link: function(scope, element, attrs) {
-            var ws = scope.selected_ws;
+            var ws = scope.ws;
 
             var table;
             scope.favs;
@@ -1767,7 +1767,7 @@ angular.module('ws-directives')
 .directive('wsDescription', function($location, $compile, $state) {
     return {
         link: function(scope, ele, attrs) {
-            var p = kb.ws.get_workspace_description({workspace: scope.selected_ws})
+            var p = kb.ws.get_workspace_description({workspace: scope.ws})
             $.when(p).done(function(data){
                 if (!data) {
                     return;
@@ -1886,21 +1886,55 @@ angular.module('ws-directives')
     }
 })
 
-.directive('objtable', function($location, $compile, $state, $stateParams, modals) {
+.directive('analysisTools', function($location, $compile, $state, $stateParams, modals) {
     return {
         templateUrl: 'views/ws/analysis-tools.html',
         link: function(scope, element, attrs) {
-            var p = kb.getWorkspaceSelector();
-            $.when(p).done(function(selector) {
-                content.rmLoading();
-                $(ele).append(selector);
-            })
+
+            scope.clearSideBar = function() {
+                $(element).html('');
+            }
+
+            scope.browser = function() {
+                scope.clearSideBar();                
+                console.log(scope.ws)
+                $(element).loading();
+                var p = kb.getWorkspaceSelector();
+                $.when(p).done(function(selector) {
+                    $(element).rmLoading();
+                    $(element).append(selector);
+                });
+
+                var p = kb.ws.list_objects({workspaces: ['nconrad:home']});
+                $.when(p).done(function(data){
+                    var table = $('<table class="table">')
+                    for (var i in data) {
+                        var ws = data[i];
+                        table.append('<tr><td>'+ws[1]+'</td></tr>')
+                    }
+                    var table = $('<div class="mini-obj-table overflow-y">').append(table)
+                    $(element).append(table)
+                    console.log(data)
+                })
+            }
+
+
+            scope.browser();
+
+            scope.tools = function() {
+                scope.clearSideBar();
+                var inputs = ['Build Model', 'Run Analysis']
+
+                for (var i in inputs) {
+                    $(element).append(inputs[i]+'<br>')
+                }
+
+            }
+
 
         }
     }
 })
-
-
 
 function getEditableDescription(d) {
     var d = $('<form role="form">\
