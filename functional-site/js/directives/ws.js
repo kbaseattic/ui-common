@@ -24,7 +24,7 @@ angular.module('ws-directives')
             // Global list and dict of fetched workspaces
             var workspaces = []; 
 
-            var nav_height = 90;
+            var nav_height = 80;
 
             // This method loads the sidebar data.  
             // Note: this is only called after instantiation when sidebar needs to be refreshed
@@ -111,6 +111,19 @@ angular.module('ws-directives')
 
             // load the content of the ws selector
             scope.loadWSTable();
+
+            // move up/down ws selector
+            /*
+            $(document).keydown(function(e) {
+
+                // move down
+                if (e.which == 40) {
+                    $('.selected-ws').parent().next()
+                    alert('move down')
+                }
+
+                e.preventDefault(); // prevent the default action (scroll / move caret)
+            });*/            
 
             function events() {
                 var filterCollapse = $('.perm-filters');
