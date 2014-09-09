@@ -1890,6 +1890,7 @@ angular.module('ws-directives')
     return {
         templateUrl: 'views/ws/analysis-tools.html',
         link: function(scope, element, attrs) {
+            console.log('called')
 
             scope.clearSideBar = function() {
                 $(element).html('');
@@ -1907,6 +1908,8 @@ angular.module('ws-directives')
 
                 var p = kb.ws.list_objects({workspaces: ['nconrad:home']});
                 $.when(p).done(function(data){
+                    $('.obj-count').text(data.length)
+
                     var table = $('<table class="table">')
                     for (var i in data) {
                         var ws = data[i];
@@ -1914,23 +1917,177 @@ angular.module('ws-directives')
                     }
                     var table = $('<div class="mini-obj-table overflow-y">').append(table)
                     $(element).append(table)
-                    console.log(data)
                 })
             }
 
-
-            scope.browser();
-
             scope.tools = function() {
                 scope.clearSideBar();
-                var inputs = ['Build Model', 'Run Analysis']
 
-                for (var i in inputs) {
-                    $(element).append(inputs[i]+'<br>')
+                for (var i in input_widgets) {
+                    var widget = input_widgets[i];
+                    $(element).append('<a class="widget-btn" data-id="'+widget.id+'">'+widget.name+'</a><br>')
                 }
 
+                $('.widget-btn').unbind('click');
+                $('.widget-btn').click(function() {
+                    var widget = $(this).data('id');
+                    console.log(widget)
+                    loadForm(widget)
+                })
             }
 
+            var input_widgets = [{name: 'Build Model', 
+                                  id: 'build_model',
+                                  form: [
+                                         {name: 'Genome Name', 
+                                          id: 'genome_id',
+                                          kbtype: 'KBaseGenomes.Genome',
+                                          help: 'Source genome name'}, 
+
+                                         {name: 'Output Metabolic Model Name', 
+                                          id: 'fba_model_id',
+                                          kbtype: 'KBaseFBA.FBAModel',
+                                          help: 'Select a name for the generated metabolic model (optional)'},     
+                                        ],
+                                   return_type: 'KBaseFBA.FBAModel',
+                                   output_widget: 'kbaseModelTabs'
+                                 },
+                                 {name: 'Run FBA', 
+                                  id: 'run_fba',
+                                  form: [
+                                         {name: 'Metabolic Model', 
+                                          id: 'fba_model_id',
+                                          kbtype: 'KBaseFBA.FBAModel', 
+                                          help: 'The metabolic model you wish to run'}, 
+
+                                         {name: 'Media', 
+                                          id: 'media_id',
+                                          kbtype: 'KBaseBiochem.Media', 
+                                          help: 'the media condition in which to run FBA (optional, default is an artificial complete media)'},     
+
+                                         {name: 'Output FBA Result Name', 
+                                          id: 'fba_result_id',
+                                          kbtype: 'KBaseFBA.FBA', 
+                                          help: 'select a name for the FBA result object (optional) '}, 
+
+                                         {name: 'Gene Knockouts', 
+                                          id: 'geneko',
+                                          help: 'specify gene knockouts by the genes feature ID delimited by semicolons(;) (optional)'}, 
+
+                                         {name: 'Reaction Knockouts', 
+                                          id: 'fba_model_id',
+                                          help: 'specify reaction knockouts by reaction ID delimited by semicolons(;) (optional)'}, 
+
+                                         {name: 'Maximum flux', 
+                                          id: 'fba_model_id',
+                                          default: 100,
+                                          help: 'default maximum nutrient uptake flux (optional)'},
+
+                                         {name: 'Minimum Uptake flux', 
+                                          id: 'fba_model_id',
+                                          default: -100,
+                                          help: 'default minumum nutrient uptake flux (optional)'},    
+
+
+                                         {name: ' Max Uptake', 
+                                          id: 'maxUptake',
+                                          default: 0,
+                                          help: 'default maximum nutrient uptake flux (optional)'},                                              
+
+                                         {name: 'Minimize flux', 
+                                          id: 'minimizeFlux',
+                                          input: ['yes', 'no'],                                          
+                                          default: 'no',
+                                          help: 'set to yes to run FBA by minimizing flux (optional)'},
+
+                                         {name: 'Maximize Objective?', 
+                                          id: 'maximizeObjective',
+                                          input: ['yes', 'no'],
+                                          default: 'yes',
+                                          help: 'set to "no" to run FBA without maximizing the objective function (optional)'},
+
+
+                                         {name: 'All rxns reversible?', 
+                                          id: 'allReversible',
+                                          input: ['yes', 'no'],
+                                          default: 'no',
+                                          help: 'set to "yes" to allow all model reactions to be reversible (optional) '},
+
+                                         {name: 'PROM constraint', 
+                                          id: 'prom',
+                                          kbtype: 'KBaseFBA.PromConstraint',
+                                          help: 'specify the PROM constraint to apply for regulation of the metabolic model  (optional)'},
+
+                                        ],
+                                        output_widget: 'kbaseFBATabsNarrative',
+                                 }
+                                ]
+/*
+    :param allreversible: set to 'yes' or '1' to allow all model reactions to be reversible (optional) [10.11]
+    :type allreversible: kbtypes.Unicode
+    :ui_name allreversible: All rxns reversible?
+    :default allreversible: no
+    
+    :param prom: specify the PROM constraint to apply for regulation of the metabolic model  (optional) [10.12]
+    :type prom: kbtypes.KBaseFBA.PromConstraint
+    :ui_name prom: PROM constraint
+    
+    :return: something 
+    :rtype: kbtypes.Unicode
+    :output_widget: kbaseFbaTabsNarrative
+*/
+
+
+
+
+            function loadForm(widget_id) {
+                var content = $('.analysis-view')
+                content.html('')
+
+                // find widget spec
+                var form;
+                for (var i in input_widgets) {
+                    if (input_widgets[i].id == widget_id) {
+                        var form = input_widgets[i].form
+                        break
+                    }
+                }
+
+                console.log('found form', form)
+
+                var groups = $('<form class="form-horizontal" role="form">');
+
+                // load each input field
+                for (var i in form) {
+                    var field = form[i];
+                    console.log(field.name);
+
+                    var group = $('<div class="form-group">');
+                    if (!(field.input) || field.input == 'text') {
+                        console.log(field)
+                        group.append('<label class="col-sm-2 control-label" >'+
+                                        field.name+
+                                   '</label>')
+                        group.append('<div class="col-sm-5">'+
+                                       '<input class="form-control" type="text" placeholder="'+field.name+'">'+
+                                    '</div>')
+                        group.append('<div class="col-sm-5">'+
+                                       field.help+
+                                    '</div>')
+
+                        // if there is a default, set it
+                        if (field.default) {
+                            group.find('input').val(field.default);
+                        }
+                    }
+                    groups.append(group);
+                }
+
+                content.append(groups);
+            }
+
+            // show mini object browser when loading
+            scope.tools();
 
         }
     }

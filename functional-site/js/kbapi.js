@@ -223,7 +223,6 @@ function KBCacheClient(token) {
 
         var p = self.ws.get_object_info([{workspace: ws, name: name}], 1)
             .then(function(info) {
-                console.log('info', info)
                 var deps = JSON.parse(info[0][10].data_dependencies);
 
                 var d = [];
@@ -326,13 +325,13 @@ function KBCacheClient(token) {
             }
 
             // add equations to biomasses object
-            /*
+
             var biomass_objs = m_obj.biomasses;
             var eqs = self.createEQs(cpd_objs, biomass_objs, 'biomasscompounds')
             for (var i in biomass_objs) {
                 var obj = biomass_objs[i];
                 obj.eq = eqs[obj.id];
-            }*/
+            }
 
             return m;
         })
@@ -342,8 +341,6 @@ function KBCacheClient(token) {
 
 
     self.createEQs = function(cpd_objs, rxn_objs, key) {
-        console.log('cpds', cpd_objs)
-        console.log('rxns', rxn_objs)
         // create a mapping of cpd ids to names
         var mapping = {};
         for (var i in cpd_objs) {
@@ -354,11 +351,9 @@ function KBCacheClient(token) {
         for (var i in rxn_objs) {
             var rxn_obj = rxn_objs[i];
             var rxn_id = rxn_obj.id;
-            console.log(rxn_id)
 
             var rxnreagents = rxn_obj[key];
             var direction = rxn_obj.direction;
-            console.log(direction)
 
             var lhs = []
             var rhs = []
@@ -386,8 +381,6 @@ function KBCacheClient(token) {
 
             var eq = lhs.join(' + ')+arrow+rhs.join(' + ');
             eqs[rxn_id] = eq
-
-            break
         }
         return eqs
     }
@@ -1477,7 +1470,6 @@ function ProjectAPI(ws_url, token) {
         var self = this;
         var metadata_fn = ws_client.get_object_info([{wsid: p.project_id, objid : p.narrative_id}], 1);
         $.when( metadata_fn).then( function( obj_info) {
-            console.log('object_info', obj_info)
             if (obj_info.length != 1) {
                 p.error_callback( "Error: narrative ws." + p.project_id +
                         ".obj." + p.narrative_id + " not found");
@@ -1498,7 +1490,7 @@ function ProjectAPI(ws_url, token) {
         res.description = meta.description;
         res.name = meta.name;
         var temp = $.parseJSON(meta.data_dependencies);
-        console.log(temp)
+
         //deps should really be stored as an id, not a name, since names can change
         var deps = temp.reduce( function(prev,curr,index) {
             var dep = curr.split(" ");
