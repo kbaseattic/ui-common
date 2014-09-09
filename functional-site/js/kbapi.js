@@ -373,11 +373,9 @@ function KBCacheClient(token) {
             }
 
             var arrow;
-            switch (direction) {
-                case '=': arrow = ' <=> ';
-                case '<': arrow = ' <= ';
-                case '>': arrow = ' => ';
-            }
+            if (direction === '=') arrow = ' <=> ';
+            if (direction === '<') arrow = ' <= ';
+            if (direction === '>') arrow = ' => ';
 
             var eq = lhs.join(' + ')+arrow+rhs.join(' + ');
             eqs[rxn_id] = eq
@@ -682,7 +680,7 @@ function UIUtils() {
         var labels = p.labels;
         var bold = (p.bold ? true : false);
 
-        var table = $('<table id="'+table_id+'" class="table table-striped table-bordered" \
+        var table = $('<table class="table table-striped table-bordered" \
                               style="margin-left: auto; margin-right: auto;"></table>');
         for (var i in labels) {
             table.append('<tr><td>'+(bold ? '<b>'+labels[i]+'</b>' : labels[i])+'</td> \
@@ -710,7 +708,7 @@ function UIUtils() {
                 var type = full_type.slice(full_type.indexOf('.')+1);
                 var kind = type.split('-')[0];
                 var label = item[7]+"/"+item[1];
-        var route;
+                var route;
                 switch (kind) {
                     case 'FBA': 
                         sub = 'fbas/';
