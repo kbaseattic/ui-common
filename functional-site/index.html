@@ -318,65 +318,67 @@
 
     <body>
         <div id="wrap">
-            <div class="nav navbar-kbase navbar-fixed-top nav-collapse nav-collapse-scrollable bs-navbar-scroll-collapse">
-                <a href="http://www.kbase.us" class="pull-left">
-                    <img id="logo" src="assets/img/kbase_logo.png" width="46"/>
-                </a>
+            <div id="content">
+                <div class="nav navbar-kbase navbar-fixed-top nav-collapse nav-collapse-scrollable bs-navbar-scroll-collapse">
+                    <a href="http://www.kbase.us" class="pull-left">
+                        <img id="logo" src="assets/img/kbase_logo.png" width="46"/>
+                    </a>
 
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav"> 
-                        <!--<li class="dropdown" ng-class="{ active: $state.includes('narrative')}">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Narrative <b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#/narrative/">Newsfeed</a></li>                
-                                <li><a href="#/narrative/projects/">Projects</a></li>
-                            </ul>
-                        </li>-->
-                        <li ng-class="{ active: $state.includes('narratives')}"><a ui-sref="narratives.featured" >Narratives</a></li>
-                        <li ng-class="{ active: $state.includes('ws')}"><a ui-sref="ws" >Workspaces</a></li>
-                        <li ng-class="{ active: $state.includes('search')}">
-                            <a ng-click="newSearch()" ng-controller="searchBarController">Search Data</a>
-                        </li>
-                        <li><a href="//kbase.us/services/docs/uploader/uploader.html">Upload</a></li>          
-                    </ul>
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav"> 
+                            <!--<li class="dropdown" ng-class="{ active: $state.includes('narrative')}">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Narrative <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#/narrative/">Newsfeed</a></li>                
+                                    <li><a href="#/narrative/projects/">Projects</a></li>
+                                </ul>
+                            </li>-->
+                            <li ng-class="{ active: $state.includes('narratives')}"><a ui-sref="narratives.featured" >Narratives</a></li>
+                            <li ng-class="{ active: $state.includes('ws')}"><a ui-sref="ws" >Workspaces</a></li>
+                            <li ng-class="{ active: $state.includes('search')}">
+                                <a ng-click="newSearch()" ng-controller="searchBarController">Search Data</a>
+                            </li>
+                            <li><a href="//kbase.us/services/docs/uploader/uploader.html">Upload</a></li>          
+                        </ul>
 
-                    <!--
-                    <ul class="nav navbar-nav"> 
-                        <li ng-class="{ active: $state.includes('favorites')}"><a href="#/favorites/all/">Favorites <span class="badge  favorite-count"></span></a></li>
-                        <li class="fav-loading"></li>
-                    </ul>
-                    -->
-             
-                    <div id="signin-button" class="pull-right"></div>
-                    <ul class="nav navbar-nav pull-right">
-                        <li class="dropdown help-dropdown">
-                            <a id="kbase_help_menu_label" href="#kbase_help_menu" class="dropdown-toggle" data-toggle="dropdown" onclick="return false;">Help <b class="caret"></b></a>
-                            <ul id="kbase_help_menu" class="dropdown-menu" role="menu" aria-labelledby="kbase_help_menu_label">
-                                <li><a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a></li>
-                                <!--<li><a href="#/landing-pages-help">Landing Page Documentation</a></li>-->
-                                <li><a href="http://kbase.us/get-started/data-search-quick-start/">Search Quick Start Guide</a></li>
-                                <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li>
-                            </ul>                        
-                        </li>
-                    </ul>
-                </div> 
-            </div>
+                        <!--
+                        <ul class="nav navbar-nav"> 
+                            <li ng-class="{ active: $state.includes('favorites')}"><a href="#/favorites/all/">Favorites <span class="badge  favorite-count"></span></a></li>
+                            <li class="fav-loading"></li>
+                        </ul>
+                        -->
+                 
+                        <div id="signin-button" class="pull-right"></div>
+                        <ul class="nav navbar-nav pull-right">
+                            <li class="dropdown help-dropdown">
+                                <a id="kbase_help_menu_label" href="#kbase_help_menu" class="dropdown-toggle" data-toggle="dropdown" onclick="return false;">Help <b class="caret"></b></a>
+                                <ul id="kbase_help_menu" class="dropdown-menu" role="menu" aria-labelledby="kbase_help_menu_label">
+                                    <li><a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a></li>
+                                    <!--<li><a href="#/landing-pages-help">Landing Page Documentation</a></li>-->
+                                    <li><a href="http://kbase.us/get-started/data-search-quick-start/">Search Quick Start Guide</a></li>
+                                    <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li>
+                                </ul>                        
+                            </li>
+                        </ul>
+                    </div> 
+                </div>
 
-            <div id="app" class="wrapper" ui-view></div>
+                <div id="app" ui-view></div>
 
-        </div> <!-- end wrap, this pushes the footer down -->
-        <div id="footer" class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main">
-            <ul>
-                <li><a href="//kbase.us/science/what-is-kbase/" target="_blank">About KBase</a></li>
-                <li><a href="//kbase.us/user-support/documentation/" target="_blank">Documentation</a></li>
-                <li><a href="//kbase.us/about/terms-and-conditions" target="_blank">Terms and Conditions</a></li>
-                <li><a href="//kbase.us/contact-us/" target="_blank">Contact Us</a></li>
-                <li><a href="http://science.energy.gov/" target="_blank"><img class="center-block" src="./assets/images/doe_sc_logo.png" /></a></li>
-            </ul>
+            </div> 
             
-            <!-- <div class="disclaimer">This site is for demonstration purposes only.</div> -->
-
+            <div id="footer" class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main">
+                <ul>
+                    <li><a href="//kbase.us/science/what-is-kbase/" target="_blank">About KBase</a></li>
+                    <li><a href="//kbase.us/user-support/documentation/" target="_blank">Documentation</a></li>
+                    <li><a href="//kbase.us/about/terms-and-conditions" target="_blank">Terms and Conditions</a></li>
+                    <li><a href="//kbase.us/contact-us/" target="_blank">Contact Us</a></li>
+                    <li><a href="http://science.energy.gov/" target="_blank"><img class="center-block" src="./assets/images/doe_sc_logo.png" /></a></li>
+                </ul>
+                
+            </div>
         </div>
+        
 
     </body>
 

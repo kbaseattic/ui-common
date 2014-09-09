@@ -1909,15 +1909,17 @@ angular.module('ws-directives')
                 $(element).html('');
             }
 
-            scope.browser = function() {
-                scope.clearSideBar();                
-                console.log(scope.ws)
+            scope.browser = function(workspace) {
+                scope.clearSideBar();
+                $(element).append('<h4>Objects</h4>')  
+
+
                 $(element).loading();
                 var p = kb.getWorkspaceSelector();
                 $.when(p).done(function(selector) {
                     $(element).rmLoading();
                     $(element).append(selector);
-                });
+                });   
 
                 var p = kb.ws.list_objects({workspaces: ['nconrad:home']});
                 $.when(p).done(function(data){
@@ -1936,6 +1938,8 @@ angular.module('ws-directives')
             scope.tools = function() {
                 scope.clearSideBar();
 
+                $(element).append('<h4>Tools</h4>')
+
                 for (var i in input_widgets) {
                     var widget = input_widgets[i];
                     $(element).append('<a class="widget-btn" data-id="'+widget.id+'">'+widget.name+'</a><br>')
@@ -1948,6 +1952,7 @@ angular.module('ws-directives')
                     loadForm(widget)
                 })
             }
+
 
             var input_widgets = [{name: 'Build Model', 
                                   id: 'build_model',
@@ -2035,23 +2040,6 @@ angular.module('ws-directives')
                                         output_widget: 'kbaseFBATabsNarrative',
                                  }
                                 ]
-/*
-    :param allreversible: set to 'yes' or '1' to allow all model reactions to be reversible (optional) [10.11]
-    :type allreversible: kbtypes.Unicode
-    :ui_name allreversible: All rxns reversible?
-    :default allreversible: no
-    
-    :param prom: specify the PROM constraint to apply for regulation of the metabolic model  (optional) [10.12]
-    :type prom: kbtypes.KBaseFBA.PromConstraint
-    :ui_name prom: PROM constraint
-    
-    :return: something 
-    :rtype: kbtypes.Unicode
-    :output_widget: kbaseFbaTabsNarrative
-*/
-
-
-
 
             function loadForm(widget_id) {
                 var content = $('.analysis-view')
@@ -2097,12 +2085,15 @@ angular.module('ws-directives')
                 }
 
                 content.append(groups);
+
+                content.append('<button type="button" class="btn btn-primary pull-right btn-run-analysis">Run</button>')
             }
 
             // show mini object browser when loading
             scope.tools();
 
         }
+
     }
 })
 

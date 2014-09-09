@@ -4,9 +4,12 @@
         <div class="pull-right" show-hide-sidebar></div>
         <div class="btn-toolbar ws-toolbar">
             <!--<a class="btn-analysis pull-left" ui-sref="ws.id({ws:ws})">ws</a>-->
-            <a ng-click="browser()" class="pull-left">data <span class="badge obj-count"></span></a>    
-            <a ng-click="tools()" class="pull-left">tools</a>    
-        </div>        
+            <ul class="nav nav-tabs">
+                <li class="active"><a ng-click="browser()" class="pull-left">data <span class="badge obj-count"></span></a></li>
+                <li><a ng-click="tools()" class="pull-left">tools</a></li>
+            </ul>
+        </div>
+
         <div class="ws-sidebar" analysis-tools></div>
     </div>
 

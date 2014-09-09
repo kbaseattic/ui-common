@@ -109,6 +109,13 @@ body {
     color: #333333;
 }
 
+html,
+body {
+    margin:0;
+    padding:0;
+    height:100%;
+}
+
 a:hover, .pointer {
     cursor: hand;
     cursor: pointer;
@@ -201,10 +208,12 @@ hr.ws-hr {
 
 
 /* bootstrap overrides */
-.wrapper { 
-    width: 95%; 
+#wrap { 
+    /*width: 95%; 
     margin-left: auto; 
-    margin-right: auto; 
+    margin-right: auto; */
+    min-height:100%;
+    position:relative;   
 }
 /* end bootstrap overrides */
 
@@ -976,26 +985,23 @@ div.FixedHeader_Cloned td {
     margin: 10px 0 0 50px;
 }
 
-#wrap {
-  min-height: 100%;
-  height: auto;
-  /* Negative indent footer by its height */
-  margin: 0 auto -58px;
-  /* Pad bottom by footer height */
-  padding: 0 0 80px;
+#content {
+    padding: 60px 20px 80px 20px;
 }
 /* for the footer */
 #footer {
-   /* margin-top: 60px;
-    position: relative;
-    bottom: 0px; */
-    /*height: 20px;*/
-    padding: 20px 0 0 20px;
+    border-top: 2px solid #eee;
+    width:100%;
+    height:40px;
+    position:absolute;
+    bottom:0;
+    right:0;
+    background: #f9f9f9;
 }
 
 #footer ul {
-    padding: 0;
-    text-align: left;
+    padding: 4px 0 0 0;
+    text-align: right;
 }
 
 #footer ul li {
