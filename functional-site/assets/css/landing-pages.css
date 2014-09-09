@@ -684,7 +684,6 @@ div::-webkit-scrollbar-thumb {
     max-width: 1200px;
 }
 
-
 .drag-placeholder {
     height: 58px;
     border: 1px solid #6da8cf;
@@ -1046,4 +1045,8 @@ div.DTCR_pointer {
     width: 1px;
     background-color: #0259C4;
     z-index: 201;
+}
+
+.obj-header {
+    margin: 0 0 10px 0;
 }

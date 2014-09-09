@@ -34,7 +34,7 @@ $.KBWidget({
                                            {name: 'Compounds', content: cpdTable},
                                            {name: 'Pathways', content: mapTable},                                               
                                     ]}); 
-        tabs.showTab('Reactions');
+        //tabs.showTab('Reactions');
 
         container.loading();
         var p = kb.get_fba(ws, name)
