@@ -372,6 +372,7 @@ function KBCacheClient(token) {
                 }
             }
 
+            var arrow;
             if (direction === '=') arrow = ' <=> ';
             if (direction === '<') arrow = ' <= ';
             if (direction === '>') arrow = ' => ';
