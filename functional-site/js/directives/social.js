@@ -223,13 +223,12 @@ angular.module('social-directives')
             ws.get_objects(objectIds,
                 function(data) {
 		    // create the widget if we found the data
-		    $(p.body()).append("stuff");
-                    /*$(p.body()).KBaseUserOverview({
+                    $(p.body()).KBaseUserRecentActivity({
                                         userInfo:data[0],
                                         wsUserInfoUrl:peopleWsUrl,
                                         wsUserInfoRef:userId+":userinfo/info",
                                         kbCache:scope.params.kbCache
-                                    });*/
+                                    });
 		},
 		function(err) {
                     // if we get an error, then no workspace or no profile exists (or is readable by this user...) and we just exit

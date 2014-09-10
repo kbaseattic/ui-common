@@ -63,7 +63,7 @@
 	    // setup the alert panel
             self.$alertPanel = $("<div></div>");
 	    self.$elem.append(self.$alertPanel);
-            self.$mainPanel = $("<div></div>");
+            self.$mainPanel = $("<div></div>").css("overflow","auto").css("height","500px");;
 	    self.$elem.append(self.$mainPanel);
 	    
             self.buildCollaboratorNetwork();
@@ -229,13 +229,13 @@
 		    tblData.push(rowData);
 		}
 		
-		var $tblDiv = $('<table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped"'
-				+' style="width: 100%; margin-left: 0px; margin-right: 0px;">');
-		var sDom = 't<fip>'
-		if (tblData.length<=10) { sDom = 'ti'; }
+		self.$mainPanel.append($('<table id="coltble" cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped"'
+				+' style="width: 100%; margin-left: 0px; margin-right: 0px;">'));
+		var sDom = 't<ip>'
+		if (tblData.length<=5) { sDom = 'ti'; }
 		var tblSettings = {
 				    //"sPaginationType": "full_numbers",
-				    "iDisplayLength": 20,
+				    "iDisplayLength": 5,
 				    "oLanguage": { "sZeroRecords": "No common collaborators found." },
 				    "order": [3,'dsc',4,'dsc'],
 				    "sDom": sDom,
@@ -248,8 +248,7 @@
 				    ],
 				    "aaData": tblData
 				};
-		var refTable = $tblDiv.dataTable(tblSettings);
-		self.$mainPanel.append(refTable);
+		var refTable = self.$mainPanel.find("#coltble").dataTable(tblSettings);
 	    }
 	    else {
 		self.$mainPanel.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>building common collaborator network...</center></p></div>');
