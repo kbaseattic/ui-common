@@ -24,7 +24,7 @@ angular.module('ws-directives')
             // Global list and dict of fetched workspaces
             var workspaces = []; 
 
-            var nav_height = 90;
+            var nav_height = 80;
 
             // This method loads the sidebar data.  
             // Note: this is only called after instantiation when sidebar needs to be refreshed
@@ -111,6 +111,19 @@ angular.module('ws-directives')
 
             // load the content of the ws selector
             scope.loadWSTable();
+
+            // move up/down ws selector
+            /*
+            $(document).keydown(function(e) {
+
+                // move down
+                if (e.which == 40) {
+                    $('.selected-ws').parent().next()
+                    alert('move down')
+                }
+
+                e.preventDefault(); // prevent the default action (scroll / move caret)
+            });*/            
 
             function events() {
                 var filterCollapse = $('.perm-filters');
@@ -305,7 +318,7 @@ angular.module('ws-directives')
 .directive('objtable', function($location, $compile, modals, favoriteService) {
     return {
         link: function(scope, element, attrs) {
-            var ws = scope.selected_ws;
+            var ws = scope.ws;
 
             var table;
             scope.favs;
@@ -1767,7 +1780,7 @@ angular.module('ws-directives')
 .directive('wsDescription', function($location, $compile, $state) {
     return {
         link: function(scope, ele, attrs) {
-            var p = kb.ws.get_workspace_description({workspace: scope.selected_ws})
+            var p = kb.ws.get_workspace_description({workspace: scope.ws})
             $.when(p).done(function(data){
                 if (!data) {
                     return;
@@ -1886,6 +1899,203 @@ angular.module('ws-directives')
     }
 })
 
+.directive('analysisTools', function($location, $compile, $state, $stateParams, modals) {
+    return {
+        templateUrl: 'views/ws/analysis-tools.html',
+        link: function(scope, element, attrs) {
+            console.log('called')
+
+            scope.clearSideBar = function() {
+                $(element).html('');
+            }
+
+            scope.browser = function(workspace) {
+                scope.clearSideBar();
+                $(element).append('<h4>Objects</h4>')  
+
+
+                $(element).loading();
+                var p = kb.getWorkspaceSelector();
+                $.when(p).done(function(selector) {
+                    $(element).rmLoading();
+                    $(element).append(selector);
+                });   
+
+                var p = kb.ws.list_objects({workspaces: ['nconrad:home']});
+                $.when(p).done(function(data){
+                    $('.obj-count').text(data.length)
+
+                    var table = $('<table class="table">')
+                    for (var i in data) {
+                        var ws = data[i];
+                        table.append('<tr><td>'+ws[1]+'</td></tr>')
+                    }
+                    var table = $('<div class="mini-obj-table overflow-y">').append(table)
+                    $(element).append(table)
+                })
+            }
+
+            scope.tools = function() {
+                scope.clearSideBar();
+
+                $(element).append('<h4>Tools</h4>')
+
+                for (var i in input_widgets) {
+                    var widget = input_widgets[i];
+                    $(element).append('<a class="widget-btn" data-id="'+widget.id+'">'+widget.name+'</a><br>')
+                }
+
+                $('.widget-btn').unbind('click');
+                $('.widget-btn').click(function() {
+                    var widget = $(this).data('id');
+                    console.log(widget)
+                    loadForm(widget)
+                })
+            }
+
+
+            var input_widgets = [{name: 'Build Model', 
+                                  id: 'build_model',
+                                  form: [
+                                         {name: 'Genome Name', 
+                                          id: 'genome_id',
+                                          kbtype: 'KBaseGenomes.Genome',
+                                          help: 'Source genome name'}, 
+
+                                         {name: 'Output Metabolic Model Name', 
+                                          id: 'fba_model_id',
+                                          kbtype: 'KBaseFBA.FBAModel',
+                                          help: 'Select a name for the generated metabolic model (optional)'},     
+                                        ],
+                                   return_type: 'KBaseFBA.FBAModel',
+                                   output_widget: 'kbaseModelTabs'
+                                 },
+                                 {name: 'Run FBA', 
+                                  id: 'run_fba',
+                                  form: [
+                                         {name: 'Metabolic Model', 
+                                          id: 'fba_model_id',
+                                          kbtype: 'KBaseFBA.FBAModel', 
+                                          help: 'The metabolic model you wish to run'}, 
+
+                                         {name: 'Media', 
+                                          id: 'media_id',
+                                          kbtype: 'KBaseBiochem.Media', 
+                                          help: 'the media condition in which to run FBA (optional, default is an artificial complete media)'},     
+
+                                         {name: 'Output FBA Result Name', 
+                                          id: 'fba_result_id',
+                                          kbtype: 'KBaseFBA.FBA', 
+                                          help: 'select a name for the FBA result object (optional) '}, 
+
+                                         {name: 'Gene Knockouts', 
+                                          id: 'geneko',
+                                          help: 'specify gene knockouts by the genes feature ID delimited by semicolons(;) (optional)'}, 
+
+                                         {name: 'Reaction Knockouts', 
+                                          id: 'fba_model_id',
+                                          help: 'specify reaction knockouts by reaction ID delimited by semicolons(;) (optional)'}, 
+
+                                         {name: 'Maximum flux', 
+                                          id: 'fba_model_id',
+                                          default: 100,
+                                          help: 'default maximum nutrient uptake flux (optional)'},
+
+                                         {name: 'Minimum Uptake flux', 
+                                          id: 'fba_model_id',
+                                          default: -100,
+                                          help: 'default minumum nutrient uptake flux (optional)'},    
+
+
+                                         {name: ' Max Uptake', 
+                                          id: 'maxUptake',
+                                          default: 0,
+                                          help: 'default maximum nutrient uptake flux (optional)'},                                              
+
+                                         {name: 'Minimize flux', 
+                                          id: 'minimizeFlux',
+                                          input: ['yes', 'no'],                                          
+                                          default: 'no',
+                                          help: 'set to yes to run FBA by minimizing flux (optional)'},
+
+                                         {name: 'Maximize Objective?', 
+                                          id: 'maximizeObjective',
+                                          input: ['yes', 'no'],
+                                          default: 'yes',
+                                          help: 'set to "no" to run FBA without maximizing the objective function (optional)'},
+
+
+                                         {name: 'All rxns reversible?', 
+                                          id: 'allReversible',
+                                          input: ['yes', 'no'],
+                                          default: 'no',
+                                          help: 'set to "yes" to allow all model reactions to be reversible (optional) '},
+
+                                         {name: 'PROM constraint', 
+                                          id: 'prom',
+                                          kbtype: 'KBaseFBA.PromConstraint',
+                                          help: 'specify the PROM constraint to apply for regulation of the metabolic model  (optional)'},
+
+                                        ],
+                                        output_widget: 'kbaseFBATabsNarrative',
+                                 }
+                                ]
+
+            function loadForm(widget_id) {
+                var content = $('.analysis-view')
+                content.html('')
+
+                // find widget spec
+                var form;
+                for (var i in input_widgets) {
+                    if (input_widgets[i].id == widget_id) {
+                        var form = input_widgets[i].form
+                        break
+                    }
+                }
+
+                console.log('found form', form)
+
+                var groups = $('<form class="form-horizontal" role="form">');
+
+                // load each input field
+                for (var i in form) {
+                    var field = form[i];
+                    console.log(field.name);
+
+                    var group = $('<div class="form-group">');
+                    if (!(field.input) || field.input == 'text') {
+                        console.log(field)
+                        group.append('<label class="col-sm-2 control-label" >'+
+                                        field.name+
+                                   '</label>')
+                        group.append('<div class="col-sm-5">'+
+                                       '<input class="form-control" type="text" placeholder="'+field.name+'">'+
+                                    '</div>')
+                        group.append('<div class="col-sm-5">'+
+                                       field.help+
+                                    '</div>')
+
+                        // if there is a default, set it
+                        if (field.default) {
+                            group.find('input').val(field.default);
+                        }
+                    }
+                    groups.append(group);
+                }
+
+                content.append(groups);
+
+                content.append('<button type="button" class="btn btn-primary pull-right btn-run-analysis">Run</button>')
+            }
+
+            // show mini object browser when loading
+            scope.tools();
+
+        }
+
+    }
+})
 
 function getEditableDescription(d) {
     var d = $('<form role="form">\

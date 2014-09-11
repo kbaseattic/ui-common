@@ -92,6 +92,12 @@ var app = angular.module('landing-pages',
           controller: 'WSManage',
         });
 
+    $stateProvider
+        .state('analysis', {
+          url: "/analysis/:ws",
+          templateUrl: 'views/ws/analysis.html',
+          controller: 'WB'})
+
 
     // model viewer routing
     $stateProvider
