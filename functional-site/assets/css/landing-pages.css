@@ -320,15 +320,19 @@ table {
     width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
-    border-spacing: 0;
-    display: table;
 }
+
+
 .ws-selector-table td{
     width: 100%;
     position: relative;
+    display: block;
+    border-style: solid;
+    border-width: 1px 0 0 0 !important;
 }
+
 .btn-ws-settings {
-    position: absolute;
+    position: absolute;  
     right: 5px;
     top: 6px;
 }
