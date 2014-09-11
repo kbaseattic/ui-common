@@ -192,9 +192,6 @@
 	},
 	
 	
-	
-	
-	
 	renderView: function () {
 	    var self = this;
 	    self.$mainPanel.empty();

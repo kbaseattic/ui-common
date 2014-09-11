@@ -78,7 +78,10 @@
 			//tuple<ws_id id, ws_name workspace, username owner, timestamp moddate,
 			//int object, permission user_permission, permission globalread,
 			//lock_status lockstat, usermeta metadata> workspace_info
-			wsids.push(data[k][0]);
+			if (data[k][2]===self.wsUserName) {
+			    //for now, only include workspaces owned by this user
+			    wsids.push(data[k][0]);
+			}
 		    }
 		    var d = new Date();
 		    d.setMonth(d.getMonth()-3);
@@ -105,7 +108,7 @@
 			    });
 			    var limit = 10;
 			    if (self.recentActivity.length>limit) {
-				self.recentActivity = self.recentActivity.slice(0,limit-1);
+				self.recentActivity = self.recentActivity.slice(0,limit);
 			    }
 			    self.render();
 			},

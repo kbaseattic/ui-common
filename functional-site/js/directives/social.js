@@ -102,10 +102,10 @@ angular.module('social-directives')
 							my_services: [],
 							resource_usage: {
 							    disk_quota:20,
-							    disk_usage:14,
+							    disk_usage:Number((Math.random() * 20).toFixed(2)),
 							    disk_units:"GB",
 							    cpu_quota:2000,
-							    cpu_usage:138,
+							    cpu_usage:Number((Math.random() * 1500).toFixed(2)),
 							    cpu_units : "CPU Hours"
 							}
 						    };
@@ -185,10 +185,21 @@ angular.module('social-directives')
 		    } else if (level>4) { color = "label-info";
 		    } else { color = "label-default"; }
 		    
+		    
+		    
+		    var shareindex = (Math.random() * 20).toFixed(2);
+		    var activityindex = (Math.random() * 20).toFixed(2);
+		    var influenceindex = (Math.random() * 20).toFixed(2);
+		    
+		    
 		    $(p.body()).append(
 				    '<center><h2><span class="label ' + color +'">'+
 				    '<span class="glyphicon glyphicon-star"></span> Level ' + level +
-				    '</span> </h2></center>'
+				    '</span> </h2>'+
+				    '<br>Contributer Index:<br><strong>'+shareindex+'</strong><br>'+
+				    '<br>Activity Index:<br><strong>'+activityindex+'</strong><br>'+
+				    '<br>Influence Index:<br><strong>'+influenceindex+'</strong><br>' +
+				    '</center>'
 				    );
                     /*$(p.body()).KBaseUserOverview({
                                         userInfo:data[0],
@@ -289,13 +300,12 @@ angular.module('social-directives')
             ws.get_objects(objectIds,
                 function(data) {
 		    // create the widget if we found the data
-		    $(p.body()).append("stuff");
-                    /*$(p.body()).KBaseUserOverview({
+		    $(p.body()).KBaseUserProjectMembership({
                                         userInfo:data[0],
                                         wsUserInfoUrl:peopleWsUrl,
                                         wsUserInfoRef:userId+":userinfo/info",
                                         kbCache:scope.params.kbCache
-                                    });*/
+                                    });
 		},
 		function(err) {
                     // if we get an error, then no workspace or no profile exists (or is readable by this user...) and we just exit
@@ -324,13 +334,12 @@ angular.module('social-directives')
             ws.get_objects(objectIds,
                 function(data) {
 		    // create the widget if we found the data
-		    $(p.body()).append("stuff");
-                    /*$(p.body()).KBaseUserOverview({
+                    $(p.body()).KBaseUserPopularNarratives({
                                         userInfo:data[0],
                                         wsUserInfoUrl:peopleWsUrl,
                                         wsUserInfoRef:userId+":userinfo/info",
                                         kbCache:scope.params.kbCache
-                                    });*/
+                                    });
 		},
 		function(err) {
                     // if we get an error, then no workspace or no profile exists (or is readable by this user...) and we just exit
@@ -360,7 +369,23 @@ angular.module('social-directives')
             ws.get_objects(objectIds,
                 function(data) {
 		    // create the widget if we found the data
-		    $(p.body()).append("stuff");
+		    $(p.body()).append(
+				    ''+
+				    '<div class="list-group">'+
+					'<a href="#" onclick="return false;" class="list-group-item"><span class="badge">#3 in the App Gallery</span>'+
+					'<strong>Ultimate Model Simulator</strong><br><small>Simulates anything, really.</small></a>'+
+					'<a href="#" onclick="return false;" class="list-group-item"><span class="badge">#52 in the App Gallery</span>'+
+					'<strong>View Some Data</strong><br><small>Takes some data and view it.</small></a>'+
+					'<a href="#" onclick="return false;" class="list-group-item"><span class="badge">#56 in the App Gallery</span>'+
+					'<strong>NCBI importer</strong><br><small>Imports stuff from NCBI to your workspace.</small></a>'+
+					'<a href="#" onclick="return false;" class="list-group-item"><span class="badge">#81 in the App Gallery</span>'+
+					'<strong>Generate List</strong><br><small>Convert some things to a list.</small></a>'+
+				      '</div>'+
+				    ''
+				    );
+		    
+		    
+		    
                     /*$(p.body()).KBaseUserOverview({
                                         userInfo:data[0],
                                         wsUserInfoUrl:peopleWsUrl,
@@ -395,13 +420,12 @@ angular.module('social-directives')
             ws.get_objects(objectIds,
                 function(data) {
 		    // create the widget if we found the data
-		    $(p.body()).append("stuff");
-                    /*$(p.body()).KBaseUserOverview({
+                    $(p.body()).KBaseUserResourceUsage({
                                         userInfo:data[0],
                                         wsUserInfoUrl:peopleWsUrl,
                                         wsUserInfoRef:userId+":userinfo/info",
                                         kbCache:scope.params.kbCache
-                                    });*/
+                                    });
 		},
 		function(err) {
                     // if we get an error, then no workspace or no profile exists (or is readable by this user...) and we just exit
@@ -429,7 +453,7 @@ angular.module('social-directives')
             ws.get_objects(objectIds,
                 function(data) {
 		    // create the widget if we found the data
-		    $(p.body()).append("stuff");
+		    $(p.body()).append("linked publications");
                     /*$(p.body()).KBaseUserOverview({
                                         userInfo:data[0],
                                         wsUserInfoUrl:peopleWsUrl,
@@ -464,7 +488,7 @@ angular.module('social-directives')
             ws.get_objects(objectIds,
                 function(data) {
 		    // create the widget if we found the data
-		    $(p.body()).append("stuff");
+		    $(p.body()).append("some people");
                     /*$(p.body()).KBaseUserOverview({
                                         userInfo:data[0],
                                         wsUserInfoUrl:peopleWsUrl,
@@ -498,7 +522,7 @@ angular.module('social-directives')
             ws.get_objects(objectIds,
                 function(data) {
 		    // create the widget if we found the data
-		    $(p.body()).append("stuff");
+		    $(p.body()).append("some people");
                     /*$(p.body()).KBaseUserOverview({
                                         userInfo:data[0],
                                         wsUserInfoUrl:peopleWsUrl,
