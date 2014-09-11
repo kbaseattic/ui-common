@@ -32,7 +32,6 @@ $.KBWidget({
 
 
                 var tableSettings = {
-                    "pagingType": "full_numbers",
                     "aaData": d,
                     "fnDrawCallback": events,
                     "aaSorting": [[ 1, "asc" ]],

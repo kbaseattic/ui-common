@@ -67,7 +67,6 @@ $.KBWidget({
                                     editable: (options.editable ? true : false)});
 
             var tableSettings = {
-                'pagingType': 'full_numbers',
                 "iDisplayLength": 10,
                 "aLengthMenu": [5, 10, 25,50,100],            
                 "aaData": [],
@@ -181,7 +180,6 @@ $.KBWidget({
 
         function gapFillTableWS(gapfillings) {
             var tableSettings = {
-                'pagingType': 'full_numbers',
                 "iDisplayLength": 10,
                 "aLengthMenu": [5, 10, 25,50,100],            
                 "aaData": [],
