@@ -89,7 +89,7 @@
         renderFromTaxonomy: function(taxonomy) {
             var searchTerms = taxonomy;
             var strainName = taxonomy[0];
-            this.dbpediaLookup(searchTerms, $.proxy(
+            this.wikipediaLookup(searchTerms, $.proxy(
                 function(desc) {
                     // If we've found something, desc.description will exist and be non-null
                     if (desc.hasOwnProperty('description') && desc.description != null) {
@@ -354,6 +354,33 @@
                             .append("<br>" + errString);
             this.$elem.empty();
             this.$elem.append($errorDiv);
+        },
+
+        wikipediaLookup: function(termList, successCallback, errorCallback, redirectFrom) {
+            if (!termList || Object.prototype.toString.call(termList) !== '[object Array]' || termList.length === 0) {
+                if (errorCallback) {
+                    errorCallback("No search term given");
+                }
+            }
+
+            var searchTerm = termList.shift();
+            var usTerm = searchTerm.replace(/\s+/g, '_');
+
+            var requestUrl = 'http://en.wikipedia.org/w/api.php?action=parse&format=json&prop=text|images&section=0&redirects=&callback=?&page=' + searchTerm;
+
+            $.get(requestUrl).then($.proxy(function(data, status) {
+                console.log(data);
+                console.log(status);
+                if (successCallback) {
+                    successCallback(data);
+                }
+            }, this), 
+            function(error) {
+                if (errorCallback) {
+                    errorCallback(error);
+                }
+            });
+
         },
 
         dbpediaLookup: function(termList, successCallback, errorCallback, redirectFrom) {
