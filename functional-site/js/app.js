@@ -501,6 +501,11 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		{url: '/people/',
 		templateUrl: 'views/social/sortable-rows-people-list.html',
 		controller: 'PeopleList'});*/
+    $stateProvider
+	.state('app',
+		{url: '/app/:appid',
+		templateUrl: 'views/social/sortable-rows-app.html',
+		controller: 'App'});
                 
                 
     $urlRouterProvider.when('', '/login/')

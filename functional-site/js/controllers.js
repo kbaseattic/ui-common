@@ -190,6 +190,21 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     });
 })
 
+.controller('App', function($scope, $stateParams) {
+    $scope.params = { 'appid':$stateParams.appid, 'kbCache' : kb }
+    $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder", 
+        handle: '.panel-heading',
+        cancel: '.panel-title,.panel-subtitle,.label,.glyphicon',
+        start: function() {
+          $(this).find('.panel-body').addClass('hide');
+          $(this).sortable('refreshPositions');
+        },
+        stop: function() {
+          $(this).find('.panel-body').removeClass('hide');
+        }
+    });
+})
+
 .controller('Trees', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;

@@ -153,6 +153,8 @@ module UserInfo {
     /* example narratives should be WS references to the Production ws! */
     typedef structure {
         string name;
+        string version;
+        string release_date;
         list <string> author_user_ids;
         string description;
         string src_code_url;
