@@ -143,6 +143,35 @@
 	    self.$mainPanel.empty();
 	    if (self.reviews) {
 	    
+		self.$addReviewPanel = $('<div>').css("width","95%");;
+		if (self.loggedIn) {
+		    var comments =
+			'</div><div class="panel panel-default">'+
+			    '<div class="panel-heading">'+
+			      '<h3 class="panel-title">Add Your Review</h3>'+
+			    '</div>'+
+			    '<div class="panel-body">'+
+			        '<div class="row">' +
+				    '<div class="col-md-12"><div class="input-group">'+
+				    '<span class="input-group-addon">Stars (1-5):</span>'+
+					'<input id="stars" type="text" class="form-control" value="'+4+'"></input>'+
+				    '</div></div>' +
+				'</div>'+
+				'<div class="row">' +
+				    '<div class="col-md-12">'+
+				      '<textarea id="comments" class="form-control" rows="2" style="resize:vertical;"></textarea>' +
+				    '</div>' +
+				'</div>'+
+				'<div class="row">' +
+				    '<div class="col-md-12">'+
+				      '<button id="comments" class="button">Submit</button>' +
+				    '</div>' +
+				'</div>'+
+			    '</div>';
+		    self.$addReviewPanel.append(comments);
+		}
+		
+		
 		// render the list of reviews
 		var $reviewList = $('<div>').css("width","95%");
 		if (self.reviews.sortedAllReviews.length>0) {
@@ -173,24 +202,23 @@
 			}
 			
 			$reviewListItemsContainer.append(
-			    '<a href="#" onclick="return false;" class="list-group-item" style="cursor:default;">' +
+			    '<a href="#/people/'+self.reviews.sortedAllReviews[r]['reviewer']+'" class="list-group-item">' +
 			    '<div><h4 style="display:inline">'+stars+'&nbsp&nbsp&nbsp&nbsp'+self.reviews.sortedAllReviews[r]['reviewer']+'&nbsp&nbsp&nbsp&nbsp</h4><i>'+time+'</i></div>' +
 			    '<div>'+self.reviews.sortedAllReviews[r]['review_text']+'</div>'+
 			    '</a>'
 			);
 		    }
 		    $reviewList.append($reviewListItemsContainer);
-		    
 		} else {
 		    $reviewList.append("<strong>No user reviews yet.  You should be the first!</strong>");
 		}
 		self.$mainPanel.append($reviewList);
+		
+		self.$mainPanel.append(self.$addReviewPanel);
 	    }
 	    else {
 		self.$mainPanel.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>getting reviews...</center></p></div>');
 	    }
-	    
-	    //self.$mainPanel.append($ssPanel);
 	},
 	
         monthLookup : ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep","Oct", "Nov", "Dec"]
