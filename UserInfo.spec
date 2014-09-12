@@ -139,12 +139,20 @@ module UserInfo {
     /* @id ws UserInfo.AppInfo */
     typedef string app_id;
     
-    /* rating should be between 1-5*/
+    /* @id ws UserInfo.UserInfoSimple */
+    typedef string user_info_id;
+    
+    /* rating should be between 1-5
+    
+      @metadata ws app
+      @metadata ws user_id
+      @metadata ws review_text
+      @metadata ws rating
+    */
     typedef structure {
         app_id app;
-        string user_id;
+        user_info_id user_id;
         string review_text;
-        string timestamp;
         int rating; 
     } AppReview;
 

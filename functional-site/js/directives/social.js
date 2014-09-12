@@ -372,13 +372,13 @@ angular.module('social-directives')
 		    $(p.body()).append(
 				    ''+
 				    '<div class="list-group">'+
-					'<a href="#" onclick="return false;" class="list-group-item"><span class="badge">#3 in the App Gallery</span>'+
+					'<a href="#/app/sampleapp" class="list-group-item"><span class="badge">#3 in the App Gallery</span>'+
 					'<strong>Ultimate Model Simulator</strong><br><small>Simulates anything, really.</small></a>'+
-					'<a href="#" onclick="return false;" class="list-group-item"><span class="badge">#52 in the App Gallery</span>'+
+					'<a href="#/app/sampleapp" class="list-group-item"><span class="badge">#52 in the App Gallery</span>'+
 					'<strong>View Some Data</strong><br><small>Takes some data and view it.</small></a>'+
-					'<a href="#" onclick="return false;" class="list-group-item"><span class="badge">#56 in the App Gallery</span>'+
+					'<a href="#/app/sampleapp" class="list-group-item"><span class="badge">#56 in the App Gallery</span>'+
 					'<strong>NCBI importer</strong><br><small>Imports stuff from NCBI to your workspace.</small></a>'+
-					'<a href="#" onclick="return false;" class="list-group-item"><span class="badge">#81 in the App Gallery</span>'+
+					'<a href="#/app/sampleapp" class="list-group-item"><span class="badge">#81 in the App Gallery</span>'+
 					'<strong>Generate List</strong><br><small>Convert some things to a list.</small></a>'+
 				      '</div>'+
 				    ''
@@ -596,9 +596,9 @@ angular.module('social-directives')
                 function(data) {
 		    // create the widget if we found the data
 		    var appData = data[0]['data'];
-		    $(ele).find(".panel-title").html(appData['name']);
                     $(p.body()).KBaseAppReviews({
                                         appData:appData,
+					appRefs:data[0]['refs'],
                                         wsUserInfoUrl:peopleWsUrl,
                                         appDataRef:"appdata/"+appid,
                                         kbCache:scope.params.kbCache
