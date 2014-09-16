@@ -94,9 +94,9 @@
                     // If we've found something, desc.description will exist and be non-null
                     if (desc.hasOwnProperty('description') && desc.description != null) {
                         if (desc.description.length > this.options.maxNumChars) {
-                            desc.description = desc.description.substr(0, this.options.maxNumChars);
-                            var lastBlank = desc.description.lastIndexOf(" ");
-                            desc.description = desc.description.substr(0, lastBlank) + "...";
+                            // desc.description = desc.description.substr(0, this.options.maxNumChars);
+                            // var lastBlank = desc.description.lastIndexOf(" ");
+                            // desc.description = desc.description.substr(0, lastBlank) + "...";
                         }
 
                         /* the viz is set up like this:
@@ -202,7 +202,7 @@
             var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
             
             obj['included'] = ["/taxonomy","/scientific_name"];
-	    self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
+            self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
                     if (data[0]) {
                         if (data[0]['data']['taxonomy']) {
                             var tax = data[0]['data']['taxonomy'];
@@ -366,13 +366,68 @@
             var searchTerm = termList.shift();
             var usTerm = searchTerm.replace(/\s+/g, '_');
 
-            var requestUrl = 'http://en.wikipedia.org/w/api.php?action=parse&format=json&prop=text|images&section=0&redirects=&callback=?&page=' + searchTerm;
+            var requestUrl = '//en.wikipedia.org/w/api.php?action=parse&format=json&prop=text|pageimages&section=0&redirects=&callback=?&page=' + searchTerm;
+            var imageLookupUrl = '//en.wikipedia.org/w/api.php?action=query&format=json&prop=pageimages&pithumbsize=500&callback=?&titles=';
 
-            $.get(requestUrl).then($.proxy(function(data, status) {
-                console.log(data);
-                console.log(status);
-                if (successCallback) {
-                    successCallback(data);
+            $.ajax({
+                type: 'GET',
+                url: requestUrl,
+                contentType: 'application/json; charset=utf-8',
+                async: true,
+                dataType: 'json'
+            })
+            .then($.proxy(function(data, status) {
+                if (data.error) {
+                    // do the next one in the list.
+                    this.wikipediaLookup(termList, successCallback, errorCallback);
+                }
+                else if (data.parse) {
+                    console.log(data);
+                    if (data.parse.text) {
+                        var hit = { 'searchTerm': searchTerm };
+
+                        var $abstract = $('<div>').html(data.parse.text["*"]);
+                        window.$abstract = $abstract;
+
+                        $abstract.find('a').each(function() {
+                            $(this).replaceWith($(this).html());
+                        });
+                        $abstract.find('sup').remove();
+                        $abstract.find('.mw-ext-cite-error').remove();
+
+                        hit['description'] = '';
+
+                        $abstract.children('p').each(function(idx, val) {
+                            hit['description'] += '<p>' + $(val).html() + '</p>';
+                        });
+                        hit['wikiUri'] = '//www.wikipedia.org/wiki/' + data.parse.title;
+
+                        if (data.parse.redirects && data.parse.redirects.length > 0) {
+                            hit['redirectFrom'] = data.parse.redirects[0].from;
+                        }
+
+                        // do image lookup
+                        $.ajax({
+                            type: 'GET',
+                            url: imageLookupUrl + data.parse.title, //.replace(/\s+/g, '_'),
+                            contentType: 'application/json; charset=utf-8',
+                            async: false,
+                            dataType: 'json'
+                        })
+                        .then(function(imageData, imageStatus) {
+                            console.log('found image info!');
+                            console.log(imageData);
+                            if (imageStatus) {
+                                for (pageNum in imageData.query.pages) {
+                                    hit['imageUri'] = imageData.query.pages[pageNum].thumbnail.source;
+                                }
+                            }
+                            console.log(hit);
+                            if (successCallback) {
+                                successCallback(hit);
+                            }
+                        });
+                    }
                 }
             }, this), 
             function(error) {
@@ -380,7 +435,6 @@
                     errorCallback(error);
                 }
             });
-
         },
 
         dbpediaLookup: function(termList, successCallback, errorCallback, redirectFrom) {
