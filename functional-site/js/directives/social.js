@@ -597,6 +597,7 @@ angular.module('social-directives')
 		    // create the widget if we found the data
 		    var appData = data[0]['data'];
                     $(p.body()).KBaseAppReviews({
+					appName:appid,
                                         appData:appData,
 					appRefs:data[0]['refs'],
                                         wsUserInfoUrl:peopleWsUrl,
