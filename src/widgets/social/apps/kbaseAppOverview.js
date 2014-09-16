@@ -40,7 +40,7 @@
 	    // setup the alert panel
             self.$alertPanel = $("<div></div>");
 	    self.$elem.append(self.$alertPanel);
-            self.$mainPanel = $("<div></div>").css("overflow","auto").css("height","400px");
+            self.$mainPanel = $("<div></div>").css("overflow","auto");
 	    self.$elem.append(self.$mainPanel);
 	    
            self.render();
@@ -64,10 +64,11 @@
 	    var self = this;
 	    var ad = self.options.appData;
 	    
-	    var $header = $('<div>');
-	    $header.append('<div><strong>Version: </strong>&nbsp&nbsp'+ad['version']+"</div>");
-	    $header.append('<div><strong>Release Date: </strong>&nbsp&nbsp'+ad['release_date']+"</div>");
+	    var $header = $('<div>').addClass("row").css("width","95%");
 	    
+	    var $basicInfo = $('<div>').addClass("col-md-8");
+	    $basicInfo.append('<div><strong>Version: </strong>&nbsp&nbsp'+ad['version']+"</div>");
+	    $basicInfo.append('<div><strong>Release Date: </strong>&nbsp&nbsp'+ad['release_date']+"</div>");
 	    var $authors = $('<div>');
 	    for(var k=0; k<ad['author_user_ids'].length; k++) {
 		if (k==0) {
@@ -76,28 +77,49 @@
 		    $authors.append(', <a href="#/people/'+ad['author_user_ids'][k]+'">'+ad['author_user_ids'][k]+"</a>");
 		}
 	    }
-	    $header.append($authors);
+	    $basicInfo.append($authors);
+	    $basicInfo.append('<div><strong>Description: </strong>&nbsp&nbsp'+ad['description']+"</div>");
 	    
-	    $header.append('<div><strong>Description: </strong>&nbsp&nbsp'+ad['description']+"</div>");
+	    var $topButtons = $('<div>').addClass("col-md-4").css("text-align","right").append(
+				      '<div>' +
+					'<h4><span class="label label-primary">#18 in the App Gallery</span></h4>' +
+				      '</div>'
+				    ).append(
+				      '<div class="btn-group">' +
+					'<button id="saveapp" class="btn btn-default">Save to Favorites</button>' +
+					'<button id="launchapp" class="btn btn-default">Launch in New Narrative</button>' +
+				      '</div>'  
+				    );
+	    
+	    $topButtons.find("#saveapp").click(function(e) {
+		    e.preventDefault(); //to prevent standard click event
+		    alert("This button should save/install this App so it can be found easily in the Narrative list of functions for the user.");
+		});
+	    $topButtons.find("#launchapp").click(function(e) {
+		    e.preventDefault(); //to prevent standard click event
+		    alert("This should create a new narrative populated with this App.");
+		});
+	    
+	    $header.append($basicInfo);
+	    $header.append($topButtons);
+	    
+	    
 	    
 	    self.$mainPanel.append($header);
 	    
+	    var imgHtml = "";
+	    for (var p=0; p<8; p++) {
+		imgHtml += '<td style="padding:10px;"><div style="background-color: gray; border: 1px solid black; padding-left:25px; padding-top:25px; width: 250px; height:250px;">'+
+		    '<br><h3>No Screenshot Available</h3>' +
+		    '</div></td>';
+	    }
+	    
 	    
 	    var $ssPanel = $("<div>").append(
-		'<br><br><div class="row" style="width:85%">'+
-		    '<div class="col-md-3"><div style="background-color: gray; border: 1px solid black; padding-left:25px; padding-top:25px; width: 250px; height:250px;">'+
-		    '<br><h3>No Screenshot Available</h3>' +
-		    '</div></div>' +
-		    
-		    '<div class="col-md-3"><div style="background-color: gray; border: 1px solid black; padding-left:25px; padding-top:25px; width: 250px; height:250px;">'+
-		    '<br><h3>No Screenshot Available</h3>' +
-		    '</div></div>' +
-		    
-		    '<div class="col-md-3"><div style="background-color: gray; border: 1px solid black; padding-left:25px; padding-top:25px; width: 250px; height:250px;">'+
-		    '<br><h3>No Screenshot Available</h3>' +
-		    '</div></div>' +
-		    
-		    '<div class="col-md-3"></div>'+
+		'<br><br><div style="width:95%;overflow:auto;">'+
+		    '<table style="border:0px;"><tr>'+
+		    imgHtml +
+		    '</tr></table>'+
 		'</div>'
 	    );
 	   
