@@ -91,7 +91,7 @@
 				'</div>'
 			    );
 	   
-	    $display.append('<div><strong>If you like this app, you might like:</h4></strong></div>');
+	    $display.append('<div><strong>If you like this app, you might also like:</h4></strong></div>');
 	    $display.append('<div class="list-group">'+
 				'<a href="#/app/sampleapp" class="list-group-item"><span class="badge">#35 in the App Gallery</span>'+
 				    '<strong>Some Related App</strong><br><small>Does something related.</small></a>'+

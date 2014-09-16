@@ -97,7 +97,11 @@
 			// not from prototype prop inherited
 			if(self.reviews.allReviewsByUser.hasOwnProperty(r)) {
 			    var review = self.reviews.allReviewsByUser[r];
-			    if (review[10]['rating'] && review[10]['review_text']) {
+			    if (review[10]['rating']) {
+				if (!review[10]['review_text']) {
+				    review[10]['review_text']="";
+				}
+				
 				var packagedReview = {
 				    reviewer : review[5],
 				    timestamp: review[3],
