@@ -14,7 +14,7 @@
             kbCache: null,
             title: "Description",
             maxNumChars: 900,
-            width: 500,
+            width: 400,
             loadingImage: null
         },
 
@@ -184,7 +184,7 @@
                     
                     this.$elem.append($('<div id="mainview">').css("overflow","auto").append('<table cellpadding="4" cellspacing="2" border=0 style="width:100%;">' +
                               '<tr><td style="vertical-align:top"><div id="taxondescription"></td>'+
-                              '<td style="vertical-align:top"><div id="taxonimage" style="width:400px;"></td></tr><br>'));
+                              '<td style="vertical-align:top"><div id="taxonimage" style="width:' + this.options.width + 'px;"></td></tr><br>'));
                     
                     
                     //this.$elem.find('#loading-mssg').hide();
@@ -356,18 +356,47 @@
             this.$elem.append($errorDiv);
         },
 
-        wikipediaLookup: function(termList, successCallback, errorCallback, redirectFrom) {
+        /**
+         * Uses Wikipedia to look up information about the genome, then passes 
+         * the results to successCallback (or the error to errorCallback).
+         *
+         * This works with two calls to Wikipedia.
+         * The first uses a series of terms in termList. It queries against each
+         * string in the array, looking for a page match (with redirects). These
+         * can be any strings, but are expected to be details of the genome's 
+         * taxonomy in order from detailed strain on up.
+         * 
+         * For example, for genome kb|g.0, this list contains:
+         * ["Escherichia coli K12", "Escherichia coli", "Escherichia", 
+         *  "Enterobacteriaceae", "Enterobacteriales", "Gammaproteobacteria", ...]
+         * and so on.
+         *
+         * Once a Wikipedia hit is found (if any), it does a second search to 
+         * find the image used on that page. This uses the pageImages query in the
+         * Wikipedia API, limiting the image size to this.width. (the API does the
+         * resizing for us) If an image is found, its URI is added to the result.
+         *
+         * Since this runs asynchronously, in the end, the results are passed to 
+         * successCallback, or it triggers errorCallback.
+         *
+         * @method
+         * @param {Array} termList - list of acceptable terms to return. If the first one is unavailable, then it looks for the second one, and so on
+         * @param {function} successCallback - callback to invoke when completed successfully
+         * @param {function} errorCallback - callback to invoke when an error occurs during execution.
+         * @private
+         */
+        wikipediaLookup: function(termList, successCallback, errorCallback) {
             if (!termList || Object.prototype.toString.call(termList) !== '[object Array]' || termList.length === 0) {
                 if (errorCallback) {
                     errorCallback("No search term given");
                 }
             }
 
+            // take the first term off the list, so we can pass the rest of it if we need to re-call this functionk
             var searchTerm = termList.shift();
-            var usTerm = searchTerm.replace(/\s+/g, '_');
 
             var requestUrl = '//en.wikipedia.org/w/api.php?action=parse&format=json&prop=text|pageimages&section=0&redirects=&callback=?&page=' + searchTerm;
-            var imageLookupUrl = '//en.wikipedia.org/w/api.php?action=query&format=json&prop=pageimages&pithumbsize=500&callback=?&titles=';
+            var imageLookupUrl = '//en.wikipedia.org/w/api.php?action=query&format=json&prop=pageimages&pithumbsize=' + this.options.width + '&callback=?&titles=';
 
             $.ajax({
                 type: 'GET',
@@ -383,48 +412,70 @@
                 }
                 else if (data.parse) {
                     console.log(data);
+                    // If we have valid text in the output, parse it how we want it.
                     if (data.parse.text) {
-                        var hit = { 'searchTerm': searchTerm };
+                        var hit = { 'searchTerm' : searchTerm };
 
+                        // Our abstract is the whole text part.
                         var $abstract = $('<div>').html(data.parse.text["*"]);
-                        window.$abstract = $abstract;
 
+                        // Remove active links to avoid confusion
                         $abstract.find('a').each(function() {
                             $(this).replaceWith($(this).html());
                         });
-                        $abstract.find('sup').remove();
+                        // Remove Wiki page references
+                        $abstract.find('sup.reference').remove();
                         $abstract.find('.mw-ext-cite-error').remove();
 
+                        // The 'description' property of our hit is the parsed abstract field
                         hit['description'] = '';
 
+                        // This is a trick to just get all of the 'p' fields, and concatenate the
+                        // jQuery nodes together as a single HTML text blob.
                         $abstract.children('p').each(function(idx, val) {
                             hit['description'] += '<p>' + $(val).html() + '</p>';
                         });
+
+                        // The title is the actual Wikipedia page link, so put that here.
                         hit['wikiUri'] = '//www.wikipedia.org/wiki/' + data.parse.title;
 
+                        // If we have a redirect, record it.
                         if (data.parse.redirects && data.parse.redirects.length > 0) {
                             hit['redirectFrom'] = data.parse.redirects[0].from;
                         }
 
-                        // do image lookup
+                        // Do image lookup based on the title
                         $.ajax({
                             type: 'GET',
-                            url: imageLookupUrl + data.parse.title, //.replace(/\s+/g, '_'),
+                            url: imageLookupUrl + data.parse.title,
                             contentType: 'application/json; charset=utf-8',
-                            async: false,
+                            async: true,
                             dataType: 'json'
                         })
                         .then(function(imageData, imageStatus) {
-                            console.log('found image info!');
+                            // If this is truthy, then we have a successful API call.
                             console.log(imageData);
                             if (imageStatus) {
-                                for (pageNum in imageData.query.pages) {
-                                    hit['imageUri'] = imageData.query.pages[pageNum].thumbnail.source;
+                                hit['imageUri'] = null;
+                                // Really, all we want is in imageData.query.pages.<pageNum>.thumbnail.source
+                                // Since we're only looking up a single title here, there's a single pageNum
+                                // property, but we don't know what it is! So we look in the Object.keys()[0]
+                                if (imageData.query && imageData.query.pages && 
+                                    Object.keys(imageData.query.pages).length > 0) {
+                                    // joys of Javascript!
+                                    var page = Object.keys(imageData.query.pages)[0];
+                                    if (imageData.query.pages[page].thumbnail)
+                                        hit['imageUri'] = imageData.query.pages[page].thumbnail.source;
                                 }
                             }
-                            console.log(hit);
+                            // Finally, pass the finished result to successCallback
                             if (successCallback) {
                                 successCallback(hit);
+                            }
+                        },
+                        function(error) {
+                            if (errorCallback) {
+                                errorCallback(error);
                             }
                         });
                     }
@@ -437,6 +488,11 @@
             });
         },
 
+        /**
+         * @deprecated This calls dbpedia (which requires going over HTTP), while the
+         *             new wikipediaLookup function gives the same results over HTTP or HTTPS.
+         *
+         */
         dbpediaLookup: function(termList, successCallback, errorCallback, redirectFrom) {
             if (!termList || Object.prototype.toString.call(termList) !== '[object Array]' || termList.length === 0) {
                 if (errorCallback) {
