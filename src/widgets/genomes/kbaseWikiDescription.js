@@ -433,7 +433,7 @@
          * @param {string|object} error - if a string, this is the error string.
          * @param error.error.message - if this exists, then this is the error string.
          * @private
-         *//
+         */
         renderError: function(error) {
             errString = "Sorry, an unknown error occured. Wikipedia.org may be down or your browser may be blocking an http request to Wikipedia.org.";
             if (typeof error === "string")
