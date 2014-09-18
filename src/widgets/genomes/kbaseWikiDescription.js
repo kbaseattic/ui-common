@@ -15,6 +15,7 @@
             title: "Description",
             maxNumChars: 900,
             width: 400,
+            maxTextHeight: 300,
             loadingImage: null
         },
 
@@ -91,6 +92,9 @@
             var strainName = taxonomy[0];
             this.wikipediaLookup(searchTerms, $.proxy(
                 function(desc) {
+                    var $taxonDescription = $('<div>');
+                    var $taxonImage = $('<div>');
+
                     // If we've found something, desc.description will exist and be non-null
                     if (desc.hasOwnProperty('description') && desc.description != null) {
                         if (desc.description.length > this.options.maxNumChars) {
@@ -115,26 +119,34 @@
                          * Image
                          */
 
-                        var descStr = "<p style='text-align:justify;'>" + desc.description + "</p>"
+                        var $descDiv = $('<div style="text-align:justify; max-height: ' + this.options.maxTextHeight + 'px; overflow-y:auto; padding-right:5px">')
+                                       .append(desc.description);
 
+                        var $descHeader = $('<div>');
                         var descHtml;
                         if (strainName === desc.redirectFrom) {
-                            descHtml = this.redirectHeader(strainName, desc.redirectFrom, desc.searchTerm) + descStr + this.descFooter(desc.wikiUri);
+                            $descHeader = $(this.redirectHeader(strainName, desc.redirectFrom, desc.searchTerm));
+//                            descHtml = this.redirectHeader(strainName, desc.redirectFrom, desc.searchTerm) + descStr;
                         }
-                        else if (desc.searchTerm === strainName) {
-                            descHtml = descStr + this.descFooter(desc.wikiUri);
-                        }
+                        // else if (desc.searchTerm === strainName) {
+                        //     descHtml = descStr;
+                        // }
                         else {
-                            descHtml = this.notFoundHeader(strainName, desc.searchTerm, desc.redirectFrom) + descStr + this.descFooter(desc.wikiUri);
+                            $descHeader = $(this.notFoundHeader(strainName, desc.searchTerm, desc.redirectFrom));
+//                            descHtml = this.notFoundHeader(strainName, desc.searchTerm, desc.redirectFrom) + descStr;
                         }
+                        var $descFooter = $(this.descFooter(desc.wikiUri));
+//                        descHtml += this.descFooter(desc.wikiUri);
 
-                        var imageHtml = "Unable to find an image. If you have one, you might consider <a href='" + desc.wikiUri + "' target='_new'>adding it to Wikipedia</a>.";
+                        var imageHtml = 'Unable to find an image. If you have one, you might consider <a href="' + desc.wikiUri + '" target="_new">adding it to Wikipedia</a>.';
                         if (desc.imageUri != null) {
-                            imageHtml = "<img src='" + desc.imageUri + "'";
+                            imageHtml = '<img src="' + desc.imageUri + '"';
                             if (this.options.width)
-                                imageHtml += "style='max-width: 100%'";
+                                imageHtml += 'style="width:' + this.options.width + 'px;"';
                             imageHtml += "/>";
                         }
+                        $taxonDescription.append($descHeader).append($descDiv).append($descFooter);
+                        $taxonImage.append(imageHtml);
                     }
                     else {
                         descHtml = this.notFoundHeader(strainName);
@@ -182,14 +194,29 @@
                     this.hideMessage();  
                     //this.$elem.append($tabSet).append($contentDiv);
                     
-                    this.$elem.append($('<div id="mainview">').css("overflow","auto").append('<table cellpadding="4" cellspacing="2" border=0 style="width:100%;">' +
-                              '<tr><td style="vertical-align:top"><div id="taxondescription"></td>'+
-                              '<td style="vertical-align:top"><div id="taxonimage" style="width:' + this.options.width + 'px;"></td></tr><br>'));
+                    this.$elem.append($('<div id="mainview">')
+                                      .css('overflow', 'auto')
+                                      .append($('<table cellpadding=4, cellspacing=2, border=0 style="width:100%">')
+                                              .append($('<tr>')
+                                                      .append($('<td style="vertical-align:top">')
+                                                              .append($taxonDescription))
+                                                      .append($('<td style="vertical-align:top">')
+                                                              .append($taxonImage))))
+                                      .append($('<br>')));
+
+                    // this.$elem.append($('<div id="mainview">')
+                    //                   .css("overflow","auto")
+                    //                   .append('<table cellpadding="4" cellspacing="2" border=0 style="width:100%;">' +
+                    //                               '<tr>' + 
+                    //                                   '<td style="vertical-align:top"><div id="taxondescription">' + descHtml + '</td>' +
+                    //                                   '<td style="vertical-align:top"><div id="taxonimage" style="width:' + this.options.width + 'px;">' + imageHtml + '</td>' +
+                    //                               '</tr>' +
+                    //                           '</table><br>'));
                     
                     
                     //this.$elem.find('#loading-mssg').hide();
-                    this.$elem.find("#taxondescription").append(descHtml);
-                    this.$elem.find("#taxonimage").append(imageHtml);
+                    // this.$elem.find("#taxondescription").append(descHtml);
+                    // this.$elem.find("#taxonimage").append(imageHtml);
                               
                 }, this), 
                 $.proxy(this.renderError, this)
@@ -341,13 +368,12 @@
         },
 
         renderError: function(error) {
-	    errString = "Sorry, an unknown error occured.  DBpedia.org may be down or your browser may be blocking an http request to DBpedia.org.";
+            errString = "Sorry, an unknown error occured.  DBpedia.org may be down or your browser may be blocking an http request to DBpedia.org.";
             if (typeof error === "string")
                 errString = error;
             else if (error && error.error && error.error.message)
                 errString = error.error.message;
 
-            
             var $errorDiv = $("<div>")
                             .addClass("alert alert-danger")
                             .append("<b>Error:</b>")
