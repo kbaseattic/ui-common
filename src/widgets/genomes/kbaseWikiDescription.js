@@ -1,6 +1,22 @@
 /**
- * Shows a species description taken from Wikipedia.
- * Also includes a picture, but that'll be under a tab or something.
+ * @module widgets/genomes/kbaseWikiDescripton
+ * KBase Wiki Description
+ * ----------------------
+ * This widget shows a description of a genome, via a given genome ID and 
+ * location, either Workspace or Central Store.
+ *
+ * From the Genome, a taxonomy is extracted and used to look up the Genome's
+ * description. If the most detailed part of the taxonomy (e.g. the strain) is
+ * not available, this climbs up the chain to the most detailed part that is.
+ * For example, "Vibrio brasiliensis LMG 20546" isn't available, but "Vibrio"
+ * is, so that is used for the description.
+ * 
+ * The description and a relevant picture are scraped from Wikipedia, using
+ * the Wikipedia API, and rendered in the widget.
+ *
+ * @author Bill Riehl [wjriehl@lbl.gov]
+ * @author Mike Sneddon [mwsneddon@lbl.gov]
+ * @author Dylan Chivian [dcchivian@lbl.gov]
  */
 (function( $, undefined ) {
     $.KBWidget({
@@ -8,6 +24,17 @@
         parent: "kbaseWidget",
         version: "1.0.0",
 
+        /**
+         * @typedef options - default set of options, settable during invocation
+         * @type {object}
+         * @property {string} genomeID - (required) the genome ID (or genome object ID from the workspace)
+         * @property {string} workspaceID - (optional) the id of the workspace the genome is in
+         * @property {object} kbCache - (optional) the cache client used to pull from the workspace
+         * @property {string} title - the title of this widget
+         * @property {number} maxNumChars - (deprecated) the maximum number of characters of the description to show
+         * @property {number} maxTextHeight - the max size of the description text area in pixels
+         * @property {string} loadingImage - (optional) the URI of a loading image
+         */
         options: {
             genomeID: null,
             workspaceID: null,
@@ -19,8 +46,16 @@
             loadingImage: null
         },
 
+        /**
+         * @type {string} cdmiURL - the default endpoint for the CDMI service
+         */
         cdmiURL: "https://kbase.us/services/cdmi_api",
 
+        /**
+         * @function init
+         * Initialize the widget. This initializes the CDMI client code.
+         * @return {object} the initialized widget
+         */
         init: function(options) {
             this._super(options);
 
@@ -28,9 +63,7 @@
                 //throw an error.
                 return this;
             }
-            this.$messagePane = $("<div/>")
-                                //.addClass("kbwidget-message-pane")
-                                //.addClass("kbwidget-hide-message");
+            this.$messagePane = $("<div>");
             this.$elem.append(this.$messagePane);
 
             this.cdmiClient = new CDMI_API(this.cdmiURL);
@@ -40,35 +73,42 @@
                 this.renderWorkspace();
             }
             else
-                this.render();
+                this.renderCdmi();
             return this;
         },
 
-        render: function() {
+        /**
+         * @function renderCdmi
+         * This renders the description based on the KBase Central Store version
+         * of the genome.
+         * @public
+         */
+        renderCdmi: function() {
             var self = this;
-            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'>loading...</center>");
             
             /*
              * A couple nested callbacks here.
              * 1. Run genomes_to_taxonomies
-             * 2. Deal with the taxonomy structure and send it to scrape_first_hit
-             * 3. Print out the output.
+             * 2. Deal with the taxonomy structure and send it to render
              */
-
             if (this.options.genomeID === null) {
                 // make an error.
                 this.renderError("Error: no genome identifier given!");
                 return;
             }
 
-            // step 1: get the taxonomy
+            // Step 1: use the cdmiClient to get the taxonomy.
             this.cdmiClient.genomes_to_taxonomies([this.options.genomeID], 
                 $.proxy(function(taxonomy) {
                     taxonomy = taxonomy[this.options.genomeID];
                     if (taxonomy) {
+                        // Step 2: render from that taxonomy, if we have one.
                         this.renderFromTaxonomy(taxonomy.reverse());
                     }
                     else {
+                        // If no taxonomy, it's a safe bet that the genome isn't found 
+                        // (it would return a valid empty array otherwise)
                         this.renderError("Genome '" + this.options.genomeID + "' not found in the KBase Central Store.");
                     }
                 }, this),
@@ -80,12 +120,19 @@
         },
 
         /**
-         * Needs to be given in reverse order. Calling function should handle
-         * what are valid names. E.g.
-         * ['Escherichia coli K-12', 'Escherichia coli', 'Escherichia', 'Enterobacteriaceae', 'Enterobacteriales', 'Gammaproteobacteria', ...]
-         * Start with most descriptive name, proceed on down to least descriptive (usually kingdom name, if available).
+         * @function renderFromTaxonomy
+         * This does the work of rendering the widget given a taxonomy array 
+         * (in order from most detail to least, e.g. from strain --> kingdom).
          * 
          * This will try to fetch wiki content for the first valid name in that list.
+         * If content is found, it is rendered onto the page. If no content is found,
+         * a message and optional Wikipedia link is given. If an error occurs, it
+         * gets rendered in a reddish error box.
+         *
+         * Regarding the rest of this widget, this is the rendering endpoint for
+         * both renderCdmi and renderWorkspace - those both generate a taxonomy
+         * list that gets passed here.
+         * @public
          */
         renderFromTaxonomy: function(taxonomy) {
             var searchTerms = taxonomy;
@@ -97,12 +144,6 @@
 
                     // If we've found something, desc.description will exist and be non-null
                     if (desc.hasOwnProperty('description') && desc.description != null) {
-                        if (desc.description.length > this.options.maxNumChars) {
-                            // desc.description = desc.description.substr(0, this.options.maxNumChars);
-                            // var lastBlank = desc.description.lastIndexOf(" ");
-                            // desc.description = desc.description.substr(0, lastBlank) + "...";
-                        }
-
                         /* the viz is set up like this:
                          * 1. Description Tab
                          *
@@ -126,17 +167,12 @@
                         var descHtml;
                         if (strainName === desc.redirectFrom) {
                             $descHeader = $(this.redirectHeader(strainName, desc.redirectFrom, desc.searchTerm));
-//                            descHtml = this.redirectHeader(strainName, desc.redirectFrom, desc.searchTerm) + descStr;
                         }
-                        // else if (desc.searchTerm === strainName) {
-                        //     descHtml = descStr;
-                        // }
                         else {
                             $descHeader = $(this.notFoundHeader(strainName, desc.searchTerm, desc.redirectFrom));
-//                            descHtml = this.notFoundHeader(strainName, desc.searchTerm, desc.redirectFrom) + descStr;
                         }
-                        var $descFooter = $(this.descFooter(desc.wikiUri));
-//                        descHtml += this.descFooter(desc.wikiUri);
+
+                        var $descFooter = $('<p>[<a href="' + desc.wikiUri + '" target="_new">more at Wikipedia</a>]</p>');
 
                         var imageHtml = 'Unable to find an image. If you have one, you might consider <a href="' + desc.wikiUri + '" target="_new">adding it to Wikipedia</a>.';
                         if (desc.imageUri != null) {
@@ -152,10 +188,8 @@
                         descHtml = this.notFoundHeader(strainName);
                     }
 
-
-                    var descId = this.uid();
-                    var imageId = this.uid();
-
+                    // var descId = this.uid();
+                    // var imageId = this.uid();
 
                     /* This is the tabbed view
                      var $contentDiv = $("<div />")
@@ -191,8 +225,9 @@
                                           .append($imageTab)
                                          ); */
 
-                    this.hideMessage();  
                     //this.$elem.append($tabSet).append($contentDiv);
+
+                    this.hideMessage();
                     
                     this.$elem.append($('<div id="mainview">')
                                       .css('overflow', 'auto')
@@ -203,33 +238,25 @@
                                                       .append($('<td style="vertical-align:top">')
                                                               .append($taxonImage))))
                                       .append($('<br>')));
-
-                    // this.$elem.append($('<div id="mainview">')
-                    //                   .css("overflow","auto")
-                    //                   .append('<table cellpadding="4" cellspacing="2" border=0 style="width:100%;">' +
-                    //                               '<tr>' + 
-                    //                                   '<td style="vertical-align:top"><div id="taxondescription">' + descHtml + '</td>' +
-                    //                                   '<td style="vertical-align:top"><div id="taxonimage" style="width:' + this.options.width + 'px;">' + imageHtml + '</td>' +
-                    //                               '</tr>' +
-                    //                           '</table><br>'));
-                    
-                    
-                    //this.$elem.find('#loading-mssg').hide();
-                    // this.$elem.find("#taxondescription").append(descHtml);
-                    // this.$elem.find("#taxonimage").append(imageHtml);
-                              
                 }, this), 
                 $.proxy(this.renderError, this)
             );
         },
 
+        /**
+         * @function renderWorkspace
+         * Fetches the Genome taxonomy and scientific name from the workspace, and
+         * passes it along to renderTaxonomy
+         * @public
+         */
         renderWorkspace: function() {
             var self = this;
-            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'>loading...</center>");
             var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
             
             obj['included'] = ["/taxonomy","/scientific_name"];
-            self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
+            self.options.kbCache.ws.get_object_subset( [ obj ], 
+                function(data) {
                     if (data[0]) {
                         if (data[0]['data']['taxonomy']) {
                             var tax = data[0]['data']['taxonomy'];
@@ -247,49 +274,37 @@
                     }
                 },
                 function(error) {
-                        
-                        var obj = self.buildObjectIdentity(self.options.workspaceID, self.options.genomeID);
-                        obj['included'] = ["/scientific_name"];
-                        self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
-                            if (data[0]) {
-                                if (data[0]['data']['scientific_name']) {
-                                    var taxList = [];
-                                    var nameTokens = data[0]['data']['scientific_name'].split(/\s+/);
-                                    for (var i=nameTokens.length; i>0; i--) {
-                                        taxList.push(nameTokens.slice(0, i).join(' '));
-                                    }
-                                    self.renderFromTaxonomy(taxList);
+                    var obj = self.buildObjectIdentity(self.options.workspaceID, self.options.genomeID);
+                    obj['included'] = ["/scientific_name"];
+                    self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
+                        if (data[0]) {
+                            if (data[0]['data']['scientific_name']) {
+                                var taxList = [];
+                                var nameTokens = data[0]['data']['scientific_name'].split(/\s+/);
+                                for (var i=nameTokens.length; i>0; i--) {
+                                    taxList.push(nameTokens.slice(0, i).join(' '));
                                 }
+                                self.renderFromTaxonomy(taxList);
                             }
-                        },
-                        function(error) {self.renderError(error);});
+                        }
+                    },
+                    function(error) {self.renderError(error);});
                 });
-            
-            // old way that requires the entire object ...
-            //var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-            //
-            //// if it fails, error out!
-            //$.when(prom).fail($.proxy(function(error) {
-            //    this.renderError(error);
-            //}, this));
-            //// if it succeeds, grab the taxonomy (or at least the scientific name) and roll out.
-            //$.when(prom).done($.proxy(function(genome) {
-            //    genome = genome[0];
-            //
-            //    var tax = genome.data.taxonomy;
-            //    var taxList = [];
-            //    var nameTokens = genome.data.scientific_name.split(/\s+/);
-            //    for (var i=nameTokens.length; i>0; i--) {
-            //        taxList.push(nameTokens.slice(0, i).join(' '));
-            //    }
-            //    if (taxList && taxList !== "Unknown") {
-            //        // parse the taxonomy, however it's munged together. semicolons, i think?
-            //        taxList = taxList.concat(tax.split(/\;\s*/).reverse());
-            //    }
-            //    this.renderFromTaxonomy(taxList);
-            //}, this));
         },
 
+        /**
+         * @method buildObjectIdentity
+         * Helper function that builds an ObjectIdentity 
+         * (used by the workspace to look up and return an object).
+         * @param {string|number} workspaceID - ID or name of the workspace we're looking up from
+         * @param {string|number} objectID - ID or name of the object we're looking up
+         * @returns {object} objId
+         * @property {number} objId.wsid - the numerical workspace id (if a number given)
+         * @property {string} objId.workspace - the string id (if a string given)
+         * @property {number} objId.objid - the numerical object id (if a number given)
+         * @property {string} objId.name - the name of the object (if a string given)
+         * @private
+         */
         buildObjectIdentity: function(workspaceID, objectID) {
             var obj = {};
             if (/^\d+$/.exec(workspaceID))
@@ -306,6 +321,12 @@
         },
 
 
+        /**
+         * @function uid
+         * Generates a random 16-character string in all caps
+         * @returns {string} a randomized id string
+         * @public
+         */
         uid: function() {
             var id='';
             for(var i=0; i<32; i++)
@@ -313,10 +334,18 @@
             return id;
         },
 
-        descFooter: function(wikiUri) {
-            return "<p>[<a href='" + wikiUri + "'' target='_new'>more at Wikipedia</a>]</p>";
-        },
-
+        /**
+         * @function notFoundHeader
+         * Generates some HTML to show if a given strain is not found.
+         * This renders the name of the strain that wasn't found, by default. If a different term
+         * was found and rendered, it (and its possible redirect) are also layed out.
+         * @param {string} strainName - (required) the name of the original strain that wasn't found.
+         * @param {string} term - (optional) the term that was found and rendered
+         * @param {string} redirectFrom - (optional) if a redirect was used to get to that term,
+         *                                show that, too.
+         * @return {string} an HTML string with the parameters rendered nicely.
+         * @private
+         */
         notFoundHeader: function(strainName, term, redirectFrom) {
             var underscoredName = strainName.replace(/\s+/g, "_");
             var str = "<p><b>\"<i>" +
@@ -336,6 +365,17 @@
             return str;
         },
 
+        /**
+         * @function redirectHeader
+         * Generates HTML that shows that the currently displayed information was found through
+         * a redirect on Wikipedia.
+         * @param {string} strainName - (required) the name of the original strain that wasn't found.
+         * @param {string} term - (required) the term that was found and rendered
+         * @param {string} redirectFrom - (required) if a redirect was used to get to that term,
+         *                                show that, too.
+         * @return {string} an HTML string with the parameters rendered nicely.
+         * @private
+         */
         redirectHeader: function(strainName, redirectFrom, term) {
             var underscoredName = redirectFrom.replace(/\s+/g, "_");
             var str = "<p><b>" +
@@ -346,18 +386,37 @@
             return str;
         },
 
+        /**
+         * @function showMessage
+         * Shows a status message in the widget.
+         * @param {string} message - the message to show (can be HTML)
+         * @private
+         */
         showMessage: function(message) {
-            var span = $("<span/>").append(message);
+            var span = $("<span>").append(message);
 
             this.$messagePane.append(span);
             this.$messagePane.removeClass("kbwidget-hide-message");
         },
 
+        /**
+         * @function hideMessage
+         * Hides a previously shown message in the widget
+         * @private
+         */
         hideMessage: function() {
             this.$messagePane.addClass("kbwidget-hide-message");
             this.$messagePane.empty();
         },
         
+        /**
+         * @function getData
+         * @deprecated
+         * Returns a data object with information that was previously used for
+         * the "card" style of landing pages.
+         * This is mostly deprecated now.
+         * @public
+         */
         getData: function() {
             return {
                 type: "Description",
@@ -367,8 +426,16 @@
             };
         },
 
+        /**
+         * @function renderError
+         * Renders the given error that occurs while looking up Wikipedia info, or making a KBase service call.
+         * This overlaps everything on the widget and should be considered a fatal crash.
+         * @param {string|object} error - if a string, this is the error string.
+         * @param error.error.message - if this exists, then this is the error string.
+         * @private
+         *//
         renderError: function(error) {
-            errString = "Sorry, an unknown error occured.  DBpedia.org may be down or your browser may be blocking an http request to DBpedia.org.";
+            errString = "Sorry, an unknown error occured. Wikipedia.org may be down or your browser may be blocking an http request to Wikipedia.org.";
             if (typeof error === "string")
                 errString = error;
             else if (error && error.error && error.error.message)
@@ -383,6 +450,7 @@
         },
 
         /**
+         * @function wikipediaLookup
          * Uses Wikipedia to look up information about the genome, then passes 
          * the results to successCallback (or the error to errorCallback).
          *
@@ -405,7 +473,6 @@
          * Since this runs asynchronously, in the end, the results are passed to 
          * successCallback, or it triggers errorCallback.
          *
-         * @method
          * @param {Array} termList - list of acceptable terms to return. If the first one is unavailable, then it looks for the second one, and so on
          * @param {function} successCallback - callback to invoke when completed successfully
          * @param {function} errorCallback - callback to invoke when an error occurs during execution.
@@ -515,9 +582,21 @@
         },
 
         /**
-         * @deprecated This calls dbpedia (which requires going over HTTP), while the
-         *             new wikipediaLookup function gives the same results over HTTP or HTTPS.
+         * @function dbpediaLookup
+         * @deprecated This calls dbpedia (which requires going over HTTP), while the new wikipediaLookup function gives the same results over HTTP or HTTPS. Also, dbpedia tends to be really flaky whenever we're about to do a demo.
          *
+         * Uses dbpedia to look up information about the genome, then passes 
+         * the results to successCallback (or the error to errorCallback).
+         *
+         * This parses dbpedia's JSON format for a few fields of interest. 
+         * If the image is missing, it's considered to be fine and returns
+         * anyway.
+         * 
+         * If the request fails, an error is triggered.
+         *
+         * Since this runs asynchronously, in the end, the results are passed to 
+         * successCallback, or it triggers errorCallback.
+         * @public
          */
         dbpediaLookup: function(termList, successCallback, errorCallback, redirectFrom) {
             if (!termList || Object.prototype.toString.call(termList) !== '[object Array]' || termList.length === 0) {
@@ -539,7 +618,6 @@
 
             var requestUrl = 'http://dbpedia.org/data/' + usTerm + '.json';
             $.get(requestUrl).then($.proxy(function(data, status) {
-
                 var processedHit = {
                     'searchTerm' : searchTerm
                 };
