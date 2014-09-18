@@ -702,6 +702,7 @@
 
         showInitialCards: function() {
             // if no template given, just load a blank layout.
+        	console.log("kbaseCardLayoutManager.showInitialCards: " + this.options.template)
             if (!this.options.template)
                 return;
 
@@ -757,6 +758,8 @@
                 this.showPangenomeCards();
             else if (this.options.template.toLowerCase() === "msa")
                 this.showMSACards();
+            else if (this.options.template.toLowerCase() === "kidledt")
+                this.showKidlEdtCards();
             else {
                 // throw an error for an unknown template. modal dialog, maybe?
             }
@@ -1502,6 +1505,20 @@
             return this;
         },
 
+        showKidlEdtCards: function() {
+            this.addNewCard("kbaseKidlWebEditor",
+                    {	type: this.options.data.type,
+            			mod: this.options.data.mod,
+                        isInCard: true
+                    },
+                    {   my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+
         /**
          * Registers all events that this manager should know about.
          * Also makes a list of all registered events, stored in this.registeredEvents[], so they
@@ -1540,10 +1557,12 @@
                                      "showBambiRunParameters", 
                                      "showBambiRawOutput",
 									 "showLitWidget",
-									 "showTreeCards",
+									 "showTree",
 									 "showHeatMap",
 									 "showLineChart",									 
-									 "showBarChart"];
+									 "showBarChart",
+									 "showKidlEditor"
+									 ];
 									 
 			/**
              * Event: showBarChart
@@ -2235,6 +2254,20 @@
             				workspaceID: data.workspaceID,
             				msaID: data.msaID,
             				token: data.token
+            			},
+            			{
+            				my: "left top",
+            				at: "center",
+            				of: data.event
+            			}
+            	);
+            });
+
+            $(document).on("showKidlEditor", function(event, data) {
+            	self.addNewCard("kbaseKidlWebEditor",
+            			{
+            				mod: data.mod,
+            				type: data.type
             			},
             			{
             				my: "left top",
