@@ -85,7 +85,7 @@
          */
         renderCdmi: function() {
             var self = this;
-            this.showMessage("<center><img src='" + this.options.loadingImage + "'>loading...</center>");
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading...</center>");
             
             /*
              * A couple nested callbacks here.
@@ -251,7 +251,7 @@
          */
         renderWorkspace: function() {
             var self = this;
-            this.showMessage("<center><img src='" + this.options.loadingImage + "'>loading...</center>");
+            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading...</center>");
             var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
             
             obj['included'] = ["/taxonomy","/scientific_name"];
