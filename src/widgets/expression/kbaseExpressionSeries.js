@@ -79,7 +79,7 @@
                     date: data[0].created,
                 };
                 var labels = ['Name','Workspace','KBID','Source','Genome','Type','Errors','Owner','Creation date'];
-                var table = kb.ui.objTable('overview-table',phenooverdata,keys,labels);
+                var table = kb.ui.objTable({obj: phenooverdata, keys: keys, labels: labels});
                 tabs.tabContent('Overview').append(table)
 
                 var series = data[0].data.genome_expression_sample_ids_map[genome];

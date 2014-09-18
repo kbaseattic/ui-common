@@ -38,7 +38,7 @@
 
     "KBaseExpression" : {
         "ExpressionSample" : null,
-        "ExpressionSeries" : null,
+        "ExpressionSeries" : "ws/expression_series",
         "ExpressionReplicateGroup" : null,
         "ExpressionPlatform" : null
     },
@@ -53,12 +53,13 @@
 
     "KBaseFBA" : {
         "Gapfilling" : null,
-        "FBA" : "fbas",
+        "FBA" : "ws/fbas",
         "ReactionSensitivityAnalysis" : null,
-        "FBAModel" : "models",
+        "FBAModel" : "ws/models",
         "Gapgeneration" : null,
         "ModelTemplate" : null,
-        "ETC" : "etc"
+        "ETC" : "etc",
+        "PromConstraint" : "ws/promconstraint"
     },
 
     "KBaseGenomes" : {
@@ -70,12 +71,12 @@
     },
 
     "KBaseGwasData" : {
-        "GwasPopulation" : "KBaseGwasData.GwasPopulation",
-        "GwasPopulationVariation" : "KBaseGwasData.GwasPopulationVariation",
-        "GwasPopulationTrait" : "KBaseGwasData.GwasPopulationTrait",
-        "GwasTopVariation" : "KBaseGwasData.GwasTopVariation",
-        "GwasTopVariations" : "KBaseGwasData.GwasTopVariations",
-        "GwasGeneList" : "KBaseGwasData.GwasGeneList"
+        "GwasPopulation" : "gptype",
+        "GwasPopulationVariation" : "gvtype",
+        "GwasPopulationTrait" : "gttype",
+        "GwasPopulationKinship" : "gpktype",
+        "GwasTopVariations" : "gtvtype",
+        "GwasGeneList" : "ggltype"
     },
 
     "KBaseNarrative" : {
@@ -96,7 +97,7 @@
     },
 
     "KBasePhenotypes" : {
-        "PhenotypeSet" : null,
+        "PhenotypeSet" : "ws/phenotype",
         "PhenotypeSimulationSet" : null
     },
 
@@ -129,7 +130,7 @@
         "MAKBicluster" : "mak",
         "ExpressionDataSeries" : null,
         "MAKBiclusterSet" : "mak",
-        "FloatDataTable" : "mak",
+        "FloatDataTable" : "floatdatatable",
         "FloatDataTableContainer" : null,
         "StringDataTable" : null,
         "StringDataTableContainer" : null

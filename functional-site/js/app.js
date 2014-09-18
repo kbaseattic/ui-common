@@ -10,10 +10,9 @@
  *  -- Some of the critical files --
  *  App:               js/app.js
  *  Controllers:       js/controllers.js
- *  Directives:        js/directives.js 
- *                     js/card-directives.js 
- *                     js/iris-directives.js
- *                     js/mv-directives.js 
+ *  Directives:        js/directives/landingpages.js 
+ *                     js/directives/*
+ *
  *  Views (templates): views/* 
  *
 */
@@ -23,8 +22,8 @@ var cardManager = undefined;
 var app = angular.module('landing-pages', 
     ['lp-directives', 'card-directives',
      'trees-directives', 'fav-directives',
-     'ws-directives', 'modeling-directives',
-     'narrative-directives', 
+     'ws-directives', 'modeling-directives', 
+     'communities-directives', 'narrative-directives', 
      'ui.router', 'ngResource', 'kbaseLogin', 
      'FeedLoad', 'ui.bootstrap', 'search'])
     .config(['$locationProvider', '$stateProvider', '$httpProvider', '$urlRouterProvider',
@@ -45,6 +44,7 @@ var app = angular.module('landing-pages',
         });
 
 
+    // narrative pages routing
     $stateProvider
         .state('narratives', {
           url: "/narratives/",
@@ -68,21 +68,6 @@ var app = angular.module('landing-pages',
           controller: 'WB'
         })
 
-    // old narrative pages */
-    /*
-    $stateProvider
-        .state('narrative', {
-          url: "/narrative/",
-          templateUrl: 'views/narrative/home.html',
-          controller: 'Narrative'
-        }).state('narrative.projects', {
-          url: "projects/",
-          templateUrl: 'views/narrative/projects.html',
-          controller: 'NarrativeProjects'
-        });
-    */
-
-
     // workspace browser routing
     $stateProvider
         .state('ws', {
@@ -93,19 +78,25 @@ var app = angular.module('landing-pages',
           url: "recent",
           templateUrl: 'views/ws/recent.html',
           controller: 'WB'
-        }).state('ws-manage', {
-          url: "/ws/manage",
-          templateUrl: 'views/ws/manage.html', 
-          controller: 'WSManage',
         }).state('ws.id', {
-          url: "objtable/:ws?type",
+          url: "objects/:ws?type",
           templateUrl: 'views/ws/objtable.html',
           controller: 'WB'
         }).state('ws.tour', {
           url: "tour/",
           templateUrl: 'views/ws/objtable.html',
           controller: 'WBTour'
+        }).state('ws-manage', {
+          url: "/ws/manage",
+          templateUrl: 'views/ws/manage.html', 
+          controller: 'WSManage',
         });
+
+    $stateProvider
+        .state('analysis', {
+          url: "/analysis/:ws",
+          templateUrl: 'views/ws/analysis.html',
+          controller: 'WB'})
 
 
     // model viewer routing
@@ -134,15 +125,18 @@ var app = angular.module('landing-pages',
 
     // workspace object landing pages
     $stateProvider
-        .state('ws.fbas', {
-          url: "fbas/:ws/:id?map",
+        .state('ws.models', {
+          url: "models/:ws/:id?map",
+          templateUrl: 'views/ws/sortable/model.html',
+          controller: 'WBLanding',
+        }).state('ws.fbas', {
+          url: "fbas/:ws/:id",
           templateUrl: 'views/ws/sortable/fba.html',
-          controller: 'FBALanding' //'WBModelLanding',
-          //reloadOnSearch: false
+          controller: 'WBLanding',
         }).state('ws.etc', {
           url: "etc/:ws/:id",
           templateUrl: 'views/ws/sortable/etc.html',
-          controller: 'WBModelLanding'
+          controller: 'WBLanding'
         }).state('ws.genomes', {
           url: "genomes/:ws/:id",
           templateUrl: 'views/objects/genome.html',
@@ -190,6 +184,22 @@ var app = angular.module('landing-pages',
         });
 
 
+    // communities pages
+    $stateProvider
+        .state('ws.metagenome', {
+          url: "metagenome/:ws/:id",
+          templateUrl: 'views/ws/objs/metagenome.html',
+          controller: 'WBLanding'
+        }).state('ws.collection', {
+          url: "collection/:ws/:id",
+          templateUrl: 'views/ws/objs/collection.html',
+          controller: 'WBLanding'
+        }).state('ws.profile', {
+          url: "profile/:ws/:id",
+          templateUrl: 'views/ws/objs/profile.html',
+          controller: 'WBLanding'
+        });
+
     // not in use
     $stateProvider
         .state('favorites', {
@@ -197,7 +207,6 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/ws/favorites.html',
           controller: 'Favorites'
         });
-
 
     // other pages
     $stateProvider
@@ -240,12 +249,6 @@ var app = angular.module('landing-pages',
              controller: 'ModelDetail'});
 
     $stateProvider
-        .state('modelcards', {
-             url: '/cards/models/:ws/:id',
-             templateUrl: 'views/objects/modelcards.html',
-             controller: 'ModelDetailCards'});
-
-    $stateProvider
        .state('gptype', {
             url: '/KBaseGwasData.GwasPopulation/:ws/:id',
             templateUrl: 'views/objects/gptype.html',
@@ -262,6 +265,10 @@ var app = angular.module('landing-pages',
             url: '/KBaseGwasData.GwasGeneList/:ws/:id',
             templateUrl: 'views/objects/ggltype.html',
             controller: 'GGLTypeDetail'})  
+       .state('gpktype', {
+            url: '/KBaseGwasData.GwasPopulationKinship/:ws/:id',
+            templateUrl: 'views/objects/gpktype.html',
+            controller: 'GGLTypeDetail'})  
        .state('gtvtype', {
             url: '/KBaseGwasData.GwasTopVariations/:ws/:id',
             templateUrl: 'views/objects/gtvtype.html',
@@ -276,11 +283,7 @@ var app = angular.module('landing-pages',
         .state('fbabyid', {
                 url: '/fbas/:ws/:id',
                 templateUrl: 'views/objects/fba.html',
-                controller: 'FBADetail'})
-        .state('fbacards', {
-                url: '/cards/fbas/:ws/:id',
-                templateUrl: 'views/objects/fbacards.html',
-                controller: 'FBADetailCards'});
+                controller: 'FBADetail'});
 
     $stateProvider
         .state('media',
@@ -392,13 +395,15 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
     $stateProvider
         .state('mak',
             {url: '/mak/:ws/:id',
-             templateUrl: 'views/objects/mak.html',
+             // templateUrl: 'views/objects/mak.html',
+			 templateUrl: 'views/genomes/sortable-rows-landing-page-bicluster.html',
              controller: 'MAKDetail'});
 
 	$stateProvider
         .state('floatdatatable',
             {url: '/floatdatatable/:ws/:id',
-             templateUrl: 'views/objects/floatdatatable.html',
+             // templateUrl: 'views/objects/floatdatatable.html',
+			 templateUrl: 'views/genomes/sortable-rows-landing-page-biclusterfloat.html',			
              controller: 'FloatDataTable'});
 
     $stateProvider
@@ -497,9 +502,9 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
                       .when('#', '/login/');
 
     $urlRouterProvider.otherwise('/404/');
-    
+
     $stateProvider.state("404", 
-            {url: '/404/', 
+            {url: '*path', 
              templateUrl : 'views/404.html'});
 
 }]);
@@ -527,14 +532,7 @@ app.service('userState', function userStateService() {
     
     return {
         userState : JSON.parse(localStorage.KBaseUserState),
-        landingPages : {"genome": "/genomes/CDS/",
-                        "feature": "/genes/CDS/",
-                        "gwasPopulation": "/KBaseGwasData.GwasPopulation/",
-                        "gwasTrait": "/KBaseGwasData.GwasPopulationTrait/",
-                        "gwasVariation": "/KBaseGwasData.GwasPopulationVariation/",
-                        "gwasGeneList": "/KBaseGwasData.GwasGeneList/",
-                        "metagenome": "http://metagenomics.anl.gov/?page=MetagenomeOverview&metagenome=",
-                       },
+        landingPages : JSON.parse("landing_pages.json"),
 
         reset : function() {
             this.userState = JSON.parse(localStorage.KBaseUserState);
@@ -565,13 +563,6 @@ configJSON = $.parseJSON( $.ajax({url: "config.json",
 
 
 app.run(function ($rootScope, $state, $stateParams, $location) {
-    var HELP_DROPDOWN = '<a href="#" class="dropdown-toggle" data-toggle="dropdown">Help <b class="caret"></b></a> \
-                 <ul class="dropdown-menu"> \
-                 <li><a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a></li> \
-                 <!--<li><a href="#/landing-pages-help">Landing Page Documentation</a></li>--> \
-                 <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li> \
-              </ul>';
-    $('.help-dropdown').html(HELP_DROPDOWN);
 
     //  Things that need to happen when a view changes.
     $rootScope.$on('$locationChangeStart', function(event) {
@@ -579,14 +570,12 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         var begin = absUrl.indexOf('/functional-site/');
         var offset = '/functional-site/'.length;
 
-        //console.log([absUrl, begin, offset, absUrl.length]);
-    
         if (absUrl.indexOf('/functional-site/#/') < 0 && begin > 0 && absUrl.length > begin + offset) {
             event.preventDefault();
-            $location.path('/404/');   
-            $state.go('404');
+            $state.go('404', null, {location: false});
         }    
     });
+
 
     //  Things that need to happen when a view changes.
     $rootScope.$on('$stateChangeSuccess', function() {
@@ -595,6 +584,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         $('.popover').remove(); // remove any dangling pop overs
         removeCards();
     });
+
 
     var finish_login = function(result) {
         if (!result.success)
@@ -635,13 +625,9 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     USER_ID = $("#signin-button").kbaseLogin('session').user_id;
     USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
     kb = new KBCacheClient(USER_TOKEN);
-    kb.nar.ensure_home_project(USER_ID);
-
+    //kb.nar.ensure_home_project(USER_ID);
 
     $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
-
-    console.log(USER_TOKEN);
-
 
     // global state object to store state
     state = new State();

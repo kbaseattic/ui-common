@@ -7,21 +7,24 @@ kb_define('KBaseGWASVarTable',
 
     $.KBWidget({
         name: "KBaseGWASVarTable",
-        parent: "kbaseWidget",
+        parent: "kbaseAuthenticatedWidget",
         version: "1.0.0",
         options: {
             width: 500,
             type:"KBaseGwasData.GwasPopulationVariation"
         },
-        workspaceURL: "https://kbase.us/services/ws",
+        workspaceURL: "https://kbase.us/services/ws/",
 
 
         init: function(options) {
             this._super(options);
 
+            this.workspaceClient = new Workspace(this.workspaceURL, {token: this.authToken()});
+            
+            return this.render();
+        },
+        render: function () {
             var self = this;
-
-            this.workspaceClient = new Workspace(this.workspaceURL);
 
             this.workspaceClient.get_objects([{name : this.options.id, workspace: this.options.ws}], 
                 function(data){
@@ -37,8 +40,9 @@ kb_define('KBaseGWASVarTable',
                         .append($("<tr/>").append("<td>originator</td><td>" + self.collection.data.originator + "</td>"))
                     ));
                 },
-
-                self.rpcError
+                function (e) {
+                    self.$elem.append("<div class='alert alert-danger'>" + e.error.message + "</div>");
+                }
             );
 
             return this;
@@ -49,7 +53,10 @@ kb_define('KBaseGWASVarTable',
                 type:this.options.type,
                 id: this.options.id,
                 workspace: this.options.ws,
-                title: "GWAS Variation Details"
+                title: "GWAS Variation Details",
+                draggable: false,
+                resizable: false,
+                dialogClass: 'no-close'
             };
         }
     });

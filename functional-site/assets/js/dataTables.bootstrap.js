@@ -5,6 +5,7 @@ $.extend( true, $.fn.dataTable.defaults, {
 	"oLanguage": {
 		"sLengthMenu": "_MENU_ records per page"
 	},
+	"bAutoWidth": false,
 	fnInitComplete: function() {
 		$('.ColVis').hide();
 		$('.ColVis button').addClass('btn btn-default');

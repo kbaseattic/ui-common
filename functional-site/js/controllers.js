@@ -192,8 +192,9 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 
 
 .controller('WB', function($scope, $stateParams, $location) {
-    $scope.selected_ws = $stateParams.ws;
+    $scope.ws = $stateParams.ws;
     $scope.type = $stateParams.type;
+
 
     var sub = $location.path().split('/')[1]
     if (sub == 'narratives') {
@@ -369,7 +370,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     $scope.id = $stateParams.id;
 })
 
-.controller('WBTour', function($scope, $stateParams, $location) {
+.controller('WBTour', function($scope, $state, $stateParams, $location) {
     $scope.selected_ws = 'chenryExample';  // workspace to use for tour
 
     // if not logged in, prompt for login
@@ -408,7 +409,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                                     Unreferenced objects will be deleted after 30 days.'}]                        
 
         function exit_callback() {
-            $scope.$apply( $location.path( '/ws/' ) );
+            $scope.$apply( $state.go('ws') );
         }
 
         new Tour({tour: tour, exit_callback: exit_callback});
@@ -603,9 +604,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                     USER_ID = $("#signin-button").kbaseLogin('session').user_id;
                     USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
 
-                    //kb = new KBCacheClient(USER_TOKEN);
-                    kb.nar.ensure_home_project(USER_ID);
-
                     $location.path('/narratives/featured');
                     $scope.$apply();
                     window.location.reload();
@@ -739,4 +737,3 @@ function ScrollCtrl($scope, $location, $anchorScroll) {
     $anchorScroll();
   }
 }
-

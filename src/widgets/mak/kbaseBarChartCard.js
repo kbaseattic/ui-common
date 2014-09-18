@@ -14,7 +14,7 @@ kb_define('KBaseBarChartCard',
             loadingImage: "assets/img/ajax-loader.gif",
             title: "MAK Result Overview Bar Chart",
             isInCard: false,
-            width: 750,
+            width: 400,
             height: 800
         },
 
@@ -43,9 +43,10 @@ kb_define('KBaseBarChartCard',
                              .classed("kbcb-tooltip", true);
 							 
 			var terms = self.options.terms
-			var chartWidth = self.options.width-50
-					
-			var $sideChart = $("<div>").css({"width":chartWidth,"top":50,"position":"absolute"})
+			var chartWidth = self.options.width
+			
+			
+			// var $sideChart = $("<div>").css({"width":chartWidth,"top":50,"position":"relative"})
 			var flat = []			
 			var termData = []						
 			var termColors = {"TIGRFam":"#CC0000","GO":"#7A00CC","COG":"#666666","SEED":"#CC5200","KEGG":"#007A00"}
@@ -62,7 +63,9 @@ kb_define('KBaseBarChartCard',
 			
 			var x = d3.scale.linear().domain([0,d3.max(flat)]).range([0,chartWidth])			
 			var selectionHandler = []
-			var $barChartDiv = $("<div id='barchart'>").css({"float":"right"})
+			var $mainDiv = $("<div id='mainDiv' style='overflow:auto;height:450px;resize:vertical'>")
+			var $barChartDiv = $("<div id='barchart'>")
+			$mainDiv.append($barChartDiv)
 			var $barChart = d3.select($barChartDiv.get(0))
 				.selectAll("div")
 				.data(termData)
@@ -86,33 +89,31 @@ kb_define('KBaseBarChartCard',
 					.text(function (d) {return d.term})
 					.on("mouseover",							
 						function(d) {                            
-							if (!$(this).hasClass('picked')) {
-								for (tile in d.tiles) {
-									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')									
-									if (!$("#MAK_tile_"+tileSelector).hasClass('picked')) {
-										d3.select("#MAK_tile_"+tileSelector).style("background", "#00FFCC")
-									}
-								}
-								d3.select(this).style("background", "#00FFCC"); 
-							}							
+							for (tile in d.tiles) {
+								tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')	
+								d3.select("#MAK_tile_"+tileSelector).style("background", "#F08A04")
+							}
+							d3.select(this).style("background", "#F08A04"); 
+				
 							// self.tooltip = self.tooltip.text("term: "+d.term+", hits: "+d.tiles.length);
 							self.tooltip = self.tooltip.text(d.term+", hits: "+d.tiles.length);
 							return self.tooltip.style("visibility", "visible");
 						}
 					)						 
                        .on("mouseout", 
-                           function(d) { 
-							if (!$(this).hasClass('picked')) {
+							function(d) {
 								for (tile in d.tiles) {
-									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
-									if (!$("#MAK_tile_"+tileSelector).hasClass('picked')) {
-										d3.select("#MAK_tile_"+tileSelector).style("background", "steelblue")
-									}
+									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')								
+									d3.select("#MAK_tile_"+tileSelector).style("background", "steelblue")
+									if ($("#MAK_tile_"+tileSelector).hasClass('pickedFromBar')) d3.select("#MAK_tile_"+tileSelector).style("background", "#F08A04")
+									if ($("#MAK_tile_"+tileSelector).hasClass('currentHeatmap')) d3.select("#MAK_tile_"+tileSelector).style("background", "#99FFCC")
 								}
-								d3.select(this).style("background", d.color);
+								d3.select(this).style("background", d.color);								
+								if ($(this).hasClass("pickedFromBar")) d3.select(this).style("background", "#F08A04");
+								if ($(this).hasClass("pickedFromTile")) d3.select(this).style("background", "#00CCFF");
+								if ($(this).hasClass("currentTerms")) d3.select(this).style("background", "#99FFCC");
+								return self.tooltip.style("visibility", "hidden"); 
 							}
-							return self.tooltip.style("visibility", "hidden"); 
-                           }
                        )
                        .on("mousemove", 
                            function() { 
@@ -121,28 +122,33 @@ kb_define('KBaseBarChartCard',
                        )
 					.on("click",
 						function(d) {
-							if ($(this).hasClass('picked')) {								
+							if ($(this).hasClass('pickedFromBar')) {								
 								for (tile in d.tiles) {
 									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
 									temp = selectionHandler.indexOf(tileSelector)
 									selectionHandler.splice(temp,1)
-									if (selectionHandler.indexOf(tileSelector)==-1) $("#MAK_tile_"+tileSelector).removeClass('picked')								
+									if (selectionHandler.indexOf(tileSelector)==-1) {
+										$("#MAK_tile_"+tileSelector).removeClass('pickedFromBar')
+									}
 								}
-								$(this).removeClass('picked')
+								$(this).removeClass('pickedFromBar')
 							}
 							else {																
 								for (tile in d.tiles) {
 									tileSelector = d.tiles[tile].replace(/\./g,'').replace(/\|/,'')
 									selectionHandler.push(tileSelector)
-									$("#MAK_tile_"+tileSelector).addClass('picked')									
+									if (!$("#MAK_tile_"+tileSelector).hasClass('pickedFromBar')) $("#MAK_tile_"+tileSelector).addClass('pickedFromBar')									
 								}
-								$(this).addClass('picked')
+								$(this).addClass('pickedFromBar')
 							}
 						}
 					)
 				
-			self.$elem.append($barChartDiv)
+			$instructions = $("<p><b><i>Click on a term bar, selections will be <span style='color:#F08A04'>orange</span>.</i></b></p><p><b><i>Selecting a bicluster (left) that contain terms in this chart will highlight the corresponding term(s) <span style='color:#00CCFF'>light blue</span>.</i></b></p>")
+			self.$elem.append($instructions)	
+			self.$elem.append($mainDiv)
 			
+			//console.log("here")
 			return this;
 		},
 		

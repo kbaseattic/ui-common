@@ -16,13 +16,22 @@ $.KBWidget({
         var self = this;
         this._super(options);
 
-        self.models = options.modelData;
-        self.fbas = options.fbaData;
-        self.workspace = options.ws;
 
+        self.model_ws = options.model_ws;
+        self.model_name = options.model_name;        
+        self.fba_ws = options.fba_ws;
+        self.fba_name = options.fba_name;
+        self.map_ws = options.map_ws;
+        self.map_name = options.map_name;
 
-        var map = options.mapData;
-        var map_id = options.mapID;
+        console.log('model_ws:', self.model_ws,
+                    'model_name:', self.model_name,
+                    'fba_ws:', self.fba_ws,
+                    'fba_name:', self.fba_name,
+                    'map_ws:', self.map_ws,
+                    'map_name:', self.map_name)
+
+        self.map_id = options.mapID;
 
         var container = this.$elem;
 
@@ -38,30 +47,49 @@ $.KBWidget({
         var gene_stroke = '#777';
         var g_present_color = '#8bc7e5';
 
-        var rxns = map.reactions;
-        var cpds = map.compounds;
-        var maplinks = map.linkedmaps;
-        var groups = map.groups;
 
-        var oset = 12, // off set for arrows
-            threshold = 2, // threshold for deciding if connection is linear
-            r = 12, // radial offset from circle.  Hooray for math degrees.
-            max_x = 0,  // used for canvas size
-            max_y = 0,  // used for canvas size
-            c_pad = 200,  // padding around max_x/max_y
-            svg;
 
-        var data = []
-        for (var i in rxns) {
-            data.push({'products': rxns[i].product_refs, 'substrates': rxns[i].substrate_refs});
+        var p1 = kb.ws.get_objects([{workspace: self.map_ws, name: self.map_name}])            
+        if (self.model_ws && self.model_name) {
+            var p2 = kb.get_model(self.model_ws, self.model_name);
         }
+        if (self.fba_ws && self.fba_name) {
+            var p3 = kb.get_fba(self.fba_ws, self.fba_name);
+        }        
+        $.when(p1, p2, p3).done(function(map_data, models, fbas) {
+            self.models = (models ? [models[0].data] : undefined);
+            self.fbas = (fbas ? [fbas[0].data] : undefined);
+
+            self.map_data = map_data[0].data;
+            rxns = self.map_data.reactions;
+            cpds = self.map_data.compounds;
+            maplinks = self.map_data.linkedmaps;
+            groups = self.map_data.groups;
+
+            oset = 12, // off set for arrows
+                threshold = 2, // threshold for deciding if connection is linear
+                r = 12, // radial offset from circle.  Hooray for math degrees.
+                max_x = 0,  // used for canvas size
+                max_y = 0,  // used for canvas size
+                c_pad = 200,  // padding around max_x/max_y
+                svg = undefined;
+
+            data = []
+            for (var i in rxns) {
+                data.push({'products': rxns[i].product_refs, 'substrates': rxns[i].substrate_refs});
+            }
+
+            self.drawMap()
+        })
 
 
+            
 
         self.drawMap = function() {
-            container.html('<div id="'+map_id+'_pathway" class="pathway"></div>');
 
-            svg = d3.select('#'+map_id+'_pathway').append("svg")
+            container.html('<div id="'+self.map_name+'_pathway" class="pathway"></div>');
+
+            svg = d3.select('#'+self.map_name+'_pathway').append("svg")
                                         .attr("width", 800)
                                        .attr("height", 1000);
 
@@ -105,7 +133,6 @@ $.KBWidget({
             }
         }
 
-        self.drawMap()
        
         // deprecated
         function getGroups() {
@@ -198,6 +225,7 @@ $.KBWidget({
 
                 fba_rxns = getFbaRxns(rxn.rxns);
 
+
                 // color flux depending on rxns found for each modle
                 if (self.fbas) {
                     var w = rxn.w / self.fbas.length;
@@ -251,7 +279,6 @@ $.KBWidget({
                                   .attr('x', x+2)
                                   .attr('y', y+h/2 + 2)
                                   .attr('class', 'rxn-label')
-                                  .style('display', 'none');
 
 
                 //content for tooltip //fixme: need to do tooltips for each model
@@ -306,10 +333,9 @@ $.KBWidget({
             var nodes = []
             var links = []
 
-            // draw connections from substrate to producconsole.log(groups)
+            // draw connections from substrate to products
             for (var j in groups) {
                 var group = groups[j];
-
                 var group_rxn_ids = group.rxn_ids;
                 var x = group.x
                 var y = group.y
@@ -619,12 +645,13 @@ $.KBWidget({
         function getFbaRxns(rxn_ids) {
             // get a list of fba arrays (or undefined) 
             // for each model supplied          
-
             var found_rxns = [];
 
             // for each model, look for model data
+
             for (var j in self.fbas) {
                 var fba = self.fbas[j];
+                console.log(fba)
                 fba_objs = fba.FBAReactionVariables;
 
                 // see if we can find the rxn in that fbas's list of reactions
@@ -772,7 +799,7 @@ $.KBWidget({
 
             var opts = $('<div class="opts-dd">Display:\
                         <div class="checkbox">\
-                            <label><input type="checkbox" data-type="rxn-label" value="">Enzymes Labels</label>\
+                            <label><input type="checkbox" data-type="rxn-label" checked="checked">Enzymes Labels</label>\
                         </div>\
                         <div class="checkbox">\
                             <label><input type="checkbox" data-type="rect" value="" checked="checked">Enzymes</label>\
@@ -964,7 +991,7 @@ $.KBWidget({
 
 
         function saveMap() {
-            var new_map = $.extend({}, map)
+            var new_map = $.extend({}, self.map_data)
 
             // get data on edited lines 
             var g = svg.selectAll('.edited-line');
@@ -1016,13 +1043,13 @@ $.KBWidget({
 
             // have to get meta data to resave object 
             var prom = kb.ws.get_object_info([{workspace: self.workspace, 
-                                               name: map_id}], 1)
+                                               name: self.map_name}], 1)
             $.when(prom).done(function(data) {
                 var metadata = data[0][10];
                 // saving object to workspace
                 var p = kb.ws.save_object({'workspace': self.workspace, 
                         'data': new_map, 
-                        'id': map_id,
+                        'id': self.map_name,
                         'type': 'KBaseBiochem.MetabolicMap',
                         'metadata': metadata
                         })

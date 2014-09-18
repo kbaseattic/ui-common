@@ -69,7 +69,7 @@ kb_define('kbaseSimulationSet',
                 };
 
                 var labels = ['Name','Workspace','KBID','Type','Errors','Owner','Creation date'];
-                var table = kb.ui.objTable('overview-table',simudata,keys,labels);
+                var table = kb.ui.objTable({obj: simudata, keys: keys, labels: labels});
                 tabs.tabContent('Overview').append(table)
 
                 var tableSettings = {

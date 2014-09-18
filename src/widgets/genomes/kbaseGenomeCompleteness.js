@@ -32,6 +32,9 @@ kb_define('KBaseGenomeCompleteness',
             this.genome_id = this.options.genome_id;
             this.kbCache = this.options.kbCache;
 
+	    this.markerRoles = [];
+	    this.markerRolesOrder = [];
+
 	    // store universal genes
 	    this.loadMarkerRoles (this.wait_for_marker_roles);
 
@@ -90,6 +93,7 @@ kb_define('KBaseGenomeCompleteness',
 
             var self = this;
             
+	    var data = [];
             $.when(prom).done($.proxy(function(data) {
             		container.empty();
             		var gnm = data[0].data;
@@ -122,7 +126,9 @@ kb_define('KBaseGenomeCompleteness',
             		for (var genePos in gnm.features) {
             			var gene = gnm.features[genePos];
             			var geneId = gene.id;
-            			var geneFunc = gene['function'];
+				if (gene['function'] === undefined)
+				    continue;
+				var geneFunc = gene['function'];
 				var cleanGeneFunc = geneFunc.replace(/\s+\/.+/,"").replace(/\s+\#.*/, "");
 				// just take first element of subsystem_data list
 				// typedef tuple<string subsystem, string variant, string role> subsystem_data;
@@ -138,6 +144,7 @@ kb_define('KBaseGenomeCompleteness',
 			}
 
 			// get tally and total
+			var something_seen = false;
 			for (var i=0; i < self.markerRolesOrder.length; i++) {
 			    var seed_role = self.markerRolesOrder[i];
 			    var tax_group = self.markerRoles[seed_role];
@@ -152,16 +159,29 @@ kb_define('KBaseGenomeCompleteness',
 			    if (markerRolesToGenes[seed_role]) {
 				//group_tally[tax_group] += markerRolesToGenes[seed_role].length;
 				group_tally[tax_group] += 1;
+				something_seen = true;
 				if (markerRolesToGenes[seed_role].length !== 1)
 				    multi_cnts_msg[tax_group] = " (Warning: multiple counts)";
 			    }
 			}
-			
 
 			// build table
 			for (var i=0; i < self.markerRolesOrder.length; i++) {
 			    var seed_role = self.markerRolesOrder[i];
 			    var tax_group = self.markerRoles[seed_role];
+
+			    // make sure we handle empty case at least somewhat gracefully
+			    if (something_seen === false) {
+				if (tax_group === "Universal") {
+				    genesData[genesData.length] = {
+					num: 0,
+					id: '-',
+					group: tax_group,
+					func: seed_role
+				    };
+				}
+				continue;
+			    }
 			    if (group_tally[tax_group] === 0)
 				continue;
 
@@ -185,6 +205,7 @@ kb_define('KBaseGenomeCompleteness',
 				};
 			    }
             		}
+
             		var genesSettings = {
             				//"sPaginationType": "full_numbers",
             				"iDisplayLength": 100,
@@ -209,6 +230,10 @@ kb_define('KBaseGenomeCompleteness',
 			for (var tax_group in group_total) {
 			    if (group_tally[tax_group] === 0)
 				continue;
+			    container.append(('<div />'+tax_group+' Single-copy Markers Seen: '+group_tally[tax_group]+' / '+group_total[tax_group]+multi_cnts_msg[tax_group]));
+			}
+			if (something_seen === false) {
+			    tax_group = "Universal";
 			    container.append(('<div />'+tax_group+' Single-copy Markers Seen: '+group_tally[tax_group]+' / '+group_total[tax_group]+multi_cnts_msg[tax_group]));
 			}
 

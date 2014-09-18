@@ -31,20 +31,19 @@ kb_define('KBaseSpecStorageCard',
 
                 var dataList = [];
             	for (var i = 0; i < data.length; i++)
-            		dataList[i] = {module: '<a onclick="specClicks[\''+pref+'module-click\'](this,event); return false;" data-module="'+data[i]+'">'+data[i]+'</a>'};
+            		dataList.push({module: '<a onclick="specClicks[\''+pref+'module-click\'](this,event); return false;" data-module="'+data[i]+'">'+data[i]+'</a>'});
                 self.$elem.append('<table id="'+pref+'module-table" class="table table-striped table-bordered"></table>');
                 var tableSettings = {
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Module name", mData: "module"}],
-                        "aaData": [],
+                        "aaData": dataList,
                         "oLanguage": {
                             "sSearch": "Search module:",
                             "sEmptyTable": "No modules registered."
                         }
                     };
                 var table = $('#'+pref+'module-table').dataTable(tableSettings);
-                table.fnAddData(dataList);
                 specClicks[pref+'module-click'] = function(elem,e) {
                 	var module = $(elem).data('module');
                     self.trigger('showSpecElement', 

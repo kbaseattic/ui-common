@@ -346,7 +346,7 @@
         },
 
         renderError: function(error) {
-            errString = "Sorry, an unknown error occurred";
+	    errString = "Sorry, an unknown error occured.  DBpedia.org may be down or your browser may be blocking an http request to DBpedia.org.";
             if (typeof error === "string")
                 errString = error;
             else if (error && error.error && error.error.message)

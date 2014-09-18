@@ -81,7 +81,7 @@
                     date: data[0].created,
                 };
                 var labels = ['Name','Workspace','KBID','Source','Genome','Expression Series','Regulome','Type','Errors','Owner','Creation date'];
-                var table = kb.ui.objTable('overview-table',phenooverdata,keys,labels);
+                var table = kb.ui.objTable({obj: phenooverdata, keys: keys, labels: labels});
                 tabs.tabContent('Overview').append(table)
 
 		    // reformat the promconstraint into one row per TF/TG pair

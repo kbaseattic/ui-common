@@ -1,85 +1,5 @@
 
 
-//https://kbase.us/services/fba_model_services/ //production fba service not deployed
-
-// This saves a request by service name, method, params, and promise
-// Todo: Make as module
-function Cache() {
-    var cache = [];
-
-    this.get = function(service, method, params) {
-        for (var i in cache) {
-            var obj = cache[i];
-            if (service != obj['service']) continue;
-            if (method != obj['method']) continue;
-            if ( angular.equals(obj['params'], params) ) { return obj; }
-        }
-        return undefined;
-    }
-
-    this.put = function(service, method, params, prom) {
-        var obj = {};
-        obj['service'] = service;    
-        obj['method'] = method;
-        obj['prom'] = prom;
-        obj['params'] = params;
-        cache.push(obj);
-        //console.log('Cache after the last "put"', cache)
-    }
-}
-
-
-// this is another experiment in caching but for particular objects.
-function WSCache() {
-    // Todo: only retrieve and store by object ids.
-
-    // cache object
-    var c = {};
-
-    this.get = function(params) {
-
-        if (params.ref) {
-            return c[params.ref];
-        } else {
-            var ws = params.ws,
-                type = params.type,
-                name = params.name;
-
-            if (ws in c && type in c[ws] && name in c[ws][type]) {
-                return c[ws][type][name];
-            }
-        }
-    }
-
-    this.put = function(params) {
-        // if reference is provided
-        if (params.ref) {
-            if (params.ref in c) {
-                return false;
-            } else {
-                c[params.ref] = params.prom;
-                return true;
-            }
-
-        // else, use strings
-        } else { 
-            var ws = params.ws,
-                name = params.name,
-                type = params.type;
-
-            if (ws in c && type in c[ws] && name in c[ws][type]) {
-                return false;
-            } else {
-                if ( !(ws in c) ) c[ws] = {};                    
-                if ( !(type in c[ws]) ) c[ws][type] = {};
-                c[ws][type][name] = params.prom;
-                return true;
-            }
-        }
-    }
-}
-
-
 function KBCacheClient(token) {
     var self = this;
     var auth = {};
@@ -126,6 +46,7 @@ function KBCacheClient(token) {
     self.search_url = search_url;    
     self.token = token;
     self.nar_type = 'KBaseNarrative.Narrative';
+    self.metagenome_url = "./communities/metagenome.html?metagenome=";
 
     // some accessible helper methods
     self.ui = new UIUtils();
@@ -302,7 +223,6 @@ function KBCacheClient(token) {
 
         var p = self.ws.get_object_info([{workspace: ws, name: name}], 1)
             .then(function(info) {
-                console.log('info', info)
                 var deps = JSON.parse(info[0][10].data_dependencies);
 
                 var d = [];
@@ -373,6 +293,7 @@ function KBCacheClient(token) {
     }
 
     self.get_model = function(ws, name){
+
         if (ws && ws.indexOf('/') != -1) {
             //var prom = c.get({ref: ws});
             //if (prom) return prom; 
@@ -404,6 +325,7 @@ function KBCacheClient(token) {
             }
 
             // add equations to biomasses object
+
             var biomass_objs = m_obj.biomasses;
             var eqs = self.createEQs(cpd_objs, biomass_objs, 'biomasscompounds')
             for (var i in biomass_objs) {
@@ -429,6 +351,7 @@ function KBCacheClient(token) {
         for (var i in rxn_objs) {
             var rxn_obj = rxn_objs[i];
             var rxn_id = rxn_obj.id;
+
             var rxnreagents = rxn_obj[key];
             var direction = rxn_obj.direction;
 
@@ -452,11 +375,9 @@ function KBCacheClient(token) {
             }
 
             var arrow;
-            switch (direction) {
-                case '=': arrow = ' <=> ';
-                case '<': arrow = ' <= ';
-                case '>': arrow = ' => ';
-            }
+            if (direction === '=') arrow = ' <=> ';
+            if (direction === '<') arrow = ' <= ';
+            if (direction === '>') arrow = ' => ';
 
             var eq = lhs.join(' + ')+arrow+rhs.join(' + ');
             eqs[rxn_id] = eq
@@ -466,54 +387,45 @@ function KBCacheClient(token) {
 
 
     self.getRoute = function(kind) {
-        var route;
         switch (kind) {
             case 'FBA': 
-                route = 'ws.fbas';
-                break;
+                return 'ws.fbas';
             case 'FBAModel': 
-                route = 'ws.mv.model';
-                break;
+                return 'ws.models';
             case 'Media': 
-                route = 'ws.media';
-                break;
+                return 'ws.media';
             case 'MetabolicMap': 
-                route = 'ws.maps';
-                break;
+                return 'ws.maps';
             case 'Media': 
-                route = 'ws.media';
-                break; 
+                return 'ws.media';
             case 'PromConstraint':
-                route = 'ws.promconstraint';
-                break; 
+                return 'ws.promconstraint';
             case 'Regulome':
-                route = 'ws.regulome';
-                break; 
+                return 'ws.regulome';
             case 'ExpressionSeries':
-                route = 'ws.expression_series';
-                break; 
+                return 'ws.expression_series';
             case 'PhenotypeSet':
-                route = 'ws.phenotype';
-                break; 
+                return 'ws.phenotype';
             case 'PhenotypeSimulationSet': 
-                route = 'ws.simulation';
-                break;  
-            // remove next block cause it's described in landing_page_map.json
-            //case 'Pangenome':
-            //    route = 'ws.pangenome';
-            //    break;                            
+                return 'ws.simulation';
+            case 'Pangenome':
+                return 'ws.pangenome';
             case 'Genome': 
-                route = 'genomesbyid';
-                break;
-	    case 'MAKResult':
-		route = 'mak';
-		break;
-	    case 'FloatDataTable':
-                route = 'floatdatatable';
-                break;
+                return 'genomesbyid';
+            case 'MAKResult':
+                return 'mak';
+            case 'FloatDataTable':
+                return 'floatdatatable';
+            case 'Metagenome':
+                return 'ws.metagenome';
+            case 'Collection':
+                return 'ws.collection';
+            case 'Profile':
+                return 'ws.profile';
         }
-        return route;
+        return undefined;
     }
+
 
     self.getWorkspaceSelector = function(all) {
         if (all) {
@@ -535,7 +447,7 @@ function KBCacheClient(token) {
 
             var wsSelect = $('<form class="form-horizontal" role="form">'+
                                 '<div class="form-group">'+
-                                    '<label class="col-sm-5 control-label">Destination Workspace</label>'+
+                                    '<label class="col-sm-5 control-label">Workspace</label>'+                                
                                     '<div class="input-group col-sm-5">'+
                                         '<input type="text" class="select-ws-input form-control focusedInput" placeholder="search">'+
                                         '<span class="input-group-btn">'+
@@ -596,6 +508,7 @@ function KBCacheClient(token) {
 
         return prom;
     }
+
 }
 
 
@@ -634,8 +547,6 @@ function UIUtils() {
                             }
                         })
     }
-
-
 
     var msecPerMinute = 1000 * 60;
     var msecPerHour = msecPerMinute * 60;
@@ -694,17 +605,66 @@ function UIUtils() {
         return Date.UTC(ymd[0],ymd[1]-1,ymd[2],hms[0],hms[1],hms[2]);  
     }
 
-    this.objTable = function(table_id, obj, keys, labels) {
-        var table = $('<table class="table table-striped table-bordered" \
-                              style="margin-left: auto; margin-right: auto;"></table>');
+    // interesting solution from http://stackoverflow.com/questions
+    // /15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript 
+    this.readableSize = function(bytes) {
+       var units = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+       if (bytes == 0) return '0 Bytes';
+       var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+       return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + units[i];
+    };    
+
+    this.objTable = function(p) {
+        var obj = p.obj;
+        var keys = p.keys;
+
+        // option to use nicely formated keys as labels
+        if (p.keysAsLabels ) {
+            var labels = []            
+            for (var i in keys) {
+                var str = keys[i].key.replace(/(id|Id)/g, 'ID')
+                var words = str.split(/_/g);
+                for (var j in words) {
+                    words[j] = words[j].charAt(0).toUpperCase() + words[j].slice(1)
+                }
+                var name = words.join(' ')
+                labels.push(name);
+            }
+        } else if ('labels' in p) {
+            var labels = p.labels;
+        } else {
+            // if labels are specified in key objects, use them
+            for (var i in keys) {
+                var key_obj = keys[i];
+                if ('label' in key_obj) {
+                    labels.push(key_obj.label);                    
+                } else {
+                    labels.push(key_obj.key)
+                }   
+
+            }
+        }
+
+
+        var table = $('<table class="table table-striped table-bordered">');
+//        style="margin-left: auto; margin-right: auto;"
+
         for (var i in keys) {
             var key = keys[i];
             var row = $('<tr>');
 
-            var label = $('<td>'+labels[i]+'</td>')
-            var value = $('<td>')
+            if (p.bold) {
+                var label = $('<td><b>'+labels[i]+'</b></td>')
+            } else {
+                var label = $('<td>'+labels[i]+'</td>');
+            }
 
-            if (key.type == 'bool') {
+            var value = $('<td>');
+
+            if ('format' in key) {
+                var val = key.format(obj)
+                value.append(val)
+            } else if (key.type == 'bool') {
                 value.append((obj[key.key] == 1 ? 'True' : 'False'))
             } else {
                 value.append(obj[key.key])
@@ -717,8 +677,12 @@ function UIUtils() {
         return table;
     }
 
-    this.listTable = function(table_id, array, labels, bold) {
-        var table = $('<table id="'+table_id+'" class="table table-striped table-bordered" \
+    this.listTable = function(p) {
+        var array = p.array;
+        var labels = p.labels;
+        var bold = (p.bold ? true : false);
+
+        var table = $('<table class="table table-striped table-bordered" \
                               style="margin-left: auto; margin-right: auto;"></table>');
         for (var i in labels) {
             table.append('<tr><td>'+(bold ? '<b>'+labels[i]+'</b>' : labels[i])+'</td> \
@@ -746,7 +710,7 @@ function UIUtils() {
                 var type = full_type.slice(full_type.indexOf('.')+1);
                 var kind = type.split('-')[0];
                 var label = item[7]+"/"+item[1];
-		var route;
+                var route;
                 switch (kind) {
                     case 'FBA': 
                         sub = 'fbas/';
@@ -814,7 +778,21 @@ function UIUtils() {
         return share_str;
     }
 
+    this.globalPermDropDown = function(perm) {
+        var dd = $('<select class="form-control create-permission" data-value="n">\
+                        <option value="n">None</option>\
+                        <option value="r">Read</option>\
+                    </select>')
+        if (perm == 'n') {
+            dd.find("option[value='n']").attr('selected', 'selected');
+        } else if (perm == 'r') {
+            dd.find("option[value='r']").attr('selected', 'selected');                        
+        } else {
+            dd.find("option[value='n']").attr('selected', 'selected');
+        }
 
+        return $('<div>').append(dd).html();
+    }
 
     // jQuery plugins that you can use to add and remove a 
     // loading giff to a dom element.  This is easier to maintain, and likely less 
@@ -840,20 +818,93 @@ function UIUtils() {
             }
 
         }
-
-
-
         return this;
     }
-
     $.fn.rmLoading = function() {
         $(this).find('.loader').remove();
     }
 
 
+
+
+}
+
+// This saves a request by service name, method, params, and promise
+// Todo: Make as module
+function Cache() {
+    var cache = [];
+
+    this.get = function(service, method, params) {
+        for (var i in cache) {
+            var obj = cache[i];
+            if (service != obj['service']) continue;
+            if (method != obj['method']) continue;
+            if ( angular.equals(obj['params'], params) ) { return obj; }
+        }
+        return undefined;
+    }
+
+    this.put = function(service, method, params, prom) {
+        var obj = {};
+        obj['service'] = service;    
+        obj['method'] = method;
+        obj['prom'] = prom;
+        obj['params'] = params;
+        cache.push(obj);
+        //console.log('Cache after the last "put"', cache)
+    }
 }
 
 
+// this is another experiment in caching but for particular objects.
+function WSCache() {
+    // Todo: only retrieve and store by object ids.
+
+    // cache object
+    var c = {};
+
+    this.get = function(params) {
+
+        if (params.ref) {
+            return c[params.ref];
+        } else {
+            var ws = params.ws,
+                type = params.type,
+                name = params.name;
+
+            if (ws in c && type in c[ws] && name in c[ws][type]) {
+                return c[ws][type][name];
+            }
+        }
+    }
+
+    this.put = function(params) {
+        // if reference is provided
+        if (params.ref) {
+            if (params.ref in c) {
+                return false;
+            } else {
+                c[params.ref] = params.prom;
+                return true;
+            }
+
+        // else, use strings
+        } else { 
+            var ws = params.ws,
+                name = params.name,
+                type = params.type;
+
+            if (ws in c && type in c[ws] && name in c[ws][type]) {
+                return false;
+            } else {
+                if ( !(ws in c) ) c[ws] = {};                    
+                if ( !(type in c[ws]) ) c[ws][type] = {};
+                c[ws][type][name] = params.prom;
+                return true;
+            }
+        }
+    }
+}
 
 function getBio(type, loaderDiv, callback) {
     var fba = new fbaModelServices('https://kbase.us/services/fba_model_services/');
@@ -1019,102 +1070,17 @@ function ProjectAPI(ws_url, token) {
         data : { description : '' },
         workspace : undefined,
         meta : {},
-	provenance : [],
-	hidden : 1
+    provenance : [],
+    hidden : 1
     };
 
-
-    // id of the div containing the kbase login widget to query for auth
-    // info. Set this to a different value if the div has been named differently.
-
-    // Common error handler callback
-    var error_handler = function() {
-        // neat trick to pickup all arguments passed in
-        var results = [].slice.call(arguments);
-        console.log( "Error in method call. Response was: ", results);
-    };
-
-
-
-    /*
-     * This is a handler to pickup get_workspaces() results and
-     * filter out anything that isn't a project workspace
-     * (basically only include it if it has a _project object
-     * within)
-     */
-    var filter_wsobj = function (p_in) {
-        console.log('p_in', p_in)
-      
-        /*
-        for (var i in p_in.res) {
-            var ws = p_in.res[i];
-
-            // if there is global read or any permissions
-            if (ws[4] == "r" || ws[5].match(/r|w|a/)) {
-
-            }
-        }
-        */
-
-        var prom = ws_client.list_objects({type: 'KBaseNarrative.Metadata', 
-                                           showHidden: 1});
-        return prom
-    };
-
-    /*
-
-  var def_params = {perms : ['r', 'w', 'a'],
-                          filter_tag : ws_tag.project};
-        var p = $.extend( def_params, p_in);
-
-        var ignore = /^core/;
-
-        // ignore any workspace with the name prefix of "core"
-        // and ignore workspace that doesn't match perms
-        var reduce_ws_meta = function ( prev, curr) {
-            if ( ignore.test(curr[0])) { 
-                return( prev);
-            }
-            if ( p.perms.indexOf(curr[4]) >= 0 ) {
-                return( prev.concat([curr]));
-            } else {
-                return( prev);
-            }
-       };
-
-        // get non-core workspaces with correct permissions
-        var ws_match = p.res.reduce(reduce_ws_meta,[]);
-        // extract workspace ids into a list
-        var ws_ids = ws_match.map( function(v) { return v[0]});
-        */    
 
     /**
      * Ensures that a USER_ID:home workspace exists and is tagged as a project.
      * If one does not exist, it calls 'new_project' and makes one.
      */
     this.ensure_home_project = function(userId) {
-
-        // if we don't have a userid, don't do anything.
-        if (!userId)
-            return;
-
-        var projId = userId + ":home";
-
-        var prom = ws_client.get_object({ type: ws_tag_type,
-                                          workspace: projId,
-                                          id: ws_tag.project });
-        $.when(prom).then(
-            undefined,                  // don't need to do anything if it already has one. 
-            $.proxy(function(error) {   // if no project USER_ID:home exists, make one
-                this.new_project({
-                    project_id: projId,
-                    error_callback: function(error) {  // Just fails more or less silently for now
-                        console.debug("Error while creating home project!"); 
-                        console.debug(error); 
-                    },
-                });
-            }, this)
-        );
+        alert('ensure_home_project has been removed!')
     };
 
     // Get all the workspaces that match the values of the
@@ -1505,7 +1471,6 @@ function ProjectAPI(ws_url, token) {
         var self = this;
         var metadata_fn = ws_client.get_object_info([{wsid: p.project_id, objid : p.narrative_id}], 1);
         $.when( metadata_fn).then( function( obj_info) {
-            console.log('object_info', obj_info)
             if (obj_info.length != 1) {
                 p.error_callback( "Error: narrative ws." + p.project_id +
                         ".obj." + p.narrative_id + " not found");
@@ -1526,7 +1491,7 @@ function ProjectAPI(ws_url, token) {
         res.description = meta.description;
         res.name = meta.name;
         var temp = $.parseJSON(meta.data_dependencies);
-        console.log(temp)
+
         //deps should really be stored as an id, not a name, since names can change
         var deps = temp.reduce( function(prev,curr,index) {
             var dep = curr.split(" ");

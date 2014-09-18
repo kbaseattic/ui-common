@@ -133,20 +133,19 @@ kb_define('KBaseSpecFunctionCard',
             		var aTypeId = data.used_type_defs[i];
             		var aTypeName = aTypeId.substring(0, aTypeId.indexOf('-'));
             		var aTypeVer = aTypeId.substring(aTypeId.indexOf('-') + 1);
-            		subsData[subsData.length] = {name: '<a onclick="specClicks[\''+pref+'subs-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer};
+            		subsData.push({name: '<a onclick="specClicks[\''+pref+'subs-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer});
             	}
                 var subsSettings = {
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
-                        "aaData": [],
+                        "aaData": subsData,
                         "oLanguage": {
                             "sSearch": "Search type:",
                             "sEmptyTable": "No types used by this type."
                         }
                     };
                 var subsTable = $('#'+pref+'subs-table').dataTable(subsSettings);
-                subsTable.fnAddData(subsData);
                 specClicks[pref+'subs-click'] = (function(elem, e) {
                     var aTypeId = $(elem).data('typeid');
                     self.trigger('showSpecElement', 
@@ -171,20 +170,19 @@ kb_define('KBaseSpecFunctionCard',
                 	} else {
                 		link = '<a onclick="specClicks[\''+pref+'vers-click\'](this,event); return false;" data-funcid="'+aFuncId+'">'+aFuncId+'</a>';
                 	}
-            		versData[versData.length] = {name: link};
+            		versData.push({name: link});
             	}
                 var versSettings = {
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function version", mData: "name"}],
-                        "aaData": [],
+                        "aaData": versData,
                         "oLanguage": {
                             "sSearch": "Search version:",
                             "sEmptyTable": "No versions registered."
                         }
                     };
                 var versTable = $('#'+pref+'vers-table').dataTable(versSettings);
-                versTable.fnAddData(versData);
                 specClicks[pref+'vers-click'] = (function(elem, e) {
                     var aFuncId = $(elem).data('funcid');
                     self.trigger('showSpecElement', 

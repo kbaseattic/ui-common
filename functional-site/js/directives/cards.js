@@ -62,6 +62,19 @@ angular.module('card-directives')
             }
         };
     })    
+    .directive('gpktype', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "gpktype", 
+                    data: scope.params, 
+                    auth: $rootScope.USER_TOKEN,
+                    userId: $rootScope.USER_ID
+                });
+            }
+        };
+    })    
     .directive('ggltype', function($rootScope) {
         return {
             link: function(scope, element, attrs) {
@@ -94,7 +107,7 @@ angular.module('card-directives')
                 if (cardManager) cardManager.destroy();
                 
                 if(scope.params.workspaceID == "CDS" ) {
-                    scope.params.workspaceID = "KBasePublicGenomesV3";
+                    scope.params.workspaceID = "KBasePublicGenomesV4";
                 }
                 if (!scope.params.genomeID) {
                     var temp = scope.params.featureID.split(".");

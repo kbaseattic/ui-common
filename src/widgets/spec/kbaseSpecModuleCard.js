@@ -106,20 +106,19 @@ kb_define('KBaseSpecModuleCard',
             	for (var typeId in data.types) {
             		var typeName = typeId.substring(typeId.indexOf('.') + 1, typeId.indexOf('-'));
             		var typeVer = typeId.substring(typeId.indexOf('-') + 1);
-            		typesData[typesData.length] = {name: '<a onclick="specClicks[\''+pref+'types-click\'](this,event); return false;" data-typeid="'+typeId+'">'+typeName+'</a>', ver: typeVer};
+            		typesData.push({name: '<a onclick="specClicks[\''+pref+'types-click\'](this,event); return false;" data-typeid="'+typeId+'">'+typeName+'</a>', ver: typeVer});
             	}
                 var typesSettings = {
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
-                        "aaData": [],
+                        "aaData": typesData,
                         "oLanguage": {
                             "sSearch": "Search type:",
                             "sEmptyTable": "No types registered."
                         }
                     };
                 var typesTable = $('#'+pref+'types-table').dataTable(typesSettings);
-                typesTable.fnAddData(typesData);
                 specClicks[pref+'types-click'] = function(elem, e) {
                     var typeId = $(elem).data('typeid');
                     self.trigger('showSpecElement', 
@@ -139,20 +138,19 @@ kb_define('KBaseSpecModuleCard',
             		var funcId = data.functions[i];
             		var funcName = funcId.substring(funcId.indexOf('.') + 1, funcId.indexOf('-'));
             		var funcVer = funcId.substring(funcId.indexOf('-') + 1);
-            		funcsData[funcsData.length] = {name: '<a onclick="specClicks[\''+pref+'funcs-click\'](this,event); return false;" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer};
+            		funcsData.push({name: '<a onclick="specClicks[\''+pref+'funcs-click\'](this,event); return false;" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer});
             	}
                 var funcsSettings = {
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function name", mData: "name"}, {sTitle: "Function version", mData: "ver"}],
-                        "aaData": [],
+                        "aaData": funcsData,
                         "oLanguage": {
                             "sSearch": "Search function:",
                             "sEmptyTable": "No functions registered."
                         }
                     };
                 var funcsTable = $('#'+pref+'funcs-table').dataTable(funcsSettings);
-                funcsTable.fnAddData(funcsData);
                 specClicks[pref+'funcs-click'] = function(elem, e) {
                     var funcId = $(elem).data('funcid');
                     self.trigger('showSpecElement', 
@@ -171,20 +169,19 @@ kb_define('KBaseSpecModuleCard',
             	for (var incName in data.included_spec_version) {
             		var incVer = data.included_spec_version[incName];
             		var incId = incName + "-" + incVer;
-            		incsData[incsData.length] = {name: '<a onclick="specClicks[\''+pref+'incs-click\'](this,event); return false;" data-incid="'+incId+'">'+incName+'</a>', ver: incVer};
+            		incsData.push({name: '<a onclick="specClicks[\''+pref+'incs-click\'](this,event); return false;" data-incid="'+incId+'">'+incName+'</a>', ver: incVer});
             	}
                 var incsSettings = {
                         "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Module name", mData: "name"}, {sTitle: "Module version", mData: "ver"}],
-                        "aaData": [],
+                        "aaData": incsData,
                         "oLanguage": {
                             "sSearch": "Search module:",
                             "sEmptyTable": "No included modules used."
                         }
                     };
                 var incsTable = $('#'+pref+'incs-table').dataTable(incsSettings);
-                incsTable.fnAddData(incsData);
                 specClicks[pref+'incs-click'] = function(elem,e) {
                     var incId = $(elem).data('incid');
                     self.trigger('showSpecElement', 
@@ -212,20 +209,19 @@ kb_define('KBaseSpecModuleCard',
                 		} else {
                 			link = '<a onclick="specClicks[\''+pref+'vers-click\'](this,event); return false;" data-verid="'+moduleName+'-'+ver+'">'+ver+'</a>';
                 		}
-                		versData[versData.length] = {ver: link, date: verDate};
+                		versData.push({ver: link, date: verDate});
                 	}
                     var versSettings = {
                             "sPaginationType": "full_numbers",
                             "iDisplayLength": 10,
                             "aoColumns": [{sTitle: "Module version", mData: "ver"}, {sTitle: "Upload date", mData: "date"}],
-                            "aaData": [],
+                            "aaData": versData,
                             "oLanguage": {
                                 "sSearch": "Search version:",
                                 "sEmptyTable": "No versions registered."
                             }
                         };
                     var versTable = $('#'+pref+'vers-table').dataTable(versSettings);
-                    versTable.fnAddData(versData);
                     specClicks[pref+'vers-click'] = function(elem,e) {
                         var modId = $(elem).data('verid');
                         self.trigger('showSpecElement', 
