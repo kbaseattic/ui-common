@@ -308,8 +308,7 @@ var app = angular.module('landing-pages',
              controller: 'WBLanding'})
         .state('genomesbyid',
             {url: '/genomes/:ws/:id',
-	     templateUrl: 'views/genomes/sortable-rows-landing-page.html',
-	     //templateUrl: 'views/objects/genome.html',
+      	     templateUrl: 'views/genomes/sortable-rows-landing-page.html',
              controller: 'WBLanding'})
         .state('kbgenomesbyws',
             {url: '/KBaseGenomes.Genome/:ws',
@@ -496,6 +495,18 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		{url: '/msa/:ws/:id',
 		templateUrl: 'views/objects/msa.html',
 		controller: 'MSADetail'});
+
+    $stateProvider
+	.state('kidledttype',
+		{url: '/kidledt/:mod/:type',
+		templateUrl: 'views/objects/kidledt.html',
+		controller: 'KidlEdtDetail'});
+
+    $stateProvider
+	.state('kidledtmod',
+		{url: '/kidledt/:mod',
+		templateUrl: 'views/objects/kidledt.html',
+		controller: 'KidlEdtDetail'});
 
     $urlRouterProvider.when('', '/login/')
                       .when('/', '/login/')
