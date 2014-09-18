@@ -10,7 +10,7 @@ angular.module('communities-directives')
             $(ele).loading();
             var prom = kb.ws.get_objects([{workspace: scope.ws, name: scope.id}])
             $.when(prom).done(function(d) {
-                var metagenome_id = d[0].data.metagenome_id;
+                var metagenome_id = d[0].data.ref.ID;
                 
                 // use metagenome id to fetch metadata on obj
                 var url = 'http://api.metagenomics.anl.gov/metagenome/'+metagenome_id+'?verbosity=mixs';
@@ -70,30 +70,34 @@ angular.module('communities-directives')
 .directive('communitiesProfile', function() {
     return {
         link: function(scope, ele, attrs) {
-
             $(ele).loading();
 
             var prom = kb.ws.get_objects([{workspace: scope.ws, name: scope.id}])
             $.when(prom).done(function(d) {
                 $(ele).rmLoading();
-
+                console.log('profile', d[0].data)
                 var data = JSON.parse(d[0].data.data);
+
+                $(ele).append('<b>Type:</b>', data.type)
                 buildTable(data);
+            }).fail(function(e){
+
             })
 
             function buildTable(data) {
-                console.log(data.rows)
-                var tableSettings = {
-                    "sPaginationType": "bootstrap",
-                    "iDisplayLength": 10,
-                    "aaData": data.rows,
-                    //"fnDrawCallback": events,
-                    "aoColumns": [
-                      { "sTitle": 'Data', 'mData': function(d){
-                        return d.id;
-                      }},
-                  ],
+                var cols = [];
+                for (var i in data.columns) {
+                    var obj = data.columns[i];
+                    cols.push({sTitle: obj.id});
                 }
+
+                var tableSettings = {sPaginationType: "bootstrap",
+                                     iaDisplayLength: 10,
+                                     aaData: data.data,
+                                     aoColumns: cols
+                                    }
+
+
                 var table = $('<table class="table table-bordered table-striped" style="width: 100%;">');
                 $(ele).append(table);
                 table.dataTable(tableSettings)
