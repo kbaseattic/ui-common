@@ -1668,7 +1668,6 @@ angular.module('ws-directives')
                 newNarrativeModal.openPrompt();
 
                 var p = kb.getWorkspaceSelector()
-                //var prom = kb.ws.list_workspace_info({perm: 'w'});
                 $.when(p).done(function(selector) {
                     body.rmLoading();
 
