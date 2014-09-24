@@ -457,6 +457,11 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
           url: "/taxon/:taxonname/:ws",
           templateUrl: 'views/objects/taxonomy.html',
           controller: 'Taxonomy'
+        })
+        .state('taxnode', {
+            url: "/taxnode/:ws/:id",
+            templateUrl: 'views/objects/taxnode.html',
+            controller: 'TaxNodeDetail'
         });
       
              

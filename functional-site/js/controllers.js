@@ -675,6 +675,11 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                      'mod': $stateParams.mod};
 })
 
+.controller('TaxNodeDetail', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id,
+                     'ws': $stateParams.ws};
+})
+
 /* controller for the copy narrative modal */
 var CopyNarrativeModalCtrl = function ($scope, $modalInstance, $location, narr) {
 

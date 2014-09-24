@@ -481,6 +481,17 @@ angular.module('card-directives')
             }
         };
     })
+    .directive('taxnodecards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "taxnode", 
+                    data: scope.params
+                });
+            }
+        };
+    })
 ;
 
 
