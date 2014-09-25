@@ -1,5 +1,6 @@
 /**
- * @author Bill Riehl <wjriehl@lbl.gov>, Roman Sutormin <rsutormin@lbl.gov>
+ * Taxonomy page showing KBaseTaxonomy.Taxon objects and links to parents, children and genomes.
+ * @author Roman Sutormin <rsutormin@lbl.gov>
  * @public
  */
 
@@ -20,7 +21,6 @@
         },
 
         pref: null,
-        loadingImage: "static/kbase/images/ajax-loader.gif",
         wsClient: null,
 
         init: function(options) {
@@ -71,57 +71,31 @@
             var info = nodes[0].info;
             var prom1 = self.wsClient.list_referencing_objects([{ref: info[6]+"/"+info[0]+"/"+info[4]}]);
             $.when(prom1).done(function(data) {
-            	var objids = [];
-            	var nodesCount = 0;
-            	var genomeCount = 0;
+            	var subnodeinfos = [];
+            	var genometaxoninfos = [];
             	for(var i = 0; i < data[0].length; i++) {
             		var oinfo = data[0][i];
             		//0:obj_id objid, 1:obj_name name, 2:type_string type,3:timestamp save_date, 4:int version, 5:username saved_by,
             		//6:ws_id wsid, 7:ws_name workspace, 8:string chsum, 9:int size, 10:usermeta meta>
             		var type = oinfo[2];
             		type = type.substr(0, type.indexOf('-'));
-            		var objid = {ref: oinfo[6]+"/"+oinfo[0]+"/"+oinfo[4]};
             		if (type === 'KBaseTaxonomy.Taxon') {
-            			if (nodesCount < 10) {
-            				objids.push(objid);
-            				nodesCount++;
-            			}
+            			subnodeinfos.push(oinfo);
             		} else if (type === 'KBaseTaxonomy.GenomeTaxon') {
-            			if (genomeCount < 10) {
-            				objids.push(objid);
-            				genomeCount++;
-            			}
+            			genometaxoninfos.push(oinfo);
             		} else {
-            			console.log("Unsupported type: " + type);
+            			// Do nothing
+            			//console.log("Unsupported type: " + type);
             		}
             	}
-            	if (objids.length > 0) {
-            		var prom2 = self.wsClient.get_objects(objids);
-            		$.when(prom2).done($.proxy(function(objArr) {
-            			var subnodes = [];
-            			var genometaxons = [];
-            			for (var i in objArr) {
-            				if (objArr[i].data.name) {
-            					subnodes.push(objArr[i]);
-            				} else if (objArr[i].data.genome_ref) {
-            					genometaxons.push(objArr[i]);
-            				}
-            			}
-            			self.showResults(nodes, subnodes, genometaxons);
-            		}, this));
-            		$.when(prom2).fail($.proxy(function(error) { 
-            			self.renderError(error); 
-            		}, this));
-            	} else {
-            		self.showResults(nodes, [], []);
-            	}
+            	self.showResults(nodes, subnodeinfos, genometaxoninfos);
             }, this);
     		$.when(prom1).fail($.proxy(function(error) { 
     			self.renderError(error); 
     		}, this));
         },
             
-        showResults: function(nodes, subnodes, genometaxons) {    
+        showResults: function(nodes, subnodeinfos, genometaxoninfos) {    
             var self = this;
             self.$elem.empty();
             var panel = $('<div class="loader-table"/>');
@@ -150,36 +124,93 @@
         	table.append('<tr><td>Name</td><td>'+taxon.name+'</td></tr>');
         	table.append('<tr><td>Aliases</td><td>'+taxon.aliases+'</td></tr>');
         	table.append('<tr><td>Rank</td><td>'+taxon.rank+'</td></tr>');
-        	table.append('<tr><td>Genetic code</td><td>'+taxon.genetic_code+'</td></tr>');
+        	table.append('<tr><td>Genetic code</td><td><a href="http://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=cgencodes#SG'+taxon.genetic_code+'" target="_blank">'+taxon.genetic_code+'</a></td></tr>');
         	if (taxon.mito_genetic_code && taxon.mito_genetic_code != 0)
         		table.append('<tr><td>Mito-genetic code</td><td>'+taxon.mito_genetic_code+'</td></tr>');
         	table.append('<tr><td>Division</td><td>'+taxon.division+'</td></tr>');
         	var table2 = $('<table class="table table-striped table-bordered" \
         			style="margin-left: auto; margin-right: auto;" id="'+self.pref+'overview-table"/>');
         	panel.append(table2);
-        	table2.append('<tr><td>Sub-nodes</td><td>Genomes</td></tr>');
-        	var subNodeLinks = "";
-        	for (var i in subnodes) {
-        		var data = subnodes[i];
+        	table2.append('<tr><td>Sub-taxa</td><td>Genomes</td></tr>');
+        	var genomeLinks = "";
+        	for (var i in genometaxoninfos) {
+        		var info = genometaxoninfos[i];
+        		var ws = info[7];
+        		var objname = info[1];
+        		genomeLinks += '<a href="/functional-site/#/genome/' + ws + '/' + objname + '">' + objname + '</a><br>';
+        	}
+        	var tr = $('<tr/>');
+        	table2.append(tr);
+        	var td1 = $('<td/>');
+        	tr.append(td1);
+        	var subnodepanel = $('<table/>');
+        	td1.append(subnodepanel);
+        	self.loadSubNode(subnodepanel, subnodeinfos, 0);
+        	var td2 = $('<td/>');
+        	tr.append(td2);
+        	var genomepanel = $('<table/>');
+        	td2.append(genomepanel);
+        	self.loadGenome(genomepanel, genometaxoninfos, 0);
+        },
+        
+        loadSubNode: function(panel, objinfos, pos) {
+            var self = this;
+            if (!pos)
+            	pos = 0;
+            if (pos >= objinfos.length)
+            	return;
+            var oinfo = objinfos[pos];
+            var objref = oinfo[6]+"/"+oinfo[0]+"/"+oinfo[4];
+            var objid = {ref: objref};
+    		var prom1 = self.wsClient.get_objects([objid]);
+    		$.when(prom1).done($.proxy(function(objArr) {
+        		var data = objArr[0];
         		var node = data.data;
         		var ws = data.info[7];
         		var objname = data.info[1];
         		var nodename = node.name; 
-        		subNodeLinks += '<a href="/functional-site/#/taxnode/' + ws + '/' + objname + '">' + nodename + '</a><br>';
-        	}
-        	if (subnodes.length == 10)
-        		subNodeLinks += "...";
-        	var genomeLinks = "";
-        	for (var i in genometaxons) {
-        		var data = genometaxons[i];
-        		var ref = data.data.genome_ref;
-        		genomeLinks += '<a href="/functional-site/#/genome/' + ref + '">' + ref + '</a><br>';
-        	}
-        	if (genometaxons.length == 10)
-        		genomeLinks += "...";
-        	table2.append('<tr><td>' + subNodeLinks + '</td><td>' + genomeLinks + '</td></tr>');
+        		panel.append('<a href="/functional-site/#/taxnode/' + ws + '/' + objname + '">' + nodename + '</a><br>');
+        		self.loadSubNode(panel, objinfos, pos + 1);
+    		}, this));
+    		$.when(prom1).fail($.proxy(function(error) { 
+        		panel.append('Error loading object ref=' + objref + ': ' + error.error.message + '<br>');
+        		self.loadSubNode(panel, objinfos, pos + 1);
+    		}, this));
         },
-        
+
+        loadGenome: function(panel, objinfos, pos) {
+            var self = this;
+            if (!pos)
+            	pos = 0;
+            if (pos >= objinfos.length)
+            	return;
+            var oinfo = objinfos[pos];
+            var objref = oinfo[6]+"/"+oinfo[0]+"/"+oinfo[4];
+            var objid = {ref: objref};
+    		var prom1 = self.wsClient.get_objects([objid]);
+    		$.when(prom1).done($.proxy(function(objArr) {
+        		objref = objArr[0].data.genome_ref;
+        		var prom2 = self.wsClient.get_object_subset([{ref: objref, included: ["scientific_name"]}]);
+        		$.when(prom2).done($.proxy(function(objArr) {
+            		var data = objArr[0];
+            		var node = data.data;
+            		var ws = 'KBasePublicGenomesV4';  //data.info[7];
+            		var objname = data.info[1];
+            		var nodename = node.scientific_name; 
+            		panel.append('<a href="/functional-site/#/genomes/' + ws + '/' + objname + '">' + nodename + '</a><br>');
+            		self.loadGenome(panel, objinfos, pos + 1);
+        		}, this));
+        		$.when(prom2).fail($.proxy(function(error) { 
+            		panel.append('Error loading object ref=' + objref + ': ' + error.error.message + '<br>');
+            		self.loadGenome(panel, objinfos, pos + 1);
+        		}, this));            		
+    		}, this));
+    		$.when(prom1).fail($.proxy(function(error) { 
+        		panel.append('Error loading object ref=' + objref + ': ' + error.error.message + '<br>');
+        		self.loadGenome(panel, objinfos, pos + 1);
+    		}, this));
+        },
+
         renderError: function(error) {
             errString = "Sorry, an unknown error occurred";
             if (typeof error === "string")
@@ -200,7 +231,7 @@
                 type: 'TaxNone',
                 id: this.options.taxID,
                 workspace: this.options.workspaceID,
-                title: 'Taxonomy node'
+                title: 'Taxonomy'
             };
         },
 

@@ -107,7 +107,7 @@
             //console.log("obj " + obj);
 
 	    var obj = this.getObjectIdentity(this.options.workspaceID, this.options.genomeID);
-            obj['included'] = ["/taxonomy","/scientific_name"];
+            obj['included'] = ["/taxonomy","/scientific_name", "/source_id"];
 	    self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
                     if (data[0]) {
                         var genome = data[0]['data'];
@@ -142,10 +142,16 @@
             var self = this;
             //console.log(genome);
             
-            this.$infoTable.empty()
-            	//.append(this.addInfoRow("ID", genome.id))
-            	.append(this.addInfoRow("Name", genome.scientific_name))
-            	.append('<tr><th>Taxonomic Lineage</th><td id="tax_td_'+this.pref+'"/></tr>');
+            var tbl = this.$infoTable.empty();
+            //tbl.append(this.addInfoRow("ID", genome.id));
+            tbl.append(this.addInfoRow("Name", genome.scientific_name));
+            if (genome.source_id) {
+            	var ncbi_tax_id = genome.source_id;
+            	if (ncbi_tax_id.indexOf('.') > 0)
+            		ncbi_tax_id = ncbi_tax_id.substring(0, ncbi_tax_id.indexOf('.'));
+                tbl.append(this.addInfoRow("Taxonomy ID", '<a href="/functional-site/#/taxnode/KBaseTaxonomyPublic/tax' + ncbi_tax_id + '" target="_blank">' + ncbi_tax_id + '</a>'));
+            }
+            tbl.append('<tr><th>Taxonomic Lineage</th><td id="tax_td_'+this.pref+'"/></tr>');
 
             self.hideMessage();
             this.$infoPanel.show();
