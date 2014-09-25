@@ -80,6 +80,10 @@
 	    $basicInfo.append($authors);
 	    $basicInfo.append('<div><strong>Description: </strong>&nbsp&nbsp'+ad['description']+"</div>");
 	    
+	    
+	    $basicInfo.append('<br><div><strong>Input Types: </strong>&nbsp&nbspKBaseGenomes.Genome</div>');
+	    $basicInfo.append('<div><strong>Output Types: </strong>&nbsp&nbspKBaseTrees.Tree</div>');
+	    
 	    var $topButtons = $('<div>').addClass("col-md-4").css("text-align","right").append(
 				      '<div>' +
 					'<h4><span class="label label-primary">#18 in the App Gallery</span></h4>' +
@@ -108,10 +112,28 @@
 	    self.$mainPanel.append($header);
 	    
 	    var imgHtml = "";
-	    for (var p=0; p<8; p++) {
-		imgHtml += '<td style="padding:10px;"><div style="background-color: gray; border: 1px solid black; padding-left:25px; padding-top:25px; width: 250px; height:250px;">'+
-		    '<br><h3>No Screenshot Available</h3>' +
-		    '</div></td>';
+	    if (ad['name'] === 'Sample App') {
+		imgHtml += '<td style="padding:10px;"><div style="border: 1px solid black; width: 350px; height:250px;">'+
+			'<img src="assets/images/social/sample_app11.png" width="100%">' +
+			'</div></td>';
+		imgHtml += '<td style="padding:10px;"><div style="border: 1px solid black; width: 350px; height:250px;">'+
+			'<img src="assets/images/social/sample_app12.png" width="100%">' +
+			'</div></td>';
+		imgHtml += '<td style="padding:10px;"><div style="border: 1px solid black; width: 350px; height:250px;">'+
+			'<img src="assets/images/social/sample_app13.png" width="100%">' +
+			'</div></td>';
+		imgHtml += '<td style="padding:10px;"><div style="border: 1px solid black; width: 350px; height:250px;">'+
+			'<img src="assets/images/social/sample_app14.png" width="100%">' +
+			'</div></td>';
+		imgHtml += '<td style="padding:10px;"><div style="border: 1px solid black; width: 350px; height:250px;">'+
+			'<img src="assets/images/social/sample_app15.png" width="100%">' +
+			'</div></td>';
+	    } else {
+		for (var p=0; p<8; p++) {
+		    imgHtml += '<td style="padding:10px;"><div style="background-color: gray; border: 1px solid black; padding-left:25px; padding-top:25px; width: 250px; height:250px;">'+
+			'<br><h3>No Screenshot Available</h3>' +
+			'</div></td>';
+		}
 	    }
 	    
 	    

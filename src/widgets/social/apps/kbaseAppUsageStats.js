@@ -80,10 +80,6 @@
 				'</div>'
 			    );
 	    
-	    
-	    
-	    
-	    
 	    $display.append('<div><strong>Most users ran these apps after running this app:</h4></strong></div>');
 	    $display.append('<div class="list-group">'+
 				'<a href="#/app/sampleapp" class="list-group-item"><span class="badge">#52 in the App Gallery</span>'+
