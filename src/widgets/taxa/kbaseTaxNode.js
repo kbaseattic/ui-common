@@ -15,7 +15,7 @@
             taxVer: null,
             token: null,
             workspaceURL: "http://dev04.berkeley.kbase.us:7058",  // "https://kbase.us/services/ws",
-            loadingImage: "static/kbase/images/ajax-loader.gif",
+            loadingImage: "assets/img/ajax-loader.gif",
             width: 1045,
             height: 600
         },
@@ -143,71 +143,139 @@
         	table2.append(tr);
         	var td1 = $('<td/>');
         	tr.append(td1);
-        	var subnodepanel = $('<table/>');
-        	td1.append(subnodepanel);
-        	self.loadSubNode(subnodepanel, subnodeinfos, 0);
+        	if (subnodeinfos.length > 0) {
+        		td1.append('<span style="display:block;">Loading...<img src="' + self.options.loadingImage + '"/></span>');
+        		self.loadSubNode(td1, subnodeinfos, 0);
+        	}
         	var td2 = $('<td/>');
         	tr.append(td2);
-        	var genomepanel = $('<table/>');
-        	td2.append(genomepanel);
-        	self.loadGenome(genomepanel, genometaxoninfos, 0);
+        	if (genometaxoninfos.length > 0) {
+        		td2.append('<span style="display:block;">Loading...<img src="' + self.options.loadingImage + '"/></span>');
+        		self.loadGenome(td2, genometaxoninfos, 0);
+        	}
         },
         
         loadSubNode: function(panel, objinfos, pos) {
             var self = this;
             if (!pos)
             	pos = 0;
-            if (pos >= objinfos.length)
+            if (pos >= objinfos.length) {
             	return;
-            var oinfo = objinfos[pos];
-            var objref = oinfo[6]+"/"+oinfo[0]+"/"+oinfo[4];
-            var objid = {ref: objref};
-    		var prom1 = self.wsClient.get_objects([objid]);
+            }
+            var objrefs = "";
+            var objids = [];
+            var block_size = 0;
+            while (pos < objinfos.length && block_size < 100) {
+            	var oinfo = objinfos[pos];
+            	var objref = oinfo[6]+"/"+oinfo[0]+"/"+oinfo[4];
+            	objids.push({ref: objref, included: ["name"]});
+            	//objids.push({ref: objref});
+            	if (objrefs.length > 0)
+            		objrefs += ", ";
+            	objrefs += objref;
+            	pos++;
+            	block_size++;
+            }
+    		var prom1 = self.wsClient.get_object_subset(objids);
+    		//var prom1 = self.wsClient.get_objects(objids);
     		$.when(prom1).done($.proxy(function(objArr) {
-        		var data = objArr[0];
-        		var node = data.data;
-        		var ws = data.info[7];
-        		var objname = data.info[1];
-        		var nodename = node.name; 
-        		panel.append('<a href="/functional-site/#/taxnode/' + ws + '/' + objname + '">' + nodename + '</a><br>');
-        		self.loadSubNode(panel, objinfos, pos + 1);
+        		self.loadSubNode(panel, objinfos, pos);
+    			for (var i in objArr) {
+    				var data = objArr[i];
+    				var node = data.data;
+    				var ws = data.info[7];
+    				var objname = data.info[1];
+    				var nodename = node.name; 
+    				panel.append('<span style="display:block;"><a href="/functional-site/#/taxnode/' + 
+    						ws + '/' + objname + '">' + nodename + '</a></span>');
+    			}
+    			self.sortSpanAhrefs(panel, true);
+        		self.updateFirstSpan(panel, pos, objinfos);
     		}, this));
     		$.when(prom1).fail($.proxy(function(error) { 
-        		panel.append('Error loading object ref=' + objref + ': ' + error.error.message + '<br>');
-        		self.loadSubNode(panel, objinfos, pos + 1);
+        		panel.append('Error loading object refs=[' + objrefs + ']: ' + error.error.message + '<br>');
+        		self.loadSubNode(panel, objinfos, pos);
+        		self.updateFirstSpan(panel, pos, objinfos);
     		}, this));
         },
 
+        sortSpanAhrefs: function(panel, skipFirst) {
+			var set = panel.children();
+			if (skipFirst)
+				set = set.slice(1);
+			set.sort(function(a, b) {
+				var compA = $(a).children().first().text();
+				var compB = $(b).children().first().text();
+				var ret = (compA === compB) ? 0 : ((compA < compB) ? -1 : 1)
+				return ret;
+			});
+			panel.append(set);
+        },
+        
+        updateFirstSpan: function(panel, pos, objinfos) {
+			var elem = panel.children().first();
+			if (pos < objinfos.length) {
+				elem.html('Loading (' + pos + ' out of ' + objinfos.length + ')...<img src="' + this.options.loadingImage + '"/>');
+			} else {
+    			elem.remove();
+			}
+        },
+        
         loadGenome: function(panel, objinfos, pos) {
             var self = this;
             if (!pos)
             	pos = 0;
             if (pos >= objinfos.length)
             	return;
-            var oinfo = objinfos[pos];
-            var objref = oinfo[6]+"/"+oinfo[0]+"/"+oinfo[4];
-            var objid = {ref: objref};
-    		var prom1 = self.wsClient.get_objects([objid]);
+            var objids = [];
+            var objrefs = "";
+            var blocksize = 0;
+            while (pos < objinfos.length && blocksize < 10) {
+            	var oinfo = objinfos[pos];
+            	var objref = oinfo[6]+"/"+oinfo[0]+"/"+oinfo[4];
+            	objids.push({ref: objref});
+            	if (objrefs.length > 0)
+            		objrefs += ", ";
+            	objrefs += objref;
+        		pos++;
+        		blocksize++;
+            }
+    		var prom1 = self.wsClient.get_objects(objids);
     		$.when(prom1).done($.proxy(function(objArr) {
-        		objref = objArr[0].data.genome_ref;
-        		var prom2 = self.wsClient.get_object_subset([{ref: objref, included: ["scientific_name"]}]);
+    			var subsets = [];
+    			objrefs = "";
+    			for (var i in objArr) {
+    				objref = objArr[i].data.genome_ref;
+    				subsets.push({ref: objref, included: ["scientific_name"]});
+    				if (objrefs.length > 0)
+    					objrefs += ", ";
+    				objrefs += objref;
+    			}
+        		var prom2 = self.wsClient.get_object_subset(subsets);
         		$.when(prom2).done($.proxy(function(objArr) {
-            		var data = objArr[0];
-            		var node = data.data;
-            		var ws = 'KBasePublicGenomesV4';  //data.info[7];
-            		var objname = data.info[1];
-            		var nodename = node.scientific_name; 
-            		panel.append('<a href="/functional-site/#/genomes/' + ws + '/' + objname + '">' + nodename + '</a><br>');
-            		self.loadGenome(panel, objinfos, pos + 1);
+            		self.loadGenome(panel, objinfos, pos);
+            		for (var i in objArr) {
+            			var data = objArr[i];
+            			var node = data.data;
+            			var ws = 'KBasePublicGenomesV4';  //data.info[7];
+            			var objname = data.info[1];
+            			var nodename = node.scientific_name + " (" + objname + ")"; 
+            			panel.append('<span style="display:block;"><a href="/functional-site/#/genomes/' + 
+            					ws + '/' + objname + '" target="_blank">' + nodename + '</a></span>');
+            		}
+        			self.sortSpanAhrefs(panel, true);
+            		self.updateFirstSpan(panel, pos, objinfos);
         		}, this));
         		$.when(prom2).fail($.proxy(function(error) { 
-            		panel.append('Error loading object ref=' + objref + ': ' + error.error.message + '<br>');
-            		self.loadGenome(panel, objinfos, pos + 1);
+            		panel.append('Error loading object refs=' + objrefs + ': ' + error.error.message + '<br>');
+            		self.loadGenome(panel, objinfos, pos);
+            		self.updateFirstSpan(panel, pos, objinfos);
         		}, this));            		
     		}, this));
     		$.when(prom1).fail($.proxy(function(error) { 
-        		panel.append('Error loading object ref=' + objref + ': ' + error.error.message + '<br>');
-        		self.loadGenome(panel, objinfos, pos + 1);
+        		panel.append('Error loading object refs=' + objrefs + ': ' + error.error.message + '<br>');
+        		self.loadGenome(panel, objinfos, pos);
+        		self.updateFirstSpan(panel, pos, objinfos);
     		}, this));
         },
 
