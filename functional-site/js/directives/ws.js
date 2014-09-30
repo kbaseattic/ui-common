@@ -743,7 +743,7 @@ angular.module('ws-directives')
                                     ' data-name="'+name+'" data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" ><b><i>'+
                                         name+'</i></b></a> (<a class="show-versions">'+instance+'</a>)'+
                                 (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
-                                '<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>';
+                                '<a class="btn-show-info pull-right invisible" >More</a>';
 
                     wsarray[1] = new_id;
                     url = "ws.id({ws:"+"'"+ws+"'})";
@@ -841,7 +841,7 @@ angular.module('ws-directives')
                                     '" data-module="'+module+'" '+'data-sub="'+sub+'">'+
                                     name+'</a>');
                     var ver_link = $('<a class="show-versions">'+instance+'</a>');
-                    var more_link = $('<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>');
+                    var more_link = $('<a class="btn-show-info pull-right invisible" >More</a>');
 
                     if (route) {
                         var url = route+"({ws:'"+ws+"', id:'"+name+"'})";
@@ -971,12 +971,10 @@ angular.module('ws-directives')
                 // effect for highlighting checkbox on hover
                 $('.obj-table tbody tr').hover(function() {
                     $(this).children('td').eq(0).find('.ncheck').addClass('ncheck-hover');
-                    $(this).find('.btn-show-info').css('visibility', 'visible')
-                    //$(this).find('.btn-show-info').removeClass('hide');
+                    $(this).find('.btn-show-info').removeClass('invisible');
                 }, function() {
                     $(this).children('td').eq(0).find('.ncheck').removeClass('ncheck-hover');
-                    $(this).find('.btn-show-info').css('visibility', 'hidden')                    
-                    //$(this).find('.btn-show-info').addClass('hide');
+                    $(this).find('.btn-show-info').addClass('invisible');
 
                 })
 

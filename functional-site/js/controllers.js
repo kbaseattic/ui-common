@@ -371,7 +371,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 .controller('WBTour', function($scope, $state, $stateParams, $location) {
-    $scope.selected_ws = 'chenryExample';  // workspace to use for tour
+    $scope.ws = 'chenryExample';  // workspace to use for tour
 
     // if not logged in, prompt for login
     if (!USER_ID) {
@@ -384,8 +384,8 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     } else {
         function checkSomething() {
             $scope.checkedList.push([ 'kb|g.0.fbamdl', 'chenryExample', 'FBAModel-2.0' ]);
-            $('.ncheck').eq(3).addClass('ncheck-checked');
             $scope.$apply();
+            $('.ncheck').eq(2).addClass('ncheck-checked');
         }
 
         var tour = [{element: '.btn-new-ws', text:'Create a new workspace here', placement: 'bottom'},
