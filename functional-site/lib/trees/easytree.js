@@ -1,4 +1,5 @@
-function EasyTree(canvasId, treeString, nodeIdToNameMap, leafClickListener, nodeColorFunc) {
+function EasyTree(canvasId, treeString, nodeIdToNameMap, leafClickListener, 
+		nodeColorFunc, init_conf) {
 	
 	var kn_g_tree = (typeof treeString === 'object') ? treeString : kn_parse(treeString);
 	
@@ -23,13 +24,15 @@ function EasyTree(canvasId, treeString, nodeIdToNameMap, leafClickListener, node
 		}
 	}
 	
-	var kn_g_conf = new Object();
 	var canvas = document.getElementById(canvasId);
 	
+	var kn_g_conf = new Object();
     var conf = kn_g_conf;
     conf.c_box = new Array();
-    conf.width = 1000; conf.height = 600;
-    conf.xmargin = 20; conf.ymargin = 20;
+    conf.width = 1000; 
+    conf.height = 600;
+    conf.xmargin = 20; 
+    conf.ymargin = 20;
     conf.fontsize = 8;
     conf.c_ext = "rgb(0,0,0)";
     conf.c_int = "rgb(255,0,0)";
@@ -39,8 +42,7 @@ function EasyTree(canvasId, treeString, nodeIdToNameMap, leafClickListener, node
     conf.c_hl = "rgb(180, 210, 255)";
     conf.c_hidden = "rgb(0,200,0)";
     conf.c_regex = "rgb(0,128,0)";
-//  conf.regex = ':S=([^:\\]]+)';
-    conf.regex = ':B=([^:\\]]+)';
+    conf.regex = ':B=([^:\\]]+)'; //':S=([^:\\]]+)';
     conf.xskip = 3.0;
     conf.yskip = 14;
     conf.box_width = 6.0;
@@ -49,6 +51,10 @@ function EasyTree(canvasId, treeString, nodeIdToNameMap, leafClickListener, node
     conf.is_circular = false;
     conf.show_dup = true;
     conf.runtime = 0;
+    conf.mode_switcher = true;
+    conf.collapsible = true;
+    for (var key in init_conf)
+    	conf[key] = init_conf[key];
 
     var changeLayoutX = 0;
     var changeLayoutY = 0;
@@ -57,21 +63,23 @@ function EasyTree(canvasId, treeString, nodeIdToNameMap, leafClickListener, node
     
     function plot(canvas, kn_g_tree, kn_g_conf) {
     	kn_plot_core(canvas, kn_g_tree, kn_g_conf);
-        var text = "Change layout";
-        var ctx = canvas.getContext("2d");
-        CanvasTextFunctions.enable(ctx);
-        ctx.strokeStyle = kn_g_conf.c_ext;
-        ctx.fillStyle = "rgb(180, 245, 220)";
-        var w = ctx.measureText(kn_g_conf.font, kn_g_conf.fontsize, text);
-        var x = kn_g_conf.width - 80;
-        var y = 1;
-        var h = kn_g_conf.fontsize * 1.5 + 1;
-        ctx.fillRect(x, y, w, h);
-        ctx.drawText(kn_g_conf.font, kn_g_conf.fontsize, x, y + kn_g_conf.fontsize * .8 + kn_g_conf.fontsize / 3, text);
-        changeLayoutX = x;
-        changeLayoutY = y;
-        changeLayoutW = w;
-        changeLayoutH = h;
+    	if (kn_g_conf.mode_switcher) {
+    		var text = "Change layout";
+    		var ctx = canvas.getContext("2d");
+    		CanvasTextFunctions.enable(ctx);
+    		ctx.strokeStyle = kn_g_conf.c_ext;
+    		ctx.fillStyle = "rgb(180, 245, 220)";
+    		var w = ctx.measureText(kn_g_conf.font, kn_g_conf.fontsize, text);
+    		var x = kn_g_conf.width - 80;
+    		var y = 1;
+    		var h = kn_g_conf.fontsize * 1.5 + 1;
+    		ctx.fillRect(x, y, w, h);
+    		ctx.drawText(kn_g_conf.font, kn_g_conf.fontsize, x, y + kn_g_conf.fontsize * .8 + kn_g_conf.fontsize / 3, text);
+    		changeLayoutX = x;
+    		changeLayoutY = y;
+    		changeLayoutW = w;
+    		changeLayoutH = h;
+    	}
     }
     
     function changeLayout(isCircular) {
@@ -105,6 +113,8 @@ function EasyTree(canvasId, treeString, nodeIdToNameMap, leafClickListener, node
             if (id >= 0 && id < kn_g_tree.node.length) {
                 var tree = kn_g_tree, conf = kn_g_conf, i = id;
                 if (i < tree.node.length && tree.node[i].child.length) {
+                	if (!kn_g_conf.collapsible)
+                		return;
                 	if (!tree.node[i].parent)
                 		return;
                     tree.node[i].hidden = !tree.node[i].hidden;
@@ -117,7 +127,7 @@ function EasyTree(canvasId, treeString, nodeIdToNameMap, leafClickListener, node
                 } else if (leafClickListener) {
             		leafClickListener(kn_g_tree.node[id], id);
             	}
-            } else {
+            } else if (kn_g_conf.mode_switcher) {
             	var x = ev._x;
             	var y = ev._y;
             	if (x >= changeLayoutX && x < changeLayoutX + changeLayoutW &&
