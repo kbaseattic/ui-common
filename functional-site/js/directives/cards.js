@@ -492,6 +492,17 @@ angular.module('card-directives')
             }
         };
     })
+    .directive('domainsearchcards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "domainsearch", 
+                    data: scope.params
+                });
+            }
+        };
+    })
 ;
 
 

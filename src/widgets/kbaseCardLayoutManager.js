@@ -762,6 +762,8 @@
                 this.showKidlEdtCards();
             else if (this.options.template.toLowerCase() === "taxnode")
                 this.showTaxNodeCards();
+            else if (this.options.template.toLowerCase() === "domainsearch")
+                this.showDomainSearchCards();
             else {
                 // throw an error for an unknown template. modal dialog, maybe?
             }
@@ -1525,6 +1527,22 @@
             this.addNewCard("kbaseTaxNode",
                     {
             			taxID: this.options.data.id,
+            			workspaceID: this.options.data.ws,
+                        isInCard: true
+                    },
+                    {
+                        my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+
+        showDomainSearchCards: function() {
+            this.addNewCard("kbaseDomainBrowser",
+                    {
+            			dcsrID: this.options.data.id,
             			workspaceID: this.options.data.ws,
                         isInCard: true
                     },

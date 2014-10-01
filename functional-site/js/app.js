@@ -513,6 +513,12 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		templateUrl: 'views/objects/kidledt.html',
 		controller: 'KidlEdtDetail'});
 
+    $stateProvider
+	.state('domainsearch',
+		{url: '/domainsearch/:ws/:id',
+		templateUrl: 'views/objects/domainsearch.html',
+		controller: 'DomainSearchDetail'});
+
     $urlRouterProvider.when('', '/login/')
                       .when('/', '/login/')
                       .when('#', '/login/');

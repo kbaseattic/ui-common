@@ -1,6 +1,6 @@
 function EasyTree(canvasId, treeString, nodeIdToNameMap, leafClickListener, nodeColorFunc) {
 	
-	var kn_g_tree = kn_parse(treeString);
+	var kn_g_tree = (typeof treeString === 'object') ? treeString : kn_parse(treeString);
 	
 	if (nodeIdToNameMap) {
 		for (var nodePos in kn_g_tree.node) {
