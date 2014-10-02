@@ -195,10 +195,10 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
     $scope.type = $stateParams.type;
 
-
     var sub = $location.path().split('/')[1]
     if (sub == 'narratives') {
         $scope.tab = $location.path().split('/')[2];
+        console.log('tab', $scope.tab )
     }
 
 
@@ -545,15 +545,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 
-
-.controller('NarrativeCtrl', function($scope, $stateParams, $location) {
-    $scope.tab = $location.path().split('/')[2];
-
-    console.log('TAB in controller ', $scope.tab)
-
-
-})
-
 .controller('Narrative', function($scope, $stateParams, $location, kbaseLogin, $modal, FeedLoad) {
     //changeNav('narrative', 'newsfeed');
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives
@@ -637,19 +628,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 
-
-/*
-.controller('CopyNarrativeModalCtrl', function ($scope, $modalInstance) {
-// controller for the modals to copy a featured narrative 
-  $scope.save = function () {
-    $modalInstance.dismiss('cancel');
-  };
-
-  $scope.cancel = function () {
-    $modalInstance.dismiss('cancel');
-  };
-})
-*/
 .controller('NarrativeProjects', function($scope, $stateParams) {
 
 })

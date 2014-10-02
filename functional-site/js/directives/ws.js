@@ -315,7 +315,7 @@ angular.module('ws-directives')
 })
 
 
-.directive('objtable', function($location, $compile, modals, favoriteService) {
+.directive('objtable', function($location, $compile, modals) {
     return {
         link: function(scope, element, attrs) {
             var ws = scope.ws;
@@ -1074,7 +1074,7 @@ angular.module('ws-directives')
 
                 copy_btn.find('.btn-mv-obj-to-nar').on('click', copyObjectsToNarrative);                                        
                 rename_btn.on('click', renameObject);
-                mv_btn.on('click', addToMV);
+                //mv_btn.on('click', addToMV);
 
                 var container = $('.table-options').append(options);
 
@@ -1900,7 +1900,6 @@ angular.module('ws-directives')
     return {
         templateUrl: 'views/ws/analysis-tools.html',
         link: function(scope, element, attrs) {
-            console.log('called')
 
             scope.clearSideBar = function() {
                 $(element).html('');
@@ -1945,7 +1944,6 @@ angular.module('ws-directives')
                 $('.widget-btn').unbind('click');
                 $('.widget-btn').click(function() {
                     var widget = $(this).data('id');
-                    console.log(widget)
                     loadForm(widget)
                 })
             }
@@ -2051,18 +2049,15 @@ angular.module('ws-directives')
                     }
                 }
 
-                console.log('found form', form)
 
                 var groups = $('<form class="form-horizontal" role="form">');
 
                 // load each input field
                 for (var i in form) {
                     var field = form[i];
-                    console.log(field.name);
 
                     var group = $('<div class="form-group">');
                     if (!(field.input) || field.input == 'text') {
-                        console.log(field)
                         group.append('<label class="col-sm-2 control-label" >'+
                                         field.name+
                                    '</label>')

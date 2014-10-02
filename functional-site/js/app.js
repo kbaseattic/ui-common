@@ -21,7 +21,7 @@ var cardManager = undefined;
 
 var app = angular.module('landing-pages', 
     ['lp-directives', 'card-directives',
-     'trees-directives', 'fav-directives',
+     'trees-directives',
      'ws-directives', 'modeling-directives', 
      'communities-directives', 'narrative-directives', 
      'ui.router', 'ngResource', 'kbaseLogin', 
@@ -201,12 +201,13 @@ var app = angular.module('landing-pages',
         });
 
     // not in use
+    /*
     $stateProvider
         .state('favorites', {
           url: "/favorites/",
           templateUrl: 'views/ws/favorites.html',
           controller: 'Favorites'
-        });
+        });*/
 
     // other pages
     $stateProvider

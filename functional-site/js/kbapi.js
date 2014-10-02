@@ -18,27 +18,27 @@ function KBCacheClient(token) {
             search_url = configJSON.prod.search_url;
         }
     } else {
-        fba_url = "http://140.221.85.73:4043/"
+        fba_url = "https://140.221.85.73:4043/"
         ws_url = "https://kbase.us/services/ws/"
-        ujs_url = "http://140.221.84.180:7083"
+        //ujs_url = "http://140.221.84.180:7083"
         search_url = "http://dev07.berkeley.kbase.us/search/"
     }
 
     console.log('FBA URL is:', fba_url);
     console.log('Workspace URL is:', ws_url);
-    console.log('User Job State URL is:', ujs_url);
+    //console.log('User Job State URL is:', ujs_url);
     console.log('Search Service URL is:', search_url);    
 
     var fba = new fbaModelServices(fba_url, auth);
     var kbws = new Workspace(ws_url, auth);
-    var ujs = new UserAndJobState(ujs_url, auth);
+    //var ujs = new UserAndJobState(ujs_url, auth);
 
     var cache = new Cache();
 
     // some kbase apis
     self.fba = fba;
     self.ws = kbws;
-    self.ujs = ujs;
+    //self.ujs = ujs;
     self.nar = new ProjectAPI(ws_url, token);
 
     // some accessible variables
