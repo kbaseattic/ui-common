@@ -335,7 +335,7 @@
         		rows.sort(function(a,b){return a.y-b.y});
                 var geneTable = $('<table style="margin: 0px; padding: 0px;"/>');
                 rightTd.append(geneTable);
-                var h = self.options.rowHeight + 0.3;
+                var h = self.options.rowHeight + 0.33;
                 for (var rowPos in rows) {
         			var geneTr = $('<tr style="margin: 0px; padding: 0px;"/>');
         			geneTable.append(geneTr);
@@ -489,7 +489,9 @@
                 		included3.push("data/" + contigId + "/" + i);
                     var prom3 = self.wsClient.get_object_subset([{ref: annRef, included: included3}]);
                     $.when(prom3).done($.proxy(function(objArr) {
-                    	var text = "";
+                    	var items = [];
+                    	var minPos = null;
+                    	var maxPos = null;
                     	for (var elemPos in objArr[0].data.data[contigId]) {
                     		var elem = objArr[0].data.data[contigId][elemPos];
                     		var fId = elem[0];
@@ -497,7 +499,6 @@
                     		var fStop = elem[2];
                     		var fDir = elem[3];
                     		var domToPlace = elem[4];
-                    		var domCount = 0;
                     		for (var domRef in domToPlace) {
                     			if (!dcsr.domain_cluster_statistics[domRef])
                     				continue;
@@ -509,25 +510,161 @@
                     				var stopInF = place[1];
                     				if (fStart + 3 * stopInF > fStop)
                     					fStop = fStart + 3 * stopInF;
+                    			}
+                    		}
+                    		if (fStop < fStart + 100)
+                    			fStop = fStart + 100;
+                    		var domText = "";
+                    		var dItems = [];
+                    		for (var domRef in domToPlace) {
+                    			if (!dcsr.domain_cluster_statistics[domRef])
+                    				continue;
+                    			var domName = dcsr.domain_cluster_statistics[domRef].name;
+                    			var places = domToPlace[domRef];
+                    			for (var placePos in places) {
+                    				var place = places[placePos];
+                    				var startInF = place[0];
+                    				var stopInF = place[1];
                     				var evalue = place[2];
                     				var bitscore = place[3];
                     				var coverage = place[4];
-                    				if (coverage)
-                    					domCount++;
+                    				domText += place + "; ";
+                    				var domDescr = "[" + startInF + ".." + stopInF + "], e-value=" + 
+                    					evalue + ", bit-score=" + bitscore + ", domain-coverage=" + coverage;
+                    				var dStart = fDir > 0 ? (fStart + 3 * startInF) : (fStop - 3 * stopInF);
+                    				var dStop = fDir > 0 ? (fStart + 3 * stopInF) : (fStop - 3 * startInF);
+                            		dItems.push({id: domName, descr: domDescr, start: dStart, stop: dStop, dir: fDir, color: null, h: 10});
                     			}
                     		}
-                    		if (fStop < fStart + 50)
-                    			fStop = fStart + 50;
-                    		text += fId + "," + fStart + "," + fStop + "," + fDir + "," + domCount + "; ";
+                    		dItems.sort(function(a,b){ return a.stop-a.start-(b.stop-b.start)});
+                    		var descr = fId + " [" + fStart + ".." + fStop + "]" + (fDir > 0 ? "+" : "-") + ", [" + domText + "]";
+                    		items.push({id: fId, descr: descr, start: fStart, stop: fStop, dir: fDir, color: '#dddddd', h: 20});
+                    		for (var dItem in dItems)
+                    			items.push(dItems[dItem]);
+                    		if (fId === featureId) {
+                    			minPos = fStart - 3000;
+                    			maxPos = fStop + 3000;
+                    		}
                     	}
+                    	var idToColor = {};
+                    	var idCount = 0;
+                    	for (var ipos in items) {
+                    		var item = items[ipos];
+                    		if (item.color)
+                    			continue;
+                    		var id = item.id;
+                    		if (idToColor[id])
+                    			continue;
+                    		idToColor[id] = idCount;
+                    		idCount++;
+                    	}
+                    	var colors = [];
+                    	for (var i = 0; i < idCount; i++)
+                    		colors.push(self.rainbow(idCount, i));
+                    	for (var ipos in items) {
+                    		var item = items[ipos];
+                    		if (item.color)
+                    			continue;
+                    		item.color = colors[idToColor[item.id]];
+                    	}                    	
                     	panel.empty();
-                    	panel.append('<span style="white-space: nowrap;">' + text + '</span>');
+                    	self.prepareSvg(minPos, maxPos, items, panel, 500, 24);
                     }, this));
                     $.when(prom3).fail($.proxy(function(error) {err(error);}, this));            	
                 }, this));
                 $.when(prom2).fail($.proxy(function(error) {err(error);}, this));            	
             }, this));
             $.when(prom).fail($.proxy(function(error) {err(error);}, this));
+        },
+
+        prepareSvg: function(minPos, maxPos, items, panel, pw, ph) {
+        	var posLen = maxPos - minPos;
+            var tooltip = d3.select("body")
+            	.append("div")
+            	.classed("kbcb-tooltip", true);
+        	var svg = d3.select(panel[0]).append("svg")
+        		.attr("width", pw)
+        		.attr("height", ph)
+        		.classed("kbcb-widget", true);
+            var trackContainer = svg.append("g");
+            var pathRight = function(left, top, height, width) {
+                var path = "M" + left + " " + top;
+                if (width > 10) {
+                    path += " L" + (left+(width-10)) + " " + top +
+                            " L" + (left+width) + " " + (top+height/2) +
+                            " L" + (left+(width-10)) + " " + (top+height) +
+                            " L" + left + " " + (top+height) + " Z";
+                } else {
+                    path += " L" + (left+width) + " " + (top+height/2) +
+                            " L" + left + " " + (top+height) + " Z";
+                }
+                return path;
+            };
+            var pathLeft = function(left, top, height, width) {
+                var path = "M" + (left+width) + " " + top;
+                if (width > 10) {
+                    path += " L" + (left+10) + " " + top +
+                            " L" + left + " " + (top+height/2) +
+                            " L" + (left+10) + " " + (top+height) +
+                            " L" + (left+width) + " " + (top+height) + " Z";
+                } else {
+                    path += " L" + left + " " + (top+height/2) +
+                            " L" + (left+width) + " " + (top+height) + " Z";
+                }
+                return path;
+            };
+            var itemPath = function(d) {
+            	var left = pw * (d.start - minPos) / posLen;
+            	var width = pw * (d.stop - d.start) / posLen;
+            	var height = d.h;
+            	var top = (ph - height) / 2;
+            	return d.dir > 0 ? pathRight(left, top, height, width) :
+            		pathLeft(left, top, height, width);
+            };
+            var trackSet = trackContainer.selectAll("path")
+            	.data(items, function(d) { return d.id; });
+            trackSet.enter()
+            	.append("path")
+            	.attr("id", function(d) { return d.id; })
+            	.attr("d", function(d) { return itemPath(d); })
+            	.style("fill", function(d) { return d.color; })
+            	.style("stroke", "black")
+            	.on("mouseover", function(d) { 
+            		d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
+            		tooltip = tooltip.text(d.id + ": " + d.descr);
+            		return tooltip.style("visibility", "visible"); 
+            	})
+            	.on("mouseout", function() { 
+            		d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
+            		return tooltip.style("visibility", "hidden"); 
+            	})
+            	.on("mousemove", function() { 
+            		return tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+            	})
+            	.on("click", function(d) { 
+            	});
+            trackSet.exit().remove();
+        },
+
+        rainbow: function(numOfSteps, step) {
+            // This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal for creating easily distinguishable vibrant markers in Google Maps and other apps.
+            // Adam Cole, 2011-Sept-14
+            // HSV to RBG adapted from: http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+            var r, g, b;
+            var h = step / numOfSteps;
+            var i = ~~(h * 6);
+            var f = h * 6 - i;
+            var q = 1 - f;
+            switch(i % 6){
+                case 0: r = 1, g = f, b = 0; break;
+                case 1: r = q, g = 1, b = 0; break;
+                case 2: r = 0, g = 1, b = f; break;
+                case 3: r = 0, g = q, b = 1; break;
+                case 4: r = f, g = 0, b = 1; break;
+                case 5: r = 1, g = 0, b = q; break;
+            }
+            var c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
+            return (c);
         },
         
         renderError: function(error) {
