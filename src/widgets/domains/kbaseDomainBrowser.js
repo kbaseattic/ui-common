@@ -19,7 +19,8 @@
             height: null, //600,
             treeWorkspace: "KBasePublicGeneDomains",
             maxNumberOfTreeNeighbors: 50,
-            rowHeight: 25
+            rowHeight: 25,
+            maxGenomeNameLength: 30
         },
 
         pref: null,
@@ -31,6 +32,10 @@
             if (!this.authToken()) {
                 this.renderError("You're not logged in!");
             } else {
+            	if (this.options.workspaceID === '*')
+            		this.options.workspaceID = "KBasePublicGeneDomains";
+            	if (this.options.dcsrID == "*")
+            		this.options.dcsrID = "CogAndPfam.dcsr";
                 this.wsClient = new Workspace(this.options.workspaceURL, {token: this.authToken()});
                 this.$messagePane = $("<div/>")
                                     .addClass("kbwidget-message-pane kbwidget-hide-message");
@@ -213,6 +218,31 @@
             var prom = this.wsClient.get_objects([{ref: dcRef}]);
             $.when(prom).done($.proxy(function(objArr) {
         		panel.empty();
+        		var dc = objArr[0].data;
+        		var domainPlaces = [];
+        		for (var genomeRef in dc.data) {
+    				var genomeName = dcsr.genome_statistics[genomeRef].scientific_name;
+        			var elems = dc.data[genomeRef];
+        			for (var elemPos in elems) {
+        				var elem = elems[elemPos];
+        				var featureId = elem[1];
+        				var places = elem[3];
+        				for (var dpPos in places) {
+        					var dp = places[dpPos];
+        					var start = dp[0];
+        					var stop = dp[1];
+        					var evalue = dp[2];
+        					var bitscore = dp[3];
+        					var coverage = dp[4];
+        					var ahref = '<a class="show-places_'+self.pref+'" data-gnm="'+genomeRef+'" '+
+        						'data-dom="'+domainRef+'" data-feat="'+featureId+'" data-start="'+start+'">';
+        					domainPlaces.push({genome: ahref+genomeName+'</a>', domain: ahref+domainName+'</a>', 
+        						feature: featureId, start: start, stop: stop, evalue: evalue, bitscore: bitscore, 
+        						coverage: coverage});
+        				}
+        			}
+        		}
+        		self.buildDomainPlaceTable(dcsr, domainPlaces, panel, tabs);
             }, this));
             $.when(prom).fail($.proxy(function(error) { 
             	panel.append($("<div>")
@@ -300,6 +330,10 @@
         			var feature = label.substring(us1 + 1, us2);
         			var start = parseInt(label.substring(us2 + 1));
         			var genomeName = dcsr.genome_statistics[genome].scientific_name;
+        			var gnl = genomeName.length;
+        			var hnl = Math.floor(self.options.maxGenomeNameLength / 2);
+        			if (gnl > hnl * 2)
+        				genomeName = genomeName.substring(0, hnl) + "..." + genomeName.substring(gnl - hnl, gnl);
         			fullNodeLabels[nodeId] = genomeName + ", " + feature + ", " + start;
         		}
                 var table = $('<table style="margin: 0px; padding: 0px;"/>');
@@ -316,7 +350,7 @@
                         	if (node.id && node.id === startNodeId)
                         		return "#0000ff";
                 			return null;
-                		}, {width: 500, yskip: self.options.rowHeight, mode_switcher: false, 
+                		}, {width: 500, yskip: self.options.rowHeight - 0.3, mode_switcher: false, 
                 			collapsible: false, ymargin: 5});
         		var rows = [];
         		for (var i in tree.node) {
@@ -335,13 +369,14 @@
         		rows.sort(function(a,b){return a.y-b.y});
                 var geneTable = $('<table style="margin: 0px; padding: 0px;"/>');
                 rightTd.append(geneTable);
-                var h = self.options.rowHeight + 0.33;
+                var h = self.options.rowHeight;
+                var idToColor = {};
                 for (var rowPos in rows) {
         			var geneTr = $('<tr style="margin: 0px; padding: 0px;"/>');
         			geneTable.append(geneTr);
         			var geneTd = $('<td style="margin: 0px; padding: 0px; height: '+h+'px; min-height: '+h+'px; max-height:'+h+'px;"/>');
         			geneTr.append(geneTd);
-        			self.loadGenes(dcsr, rows[rowPos], geneTd);
+        			self.loadGenes(dcsr, rows[rowPos], geneTd, idToColor);
         		}
             }, this));
             $.when(prom).fail($.proxy(function(error) { 
@@ -456,13 +491,10 @@
         	}
         },
 
-        loadGenes: function(dcsr, row, panel) {
+        loadGenes: function(dcsr, row, panel, idToColor) {
             function err(error) {
         		panel.empty();
-            	panel.append($("<div>")
-                            .addClass("alert alert-danger")
-                            .append("<b>Error:</b>")
-                            .append("<br>" + error.error.message));
+            	panel.append("<b>Error:</b> " + error.error.message);
             }
         	var self = this;
         	panel.append('loading...');
@@ -520,6 +552,8 @@
                     			if (!dcsr.domain_cluster_statistics[domRef])
                     				continue;
                     			var domName = dcsr.domain_cluster_statistics[domRef].name;
+                				if (domName.indexOf('.domain') > 0)
+                					domName = domName.substring(0, domName.indexOf('.domain'));
                     			var places = domToPlace[domRef];
                     			for (var placePos in places) {
                     				var place = places[placePos];
@@ -528,47 +562,28 @@
                     				var evalue = place[2];
                     				var bitscore = place[3];
                     				var coverage = place[4];
-                    				domText += place + "; ";
-                    				var domDescr = "[" + startInF + ".." + stopInF + "], e-value=" + 
+                    				domText += domName + ":" + place + "; ";
+                    				var domDescr = domName + ": [" + startInF + ".." + stopInF + "], e-value=" + 
                     					evalue + ", bit-score=" + bitscore + ", domain-coverage=" + coverage;
                     				var dStart = fDir > 0 ? (fStart + 3 * startInF) : (fStop - 3 * stopInF);
                     				var dStop = fDir > 0 ? (fStart + 3 * stopInF) : (fStop - 3 * startInF);
-                            		dItems.push({id: domName, descr: domDescr, start: dStart, stop: dStop, dir: fDir, color: null, h: 10});
+                    				var color = self.getColorForId(idToColor, domName);
+                            		dItems.push({id: fId + "-" + domName, descr: domDescr, 
+                            			start: dStart, stop: dStop, dir: fDir, color: color, h: 9});
                     			}
                     		}
                     		dItems.sort(function(a,b){ return a.stop-a.start-(b.stop-b.start)});
-                    		var descr = fId + " [" + fStart + ".." + fStop + "]" + (fDir > 0 ? "+" : "-") + ", [" + domText + "]";
-                    		items.push({id: fId, descr: descr, start: fStart, stop: fStop, dir: fDir, color: '#dddddd', h: 20});
+                    		var descr = fId + ": [" + fStart + ".." + fStop + "]" + (fDir > 0 ? "+" : "-") + ", [" + domText + "]";
+                    		items.push({id: fId, descr: descr, start: fStart, stop: fStop, dir: fDir, color: '#dddddd', h: 18});
                     		for (var dItem in dItems)
                     			items.push(dItems[dItem]);
                     		if (fId === featureId) {
-                    			minPos = fStart - 3000;
-                    			maxPos = fStop + 3000;
+                    			minPos = fStart - 5000;
+                    			maxPos = fStop + 5000;
                     		}
                     	}
-                    	var idToColor = {};
-                    	var idCount = 0;
-                    	for (var ipos in items) {
-                    		var item = items[ipos];
-                    		if (item.color)
-                    			continue;
-                    		var id = item.id;
-                    		if (idToColor[id])
-                    			continue;
-                    		idToColor[id] = idCount;
-                    		idCount++;
-                    	}
-                    	var colors = [];
-                    	for (var i = 0; i < idCount; i++)
-                    		colors.push(self.rainbow(idCount, i));
-                    	for (var ipos in items) {
-                    		var item = items[ipos];
-                    		if (item.color)
-                    			continue;
-                    		item.color = colors[idToColor[item.id]];
-                    	}                    	
                     	panel.empty();
-                    	self.prepareSvg(minPos, maxPos, items, panel, 500, 24);
+                    	self.prepareSvg(minPos, maxPos, items, panel, 500, 20);
                     }, this));
                     $.when(prom3).fail($.proxy(function(error) {err(error);}, this));            	
                 }, this));
@@ -631,7 +646,7 @@
             	.style("stroke", "black")
             	.on("mouseover", function(d) { 
             		d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
-            		tooltip = tooltip.text(d.id + ": " + d.descr);
+            		tooltip = tooltip.text(d.descr);
             		return tooltip.style("visibility", "visible"); 
             	})
             	.on("mouseout", function() { 
@@ -644,6 +659,20 @@
             	.on("click", function(d) { 
             	});
             trackSet.exit().remove();
+        },
+
+        getColorForId: function(idToColor, id) {
+        	var ret = idToColor[id];
+        	if (!ret) {
+        		var hash = 0;
+        	    for (var i = 0; i < id.length; i++)
+        	       hash = id.charCodeAt(i) + ((hash << 5) - hash);
+        	    var code = Math.abs(hash + Math.floor(Math.random() * 1000)) % 1000;
+        		ret = this.rainbow(1000, code);
+        	    //console.log(id + " -> " + hash + " -> " + code + " -> " + ret);
+        		idToColor[id] = ret;
+        	}
+        	return ret;
         },
 
         rainbow: function(numOfSteps, step) {
@@ -684,10 +713,10 @@
 
         getData: function() {
             return {
-                type: 'TaxNone',
+                type: 'DomainBrowser',
                 id: this.options.taxID,
                 workspace: this.options.workspaceID,
-                title: 'Taxonomy'
+                title: 'Domain Browser'
             };
         },
 
