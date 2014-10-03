@@ -198,7 +198,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     var sub = $location.path().split('/')[1]
     if (sub == 'narratives') {
         $scope.tab = $location.path().split('/')[2];
-        console.log('tab', $scope.tab )
     }
 
 
