@@ -194,7 +194,7 @@
         						var coverage = dp[4];
         						var ahref = '<a class="show-places_'+self.pref+'" data-gnm="'+genomeRef+'" '+
         							'data-dom="'+domainRef+'" data-feat="'+featureId+'" data-start="'+start+'">';
-        						domainPlaces.push({genome: ahref+genomeName+'</a>', domain: ahref+domainName+'</a>', 
+        						domainPlaces.push({genome: genomeName, domain: ahref+domainName+'</a>', 
         							feature: featureId, start: start, stop: stop, evalue: evalue, bitscore: bitscore, 
         							coverage: coverage});
         					}
@@ -236,7 +236,7 @@
         					var coverage = dp[4];
         					var ahref = '<a class="show-places_'+self.pref+'" data-gnm="'+genomeRef+'" '+
         						'data-dom="'+domainRef+'" data-feat="'+featureId+'" data-start="'+start+'">';
-        					domainPlaces.push({genome: ahref+genomeName+'</a>', domain: ahref+domainName+'</a>', 
+        					domainPlaces.push({genome: ahref+genomeName+'</a>', domain: domainName, 
         						feature: featureId, start: start, stop: stop, evalue: evalue, bitscore: bitscore, 
         						coverage: coverage});
         				}
@@ -311,16 +311,18 @@
         		panel.empty();
         		var treeObj = objArr[0].data;
         		var startLabel = '' + genomeRef + '_' + featureId + '_' + startInFeature;
+        		//console.log("startLabel=" + startLabel);
             	var startNodeId = null;
             	for (var nodeId in treeObj.default_node_labels) {
+            		//console.log("label=" + treeObj.default_node_labels[nodeId]);
             		if (treeObj.default_node_labels[nodeId] === startLabel) {
             			startNodeId = nodeId;
+                    	//console.log("startNodeId=" + startNodeId);
             			break;
             		}
             	}
-            	//console.log(startLabel + " -> " + startNodeId);
+            	//console.log("startNodeId=" + startNodeId);
         		var tree = self.cutTree(treeObj.tree, startNodeId, self.options.maxNumberOfTreeNeighbors);
-        		//console.log(tree);
         		var fullNodeLabels = {};
         		for (var nodeId in treeObj.default_node_labels) {
         			var label = treeObj.default_node_labels[nodeId];
@@ -344,7 +346,7 @@
                 tr.append(leftTd);
                 var rightTd = $('<td style="margin: 0px; padding: 0px;"/>');
                 tr.append(rightTd);
-                var canvasId = "knhx-canvas-" + self.pref;
+                var canvasId = "knhx-canvas-" + self.uuid();
                 leftTd.append('<canvas id="' + canvasId + '">');
                 new EasyTree(canvasId, tree, fullNodeLabels, function(node) {}, function(node) {
                         	if (node.id && node.id === startNodeId)
@@ -352,7 +354,7 @@
                 			return null;
                 		}, {width: 500, yskip: self.options.rowHeight - 0.3, mode_switcher: false, 
                 			collapsible: false, ymargin: 5});
-        		var rows = [];
+                var rows = [];
         		for (var i in tree.node) {
         			var node = tree.node[i];
         			if (node.child.length == 0) {
@@ -376,8 +378,25 @@
         			geneTable.append(geneTr);
         			var geneTd = $('<td style="margin: 0px; padding: 0px; height: '+h+'px; min-height: '+h+'px; max-height:'+h+'px;"/>');
         			geneTr.append(geneTd);
-        			self.loadGenes(dcsr, rows[rowPos], geneTd, idToColor);
+        			geneTd.append('loading...');
+        			rows[rowPos].panel = geneTd;
+        			//self.loadGenes(dcsr, rows, rowPos, idToColor);
         		}
+        		var groupMap = {};
+                for (var rowPos in rows) {
+                	var row = rows[rowPos];
+                	var gnmRef = row.genome;
+    				var group = groupMap[gnmRef];
+    				if (!group) {
+    					group = [];
+    					groupMap[gnmRef] = group
+    				}
+    				group.push(row);
+                }
+                var groups = [];
+                for (var key in groupMap)
+                	groups.push(groupMap[key]);
+                self.loadGenes(dcsr, groups, 0, idToColor);
             }, this));
             $.when(prom).fail($.proxy(function(error) { 
         		panel.empty();
@@ -390,11 +409,11 @@
         
         cutTree: function(treeString, startNodeName, numberOfNeighbors) {
         	var self = this;
+        	//console.log("treeString=" + treeString);
+        	//console.log("startNodeName=" + startNodeName);
         	var tree = kn_parse(treeString);
-        	//console.log(tree);
         	var nodeNameToDist = {};
         	collectDistFromStart(tree.root, startNodeName, nodeNameToDist);
-        	//console.log(nodeNameToDist);
         	var nodeNames = [];
         	for (var name in nodeNameToDist)
         		nodeNames.push(name);
@@ -403,13 +422,13 @@
         	closeNodeNames[startNodeName] = 1;
         	for (var i = 0; i < Math.min(numberOfNeighbors, nodeNames.length); i++)
         		closeNodeNames[nodeNames[i]] = 1;
-        	//console.log(closeNodeNames);
         	var leafs = cutAbsent(tree.root, closeNodeNames);
         	for (var i = tree.node.length - 1; i >= 0; i--) {
         		if (tree.node[i].meta === "del")
         			tree.node.splice(i, 1);
         	}
         	tree.n_tips = leafs;
+        	//console.log(tree);
         	return tree;
         	function collectDistFromStart(node, startName, nameToDist) {
         		var startPos = null;
@@ -491,99 +510,166 @@
         	}
         },
 
-        loadGenes: function(dcsr, row, panel, idToColor) {
+        loadGenes: function(dcsr, groups, groupPos, idToColor) {
+        	var self = this;
+        	//console.log("In loadGenes: groupPos=" + groupPos);
+        	if (groupPos >= groups.length)
+        		return;
             function err(error) {
         		panel.empty();
             	panel.append("<b>Error:</b> " + error.error.message);
+            	self.loadGenes(dcsr, groups, groupPos, idToColor);
             }
-        	var self = this;
-        	panel.append('loading...');
-        	var genomeRef = row.genome;
-        	var annRef = dcsr.annotation_refs[genomeRef];
-        	var featureId = row.feature;
-        	var startInFeature = row.start;
-            var prom = this.wsClient.get_object_subset([{ref: annRef, 
-            	included: ["feature_to_contig_and_index/" + featureId]}]);
+        	var rows = groups[groupPos];
+        	groupPos++;
+        	//console.log(rows);
+        	var included1 = [];
+        	var annRef = null;
+        	for (var rowPos in rows) {
+        		var row = rows[rowPos];
+        		var featureId = row.feature;
+        		included1.push("feature_to_contig_and_index/" + featureId);
+        		if (!annRef) {
+            		var genomeRef = row.genome;
+            		annRef = dcsr.annotation_refs[genomeRef];
+        		}
+        	}
+            var prom = this.wsClient.get_object_subset([{ref: annRef, included: included1}]);
             $.when(prom).done($.proxy(function(objArr) {
-            	var contigIdAndFeatIndex = objArr[0].data.feature_to_contig_and_index[featureId];
-            	var contigId = contigIdAndFeatIndex[0];
-            	var featureIndex = contigIdAndFeatIndex[1];
-                var prom2 = self.wsClient.get_object_subset([{ref: annRef, 
-                	included: ["contig_to_size_and_feature_count/" + contigId]}]);
+            	var included2 = [];
+            	for (var rowPos in rows) {
+            		var row = rows[rowPos];
+            		var featureId = row.feature;
+            		var contigIdAndFeatIndex = objArr[0].data.feature_to_contig_and_index[featureId];
+            		var contigId = contigIdAndFeatIndex[0];
+            		row.contig = contigId;
+            		var featureIndex = contigIdAndFeatIndex[1];
+            		row.fIndex = featureIndex;
+            		included2.push("contig_to_size_and_feature_count/" + contigId);
+            	}
+                var prom2 = self.wsClient.get_object_subset([{ref: annRef, included: included2}]);
                 $.when(prom2).done($.proxy(function(objArr) {
-                	var contigLenAndFeatCount = objArr[0].data.contig_to_size_and_feature_count[contigId];
-                	var contigLen = contigLenAndFeatCount[0];
-                	var featureCount = contigLenAndFeatCount[1];
-                	var featureMinIndex = Math.max(0, featureIndex - 10);
-                	var featureMaxIndex = Math.min(featureIndex + 10, featureCount - 1);
+                	var ctg2ind2rows = {};
+                	for (var rowPos in rows) {
+                		var row = rows[rowPos];
+                		var contigId = row.contig;
+                		var ind2rows = ctg2ind2rows[contigId];
+                		if (!ind2rows) {
+                			ind2rows = {};
+                			ctg2ind2rows[contigId] = ind2rows;
+                		}
+                		var contigLenAndFeatCount = objArr[0].data.contig_to_size_and_feature_count[contigId];
+                		var contigLen = contigLenAndFeatCount[0];
+                		var featureCount = contigLenAndFeatCount[1];
+                		var featureIndex = row.fIndex;
+                		var featureMinIndex = Math.max(0, featureIndex - 10);
+                		var featureMaxIndex = Math.min(featureIndex + 10, featureCount - 1);
+                    	for (var i = featureMinIndex; i <= featureMaxIndex; i++) {
+                    		var rowsForIndex = ind2rows[i];
+                    		if (!rowsForIndex) {
+                    			rowsForIndex = [];
+                    			ind2rows[i] = rowsForIndex;
+                    		}
+                    		rowsForIndex.push(row);
+                    	}
+                	}
                 	var included3 = [];
-                	for (var i = featureMinIndex; i <= featureMaxIndex; i++)
-                		included3.push("data/" + contigId + "/" + i);
+                	var ctg2listOfIndAndRows = {};
+                	for (var contigId in ctg2ind2rows) {
+                		var ind2rows = ctg2ind2rows[contigId];
+                		var listOfIndAndRows = [];
+                		for (var i in ind2rows) 
+                			listOfIndAndRows.push({index: i, rows: ind2rows[i]});
+                		listOfIndAndRows.sort(function(a,b){ return a.index-b.index; });
+                		ctg2listOfIndAndRows[contigId] = listOfIndAndRows;
+                		for (var entryPos in listOfIndAndRows) 
+                			included3.push("data/" + contigId + "/" + listOfIndAndRows[entryPos].index);
+                	}
                     var prom3 = self.wsClient.get_object_subset([{ref: annRef, included: included3}]);
                     $.when(prom3).done($.proxy(function(objArr) {
-                    	var items = [];
-                    	var minPos = null;
-                    	var maxPos = null;
-                    	for (var elemPos in objArr[0].data.data[contigId]) {
-                    		var elem = objArr[0].data.data[contigId][elemPos];
-                    		var fId = elem[0];
-                    		var fStart = elem[1];
-                    		var fStop = elem[2];
-                    		var fDir = elem[3];
-                    		var domToPlace = elem[4];
-                    		for (var domRef in domToPlace) {
-                    			if (!dcsr.domain_cluster_statistics[domRef])
-                    				continue;
-                    			var domName = dcsr.domain_cluster_statistics[domRef].name;
-                    			var places = domToPlace[domRef];
-                    			for (var placePos in places) {
-                    				var place = places[placePos];
-                    				var startInF = place[0];
-                    				var stopInF = place[1];
-                    				if (fStart + 3 * stopInF > fStop)
-                    					fStop = fStart + 3 * stopInF;
+                    	self.loadGenes(dcsr, groups, groupPos, idToColor);
+                    	for (var contigId in objArr[0].data.data) {
+                    		var elems = objArr[0].data.data[contigId];
+                        	var listOfIndAndRows = ctg2listOfIndAndRows[contigId];
+                        	//console.log("contigId=" + contigId + ", elems=" + elems.length + ", listOfIndAndRows=" + listOfIndAndRows.length);
+                    		for (var elemPos in elems) {
+                    			var elem = elems[elemPos];
+                    			for (var rowPos in listOfIndAndRows[elemPos].rows) {
+                    				var row = listOfIndAndRows[elemPos].rows[rowPos];
+                    				if (!row.elems)
+                    					row.elems = [];
+                    				row.elems.push(elem);
                     			}
-                    		}
-                    		if (fStop < fStart + 100)
-                    			fStop = fStart + 100;
-                    		var domText = "";
-                    		var dItems = [];
-                    		for (var domRef in domToPlace) {
-                    			if (!dcsr.domain_cluster_statistics[domRef])
-                    				continue;
-                    			var domName = dcsr.domain_cluster_statistics[domRef].name;
-                				if (domName.indexOf('.domain') > 0)
-                					domName = domName.substring(0, domName.indexOf('.domain'));
-                    			var places = domToPlace[domRef];
-                    			for (var placePos in places) {
-                    				var place = places[placePos];
-                    				var startInF = place[0];
-                    				var stopInF = place[1];
-                    				var evalue = place[2];
-                    				var bitscore = place[3];
-                    				var coverage = place[4];
-                    				domText += domName + ":" + place + "; ";
-                    				var domDescr = domName + ": [" + startInF + ".." + stopInF + "], e-value=" + 
-                    					evalue + ", bit-score=" + bitscore + ", domain-coverage=" + coverage;
-                    				var dStart = fDir > 0 ? (fStart + 3 * startInF) : (fStop - 3 * stopInF);
-                    				var dStop = fDir > 0 ? (fStart + 3 * stopInF) : (fStop - 3 * startInF);
-                    				var color = self.getColorForId(idToColor, domName);
-                            		dItems.push({id: fId + "-" + domName, descr: domDescr, 
-                            			start: dStart, stop: dStop, dir: fDir, color: color, h: 9});
-                    			}
-                    		}
-                    		dItems.sort(function(a,b){ return a.stop-a.start-(b.stop-b.start)});
-                    		var descr = fId + ": [" + fStart + ".." + fStop + "]" + (fDir > 0 ? "+" : "-") + ", [" + domText + "]";
-                    		items.push({id: fId, descr: descr, start: fStart, stop: fStop, dir: fDir, color: '#dddddd', h: 18});
-                    		for (var dItem in dItems)
-                    			items.push(dItems[dItem]);
-                    		if (fId === featureId) {
-                    			minPos = fStart - 5000;
-                    			maxPos = fStop + 5000;
-                    		}
+                        	}
                     	}
-                    	panel.empty();
-                    	self.prepareSvg(minPos, maxPos, items, panel, 500, 20);
+                    	for (var rowPos in rows) {
+                    		var row = rows[rowPos];
+                    		var panel = row.panel;
+                    		var featureId = row.feature;
+                    		var items = [];
+                    		var minPos = null;
+                    		var maxPos = null;
+                    		for (var elemPos in row.elems) {
+                    			var elem = row.elems[elemPos];
+                    			var fId = elem[0];
+                    			var fStart = elem[1];
+                    			var fStop = elem[2];
+                    			var fDir = elem[3];
+                    			var domToPlace = elem[4];
+                    			for (var domRef in domToPlace) {
+                    				if (!dcsr.domain_cluster_statistics[domRef])
+                    					continue;
+                    				var domName = dcsr.domain_cluster_statistics[domRef].name;
+                    				var places = domToPlace[domRef];
+                    				for (var placePos in places) {
+                    					var place = places[placePos];
+                    					var startInF = place[0];
+                    					var stopInF = place[1];
+                    					if (fStart + 3 * stopInF > fStop)
+                    						fStop = fStart + 3 * stopInF;
+                    				}
+                    			}
+                    			if (fStop < fStart + 100)
+                    				fStop = fStart + 100;
+                    			var domText = "";
+                    			var dItems = [];
+                    			for (var domRef in domToPlace) {
+                    				if (!dcsr.domain_cluster_statistics[domRef])
+                    					continue;
+                    				var domName = dcsr.domain_cluster_statistics[domRef].name;
+                    				if (domName.indexOf('.domain') > 0)
+                    					domName = domName.substring(0, domName.indexOf('.domain'));
+                    				var places = domToPlace[domRef];
+                    				for (var placePos in places) {
+                    					var place = places[placePos];
+                    					var startInF = place[0];
+                    					var stopInF = place[1];
+                    					var evalue = place[2];
+                    					var bitscore = place[3];
+                    					var coverage = place[4];
+                    					domText += domName + ":" + place + "; ";
+                    					var domDescr = domName + ": [" + startInF + ".." + stopInF + "], e-value=" + 
+                    					evalue + ", bit-score=" + bitscore + ", domain-coverage=" + coverage;
+                    					var dStart = fDir > 0 ? (fStart + 3 * startInF) : (fStop - 3 * stopInF);
+                    					var dStop = fDir > 0 ? (fStart + 3 * stopInF) : (fStop - 3 * startInF);
+                    					var color = self.getColorForId(idToColor, domName);
+                    					dItems.push({id: fId + "-" + domName, descr: domDescr, 
+                    						start: dStart, stop: dStop, dir: fDir, color: color, h: 8});
+                    				}
+                    			}
+                    			dItems.sort(function(a,b){ return a.stop-a.start-(b.stop-b.start)});
+                    			var descr = fId + ": [" + fStart + ".." + fStop + "]" + (fDir > 0 ? "+" : "-") + ", [" + domText + "]";
+                    			items.push({id: fId, descr: descr, start: fStart, stop: fStop, dir: fDir, color: '#dddddd', h: 16});
+                    			for (var dItem in dItems)
+                    				items.push(dItems[dItem]);
+                    			if (fId === featureId) {
+                    				minPos = fStart - 5000;
+                    				maxPos = fStop + 5000;
+                    			}
+                    		}
+                    		panel.empty();
+                    		self.prepareSvg(minPos, maxPos, items, panel, 500, 20);
+                    	}
                     }, this));
                     $.when(prom3).fail($.proxy(function(error) {err(error);}, this));            	
                 }, this));
@@ -629,12 +715,14 @@
                 return path;
             };
             var itemPath = function(d) {
-            	var left = pw * (d.start - minPos) / posLen;
-            	var width = pw * (d.stop - d.start) / posLen;
-            	var height = d.h;
-            	var top = (ph - height) / 2;
-            	return d.dir > 0 ? pathRight(left, top, height, width) :
+            	var left = Math.floor(pw * (d.start - minPos) / posLen);
+            	var width = Math.floor(pw * (d.stop - d.start) / posLen);
+            	var height = Math.floor(d.h);
+            	var top = Math.floor((ph - height) / 2);
+            	var ret = d.dir > 0 ? pathRight(left, top, height, width) :
             		pathLeft(left, top, height, width);
+            	//console.log(ret);
+            	return ret;
             };
             var trackSet = trackContainer.selectAll("path")
             	.data(items, function(d) { return d.id; });
@@ -676,9 +764,11 @@
         },
 
         rainbow: function(numOfSteps, step) {
-            // This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal for creating easily distinguishable vibrant markers in Google Maps and other apps.
+            // This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal 
+        	// for creating easily distinguishable vibrant markers in Google Maps and other apps.
             // Adam Cole, 2011-Sept-14
-            // HSV to RBG adapted from: http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+            // HSV to RBG adapted from: 
+        	// http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
             var r, g, b;
             var h = step / numOfSteps;
             var i = ~~(h * 6);
@@ -692,7 +782,8 @@
                 case 4: r = f, g = 0, b = 1; break;
                 case 5: r = 1, g = 0, b = q; break;
             }
-            var c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
+            var c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + 
+            	("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
             return (c);
         },
         
