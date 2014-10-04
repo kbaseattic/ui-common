@@ -324,6 +324,7 @@
             	//console.log("startNodeId=" + startNodeId);
         		var tree = self.cutTree(treeObj.tree, startNodeId, self.options.maxNumberOfTreeNeighbors);
         		var fullNodeLabels = {};
+        		//var included = [];
         		for (var nodeId in treeObj.default_node_labels) {
         			var label = treeObj.default_node_labels[nodeId];
         			var us1 = label.indexOf('_');
@@ -337,24 +338,41 @@
         			if (gnl > hnl * 2)
         				genomeName = genomeName.substring(0, hnl) + "..." + genomeName.substring(gnl - hnl, gnl);
         			fullNodeLabels[nodeId] = genomeName + ", " + feature + ", " + start;
+        			//included.push("data/\"" + genome + "\"");
         		}
-                var table = $('<table style="margin: 0px; padding: 0px;"/>');
-                panel.append(table);
-                var tr = $('<tr style="margin: 0px; padding: 0px;"/>');
-                table.append(tr);
-                var leftTd = $('<td style="margin: 0px; padding: 0px;"/>');
-                tr.append(leftTd);
-                var rightTd = $('<td style="margin: 0px; padding: 0px;"/>');
-                tr.append(rightTd);
-                var canvasId = "knhx-canvas-" + self.uuid();
-                leftTd.append('<canvas id="' + canvasId + '">');
-                new EasyTree(canvasId, tree, fullNodeLabels, function(node) {}, function(node) {
-                        	if (node.id && node.id === startNodeId)
-                        		return "#0000ff";
-                			return null;
-                		}, {width: 500, yskip: self.options.rowHeight - 0.3, mode_switcher: false, 
-                			collapsible: false, ymargin: 5});
-                var rows = [];
+            	//var dcRef = dcsr.domain_cluster_refs[domainRef];
+                //var prom2 = this.wsClient.get_object_subset([{ref: dcRef, included: included}]);
+                //$.when(prom2).done($.proxy(function(objArr) {
+            	//	var dc = objArr[0].data;
+            	//	var genomeRefAndFId2contigAndFInd = {};
+            	//	for (var genomeRef in dc.data) {
+        		//		var genomeName = dcsr.genome_statistics[genomeRef].scientific_name;
+            	//		var elems = dc.data[genomeRef];
+            	//		for (var elemPos in elems) {
+            	//			var elem = elems[elemPos];
+            	//			var contigId = elem[0];
+            	//			var featureId = elem[1];
+            	//			var featureIndex = elem[2];
+            	//			genomeRefAndFId2contigAndFInd[genomeRef + "_" + featureId] = [contigId, featureIndex];
+            	//		}
+            	//	}
+        		var table = $('<table style="margin: 0px; padding: 0px;"/>');
+        		panel.append(table);
+        		var tr = $('<tr style="margin: 0px; padding: 0px;"/>');
+        		table.append(tr);
+        		var leftTd = $('<td style="margin: 0px; padding: 0px;"/>');
+        		tr.append(leftTd);
+        		var rightTd = $('<td style="margin: 0px; padding: 0px;"/>');
+        		tr.append(rightTd);
+        		var canvasId = "knhx-canvas-" + self.uuid();
+        		leftTd.append('<canvas id="' + canvasId + '">');
+        		new EasyTree(canvasId, tree, fullNodeLabels, function(node) {}, function(node) {
+        			if (node.id && node.id === startNodeId)
+        				return "#0000ff";
+        			return null;
+        		}, {width: 500, yskip: self.options.rowHeight - 0.3, mode_switcher: false, 
+        			collapsible: false, ymargin: 5});
+        		var rows = [];
         		for (var i in tree.node) {
         			var node = tree.node[i];
         			if (node.child.length == 0) {
@@ -369,11 +387,11 @@
         			}
         		}
         		rows.sort(function(a,b){return a.y-b.y});
-                var geneTable = $('<table style="margin: 0px; padding: 0px;"/>');
-                rightTd.append(geneTable);
-                var h = self.options.rowHeight;
-                var idToColor = {};
-                for (var rowPos in rows) {
+        		var geneTable = $('<table style="margin: 0px; padding: 0px;"/>');
+        		rightTd.append(geneTable);
+        		var h = self.options.rowHeight;
+        		var idToColor = {};
+        		for (var rowPos in rows) {
         			var geneTr = $('<tr style="margin: 0px; padding: 0px;"/>');
         			geneTable.append(geneTr);
         			var geneTd = $('<td style="margin: 0px; padding: 0px; height: '+h+'px; min-height: '+h+'px; max-height:'+h+'px;"/>');
@@ -383,20 +401,35 @@
         			//self.loadGenes(dcsr, rows, rowPos, idToColor);
         		}
         		var groupMap = {};
-                for (var rowPos in rows) {
-                	var row = rows[rowPos];
-                	var gnmRef = row.genome;
-    				var group = groupMap[gnmRef];
-    				if (!group) {
-    					group = [];
-    					groupMap[gnmRef] = group
-    				}
-    				group.push(row);
-                }
-                var groups = [];
-                for (var key in groupMap)
-                	groups.push(groupMap[key]);
-                self.loadGenes(dcsr, groups, 0, idToColor);
+        		for (var rowPos in rows) {
+        			var row = rows[rowPos];
+        			var gnmRef = row.genome;
+        			var group = groupMap[gnmRef];
+        			if (!group) {
+        				group = [];
+        				groupMap[gnmRef] = group
+        			}
+        			group.push(row);
+        		}
+        		var groupLists = [[],[],[],[],[]];
+        		var listPos = 0;
+        		for (var key in groupMap) {
+        			var groups = groupLists[listPos];
+        			groups.push(groupMap[key]);
+        			listPos = (listPos + 1) % groupLists.length;
+        		}
+        		for (var listPos in groupLists) {
+        			var groups = groupLists[listPos];
+        			self.loadGenes(dcsr, groups, 0, idToColor, null);
+        		}
+                //}, this));
+                //$.when(prom2).fail($.proxy(function(error) { 
+            	//	panel.empty();
+                //	panel.append($("<div>")
+                //                .addClass("alert alert-danger")
+                //                .append("<b>Error:</b>")
+                //                .append("<br>" + error.error.message));
+                //}, this));
             }, this));
             $.when(prom).fail($.proxy(function(error) { 
         		panel.empty();
@@ -429,6 +462,7 @@
         	}
         	tree.n_tips = leafs;
         	//console.log(tree);
+        	//rotateToStart(tree.root, startNodeName);
         	return tree;
         	function collectDistFromStart(node, startName, nameToDist) {
         		var startPos = null;
@@ -508,9 +542,32 @@
         			return 1;
         		}
         	}
+        	
+        	/*function rotateToStart(node, startName) {
+        		if (node.child.length > 0) {
+        			var startPos = null;
+        			for (var pos in node.child) {
+        				var ch = node.child[pos];
+        				if (rotateToStart(ch, startName))
+        					startPos = pos;
+        			}
+        			if (startPos != null && startPos > 0) {
+            			console.log(startPos + ", *");
+        				var ch = node.child[0];
+        				node.child[0] = node.child[startPos];
+        				node.child[startPos] = ch;
+        			}
+        			var ret = startPos != null;
+        			console.log(startPos + ", " + ret);
+        			return ret;
+        		} else {
+        			console.log(node.name + " <> " + startName)
+        			return node.name === startName;
+        		}
+        	}*/
         },
 
-        loadGenes: function(dcsr, groups, groupPos, idToColor) {
+        loadGenes: function(dcsr, groups, groupPos, idToColor, genomeRefAndFId2contigAndFInd) {
         	var self = this;
         	//console.log("In loadGenes: groupPos=" + groupPos);
         	if (groupPos >= groups.length)
@@ -518,19 +575,20 @@
             function err(error) {
         		panel.empty();
             	panel.append("<b>Error:</b> " + error.error.message);
-            	self.loadGenes(dcsr, groups, groupPos, idToColor);
+            	self.loadGenes(dcsr, groups, groupPos, idToColor, genomeRefAndFId2contigAndFInd);
             }
         	var rows = groups[groupPos];
         	groupPos++;
         	//console.log(rows);
         	var included1 = [];
+        	var genomeRef = null;
         	var annRef = null;
         	for (var rowPos in rows) {
         		var row = rows[rowPos];
         		var featureId = row.feature;
         		included1.push("feature_to_contig_and_index/" + featureId);
         		if (!annRef) {
-            		var genomeRef = row.genome;
+            		genomeRef = row.genome;
             		annRef = dcsr.annotation_refs[genomeRef];
         		}
         	}
@@ -542,8 +600,13 @@
             		var featureId = row.feature;
             		var contigIdAndFeatIndex = objArr[0].data.feature_to_contig_and_index[featureId];
             		var contigId = contigIdAndFeatIndex[0];
-            		row.contig = contigId;
             		var featureIndex = contigIdAndFeatIndex[1];
+            		//var contigIdAndFeatIndex2 = genomeRefAndFId2contigAndFInd[genomeRef + "_" + featureId];
+            		//var contigId2 = contigIdAndFeatIndex2[0];
+            		//var featureIndex2 = contigIdAndFeatIndex2[1];
+            		//console.log("contigId=" + contigId + ", contigId2=" + contigId2 + ", "+
+            		//		"featureIndex=" + featureIndex + ", featureIndex2=" + featureIndex2);
+            		row.contig = contigId;
             		row.fIndex = featureIndex;
             		included2.push("contig_to_size_and_feature_count/" + contigId);
             	}
@@ -587,7 +650,7 @@
                 	}
                     var prom3 = self.wsClient.get_object_subset([{ref: annRef, included: included3}]);
                     $.when(prom3).done($.proxy(function(objArr) {
-                    	self.loadGenes(dcsr, groups, groupPos, idToColor);
+                    	self.loadGenes(dcsr, groups, groupPos, idToColor, genomeRefAndFId2contigAndFInd);
                     	for (var contigId in objArr[0].data.data) {
                     		var elems = objArr[0].data.data[contigId];
                         	var listOfIndAndRows = ctg2listOfIndAndRows[contigId];
