@@ -296,21 +296,6 @@ table {
     content: "";
 }
 
-.caret-down {
-    display: inline-block;
-    width: 0px;
-    height: 0px;
-    margin-left: 2px;
-    vertical-align: middle;
-    border-top: none;
-    border-bottom: 4px solid #FFFFFF;
-    border-right: 4px solid transparent;
-    border-left: 4px solid transparent;
-    border-top-width: 0px;
-    border-top-style: dotted;
-    content: "";
-}
-
 .scroll-pane {
     overflow-y: scroll;
 }
@@ -1080,6 +1065,10 @@ div.DTCR_pointer {
     margin: 0 0 10px 0;
 }
 
+/* analysis stuff */
 
+.mini-obj-table {
+    max-height: 500px;
+}
 
 

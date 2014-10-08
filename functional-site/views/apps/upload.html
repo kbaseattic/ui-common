@@ -1,0 +1,47 @@
+
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="dashboard-info blue">
+                            <i class="fa fa-cloud-upload fa-5x pull-left"></i>
+                            <div class="h1" upload-count>0</div>
+                            <div class="h4">Uploading</div>
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-md-offset-1">
+                        <div class="dashboard-info green">
+                            <i class="fa fa-check-square fa-5x pull-left"></i>
+                            <div class="h1" upload-count>0</div>
+                            <span class="h4">Completed</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <br>
+
+                <div class="row">
+                    <div class="col-md-5">
+                        <div flow-init="{target: 'http://localhost:5000/upload'}"
+                             flow-files-submitted="$flow.upload()"
+                             flow-file-success="$file.msg = $message">
+
+                            <div class="text-center">
+                                <div class="alert" flow-drop flow-drag-enter="class='alert-success'" flow-drag-leave="class=''" ng-class="class">
+                                    Drag and Drop your file here
+                                </div>
+                                <b>or</b><br>
+                                <br>
+                                <span class="btn btn-primary btn-sm" flow-btn>Upload File</span>
+                            </div>
+
+                            <table>
+                                <tr ng-repeat="file in $flow.files">
+                                    <td>{{$index+1}}</td>
+                                    <td>{{file.name}}</td>
+                                    <td>{{file.msg}}</td>
+                                </tr>
+                            </table>
+                        </div> <!-- end flow upload -->
+                    </div>
+                </div>
+
