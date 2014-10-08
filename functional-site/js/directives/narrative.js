@@ -1,12 +1,148 @@
 
 /*
  * Narrative directives
- * 
+ *  - narrativeCell : extends functionality of a cell 
+ *  - kbWidget : wrapper for jquery output widgets
+ *  - wsSelector : mini workspace selector dropdown
+ *
+ * Controllers:  (See Analysis in js/controllers.js)
 */
 
 var narrativeDirectives = angular.module('narrative-directives', []);
 
 angular.module('narrative-directives')
+
+.directive('narrativeCell', function(narrative) {
+    return {
+        link: function(scope, ele, attrs) {
+
+            // dictionary for fields in form.  Here, keys are the ui_name 
+            scope.fields = {};  
+
+            scope.flip = function($event) {
+                $($event.target).parents('.panel').find('.narrative-cell').toggleClass('flipped')
+            }
+
+            scope.minimize = function($event) {
+                $($event.target).parents('.panel').find('.panel-body').slideToggle('fast');
+            }
+
+            scope.runCell = function(index, cell) {
+                var task = {name: cell.title, fields: scope.fields};
+                narrative.newTask(task);
+            }
+
+
+        }
+    }
+})
+
+.directive('kbWidget', function() {
+    return {
+        link: function(scope, element, attrs) {
+            // instantiation of a kbase widget
+        }
+    }
+})
+
+.directive('animateOnChange', function($animate) {
+  return {
+      link: function(scope, elem, attr) {
+          scope.$watch(attr.animateOnChange, function(nv,ov) {
+            if (nv!=ov) {
+              var c = nv > ov ? 'change-up' : 'change';
+              console.log('changing', c)
+              elem.addClass(c).removeClass(c, {duration: 1000})
+            }
+          });    
+
+        }
+   };
+})
+
+
+.directive('wsSelector', function() {
+    return {
+        link: function(scope, element, attrs) {
+
+            var wsSelect = $('<form class="form-horizontal" role="form">'+
+                                '<div class="form-group">'+
+                                    '<div class="input-group col-sm-12">'+
+                                        '<input type="text" class="select-ws-input form-control focusedInput" placeholder="Search workspaces">'+
+                                        '<span class="input-group-btn">'+
+                                            '<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">'+
+                                                '<span class="caret"></span>'+
+                                            '</button>'+
+                                        '</span>'+
+                                    //'<a class="btn-new-ws pull-right">New WS</a>'+
+                                    '</div>'+
+                            '</div>');            
+            element.append(wsSelect);
+
+            var p = kb.ws.list_workspace_info({perm: 'w'});
+            var prom = $.when(p).then(function(workspaces){
+                var workspaces = workspaces.sort(compare)
+
+                function compare(a,b) {
+                    var t1 = kb.ui.getTimestamp(b[3]) 
+                    var t2 = kb.ui.getTimestamp(a[3]) 
+                    if (t1 < t2) return -1;
+                    if (t1 > t2) return 1;
+                    return 0;
+                }
+
+                var select = $('<ul class="dropdown-menu select-ws-dd" role="menu">');
+                for (var i in workspaces) {
+                    select.append('<li><a>'+workspaces[i][1]+'</a></li>');
+                }
+
+                wsSelect.find('.input-group-btn').append(select);
+
+                var dd = wsSelect.find('.select-ws-dd');
+                var input = wsSelect.find('input');
+
+                var not_found = $('<li class="select-ws-dd-not-found"><a><b>Not Found</b></a></li>');
+                dd.append(not_found);
+                input.keyup(function() {
+                    dd.find('li').show();
+
+                    wsSelect.find('.input-group-btn').addClass('open');
+
+                    var input = $(this).val();
+                    dd.find('li').each(function(){
+                        if ($(this).text().toLowerCase().indexOf(input.toLowerCase()) != -1) {
+                            return true;
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+
+                    if (dd.find('li').is(':visible') == 1) {
+                        not_found.hide();
+                    } else {
+                        not_found.show();
+                    }
+                }) 
+
+                dd.find('li').click(function() {
+                    dd.find('li').removeClass('active');
+
+                    if (!$(this).hasClass('select-ws-dd-not-found')) {
+                        $(this).addClass('active');                    
+
+                        var val = $(this).text();
+                        input.val(val);
+                    }
+                })
+
+                element.append(wsSelect)
+            })
+
+        }
+    }
+})
+
+
 .directive('recentnarratives', function($location) {
     return {
         link: function(scope, element, attrs) {
@@ -83,25 +219,3 @@ angular.module('narrative-directives')
         } 
     };
 })  
-.directive('copyfeatured', function($state, modals) {
-    return {
-        link: function(scope, element, attrs) {
-            $(element).find('tr').hover(function() {
-                $(this).find('.btn').css('visibility', 'visible');
-            }, function() {
-                $(this).find('.btn').css('visibility', 'hidden');
-            })
-
-            var copyBtns = $(element).find('.btn');
-            copyBtns.unbind('click');
-            copyBtns.click(function() {
-                console.log('click')
-                var ws = $(this).data('ws');
-                modals.copyWS({ws: ws, submit_cb: function() {
-                    $state.go('narratives.mynarratives');
-                    kb.ui.notify('Copied Narratives and Objects From: <i>'+ws+'</i>');                    
-                }});
-            })
-        }
-    }
-})

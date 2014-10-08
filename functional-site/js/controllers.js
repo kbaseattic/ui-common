@@ -8,7 +8,22 @@
 */
 
 
-app.controller('RxnDetail', function($scope, $stateParams) {
+app.controller('methodAccordion', function ($scope, narrative, $http) {
+
+
+})
+
+.controller('Analysis', function($scope, $stateParams, $location, narrative, $http) {
+    $scope.ws = $stateParams.ws;
+
+    // service for narrative (builder) state
+    $scope.narrative = narrative;
+
+})
+
+
+
+.controller('RxnDetail', function($scope, $stateParams) {
     $scope.ids = $stateParams.ids.split('&');
 })
 
@@ -196,6 +211,11 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     $scope.type = $stateParams.type;
 
     var sub = $location.path().split('/')[1]
+
+    if (sub == 'analysis') {
+        $scope.tab = $location.path().split('/')[3];
+    }
+
     if (sub == 'narratives') {
         $scope.tab = $location.path().split('/')[2];
     }
@@ -217,12 +237,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 
 })
 
-.controller('FBALanding', function($scope, $stateParams) {
-    $scope.ws = $stateParams.ws;
-    $scope.id = $stateParams.id;  
 
-
-})
 
 .controller('WBLanding', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
@@ -363,7 +378,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 
 })
 
-
 .controller('WBJSON', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
@@ -492,7 +506,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     }
 
 
-
     $scope.rmObject = function(ws, id, type, module) {
         for (var i in $scope.favs) {
             if ($scope.favs[i].ws == ws
@@ -544,94 +557,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 })
 
 
-.controller('Narrative', function($scope, $stateParams, $location, kbaseLogin, $modal, FeedLoad) {
-    //changeNav('narrative', 'newsfeed');
-    $scope.nar_url = configJSON.narrative_url; // used for links to narratives
-
-    //to open the copy narrative dialog
-    $scope.copyNarrativeForm = function (title) {
-
-        //$scope.narr.title = title;
-
-        var modalInstance = $modal.open({
-          templateUrl: 'views/narrative/dialogboxes/copynarrative.html',
-          controller: CopyNarrativeModalCtrl,
-          resolve: {
-                narr: function () {
-                    return title;
-                    }
-                
-            }
-        });
-    };
-
-    // callback for ng-click 'loginUser':
-    $scope.loginUser = function (user) {
-        $("#loading-indicator").show();
-
-        kbaseLogin.login(
-            user.username,
-            user.password,
-            function(args) {
-                if (args.success === 1) {
-
-                    this.registerLogin(args);
-                    //this.data('_session', kbaseCookie);
-
-                    //set the cookie
-                    // var c = $("#login-widget").kbaseLogin('get_kbase_cookie');
-                    
-                    // var cookieName = 'kbase_session';
-                    // var cookieString = 'un=' + c.user_id + 
-                    //                    '|kbase_sessionid=' + c.kbase_sessionid +
-                    //                    '|user_id=' + c.user_id +
-                    //                    '|token=' + c.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
-                    // $.cookie(cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
-                    // $.cookie(cookieName, cookieString, { path: '/', expires: 60 });
-
-                    //this.data('_session', c);
-
-                    USER_ID = $("#signin-button").kbaseLogin('session').user_id;
-                    USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
-
-                    $location.path('/narratives/featured');
-                    $scope.$apply();
-                    window.location.reload();
-
-                } else {
-                    console.log("error logging in");
-                    $("#loading-indicator").hide();
-                    var errormsg = args.message;
-                    if (errormsg == "LoginFailure: Authentication failed.") {
-                        errormsg = "Login Failed: your username/password is incorrect.";
-                    }
-                    $("#login_error").html(errormsg);
-                    $("#login_error").show();
-
-                }
-
-            }
-        );
-    };
-
-    $scope.logoutUser = function() {
-        kbaseLogin.logout(false);
-    };
-
-    $scope.loggedIn = function() {
-        var c = kbaseLogin.get_kbase_cookie();
-        $scope.username = c.name;
-        return (c.user_id !== undefined && c.user_id !== null);
-    };
-
-})
-
-
-.controller('NarrativeProjects', function($scope, $stateParams) {
-
-})
-
-
 .controller('TreeDetail', function($scope, $stateParams) {
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
@@ -652,48 +577,8 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                      'mod': $stateParams.mod};
 })
 
-/* controller for the copy narrative modal */
-var CopyNarrativeModalCtrl = function ($scope, $modalInstance, $location, narr) {
 
-    $scope.narr = narr;
-    // callback for ng-click 'copy narrative':
-    $scope.copyNarrative = function () {
-        $('#loading-indicator').show();
-        $('#copy-narr-button').attr("disabled", "disabled");
-        kb.nar.copy_narrative({
-            fq_id: $scope.narr,
-            callback: function(results) {
-                
-                //console.log("copied narrative " + results.fq_id);
-                window.location.replace("http://demo.kbase.us/narrative/" + results.fq_id);
-                //$modalInstance.dismiss();
 
-                
-            },
-            error_callback: function(message) {
-                //console.log("error occurred " + message);
-
-                if (!message.match("No object with name")) {
-                    $('#loading-indicator').hide();
-
-                    $scope.alerts = [];
-                    $scope.alerts.push({type: 'danger', msg: "We were unable to copy the narrative and its datasets into your home workspace. Error: " + message});
-                    //TODO need to retrieve the actual error message 
-                    $scope.$apply();
-                }
-            }
-
-        })
-    }
-    $scope.cancel = function () {
-        $modalInstance.dismiss('cancel');
-    };
-
-    $scope.closeAlert = function(index) {
-        $scope.alerts.splice(index, 1);
-    };
-
-};
 
 
 function LPHelp($scope, $stateParams, $location) {

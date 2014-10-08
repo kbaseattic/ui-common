@@ -21,11 +21,11 @@ var cardManager = undefined;
 
 var app = angular.module('landing-pages', 
     ['lp-directives', 'card-directives',
-     'trees-directives',
+     'trees-directives', 
      'ws-directives', 'modeling-directives', 
      'communities-directives', 'narrative-directives', 
      'ui.router', 'ngResource', 'kbaseLogin', 
-     'FeedLoad', 'ui.bootstrap', 'search'])
+      'flow', 'ui.bootstrap', 'search'])
     .config(['$locationProvider', '$stateProvider', '$httpProvider', '$urlRouterProvider',
     function($locationProvider, $stateProvider, $httpProvider, $urlRouterProvider) {
 
@@ -92,11 +92,41 @@ var app = angular.module('landing-pages',
           controller: 'WSManage',
         });
 
-    $stateProvider
+
+    $stateProvider 
         .state('analysis', {
-          url: "/analysis/:ws/:tab",
-          templateUrl: 'views/ws/analysis.html',
-          controller: 'WB'})
+          url: "/analysis/:ws/",
+          templateUrl: 'views/apps/analysis.html',
+          controller: 'Analysis'})
+
+        .state('analysis.upload', {
+          url: "upload",
+          templateUrl: 'views/apps/upload.html',
+          controller: 'Analysis'})   
+        .state('analysis.tasks', {
+          url: "tasks",
+          templateUrl: 'views/apps/tasks.html',
+          controller: 'Analysis'})
+
+        .state('analysis.apps', {
+          url: "apps",
+          templateUrl: 'views/apps/narrative.html',
+          controller: 'Analysis'
+        })
+        .state('analysis.builder', {
+          url: "builder",
+          templateUrl: 'views/apps/narrative.html',
+          controller: 'Analysis'
+        })      
+        .state('analysis.data', {
+          url: "data",
+          templateUrl: 'views/apps/narrative.html',
+          controller: 'Analysis'
+        })          
+
+
+           
+
 
 
     // model viewer routing
@@ -560,12 +590,14 @@ kbaseLogin.factory('kbaseLogin', function() {
 });
 
 //add the Google Feeds API as a module
+/*
 var Feed = angular.module('FeedLoad', ['ngResource'])
     .factory('FeedLoad', function ($resource) {
         return $resource('//ajax.googleapis.com/ajax/services/feed/load', {}, {
             fetch: { method: 'JSONP', params: {v: '1.0', callback: 'JSON_CALLBACK'} }
         });
     });
+*/
 
 configJSON = $.parseJSON( $.ajax({url: "config.json", 
                              async: false, 
