@@ -308,7 +308,6 @@
         	var treeRef = this.options.treeWorkspace + '/' + domainName + '.msa.tree';
             var prom = this.wsClient.get_objects([{ref: treeRef}]);
             $.when(prom).done($.proxy(function(objArr) {
-        		panel.empty();
         		var treeObj = objArr[0].data;
         		var startLabel = '' + genomeRef + '_' + featureId + '_' + startInFeature;
         		//console.log("startLabel=" + startLabel);
@@ -324,12 +323,13 @@
             	//console.log("startNodeId=" + startNodeId);
         		var tree = self.cutTree(treeObj.tree, startNodeId, self.options.maxNumberOfTreeNeighbors);
         		var fullNodeLabels = {};
-        		//var included = [];
+        		var genomeRefs = {};
         		for (var nodeId in treeObj.default_node_labels) {
         			var label = treeObj.default_node_labels[nodeId];
         			var us1 = label.indexOf('_');
         			var us2 = label.lastIndexOf('_');
         			var genome = label.substring(0, us1);
+        			genomeRefs[genome] = 1;
         			var feature = label.substring(us1 + 1, us2);
         			var start = parseInt(label.substring(us2 + 1));
         			var genomeName = dcsr.genome_statistics[genome].scientific_name;
@@ -340,22 +340,23 @@
         			fullNodeLabels[nodeId] = genomeName + ", " + feature + ", " + start;
         			//included.push("data/\"" + genome + "\"");
         		}
-            	//var dcRef = dcsr.domain_cluster_refs[domainRef];
-                //var prom2 = this.wsClient.get_object_subset([{ref: dcRef, included: included}]);
-                //$.when(prom2).done($.proxy(function(objArr) {
-            	//	var dc = objArr[0].data;
-            	//	var genomeRefAndFId2contigAndFInd = {};
-            	//	for (var genomeRef in dc.data) {
-        		//		var genomeName = dcsr.genome_statistics[genomeRef].scientific_name;
-            	//		var elems = dc.data[genomeRef];
-            	//		for (var elemPos in elems) {
-            	//			var elem = elems[elemPos];
-            	//			var contigId = elem[0];
-            	//			var featureId = elem[1];
-            	//			var featureIndex = elem[2];
-            	//			genomeRefAndFId2contigAndFInd[genomeRef + "_" + featureId] = [contigId, featureIndex];
-            	//		}
-            	//	}
+            	var dcRef = dcsr.domain_cluster_refs[domainRef];
+                var prom2 = this.wsClient.get_objects([{ref: dcRef}]);
+                $.when(prom2).done($.proxy(function(objArr) {
+                	panel.empty();
+            		var dc = objArr[0].data;
+            		var genomeRefAndFId2contigAndFInd = {};
+            		for (var genomeRef in genomeRefs) {
+        				var genomeName = dcsr.genome_statistics[genomeRef].scientific_name;
+            			var elems = dc.data[genomeRef];
+            			for (var elemPos in elems) {
+            				var elem = elems[elemPos];
+            				var contigId = elem[0];
+            				var featureId = elem[1];
+            				var featureIndex = elem[2];
+            				genomeRefAndFId2contigAndFInd[genomeRef + "_" + featureId] = [contigId, featureIndex];
+            			}
+            		}
         		var table = $('<table style="margin: 0px; padding: 0px;"/>');
         		panel.append(table);
         		var tr = $('<tr style="margin: 0px; padding: 0px;"/>');
@@ -420,16 +421,16 @@
         		}
         		for (var listPos in groupLists) {
         			var groups = groupLists[listPos];
-        			self.loadGenes(dcsr, groups, 0, idToColor, null);
+        			self.loadGenes(dcsr, groups, 0, idToColor, genomeRefAndFId2contigAndFInd);
         		}
-                //}, this));
-                //$.when(prom2).fail($.proxy(function(error) { 
-            	//	panel.empty();
-                //	panel.append($("<div>")
-                //                .addClass("alert alert-danger")
-                //                .append("<b>Error:</b>")
-                //                .append("<br>" + error.error.message));
-                //}, this));
+                }, this));
+                $.when(prom2).fail($.proxy(function(error) { 
+            		panel.empty();
+                	panel.append($("<div>")
+                                .addClass("alert alert-danger")
+                                .append("<b>Error:</b>")
+                                .append("<br>" + error.error.message));
+                }, this));
             }, this));
             $.when(prom).fail($.proxy(function(error) { 
         		panel.empty();
@@ -569,17 +570,19 @@
 
         loadGenes: function(dcsr, groups, groupPos, idToColor, genomeRefAndFId2contigAndFInd) {
         	var self = this;
-        	//console.log("In loadGenes: groupPos=" + groupPos);
         	if (groupPos >= groups.length)
         		return;
+        	var rows = groups[groupPos];
             function err(error) {
-        		panel.empty();
-            	panel.append("<b>Error:</b> " + error.error.message);
+            	for (var rowPos in rows) {
+            		var row = rows[rowPos];
+            		var panel = row.panel;
+            		panel.empty();
+            		panel.append('<div style="font-size: 8px;"><b>Error:</b> ' + error.error.message + '</div>');
+            	}
             	self.loadGenes(dcsr, groups, groupPos, idToColor, genomeRefAndFId2contigAndFInd);
             }
-        	var rows = groups[groupPos];
         	groupPos++;
-        	//console.log(rows);
         	var included1 = [];
         	var genomeRef = null;
         	var annRef = null;
@@ -592,153 +595,158 @@
             		annRef = dcsr.annotation_refs[genomeRef];
         		}
         	}
-            var prom = this.wsClient.get_object_subset([{ref: annRef, included: included1}]);
-            $.when(prom).done($.proxy(function(objArr) {
-            	var included2 = [];
-            	for (var rowPos in rows) {
-            		var row = rows[rowPos];
-            		var featureId = row.feature;
-            		var contigIdAndFeatIndex = objArr[0].data.feature_to_contig_and_index[featureId];
-            		var contigId = contigIdAndFeatIndex[0];
-            		var featureIndex = contigIdAndFeatIndex[1];
-            		//var contigIdAndFeatIndex2 = genomeRefAndFId2contigAndFInd[genomeRef + "_" + featureId];
-            		//var contigId2 = contigIdAndFeatIndex2[0];
-            		//var featureIndex2 = contigIdAndFeatIndex2[1];
-            		//console.log("contigId=" + contigId + ", contigId2=" + contigId2 + ", "+
-            		//		"featureIndex=" + featureIndex + ", featureIndex2=" + featureIndex2);
-            		row.contig = contigId;
-            		row.fIndex = featureIndex;
-            		included2.push("contig_to_size_and_feature_count/" + contigId);
-            	}
-                var prom2 = self.wsClient.get_object_subset([{ref: annRef, included: included2}]);
-                $.when(prom2).done($.proxy(function(objArr) {
-                	var ctg2ind2rows = {};
-                	for (var rowPos in rows) {
-                		var row = rows[rowPos];
-                		var contigId = row.contig;
-                		var ind2rows = ctg2ind2rows[contigId];
-                		if (!ind2rows) {
-                			ind2rows = {};
-                			ctg2ind2rows[contigId] = ind2rows;
-                		}
-                		var contigLenAndFeatCount = objArr[0].data.contig_to_size_and_feature_count[contigId];
-                		var contigLen = contigLenAndFeatCount[0];
-                		var featureCount = contigLenAndFeatCount[1];
-                		var featureIndex = row.fIndex;
-                		var featureMinIndex = Math.max(0, featureIndex - 10);
-                		var featureMaxIndex = Math.min(featureIndex + 10, featureCount - 1);
-                    	for (var i = featureMinIndex; i <= featureMaxIndex; i++) {
-                    		var rowsForIndex = ind2rows[i];
-                    		if (!rowsForIndex) {
-                    			rowsForIndex = [];
-                    			ind2rows[i] = rowsForIndex;
-                    		}
-                    		rowsForIndex.push(row);
-                    	}
-                	}
-                	var included3 = [];
-                	var ctg2listOfIndAndRows = {};
-                	for (var contigId in ctg2ind2rows) {
-                		var ind2rows = ctg2ind2rows[contigId];
-                		var listOfIndAndRows = [];
-                		for (var i in ind2rows) 
-                			listOfIndAndRows.push({index: i, rows: ind2rows[i]});
-                		listOfIndAndRows.sort(function(a,b){ return a.index-b.index; });
-                		ctg2listOfIndAndRows[contigId] = listOfIndAndRows;
-                		for (var entryPos in listOfIndAndRows) 
-                			included3.push("data/" + contigId + "/" + listOfIndAndRows[entryPos].index);
-                	}
-                    var prom3 = self.wsClient.get_object_subset([{ref: annRef, included: included3}]);
-                    $.when(prom3).done($.proxy(function(objArr) {
-                    	self.loadGenes(dcsr, groups, groupPos, idToColor, genomeRefAndFId2contigAndFInd);
-                    	for (var contigId in objArr[0].data.data) {
-                    		var elems = objArr[0].data.data[contigId];
-                        	var listOfIndAndRows = ctg2listOfIndAndRows[contigId];
-                        	//console.log("contigId=" + contigId + ", elems=" + elems.length + ", listOfIndAndRows=" + listOfIndAndRows.length);
-                    		for (var elemPos in elems) {
-                    			var elem = elems[elemPos];
-                    			for (var rowPos in listOfIndAndRows[elemPos].rows) {
-                    				var row = listOfIndAndRows[elemPos].rows[rowPos];
-                    				if (!row.elems)
-                    					row.elems = [];
-                    				row.elems.push(elem);
-                    			}
-                        	}
-                    	}
-                    	for (var rowPos in rows) {
-                    		var row = rows[rowPos];
-                    		var panel = row.panel;
-                    		var featureId = row.feature;
-                    		var items = [];
-                    		var minPos = null;
-                    		var maxPos = null;
-                    		for (var elemPos in row.elems) {
-                    			var elem = row.elems[elemPos];
-                    			var fId = elem[0];
-                    			var fStart = elem[1];
-                    			var fStop = elem[2];
-                    			var fDir = elem[3];
-                    			var domToPlace = elem[4];
-                    			for (var domRef in domToPlace) {
-                    				if (!dcsr.domain_cluster_statistics[domRef])
-                    					continue;
-                    				var domName = dcsr.domain_cluster_statistics[domRef].name;
-                    				var places = domToPlace[domRef];
-                    				for (var placePos in places) {
-                    					var place = places[placePos];
-                    					var startInF = place[0];
-                    					var stopInF = place[1];
-                    					if (fStart + 3 * stopInF > fStop)
-                    						fStop = fStart + 3 * stopInF;
-                    				}
-                    			}
-                    			if (fStop < fStart + 100)
-                    				fStop = fStart + 100;
-                    			var domText = "";
-                    			var dItems = [];
-                    			for (var domRef in domToPlace) {
-                    				if (!dcsr.domain_cluster_statistics[domRef])
-                    					continue;
-                    				var domName = dcsr.domain_cluster_statistics[domRef].name;
-                    				if (domName.indexOf('.domain') > 0)
-                    					domName = domName.substring(0, domName.indexOf('.domain'));
-                    				var places = domToPlace[domRef];
-                    				for (var placePos in places) {
-                    					var place = places[placePos];
-                    					var startInF = place[0];
-                    					var stopInF = place[1];
-                    					var evalue = place[2];
-                    					var bitscore = place[3];
-                    					var coverage = place[4];
-                    					domText += domName + ":" + place + "; ";
-                    					var domDescr = domName + ": [" + startInF + ".." + stopInF + "], e-value=" + 
-                    					evalue + ", bit-score=" + bitscore + ", domain-coverage=" + coverage;
-                    					var dStart = fDir > 0 ? (fStart + 3 * startInF) : (fStop - 3 * stopInF);
-                    					var dStop = fDir > 0 ? (fStart + 3 * stopInF) : (fStop - 3 * startInF);
-                    					var color = self.getColorForId(idToColor, domName);
-                    					dItems.push({id: fId + "-" + domName, descr: domDescr, 
-                    						start: dStart, stop: dStop, dir: fDir, color: color, h: 8});
-                    				}
-                    			}
-                    			dItems.sort(function(a,b){ return a.stop-a.start-(b.stop-b.start)});
-                    			var descr = fId + ": [" + fStart + ".." + fStop + "]" + (fDir > 0 ? "+" : "-") + ", [" + domText + "]";
-                    			items.push({id: fId, descr: descr, start: fStart, stop: fStop, dir: fDir, color: '#dddddd', h: 16});
-                    			for (var dItem in dItems)
-                    				items.push(dItems[dItem]);
-                    			if (fId === featureId) {
-                    				minPos = fStart - 5000;
-                    				maxPos = fStop + 5000;
-                    			}
-                    		}
-                    		panel.empty();
-                    		self.prepareSvg(minPos, maxPos, items, panel, 500, 20);
-                    	}
-                    }, this));
-                    $.when(prom3).fail($.proxy(function(error) {err(error);}, this));            	
-                }, this));
-                $.when(prom2).fail($.proxy(function(error) {err(error);}, this));            	
-            }, this));
-            $.when(prom).fail($.proxy(function(error) {err(error);}, this));
+        	var included2 = [];
+        	for (var rowPos in rows) {
+        		var row = rows[rowPos];
+        		var featureId = row.feature;
+        		var contigIdAndFeatIndex2 = genomeRefAndFId2contigAndFInd[genomeRef + "_" + featureId];
+        		var contigId = contigIdAndFeatIndex2[0];
+        		var featureIndex = contigIdAndFeatIndex2[1];
+        		row.contig = contigId;
+        		row.fIndex = featureIndex;
+        		included2.push("contig_to_size_and_feature_count/" + contigId);
+        	}
+        	part2(null);
+        	function onErrorOfPart2(error) {
+        		for (var rowPos in rows) {
+        			var row = rows[rowPos];
+        			var panel = row.panel;
+        			panel.empty();
+        			panel.append('<div style="font-size: 10px;"><b>Error:</b> ' + error.error.message + '</div>');
+        		}
+        		var prom2 = self.wsClient.get_object_subset([{ref: annRef, included: included2}]);
+        		$.when(prom2).done($.proxy(function(objArr) {
+        			part2(objArr[0].data.contig_to_size_and_feature_count);
+        		}, this));
+        		$.when(prom2).fail($.proxy(function(error) {err(error);}, this));            	
+        	}
+        	function part2(contig_to_size_and_feature_count) {
+        		var ctg2ind2rows = {};
+        		for (var rowPos in rows) {
+        			var row = rows[rowPos];
+        			var contigId = row.contig;
+        			var ind2rows = ctg2ind2rows[contigId];
+        			if (!ind2rows) {
+        				ind2rows = {};
+        				ctg2ind2rows[contigId] = ind2rows;
+        			}
+        			var featureIndex = row.fIndex;
+        			var featureMinIndex = Math.max(0, featureIndex - 10);
+        			var featureMaxIndex = featureIndex + 10;  //Math.min(featureIndex + 10, featureCount - 1);
+        			if (contig_to_size_and_feature_count) {
+        				var contigLenAndFeatCount = contig_to_size_and_feature_count[contigId];
+        				var featureCount = contigLenAndFeatCount[1];
+        				if (featureMaxIndex > featureCount - 1)
+        					featureMaxIndex = featureCount - 1;
+        			}
+        			for (var i = featureMinIndex; i <= featureMaxIndex; i++) {
+        				var rowsForIndex = ind2rows[i];
+        				if (!rowsForIndex) {
+        					rowsForIndex = [];
+        					ind2rows[i] = rowsForIndex;
+        				}
+        				rowsForIndex.push(row);
+        			}
+        		}
+        		var included3 = [];
+        		var ctg2listOfIndAndRows = {};
+        		for (var contigId in ctg2ind2rows) {
+        			var ind2rows = ctg2ind2rows[contigId];
+        			var listOfIndAndRows = [];
+        			for (var i in ind2rows) 
+        				listOfIndAndRows.push({index: i, rows: ind2rows[i]});
+        			listOfIndAndRows.sort(function(a,b){ return a.index-b.index; });
+        			ctg2listOfIndAndRows[contigId] = listOfIndAndRows;
+        			for (var entryPos in listOfIndAndRows) 
+        				included3.push("data/" + contigId + "/" + listOfIndAndRows[entryPos].index);
+        		}
+        		var prom3 = self.wsClient.get_object_subset([{ref: annRef, included: included3}]);
+        		$.when(prom3).done($.proxy(function(objArr) {
+        			self.loadGenes(dcsr, groups, groupPos, idToColor, genomeRefAndFId2contigAndFInd);
+        			for (var contigId in objArr[0].data.data) {
+        				var elems = objArr[0].data.data[contigId];
+        				var listOfIndAndRows = ctg2listOfIndAndRows[contigId];
+        				for (var elemPos in elems) {
+        					var elem = elems[elemPos];
+        					for (var rowPos in listOfIndAndRows[elemPos].rows) {
+        						var row = listOfIndAndRows[elemPos].rows[rowPos];
+        						if (!row.elems)
+        							row.elems = [];
+        						row.elems.push(elem);
+        					}
+        				}
+        			}
+        			for (var rowPos in rows) {
+        				var row = rows[rowPos];
+        				var panel = row.panel;
+        				var featureId = row.feature;
+        				var items = [];
+        				var minPos = null;
+        				var maxPos = null;
+        				for (var elemPos in row.elems) {
+        					var elem = row.elems[elemPos];
+        					var fId = elem[0];
+        					var fStart = elem[1];
+        					var fStop = elem[2];
+        					var fDir = elem[3];
+        					var domToPlace = elem[4];
+        					for (var domRef in domToPlace) {
+        						if (!dcsr.domain_cluster_statistics[domRef])
+        							continue;
+        						var domName = dcsr.domain_cluster_statistics[domRef].name;
+        						var places = domToPlace[domRef];
+        						for (var placePos in places) {
+        							var place = places[placePos];
+        							var startInF = place[0];
+        							var stopInF = place[1];
+        							if (fStart + 3 * stopInF > fStop)
+        								fStop = fStart + 3 * stopInF;
+        						}
+        					}
+        					if (fStop < fStart + 100)
+        						fStop = fStart + 100;
+        					var domText = "";
+        					var dItems = [];
+        					for (var domRef in domToPlace) {
+        						if (!dcsr.domain_cluster_statistics[domRef])
+        							continue;
+        						var domName = dcsr.domain_cluster_statistics[domRef].name;
+        						if (domName.indexOf('.domain') > 0)
+        							domName = domName.substring(0, domName.indexOf('.domain'));
+        						var places = domToPlace[domRef];
+        						for (var placePos in places) {
+        							var place = places[placePos];
+        							var startInF = place[0];
+        							var stopInF = place[1];
+        							var evalue = place[2];
+        							var bitscore = place[3];
+        							var coverage = place[4];
+        							domText += domName + ":" + place + "; ";
+        							var domDescr = domName + ": [" + startInF + ".." + stopInF + "], e-value=" + 
+        							evalue + ", bit-score=" + bitscore + ", domain-coverage=" + coverage;
+        							var dStart = fDir > 0 ? (fStart + 3 * startInF) : (fStop - 3 * stopInF);
+        							var dStop = fDir > 0 ? (fStart + 3 * stopInF) : (fStop - 3 * startInF);
+        							var color = self.getColorForId(idToColor, domName);
+        							dItems.push({id: fId + "-" + domName, descr: domDescr, 
+        								start: dStart, stop: dStop, dir: fDir, color: color, h: 8});
+        						}
+        					}
+        					dItems.sort(function(a,b){ return a.stop-a.start-(b.stop-b.start)});
+        					var descr = fId + ": [" + fStart + ".." + fStop + "]" + (fDir > 0 ? "+" : "-") + ", [" + domText + "]";
+        					items.push({id: fId, descr: descr, start: fStart, stop: fStop, dir: fDir, color: '#dddddd', h: 16});
+        					for (var dItem in dItems)
+        						items.push(dItems[dItem]);
+        					if (fId === featureId) {
+        						minPos = fStart - 5000;
+        						maxPos = fStop + 5000;
+        					}
+        				}
+        				panel.empty();
+        				self.prepareSvg(minPos, maxPos, items, panel, 500, 20);
+        			}
+        		}, this));
+        		$.when(prom3).fail($.proxy(function(error) {onErrorOfPart2(error);}, this));  
+        	}
         },
 
         prepareSvg: function(minPos, maxPos, items, panel, pw, ph) {
