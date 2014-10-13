@@ -21,7 +21,17 @@
 	padding: 5px;
 }
 
+.ws-toolbar .nav-pills {
+	margin: 5px 0 0 0;
+}
 
+.ws-toolbar .nav-pills a {
+	border-radius: 0px;
+}
+
+.ws-toolbar .nav-pills li a{
+	margin: 0;
+}
 
 .mini-obj-table {
 	background: #fff;
@@ -78,14 +88,13 @@
 }
 .narrative-cell .back {
 	z-index: 20;
-
 	position:absolute;
 	top:0;
 	right:0;
-
 	background: white;
-
 	transform: rotateY( 180deg );
+
+	margin: 20px;
 }
 
 .narrative-cell.flipped {

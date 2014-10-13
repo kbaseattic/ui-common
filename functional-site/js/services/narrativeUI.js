@@ -8,6 +8,9 @@
 
 app.service('narrative', function($http) {
     var self = this;
+    
+    // default workspace; used at the start of the application
+    var default_ws = USER_ID+":home";    
 
     // models for methods; two for faster retrieval and updating of templates
     this.methods = [];
@@ -20,16 +23,17 @@ app.service('narrative', function($http) {
     this.current_app;
 
 	// model for ws objects in 'data' view
-	this.selected_ws;
-	this.ws_objects = [];  
+    this.current_ws = default_ws;
+	this.ws_objects;
+    this.wsObjsByType;
 
 	// model for tasks; appears in 'running tasks'
 	this.tasks = [];
 
     // add cell to narrative model
     this.addCell = function(name) {
-		console.log('add narrative cell:', name, cell_obj);
         var cell_obj = self.method_dict[name];
+        console.log('add narrative cell:', name, cell_obj);
         self.cells.push(cell_obj);
     }
 
@@ -40,23 +44,14 @@ app.service('narrative', function($http) {
     }
 
     this.setApp = function(name) {
-		console.log('setting app to:', name, cell_obj);
+        var cell_obj = self.method_dict[name];
         self.current_app = cell_obj;
     }
-
-
-    // run a cell on a page; independent of "narrative" concept
-    /*this.runCell = function(index, cell) {
-    	console.log('running cell:', index, 'with params', cell )
-
-    	self.newTask({name: cell.title, params: cell.params})
-    }*/
 
     // a task is of the form {name: cell.title, fields: scope.fields}
     this.newTask = function(task) {
     	self.tasks.push(task);
     }
-
 
 
     // Load data for apps, app builder, and data 
@@ -109,19 +104,6 @@ app.service('narrative', function($http) {
         }
         return props;
     }
-
-    // let's make this happen: 
-    // http://ngmodules.org/modules/angularjs-json-rpc
-    if (!self.ws_objects) {
-        var p = kb.ws.list_objects({workspaces: [USER_ID+':home']});
-        $.when(p).done(function(data){
-
-            $scope.$apply(function() {
-                self.ws_objects = data;
-            })
-        })
-    }
-
 
 });
 

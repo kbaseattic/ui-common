@@ -6,10 +6,12 @@
 
         <!-- external css -->
         <link rel="stylesheet" type="text/css" href="../ext/bootstrap/3.0.0/css/bootstrap.css" />
-        <link rel="stylesheet" type="text/css" href="../ext/jquery-ui/1.10.3/css/custom-theme/jquery-ui-1.10.0.custom.css">
+        <!--<link rel="stylesheet" type="text/css" href="../ext/jquery-ui/1.10.3/css/custom-theme/jquery-ui-1.10.0.custom.css"> needs justification-->
         
         <link rel="stylesheet" type="text/css" href="assets/css/dataTables.bootstrap.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/ws-browser.css" />
+        <!--<link rel="stylesheet" type="text/css" href="assets/js/acute-select/acute/acute.select/acute.select.css" />-->
+
         <link rel="stylesheet" type="text/css" href="assets/css/ng-grid.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/jquery.jsonview.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/prettify.css" />
@@ -97,6 +99,7 @@
         <script src="assets/js/kbclient/wikiScraper.js"></script>
         <script src="assets/js/kbclient/kbaseTrees.js"></script>        
         <script src="assets/js/kbclient/KBaseExpressionClient.js"></script>
+        <script src="assets/js/kbclient/shock.js"></script>        
         <script src="assets/js/widgetMaxWidthCorrection.js"></script>        
 
         <!-- widgets -->
@@ -285,11 +288,15 @@
         <!-- End Network widgets -->
 
         <!-- app -->
+        <script src="assets/js/file-upload-1.6.12/angular-file-upload-shim.min.js"></script>
         <script src="js/angular-1.2.14/angular.min.js"></script>
+
         <script src="js/angular-1.2.14/angular-resource.min.js"></script> 
         <script src="js/angular-1.2.14/angular-animate.min.js"></script> 
         <script src="js/ui-router-0.2.10/angular-ui-router.min.js"></script>
         <script src="js/ui-bootstrap-0.11.0/ui-bootstrap-tpls-0.11.0.min.js"></script>
+        <script src="assets/js/file-upload-1.6.12/angular-file-upload.min.js"></script>
+
         <script src="js/app.js"></script>        
         <script src="js/search.js"></script>
 
@@ -305,9 +312,10 @@
         <script src="js/controllers.js"></script>
         <!--<script src="js/services/favorites.js"></script>-->
         <script src="js/services/workspaceUI.js"></script>
-        <script src="js/services/narrativeUI.js"></script>        
+
+        <!--<script src="assets/js/acute-select/acute/acute.select/acute.select.js"></script>         -->
+        <script src="js/services/narrativeUI.js"></script> 
         <script src="js/kbapi.js"></script>
-        <script src="../ext/ng-flow/dist/ng-flow-standalone.min.js"></script>
         <script src="assets/js/header.js"></script>
         
         <!-- RequireJS should go after all other javascript imports -->
@@ -336,7 +344,7 @@
                                 <a ui-sref="narratives.featured" >Narratives</a>
                             </li>
                             <li ng-class="{ active: $state.includes('analysis')}">
-                                <a ui-sref="analysis({ws: 'nconrad:home'})">Apps</a>
+                                <a ui-sref="analysis.apps">Apps</a>
                             </li>
                             <li ng-class="{ active: $state.includes('ws')}">
                                 <a ui-sref="ws">Workspaces</a>

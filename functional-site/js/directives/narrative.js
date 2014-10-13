@@ -3,9 +3,15 @@
  * Narrative directives
  *  - narrativeCell : extends functionality of a cell 
  *  - kbWidget : wrapper for jquery output widgets
- *  - wsSelector : mini workspace selector dropdown
+ *  - ddSelector : searchable angular, bootstrapifyed dropdown used 
+ *                 for selectors
  *
  * Controllers:  (See Analysis in js/controllers.js)
+ *
+ *
+ * Authors:
+ *  Neal Conrad <nealconrad@gmail.com>
+ *
 */
 
 var narrativeDirectives = angular.module('narrative-directives', []);
@@ -37,6 +43,14 @@ angular.module('narrative-directives')
     }
 })
 
+.directive('showData', function() {
+    return {
+        link: function(scope, ele, attrs) {
+
+        }
+    }
+})
+
 .directive('kbWidget', function() {
     return {
         link: function(scope, element, attrs) {
@@ -61,87 +75,66 @@ angular.module('narrative-directives')
 })
 
 
-.directive('wsSelector', function() {
+/* Author:
+ *  Neal Conrad <nealconrad@gmail.com>
+ */
+.directive('ddSelector', function() {
     return {
+        templateUrl: 'views/partials/ws-dropdown.html',
         link: function(scope, element, attrs) {
 
-            var wsSelect = $('<form class="form-horizontal" role="form">'+
-                                '<div class="form-group">'+
-                                    '<div class="input-group col-sm-12">'+
-                                        '<input type="text" class="select-ws-input form-control focusedInput" placeholder="Search workspaces">'+
-                                        '<span class="input-group-btn">'+
-                                            '<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">'+
-                                                '<span class="caret"></span>'+
-                                            '</button>'+
-                                        '</span>'+
-                                    //'<a class="btn-new-ws pull-right">New WS</a>'+
-                                    '</div>'+
-                            '</div>');            
-            element.append(wsSelect);
+            // model for input
+            scope.ddModel = attrs.ddModel;
 
-            var p = kb.ws.list_workspace_info({perm: 'w'});
-            var prom = $.when(p).then(function(workspaces){
-                var workspaces = workspaces.sort(compare)
+            // if there is a default for the text box, use it
+            if (attrs.ddDefault) {
+                scope.ddSelected = attrs.ddDefault;
+            }
 
-                function compare(a,b) {
-                    var t1 = kb.ui.getTimestamp(b[3]) 
-                    var t2 = kb.ui.getTimestamp(a[3]) 
-                    if (t1 < t2) return -1;
-                    if (t1 > t2) return 1;
-                    return 0;
-                }
+            // model to watch is the attr 'dd-data'
+            scope.$watch(attrs.ddData, function(value) {
+                scope.items = value;
+            })
 
-                var select = $('<ul class="dropdown-menu select-ws-dd" role="menu">');
-                for (var i in workspaces) {
-                    select.append('<li><a>'+workspaces[i][1]+'</a></li>');
-                }
+            scope.selectedIndex = -1;
+            scope.ddSelect = function($index, item) {
+                scope.selectedIndex = $index;
+                scope.ddSelected = item.name;
+            }
+            
+            // need to make work for state resets
+            scope.openDDSelector = function() {
+                $(element).find('.input-group-btn').addClass('open');
+                $(element).find('.dd-selector' ).focus();
+            }
+        }
+    }
+})
 
-                wsSelect.find('.input-group-btn').append(select);
+.directive('kbUpload', function($location) {
+    return {
+        link: function(scope, element, attrs) {
+            console.log(USER_TOKEN)
+            SHOCK.init({ token: USER_TOKEN, url: scope.shockURL })
 
-                var dd = wsSelect.find('.select-ws-dd');
-                var input = wsSelect.find('input');
+            var url = "http://140.221.67.190:7078/node" ;
 
-                var not_found = $('<li class="select-ws-dd-not-found"><a><b>Not Found</b></a></li>');
-                dd.append(not_found);
-                input.keyup(function() {
-                    dd.find('li').show();
-
-                    wsSelect.find('.input-group-btn').addClass('open');
-
-                    var input = $(this).val();
-                    dd.find('li').each(function(){
-                        if ($(this).text().toLowerCase().indexOf(input.toLowerCase()) != -1) {
-                            return true;
-                        } else {
-                            $(this).hide();
-                        }
-                    });
-
-                    if (dd.find('li').is(':visible') == 1) {
-                        not_found.hide();
-                    } else {
-                        not_found.show();
-                    }
-                }) 
-
-                dd.find('li').click(function() {
-                    dd.find('li').removeClass('active');
-
-                    if (!$(this).hasClass('select-ws-dd-not-found')) {
-                        $(this).addClass('active');                    
-
-                        var val = $(this).text();
-                        input.val(val);
-                    }
+            /*
+            var prom = SHOCK.get_all_nodes(function(data) {
+                console.log('shock data!', data)
+            })*/
+            
+            var prom = SHOCK.get_all_nodes();
+            $.when(prom).done(function(data){
+                scope.$apply(function(){
+                    scope.uploads = data;
                 })
-
-                element.append(wsSelect)
+                console.log(data)
             })
 
         }
     }
 })
-
 
 .directive('recentnarratives', function($location) {
     return {

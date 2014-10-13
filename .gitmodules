@@ -10,6 +10,6 @@
 [submodule "ext/kbase-api"]
 	path = ext/kbase-api
 	url = git://github.com/gingi/kbasejs
-[submodule "ext/ng-flow"]
-	path = ext/ng-flow
-	url = https://github.com/flowjs/ng-flow
+[submodule "ext/acute-select"]
+	path = ext/acute-select
+	url = https://github.com/john-oc/acute-select

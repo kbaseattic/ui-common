@@ -23,9 +23,9 @@ var app = angular.module('landing-pages',
     ['lp-directives', 'card-directives',
      'trees-directives', 
      'ws-directives', 'modeling-directives', 
-     'communities-directives', 'narrative-directives', 
+     'communities-directives', 'narrative-directives', 'angularFileUpload',
      'ui.router', 'ngResource', 'kbaseLogin', 
-      'flow', 'ui.bootstrap', 'search'])
+      'ui.bootstrap', 'search'])
     .config(['$locationProvider', '$stateProvider', '$httpProvider', '$urlRouterProvider',
     function($locationProvider, $stateProvider, $httpProvider, $urlRouterProvider) {
 
@@ -95,14 +95,14 @@ var app = angular.module('landing-pages',
 
     $stateProvider 
         .state('analysis', {
-          url: "/analysis/:ws/",
+          url: "/analysis/",
           templateUrl: 'views/apps/analysis.html',
           controller: 'Analysis'})
 
         .state('analysis.upload', {
           url: "upload",
           templateUrl: 'views/apps/upload.html',
-          controller: 'Analysis'})   
+          controller: 'Upload'})   
         .state('analysis.tasks', {
           url: "tasks",
           templateUrl: 'views/apps/tasks.html',
@@ -110,19 +110,23 @@ var app = angular.module('landing-pages',
 
         .state('analysis.apps', {
           url: "apps",
-          templateUrl: 'views/apps/narrative.html',
+          templateUrl: 'views/apps/apps.html',
           controller: 'Analysis'
         })
         .state('analysis.builder', {
           url: "builder",
           templateUrl: 'views/apps/narrative.html',
           controller: 'Analysis'
+        }).state('analysis.objects', {
+          url: "objects",
+          templateUrl: 'views/ws/objtable.html',
+          controller: 'Analysis'
         })      
-        .state('analysis.data', {
+        /*.state('analysis.data', {
           url: "data",
           templateUrl: 'views/apps/narrative.html',
           controller: 'Analysis'
-        })          
+        })*/
 
 
            
@@ -768,7 +772,6 @@ function State() {
         return localStorage.setItem(key, val);
     };
 }
-
 
 
 
