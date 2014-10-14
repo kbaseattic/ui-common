@@ -21,6 +21,10 @@
 	padding: 5px;
 }
 
+.default-ws-container {
+	background: #222;
+}
+
 .ws-toolbar .nav-pills {
 	margin: 5px 0 0 0;
 }
@@ -196,3 +200,4 @@ border: 1px solid #ff2121;
 .change-up-remove-active {
   background-color: white;
 }
+

@@ -56,8 +56,10 @@ app.service('narrative', function($http) {
 
     // Load data for apps, app builder, and data 
     $http.get('data/services.json').success(function(data) {
+        console.log('form data', data)
+
         // reorganize data since it doesn't make any sense.  
-        // why is there no order to the groups of menthods?
+        // why is there no order to the groups of methods?
         var methods = [];
         var method_dict = {}
         for (var key in data) {

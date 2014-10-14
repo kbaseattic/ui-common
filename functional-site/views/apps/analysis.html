@@ -6,11 +6,17 @@
         <div class="btn-toolbar ws-toolbar">
             <div class="row">
                 <div class="col-md-12">
+                    <div class="default-ws-container">
 
-                    <div dd-selector 
-                         dd-selected="selectedWS" 
-                         dd-data="narrative.ws_list" 
-                         on-change="wsSelected(value)">
+                        <span class="text-muted">Default Workspace</span>
+                        <a class="pull-right" ui-sref="analysis.objects({ws: ddSelected})">Data 
+                            (<span>{{narrative.ws_objects.length}}</span>)
+                        </a>    
+                        <div dd-selector 
+                             dd-selected="selectedWS" 
+                             dd-data="narrative.ws_list" 
+                             on-change="wsSelected(value)">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -20,11 +26,12 @@
                 <li ng-class="{ active: $state.includes('analysis.upload') }">
                     <a ui-sref="analysis.upload">Upload</a>
                 </li>
+                <!--
                 <li ng-class="{ active: $state.includes('analysis.objects') }">
                     <a  ui-sref="analysis.objects({ws: ddSelected})">Data 
                         (<span>{{narrative.ws_objects.length}}</span>)
                     </a>              
-                </li>                
+                </li>-->
                 <li ng-class="{ active: $state.includes('analysis.tasks') }" >
                     <a ui-sref="analysis.tasks" >
                         Tasks 

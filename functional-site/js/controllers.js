@@ -3,7 +3,7 @@
 /*  Controllers
  *
  *  These are the 'glue' between models and views.
- *  See: http://docs.angularjs.org/guide/dev_guide.mvc.understanding_controller
+ *  See: https://docs.angularjs.org/guide/controller
  *  
 */
 
