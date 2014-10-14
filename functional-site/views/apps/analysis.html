@@ -32,6 +32,10 @@
                         (<span>{{narrative.ws_objects.length}}</span>)
                     </a>              
                 </li>-->
+
+                <li ng-class="{ active: $state.includes('analysis.apps')}" >
+                    <a ui-sref="analysis.apps">Apps</a>
+                </li>                
                 <li ng-class="{ active: $state.includes('analysis.tasks') }" >
                     <a ui-sref="analysis.tasks" >
                         Tasks 
@@ -43,20 +47,22 @@
 
             <br>
 
+            <!--
             <ul class="nav nav-tabs">
                 <li ng-class="{ active: $state.includes('analysis.apps')}" >
                     <a ui-sref="analysis.apps">Apps</a>
                 </li>
-                <!--
+
                 <li ng-class="{ active: $state.includes('analysis.builder')}" >
                     <a ui-sref="analysis.builder">App Builder</a>
-                </li>-->
-            </ul>
+                </li>
+            </ul>-->
 
 
             <!--  ng-click="showData = !showData" ng-class="{active: showData}" class="data-tab" -->
 
             <div ng-if="$state.includes('analysis.apps')">
+                <h3>Apps</h3>
                  <ul class="app-list list-group">
                     <li><a class="text-muted" >Assemble</a></li>
                     <li><a ng-click="narrative.setApp('Annotate ContigSet')">Annotate</a></li>

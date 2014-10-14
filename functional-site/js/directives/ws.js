@@ -192,8 +192,8 @@ angular.module('ws-directives')
 
 
                 // events for search box
-                $('.search-query').unbind('click');
-                $('.search-query').keyup(function() {
+                $('.wb-search').unbind('click');
+                $('.wb-search').keyup(function() {
                     $('.select-box').find('td').show();
                         var input = $(this).val();
                         $('.select-box').find('td').each(function(){
