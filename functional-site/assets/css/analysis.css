@@ -41,17 +41,18 @@
 	background: #fff;
 }
 
-/* upload pages */
 
-
-/* task pages */
-
+/* 
+ * task pages 
+*/ 
 .task-table {
 	margin: 200px 0 0 0;
 }
 
 
-/* app builder cells */
+/* 
+ * App Builder Cells
+*/ 
 .analysis-view ul {
 	padding: 0;
 	list-style: none;
@@ -106,7 +107,6 @@
 }
 
 
-
 .info-box {
 	min-height: 140px;
 	border: 1px solid black;
@@ -118,6 +118,14 @@
 	box-shadow:         0px 0px 3px 0px rgba(50, 50, 50, 0.75);
 }
 
+
+
+
+
+
+/*
+ *  Common
+*/ 
 .dashboard-info {
 	color: #888;
 	padding: 0 0 0 20px;
@@ -139,23 +147,23 @@
 
 
 .info-box.info {
-background: #67c2ef;
-border: 1px solid #39afea;
+	background: #67c2ef;
+	border: 1px solid #39afea;
 }
 
 .info-box.warning {
-background: #fabb3d;
-border: 1px solid #f9aa0b;
+	background: #fabb3d;
+	border: 1px solid #f9aa0b;
 }
 
 .info-box.success {
-background: #79c447;
-border: 1px solid #61a434;
+	background: #79c447;
+	border: 1px solid #61a434;
 }
 
 .info-box.danger {
-background: #ff5454;
-border: 1px solid #ff2121;
+	background: #ff5454;
+	border: 1px solid #ff2121;
 }
 
 

@@ -1,11 +1,10 @@
 
 /*
- *  Landing Page App 
+ *  KBase "Functional Website"
  *
- *  Right now, this file is responsible for landing page URLs
- *  and which controllers and templates are used.
+ *  Login, Workspace/Narrative Browser, Upload, Apps
  *
- *  The app uses angular.js, a MVC front-end framework.
+ *  Uses Angular.js
  *
  *  -- Some of the critical files --
  *  App:               js/app.js
@@ -22,8 +21,8 @@ var cardManager = undefined;
 var app = angular.module('landing-pages', 
     ['lp-directives', 'card-directives',
      'trees-directives', 
-     'ws-directives', 'modeling-directives', 
-     'communities-directives', 'narrative-directives', 'angularFileUpload',
+     'ws-directives', 'modeling-directives', 'angular-json-rpc',
+     'communities-directives', 'narrative-directives',
      'ui.router', 'ngResource', 'kbaseLogin', 
       'ui.bootstrap', 'search'])
     .config(['$locationProvider', '$stateProvider', '$httpProvider', '$urlRouterProvider',
