@@ -1020,21 +1020,31 @@
                         error: $.proxy(
                             function (jqXHR, textStatus, errorThrown) {
 
-                                // If we have a useless error message, replace with
-                                // friendly, but useless error message
-
+                                /* Some error cases
+                                 * status == 401 - show "uid/pw = wrong!" message
+                                 * status is not 401, 
+                                 *     and we have a responseJSON - if that's the "LoginFailure: Auth fail" error, show the same uid/pw wrong msg.
+                                 *     and we do not have a responseJSON (or it's something else): show a generic message
+                                 */
                                 var errmsg = textStatus;
-                                if (jqXHR.responseJSON) {
-                                    errmsg = jqXHR.responseJSON.error_msg;
+                                var wrongPwMsg = "Login Failed: your username/password is incorrect.";
+                                if (jqXHR.status && jqXHR.status === 401) {
+                                    errmsg = wrongPwMsg;
                                 }
-
+                                else if (jqXHR.responseJSON) {
+                                    // if it has an error_msg field, use it
+                                    if (jqXHR.responseJSON.error_msg) {
+                                        errmsg = jqXHR.responseJSON.error_msg;
+                                    }
+                                    // if that's the unclear auth fail message, update it
+                                    if (errmsg === "LoginFailure: Authentication failed.") {
+                                        errmsg = wrongPwMg;
+                                    }
+                                }
+                                // if we get through here and still have a useless error message, update that, too.
                                 if (errmsg == "error") {
                                     errmsg = "Error connecting to KBase login server";
                                 }
-                                else if (errmsg === "LoginFailure: Authentication failed.") {
-                                    errmsg = "Login Failed: your username/password is incorrect.";
-                                }
-
 
                                 this.populateLoginInfo({});
                                 callback.call(this,{ status : 0, message : errmsg })

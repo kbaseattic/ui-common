@@ -23,9 +23,14 @@
 
 
         <!-- kbase css -->
+<<<<<<< HEAD
         <link rel="stylesheet" type="text/css" href="assets/css/kb-ui.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/kb-visualizations.css" />        
         <link rel="stylesheet" type="text/css" href="assets/css/analysis.css" />        
+=======
+        <link rel="stylesheet" type="text/css" href="assets/css/kb-visualizations.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/kb-ui.css" />
+>>>>>>> master
         <link rel="stylesheet" type="text/css" href="assets/css/search.css" />
         <link rel="stylesheet" type="text/css" href="assets/js/ws-widgets/style.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/nc-tour.css" />
@@ -328,7 +333,7 @@
             <div id="content">
                 <div class="nav navbar-kbase navbar-fixed-top nav-collapse nav-collapse-scrollable bs-navbar-scroll-collapse">
                     <a href="http://www.kbase.us" class="pull-left">
-                        <!--<img id="logo" src="assets/img/labs_icon.png" width="46"/>-->
+                        <img id="logo" src="assets/img/kbase_logo.png" width="46"/>
                     </a>
 
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -343,16 +348,17 @@
                             <li ng-class="{ active: $state.includes('narratives')}">
                                 <a ui-sref="narratives.featured" >Narratives</a>
                             </li>
+                            <!--
                             <li ng-class="{ active: $state.includes('analysis')}">
                                 <a ui-sref="analysis.apps">Apps</a>
-                            </li>
+                            </li>-->
                             <li ng-class="{ active: $state.includes('ws')}">
                                 <a ui-sref="ws">Workspaces</a>
                             </li>
                             <li ng-class="{ active: $state.includes('search')}">
                                 <a ng-click="newSearch()" ng-controller="searchBarController">Search Data</a>
                             </li>
-                            <!--<li><a href="//kbase.us/services/docs/uploader/uploader.html">Upload</a></li>-->
+                            <li><a href="//kbase.us/services/docs/uploader/uploader.html">Upload</a></li>
                         </ul>
 
                         <!--

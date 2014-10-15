@@ -4,7 +4,7 @@
     "prod": {"workspace_url": "https://kbase.us/services/ws/",
              "fba_url" : "https://kbase.us/services/KBaseFBAModeling/",
              "user_job_state_url": "https://140.221.84.180:7083",
-             "search_url": "https://search-dev.kbase.us/search/" },
+             "search_url": "https://kbase.us/services/search/" },
     "dev": { "workspace_url": "http://dev04.berkeley.kbase.us:7058",
              "fba_url" : "https://140.221.85.73:4043/",
              "user_job_state_url": "https://140.221.84.180:7083",
