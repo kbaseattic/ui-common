@@ -14,5 +14,8 @@
                "user_job_state_url": "https://140.221.84.180:7083",
                "search_url": "https://search-dev.kbase.us/search/"},             
 
-    "narrative_url": "//narrative.kbase.us/narrative"
+    "narrative_url": "//narrative.kbase.us/narrative",
+
+    "ui" : {"footer": "" }
+
 }
