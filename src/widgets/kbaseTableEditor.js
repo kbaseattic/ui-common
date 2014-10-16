@@ -15,12 +15,13 @@
 
             table = $('<table class="table">');
 
+            // button for editing table
             var edit_btn = $('<button type="button">Edit</button>')
             edit_btn.click(editTable);
             container.append(edit_btn);
 
+            // build the editable table
             buildTable();
-
 
 
             function buildTable() {
@@ -61,7 +62,7 @@
                     })
 
                     // add delete button to every row
-                    $(this).append('<button type="button" class="btn btn-default btn-remove-row"><span class="glyphicon glyphicon-trash"></span></button>')
+                    $(this).append('<button type="button" class="btn btn-default btn-remove-row"><span class="glyphicon glyphicon-trash"></span></button>');
                 })
 
                 $('.btn-remove-row').unbind('click');

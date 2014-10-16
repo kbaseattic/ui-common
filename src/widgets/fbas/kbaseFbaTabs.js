@@ -102,7 +102,6 @@ $.KBWidget({
             overviewTable.append(table);
 
             var tableSettings = {
-                "sPaginationType": "bootstrap",
                 "iDisplayLength": 10,
                 "aLengthMenu": [5, 10, 25,50,100],
                 "oLanguage": {
