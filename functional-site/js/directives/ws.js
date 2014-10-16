@@ -24,7 +24,7 @@ angular.module('ws-directives')
             // Global list and dict of fetched workspaces
             var workspaces = []; 
 
-            var nav_height = 90;
+            var nav_height = 80;
 
             // This method loads the sidebar data.  
             // Note: this is only called after instantiation when sidebar needs to be refreshed
@@ -112,6 +112,19 @@ angular.module('ws-directives')
             // load the content of the ws selector
             scope.loadWSTable();
 
+            // move up/down ws selector
+            /*
+            $(document).keydown(function(e) {
+
+                // move down
+                if (e.which == 40) {
+                    $('.selected-ws').parent().next()
+                    alert('move down')
+                }
+
+                e.preventDefault(); // prevent the default action (scroll / move caret)
+            });*/            
+
             function events() {
                 var filterCollapse = $('.perm-filters');
                 var filterOwner = filterCollapse.find('#ws-filter-owner').change(filter);
@@ -179,8 +192,8 @@ angular.module('ws-directives')
 
 
                 // events for search box
-                $('.search-query').unbind('click');
-                $('.search-query').keyup(function() {
+                $('.wb-search').unbind('click');
+                $('.wb-search').keyup(function() {
                     $('.select-box').find('td').show();
                         var input = $(this).val();
                         $('.select-box').find('td').each(function(){
@@ -302,10 +315,10 @@ angular.module('ws-directives')
 })
 
 
-.directive('objtable', function($location, $compile, modals, favoriteService) {
+.directive('objtable', function($location, $compile, modals) {
     return {
         link: function(scope, element, attrs) {
-            var ws = scope.selected_ws;
+            var ws = scope.ws;
 
             var table;
             scope.favs;
@@ -730,7 +743,7 @@ angular.module('ws-directives')
                                     ' data-name="'+name+'" data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" ><b><i>'+
                                         name+'</i></b></a> (<a class="show-versions">'+instance+'</a>)'+
                                 (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
-                                '<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>';
+                                '<a class="btn-show-info pull-right invisible" >More</a>';
 
                     wsarray[1] = new_id;
                     url = "ws.id({ws:"+"'"+ws+"'})";
@@ -828,7 +841,7 @@ angular.module('ws-directives')
                                     '" data-module="'+module+'" '+'data-sub="'+sub+'">'+
                                     name+'</a>');
                     var ver_link = $('<a class="show-versions">'+instance+'</a>');
-                    var more_link = $('<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>');
+                    var more_link = $('<a class="btn-show-info pull-right invisible" >More</a>');
 
                     if (route) {
                         var url = route+"({ws:'"+ws+"', id:'"+name+"'})";
@@ -958,12 +971,10 @@ angular.module('ws-directives')
                 // effect for highlighting checkbox on hover
                 $('.obj-table tbody tr').hover(function() {
                     $(this).children('td').eq(0).find('.ncheck').addClass('ncheck-hover');
-                    $(this).find('.btn-show-info').css('visibility', 'visible')
-                    //$(this).find('.btn-show-info').removeClass('hide');
+                    $(this).find('.btn-show-info').removeClass('invisible');
                 }, function() {
                     $(this).children('td').eq(0).find('.ncheck').removeClass('ncheck-hover');
-                    $(this).find('.btn-show-info').css('visibility', 'hidden')                    
-                    //$(this).find('.btn-show-info').addClass('hide');
+                    $(this).find('.btn-show-info').addClass('invisible');
 
                 })
 
@@ -1063,7 +1074,7 @@ angular.module('ws-directives')
 
                 copy_btn.find('.btn-mv-obj-to-nar').on('click', copyObjectsToNarrative);                                        
                 rename_btn.on('click', renameObject);
-                mv_btn.on('click', addToMV);
+                //mv_btn.on('click', addToMV);
 
                 var container = $('.table-options').append(options);
 
@@ -1655,7 +1666,6 @@ angular.module('ws-directives')
                 newNarrativeModal.openPrompt();
 
                 var p = kb.getWorkspaceSelector()
-                //var prom = kb.ws.list_workspace_info({perm: 'w'});
                 $.when(p).done(function(selector) {
                     body.rmLoading();
 
@@ -1767,7 +1777,7 @@ angular.module('ws-directives')
 .directive('wsDescription', function($location, $compile, $state) {
     return {
         link: function(scope, ele, attrs) {
-            var p = kb.ws.get_workspace_description({workspace: scope.selected_ws})
+            var p = kb.ws.get_workspace_description({workspace: scope.ws})
             $.when(p).done(function(data){
                 if (!data) {
                     return;

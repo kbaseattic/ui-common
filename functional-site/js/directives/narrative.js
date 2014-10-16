@@ -1,12 +1,141 @@
 
 /*
  * Narrative directives
- * 
+ *  - narrativeCell : extends functionality of a cell 
+ *  - kbWidget : wrapper for jquery output widgets
+ *  - ddSelector : searchable angular, bootstrapifyed dropdown used 
+ *                 for selectors
+ *
+ * Controllers:  (See Analysis in js/controllers.js)
+ *
+ *
+ * Authors:
+ *  Neal Conrad <nealconrad@gmail.com>
+ *
 */
 
 var narrativeDirectives = angular.module('narrative-directives', []);
 
 angular.module('narrative-directives')
+
+.directive('narrativeCell', function(narrative) {
+    return {
+        link: function(scope, ele, attrs) {
+
+            // dictionary for fields in form.  Here, keys are the ui_name 
+            scope.fields = {};  
+
+            scope.flip = function($event) {
+                $($event.target).parents('.panel').find('.narrative-cell').toggleClass('flipped')
+            }
+
+            scope.minimize = function($event) {
+                $($event.target).parents('.panel').find('.panel-body').slideToggle('fast');
+            }
+
+            scope.runCell = function(index, cell) {
+                var task = {name: cell.title, fields: scope.fields};
+                narrative.newTask(task);
+            }
+
+
+        }
+    }
+})
+
+.directive('showData', function() {
+    return {
+        link: function(scope, ele, attrs) {
+
+        }
+    }
+})
+
+.directive('kbWidget', function() {
+    return {
+        link: function(scope, element, attrs) {
+            // instantiation of a kbase widget
+        }
+    }
+})
+
+.directive('animateOnChange', function($animate) {
+  return {
+      link: function(scope, elem, attr) {
+          scope.$watch(attr.animateOnChange, function(nv,ov) {
+            if (nv!=ov) {
+              var c = nv > ov ? 'change-up' : 'change';
+              console.log('changing', c)
+              elem.addClass(c).removeClass(c, {duration: 1000})
+            }
+          });    
+
+        }
+   };
+})
+
+
+/* Author:
+ *  Neal Conrad <nealconrad@gmail.com>
+ */
+.directive('ddSelector', function() {
+    return {
+        templateUrl: 'views/partials/ws-dropdown.html',
+        link: function(scope, element, attrs) {
+
+            // model for input
+            scope.ddModel = attrs.ddModel;
+
+            // if there is a default for the text box, use it
+            if (attrs.ddDefault) {
+                scope.ddSelected = attrs.ddDefault;
+            }
+
+            // model to watch is the attr 'dd-data'
+            scope.$watch(attrs.ddData, function(value) {
+                scope.items = value;
+            })
+
+            scope.selectedIndex = -1;
+            scope.ddSelect = function($index, item) {
+                scope.selectedIndex = $index;
+                scope.ddSelected = item.name;
+            }
+            
+            // need to make work for state resets
+            scope.openDDSelector = function() {
+                $(element).find('.input-group-btn').addClass('open');
+                $(element).find('.dd-selector' ).focus();
+            }
+        }
+    }
+})
+
+.directive('kbUpload', function($location) {
+    return {
+        link: function(scope, element, attrs) {
+            console.log(USER_TOKEN)
+            SHOCK.init({ token: USER_TOKEN, url: scope.shockURL })
+
+            var url = "http://140.221.67.190:7078/node" ;
+
+            /*
+            var prom = SHOCK.get_all_nodes(function(data) {
+                console.log('shock data!', data)
+            })*/
+            
+            var prom = SHOCK.get_all_nodes();
+            $.when(prom).done(function(data){
+                scope.$apply(function(){
+                    scope.uploads = data;
+                })
+                console.log(data)
+            })
+
+        }
+    }
+})
+
 .directive('recentnarratives', function($location) {
     return {
         link: function(scope, element, attrs) {
@@ -83,25 +212,3 @@ angular.module('narrative-directives')
         } 
     };
 })  
-.directive('copyfeatured', function($state, modals) {
-    return {
-        link: function(scope, element, attrs) {
-            $(element).find('tr').hover(function() {
-                $(this).find('.btn').css('visibility', 'visible');
-            }, function() {
-                $(this).find('.btn').css('visibility', 'hidden');
-            })
-
-            var copyBtns = $(element).find('.btn');
-            copyBtns.unbind('click');
-            copyBtns.click(function() {
-                console.log('click')
-                var ws = $(this).data('ws');
-                modals.copyWS({ws: ws, submit_cb: function() {
-                    $state.go('narratives.mynarratives');
-                    kb.ui.notify('Copied Narratives and Objects From: <i>'+ws+'</i>');                    
-                }});
-            })
-        }
-    }
-})

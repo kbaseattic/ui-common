@@ -1,11 +1,10 @@
 
 /*
- *  Landing Page App 
+ *  KBase "Functional Website"
  *
- *  Right now, this file is responsible for landing page URLs
- *  and which controllers and templates are used.
+ *  Login, Workspace/Narrative Browser, Upload, Apps
  *
- *  The app uses angular.js, a MVC front-end framework.
+ *  Uses Angular.js
  *
  *  -- Some of the critical files --
  *  App:               js/app.js
@@ -21,11 +20,11 @@ var cardManager = undefined;
 
 var app = angular.module('landing-pages', 
     ['lp-directives', 'card-directives',
-     'trees-directives', 'fav-directives',
-     'ws-directives', 'modeling-directives', 
-     'communities-directives', 'narrative-directives', 
+     'trees-directives', 
+     'ws-directives', 'modeling-directives', 'angular-json-rpc',
+     'communities-directives', 'narrative-directives',
      'ui.router', 'ngResource', 'kbaseLogin', 
-     'FeedLoad', 'ui.bootstrap', 'search'])
+      'ui.bootstrap', 'search'])
     .config(['$locationProvider', '$stateProvider', '$httpProvider', '$urlRouterProvider',
     function($locationProvider, $stateProvider, $httpProvider, $urlRouterProvider) {
 
@@ -91,6 +90,46 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/ws/manage.html', 
           controller: 'WSManage',
         });
+
+
+    $stateProvider 
+        .state('analysis', {
+          url: "/analysis/",
+          templateUrl: 'views/apps/analysis.html',
+          controller: 'Analysis'})
+
+        .state('analysis.upload', {
+          url: "upload",
+          templateUrl: 'views/apps/upload.html',
+          controller: 'Upload'})   
+        .state('analysis.tasks', {
+          url: "tasks",
+          templateUrl: 'views/apps/tasks.html',
+          controller: 'Analysis'})
+
+        .state('analysis.apps', {
+          url: "apps",
+          templateUrl: 'views/apps/apps.html',
+          controller: 'Analysis'
+        })
+        .state('analysis.builder', {
+          url: "builder",
+          templateUrl: 'views/apps/narrative.html',
+          controller: 'Analysis'
+        }).state('analysis.objects', {
+          url: "objects",
+          templateUrl: 'views/ws/objtable.html',
+          controller: 'Analysis'
+        })      
+        /*.state('analysis.data', {
+          url: "data",
+          templateUrl: 'views/apps/narrative.html',
+          controller: 'Analysis'
+        })*/
+
+
+           
+
 
 
     // model viewer routing
@@ -195,12 +234,13 @@ var app = angular.module('landing-pages',
         });
 
     // not in use
+    /*
     $stateProvider
         .state('favorites', {
           url: "/favorites/",
           templateUrl: 'views/ws/favorites.html',
           controller: 'Favorites'
-        });
+        });*/
 
     // other pages
     $stateProvider
@@ -302,8 +342,7 @@ var app = angular.module('landing-pages',
              controller: 'WBLanding'})
         .state('genomesbyid',
             {url: '/genomes/:ws/:id',
-	     templateUrl: 'views/genomes/sortable-rows-landing-page.html',
-	     //templateUrl: 'views/objects/genome.html',
+      	     templateUrl: 'views/genomes/sortable-rows-landing-page.html',
              controller: 'WBLanding'})
         .state('kbgenomesbyws',
             {url: '/KBaseGenomes.Genome/:ws',
@@ -491,6 +530,18 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		templateUrl: 'views/objects/msa.html',
 		controller: 'MSADetail'});
 
+    $stateProvider
+	.state('kidledttype',
+		{url: '/kidledt/:mod/:type',
+		templateUrl: 'views/objects/kidledt.html',
+		controller: 'KidlEdtDetail'});
+
+    $stateProvider
+	.state('kidledtmod',
+		{url: '/kidledt/:mod',
+		templateUrl: 'views/objects/kidledt.html',
+		controller: 'KidlEdtDetail'});
+
     $urlRouterProvider.when('', '/login/')
                       .when('/', '/login/')
                       .when('#', '/login/');
@@ -542,12 +593,14 @@ kbaseLogin.factory('kbaseLogin', function() {
 });
 
 //add the Google Feeds API as a module
+/*
 var Feed = angular.module('FeedLoad', ['ngResource'])
     .factory('FeedLoad', function ($resource) {
         return $resource('//ajax.googleapis.com/ajax/services/feed/load', {}, {
             fetch: { method: 'JSONP', params: {v: '1.0', callback: 'JSON_CALLBACK'} }
         });
     });
+*/
 
 configJSON = $.parseJSON( $.ajax({url: "config.json", 
                              async: false, 
@@ -718,7 +771,6 @@ function State() {
         return localStorage.setItem(key, val);
     };
 }
-
 
 
 
