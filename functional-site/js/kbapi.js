@@ -18,7 +18,7 @@ function KBCacheClient(token) {
             search_url = configJSON.prod.search_url;
         }
     } else {
-        fba_url = "https://140.221.85.73:4043/"
+        fba_url = "http://kbase.us/services/KBaseFBAModeling/"
         ws_url = "https://kbase.us/services/ws/"
         //ujs_url = "http://140.221.84.180:7083"
         search_url = "http://dev07.berkeley.kbase.us/search/"
@@ -732,10 +732,36 @@ function UIUtils() {
                         break; 
                 }
 
-                var link = '<a href="#/'+route+label+'">'+label+'</a>'
+                var link = '<a href="#/'+route+label+'">'+label+'</a>';
                 refhash[reflist[i]] = {link: link, label: label};
             }
             return refhash
+        })
+        return p;
+    }
+
+    this.refsToJson = function(ref_list) {
+        var obj_refs = []
+        for (var i in ref_list) {
+            obj_refs.push({ref: ref_list[i]})
+        }
+
+        var obj = {}
+        var prom = kb.ws.get_object_info(obj_refs)
+        var p = $.when(prom).then(function(refinfo) {
+            for (var i=0; i<refinfo.length; i++) {
+                var item = refinfo[i];
+                var full_type = item[2];
+                var module = full_type.split('.')[0];
+                var type = full_type.slice(full_type.indexOf('.')+1);
+                var kind = type.split('-')[0];
+                var label = item[7]+"/"+item[1];
+
+                if ( !(kind in obj) )  obj[kind] = [];
+
+                obj[kind].push(label);
+            }
+            return obj;
         })
         return p;
     }
@@ -795,8 +821,7 @@ function UIUtils() {
     }
 
     // jQuery plugins that you can use to add and remove a 
-    // loading giff to a dom element.  This is easier to maintain, and likely less 
-    // code than using CSS classes.
+    // loading giff to a dom element.
     $.fn.loading = function(text, big) {
         $(this).rmLoading()
 

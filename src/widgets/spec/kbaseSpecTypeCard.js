@@ -21,7 +21,7 @@
         	var container = self.$elem;
             container.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace(newWorkspaceServiceUrlForSpec, {token: options.token});
+            var kbws = new Workspace(newWorkspaceServiceUrlForSpec, {token: self.options.token});
             var typeName = this.options.id;
             var typeVer = null;
             if (typeName.indexOf('-') >= 0) {
@@ -85,7 +85,7 @@
                     		{
                     			kind: "module", 
                     			id : moduleId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -111,7 +111,7 @@
                     		{
                     			kind: "type", 
                     			id : aTypeId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -143,7 +143,7 @@
             		funcsData.push({name: '<a onclick="specClicks[\''+pref+'funcs-click\'](this,event); return false;" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer});
             	}
                 var funcsSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function name", mData: "name"}, {sTitle: "Function version", mData: "ver"}],
                         "aaData": funcsData,
@@ -159,7 +159,7 @@
                     		{
                     			kind: "function", 
                     			id : funcId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -175,7 +175,7 @@
             		typesData.push({name: '<a onclick="specClicks[\''+pref+'types-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer});
             	}
                 var typesSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
                         "aaData": typesData,
@@ -191,7 +191,7 @@
                     		{
                     			kind: "type", 
                     			id : aTypeId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -207,7 +207,7 @@
             		subsData.push({name: '<a onclick="specClicks[\''+pref+'subs-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer});
             	}
                 var subsSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
                         "aaData": subsData,
@@ -223,7 +223,7 @@
                     		{
                     			kind: "type", 
                     			id : aTypeId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -244,7 +244,7 @@
             		versData.push({name: link});
             	}
                 var versSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type version", mData: "name"}],
                         "aaData": versData,
@@ -260,7 +260,7 @@
                     		{
                     			kind: "type", 
                     			id : aTypeId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -277,7 +277,7 @@
         getData: function() {
             return {
                 type: "KBaseSpecTypeCard",
-                id: this.options.name,
+                id: this.options.id,
                 workspace: "specification",
                 title: "Typed Object Specification"
             };
