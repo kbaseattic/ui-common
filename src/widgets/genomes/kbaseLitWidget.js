@@ -104,13 +104,13 @@ kb_define('KBaseLitWidget',
 				loader.show()
 				$.ajax({
 					async: true,
-					url: 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=500&term='+lit.replace(/\s+/g, "+"),
+					url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=500&term='+lit.replace(/\s+/g, "+"),
 					type: 'GET',
 					success: 
 					function(data) {
 						
 						var htmlJson = self.xmlToJson(data)
-						var query = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='
+						var query = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='
 						if (htmlJson.eSearchResult[1].Count["#text"] == "0") {
 							var tableSettings = {
 								// "sPaginationType": "full_numbers",
@@ -188,7 +188,7 @@ kb_define('KBaseLitWidget',
 										if (infoRow["@attributes"].Name == "Source") tableInputRow["source"] = infoRow["#text"]
 										if (infoRow["@attributes"].Name == "Title") {
 											// console.log(infoRow)
-											tableInputRow["title"] = "<a href=" + "http://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"												
+											tableInputRow["title"] = "<a href=" + "https://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"												
 										}
 										if (infoRow["@attributes"].Name == "AuthorList") {
 											var authors = ""
