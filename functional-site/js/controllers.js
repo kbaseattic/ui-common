@@ -331,15 +331,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     $scope.ws = $stateParams.ws;
     $scope.type = $stateParams.type;
 
-    var sub = $location.path().split('/')[1]
-
-    if (sub == 'analysis') {
-        $scope.tab = $location.path().split('/')[3];
-    }
-
-    if (sub == 'narratives') {
-        $scope.tab = $location.path().split('/')[2];
-    }
+    $scope.nar_url = configJSON.narrative_url;
 
 
     $scope.showPreviousChanges = function() {
@@ -357,6 +349,76 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     }
 
 })
+
+
+.controller('Login', function($scope, $stateParams, $location, kbaseLogin, $modal) {
+    $scope.nar_url = configJSON.narrative_url; // used for links to narratives
+
+    // callback for ng-click 'loginUser':
+    $scope.loginUser = function (user) {
+        $("#loading-indicator").show();
+
+        kbaseLogin.login(
+            user.username,
+            user.password,
+            function(args) {
+                if (args.success === 1) {
+
+                    this.registerLogin(args);
+                    //this.data('_session', kbaseCookie);
+
+                    //set the cookie
+                    // var c = $("#login-widget").kbaseLogin('get_kbase_cookie');
+                    
+                    // var cookieName = 'kbase_session';
+                    // var cookieString = 'un=' + c.user_id + 
+                    //                    '|kbase_sessionid=' + c.kbase_sessionid +
+                    //                    '|user_id=' + c.user_id +
+                    //                    '|token=' + c.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
+                    // $.cookie(cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
+                    // $.cookie(cookieName, cookieString, { path: '/', expires: 60 });
+
+                    //this.data('_session', c);
+
+                    USER_ID = $("#signin-button").kbaseLogin('session').user_id;
+                    USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
+
+                    //kb = new KBCacheClient(USER_TOKEN);
+                    //kb.nar.ensure_home_project(USER_ID);
+
+                    $location.path('/narratives/featured');
+                    $scope.$apply();
+                    window.location.reload();
+
+                } else {
+                    console.log("error logging in");
+                    $("#loading-indicator").hide();
+                    var errormsg = args.message;
+                    if (errormsg == "LoginFailure: Authentication failed.") {
+                        errormsg = "Login Failed: your username/password is incorrect.";
+                    }
+                    $("#login_error").html(errormsg);
+                    $("#login_error").show();
+
+                }
+
+            }
+        );
+    };
+
+    $scope.logoutUser = function() {
+        kbaseLogin.logout(false);
+    };
+
+    $scope.loggedIn = function() {
+        var c = kbaseLogin.get_kbase_cookie();
+        $scope.username = c.name;
+        return (c.user_id !== undefined && c.user_id !== null);
+    };
+
+})
+
+
 
 
 

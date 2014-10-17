@@ -38,8 +38,8 @@ var app = angular.module('landing-pages',
     $stateProvider
         .state('login', {
           url: "/login/",
-          templateUrl: 'views/narrative/login.html',
-          controller: 'Narrative'
+          templateUrl: 'views/login.html',
+          controller: 'Login'
         });
 
 
