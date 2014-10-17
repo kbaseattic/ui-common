@@ -333,6 +333,11 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
     $scope.nar_url = configJSON.narrative_url;
 
+    var sub = $location.path().split('/')[1];
+
+    if (sub == 'narratives') {
+        $scope.tab = $location.path().split('/')[2];
+    }
 
     $scope.showPreviousChanges = function() {
         $('#previous-changes').slideToggle();
