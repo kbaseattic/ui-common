@@ -296,6 +296,21 @@ table {
     content: "";
 }
 
+.caret-down {
+    display: inline-block;
+    width: 0px;
+    height: 0px;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-top: none;
+    border-bottom: 4px solid #FFFFFF;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    border-top-width: 0px;
+    border-top-style: dotted;
+    content: "";
+}
+
 .scroll-pane {
     overflow-y: scroll;
 }
@@ -647,7 +662,7 @@ div::-webkit-scrollbar-thumb {
     margin: 0 3px 0 0;
 }
 
-/* fix me */
+/* datatables */
 .dataTables_length label {
     margin: 7px 0 0 0;
 }
@@ -655,14 +670,40 @@ div::-webkit-scrollbar-thumb {
 .dataTables_info {
     margin: 0 10px 0 0;
 }
-.dataTables_filter {
-
-}
 
 .dataTables_length, .dataTables_info {
     float: left;
 }
 
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc,
+table.dataTable thead .sorting_asc_disabled,
+table.dataTable thead .sorting_desc_disabled {
+    background: 0 0;
+}
+
+table.dataTable thead .sorting_asc:after {
+    content: "\f0de";
+    float: right;
+    font-family: fontawesome;
+}
+
+table.dataTable thead .sorting_desc:after {
+    content: "\f0dd";
+    float: right;
+    font-family: fontawesome;
+}
+
+table.dataTable thead .sorting:after {
+    content: "\f0dc";
+    float: right;
+    font-family: fontawesome;
+    color: rgba(50,50,50,.5);
+}
+
+
+/* text overrun */
 .ellipsis {
     white-space: nowrap; 
     text-overflow: ellipsis;
@@ -823,23 +864,6 @@ div::-webkit-scrollbar-thumb {
 .object-view .dataTable {
     margin: 10px 0 0 0;
 }
-
-
-div.FixedHeader_Cloned th,
-div.FixedHeader_Cloned td {
-    background-color: white !important;
-    top: 75px;
-}
-/*
-.FixedHeader_Header {
-    background: #fff;
-    margin: -5px 0 0px 0;
-    top: 75px;
-    height: 44px;
-}*/
-
-
-
 
 .narrative-sidebar li {
     list-style: none;
@@ -1065,10 +1089,6 @@ div.DTCR_pointer {
     margin: 0 0 10px 0;
 }
 
-/* analysis stuff */
 
-.mini-obj-table {
-    max-height: 500px;
-}
 
 

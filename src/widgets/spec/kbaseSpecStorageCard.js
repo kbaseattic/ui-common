@@ -25,7 +25,7 @@ kb_define('KBaseSpecStorageCard',
         	var pref = generateSpecPrefix();
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace(newWorkspaceServiceUrlForSpec, {token: options.token});
+            var kbws = new Workspace(newWorkspaceServiceUrlForSpec, {token: self.options.token});
             kbws.list_modules({}, function(data) {
                 $('.loader-table').remove();
 
@@ -34,7 +34,7 @@ kb_define('KBaseSpecStorageCard',
             		dataList.push({module: '<a onclick="specClicks[\''+pref+'module-click\'](this,event); return false;" data-module="'+data[i]+'">'+data[i]+'</a>'});
                 self.$elem.append('<table id="'+pref+'module-table" class="table table-striped table-bordered"></table>');
                 var tableSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Module name", mData: "module"}],
                         "aaData": dataList,
@@ -50,7 +50,7 @@ kb_define('KBaseSpecStorageCard',
                     		{
                     			kind: "module", 
                     			id : module,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 };

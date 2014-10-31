@@ -26,7 +26,7 @@ kb_define('KBaseSpecFunctionCard',
             var container = this.$elem;
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace(newWorkspaceServiceUrlForSpec, {token: options.token});
+            var kbws = new Workspace(newWorkspaceServiceUrlForSpec, {token: self.options.token});
             var funcName = this.options.id;
             var funcVer = null;
             if (funcName.indexOf('-') >= 0) {
@@ -87,7 +87,7 @@ kb_define('KBaseSpecFunctionCard',
                     		{
                     			kind: "module", 
                     			id : moduleId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -104,7 +104,7 @@ kb_define('KBaseSpecFunctionCard',
                     		{
                     			kind: "type", 
                     			id : aTypeId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -136,7 +136,7 @@ kb_define('KBaseSpecFunctionCard',
             		subsData.push({name: '<a onclick="specClicks[\''+pref+'subs-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer});
             	}
                 var subsSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
                         "aaData": subsData,
@@ -152,7 +152,7 @@ kb_define('KBaseSpecFunctionCard',
                     		{
                     			kind: "type", 
                     			id : aTypeId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -173,7 +173,7 @@ kb_define('KBaseSpecFunctionCard',
             		versData.push({name: link});
             	}
                 var versSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function version", mData: "name"}],
                         "aaData": versData,
@@ -189,7 +189,7 @@ kb_define('KBaseSpecFunctionCard',
                     		{
                     			kind: "function", 
                     			id : aFuncId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -206,7 +206,7 @@ kb_define('KBaseSpecFunctionCard',
         getData: function() {
             return {
                 type: "KBaseSpecFunctionCard",
-                id: this.options.name,
+                id: this.options.id,
                 workspace: 'specification',
                 title: "Function Object Specification"
             };

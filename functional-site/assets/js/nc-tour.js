@@ -49,6 +49,7 @@ function Tour(settings) {
 
     var loop;
     var i = 0;
+    var bHiddens = [];
     var bVisibles = [];
     $('.btn-start-tour').click(function() {
         clearInterval(loop);
@@ -66,9 +67,13 @@ function Tour(settings) {
     $('.btn-exit-tour').click(function() {
         clearInterval(loop);
         $('.tour, .tour-modal-backdrop, .popover').remove();
-        for (var i in bVisibles) {
-            bVisibles[i].addClass('hide');
+        for (var i in bHiddens) {
+            bHiddens[i].addClass('hide');        
         }
+        for (var i in bVisibles) {
+            bVisibles[i].addClass('invisible');
+        }
+
         exit_callback();
     })
 
@@ -148,12 +153,20 @@ function Tour(settings) {
         var placement = exhibit.placement ? exhibit.placement : 'bottom';
 
         if (hover) {
-            ele.removeClass('hide');
-            bVisibles.push(ele);
+            
+            if ( ele.hasClass('hide') ) {
+                ele.removeClass('hide');
+                bHiddens.push(ele);
+            } 
+            if ( ele.hasClass('invisible') ) {
+                bVisibles.push(ele);
+                ele.removeClass('invisible');
+            }
+
         }
 
         ele.tooltip('destroy'); // destroy the regular tooltips
-        ele.popover('destroy')
+        ele.popover('destroy');
 
         if (text) {
             ele.popover({content: '<div class="tour-text">'+text+'</div>', placement: placement, 

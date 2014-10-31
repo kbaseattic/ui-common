@@ -68,10 +68,11 @@ $.KBWidget({
 
 
         self.loadTable = function(data) {
-            mapTable.kbasePathways({model_ws: ws, model_name: name});
+            mapTable.kbasePathways({model_ws: ws, 
+                                    model_name: name, 
+                                    editable: (options.editable ? true : false)});
 
             var tableSettings = {
-                "sPaginationType": "bootstrap",
                 "iDisplayLength": 10,
                 "aLengthMenu": [5, 10, 25,50,100],            
                 "aaData": [],
@@ -185,7 +186,6 @@ $.KBWidget({
 
         function gapFillTableWS(gapfillings) {
             var tableSettings = {
-                "sPaginationType": "bootstrap",
                 "iDisplayLength": 10,
                 "aLengthMenu": [5, 10, 25,50,100],            
                 "aaData": [],

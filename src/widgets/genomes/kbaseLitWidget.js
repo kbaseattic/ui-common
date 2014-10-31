@@ -104,13 +104,14 @@ kb_define('KBaseLitWidget',
 				loader.show()
 				$.ajax({
 					async: true,
-					url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=500&term='+lit.replace(/\s+/g, "+"),
+					url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=500&sort=pub+date&term='+lit.replace(/\s+/g, "+"),
 					type: 'GET',
 					success: 
 					function(data) {
 						
 						var htmlJson = self.xmlToJson(data)
 						var query = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id='
+						var abstr = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&rettype=abstract&id='
 						if (htmlJson.eSearchResult[1].Count["#text"] == "0") {
 							var tableSettings = {
 								// "sPaginationType": "full_numbers",
@@ -190,20 +191,21 @@ kb_define('KBaseLitWidget',
 											// console.log(infoRow)
 											tableInputRow["title"] = "<a href=" + "https://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"												
 										}
-										if (infoRow["@attributes"].Name == "AuthorList") {
-											var authors = ""
-											if ("#text" in infoRow) {																					
-												if ($.isArray(infoRow.Item)) {
-													commaDelay = 1
-													for (author_idx in infoRow.Item) {
-														author = infoRow.Item[author_idx]
-														if (commaDelay == 0) authors+=", "
-														else commaDelay--
-														authors+=author["#text"]													
-													}												
-												}											
-												else {
-													authors = infoRow.Item["#text"]
+										
+										var articleIDs = []
+										
+										for (summary_idx in summaryList) {
+											summary = summaryList[summary_idx].Item
+											var tableInputRow = {}				
+											var isJournal = false;
+											for (item_idx in summary) {
+												infoRow = summary[item_idx]
+												if (infoRow["@attributes"].Name == "PubDate") tableInputRow["date"] = infoRow["#text"].substring(0,4)
+												if (infoRow["@attributes"].Name == "Source") tableInputRow["source"] = infoRow["#text"]
+												if (infoRow["@attributes"].Name == "Title") {
+													tableInputRow["title"] = "<a href=" + "https://www.ncbi.nlm.nih.gov/pubmed/"+summaryList[summary_idx].Id["#text"] + " target=_blank>" + infoRow["#text"] + "</a>"
+													tableInputRow["abstract"] = summaryList[summary_idx].Id["#text"]
+													articleIDs.push(summaryList[summary_idx].Id["#text"])
 												}
 											}
 											else {

@@ -3,12 +3,148 @@
 /*  Controllers
  *
  *  These are the 'glue' between models and views.
- *  See: http://docs.angularjs.org/guide/dev_guide.mvc.understanding_controller
+ *  See: https://docs.angularjs.org/guide/controller
  *  
 */
 
 
-app.controller('RxnDetail', function($scope, $stateParams) {
+app.controller('methodAccordion', function ($scope, narrative, $http) {
+
+
+})
+ 
+.controller('Analysis', function($scope, $state, $stateParams, $location, narrative, $http) {
+    // service for narrative (builder) state
+    $scope.narrative = narrative;
+
+    // selected workpsace
+    $scope.ddSelected = narrative.current_ws;
+    $scope.ws = $scope.ddSelected; // scope.ws variable for workspace browser
+
+    // let's make this happen: 
+    // http://ngmodules.org/modules/angularjs-json-rpc
+    if (!narrative.ws_objects) {
+        var p = kb.ws.list_objects({workspaces: [$scope.ddSelected]});
+        $.when(p).done(function(data){
+            $scope.$apply(function() {
+                narrative.ws_objects = data;
+
+                var types = {};
+                for (var i in data) {
+                    var type = data[i][2].split('-')[0];
+                    var obj = {name: data[i][1], id: data[i][0]};
+
+                    if (type in types) {
+                        types[type].push(obj);
+                    } else {
+                        types[type] = [obj];
+                    }
+                }
+
+                narrative.wsObjsByType = types
+            })
+        })
+    }
+
+    var prom = kb.ws.list_workspace_info({perm: 'w'});
+    $.when(prom).then(function(workspaces){
+        var workspaces = workspaces.sort(compare)
+
+        function compare(a,b) {
+            var t1 = kb.ui.getTimestamp(b[3]) 
+            var t2 = kb.ui.getTimestamp(a[3]) 
+            if (t1 < t2) return -1;
+            if (t1 > t2) return 1;
+            return 0;
+        }
+
+        var ws_list = [];
+        for (var i in workspaces) {
+            ws_list.push({name: workspaces[i][1], id: workspaces[i][0]})
+        }
+
+        $scope.$apply(function() {
+            narrative.ws_list = ws_list
+        })
+    });
+
+    // update workspace objects if dropdown changes
+    $scope.$watch('ddSelected', function(new_ws) {
+        var p = kb.ws.list_objects({workspaces: [new_ws]});
+        $.when(p).done(function(data){
+            $scope.$apply(function() {
+                narrative.ws_objects = data;
+
+                // if newly selected workspace is not the same
+                // as current, go to workspace browser view 
+                if (narrative.current_ws != new_ws) {
+                    narrative.current_ws = new_ws;                    
+                    $state.go('analysis.objects', null, {reload: true});
+                }
+            })
+        })  
+    })
+
+})
+
+.controller('Upload', function($scope, $state, $stateParams, $http) {
+    $scope.shockURL = "http://140.221.67.190:7078"
+
+    // improve by using angular http
+    $scope.uploadFile = function(files) {
+        $scope.$apply( function() {
+            $scope.uploadComplete = false;
+        })
+
+        //SHOCK.init({ token: USER_TOKEN, url: $scope.shockURL })
+        //SHOCK.upload('uploader')
+
+        var form = new FormData($('form')[0]);
+        $.ajax({
+            url: $scope.shockURL+'/node',  //Server script to process data
+            type: 'POST',
+            xhr: function() { 
+                var myXhr = $.ajaxSettings.xhr();
+                if(myXhr.upload){ 
+                    myXhr.upload.addEventListener('progress', updateProgress, false);
+                }
+                return myXhr;
+            },            
+            beforeSend: function (request) {
+                request.setRequestHeader("Authorization", SHOCK.auth_header.Authorization);
+            },
+            success: function(data) {
+                $scope.$apply(function() {
+                    $scope.uploadProgress = 0;
+                    $scope.uploadComplete = true; 
+                })
+
+            },
+            error: function(e){
+                console.log('fail', e)
+            },
+            data: form,
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+
+        function updateProgress (oEvent) {
+            if (oEvent.lengthComputable) {
+                var percent = oEvent.loaded / files[0].size;
+                $scope.$apply(function() {
+                    $scope.uploadProgress = Math.floor(percent*100);
+                })
+            }
+        }
+
+    }
+
+})
+
+
+
+.controller('RxnDetail', function($scope, $stateParams) {
     $scope.ids = $stateParams.ids.split('&');
 })
 
@@ -195,12 +331,13 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
     $scope.type = $stateParams.type;
 
+    $scope.nar_url = configJSON.narrative_url;
 
-    var sub = $location.path().split('/')[1]
+    var sub = $location.path().split('/')[1];
+
     if (sub == 'narratives') {
         $scope.tab = $location.path().split('/')[2];
     }
-
 
     $scope.showPreviousChanges = function() {
         $('#previous-changes').slideToggle();
@@ -218,12 +355,77 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 
 })
 
-.controller('FBALanding', function($scope, $stateParams) {
-    $scope.ws = $stateParams.ws;
-    $scope.id = $stateParams.id;  
 
+.controller('Login', function($scope, $stateParams, $location, kbaseLogin, $modal) {
+    $scope.nar_url = configJSON.narrative_url; // used for links to narratives
+
+    // callback for ng-click 'loginUser':
+    $scope.loginUser = function (user) {
+        $("#loading-indicator").show();
+
+        kbaseLogin.login(
+            user.username,
+            user.password,
+            function(args) {
+                if (args.success === 1) {
+
+                    this.registerLogin(args);
+                    //this.data('_session', kbaseCookie);
+
+                    //set the cookie
+                    // var c = $("#login-widget").kbaseLogin('get_kbase_cookie');
+                    
+                    // var cookieName = 'kbase_session';
+                    // var cookieString = 'un=' + c.user_id + 
+                    //                    '|kbase_sessionid=' + c.kbase_sessionid +
+                    //                    '|user_id=' + c.user_id +
+                    //                    '|token=' + c.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
+                    // $.cookie(cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
+                    // $.cookie(cookieName, cookieString, { path: '/', expires: 60 });
+
+                    //this.data('_session', c);
+
+                    USER_ID = $("#signin-button").kbaseLogin('session').user_id;
+                    USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
+
+                    //kb = new KBCacheClient(USER_TOKEN);
+                    //kb.nar.ensure_home_project(USER_ID);
+
+                    $location.path('/narratives/featured');
+                    $scope.$apply();
+                    window.location.reload();
+
+                } else {
+                    console.log("error logging in");
+                    $("#loading-indicator").hide();
+                    var errormsg = args.message;
+                    if (errormsg == "LoginFailure: Authentication failed.") {
+                        errormsg = "Login Failed: your username/password is incorrect.";
+                    }
+                    $("#login_error").html(errormsg);
+                    $("#login_error").show();
+
+                }
+
+            }
+        );
+    };
+
+    $scope.logoutUser = function() {
+        kbaseLogin.logout(false);
+    };
+
+    $scope.loggedIn = function() {
+        var c = kbaseLogin.get_kbase_cookie();
+        $scope.username = c.name;
+        return (c.user_id !== undefined && c.user_id !== null);
+    };
 
 })
+
+
+
+
 
 .controller('WBLanding', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
@@ -364,14 +566,13 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 
 })
 
-
 .controller('WBJSON', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
 
 .controller('WBTour', function($scope, $state, $stateParams, $location) {
-    $scope.selected_ws = 'chenryExample';  // workspace to use for tour
+    $scope.ws = 'chenryExample';  // workspace to use for tour
 
     // if not logged in, prompt for login
     if (!USER_ID) {
@@ -384,8 +585,8 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     } else {
         function checkSomething() {
             $scope.checkedList.push([ 'kb|g.0.fbamdl', 'chenryExample', 'FBAModel-2.0' ]);
-            $('.ncheck').eq(3).addClass('ncheck-checked');
             $scope.$apply();
+            $('.ncheck').eq(2).addClass('ncheck-checked');
         }
 
         var tour = [{element: '.btn-new-ws', text:'Create a new workspace here', placement: 'bottom'},
@@ -397,7 +598,7 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                         text: 'View data about the object, including visualizations and KBase widgets'},
                     {element: '.show-versions', n: 2, text: 'View the objects history.'},
                     {element: '.btn-show-info', n: 2, 
-                        text: 'View meta data, download the objects, etc', bVisible: true},
+                        text: 'View meta data,  download the objects, etc', bVisible: true},
                     {element: '.ncheck', n: 2, text: 'Select objects by using checkboxes<br> and see options appear above', 
                         event: checkSomething},
                     {element: '.btn-table-settings', text: 'Show and hide columns and set other object table settings'},   
@@ -493,7 +694,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     }
 
 
-
     $scope.rmObject = function(ws, id, type, module) {
         for (var i in $scope.favs) {
             if ($scope.favs[i].ws == ws
@@ -526,11 +726,8 @@ app.controller('RxnDetail', function($scope, $stateParams) {
 
     //$scope.displayViewer('chenrydemo', 'kb|g.9.fbamdl.25.fba.55', 'FBA')
 
-
     $scope.AccordionCtrl = function($scope) {
       $scope.oneAtATime = true;
-
-
 
       $scope.items = ['Item 1', 'Item 2', 'Item 3'];
 
@@ -541,116 +738,6 @@ app.controller('RxnDetail', function($scope, $stateParams) {
     }
 
 
-
-})
-
-
-
-.controller('NarrativeCtrl', function($scope, $stateParams, $location) {
-    $scope.tab = $location.path().split('/')[2];
-
-    console.log('TAB in controller ', $scope.tab)
-
-
-})
-
-.controller('Narrative', function($scope, $stateParams, $location, kbaseLogin, $modal, FeedLoad) {
-    //changeNav('narrative', 'newsfeed');
-    $scope.nar_url = configJSON.narrative_url; // used for links to narratives
-
-    //to open the copy narrative dialog
-    $scope.copyNarrativeForm = function (title) {
-
-        //$scope.narr.title = title;
-
-        var modalInstance = $modal.open({
-          templateUrl: 'views/narrative/dialogboxes/copynarrative.html',
-          controller: CopyNarrativeModalCtrl,
-          resolve: {
-                narr: function () {
-                    return title;
-                    }
-                
-            }
-        });
-    };
-
-    // callback for ng-click 'loginUser':
-    $scope.loginUser = function (user) {
-        $("#loading-indicator").show();
-
-        kbaseLogin.login(
-            user.username,
-            user.password,
-            function(args) {
-                if (args.success === 1) {
-
-                    this.registerLogin(args);
-                    //this.data('_session', kbaseCookie);
-
-                    //set the cookie
-                    // var c = $("#login-widget").kbaseLogin('get_kbase_cookie');
-                    
-                    // var cookieName = 'kbase_session';
-                    // var cookieString = 'un=' + c.user_id + 
-                    //                    '|kbase_sessionid=' + c.kbase_sessionid +
-                    //                    '|user_id=' + c.user_id +
-                    //                    '|token=' + c.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
-                    // $.cookie(cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
-                    // $.cookie(cookieName, cookieString, { path: '/', expires: 60 });
-
-                    //this.data('_session', c);
-
-                    USER_ID = $("#signin-button").kbaseLogin('session').user_id;
-                    USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
-
-                    $location.path('/narratives/featured');
-                    $scope.$apply();
-                    window.location.reload();
-
-                } else {
-                    console.log("error logging in");
-                    $("#loading-indicator").hide();
-                    var errormsg = args.message;
-                    if (errormsg == "LoginFailure: Authentication failed.") {
-                        errormsg = "Login Failed: your username/password is incorrect.";
-                    }
-                    $("#login_error").html(errormsg);
-                    $("#login_error").show();
-
-                }
-
-            }
-        );
-    };
-
-    $scope.logoutUser = function() {
-        kbaseLogin.logout(false);
-    };
-
-    $scope.loggedIn = function() {
-        var c = kbaseLogin.get_kbase_cookie();
-        $scope.username = c.name;
-        return (c.user_id !== undefined && c.user_id !== null);
-    };
-
-})
-
-
-
-/*
-.controller('CopyNarrativeModalCtrl', function ($scope, $modalInstance) {
-// controller for the modals to copy a featured narrative 
-  $scope.save = function () {
-    $modalInstance.dismiss('cancel');
-  };
-
-  $scope.cancel = function () {
-    $modalInstance.dismiss('cancel');
-  };
-})
-*/
-.controller('NarrativeProjects', function($scope, $stateParams) {
 
 })
 
@@ -670,48 +757,11 @@ app.controller('RxnDetail', function($scope, $stateParams) {
                      'ws': $stateParams.ws};
 })
 
-/* controller for the copy narrative modal */
-var CopyNarrativeModalCtrl = function ($scope, $modalInstance, $location, narr) {
+.controller('KidlEdtDetail', function($scope, $stateParams) {
+    $scope.params = {'type': $stateParams.type,
+                     'mod': $stateParams.mod};
+})
 
-    $scope.narr = narr;
-    // callback for ng-click 'copy narrative':
-    $scope.copyNarrative = function () {
-        $('#loading-indicator').show();
-        $('#copy-narr-button').attr("disabled", "disabled");
-        kb.nar.copy_narrative({
-            fq_id: $scope.narr,
-            callback: function(results) {
-                
-                //console.log("copied narrative " + results.fq_id);
-                window.location.replace("http://demo.kbase.us/narrative/" + results.fq_id);
-                //$modalInstance.dismiss();
-
-                
-            },
-            error_callback: function(message) {
-                //console.log("error occurred " + message);
-
-                if (!message.match("No object with name")) {
-                    $('#loading-indicator').hide();
-
-                    $scope.alerts = [];
-                    $scope.alerts.push({type: 'danger', msg: "We were unable to copy the narrative and its datasets into your home workspace. Error: " + message});
-                    //TODO need to retrieve the actual error message 
-                    $scope.$apply();
-                }
-            }
-
-        })
-    }
-    $scope.cancel = function () {
-        $modalInstance.dismiss('cancel');
-    };
-
-    $scope.closeAlert = function(index) {
-        $scope.alerts.splice(index, 1);
-    };
-
-};
 
 
 function LPHelp($scope, $stateParams, $location) {
@@ -737,3 +787,15 @@ function ScrollCtrl($scope, $location, $anchorScroll) {
     $anchorScroll();
   }
 }
+
+
+angular.module('angular-json-rpc', []).config([ "$provide", function($provide) {
+    
+    return $provide.decorator('$http', ['$delegate', function($delegate){
+            $delegate.jsonrpc = function(url, method, parameters, config){
+                var data = {"jsonrpc": "2.0", "method": method, "params": parameters, "id" : 1};
+                return $delegate.post(url, data, angular.extend({'headers':{'Content-Type': 'application/json'}}, config) );
+            };
+            return $delegate;
+        }]);
+}]);

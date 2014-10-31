@@ -192,8 +192,8 @@ angular.module('ws-directives')
 
 
                 // events for search box
-                $('.search-query').unbind('click');
-                $('.search-query').keyup(function() {
+                $('.wb-search').unbind('click');
+                $('.wb-search').keyup(function() {
                     $('.select-box').find('td').show();
                         var input = $(this).val();
                         $('.select-box').find('td').each(function(){
@@ -315,7 +315,7 @@ angular.module('ws-directives')
 })
 
 
-.directive('objtable', function($location, $compile, modals, favoriteService) {
+.directive('objtable', function($location, $compile, modals) {
     return {
         link: function(scope, element, attrs) {
             var ws = scope.ws;
@@ -743,7 +743,7 @@ angular.module('ws-directives')
                                     ' data-name="'+name+'" data-type="'+type+'" data-kind="'+kind+'" data-module="'+module+'" ><b><i>'+
                                         name+'</i></b></a> (<a class="show-versions">'+instance+'</a>)'+
                                 (isFav ? ' <span class="glyphicon glyphicon-star btn-fav"></span>': '')+
-                                '<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>';
+                                '<a class="btn-show-info pull-right invisible" >More</a>';
 
                     wsarray[1] = new_id;
                     url = "ws.id({ws:"+"'"+ws+"'})";
@@ -841,7 +841,7 @@ angular.module('ws-directives')
                                     '" data-module="'+module+'" '+'data-sub="'+sub+'">'+
                                     name+'</a>');
                     var ver_link = $('<a class="show-versions">'+instance+'</a>');
-                    var more_link = $('<a class="btn-show-info pull-right" style="visibility: hidden;">More</a>');
+                    var more_link = $('<a class="btn-show-info pull-right invisible" >More</a>');
 
                     if (route) {
                         var url = route+"({ws:'"+ws+"', id:'"+name+"'})";
@@ -971,12 +971,10 @@ angular.module('ws-directives')
                 // effect for highlighting checkbox on hover
                 $('.obj-table tbody tr').hover(function() {
                     $(this).children('td').eq(0).find('.ncheck').addClass('ncheck-hover');
-                    $(this).find('.btn-show-info').css('visibility', 'visible')
-                    //$(this).find('.btn-show-info').removeClass('hide');
+                    $(this).find('.btn-show-info').removeClass('invisible');
                 }, function() {
                     $(this).children('td').eq(0).find('.ncheck').removeClass('ncheck-hover');
-                    $(this).find('.btn-show-info').css('visibility', 'hidden')                    
-                    //$(this).find('.btn-show-info').addClass('hide');
+                    $(this).find('.btn-show-info').addClass('invisible');
 
                 })
 
@@ -1076,7 +1074,7 @@ angular.module('ws-directives')
 
                 copy_btn.find('.btn-mv-obj-to-nar').on('click', copyObjectsToNarrative);                                        
                 rename_btn.on('click', renameObject);
-                mv_btn.on('click', addToMV);
+                //mv_btn.on('click', addToMV);
 
                 var container = $('.table-options').append(options);
 
@@ -1668,7 +1666,6 @@ angular.module('ws-directives')
                 newNarrativeModal.openPrompt();
 
                 var p = kb.getWorkspaceSelector()
-                //var prom = kb.ws.list_workspace_info({perm: 'w'});
                 $.when(p).done(function(selector) {
                     body.rmLoading();
 
@@ -1899,203 +1896,6 @@ angular.module('ws-directives')
     }
 })
 
-.directive('analysisTools', function($location, $compile, $state, $stateParams, modals) {
-    return {
-        templateUrl: 'views/ws/analysis-tools.html',
-        link: function(scope, element, attrs) {
-            console.log('called')
-
-            scope.clearSideBar = function() {
-                $(element).html('');
-            }
-
-            scope.browser = function(workspace) {
-                scope.clearSideBar();
-                $(element).append('<h4>Objects</h4>')  
-
-
-                $(element).loading();
-                var p = kb.getWorkspaceSelector();
-                $.when(p).done(function(selector) {
-                    $(element).rmLoading();
-                    $(element).append(selector);
-                });   
-
-                var p = kb.ws.list_objects({workspaces: ['nconrad:home']});
-                $.when(p).done(function(data){
-                    $('.obj-count').text(data.length)
-
-                    var table = $('<table class="table">')
-                    for (var i in data) {
-                        var ws = data[i];
-                        table.append('<tr><td>'+ws[1]+'</td></tr>')
-                    }
-                    var table = $('<div class="mini-obj-table overflow-y">').append(table)
-                    $(element).append(table)
-                })
-            }
-
-            scope.tools = function() {
-                scope.clearSideBar();
-
-                $(element).append('<h4>Tools</h4>')
-
-                for (var i in input_widgets) {
-                    var widget = input_widgets[i];
-                    $(element).append('<a class="widget-btn" data-id="'+widget.id+'">'+widget.name+'</a><br>')
-                }
-
-                $('.widget-btn').unbind('click');
-                $('.widget-btn').click(function() {
-                    var widget = $(this).data('id');
-                    console.log(widget)
-                    loadForm(widget)
-                })
-            }
-
-
-            var input_widgets = [{name: 'Build Model', 
-                                  id: 'build_model',
-                                  form: [
-                                         {name: 'Genome Name', 
-                                          id: 'genome_id',
-                                          kbtype: 'KBaseGenomes.Genome',
-                                          help: 'Source genome name'}, 
-
-                                         {name: 'Output Metabolic Model Name', 
-                                          id: 'fba_model_id',
-                                          kbtype: 'KBaseFBA.FBAModel',
-                                          help: 'Select a name for the generated metabolic model (optional)'},     
-                                        ],
-                                   return_type: 'KBaseFBA.FBAModel',
-                                   output_widget: 'kbaseModelTabs'
-                                 },
-                                 {name: 'Run FBA', 
-                                  id: 'run_fba',
-                                  form: [
-                                         {name: 'Metabolic Model', 
-                                          id: 'fba_model_id',
-                                          kbtype: 'KBaseFBA.FBAModel', 
-                                          help: 'The metabolic model you wish to run'}, 
-
-                                         {name: 'Media', 
-                                          id: 'media_id',
-                                          kbtype: 'KBaseBiochem.Media', 
-                                          help: 'the media condition in which to run FBA (optional, default is an artificial complete media)'},     
-
-                                         {name: 'Output FBA Result Name', 
-                                          id: 'fba_result_id',
-                                          kbtype: 'KBaseFBA.FBA', 
-                                          help: 'select a name for the FBA result object (optional) '}, 
-
-                                         {name: 'Gene Knockouts', 
-                                          id: 'geneko',
-                                          help: 'specify gene knockouts by the genes feature ID delimited by semicolons(;) (optional)'}, 
-
-                                         {name: 'Reaction Knockouts', 
-                                          id: 'fba_model_id',
-                                          help: 'specify reaction knockouts by reaction ID delimited by semicolons(;) (optional)'}, 
-
-                                         {name: 'Maximum flux', 
-                                          id: 'fba_model_id',
-                                          default: 100,
-                                          help: 'default maximum nutrient uptake flux (optional)'},
-
-                                         {name: 'Minimum Uptake flux', 
-                                          id: 'fba_model_id',
-                                          default: -100,
-                                          help: 'default minumum nutrient uptake flux (optional)'},    
-
-
-                                         {name: ' Max Uptake', 
-                                          id: 'maxUptake',
-                                          default: 0,
-                                          help: 'default maximum nutrient uptake flux (optional)'},                                              
-
-                                         {name: 'Minimize flux', 
-                                          id: 'minimizeFlux',
-                                          input: ['yes', 'no'],                                          
-                                          default: 'no',
-                                          help: 'set to yes to run FBA by minimizing flux (optional)'},
-
-                                         {name: 'Maximize Objective?', 
-                                          id: 'maximizeObjective',
-                                          input: ['yes', 'no'],
-                                          default: 'yes',
-                                          help: 'set to "no" to run FBA without maximizing the objective function (optional)'},
-
-
-                                         {name: 'All rxns reversible?', 
-                                          id: 'allReversible',
-                                          input: ['yes', 'no'],
-                                          default: 'no',
-                                          help: 'set to "yes" to allow all model reactions to be reversible (optional) '},
-
-                                         {name: 'PROM constraint', 
-                                          id: 'prom',
-                                          kbtype: 'KBaseFBA.PromConstraint',
-                                          help: 'specify the PROM constraint to apply for regulation of the metabolic model  (optional)'},
-
-                                        ],
-                                        output_widget: 'kbaseFBATabsNarrative',
-                                 }
-                                ]
-
-            function loadForm(widget_id) {
-                var content = $('.analysis-view')
-                content.html('')
-
-                // find widget spec
-                var form;
-                for (var i in input_widgets) {
-                    if (input_widgets[i].id == widget_id) {
-                        var form = input_widgets[i].form
-                        break
-                    }
-                }
-
-                console.log('found form', form)
-
-                var groups = $('<form class="form-horizontal" role="form">');
-
-                // load each input field
-                for (var i in form) {
-                    var field = form[i];
-                    console.log(field.name);
-
-                    var group = $('<div class="form-group">');
-                    if (!(field.input) || field.input == 'text') {
-                        console.log(field)
-                        group.append('<label class="col-sm-2 control-label" >'+
-                                        field.name+
-                                   '</label>')
-                        group.append('<div class="col-sm-5">'+
-                                       '<input class="form-control" type="text" placeholder="'+field.name+'">'+
-                                    '</div>')
-                        group.append('<div class="col-sm-5">'+
-                                       field.help+
-                                    '</div>')
-
-                        // if there is a default, set it
-                        if (field.default) {
-                            group.find('input').val(field.default);
-                        }
-                    }
-                    groups.append(group);
-                }
-
-                content.append(groups);
-
-                content.append('<button type="button" class="btn btn-primary pull-right btn-run-analysis">Run</button>')
-            }
-
-            // show mini object browser when loading
-            scope.tools();
-
-        }
-
-    }
-})
 
 function getEditableDescription(d) {
     var d = $('<form role="form">\

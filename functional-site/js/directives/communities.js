@@ -13,7 +13,7 @@ angular.module('communities-directives')
                 var metagenome_id = d[0].data.ref.ID;
                 
                 // use metagenome id to fetch metadata on obj
-                var url = 'http://api.metagenomics.anl.gov/metagenome/'+metagenome_id+'?verbosity=mixs';
+                var url = 'https://kbase.us/services/communities/'+metagenome_id+'?verbosity=mixs';
                 $.get(url, function(data) {
                     $(ele).rmLoading();
 
@@ -45,6 +45,8 @@ angular.module('communities-directives')
                                                 bold: true});
                     $(ele).append(table);
                 })
+            }).fail(function(e){
+                $(ele).html('<div class="alert alert-danger">'+e.error.message+'</div>');
             })
         }
     }
@@ -63,6 +65,8 @@ angular.module('communities-directives')
                 scope.created = data.created;
                 scope.members = data.members;
                 scope.$apply();
+            }).fail(function(e){
+                $(ele).html('<div class="alert alert-danger">'+e.error.message+'</div>');
             })
         }
     }
@@ -75,13 +79,13 @@ angular.module('communities-directives')
             var prom = kb.ws.get_objects([{workspace: scope.ws, name: scope.id}])
             $.when(prom).done(function(d) {
                 $(ele).rmLoading();
-                console.log('profile', d[0].data)
+                console.log('profile', d[0].data);
                 var data = JSON.parse(d[0].data.data);
 
                 $(ele).append('<b>Type:</b>', data.type)
                 buildTable(data);
             }).fail(function(e){
-
+                $(ele).html('<div class="alert alert-danger">'+e.error.message+'</div>');
             })
 
             function buildTable(data) {
