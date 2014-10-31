@@ -101,6 +101,7 @@
 				'kbaseCardLayoutManager'            : 'kbaseCardLayoutManager',
 				'kbaseDataBrowser'                  : 'kbaseDataBrowser',
 				'kbaseDeletePrompt'                 : 'kbaseDeletePrompt',
+				'kbaseDownload'                     : 'kbaseDownload',
 				'kbaseErrorPrompt'                  : 'kbaseErrorPrompt',
 				'kbaseFormBuilder'                  : 'kbaseFormBuilder',
 				'kbaseGeneTable'                    : 'kbaseGeneTable',

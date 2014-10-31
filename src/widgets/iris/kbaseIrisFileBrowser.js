@@ -1128,8 +1128,9 @@ this.dbg('will upload ' + pid + ',' + this.currentUploadJob);
         },
 
         urlForFile : function(file, type) {
-            var url = this.options.invocationURL + "/" + type + "/" + file + "?session_id=" + encodeURIComponent(this.sessionId()) + '&token=' + encodeURIComponent(this.authToken());
+            var url = "/" + type + "/" + file + "?session_id=" + encodeURIComponent(this.sessionId()) + '&token=' + encodeURIComponent(this.authToken());
             url = url.replace(new RegExp('/+', 'g'), "/");
+            url = this.options.invocationURL + url;
             //this.dbg(url);
             return url;
         },

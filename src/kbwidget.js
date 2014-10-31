@@ -28,7 +28,9 @@ kb_define('kbwidget', ['jquery', 'handlebars'], function ($) {
                 var $val = $(val);
                 var widget = $val.attr('data-kbwidget');
 
-                var options = $val.attr('data-kbwidget-options');
+                var options = $val.text();
+
+                $val.empty();
                 if (options != undefined) {
                     options = JSON.parse(options);
                 }
