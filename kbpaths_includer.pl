@@ -81,13 +81,13 @@ sub depdealer {
 
 my $pathsStr = <<"ePathsStr";
 
-<link href="/ext/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
-<link href="/ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+<link href="/ext/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="/ext/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
 <script src="/ext/jquery/jquery-1.10.2.min.js"></script>
 
 <script src="/ext/jquery-ui/1.10.3/js/jquery-ui-1.10.3.custom.min.js"></script>
-<script src="/ext/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="/ext/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 <script src="/ext/d3/d3.v3.min.js"></script>
 <script src="/ext/handlebars/handlebars-v1.3.0.js"></script>
 

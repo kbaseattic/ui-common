@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <!--<link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>-->
+
+<link href="ext/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="ext/bootstrap/3.3.0/css/bootstrap-theme.min.css" rel="stylesheet">
+<link href="ext/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+<script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+
+<script type = 'text/javascript'>
+    var kb_use_require = true;
+    var kb_norequire = function(deps, callback) {
+        callback(jQuery);
+    };
+    var kb_nodefine = function(module, deps, callback) {
+        callback(jQuery);
+    };
+    if (kb_use_require) {
+        kb_define = define;
+        kb_require = require;
+    }
+    else {
+        kb_define = kb_nodefine;
+        kb_require = kb_norequire;
+    }
+</script>
+
+
+<style type="text/css">
+h2.slide{
+    margin: 0;
+    //color: #666;
+    padding-top: 30px;
+    padding-bottom : 150px;
+    font-size: 52px;
+    font-family: "trebuchet ms", sans-serif;
+}
+.item{
+//    background: #333;
+    text-align: center;
+    height: 300px !important;
+}
+.carousel{
+//    margin-top: 20px;
+}
+.bs-example{
+//	margin: 20px;
+}
+
+.carousel-caption {
+    color : black;
+}
+
+div.tile {
+    float : left;
+    //width : 50%
+}
+
+div.tile > ul {
+//    list-style-type : none;
+margin : 0px,
+    padding : 2px;
+    font-size : 200%;
+//    border : 1px solid blue;
+}
+
+</style>
+
+        <script type = 'text/javascript'>
+            <!--
+
+                function getParameterByName(name) {
+                  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                  var regexS = "[\\?&]" + name + "=([^&#]*)";
+                  var regex = new RegExp(regexS);
+                  var results = regex.exec(window.location.search);
+                  if(results == null)
+                    return "";
+                  else
+                    return decodeURIComponent(results[1].replace(/\+/g, " "));
+                }
+var nms;
+function details (m) {
+m = {id : m};
+
+                            nms.get_method_full_info({ids:[m.id]}, function(data) {
+
+                                nms.get_method_spec({ids:[m.id]}, function (spec) {
+
+                                var meth = data[0];
+
+                                var $res =
+                                    $.jqElem('div');
+
+                                var $galrow = $res.append(
+                                    $.jqElem('div').addClass('row'));
+                                var $gal = $galrow.append($.jqElem('div').addClass('col-md-12'));
+
+meth.screenshots = ['a', 'b', 'c'];
+
+                                $.each(
+                                    meth.screenshots,
+                                    function (idx, ss) {
+                                        $gal
+                                            .attr('data-target', '#imgModal')
+                                            .append(
+                                                $.jqElem('img')
+                                                    .attr('src', 'http://kbase.us/services/docs/invocation/Iris/img/labs_icon.png')
+                                                    .css({width : '128px', height : '128px', margin : '2px'})
+                                                    .on('click', function(e) {
+                                                        $('#bigImg').attr('src', "http://kbase.us/themes/kbase/images/Kbase_Logo.png");
+                                                        $('#imgModal').modal();
+                                                    })
+                                            )
+
+/*                                            .append(
+                                                $.jqElem('a')
+                                                    //.attr('rel', 'group')
+                                                    //.attr('href', "http://kbase.us/themes/kbase/images/Kbase_Logo.png")
+                                                    .attr('href', '#')
+                                                    .attr('data-toggle', 'modal')
+                                                    .attr('data-target', '#imgModal')
+                                                    .append(
+                                                        $.jqElem('img')
+                                                            .attr('src', 'http://kbase.us/services/docs/invocation/Iris/img/labs_icon.png')
+                                                    )
+                                            );
+*/
+                                        /*$gal
+                                            .append(
+                                                $.jqElem('img')
+                                                    .css({'width' : '128px', 'height' : '128px; margin : 5px'})
+                                                    .attr('src', 'http://kbase.us/services/docs/invocation/Iris/img/labs_icon.png')
+                                            )
+                                        ;*/
+                                    }
+                                );
+                                $gal.append("&lt;--- No screenshots available yet. :-( But thumbnails would go right there. Click on them.");
+
+
+                                $res
+                                        .append(
+                                            $.jqElem('div')
+                                                .addClass('row')
+                                                .append(
+                                                    $.jqElem('div')
+                                                        .addClass('col-md-10')
+                                                        .append($.jqElem('h1').append(meth.name))
+                                                )
+                                                .append(
+                                                    $.jqElem('div')
+                                                        .addClass('col-md-2')
+                                                        .append(
+                                                            $.jqElem('button')
+                                                                .addClass('btn btn-primary')
+                                                                .on('click', function(e) {
+                                                                    alert('Adds to a narrative somehow!')
+                                                                })
+                                                                .append('Launch in New Narrative')
+
+
+                                                        )
+                                                )
+                                        )
+                                        .append(
+                                            $.jqElem('div')
+                                                .addClass('row')
+                                                .append(
+                                                    $.jqElem('div')
+                                                        .addClass('col-md-12')
+                                                        .append($.jqElem('h2').append(meth.subtitle))
+                                                )
+                                        )
+                                        .append(
+                                            $.jqElem('div')
+                                                .addClass('row')
+                                                .append(
+                                                    $.jqElem('div')
+                                                        .addClass('col-md-4')
+                                                        .css({'font-weight' : 'bold'})
+                                                        .append('Version')
+                                                )
+                                                .append(
+                                                    $.jqElem('div')
+                                                        .addClass('col-md-8')
+                                                        .append(meth.ver)
+                                                )
+                                        )
+                                        .append(
+                                            $.jqElem('div')
+                                                .addClass('row')
+                                                .append(
+                                                    $.jqElem('div')
+                                                        .addClass('col-md-4')
+                                                        .css({'font-weight' : 'bold'})
+                                                        .append('Help or questions? Contact:')
+                                                )
+                                                .append(
+                                                    $.jqElem('div')
+                                                        .addClass('col-md-8')
+                                                        .append(meth.contact)
+                                                )
+                                        )
+                                        .append($.jqElem('hr'))
+                                        .append(
+                                            $.jqElem('div')
+                                                .addClass('row')
+                                                .append(
+                                                    $.jqElem('div')
+                                                        .addClass('col-md-12')
+                                                        .append($.jqElem('h4').append('Technical Details'))
+                                                )
+                                        )
+                                        .append(
+                                            $.jqElem('div')
+                                                .addClass('row')
+                                                .append(
+                                                    $.jqElem('div')
+                                                        .addClass('col-md-12')
+                                                        .append(meth.technical_description)
+                                                )
+                                        )
+                                        .append($.jqElem('hr'))
+                                        .append(
+                                            $.jqElem('div')
+                                                .addClass('row')
+                                                .append(
+                                                    $.jqElem('div')
+                                                        .addClass('col-md-12')
+                                                        .append($.jqElem('h4').append('Technical Parameter Details'))
+                                                )
+                                        )
+
+                                ;
+
+                                var $specField = $.jqElem('ul').css('list-style-type', 'none');
+
+                                $.each(
+                                    spec[0].parameters,
+                                    function (idx, param) {
+                                        var $li = $specField.append($.jqElem('li').append('Parameter ' + (idx + 1)));
+                                        $li.append(
+                                            $.jqElem('ul')
+                                                .css('list-style-type', 'none')
+                                                    .append(
+                                                        $.jqElem('li')
+                                                            .append(
+                                                                $.jqElem('b').append(param.ui_name)
+                                                            )
+                                                            .append(
+                                                                $.jqElem('ul')
+                                                                    .css('list-style-type', 'none')
+                                                                    .append($.jqElem('li').append(param.short_hint))
+                                                                    .append($.jqElem('li').append(param.long_hint))
+                                                            )
+                                                    )
+                                        );
+
+                                        $specField.append($li);
+
+
+                                    }
+                                );
+
+                                $res.append($specField);
+
+                                $('#method-details').empty();
+                                $('#method-details').append($res);
+
+                            });},
+                            //error
+                            function(e) {
+                                $('#method-details').empty();
+                                $('#method-details').append(
+                                    $.jqElem('div')
+                                        .addClass('alert alert-warning')
+                                        .append("No information available for " + m.id)
+                                );
+                            });
+                        }
+
+                kb_require(['kbpaths'], function() {
+                    kb_require(['jquery', 'bootstrap', 'narrativeMethodStore', 'kbaseAccordion', 'kbaseTable',
+                        ], function($) {
+                        $(function() {
+
+//setTimeout(function(e) { $('#carousel-right').click()}, 50);
+$('.carousel').carousel({interval : 5000});
+
+nms = new NarrativeMethodStore("https://kbase.us/services/narrative_method_store"+"/rpc");
+
+    //messy way just to get the sortByKey method. Need to make it a class method or something.
+    var $accordion = $.jqElem('div').kbaseAccordion({ elements : []});
+
+nms.get_method_full_info({'ids':['compare_two_metabolic_models_generic']}, function(data) {
+
+});
+
+nms.list_methods({}, function(data) {
+
+
+    var categories = {};
+
+    var categoryLists = {
+        plants : {
+            list : [],
+            $elem : $.jqElem('ul').css({'font-size' : '100%'})
+        },
+        microbes : {
+            list : [],
+            $elem : $.jqElem('ul').css({'font-size' : '100%'})
+        },
+        communities : {
+            list : [],
+            $elem : $.jqElem('ul').css({'font-size' : '100%'})
+        },
+    };
+
+
+    $.each(
+        data,
+        function (idx, val) {
+            $.each(
+                val.categories,
+                function (idx, cat) {
+                    if (categories[cat] == undefined) {
+                        categories[cat] = [];
+                    }
+                    categories[cat].push(val);
+
+                    if (cat.match(/microbe/i || val.name.match(/microbe/i))) {
+                        categoryLists.microbes.list.push(val);
+                    }
+
+                    if (cat.match(/plant/i || val.name.match(/plant/i))) {
+                        categoryLists.plants.list.push(val);
+                    }
+
+                    if (cat.match(/commun/i || val.name.match(/commun/i))) {
+                        categoryLists.communities.list.push(val);
+                    }
+                }
+            );
+        }
+    );
+
+    $.each(
+        categoryLists,
+        function (key, stuff) {
+            var $elem = stuff.$elem;
+            $.each(
+                stuff.list,
+                function (idx, m) {
+                    var $link = $.jqElem('a')
+                        .attr('title', m.tooltip)
+                        .tooltip()
+                        .on('click', function() {details(m.id)})
+                        .append(m.name);
+
+                    $elem.append(
+                        $.jqElem('li')
+                            .append($link)
+                    );
+                }
+            )
+        }
+    );
+
+    var list = [];
+
+    $.each(
+        categories,
+        function (cat, methods) {
+            var $ul = $.jqElem('ul').css('padding-left', '0px');
+            $.each(
+                methods.sort($accordion.sortByKey('name')),
+                function (idx, m) {
+
+                    var $link = $.jqElem('a')
+                        .attr('title', m.tooltip)
+                        .tooltip()
+                        .on('click', function() {details(m.id)})
+                        .append(m.name);
+
+                    $ul.append(
+                        $.jqElem('li')
+                            .css('list-style', 'none')
+                            .append($link)
+                    );
+                }
+            );
+
+            cat = cat.replace(/_/g, ' ');
+            cat = cat.replace(/ (\w)/g, function(l) { return l.toUpperCase()} );
+            cat = cat.charAt(0).toUpperCase() + cat.slice(1);
+
+            list.push( { title : cat, body : $ul} ) ;
+        }
+    );
+
+    list = list.sort($accordion.sortByKey('title'));
+
+    var $iaccordion = $.jqElem('div').kbaseAccordion({elements : list});
+
+    var tree = [
+        {
+            val : "I'm interested in genes",
+            children : [
+                {
+                    val : 'I want to upload them',
+                    details : 'upload_file'
+                }
+            ]
+
+        },
+        {
+            val : "I'm interested in communities",
+            children : [
+                {
+                    val : "I want to work with metabolic models",
+                    children : [
+                        { val : 'Compare Metabolic Model', details : 'compare_metabolic_model'},
+                        { val : 'Create Metabolic Model', details : 'create_metabolic_model'},
+                        { val : 'Gapfill Metabolic Model', details : 'gapfill_metabolic_model'},
+                    ]
+                },
+                {
+                    val : "I want to work with abundance profiles",
+                    children : [
+                        { val : 'I want to add metadata', details : 'add_metadata_to_abundance_profile'},
+                        { val : 'I want to view a boxplot', details : 'boxplots_from_abundance_profile'},
+                        { val : "I'm interested in heatmaps",
+                            children : [
+                                {val : "I want to see an interactive heatmap", details : 'interactive_heatmap_from_abundance_profile'},
+                                {val : "I want to see a non-interactive heatmap", details : 'heatmap_from_abundance_profile'},
+                            ]
+                        },
+                        { val : 'I want to merge profiles', details : 'merge_abundance_profiles'},
+                        { val : "I'm interested in PCoA", details : 'pcoa_from_abundance_profile'},
+                        { val : "I'm interested in PICRUSt predictions", details : 'picrust_predicted_abundance_profile'},
+                        { val : 'I want to rank them', details : 'rank_abundance_from_abundance_profile'},
+                        { val : 'I want annotations', details : 'retrieve_annotation_abundance_profile'},
+                        { val : 'I want to sub select them', details : 'sub_select_abundance_profile'},
+                        { val : 'I want to see metadata', details : 'view_abundance_profile_metadata'},
+                        { val : 'I want to sub profile values', details : 'view_abundance_profile_values'},
+                    ]
+                },
+
+                {val : "Show me everything communities related", body : categoryLists.communities.$elem},
+            ]
+        },
+        {
+            val : "I'm interested in microbes",
+            children : [
+                {
+                    val : "I want to annotate them",
+                    children : [
+                        { val : 'Add KBase Annotation', details : 'add_kbase_annotation'},
+                        { val : 'Annotate ContigSet', details : 'annotate_contigset'},
+                        { val : 'Annotate Genome', details : 'annotate_genome'},
+                    ]
+                },
+                {
+                    val : "I want to build something with them",
+                    children : [
+                        { val : 'Build Gene Tree', details : 'build_gene_tree'},
+                        { val : 'Build Genome Set From Tree', details : 'build_genome_set_from_tree'},
+                        { val : 'Build Genome Set Object', details : 'build_genome_set_object'},
+                    ]
+                },
+                {
+                    val : "I have data to upload",
+                    children : [
+                        { val : 'Upload Contigs (FASTA-file)', details : 'upload_contigs_fasta_file'},
+                        { val : 'Upload Genome (GBK-file)', details : 'upload_genome_gbk_file'},
+                    ]
+                },
+                {val : 'I want to view a pangenome', details : 'view_pangenome'},
+                {val : 'I want to view a a proteome comparison', details : 'view_proteome_comparison'},
+                {val : 'I want to view a tree', details : 'view_tree'},
+                {val : "Show me everything microbes related", body : categoryLists.microbes.$elem},
+            ]
+        },
+        {
+            val : "I'm interested in plants",
+            children : [
+                { val : "I want to annotate clusters", details : 'annotate_clusters_with_enriched_ontology_terms' },
+                { val : "I want to annotate networks", details : 'annotate_network_genes_with_ontology_terms' },
+                { val : "I want to construct a co-expression network", details : 'construct_co_expression_network_and_clusters' },
+                { val : "Show me everything plants related", body : categoryLists.plants.$elem },
+            ]
+        },
+        {
+            val : "I want help with common tasks",
+            children : [
+                {
+                    val : "I want to do something with a data file",
+                    children : [
+                        { val : 'Delete File', details : 'delete_file'},
+                        { val : 'Download File', details : 'download_file'},
+                        { val : 'Rename File', details : 'rename_file'},
+                        { val : 'Upload File', details : 'upload_file'},
+                        { val : 'View Files', details : 'view_files'},
+                    ]
+                },
+                {
+                    val : "I want to run a command",
+                    details : 'execute_kbase_command'
+                },
+                {
+                    val : "I'm interested in annotations",
+                    children : [
+                        { val : 'Add KBase Annotation', details : 'add_kbase_annotation'},
+                        { val : 'Annotate Genome', details : 'annotate_genome'},
+                    ]
+                },
+            ],
+
+        },
+        {
+            val : "I want to see everything",
+            body : $iaccordion.$elem,
+        }
+    ];
+
+    var $root = $.jqElem('div')
+        .addClass('tile')
+        .css('width', '50%')
+    ;
+
+    $('#floater').css('width', '200%');
+
+    $('#floater').append($root);
+
+    var $rootul = $.jqElem('ul');
+    $root.append($rootul);
+
+
+
+    $.each(
+        tree,
+        function (idx, node) {
+            $rootul.append(
+                $.jqElem('li')
+                    .append(
+                        $.jqElem('a')
+                            .on('click', function(e) {
+                                e.preventDefault();e.stopPropagation();
+                                magicmove(e, 'right', node);
+
+                            })
+                            .append(node.val)
+                            .append($.jqElem('i').addClass('fa fa-arrow-right pull-right'))
+                    )
+            );
+        }
+    );
+
+
+});
+
+                        });
+                });});
+
+    function magicmove (e, dir, node) {
+        var width = $('#browser').width();
+        var delta = (dir == 'right' ? '-' : '+') + '=' + width + 'px';
+        var $tile = $(e.target).parent().parent().parent();
+
+        if (dir == 'right') {
+            var $nextTile = $tile.next();
+
+            if ($nextTile.get(0) == undefined) {
+                $nextTile = $.jqElem('div').addClass('tile');
+                var tiles = $('#floater').children().length;
+
+                var newFloaterWidth = (tiles + 1) * 100;
+
+                $('#floater').css('width', newFloaterWidth + '%');
+                var newTileWidth = 100 / (tiles + 1);
+                $('#floater').append($nextTile);
+                $('div.tile').css('width', newTileWidth + '%');
+
+            }
+            else {
+                $nextTile.empty();
+            }
+
+            var $backbutton = $.jqElem('button')
+                            .addClass('btn btn-default btn-xs')
+                            .on('click', function(e) {
+                                e.preventDefault();e.stopPropagation();
+                                magicmove(e, 'left');
+                            })
+                            .append(
+                                $.jqElem('i').addClass('fa fa-arrow-left')
+                            );
+
+            if (node.children) {
+
+                var $nextUl = $.jqElem('ul');
+                $nextTile.append($nextUl);
+
+                $.each(
+                    node.children,
+                    function (idx, subNode) {
+                        $nextUl.append(
+                            $.jqElem('li')
+                                .append(
+                                    $.jqElem('a')
+                                        .on('click', function(e) {
+                                            e.preventDefault();e.stopPropagation();
+                                            if (subNode.details) {
+                                                details(subNode.details);
+                                            }
+                                            else {
+                                                magicmove(e, 'right', subNode);
+                                            }
+
+                                        })
+                                        .append(subNode.val)
+                                        .append($.jqElem('i').addClass(subNode.details ? '' : 'fa fa-arrow-right pull-right'))
+                                )
+                        );
+                    }
+                )
+
+                $nextUl.append(
+                    $.jqElem('li')
+                        .css('text-align', 'right')
+                        .css("list-style-type", "none")
+                        .append($backbutton)
+                );
+            }
+            else if (node.body) {
+                $nextTile
+                    .append(node.body)
+                    .append(
+                        $.jqElem('div')
+                            .css('text-align', 'right')
+                            .append($backbutton)
+                    );
+            }
+            else {
+                $nextTile.append(
+                    'Nothing here. :-('
+                )
+                .append(
+                    $.jqElem('div')
+                        .css('text-align', 'right')
+                        .append($backbutton)
+                )
+            }
+        }
+
+        $('#floater').animate({left : delta});
+    }
+
+            //-->
+        </script>
+    </head>
+
+    <body>
+
+                <div class="nav navbar-kbase navbar-fixed-top nav-collapse nav-collapse-scrollable bs-navbar-scroll-collapse">
+                    <a href="http://www.kbase.us" class="pull-left">
+                        <img id="logo" src="/functional-site/assets/img/kbase_logo.png" width="46"/>
+                    </a>
+
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <!--<li class="dropdown" ng-class="{ active: $state.includes('narrative')}">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Narrative <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#/narrative/">Newsfeed</a></li>
+                                    <li><a href="#/narrative/projects/">Projects</a></li>
+                                </ul>
+                            </li>-->
+                            <li ng-class="{ active: $state.includes('narratives')}"><a ui-sref="narratives.featured" >Narratives</a></li>
+                            <li ng-class="{ active: $state.includes('ws')}"><a ui-sref="ws" >Workspaces</a></li>
+                            <li ng-class="{ active: $state.includes('search')}">
+                                <a ng-click="newSearch()" ng-controller="searchBarController">Search Data</a>
+                            </li>
+                            <li><a href="//kbase.us/services/docs/uploader/uploader.html">Upload</a></li>
+                        </ul>
+
+                        <!--
+                        <ul class="nav navbar-nav">
+                            <li ng-class="{ active: $state.includes('favorites')}"><a href="#/favorites/all/">Favorites <span class="badge  favorite-count"></span></a></li>
+                            <li class="fav-loading"></li>
+                        </ul>
+                        -->
+
+                        <div id="signin-button" class="pull-right"></div>
+                        <ul class="nav navbar-nav pull-right">
+                            <li class="dropdown help-dropdown">
+                                <a id="kbase_help_menu_label" href="#kbase_help_menu" class="dropdown-toggle" data-toggle="dropdown" onclick="return false;">Help <b class="caret"></b></a>
+                                <ul id="kbase_help_menu" class="dropdown-menu" role="menu" aria-labelledby="kbase_help_menu_label">
+                                    <li><a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a></li>
+                                    <!--<li><a href="#/landing-pages-help">Landing Page Documentation</a></li>-->
+                                    <li><a href="http://kbase.us/get-started/data-search-quick-start/">Search Quick Start Guide</a></li>
+                                    <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+<div class = 'container-fluid'>
+        <div class = 'row' style = 'margin-top : 55px'>
+            <div class = 'col-md-4'>
+                <div id = 'browser' style = 'overflow : hidden;'>
+                    <div style = 'position : relative; left : 0px;' id = 'floater'>
+
+                    </div>
+                </div>
+            </div>
+            <div class = 'col-md-8'>
+
+                <div class="bs-example">
+                    <div id="myCarousel" class="carousel slide" data-interval="5000" data-ride="carousel">
+                        <!-- Carousel indicators -->
+                        <ol class="carousel-indicators">
+                            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                            <li data-target="#myCarousel" data-slide-to="1"></li>
+                            <li data-target="#myCarousel" data-slide-to="2"></li>
+                        </ol>
+                       <!-- Carousel items -->
+                        <div class="carousel-inner">
+                            <div class="active item">
+                                <h2 class = 'slide'><a href = "javascript:details('assemble_genome_from_fasta')">Assemble Genome from Fasta</a></h2>
+                                <div class="carousel-caption">
+                                  <h3>This assembles a ContigSet into a Genome object in your workspace. This should be run before trying to annotate a Genome. [2]</h3>
+                                  <p>This assembles a ContigSet into a Genome object in your workspace. This should be run before trying to annotate a Genome. [2]</p>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h2 class = 'slide'><a href = "javascript:details('build_gene_tree')">Build Gene Tree</a></h2>
+                                <div class="carousel-caption">
+                                  <h3>Build phylogenetic tree for multiple alignmnet of protein sequences [28]</h3>
+                                  <p>Build phylogenetic tree for multiple alignmnet of protein sequences [28]</p>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <h2 class = 'slide'><a href = "javascript:details('view_proteome_comparison')">View Proteome Comparison</a></h2>
+                                <div class="carousel-caption">
+                                  <h3>Show the hit map result of running a comparison between two proteomes, which includes information about best-bidirectional hits. [18]</h3>
+                                  <p>Show the hit map result of running a comparison between two proteomes, which includes information about best-bidirectional hits. [18]</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Carousel nav -->
+                        <a class="carousel-control left" href="#myCarousel" data-slide="prev">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                        </a>
+                        <a id = 'carousel-right' class="carousel-control right" href="#myCarousel" data-slide="next">
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                        </a>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div id = 'method-details'></div>
+
+            </div>
+        </div>
+
+        <div class = 'row'>
+            <div class = 'col-md-10 col-md-offset-2' style = 'padding : 20px'>
+                <div id = 'metddhod-details'></div>
+            </div>
+        </div>
+</div>
+
+<div id = 'imgModal' class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+      </div>
+      <div class="modal-body">
+        <img id = 'bigImg'>
+      </div>
+      <!--<div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>-->
+    </div>
+  </div>
+</div>
+
+    </body>
+
+</html>

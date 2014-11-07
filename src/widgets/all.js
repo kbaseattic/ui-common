@@ -1,5 +1,6 @@
 kb_define('all',
     [
+    'narrativeMethodStore',
 	'CDMI_API',
 	'Client',
 	'Heatmap_widget',
