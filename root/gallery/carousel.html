@@ -63,14 +63,21 @@ h2.slide{
 div.tile {
     float : left;
     //width : 50%
+    padding : 0px;
 }
 
 div.tile > ul {
-//    list-style-type : none;
-margin : 0px,
-    padding : 2px;
-    font-size : 200%;
-//    border : 1px solid blue;
+    list-style-type : none;
+margin : 0px;
+    padding : 0px;
+    //font-size : 200%;
+    //border : 1px solid red;
+}
+
+div.tile > ul > li {
+    margin : 0px;
+    padding : 1px;
+    //border : 1px solid green;
 }
 
 </style>
@@ -550,9 +557,11 @@ nms.list_methods({}, function(data) {
         tree,
         function (idx, node) {
             $rootul.append(
-                $.jqElem('li')
+                $.jqElem('li')//.addClass('panel').css('border', '2px solid blue')
                     .append(
-                        $.jqElem('a')
+                        $.jqElem('button')
+                            .addClass('btn btn-primary')
+                            .css({width : '100%', height : '100%', 'text-align' : 'left', 'line-height' : '1em'})
                             .on('click', function(e) {
                                 e.preventDefault();e.stopPropagation();
                                 magicmove(e, 'right', node);
@@ -596,7 +605,8 @@ nms.list_methods({}, function(data) {
             }
 
             var $backbutton = $.jqElem('button')
-                            .addClass('btn btn-default btn-xs')
+                            .addClass('btn btn-primary')
+                            .css({width : '100%', height : '100%', 'text-align' : 'left', 'line-height' : '1em'})
                             .on('click', function(e) {
                                 e.preventDefault();e.stopPropagation();
                                 magicmove(e, 'left');
@@ -616,7 +626,9 @@ nms.list_methods({}, function(data) {
                         $nextUl.append(
                             $.jqElem('li')
                                 .append(
-                                    $.jqElem('a')
+                                    $.jqElem('button')
+                                        .addClass('btn btn-primary')
+                                        .css({width : '100%', height : '100%', 'text-align' : 'left', 'line-height' : '1em'})
                                         .on('click', function(e) {
                                             e.preventDefault();e.stopPropagation();
                                             if (subNode.details) {
