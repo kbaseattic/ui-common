@@ -345,40 +345,18 @@ nms.list_methods({}, function(data) {
                     categories[cat].push(val);
 
                     if (cat.match(/microbe/i || val.name.match(/microbe/i))) {
-                        categoryLists.microbes.list.push(val);
+                        categoryLists.microbes.list.push({val : val.name, details : val.id});
                     }
 
                     if (cat.match(/plant/i || val.name.match(/plant/i))) {
-                        categoryLists.plants.list.push(val);
+                        categoryLists.plants.list.push({val : val.name, details : val.id});
                     }
 
                     if (cat.match(/commun/i || val.name.match(/commun/i))) {
-                        categoryLists.communities.list.push(val);
+                        categoryLists.communities.list.push({val : val.name, details : val.id});
                     }
                 }
             );
-        }
-    );
-
-    $.each(
-        categoryLists,
-        function (key, stuff) {
-            var $elem = stuff.$elem;
-            $.each(
-                stuff.list,
-                function (idx, m) {
-                    var $link = $.jqElem('a')
-                        .attr('title', m.tooltip)
-                        .tooltip()
-                        .on('click', function() {details(m.id)})
-                        .append(m.name);
-
-                    $elem.append(
-                        $.jqElem('li')
-                            .append($link)
-                    );
-                }
-            )
         }
     );
 
@@ -462,7 +440,7 @@ nms.list_methods({}, function(data) {
                     ]
                 },
 
-                {val : "Show me everything communities related", body : categoryLists.communities.$elem},
+                {val : "Show me everything communities related", children : categoryLists.communities.list},
             ]
         },
         {
@@ -494,7 +472,7 @@ nms.list_methods({}, function(data) {
                 {val : 'I want to view a pangenome', details : 'view_pangenome'},
                 {val : 'I want to view a a proteome comparison', details : 'view_proteome_comparison'},
                 {val : 'I want to view a tree', details : 'view_tree'},
-                {val : "Show me everything microbes related", body : categoryLists.microbes.$elem},
+                {val : "Show me everything microbes related", children : categoryLists.microbes.list},
             ]
         },
         {
@@ -503,7 +481,7 @@ nms.list_methods({}, function(data) {
                 { val : "I want to annotate clusters", details : 'annotate_clusters_with_enriched_ontology_terms' },
                 { val : "I want to annotate networks", details : 'annotate_network_genes_with_ontology_terms' },
                 { val : "I want to construct a co-expression network", details : 'construct_co_expression_network_and_clusters' },
-                { val : "Show me everything plants related", body : categoryLists.plants.$elem },
+                { val : "Show me everything plants related", children : categoryLists.plants.list },
             ]
         },
         {
@@ -605,7 +583,7 @@ nms.list_methods({}, function(data) {
             }
 
             var $backbutton = $.jqElem('button')
-                            .addClass('btn btn-primary')
+                            .addClass('btn btn-info')
                             .css({width : '100%', height : '100%', 'text-align' : 'left', 'line-height' : '1em'})
                             .on('click', function(e) {
                                 e.preventDefault();e.stopPropagation();
@@ -613,7 +591,8 @@ nms.list_methods({}, function(data) {
                             })
                             .append(
                                 $.jqElem('i').addClass('fa fa-arrow-left')
-                            );
+                            )
+                            .append(' ' + node.val)
 
             if (node.children) {
 
@@ -640,7 +619,9 @@ nms.list_methods({}, function(data) {
 
                                         })
                                         .append(subNode.val)
-                                        .append($.jqElem('i').addClass(subNode.details ? '' : 'fa fa-arrow-right pull-right'))
+                                        .append($.jqElem('i')
+                                            .addClass('pull-right fa')
+                                            .addClass(subNode.details ? 'fa-search' : 'fa-arrow-right'))
                                 )
                         );
                     }
