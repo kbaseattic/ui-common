@@ -409,14 +409,20 @@ angular.module('card-directives')
             }
         };
     })
+    
     .directive('wsobjgraphcenteredview', function($rootScope) {
         return {
-            link: function(scope, element, attrs) {
-                if (cardManager) cardManager.destroy();
+            link: function(scope, ele, attrs) {
+		var p = $(ele).kbasePanel({title: 'Object Reference and Provenance Graph',
+                                           rightLabel: scope.params.ws,
+                                           subText: scope.params.id});
+		p.loading();
+		$(p.body()).KBaseWSObjGraphCenteredView({objNameOrId: scope.params.id, wsNameOrId: scope.params.ws, kbCache: kb});
+                /*if (cardManager) cardManager.destroy();
                 cardManager = $(element).KBaseCardLayoutManager({
                     template: "wsobjgraphcenteredview", 
                     data: scope.params
-                });
+                });*/
             }
         };
     })
