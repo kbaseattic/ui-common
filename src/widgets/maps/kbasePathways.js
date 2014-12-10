@@ -7,7 +7,7 @@ $.KBWidget({
     },
     
     init: function(options) {
-        var map_ws = 'nconrad:paths';;
+        var map_ws = 'nconrad:paths';
         var container = this.$elem;
 
         var model_ws = options.model_ws;
@@ -105,6 +105,7 @@ $.KBWidget({
                                     fba_name: fba_name,                                    
                                     map_ws: map_ws,
                                     map_name: map,
+                                    image: true,
                                     editable: (options.editable ? true : false),
                                 })
         }

@@ -17,6 +17,7 @@ $.KBWidget({
         self.fba_name = options.fba_name;
         self.map_ws = options.map_ws;
         self.map_name = options.map_name;
+        self.image = options.image;
 
         console.log('model_ws:', self.model_ws,
                     'model_name:', self.model_name,
@@ -80,8 +81,10 @@ $.KBWidget({
             
 
         self.drawMap = function() {
+            container.html('')
+            container.html('<img class="pathway-png" src="data/map/'+self.map_name+'.png">');
+            container.append('<div id="'+self.map_name+'_pathway" class="pathway"></div>');
 
-            container.html('<div id="'+self.map_name+'_pathway" class="pathway"></div>');
 
             svg = d3.select('#'+self.map_name+'_pathway').append("svg")
                                         .attr("width", 800)
@@ -113,9 +116,9 @@ $.KBWidget({
                 .attr('d', 'M10,-5L0,0L10,5')
                 .attr('fill', '#000');
 
-            drawConnections();
+            if (!self.image) drawConnections();
             drawReactions();
-            drawMapLinks();
+            if (!self.image) drawMapLinks();
 
 
             // addjust canvas size for map size //fixme: this could be precomputed
