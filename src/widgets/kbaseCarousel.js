@@ -74,7 +74,7 @@
                         $.jqElem('div')
                             .addClass(innerClass)
                             .css('text-align' , 'center')
-                            .css('height', '300px')
+                            .css('height', '250px')
                             .append(
                                 $.jqElem('h2')
                                     .addClass('slide')
@@ -82,8 +82,8 @@
                                     {
                                         margin: 0,
                                         'padding-top': '30px',
-                                        'padding-bottom' : '150px',
-                                        'font-size': '52px',
+                                        'padding-bottom' : '20px',
+                                        'font-size': '200%',
                                         'font-family': "trebuchet ms sans-serif"
                                     })
                                     .append(

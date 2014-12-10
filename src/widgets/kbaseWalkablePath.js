@@ -100,7 +100,7 @@
                     children : [
                         { val : "I want to annotate clusters", details : 'annotate_clusters_with_enriched_ontology_terms' },
                         { val : "I want to annotate networks", details : 'annotate_network_genes_with_ontology_terms' },
-                        { val : "I want to construct a co-expression network", details : 'construct_co_expression_network_and_clusters' },
+                        { val : "I want to construct a network", details : 'construct_co_expression_network_and_clusters' },
                         //{ val : "Show me everything plants related", childrenKey : 'plantsList'},
                     ]
                 },
@@ -165,15 +165,15 @@
                 var categoryLists = {
                     plants : {
                         list : [],
-                        $elem : $.jqElem('ul').css({'font-size' : '100%'})
+                        $elem : $.jqElem('ul').css({'font-size' : '100%'}).css($wp.options.ulStyle)
                     },
                     microbes : {
                         list : [],
-                        $elem : $.jqElem('ul').css({'font-size' : '100%'})
+                        $elem : $.jqElem('ul').css({'font-size' : '100%'}).css($wp.options.ulStyle)
                     },
                     communities : {
                         list : [],
-                        $elem : $.jqElem('ul').css({'font-size' : '100%'})
+                        $elem : $.jqElem('ul').css({'font-size' : '100%'}).css($wp.options.ulStyle)
                     },
                 };
 
@@ -210,7 +210,7 @@
                 $.each(
                     categories,
                     function (cat, methods) {
-                        var $ul = $.jqElem('ul').css('padding-left', '0px');
+                        var $ul = $.jqElem('ul').css('padding-left', '0px').css($wp.options.ulStyle);
                         $.each(
                             methods.sort($accordion.sortByKey('name')),
                             function (idx, m) {
@@ -328,7 +328,7 @@
                             .append(
                                 $.jqElem('button')
                                     .addClass('btn btn-primary')
-                                    .css({width : '100%', height : '100%', 'text-align' : 'left', 'line-height' : '1em'})
+                                    .css({width : '100%', height : '100%', 'text-align' : 'left', 'line-height' : '1em', 'padding' : '6px 4px'})
                                     .on('click', function(e) {
                                         e.preventDefault();e.stopPropagation();
 
@@ -369,9 +369,10 @@
 
             if (dir == 'right') {
                 var $nextTile = $tile.next();
+                $tile.css('float', 'left');
 
                 if ($nextTile.get(0) == undefined) {
-                    $nextTile = $.jqElem('div').addClass('tile');
+                    $nextTile = $.jqElem('div').addClass('tile').css('float', 'right');
                     var tiles = this.$floater.children().length;
 
                     var newFloaterWidth = (tiles + 1) * 100;
@@ -412,7 +413,7 @@
 
                 if (node.children) {
 
-                    var $nextUl = $.jqElem('ul');
+                    var $nextUl = $.jqElem('ul').css($wp.options.ulStyle);
                     $nextTile.append($nextUl);
 
                     $.each(
@@ -423,7 +424,7 @@
                                     .append(
                                         $.jqElem('button')
                                             .addClass('btn btn-primary')
-                                            .css({width : '100%', height : '100%', 'text-align' : 'left', 'line-height' : '1em'})
+                                            .css({width : '100%', height : '100%', 'text-align' : 'left', 'line-height' : '1em', 'padding' : '6px 4px'})
                                             .on('click', function(e) {
                                                 e.preventDefault();e.stopPropagation();
                                                 if (subNode.details && $wp.options.methodDetails) {

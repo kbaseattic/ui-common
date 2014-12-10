@@ -81,7 +81,7 @@ kb_define('kbaseMethodDescription',
                             .addClass('row')
                             .append(
                                 $.jqElem('div')
-                                    .addClass('col-md-10')
+                                    .addClass('col-md-8')
                                     .append($.jqElem('h1').append(meth.name))
                             )
                             .append(
@@ -91,10 +91,12 @@ kb_define('kbaseMethodDescription',
                                         $.jqElem('button')
                                             .addClass('btn btn-primary')
                                             .on('click', function(e) {
-                                                alert('Adds to a narrative somehow!')
+                                                if ($details.options.sidePanel) {
+                                                    $details.options.sidePanel.toggleOverlay();
+                                                }
+                                                $details.trigger('methodClicked.Narrative', spec[0]);
                                             })
-                                            .append('Launch in New Narrative')
-
+                                            .append('Add to narrative')
 
                                     )
                             )

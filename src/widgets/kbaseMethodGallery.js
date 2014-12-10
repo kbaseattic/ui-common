@@ -56,12 +56,12 @@ kb_define('kbaseMethodGallery',
             ;
 
             this._rewireIds($root, this);
-console.log(this.data());
+
             var $mostPopular = $.jqElem('div').kbasePopularMethods();
             this.data('method-details').append($mostPopular.$elem);
 
             var $methodDetails = this.data('method-details').kbaseMethodDescription(
-                {mostPopular : $mostPopular}
+                {mostPopular : $mostPopular, sidePanel : this.options.sidePanel}
             );
 
             this.data('paths').kbaseWalkablePath({ methodDetails : $methodDetails, mostPopular : $mostPopular});
