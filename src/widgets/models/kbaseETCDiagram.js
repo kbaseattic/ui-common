@@ -78,12 +78,13 @@ $.KBWidget({
                 var g = svg.append('g');
                 g.append("text")
                  .attr("x", start_x + w*j)
-                 .attr("y", start_y)
+                 .attr("y", start_y - h/3 )
                  .text(name)
                  .attr("font-size", '12px');
 
                 // FIXME: rename steps -> entities on backend
                 var col_entities = rows[j].steps;
+                var unique_entities
                 for (var i in col_entities) {
                     var entity = col_entities[i];
 
@@ -97,7 +98,6 @@ $.KBWidget({
                         }
                     }
 
-
                     var x = start_x + w*j;
                     var y = start_y + h*i;
                     var color = (found_rxns.length > 0 ? gene_color : 'white')
@@ -105,16 +105,29 @@ $.KBWidget({
                 }
             }
 
-            console.log('electron_acceptors', electron_acceptors);
+            console.log('electron_acceptors', electron_acceptors, (rows.length+1));
             for (var i in electron_acceptors) {
                 var col_entities = electron_acceptors[i].steps;
+                console.log('cols', col_entities)
 
-                for (var j in col_entities) {
+                for (var j in col_entities) { 
                     var entity = col_entities[j];
 
-                    var x = start_x + w*(rows.length+1);
+
+                    var found_rxns = [];  //may need to know which rxn was found
+                    for (var k in entity.reactions) {
+                        var rxn_id = entity.reactions[i];
+
+                        if (rxn_id in model_rxns) {
+
+                            found_rxns.push(model_rxns[rxn_id]);
+                        }
+                    }                    
+
+                    var x = start_x + w*(3);
                     var y = start_y + h*i;
-                    drawBox(entity, x, y);
+                    var color = (found_rxns.length > 0 ? gene_color : 'white')                    
+                    drawBox(entity, x, y, color);
                 }
             }
             

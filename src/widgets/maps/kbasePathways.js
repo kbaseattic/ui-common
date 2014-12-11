@@ -15,6 +15,9 @@ $.KBWidget({
         var fba_ws = options.fba_ws;
         var fba_name = options.fba_name;
 
+        var models = options.modelData;
+        var fbas = options.fbaData;        
+
         // add tabs
         var selectionTable = $('<table cellpadding="0" cellspacing="0" border="0" \
             class="table table-bordered table-striped">');
@@ -85,7 +88,7 @@ $.KBWidget({
                 var name = $(this).text();
                 var exists;
 
-                var container = $('<div id="path-'+map_id+'">');
+                var container = $('<div id="path-'+map_id+'" class="path-container">');
                 container.loading();
                 tabs.addTab({name: name, removable: true, content: container});
                 load_map(map_id, container);
@@ -98,16 +101,26 @@ $.KBWidget({
                                placement: 'right', delay: {show: 1000}});
         } // end events
 
-        function load_map(map, container) {                       
+        function load_map(map, container) {
+            if (models) {
+                container.kbasePathway({models: models,
+                                        fbas: fbas,
+                                        map_ws: map_ws,
+                                        map_name: map,
+                                        image: (options.image ? true : false),
+                                        editable: (options.editable ? true : false),
+                                    })
+            } else {
             container.kbasePathway({model_ws: model_ws,
                                     model_name: model_name,
                                     fba_ws: fba_ws,
                                     fba_name: fba_name,                                    
                                     map_ws: map_ws,
                                     map_name: map,
-                                    image: true,
+                                    image: (options.image ? true : false),
                                     editable: (options.editable ? true : false),
                                 })
+            }
         }
 
         return this;

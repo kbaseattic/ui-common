@@ -19,12 +19,17 @@ $.KBWidget({
         self.map_name = options.map_name;
         self.image = options.image;
 
+
+        self.models = options.models;
+        self.fbas = options.fbas;
+
+
         console.log('model_ws:', self.model_ws,
                     'model_name:', self.model_name,
                     'fba_ws:', self.fba_ws,
                     'fba_name:', self.fba_name,
                     'map_ws:', self.map_ws,
-                    'map_name:', self.map_name)
+                    'map_name:', self.map_name);
 
         self.map_id = options.mapID;
 
@@ -42,20 +47,41 @@ $.KBWidget({
         var gene_stroke = '#777';
         var g_present_color = '#8bc7e5';
 
+        // if data was sent to widget, don't fetch.  I know, it's crazy
+        if (!self.models) {
+            var p1 = kb.ws.get_objects([{workspace: self.map_ws, name: self.map_name}])            
+            if (self.model_ws && self.model_name) {
+                var p2 = kb.get_model(self.model_ws, self.model_name);
+            }
+            if (self.fba_ws && self.fba_name) {
+                var p3 = kb.get_fba(self.fba_ws, self.fba_name);
+            }        
+            $.when(p1, p2, p3).done(function(map_data, models, fbas) {
+                self.map_data = map_data;
+                self.models = (models ? [models[0].data] : undefined);
+                self.fbas = (fbas ? [fbas[0].data] : undefined);
+                initialize();
+            })
+        } else {
+            kb.ws.get_objects([{workspace: self.map_ws, name: self.map_name}])
+                .done(function(map_data) {
+                    self.map_data = map_data;
+                    initialize()
+                })
 
-
-        var p1 = kb.ws.get_objects([{workspace: self.map_ws, name: self.map_name}])            
-        if (self.model_ws && self.model_name) {
-            var p2 = kb.get_model(self.model_ws, self.model_name);
         }
-        if (self.fba_ws && self.fba_name) {
-            var p3 = kb.get_fba(self.fba_ws, self.fba_name);
-        }        
-        $.when(p1, p2, p3).done(function(map_data, models, fbas) {
-            self.models = (models ? [models[0].data] : undefined);
-            self.fbas = (fbas ? [fbas[0].data] : undefined);
 
-            self.map_data = map_data[0].data;
+        this.redraw = function(models, fbas) {
+            self.models = models;
+            self.fbas = fbas;
+        }
+
+        function initialize() {
+            var models = [];
+            var fbas = [];
+
+            console.log('so the models are ', self.models, self.fbas)
+            self.map_data = self.map_data[0].data;
             rxns = self.map_data.reactions;
             cpds = self.map_data.compounds;
             maplinks = self.map_data.linkedmaps;
@@ -75,9 +101,7 @@ $.KBWidget({
             }
 
             self.drawMap()
-        })
-
-
+        }
             
 
         self.drawMap = function() {
@@ -648,7 +672,7 @@ $.KBWidget({
 
             for (var j in self.fbas) {
                 var fba = self.fbas[j];
-                console.log(fba)
+                if (!fba) continue;
                 fba_objs = fba.FBAReactionVariables;
 
                 // see if we can find the rxn in that fbas's list of reactions
