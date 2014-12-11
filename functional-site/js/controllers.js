@@ -762,6 +762,11 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
                      'mod': $stateParams.mod};
 })
 
+.controller('JGI', function($scope, $stateParams) {
+    $scope.params = {'ws': $stateParams.ws,
+                     'obj': $stateParams.obj};
+})
+
 
 
 function LPHelp($scope, $stateParams, $location) {

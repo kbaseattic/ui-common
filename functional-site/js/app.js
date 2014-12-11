@@ -541,6 +541,12 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		{url: '/kidledt/:mod',
 		templateUrl: 'views/objects/kidledt.html',
 		controller: 'KidlEdtDetail'});
+  
+    $stateProvider
+	.state('jgi',
+		{url: '/jgi/:ws/:obj',
+		templateUrl: 'views/jgi/jgi_obj_info.html',
+		controller: 'JGI'});
 
     $urlRouterProvider.when('', '/login/')
                       .when('/', '/login/')
