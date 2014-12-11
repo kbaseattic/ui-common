@@ -65,7 +65,15 @@ var app = angular.module('landing-pages',
           url: "featured",
           templateUrl: 'views/ws/featured.html',
           controller: 'WB'
-        })
+        });
+  
+    // new narrative manager routing
+     $stateProvider
+        .state('narrativemanager', {
+          url: "/narrativemanager/:action?app&copydata&appparam",
+          templateUrl: 'views/narrative/narrative-manager.html',
+          controller: 'narrativemanager'
+        });
 
     // workspace browser routing
     $stateProvider
