@@ -544,7 +544,7 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
   
     $stateProvider
 	.state('jgi',
-		{url: '/jgi/:ws/:obj',
+		{url: '/jgi/import/:ws/:obj',
 		templateUrl: 'views/jgi/jgi_obj_info.html',
 		controller: 'JGI'});
 
