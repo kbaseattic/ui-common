@@ -211,4 +211,33 @@ angular.module('narrative-directives')
 
         } 
     };
-})  
+})
+
+/** NEW FOR FEB 2014 - handles routing to the narrative after login **/
+.directive('narrativemanager', function($rootScope) {
+    return {
+        link: function(scope, element, attrs) {
+            var p = scope.params;
+            if (typeof configJSON !== null) {
+                if (configJSON.setup) {
+                    if (configJSON[configJSON.setup]) {
+                        if (configJSON[configJSON.setup].workspace_url) {
+                            p.ws_url = configJSON[configJSON.setup].workspace_url;
+                        }
+                    }
+                    
+                }
+            }
+            $(element).kbaseNarrativeManager({
+                params:p,
+                loadingImage: "assets/img/ajax-loader.gif"
+                });
+        }
+    }
+});
+
+
+
+
+
+
