@@ -11,6 +11,15 @@
         parent: "kbaseAuthenticatedWidget",
         version: "1.0.0",
 	
+	
+	/*
+	params should have the following fields:
+	
+	action: start | new
+	
+	
+	
+	*/
         options: {
 	    loadingImage: "assets/img/ajax-loader.gif",
             ws_url: "https://kbase.us/services/ws",
@@ -49,12 +58,14 @@
 	    if (self.options.params) {
 		// START - load up last narrative, or start the user's first narrative
 		if (self.options.params.action === 'start') {
-		    this.manager.detectStartSettings(self.options.params,
+		    self.manager.detectStartSettings(self.options.params,
 			function(result) {
 			    console.log(result);
 			    if (result.last_narrative) {
 				// we have a last_narrative, so go there
 				//console.log('should redirect...');
+				self.$mainPanel.html('redirecting to <a href="/narrative/ws.'+result.last_narrative.ws_info[0]+'.obj.'+result.last_narrative.nar_info[0]+
+						     '">/narrative/ws.'+result.last_narrative.ws_info[0]+'.obj.'+result.last_narrative.nar_info[0]+'</a>');
 				window.location.replace("/narrative/ws."+result.last_narrative.ws_info[0]+".obj."+result.last_narrative.nar_info[0]);
 			    } else {
 				// we need to construct a new narrative- we have a first timer
@@ -63,6 +74,7 @@
 				    function(info) {
 					var newWsId = info.nar_info[6];
 					var newNarId = info.nar_info[0];
+					self.$mainPanel.html('redirecting to <a href="/narrative/ws.'+newWsId+'.obj.'+newNarId+'">/narrative/ws.'+newWsId+'.obj.'+newNarId+'</a>');
 					window.location.replace("/narrative/ws."+newWsId+".obj."+newNarId);
 				    },
 				    function(error) {
@@ -75,6 +87,32 @@
 			function(error) {
 			    console.error(error);
 			});
+		} else if (self.options.params.action === 'new') {
+		    
+		    var importData = null;
+		    if (self.options.params.copydata) {
+			importData = self.options.params.copydata.split(';');
+		    }
+		    
+		    var cells=[];
+		    if (self.options.params.app) {
+			cells = [ {app:self.options.params.app} ];
+		    }
+		    self.manager.createTempNarrative(
+				    { cells:cells,parameters:[],importData : importData },
+				    function(info) {
+					var newWsId = info.nar_info[6];
+					var newNarId = info.nar_info[0];
+					self.$mainPanel.html('redirecting to <a href="/narrative/ws.'+newWsId+'.obj.'+newNarId+'">/narrative/ws.'+newWsId+'.obj.'+newNarId+'</a>');
+					window.location.replace("/narrative/ws."+newWsId+".obj."+newNarId);
+				    },
+				    function(error) {
+					console.error(error);
+					$mainPanel.html('Unexpected error in loading KBase.');
+				    }
+				);
+		} else {
+		    self.$mainPanel.html('action "'+self.options.params.action+'" not supported; only "start" or "new" accepted.');
 		}
 		
 		// else do something if action isn't correct!!
