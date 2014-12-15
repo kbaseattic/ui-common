@@ -19,17 +19,17 @@
                 {
                     name : 'Assemble Genome from Fasta',
                     id : 'assemble_genome_from_fasta',
-                    caption : '<h3>This assembles a ContigSet into a Genome object in your workspace. This should be run before trying to annotate a Genome. [2]</h3><p>This assembles a ContigSet into a Genome object in your workspace. This should be run before trying to annotate a Genome. [2]</p>'
+                    caption : '<h3 style = "padding : 0px; margin : 0px">This assembles a ContigSet into a Genome object in your workspace. This should be run before trying to annotate a Genome. [2]</h3><p>This assembles a ContigSet into a Genome object in your workspace. This should be run before trying to annotate a Genome. [2]</p>'
                 },
                 {
                     name : 'Build Gene Tree',
                     id : 'build_gene_tree',
-                    caption : '<h3>Build phylogenetic tree for multiple alignmnet of protein sequences [28]</h3><p>Build phylogenetic tree for multiple alignmnet of protein sequences [28]</p>'
+                    caption : '<h3 style = "padding : 0px; margin : 0px">Build phylogenetic tree for multiple alignmnet of protein sequences [28]</h3><p>Build phylogenetic tree for multiple alignmnet of protein sequences [28]</p>'
                 },
                 {
                     name : 'View Proteome Comparison',
                     id : 'view_proteome_comparison',
-                    caption : '<h3>Show the hit map result of running a comparison between two proteomes, which includes information about best-bidirectional hits. [18]</h3><p>Show the hit map result of running a comparison between two proteomes, which includes information about best-bidirectional hits. [18]</p>'
+                    caption : '<h3 style = "padding : 0px; margin : 0px">Show the hit map result of running a comparison between two proteomes, which includes information about best-bidirectional hits. [18]</h3><p>Show the hit map result of running a comparison between two proteomes, which includes information about best-bidirectional hits. [18]</p>'
                 },
             ]
         },
@@ -102,6 +102,7 @@
                                 $.jqElem('div')
                                     .addClass('carousel-caption')
                                     .css('color', 'black')
+                                    .css('padding', '0px')
                                     .append(val.caption)
                             )
                     );

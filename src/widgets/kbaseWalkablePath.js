@@ -355,7 +355,7 @@
                             )
                     );
                 }
-            )
+            );
 
         },
 
@@ -364,6 +364,18 @@
             var $wp = this;
 
             var width = this.$elem.width();
+
+
+            //XXX - something in the CSS in the new rev of narrative-develop is resizing the width and making it 50px wider once you click on it.
+            //So we just check to see if we've compensated for it - if not, then change our offset by 50px.
+            //never speak of it again.
+            //
+            //no idea what's really happening. This should be investigated further. It looks like the initial rendering of it is off for some reason.
+            if (! this.bullshitHack) {
+                this.bullshitHack = true;
+                width += 50;
+            }
+
             var delta = (dir == 'right' ? '-' : '+') + '=' + width + 'px';
             var $tile = $(e.target).parent().parent().parent();
 
