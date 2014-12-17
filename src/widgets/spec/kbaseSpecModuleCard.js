@@ -16,11 +16,21 @@
             this._super(options);
             if (!this.options.token)
             	this.options.token = this.authToken();
+            //console.log(this.options.token);
+            var userName = null;
+            if (this.options.token) {
+            	var tokenParts = this.options.token.split("|");
+            	for (var i in tokenParts) {
+            		var keyValue = tokenParts[i].split("=");
+            		if (keyValue.length == 2 && keyValue[0] === "un")
+            			userName = keyValue[1];
+            	}
+            }
             var self = this;
             var container = this.$elem;
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace(newWorkspaceServiceUrlForSpec, {token: options.token});
+            var kbws = new Workspace(newWorkspaceServiceUrlForSpec, {token: self.options.token});
             var moduleName = this.options.id;
             var moduleVer = null;
             if (moduleName.indexOf('-') >= 0) {
@@ -70,6 +80,23 @@
                                   <td>'+overviewData[i]+'</td></tr>');
                 }
             	overviewTable.append('<tr><td>Description</td><td><textarea style="width:100%;" cols="2" rows="5" readonly>'+data.description+'</textarea></td></tr>');
+            	var isOwner = false;
+            	for (var j in data.owners) {
+            		if (userName && data.owners[j] === userName) {
+            			isOwner = true;
+            			break;
+            		}
+            	}
+            	if (isOwner) {
+            		var openEditorBtn = $('<button class="btn btn-primary">Open in editor</button>');
+            		$('#'+pref+'overview').append(openEditorBtn);
+            		openEditorBtn.click(function (e) {
+            			self.trigger('showKidlEditor', 
+            					{	mod: moduleName,
+            						event: e
+            					});
+            		});
+            	}
 
             	////////////////////////////// Spec-file Tab //////////////////////////////
             	var specText = $('<div/>').text(data.spec).html();
@@ -103,7 +130,7 @@
             		typesData.push({name: '<a onclick="specClicks[\''+pref+'types-click\'](this,event); return false;" data-typeid="'+typeId+'">'+typeName+'</a>', ver: typeVer});
             	}
                 var typesSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
                         "aaData": typesData,
@@ -119,7 +146,7 @@
                     		{
                     			kind: "type", 
                     			id : typeId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 };
@@ -135,7 +162,7 @@
             		funcsData.push({name: '<a onclick="specClicks[\''+pref+'funcs-click\'](this,event); return false;" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer});
             	}
                 var funcsSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function name", mData: "name"}, {sTitle: "Function version", mData: "ver"}],
                         "aaData": funcsData,
@@ -151,7 +178,7 @@
                     		{
                     			kind: "function", 
                     			id : funcId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 };
@@ -166,7 +193,7 @@
             		incsData.push({name: '<a onclick="specClicks[\''+pref+'incs-click\'](this,event); return false;" data-incid="'+incId+'">'+incName+'</a>', ver: incVer});
             	}
                 var incsSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Module name", mData: "name"}, {sTitle: "Module version", mData: "ver"}],
                         "aaData": incsData,
@@ -182,7 +209,7 @@
                     		{
                     			kind: "module", 
                     			id : incId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 };
@@ -206,7 +233,7 @@
                 		versData.push({ver: link, date: verDate});
                 	}
                     var versSettings = {
-                            "sPaginationType": "full_numbers",
+                            "sPaginationType": "bootstrap",
                             "iDisplayLength": 10,
                             "aoColumns": [{sTitle: "Module version", mData: "ver"}, {sTitle: "Upload date", mData: "date"}],
                             "aaData": versData,
@@ -222,7 +249,7 @@
                         		{
                         			kind: "module", 
                         			id : modId,
-                        			token: options.token,
+                        			token: self.options.token,
                         			event: e
                         		});
                     };
@@ -241,7 +268,7 @@
         getData: function() {
             return {
                 type: "KBaseSpecModuleCard",
-                id: this.options.name,
+                id: this.options.id,
                 workspace: 'specification',
                 title: "Module Object Specification"
             };

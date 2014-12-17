@@ -18,27 +18,27 @@ function KBCacheClient(token) {
             search_url = configJSON.prod.search_url;
         }
     } else {
-        fba_url = "http://140.221.85.73:4043/"
+        fba_url = "http://kbase.us/services/KBaseFBAModeling/"
         ws_url = "https://kbase.us/services/ws/"
-        ujs_url = "http://140.221.84.180:7083"
+        //ujs_url = "http://140.221.84.180:7083"
         search_url = "http://dev07.berkeley.kbase.us/search/"
     }
 
     console.log('FBA URL is:', fba_url);
     console.log('Workspace URL is:', ws_url);
-    console.log('User Job State URL is:', ujs_url);
+    //console.log('User Job State URL is:', ujs_url);
     console.log('Search Service URL is:', search_url);    
 
     var fba = new fbaModelServices(fba_url, auth);
     var kbws = new Workspace(ws_url, auth);
-    var ujs = new UserAndJobState(ujs_url, auth);
+    //var ujs = new UserAndJobState(ujs_url, auth);
 
     var cache = new Cache();
 
     // some kbase apis
     self.fba = fba;
     self.ws = kbws;
-    self.ujs = ujs;
+    //self.ujs = ujs;
     self.nar = new ProjectAPI(ws_url, token);
 
     // some accessible variables
@@ -223,7 +223,6 @@ function KBCacheClient(token) {
 
         var p = self.ws.get_object_info([{workspace: ws, name: name}], 1)
             .then(function(info) {
-                console.log('info', info)
                 var deps = JSON.parse(info[0][10].data_dependencies);
 
                 var d = [];
@@ -294,6 +293,7 @@ function KBCacheClient(token) {
     }
 
     self.get_model = function(ws, name){
+
         if (ws && ws.indexOf('/') != -1) {
             //var prom = c.get({ref: ws});
             //if (prom) return prom; 
@@ -309,6 +309,7 @@ function KBCacheClient(token) {
         }
 
         var prom = $.when(p).then(function(m) {
+            console.log('model', m)
             var m_obj = m[0].data
             var rxn_objs = m_obj.modelreactions;
             var cpd_objs = m_obj.modelcompounds
@@ -325,6 +326,7 @@ function KBCacheClient(token) {
             }
 
             // add equations to biomasses object
+
             var biomass_objs = m_obj.biomasses;
             var eqs = self.createEQs(cpd_objs, biomass_objs, 'biomasscompounds')
             for (var i in biomass_objs) {
@@ -350,6 +352,7 @@ function KBCacheClient(token) {
         for (var i in rxn_objs) {
             var rxn_obj = rxn_objs[i];
             var rxn_id = rxn_obj.id;
+
             var rxnreagents = rxn_obj[key];
             var direction = rxn_obj.direction;
 
@@ -373,11 +376,9 @@ function KBCacheClient(token) {
             }
 
             var arrow;
-            switch (direction) {
-                case '=': arrow = ' <=> ';
-                case '<': arrow = ' <= ';
-                case '>': arrow = ' => ';
-            }
+            if (direction === '=' || direction === '<=>') arrow = ' <=> ';
+            if (direction === '<' || direction === '<=') arrow = ' <= ';
+            if (direction === '>' || direction === '=>') arrow = ' => ';
 
             var eq = lhs.join(' + ')+arrow+rhs.join(' + ');
             eqs[rxn_id] = eq
@@ -447,7 +448,7 @@ function KBCacheClient(token) {
 
             var wsSelect = $('<form class="form-horizontal" role="form">'+
                                 '<div class="form-group">'+
-                                    '<label class="col-sm-5 control-label">Destination Workspace</label>'+
+                                    '<label class="col-sm-5 control-label">Workspace</label>'+                                
                                     '<div class="input-group col-sm-5">'+
                                         '<input type="text" class="select-ws-input form-control focusedInput" placeholder="search">'+
                                         '<span class="input-group-btn">'+
@@ -682,7 +683,7 @@ function UIUtils() {
         var labels = p.labels;
         var bold = (p.bold ? true : false);
 
-        var table = $('<table id="'+table_id+'" class="table table-striped table-bordered" \
+        var table = $('<table class="table table-striped table-bordered" \
                               style="margin-left: auto; margin-right: auto;"></table>');
         for (var i in labels) {
             table.append('<tr><td>'+(bold ? '<b>'+labels[i]+'</b>' : labels[i])+'</td> \
@@ -710,7 +711,7 @@ function UIUtils() {
                 var type = full_type.slice(full_type.indexOf('.')+1);
                 var kind = type.split('-')[0];
                 var label = item[7]+"/"+item[1];
-        var route;
+                var route;
                 switch (kind) {
                     case 'FBA': 
                         sub = 'fbas/';
@@ -732,10 +733,36 @@ function UIUtils() {
                         break; 
                 }
 
-                var link = '<a href="#/'+route+label+'">'+label+'</a>'
+                var link = '<a href="#/'+route+label+'">'+label+'</a>';
                 refhash[reflist[i]] = {link: link, label: label};
             }
             return refhash
+        })
+        return p;
+    }
+
+    this.refsToJson = function(ref_list) {
+        var obj_refs = []
+        for (var i in ref_list) {
+            obj_refs.push({ref: ref_list[i]})
+        }
+
+        var obj = {}
+        var prom = kb.ws.get_object_info(obj_refs)
+        var p = $.when(prom).then(function(refinfo) {
+            for (var i=0; i<refinfo.length; i++) {
+                var item = refinfo[i];
+                var full_type = item[2];
+                var module = full_type.split('.')[0];
+                var type = full_type.slice(full_type.indexOf('.')+1);
+                var kind = type.split('-')[0];
+                var label = item[7]+"/"+item[1];
+
+                if ( !(kind in obj) )  obj[kind] = [];
+
+                obj[kind].push(label);
+            }
+            return obj;
         })
         return p;
     }
@@ -795,8 +822,7 @@ function UIUtils() {
     }
 
     // jQuery plugins that you can use to add and remove a 
-    // loading giff to a dom element.  This is easier to maintain, and likely less 
-    // code than using CSS classes.
+    // loading giff to a dom element.
     $.fn.loading = function(text, big) {
         $(this).rmLoading()
 
@@ -1471,7 +1497,6 @@ function ProjectAPI(ws_url, token) {
         var self = this;
         var metadata_fn = ws_client.get_object_info([{wsid: p.project_id, objid : p.narrative_id}], 1);
         $.when( metadata_fn).then( function( obj_info) {
-            console.log('object_info', obj_info)
             if (obj_info.length != 1) {
                 p.error_callback( "Error: narrative ws." + p.project_id +
                         ".obj." + p.narrative_id + " not found");
@@ -1492,7 +1517,7 @@ function ProjectAPI(ws_url, token) {
         res.description = meta.description;
         res.name = meta.name;
         var temp = $.parseJSON(meta.data_dependencies);
-        console.log(temp)
+
         //deps should really be stored as an id, not a name, since names can change
         var deps = temp.reduce( function(prev,curr,index) {
             var dep = curr.split(" ");

@@ -34,7 +34,7 @@ $.KBWidget({
                                            {name: 'Compounds', content: cpdTable},
                                            {name: 'Pathways', content: mapTable},                                               
                                     ]}); 
-        tabs.showTab('Reactions');
+        //tabs.showTab('Reactions');
 
         container.loading();
         var p = kb.get_fba(ws, name)
@@ -102,7 +102,6 @@ $.KBWidget({
             overviewTable.append(table);
 
             var tableSettings = {
-                "sPaginationType": "bootstrap",
                 "iDisplayLength": 10,
                 "aLengthMenu": [5, 10, 25,50,100],
                 "oLanguage": {

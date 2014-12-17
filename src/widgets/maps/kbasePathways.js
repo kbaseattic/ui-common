@@ -7,7 +7,7 @@ $.KBWidget({
     },
     
     init: function(options) {
-        var map_ws = 'nconrad:paths';
+        var map_ws = 'nconrad:paths';;
         var container = this.$elem;
 
         var model_ws = options.model_ws;
@@ -32,8 +32,6 @@ $.KBWidget({
 
 
                 var tableSettings = {
-                    "sPaginationType": "bootstrap",
-                    "iDisplayLength": 10,
                     "aaData": d,
                     "fnDrawCallback": events,
                     "aaSorting": [[ 1, "asc" ]],
@@ -107,7 +105,7 @@ $.KBWidget({
                                     fba_name: fba_name,                                    
                                     map_ws: map_ws,
                                     map_name: map,
-                                    editable: true,
+                                    editable: (options.editable ? true : false),
                                 })
         }
 

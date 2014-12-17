@@ -8,11 +8,21 @@ $.KBWidget({
     init: function(options) {
         this._super(options);
         var self = this;
-        var media = options.ids[0];
-        var ws = options.workspaces[0];        
-        var mediadata = options.data[0];
+        var media = options.name;
+        var ws = options.ws;        
+
         var container = this.$elem;
-        media_view(container, mediadata);
+
+        container.loading();
+        var prom = kb.fba.get_media({medias: [media], workspaces: [ws]})
+        $.when(prom).done(function(data) {
+            container.rmLoading();
+            var mediadata = data[0];  // fixme: refactor 
+
+            media_view(container, data[0]);
+        })
+
+
 
         function media_view(container, data) {
             $('.loader-rxn').remove();

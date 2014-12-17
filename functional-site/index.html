@@ -4,36 +4,45 @@
         <title>KBase Narrative Interface (prototype)</title>
         <link rel="icon" type="image/x-icon" href="assets/img/KBase_favicon.ico">
 
-        <!-- Global KBase css -->
+        <!-- external css -->
         <link rel="stylesheet" type="text/css" href="../ext/bootstrap/3.0.0/css/bootstrap.css" />
-        <link rel="stylesheet" type="text/css" href="../ext/jquery-ui/1.10.3/css/custom-theme/jquery-ui-1.10.0.custom.css"> 
-
+        <!-- jquery-ui-1.10.0.custom.css is needed for the landing page card layout, some old landing pages still use this style -->
+        <link rel="stylesheet" type="text/css" href="../ext/jquery-ui/1.10.3/css/custom-theme/jquery-ui-1.10.0.custom.css">
+        
         <link rel="stylesheet" type="text/css" href="assets/css/dataTables.bootstrap.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/ws-browser.css" />
+        <!--<link rel="stylesheet" type="text/css" href="assets/js/acute-select/acute/acute.select/acute.select.css" />-->
+
         <link rel="stylesheet" type="text/css" href="assets/css/ng-grid.css" />
-
-        <link rel="stylesheet" type="text/css" href="assets/css/kb-visualizations.css" />
-        <link rel="stylesheet" type="text/css" href="assets/css/landing-pages.css" />
-        <link rel="stylesheet" type="text/css" href="assets/css/search.css" />
-        <link rel="stylesheet" type="text/css" href="assets/css/jquery.jsonview.css" />        
-
-        <link rel="stylesheet" type="text/css" href="assets/js/ws-widgets/style.css" />
-        <link rel="stylesheet" type="text/css" href="assets/css/nc-tour.css" />
-
-        <!-- KBase widget css -->
-        <link rel="stylesheet" type="text/css" href="assets/css/kbaseLandingPageCard.css" />
-        <link rel="stylesheet" type="text/css" href="assets/css/kbaseSEEDFunctions.css" />
-
+        <link rel="stylesheet" type="text/css" href="assets/css/jquery.jsonview.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/prettify.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/sankeystyle.css" />
         <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/font-awesome-4.0.3/css/font-awesome.css" />
         <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.css" />
+        <link rel="stylesheet" href="../ext/animate/animate.css" />                 
+        <!-- End external css -->
 
-        <link rel="stylesheet" href="../ext/animate/animate.css" />
+
+        <!-- kbase css -->
+        <link rel="stylesheet" type="text/css" href="assets/css/kb-ui.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/kb-visualizations.css" />        
+        <link rel="stylesheet" type="text/css" href="assets/css/analysis.css" />        
+        <link rel="stylesheet" type="text/css" href="assets/css/search.css" />
+        <link rel="stylesheet" type="text/css" href="assets/js/ws-widgets/style.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/nc-tour.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/gwas.css" />
+
+        <link rel="stylesheet" type="text/css" href="assets/css/kbaseLandingPageCard.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/kbaseSEEDFunctions.css" />
+        <!-- End kbase css -->
+
 
         <!-- External javascript packages -->
         <script src="../ext/bowser/bowser.min.js"></script>
-        <!-- remove? <script src="../ext/underscore-min/underscore-min.js"></script>-->
+        <script src="../ext/underscore/1.6.0/underscore-min.js"></script>
 
         <!-- Google Analytics -->
+
         <script>
             (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
             (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -91,6 +100,7 @@
         <script src="assets/js/kbclient/wikiScraper.js"></script>
         <script src="assets/js/kbclient/kbaseTrees.js"></script>        
         <script src="assets/js/kbclient/KBaseExpressionClient.js"></script>
+        <script src="assets/js/kbclient/shock.js"></script>        
         <script src="assets/js/widgetMaxWidthCorrection.js"></script>        
 
         <!-- widgets -->
@@ -107,8 +117,7 @@
         <script src="../src/widgets/maps/kbasePathway.js"></script>
         <script src="../src/widgets/models/kbaseModelMeta.js"></script>
         <script src="../src/widgets/models/kbaseModelTabs.js"></script>
-        <script src="../src/widgets/models/kbaseModelCore.js"></script>
-        <script src="../src/widgets/models/kbaseModelOpts.js"></script>        
+        <script src="../src/widgets/models/kbaseModelCore.js"></script>     
 
         <script src="../src/widgets/fbas/kbaseFbaTabs.js"></script>
         <script src="../src/widgets/fbas/kbaseFbaMeta.js"></script>        
@@ -120,22 +129,13 @@
 
         <script src="../src/widgets/media/kbaseMediaEditor.js"></script>
 
-        <script src="../src/widgets/misc/kbaseSeqSearch.js"></script>
-
-        <script src="../src/widgets/workspaces/kbaseWSModelTable.js"></script>
         <script src="../src/widgets/workspaces/kbaseWSFbaTable.js"></script>
         <script src="../src/widgets/workspaces/kbaseWSMediaTable.js"></script>
-        <script src="../src/widgets/workspaces/kbaseSimpleWSSelect.js"></script>
-        <script src="../src/widgets/workspaces/kbaseWSHandler.js"></script>
-        <script src="../src/widgets/workspaces/kbaseWSSelector.js"></script>
-        <script src="../src/widgets/workspaces/kbaseWSObjectTable.js"></script>
-        <script src="../src/widgets/workspaces/kbaseWSButtons.js"></script>
-        <script src="../src/widgets/biochemistry/kbaseRxn.js"></script>
-        <script src="../src/widgets/biochemistry/kbaseCpd.js"></script>
     
         <!-- ws obj reference related widgets -->
         <script src="../ext/d3/sankey.js"></script> <!-- this is a d3 plugin -->
-        <link rel="stylesheet" type="text/css" href="assets/css/sankeystyle.css" />
+
+        <script src="../src/widgets/workspaces/kbaseWSButtons.js"></script>
         <script src="../src/widgets/workspaces/kbaseWSReferenceList.js"></script>
         <script src="../src/widgets/objgraphs/kbaseWSObjGraphView.js"></script>
         <script src="../src/widgets/objgraphs/kbaseWSObjGraphCenteredView.js"></script>
@@ -244,7 +244,6 @@
         <!-- End Bambi widgets -->
 
         <!-- GWAS widgets -->
-        <link rel="stylesheet" type="text/css" href="assets/css/gwas.css" />
         <script src='../src/widgets/kbaseAuthenticatedWidget.js'></script>
         <script src="//maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
         <script src='../ext/gmaps/gmap3.js'></script>
@@ -278,15 +277,15 @@
 
         <!-- KBase new workspace client library javascript -->
         <!-- Syntax Highlighter code -->
-        <link rel="stylesheet" type="text/css" href="assets/css/prettify.css" />
-
         <script src="assets/js/prettify.js"></script>
+
         <!-- Spec widgets -->
         <script  src="../src/widgets/spec/kbaseSpecCommon.js"></script>
         <script  src="../src/widgets/spec/kbaseSpecStorageCard.js"></script>
         <script  src="../src/widgets/spec/kbaseSpecModuleCard.js"></script>
         <script  src="../src/widgets/spec/kbaseSpecTypeCard.js"></script>
         <script  src="../src/widgets/spec/kbaseSpecFunctionCard.js"></script>
+        <script src="../src/widgets/spec/kbaseKidlWebEditor.js"></script>
         <!-- End Spec widgets -->
 
         <script src="../src/widgets/trees/kbaseTree.js"></script>
@@ -306,19 +305,22 @@
         <script  src="../src/widgets/networks/kbaseNetworkCard.js"></script>
         <!-- End Network widgets -->
 
-        <!-- application -->
+        <!-- app -->
+        <script src="assets/js/file-upload-1.6.12/angular-file-upload-shim.min.js"></script>
         <script src="js/angular-1.2.14/angular.min.js"></script>
+
         <script src="js/angular-1.2.14/angular-resource.min.js"></script> 
         <script src="js/angular-1.2.14/angular-animate.min.js"></script> 
         <script src="js/ui-router-0.2.10/angular-ui-router.min.js"></script>
         <script src="js/ui-bootstrap-0.11.0/ui-bootstrap-tpls-0.11.0.min.js"></script>
+        <script src="assets/js/file-upload-1.6.12/angular-file-upload.min.js"></script>
 
         <script src="js/app.js"></script>        
         <script src="js/search.js"></script>
 
         <script src="js/directives/landingpages.js"></script>
         <script src="js/directives/cards.js"></script>
-        <script src="js/directives/fav.js"></script>
+        <!--<script src="js/directives/fav.js"></script>-->
         <script src="js/directives/ws.js"></script>           
         <script src="js/directives/trees.js"></script>        
         <script src="js/directives/narrative.js"></script>
@@ -327,74 +329,90 @@
         <script src="js/directives/communities.js"></script>       
         <script src="js/directives/social.js"></script>         
         <script src="js/controllers.js"></script>
-        <script src="js/services/favorites.js"></script>
+        <!--<script src="js/services/favorites.js"></script>-->
         <script src="js/services/workspaceUI.js"></script>
+
+        <!--<script src="assets/js/acute-select/acute/acute.select/acute.select.js"></script>         -->
+        <script src="js/services/narrativeUI.js"></script> 
         <script src="js/kbapi.js"></script>
         <script src="assets/js/header.js"></script>
+        
+        <!-- RequireJS should go after all other javascript imports -->
+        <script src="../ext/requirejs/2.1.9/require.js"></script>
         <!-- end application -->
     </head>
 
     <body>
         <div id="wrap">
-            <div class="nav navbar-kbase navbar-fixed-top nav-collapse nav-collapse-scrollable bs-navbar-scroll-collapse">
-                <a href="http://www.kbase.us" class="pull-left">
-                    <img id="logo" src="assets/img/kbase_logo.png" width="46"/>
-                </a>
+            <div id="content">
+                <div class="nav navbar-kbase navbar-fixed-top nav-collapse nav-collapse-scrollable bs-navbar-scroll-collapse">
+                    <a href="http://www.kbase.us" class="pull-left">
+                        <img id="logo" src="assets/img/kbase_logo.png" width="46"/>
+                    </a>
 
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav"> 
-                        <!--<li class="dropdown" ng-class="{ active: $state.includes('narrative')}">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Narrative <b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#/narrative/">Newsfeed</a></li>                
-                                <li><a href="#/narrative/projects/">Projects</a></li>
-                            </ul>
-                        </li>-->
-                        <li ng-class="{ active: $state.includes('narratives')}"><a ui-sref="narratives.featured" >Narratives</a></li>
-                        <li ng-class="{ active: $state.includes('ws')}"><a ui-sref="ws" >Workspaces</a></li>
-                        <li ng-class="{ active: $state.includes('search')}">
-                            <a ng-click="newSearch()" ng-controller="searchBarController">Search Data</a>
-                        </li>
-                        <li><a href="//kbase.us/services/docs/uploader/uploader.html">Upload</a></li>          
-                    </ul>
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav"> 
+                            <!--<li class="dropdown" ng-class="{ active: $state.includes('narrative')}">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Narrative <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#/narrative/">Newsfeed</a></li>                
+                                    <li><a href="#/narrative/projects/">Projects</a></li>
+                                </ul>
+                            </li>-->
+                            <li ng-class="{ active: $state.includes('narratives')}">
+                                <a ui-sref="narratives.featured" >Narratives</a>
+                            </li>
+                            <!--
+                            <li ng-class="{ active: $state.includes('analysis')}">
+                                <a ui-sref="analysis.apps">Apps</a>
+                            </li>-->
+                            <li ng-class="{ active: $state.includes('ws')}">
+                                <a ui-sref="ws">Workspaces</a>
+                            </li>
+                            <li ng-class="{ active: $state.includes('search')}">
+                                <a ng-click="newSearch()" ng-controller="searchBarController">Search Data</a>
+                            </li>
+                            <li><a href="//kbase.us/services/docs/uploader/uploader.html">Upload</a></li>
+                        </ul>
 
-                    <!--
-                    <ul class="nav navbar-nav"> 
-                        <li ng-class="{ active: $state.includes('favorites')}"><a href="#/favorites/all/">Favorites <span class="badge  favorite-count"></span></a></li>
-                        <li class="fav-loading"></li>
-                    </ul>
-                    -->
-             
-                    <div id="signin-button" class="pull-right"></div>
-                    <ul class="nav navbar-nav pull-right">
-                        <li class="dropdown help-dropdown">
-                            <a id="kbase_help_menu_label" href="#kbase_help_menu" class="dropdown-toggle" data-toggle="dropdown" onclick="return false;">Help <b class="caret"></b></a>
-                            <ul id="kbase_help_menu" class="dropdown-menu" role="menu" aria-labelledby="kbase_help_menu_label">
-                                <li><a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a></li>
-                                <!--<li><a href="#/landing-pages-help">Landing Page Documentation</a></li>-->
-                                <li><a href="http://kbase.us/get-started/data-search-quick-start/">Search Quick Start Guide</a></li>
-                                <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li>
-                            </ul>                        
-                        </li>
-                    </ul>
-                </div> 
-            </div>
+                        <!--
+                        <ul class="nav navbar-nav"> 
+                            <li ng-class="{ active: $state.includes('favorites')}"><a href="#/favorites/all/">Favorites <span class="badge  favorite-count"></span></a></li>
+                            <li class="fav-loading"></li>
+                        </ul>
+                        -->
+                 
+                        <div id="signin-button" class="pull-right"></div>
+                        <ul class="nav navbar-nav pull-right">
+                            <li class="dropdown help-dropdown">
+                                <a id="kbase_help_menu_label" href="#kbase_help_menu" class="dropdown-toggle" data-toggle="dropdown" onclick="return false;">Help <b class="caret"></b></a>
+                                <ul id="kbase_help_menu" class="dropdown-menu" role="menu" aria-labelledby="kbase_help_menu_label">
+                                    <li><a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a></li>
+                                    <!--<li><a href="#/landing-pages-help">Landing Page Documentation</a></li>-->
+                                    <li><a href="http://kbase.us/get-started/data-search-quick-start/">Search Quick Start Guide</a></li>
+                                    <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li>
+                                </ul>                        
+                            </li>
+                        </ul>
+                    </div> 
+                </div>
 
-            <div id="app" class="wrapper" ui-view></div>
+                <div id="app" ui-view></div>
 
-        </div> <!-- end wrap, this pushes the footer down -->
-        <div id="footer" class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main">
-            <ul>
-                <li><a href="//kbase.us/science/what-is-kbase/" target="_blank">About KBase</a></li>
-                <li><a href="//kbase.us/user-support/documentation/" target="_blank">Documentation</a></li>
-                <li><a href="//kbase.us/about/terms-and-conditions" target="_blank">Terms and Conditions</a></li>
-                <li><a href="//kbase.us/contact-us/" target="_blank">Contact Us</a></li>
-                <li><a href="http://science.energy.gov/" target="_blank"><img class="center-block" src="./assets/images/doe_sc_logo.png" /></a></li>
-            </ul>
+            </div> 
             
-            <!-- <div class="disclaimer">This site is for demonstration purposes only.</div> -->
-
+            <div id="footer" class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main">
+                <ul>
+                    <li><a href="//kbase.us/science/what-is-kbase/" target="_blank">About KBase</a></li>
+                    <li><a href="//kbase.us/user-support/documentation/" target="_blank">Documentation</a></li>
+                    <li><a href="//kbase.us/about/terms-and-conditions" target="_blank">Terms and Conditions</a></li>
+                    <li><a href="//kbase.us/contact-us/" target="_blank">Contact Us</a></li>
+                    <li><a href="http://science.energy.gov/" target="_blank"><img class="center-block" src="./assets/images/doe_sc_logo.png" /></a></li>
+                </ul>
+                
+            </div>
         </div>
+        
 
     </body>
 

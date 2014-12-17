@@ -109,6 +109,13 @@ body {
     color: #333333;
 }
 
+html,
+body {
+    margin:0;
+    padding:0;
+    height:100%;
+}
+
 a:hover, .pointer {
     cursor: hand;
     cursor: pointer;
@@ -201,10 +208,12 @@ hr.ws-hr {
 
 
 /* bootstrap overrides */
-.wrapper { 
-    width: 95%; 
+#wrap { 
+    /*width: 95%; 
     margin-left: auto; 
-    margin-right: auto; 
+    margin-right: auto; */
+    min-height: 100%;
+    position:relative;   
 }
 /* end bootstrap overrides */
 
@@ -287,11 +296,29 @@ table {
     content: "";
 }
 
+.caret-down {
+    display: inline-block;
+    width: 0px;
+    height: 0px;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-top: none;
+    border-bottom: 4px solid #FFFFFF;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    border-top-width: 0px;
+    border-top-style: dotted;
+    content: "";
+}
+
 .scroll-pane {
     overflow-y: scroll;
 }
-.scroll-pane.overflow-x {
+.overflow-x {
     overflow-x: scroll;
+}
+.overflow-y {
+    overflow-y: scroll;
 }
 
 #select-box {
@@ -308,15 +335,19 @@ table {
     width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
-    border-spacing: 0;
-    display: table;
 }
+
+
 .ws-selector-table td{
     width: 100%;
     position: relative;
+    display: block;
+    border-style: solid;
+    border-width: 1px 0 0 0 !important;
 }
+
 .btn-ws-settings {
-    position: absolute;
+    position: absolute;  
     right: 5px;
     top: 6px;
 }
@@ -631,7 +662,7 @@ div::-webkit-scrollbar-thumb {
     margin: 0 3px 0 0;
 }
 
-/* fix me */
+/* datatables */
 .dataTables_length label {
     margin: 7px 0 0 0;
 }
@@ -639,14 +670,40 @@ div::-webkit-scrollbar-thumb {
 .dataTables_info {
     margin: 0 10px 0 0;
 }
-.dataTables_filter {
-
-}
 
 .dataTables_length, .dataTables_info {
     float: left;
 }
 
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc,
+table.dataTable thead .sorting_asc_disabled,
+table.dataTable thead .sorting_desc_disabled {
+    background: 0 0;
+}
+
+table.dataTable thead .sorting_asc:after {
+    content: "\f0de";
+    float: right;
+    font-family: fontawesome;
+}
+
+table.dataTable thead .sorting_desc:after {
+    content: "\f0dd";
+    float: right;
+    font-family: fontawesome;
+}
+
+table.dataTable thead .sorting:after {
+    content: "\f0dc";
+    float: right;
+    font-family: fontawesome;
+    color: rgba(50,50,50,.5);
+}
+
+
+/* text overrun */
 .ellipsis {
     white-space: nowrap; 
     text-overflow: ellipsis;
@@ -683,7 +740,6 @@ div::-webkit-scrollbar-thumb {
 .obj-table-header-descript .popover {
     max-width: 1200px;
 }
-
 
 .drag-placeholder {
     height: 58px;
@@ -808,23 +864,6 @@ div::-webkit-scrollbar-thumb {
 .object-view .dataTable {
     margin: 10px 0 0 0;
 }
-
-
-div.FixedHeader_Cloned th,
-div.FixedHeader_Cloned td {
-    background-color: white !important;
-    top: 75px;
-}
-/*
-.FixedHeader_Header {
-    background: #fff;
-    margin: -5px 0 0px 0;
-    top: 75px;
-    height: 44px;
-}*/
-
-
-
 
 .narrative-sidebar li {
     list-style: none;
@@ -974,26 +1013,23 @@ div.FixedHeader_Cloned td {
     margin: 10px 0 0 50px;
 }
 
-#wrap {
-  min-height: 100%;
-  height: auto;
-  /* Negative indent footer by its height */
-  margin: 0 auto -58px;
-  /* Pad bottom by footer height */
-  padding: 0 0 80px;
+#content {
+    padding: 60px 20px 50px 20px;
 }
 /* for the footer */
 #footer {
-   /* margin-top: 60px;
-    position: relative;
-    bottom: 0px; */
-    /*height: 20px;*/
-    padding: 20px 0 0 20px;
+    border-top: 2px solid #eee;
+    width:100%;
+    height:40px;
+    position:absolute;
+    bottom:0;
+    right:0;
+    background: #f9f9f9;
 }
 
 #footer ul {
-    padding: 0;
-    text-align: left;
+    margin: 4px 0 0 0;
+    text-align: right;
 }
 
 #footer ul li {
@@ -1047,3 +1083,12 @@ div.DTCR_pointer {
     background-color: #0259C4;
     z-index: 201;
 }
+
+
+.obj-header {
+    margin: 0 0 10px 0;
+}
+
+
+
+

@@ -1,8 +1,6 @@
 /*
- *  Landing Page App 
+ *  KBase Workspace Browser, data views, and Search
  *
- *  Right now, this file is responsible for landing page URLs
- *  and which controllers and templates are used.
  *
  *  The app uses angular.js, a MVC front-end framework.
  *
@@ -11,8 +9,7 @@
  *  Controllers:       js/controllers.js
  *  Directives:        js/directives.js 
  *                     js/card-directives.js 
- *                     js/iris-directives.js
- *                     js/mv-directives.js 
+ *
  *  Views (templates): views/* 
  *
 */
@@ -21,7 +18,7 @@
 You can run the functional site anywhere by:
 1) git clone kbase@git.kbase.us:ui-common.git  <whatever_path>
 2) point nginx or apache to  <whatever_path>
-3) The codes uses the production urls for workspaces and fba by default.  To use different urls, edit <whatever_path>/functional-site/config.json.  i.e., in config.json, change the value of 'setup' to 'wsdev', instead of 'prod', and then it will use these urls:
+3) The code uses the production urls for workspaces and fba by default.  To use different urls, edit <whatever_path>/functional-site/config.json.  i.e., in config.json, change the value of 'setup' to 'wsdev', instead of 'prod', and then it will use these urls:
 
     "wsdev": { "workspace_url": "http://140.221.84.209:7058",
                "fba_url" : "http://kbase.us/services/KBaseFBAModeling/",
