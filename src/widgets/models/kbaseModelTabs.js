@@ -35,8 +35,7 @@ $.KBWidget({
                 class="table table-bordered table-striped" style="width: 100%;">');
         var ggTable = $('<table cellpadding="0" cellspacing="0" border="0" \
                 class="table table-bordered table-striped" style="width: 100%;">');
-        var etcTable = $('<table cellpadding="0" cellspacing="0" border="0" \
-                class="table table-bordered table-striped" style="width: 100%;">');        
+        var etcPanel = $('<div>');        
         var mapTable = $('<div>');
 
         var tabs = container.kbTabs({tabs: [{name: 'Reactions', content: rxnTable, active: true},
@@ -45,7 +44,7 @@ $.KBWidget({
                                             {name: 'Biomass', content: biomassTable},
                                             {name: 'Gapfill', content: gfTable},
                                             {name: 'Gapgen', content: ggTable},
-                                            {name: 'ETC', content: etcTable},                                             
+                                            {name: 'ETC', content: etcPanel},                                             
                                             {name: 'Pathways', content: mapTable}
                                     ]});
 
@@ -124,7 +123,7 @@ $.KBWidget({
                 gfTable.after('<h5>There are no gapfilling solutions for this model.  Try running gapfill.</h5>')
             }
 
-            etcTable.kbaseETCDiagram({ws: ws, name: name})
+            etcPanel.kbaseETCDiagram({ws: ws, name: name})
 
         }
 

@@ -31,10 +31,10 @@ $.KBWidget({
         var w = 100,
             h = 30;
 
-        var start_x = 100,
-            start_y = 100;
+        var start_x = 25,
+            start_y = 75;
 
-        var padding = 10;
+        var font_size = '12px';
 
         ele.append('<div id="canvas">');
         var svg = d3.select("#canvas").append("svg")
@@ -53,6 +53,8 @@ $.KBWidget({
 
             console.log('etc', etc);
             draw(etc, model);
+
+
         })
 
         function draw(etc, model) {
@@ -74,13 +76,27 @@ $.KBWidget({
                 }
 
                 var name = rows[j].name 
+                console.log('name', name.replace('/', '<br/>'))
 
-                var g = svg.append('g');
-                g.append("text")
-                 .attr("x", start_x + w*j)
-                 .attr("y", start_y - h/3 )
-                 .text(name)
-                 .attr("font-size", '12px');
+                //var g = svg.append('g');
+                if (name.indexOf('/') === -1) {
+                  svg.append("text")
+                     .attr("y", start_y - h/3)
+                     .attr("x", start_x + w*j)
+                     .text(name)
+                     .attr('font-size', font_size)
+                } else {
+                  svg.append("text")
+                     .attr("y", start_y - h/1.2)
+                     .attr("x", start_x + w*j)
+                     .text(name.split('/')[0]+' &')
+                     .attr('font-size', font_size);                   
+                  svg.append("text")
+                     .attr("y", start_y - h/3)
+                     .attr("x", start_x + w*j)
+                     .text(name.split('/')[1])
+                     .attr('font-size', font_size);                     
+                }
 
                 // FIXME: rename steps -> entities on backend
                 var col_entities = rows[j].steps;
@@ -94,8 +110,9 @@ $.KBWidget({
                         unique_entities[entity.substrates.name] = [entity]
                 }
                 unique_columns.push(unique_entities)
-
             }
+
+
 
             // next, plot first x columns
             for (var i=0; i < unique_columns.length; i++) {
@@ -129,6 +146,11 @@ $.KBWidget({
             }
 
                               
+            svg.append("text")
+                 .attr("y", start_y - h/3)
+                 .attr("x", start_x + w*(3))
+                 .text('Electron Acceptors')
+                 .attr('font-size', font_size);
 
             for (var i in electron_acceptors) {
                 var col_entities = electron_acceptors[i].steps;
@@ -153,8 +175,8 @@ $.KBWidget({
                     drawEA(electron_acceptors[i], x, y, color);
                 }
             }
-            
         } // end draw 
+
 
 
         function drawBox(name, x, y, color, info) {
