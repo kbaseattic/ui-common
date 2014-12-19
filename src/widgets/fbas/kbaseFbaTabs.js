@@ -15,7 +15,7 @@ $.KBWidget({
     },
     init: function(options) {
         this._super(options);
-        var self = this;        
+        var self = this;
 
         var ws = options.ws;
         var name = options.name;
@@ -27,13 +27,13 @@ $.KBWidget({
                 class="table table-bordered table-striped" style="width: 100%;">');
         var cpdTable = $('<table cellpadding="0" cellspacing="0" border="0" \
                 class="table table-bordered table-striped" style="width: 100%;">');
-        var mapTable = $('<div>')            
+        var mapTable = $('<div>')
 
         var tabs = container.kbTabs({tabs: [{name: 'Overview', content: overviewTable, active: true},
                                            {name: 'Reactions', content: rxnTable},
                                            {name: 'Compounds', content: cpdTable},
-                                           {name: 'Pathways', content: mapTable},                                               
-                                    ]}); 
+                                           {name: 'Pathways', content: mapTable},
+                                    ]});
         //tabs.showTab('Reactions');
 
         container.loading();
@@ -43,7 +43,7 @@ $.KBWidget({
             var data = data[0].data;
             self.loadTable(data);
         }).fail(function(e){
-            container.rmLoading();            
+            container.rmLoading();
             container.append('<div class="alert alert-danger">'+
                             e.error.message+'</div>');
         });
@@ -51,11 +51,11 @@ $.KBWidget({
 
         self.loadTable = function(data) {
             mapTable.kbasePathways({fba_ws: ws,
-                                    fba_name: name, 
+                                    fba_name: name,
                                     image: options.image ? true : false});
 
             var keys = [{key: 'id'},
-                        {key: 'maximizeObjective', type: 'bool'},        
+                        {key: 'maximizeObjective', type: 'bool'},
                         {key: 'drainfluxUseVariables', type: 'bool'},
                         {key: 'noErrorThermodynamicConstraints', type: 'bool'},
                         {key: 'objectiveConstraintFraction'},
@@ -78,7 +78,7 @@ $.KBWidget({
                         {key: 'decomposeReversibleFlux', type: 'bool'}];
 
             var labels = ['Name',
-                          'Maximize Objective',                      
+                          'Maximize Objective',
                           'Drain Flux Use Variables',
                           'No Error Thermodynamic Constraints',
                           'Objective Constraint Fraction',
@@ -117,7 +117,7 @@ $.KBWidget({
             var keys = ["modelreaction_ref", "value", "lowerBound", "upperBound", "min", "max", "eq"]; //variableType
             var cols = getColumnsByKey(keys, labels);
             cols[0].sWidth = '18%'
-            var rxnTableSettings = $.extend({}, tableSettings, {fnDrawCallback: events});               
+            var rxnTableSettings = $.extend({}, tableSettings, {fnDrawCallback: events});
             rxnTableSettings.aoColumns = cols;
             rxnTableSettings.aaData = dataDict;
             var table = rxnTable.dataTable(rxnTableSettings);
@@ -125,14 +125,14 @@ $.KBWidget({
             // cpd flux table
             var dataDict = formatObjs(data.FBACompoundVariables, 'cpd');
             var labels = ["id", "Flux", "lower", "upper", "min", "max"];
-            var keys = ["modelcompound_ref", "value", "lowerBound", "upperBound", "min", "max"]        
+            var keys = ["modelcompound_ref", "value", "lowerBound", "upperBound", "min", "max"]
             var cols = getColumnsByKey(keys, labels);
             var cpdTableSettings = $.extend({}, tableSettings, {fnDrawCallback: events});
             cpdTableSettings.aoColumns = cols;
             cpdTableSettings.aaData = dataDict;
             var table = cpdTable.dataTable(cpdTableSettings);
         }
-            
+
         function formatObjs(objs, type) {
             var fluxes = []
             if (type == 'rxn') {
@@ -155,7 +155,7 @@ $.KBWidget({
                     obj.modelcompound_ref = '<a class="cpd-click" data-cpd="'+cpd+'">'
                                 +cpd+'</a> ('+compart+')';
                     fluxes.push(obj);
-                }                
+                }
             }
 
             return fluxes;
@@ -186,7 +186,7 @@ $.KBWidget({
                 c.kbaseRxn({id: name});
                 tabs.addTab({name: name, content: c, removable: true});
                 tabs.showTab(name);
-            });            
+            });
             $('.cpd-click').unbind('click');
             $('.cpd-click').click(function() {
                 var name = $(this).data('cpd');
@@ -194,7 +194,7 @@ $.KBWidget({
                 c.kbaseCpd({id: name});
                 tabs.addTab({name: name, content: c,  removable: true});
                 tabs.showTab(name);
-            });                        
+            });
         }
 
         //this._rewireIds(this.$elem, this);

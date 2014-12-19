@@ -1,11 +1,11 @@
 (function( $, undefined ) {
 
 $.KBWidget({
-    name: "kbasePathways",     
+    name: "kbasePathways",
     version: "1.0.0",
     options: {
     },
-    
+
     init: function(options) {
         var map_ws = 'nconrad:paths';
         var container = this.$elem;
@@ -16,13 +16,13 @@ $.KBWidget({
         var fba_name = options.fba_name;
 
         var models = options.modelData;
-        var fbas = options.fbaData;        
+        var fbas = options.fbaData;
 
         // add tabs
         var selectionTable = $('<table cellpadding="0" cellspacing="0" border="0" \
             class="table table-bordered table-striped">');
         var tabs = container.kbTabs({tabs: [
-                                        {name: 'Selection', content: selectionTable, active: true} 
+                                        {name: 'Selection', content: selectionTable, active: true}
                                     ]});
 
 
@@ -41,7 +41,7 @@ $.KBWidget({
                     "aoColumns": [
                         { sTitle: 'Name', mData: function(d) {
                             return '<a class="pathway-link" data-map_id="'+d[1]+'">'+d[10].name+'</a>';
-                        }}, 
+                        }},
                         { sTitle: 'Map ID', mData: 1},
                         { sTitle: 'Rxn Count', sWidth: '10%', mData: function(d){
                             if ('reaction_ids' in d[10]){
@@ -56,11 +56,11 @@ $.KBWidget({
                             } else {
                                 return 'N/A';
                             }
-                        }} , 
+                        }} ,
                         { sTitle: "Source","sWidth": "10%", mData: function(d) {
                             return "KEGG";
                         }},
-                    ],                         
+                    ],
                     "oLanguage": {
                         "sEmptyTable": "No objects in workspace",
                         "sSearch": "Search:"
@@ -68,7 +68,7 @@ $.KBWidget({
                 }
 
 
-                var table = selectionTable.dataTable(tableSettings);  
+                var table = selectionTable.dataTable(tableSettings);
 
             }).fail(function(e){
                 container.prepend('<div class="alert alert-danger">'+
@@ -97,12 +97,12 @@ $.KBWidget({
 
             // tooltip for hover on pathway name
             container.find('.pathway-link')
-                     .tooltip({title: 'Open path tab', 
+                     .tooltip({title: 'Open path tab',
                                placement: 'right', delay: {show: 1000}});
         } // end events
 
         function load_map(map, container) {
-            if (models) 
+            if (models)
                 container.kbasePathway({models: models,
                                         fbas: fbas,
                                         map_ws: map_ws,
@@ -110,7 +110,7 @@ $.KBWidget({
                                         image: (options.image ? true : false),
                                         editable: (options.editable ? true : false),
                                     })
-            else 
+            else
                 container.kbasePathway({model_ws: model_ws,
                                         model_name: model_name,
                                         fba_ws: fba_ws,

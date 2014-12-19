@@ -1,7 +1,7 @@
 (function( $, undefined ) {
 
 $.KBWidget({
-    name: "kbaseETCDiagram",    
+    name: "kbaseETCDiagram",
     version: "1.0.0",
     options: {
     },
@@ -53,30 +53,27 @@ $.KBWidget({
 
             console.log('etc', etc);
             draw(etc, model);
-
-
         })
 
         function draw(etc, model) {
 
-                //.append("g")
-                    //.call(d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", zoom))
-                //.append("g");
+            //.append("g")
+                //.call(d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", zoom))
+            //.append("g");
 
             var model_rxns = rxnDict(model),
                 rows = etc.pathways;
 
             // first get unique substrates (by name), and filter out electron electron_acceptors
             var electron_acceptors = [];
-            var unique_columns = [];            
+            var unique_columns = [];
             for (var j=0; j<rows.length; j++) {
                 if (rows[j].type == "electron_acceptor") {
                     electron_acceptors.push(rows[j]);
                     continue;
                 }
 
-                var name = rows[j].name 
-                console.log('name', name.replace('/', '<br/>'))
+                var name = rows[j].name
 
                 //var g = svg.append('g');
                 if (name.indexOf('/') === -1) {
@@ -89,13 +86,13 @@ $.KBWidget({
                   svg.append("text")
                      .attr("y", start_y - h/1.2)
                      .attr("x", start_x + w*j)
-                     .text(name.split('/')[0]+' &')
-                     .attr('font-size', font_size);                   
+                     .text(name.split('/')[0]+' & ')
+                     .attr('font-size', font_size);
                   svg.append("text")
                      .attr("y", start_y - h/3)
                      .attr("x", start_x + w*j)
                      .text(name.split('/')[1])
-                     .attr('font-size', font_size);                     
+                     .attr('font-size', font_size);
                 }
 
                 // FIXME: rename steps -> entities on backend
@@ -104,9 +101,9 @@ $.KBWidget({
                 for (var i in col_entities) {
                     var entity = col_entities[i];
 
-                    if (entity.substrates.name in unique_entities ) 
+                    if (entity.substrates.name in unique_entities )
                         unique_entities[entity.substrates.name].push(entity);
-                    else 
+                    else
                         unique_entities[entity.substrates.name] = [entity]
                 }
                 unique_columns.push(unique_entities)
@@ -131,7 +128,7 @@ $.KBWidget({
                         for (var k=0; k<obj.reactions.length; k++) {
                             var rxn_id = obj.reactions[k];
 
-                            if (rxn_id in model_rxns) 
+                            if (rxn_id in model_rxns)
                                 found_rxns.push(model_rxns[rxn_id]);
                         }
                     }
@@ -145,7 +142,7 @@ $.KBWidget({
                 }
             }
 
-                              
+
             svg.append("text")
                  .attr("y", start_y - h/3)
                  .attr("x", start_x + w*(3))
@@ -155,27 +152,35 @@ $.KBWidget({
             for (var i in electron_acceptors) {
                 var col_entities = electron_acceptors[i].steps;
 
-                for (var j in col_entities) { 
+                for (var j in col_entities) {
                     var entity = col_entities[j];
+
 
 
                     var found_rxns = [];  //may need to know which rxn was found
                     for (var k in entity.reactions) {
-                        var rxn_id = entity.reactions[i];
+                        var rxn_id = entity.reactions[k];
 
-                        if (rxn_id in model_rxns) {
-
-                            found_rxns.push(model_rxns[rxn_id]);
-                        }
-                    }                    
+                        if (rxn_id in model_rxns) found_rxns.push(model_rxns[rxn_id]);
+                    }
 
                     var x = start_x + w*(3);
                     var y = start_y + h*i;
-                    var color = (found_rxns.length > 0 ? gene_color : 'white')                    
-                    drawEA(electron_acceptors[i], x, y, color);
+                    var color = (found_rxns.length > 0 ? gene_color : 'white')
+
+                    console.log(entity)
+                    var reactions = entity.reactions;
+                    var substrates = entity.substrates;
+                    var products = entity.products;
+
+                    var content = reactions[0]+' - '+
+                              substrates.name+ ' - '+
+                              products.name+'<br>'
+
+                    drawBox(electron_acceptors[i].name, x, y, color, [entity]);
                 }
             }
-        } // end draw 
+        } // end draw
 
 
 
@@ -195,7 +200,7 @@ $.KBWidget({
             g.append("text")
              .attr("x", x+ 4)
              .attr("y", y + h/2)
-             .text(name) 
+             .text(name)
              .attr("font-size", '10px');
 
              var content = $('<div>');
@@ -239,7 +244,7 @@ $.KBWidget({
             g.append("text")
              .attr("x", x+ 4)
              .attr("y", y + h/2)
-             .text(entity.name) 
+             .text(entity.name)
              .attr("font-size", '10px');
 
             //var content = '<b>'+entity.substrates.name+' Substrates</b><br>'+

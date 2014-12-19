@@ -1,7 +1,7 @@
 (function( $, undefined ) {
 
 $.KBWidget({
-    name: "kbaseModelTabs",    
+    name: "kbaseModelTabs",
     version: "1.0.0",
     options: {
     },
@@ -35,7 +35,7 @@ $.KBWidget({
                 class="table table-bordered table-striped" style="width: 100%;">');
         var ggTable = $('<table cellpadding="0" cellspacing="0" border="0" \
                 class="table table-bordered table-striped" style="width: 100%;">');
-        var etcPanel = $('<div>');        
+        var etcPanel = $('<div>');
         var mapTable = $('<div>');
 
         var tabs = container.kbTabs({tabs: [{name: 'Reactions', content: rxnTable, active: true},
@@ -44,7 +44,7 @@ $.KBWidget({
                                             {name: 'Biomass', content: biomassTable},
                                             {name: 'Gapfill', content: gfTable},
                                             {name: 'Gapgen', content: ggTable},
-                                            {name: 'ETC', content: etcPanel},                                             
+                                            {name: 'ETC', content: etcPanel},
                                             {name: 'Pathways', content: mapTable}
                                     ]});
 
@@ -57,21 +57,21 @@ $.KBWidget({
             var data = data[0].data;
             self.loadTable(data);
         }).fail(function(e){
-            container.rmLoading();            
+            container.rmLoading();
             container.append('<div class="alert alert-danger">'+
                             e.error.message+'</div>');
         });
 
 
         self.loadTable = function(data) {
-            mapTable.kbasePathways({model_ws: ws, 
-                                    model_name: name, 
+            mapTable.kbasePathways({model_ws: ws,
+                                    model_name: name,
                                     editable: options.editable ? true : false,
                                     image: options.image ? true : false });
 
             var tableSettings = {
                 "iDisplayLength": 10,
-                "aLengthMenu": [5, 10, 25,50,100],            
+                "aLengthMenu": [5, 10, 25,50,100],
                 "aaData": [],
                 "oLanguage": {
                     "sSearch": "Search all:"
@@ -92,7 +92,7 @@ $.KBWidget({
             var keys = ["reaction", "name", "eq"]
             var labels = ["reaction", "name", "eq"]// "equation", features","name"];
             var cols = getColumns(keys, labels);
-            var rxnTableSettings = $.extend({}, tableSettings, {fnDrawCallback: rxnEvents});   
+            var rxnTableSettings = $.extend({}, tableSettings, {fnDrawCallback: rxnEvents});
             rxnTableSettings.aoColumns = cols;
             rxnTableSettings.aoColumns[0].sWidth = '15%';
             var t = rxnTable.dataTable(rxnTableSettings);
@@ -103,7 +103,7 @@ $.KBWidget({
             var keys = ["id", "name", "formula"];//["compartment", "compound", "name"];
             var labels = ["id", "name", "formula"];//["compartment", "compound", "name"];
             var cols = getColumns(keys, labels);
-            var cpdTableSettings = $.extend({}, tableSettings, {fnDrawCallback: cpdEvents});           
+            var cpdTableSettings = $.extend({}, tableSettings, {fnDrawCallback: cpdEvents});
             cpdTableSettings.aoColumns = cols;
             var t = cpdTable.dataTable(cpdTableSettings);
             t.fnAddData(dataDict);
@@ -187,7 +187,7 @@ $.KBWidget({
         function gapFillTableWS(gapfillings) {
             var tableSettings = {
                 "iDisplayLength": 10,
-                "aLengthMenu": [5, 10, 25,50,100],            
+                "aLengthMenu": [5, 10, 25,50,100],
                 "aaData": [],
                 "oLanguage": {
                     "sSearch": "Search all:",
@@ -240,7 +240,7 @@ $.KBWidget({
                     } else {
                         gapTable.fnOpen( tr, '', "info_row" );
                         $(this).closest('tr').next('tr').children('.info_row').append('<p class="muted loader-gap-sol"> \
-                            <img src="assets/img/ajax-loader.gif"> loading possible solutions...</p>')                
+                            <img src="assets/img/ajax-loader.gif"> loading possible solutions...</p>')
                         showGapfillSolutionsWS(tr, id, ws, gap_name);
                     }
 
@@ -317,15 +317,15 @@ $.KBWidget({
                     }
 
                     $(tr).next().children('td').append(solList.html());
-                    $('.loader-gap-sol').remove();   
+                    $('.loader-gap-sol').remove();
 
                 })
 
-            }            
+            }
 
         }
 
-        
+
 
         //this._rewireIds(this.$elem, this);
         return this;
