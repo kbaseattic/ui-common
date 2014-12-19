@@ -50,7 +50,9 @@ $.KBWidget({
 
 
         self.loadTable = function(data) {
-            mapTable.kbasePathways({fba_ws: ws, fba_name: name});
+            mapTable.kbasePathways({fba_ws: ws,
+                                    fba_name: name, 
+                                    image: options.image ? true : false});
 
             var keys = [{key: 'id'},
                         {key: 'maximizeObjective', type: 'bool'},        

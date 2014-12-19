@@ -67,7 +67,8 @@ $.KBWidget({
         self.loadTable = function(data) {
             mapTable.kbasePathways({model_ws: ws, 
                                     model_name: name, 
-                                    editable: (options.editable ? true : false)});
+                                    editable: options.editable ? true : false,
+                                    image: options.image ? true : false });
 
             var tableSettings = {
                 "iDisplayLength": 10,

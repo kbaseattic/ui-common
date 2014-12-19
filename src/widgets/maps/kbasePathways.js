@@ -102,7 +102,7 @@ $.KBWidget({
         } // end events
 
         function load_map(map, container) {
-            if (models) {
+            if (models) 
                 container.kbasePathway({models: models,
                                         fbas: fbas,
                                         map_ws: map_ws,
@@ -110,17 +110,16 @@ $.KBWidget({
                                         image: (options.image ? true : false),
                                         editable: (options.editable ? true : false),
                                     })
-            } else {
-            container.kbasePathway({model_ws: model_ws,
-                                    model_name: model_name,
-                                    fba_ws: fba_ws,
-                                    fba_name: fba_name,                                    
-                                    map_ws: map_ws,
-                                    map_name: map,
-                                    image: (options.image ? true : false),
-                                    editable: (options.editable ? true : false),
-                                })
-            }
+            else 
+                container.kbasePathway({model_ws: model_ws,
+                                        model_name: model_name,
+                                        fba_ws: fba_ws,
+                                        fba_name: fba_name,
+                                        map_ws: map_ws,
+                                        map_name: map,
+                                        image: (options.image ? true : false),
+                                        editable: (options.editable ? true : false),
+                                    })
         }
 
         return this;
