@@ -10,7 +10,6 @@ $.KBWidget({
         var self = this;
         this._super(options);
 
-
         self.model_ws = options.model_ws;
         self.model_name = options.model_name;
         self.fba_ws = options.fba_ws;
@@ -22,7 +21,6 @@ $.KBWidget({
 
         self.models = options.models;
         self.fbas = options.fbas;
-
 
         console.log('model_ws:', self.model_ws,
                     'model_name:', self.model_name,
@@ -37,7 +35,7 @@ $.KBWidget({
 
         var stroke_color = '#666';
         var stroke_color2 = '#000';
-        var stroke_width = '1.5px';
+        var stroke_width = '1px';
         var highlight = 'steelblue';
 
         var flux_threshold = 0.001;
@@ -50,12 +48,12 @@ $.KBWidget({
         // if data was sent to widget, don't fetch.  I know, it's crazy
         if (!self.models) {
             var p1 = kb.ws.get_objects([{workspace: self.map_ws, name: self.map_name}])
-            if (self.model_ws && self.model_name) {
+            if (self.model_ws && self.model_name)
                 var p2 = kb.get_model(self.model_ws, self.model_name);
-            }
-            if (self.fba_ws && self.fba_name) {
+
+            if (self.fba_ws && self.fba_name)
                 var p3 = kb.get_fba(self.fba_ws, self.fba_name);
-            }
+
             $.when(p1, p2, p3).done(function(map_data, models, fbas) {
                 self.map_data = map_data;
                 self.models = (models ? [models[0].data] : undefined);
@@ -216,9 +214,10 @@ $.KBWidget({
                 var outer_rect = group.append('rect')
                                   .attr('class', 'rxn')
                                   .attr('x', x-1)
-                                  .attr('y', y-2)
-                                  .attr('width', w)
-                                  .attr('height', h)
+                                  .attr('y', y-1)
+                                  .attr('width', w+1)
+                                  .attr('height', h+1)
+                                  .attr('stroke-width', stroke_width)
 
                 found_rxns = getModelRxns(rxn.rxns);
 
@@ -229,10 +228,10 @@ $.KBWidget({
                     for (var i in found_rxns) {
                         var found_rxn = found_rxns[i];
                             var rect = group.append('rect')
-                                        .attr('x', x+(w*i))
-                                        .attr('y', y-2)
-                                        .attr('width', w)
-                                        .attr('height', h)
+                                        .attr('x', x+((w+1)*i)-1)
+                                        .attr('y', y-1)
+                                        .attr('width', w+2)
+                                        .attr('height', h+1)
 
                         if (found_rxn.length > 0) {
                             rect.attr('fill', '#bbe8f9');
@@ -240,11 +239,15 @@ $.KBWidget({
                             outer_rect.remove()
                         } else {
                             rect.attr('fill', '#fff')
+                            rect.attr('stroke', stroke_color2);
                         }
+
+                        tooltip(rect.node(), rxn);
                     }
                 }
 
                 fba_rxns = getFbaRxns(rxn.rxns);
+
 
 
                 // color flux depending on rxns found for each modle
@@ -254,64 +257,41 @@ $.KBWidget({
                     for (var i in fba_rxns) {
                         var flux;
                         var found_rxns = fba_rxns[i];
-                        var rect = group.append('rect').attr('x', x+(w*i))
-                                        .attr('y', y-2)
-                                        .attr('width', w)
-                                        .attr('height', h)
+                        var rect = group.append('rect')
+                                        .attr('x',  x+((w+1)*i)-1)
+                                        .attr('y', y-1)
+                                        .attr('width', w+2)
+                                        .attr('height', h+1);
+
 
                         if (found_rxns.length) {
                             //find largest magnitude flux
                             flux = 0
                             for (var j in found_rxns) {
-                                if (Math.abs(found_rxns[j].value) > Math.abs(flux) ) {
-                                    flux = found_rxns[j].value
-                                }
+                                if (Math.abs(found_rxns[j].value) > Math.abs(flux) )
+                                    flux = found_rxns[j].value;
                             }
 
                         }
 
-                        if (flux) {
-                            var color = get_heat_color(flux)
-                        }
+
+                        if (flux)
+                            var color = get_heat_color(flux);
 
 
                         //$('.col-md-9').append('flux: '+ flux + ' color: '+color + '  '+JSON.stringify(found_rxns)+'<br>')
                         //$('.col-md-9').append('rxn '+ JSON.stringify(rxn.rxns)+' color: '+ color+'<br>')
                         rect.attr('fill', color);
                         if (color != '#fff') {
-                            rect.attr('stroke', stroke_color2)
-                            outer_rect.remove()
+                            rect.attr('stroke', stroke_color2);
+                            outer_rect.remove();
                         }
+
+                        tooltip(rect.node(), rxn, flux);
                     }
                 }
 
-                // get substrates and products
-                var subs = []
-                for (var i in rxn.substrate_refs) {
-                    subs.push(rxn.substrate_refs[i].compound_ref);
-                }
-                var prods = []
-                for (var i in rxn.product_refs) {
-                    prods.push(rxn.product_refs[i].compound_ref);
-                }
 
-                // add reaction label
-                var text = group.append('text').text(rxn.name)
-                                  .attr('x', x+2)
-                                  .attr('y', y+h/2 + 2)
-                                  .attr('class', 'rxn-label')
-
-
-                //content for tooltip //fixme: need to do tooltips for each model
-                var content = 'ID: ' + rxn.id+'<br>'+
-                              'Rxns: ' + rxn.rxns.join(', ')+'<br>'+
-                              'Substrates: ' + subs.join(', ')+'<br>'+
-                              'Products: ' + prods.join(', ')+'<br><br>'+
-                              'Flux: '+ (flux ? flux : 'None');
-
-
-                $(group.node()).popover({html: true, content: content, animation: false,
-                                        container: 'body', trigger: 'hover'});
 
                 // hide and show text on hoverover
                 $(group.node()).hover(function() {
@@ -330,6 +310,36 @@ $.KBWidget({
             //rects.data(data);
         }
 
+
+        function tooltip(container, rxn, flux) {
+            // get substrates and products
+            var subs = []
+            for (var i in rxn.substrate_refs) {
+                subs.push(rxn.substrate_refs[i].compound_ref);
+            }
+            var prods = []
+            for (var i in rxn.product_refs) {
+                prods.push(rxn.product_refs[i].compound_ref);
+            }
+
+            // add reaction label
+            //var text = group.append('text').text(rxn.name)
+            //                  .attr('x', x+2)
+            //                  .attr('y', y+h/2 + 2)
+            //                  .attr('class', 'rxn-label');
+
+
+            //content for tooltip
+            var content = 'ID: ' + rxn.id+'<br>'+
+                          'Rxns: ' + rxn.rxns.join(', ')+'<br>'+
+                          'Substrates: ' + subs.join(', ')+'<br>'+
+                          'Products: ' + prods.join(', ')+'<br><br>'+
+                          'Flux: '+ (flux ? flux : 'None');
+
+
+            $(container).popover({html: true, content: content, animation: false,
+                                    container: 'body', trigger: 'hover'});
+        }
 
         function drawCompounds() {
             for (var i in cpds) {
@@ -664,6 +674,8 @@ $.KBWidget({
         }
 
         function getFbaRxns(rxn_ids) {
+            console.log('rxn_ids', rxn_ids);
+
             // get a list of fba arrays (or undefined)
             // for each model supplied
             var found_rxns = [];
@@ -673,7 +685,8 @@ $.KBWidget({
             for (var j in self.fbas) {
                 var fba = self.fbas[j];
                 if (!fba) continue;
-                fba_objs = fba.FBAReactionVariables;
+                fba_objs = fba.data.FBAReactionVariables;
+                console.log('fba_objs', fba_objs)
 
                 // see if we can find the rxn in that fbas's list of reactions
                 var found_rxn = [];
