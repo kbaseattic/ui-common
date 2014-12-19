@@ -61,12 +61,12 @@ $.KBWidget({
                     //.call(d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", zoom))
                 //.append("g");
 
-            var model_rxns = rxnDict(model);
-            var rows = etc.pathways;
+            var model_rxns = rxnDict(model),
+                rows = etc.pathways;
 
-            console.log('etc_pathways', rows)          
-
+            // first get unique substrates (by name), and filter out electron electron_acceptors
             var electron_acceptors = [];
+            var unique_columns = [];            
             for (var j=0; j<rows.length; j++) {
                 if (rows[j].type == "electron_acceptor") {
                     electron_acceptors.push(rows[j]);
@@ -84,31 +84,54 @@ $.KBWidget({
 
                 // FIXME: rename steps -> entities on backend
                 var col_entities = rows[j].steps;
-                var unique_entities
+                var unique_entities = {};
                 for (var i in col_entities) {
                     var entity = col_entities[i];
 
-                    var found_rxns = [];  //may need to know which rxn was found
-                    for (var k in entity.reactions) {
-                        var rxn_id = entity.reactions[i];
+                    if (entity.substrates.name in unique_entities ) 
+                        unique_entities[entity.substrates.name].push(entity);
+                    else 
+                        unique_entities[entity.substrates.name] = [entity]
+                }
+                unique_columns.push(unique_entities)
 
-                        if (rxn_id in model_rxns) {
+            }
 
-                            found_rxns.push(model_rxns[rxn_id]);
+            // next, plot first x columns
+            for (var i=0; i < unique_columns.length; i++) {
+                var entities = unique_columns[i];
+
+                var z = 0;
+                for (var entity in entities) {
+                    var name = entity
+
+                    var info = entities[name];
+                    var found_rxns = [];
+                    for (var j=0; j<info.length; j++) {
+                        var obj = info[j]
+
+                        var found_rxns = [];  //may need to know which rxn was found
+                        for (var k=0; k<obj.reactions.length; k++) {
+                            var rxn_id = obj.reactions[k];
+
+                            if (rxn_id in model_rxns) 
+                                found_rxns.push(model_rxns[rxn_id]);
                         }
                     }
 
-                    var x = start_x + w*j;
-                    var y = start_y + h*i;
+                    var x = start_x + w*i;
+                    var y = start_y + h*z;
                     var color = (found_rxns.length > 0 ? gene_color : 'white')
-                    drawBox(entity, x, y, color);
+
+                    drawBox(name, x, y, color, info);
+                    z++;
                 }
             }
 
-            console.log('electron_acceptors', electron_acceptors, (rows.length+1));
+                              
+
             for (var i in electron_acceptors) {
                 var col_entities = electron_acceptors[i].steps;
-                console.log('cols', col_entities)
 
                 for (var j in col_entities) { 
                     var entity = col_entities[j];
@@ -127,15 +150,57 @@ $.KBWidget({
                     var x = start_x + w*(3);
                     var y = start_y + h*i;
                     var color = (found_rxns.length > 0 ? gene_color : 'white')                    
-                    drawBox(entity, x, y, color);
+                    drawEA(electron_acceptors[i], x, y, color);
                 }
             }
             
         } // end draw 
 
 
-        function drawBox(entity, x, y, color) {
-            var rxns = entity.reactions;
+        function drawBox(name, x, y, color, info) {
+            var g = svg.append('g');
+            var rect = g.append('rect')
+                        .attr('class', 'rxn')
+                        .data( [{ x: x, y: y }])
+                        .attr('x', x)
+                        .attr('y', y)
+                        .attr('width', w)
+                        .attr('height', h)
+                        .style('stroke', '#666')
+                        .style('fill', (color ? color : 'white') );
+
+
+            g.append("text")
+             .attr("x", x+ 4)
+             .attr("y", y + h/2)
+             .text(name) 
+             .attr("font-size", '10px');
+
+             var content = $('<div>');
+             for (var i=0; i<info.length; i++) {
+                var reactions = info[i].reactions;
+                var substrates = info[i].substrates;
+
+                var products = info[i].products;
+
+                content.append('('+i+') '+reactions[0]+' - '+
+                                          substrates.name+ ' - '+
+                                          products.name+'<br>')
+             }
+
+            //var content = JSON.stringify(info);
+
+
+            $(g.node()).popover({content: content,
+                                 trigger: 'hover',
+                                 html: true,
+                                 placement: 'bottom',
+                                 container: 'body'});
+        }
+
+
+        function drawEA(entity, x, y, color) {
+            //var rxns = entity.reactions;
 
             var g = svg.append('g');
             var rect = g.append('rect')
@@ -152,23 +217,23 @@ $.KBWidget({
             g.append("text")
              .attr("x", x+ 4)
              .attr("y", y + h/2)
-             .text(entity.substrates.name) 
+             .text(entity.name) 
              .attr("font-size", '10px');
 
-            var content = '<b>'+entity.substrates.name+' Substrates</b><br>'+
-                           entity.substrates.compound_refs.join(', ')+'<br><br>'+
-                        '<b>'+entity.products.name+' Products</b><br>'+
-                            entity.products.compound_refs.join(', ');
+            //var content = '<b>'+entity.substrates.name+' Substrates</b><br>'+
+            //               entity.substrates.compound_refs.join(', ')+'<br><br>'+
+            //            '<b>'+entity.products.name+' Products</b><br>'+
+            //                entity.products.compound_refs.join(', ');
 
 
-            $(g.node()).popover({content: content,
-                                 title: '<b>'+rxns.join(', ')+'</b>',
+            $(g.node()).popover({content: '',
+                                 title: entity.name,
+                                 //title: '<b>'+rxns.join(', ')+'</b>',
                                  trigger: 'hover',
                                  html: true,
                                  placement: 'bottom',
                                  container: 'body'});
         }
-
 
         return this;
     }  //end init
