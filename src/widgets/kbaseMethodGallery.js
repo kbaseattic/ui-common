@@ -92,12 +92,12 @@ kb_define('kbaseMethodGallery',
 
                                 .append(
                                     $.jqElem('div')
-                                        .addClass('col-sm-1')
+                                        .addClass('col-sm-2')
                                         .append('Browse')
                                 )
                                 .append(
                                     $.jqElem('div')
-                                        .addClass('col-sm-7')
+                                        .addClass('col-sm-6')
                                         .append(
                                             $.jqElem('span')
                                                 //.addClass('badge')
@@ -157,7 +157,7 @@ kb_define('kbaseMethodGallery',
                                     .css('height', '100px')
                                     .append(
                                         $.jqElem('img')
-                                            .attr('src', '/root/img/labs_icon.png')
+                                            .attr('src', '/static/kbase/images/kbase_logo.png')
                                             .attr('width', '50')
                                             .attr('height', '50')
                                             .css('margin', '2px')
