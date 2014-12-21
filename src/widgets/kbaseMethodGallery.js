@@ -172,7 +172,7 @@ kb_define('kbaseMethodGallery',
                             )
                             .append(
                                 $.jqElem('div')
-                                    .append($.jqElem('h4').append(topApp.name))
+                                    .append($.jqElem('h4').append(meth.name))
                                     .append(topApp.subtitle)
                                     .append('<br>')
                                     .append(
