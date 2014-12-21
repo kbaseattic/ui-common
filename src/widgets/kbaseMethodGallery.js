@@ -56,7 +56,7 @@ kb_define('kbaseMethodGallery',
                         .css('background-color', 'white')
                         .append(
                             $.jqElem('img')
-                                .attr('src', '/root/img/labs_icon.png')
+                                .attr('src', '/static/kbase/images/kbase_logo.png')
                                 .attr('width', '128')
                                 .attr('height', '128')
                                 .addClass('pull-right')
