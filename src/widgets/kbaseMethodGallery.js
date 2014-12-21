@@ -72,6 +72,9 @@ kb_define('kbaseMethodGallery',
                                 .on('click', function(e) {
                                     e.preventDefault();
                                     e.stopPropagation();
+                                    if ($gal.options.sidePanel) {
+                                        $gal.options.sidePanel.toggleOverlay();
+                                    }
                                     $(this).trigger('methodClicked.Narrative', topApp);
                                 })
                         )
@@ -176,10 +179,10 @@ kb_define('kbaseMethodGallery',
                                             .on('click', function(e) {
                                                 e.preventDefault();
                                                 e.stopPropagation();
-                                                $(this).trigger('methodClicked.Narrative', topApp);
                                                 if ($gal.options.sidePanel) {
                                                     $gal.options.sidePanel.toggleOverlay();
                                                 }
+                                                $(this).trigger('methodClicked.Narrative', meth);
                                             })
                                     )
                             )
