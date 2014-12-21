@@ -30,6 +30,8 @@ kb_define('kbaseMethodGallery',
 
         appendUI : function($elem) {
 
+            var $gal = this;
+
             $elem.addClass('container-fluid');
             $elem.css('background-color', 'lightgray');
 
@@ -175,6 +177,9 @@ kb_define('kbaseMethodGallery',
                                                 e.preventDefault();
                                                 e.stopPropagation();
                                                 $(this).trigger('methodClicked.Narrative', topApp);
+                                                if ($gal.options.sidePanel) {
+                                                    $gal.options.sidePanel.toggleOverlay();
+                                                }
                                             })
                                     )
                             )
