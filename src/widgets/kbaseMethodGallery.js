@@ -109,7 +109,7 @@ kb_define('kbaseMethodGallery',
                                             $.jqElem('span')
                                                 //.addClass('badge')
                                                 //.css('line-height', 1.52857143)
-                                                .append('MICROBES')
+                                                .append('PLANTS')
                                                 .css('background-color', 'lightgray')
                                                 .css('border-radius', '5px')
                                                 .css('padding', '2px')
