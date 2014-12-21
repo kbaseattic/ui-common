@@ -64,11 +64,14 @@ div.tile > ul > li {
 
 
                 kb_require(['kbpaths'], function() {
-                    kb_require(['jquery', 'bootstrap', 'kbaseMethodGallery'
+                    kb_require(['jquery', 'bootstrap', 'kbaseMethodGallery', 'kbaseBox',
                         ], function($) {
                         $(function() {
 
                         $('#gallery').kbaseMethodGallery();
+
+            var nms = new NarrativeMethodStore("https://kbase.us/services/narrative_method_store/rpc");
+
 
 
 
@@ -83,6 +86,7 @@ div.tile > ul > li {
 
     <div id = 'gallery'></div>
 
+<div id = 'box' style = 'background-color : lightgray;' class = 'container-fluid'></div>
 
 
     </body>

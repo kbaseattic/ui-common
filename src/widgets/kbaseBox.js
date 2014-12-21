@@ -49,6 +49,7 @@ kb_define('kbaseBox', ['jquery', 'kbwidget', 'kbaseButtonControls'], function( $
             controls : [],
             bannerColor : 'lightgray',
             boxColor : 'lightgray',
+            displayTitle : true,
         },
 
         init: function(options) {
@@ -175,6 +176,10 @@ kb_define('kbaseBox', ['jquery', 'kbwidget', 'kbaseButtonControls'], function( $
                         controls : this.options.controls
                     }
                 )
+            }
+
+            if (! this.options.displayTitle) {
+                this.data('banner').css("display", 'none');
             }
 
             //this.setControls(this.options.controls);

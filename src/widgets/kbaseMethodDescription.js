@@ -33,7 +33,7 @@ kb_define('kbaseMethodDescription',
             this.nms.get_method_full_info({ids:[m.id]}, function(data) {
 
             $details.nms.get_method_spec({ids:[m.id]}, function (spec) {
-
+console.log("DETAILED SPEC IS ", spec);
             var meth = data[0];
 
             var $res =
