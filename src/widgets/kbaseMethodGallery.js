@@ -76,7 +76,8 @@ kb_define('kbaseMethodGallery',
                                     if ($gal.options.sidePanel) {
                                         $gal.options.sidePanel.toggleOverlay();
                                     }
-                                    $(this).trigger('methodClicked.Narrative', topApp);
+
+                                    $gal.trigger('appClicked.Narrative', topApp);
                                 })
                         )
                     );
@@ -183,7 +184,7 @@ kb_define('kbaseMethodGallery',
                                                 if ($gal.options.sidePanel) {
                                                     $gal.options.sidePanel.toggleOverlay();
                                                 }
-                                                $(this).trigger('methodClicked.Narrative', meth);
+                                                $gal.trigger('appClicked.Narrative', meth);
                                             })
                                     )
                             )
