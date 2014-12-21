@@ -34,6 +34,7 @@ kb_define('kbaseMethodGallery',
 
             $elem.addClass('container-fluid');
             $elem.css('background-color', 'lightgray');
+            $elem.css('height', '560px');
 
 
             var topMeth = 4;
