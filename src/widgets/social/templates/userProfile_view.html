@@ -1,0 +1,62 @@
+
+<div class="profile-info">
+<div class="row">
+  <div class="col-md-9">
+    <h2>{% if profile.title %}{{profile.title | titleLabel }} {% endif %}{{user.realname}}{% if profile.suffix %}, {{profile.suffix}}{% endif %}</h2>
+  </div>
+  <div class="col-md-3">
+
+    {% if env.isOwner %}
+    <div class="btn-group pull-right">
+      <button type="button" class="btn btn-primary" data-button="edit-info">Edit Profile</button>
+    </div>
+    
+    {% endif %}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    {% if profile.location %}<i>{{profile.location}}</i>{% endif %}
+    {% if profile.email %}
+    <p><a href="mailto:{{profile.email}}">{{profile.email}}</a></p>
+    {% endif %}
+  </div>
+</div>
+      
+<div class="row">
+  <div class="col-md-6">
+      <div class="" style="font-weight: bold;">User Class</div>
+        <ul><li>{{ profile.userClass | userClassLabel }}</li></ul>
+      <div class="" style="font-weight: bold;">Roles</div>
+      {% if profile.roles %}
+        <ul>
+        {% for role in profile.roles %}
+          <li>{{role | roleLabel }}</li>
+        {% endfor %}
+        </ul>
+      {% else %}
+      <p>No roles assigned</p>
+      {% endif %}
+    </div>
+    <div class="col-md-6">      
+      {% if profile.affiliations %}
+        <div class="" style="font-weight: bold;">Affiliations</div>
+        {% for aff in profile.affiliations %}
+          <p><strong>{{aff.title}}</strong>({{aff.start}}-{% if aff.end %}{{aff.end}}{% else %}present{% endif %}) {{aff.institution}}</p>
+        {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    {% if profile.personal_statement %}
+      {{profile.personal_statement}}
+    {% endif %}
+  </div>
+</div>
+
+</div>

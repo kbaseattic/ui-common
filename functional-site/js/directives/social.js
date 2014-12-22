@@ -57,12 +57,14 @@ angular.module('social-directives')
           }
           
           var userProfile = data[0];
+          userProfile.env = {};
           
           if (userProfile !== null) {
+            userProfile.env.isOwner = userOwnsProfile;
             if (userOwnsProfile) {
                $(ele).find('.panel-title').html('You - ' + loggedInName + ' (' + userId + ')');
             } else {
-              $(ele).find('.panel-title').html(userProfile.data.basic_personal_info.real_name + ' (' + userId + ')');
+              $(ele).find('.panel-title').html(userProfile.user.realname + ' (' + userId + ')');
             }
             $(p.body()).KBaseUserOverview({
               userInfo: userProfile,
@@ -73,6 +75,7 @@ angular.module('social-directives')
           } else {
             console.log('User not found getting user profile.');
             if (userOwnsProfile) {
+              userProfile.env.isOwner = true;
                $(ele).find('.panel-title').html('You - ' + loggedInName + ' (' + userId + ')');
                $(p.body()).append('<p>You do not have a profile yet. Create one.</p>');
                $(p.body()).append('<button type="button" class="btn btn-primary" data-button="create-profile">Create Your Public KBase User Page</button>');
@@ -84,13 +87,12 @@ angular.module('social-directives')
                      thumbnail: null                    
                    },
                    profile: {
-                     basic_personal_info: {
                        title: "",
                        suffix: "",
                        location: "",
                        email_addresses: []
-                     }
-                   }
+                   },
+                   isOwner: true
                   };
                   userProfileClient.set_user_profile({profile: minimalProfile}, function (result) {
                     console.log('Profile successfully saved.');

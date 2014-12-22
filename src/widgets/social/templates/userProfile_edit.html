@@ -1,0 +1,157 @@
+
+<form class="form-horizontal" role="form">
+	<div class="row">
+	  <div class="col-md-12">
+	    {% if env.isOwner %}
+	    	<div class="btn-toolbar" style="margin-bottom: 10px;">
+	    		<div class="btn-group">
+	    			<div class="btn-label">
+	    				Editing Your Profile
+	    			</div>
+	    		</div>
+	    		<div class="btn-group pull-right">
+	   				<button type="button" class="btn btn-danger" data-button="cancel">Cancel</button>
+	        		<button type="button" class="btn btn-success" data-button="save">Save</button>
+	   			</div>
+	   		</div>
+	    {% endif %}    
+	  </div>
+	</div>
+
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Basic Personal Information</h3>
+	  </div>
+	  <div class="panel-body">
+	    <div class="row">
+	      <div class="col-md-2">
+	      	<div class="form-group">
+		        <label for="field-title">Title</label>
+		        <select class="form-control" id="field-title" data-field="title">
+		          {% for title in env.titles %}
+		          	<option value="{{title.id}}" {% if title.id == profile.title %} selected {% endif %}>{{title.label}}</option>
+		          {% endfor %}
+		        </select>
+		        <script>
+		        // $('[data-field="title"] option[value="{{profile.title}}"]').prop('selected', true);
+		        </script>
+		    </div>
+	      </div>
+	      <div class="col-md-7">
+	        <div class="form-group">
+	           <label for="field_real_name">Your Name *</label>
+	           <div class="input-group-lg"><input id="pRealName" type="text" class="form-control" value="{{user.realname}}"></div>
+	           <div data-field-message="field_real_name" class="field-message col-md-12"></div>
+	        </div>
+	      </div>
+	      <div class="col-md-3">
+	      	<div class="form-group">
+		        <label for="field_suffix">Suffix</label>
+		        <div class="input-group-lg"><input id="pSuffix" type="text" class="form-control" value="{{profile.suffix}}"></div>
+		    </div>
+	      </div>
+	    </div>
+
+	    <div class="form-group">
+			<label for="location-field" class="control-label col-md-3">Location</label>
+			<div class="col-md-9">
+				<input id="location-field" type="text" class="form-control" value="{{profile.location}}">
+			</div>	          
+			<div data-field-message="location" class="field-message col-md-9 col-md-push-3"></div>
+	    </div>
+
+	    <div class="form-group">
+        	<label for="email-field" class="control-label col-md-3">Primary Email</label>
+        	<div class="col-md-9">
+        		<input id="email-field" data-field="email" type="text" class="form-control" value="{{profile.email}}">
+        	</div>
+	    </div>
+	  </div>
+	</div>
+	<div class="panel panel-default">
+	  <div class="panel-heading"><h3 class="panel-title">Your Roles</h3></div>
+	    <div class="panel-body">
+	      <div class="row">
+	        <div class="col-md-12">
+	          {% for role in env.roles %}
+	          <div class="checkbox">
+	            <label><input data-field="roles" type="checkbox" value="{{role.id}}" >{{role.label}}</label>
+	          </div>
+	          {% endfor %}
+	          <script>
+	           {% for role in profile.roles %}
+	          $('[data-field="roles"][value="{{role}}"]').prop('checked', true);
+	          {% endfor %}
+	          </script>
+	        </div>
+	      </div>
+	    </div>
+	</div>
+	      
+	<div class="panel panel-default">
+	  <div class="panel-heading"><h3 class="panel-title">User Class</h3></div>
+	    <div class="panel-body">
+	      <div class="row">
+	        <div class="col-md-12">
+	          {% for class in env.userClasses %}
+	            <div class="radio">
+	              <label><input data-field="userClass" name="userClass" type="radio" value="{{class.id}}">{{class.label}}</label>
+	            </div>
+	          {% endfor %}
+	          <script>
+	          $('[data-field="userClass"][value="{{profile.userClass}}"]').prop('checked', true);
+	          </script>
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Affiliations</h3>
+	  </div>
+	  <div id="affiliationPanel" class="panel-body">
+	    <div class="row">
+	      <div class="col-md-1"></div>
+	      <div class="col-md-11">
+	        <button id="addAffiliation" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add Affiliation</button>
+	      </div>
+	    </div>
+	    
+	    <div class="row">
+	      <div class="col-md-1"></div>
+	      <div class="col-md-11" data-placeholder="affiliations">
+	        
+	        {% for aff in profile.affiliations %}
+	        {% include "userProfile_edit_affiliation.html" %}
+	        {% endfor %}
+	    
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	     
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Personal or Research Statement</h3>
+	  </div>
+	  <div class="panel-body">
+	    <div class="row">
+	      <div class="col-md-12">
+	        <textarea id="personalStatement" class="form-control" rows="8" style="resize:vertical;">{{profile.personal_statement}}</textarea>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="row">
+	  <div class="col-md-9"></div>
+	  <div class="col-md-3">
+	    {% if env.isOwner %}
+	        <button type="button" class="btn btn-success" data-button="save">Save</button>
+	   		<button type="button" class="btn btn-danger" data-button="cancel">Cancel</button>
+	    {% endif %}
+	  </div>
+	</div>
+</form>
