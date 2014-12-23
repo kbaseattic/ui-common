@@ -22,7 +22,6 @@
     init: function(options) {
       this._super(options);
       var self = this;
-      console.log(options.userInfo);
 
       this.userProfileClient = options.userProfileClient;
       
@@ -33,7 +32,7 @@
       if (options.userInfo) {
         this.userInfoData = options.userInfo;
         this.userProfile = options.userInfo;
-        if (this.userInfoData['user']['username'] === this.loggedInUserId) {
+        if (this.userProfile['user']['username'] === this.loggedInUserId) {
           this.isProfileOwner = true;
         }
       }
@@ -78,8 +77,58 @@
         this.titlesMap[this.titles[i].id] = this.titles[i].label;
       }
       this.userProfile.env.titles = this.titles;
+
+      this.gravatar_defaults = [
+      {id: 'mm', label: 'Mystery Man - simple, cartoon-style silhouetted outline'},
+      {id: 'identicon', label: 'Identicon - a geometric pattern based on an email hash'},
+      {id: 'monsterid', label: 'MonsterID - generated "monster" with different colors, faces, etc'},
+      {id: 'wavatar', label: 'Wavatar - generated faces with differing features and backgrounds'},
+      {id: 'retro', label: 'Retro - 8-bit arcade-style pixelated faces'},
+      {id: 'blank', label: 'Blank - A Blank Space'}
+      ];
+       this.gravatarDefaultsMap = {};
+      for (var i in this.gravatar_defaults) {
+        this.gravatarDefaultsMap[this.gravatar_defaults[i].id] = this.gravatar_defaults[i].label;
+      }
+      this.userProfile.env.gravatar_defaults = this.gravatar_defaults;
+
+       this.avatarColors = [
+
+{id: 'maroon', label: 'maroon', color: '#800000', textColor: '#FFF'},
+{id: 'red', label: 'red', color: '#ff0000', textColor: '#FFF'},
+{id: 'orange', label: 'orange', color: '#ffA500', textColor: '#FFF'}, 
+{id: 'yellow', label: 'yellow', color: '#ffff00', textColor: '#FFF'}, 
+{id: 'olive', label: 'olive', color: '#808000', textColor: '#FFF'},
+{id: 'purple', label: 'purple', color: '#800080', textColor: '#FFF'},
+{id: 'fuchsia', label: 'fuchsia', color: '#ff00ff', textColor: '#FFF'},
+{id: 'white', label: 'white', color: '#ffffff', textColor: '#FFF'},
+{id: 'lime', label: 'lime', color: '#00ff00', textColor: '#FFF'},
+{id: 'green', label: 'green', color: '#008000', textColor: '#FFF'},
+{id: 'navy', label: 'navy', color: '#000080', textColor: '#FFF'},
+{id: 'blue', label: 'blue', color: '#0000ff', textColor: '#FFF'},
+{id: 'aqua', label: 'aqua', color: '#00ffff', textColor: '#FFF'},
+{id: 'teal', label: 'teal', color: '#008080', textColor: '#FFF'},
+{id: 'black', label: 'black', color: '#000000', textColor: '#FFF'},
+{id: 'silver', label: 'silver', color: '#c0c0c0', textColor: '#FFF'},
+{id: 'gray', label: 'gray', color: '#808080', textColor: '#FFF'}
+      ];
+       this.avatarColorsMap = {};
+      for (var i in this.avatarColors) {
+        this.avatarColorsMap[this.avatarColors[i].id] = this.avatarColors[i].label;
+      }
+      this.userProfile.env.avatarColors = this.avatarColors;
       
-      var env = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/social/templates'));
+      /*
+      Note that we do not use autoescaping. This means we need to inspect all places where
+      template variables are inserted, and ensure that any values which are derived from
+      user input and not run through a transformation filter are escaped with | e.
+      We would rather not use auto-escaping due to performance concerns.
+      We cannot use auto-escaping due to the need to filter some fields before output.
+      E.g. to insert line breaks, perform simple markup.
+      */
+      var env = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/social/templates'), {
+        'autoescape': false
+      });
       
       var widget = this;
       env.addFilter('roleLabel', function(role) {
@@ -103,10 +152,23 @@
           return title;
         }
       });
+      // create a gravatar-url out of an email address and a 
+      // default option.
+      env.addFilter('gravatar', function(email, size, rating, gdefault) {
+        // TODO: http/https.
+        var md5Hash = md5(email);
+        var url = 'http://www.gravatar.com/avatar/' + md5Hash + '?s='+size+'&amp;r='+rating+'&d='+gdefault
+        return url;
+      });
+      env.addFilter('kbmarkup', function(s) {
+        s = s.replace(/\n/g, '<br>');
+        return s; 
+      });
       
       this.viewTemplate = env.getTemplate('userProfile_view.html');
       this.editTemplate = env.getTemplate('userProfile_edit.html');
       this.layoutTemplate = env.getTemplate('userProfile_layout.html');
+      this.pictureTemplate = env.getTemplate('userProfile_picture.html');
       
       this.setupLayout();
       this.alertPanel = this.$elem.find('[data-placeholder="alert"]');
@@ -160,8 +222,9 @@
     this.infoPanel.append(out);
     
     $('[data-button="save"]').on('click', function (e) {
-      self.saveData();
-      self.showInfoView();
+      if (self.saveData()) {
+        self.showInfoView();
+      }
     });
     $('[data-button="cancel"]').on('click', function (e) {
       self.showInfoView();      
@@ -193,6 +256,7 @@
     },
 
     saveData: function() {
+      var that = this;
       this.clearMessages();
       this.clearFieldMessages();
       
@@ -250,6 +314,24 @@
       if (email) {
         this.userInfoData.profile['email'] = email;
       }
+
+       // GRAVATAR
+      var gravatar_default = this.$elem.find('[data-field="gravatar_default"]').val();
+      if (gravatar_default) {
+        this.userInfoData.profile['gravatar_default'] = gravatar_default;
+      }
+
+      var avatar_color = this.$elem.find('[data-field="avatar_color"]').val();
+      if (avatar_color) {
+        this.userInfoData.profile['avatar_color'] = avatar_color;
+      }
+
+      var avatar_initials = this.$elem.find('[data-field="avatar_initials"]').val();
+      if (avatar_initials) {
+        this.userInfoData.profile['avatar_initials'] = avatar_initials;
+      } else {
+        delete(this.userInfoData.profile['avatar_initials']);
+      }
       
       /* Coding: Roles, Funding */
       
@@ -267,7 +349,7 @@
       userClassFields.each(function() {
         if ($(this).is(':checked')) {
           // should only be one...
-          this.userInfoData.profile['userClass'] = $(this).val();
+          that.userInfoData.profile['userClass'] = $(this).val();
         }
       });
         
@@ -307,16 +389,16 @@
       
       this.userProfileClient.set_user_profile({profile: this.userProfile}, 
         function (response) {
-          this.addSuccessMessage('Success!', 'Your user profile has been updated.');
+          that.addSuccessMessage('Success!', 'Your user profile has been updated.');
         },
         function (err) {
-          this.addErrorMessage('Error!', 'Your user profile could not be saved: ' + err.error.message);
-          console.log(err);
+          that.addErrorMessage('Error!', 'Your user profile could not be saved: ' + err.error.message);
+          console.log('Error setting user profile: ' + err);
         });
       
       return true;
     },
-    
+
     clearFieldMessages: function() {
       $('[data-field-message]').empty();
     },
@@ -337,12 +419,8 @@
     },
 
     setupPicture: function() {
-      var self = this;
-      var pic = '<center><img src="assets/images/nouserpic.png" width="95%" style="max-width: 300px;"></center>';
-      self.$elem.find('[data-placeholder="picture"]').append(pic);
-      if (self.isProfileOwner) {
-        self.$elem.find('[data-placeholder="picture"]').append('<center><button type="button" class="btn btn-primary">Upload New Picture</button></center>');
-      }
+      var pic = this.pictureTemplate.render(this.userProfile);
+      this.$elem.find('[data-placeholder="picture"]').append(pic);
     },
 
     setupLayout: function() {

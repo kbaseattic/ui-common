@@ -2,7 +2,7 @@
 <div class="profile-info">
 <div class="row">
   <div class="col-md-9">
-    <h2>{% if profile.title %}{{profile.title | titleLabel }} {% endif %}{{user.realname}}{% if profile.suffix %}, {{profile.suffix}}{% endif %}</h2>
+    <h2>{% if profile.title %}{{profile.title | titleLabel }} {% endif %}{{user.realname | e}}{% if profile.suffix %}, {{profile.suffix | e}}{% endif %}</h2>
   </div>
   <div class="col-md-3">
 
@@ -17,9 +17,9 @@
 
 <div class="row">
   <div class="col-md-12">
-    {% if profile.location %}<i>{{profile.location}}</i>{% endif %}
+    {% if profile.location %}<i>{{profile.location | e}}</i>{% endif %}
     {% if profile.email %}
-    <p><a href="mailto:{{profile.email}}">{{profile.email}}</a></p>
+    <p><a href="mailto:{{profile.email | e}}">{{profile.email | e}}</a></p>
     {% endif %}
   </div>
 </div>
@@ -27,7 +27,7 @@
 <div class="row">
   <div class="col-md-6">
       <div class="" style="font-weight: bold;">User Class</div>
-        <ul><li>{{ profile.userClass | userClassLabel }}</li></ul>
+        <ul><li>{{ profile.userClass | userClassLabel}}</li></ul>
       <div class="" style="font-weight: bold;">Roles</div>
       {% if profile.roles %}
         <ul>
@@ -43,7 +43,7 @@
       {% if profile.affiliations %}
         <div class="" style="font-weight: bold;">Affiliations</div>
         {% for aff in profile.affiliations %}
-          <p><strong>{{aff.title}}</strong>({{aff.start}}-{% if aff.end %}{{aff.end}}{% else %}present{% endif %}) {{aff.institution}}</p>
+          <p><strong>{{aff.title | e}}</strong>({{aff.start | e}}-{% if aff.end %}{{aff.end | e}}{% else %}present{% endif %}) {{aff.institution | e}}</p>
         {% endfor %}
         </div>
       {% endif %}
@@ -54,7 +54,7 @@
 <div class="row">
   <div class="col-md-12">
     {% if profile.personal_statement %}
-      {{profile.personal_statement}}
+      {{profile.personal_statement | e | kbmarkup}}
     {% endif %}
   </div>
 </div>

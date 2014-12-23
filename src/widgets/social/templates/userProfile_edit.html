@@ -1,5 +1,10 @@
 
-<form class="form-horizontal" role="form">
+<style type="text/css">
+.profile-editor .name-panel .form-group {
+	margin: 0 10px;
+}
+</style>
+<form class="form-horizontal profile-editor" role="form">
 	<div class="row">
 	  <div class="col-md-12">
 	    {% if env.isOwner %}
@@ -23,7 +28,7 @@
 	    <h3 class="panel-title">Basic Personal Information</h3>
 	  </div>
 	  <div class="panel-body">
-	    <div class="row">
+	    <div class="form-group name-panel">
 	      <div class="col-md-2">
 	      	<div class="form-group">
 		        <label for="field-title">Title</label>
@@ -32,9 +37,7 @@
 		          	<option value="{{title.id}}" {% if title.id == profile.title %} selected {% endif %}>{{title.label}}</option>
 		          {% endfor %}
 		        </select>
-		        <script>
-		        // $('[data-field="title"] option[value="{{profile.title}}"]').prop('selected', true);
-		        </script>
+		        
 		    </div>
 	      </div>
 	      <div class="col-md-7">
@@ -68,6 +71,77 @@
 	    </div>
 	  </div>
 	</div>
+
+	<div class="panel panel-default">
+	  <div class="panel-heading"><h3 class="panel-title">Your Gravatar</h3></div>
+	    <div class="panel-body">
+	      <div class="row">
+	        <div class="col-md-3">
+	        	<img src="{{profile.email | gravatar(200,"pg",profile.gravatar_default)}}" width="95%" style="max-width: 300px;">
+	        </div>
+	        <div class="col-md-9">
+	        	<p>Your gravatar is based on an image you have associated with your email address at <a href="http://en.gravatar.com">Gravatar</a>, a free public profile service from Automattic, the same people who brought us Wordpress. If you have a gravatar associated with the email address in this profile, we will display it within KBase.</p>
+	        	<p>If you don't have a personal gravator, or prefer not to use one, you may select one of the default auto-generated gravatars provided below.</p>
+
+	         	<div class="form-group">
+		           <label for="gravatar_default" class="control-label col-md-3">Default Gravatar</label>
+		           <div class="col-md-9">
+		           
+			           	<select id="gravatar_default" data-field="gravatar_default" class="form-control">
+		           		    <option value="">- none -</option>
+			           	{% for default in env.gravatar_defaults %}
+			           	<option value="{{default.id}}" {% if default.id==profile.gravatar_default %} selected{% endif %}>{{default.label}}</option>
+			           	{% endfor %}
+			           	</select>
+			           	<script>
+			           	$('[data-field="gravatar_default"]').on('change', function (e) {
+			           		var v = $(this).val();
+			           		if (v.length > 0) {
+			           			$('[data-field="avatar_color"] option').prop('selected', false);
+			           			$('[data-field="avatar_initials"]').val('');
+			           		}
+			           	});
+			           	</script>
+
+		           </div>
+		           <!--<div data-field-help="field_real_name" class="field-help col-md-12">
+		           	In case you do not have a Gravatar image attached to your email address, you can request one of several styles of 
+		           fallback, or default, images to be displayed instead.
+		           </div>-->
+	        	</div>
+
+	        	<p>Or you may disable the gravatar service completely and use a solid color with your initials</p>
+
+	        	<div class="form-group">
+	        		<label for="avatar_color" class="control-label col-md-3">A Solid Color</label>
+		           <div class="col-md-9">
+		           		<select id="avatar_color" data-field="avatar_color" class="form-control">
+		           		    <option value="">- none -</option>
+				           	{% for color in env.avatarColors %}
+				           	<option value="{{color.id}}" {% if color.id==profile.avatar_color %} selected{% endif %}  style="background-color: {{color.color}}; color: {{color.textColor}}">{{color.label}}</option>
+				           	{% endfor %}
+			           	</select>
+			           	<script>
+			           	$('[data-field="avatar_color"]').on('change', function (e) {
+			           		var v = $(this).val();
+			           		if (v.length > 0) {
+			           			$('[data-field="gravatar_default"] option').prop('selected', false);
+			           		}
+			           	});
+			           	</script>
+		           </div>
+	        	</div>
+	        	<div class="form-group">
+	        		<label for="avatar-initials" class="control-label col-md-3">Your Initials</label>
+		           <div class="col-md-9">
+		           		<input id="avatar-initials" data-field="avatar_initials" type="text" class="form-control" value="{{profile.avatar_initials}}">
+		           </div>
+	        	</div>
+	        </div>
+	      </div>
+	    </div>
+	</div>
+
 	<div class="panel panel-default">
 	  <div class="panel-heading"><h3 class="panel-title">Your Roles</h3></div>
 	    <div class="panel-body">
@@ -75,7 +149,7 @@
 	        <div class="col-md-12">
 	          {% for role in env.roles %}
 	          <div class="checkbox">
-	            <label><input data-field="roles" type="checkbox" value="{{role.id}}" >{{role.label}}</label>
+	            <label><input data-field="roles" type="checkbox" value="{{role.id}}" {% if title.id == profile.title %} selected {% endif %}>{{role.label}}</label>
 	          </div>
 	          {% endfor %}
 	          <script>
