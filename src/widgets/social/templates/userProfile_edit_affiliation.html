@@ -1,37 +1,41 @@
-    <div class="panel panel-default">
-      <div class="affiliation-input-group panel-body">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="input-group">
-              <span class="input-group-addon">Title</span>
-              <input id="affTitle" type="text" class="form-control" value="{{aff.title}}">
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="input-group">
-              <span class="input-group-addon">Institution</span>
-              <input id="affInstitution" type="text" class="form-control" value="{{aff.institution}}">
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-3">
-            <div class="input-group">
-              <span class="input-group-addon">Starting in Year</span>
-              <input id="affStart" type="text" class="form-control" value="{{aff.start_year}}">
-            </div>
-          </div>
-          <div class="col-md-1"></div>
-          <div class="col-md-3"><div class="input-group">
-            <span class="input-group-addon">Ending in Year</span>
-            <input id="affEnd" type="text" class="form-control" value="{{aff.end_year}}">
-          </div>
-          <div class="col-md-3"></div>
-          <div class="col-md-2">
-            <button type="button" class="btn btn-danger">Remove</button>
-          </div>
-        </div>
+<div class="panel panel-default affiliation" data-field-group="affiliation">
+    <div class="panel-heading">
+      <div class="button-group pull-right">
+        <button type="button" class="btn btn-xs btn-danger" data-button="remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
       </div>
+      <div class="panel-title">
+        {{affiliation.institution}} - {{affiliation.start_year}}-{% if affiliation.end_year %}{{affiliation.end_year | e}}{% else %}present{% endif %}
+      </div>
+      
     </div>
+    <div class="panel-body" >
+
+        <div class="form-group">
+            <label for="affiliation-title-{{affid}}" class="control-label col-md-3">Title</label>
+            <div class="col-md-9">
+                <input id="affiliation-title-{{affid}}" type="text" class="form-control" data-field="title" value="{{affiliation.title | e}}">
+            </div>
+            <div data-field-message="title" class="field-message col-md-9 col-md-push-3"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="affiliation-institution-{{affid}}" class="control-label col-md-3">Institution</label>
+            <div class="col-md-9">
+                <input id="affiliation-institution-{{affid}}" type="text" class="form-control" data-field="institution" value="{{affiliation.institution | e}}">
+            </div>
+            <div data-field-message="institution" class="field-message col-md-9 col-md-push-3"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="affiliation-start_year-{{affid}}" class="control-label col-md-3">Starting in Year</label>
+            <div class="col-md-3">
+                <input id="affiliation-start_year-{{affid}}" type="text" class="form-control" data-field="start_year" value="{{affiliation.start_year}}">
+            </div>
+            <label for="affiliation-end_year-{{affid}}" class="control-label col-md-3">Ending</label>
+            <div class="col-md-3">
+                <input id="affiliation-end_year-{{affid}}" type="text" class="form-control" data-field="end_year value="{{affiliation.end_year}}">
+            </div>
+        </div>
+
+    </div>
+</div>

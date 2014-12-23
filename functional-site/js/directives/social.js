@@ -55,6 +55,9 @@ angular.module('social-directives')
               userOwnsProfile = true;
             }
           }
+
+          console.log('fetched user profile');
+          console.log(data);
           
           var userProfile = data[0];
           userProfile.env = {};

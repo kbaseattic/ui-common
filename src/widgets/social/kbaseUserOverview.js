@@ -169,6 +169,8 @@
       this.editTemplate = env.getTemplate('userProfile_edit.html');
       this.layoutTemplate = env.getTemplate('userProfile_layout.html');
       this.pictureTemplate = env.getTemplate('userProfile_picture.html');
+      this.editAffiliationTemplate = env.getTemplate('userProfile_edit_affiliation.html');
+      this.newAffiliationTemplate = env.getTemplate('userProfile_new_affiliation.html');
       
       this.setupLayout();
       this.alertPanel = this.$elem.find('[data-placeholder="alert"]');
@@ -213,21 +215,50 @@
                                                 };
     */
 
-
+  _generatedId: 0,
+  genId: function () {
+    return 'gen_'+this._generatedId++;
+  },
   showEditView: function() {
-    var self = this;
+    var that = this;
     this.infoPanel.empty();
     
     var out = this.editTemplate.render(this.userProfile);
     this.infoPanel.append(out);
     
+    // wire up basic form crud buttons.
     $('[data-button="save"]').on('click', function (e) {
-      if (self.saveData()) {
-        self.showInfoView();
+      if (that.saveData()) {
+        that.showInfoView();
       }
     });
     $('[data-button="cancel"]').on('click', function (e) {
-      self.showInfoView();      
+      that.showInfoView();      
+    });
+
+    // wire up affiliation add/remove buttons.
+    $('[data-button="add-affiliation"]').on('click', function (e) {
+      // grab the container 
+      var affiliations = that.$elem.find('[data-field-group="affiliations"]');
+
+      // render a new affiliation
+      // console.log('AFF: ' + that.newAffiliationTemplate);
+      var id = that.genId();
+      var newAffiliation = that.newAffiliationTemplate.render({generatedId: id});
+
+      // append to the container
+       affiliations.append(newAffiliation);
+
+      // wire up the remove button.
+      // NB the container gets the generated-id stamp.
+      affiliations.find('[data-generated-id="'+id+'"] [data-button="remove"]').on('click', function (e) {
+        $(this).closest('[data-field-group="affiliation"]').remove();
+      });
+
+    });
+
+    this.$elem.find('[data-field-group="affiliation"] [data-button="remove"]').on('click', function (e) {
+      $(this).closest('[data-field-group="affiliation"]').remove();
     });
     
     // select options and check radio and checkbox buttons...
@@ -293,21 +324,25 @@
       // SUFFIX
       var pSuffix = this.$elem.find("#pSuffix").val();
       if (pSuffix.length === 0) {
-        delete this.userProfile.profile['suffix'];
+        delete this.userInfoData.profile['suffix'];
       } else {
-        this.userProfile.profile['suffix'] = pSuffix;
+        this.userInfoData.profile['suffix'] = pSuffix;
       }
 
       // TITLE
       var title = this.$elem.find('[data-field="title"]').val();
       if (title && title.length === 0) {
-        delete this.userProfile.profile['title'];
+        delete this.userInfoData.profile['title'];
       } else {
         this.userInfoData.profile['title'] = title;
       }
 
-      var pLoc = this.$elem.find("#pLocation").val();
-      this.userInfoData.profile['location'] = pLoc;
+      var location = this.$elem.find('[data-field="location"]').val();
+      if (location && location.length === 0) {
+        delete this.userInfoData.profile['location'];
+      } else {
+        this.userInfoData.profile['location'] = location;
+      }
       
       // EMAIL
       var email = this.$elem.find('[data-field="email"]').val();
@@ -317,24 +352,34 @@
 
        // GRAVATAR
       var gravatar_default = this.$elem.find('[data-field="gravatar_default"]').val();
-      if (gravatar_default) {
+      if (gravatar_default && gravatar_default.length > 0) {
         this.userInfoData.profile['gravatar_default'] = gravatar_default;
+      } else {
+        //delete(this.userInfoData.profile['gravatar_default']);
+        this.userInfoData.profile['gravatar_default'] = '';
       }
-
+//console.log('AVATAR COLOR1: ' + this.userInfoData.profile['avatar_color']);
       var avatar_color = this.$elem.find('[data-field="avatar_color"]').val();
-      if (avatar_color) {
+//      console.log('AVATAR COLOR: ' + avatar_color);
+      if (avatar_color && avatar_color.length > 0) {
         this.userInfoData.profile['avatar_color'] = avatar_color;
+      } else {
+        // delete(this.userInfoData.profile['avatar_color']);
+        this.userInfoData.profile['avatar_color'] = '';
       }
+//    #console.log('AVATAR COLOR2: ' + this.userInfoData.profile['avatar_color']);
 
       var avatar_initials = this.$elem.find('[data-field="avatar_initials"]').val();
-      if (avatar_initials) {
+      if (avatar_initials && avatar_initials.length > 0) {
         this.userInfoData.profile['avatar_initials'] = avatar_initials;
       } else {
-        delete(this.userInfoData.profile['avatar_initials']);
+        // delete(this.userInfoData.profile['avatar_initials']);
+        this.userInfoData.profile['avatar_initials'] = '';
       }
       
       /* Coding: Roles, Funding */
       
+      // ROLES
       var roles = [];
       var roleFields = this.$elem.find('[data-field="roles"]');
       roleFields.each(function() {
@@ -345,6 +390,7 @@
       this.userInfoData.profile['roles'] = roles;
      
      
+     // USER CLASS
       var userClassFields = this.$elem.find('[data-field="userClass"]');
       userClassFields.each(function() {
         if ($(this).is(':checked')) {
@@ -354,40 +400,57 @@
       });
         
 
-      var bioAff = this.$elem.find(".affiliation-input-group");
-      var affiliations = [];
-      for (var ba = 0; ba < bioAff.length; ba++) {
-        var newAff = {
-          title: $(bioAff[ba]).find("#affTitle").val(),
-          institution: $(bioAff[ba]).find("#affInstitution").val(),
-          start_year: parseInt($(bioAff[ba]).find("#affStart").val()),
-          end_year: parseInt($(bioAff[ba]).find("#affEnd").val())
+      // AFFILIATIONS
+      var affiliations = this.$elem.find('[data-field-group="affiliation"]');
+      var affiliationsToSave = [];
+      for (var i=0; i < affiliations.length; i++) {
+
+        var startYear = $(affiliations[i]).find('[data-field="start_year"]').val();
+        if (startYear === NaN) {
+          startYear = '';
+          // TODO: flag as error.
+        }
+
+        var endYear = $(affiliations[i]).find('[data-field="end_year"]').val();
+        if (endYear === NaN) {
+          endYear = '';
+          // TODO: flag as error.
+        }
+
+        var affiliation = {
+          title: $(affiliations[i]).find('[data-field="title"]').val(),
+          institution: $(affiliations[i]).find('[data-field="institution"]').val(),
+          start_year: startYear,
+          end_year: endYear
         };
-        if (newAff['title'] && newAff['institution']) {
-          affiliations.push(newAff);
+
+        // TODO better way of handling this!
+        if (affiliation['title'] && affiliation['institution']) {
+          affiliationsToSave.push(affiliation);
         }
       }
-      this.userInfoData.profile['affiliations'] = affiliations;
+      this.userInfoData.profile['affiliations'] = affiliationsToSave;
 
+
+      // PERSONAL STATEMENT / BIO
       this.userInfoData.profile['personal_statement'] = this.$elem.find("#personalStatement").val();
       
+
+      // SAVING
       if (formHasError) {
         this.addErrorMessage('Not Saved', 'Your changes cannot be saved due to one or more errors. Please review the form, make the required corrections, and try again.');
         return false;
       }
 
-      // step 2: save this object to the workspace
-      var newObjSaveData = {
-        name: "info",
-        type: "UserInfo.UserInfoSimple",
-        data: this.userInfoData,
-        provenance: [{
-          description: "created by the KBase functional site, edited by the user"
-        }]
-      };
-      
-      
-      this.userProfileClient.set_user_profile({profile: this.userProfile}, 
+      // Clean up the user info data object.
+
+      var toSave = {};
+      toSave.user = this.userInfoData.user;
+      toSave.profile = this.userInfoData.profile;
+
+      console.log(toSave);
+
+      this.userProfileClient.set_user_profile({profile: toSave}, 
         function (response) {
           that.addSuccessMessage('Success!', 'Your user profile has been updated.');
         },

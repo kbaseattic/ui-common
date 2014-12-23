@@ -1,1 +1,5 @@
-<center><img src="{{profile.email | gravatar(200,"pg",profile.gravatar_default)}}" width="95%" style="max-width: 300px;"></center>
+{%if profile.gravatar_default and profile.email %}
+<img src="{{profile.email | gravatar(200,"pg",profile.gravatar_default)}}" width="95%" style="max-width: 300px;">
+{% elif profile.avatar_color %}
+<div style="width: 95%; height: 0; padding-bottom: 100%; background-color: {{profile.avatar_color}};">{{profile.avatar_initials}}</div>
+{% endif %}

@@ -42,8 +42,8 @@
     <div class="col-md-6">      
       {% if profile.affiliations %}
         <div class="" style="font-weight: bold;">Affiliations</div>
-        {% for aff in profile.affiliations %}
-          <p><strong>{{aff.title | e}}</strong>({{aff.start | e}}-{% if aff.end %}{{aff.end | e}}{% else %}present{% endif %}) {{aff.institution | e}}</p>
+        {% for affiliation in profile.affiliations %}
+          <p><strong>{{affiliation.title | e}}</strong> ({{affiliation.start_year| e}}-{% if affiliation.end_year %}{{affiliation.end_year | e}}{% else %}present{% endif %}) @ {{affiliation.institution | e}}</p>
         {% endfor %}
         </div>
       {% endif %}
