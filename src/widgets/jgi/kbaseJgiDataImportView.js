@@ -111,6 +111,8 @@
             var $basicInfo =
                 $('<div>').addClass('col-md-6')
                     .append($('<div>').append('<h3>' + self.objData.name + '</h3>'))
+                    .append($('<div>').css({'color':'#555'})
+                            .append('Workspace: ' + self.objData.workspace))
                     .append($('<div>').css({'color':'#555'}) //todo: make this a real style somewhere
                             .append('<a href="#/spec/type/'+self.objData.type +
                                     '" target="_blank">'+typeNameNice+'</a>'))
@@ -123,7 +125,7 @@
             var $buttonDiv =
                 $('<div>').css({'margin':'10px','margin-top':'20px'})
                     .append($('<a href="">').addClass('btn btn-info')
-                            .css({'margin':'5px'}).append('Launch New Analysis'))
+                            .css({'margin':'5px'}).append('Copy to Narrative'))
                     .append($('<a href="">').addClass('btn btn-info')
                             .css({'margin':'5px'}).append('Launch Assembly App'))
                 //.append($('<a href="">').addClass('btn btn-info').css({'margin':'5px'}).append('Copy into Existing Analysis'));
@@ -159,6 +161,8 @@
             var $basicInfo =
                 $('<div>').addClass('col-md-6')
                     .append($('<div>').append('<h3>' + self.objData.name + '</h3>'))
+                    .append($('<div>').css({'color':'#555'})
+                            .append('Workspace: ' + self.objData.workspace))
                     .append($('<div>').css({'color':'#555'}) //todo: make this a real style somewhere
                             .append('<a href="#/spec/type/' + self.objData.type +
                                     '" target="_blank">'+typeNameNice+'</a>'))
@@ -170,8 +174,8 @@
 
             var $buttonDiv =
                 $('<div>').css({'margin':'10px','margin-top':'20px'})
-                .append($('<a href="#/narrativemanager/new">').addClass('btn btn-info')
-                        .css({'margin':'5px'}).append('Launch New Analysis'));
+                .append($('<a href="">').addClass('btn btn-info')
+                        .css({'margin':'5px'}).append('Copy to Narrative'));
             $basicInfo.append($buttonDiv);
             var $metaInfo = $('<div>').addClass('col-md-6').css({'margin-top':'20px'});
 
