@@ -59,7 +59,19 @@
                     [{ref:self.options.ws+"/"+self.options.obj}],1,
                     function(objInfoList) {
                         if (objInfoList[0]) {
-                            self.objData = {info:objInfoList[0]};
+                            self.objData = {
+                                    obj_id: objInfoList[0][0],
+                                    name: objInfoList[0][1],
+                                    type: objInfoList[0][2],
+                                    save_date: objInfoList[0][3],
+                                    version: objInfoList[0][4],
+                                    saved_by: objInfoList[0][5],
+                                    wsid: objInfoList[0][6],
+                                    workspace: objInfoList[0][7],
+                                    chsum: objInfoList[0][8],
+                                    size: objInfoList[0][9],
+                                    meta: objInfoList[0][10],
+                                    };
                             console.log(self.objData);
                             self.render();
                         } else {
@@ -81,13 +93,13 @@
                 self.$mainPanel.empty();
 
                 // first we detect the type
-                var typeName = self.objData.info[2].split('-')[0];
+                var typeName = self.objData.type.split('-')[0];
                 if (typeName === 'KBaseFile.SingleEndLibrary') {
                     self.renderLibraryFile('Single End Read Library');
                 } else if (typeName === 'KBaseFile.PairedEndLibrary') {
                     self.renderLibraryFile('Paired End Read Library');
                 } else {
-                    self.renderUnknownType(self.objData.info[2]);
+                    self.renderUnknownType(self.objData.type);
                 }
             }
         },
@@ -98,15 +110,15 @@
 
             var $basicInfo =
                 $('<div>').addClass('col-md-6')
-                    .append($('<div>').append('<h3>'+self.objData.info[1]+'</h3>'))
+                    .append($('<div>').append('<h3>' + self.objData.name + '</h3>'))
                     .append($('<div>').css({'color':'#555'}) //todo: make this a real style somewhere
-                            .append('<a href="#/spec/type/'+self.objData.info[2] +
+                            .append('<a href="#/spec/type/'+self.objData.type +
                                     '" target="_blank">'+typeNameNice+'</a>'))
                     .append($('<div>').css({'color':'#555'})
-                            .append('Imported on '+self.getTimeStr(self.objData.info[3])))
+                            .append('Imported on '+self.getTimeStr(self.objData.save_date)))
                     .append($('<div>').css({'color':'#555'})
-                            .append('Perm Ref: ' + self.objData.info[6] + "/"
-                                    + self.objData.info[0] + "/" + self.objData.info[4]))
+                            .append('Perm Ref: ' + self.objData.wsid + "/"
+                                    + self.objData.obj_id + "/" + self.objData.version))
 
             var $buttonDiv =
                 $('<div>').css({'margin':'10px','margin-top':'20px'})
@@ -121,12 +133,12 @@
             var $metaInfo = $('<div>').addClass('col-md-6').css({'margin-top':'20px'});
 
             var $metaTbl = $('<table>').addClass("table table-striped table-bordered").css({'width':'100%'});
-            for(var key in self.objData.info[10]) {
-                if (self.objData.info[10].hasOwnProperty(key)) {
+            for(var key in self.objData.meta) {
+                if (self.objData.meta.hasOwnProperty(key)) {
                     $metaTbl.append(
                             $('<tr>')
                             .append($('<th>').append(key))
-                            .append($('<td>').append(self.objData.info[10][key])));
+                            .append($('<td>').append(self.objData.meta[key])));
                 }
             }
             $metaInfo.append($metaTbl)
@@ -146,15 +158,15 @@
             var self = this;
             var $basicInfo =
                 $('<div>').addClass('col-md-6')
-                    .append($('<div>').append('<h3>'+self.objData.info[1]+'</h3>'))
+                    .append($('<div>').append('<h3>' + self.objData.name + '</h3>'))
                     .append($('<div>').css({'color':'#555'}) //todo: make this a real style somewhere
-                            .append('<a href="#/spec/type/' + self.objData.info[2] +
+                            .append('<a href="#/spec/type/' + self.objData.type +
                                     '" target="_blank">'+typeNameNice+'</a>'))
                     .append($('<div>').css({'color':'#555'})
-                            .append('Updated on '+self.getTimeStr(self.objData.info[3])))
+                            .append('Updated on '+self.getTimeStr(self.objData.save_date)))
                     .append($('<div>').css({'color':'#555'})
-                            .append('Perm Ref: ' + self.objData.info[6] +
-                                    "/"+self.objData.info[0]+"/"+self.objData.info[4] ))
+                            .append('Perm Ref: ' + self.objData.wsid +
+                                    "/"+self.objData.obj_id+"/"+self.objData.version ))
 
             var $buttonDiv =
                 $('<div>').css({'margin':'10px','margin-top':'20px'})
@@ -164,12 +176,12 @@
             var $metaInfo = $('<div>').addClass('col-md-6').css({'margin-top':'20px'});
 
             var $metaTbl = $('<table>').addClass("table table-striped table-bordered").css({'width':'100%'});
-            for(var key in self.objData.info[10]) {
-                if (self.objData.info[10].hasOwnProperty(key)) {
+            for(var key in self.objData.meta) {
+                if (self.objData.meta.hasOwnProperty(key)) {
                     $metaTbl.append(
                             $('<tr>')
                             .append($('<th>').append(key))
-                            .append($('<td>').append(self.objData.info[10][key])));
+                            .append($('<td>').append(self.objData.meta[key])));
                 }
             }
             $metaInfo.append($metaTbl)
