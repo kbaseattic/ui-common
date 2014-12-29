@@ -129,6 +129,17 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 this.alertPanel = this.panelBody.find('[data-placeholder="alert"]');
                 this.infoPanel = this.panelBody.find('[data-placeholder="info"]');
 
+                // Set up listeners for any kbase events we are interested in:
+                $(document).on('loggedIn.kbase', function(e, auth) {
+                    this.authToken = auth.token;
+                    this.sync(function () {this.render();});
+                }.bind(this));
+
+                $(document).on('loggedOut.kbase', function(e, auth) {
+                    this.authToken = null;
+                    this.sync(function () {this.render();});
+                }.bind(this));
+
                 return this;
             }
         },
@@ -156,7 +167,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 // Head off at the pass -- if not logged in, can't show profile.
                 if (!this.authToken) {
                     this.panelTitle = 'Unauthorized';
-                    this.infoPanel.empty().append(this.unauthorizedTemplate.render(this.context));
+                    this.setupPicture();
+                    this.infoPanel.html(this.unauthorizedTemplate.render(this.context));
                 } else if (this.userRecord && this.userRecord.user) {
 
                     // Title can be be based on logged in user infor or the profile.
@@ -182,7 +194,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     // no profile, no basic aaccount info
                     this.panelTitle.html('User Not Found');
                     this.setupPicture();
-                    this.infoPanel.empty().append(this.noUserTemplate.render(this.context));
+                    this.infoPanel.html(this.noUserTemplate.render(this.context));
                 }
                 return this;
             }
@@ -190,58 +202,51 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         sync: {
             value: function (callback) {
- 
                 // DATA
                 // This is where we get the data to feed to the widget.
                 // Each widget has its own independent data fetch.
-
                 if (!this.authToken) {
                     // We don't fetch any data if a user is not logged in.
                     this.userRecord = null;
-                    this.setupPicture();
-                    this.render();
+                    callback();
                 } else {
-
                     var userProfileServiceURL = 'http://dev19.berkeley.kbase.us/services/user_profile/rpc';
                     var userProfile;
 
-                    //if (this.authToken) {
-                        this.userProfileClient = new UserProfile(userProfileServiceURL, {
-                            token: this.authToken
-                        });
-                    //} else {
-                    //    this.userProfileClient = new UserProfile(userProfileServiceURL);
-                    //}
-
-                    var that = this;
-                    this.userProfileClient.get_user_profile([this.userId], function(data) {
-                        if (data[0]) {
-                            // profile found
-                            that.userRecord = data[0];
-                            that.context.userRecord = that.userRecord;
-                            // NB: this is just for now. We should probably incorporate
-                            // the account <-> profile syncing somewhere else/
-                            that.ensureAccountData(function() {
-                                callback.call(that);
-                            });
-                        } else {
-                            // logged in
-                            that.userRecord = {};
-                            that.context.userRecord = that.userRecord;
-                            that.ensureAccountData(function() {
-                                callback.call(that);
-                            });
-                        }
-                    }, function(err) {
-                        console.log('Error getting user profile.');
-                        console.log(err);
-                        that.panelTitle.html('Error getting profile');
-                        that.panelBody.html('<p>Error getting profile: ' + err + '</p>');
+                    this.userProfileClient = new UserProfile(userProfileServiceURL, {
+                        token: this.authToken
                     });
-                    return this;
+                   
+                    this.userProfileClient.get_user_profile([this.userId], 
+                        function(data) {
+                            if (data[0]) {
+                                // profile found
+                                this.userRecord = data[0];
+                                this.context.userRecord = this.userRecord;
+                                // NB: this is just for now. We should probably incorporate
+                                // the account <-> profile syncing somewhere else/
+                                this.ensureAccountData(function() {
+                                    callback();
+                                }.bind(this));
+                            } else {
+                                // logged in
+                                this.userRecord = {};
+                                this.context.userRecord = this.userRecord;
+                                this.ensureAccountData(function() {
+                                    callback();
+                                }.bind(this));
+                            }
+                        }.bind(this), 
+                        function(err) {
+                            console.log('Error getting user profile.');
+                            console.log(err);
+                            that.panelTitle.html('Error getting profile');
+                            that.panelBody.html('<p>Error getting profile: ' + err + '</p>');
+                        }.bind(this)
+                    );
                 }
+                return this;
             }
-
         },
 
         ensureAccountData: {
@@ -550,70 +555,54 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         showEditView: {
             value: function() {
-                var that = this;
-                this.infoPanel.empty();
-
-                var out = this.editTemplate.render(this.context);
-                this.infoPanel.append(out);
+                this.infoPanel.html(this.editTemplate.render(this.context));
 
                 // wire up basic form crud buttons.
                 $('[data-button="save"]').on('click', function(e) {
-                    if (that.updateUserRecordFromForm()) {
-                        that.saveUserRecord({
+                    if (this.updateUserRecordFromForm()) {
+                        this.saveUserRecord({
                             success: function() {
                                 this.addSuccessMessage('Success!', 'Your user profile has been updated.');
                                 this.showInfoView();
                             }
                         });
                     }
-                });
+                }.bind(this));
                 $('[data-button="cancel"]').on('click', function(e) {
-                    that.clearMessages();
-                    that.showInfoView();
-                });
+                    this.clearMessages();
+                    this.showInfoView();
+                }.bind(this));
 
                 // wire up affiliation add/remove buttons.
                 $('[data-button="add-affiliation"]').on('click', function(e) {
                     // grab the container 
-                    var affiliations = that.panelBody.find('[data-field-group="affiliations"]');
+                    var affiliations = this.infoPanel.find('[data-field-group="affiliations"]');
 
                     // render a new affiliation
-                    var id = that.genId();
-                    var newAffiliation = that.newAffiliationTemplate.render({
+                    var id = this.genId();
+                    var newAffiliation = this.newAffiliationTemplate.render({
                         generatedId: id
                     });
 
                     // append to the container
                     affiliations.append(newAffiliation);
+                }.bind(this));
 
-                    // wire up the remove button.
-                    // NB the container gets the generated-id stamp.
-                    affiliations.find('[data-generated-id="' + id + '"] [data-button="remove"]').on('click', function(e) {
-                        $(this).closest('[data-field-group="affiliation"]').remove();
-                    });
-
-                });
-
-                this.panelBody.find('[data-field-group="affiliation"] [data-button="remove"]').on('click', function(e) {
+                // Wire up remove button for any affiliation.
+                this.infoPanel.find('[data-field-group="affiliations"]').on('click', '[data-button="remove"]', function(e) {
+                    // remove the containing affiliation group.
                     $(this).closest('[data-field-group="affiliation"]').remove();
                 });
-
-                // select options and check radio and checkbox buttons...
-                // hook up the buttons
-                //    $('[data-placeholder="info"] [data-button="edit-info"]').on('click', function (e) {
-                //    self.showEditView();
-                //});
             }
         },
 
         showNoProfileView: {
             value: function() {
-                var that = this;
-                this.infoPanel.empty().append(this.noProfileTemplate.render(this.context));
+                this.infoPanel.html(this.noProfileTemplate.render(this.context));
                 if (this.isProfileOwner) {
                     $('[data-button="create-profile"]').on('click', function(e) {
-                        that.createProfile();
-                    });
+                        this.createProfile();
+                    }.bind(this));
                 }
             }
         },
@@ -661,8 +650,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 this.userProfileClient.set_user_profile({
                         profile: this.userRecord
                 },
-                function(response) {
-                    
+                function(response) {                    
                     if (cfg.success) {
                         cfg.success.call(that);
                     }
@@ -677,20 +665,11 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         showInfoView: {
             value: function() {
-                var that = this;
-                this.infoPanel.empty();
-
-                var context = this.context;
-                context.user = this.userRecord.user;
-                context.profile = this.userRecord.profile;
-                context.account = this.userRecord.account;
-                var out = this.viewTemplate.render(context);
-                this.infoPanel.append(out);
-
+                this.infoPanel.html(this.viewTemplate.render(this.context));
                 $('[data-placeholder="info"] [data-button="edit-info"]').on('click', function(e) {
-                    that.clearMessages();
-                    that.showEditView();
-                });
+                    this.clearMessages();
+                    this.showEditView();
+                }.bind(this));
             }
         },
 
@@ -919,7 +898,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         setupPicture: {
             value: function() {
                 var pic = this.pictureTemplate.render(this.context);
-                this.panelBody.find('[data-placeholder="picture"]').append(pic);
+                this.panelBody.find('[data-placeholder="picture"]').html(pic);
             }
         },
 
@@ -929,7 +908,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     autoescape: true
                 });
                 var out = this.layoutTemplate.render(this.userRecord);
-                this.panelBody.append(out);
+                this.panelBody.html(out);
             }
         }
 
