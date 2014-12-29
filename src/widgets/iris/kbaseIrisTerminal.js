@@ -643,7 +643,11 @@ kb_define('kbaseIrisTerminal',
                         +"To find out what's new, type "
                     )
                     .append(this.create_run_link('whatsnew'))
-                    .append(' (' + this.whatsnew().currentReleaseString() + ')' ),
+                    .append(' (' + this.whatsnew().currentReleaseString() + ')' )
+                    .append('<br><br>')
+                    .append($.jqElem('span').css('color', 'red')
+                        .append('IRIS is a legacy system and is no longer officially supported. Some of the commands in the IRIS tutorials may not work correctly. We recommend that you use the next-generation KBase user interface, the <a href = "https://narrative.kbase.us/">Narrative interface</a>.')
+                    ),
                     'html'
             );
 
