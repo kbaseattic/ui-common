@@ -149,10 +149,29 @@
 	</div>
 
 	<div class="panel panel-default">
+	  <div class="panel-heading"><h3 class="panel-title">User Class</h3></div>
+	    <div class="panel-body">
+	      <div class="row">
+	        <div class="col-md-12">
+	          <p>What is the primary use for this account?</p>
+	          {% for class in env.userClasses %}
+	            <div class="radio">
+	              <label><input data-field="userClass" name="userClass" type="radio" value="{{class.id}}" {% if class.id==userRecord.profile.userClass %} checked{% endif %}>{{class.label}}</label>
+	            </div>
+	          {% endfor %}
+	          
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="panel panel-default">
 	  <div class="panel-heading"><h3 class="panel-title">Your Roles</h3></div>
 	    <div class="panel-body">
 	      <div class="row">
 	        <div class="col-md-12">
+	        <p>How are you using this account?</p>
 	          {% for role in env.roles %}
 	          <div class="checkbox">
 	            <label><input data-field="roles" type="checkbox" value="{{role.id}}" {% if title.id == userRecord.profile.title %} selected {% endif %}>{{role.label}}</label>
@@ -168,22 +187,7 @@
 	    </div>
 	</div>
 	      
-	<div class="panel panel-default">
-	  <div class="panel-heading"><h3 class="panel-title">User Class</h3></div>
-	    <div class="panel-body">
-	      <div class="row">
-	        <div class="col-md-12">
-	          {% for class in env.userClasses %}
-	            <div class="radio">
-	              <label><input data-field="userClass" name="userClass" type="radio" value="{{class.id}}" {% if class.id==userRecord.profile.userClass %} checked{% endif %}>{{class.label}}</label>
-	            </div>
-	          {% endfor %}
-	          
-	        </div>
-	      </div>
-	    </div>
-	  </div>
-	</div>
+	
 
 	<div class="panel panel-default">
 	  <div class="panel-heading">

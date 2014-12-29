@@ -272,6 +272,37 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                    Used to generate the user role checkboxes, and to provide labels for the info view
                 */
                 this.userRoles = [{
+                    id: 'pi',
+                    label: 'Principal Investigator'
+                }, {
+                    id: 'gradstudent',
+                    label: 'Graduate Student'
+                }, {
+                    id: 'developer',
+                    label: 'Developer'
+                }, {
+                    id: 'tester',
+                    label: 'Tester'
+                }, {
+                    id: 'documentation',
+                    label: 'Documentation'
+                }, {
+                    id: 'general',
+                    label: 'General Interest'
+                }
+                ];
+                this.userRolesMap = {};
+                for (var i in this.userRoles) {
+                    this.userRolesMap[this.userRoles[i].id] = this.userRoles[i].label;
+                }
+                this.context.env.roles = this.userRoles;
+
+            }
+        },
+
+        createUserClasses: {
+            value: function () {
+                this.userClasses = [{
                     id: 'gsp-researcher',
                     label: 'GSP Researcher'
                 }, {
@@ -281,18 +312,23 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     id: 'ber-funded',
                     label: 'BER Funded'
                 }, {
-                    id: 'developer',
-                    label: 'Developer'
+                    id: 'kbase-internal',
+                    label: 'KBase Staff'
                 }, {
-                    id: 'tester',
-                    label: 'Tester'
+                    id: 'kbase-test',
+                    label: 'KBase Test/Beta User'
+                }, {
+                    id: 'nonprofit',
+                    label: 'Other Nonprofit'
+                }, {
+                    id: 'commercial',
+                    label: 'Commercial User'
                 }];
-                this.userRolesMap = {};
-                for (var i in this.userRoles) {
-                    this.userRolesMap[this.userRoles[i].id] = this.userRoles[i].label;
+                this.userClassesMap = {};
+                for (var i in this.userClasses) {
+                    this.userClassesMap[this.userClasses[i].id] = this.userClasses[i].label;
                 }
-                this.context.env.roles = this.userRoles;
-
+                this.context.env.userClasses = this.userClasses;
             }
         },
 
@@ -310,6 +346,9 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 }, {
                     id: 'kbase-test',
                     label: 'KBase Test/Beta User'
+                }, {
+                    id: 'commercial',
+                    label: 'Commercial User'
                 }];
                 this.userClassesMap = {};
                 for (var i in this.userClasses) {
