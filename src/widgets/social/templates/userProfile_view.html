@@ -19,8 +19,8 @@
 <div class="profile-info">
   <div class="row">
     <div class="col-md-9">
-      <h2>{% if profile.title %}{{profile.title | titleLabel }} {% endif %}{{user.realname | e}}{% if profile.suffix %}, {{profile.suffix | e}}{% endif %}</h2>
-      {% if env.isOwner and user.realname != account.realname %}<p class="text-warning">Note: The name on your account is <i>{{ account.realname }}</i>.</p>{% endif %}
+      <h2>{% if userRecord.profile.title %}{{userRecord.profile.title | titleLabel }} {% endif %}{{userRecord.user.realname | e}}{% if userRecord.profile.suffix %}, {{profile.suffix | e}}{% endif %}</h2>
+      {% if env.isOwner and userRecord.user.realname != userRecord.account.realname %}<p class="text-warning">Note: The name on your account is <i>{{ userRecord.account.realname }}</i>.</p>{% endif %}
     </div>
     <div class="col-md-3">
 
@@ -35,10 +35,10 @@
 
   <div class="row">
     <div class="col-md-12">
-      {% if profile.location %}<i>{{profile.location | e}}</i>{% endif %}
-      {% if profile.email %}
-      <p><a href="mailto:{{profile.email | e}}">{{profile.email | e}}</a></p>
-      {% if env.isOwner and profile.email != account.email %}<p class="text-warning">Note: The email on your account is <i>{{ account.email }}</i>.</p>{% endif %}
+      {% if userRecord.profile.location %}<i>{{userRecord.profile.location | e}}</i>{% endif %}
+      {% if userRecord.profile.email %}
+      <p><a href="mailto:{{profile.email | e}}">{{userRecord.profile.email | e}}</a></p>
+      {% if env.isOwner and userRecord.profile.email != userRecord.account.email %}<p class="text-warning">Note: The email on your account is <i>{{ userRecord.account.email }}</i>.</p>{% endif %}
       {% endif %}
     </div>
   </div>
@@ -46,11 +46,11 @@
   <div class="row">
     <div class="col-md-6">
         <h3>User Class</h3>
-          <ul><li>{{ profile.userClass | userClassLabel}}</li></ul>
+          <ul><li>{{ userRecord.profile.userClass | userClassLabel}}</li></ul>
         <h3>Roles</h3>
         {% if profile.roles %}
           <ul>
-          {% for role in profile.roles %}
+          {% for role in userRecord.profile.roles %}
             <li>{{role | roleLabel }}</li>
           {% endfor %}
           </ul>
@@ -59,9 +59,9 @@
         {% endif %}
       </div>
       <div class="col-md-6">      
-        {% if profile.affiliations %}
+        {% if userRecord.profile.affiliations %}
           <h3>Affiliations</h3>
-          {% for affiliation in profile.affiliations|sort(true, true, "start_year") %}
+          {% for affiliation in userRecord.profile.affiliations|sort(true, true, "start_year") %}
             <p><strong>{{affiliation.title | e}}</strong> ({{affiliation.start_year| e}}-{% if affiliation.end_year %}{{affiliation.end_year | e}}{% else %}present{% endif %}) @ {{affiliation.institution | e}}</p>
           {% endfor %}
           </div>
@@ -73,13 +73,13 @@
   <div class="row">
     <div class="col-md-12">
       <div class="well personal-statement">    
-      {% if profile.personal_statement %}
+      {% if userRecord.profile.personal_statement %}
         {{profile.personal_statement | e | kbmarkup}}
       {% else %}
         {%if env.isOwner %}
-          You don't have a personal statement. Don't you want to tell a little about yourself to the KBase community?
+          You don't have a personal statement. Don't you want to let the the KBase community know a little about you?
         {% else %}
-           - This user does not have a personal statement - 
+          <i>This user does not have a personal statement</i>
         {% endif %}
       {% endif %}
       </div>

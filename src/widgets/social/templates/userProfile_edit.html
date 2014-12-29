@@ -34,7 +34,7 @@
 		        <label for="field-title">Title</label>
 		        <select class="form-control" id="field-title" data-field="title">
 		          {% for title in env.titles %}
-		          	<option value="{{title.id}}" {% if title.id==profile.title %} selected {% endif %}>{{title.label}}</option>
+		          	<option value="{{title.id}}" {% if title.id==userRecord.profile.title %} selected {% endif %}>{{title.label}}</option>
 		          {% endfor %}
 		        </select>
 		        
@@ -43,14 +43,14 @@
 	      <div class="col-md-7">
 	        <div class="form-group">
 	           <label for="field-realname">Your Name *</label>
-	           <div class="input-group-lg"><input id="field-realname" type="text" class="form-control" data-field="realname" value="{{user.realname}}"></div>
+	           <div class="input-group-lg"><input id="field-realname" type="text" class="form-control" data-field="realname" value="{{userRecord.user.realname}}"></div>
 	           <div data-message-for-field="realname" class="field-message"></div>
 	        </div>
 	      </div>
 	      <div class="col-md-3">
 	      	<div class="form-group">
 		        <label for="field_suffix">Suffix</label>
-		        <div class="input-group-lg"><input id="field_suffix" type="text" class="form-control" data-field="suffix" value="{{profile.suffix}}"></div>
+		        <div class="input-group-lg"><input id="field_suffix" type="text" class="form-control" data-field="suffix" value="{{userRecord.profile.suffix}}"></div>
 		        <div data-message-for-field="suffix" class="field-message"></div>
 		    </div>
 	      </div>
@@ -59,7 +59,7 @@
 	    <div class="form-group">
 			<label for="location-field" class="control-label col-md-3">Location</label>
 			<div class="col-md-9">
-				<input id="location-field" type="text" class="form-control" data-field="location" value="{{profile.location}}">
+				<input id="location-field" type="text" class="form-control" data-field="location" value="{{userRecord.profile.location}}">
 			</div>	          
 			<div data-message-for-field="location" class="field-message col-md-9 col-md-push-3"></div>
 	    </div>
@@ -67,7 +67,7 @@
 	    <div class="form-group">
         	<label for="email-field" class="control-label col-md-3">Primary Email</label>
         	<div class="col-md-9">
-        		<input id="email-field" data-field="email" type="text" class="form-control" value="{{profile.email}}">
+        		<input id="email-field" data-field="email" type="text" class="form-control" value="{{userRecord.profile.email}}">
         	</div>
         	<div data-message-for-field="email" class="field-message col-md-9 col-md-push-3"></div>
 	    </div>
@@ -79,10 +79,10 @@
 	    <div class="panel-body">
 	      <div class="row">
 	        <div class="col-md-3">
-	        	{%if profile.gravatar_default and profile.email %}
-	        	<img src="{{profile.email | gravatar(200,"pg",profile.gravatar_default)}}" width="95%" style="max-width: 300px;">
-	        	{% elif profile.avatar_color %}
-	        	<div style="width: 95%; height: 0; padding-bottom: 100%; background-color: {{profile.avatar_color}};">{{profile.avatar_initials}}</div>
+	        	{%if userRecord.profile.gravatar_default and userRecord.profile.email %}
+	        	<img src="{{userRecord.profile.email | gravatar(200,"pg",userRecord.profile.gravatar_default)}}" width="95%" style="max-width: 300px;">
+	        	{% elif userRecord.profile.avatar_color %}
+	        	<div style="width: 95%; height: 0; padding-bottom: 100%; background-color: {{userRecord.profile.avatar_color}};">{{userRecord.profile.avatar_initials}}</div>
 	        	{% endif %}
 	        </div>
 	        <div class="col-md-9">
@@ -96,7 +96,7 @@
 			           	<select id="gravatar_default" data-field="gravatar_default" class="form-control">
 		           		    <option value="">- none -</option>
 			           	{% for default in env.gravatar_defaults %}
-			           	<option value="{{default.id}}" {% if default.id==profile.gravatar_default %} selected{% endif %}>{{default.label}}</option>
+			           	<option value="{{default.id}}" {% if default.id==userRecord.profile.gravatar_default %} selected{% endif %}>{{default.label}}</option>
 			           	{% endfor %}
 			           	</select>
 			           	<script>
@@ -124,7 +124,7 @@
 		           		<select id="avatar_color" data-field="avatar_color" class="form-control">
 		           		    <option value="">- none -</option>
 				           	{% for color in env.avatarColors %}
-				           	<option value="{{color.id}}" {% if color.id==profile.avatar_color %} selected{% endif %}  style="background-color: {{color.color}}; color: {{color.textColor}}">{{color.label}}</option>
+				           	<option value="{{color.id}}" {% if color.id==userRecord.profile.avatar_color %} selected{% endif %}  style="background-color: {{color.color}}; color: {{color.textColor}}">{{color.label}}</option>
 				           	{% endfor %}
 			           	</select>
 			           	<script>
@@ -140,7 +140,7 @@
 	        	<div class="form-group">
 	        		<label for="avatar-initials" class="control-label col-md-3">Your Initials</label>
 		           <div class="col-md-9">
-		           		<input id="avatar-initials" data-field="avatar_initials" type="text" class="form-control" value="{{profile.avatar_initials}}">
+		           		<input id="avatar-initials" data-field="avatar_initials" type="text" class="form-control" value="{{userRecord.profile.avatar_initials}}">
 		           </div>
 	        	</div>
 	        </div>
@@ -155,11 +155,11 @@
 	        <div class="col-md-12">
 	          {% for role in env.roles %}
 	          <div class="checkbox">
-	            <label><input data-field="roles" type="checkbox" value="{{role.id}}" {% if title.id == profile.title %} selected {% endif %}>{{role.label}}</label>
+	            <label><input data-field="roles" type="checkbox" value="{{role.id}}" {% if title.id == userRecord.profile.title %} selected {% endif %}>{{role.label}}</label>
 	          </div>
 	          {% endfor %}
 	          <script>
-	           {% for role in profile.roles %}
+	           {% for role in userRecord.profile.roles %}
 	          $('[data-field="roles"][value="{{role}}"]').prop('checked', true);
 	          {% endfor %}
 	          </script>
@@ -175,7 +175,7 @@
 	        <div class="col-md-12">
 	          {% for class in env.userClasses %}
 	            <div class="radio">
-	              <label><input data-field="userClass" name="userClass" type="radio" value="{{class.id}}" {% if class.id==profile.userClass %} checked{% endif %}>{{class.label}}</label>
+	              <label><input data-field="userClass" name="userClass" type="radio" value="{{class.id}}" {% if class.id==userRecord.profile.userClass %} checked{% endif %}>{{class.label}}</label>
 	            </div>
 	          {% endfor %}
 	          
@@ -193,7 +193,7 @@
 	    <div class="row">
 	      <div class="col-md-12" data-field-group="affiliations">
 	        
-	        {% for affiliation in profile.affiliations %}
+	        {% for affiliation in userRecord.profile.affiliations|sort(true,true,"start_year") %}
 	        {% include "userProfile_edit_affiliation.html" %}
 	        {% endfor %}
 	    
@@ -216,7 +216,7 @@
 	  <div class="panel-body">
 	    <div class="row">
 	      <div class="col-md-12">
-	        <textarea id="personalStatement" class="form-control" rows="8" style="resize:vertical;">{{profile.personal_statement}}</textarea>
+	        <textarea id="personalStatement" class="form-control" rows="8" style="resize:vertical;">{{userRecord.profile.personal_statement}}</textarea>
 	      </div>
 	    </div>
 	  </div>

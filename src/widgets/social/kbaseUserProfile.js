@@ -40,15 +40,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 } else {
                     this.userOwnsProfile = false;
                 }
-
-
-
-                // this._super(options);
-
-               
-
-                
-
                 
                 this.userRecord = cfg.userInfo;
                 this.userId = cfg.userId;
@@ -198,7 +189,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         },
 
         sync: {
-            value: function () {
+            value: function (callback) {
  
                 // DATA
                 // This is where we get the data to feed to the widget.
@@ -227,14 +218,18 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                         if (data[0]) {
                             // profile found
                             that.userRecord = data[0];
+                            that.context.userRecord = that.userRecord;
+                            // NB: this is just for now. We should probably incorporate
+                            // the account <-> profile syncing somewhere else/
                             that.ensureAccountData(function() {
-                                that.render();
+                                callback.call(that);
                             });
                         } else {
                             // logged in
                             that.userRecord = {};
+                            that.context.userRecord = that.userRecord;
                             that.ensureAccountData(function() {
-                                that.render();
+                                callback.call(that);
                             });
                         }
                     }, function(err) {
@@ -263,10 +258,10 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                         } else {
                             // what to do if not found? Should not get here...
                         }
-                        then();
+                        then.call(that);
                     });
                 } else {
-                    then();
+                    then.call(this);
                 }
             }
         },
@@ -524,11 +519,17 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
                 // wire up basic form crud buttons.
                 $('[data-button="save"]').on('click', function(e) {
-                    if (that.saveData()) {
-                        that.showInfoView();
+                    if (that.updateUserRecordFromForm()) {
+                        that.saveUserRecord({
+                            success: function() {
+                                this.addSuccessMessage('Success!', 'Your user profile has been updated.');
+                                this.showInfoView();
+                            }
+                        });
                     }
                 });
                 $('[data-button="cancel"]').on('click', function(e) {
+                    that.clearMessages();
                     that.showInfoView();
                 });
 
@@ -568,8 +569,70 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         showNoProfileView: {
             value: function() {
-                var context = this.context;
-                this.infoPanel.empty().append(this.noProfileTemplate.render(context));
+                var that = this;
+                this.infoPanel.empty().append(this.noProfileTemplate.render(this.context));
+                if (this.isProfileOwner) {
+                    $('[data-button="create-profile"]').on('click', function(e) {
+                        that.createProfile();
+                    });
+                }
+            }
+        },
+
+        createProfile: {
+            value: function () {
+                // Get basic user account info (may already have it).
+                this.ensureAccountData(function () {
+
+                    // Copy the account fields to the corresponding user and profile fields.
+                    this.userRecord.user = {
+                        username: this.userRecord.account.username,
+                        realname: this.userRecord.account.realname,
+                    };
+                    this.userRecord.profile = {
+                        email: this.userRecord.account.email
+                    };
+
+                    this.saveUserRecord({
+                        success: function() {
+                            this.addSuccessMessage('Success!', 'Your user profile has been created.');
+                            this.showEditView();
+                        }
+                    });
+                    
+                })
+
+            }
+        },
+
+        saveUserRecord: {
+            value: function (cfg) {
+
+                /*var toSave = {};
+                toSave.user = this.userRecord.user;
+                toSave.profile = this.userRecord.profile;
+                toSave.profile.basic_personal_info = null;
+                toSave.profile.email_address = null;
+                toSave.profile.email_addresses = null;
+                console.log(toSave);
+
+                toSave.env = null;
+                */
+                var that = this;
+                this.userProfileClient.set_user_profile({
+                        profile: this.userRecord
+                },
+                function(response) {
+                    
+                    if (cfg.success) {
+                        cfg.success.call(that);
+                    }
+                },
+                function(err) {
+                    that.addErrorMessage('Error!', 'Your user profile could not be saved: ' + err.error.message);
+                    console.log('Error setting user profile: ' + err);
+                });
+
             }
         },
 
@@ -636,7 +699,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
 
-        saveData: {
+        updateUserRecordFromForm: {
             value: function() {
                 var that = this;
                 this.clearErrors();
@@ -777,32 +840,12 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     return false;
                 }
 
-                console.log('saving...');
-                console.log(toSave);
+                //console.log('saving...');
+                //console.log(toSave);
 
                 // Clean up the user info data object.
 
-                var toSave = {};
-                toSave.user = this.userRecord.user;
-                toSave.profile = this.userRecord.profile;
-                toSave.profile.basic_personal_info = null;
-                toSave.profile.email_address = null;
-                toSave.profile.email_addresses = null;
-                console.log(toSave);
-
-                toSave.env = null;
-
-                this.userProfileClient.set_user_profile({
-                        profile: toSave
-                    },
-                    function(response) {
-                        that.addSuccessMessage('Success!', 'Your user profile has been updated.');
-                    },
-                    function(err) {
-                        that.addErrorMessage('Error!', 'Your user profile could not be saved: ' + err.error.message);
-                        console.log('Error setting user profile: ' + err);
-                    });
-
+               
                 return true;
             }
         },

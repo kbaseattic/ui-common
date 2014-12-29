@@ -18,7 +18,7 @@ angular.module('social-directives')
                     container: $(ele),
                     userId: scope.params.userid,
                     token: scope.params.kbCache.token
-                }).sync();
+                }).sync(function() {this.render()});
 
             });
         }
