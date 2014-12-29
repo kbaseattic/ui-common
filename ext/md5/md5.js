@@ -1,4 +1,5 @@
-;!function(g) {
+define([], function () {
+// eap: 2014-12-28: converted to amd
 	var $0 = [], // result
 		$1 = [], // tail
 		$2 = [], // blocks
@@ -12,7 +13,7 @@
 		BUF = [];
 
 	// use Int32Array if defined
-	if(g.Int32Array) {
+	if(window.Int32Array) {
 		$1 = new Int32Array(16);
 		$2 = new Int32Array(16);
 		$3 = new Int32Array(4);
@@ -287,5 +288,5 @@
 		BUF[3] = d;
 	}
 
-	g.md5 = g.md5 || md5;
-}(typeof global === "undefined" ? window : global);
+	return md5;
+});

@@ -34,7 +34,7 @@
 		        <label for="field-title">Title</label>
 		        <select class="form-control" id="field-title" data-field="title">
 		          {% for title in env.titles %}
-		          	<option value="{{title.id}}" {% if title.id == profile.title %} selected {% endif %}>{{title.label}}</option>
+		          	<option value="{{title.id}}" {% if title.id==profile.title %} selected {% endif %}>{{title.label}}</option>
 		          {% endfor %}
 		        </select>
 		        
@@ -42,15 +42,16 @@
 	      </div>
 	      <div class="col-md-7">
 	        <div class="form-group">
-	           <label for="field_real_name">Your Name *</label>
-	           <div class="input-group-lg"><input id="pRealName" type="text" class="form-control" value="{{user.realname}}"></div>
-	           <div data-field-message="field_real_name" class="field-message col-md-12"></div>
+	           <label for="field-realname">Your Name *</label>
+	           <div class="input-group-lg"><input id="field-realname" type="text" class="form-control" data-field="realname" value="{{user.realname}}"></div>
+	           <div data-message-for-field="realname" class="field-message"></div>
 	        </div>
 	      </div>
 	      <div class="col-md-3">
 	      	<div class="form-group">
 		        <label for="field_suffix">Suffix</label>
-		        <div class="input-group-lg"><input id="pSuffix" type="text" class="form-control" value="{{profile.suffix}}"></div>
+		        <div class="input-group-lg"><input id="field_suffix" type="text" class="form-control" data-field="suffix" value="{{profile.suffix}}"></div>
+		        <div data-message-for-field="suffix" class="field-message"></div>
 		    </div>
 	      </div>
 	    </div>
@@ -60,7 +61,7 @@
 			<div class="col-md-9">
 				<input id="location-field" type="text" class="form-control" data-field="location" value="{{profile.location}}">
 			</div>	          
-			<div data-field-message="location" class="field-message col-md-9 col-md-push-3"></div>
+			<div data-message-for-field="location" class="field-message col-md-9 col-md-push-3"></div>
 	    </div>
 
 	    <div class="form-group">
@@ -68,6 +69,7 @@
         	<div class="col-md-9">
         		<input id="email-field" data-field="email" type="text" class="form-control" value="{{profile.email}}">
         	</div>
+        	<div data-message-for-field="email" class="field-message col-md-9 col-md-push-3"></div>
 	    </div>
 	  </div>
 	</div>
@@ -189,20 +191,19 @@
 	  </div>
 	  <div id="affiliationPanel" class="panel-body">
 	    <div class="row">
-	      <div class="col-md-12">
-	      	<div class="button-group" style="margin-bottom: 10px;">
-	        	<button id="addAffiliation" type="button" class="btn btn-default" data-button="add-affiliation"><span class="glyphicon glyphicon-plus"></span> Add Affiliation</button>
-	        </div>
-	      </div>
-	    </div>
-	    
-	    <div class="row">
 	      <div class="col-md-12" data-field-group="affiliations">
 	        
 	        {% for affiliation in profile.affiliations %}
 	        {% include "userProfile_edit_affiliation.html" %}
 	        {% endfor %}
 	    
+	      </div>
+	    </div>
+	    <div class="row">
+	      <div class="col-md-12">
+	      	<div class="button-group" style="margin-bottom: 10px;">
+	        	<button id="addAffiliation" type="button" class="btn btn-default" data-button="add-affiliation"><span class="glyphicon glyphicon-plus"></span> Add Affiliation</button>
+	        </div>
 	      </div>
 	    </div>
 	  </div>
