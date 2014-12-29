@@ -20,7 +20,7 @@
   <div class="row">
     <div class="col-md-9">
       <h2>{% if profile.title %}{{profile.title | titleLabel }} {% endif %}{{user.realname | e}}{% if profile.suffix %}, {{profile.suffix | e}}{% endif %}</h2>
-      {% if env.isOwner and user.realname != account.realname %}<p>Note: The name on your account is different: It is {{ account.realname }}.</p>{% endif %}
+      {% if env.isOwner and user.realname != account.realname %}<p class="text-warning">Note: The name on your account is <i>{{ account.realname }}</i>.</p>{% endif %}
     </div>
     <div class="col-md-3">
 
@@ -38,6 +38,7 @@
       {% if profile.location %}<i>{{profile.location | e}}</i>{% endif %}
       {% if profile.email %}
       <p><a href="mailto:{{profile.email | e}}">{{profile.email | e}}</a></p>
+      {% if env.isOwner and profile.email != account.email %}<p class="text-warning">Note: The email on your account is <i>{{ account.email }}</i>.</p>{% endif %}
       {% endif %}
     </div>
   </div>
@@ -60,7 +61,7 @@
       <div class="col-md-6">      
         {% if profile.affiliations %}
           <h3>Affiliations</h3>
-          {% for affiliation in profile.affiliations %}
+          {% for affiliation in profile.affiliations|sort(true, true, "start_year") %}
             <p><strong>{{affiliation.title | e}}</strong> ({{affiliation.start_year| e}}-{% if affiliation.end_year %}{{affiliation.end_year | e}}{% else %}present{% endif %}) @ {{affiliation.institution | e}}</p>
           {% endfor %}
           </div>
