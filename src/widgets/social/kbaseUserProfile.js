@@ -16,7 +16,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 this.createPanel();
 
                 // Give ourselves the ability to show templates.
-                var templateEnv = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/social/templates'), {
+                this.templateEnv = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/social/templates'), {
                     'autoescape': false
                 });
 
@@ -78,21 +78,21 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 
 
                 var widget = this;
-                templateEnv.addFilter('roleLabel', function(role) {
+                this.templateEnv.addFilter('roleLabel', function(role) {
                     if (widget.userRolesMap[role]) {
                         return widget.userRolesMap[role];
                     } else {
                         return role;
                     }
                 });
-                templateEnv.addFilter('userClassLabel', function(userClass) {
+                this.templateEnv.addFilter('userClassLabel', function(userClass) {
                     if (widget.userClassesMap[userClass]) {
                         return widget.userClassesMap[userClass];
                     } else {
                         return userClass;
                     }
                 });
-                templateEnv.addFilter('titleLabel', function(title) {
+                this.templateEnv.addFilter('titleLabel', function(title) {
                     if (widget.titlesMap[title]) {
                         return widget.titlesMap[title];
                     } else {
@@ -101,17 +101,19 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 });
                 // create a gravatar-url out of an email address and a 
                 // default option.
-                templateEnv.addFilter('gravatar', function(email, size, rating, gdefault) {
+                this.templateEnv.addFilter('gravatar', function(email, size, rating, gdefault) {
                     // TODO: http/https.
                     var md5Hash = md5(email);
                     var url = 'http://www.gravatar.com/avatar/' + md5Hash + '?s=' + size + '&amp;r=' + rating + '&d=' + gdefault
                     return url;
                 });
-                templateEnv.addFilter('kbmarkup', function(s) {
+                this.templateEnv.addFilter('kbmarkup', function(s) {
                     s = s.replace(/\n/g, '<br>');
                     return s;
                 });
 
+                this.templates = {};
+                /*
                 this.viewTemplate = templateEnv.getTemplate('userProfile_view.html');
                 this.editTemplate = templateEnv.getTemplate('userProfile_edit.html');
                 this.layoutTemplate = templateEnv.getTemplate('userProfile_layout.html');
@@ -121,6 +123,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 this.noProfileTemplate = templateEnv.getTemplate('userProfile_no_profile.html');
                 this.noUserTemplate = templateEnv.getTemplate('userProfile_no_user.html');
                 this.unauthorizedTemplate = templateEnv.getTemplate('userProfile_unauthorized.html');
+                */
 
                 // Set up the basic panel layout.
                 this.setupLayout();
@@ -141,6 +144,15 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 }.bind(this));
 
                 return this;
+            }
+        },
+
+        getTemplate: {
+            value: function(name) {
+                if (this.templates[name] === undefined) {
+                    this.templates[name] = this.templateEnv.getTemplate('userProfile_' + name + '.html');
+                }
+                return this.templates[name];
             }
         },
 
@@ -168,7 +180,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 if (!this.authToken) {
                     this.panelTitle = 'Unauthorized';
                     this.setupPicture();
-                    this.infoPanel.html(this.unauthorizedTemplate.render(this.context));
+                    this.infoPanel.html(this.getTemplate('unauthorized').render(this.context));
                 } else if (this.userRecord && this.userRecord.user) {
 
                     // Title can be be based on logged in user infor or the profile.
@@ -194,7 +206,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     // no profile, no basic aaccount info
                     this.panelTitle.html('User Not Found');
                     this.setupPicture();
-                    this.infoPanel.html(this.noUserTemplate.render(this.context));
+                    this.infoPanel.html(this.getTemplate('no_user').render(this.context));
                 }
                 return this;
             }
@@ -555,7 +567,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         showEditView: {
             value: function() {
-                this.infoPanel.html(this.editTemplate.render(this.context));
+                this.infoPanel.html(this.getTemplate('edit').render(this.context));
 
                 // wire up basic form crud buttons.
                 $('[data-button="save"]').on('click', function(e) {
@@ -580,7 +592,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
                     // render a new affiliation
                     var id = this.genId();
-                    var newAffiliation = this.newAffiliationTemplate.render({
+                    var newAffiliation = this.getTemplate('new_affiliation').render({
                         generatedId: id
                     });
 
@@ -610,7 +622,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         showNoProfileView: {
             value: function() {
-                this.infoPanel.html(this.noProfileTemplate.render(this.context));
+                this.infoPanel.html(this.getTemplate('no_profile').render(this.context));
                 if (this.isProfileOwner) {
                     $('[data-button="create-profile"]').on('click', function(e) {
                         this.createProfile();
@@ -677,7 +689,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         showInfoView: {
             value: function() {
-                this.infoPanel.html(this.viewTemplate.render(this.context));
+                this.infoPanel.html(this.getTemplate('view').render(this.context));
                 $('[data-placeholder="info"] [data-button="edit-info"]').on('click', function(e) {
                     this.clearMessages();
                     this.showEditView();
@@ -909,7 +921,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         setupPicture: {
             value: function() {
-                var pic = this.pictureTemplate.render(this.context);
+                var pic = this.getTemplate('picture').render(this.context);
                 this.panelBody.find('[data-placeholder="picture"]').html(pic);
             }
         },
@@ -919,7 +931,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 nunjucks.configure({
                     autoescape: true
                 });
-                var out = this.layoutTemplate.render(this.userRecord);
+                var out = this.getTemplate('layout').render(this.userRecord);
                 this.panelBody.html(out);
             }
         }
