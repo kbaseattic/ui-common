@@ -132,12 +132,12 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 // Set up listeners for any kbase events we are interested in:
                 $(document).on('loggedIn.kbase', function(e, auth) {
                     this.authToken = auth.token;
-                    this.sync(function () {this.render();});
+                    this.sync(function () {this.render()}.bind(this));
                 }.bind(this));
 
                 $(document).on('loggedOut.kbase', function(e, auth) {
                     this.authToken = null;
-                    this.sync(function () {this.render();});
+                    this.sync(function () {this.render()}.bind(this));
                 }.bind(this));
 
                 return this;
