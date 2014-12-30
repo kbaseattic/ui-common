@@ -593,6 +593,18 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     // remove the containing affiliation group.
                     $(this).closest('[data-field-group="affiliation"]').remove();
                 });
+                // on any field change events, we update the relevant affiliation panel title
+                this.infoPanel.find('[data-field-group="affiliations"]').on('keyup', 'input', function(e) {
+                    // remove the containing affiliation group.
+                    var panel  = $(this).closest('[data-field-group="affiliation"]');
+                    var title = panel.find('[data-field="title"]').val();
+                    var institution = panel.find('[data-field="institution"]').val();
+                    var startYear = panel.find('[data-field="start_year"]').val();
+                    var endYear = panel.find('[data-field="end_year"]').val();
+                    endYear = endYear ? endYear : 'present';
+
+                    panel.find('.panel-title').html(title + ' @ ' + institution + ', ' + startYear+'-'+endYear);
+                });
             }
         },
 

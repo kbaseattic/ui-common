@@ -4,7 +4,7 @@
         <button type="button" class="btn btn-xs btn-danger" data-button="remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
       </div>
       <div class="panel-title">
-        {{affiliation.institution}} - {{affiliation.start_year}}-{% if affiliation.end_year %}{{affiliation.end_year | e}}{% else %}present{% endif %}
+        {{affiliation.title}} ({{affiliation.start_year}}-{% if affiliation.end_year %}{{affiliation.end_year | e}}{% else %}present{% endif %}) @ {{affiliation.institution}}
       </div>
       
     </div>
