@@ -79,11 +79,9 @@
 	    <div class="panel-body">
 	      <div class="row">
 	        <div class="col-md-3">
-	        	{%if userRecord.profile.gravatar_default and userRecord.profile.email %}
-	        	<img src="{{userRecord.profile.email | gravatar(200,"pg",userRecord.profile.gravatar_default)}}" width="95%" style="max-width: 300px;">
-	        	{% elif userRecord.profile.avatar_color %}
-	        	<div style="width: 95%; height: 0; padding-bottom: 100%; background-color: {{userRecord.profile.avatar_color}};">{{userRecord.profile.avatar_initials}}</div>
-	        	{% endif %}
+	        {% include "userProfile_picture.html" %}
+
+	        	
 	        </div>
 	        <div class="col-md-9">
 	        	<p>Your gravatar is based on an image you have associated with your email address at <a href="http://en.gravatar.com">Gravatar</a>, a free public profile service from Automattic, the same people who brought us Wordpress. If you have a gravatar associated with the email address in this profile, we will display it within KBase.</p>

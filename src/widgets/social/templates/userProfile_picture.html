@@ -1,7 +1,7 @@
 {%if userRecord.profile.gravatar_default and userRecord.profile.email %}
-<img src="{{userRecord.profile.email | gravatar(200,"pg",profile.gravatar_default)}}" width="95%" style="max-width: 300px;">
+<img src="{{userRecord.profile.email | gravatar(200,"pg",userRecord.profile.gravatar_default)}}" width="95%" style="max-width: 300px;">
 {% elif userRecord.profile.avatar_color %}
-<div style="width: 95%; height: 0; padding-bottom: 100%; background-color: {{profile.avatar_color}};">{{userRecord.profile.avatar_initials}}</div>
+<div style="width: 95%; height: 0; padding-bottom: 100%; background-color: {{userRecord.profile.avatar_color|avatarBackgroundColor}}; color: {{userRecord.profile.avatar_color|avatarTextColor}};"><div style="padding: 6px;">{{userRecord.profile.avatar_initials}}</div></div>
 {% else %}
 <center><img src="assets/images/nouserpic.png" width="95%" style="max-width: 300px;"></center>
 {% endif %}
