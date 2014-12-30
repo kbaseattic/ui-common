@@ -3,8 +3,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
     var ProfileWidget = Object.create({}, {
         init: {
-            value: function (cfg) {
-                this.userNameFetchUrl = "https://kbase.us/services/genome_comparison/users?usernames=";
+            value: function (cfg) {                
                 this._generatedId = 0; 
 
                 this.container = cfg.container;
@@ -12,8 +11,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     this.container = $(this.container);
                 }
 
-                // In all cases, we want an operable panel to interface with the user.
-                this.createPanel();
 
                 // Give ourselves the ability to show templates.
                 this.templateEnv = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/social/templates'), {
@@ -125,25 +122,24 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 this.unauthorizedTemplate = templateEnv.getTemplate('userProfile_unauthorized.html');
                 */
 
-                // Set up the basic panel layout.
-                this.setupLayout();
 
-                // These are just convenience placeholders.
-                this.alertPanel = this.panelBody.find('[data-placeholder="alert"]');
-                this.infoPanel = this.panelBody.find('[data-placeholder="info"]');
-
-                // Set up listeners for any kbase events we are interested in:
-                $(document).on('loggedIn.kbase', function(e, auth) {
-                    this.authToken = auth.token;
-                    this.sync(function () {this.render()}.bind(this));
-                }.bind(this));
-
-                $(document).on('loggedOut.kbase', function(e, auth) {
-                    this.authToken = null;
-                    this.sync(function () {this.render()}.bind(this));
-                }.bind(this));
 
                 return this;
+            }
+        },
+
+        go: {
+            value: function () {
+                this.createInitialUI();
+                this.sync(function() {
+                    this.render()
+                }.bind(this));
+            }
+        },
+
+        stop: {
+            value: function () {
+
             }
         },
 
@@ -156,20 +152,24 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
 
-        createPanel: {
-            value: function() {
-                // Create the main panel for this widget.
-                this.panel = '<div class="panel panel-default">'+
-                                    '<div class="panel-heading"><span class="panel-title"></span></div>' +
-                                    '<div class="panel-subitle"></div>' +
-                                    '<div class="panel-body"></div></div>';
+        createInitialUI: {
+            value: function () {
+                // Set up the basic panel layout.
+                // This adds stuff like the message area at the top of the panel body,
+                // and a main body div.
+                this.renderLayout();
+                console.log('layout rendered?');
 
-               
-                this.container.html(this.panel);
+                // Set up listeners for any kbase events we are interested in:
+                $(document).on('loggedIn.kbase', function(e, auth) {
+                    this.authToken = auth.token;
+                    this.sync(function () {this.render()}.bind(this));
+                }.bind(this));
 
-                // Set up easy access to the title and body areas.
-                this.panelTitle = this.container.find('.panel-heading .panel-title');
-                this.panelBody = this.container.find('.panel-body');
+                $(document).on('loggedOut.kbase', function(e, auth) {
+                    this.authToken = null;
+                    this.sync(function () {this.render()}.bind(this));
+                }.bind(this));
             }
         },
 
@@ -178,35 +178,35 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 // Generate initial view.
                 // Head off at the pass -- if not logged in, can't show profile.
                 if (!this.authToken) {
-                    this.panelTitle = 'Unauthorized';
-                    this.setupPicture();
-                    this.infoPanel.html(this.getTemplate('unauthorized').render(this.context));
+                    this.titlePlace.html('Unauthorized');
+                    this.renderPicture();
+                    this.contentPlace.html(this.getTemplate('unauthorized').render(this.context));
                 } else if (this.userRecord && this.userRecord.user) {
 
                     // Title can be be based on logged in user infor or the profile.
                     if (this.userOwnsProfile) {
-                        this.panelTitle.html('You - ' + this.loggedInName + ' (' + this.userRecord.user.username + ')');
+                        this.titlePlace.html('You - ' + this.loggedInName + ' (' + this.userRecord.user.username + ')');
                     } else {
-                        this.panelTitle.html(this.userRecord.user.realname + ' (' + this.userRecord.user.username + ')');
+                        this.titlePlace.html(this.userRecord.user.realname + ' (' + this.userRecord.user.username + ')');
                     }
 
                     this.context.user = this.userRecord.user;
                     this.context.profile = this.userRecord.profile;
                     this.context.account = this.userRecord.account;
 
-                    this.setupPicture();
+                    this.renderPicture();
                     this.showInfoView();
                 } else if (this.userRecord && this.userRecord.account) {
                     // no profile, but have basic account info.
                     this.context.account = this.userRecord.account;
-                    this.panelTitle.html(this.userRecord.account.realname + ' (' + this.userRecord.account.username + ')');
-                    this.setupPicture();
+                    this.titlePlace.html(this.userRecord.account.realname + ' (' + this.userRecord.account.username + ')');
+                    this.renderPicture();
                     this.showNoProfileView();
                 } else {
                     // no profile, no basic aaccount info
-                    this.panelTitle.html('User Not Found');
-                    this.setupPicture();
-                    this.infoPanel.html(this.getTemplate('no_user').render(this.context));
+                    this.titlePlace.html('User Not Found');
+                    this.renderPicture();
+                    this.contentPlace.html(this.getTemplate('no_user').render(this.context));
                 }
                 return this;
             }
@@ -252,8 +252,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                         function(err) {
                             console.log('Error getting user profile.');
                             console.log(err);
-                            that.panelTitle.html('Error getting profile');
-                            that.panelBody.html('<p>Error getting profile: ' + err + '</p>');
+                            that.titlePlace.html('Error getting profile');
+                            that.contentPlace.html('<p>Error getting profile: ' + err + '</p>');
                         }.bind(this)
                     );
                 }
@@ -567,7 +567,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         showEditView: {
             value: function() {
-                this.infoPanel.html(this.getTemplate('edit').render(this.context));
+                this.contentPlace.html(this.getTemplate('edit').render(this.context));
 
                 // wire up basic form crud buttons.
                 $('[data-button="save"]').on('click', function(e) {
@@ -588,7 +588,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 // wire up affiliation add/remove buttons.
                 $('[data-button="add-affiliation"]').on('click', function(e) {
                     // grab the container 
-                    var affiliations = this.infoPanel.find('[data-field-group="affiliations"]');
+                    var affiliations = this.contentPlace.find('[data-field-group="affiliations"]');
 
                     // render a new affiliation
                     var id = this.genId();
@@ -601,12 +601,12 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 }.bind(this));
 
                 // Wire up remove button for any affiliation.
-                this.infoPanel.find('[data-field-group="affiliations"]').on('click', '[data-button="remove"]', function(e) {
+                this.contentPlace.find('[data-field-group="affiliations"]').on('click', '[data-button="remove"]', function(e) {
                     // remove the containing affiliation group.
                     $(this).closest('[data-field-group="affiliation"]').remove();
                 });
                 // on any field change events, we update the relevant affiliation panel title
-                this.infoPanel.find('[data-field-group="affiliations"]').on('keyup', 'input', function(e) {
+                this.contentPlace.find('[data-field-group="affiliations"]').on('keyup', 'input', function(e) {
                     // remove the containing affiliation group.
                     var panel  = $(this).closest('[data-field-group="affiliation"]');
                     var title = panel.find('[data-field="title"]').val();
@@ -622,7 +622,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         showNoProfileView: {
             value: function() {
-                this.infoPanel.html(this.getTemplate('no_profile').render(this.context));
+                this.contentPlace.html(this.getTemplate('no_profile').render(this.context));
                 if (this.isProfileOwner) {
                     $('[data-button="create-profile"]').on('click', function(e) {
                         this.createProfile();
@@ -689,8 +689,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         showInfoView: {
             value: function() {
-                this.infoPanel.html(this.getTemplate('view').render(this.context));
-                $('[data-placeholder="info"] [data-button="edit-info"]').on('click', function(e) {
+                this.contentPlace.html(this.getTemplate('view').render(this.context));
+                this.contentPlace.find('[data-button="edit"]').on('click', function(e) {
                     this.clearMessages();
                     this.showEditView();
                 }.bind(this));
@@ -700,11 +700,11 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         setFieldError: {
             value: function(name, message) {
                 //console.log('ERROR: ' + name + ', ' + message);
-                var fieldControl = this.panelBody.find('[data-field="' + name + '"]').closest('.form-group');
+                var fieldControl = this.contentPlace.find('[data-field="' + name + '"]').closest('.form-group');
                 if (fieldControl) {
                     fieldControl.addClass('has-error');
                 }
-                var fieldMessage = this.panelBody.find('[data-message-for-field="' + name + '"]');
+                var fieldMessage = this.contentPlace.find('[data-message-for-field="' + name + '"]');
                 if (fieldMessage) {
                     fieldMessage.html(message);
                     fieldMessage.addClass('error-message');
@@ -727,7 +727,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         },
         getFieldValue: {
             value: function(name) {
-                return this.panelBody.find('[data-field="' + name + '"]').val();
+                return this.contentPlace.find('[data-field="' + name + '"]').val();
             }
         },
 
@@ -735,8 +735,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             value: function() {
                 this.clearMessages();
                 this.clearFieldMessages();
-                this.panelBody.find('.has-error').removeClass('has-error');
-                this.panelBody.find('.error-message').removeClass('error-message');
+                this.contentPlace.find('.has-error').removeClass('has-error');
+                this.contentPlace.find('.error-message').removeClass('error-message');
                 this.formHasError = false;
             }
         },
@@ -771,14 +771,14 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 }
 
                 // TITLE
-                var title = this.panelBody.find('[data-field="title"]').val();
+                var title = this.contentPlace.find('[data-field="title"]').val();
                 if (title && title.length === 0) {
                     delete this.userRecord.profile['title'];
                 } else {                    
                     this.userRecord.profile['title'] = title;
                 }
 
-                var location = this.panelBody.find('[data-field="location"]').val();
+                var location = this.contentPlace.find('[data-field="location"]').val();
                 if (location && location.length > 0) {
                     this.userRecord.profile['location'] = location;
                 } else {
@@ -794,14 +794,14 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 }
 
                 // GRAVATAR
-                var gravatar_default = this.panelBody.find('[data-field="gravatar_default"]').val();
+                var gravatar_default = this.contentPlace.find('[data-field="gravatar_default"]').val();
                 if (gravatar_default && gravatar_default.length > 0) {
                     this.userRecord.profile['gravatar_default'] = gravatar_default;
                 } else {
                     //delete(this.userRecord.profile['gravatar_default']);
                     this.userRecord.profile['gravatar_default'] = '';
                 }
-                var avatar_color = this.panelBody.find('[data-field="avatar_color"]').val();
+                var avatar_color = this.contentPlace.find('[data-field="avatar_color"]').val();
                 if (avatar_color && avatar_color.length > 0) {
                     this.userRecord.profile['avatar_color'] = avatar_color;
                 } else {
@@ -809,7 +809,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     this.userRecord.profile['avatar_color'] = '';
                 }
 
-                var avatar_initials = this.panelBody.find('[data-field="avatar_initials"]').val();
+                var avatar_initials = this.contentPlace.find('[data-field="avatar_initials"]').val();
                 if (avatar_initials && avatar_initials.length > 0) {
                     this.userRecord.profile['avatar_initials'] = avatar_initials;
                 } else {
@@ -821,7 +821,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
                 // ROLES
                 var roles = [];
-                var roleFields = this.panelBody.find('[data-field="roles"]');
+                var roleFields = this.contentPlace.find('[data-field="roles"]');
                 roleFields.each(function() {
                     if ($(this).is(':checked')) {
                         roles.push($(this).val());
@@ -831,7 +831,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
 
                 // USER CLASS
-                var userClassFields = this.panelBody.find('[data-field="userClass"]');
+                var userClassFields = this.contentPlace.find('[data-field="userClass"]');
                 userClassFields.each(function() {
                     if ($(this).is(':checked')) {
                         // should only be one...
@@ -841,7 +841,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
 
                 // AFFILIATIONS
-                var affiliations = this.panelBody.find('[data-field-group="affiliation"]');
+                var affiliations = this.contentPlace.find('[data-field-group="affiliation"]');
                 var affiliationsToSave = [];
                 for (var i = 0; i < affiliations.length; i++) {
 
@@ -873,7 +873,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
 
                 // PERSONAL STATEMENT / BIO
-                this.userRecord.profile['personal_statement'] = this.panelBody.find("#personalStatement").val();
+                this.userRecord.profile['personal_statement'] = this.contentPlace.find('[data-field="personal_statement"]').val();
 
 
                 // SAVING
@@ -899,12 +899,12 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         },
         clearMessages: {
             value: function() {
-                this.alertPanel.empty();
+                this.alertPlace.empty();
             }
         },
         addSuccessMessage: {
             value: function(title, message) {
-                this.alertPanel.append(
+                this.alertPlace.append(
                     '<div class="alert alert-success alert-dismissible" role="alert">' +
                     '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
                     '<strong>' + title + '</strong> ' + message + '</div>');
@@ -912,27 +912,30 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         },
         addErrorMessage: {
             value: function(title, message) {
-                this.alertPanel.append(
+                this.alertPlace.append(
                     '<div class="alert alert-danger alert-dismissible" role="alert">' +
                     '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
                     '<strong>' + title + '</strong> ' + message + '</div>');
             }
         },
 
-        setupPicture: {
+        renderPicture: {
             value: function() {
                 var pic = this.getTemplate('picture').render(this.context);
-                this.panelBody.find('[data-placeholder="picture"]').html(pic);
+                this.container.find('[data-placeholder="picture"]').html(pic);
             }
         },
 
-        setupLayout: {
+        renderLayout: {
             value: function() {
                 nunjucks.configure({
                     autoescape: true
                 });
-                var out = this.getTemplate('layout').render(this.userRecord);
-                this.panelBody.html(out);
+                this.container.html(this.getTemplate('layout').render(this.context));
+                 // These are just convenience placeholders.
+                this.alertPlace = this.container.find('[data-placeholder="alert"]');
+                this.contentPlace = this.container.find('[data-placeholder="content"]');
+                this.titlePlace = this.container.find('[data-placeholder="title"]');
             }
         }
 
