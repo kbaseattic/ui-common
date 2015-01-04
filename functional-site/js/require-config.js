@@ -18,6 +18,7 @@ require.config({
       domReady: '/ext/require-plugins/domReady', 
     	text: '/ext/require-plugins/text',
 
+
       // widgets
       // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
       kbaseuserprofilewidget: '/src/widgets/social/kbaseUserProfile'
@@ -25,6 +26,11 @@ require.config({
    shim: { 
     'kbaseuserprofileserviceclient': {
       exports: 'UserProfile'
+    },
+    jsx: {
+      fileExtension: '.jsx',
+      harmony: true,
+      stripTypes: true
     }
   }
 });

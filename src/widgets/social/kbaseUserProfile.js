@@ -74,24 +74,24 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 */
                 
 
-                var widget = this;
+                var that = this;
                 this.templateEnv.addFilter('roleLabel', function(role) {
-                    if (widget.userRolesMap[role]) {
-                        return widget.userRolesMap[role];
+                    if (that.userRolesMap[role]) {
+                        return that.userRolesMap[role];
                     } else {
                         return role;
                     }
                 });
                 this.templateEnv.addFilter('userClassLabel', function(userClass) {
-                    if (widget.userClassesMap[userClass]) {
-                        return widget.userClassesMap[userClass];
+                    if (that.userClassesMap[userClass]) {
+                        return that.userClassesMap[userClass];
                     } else {
                         return userClass;
                     }
                 });
                 this.templateEnv.addFilter('titleLabel', function(title) {
-                    if (widget.titlesMap[title]) {
-                        return widget.titlesMap[title];
+                    if (that.titlesMap[title]) {
+                        return that.titlesMap[title];
                     } else {
                         return title;
                     }
@@ -137,6 +137,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         go: {
             value: function () {
                 this.createInitialUI();
+                this.renderWaiting();
                 this.sync(function() {
                     this.render()
                 }.bind(this));
@@ -149,6 +150,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
 
+
+        // PATTERNS
         getTemplate: {
             value: function(name) {
                 if (this.templates[name] === undefined) {
@@ -157,7 +160,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 return this.templates[name];
             }
         },
-
        
         sync: {
             value: function (callback) {
@@ -197,10 +199,12 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                             }
                         }.bind(this), 
                         function(err) {
-                            console.log('Error getting user profile.');
+                            console.log('[UserProfile.sync] Error getting user profile.');
                             console.log(err);
-                            that.titlePlace.html('Error getting profile');
-                            that.contentPlace.html('<p>Error getting profile: ' + err + '</p>');
+                            this.showError({
+                            	title: 'Error Getting Profile', 
+                            	message: '<p>Error getting profile: ' + err + '</p>'
+                            });
                         }.bind(this)
                     );
                 }
@@ -208,24 +212,32 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
 
+        genId: {
+            value: function() {
+                return 'gen_' + this._generatedId++;
+            }
+        },
+
         ensureAccountData: {
-            value: function(then) {
+            value: function(callback) {
                 if (!this.userRecord.account) {
-                    var that  = this;
                     this.getGenomeComparisonUserInfo({userId: this.userId}, function (data) {
                         if (data.realname) {
-                            that.userRecord.account = {
+                            this.userRecord.account = {
                                 realname: data.realname,
                                 email: data.email,
                                 username: this.userId
                             };
                         } else {
-                            // what to do if not found? Should not get here...
-                        }
-                        then.call(that);
-                    });
+                        	this.showError({
+                        		title: 'Error', 
+                        		message: 'No user info returned from Genome Comparison'
+                        	});
+                        };
+                        callback.call(this);
+                    }.bind(this));
                 } else {
-                    then.call(this);
+                    callback.call(this);
                 }
             }
         },
@@ -469,52 +481,605 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 this.context.env.avatarColors = this.avatarColors;
             }
         },
+
+
+
+
        
-        getGenomeComparisonUserInfo: {
-            value: function(cfg, fun) {
-                // Can't use this, because the globus CORS policy does 
-                // not allow us to.
-                // TODO: need to incorporate this into the user profile
-                // service.
-                // FORNOW: use the getGenomeComparisonUserInfo workaround for now.
-                if (!this.authToken) {
-                    fun.call(that, {});
+        // MODEL UPDATE
+
+        updateField: {
+            value: function (fieldName, controlType, dataPath, validationFun) {
+                var field = this.contentPlace.find('[data-field="'+fieldName+'"]');
+                if (!field) {
+                    throw 'Field "' + fieldName + '" was not found on the form.';
                 }
-                var host = 'kbase.us';
-                var path = '/services/genome_comparison/users';
-                var that = this;
-                var query = 'usernames=' + cfg.userId + '&token=' + this.authToken;
-                var url = 'https://' + host + path + '?' + query;
-                var that = this;
-                $.ajax(url, {
-                    dataType: 'json',
-                    success: function (responseData) {  
-                         if (responseData.data[cfg.userId] && responseData.data[cfg.userId].fullName) {
-                            fun.call(that, {
-                                realname: responseData.data[cfg.userId].fullName, 
-                                email: responseData.data[cfg.userId].email,
-                                username: cfg.userId
-                            });
-                        } else {
-                            fun.call(that, {realname: null});
+                var control = field.find(controlType);
+                if (!control) {
+                    throw 'Field "' + fieldName + '" does not have an input control of type "' + controlType + '"';
+                }
+
+                try {
+                    var result = validationFun.call(this, control.val());
+                    if (result === undefined) {
+                        this.deleteProfileField(dataPath, fieldName, result);
+                    } else {
+                        this.setProfileField(dataPath, fieldName, result);
+                    }
+                } catch (err) {
+                    this.setFieldError(field, err);
+               }
+            }
+        },
+
+        formToObject: {
+        	value: function (schema) {
+        		// walk the schema, building an object out of any form values 
+        		// that we find.
+        		var that = this;
+        		var form = this.contentPlace.find['form'];
+        		var parser = Object.create({}, {
+        			init: {
+        				value: function (cfg) {
+        					if (typeof cfg.container === 'string') {
+        						this.container = $(cfg.container);
+        					} else {
+	        					this.container = cfg.container;
+	        				}
+	        				this.currentPath = [];
+	        				this.jsonRoot = Object.create(null);
+	        				this.currentJsonNode = this.jsonRoot;
+	        				return this;
+	        			}
+	        		},
+        			getFieldValue: {
+			            value: function(name) {
+			                var field = this.container.find('[data-field="' + name + '"]');
+			                if (!field || field.length === 0) {
+			                	// NB: this is not null, which is reserved for a field with empty data.
+			                	return undefined;
+			                	//throw 'Unable to find field "' + name + '"';
+			                }
+		                	var control = field.find('input, textarea, select');
+		                	if (!control || control.length === 0) {
+		                		// NB: this is not null, which is reserved for a field with empty data.
+		                		return undefined;
+			                	//throw 'Unable to find field control in "' + name + '"';
+			                }
+		                	switch (control.prop('tagName').toLowerCase()) {
+		                		case 'input':
+			                		switch (control.attr('type')) {
+			                			case 'checkbox': 
+				                			return control.map(function() {
+						                    	var $el = $(this);
+						                   		if ($el.prop('checked')) {
+						                   			return $el.val();
+						                   		} else {
+						                   			return null;
+						                   		}
+						                    }).get();
+			                			case 'radio':
+			                				var value = control.map(function() {
+						                    	var $el = $(this);
+						                   		if ($el.prop('checked')) {
+						                   			return $el.val();
+						                   		} else {
+						                   			return null;
+						                   		}
+						                    }).get();
+						                    if (value.length === 1) {
+						                    	return value[0];
+						                    } else {
+						                    	return null;
+						                    }
+			                			default:
+			                				var value = control.val();
+			                				if (value && value.length > 0) {
+			                					return value;
+			                				} else {
+			                					return null;
+			                				}
+			                		}
+			                	case 'textarea': 
+			                		var value = control.val();
+		                			if (value) {
+		                				if (value.length === 0) {
+		                					value = null;
+		                				}
+		                			}
+		                			return value;
+			                	case 'select': 
+			                		var value = control.val();
+		                			if (value) {
+		                				if (value.length === 0) {
+		                					value = null;
+		                				}
+		                			}
+		                			return value;
+		                	}
+						}
+					},
+        			parseObject: {
+        				value: function (schema) {
+	        				// console.log('followObject: ' + schema.type);
+	        				// console.log(schema);
+	        				var newObject = {};
+		        			var propNames = Object.getOwnPropertyNames(schema.properties);
+		        			for (var i=0; i<propNames.length; i++) {
+		        				// console.log('getting prop '+propNames[i]);
+		        				var propName = propNames[i];
+		        				var propSchema = schema.properties[propName];
+
+		        				switch (propSchema.type) {
+		        					case 'object':
+			        					var json = {};
+			        					// var node = parentNode.find('[data-field-group="'+propName+'"]');
+			        					this.currentPath.push(propName);
+			        					
+			        					newObject[propName] = this.parseObject(propSchema); 
+
+			        					this.currentPath.pop();
+			        					break;
+			        				case 'array':
+			        					this.currentPath.push(propName);
+			        					newObject[propName] = this.parseArray(propSchema);
+			        					this.currentPath.pop();
+			        					break;
+			        				case 'string':
+			        					this.currentPath.push(propName);
+			        					var value = this.parseString(propSchema);
+			        					if (value !== undefined) {
+			        						newObject[propName] = value;
+			        					}
+		        						this.currentPath.pop();
+		        						break;
+		        					case 'integer':
+		        						this.currentPath.push(propName);
+			        					var value = this.parseInteger(propSchema);
+			        					if (value !== undefined) {
+			        						newObject[propName] = value;
+			        					}
+		        						this.currentPath.pop();
+		        						break;
+		        					case 'boolean':
+		        						// noop
+		        						break;
+		        					case 'null':
+		        						// noop
+		        						break;
+		        				}
+		        			}
+		        			return newObject;
+		        		}
+
+	        		},
+	        		parseArray: {
+	        			value: function (schema) {
+		        			// for now just handle a non-nested array ... i.e. an array of objects or values
+		        			var itemSchema = schema.items;
+		        			// The array items are driven by the DOM in this case. We need to loop through the
+		        			// nodes returned by the selector for this array.
+		        			//this.currentPath.push(propName);
+		        			var path = this.currentPath.join('.');
+		        			// We select the field by the usual method, data-field. On in this case, it will contain
+		        			// a form control which can provide multiple selections, either a checkbox, a select, or
+		        			// multiple inputs with the same name (?).
+		        			// We have to handle the case of multi-valued fields (checkbox)
+		        			switch (itemSchema.type) {
+		        				case 'string':
+		        					// map to controls here. If the controls are implemented right, as checkboxes or
+		        					// a select with multiple-values, we get back an array of values.
+		        					return this.getFieldValue(path);
+		        				case 'object': 
+		        					// we don't have a canned way to get a set of fields ... yet.
+		        					console.log('PATH=' + path);
+		        					var value =  this.container.find('[data-field="'+path+'"] fieldset').map(function () {
+		        						return Object.create(parser).init({container: $(this)}).parseObject(itemSchema);
+		        					}).get();
+		        					return value;
+		        				default:
+		        					throw "Can't make array out of " + itemSchema.type + " yet.";	        					
+		        			}
+		        		}
+
+	        		},
+	        		parseString: {
+	        			value: function (schema) {
+							var fieldName = this.currentPath.join('.');
+							return this.getFieldValue(fieldName);
+		        		}
+		        	},
+	        		parseInteger: {
+	        			value: function (schema) {
+							var fieldName = this.currentPath.join('.');
+							var strVal = this.getFieldValue(fieldName);
+        					if (strVal) {
+        						var intVal = parseInt(strVal);
+        						if (intVal !== NaN) {
+        							return intVal;
+        						}
+        					}
+        					return undefined;
+		        		}
+		        	}
+        		});
+        		return parser.init({container: this.contentPlace}).parseObject(schema);
+        	}
+        },
+
+		updateUserRecord: {
+			value: function (newRecord) {
+				var merger = {
+					init: function (obj) {
+						this.dest = obj;
+						return this;
+					},
+					getType: function  (x) {
+						var t = typeof x;
+						if (t === 'object') {
+							if (x === null) {
+								return 'null';
+							} else if (x.pop && x.push) {
+								return 'array';
+							} else {
+								return 'object';
+							}
+						} else {
+							return t;
+						}
+					},
+					merge: function (obj) {
+						switch (this.getType(obj)) {
+							case 'string': 
+							case 'integer':
+							case 'boolean':
+							case 'null': 
+								throw "Can't merge a '" + (typeof val) + "'";
+								break;
+							case 'object':
+								return this.mergeObject(obj);
+								break;
+							case 'array':
+								return this.mergeArray(obj);
+								break;
+							default:
+								throw "Can't merge a '" + (typeof val) + "'";
+						}
+
+					},	
+					mergeObject: function (obj) {
+						var keys = Object.keys(obj);
+						for (var i=0; i<keys.length; i++) {
+							var key = keys[i];
+							var val = obj[key];
+							var t = this.getType(val);
+							//console.log('[mergeObject] ' + key + ', ' + val + ', ' + t);
+							switch (t) {
+								case 'string': 
+								case 'number':
+								case 'boolean':
+								case 'null': 
+									this.dest[key] = val;
+									break;
+								case 'object':
+									if (!this.dest[key]) {
+										this.dest[key] = {};
+									}
+									this.dest[key] = Object.create(merger).init(this.dest[key]).mergeObject(obj[key]);
+									break;
+								case 'array':
+									if (!this.dest[key]) {
+										this.dest[key] = [];
+									}
+									this.dest[key] = Object.create(merger).init(this.dest[key]).mergeArray(obj[key]);
+									break;
+								case 'undefined':
+									if (this.dest[key]) {
+										delete this.dest[key];
+									}
+									break;
+							}
+						}
+						return this.dest;
+					},
+					mergeArray: function (arr) {
+						var deleted  = false;
+						for (var i=0; i<arr.length; i++) {
+							var val = arr[i];
+							var t = this.getType(val);
+							switch (t) {
+								case 'string': 
+								case 'number':
+								case 'boolean':
+								case 'null': 
+									this.dest[i] = val;
+									break;
+								case 'object':
+									if (!this.dest[i]) {
+										this.dest[i] = {};
+									}
+									this.dest[i] = Object.create(merger).init(this.dest[i]).mergeObject(arr[i]);
+									break;
+								case 'array':
+									if (!this.dest[i]) {
+										this.dest[i] = [];
+									}
+									this.dest[i] = Object.create(merger).init(this.dest[i]).mergeArray(obj[i]);
+									break;
+								case 'undefined':
+									if (this.dest[i]) {
+										this.dest[i] = undefined;
+									}
+									break;
+							}
+						}
+						if (deleted) {
+							return this.dest.filter(function (value) {
+								if (value === undefined) {
+									return false;
+								} else {
+									return true;
+								}
+							});
+						} else {
+							return this.dest;
+						}
+					}
+				};
+				//console.log("1");
+				console.log('userRecord');
+				console.log(this.userRecord);
+				var recordCopy = Object.create(merger).init({}).mergeObject(this.userRecord);
+				//console.log("2");
+				console.log('newRecord');
+				console.log(newRecord);
+				var merged = Object.create(merger).init(recordCopy).mergeObject(newRecord);
+				//console.log("3");
+				return merged;
+			}
+		},
+        updateUserRecordFromForm: {
+            value: function() {
+                this.clearErrors();
+
+                var schema = {
+                	type: 'object', 
+                   	properties: {
+	                	user: {
+	                		type: 'object',
+	                	 	properties: {
+	                	 		username: {type: 'string'},
+	                	 		realname: {type: 'string'}
+	                	 	},
+	                	 	required: ['username', 'realname']
+	                	},
+	                	profile: {
+	                		type: 'object',
+	                	 	properties: {
+		                	 	avatar : {
+		                	 		type: 'object', 
+		                	     	properties: {
+		                	     		gravatar_default: {type: 'string'},
+		                	     		avatar_color: {type: 'string'},
+		                	     		avatar_initials: {type: 'string'}
+		                	     	}
+		                	    },
+		                	 	title: {type: 'string'},
+		                	 	suffix: {type: 'string'},
+		                	 	location: {type: 'string'},
+		                	 	email: {type: 'string'},
+		                	 	personal_statement: {type: 'string'},
+		                	 	user_class: {type: 'string'},
+		                	 	roles: {
+		                	 		type: 'array',
+		                	     	items: {type: 'string'}
+		                	    },
+		                	    affiliations: {
+		                	    	type: 'array',
+		                	    	items: {
+		                	    		type: 'object',
+		                	    		properties: {
+		                	    			title: {type: 'string'},
+			                	     	 	institution: {type: 'string'},
+			                	     	 	start_year: {type: 'integer'},
+			                	     	 	end_year: {type: 'integer'}
+		                	    		}
+		                	    	}
+		                	    }
+		                	},
+		                	required: ['email', 'user_class', 'user_roles', 'location']            	
+	                	}
+	                }
+	            };
+
+
+                var json = this.formToObject(schema);
+
+                // console.log(this.updateUserRecord);
+                //console.log('JSON');
+                //console.log(json);
+                var updated = this.updateUserRecord(json);
+
+                // Check the updated form ...
+
+                // If errors, emit them.
+
+                // Otherwise, set the userRecord to the new one.
+
+                this.userRecord = updated;
+
+                console.log('UPDATED');
+                console.log(updated);
+
+                // step 1: translate forms to this object...
+
+                // REALNAME
+
+                /*
+
+                this.updateField('realname', 'input', ['user'], function (value) {
+                    if (!value || value.length === 0) {
+                        throw 'Name field is required';
+                    } else if (value.length > 100) {
+                        throw 'The name field may not be more than 100 characters long.';
+                    }   
+                    return value;
+                });
+
+                
+
+
+                // SUFFIX
+                this.updateField('suffix', 'input', ['profile'], function (value) {
+                    if (value) {
+                        if (value.length > 25) {
+                            throw 'The Suffix field may not be more than 25 characters long.';
+                        } 
+                    }
+                    return value;
+                });
+
+                // TITLE
+                var title = this.contentPlace.find('[data-field="title"]').val();
+                this.updateField('title', 'input', ['profile'], function (value) {
+                    if (value) {
+                        if (!this.titlesMap[value]) {
+                            throw 'The title value "'+value+'" is not within the acceptable range.'
                         }
-                    },
-                    error: function (jqxhr, status, error) {
-                        console.log('error getting globus data: ' + jqxhr.responseText + ', ' + error);
+                    }
+                    return value;
+                }.bind(this));
+*/
+/*
+                // LOCATION
+                var location = this.contentPlace.find('[data-field="location"]').val();
+                if (location && location.length > 0) {
+                    this.userRecord.profile['location'] = location;
+                } else {
+                    this.userRecord.profile['location'] = null;
+                }
+
+                // EMAIL
+                var email = this.getFieldValue('email');
+                if (!email || email.length === 0) {
+                    this.setFieldError('email', 'The E-Mail field is required.');
+                } else {
+                    this.setProfileField('profile', 'email', email);
+                }
+
+                // GRAVATAR & AVATAR
+                var gravatar_default = this.contentPlace.find('[data-field="gravatar_default"]').val();
+                if (gravatar_default && gravatar_default.length > 0) {
+                    this.userRecord.profile['gravatar_default'] = gravatar_default;
+                } else {
+                    //delete(this.userRecord.profile['gravatar_default']);
+                    this.userRecord.profile['gravatar_default'] = '';
+                }
+                var avatar_color = this.contentPlace.find('[data-field="avatar_color"]').val();
+                if (avatar_color && avatar_color.length > 0) {
+                    this.userRecord.profile['avatar_color'] = avatar_color;
+                } else {
+                    // delete(this.userRecord.profile['avatar_color']);
+                    this.userRecord.profile['avatar_color'] = '';
+                }
+
+                var avatar_initials = this.contentPlace.find('[data-field="avatar_initials"]').val();
+                if (avatar_initials && avatar_initials.length > 0) {
+                    this.userRecord.profile['avatar_initials'] = avatar_initials;
+                } else {
+                    // delete(this.userRecord.profile['avatar_initials']);
+                    this.userRecord.profile['avatar_initials'] = '';
+                }
+
+                // Coding: Roles, Funding 
+
+                // ROLES
+                var roles = [];
+                var roleFields = this.contentPlace.find('[data-field="roles"]');
+                roleFields.each(function() {
+                    if ($(this).is(':checked')) {
+                        roles.push($(this).val());
                     }
                 });
+                this.userRecord.profile['roles'] = roles;
+
+
+                // USER CLASS
+                var userClassFields = this.contentPlace.find('[data-field="userClass"]');
+                userClassFields.each(function() {
+                    if ($(this).is(':checked')) {
+                        // should only be one...
+                        that.userRecord.profile['userClass'] = $(this).val();
+                    }
+                });
+
+
+                // AFFILIATIONS
+                var affiliations = this.contentPlace.find('[data-field-group="affiliation"]');
+                var affiliationsToSave = [];
+                var currentYear = (new Date()).getFullYear();                
+                for (var i = 0; i < affiliations.length; i++) {
+
+                    var startYearNode = $(affiliations[i]).find('[data-field="start_year"]')
+                    var startYear = startYear.val();
+                    if (!startYear || startYear.length === 0) {
+                        this.setFieldError(startYearNode, 'The Start Year for an affiliation is required.');
+                    } else {
+                        startYear = parseInt(startYear);                    
+                        if (startYear === NaN) {
+                            this.setFieldError(startYearNode, 'This value needs to be an integer between 1900 and ' + currentYear);
+                        } else if (startYear < 1900) {
+                            this.setFieldError(startYearNode, 'This value needs to be an integer between 1900 and ' + currentYear);
+                        } else if (startYear > currentYear) {
+                            this.setFieldError(startYearNode, 'This value needs to be an integer between 1900 and ' + currentYear);
+                        } else {
+                            that.userRecord.profile['start_year'] = startYear;
+                        }
+                    }
+
+                    var endYear = $(affiliations[i]).find('[data-field="end_year"] input').val();
+                    if (endYear === NaN) {
+                        endYear = '';
+                        // TODO: flag as error.
+                    }
+
+                    var affiliation = {
+                        title: $(affiliations[i]).find('[data-field="title"] input').val(),
+                        institution: $(affiliations[i]).find('[data-field="institution"] input').val(),
+                        start_year: startYear,
+                        end_year: endYear
+                    };
+
+                    // TODO better way of handling this!
+                    if (affiliation['title'] && affiliation['institution']) {
+                        affiliationsToSave.push(affiliation);
+                    }
+                }
+                this.userRecord.profile['affiliations'] = affiliationsToSave;
+
+
+                // PERSONAL STATEMENT / BIO
+                this.userRecord.profile['personal_statement'] = this.contentPlace.find('[data-field="personal_statement"] textarea').val();
+                */
+
+
+                // SAVING
+                if (this.formHasError) {
+                    this.addErrorMessage('Not Saved', 'Your changes cannot be saved due to one or more errors. Please review the form, make the required corrections, and try again.');
+                    return false;
+                }
+
+                //console.log('saving...');
+                //console.log(toSave);
+
+                // Clean up the user info data object.
+
+               
+                return true;
             }
         },
 
-        genId: {
-            value: function() {
-                return 'gen_' + this._generatedId++;
-            }
-        },
-
-
-
-        createProfile: {
+        createUserRecord: {
             value: function () {
                 // Get basic user account info (may already have it).
                 this.ensureAccountData(function () {
@@ -570,175 +1135,158 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
 
-
         setProfileField: {
-            value: function(section, name, value) {
-                this.userRecord[section][name] = value;
+            value: function(path, name, value) {
+                var rec = this.userRecord;
+                for (var i=0; i<path.length; path++) {
+                    if (!rec[path[i]]) {
+                        rec[path[i]] = {};
+                    }
+                    rec = rec[path[i]];
+                }
+                rec[name] = value;
             }
         },
+
         deleteProfileField: {
-            value: function(section, name) {
-                delete this.userRecord[section][name];
+            value: function(path, name) {
+                 for (var i=0; i<path.length; path++) {
+                    if (!rec[path[i]]) {
+                        return
+                    }
+                    rec = rec[path[i]];
+                }
+                delete rec[name];
             }
         },
+
+        showError: {
+        	value: function (data) {
+        		var title;
+        		if (data.title) {
+        			title = data.title;
+        		} else {
+        			title = 'Error';
+        		}
+        		this.titlePlace.html(title);
+                this.renderPicture();
+        		// NB: use a template here in case we have more interesting things to say.
+        		var context = data;
+				this.contentPlace.html(this.getTemplate('error').render(context));
+        	}
+        },
+
+        getGenomeComparisonUserInfo: {
+            value: function(cfg, callback) {
+                // Can't use this, because the globus CORS policy does 
+                // not allow us to.
+                // TODO: need to incorporate this into the user profile
+                // service.
+                // FORNOW: use the getGenomeComparisonUserInfo workaround for now.
+                if (!this.authToken) {
+                    callback.call(that, {});
+                }
+                var host = 'kbase.us';
+                var path = '/services/genome_comparison/users';
+                var query = 'usernames=' + cfg.userId + '&token=' + this.authToken;
+                var url = 'https://' + host + path + '?' + query;
+                $.ajax(url, {
+                    dataType: 'json',
+                    success: function (responseData) {  
+                         if (responseData.data[cfg.userId] && responseData.data[cfg.userId].fullName) {
+                            callback.call(this, {
+                                realname: responseData.data[cfg.userId].fullName, 
+                                email: responseData.data[cfg.userId].email,
+                                username: cfg.userId
+                            });
+                        } else {
+                            callback.call(this, {realname: null});
+                        }
+                    }.bind(this),
+                    error: function (jqxhr, status, error) {
+                    	this.showError({
+                    		title: 'Error', 
+                    		message: 'Error getting account data from Genome Comparison.',
+                    		responseText: jqxhr.responseText,
+                    		status: status,
+                    		error: error,
+                    		jqxhr: jqxhr
+                    	});
+
+                        console.log('error getting globus data: ' + jqxhr.responseText + ', ' + error);
+                        console.log(jqxhr); console.log(status); console.log(error);
+                    }.bind(this)
+                });
+            }
+        },
+
 
         // DOM QUERY
         getFieldValue: {
             value: function(name) {
-                return this.contentPlace.find('[data-field="' + name + '"]').val();
-            }
-        },
-
-       
-        // MODEL UPDATE
-        updateUserRecordFromForm: {
-            value: function() {
-                var that = this;
-                this.clearErrors();
-
-                // step 1: translate forms to this object...
-
-                // REALNAME
-                var realname = this.getFieldValue('realname');
-                if (!realname || realname.length === 0) {
-                    this.setFieldError('realname', 'Name field is required');
-                } else if (realname.length > 100) {
-                    this.setFieldError('realname', 'The name field may not be more than 100 characters long.');
+                var field = this.contentPlace.find('[data-field="' + name + '"]');
+                if (!field || field.length === 0) {
+                	return undefined;
                 } else {
-                    this.setProfileField('user', 'realname', realname);
-                }
-
-                // SUFFIX
-                var suffix = this.getFieldValue('suffix');
-                if (suffix) {
-                    if (suffix.length > 25) {
-                        this.setFieldError('suffix', 'The Suffix field may not be more than 25 characters long.');
-                    } else {
-                        this.setProfileField('profile', 'suffix', suffix);
-                    }
-                } else {
-                    this.deleteProfileField('profile', 'suffix');
-                }
-
-                // TITLE
-                var title = this.contentPlace.find('[data-field="title"]').val();
-                if (title && title.length === 0) {
-                    delete this.userRecord.profile['title'];
-                } else {                    
-                    this.userRecord.profile['title'] = title;
-                }
-
-                var location = this.contentPlace.find('[data-field="location"]').val();
-                if (location && location.length > 0) {
-                    this.userRecord.profile['location'] = location;
-                } else {
-                    this.userRecord.profile['location'] = null;
-                }
-
-                // EMAIL
-                var email = this.getFieldValue('email');
-                if (!email || email.length === 0) {
-                    this.setFieldError('email', 'The E-Mail field is required.');
-                } else {
-                    this.setProfileField('profile', 'email', email);
-                }
-
-                // GRAVATAR
-                var gravatar_default = this.contentPlace.find('[data-field="gravatar_default"]').val();
-                if (gravatar_default && gravatar_default.length > 0) {
-                    this.userRecord.profile['gravatar_default'] = gravatar_default;
-                } else {
-                    //delete(this.userRecord.profile['gravatar_default']);
-                    this.userRecord.profile['gravatar_default'] = '';
-                }
-                var avatar_color = this.contentPlace.find('[data-field="avatar_color"]').val();
-                if (avatar_color && avatar_color.length > 0) {
-                    this.userRecord.profile['avatar_color'] = avatar_color;
-                } else {
-                    // delete(this.userRecord.profile['avatar_color']);
-                    this.userRecord.profile['avatar_color'] = '';
-                }
-
-                var avatar_initials = this.contentPlace.find('[data-field="avatar_initials"]').val();
-                if (avatar_initials && avatar_initials.length > 0) {
-                    this.userRecord.profile['avatar_initials'] = avatar_initials;
-                } else {
-                    // delete(this.userRecord.profile['avatar_initials']);
-                    this.userRecord.profile['avatar_initials'] = '';
-                }
-
-                /* Coding: Roles, Funding */
-
-                // ROLES
-                var roles = [];
-                var roleFields = this.contentPlace.find('[data-field="roles"]');
-                roleFields.each(function() {
-                    if ($(this).is(':checked')) {
-                        roles.push($(this).val());
-                    }
-                });
-                this.userRecord.profile['roles'] = roles;
-
-
-                // USER CLASS
-                var userClassFields = this.contentPlace.find('[data-field="userClass"]');
-                userClassFields.each(function() {
-                    if ($(this).is(':checked')) {
-                        // should only be one...
-                        that.userRecord.profile['userClass'] = $(this).val();
-                    }
-                });
-
-
-                // AFFILIATIONS
-                var affiliations = this.contentPlace.find('[data-field-group="affiliation"]');
-                var affiliationsToSave = [];
-                for (var i = 0; i < affiliations.length; i++) {
-
-                    var startYear = $(affiliations[i]).find('[data-field="start_year"]').val();
-                    if (startYear === NaN) {
-                        startYear = '';
-                        // TODO: flag as error.
-                    }
-
-                    var endYear = $(affiliations[i]).find('[data-field="end_year"]').val();
-                    if (endYear === NaN) {
-                        endYear = '';
-                        // TODO: flag as error.
-                    }
-
-                    var affiliation = {
-                        title: $(affiliations[i]).find('[data-field="title"]').val(),
-                        institution: $(affiliations[i]).find('[data-field="institution"]').val(),
-                        start_year: startYear,
-                        end_year: endYear
-                    };
-
-                    // TODO better way of handling this!
-                    if (affiliation['title'] && affiliation['institution']) {
-                        affiliationsToSave.push(affiliation);
-                    }
-                }
-                this.userRecord.profile['affiliations'] = affiliationsToSave;
-
-
-                // PERSONAL STATEMENT / BIO
-                this.userRecord.profile['personal_statement'] = this.contentPlace.find('[data-field="personal_statement"]').val();
-
-
-                // SAVING
-                if (this.formHasError) {
-                    this.addErrorMessage('Not Saved', 'Your changes cannot be saved due to one or more errors. Please review the form, make the required corrections, and try again.');
-                    return false;
-                }
-
-                //console.log('saving...');
-                //console.log(toSave);
-
-                // Clean up the user info data object.
-
-               
-                return true;
+                	var control = field.find('input, textarea, select');
+                	var tag = control.prop('tagName').toLowerCase();
+                	// console.log('tag for '+name+' is ' + tag);
+                	switch (tag) {
+                		case 'input':
+	                		var inputType = control.attr('type');
+	                		switch (inputType) {
+	                			case 'checkbox': 
+		                			return control.map(function() {
+				                    	var $el = $(this);
+				                   		if ($el.prop('checked')) {
+				                   			return $el.val();
+				                   		} else {
+				                   			return null;
+				                   		}
+				                    }).get();
+	                			case 'radio':
+	                				var value = control.map(function() {
+				                    	var $el = $(this);
+				                   		if ($el.prop('checked')) {
+				                   			return $el.val();
+				                   		} else {
+				                   			return null;
+				                   		}
+				                    }).get();
+				                    if (value.length === 1) {
+				                    	return value[0];
+				                    } else {
+				                    	return null;
+				                    }
+	                			default:
+	                				var value = control.val();
+	                				if (value && value.length > 0) {
+	                					return value;
+	                				} else {
+	                					return null;
+	                				}
+	                		}
+	                	case 'textarea': 
+	                		var value = control.val();
+                			if (value) {
+                				if (value.length === 0) {
+                					value = null;
+                				}
+                			}
+                			return value;
+	                		break;
+	                	case 'select': 
+	                		var value = control.val();
+                			if (value) {
+                				if (value.length === 0) {
+                					value = null;
+                				}
+                			}
+                			return value;
+	                		break;
+                	}
+				}
+                	
             }
         },
 
@@ -757,12 +1305,24 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         },
 
         setFieldError: {
-            value: function(name, message) {
-                //console.log('ERROR: ' + name + ', ' + message);
-                var fieldControl = this.contentPlace.find('[data-field="' + name + '"]').closest('.form-group');
-                if (fieldControl) {
-                    fieldControl.addClass('has-error');
+            value: function(field, message) {
+
+                if (typeof field === 'string') {
+                    field = this.contentPlace.find('[data-field="'+field+'"]');
                 }
+                field.find('.form-control').addClass('has-error');
+                var messageNode = field.find('[data-element="message"]');
+                console.log('message: ');
+                console.log(messageNode);
+                if (message) {
+                    messageNode.html(message);
+                    messageNode.addClass('error-message');
+                }
+                //var fieldControl = this.contentPlace.find('[data-field="' + name + '"]').closest('.form-group');
+                //if (fieldControl) {
+                //    fieldControl.addClass('has-error');
+                //}
+                /*
                 var fieldMessage = this.contentPlace.find('[data-message-for-field="' + name + '"]');
                 if (fieldMessage) {
                     fieldMessage.html(message);
@@ -770,9 +1330,11 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 } else {
                     console.log('no message container: ' + message);
                 }
+                */
                 this.formHasError = true;
             }
         },
+
         createInitialUI: {
             value: function () {
                 // Set up the basic panel layout.
@@ -825,7 +1387,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 return this;
             }
         },
-
 
         showEditView: {
             value: function() {
@@ -887,7 +1448,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 this.contentPlace.html(this.getTemplate('no_profile').render(this.context));
                 if (this.isProfileOwner) {
                     $('[data-button="create-profile"]').on('click', function(e) {
-                        this.createProfile();
+                        this.createUserRecord();
                     }.bind(this));
                 }
             }
@@ -909,11 +1470,13 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 $('[data-field-message]').empty();
             }
         },
+
         clearMessages: {
             value: function() {
                 this.alertPlace.empty();
             }
         },
+
         addSuccessMessage: {
             value: function(title, message) {
                 this.alertPlace.append(
@@ -922,6 +1485,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     '<strong>' + title + '</strong> ' + message + '</div>');
             }
         },
+
         addErrorMessage: {
             value: function(title, message) {
                 this.alertPlace.append(
@@ -948,6 +1512,12 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 this.alertPlace = this.container.find('[data-placeholder="alert"]');
                 this.contentPlace = this.container.find('[data-placeholder="content"]');
                 this.titlePlace = this.container.find('[data-placeholder="title"]');
+            }
+        },
+
+        renderWaiting: {
+            value: function () {
+                this.contentPlace.html('<img src="assets/img/ajax-loader.gif"></img>');
             }
         }
 

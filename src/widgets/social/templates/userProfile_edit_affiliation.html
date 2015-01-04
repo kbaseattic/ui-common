@@ -1,4 +1,4 @@
-<div class="panel panel-default affiliation" data-field-group="affiliation">
+<div class="panel panel-default affiliation" data-field-group="affiliation" data-field-group-type="array-item">
     <div class="panel-heading">
       <div class="button-group pull-right">
         <button type="button" class="btn btn-xs btn-danger" data-button="remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
@@ -9,33 +9,36 @@
       
     </div>
     <div class="panel-body" >
-
-        <div class="form-group">
+    <fieldset>
+        <div class="form-group" data-field="title">
             <label for="affiliation-title-{{affid}}" class="control-label col-md-3">Title</label>
             <div class="col-md-9">
-                <input id="affiliation-title-{{affid}}" type="text" class="form-control" data-field="title" value="{{affiliation.title | e}}">
+                <input id="affiliation-title-{{affid}}" type="text" class="form-control" value="{{affiliation.title | e}}">
             </div>
-            <div data-field-message="title" class="field-message col-md-9 col-md-push-3"></div>
+            <div data-element="message" class="field-message col-md-9 col-md-push-3"></div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" data-field="institution">
             <label for="affiliation-institution-{{affid}}" class="control-label col-md-3">Institution</label>
             <div class="col-md-9">
-                <input id="affiliation-institution-{{affid}}" type="text" class="form-control" data-field="institution" value="{{affiliation.institution | e}}">
+                <input id="affiliation-institution-{{affid}}" type="text" class="form-control" value="{{affiliation.institution | e}}">
             </div>
-            <div data-field-message="institution" class="field-message col-md-9 col-md-push-3"></div>
+            <div data-element="message" class="field-message col-md-9 col-md-push-3"></div>
         </div>
 
         <div class="form-group">
-            <label for="affiliation-start_year-{{affid}}" class="control-label col-md-3">Starting in Year</label>
-            <div class="col-md-3">
-                <input id="affiliation-start_year-{{affid}}" type="text" class="form-control" data-field="start_year" value="{{affiliation.start_year}}">
+            
+            <div class="col-md-3" data-field="start_year">
+                <label for="affiliation-start_year-{{affid}}" class="control-label col-md-3">Starting in Year</label>
+                <input id="affiliation-start_year-{{affid}}" type="text" class="form-control" value="{{affiliation.start_year}}">
+                <div data-field-part="message" class="field-message"></div>
             </div>
-            <label for="affiliation-end_year-{{affid}}" class="control-label col-md-3">Ending</label>
-            <div class="col-md-3">
-                <input id="affiliation-end_year-{{affid}}" type="text" class="form-control" data-field="end_year" value="{{affiliation.end_year}}">
+            <div class="col-md-3" data-field="end_year">
+                <label for="affiliation-end_year-{{affid}}" class="control-label col-md-3">Ending</label>
+                <input id="affiliation-end_year-{{affid}}" type="text" class="form-control" value="{{affiliation.end_year}}">
+                <div data-element="message" class="field-message"></div>
             </div>
         </div>
-
+    </fieldset>
     </div>
 </div>

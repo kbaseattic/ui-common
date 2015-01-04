@@ -1,20 +1,20 @@
 
 <style type="text/css">
-.profile-info h3 {
-  font-size: 130%;
-  margin: 10px 0 5px 0;
-  text-decoration: underline;
-}
-.profile-info ul {
-  padding: 0;
-}
-.profile-info ul li {
-  margin: 0;
-}
-.personal-statement {
-  margin: 20px 0 0 0;
-  line-height: 1.5;
-}
+  .profile-info h3 {
+    font-size: 130%;
+    margin: 10px 0 5px 0;
+    text-decoration: underline;
+  }
+  .profile-info ul {
+    padding: 0;
+  }
+  .profile-info ul li {
+    margin: 0;
+  }
+  .personal-statement {
+    margin: 20px 0 0 0;
+    line-height: 1.5;
+  }
 </style>
 <div class="profile-info">
   <div class="row">
@@ -37,66 +37,64 @@
     <div class="col-md-12">
       {% if userRecord.profile.location %}<i>{{userRecord.profile.location | e}}</i>{% endif %}
       {% if userRecord.profile.email %}
-      <p><a href="mailto:{{userRecord.profile.email | e}}">{{userRecord.profile.email | e}}</a></p>
+      <p><a href="mailto:{{profile.email | e}}">{{userRecord.profile.email | e}}</a></p>
       {% if env.isOwner and userRecord.profile.email != userRecord.account.email %}<p class="text-warning">Note: The email on your account is <i>{{ userRecord.account.email }}</i>.</p>{% endif %}
       {% endif %}
     </div>
   </div>
-        
+
   <div class="row">
     <div class="col-md-6">
-        <h3>User Class</h3>
-        {% if userRecord.profile.userClass %}
-          <ul><li>{{ userRecord.profile.userClass | userClassLabel}}</li></ul>
-        {% elif env.isOwner %}
-          <p class="text-warning">It is very useful to know what type of KBase user you are.</p>
-        {% else %}
-          <p>No user class assigned</p>  
-        {% endif %}
+      <h3>User Class</h3>
+      {% if userRecord.profile.userClass %}
+        <ul><li>{{ userRecord.profile.userClass | userClassLabel}}</li></ul>
+      {% elif env.isOwner %}
+        <p class="text-warning">It is very useful to know what type of KBase user you are.</p>
+      {% else %}
+        <p>No user class assigned</p>  
+      {% endif %}
 
-        <h3>Roles</h3>
-        {% if userRecord.profile.roles|length > 0 %}
-          <ul>
+      <h3>Roles</h3>
+      {% if userRecord.profile.roles|length > 0 %}
+        <ul>
           {% for role in userRecord.profile.roles %}
             <li>{{role | roleLabel }}</li>
           {% endfor %}
-          </ul>
-        {% elif env.isOwner %}
-          <p class="text-warning">It is very useful to know what type of roles you are fulfilling with your KBase account.</p>
-        {% else %}
-          <p>No roles assigned</p>
-        {% endif %}
-      </div>
-      <div class="col-md-6">
-        <h3>Affiliations</h3>  
-        {% if userRecord.profile.affiliations|length > 0 %}  
-          {% for affiliation in userRecord.profile.affiliations|sort(true, true, "start_year") %}
-            <p><strong>{{affiliation.title | e}}</strong> ({{affiliation.start_year| e}}-{% if affiliation.end_year %}{{affiliation.end_year | e}}{% else %}present{% endif %}) @ {{affiliation.institution | e}}</p>
-          {% endfor %}
-          </div>
-        {% elif env.isOwner %}
-          <p class="text-warning">Show your colors! Please add one or more affiliations.</p>
-        {% else %}
-          <p>No affiliations recorded for this user</p>
-        {% endif %}
-      </div>
+        </ul>
+      {% elif env.isOwner %}
+        <p class="text-warning">It is very useful to know what type of roles you are fulfilling with your KBase account.</p>
+      {% else %}
+        <p>No roles assigned</p>
+      {% endif %}
+    </div>
+    <div class="col-md-6">
+      <h3>Affiliations</h3>  
+      {% if userRecord.profile.affiliations|length > 0 %}  
+        {% for affiliation in userRecord.profile.affiliations|sort(true, true, "start_year") %}
+          <p><strong>{{affiliation.title | e}}</strong> ({{affiliation.start_year| e}}-{% if affiliation.end_year %}{{affiliation.end_year | e}}{% else %}present{% endif %}) @ {{affiliation.institution | e}}</p>
+        {% endfor %}
+      {% elif env.isOwner %}
+        <p class="text-warning">Show your colors! Please add one or more affiliations.</p>
+      {% else %}
+        <p>No affiliations recorded for this user</p>
+      {% endif %}
     </div>
   </div>
+
 
   <div class="row">
     <div class="col-md-12">
       <div class="well personal-statement">    
-      {% if userRecord.profile.personal_statement %}
-        {{userRecord.profile.personal_statement | e | kbmarkup}}
-      {% else %}
-        {%if env.isOwner %}
-          You don't have a personal statement. Don't you want to let the the KBase community know a little about you?
+        {% if userRecord.profile.personal_statement %}
+          {{userRecord.profile.personal_statement | e | kbmarkup}}
         {% else %}
-          <i>This user does not have a personal statement</i>
+          {%if env.isOwner %}
+            You don't have a personal statement. Don't you want to let the the KBase community know a little about you?
+          {% else %}
+            <i>This user does not have a personal statement</i>
+          {% endif %}
         {% endif %}
-      {% endif %}
       </div>
     </div>
   </div>
-
 </div>
