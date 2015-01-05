@@ -8,13 +8,36 @@
             obj: null,
             loadingImage: "assets/img/ajax-loader.gif",
             ws_url: "https://kbase.us/services/ws"
-//              ws_url:"https://dev04.berkeley.kbase.us/services/ws"
+//            ws_url:"https://dev04.berkeley.kbase.us/services/ws"
+//            ws_url:"https://dev03.berkeley.kbase.us/services/ws"
         },
 
         ws: null, // the ws client
 
         $mainPanel: null,
         $errorPanel: null,
+        
+        typereg: {'KBaseFile.SingleEndLibrary':
+                       {nicetype: 'Single End Read Library',
+                        app: 'Assembly'
+                        },
+                   'KBaseFile.PairedEndLibrary':
+                       {nicetype: 'Paired End Read Library',
+                        app: 'Assembly'
+                        },
+                   'KBaseFile.AssemblyFile':
+                       {nicetype: 'Assembly File',
+                        app: 'Assembly File to ContigSet'
+                        },
+                   'KBaseFile.AnnotationFile':
+                       {nicetype: 'Annotation File',
+                        app: 'Annotation File to Genome'
+                        },
+                   'none':
+                       {nicetype: null,
+                        app: null
+                       }
+                    },
 
         init: function(options) {
             this._super(options);
@@ -92,55 +115,65 @@
                 // do things
                 self.$mainPanel.empty();
 
-                // first we detect the type
                 var typeName = self.objData.type.split('-')[0];
-                if (typeName === 'KBaseFile.SingleEndLibrary') {
-                    self.renderLibraryFile('Single End Read Library');
-                } else if (typeName === 'KBaseFile.PairedEndLibrary') {
-                    self.renderLibraryFile('Paired End Read Library');
+                if (typeName in self.typereg) {
+                    self.renderType(self.typereg[typeName]);
                 } else {
-                    self.renderUnknownType(self.objData.type);
+                    self.renderType(self.typereg.none);
                 }
             }
         },
 
 
-        renderLibraryFile: function(typeNameNice) {
+        renderType: function(typeInfo) {
             var self = this;
+            var typeNameNice;
+            if (typeInfo.nicetype != null) {
+                typeNameNice = typeInfo.nicetype;
+            } else {
+                typeNameNice = self.objData.type;
+            }
 
             var $basicInfo =
                 $('<div>').addClass('col-md-6')
                     .append($('<div>').append('<h3>' + self.objData.name + '</h3>'))
                     .append($('<div>').css({'color':'#555'})
-                            .append('Workspace: ' + self.objData.workspace))
+                            .append('Workspace: ' + '<a href="#/ws/objects/' +
+                                    self.objData.workspace +
+                                    '" target="_blank">' +
+                                    self.objData.workspace + '</a>'))
                     .append($('<div>').css({'color':'#555'}) //todo: make this a real style somewhere
-                            .append('<a href="#/spec/type/'+self.objData.type +
-                                    '" target="_blank">'+typeNameNice+'</a>'))
+                            .append('<a href="#/spec/type/' + self.objData.type +
+                                    '" target="_blank">' + typeNameNice + '</a>'))
                     .append($('<div>').css({'color':'#555'})
-                            .append('Imported on '+self.getTimeStr(self.objData.save_date)))
+                            .append('Imported on ' + self.getTimeStr(self.objData.save_date)))
                     .append($('<div>').css({'color':'#555'})
                             .append('Perm Ref: ' + self.objData.wsid + "/"
                                     + self.objData.obj_id + "/" + self.objData.version))
 
             var $buttonDiv =
-                $('<div>').css({'margin':'10px','margin-top':'20px'})
-                    .append($('<a href="">').addClass('btn btn-info')
-                            .css({'margin':'5px'}).append('Copy to Narrative'))
-                    .append($('<a href="">').addClass('btn btn-info')
-                            .css({'margin':'5px'}).append('Launch Assembly App'))
-                //.append($('<a href="">').addClass('btn btn-info').css({'margin':'5px'}).append('Copy into Existing Analysis'));
+                $('<div>').css({'margin':'10px','margin-top':'20px'});
+            if (typeInfo.app != null) {
+                $buttonDiv.append($('<a href="">').addClass('btn btn-info')
+                            .css({'margin':'5px'})
+                            .append('Launch ' + typeInfo.app + ' App'));
+            }
+            $buttonDiv.append($('<a href="">').addClass('btn btn-info')
+                .css({'margin':'5px'}).append('Copy to Narrative'));
 
             $basicInfo.append($buttonDiv);
 
             var $metaInfo = $('<div>').addClass('col-md-6').css({'margin-top':'20px'});
 
             var $metaTbl = $('<table>').addClass("table table-striped table-bordered").css({'width':'100%'});
-            for(var key in self.objData.meta) {
+            var k = Object.keys(self.objData.meta).sort();
+            for(var i = 0; i < k.length; i++) {
+                var key = k[i];
                 if (self.objData.meta.hasOwnProperty(key)) {
-                    $metaTbl.append(
-                            $('<tr>')
-                            .append($('<th>').append(key))
-                            .append($('<td>').append(self.objData.meta[key])));
+                    $metaTbl.append($('<tr>')
+                                .append($('<th>').append(key))
+                                .append($('<td>')
+                                        .append(self.objData.meta[key])));
                 }
             }
             $metaInfo.append($metaTbl)
@@ -154,51 +187,6 @@
 
             self.$mainPanel.append($content);
         },
-
-        /* copied from render library file because i expect these viewers to diverge somewhat */
-        renderUnknownType: function(typeNameNice) {
-            var self = this;
-            var $basicInfo =
-                $('<div>').addClass('col-md-6')
-                    .append($('<div>').append('<h3>' + self.objData.name + '</h3>'))
-                    .append($('<div>').css({'color':'#555'})
-                            .append('Workspace: ' + self.objData.workspace))
-                    .append($('<div>').css({'color':'#555'}) //todo: make this a real style somewhere
-                            .append('<a href="#/spec/type/' + self.objData.type +
-                                    '" target="_blank">'+typeNameNice+'</a>'))
-                    .append($('<div>').css({'color':'#555'})
-                            .append('Updated on '+self.getTimeStr(self.objData.save_date)))
-                    .append($('<div>').css({'color':'#555'})
-                            .append('Perm Ref: ' + self.objData.wsid +
-                                    "/"+self.objData.obj_id+"/"+self.objData.version ))
-
-            var $buttonDiv =
-                $('<div>').css({'margin':'10px','margin-top':'20px'})
-                .append($('<a href="">').addClass('btn btn-info')
-                        .css({'margin':'5px'}).append('Copy to Narrative'));
-            $basicInfo.append($buttonDiv);
-            var $metaInfo = $('<div>').addClass('col-md-6').css({'margin-top':'20px'});
-
-            var $metaTbl = $('<table>').addClass("table table-striped table-bordered").css({'width':'100%'});
-            for(var key in self.objData.meta) {
-                if (self.objData.meta.hasOwnProperty(key)) {
-                    $metaTbl.append(
-                            $('<tr>')
-                            .append($('<th>').append(key))
-                            .append($('<td>').append(self.objData.meta[key])));
-                }
-            }
-            $metaInfo.append($metaTbl)
-
-            var $content =
-                $('<div>').append(
-                        $('<div>').addClass('row')
-                        .append($basicInfo)
-                        .append($metaInfo));
-
-            self.$mainPanel.append($content);
-        },
-
 
         notLoggedIn: function() {
             this.$mainPanel.empty();
