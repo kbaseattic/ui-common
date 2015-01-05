@@ -163,12 +163,14 @@
             var $metaInfo = $('<div>').addClass('col-md-6').css({'margin-top':'20px'});
 
             var $metaTbl = $('<table>').addClass("table table-striped table-bordered").css({'width':'100%'});
-            for(var key in self.objData.meta) {
+            var k = Object.keys(self.objData.meta).sort();
+            for(var i = 0; i < k.length; i++) {
+                var key = k[i];
                 if (self.objData.meta.hasOwnProperty(key)) {
-                    $metaTbl.append(
-                            $('<tr>')
-                            .append($('<th>').append(key))
-                            .append($('<td>').append(self.objData.meta[key])));
+                    $metaTbl.append($('<tr>')
+                                .append($('<th>').append(key))
+                                .append($('<td>')
+                                        .append(self.objData.meta[key])));
                 }
             }
             $metaInfo.append($metaTbl)
