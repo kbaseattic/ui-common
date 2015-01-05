@@ -138,7 +138,10 @@
                 $('<div>').addClass('col-md-6')
                     .append($('<div>').append('<h3>' + self.objData.name + '</h3>'))
                     .append($('<div>').css({'color':'#555'})
-                            .append('Workspace: ' + self.objData.workspace))
+                            .append('Workspace: ' + '<a href="#/ws/objects/' +
+                                    self.objData.workspace +
+                                    '" target="_blank">' +
+                                    self.objData.workspace + '</a>'))
                     .append($('<div>').css({'color':'#555'}) //todo: make this a real style somewhere
                             .append('<a href="#/spec/type/' + self.objData.type +
                                     '" target="_blank">' + typeNameNice + '</a>'))
