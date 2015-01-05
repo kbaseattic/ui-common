@@ -20,7 +20,7 @@
   <div class="row">
     <div class="col-md-9">
       <h2>{% if userRecord.profile.title %}{{userRecord.profile.title | titleLabel }} {% endif %}{{userRecord.user.realname | e}}{% if userRecord.profile.suffix %}, {{userRecord.profile.suffix | e}}{% endif %}</h2>
-      {% if env.isOwner and userRecord.user.realname != userRecord.account.realname %}<p class="text-warning">Note: The name on your account is <i>{{ userRecord.account.realname }}</i>.</p>{% endif %}
+      {% if env.isOwner and userRecord.user.realname != userRecord.profile.account.realname %}<p class="text-warning">Note: The name on your account is <i>{{ userRecord.profile.account.realname }}</i>.</p>{% endif %}
     </div>
     <div class="col-md-3">
 
@@ -38,7 +38,7 @@
       {% if userRecord.profile.location %}<i>{{userRecord.profile.location | e}}</i>{% endif %}
       {% if userRecord.profile.email %}
       <p><a href="mailto:{{profile.email | e}}">{{userRecord.profile.email | e}}</a></p>
-      {% if env.isOwner and userRecord.profile.email != userRecord.account.email %}<p class="text-warning">Note: The email on your account is <i>{{ userRecord.account.email }}</i>.</p>{% endif %}
+      {% if env.isOwner and userRecord.profile.email != userRecord.profile.account.email %}<p class="text-warning">Note: The email on your account is <i>{{ userRecord.profile.account.email }}</i>.</p>{% endif %}
       {% endif %}
     </div>
   </div>
@@ -46,8 +46,8 @@
   <div class="row">
     <div class="col-md-6">
       <h3>User Class</h3>
-      {% if userRecord.profile.userClass %}
-        <ul><li>{{ userRecord.profile.userClass | userClassLabel}}</li></ul>
+      {% if userRecord.profile.user_class %}
+        <ul><li>{{ userRecord.profile.user_class | userClassLabel}}</li></ul>
       {% elif env.isOwner %}
         <p class="text-warning">It is very useful to know what type of KBase user you are.</p>
       {% else %}

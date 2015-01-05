@@ -13,9 +13,9 @@
 
 		init: function(options) {
 			this._super(options);
-			console.log('ws url?');
-			console.log(this.options.kbCache.ws_url);
-			console.log(this.options.kbCache.token);
+			//console.log('ws url?');
+			//console.log(this.options.kbCache.ws_url);
+			//console.log(this.options.kbCache.token);
 			if (this.options.kbCache.ws_url) {
 				this.wsUrl = this.options.kbCache.ws_url;
 			}
@@ -59,9 +59,9 @@
 							wsids.push(data[k][0]);
 						}
 					}
-					console.log('hmm, recent activity?');
-					console.log(that.userId);
-					console.log(data);
+					//console.log('hmm, recent activity?');
+					//console.log(that.userId);
+					//console.log(data);
 					if (wsids.length > 0) {
 						var d = new Date();
 						d.setMonth(d.getMonth() - 3);

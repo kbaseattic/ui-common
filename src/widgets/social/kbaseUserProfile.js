@@ -136,11 +136,12 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         go: {
             value: function () {
-                this.createInitialUI();
-                this.renderWaiting();
-                this.sync(function() {
-                    this.render()
-                }.bind(this));
+                this.renderWaitingView();
+                this.getInitialData({
+                	success: function() {
+                    	this.render()
+                    }.bind(this)
+                });
             }
         },
 
@@ -161,17 +162,20 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
        
-        sync: {
-            value: function (callback) {
+        getInitialData: {
+            value: function (callbacks) {
                 // DATA
                 // This is where we get the data to feed to the widget.
                 // Each widget has its own independent data fetch.
+                // This may be called at any point to
                 if (!this.authToken) {
                     // We don't fetch any data if a user is not logged in.
                     this.userRecord = null;
-                    callback();
+                    if (callbacks.success) {
+                    	callbacks.success.call(this);
+                    }
                 } else {
-                    var userProfileServiceURL = 'http://dev19.berkeley.kbase.us/services/user_profile/rpc';
+                    var userProfileServiceURL = window.location.protocol + '//dev19.berkeley.kbase.us/services/user_profile/rpc';
                     var userProfile;
 
                     this.userProfileClient = new UserProfile(userProfileServiceURL, {
@@ -180,6 +184,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                    
                     this.userProfileClient.get_user_profile([this.userId], 
                         function(data) {
+                        	//console.log('got user data');
+                        	//console.log(data);
                             if (data[0]) {
                                 // profile found
                                 this.userRecord = data[0];
@@ -187,23 +193,29 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                                 // NB: this is just for now. We should probably incorporate
                                 // the account <-> profile syncing somewhere else/
                                 this.ensureAccountData(function() {
-                                    callback();
+                                    if (callbacks.success) {
+				                    	callbacks.success.call(this);
+				                    }
                                 }.bind(this));
                             } else {
-                                // logged in
-                                this.userRecord = {};
+                                // no profile ... create a bare bones one.
+                                this.userRecord = {
+                                	user: {}, profile: {}
+                                }
                                 this.context.userRecord = this.userRecord;
                                 this.ensureAccountData(function() {
-                                    callback();
+                                    if (callbacks.success) {
+				                    	callbacks.success.call(this);
+				                    }
                                 }.bind(this));
                             }
                         }.bind(this), 
                         function(err) {
                             console.log('[UserProfile.sync] Error getting user profile.');
                             console.log(err);
-                            this.showError({
+                            this.renderErrorView({
                             	title: 'Error Getting Profile', 
-                            	message: '<p>Error getting profile: ' + err + '</p>'
+                            	message: 'Error getting profile: ' + err
                             });
                         }.bind(this)
                     );
@@ -220,16 +232,20 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         ensureAccountData: {
             value: function(callback) {
-                if (!this.userRecord.account) {
-                    this.getGenomeComparisonUserInfo({userId: this.userId}, function (data) {
+            	// assumes the user record has been loaded, inspects to ensure the account
+            	// property is set, and if not, fetches it and sets it.
+                if (!this.userRecord.profile.account) {
+                	//console.log('GETTING user account');
+                	// console.log(this.userRecord);
+                    this.getUserAccountInfo({userId: this.userId}, function (data) {
                         if (data.realname) {
-                            this.userRecord.account = {
+                            this.userRecord.profile.account = {
                                 realname: data.realname,
                                 email: data.email,
                                 username: this.userId
                             };
                         } else {
-                        	this.showError({
+                        	this.renderErrorView({
                         		title: 'Error', 
                         		message: 'No user info returned from Genome Comparison'
                         	});
@@ -490,7 +506,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         updateField: {
             value: function (fieldName, controlType, dataPath, validationFun) {
-                var field = this.contentPlace.find('[data-field="'+fieldName+'"]');
+                var field = this.places.content.find('[data-field="'+fieldName+'"]');
                 if (!field) {
                     throw 'Field "' + fieldName + '" was not found on the form.';
                 }
@@ -517,7 +533,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         		// walk the schema, building an object out of any form values 
         		// that we find.
         		var that = this;
-        		var form = this.contentPlace.find['form'];
+        		var form = this.places.content.find['form'];
         		var parser = Object.create({}, {
         			init: {
         				value: function (cfg) {
@@ -601,12 +617,9 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 					},
         			parseObject: {
         				value: function (schema) {
-	        				// console.log('followObject: ' + schema.type);
-	        				// console.log(schema);
 	        				var newObject = {};
 		        			var propNames = Object.getOwnPropertyNames(schema.properties);
 		        			for (var i=0; i<propNames.length; i++) {
-		        				// console.log('getting prop '+propNames[i]);
 		        				var propName = propNames[i];
 		        				var propSchema = schema.properties[propName];
 
@@ -672,7 +685,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 		        					return this.getFieldValue(path);
 		        				case 'object': 
 		        					// we don't have a canned way to get a set of fields ... yet.
-		        					console.log('PATH=' + path);
 		        					var value =  this.container.find('[data-field="'+path+'"] fieldset').map(function () {
 		        						return Object.create(parser).init({container: $(this)}).parseObject(itemSchema);
 		        					}).get();
@@ -703,7 +715,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 		        		}
 		        	}
         		});
-        		return parser.init({container: this.contentPlace}).parseObject(schema);
+        		return parser.init({container: this.places.content}).parseObject(schema);
         	}
         },
 
@@ -753,7 +765,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 							var key = keys[i];
 							var val = obj[key];
 							var t = this.getType(val);
-							//console.log('[mergeObject] ' + key + ', ' + val + ', ' + t);
 							switch (t) {
 								case 'string': 
 								case 'number':
@@ -827,12 +838,12 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 					}
 				};
 				//console.log("1");
-				console.log('userRecord');
-				console.log(this.userRecord);
+				//console.log('userRecord');
+				//console.log(this.userRecord);
 				var recordCopy = Object.create(merger).init({}).mergeObject(this.userRecord);
 				//console.log("2");
-				console.log('newRecord');
-				console.log(newRecord);
+				//console.log('newRecord');
+				//console.log(newRecord);
 				var merged = Object.create(merger).init(recordCopy).mergeObject(newRecord);
 				//console.log("3");
 				return merged;
@@ -906,10 +917,13 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
                 // Otherwise, set the userRecord to the new one.
 
-                this.userRecord = updated;
+                this.userRecord = updated; 
 
-                console.log('UPDATED');
-                console.log(updated);
+                // And in the context as well, since we have replaced the entire object.
+                this.context.userRecord = updated;
+
+                //console.log('UPDATED');
+                //console.log(updated);
 
                 // step 1: translate forms to this object...
 
@@ -1083,20 +1097,24 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             value: function () {
                 // Get basic user account info (may already have it).
                 this.ensureAccountData(function () {
-
-                    // Copy the account fields to the corresponding user and profile fields.
-                    this.userRecord.user = {
-                        username: this.userRecord.account.username,
-                        realname: this.userRecord.account.realname,
-                    };
-                    this.userRecord.profile = {
-                        email: this.userRecord.account.email
-                    };
+                	// account data has been set ... copy the account fields to the corresponding user and profile fields.
+                	this.userRecord.user.username = this.userRecord.profile.account.username;
+                	this.userRecord.user.realname = this.userRecord.profile.account.realname;
+                    this.userRecord.profile.email = this.userRecord.profile.account.email
 
                     this.saveUserRecord({
                         success: function() {
+                        	this.renderViewEditLayout();
+                        	this.renderPicture();
+                            this.renderEditView();
                             this.addSuccessMessage('Success!', 'Your user profile has been created.');
-                            this.showEditView();
+                        },
+                        error: function (error) {
+                        	this.renderLayout();
+                        	this.renderErrorView({
+                        		title: 'Error',
+                        		message: 'Your user profile could not be saved: ' + error.message
+                        	})
                         }
                     });
                     
@@ -1107,31 +1125,21 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         saveUserRecord: {
             value: function (cfg) {
-
-                /*var toSave = {};
-                toSave.user = this.userRecord.user;
-                toSave.profile = this.userRecord.profile;
-                toSave.profile.basic_personal_info = null;
-                toSave.profile.email_address = null;
-                toSave.profile.email_addresses = null;
-                console.log(toSave);
-
-                toSave.env = null;
-                */
-                var that = this;
                 this.userProfileClient.set_user_profile({
                         profile: this.userRecord
                 },
                 function(response) {                    
                     if (cfg.success) {
-                        cfg.success.call(that);
+                        cfg.success.call(this);
                     }
-                },
+                }.bind(this),
                 function(err) {
-                    that.addErrorMessage('Error!', 'Your user profile could not be saved: ' + err.error.message);
-                    console.log('Error setting user profile: ' + err);
-                });
-
+                	if (cfg.success) {
+                        cfg.success.call(this, err.error);
+                    }
+                    //that.addErrorMessage('Error!', 'Your user profile could not be saved: ' + err.error.message);
+                    //console.log('Error setting user profile: ' + err);
+                }.bind(this));
             }
         },
 
@@ -1160,23 +1168,25 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
 
-        showError: {
+        renderErrorView: {
         	value: function (data) {
+        		// Make sure we have the standard panel layout.
+        		this.renderLayout();
         		var title;
         		if (data.title) {
         			title = data.title;
         		} else {
         			title = 'Error';
         		}
-        		this.titlePlace.html(title);
+        		this.places.title.html(title);
                 this.renderPicture();
         		// NB: use a template here in case we have more interesting things to say.
         		var context = data;
-				this.contentPlace.html(this.getTemplate('error').render(context));
+				this.places.content.html(this.getTemplate('error').render(context));
         	}
         },
 
-        getGenomeComparisonUserInfo: {
+        getUserAccountInfo: {
             value: function(cfg, callback) {
                 // Can't use this, because the globus CORS policy does 
                 // not allow us to.
@@ -1186,7 +1196,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 if (!this.authToken) {
                     callback.call(that, {});
                 }
-                var host = 'kbase.us';
+                // var host = 'kbase.us'; 
+                var host = 'mock.kbase.us';
                 var path = '/services/genome_comparison/users';
                 var query = 'usernames=' + cfg.userId + '&token=' + this.authToken;
                 var url = 'https://' + host + path + '?' + query;
@@ -1203,28 +1214,34 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                             callback.call(this, {realname: null});
                         }
                     }.bind(this),
-                    error: function (jqxhr, status, error) {
-                    	this.showError({
+                    error: function (jqxhr, status, error) {  
+                    	var message = 'Error getting account data from Genome Comparison. ';
+                    	if (jqxhr.status < 3) {
+                    		message += 'A network error has occurred with status "'+jqxhr.status+'". ';
+                    	} else {
+                    		message += 'An error occured with the service. The code is "'+jqxhr.status+'", "'+jqxhr.statusText+'". ';
+                    	}
+                    	this.renderErrorView({
                     		title: 'Error', 
-                    		message: 'Error getting account data from Genome Comparison.',
+                    		message: message,
                     		responseText: jqxhr.responseText,
                     		status: status,
                     		error: error,
                     		jqxhr: jqxhr
                     	});
 
-                        console.log('error getting globus data: ' + jqxhr.responseText + ', ' + error);
+                        console.log('[UserProfile.getUserAcountInfo] Error getting data: ' + jqxhr.responseText + ', ' + error);
                         console.log(jqxhr); console.log(status); console.log(error);
                     }.bind(this)
                 });
             }
         },
 
-
+		
         // DOM QUERY
         getFieldValue: {
             value: function(name) {
-                var field = this.contentPlace.find('[data-field="' + name + '"]');
+                var field = this.places.content.find('[data-field="' + name + '"]');
                 if (!field || field.length === 0) {
                 	return undefined;
                 } else {
@@ -1294,12 +1311,20 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         // main views
 
-        showInfoView: {
+        renderInfoView: {
             value: function() {
-                this.contentPlace.html(this.getTemplate('view').render(this.context));
-                this.contentPlace.find('[data-button="edit"]').on('click', function(e) {
+        	  	if (this.userOwnsProfile) {
+                    this.places.title.html('You - ' + this.loggedInName + ' (' + this.userRecord.user.username + ')');
+                } else {
+                    this.places.title.html(this.userRecord.user.realname + ' (' + this.userRecord.user.username + ')');
+                }
+                this.renderPicture();
+                //console.log('CONTENT');
+                //console.log(this.places);
+                this.places.content.html(this.getTemplate('view').render(this.context));
+                this.places.content.find('[data-button="edit"]').on('click', function(e) {
                     this.clearMessages();
-                    this.showEditView();
+                    this.renderEditView();
                 }.bind(this));
             }
         },
@@ -1308,7 +1333,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             value: function(field, message) {
 
                 if (typeof field === 'string') {
-                    field = this.contentPlace.find('[data-field="'+field+'"]');
+                    field = this.places.content.find('[data-field="'+field+'"]');
                 }
                 field.find('.form-control').addClass('has-error');
                 var messageNode = field.find('[data-element="message"]');
@@ -1341,77 +1366,80 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 // This adds stuff like the message area at the top of the panel body,
                 // and a main body div.
                 this.renderLayout();
-                console.log('layout rendered?');
 
                 // Set up listeners for any kbase events we are interested in:
                 $(document).on('loggedIn.kbase', function(e, auth) {
                     this.authToken = auth.token;
-                    this.sync(function () {this.render()}.bind(this));
+                    this.getInitialData({
+                    	success: function () {
+                    		this.render()
+                    	}.bind(this)
+                    });
                 }.bind(this));
 
                 $(document).on('loggedOut.kbase', function(e, auth) {
                     this.authToken = null;
-                    this.sync(function () {this.render()}.bind(this));
+                    this.getInitialData({
+                    	success: function () {
+                    		this.render()
+                    	}.bind(this)
+                    });
                 }.bind(this));
             }
         },
 
         render: {
             value: function () {
-                // Generate initial view.
+                // Generate initial view based on the current state of this widget.
                 // Head off at the pass -- if not logged in, can't show profile.
                 if (!this.authToken) {
-                    this.titlePlace.html('Unauthorized');
+                    this.places.title.html('Unauthorized');
                     this.renderPicture();
-                    this.contentPlace.html(this.getTemplate('unauthorized').render(this.context));
+                    this.places.content.html(this.getTemplate('unauthorized').render(this.context));
                 } else if (this.userRecord && this.userRecord.user) {
                     // Title can be be based on logged in user infor or the profile.
-                    if (this.userOwnsProfile) {
-                        this.titlePlace.html('You - ' + this.loggedInName + ' (' + this.userRecord.user.username + ')');
-                    } else {
-                        this.titlePlace.html(this.userRecord.user.realname + ' (' + this.userRecord.user.username + ')');
-                    }
-                    this.renderPicture();
-                    this.showInfoView();
+                    this.renderViewEditLayout();
+                    this.renderInfoView();
                 } else if (this.userRecord && this.userRecord.account) {
                     // no profile, but have basic account info.
-                    this.titlePlace.html(this.userRecord.account.realname + ' (' + this.userRecord.account.username + ')');
+                    this.places.title.html(this.userRecord.account.realname + ' (' + this.userRecord.account.username + ')');
                     this.renderPicture();
                     this.showNoProfileView();
                 } else {
                     // no profile, no basic aaccount info
-                    this.titlePlace.html('User Not Found');
+                    this.places.title.html('User Not Found');
                     this.renderPicture();
-                    this.contentPlace.html(this.getTemplate('no_user').render(this.context));
+                    this.places.content.html(this.getTemplate('no_user').render(this.context));
                 }
                 return this;
             }
         },
 
-        showEditView: {
+        renderEditView: {
             value: function() {
-                this.contentPlace.html(this.getTemplate('edit').render(this.context));
+                this.places.content.html(this.getTemplate('edit').render(this.context));
 
                 // wire up basic form crud buttons.
                 $('[data-button="save"]').on('click', function(e) {
                     if (this.updateUserRecordFromForm()) {
                         this.saveUserRecord({
                             success: function() {
+                                this.renderViewEditLayout();
                                 this.addSuccessMessage('Success!', 'Your user profile has been updated.');
-                                this.showInfoView();
+                                this.renderInfoView();
                             }
                         });
                     }
                 }.bind(this));
                 $('[data-button="cancel"]').on('click', function(e) {
                     this.clearMessages();
-                    this.showInfoView();
+                    this.renderInfoView();
                 }.bind(this));
 
                 // wire up affiliation add/remove buttons.
                 $('[data-button="add-affiliation"]').on('click', function(e) {
                     // grab the container 
-                    var affiliations = this.contentPlace.find('[data-field-group="affiliations"]');
+                    var affiliations = this.places.content.find('[data-field-group="affiliations"]');
 
                     // render a new affiliation
                     var id = this.genId();
@@ -1424,12 +1452,12 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 }.bind(this));
 
                 // Wire up remove button for any affiliation.
-                this.contentPlace.find('[data-field-group="affiliations"]').on('click', '[data-button="remove"]', function(e) {
+                this.places.content.find('[data-field-group="affiliations"]').on('click', '[data-button="remove"]', function(e) {
                     // remove the containing affiliation group.
                     $(this).closest('[data-field-group="affiliation"]').remove();
                 });
                 // on any field change events, we update the relevant affiliation panel title
-                this.contentPlace.find('[data-field-group="affiliations"]').on('keyup', 'input', function(e) {
+                this.places.content.find('[data-field-group="affiliations"]').on('keyup', 'input', function(e) {
                     // remove the containing affiliation group.
                     var panel  = $(this).closest('[data-field-group="affiliation"]');
                     var title = panel.find('[data-field="title"]').val();
@@ -1445,7 +1473,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         showNoProfileView: {
             value: function() {
-                this.contentPlace.html(this.getTemplate('no_profile').render(this.context));
+                this.places.content.html(this.getTemplate('no_profile').render(this.context));
                 if (this.isProfileOwner) {
                     $('[data-button="create-profile"]').on('click', function(e) {
                         this.createUserRecord();
@@ -1459,8 +1487,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             value: function() {
                 this.clearMessages();
                 this.clearFieldMessages();
-                this.contentPlace.find('.has-error').removeClass('has-error');
-                this.contentPlace.find('.error-message').removeClass('error-message');
+                this.places.content.find('.has-error').removeClass('has-error');
+                this.places.content.find('.error-message').removeClass('error-message');
                 this.formHasError = false;
             }
         },
@@ -1473,13 +1501,13 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         clearMessages: {
             value: function() {
-                this.alertPlace.empty();
+                this.places.alert.empty();
             }
         },
 
         addSuccessMessage: {
             value: function(title, message) {
-                this.alertPlace.append(
+                this.places.alert.html(
                     '<div class="alert alert-success alert-dismissible" role="alert">' +
                     '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
                     '<strong>' + title + '</strong> ' + message + '</div>');
@@ -1488,7 +1516,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         addErrorMessage: {
             value: function(title, message) {
-                this.alertPlace.append(
+                this.places.alert.append(
                     '<div class="alert alert-danger alert-dismissible" role="alert">' +
                     '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
                     '<strong>' + title + '</strong> ' + message + '</div>');
@@ -1502,22 +1530,38 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
 
+        renderViewEditLayout: {
+            value: function() {
+                nunjucks.configure({
+                    autoescape: true
+                });
+                this.container.html(this.getTemplate('view_edit_layout').render(this.context));
+                 // These are just convenience placeholders.
+                 this.places = {
+                	title: this.container.find('[data-placeholder="title"]'),
+                	alert: this.container.find('[data-placeholder="alert"]'),
+                	content: this.container.find('[data-placeholder="content"]')
+                };
+            }
+        },
+
         renderLayout: {
             value: function() {
                 nunjucks.configure({
                     autoescape: true
                 });
                 this.container.html(this.getTemplate('layout').render(this.context));
-                 // These are just convenience placeholders.
-                this.alertPlace = this.container.find('[data-placeholder="alert"]');
-                this.contentPlace = this.container.find('[data-placeholder="content"]');
-                this.titlePlace = this.container.find('[data-placeholder="title"]');
+                this.places = {
+                	title: this.container.find('[data-placeholder="title"]'),
+                	content: this.container.find('[data-placeholder="content"]')
+                };
             }
         },
 
-        renderWaiting: {
+        renderWaitingView: {
             value: function () {
-                this.contentPlace.html('<img src="assets/img/ajax-loader.gif"></img>');
+            	this.renderLayout();
+                this.places.content.html('<img src="assets/img/ajax-loader.gif"></img>');
             }
         }
 
