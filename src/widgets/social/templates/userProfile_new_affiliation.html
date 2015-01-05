@@ -9,32 +9,37 @@
       
     </div>
     <div class="panel-body">
+        <fieldset>
+            <div class="form-group" data-field="title">
+                <label for="affiliation-title-{{generatedId}}" class="control-label col-md-3">Title</label>
+                <div class="col-md-9">
+                    <input id="affiliation-title-{{generatedId}}" type="text" class="form-control" value="">
+                </div>
+                <div data-field-message="title" class="field-message col-md-9 col-md-push-3"></div>
+            </div>
 
-        <div class="form-group">
-            <label for="affiliation-title-{{generatedId}}" class="control-label col-md-3">Title</label>
-            <div class="col-md-9">
-                <input id="affiliation-title-{{generatedId}}" type="text" class="form-control" data-field="title" value="">
+            <div class="form-group" data-field="institution">
+                <label for="affiliation-institution-{{generatedId}}" class="control-label col-md-3">Institution</label>
+                <div class="col-md-9">
+                    <input id="affiliation-institution-{{generatedId}}" type="text" class="form-control" value="">
+                </div>
+                <div data-field-message="institution" class="field-message col-md-9 col-md-push-3"></div>
             </div>
-            <div data-field-message="title" class="field-message col-md-9 col-md-push-3"></div>
-        </div>
 
-        <div class="form-group">
-            <label for="affiliation-institution-{{generatedId}}" class="control-label col-md-3">Institution</label>
-            <div class="col-md-9">
-                <input id="affiliation-institution-{{generatedId}}" type="text" class="form-control" data-field="institution" value="">
+            <div class="form-group">
+                
+                <div class="col-md-3" data-field="start_year">
+                    <label for="affiliation-start_year-{{generatedId}}" class="control-label col-md-3">Starting in Year</label>
+                    <input id="start_year-{{generatedId}}" type="text" class="form-control" value="">
+                     <div data-field-part="message" class="field-message"></div>
+                </div>
+                
+                <div class="col-md-3" data-field="end_year">
+                    <label for="affiliation-end_year-{{generatedId}}" class="control-label col-md-3">Ending</label>
+                    <input id="end_year-{{generatedId}}" type="text" class="form-control" value="">
+                     <div data-field-part="message" class="field-message"></div>
+                </div>
             </div>
-            <div data-field-message="institution" class="field-message col-md-9 col-md-push-3"></div>
-        </div>
-
-        <div class="form-group">
-            <label for="affiliation-start_year-{{generatedId}}" class="control-label col-md-3">Starting in Year</label>
-            <div class="col-md-3">
-                <input id="start_year-{{generatedId}}" type="text" class="form-control" data-field="start_year" value="">
-            </div>
-            <label for="affiliation-end_year-{{generatedId}}" class="control-label col-md-3">Ending</label>
-            <div class="col-md-3">
-                <input id="end_year-{{generatedId}}" type="text" class="form-control" data-field="end_year" value="">
-            </div>
-        </div>
+        </fieldset>
     </div>
 </div>

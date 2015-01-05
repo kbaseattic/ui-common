@@ -1439,7 +1439,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 // wire up affiliation add/remove buttons.
                 $('[data-button="add-affiliation"]').on('click', function(e) {
                     // grab the container 
-                    var affiliations = this.places.content.find('[data-field-group="affiliations"]');
+                    var affiliations = this.places.content.find('[data-field="profile.affiliations"]');
 
                     // render a new affiliation
                     var id = this.genId();
@@ -1452,18 +1452,18 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 }.bind(this));
 
                 // Wire up remove button for any affiliation.
-                this.places.content.find('[data-field-group="affiliations"]').on('click', '[data-button="remove"]', function(e) {
+                this.places.content.find('[data-field="profile.affiliations"]').on('click', '[data-button="remove"]', function(e) {
                     // remove the containing affiliation group.
                     $(this).closest('[data-field-group="affiliation"]').remove();
                 });
                 // on any field change events, we update the relevant affiliation panel title
-                this.places.content.find('[data-field-group="affiliations"]').on('keyup', 'input', function(e) {
+                this.places.content.find('[data-field="profile.affiliations"]').on('keyup', 'input', function(e) {
                     // remove the containing affiliation group.
                     var panel  = $(this).closest('[data-field-group="affiliation"]');
-                    var title = panel.find('[data-field="title"]').val();
-                    var institution = panel.find('[data-field="institution"]').val();
-                    var startYear = panel.find('[data-field="start_year"]').val();
-                    var endYear = panel.find('[data-field="end_year"]').val();
+                    var title = panel.find('[data-field="title"] input').val();
+                    var institution = panel.find('[data-field="institution"] input').val();
+                    var startYear = panel.find('[data-field="start_year"] input').val();
+                    var endYear = panel.find('[data-field="end_year"] input').val();
                     endYear = endYear ? endYear : 'present';
 
                     panel.find('.panel-title').html(title + ' @ ' + institution + ', ' + startYear+'-'+endYear);

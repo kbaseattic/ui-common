@@ -100,7 +100,7 @@
 			           	<select id="gravatar_default" class="form-control">
 		           		    <option value="">- none -</option>
 			           	{% for default in env.gravatar_defaults %}
-			           	<option value="{{default.id}}" {% if default.id==userRecord.profile.gravatar_default %} selected{% endif %}>{{default.label}}</option>
+			           	<option value="{{default.id}}" {% if default.id==userRecord.profile.avatar.gravatar_default %} selected{% endif %}>{{default.label}}</option>
 			           	{% endfor %}
 			           	</select>
 			           	<script>

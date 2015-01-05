@@ -10,7 +10,7 @@ angular.module('social-directives', []);
 angular.module('social-directives')
 
 
-.directive('socialuseroverview3', function($rootScope) {
+.directive('socialuserprofile', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
             require(['kbaseuserprofilewidget'], function(userProfileWidget) {
@@ -21,134 +21,6 @@ angular.module('social-directives')
                     token: scope.params.kbCache.token
                 }).go();
             });
-        }
-    };
-})
-.directive('socialuseroverview2', function($rootScope) {
-    return {
-        link: function(scope, ele, attrs) {
-           
-            var loggedInUserId = $('<div></div>').kbaseLogin().get_kbase_cookie('user_id');
-            var loggedInName = $('<div></div>').kbaseLogin().get_kbase_cookie('name');
-            var userId = scope.params.userid;
-
-            // setup temporary panel
-            if (!userId) {
-                var p = $(ele).kbasePanel({
-                    title: "User Profile"
-                });
-                $(p.body()).append("No user specified.");
-            } else {
-                var p = $(ele).kbasePanel({
-                    title: userId
-                })
-                p.loading();
-
-                // create ws client (because we need to go to the dev workspace)
-                var isLoggedIn = false;
-
-
-                // DATA
-                // This is where we get the data to feed to the widget.
-                // Each widget has its own independent data fetch.
-
-                var userProfileServiceURL = 'http://dev19.berkeley.kbase.us/services/user_profile/rpc';
-                var userProfile;
-
-                if (scope.params.kbCache.token) {
-                    userProfileClient = new UserProfile(userProfileServiceURL, {
-                        token: scope.params.kbCache.token
-                    });
-                    isLoggedIn = true;
-                } else {
-                    userProfileClient = new UserProfile(userProfileServiceURL);
-                }
-
-                userProfileClient.get_user_profile([userId], function(data) {
-                    var userOwnsProfile = false;
-                    if (isLoggedIn) {
-                        var loggedInUserId = $('<div></div>').kbaseLogin().get_kbase_cookie('user_id');
-                        var loggedInName = $('<div></div>').kbaseLogin().get_kbase_cookie('name');
-                        if (loggedInUserId === userId) {
-                            userOwnsProfile = true;
-                        }
-                    }
-
-                    var userProfile = data[0];
-
-                    if (userProfile !== null) {
-                        userProfile.env = {};
-                        userProfile.env.isOwner = userOwnsProfile;
-                        if (userOwnsProfile) {
-                            $(ele).find('.panel-title').html('You - ' + loggedInName + ' (' + userId + ')');
-                        } else {
-                            $(ele).find('.panel-title').html(userProfile.user.realname + ' (' + userId + ')');
-                        }
-                        $(p.body()).KBaseUserOverview({
-                            userInfo: userProfile,
-                            userProfileClient: userProfileClient,
-                            loggedInUserId: loggedInUserId,
-                            userId: userId,
-                            kbCache: scope.params.kbCache
-                        });
-                    } else {
-                        // console.log('User not found getting user profile.');
-                        //if (userOwnsProfile) {
-                            if (userOwnsProfile) {
-                                $(ele).find('.panel-title').html('You - ' + loggedInName + ' (' + userId + ')');
-                            } else {
-                                // $(ele).find('.panel-title').html('Real Name??' + ' (' + userId + ')');
-                            }
-                            $(p.body()).KBaseUserOverview({
-                                container: $(ele),
-                                userInfo: null,
-                                userProfileClient: userProfileClient,
-                                loggedInUserId: loggedInUserId,
-                                userId: userId,
-                                kbCache: scope.params.kbCache
-                            });
-                            
-                        /*    $('[data-button="create-profile"]').on('click', function(e) {
-                                var minimalProfile = {
-                                    user: {
-                                        username: userId,
-                                        realname: loggedInName,
-                                        thumbnail: null
-                                    },
-                                    profile: {
-                                        title: "",
-                                        suffix: "",
-                                        location: "",
-                                        email_addresses: []
-                                    },
-                                    isOwner: true
-                                };
-                                userProfileClient.set_user_profile({
-                                    profile: minimalProfile
-                                }, function(result) {
-                                    console.log('Profile successfully saved.');
-                                }, function(err) {
-                                    console.log('Error saving profile');
-                                    console.log(JSON.stringify(err));
-                                });
-                            });
-*/
-                        //} else {
-                        //    $(ele).find('.panel-title').html('Profile not found for ' + userId);
-                        //    $(p.body()).append('<p>No profile found for user ' + userId + '</p>');
-                        //}
-
-                    }
-
-                }, function(err) {
-                    console.log('Error getting user profile.');
-                    console.log(err);
-                    $(ele).find('.panel-title').html('Error getting profile');
-                    $(p.body()).append('<p>Error getting profile: ' + err + '</p>');
-
-                });
-
-            } // end else if (userId)
         }
     };
 })
