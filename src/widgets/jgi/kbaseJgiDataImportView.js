@@ -209,19 +209,33 @@
                     self.copyData(event, wsinfo);
                 };
             };
-            workspaces.sort(function(a, b) {return a[1].localeCompare(b[1])});
+            workspaces.sort(function(a, b) {
+                var narname_a = a[8].narrative_nice_name;
+                var narname_b = b[8].narrative_nice_name;
+                if (narname_a == null) {
+                    return 1;
+                } else if (narname_b == null) {
+                    return -1;
+                } else {
+                    return narname_a.localeCompare(narname_b);
+                }
+            });
             var list = $('<ul>').addClass('dropdown-menu').attr('role', 'menu')
                 .attr('aria-labelledby', uniqueid);
             if (workspaces.length > 0) {
                 for (var i = 0; i < workspaces.length; i++) {
-                    //TODO only list narrative workspaces & list by narrative name
-                    //TODO non-unique narrative names
-                    list.append($('<li>').attr('role', 'presentation')
-                            .append($('<a>').attr('role', 'menuitem')
-                                .attr('tabindex', '-1').append(workspaces[i][1])
-                                .click(createfunc(workspaces[i])) //save ws in closure
-                             )
-                    );
+                    var narname = workspaces[i][8].narrative_nice_name;
+                    if (narname != null) {
+                        list.append($('<li>').attr('role', 'presentation')
+                                .append($('<a>').attr('role', 'menuitem')
+                                    .attr('tabindex', '-1')
+                                    .append(narname + ' (' +
+                                            self.getTimeStr(workspaces[i][3]) +
+                                            ')')
+                                    .click(createfunc(workspaces[i])) //save ws in closure
+                                 )
+                        );
+                    }
                 }
             } else {
                 list.append($('<li>').attr('role', 'presentation')
