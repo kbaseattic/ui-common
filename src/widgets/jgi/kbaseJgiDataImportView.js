@@ -16,6 +16,7 @@
 
         $mainPanel: null,
         $errorPanel: null,
+        copyDropdown: null,
         
         typereg: {'KBaseFile.SingleEndLibrary':
                        {nicetype: 'Single End Read Library',
@@ -154,6 +155,7 @@
             var $buttonDiv =
                 $('<div>').css({'margin':'10px','margin-top':'20px'});
             if (typeInfo.app != null) {
+                //TODO link to narrative
                 $buttonDiv.append($('<a href="">').addClass('btn btn-info')
                             .css({'margin':'5px'})
                             .append('Launch ' + typeInfo.app + ' App'));
@@ -213,9 +215,7 @@
             if (workspaces.length > 0) {
                 for (var i = 0; i < workspaces.length; i++) {
                     //TODO only list narrative workspaces & list by narrative name
-                    //TODO implement copy 
-                    //TODO copy feedback
-                    //TODO non-unique ws names
+                    //TODO non-unique narrative names
                     list.append($('<li>').attr('role', 'presentation')
                             .append($('<a>').attr('role', 'menuitem')
                                 .attr('tabindex', '-1').append(workspaces[i][1])
@@ -232,21 +232,35 @@
                          )
                 );
             }
+            self.copyDropdown = $('<button>')
+                    .addClass("btn btn-default dropdown-toggle")
+                    .attr('type', 'button').attr('id', uniqueid)
+                    .attr('data-toggle', 'dropdown')
+                    .attr('aria-expanded', 'true')
+                    .append('Copy to Narrative')
+                    .append($('<span>').addClass('caret')
+                            .css({'margin-left': '5px'}));
             
             element.append($('<div>').addClass('dropdown').css({margin: '5px'})
-                .append($('<button>')
-                        .addClass("btn btn-default dropdown-toggle")
-                        .attr('type', 'button').attr('id', uniqueid)
-                        .attr('data-toggle', 'dropdown')
-                        .attr('aria-expanded', 'true')
-                        .append('Copy to Narrative')
-                        .append($('<span>').addClass('caret')
-                                .css({'margin-left': '5px'})))
+                .append(self.copyDropdown)
                 .append(list));
         },
         
         copyData: function(event, workspaceInfo) {
-            alert(workspaceInfo);
+            var self = this;
+            self.copyDropdown.addClass('disabled');
+            //copies are really fast, so I don't think a spinner is really needed
+            self.ws.copy_object(
+                    {from: {ref: self.objData.wsid + '/' + self.objData.obj_id},
+                     to: {wsid: workspaceInfo[0], name: self.objData.name}
+                    }, function(objInfo) {
+                        self.copyDropdown.removeClass('disabled');
+                        alert("Copy complete"); //nicer alert?
+                    }, function(error) {
+                        self.copyDropdown.removeClass('disabled');
+                        self.showError(error);
+                    }
+            );
         },
 
         notLoggedIn: function() {
