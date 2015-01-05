@@ -200,25 +200,44 @@
         },
         
         fillCopyDropdown: function(element, workspaces) {
+            var self = this;
             var uniqueid = 'mycrazyuniqueidthatnooneshouldeveruse';
+            var createfunc = function(wsinfo) {
+                return function(event) {
+                    self.copyData(event, wsinfo);
+                };
+            };
             workspaces.sort(function(a, b) {return a[1].localeCompare(b[1])});
             var list = $('<ul>').addClass('dropdown-menu').attr('role', 'menu')
                 .attr('aria-labelledby', uniqueid);
             for (var i = 0; i < workspaces.length; i++) {
                 //TODO only list narrative workspaces & list by narrative name
-                //TODO implement copy w/ feedback
+                //TODO implement copy 
+                //TODO copy feedback
                 //TODO what happens if no workspaces
+                //TODO non-unique ws names
                 list.append($('<li>').attr('role', 'presentation')
                         .append($('<a>').attr('role', 'menuitem')
-                            .attr('tabindex', '-1').append(workspaces[i][1])));
+                            .attr('tabindex', '-1').append(workspaces[i][1])
+                            .click(createfunc(workspaces[i])) //save ws in closure
+                         )
+                );
             }
             
             element.append($('<div>').addClass('dropdown').css({margin: '5px'})
-                .append($('<button>').addClass("btn btn-default dropdown-toggle")
-                    .attr('type', 'button').attr('id', uniqueid).attr('data-toggle', 'dropdown').attr('aria-expanded', 'true')
-                    .append('Copy to Narrative')
-                    .append($('<span>').addClass('caret').css({'margin-left': '5px'})))
+                .append($('<button>')
+                        .addClass("btn btn-default dropdown-toggle")
+                        .attr('type', 'button').attr('id', uniqueid)
+                        .attr('data-toggle', 'dropdown')
+                        .attr('aria-expanded', 'true')
+                        .append('Copy to Narrative')
+                        .append($('<span>').addClass('caret')
+                                .css({'margin-left': '5px'})))
                 .append(list));
+        },
+        
+        copyData: function(event, workspaceInfo) {
+            alert(workspaceInfo);
         },
 
         notLoggedIn: function() {
