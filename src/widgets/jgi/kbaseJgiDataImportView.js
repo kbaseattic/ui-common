@@ -210,16 +210,25 @@
             workspaces.sort(function(a, b) {return a[1].localeCompare(b[1])});
             var list = $('<ul>').addClass('dropdown-menu').attr('role', 'menu')
                 .attr('aria-labelledby', uniqueid);
-            for (var i = 0; i < workspaces.length; i++) {
-                //TODO only list narrative workspaces & list by narrative name
-                //TODO implement copy 
-                //TODO copy feedback
-                //TODO what happens if no workspaces
-                //TODO non-unique ws names
+            if (workspaces.length > 0) {
+                for (var i = 0; i < workspaces.length; i++) {
+                    //TODO only list narrative workspaces & list by narrative name
+                    //TODO implement copy 
+                    //TODO copy feedback
+                    //TODO non-unique ws names
+                    list.append($('<li>').attr('role', 'presentation')
+                            .append($('<a>').attr('role', 'menuitem')
+                                .attr('tabindex', '-1').append(workspaces[i][1])
+                                .click(createfunc(workspaces[i])) //save ws in closure
+                             )
+                    );
+                }
+            } else {
                 list.append($('<li>').attr('role', 'presentation')
+                        .addClass('disabled')
                         .append($('<a>').attr('role', 'menuitem')
-                            .attr('tabindex', '-1').append(workspaces[i][1])
-                            .click(createfunc(workspaces[i])) //save ws in closure
+                            .attr('tabindex', '-1')
+                            .append('You have no writeable narratives')
                          )
                 );
             }
