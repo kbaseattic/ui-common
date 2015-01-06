@@ -1410,7 +1410,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     // no profile, but have basic account info.
                     this.places.title.html(this.userRecord.profile.account.realname + ' (' + this.userRecord.profile.account.username + ')');
                     this.renderPicture();
-                    this.showNoProfileView();
+                    this.renderNoProfileView();
                 } else {
                     // no profile, no basic aaccount info
                     this.places.title.html('User Not Found');
@@ -1477,7 +1477,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
 
-        showNoProfileView: {
+        renderNoProfileView: {
             value: function() {
                 this.places.content.html(this.getTemplate('no_profile').render(this.context));
                 if (this.isProfileOwner) {
