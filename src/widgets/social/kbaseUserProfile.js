@@ -2,6 +2,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
     "use strict";
 
     var ProfileWidget = Object.create({}, {
+
         init: {
             value: function (cfg) {                
                 this._generatedId = 0; 
@@ -9,6 +10,13 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 this.container = cfg.container;
                 if (typeof this.container === 'string') {
                     this.container = $(this.container);
+                }
+
+                this.userProfileService = {
+                    host: 'dev19.berkeley.kbase.us'
+                }
+                this.userAccountService = {
+                    host: 'kbase.us'
                 }
 
 
@@ -101,7 +109,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 this.templateEnv.addFilter('gravatar', function(email, size, rating, gdefault) {
                     // TODO: http/https.
                     var md5Hash = md5(email);
-                    var url = 'http://www.gravatar.com/avatar/' + md5Hash + '?s=' + size + '&amp;r=' + rating + '&d=' + gdefault
+                    // window.location.protocol
+                    var url = 'https://www.gravatar.com/avatar/' + md5Hash + '?s=' + size + '&amp;r=' + rating + '&d=' + gdefault
                     return url;
                 });
                 this.templateEnv.addFilter('kbmarkup', function(s) {
@@ -130,16 +139,117 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
                 this.messages = [];
 
+                // Set up listeners for any kbase events we are interested in:
+                // NB: following tradition, the auth listeners are namespaced for kbase; the events
+                // are not actually emitted in the kbase namespace.
+                $(document).on('loggedIn.kbase', function(e, auth) {
+                   this.onLoggedIn(e, auth);
+                }.bind(this));
 
+                $(document).on('loggedOut.kbase', function(e, auth) {
+                    this.onLoggedOut(e, auth);
+                }.bind(this));
 
                 return this;
+            }
+        },
+
+        // STATE CHANGES
+
+        /*
+            getCurrentState 
+        */
+        getCurrentState: {
+            value: function (callbacks) {
+                // DATA
+                // This is where we get the data to feed to the widget.
+                // Each widget has its own independent data fetch.
+                // This may be called at any point to
+                if (!this.authToken) {
+                    // We don't fetch any data if a user is not logged in.
+                    this.userRecord = null;
+                    if (callbacks.success) {
+                        callbacks.success.call(this);
+                    }
+                } else {
+                    var userProfileServiceURL = 'http://'+ this.userProfileService.host+'/services/user_profile/rpc';
+                    var userProfile;
+
+                    this.userProfileClient = new UserProfile(userProfileServiceURL, {
+                        token: this.authToken
+                    });
+                    $.ajaxSetup({
+                        timeout: 10000 
+                    });
+                    this.userProfileClient.get_user_profile([this.userId], 
+                        function(data) {
+                            //console.log('got user data');
+                            //console.log(data);
+                            if (data[0]) {
+                                // profile found
+                                this.hasProfile = true;
+                                this.userRecord = data[0];
+                                this.context.userRecord = this.userRecord;
+                                // NB: this is just for now. We should probably incorporate
+                                // the account <-> profile syncing somewhere else/
+                                this.ensureAccountData(function() {
+                                    if (callbacks.success) {
+                                        callbacks.success.call(this);
+                                    }
+                                }.bind(this));
+                            } else {
+                                // no profile ... create a bare bones one.
+                                this.hasProfile = false;
+                                this.userRecord = {
+                                    user: {}, profile: {}
+                                }
+                                this.context.userRecord = this.userRecord;
+                                this.ensureAccountData(function() {
+                                    if (callbacks.success) {
+                                        callbacks.success.call(this);
+                                    }
+                                }.bind(this));
+                            }
+                        }.bind(this), 
+                        function(err) {
+                            console.log('[UserProfile.sync] Error getting user profile.');
+                            console.log(err);
+                            this.renderErrorView({
+                                title: 'Error Getting Profile', 
+                                message: 'Error getting profile: ' + err
+                            });
+                        }.bind(this)
+                    );
+                }
+                return this;
+            }
+        },
+
+        onLoggedIn: {
+            value: function (e, auth) {
+                this.authToken = auth.token;
+                this.getCurrentState({
+                    success: function () {
+                        this.render()
+                    }.bind(this)
+                });
+            }
+        },
+        onLoggedOut: {
+            value: function (e, auth) {
+                this.authToken = null;
+                this.getCurrentState({
+                    success: function () {
+                        this.render()
+                    }.bind(this)
+                });
             }
         },
 
         go: {
             value: function () {
                 this.renderWaitingView();
-                this.getInitialData({
+                this.getCurrentState({
                 	success: function() {
                     	this.render()
                     }.bind(this)
@@ -164,69 +274,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
        
-        getInitialData: {
-            value: function (callbacks) {
-                // DATA
-                // This is where we get the data to feed to the widget.
-                // Each widget has its own independent data fetch.
-                // This may be called at any point to
-                if (!this.authToken) {
-                    // We don't fetch any data if a user is not logged in.
-                    this.userRecord = null;
-                    if (callbacks.success) {
-                    	callbacks.success.call(this);
-                    }
-                } else {
-                    var userProfileServiceURL = window.location.protocol + '//dev19.berkeley.kbase.us/services/user_profile/rpc';
-                    var userProfile;
-
-                    this.userProfileClient = new UserProfile(userProfileServiceURL, {
-                        token: this.authToken
-                    });
-                   
-                    this.userProfileClient.get_user_profile([this.userId], 
-                        function(data) {
-                        	//console.log('got user data');
-                        	//console.log(data);
-                            if (data[0]) {
-                                // profile found
-                                this.hasProfile = true;
-                                this.userRecord = data[0];
-                                this.context.userRecord = this.userRecord;
-                                // NB: this is just for now. We should probably incorporate
-                                // the account <-> profile syncing somewhere else/
-                                this.ensureAccountData(function() {
-                                    if (callbacks.success) {
-				                    	callbacks.success.call(this);
-				                    }
-                                }.bind(this));
-                            } else {
-                                // no profile ... create a bare bones one.
-                                this.hasProfile = false;
-                                this.userRecord = {
-                                	user: {}, profile: {}
-                                }
-                                this.context.userRecord = this.userRecord;
-                                this.ensureAccountData(function() {
-                                    if (callbacks.success) {
-				                    	callbacks.success.call(this);
-				                    }
-                                }.bind(this));
-                            }
-                        }.bind(this), 
-                        function(err) {
-                            console.log('[UserProfile.sync] Error getting user profile.');
-                            console.log(err);
-                            this.renderErrorView({
-                            	title: 'Error Getting Profile', 
-                            	message: 'Error getting profile: ' + err
-                            });
-                        }.bind(this)
-                    );
-                }
-                return this;
-            }
-        },
+        
 
         genId: {
             value: function() {
@@ -1202,7 +1250,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 if (!this.authToken) {
                     callback.call(that, {});
                 }
-                var host = 'kbase.us'; 
+                var host = this.userAccountService.host; 
                 // var host = 'mock.kbase.us';
                 var path = '/services/genome_comparison/users';
                 var query = 'usernames=' + cfg.userId + '&token=' + this.authToken;
@@ -1317,6 +1365,33 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         // main views
 
+        render: {
+            value: function () {
+                // Generate initial view based on the current state of this widget.
+                // Head off at the pass -- if not logged in, can't show profile.
+                if (!this.authToken) {
+                    this.places.title.html('Unauthorized');
+                    this.renderPicture();
+                    this.places.content.html(this.getTemplate('unauthorized').render(this.context));
+                } else if (this.hasProfile) {
+                    // Title can be be based on logged in user infor or the profile.
+                    this.renderViewEditLayout();
+                    this.renderInfoView();
+                } else if (this.hasAccount) {
+                    // no profile, but have basic account info.
+                    this.places.title.html(this.userRecord.profile.account.realname + ' (' + this.userRecord.profile.account.username + ')');
+                    this.renderPicture();
+                    this.renderNoProfileView();
+                } else {
+                    // no profile, no basic aaccount info
+                    this.places.title.html('User Not Found');
+                    this.renderPicture();
+                    this.places.content.html(this.getTemplate('no_user').render(this.context));
+                }
+                return this;
+            }
+        },
+
         renderInfoView: {
             value: function() {
         	  	if (this.userOwnsProfile) {
@@ -1376,7 +1451,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 // Set up listeners for any kbase events we are interested in:
                 $(document).on('loggedIn.kbase', function(e, auth) {
                     this.authToken = auth.token;
-                    this.getInitialData({
+                    this.getCurrentState({
                     	success: function () {
                     		this.render()
                     	}.bind(this)
@@ -1385,7 +1460,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
                 $(document).on('loggedOut.kbase', function(e, auth) {
                     this.authToken = null;
-                    this.getInitialData({
+                    this.getCurrentState({
                     	success: function () {
                     		this.render()
                     	}.bind(this)
@@ -1394,32 +1469,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
 
-        render: {
-            value: function () {
-                // Generate initial view based on the current state of this widget.
-                // Head off at the pass -- if not logged in, can't show profile.
-                if (!this.authToken) {
-                    this.places.title.html('Unauthorized');
-                    this.renderPicture();
-                    this.places.content.html(this.getTemplate('unauthorized').render(this.context));
-                } else if (this.hasProfile) {
-                    // Title can be be based on logged in user infor or the profile.
-                    this.renderViewEditLayout();
-                    this.renderInfoView();
-                } else if (this.hasAccount) {
-                    // no profile, but have basic account info.
-                    this.places.title.html(this.userRecord.profile.account.realname + ' (' + this.userRecord.profile.account.username + ')');
-                    this.renderPicture();
-                    this.renderNoProfileView();
-                } else {
-                    // no profile, no basic aaccount info
-                    this.places.title.html('User Not Found');
-                    this.renderPicture();
-                    this.places.content.html(this.getTemplate('no_user').render(this.context));
-                }
-                return this;
-            }
-        },
+        
 
         renderEditView: {
             value: function() {
