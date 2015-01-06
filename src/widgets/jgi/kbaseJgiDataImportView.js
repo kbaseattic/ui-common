@@ -16,6 +16,7 @@
 
         $mainPanel: null,
         $errorPanel: null,
+        copyDropdown: null,
         
         typereg: {'KBaseFile.SingleEndLibrary':
                        {nicetype: 'Single End Read Library',
@@ -154,12 +155,12 @@
             var $buttonDiv =
                 $('<div>').css({'margin':'10px','margin-top':'20px'});
             if (typeInfo.app != null) {
+                //TODO link to narrative
                 $buttonDiv.append($('<a href="">').addClass('btn btn-info')
                             .css({'margin':'5px'})
                             .append('Launch ' + typeInfo.app + ' App'));
             }
-            $buttonDiv.append($('<a href="">').addClass('btn btn-info')
-                .css({'margin':'5px'}).append('Copy to Narrative'));
+            self.addCopyDropdown($buttonDiv);
 
             $basicInfo.append($buttonDiv);
 
@@ -186,6 +187,94 @@
                         .append($metaInfo));
 
             self.$mainPanel.append($content);
+        },
+        
+        addCopyDropdown: function(element) {
+            var self = this;
+            self.ws.list_workspace_info({perm: 'w'},
+                    function(workspaces) {
+                        self.fillCopyDropdown(element, workspaces);
+                    },
+                    function(error) {
+                        self.showError(error);
+                    }
+            );
+        },
+        
+        fillCopyDropdown: function(element, workspaces) {
+            var self = this;
+            var uniqueid = 'mycrazyuniqueidthatnooneshouldeveruse';
+            var createfunc = function(wsinfo) {
+                return function(event) {
+                    self.copyData(event, wsinfo);
+                };
+            };
+            workspaces.sort(function(a, b) {
+                var narname_a = a[8].narrative_nice_name;
+                var narname_b = b[8].narrative_nice_name;
+                if (narname_a == null) {
+                    return 1;
+                } else if (narname_b == null) {
+                    return -1;
+                } else {
+                    return narname_a.localeCompare(narname_b);
+                }
+            });
+            var list = $('<ul>').addClass('dropdown-menu').attr('role', 'menu')
+                .attr('aria-labelledby', uniqueid);
+            if (workspaces.length > 0) {
+                for (var i = 0; i < workspaces.length; i++) {
+                    var narname = workspaces[i][8].narrative_nice_name;
+                    if (narname != null) {
+                        list.append($('<li>').attr('role', 'presentation')
+                                .append($('<a>').attr('role', 'menuitem')
+                                    .attr('tabindex', '-1')
+                                    .append(narname + ' (' +
+                                            self.getTimeStr(workspaces[i][3]) +
+                                            ')')
+                                    .click(createfunc(workspaces[i])) //save ws in closure
+                                 )
+                        );
+                    }
+                }
+            } else {
+                list.append($('<li>').attr('role', 'presentation')
+                        .addClass('disabled')
+                        .append($('<a>').attr('role', 'menuitem')
+                            .attr('tabindex', '-1')
+                            .append('You have no writeable narratives')
+                         )
+                );
+            }
+            self.copyDropdown = $('<button>')
+                    .addClass("btn btn-default dropdown-toggle")
+                    .attr('type', 'button').attr('id', uniqueid)
+                    .attr('data-toggle', 'dropdown')
+                    .attr('aria-expanded', 'true')
+                    .append('Copy to Narrative')
+                    .append($('<span>').addClass('caret')
+                            .css({'margin-left': '5px'}));
+            
+            element.append($('<div>').addClass('dropdown').css({margin: '5px'})
+                .append(self.copyDropdown)
+                .append(list));
+        },
+        
+        copyData: function(event, workspaceInfo) {
+            var self = this;
+            self.copyDropdown.addClass('disabled');
+            //copies are really fast, so I don't think a spinner is really needed
+            self.ws.copy_object(
+                    {from: {ref: self.objData.wsid + '/' + self.objData.obj_id},
+                     to: {wsid: workspaceInfo[0], name: self.objData.name}
+                    }, function(objInfo) {
+                        self.copyDropdown.removeClass('disabled');
+                        alert("Copy complete"); //nicer alert?
+                    }, function(error) {
+                        self.copyDropdown.removeClass('disabled');
+                        self.showError(error);
+                    }
+            );
         },
 
         notLoggedIn: function() {
