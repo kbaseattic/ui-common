@@ -16,7 +16,8 @@
 
         $mainPanel: null,
         $errorPanel: null,
-        copyDropdown: null,
+        $msgPanel: null,
+        $copyDropdown: null,
         
         typereg: {'KBaseFile.SingleEndLibrary':
                        {nicetype: 'Single End Read Library',
@@ -45,6 +46,9 @@
 
             this.$errorPanel = $('<div>').addClass('alert alert-danger').hide();
             this.$elem.append(this.$errorPanel);
+            
+            this.$msgPanel = $('<div>');
+            this.$elem.append(this.$msgPanel);
 
             this.$mainPanel = $("<div>");
             this.$elem.append(this.$mainPanel);
@@ -180,11 +184,9 @@
             $metaInfo.append($metaTbl)
 
 
-            var $content =
-                $('<div>').append(
-                        $('<div>').addClass('row')
+            var $content = $('<div>').addClass('row')
                         .append($basicInfo)
-                        .append($metaInfo));
+                        .append($metaInfo);
 
             self.$mainPanel.append($content);
         },
@@ -246,7 +248,7 @@
                          )
                 );
             }
-            self.copyDropdown = $('<button>')
+            self.$copyDropdown = $('<button>')
                     .addClass("btn btn-default dropdown-toggle")
                     .attr('type', 'button').attr('id', uniqueid)
                     .attr('data-toggle', 'dropdown')
@@ -256,25 +258,43 @@
                             .css({'margin-left': '5px'}));
             
             element.append($('<div>').addClass('dropdown').css({margin: '5px'})
-                .append(self.copyDropdown)
+                .append(self.$copyDropdown)
                 .append(list));
         },
         
         copyData: function(event, workspaceInfo) {
             var self = this;
-            self.copyDropdown.addClass('disabled');
+            self.$copyDropdown.addClass('disabled');
             //copies are really fast, so I don't think a spinner is really needed
             self.ws.copy_object(
                     {from: {ref: self.objData.wsid + '/' + self.objData.obj_id},
                      to: {wsid: workspaceInfo[0], name: self.objData.name}
                     }, function(objInfo) {
-                        self.copyDropdown.removeClass('disabled');
-                        alert("Copy complete"); //nicer alert?
+                        self.$copyDropdown.removeClass('disabled');
+                        self.successMsg('Copied object ' + self.objData.name + 
+                                ' to narrative ' +
+                                workspaceInfo[8].narrative_nice_name);
                     }, function(error) {
-                        self.copyDropdown.removeClass('disabled');
+                        self.$copyDropdown.removeClass('disabled');
                         self.showError(error);
                     }
             );
+        },
+        
+        successMsg: function(message) {
+            var self = this;
+            self.$msgPanel.append($('<div>')
+                  .addClass('alert alert-success alert-dismissible')
+                  .attr('role', 'alert')
+                  .append(message)
+                  .append($('<button>').addClass('close')
+                          .attr('type', 'button')
+                          .attr('data-dismiss', 'alert')
+                          .attr('aria-label', 'Close')
+                          .append($('<span>').attr('aria-hidden', 'true')
+                                  .append('&times;'))
+                          )
+                  );
         },
 
         notLoggedIn: function() {
