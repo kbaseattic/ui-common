@@ -125,13 +125,14 @@
 	        	<div class="form-group" data-field="profile.avatar.avatar_color">
 	        		<label for="avatar_color" class="control-label col-md-3">A Solid Color</label>
 		           	<div class="col-md-9">
+
 		           		<select id="avatar_color" class="form-control">
 		           		    <option value="">- none -</option>
 				           	{% for color in env.avatarColors %}
-				           	<option value="{{color.id}}" {% if color.id==userRecord.profile.avatar_color %} selected{% endif %}  style="background-color: {{color.color}}; color: {{color.textColor}}">{{color.label}}</option>
+				           	<option value="{{color.id}}" {% if color.id==userRecord.profile.avatar.avatar_color %} selected{% endif %}  style="background-color: {{color.color}}; color: {{color.textColor}}">{{color.label}}</option>
 				           	{% endfor %}
 			           	</select>
-			           	<script>
+			           	<script> 
 			           	$('[data-field="profile.avatar.avatar_color"] select').on('change', function (e) {
 			           		var v = $(this).val();
 			           		if (v.length > 0) {
@@ -145,7 +146,7 @@
 	        	<div class="form-group" data-field="profile.avatar.avatar_initials">
 	        		<label for="avatar-initials" class="control-label col-md-3">Your Initials</label>
 		           <div class="col-md-9">
-		           		<input id="avatar-initials" type="text" class="form-control" value="{{userRecord.profile.avatar_initials}}">
+		           		<input id="avatar-initials" type="text" class="form-control" value="{{userRecord.profile.avatar.avatar_initials}}">
 		           		<div data-element="message" class="field-message"></div>
 		           </div>
 	        	</div>

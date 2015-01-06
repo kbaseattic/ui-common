@@ -128,6 +128,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 this.unauthorizedTemplate = templateEnv.getTemplate('userProfile_unauthorized.html');
                 */
 
+                this.messages = [];
+
 
 
                 return this;
@@ -188,6 +190,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                         	//console.log(data);
                             if (data[0]) {
                                 // profile found
+                                this.hasProfile = true;
                                 this.userRecord = data[0];
                                 this.context.userRecord = this.userRecord;
                                 // NB: this is just for now. We should probably incorporate
@@ -199,6 +202,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                                 }.bind(this));
                             } else {
                                 // no profile ... create a bare bones one.
+                                this.hasProfile = false;
                                 this.userRecord = {
                                 	user: {}, profile: {}
                                 }
@@ -239,12 +243,14 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 	// console.log(this.userRecord);
                     this.getUserAccountInfo({userId: this.userId}, function (data) {
                         if (data.realname) {
+                            this.hasAccount = true;
                             this.userRecord.profile.account = {
                                 realname: data.realname,
                                 email: data.email,
                                 username: this.userId
                             };
                         } else {
+                            this.hasAccount = false;
                         	this.renderErrorView({
                         		title: 'Error', 
                         		message: 'No user info returned from Genome Comparison'
@@ -922,8 +928,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 // And in the context as well, since we have replaced the entire object.
                 this.context.userRecord = updated;
 
-                //console.log('UPDATED');
-                //console.log(updated);
+                //console.log('UPDATED'); 
+                //console.log(updated); 
 
                 // step 1: translate forms to this object...
 
@@ -1196,8 +1202,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 if (!this.authToken) {
                     callback.call(that, {});
                 }
-                // var host = 'kbase.us'; 
-                var host = 'mock.kbase.us';
+                var host = 'kbase.us'; 
+                // var host = 'mock.kbase.us';
                 var path = '/services/genome_comparison/users';
                 var query = 'usernames=' + cfg.userId + '&token=' + this.authToken;
                 var url = 'https://' + host + path + '?' + query;
@@ -1396,13 +1402,13 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     this.places.title.html('Unauthorized');
                     this.renderPicture();
                     this.places.content.html(this.getTemplate('unauthorized').render(this.context));
-                } else if (this.userRecord && this.userRecord.user) {
+                } else if (this.hasProfile) {
                     // Title can be be based on logged in user infor or the profile.
                     this.renderViewEditLayout();
                     this.renderInfoView();
-                } else if (this.userRecord && this.userRecord.account) {
+                } else if (this.hasAccount) {
                     // no profile, but have basic account info.
-                    this.places.title.html(this.userRecord.account.realname + ' (' + this.userRecord.account.username + ')');
+                    this.places.title.html(this.userRecord.profile.account.realname + ' (' + this.userRecord.profile.account.username + ')');
                     this.renderPicture();
                     this.showNoProfileView();
                 } else {
@@ -1483,7 +1489,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         },
 
         // dom  update utils
-         clearErrors: {
+        clearErrors: {
             value: function() {
                 this.clearMessages();
                 this.clearFieldMessages();
@@ -1499,27 +1505,60 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
 
+        renderMessages: {
+            value: function () {
+                if (this.places.alert) {
+                    this.places.alert.empty();
+                    for (var i=0; i<this.messages.length; i++) {
+                        var message = this.messages[i];
+                        var alertClass = 'default';
+                        switch (message.type) {
+                            case 'success': alertClass = 'dismissable';break;
+                            case 'error': alertClass = 'danger'; break; 
+                        }
+                        this.places.alert.append(
+                        '<div class="alert alert-success alert-'+alertClass+'" role="alert">' +
+                        '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
+                        '<strong>' + message.title + '</strong> ' + message.message + '</div>');
+                    }
+                }
+            }
+        },
+
         clearMessages: {
             value: function() {
-                this.places.alert.empty();
+                this.messages = [];
+                this.renderMessages();
             }
         },
 
         addSuccessMessage: {
             value: function(title, message) {
+                this.messages.push({
+                    type: 'success', title: title, message: message
+                });
+                this.renderMessages();
+                /*
                 this.places.alert.html(
                     '<div class="alert alert-success alert-dismissible" role="alert">' +
                     '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
                     '<strong>' + title + '</strong> ' + message + '</div>');
+                */
             }
         },
 
         addErrorMessage: {
             value: function(title, message) {
+                this.messages.push({
+                    type: 'error', title: title, message: message
+                });
+                this.renderMessages();
+                /*
                 this.places.alert.append(
                     '<div class="alert alert-danger alert-dismissible" role="alert">' +
                     '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
                     '<strong>' + title + '</strong> ' + message + '</div>');
+                */
             }
         },
 
