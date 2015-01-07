@@ -195,6 +195,13 @@
             var self = this;
             self.ws.list_workspace_info({perm: 'w'},
                     function(workspaces) {
+                        for (var i = workspaces.length - 1; i >= 0; i--) {
+                            var narnnicename = workspaces[i][8]
+                                    .narrative_nice_name;
+                            if (narnnicename == null) {
+                                workspaces.splice(i, 1);
+                            }
+                        }
                         self.fillCopyDropdown(element, workspaces);
                     },
                     function(error) {
@@ -212,15 +219,9 @@
                 };
             };
             workspaces.sort(function(a, b) {
-                var narname_a = a[8].narrative_nice_name;
-                var narname_b = b[8].narrative_nice_name;
-                if (narname_a == null) {
-                    return 1;
-                } else if (narname_b == null) {
-                    return -1;
-                } else {
-                    return narname_a.localeCompare(narname_b);
-                }
+                return a[8].narrative_nice_name
+                        .localeCompare(b[8].narrative_nice_name);
+                
             });
             var list = $('<ul>').addClass('dropdown-menu').attr('role', 'menu')
                 .attr('aria-labelledby', uniqueid);
