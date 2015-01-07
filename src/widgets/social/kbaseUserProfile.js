@@ -14,13 +14,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
                 this.userProfileService = {
                     // host: 'dev19.berkeley.kbase.us'
-                    host: 'ci.kbase.us'
+                    url:'https://kbase.us/services/user_profile/rpc'
                 }
-                this.userAccountService = {
-                    host: 'kbase.us'
-                    // host: 'ci.kbase.us'
-                }
-
 
                 // Give ourselves the ability to show templates.
                 this.templateEnv = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/social/templates'), {
@@ -163,10 +158,10 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                         callbacks.success.call(this);
                     }
                 } else {
-                    var userProfileServiceURL = 'https://'+ this.userProfileService.host+'/services/user_profile/rpc';
+                    
                     var userProfile;
 
-                    this.userProfileClient = new UserProfileService(userProfileServiceURL, {
+                    this.userProfileClient = new UserProfileService(this.userProfileService.url, {
                         token: this.authToken
                     });
                     $.ajaxSetup({
@@ -1454,95 +1449,43 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
         getUserAccountInfo: {
             value: function (cfg) {
-                var userProfileServiceURL = 'https://'+ this.userProfileService.host+'/services/user_profile/rpc';
-                    var userProfile;
+               
+                var userProfile;
 
-                    this.userProfileClient = new UserProfileService(userProfileServiceURL, {
-                        token: this.authToken
-                    });
-                    $.ajaxSetup({
-                        timeout: 10000 
-                    });
-                    this.userProfileClient.lookup_globus_user([cfg.userId], 
-                        function(data) {
-                            //console.log('got user data');
-                            //console.log(data);
-                            if (data) {
-                               if (cfg.success) {
-                                cfg.success(data[cfg.userId]);
-                               }
-                            } else {
-                                if (cfg.error) {
-                                    cfg.error({
-                                        title: 'User not found',
-                                        message: 'No account information found for this user.'
-                                    });
-                                }
-                            }
-                        }.bind(this), 
-                        function(err) {
+                this.userProfileClient = new UserProfileService(this.userProfileService.url, {
+                    token: this.authToken
+                });
+                $.ajaxSetup({
+                    timeout: 10000 
+                });
+                this.userProfileClient.lookup_globus_user([cfg.userId], 
+                    function(data) {
+                        //console.log('got user data');
+                        //console.log(data);
+                        if (data) {
+                           if (cfg.success) {
+                            cfg.success(data[cfg.userId]);
+                           }
+                        } else {
                             if (cfg.error) {
                                 cfg.error({
                                     title: 'User not found',
                                     message: 'No account information found for this user.'
                                 });
                             }
-                        }.bind(this)
-                    );
-            }
-        },
-
-        getUserAccountInfox: {
-            value: function(cfg, callback) {
-                // Can't use this, because the globus CORS policy does 
-                // not allow us to.
-                // TODO: need to incorporate this into the user profile
-                // service.
-                // FORNOW: use the getGenomeComparisonUserInfo workaround for now.
-                if (!this.authToken) {
-                    callback.call(that, {});
-                }
-                var host = this.userAccountService.host; 
-                // var host = 'mock.kbase.us';
-                var path = '/services/genome_comparison/users';
-                var query = 'usernames=' + cfg.userId + '&token=' + this.authToken;
-                var url = 'https://' + host + path + '?' + query;
-                $.ajax(url, {
-                    dataType: 'json',
-                    success: function (responseData) {  
-                         if (responseData.data[cfg.userId] && responseData.data[cfg.userId].fullName) {
-                            callback.call(this, {
-                                realname: responseData.data[cfg.userId].fullName, 
-                                email: responseData.data[cfg.userId].email,
-                                username: cfg.userId
-                            });
-                        } else {
-                            callback.call(this, {realname: null});
                         }
-                    }.bind(this),
-                    error: function (jqxhr, status, error) {  
-                    	var message = 'Error getting account data from Genome Comparison. ';
-                    	if (jqxhr.status < 3) {
-                    		message += 'A network error has occurred with status "'+jqxhr.status+'". ';
-                    	} else {
-                    		message += 'An error occured with the service. The code is "'+jqxhr.status+'", "'+jqxhr.statusText+'". ';
-                    	}
-                    	this.renderErrorView({
-                    		title: 'Error', 
-                    		message: message,
-                    		responseText: jqxhr.responseText,
-                    		status: status,
-                    		error: error,
-                    		jqxhr: jqxhr
-                    	});
-
-                        //console.log('[UserProfile.getUserAcountInfo] Error getting data: ' + jqxhr.responseText + ', ' + error);
-                        //console.log(jqxhr); console.log(status); console.log(error);
+                    }.bind(this), 
+                    function(err) {
+                        if (cfg.error) {
+                            cfg.error({
+                                title: 'User not found',
+                                message: 'No account information found for this user.'
+                            });
+                        }
                     }.bind(this)
-                });
+                );
             }
         },
-
 		
         // DOM QUERY
         getFieldValue: {
