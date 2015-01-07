@@ -43,6 +43,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     this.userOwnsProfile = false;
                 }
                 
+                this.accountRecord = null;
                 this.userRecord = cfg.userInfo;
                 this.userId = cfg.userId;
                 this.loggedInUserid = cfg.loggedInUserId;
@@ -143,6 +144,41 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         // STATE CHANGES
 
         /*
+            Calculate cached state properties.
+            Should be run after state is loaded, and after any state changes. 
+        */
+        calcState: {
+            value: function () {
+
+                if (this.userRecord) {
+                    this.hasProfile = true;
+                    if (this.accountRecord) {
+                        this.userRecord.profile.account = this.accountRecord;
+                    }
+                } else {
+                    this.hasProfile = false;
+                    if (this.accountRecord) {
+                        this.hasAccount = true;
+                    }
+                }
+
+                // Context for templates -- should be a separate method.
+                this.context.profileStatus = this.getProfileStatus();
+                this.context.accountRecord = this.accountRecord;
+                this.context.userRecord = this.userRecord;
+
+                /*
+                this.userRecord.profile.account = {
+                    realname: data.fullName,
+                    email: data.email,
+                    username: data.userName
+                };
+                */
+
+            }
+        },
+
+        /*
             getCurrentState 
         */
         getCurrentState: {
@@ -158,7 +194,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                         callbacks.success.call(this);
                     }
                 } else {
-                    
                     var userProfile;
 
                     this.userProfileClient = new UserProfileService(this.userProfileService.url, {
@@ -173,53 +208,55 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                             //console.log(data);
                             if (data[0]) {
                                 // profile found
-                                this.hasProfile = true;
                                 this.userRecord = data[0];
-                                this.context.userRecord = this.userRecord;
+
                                 // NB: this is just for now. We should probably incorporate
                                 // the account <-> profile syncing somewhere else/
-                                this.ensureAccountData({
-                                    success: function() {
-                                        if (callbacks.success) {
-                                            callbacks.success.call(this);
-                                        }
-                                    }.bind(this),
-                                    error: function(err) {
-                                        this.renderErrorView({
-                                            title: 'Error Getting User Account', 
-                                            message: 'Error getting user account: ' + err
-                                        });
-                                    }
-                                });
+                                // This is the cached version of the globus user record.
+                                this.accountRecord = this.userRecord.account;
+
+                                if (!this.accountRecord) {
+                                    this.getUserAccountInfo({
+                                        userId: this.userId, 
+                                        success: function (data) {
+                                            this.accountRecord = data;
+                                            this.calcState();
+                                            if (callbacks.success) {
+                                                callbacks.success.call(this);
+                                            }
+                                        }.bind(this),
+                                        error: function (err) {
+                                            this.renderErrorView(err);
+                                            // this.status = 'error';
+                                        }.bind(this)
+                                    });
+                                } else {
+                                    this.calcState();
+                                }
                             } else {
                                 // no profile ... create a bare bones one.
-                                this.hasProfile = false;
-                                this.userRecord = {
-                                    user: {}, profile: {}
-                                }
-                                this.context.userRecord = this.userRecord;
-                                this.ensureAccountData({
-                                    success: function() {
+                                this.userRecord = null;
+                                this.getUserAccountInfo({
+                                    userId: this.userId, 
+                                    success: function (data) {
+                                        this.accountRecord = data;
+                                        this.calcState();
                                         if (callbacks.success) {
                                             callbacks.success.call(this);
                                         }
                                     }.bind(this),
-                                    error: function(err) {
-                                        this.renderErrorView({
-                                            title: 'Error Getting User Account', 
-                                            message: 'Error getting user account: ' + err
-                                        });
-                                    }
+                                    error: function (err) {
+                                        // this.status = 'error';
+                                        this.renderErrorView(err);
+                                    }.bind(this)
                                 });
                             }
                         }.bind(this), 
                         function(err) {
+                            this.renderErrorView(err);
                             console.log('[UserProfile.sync] Error getting user profile.');
                             console.log(err);
-                            this.renderErrorView({
-                                title: 'Error Getting Profile', 
-                                message: 'Error getting profile: ' + err
-                            });
+                            this.renderErrorView(err);
                         }.bind(this)
                     );
                 }
@@ -266,7 +303,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         },
 
 
-        // PATTERNS
+        // TEMPLATES
         getTemplate: {
             value: function(name) {
                 if (this.templates[name] === undefined) {
@@ -288,12 +325,13 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             value: function(cfg) {
             	// assumes the user record has been loaded, inspects to ensure the account
             	// property is set, and if not, fetches it and sets it.
-                if (!this.userRecord.profile.account) {
+                if (!this.accountRecord) {
                 	//console.log('GETTING user account');
                 	// console.log(this.userRecord);
                     this.getUserAccountInfo({
                         userId: this.userId, 
                         success: function (data) {
+                            this.accountRecord = data;
                             if (data) {
                                 this.hasAccount = true;
                                 this.userRecord.profile.account = {
@@ -972,7 +1010,9 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 								case 'array':
 									if (!this.dest[key]) {
 										this.dest[key] = [];
-									}
+									} else {
+                                        this.dest[key] = [];
+                                    }
 									this.dest[key] = Object.create(merger).init(this.dest[key]).mergeArray(obj[key]);
 									break;
 								case 'undefined':
@@ -1180,8 +1220,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 // And in the context as well, since we have replaced the entire object.
                 this.context.userRecord = updated;
 
-                //console.log('UPDATED'); 
-                //console.log(updated); 
+                console.log('UPDATED'); 
+                console.log(updated); 
 
                 // step 1: translate forms to this object...
 
@@ -1352,35 +1392,38 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         },
 
         createUserRecord: {
-            value: function () {
+            value: function (cfg) {
                 // Get basic user account info (may already have it).
-                this.ensureAccountData({
-                    success: function () {
-                    	// account data has been set ... copy the account fields to the corresponding user and profile fields.
-                    	this.userRecord.user.username = this.userRecord.profile.account.username;
-                    	this.userRecord.user.realname = this.userRecord.profile.account.realname;
-                        this.userRecord.profile.email = this.userRecord.profile.account.email
 
-                        this.saveUserRecord({
-                            success: function() {
-                            	this.renderViewEditLayout();
-                            	this.renderPicture();
-                                this.renderEditView();
-                                this.addSuccessMessage('Success!', 'Your user profile has been created.');
+                this.getUserAccountInfo({
+                    userId: this.userId, 
+                    success: function (data) {
+                        this.accountRecord = data;
+
+                        // account data has been set ... copy the account fields to the corresponding user and profile fields.
+                        this.userRecord = {
+                            user: {
+                                username: data.userName,
+                                realname: data.fullName
                             },
-                            error: function (error) {
-                            	this.renderErrorView({
-                            		title: 'Error',
-                            		message: 'Your user profile could not be saved: ' + error.message
-                            	})
+                            profile: {
+                                email: data.email,
+                                account: data
                             }
-                        });                    
+                        };
+
+                        this.calcState();
+                        if (cfg.success) {
+                            cfg.success(this);
+                        }
                     }.bind(this),
                     error: function (err) {
-                        this.renderErrorView(err);
+                        // this.status = 'error';
+                        if (cfg.error) {
+                            cfg.error(err);
+                        }
                     }.bind(this)
-                })
-
+                });
             }
         },
 
@@ -1486,6 +1529,126 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 );
             }
         },
+
+        getProp: {
+            value: function (obj, prop) {
+                var props = prop.split('.');
+
+                var temp = obj;
+                for (var i=0; i<props.length; i++) {
+                    var key = props[i];
+                    //console.log(key);
+                    //console.log(temp[key]);
+                    if (temp[key] === undefined) {
+                        return obj[key];
+                    } else {
+                        temp = temp[key];
+                    }
+                }
+                return temp;
+            }
+        },
+
+        getProfileStatus: {
+            value: function () {
+                // if profile is present
+                var status = null;
+                if (!this.hasProfile) {
+                    return {
+                        status: 'none'
+                    }
+                }
+
+                // rate the profile based on percent of fields completed.
+                /*
+                    status:
+                        none - no profile
+                        incomplete - required fields not filled in
+                        complete - required fields filled in, no optional fields
+                    percent_complete:
+                        if required fields are completed, rate it based on the completion of the
+                        the following fields:
+                        real name, location, email, user class, roles, affiliations, personal statement
+                */
+                var requiredFields = [
+                    'user.username', 'profile.email', 'profile.user_class'
+                ];
+
+                var fieldsToCheck = [
+                    'user.username', 'profile.location', 'profile.email', 'profile.user_class', 'profile.roles',
+                    'profile.affiliations', 'profile.personal_statement'
+                ];
+
+                // ensure required fields.
+                var missing = [];
+
+                // console.log('profile?'); console.log(this.userRecord);
+                for (var i=0; i<requiredFields.length; i++) {
+                    var value = this.getProp(this.userRecord, requiredFields[i]);
+                    if (this.isBlank(value)) {
+                        status = 'incomplete;'
+                        missing.push(requiredFields[i]);
+                    }
+                }
+
+                if (status) {
+                    return {
+                        status: status, 
+                        message: 'The following required profile fields are missing: ' + missing.join(', ')
+                    }
+                }
+
+                for (var i=0; i<fieldsToCheck.length; i++) {
+                    var value = this.getProp(this.userRecord, fieldsToCheck[i]);
+                    if (fieldsToCheck[i] === 'profile.personal_statement') {
+                        console.log('PERSONAL: ');
+                        console.log(value);
+                    }
+                    if (this.isBlank(value)) {
+                        missing.push(fieldsToCheck[i]);
+                    }
+                }
+
+                var percentComplete = Math.round(100 * (fieldsToCheck.length - missing.length) /  fieldsToCheck.length);
+
+                if (percentComplete < 100) {
+                    return {
+                        status: 'minimal',
+                        message: 'The profile is complete, but could be richer.',
+                        percentComplete: percentComplete
+                    }
+                } else {
+                    return {
+                        status: 'complete',
+                        message: 'Congratulations, your profile is complete!'
+                    }
+                }
+
+                
+            }
+        },
+
+        isBlank: {
+            value: function (value) {
+                if (value === undefined) {
+                   return true;
+                } else if (typeof value === 'object') {
+                    //console.log('STATUS ' + requiredFields[i] + ':' + value.push);
+                    if (value.push && value.pop) {
+                        if (value.length === 0) {
+                            return true;
+                        }
+                    } else {
+                        if (value.getOwnPropertyNames().length === 0) {
+                            return true;
+                        }
+                    }
+                } else if (typeof value === 'string' && value.length === 0) {
+                    return true;
+                }
+                return false;
+            }
+        },
 		
         // DOM QUERY
         getFieldValue: {
@@ -1564,6 +1727,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             value: function () {
                 // Generate initial view based on the current state of this widget.
                 // Head off at the pass -- if not logged in, can't show profile.
+                this.calcState();
                 if (!this.authToken) {
                     this.places.title.html('Unauthorized');
                     this.renderPicture();
@@ -1574,7 +1738,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     this.renderInfoView();
                 } else if (this.hasAccount) {
                     // no profile, but have basic account info.
-                    this.places.title.html(this.userRecord.profile.account.realname + ' (' + this.userRecord.profile.account.username + ')');
+                    this.places.title.html(this.accountRecord.fullName + ' (' + this.accountRecord.userName + ')');
                     this.renderPicture();
                     this.renderNoProfileView();
                 } else {
@@ -1682,6 +1846,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     if (this.updateUserRecordFromForm()) {
                         this.saveUserRecord({
                             success: function() {
+                                this.calcState();
                                 this.renderViewEditLayout();
                                 this.addSuccessMessage('Success!', 'Your user profile has been updated.');
                                 this.renderInfoView();
@@ -1732,10 +1897,21 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         renderNoProfileView: {
             value: function() {
                 this.places.content.html(this.getTemplate('no_profile').render(this.context));
+                var that = this;
                 if (this.isProfileOwner) {
                     $('[data-button="create-profile"]').on('click', function(e) {
-                        this.createUserRecord();
-                    }.bind(this));
+                        that.createUserRecord({
+                            success: function () {
+                                this.renderViewEditLayout();
+                                this.renderPicture();
+                                this.renderEditView();
+                                this.addSuccessMessage('Success!', 'Your user profile has been created.');
+                            }.bind(that),
+                            error: function (err) {
+                                this.renderErrorView(err);
+                            }.bind(that)
+                        });
+                    });
                 }
             }
         },

@@ -20,7 +20,7 @@
   <div class="row">
     <div class="col-md-9">
       <h2>{% if userRecord.profile.title %}{{userRecord.profile.title | titleLabel }} {% endif %}{{userRecord.user.realname | e}}{% if userRecord.profile.suffix %}, {{userRecord.profile.suffix | e}}{% endif %}</h2>
-      {% if env.isOwner and userRecord.user.realname != userRecord.profile.account.realname %}<p class="text-warning">Note: The name on your account is <i>{{ userRecord.profile.account.realname }}</i>.</p>{% endif %}
+      {% if env.isOwner and userRecord.user.realname != accountRecord.fullName %}<p class="text-warning">Note: The name on your account is <i>{{ accountRecord.fullName }}</i>.</p>{% endif %}
     </div>
     <div class="col-md-3">
 
@@ -38,7 +38,16 @@
       {% if userRecord.profile.location %}<i>{{userRecord.profile.location | e}}</i>{% endif %}
       {% if userRecord.profile.email %}
       <p><a href="mailto:{{profile.email | e}}">{{userRecord.profile.email | e}}</a></p>
-      {% if env.isOwner and userRecord.profile.email != userRecord.profile.account.email %}<p class="text-warning">Note: The email on your account is <i>{{ userRecord.profile.account.email }}</i>.</p>{% endif %}
+      {% if env.isOwner and userRecord.profile.email != accountRecord.email %}<p class="text-warning">Note: The email on your account is <i>{{ accountRecord.email }}</i>.</p>{% endif %}
+      {% endif %}
+      {%if profileStatus.status == "none" %}
+        <p>shouldn't see this</p>
+      {% elif profileStatus.status == "incomplete" %}
+        <p>Profile status: {{profileStatus.status}}, {{profileStatus.message}}</p>
+      {% elif profileStatus.status == "minimal" %}
+        <p>Your profile's minimal requirements have been met, but is only {{profileStatus.percentComplete}}% complete.</p>
+      {% elif profileStatus.status == "complete" %}
+        <p>Congratulations, your profile is complete!</p>
       {% endif %}
     </div>
   </div>
