@@ -724,12 +724,12 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                             if (schema.required) {
                                 for (var i=0; i<schema.required.length; i++) {
                                     var requiredProp = schema.required[i];
-                                    console.log('Required: ' + requiredProp);
-                                    console.log(newObject[requiredProp]);
+                                    //console.log('Required: ' + requiredProp);
+                                    //console.log(newObject[requiredProp]);
                                     if (newObject[requiredProp] === undefined || newObject[requiredProp] === null) {
                                         this.currentPath.push(requiredProp);
                                         var propPath = this.currentPath.join('.');
-                                        console.log('missing: ' + requiredProp + ':' + propPath);
+                                        //console.log('missing: ' + requiredProp + ':' + propPath);
                                         this.addFieldError({
                                             propPath: propPath,
                                             message: 'This field is required'
@@ -1610,18 +1610,18 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 //if (!container) {
                 //    container = this.places.content;
                 //}
-                console.log('[showFieldError]');
-                console.log(container);
-                console.log(field);
+                //console.log('[showFieldError]');
+                //console.log(container);
+                //console.log(field);
                 if (typeof field === 'string') {
                     field = container.find('[data-field="'+field+'"]');
                 }
                 field.addClass('has-error');
                 var messageNode = field.find('[data-element="message"]');
-                console.log('message: ');
-                console.log(message);
-                console.log(field);
-                console.log(messageNode);
+                //console.log('message: ');
+                //console.log(message);
+                //console.log(field);
+                //console.log(messageNode);
                 if (message) {
                     messageNode.html(message);
                     // messageNode.addClass('error-message');
