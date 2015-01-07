@@ -183,11 +183,19 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                                 this.context.userRecord = this.userRecord;
                                 // NB: this is just for now. We should probably incorporate
                                 // the account <-> profile syncing somewhere else/
-                                this.ensureAccountData(function() {
-                                    if (callbacks.success) {
-                                        callbacks.success.call(this);
+                                this.ensureAccountData({
+                                    success: function() {
+                                        if (callbacks.success) {
+                                            callbacks.success.call(this);
+                                        }
+                                    }.bind(this),
+                                    error: function(err) {
+                                        this.renderErrorView({
+                                            title: 'Error Getting User Account', 
+                                            message: 'Error getting user account: ' + err
+                                        });
                                     }
-                                }.bind(this));
+                                });
                             } else {
                                 // no profile ... create a bare bones one.
                                 this.hasProfile = false;
@@ -195,11 +203,19 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                                     user: {}, profile: {}
                                 }
                                 this.context.userRecord = this.userRecord;
-                                this.ensureAccountData(function() {
-                                    if (callbacks.success) {
-                                        callbacks.success.call(this);
+                                this.ensureAccountData({
+                                    success: function() {
+                                        if (callbacks.success) {
+                                            callbacks.success.call(this);
+                                        }
+                                    }.bind(this),
+                                    error: function(err) {
+                                        this.renderErrorView({
+                                            title: 'Error Getting User Account', 
+                                            message: 'Error getting user account: ' + err
+                                        });
                                     }
-                                }.bind(this));
+                                });
                             }
                         }.bind(this), 
                         function(err) {
@@ -274,31 +290,41 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         },
 
         ensureAccountData: {
-            value: function(callback) {
+            value: function(cfg) {
             	// assumes the user record has been loaded, inspects to ensure the account
             	// property is set, and if not, fetches it and sets it.
                 if (!this.userRecord.profile.account) {
                 	//console.log('GETTING user account');
                 	// console.log(this.userRecord);
-                    this.getUserAccountInfo({userId: this.userId}, function (data) {
-                        if (data.realname) {
-                            this.hasAccount = true;
-                            this.userRecord.profile.account = {
-                                realname: data.realname,
-                                email: data.email,
-                                username: this.userId
+                    this.getUserAccountInfo({
+                        userId: this.userId, 
+                        success: function (data) {
+                            if (data) {
+                                this.hasAccount = true;
+                                this.userRecord.profile.account = {
+                                    realname: data.fullName,
+                                    email: data.email,
+                                    username: data.userName
+                                };
+                            } else {
+                                this.hasAccount = false;
+                            	this.renderErrorView({
+                            		title: 'Error', 
+                            		message: 'No information returned about the user account'
+                            	});
                             };
-                        } else {
-                            this.hasAccount = false;
-                        	this.renderErrorView({
-                        		title: 'Error', 
-                        		message: 'No user info returned from Genome Comparison'
-                        	});
-                        };
-                        callback.call(this);
-                    }.bind(this));
+                            cfg.success();
+                        }.bind(this),
+                        error: function (err) {
+                            this.status = 'error';
+                            this.renderErrorView({
+                                title: 'Error Getting User Account Info', 
+                                message: 'There was a system error retrieving your account information.'
+                            });
+                        }.bind(this)
+                    });
                 } else {
-                    callback.call(this);
+                    cfg.success();
                 }
             }
         },
@@ -1333,28 +1359,31 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         createUserRecord: {
             value: function () {
                 // Get basic user account info (may already have it).
-                this.ensureAccountData(function () {
-                	// account data has been set ... copy the account fields to the corresponding user and profile fields.
-                	this.userRecord.user.username = this.userRecord.profile.account.username;
-                	this.userRecord.user.realname = this.userRecord.profile.account.realname;
-                    this.userRecord.profile.email = this.userRecord.profile.account.email
+                this.ensureAccountData({
+                    success: function () {
+                    	// account data has been set ... copy the account fields to the corresponding user and profile fields.
+                    	this.userRecord.user.username = this.userRecord.profile.account.username;
+                    	this.userRecord.user.realname = this.userRecord.profile.account.realname;
+                        this.userRecord.profile.email = this.userRecord.profile.account.email
 
-                    this.saveUserRecord({
-                        success: function() {
-                        	this.renderViewEditLayout();
-                        	this.renderPicture();
-                            this.renderEditView();
-                            this.addSuccessMessage('Success!', 'Your user profile has been created.');
-                        },
-                        error: function (error) {
-                        	this.renderLayout();
-                        	this.renderErrorView({
-                        		title: 'Error',
-                        		message: 'Your user profile could not be saved: ' + error.message
-                        	})
-                        }
-                    });
-                    
+                        this.saveUserRecord({
+                            success: function() {
+                            	this.renderViewEditLayout();
+                            	this.renderPicture();
+                                this.renderEditView();
+                                this.addSuccessMessage('Success!', 'Your user profile has been created.');
+                            },
+                            error: function (error) {
+                            	this.renderErrorView({
+                            		title: 'Error',
+                            		message: 'Your user profile could not be saved: ' + error.message
+                            	})
+                            }
+                        });                    
+                    }.bind(this),
+                    error: function (err) {
+                        this.renderErrorView(err);
+                    }.bind(this)
                 })
 
             }
@@ -1424,6 +1453,46 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         },
 
         getUserAccountInfo: {
+            value: function (cfg) {
+                var userProfileServiceURL = 'https://'+ this.userProfileService.host+'/services/user_profile/rpc';
+                    var userProfile;
+
+                    this.userProfileClient = new UserProfileService(userProfileServiceURL, {
+                        token: this.authToken
+                    });
+                    $.ajaxSetup({
+                        timeout: 10000 
+                    });
+                    this.userProfileClient.lookup_globus_user([cfg.userId], 
+                        function(data) {
+                            //console.log('got user data');
+                            //console.log(data);
+                            if (data) {
+                               if (cfg.success) {
+                                cfg.success(data[cfg.userId]);
+                               }
+                            } else {
+                                if (cfg.error) {
+                                    cfg.error({
+                                        title: 'User not found',
+                                        message: 'No account information found for this user.'
+                                    });
+                                }
+                            }
+                        }.bind(this), 
+                        function(err) {
+                            if (cfg.error) {
+                                cfg.error({
+                                    title: 'User not found',
+                                    message: 'No account information found for this user.'
+                                });
+                            }
+                        }.bind(this)
+                    );
+            }
+        },
+
+        getUserAccountInfox: {
             value: function(cfg, callback) {
                 // Can't use this, because the globus CORS policy does 
                 // not allow us to.
