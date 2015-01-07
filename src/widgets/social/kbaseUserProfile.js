@@ -1,4 +1,4 @@
-define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function (nunjucks, $, md5, UserProfile) {
+define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function (nunjucks, $, md5, UserProfileService) {
     "use strict";
 
     var ProfileWidget = Object.create({}, {
@@ -13,10 +13,12 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 }
 
                 this.userProfileService = {
-                    host: 'dev19.berkeley.kbase.us'
+                    // host: 'dev19.berkeley.kbase.us'
+                    host: 'ci.kbase.us'
                 }
                 this.userAccountService = {
                     host: 'kbase.us'
+                    // host: 'ci.kbase.us'
                 }
 
 
@@ -125,17 +127,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 }.bind(this));
 
                 this.templates = {};
-                /*
-                this.viewTemplate = templateEnv.getTemplate('userProfile_view.html');
-                this.editTemplate = templateEnv.getTemplate('userProfile_edit.html');
-                this.layoutTemplate = templateEnv.getTemplate('userProfile_layout.html');
-                this.pictureTemplate = templateEnv.getTemplate('userProfile_picture.html');
-                this.editAffiliationTemplate = templateEnv.getTemplate('userProfile_edit_affiliation.html');
-                this.newAffiliationTemplate = templateEnv.getTemplate('userProfile_new_affiliation.html');
-                this.noProfileTemplate = templateEnv.getTemplate('userProfile_no_profile.html');
-                this.noUserTemplate = templateEnv.getTemplate('userProfile_no_user.html');
-                this.unauthorizedTemplate = templateEnv.getTemplate('userProfile_unauthorized.html');
-                */
 
                 this.messages = [];
 
@@ -172,10 +163,10 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                         callbacks.success.call(this);
                     }
                 } else {
-                    var userProfileServiceURL = 'http://'+ this.userProfileService.host+'/services/user_profile/rpc';
+                    var userProfileServiceURL = 'https://'+ this.userProfileService.host+'/services/user_profile/rpc';
                     var userProfile;
 
-                    this.userProfileClient = new UserProfile(userProfileServiceURL, {
+                    this.userProfileClient = new UserProfileService(userProfileServiceURL, {
                         token: this.authToken
                     });
                     $.ajaxSetup({
@@ -349,45 +340,13 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         createUserClasses: {
             value: function () {
                 this.userClasses = [{
-                    id: 'gsp-researcher',
-                    label: 'GSP Researcher'
-                }, {
-                    id: 'berc-researcher',
-                    label: 'BERC Researcher'
-                }, {
-                    id: 'ber-funded',
-                    label: 'BER Funded'
-                }, {
-                    id: 'kbase-internal',
-                    label: 'KBase Staff'
-                }, {
-                    id: 'kbase-test',
-                    label: 'KBase Test/Beta User'
-                }, {
-                    id: 'nonprofit',
-                    label: 'Other Nonprofit'
-                }, {
-                    id: 'commercial',
-                    label: 'Commercial User'
-                }];
-                this.userClassesMap = {};
-                for (var i in this.userClasses) {
-                    this.userClassesMap[this.userClasses[i].id] = this.userClasses[i].label;
-                }
-                this.context.env.userClasses = this.userClasses;
-            }
-        },
-
-        createUserClasses: {
-            value: function () {
-                this.userClasses = [{
                     id: 'pi',
                     label: 'Principal Investigator'
                 }, {
                     id: 'gradstudent',
                     label: 'Graduate Student'
                 }, {
-                    id: 'kbase-internal',
+                    id: 'kbase-internal', 
                     label: 'KBase Staff'
                 }, {
                     id: 'kbase-test',
@@ -558,6 +517,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
        
         // MODEL UPDATE
 
+        /*
         updateField: {
             value: function (fieldName, controlType, dataPath, validationFun) {
                 var field = this.places.content.find('[data-field="'+fieldName+'"]');
@@ -581,6 +541,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                }
             }
         },
+        */
 
         formToObject: {
         	value: function (schema) {
@@ -588,6 +549,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         		// that we find.
         		var that = this;
         		var form = this.places.content.find['form'];
+                var fieldValidationErrors = [];
+                var objectValidationErrors = [];
         		var parser = Object.create({}, {
         			init: {
         				value: function (cfg) {
@@ -599,22 +562,24 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 	        				this.currentPath = [];
 	        				this.jsonRoot = Object.create(null);
 	        				this.currentJsonNode = this.jsonRoot;
+                            this.fieldValidationErrors = cfg.fieldValidationErrors;
+                            this.objectValidationErrors = cfg.objectValidationErrors;
 	        				return this;
 	        			}
 	        		},
         			getFieldValue: {
 			            value: function(name) {
+                            // Each form control is marked with a data-field attribute on a container element, with the name set to the 
+                            // property path on the data object. The actual form control is found inisde the container.
 			                var field = this.container.find('[data-field="' + name + '"]');
 			                if (!field || field.length === 0) {
 			                	// NB: this is not null, which is reserved for a field with empty data.
 			                	return undefined;
-			                	//throw 'Unable to find field "' + name + '"';
 			                }
 		                	var control = field.find('input, textarea, select');
 		                	if (!control || control.length === 0) {
 		                		// NB: this is not null, which is reserved for a field with empty data.
 		                		return undefined;
-			                	//throw 'Unable to find field control in "' + name + '"';
 			                }
 		                	switch (control.prop('tagName').toLowerCase()) {
 		                		case 'input':
@@ -682,19 +647,34 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 			        					var json = {};
 			        					// var node = parentNode.find('[data-field-group="'+propName+'"]');
 			        					this.currentPath.push(propName);
-			        					
-			        					newObject[propName] = this.parseObject(propSchema); 
+
+                                        var value = this.parseObject(propSchema);
+			        					if (value) {
+			        					    newObject[propName] = value;
+                                        }
+                                       
 
 			        					this.currentPath.pop();
 			        					break;
 			        				case 'array':
 			        					this.currentPath.push(propName);
-			        					newObject[propName] = this.parseArray(propSchema);
+                                        var value = this.parseArray(propSchema);
+                                        if (value) {
+			        					    newObject[propName] = value;
+                                        }
 			        					this.currentPath.pop();
 			        					break;
 			        				case 'string':
 			        					this.currentPath.push(propName);
 			        					var value = this.parseString(propSchema);
+                                        var error = this.validateString(value, propSchema);
+                                        if (error) {
+                                            this.addFieldError({
+                                                propPath: this.currentPath.join('.'),
+                                                message: error
+
+                                            })
+                                        }
 			        					if (value !== undefined) {
 			        						newObject[propName] = value;
 			        					}
@@ -702,7 +682,9 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 		        						break;
 		        					case 'integer':
 		        						this.currentPath.push(propName);
+                                        //console.log('GOT INTEGER');
 			        					var value = this.parseInteger(propSchema);
+                                        //console.log('The Value is ' + value); 
 			        					if (value !== undefined) {
 			        						newObject[propName] = value;
 			        					}
@@ -715,7 +697,27 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 		        						// noop
 		        						break;
 		        				}
+
 		        			}
+
+                            if (schema.required) {
+                                for (var i=0; i<schema.required.length; i++) {
+                                    var requiredProp = schema.required[i];
+                                    console.log('Required: ' + requiredProp);
+                                    console.log(newObject[requiredProp]);
+                                    if (newObject[requiredProp] === undefined || newObject[requiredProp] === null) {
+                                        this.currentPath.push(requiredProp);
+                                        var propPath = this.currentPath.join('.');
+                                        console.log('missing: ' + requiredProp + ':' + propPath);
+                                        this.addFieldError({
+                                            propPath: propPath,
+                                            message: 'This field is required'
+                                        });
+                                        this.currentPath.pop();
+                                    }
+                                }
+                            }
+
 		        			return newObject;
 		        		}
 
@@ -739,8 +741,15 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 		        					return this.getFieldValue(path);
 		        				case 'object': 
 		        					// we don't have a canned way to get a set of fields ... yet.
-		        					var value =  this.container.find('[data-field="'+path+'"] fieldset').map(function () {
-		        						return Object.create(parser).init({container: $(this)}).parseObject(itemSchema);
+		        					var value =  this.container.find('[data-field="'+path+'"] fieldset').map(function (i) {
+                                        // do array objects in a separate parser because we need to establish a new
+                                        // container (one for each array element) and path (a fresh path for each array element and container)
+		        						var newObj = Object.create(parser).init({
+                                            container: $(this),
+                                            fieldValidationErrors: fieldValidationErrors,
+                                            objectValidationErrors: objectValidationErrors
+                                        }).parseObject(itemSchema);
+                                        return newObj;
 		        					}).get();
 		        					return value;
 		        				default:
@@ -749,28 +758,135 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 		        		}
 
 	        		},
-	        		parseString: {
+                    validateString: {
+                        value: function (value, schema) {
+                            // handle formats:
+                            if (value) {
+                                switch (schema.format) {
+                                    case 'email': 
+                                        var emailRe = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                                        if (!emailRe.test(value)) {
+                                            return 'Invalid email format';
+                                        }
+                                        break;
+                                }
+                            }
+                            return false;
+                        }
+                    },
+	        		parseString: { 
 	        			value: function (schema) {
 							var fieldName = this.currentPath.join('.');
 							return this.getFieldValue(fieldName);
 		        		}
 		        	},
+                    addFieldError: {
+                        value: function (err) {
+                            err.container = this.container;
+                            this.fieldValidationErrors.push(err);
+                        }
+                    },
 	        		parseInteger: {
-	        			value: function (schema) {
+	        			value: function (schema) { 
 							var fieldName = this.currentPath.join('.');
 							var strVal = this.getFieldValue(fieldName);
         					if (strVal) {
-        						var intVal = parseInt(strVal);
-        						if (intVal !== NaN) {
-        							return intVal;
-        						}
-        					}
-        					return undefined;
+                                if (strVal.length > 0) {
+            						var intVal = parseInt(strVal);
+            						if (isNaN(intVal)) {
+            							this.addFieldError({
+                                            propPath: fieldName,
+                                            message: 'Not a valid integer'
+                                        });
+                                        return undefined;
+            						} else {
+                                        var invalid = false;
+                                        if (schema.minimum) {
+                                            if (schema.minimumExclusive) {
+                                                if (intVal <= schema.minimum) {
+                                                    invalid = true;
+                                                    this.addFieldError({
+                                                        propPath: fieldName,
+                                                        message: 'The integer value is below or at the minimum of ' + schema.minimum
+                                                    }); 
+                                                }
+                                            } else {
+                                                if (intVal < schema.minimum) {
+                                                    invalid = true;
+                                                   this.addFieldError({
+                                                        propPath: fieldName,
+                                                        message: 'The integer value is below the minimum of ' + schema.minimum
+                                                    }); 
+                                                }
+                                            }
+                                        }
+                                        if (schema.maximum) {
+                                            if (schema.maximumExclusive) {
+                                                if (intVal >= schema.maximum) {
+                                                    invalid = true;
+                                                   this.addFieldError({
+                                                        propPath: fieldName,
+                                                        message: 'The integer value is above or at the maximum of ' + schema.maximum
+                                                    }); 
+                                                }
+                                            } else {
+                                                 if (intVal > schema.maximum) {
+                                                    invalid = true;
+                                                   this.addFieldError({
+                                                        propPath: fieldName,
+                                                        message: 'The integer value is above the maximum of ' + schema.maximum
+                                                    }); 
+                                                }
+                                            }
+                                        }
+                                        if (invalid) {
+                                            return undefined;
+                                        } else {
+                                            return intVal;
+                                        }
+                                    }
+                                } else {
+                                    return undefined;
+                                }
+        					} else {
+        					   return undefined;
+                            }
 		        		}
 		        	}
-        		});
-        		return parser.init({container: this.places.content}).parseObject(schema);
+        		}); 
+        		var result =  parser.init({
+                    container: this.places.content,
+                    fieldValidationErrors: fieldValidationErrors,
+                    objectValidationErrors: objectValidationErrors
+                }).parseObject(schema);
+
+                var errors = false;
+                if (fieldValidationErrors.length > 0) {
+                    errors = true;
+                    this.showFieldValidationErrors(fieldValidationErrors);
+                }
+                if (objectValidationErrors.length > 0) {
+                    errors = true;
+                    // this.showObjectValidationErrors(objectValidationErrors);
+                }
+
+                //console.log(fieldValidationErrors);
+                //console.log(objectValidationErrors);
+                if (errors) {
+                    throw 'Validation errors processing the form';
+                } else {
+                    return result;
+                }
         	}
+        },
+
+        showFieldValidationErrors: {
+            value: function (errors) {
+                for (var i=0; i<errors.length; i++) {
+                    var error = errors[i];
+                    this.showFieldError(error.container, error.propPath, error.message);
+                }
+            }
         },
 
 		updateUserRecord: {
@@ -903,62 +1019,129 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 				return merged;
 			}
 		},
+        getUserProfileFormSchema: {
+            value: function () {
+                // For building and validating user form input for a user profile.
+                // This is a subset of the user profile schema.
+                // FORNOW: fairly loose, other than sensible limits and formatting checks.
+                // NB: 
+                return {
+                    type: 'object', 
+                    properties: {
+                        user: {
+                            type: 'object',
+                            properties: {
+                                realname: {type: 'string', maxLength: 100}
+                            },
+                            required: ['realname']
+                        },
+                        profile: {
+                            type: 'object',
+                            properties: {
+                                avatar : {
+                                    type: 'object', 
+                                    properties: {
+                                        gravatar_default: {type: 'string'},
+                                        avatar_color: {type: 'string'},
+                                        avatar_initials: {type: 'string'}
+                                    }
+                                },
+                                title: {type: 'string'},
+                                suffix: {type: 'string'},
+                                location: {type: 'string', maxLength: 25},
+                                email: {type: 'string', format: 'email'},
+                                personal_statement: {type: 'string'},
+                                user_class: {type: 'string'},
+                                roles: {
+                                    type: 'array',
+                                    items: {type: 'string'}
+                                },
+                                affiliations: {
+                                    type: 'array',
+                                    items: {
+                                        type: 'object',
+                                        properties: {
+                                            title: {type: 'string'},
+                                            institution: {type: 'string'},
+                                            start_year: {type: 'integer', minimum: 1900, maximum: 2100},
+                                            end_year: {type: 'integer', minimum: 1900, maximum: 2100}
+                                        },
+                                        required: ['title', 'institution', 'start_year']
+                                    }
+                                }
+                            },
+                            required: ['email', 'user_class', 'roles', 'location']             
+                        }
+                    }
+                };
+            }
+        },
+        getUserProfileSchema: {
+            value: function () {
+                return {
+                    type: 'object', 
+                    properties: {
+                        user: {
+                            type: 'object',
+                            properties: {
+                                username: {type: 'string'},
+                                realname: {type: 'string'}
+                            },
+                            required: ['username', 'realname']
+                        },
+                        profile: {
+                            type: 'object',
+                            properties: {
+                                avatar : {
+                                    type: 'object', 
+                                    properties: {
+                                        gravatar_default: {type: 'string'},
+                                        avatar_color: {type: 'string'},
+                                        avatar_initials: {type: 'string'}
+                                    }
+                                },
+                                title: {type: 'string'},
+                                suffix: {type: 'string'},
+                                location: {type: 'string'},
+                                email: {type: 'string'},
+                                personal_statement: {type: 'string'},
+                                user_class: {type: 'string'},
+                                roles: {
+                                    type: 'array',
+                                    items: {type: 'string'}
+                                },
+                                affiliations: {
+                                    type: 'array',
+                                    items: {
+                                        type: 'object',
+                                        properties: {
+                                            title: {type: 'string'},
+                                            institution: {type: 'string'},
+                                            start_year: {type: 'integer'},
+                                            end_year: {type: 'integer'}
+                                        }
+                                    }
+                                }
+                            },
+                            required: ['email', 'user_class', 'user_roles', 'location']             
+                        }
+                    }
+                };
+            }
+        },
         updateUserRecordFromForm: {
             value: function() {
                 this.clearErrors();
 
-                var schema = {
-                	type: 'object', 
-                   	properties: {
-	                	user: {
-	                		type: 'object',
-	                	 	properties: {
-	                	 		username: {type: 'string'},
-	                	 		realname: {type: 'string'}
-	                	 	},
-	                	 	required: ['username', 'realname']
-	                	},
-	                	profile: {
-	                		type: 'object',
-	                	 	properties: {
-		                	 	avatar : {
-		                	 		type: 'object', 
-		                	     	properties: {
-		                	     		gravatar_default: {type: 'string'},
-		                	     		avatar_color: {type: 'string'},
-		                	     		avatar_initials: {type: 'string'}
-		                	     	}
-		                	    },
-		                	 	title: {type: 'string'},
-		                	 	suffix: {type: 'string'},
-		                	 	location: {type: 'string'},
-		                	 	email: {type: 'string'},
-		                	 	personal_statement: {type: 'string'},
-		                	 	user_class: {type: 'string'},
-		                	 	roles: {
-		                	 		type: 'array',
-		                	     	items: {type: 'string'}
-		                	    },
-		                	    affiliations: {
-		                	    	type: 'array',
-		                	    	items: {
-		                	    		type: 'object',
-		                	    		properties: {
-		                	    			title: {type: 'string'},
-			                	     	 	institution: {type: 'string'},
-			                	     	 	start_year: {type: 'integer'},
-			                	     	 	end_year: {type: 'integer'}
-		                	    		}
-		                	    	}
-		                	    }
-		                	},
-		                	required: ['email', 'user_class', 'user_roles', 'location']            	
-	                	}
-	                }
-	            };
+                var schema = this.getUserProfileFormSchema();
 
 
-                var json = this.formToObject(schema);
+                try {
+                    var json = this.formToObject(schema);
+                } catch (e) {
+                    this.addErrorMessage('Error', 'There was an error processing the form:' + e);
+                    return false;
+                }
 
                 // console.log(this.updateUserRecord);
                 //console.log('JSON');
@@ -1284,8 +1467,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     		jqxhr: jqxhr
                     	});
 
-                        console.log('[UserProfile.getUserAcountInfo] Error getting data: ' + jqxhr.responseText + ', ' + error);
-                        console.log(jqxhr); console.log(status); console.log(error);
+                        //console.log('[UserProfile.getUserAcountInfo] Error getting data: ' + jqxhr.responseText + ', ' + error);
+                        //console.log(jqxhr); console.log(status); console.log(error);
                     }.bind(this)
                 });
             }
@@ -1410,19 +1593,26 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             }
         },
 
-        setFieldError: {
-            value: function(field, message) {
-
+        showFieldError: {
+            value: function(container, field, message) {
+                //if (!container) {
+                //    container = this.places.content;
+                //}
+                console.log('[showFieldError]');
+                console.log(container);
+                console.log(field);
                 if (typeof field === 'string') {
-                    field = this.places.content.find('[data-field="'+field+'"]');
+                    field = container.find('[data-field="'+field+'"]');
                 }
-                field.find('.form-control').addClass('has-error');
+                field.addClass('has-error');
                 var messageNode = field.find('[data-element="message"]');
                 console.log('message: ');
+                console.log(message);
+                console.log(field);
                 console.log(messageNode);
                 if (message) {
                     messageNode.html(message);
-                    messageNode.addClass('error-message');
+                    // messageNode.addClass('error-message');
                 }
                 //var fieldControl = this.contentPlace.find('[data-field="' + name + '"]').closest('.form-group');
                 //if (fieldControl) {
