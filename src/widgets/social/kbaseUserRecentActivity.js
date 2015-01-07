@@ -1,167 +1,131 @@
-(function($, undefined) {
-	$.KBWidget({
-		name: "KBaseUserRecentActivity",
-		parent: "kbaseAuthenticatedWidget",
-		version: "1.0.0",
+define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, SocialWidget) {
+	var RecentActivityWidget = Object.create(SocialWidget, {
+		init: {
+			value: function (cfg) {
+				cfg.name = 'RecentActivity';
+				cfg.title = 'Recent Activity';
+				this.SocialWidget_init(cfg);
 
-		options: {
-			userId: null,
-			kbCache: {},
+				this.templates.env.addFilter('dateFormat', function(dateString) {					
+					var d = new Date(dateString);
+					var shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+					var time = "";
+					var minutes = d.getMinutes();
+					if (minutes < 10) {
+						minutes = "0" + minutes;
+					}
+					if (d.getHours() >= 12) {
+						if (d.getHours() != 12) {
+							time = (d.getHours() - 12) + ":" + minutes + "pm";
+						} else {
+							time = "12:" + minutes + "pm";
+						}
+					} else {
+						time = d.getHours() + ":" + minutes + "am";
+					}
+					return shortMonths[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear() + " at " + time;
+                });
+                this.templates.env.addFilter('typeIcon', function (type) {
+                	var initial = type.charAt(0);
+                	return '<span style="border: 1px red solid; padding: 6px;font-weight: bold; font-size: 150%">' + initial + '</span>';
+                })
+				
+				if (cfg.workspaceURL) {
+					if (this.auth.authToken) {
+						this.workspaceClient = new Workspace(cfg.workspaceURL, {
+							token: this.auth.authToken
+						});
+					} else {
+						this.workspaceClient = new Workspace(cfg.workspaceURL); 
+					}
+				} else {
+					throw 'The workspace client url is not defined';
+				}
+
+				// TODO: get this from somewhere, allow user to configure this.
+				this.params.limit = 10;
+
+                return this;
+			}
 		},
 
-		alertPanel: null,
-
-		init: function(options) {
-			this._super(options);
-			//console.log('ws url?');
-			//console.log(this.options.kbCache.ws_url);
-			//console.log(this.options.kbCache.token);
-			if (this.options.kbCache.ws_url) {
-				this.wsUrl = this.options.kbCache.ws_url;
+		render: {
+			value: function () {
+				console.log('Context');
+				console.log(this.context);
+				this.places.content.html(this.getTemplate('recent_activity').render(this.context));
 			}
-			if (this.options.kbCache.token) {
-				this.ws = new Workspace(this.wsUrl, {
-					token: this.options.kbCache.token
-				});
-			} else {
-				this.ws = new Workspace(this.wsUrl);
-			}
-
-			this.userId = this.options.userId;
-
-			// setup the alert panel
-			this.alertPanel = $("<div></div>");
-			this.$elem.append(this.alertPanel);
-			this.$mainPanel = $("<div></div>").css("overflow", "auto").css("max-height", "500px");
-			this.$elem.append(this.$mainPanel);
-
-			this.recentActivity = [];
-
-			this.renderLoading();
-			this.getRecentActivity();
-
-			return this;
 		},
 
-		getRecentActivity: function() {
-			var that = this;
+		getCurrentState: {
+			value: function(cfg) {
+				// Reset or create the recent activity list.
+				this.data.recentActivity = [];
 
-			// we want to look at data in all workspaces
-			this.ws.list_workspace_info({},
-				function(data) {
+				// NB: this loads and inspects data in all workspaces. Is this really advisable??
+				this.workspaceClient.list_workspace_info({}, function(data) {
+					// collect all the workspace objects available to this user, filtering 
+					// out those that are actually owned by the user.
 					var wsids = [];
-					for (var k = 0; k < data.length; k++) {
+					for (var i=0; i<data.length; i++) {
 						//tuple<ws_id id, ws_name workspace, username owner, timestamp moddate,
 						//int object, permission user_permission, permission globalread,
 						//lock_status lockstat, usermeta metadata> workspace_info
-						if (data[k][2] === that.userId) {
+						if (data[i][2] === this.params.userId) {
 							//for now, only include workspaces owned by this user
-							wsids.push(data[k][0]);
+							wsids.push(data[i][0]);
 						}
 					}
-					//console.log('hmm, recent activity?');
-					//console.log(that.userId);
-					//console.log(data);
+
+					// Get details for, sort, and limit the list of workspace objects.
 					if (wsids.length > 0) {
 						var d = new Date();
 						d.setMonth(d.getMonth() - 3);
 						var params = {
-							savedby: [that.userId],
+							savedby: [this.params.userId],
 							after: d.toISOString(),
 							ids: wsids
 						};
-						that.ws.list_objects(params,
+						this.workspaceClient.list_objects(params,
 							function(data) {
-								that.recentActivity = [];
-								for (var k = 0; k < data.length; k++) {
+								for (var i=0; i<data.length; i++) {
 									//<obj_id objid, obj_name name, type_string type,
 									//timestamp save_date, int version, username saved_by,
 									//ws_id wsid, ws_name workspace, string chsum, int size, usermeta meta>
-									that.recentActivity.push({
-										name: data[k][1],
-										ws: data[k][7],
-										type: (data[k][2].split("-")[0]).split("\.")[1],
-										date: data[k][3]
+									this.data.recentActivity.push({
+										name: data[i][1],
+										ws: data[i][7],
+										type: (data[i][2].split("-")[0]).split("\.")[1],
+										date: data[i][3]
 									});
 								}
 
-								that.recentActivity.sort(function(a, b) {
+								this.data.recentActivity.sort(function(a, b) {
 									var x = new Date(a.date);
 									var y = new Date(b.date);
 									return ((x < y) ? 1 : ((x > y) ? -1 : 0));
 								});
-								var limit = 10;
-								if (that.recentActivity.length > limit) {
-									that.recentActivity = that.recentActivity.slice(0, limit);
+								if (this.data.recentActivity.length > this.params.limit) {
+									this.data.recentActivity = this.data.recentActivity.slice(0, this.params.limit);
 								}
-								that.render();
-							},
+								cfg.success();
+							}.bind(this),
 							function(err) {
-								that.renderError(err);
-							});
+								cfg.error(err);
+							}.bind(this));
 					} else {
-						that.render();
+						// Didn't find anything, but still considered "success"
+						cfg.success();
 					}
-				},
+				}.bind(this),
 				function(err) {
-					that.renderError(err);
-				});
-		},
-
-		renderLoading: function () {
-			this.$mainPanel.empty();
-			this.$mainPanel.append('<div id="loading-msg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>searching for recent activity...</center></p></div>');
-		},
-
-		renderError: function (err) {
-			this.$mainPanel.empty();
-			console.log('ERROR');
-			console.log(err);
-			this.$mainPanel.append('<p>Error loading recent activity:</p>' +err.error.message);
-		},
-
-		render: function() {
-			
-			this.$mainPanel.empty();
-			// simple table view
-			if (this.recentActivity) {
-				var $tbl = $('<table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped">').css("width", "90%");
-
-				if (this.recentActivity.length > 0) {
-					for (var k = 0; k < this.recentActivity.length; k++) {
-						var d = new Date(this.recentActivity[k]["date"]);
-
-						var time = "";
-						var minutes = d.getMinutes();
-						if (minutes < 10) {
-							minutes = "0" + minutes;
-						}
-						if (d.getHours() >= 12) {
-							if (d.getHours() != 12) {
-								time = (d.getHours() - 12) + ":" + minutes + "pm";
-							} else {
-								time = "12:" + minutes + "pm";
-							}
-						} else {
-							time = d.getHours() + ":" + minutes + "am";
-						}
-						var objhtml = this.recentActivity[k]["name"] + " (" + this.recentActivity[k]["type"] + ")<br><i><small>modified on " +
-							this.monthLookup[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear() + " at " + time +
-							"</small></i>";
-
-						$tbl.append($("<tr>").append($("<td>").append(objhtml)));
-					}
-					this.$mainPanel.append($tbl);
-				} else {
-					this.$mainPanel.append("<b>No activity in the last 3 months.</b>");
-				}
-			} else {
-				this.$mainPanel.append('<b>Error loading activity.</b>');
-			}
-
-		},
-		monthLookup: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+					this.renderError(err);
+				}.bind(this));
+			}	
+		}
 
 	});
 
-})(jQuery)
+	return RecentActivityWidget;
+});

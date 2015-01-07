@@ -1,0 +1,19 @@
+<table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped">
+
+{% if data.recentActivity | length > 0 %}
+
+{% for activity in data.recentActivity %}
+	<tr>
+		<td>{{activity.type | typeIcon }}</td>
+		<td><b>{{activity.type}}</b> - {{activity.name}}<br><i>modified on {{activity.date | dateFormat }}</i></td>
+	</tr>
+	
+{% endfor %}
+
+{% else %}
+
+Sorry, no recent activity.
+
+{% endif %}
+
+</table>
