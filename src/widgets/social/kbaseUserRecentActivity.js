@@ -52,8 +52,8 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 
 		render: {
 			value: function () {
-				console.log('Context');
-				console.log(this.context);
+				//console.log('Context');
+				//console.log(this.context);
 				this.places.content.html(this.getTemplate('recent_activity').render(this.context));
 			}
 		},
@@ -88,17 +88,27 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 							ids: wsids
 						};
 						this.workspaceClient.list_objects(params,
-							function(data) {
+							function(data) { 
 								for (var i=0; i<data.length; i++) {
+									//console.log('data: ' + i);
+									//console.log(data[i]);
 									//<obj_id objid, obj_name name, type_string type,
 									//timestamp save_date, int version, username saved_by,
 									//ws_id wsid, ws_name workspace, string chsum, int size, usermeta meta>
-									this.data.recentActivity.push({
-										name: data[i][1],
-										ws: data[i][7],
-										type: (data[i][2].split("-")[0]).split("\.")[1],
-										date: data[i][3]
-									});
+									// only consider narratives.
+									// just get the second component of the type name.
+									var dataType = (data[i][2].split("-")[0]).split("\.")[1];
+									if (dataType === 'Narrative') {
+										this.data.recentActivity.push({
+											name: data[i][1],
+											ws: data[i][7],
+											ref: data[i][7] + '/' + data[i][1],
+											type: dataType, 
+											date: data[i][3],
+											checksum: data[i][8],
+											obj_id: 'ws.' + data[i][6] + '.obj.' + data[i][0]
+										});
+									}
 								}
 
 								this.data.recentActivity.sort(function(a, b) {
@@ -106,10 +116,34 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 									var y = new Date(b.date);
 									return ((x < y) ? 1 : ((x > y) ? -1 : 0));
 								});
+								var recentActivityMap = {};
 								if (this.data.recentActivity.length > this.params.limit) {
 									this.data.recentActivity = this.data.recentActivity.slice(0, this.params.limit);
+									
+									this.data.recentActivity.forEach(function (x) {
+										recentActivityMap[x.ref] = x;
+									});
 								}
-								cfg.success();
+
+								var wsrefs = this.data.recentActivity.map(function (x) {
+									return {
+										ref: x.ref
+									};
+								});
+
+								this.workspaceClient.get_objects(wsrefs, 
+									function (wsobjs) {
+										for (var i=0; i<wsobjs.length; i++) {
+											var wsobj = wsobjs[i];
+											var ref = wsobj.info[7] + '/' + wsobj.info[1];
+											recentActivityMap[ref].ws_object = wsobj;
+										}
+										cfg.success();
+									}.bind(this), 
+									function (err) {
+										cfg.error(err);
+									}
+								);
 							}.bind(this),
 							function(err) {
 								cfg.error(err);

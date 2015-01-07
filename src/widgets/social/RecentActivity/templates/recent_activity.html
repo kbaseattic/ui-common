@@ -4,8 +4,10 @@
 
 {% for activity in data.recentActivity %}
 	<tr>
-		<td>{{activity.type | typeIcon }}</td>
+		<!-- <td>{{activity.type | typeIcon }}</td> 
 		<td><b>{{activity.type}}</b> - {{activity.name}}<br><i>modified on {{activity.date | dateFormat }}</i></td>
+		-->
+		<td><a target="_blank" href="/narrative/{{activity.obj_id}}">{{activity.ws_object.data.metadata.name}}</a><br><i>modified on {{activity.date | dateFormat }}</td>
 	</tr>
 	
 {% endfor %}
