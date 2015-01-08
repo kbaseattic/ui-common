@@ -21,20 +21,24 @@
         
         typereg: {'KBaseFile.SingleEndLibrary':
                        {nicetype: 'Single End Read Library',
-                        app: 'Assembly'
+                        app_name: 'Assembly and Annotation',
+                        app: 'genome_annotation'
                         },
                    'KBaseFile.PairedEndLibrary':
                        {nicetype: 'Paired End Read Library',
-                        app: 'Assembly'
+                        app_name: 'Assembly and Annotation',
+                        app: 'genome_annotation'
                         },
                    'KBaseFile.AssemblyFile':
                        {nicetype: 'Assembly File',
-                        app: 'Assembly File to ContigSet'
+                        app_name: 'Assembly File to ContigSet',
+                        app: null
                         },
-                   'KBaseFile.AnnotationFile':
-                       {nicetype: 'Annotation File',
-                        app: 'Annotation File to Genome'
-                        },
+//                   'KBaseFile.AnnotationFile':
+//                       {nicetype: 'Annotation File',
+//                        app_name: 'Annotation File to Genome',
+//                        app: null
+//                        },
                    'none':
                        {nicetype: null,
                         app: null
@@ -138,7 +142,9 @@
             } else {
                 typeNameNice = self.objData.type;
             }
-
+            var permref = self.objData.wsid + "/" + self.objData.obj_id + "/" +
+                    self.objData.version;
+            
             var $basicInfo =
                 $('<div>').addClass('col-md-6')
                     .append($('<div>').append('<h3>' + self.objData.name + '</h3>'))
@@ -153,16 +159,17 @@
                     .append($('<div>').css({'color':'#555'})
                             .append('Imported on ' + self.getTimeStr(self.objData.save_date)))
                     .append($('<div>').css({'color':'#555'})
-                            .append('Perm Ref: ' + self.objData.wsid + "/"
-                                    + self.objData.obj_id + "/" + self.objData.version))
+                            .append('Perm Ref: ' + permref))
 
             var $buttonDiv =
                 $('<div>').css({'margin':'10px','margin-top':'20px'});
             if (typeInfo.app != null) {
                 //TODO link to narrative
-                $buttonDiv.append($('<a href="">').addClass('btn btn-info')
+                $buttonDiv.append($('<a href="#/narrativemanager/new?copydata='
+                                        + permref + '&app=' + typeInfo.app +
+                                        '">').addClass('btn btn-info')
                             .css({'margin':'5px'})
-                            .append('Launch ' + typeInfo.app + ' App'));
+                            .append('Launch ' + typeInfo.app_name + ' App'));
             }
             self.addCopyDropdown($buttonDiv);
 
