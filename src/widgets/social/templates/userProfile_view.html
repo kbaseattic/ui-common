@@ -1,0 +1,109 @@
+
+<style type="text/css">
+  .profile-info h3 {
+    font-size: 130%;
+    margin: 10px 0 5px 0;
+    text-decoration: underline;
+  }
+  .profile-info ul {
+    padding: 0;
+  }
+  .profile-info ul li {
+    margin: 0;
+  }
+  .personal-statement {
+    margin: 20px 0 0 0;
+    line-height: 1.5;
+  }
+</style>
+<div class="profile-info">
+  <div class="row">
+    <div class="col-md-9">
+      <h2>{% if userRecord.profile.title %}{{userRecord.profile.title | titleLabel }} {% endif %}{{userRecord.user.realname | e}}{% if userRecord.profile.suffix %}, {{userRecord.profile.suffix | e}}{% endif %}</h2>
+      {% if env.isOwner and userRecord.user.realname != accountRecord.fullName %}<p class="text-warning">Note: The name on your account is <i>{{ accountRecord.fullName }}</i>.</p>{% endif %}
+    </div>
+    <div class="col-md-3">
+
+      {% if env.isOwner %}
+      <div class="btn-group pull-right">
+        <button type="button" class="btn btn-primary" data-button="edit">Edit Profile</button>
+      </div>
+      
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      {% if userRecord.profile.location %}<i>{{userRecord.profile.location | e}}</i>{% endif %}
+      {% if userRecord.profile.email %}
+      <p><a href="mailto:{{profile.email | e}}">{{userRecord.profile.email | e}}</a></p>
+      {% if env.isOwner and userRecord.profile.email != accountRecord.email %}<p class="text-warning">Note: The email on your account is <i>{{ accountRecord.email }}</i>.</p>{% endif %}
+      {% endif %}
+      {%if profileStatus.status == "none" %}
+        <p>shouldn't see this</p>
+      {% elif profileStatus.status == "incomplete" %}
+        <p>Profile status: {{profileStatus.status}}, {{profileStatus.message}}</p>
+      {% elif profileStatus.status == "minimal" %}
+        <p>Your profile's minimal requirements have been met, but is only {{profileStatus.percentComplete}}% complete.</p>
+      {% elif profileStatus.status == "complete" %}
+        <p>Congratulations, your profile is complete!</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h3>User Class</h3>
+      {% if userRecord.profile.user_class %}
+        <ul><li>{{ userRecord.profile.user_class | userClassLabel}}</li></ul>
+      {% elif env.isOwner %}
+        <p class="text-warning">It is very useful to know what type of KBase user you are.</p>
+      {% else %}
+        <p>No user class assigned</p>  
+      {% endif %}
+
+      <h3>Roles</h3>
+      {% if userRecord.profile.roles|length > 0 %}
+        <ul>
+          {% for role in userRecord.profile.roles %}
+            <li>{{role | roleLabel }}</li>
+          {% endfor %}
+        </ul>
+      {% elif env.isOwner %}
+        <p class="text-warning">It is very useful to know what type of roles you are fulfilling with your KBase account.</p>
+      {% else %}
+        <p>No roles assigned</p>
+      {% endif %}
+    </div>
+    <div class="col-md-6">
+      <h3>Affiliations</h3>  
+      {% if userRecord.profile.affiliations|length > 0 %}  
+        {% for affiliation in userRecord.profile.affiliations|sort(true, true, "start_year") %}
+          <p><strong>{{affiliation.title | e}}</strong> ({{affiliation.start_year| e}}-{% if affiliation.end_year %}{{affiliation.end_year | e}}{% else %}present{% endif %}) @ {{affiliation.institution | e}}</p>
+        {% endfor %}
+      {% elif env.isOwner %}
+        <p class="text-warning">Show your colors! Please add one or more affiliations.</p>
+      {% else %}
+        <p>No affiliations recorded for this user</p>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="well personal-statement">    
+        {% if userRecord.profile.personal_statement %}
+          {{userRecord.profile.personal_statement | e | kbmarkup}}
+        {% else %}
+          {%if env.isOwner %}
+            You don't have a personal statement. Don't you want to let the the KBase community know a little about you?
+          {% else %}
+            <i>This user does not have a personal statement</i>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

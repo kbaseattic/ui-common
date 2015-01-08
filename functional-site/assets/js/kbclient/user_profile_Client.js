@@ -63,6 +63,26 @@ function UserProfile(url, auth, auth_cb) {
         deprecationWarning();
         return json_call_ajax("UserProfile.set_user_profile", [p], 0, _callback, _error_callback);
     };
+
+    this.update_user_profile = function (p, _callback, _errorCallback) {
+    return json_call_ajax("UserProfile.update_user_profile",
+        [p], 0, _callback, _errorCallback);
+};
+
+    this.update_user_profile_async = function (p, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("UserProfile.update_user_profile", [p], 0, _callback, _error_callback);
+    };
+
+    this.lookup_globus_user = function (usernames, _callback, _errorCallback) {
+    return json_call_ajax("UserProfile.lookup_globus_user",
+        [usernames], 1, _callback, _errorCallback);
+};
+
+    this.lookup_globus_user_async = function (usernames, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("UserProfile.lookup_globus_user", [usernames], 1, _callback, _error_callback);
+    };
  
 
     /*
