@@ -22,12 +22,12 @@
         typereg: {'KBaseFile.SingleEndLibrary':
                        {nicetype: 'Single End Read Library',
                         app_name: 'Assembly and Annotation',
-                        app: 'genome_annotation'
+                        app: 'genome_assembly'
                         },
                    'KBaseFile.PairedEndLibrary':
                        {nicetype: 'Paired End Read Library',
                         app_name: 'Assembly and Annotation',
-                        app: 'genome_annotation'
+                        app: 'genome_assembly'
                         },
                    'KBaseFile.AssemblyFile':
                        {nicetype: 'Assembly File',
