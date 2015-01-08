@@ -189,6 +189,8 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 								this.data.recentActivity.forEach(function (x) {
 									recentActivityMap[x.ref] = x;
 								});
+                
+                cfg.success();
 								
 							}.bind(this),
 							function(err) {
