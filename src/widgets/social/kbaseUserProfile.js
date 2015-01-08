@@ -1104,7 +1104,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                                     properties: {
                                         gravatar_default: {type: 'string'},
                                         avatar_color: {type: 'string'},
-                                        avatar_initials: {type: 'string'}
+                                        avatar_phrase: {type: 'string'}
                                     }
                                 },
                                 title: {type: 'string'},
@@ -1158,7 +1158,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                                     properties: {
                                         gravatar_default: {type: 'string'},
                                         avatar_color: {type: 'string'},
-                                        avatar_initials: {type: 'string'}
+                                        avatar_phrase: {type: 'string'}
                                     }
                                 },
                                 title: {type: 'string'},
@@ -1601,8 +1601,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 for (var i=0; i<fieldsToCheck.length; i++) {
                     var value = this.getProp(this.userRecord, fieldsToCheck[i]);
                     if (fieldsToCheck[i] === 'profile.personal_statement') {
-                        console.log('PERSONAL: ');
-                        console.log(value);
+                        // console.log('PERSONAL: ');
+                        // console.log(value);
                     }
                     if (this.isBlank(value)) {
                         missing.push(fieldsToCheck[i]);

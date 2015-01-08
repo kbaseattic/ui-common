@@ -3,7 +3,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 		init: {
 			value: function (cfg) {
 				cfg.name = 'RecentActivity';
-				cfg.title = 'Recent Activity';
+				cfg.title = 'Recently Updated Narratives';
 				this.SocialWidget_init(cfg);
 
 				this.templates.env.addFilter('dateFormat', function(dateString) {					
@@ -63,30 +63,65 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 				// Reset or create the recent activity list.
 				this.data.recentActivity = [];
 
-				// NB: this loads and inspects data in all workspaces. Is this really advisable??
-				this.workspaceClient.list_workspace_info({}, function(data) {
-					// collect all the workspace objects available to this user, filtering 
-					// out those that are actually owned by the user.
-					var wsids = [];
+
+				// Note that Narratives are now associated 1-1 with a workspace. 
+				// Some new narrative attributes, such as name and (maybe) description, are actually
+				// stored as attributes of the workspace itself.
+				// At present we can just use the presence of "narrative_nice_name" metadata attribute 
+				// to flag a compatible workspace.
+				var d = new Date();
+				d.setMonth(d.getMonth() - 3);
+				this.workspaceClient.list_workspace_info({
+					after: d.toISOString(),
+					showDeleted: 0,
+					owners: [this.params.userId]
+				}, function(data) {
+					var workspaceIds = [];
+					var workspaceMap = {};
+
+					// First we both transfor each ws info object into a nicer js object,
+					// and filter for modern narrative workspaces.
 					for (var i=0; i<data.length; i++) {
 						//tuple<ws_id id, ws_name workspace, username owner, timestamp moddate,
 						//int object, permission user_permission, permission globalread,
 						//lock_status lockstat, usermeta metadata> workspace_info
-						if (data[i][2] === this.params.userId) {
-							//for now, only include workspaces owned by this user
-							wsids.push(data[i][0]);
+						var wsInfo = {
+							id: data[i][0],
+							name: data[i][1],
+							owner: data[i][2],
+							modified: data[i][3],
+							object_count: data[i][4],
+							permission: data[i][5],
+							globalread: data[i][6],
+							lockstat: data[i][7],
+							metadata: data[i][8]
+						};
+
+						if (wsInfo.metadata.narrative_nice_name) {
+							// workspaces.push(wsInfo);
+							workspaceIds.push(wsInfo.id);
+							workspaceMap[wsInfo.name] = wsInfo;
+							//console.log('GOT ONE');
+							//console.log(data[i]);
 						}
 					}
 
+					// Then we need to get the actual narratives because we need the ids in order
+					// to form a url.
+					// NB this is a bit awkward -- perhaps there will be a way soon to open a narrative
+					// just by specifying the workspace.
+
 					// Get details for, sort, and limit the list of workspace objects.
-					if (wsids.length > 0) {
-						var d = new Date();
-						d.setMonth(d.getMonth() - 3);
+					if (workspaceIds.length > 0) {
+						
 						var params = {
 							savedby: [this.params.userId],
 							after: d.toISOString(),
-							ids: wsids
+							ids: workspaceIds,
+							type: 'KBaseNarrative.Narrative',
+							includeMetadata: 1
 						};
+						var workspacesWithNarratives = {};
 						this.workspaceClient.list_objects(params,
 							function(data) { 
 								for (var i=0; i<data.length; i++) {
@@ -97,19 +132,41 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 									//ws_id wsid, ws_name workspace, string chsum, int size, usermeta meta>
 									// only consider narratives.
 									// just get the second component of the type name.
-									var dataType = (data[i][2].split("-")[0]).split("\.")[1];
-									if (dataType === 'Narrative') {
-										this.data.recentActivity.push({
-											name: data[i][1],
-											ws: data[i][7],
-											ref: data[i][7] + '/' + data[i][1],
-											type: dataType, 
-											date: data[i][3],
-											checksum: data[i][8],
-											obj_id: 'ws.' + data[i][6] + '.obj.' + data[i][0]
-										});
+									// var dataType = (data[i][2].split("-")[0]).split("\.")[1];
+									//if (dataType === 'Narrative') {
+									var narrativeInfo = {
+										name: data[i][1],
+										ws: data[i][7],
+										ref: data[i][7] + '/' + data[i][1],
+										// type: dataType, 
+										date: data[i][3],
+										checksum: data[i][8],
+										obj_id: 'ws.' + data[i][6] + '.obj.' + data[i][0]
+									};
+									var workspaceName = narrativeInfo.ws;
+									if (workspacesWithNarratives[workspaceName]) {
+										this.addWarningMessage('Workspace '+workspaceName+' already has a narrative ' +
+											workspacesWithNarratives[workspaceName].name + ', ' +
+											narrativeInfo.name + ' was skipped.');
+									} else {
+										
+										//var dataType = narrativeInfo.(data[i][2].split("-")[0]).split("\.")[1];
+										var workspaceInfo = workspaceMap[narrativeInfo.ws];
+										if (workspaceInfo) {
+											narrativeInfo.nice_name = workspaceInfo.metadata.narrative_nice_name;
+											narrativeInfo.description = workspaceInfo.metadata.narrative_description;
+											this.data.recentActivity.push(narrativeInfo);
+										} else {
+											this.addWarningMessage('Workspace ' + narrativeInfo.ws + ' for narrative '+narrativeInfo.name + ' not found.');
+										}
+										
+										workspacesWithNarratives[workspaceName] = narrativeInfo;
 									}
+
 								}
+
+								// We should now have the list of recently active narratives.
+								// Now we sort and limit the list.
 
 								this.data.recentActivity.sort(function(a, b) {
 									var x = new Date(a.date);
@@ -119,11 +176,10 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 								var recentActivityMap = {};
 								if (this.data.recentActivity.length > this.params.limit) {
 									this.data.recentActivity = this.data.recentActivity.slice(0, this.params.limit);
-									
-									this.data.recentActivity.forEach(function (x) {
-										recentActivityMap[x.ref] = x;
-									});
 								}
+								this.data.recentActivity.forEach(function (x) {
+									recentActivityMap[x.ref] = x;
+								});
 
 								var wsrefs = this.data.recentActivity.map(function (x) {
 									return {
@@ -131,22 +187,29 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 									};
 								});
 
+								cfg.success();
+
+								/*
 								this.workspaceClient.get_objects(wsrefs, 
 									function (wsobjs) {
 										for (var i=0; i<wsobjs.length; i++) {
 											var wsobj = wsobjs[i];
 											var ref = wsobj.info[7] + '/' + wsobj.info[1];
-											recentActivityMap[ref].ws_object = wsobj;
+											var recent = recentActivityMap[ref];
+											if (recent) {
+												recent.ws_object = wsobj;
+											} 
 										}
 										cfg.success();
 									}.bind(this), 
 									function (err) {
-										cfg.error(err);
+										cfg.error(err.error.message);
 									}
 								);
+								*/
 							}.bind(this),
 							function(err) {
-								cfg.error(err);
+								cfg.error(err.error.message);
 							}.bind(this));
 					} else {
 						// Didn't find anything, but still considered "success"
@@ -154,7 +217,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 					}
 				}.bind(this),
 				function(err) {
-					this.renderError(err);
+					cfg.error(err.error.message);
 				}.bind(this));
 			}	
 		}
