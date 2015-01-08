@@ -1,6 +1,9 @@
 <p>An error has been encountered.</p>
-
+{% if message %}
 {{message | kbmarkup}}
+{% else %}
+No message
+{% endif %}
 
 <!--
 <hr>

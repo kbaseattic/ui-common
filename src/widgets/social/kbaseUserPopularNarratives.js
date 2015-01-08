@@ -140,7 +140,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 										// type: dataType, 
 										checksum: data[i][8],
 										size: data[i][9],
-										meta: data[i][10],
+										metadata: data[i][10],
 										ref: data[i][7] + '/' + data[i][1],
 										obj_id: 'ws.' + data[i][6] + '.obj.' + data[i][0]
 									};

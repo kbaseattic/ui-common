@@ -7,7 +7,7 @@
 		{# <td>{{activity.type | typeIcon }}</td> 
 		<td><b>{{activity.type}}</b> - {{activity.name}}<br><i>modified on {{activity.date | dateFormat }}</i></td>
 		#}
-		<td><a target="_blank" href="/narrative/{{activity.obj_id}}">{{activity.nice_name}}</a><br><i>modified on {{activity.date | dateFormat }}
+		<td><a target="_blank" href="/narrative/{{activity.obj_id}}">{{activity.nice_name}}</a><br><i>modified on {{activity.save_date | dateFormat }}
 		{% if activity.description %}<p>{{activity.description}}</p>{% endif %}</td>
 	</tr>
 	

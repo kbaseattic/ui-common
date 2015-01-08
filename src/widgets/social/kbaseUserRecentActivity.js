@@ -135,39 +135,48 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 									// var dataType = (data[i][2].split("-")[0]).split("\.")[1];
 									//if (dataType === 'Narrative') {
 									var narrativeInfo = {
+										id: data[i][0],
 										name: data[i][1],
+										type: data[i][2],
+										save_date: data[i][3],
+										version: data[i][4],
+										saved_by: data[i][5],
+										wsid: data[i][6],
 										ws: data[i][7],
-										ref: data[i][7] + '/' + data[i][1],
 										// type: dataType, 
-										date: data[i][3],
 										checksum: data[i][8],
+										size: data[i][9],
+										metadata: data[i][10],
+										ref: data[i][7] + '/' + data[i][1],
 										obj_id: 'ws.' + data[i][6] + '.obj.' + data[i][0]
 									};
-									var workspaceName = narrativeInfo.ws;
-									if (workspacesWithNarratives[workspaceName]) {
-										this.addWarningMessage('Workspace '+workspaceName+' already has a narrative ' +
-											workspacesWithNarratives[workspaceName].name + ', ' +
+               	  var workspaceInfo = workspaceMap[narrativeInfo.ws];
+                  
+									if (workspacesWithNarratives[narrativeInfo.ws]) {
+										this.addWarningMessage('Workspace '+narrativeInfo.ws+' already has a narrative ' +
+											workspacesWithNarratives[narrativeInfo.ws].name + ', ' +
 											narrativeInfo.name + ' was skipped.');
-									} else {
-										
+									} else {										
 										//var dataType = narrativeInfo.(data[i][2].split("-")[0]).split("\.")[1];
 										var workspaceInfo = workspaceMap[narrativeInfo.ws];
 										if (workspaceInfo) {
-											narrativeInfo.nice_name = workspaceInfo.metadata.narrative_nice_name;
-											narrativeInfo.description = workspaceInfo.metadata.narrative_description;
-											this.data.recentActivity.push(narrativeInfo);
+                      if (workspaceInfo.metadata.narrative_nice_name === narrativeInfo.metadata.name) {
+                        // only keep the narrative with a matching name.
+											  narrativeInfo.nice_name = workspaceInfo.metadata.narrative_nice_name;
+											  narrativeInfo.description = workspaceInfo.metadata.narrative_description;
+											  this.data.recentActivity.push(narrativeInfo);
+                        workspacesWithNarratives[narrativeInfo.ws] = narrativeInfo;
+                      } else {
+                        this.addWarningMessage('Narrative '+ narrativeInfo.name + ' does not match the workspace narrative ' + workspaceInfo.metadata.narrative_nice_name);
+                      }
 										} else {
 											this.addWarningMessage('Workspace ' + narrativeInfo.ws + ' for narrative '+narrativeInfo.name + ' not found.');
 										}
-										
-										workspacesWithNarratives[workspaceName] = narrativeInfo;
 									}
-
 								}
 
 								// We should now have the list of recently active narratives.
 								// Now we sort and limit the list.
-
 								this.data.recentActivity.sort(function(a, b) {
 									var x = new Date(a.date);
 									var y = new Date(b.date);
@@ -180,33 +189,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget'], function ($, nunjucks, Socia
 								this.data.recentActivity.forEach(function (x) {
 									recentActivityMap[x.ref] = x;
 								});
-
-								var wsrefs = this.data.recentActivity.map(function (x) {
-									return {
-										ref: x.ref
-									};
-								});
-
-								cfg.success();
-
-								/*
-								this.workspaceClient.get_objects(wsrefs, 
-									function (wsobjs) {
-										for (var i=0; i<wsobjs.length; i++) {
-											var wsobj = wsobjs[i];
-											var ref = wsobj.info[7] + '/' + wsobj.info[1];
-											var recent = recentActivityMap[ref];
-											if (recent) {
-												recent.ws_object = wsobj;
-											} 
-										}
-										cfg.success();
-									}.bind(this), 
-									function (err) {
-										cfg.error(err.error.message);
-									}
-								);
-								*/
+								
 							}.bind(this),
 							function(err) {
 								cfg.error(err.error.message);
