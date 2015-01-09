@@ -14,7 +14,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
 
                 this.userProfileService = {
                     // host: 'dev19.berkeley.kbase.us'
-                    url:'https://kbase.us/services/user_profile/rpc'
+                    url:'http://dev19.berkeley.kbase.us/services/user_profile/rpc'
+                    // url:'https://kbase.us/services/user_profile/rpc'
                 }
 
                 // Give ourselves the ability to show templates.
@@ -149,8 +150,28 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
         */
         calcState: {
             value: function () {
+              
+              if (this.userRecord) {
+                if (this.userRecord.user) {
+                  if (this.userRecord.profile) {
+                    this.profileStatus = 'profile';
+                  } else {
+                    this.profileStatus = 'stub';
+                  }
+                } else {
+                  this.profileStatus = 'error';
+                }
+              } else {
+                this.profileStatus = 'none';
+              }
+              
+              if (this.profileStatus === 'profile') {
+                if (this.accountRecord) {
+                  this.userRecord.profile.account = this.accountRecord;
+                }
+              }
 
-                if (this.userRecord) {
+              /*  if (this.userRecord) {
                     this.hasProfile = true;
                     if (this.accountRecord) {
                         this.userRecord.profile.account = this.accountRecord;
@@ -161,6 +182,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                         this.hasAccount = true;
                     }
                 }
+                */
 
                 // Context for templates -- should be a separate method.
                 this.context.profileStatus = this.getProfileStatus();
@@ -333,14 +355,13 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                         success: function (data) {
                             this.accountRecord = data;
                             if (data) {
-                                this.hasAccount = true;
                                 this.userRecord.profile.account = {
                                     realname: data.fullName,
                                     email: data.email,
                                     username: data.userName
                                 };
                             } else {
-                                this.hasAccount = false;
+                              delete this.accountRecord;
                             	this.renderErrorView({
                             		title: 'Error', 
                             		message: 'No information returned about the user account'
@@ -1104,7 +1125,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                                     properties: {
                                         gravatar_default: {type: 'string'},
                                         avatar_color: {type: 'string'},
-                                        avatar_initials: {type: 'string'}
+                                        avatar_phrase: {type: 'string'}
                                     }
                                 },
                                 title: {type: 'string'},
@@ -1158,7 +1179,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                                     properties: {
                                         gravatar_default: {type: 'string'},
                                         avatar_color: {type: 'string'},
-                                        avatar_initials: {type: 'string'}
+                                        avatar_phrase: {type: 'string'}
                                     }
                                 },
                                 title: {type: 'string'},
@@ -1513,16 +1534,18 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                             if (cfg.error) {
                                 cfg.error({
                                     title: 'User not found',
-                                    message: 'No account information found for this user.'
+                                    message: 'No account information found for this user (empty data).'
                                 });
                             }
                         }
                     }.bind(this), 
                     function(err) {
                         if (cfg.error) {
+                          console.log('ERROR');
+                          console.log(err);
                             cfg.error({
                                 title: 'User not found',
-                                message: 'No account information found for this user.'
+                                message: 'No account information found for this user ' + cfg.userId
                             });
                         }
                     }.bind(this)
@@ -1553,7 +1576,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
             value: function () {
                 // if profile is present
                 var status = null;
-                if (!this.hasProfile) {
+                if (this.profileStatus !== 'profile') {
                     return {
                         status: 'none'
                     }
@@ -1601,8 +1624,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                 for (var i=0; i<fieldsToCheck.length; i++) {
                     var value = this.getProp(this.userRecord, fieldsToCheck[i]);
                     if (fieldsToCheck[i] === 'profile.personal_statement') {
-                        console.log('PERSONAL: ');
-                        console.log(value);
+                        // console.log('PERSONAL: ');
+                        // console.log(value);
                     }
                     if (this.isBlank(value)) {
                         missing.push(fieldsToCheck[i]);
@@ -1634,7 +1657,9 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                    return true;
                 } else if (typeof value === 'object') {
                     //console.log('STATUS ' + requiredFields[i] + ':' + value.push);
-                    if (value.push && value.pop) {
+                    if (value === null) {
+                        return true;
+                    } else if (value.push && value.pop) {
                         if (value.length === 0) {
                             return true;
                         }
@@ -1732,11 +1757,15 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                     this.places.title.html('Unauthorized');
                     this.renderPicture();
                     this.places.content.html(this.getTemplate('unauthorized').render(this.context));
-                } else if (this.hasProfile) {
+                } else if (this.profileStatus === 'profile') {
                     // Title can be be based on logged in user infor or the profile.
                     this.renderViewEditLayout();
                     this.renderInfoView();
-                } else if (this.hasAccount) {
+                } else if (this.profileStatus === 'stub') {
+                      // Title can be be based on logged in user infor or the profile.
+                      this.places.title.html(this.userRecord.user.realname + ' (' + this.userRecord.user.username + ')');
+                      this.renderStubProfileView();
+                } else if (this.accountRecord) {
                     // no profile, but have basic account info.
                     this.places.title.html(this.accountRecord.fullName + ' (' + this.accountRecord.userName + ')');
                     this.renderPicture();
@@ -1904,7 +1933,29 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function 
                             success: function () {
                                 this.renderViewEditLayout();
                                 this.renderPicture();
-                                this.renderEditView();
+                                //this.renderEditView();
+                                this.addSuccessMessage('Success!', 'Your user profile has been created.');
+                            }.bind(that),
+                            error: function (err) {
+                                this.renderErrorView(err);
+                            }.bind(that)
+                        });
+                    });
+                }
+            }
+        },
+        
+        renderStubProfileView: {
+            value: function() {
+                this.places.content.html(this.getTemplate('stub_profile').render(this.context));
+                var that = this;
+                if (this.isProfileOwner) {
+                    $('[data-button="create-profile"]').on('click', function(e) {
+                        that.createUserRecord({
+                            success: function () {
+                                this.renderViewEditLayout();
+                                this.renderPicture();
+                                //this.renderEditView();
                                 this.addSuccessMessage('Success!', 'Your user profile has been created.');
                             }.bind(that),
                             error: function (err) {

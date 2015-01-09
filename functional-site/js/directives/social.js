@@ -166,26 +166,27 @@ angular.module('social-directives')
             }
         };
     })
-    .directive('socialuserhistoryx', function($rootScope) {
+    .directive('socialuserpopularnarratives', function($rootScope) {
         return {
             link: function(scope, ele, attrs) {
-                var userId = scope.params.userid;
-
-                // setup panel
-                var p = $(ele).kbasePanel({
-                    title: "Recent Activity"
-                }) /* ,rightLabel: "ws", subText: scope.userid}); */
-                p.loading();
-                $(p.body()).KBaseUserRecentActivity({
-                    // userInfo: data[0],
-                    // wsUserInfoUrl: peopleWsUrl,
-                    // wsUserInfoRef: userId + ":userinfo/info",
-                    userId: userId,
-                    kbCache: scope.params.kbCache
-                });
+              
+              require(['kbaseuserpopularnarratives'], function(Widget) {
+                try {
+                  var widget = Object.create(Widget);
+                  widget.init({
+                      container: $(ele),
+                      userId: scope.params.userid,
+                      authToken: scope.params.kbCache.token,
+                      workspaceURL: scope.params.kbCache.ws_url
+                  }).go();
+                } catch (ex) {
+                  $(ele).html('Error: ' + ex);
+                }
+              });
             }
         };
     })
+    
     .directive('socialusercollaborators', function($rootScope) {
         return {
             link: function(scope, ele, attrs) {
@@ -270,52 +271,7 @@ angular.module('social-directives')
             }
         };
     })
-
-.directive('socialuserpopularnarratives', function($rootScope) {
-    return {
-        link: function(scope, ele, attrs) {
-            var userId = scope.params.userid;
-
-            // setup panel
-            var p = $(ele).kbasePanel({
-                title: "Popular Narratives"
-            }) /* ,rightLabel: "ws", subText: scope.userid}); */
-            p.loading();
-
-            // create ws client (because we need to go to the dev workspace)
-            var peopleWsUrl = "http://dev04.berkeley.kbase.us:7058";
-            var ws;
-            if (scope.params.kbCache.token) {
-                ws = new Workspace(peopleWsUrl, {
-                    token: scope.params.kbCache.token
-                });
-            } else {
-                ws = new Workspace(peopleWsUrl);
-            }
-
-            var objectIds = [{
-                ref: userId + ":userinfo/info"
-            }];
-            ws.get_objects(objectIds,
-                function(data) {
-                    // create the widget if we found the data
-                    $(p.body()).KBaseUserPopularNarratives({
-                        userInfo: data[0],
-                        wsUserInfoUrl: peopleWsUrl,
-                        wsUserInfoRef: userId + ":userinfo/info",
-                        kbCache: scope.params.kbCache
-                    });
-                },
-                function(err) {
-                    // if we get an error, then no workspace or no profile exists (or is readable by this user...) and we just exit
-                    $(p.body()).append("Not visible for user <i>" + userId + "</i>.");
-                });
-        }
-    };
-})
-
-
-.directive('socialusertopapps', function($rootScope) {
+    .directive('socialusertopapps', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
             var userId = scope.params.userid;
