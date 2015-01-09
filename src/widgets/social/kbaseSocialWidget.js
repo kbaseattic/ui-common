@@ -28,6 +28,10 @@ define(['nunjucks', 'jquery'], function (nunjucks, $) {
                   throw 'Widget title is required';
                 }
                 this.widgetTitle = cfg.title;
+                
+
+
+                this.messages = [];
 
 
                 // TODO: FIX THIS!!!
@@ -64,6 +68,12 @@ define(['nunjucks', 'jquery'], function (nunjucks, $) {
                 this.templates = {};
                 this.templates.env = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/social/'+this.widgetName+'/templates'), {
                     'autoescape': false
+                });
+                this.templates.env.addFilter('kbmarkup', function(s) {
+                  if (s) {
+                    s = s.replace(/\n/g, '<br>');
+                  }
+                  return s;
                 });
                 // This is the cache of templates.
                 this.templates.cache = {};
@@ -104,10 +114,12 @@ define(['nunjucks', 'jquery'], function (nunjucks, $) {
                     	this.render()
                     }.bind(this),
                     error: function (err) {
-                      if (typeof error === 'string') {
+                      console.log('ERROR');
+                      console.log(err);
+                      if (typeof err === 'string') {
                         err = {
                           title: 'Error',
-                          message: 'err'
+                          message: err
                         }
                       }
                       this.renderErrorView(err);
@@ -236,6 +248,7 @@ define(['nunjucks', 'jquery'], function (nunjucks, $) {
                 this.container.html(this.getTemplate('layout').render(this.context));
                 this.places = {
                 	title: this.container.find('[data-placeholder="title"]'),
+                  alert: this.container.find('[data-placeholder="alert"]'),
                 	content: this.container.find('[data-placeholder="content"]')
                 };
             }
@@ -248,6 +261,73 @@ define(['nunjucks', 'jquery'], function (nunjucks, $) {
         renderWaitingView: {
             value: function () {
                 this.places.content.html('<img src="assets/img/ajax-loader.gif"></img>');
+            }
+        },
+        
+        renderMessages: {
+            value: function () {
+                if (this.places.alert) {
+                    this.places.alert.empty();
+                    for (var i=0; i<this.messages.length; i++) {
+                        var message = this.messages[i];
+                        var alertClass = 'default';
+                        switch (message.type) {
+                            case 'success': alertClass = 'dismissable';break;
+                            case 'warning': alertClass = 'warn';break;
+                            case 'error': alertClass = 'danger'; break; 
+                        }
+                        this.places.alert.append(
+                        '<div class="alert alert-success alert-'+alertClass+'" role="alert">' +
+                        '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
+                        '<strong>' + message.title + '</strong> ' + message.message + '</div>');
+                    }
+                }
+            }
+        },
+
+        clearMessages: {
+            value: function() {
+                this.messages = [];
+                this.renderMessages();
+            }
+        },
+
+        addSuccessMessage: {
+            value: function(title, message) {
+              if (message === undefined) {
+                message = title;
+                title = '';
+              }
+                this.messages.push({
+                    type: 'success', title: title, message: message
+                });
+                this.renderMessages();
+            }
+        }, 
+        
+        addWarningMessage: {
+            value: function(title, message) {
+              if (message === undefined) {
+                message = title;
+                title = '';
+              }
+                this.messages.push({
+                    type: 'warning', title: title, message: message
+                });
+                this.renderMessages();
+            }
+        },
+
+        addErrorMessage: {
+            value: function(title, message) {
+              if (message === undefined) {
+                message = title;
+                title = '';
+              }
+                this.messages.push({
+                    type: 'error', title: title, message: message
+                });
+                this.renderMessages();
             }
         }
 

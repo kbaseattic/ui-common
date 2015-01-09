@@ -77,7 +77,7 @@
 	</div>
 
 	<div class="panel panel-default">
-	  <div class="panel-heading"><h3 class="panel-title">Your Gravatar</h3></div>
+	  <div class="panel-heading"><h3 class="panel-title">Your Avatar</h3></div>
 	    <div class="panel-body">
 	      <div class="row">
 	        <div class="col-md-3">
@@ -86,6 +86,7 @@
 	        	
 	        </div>
 	        <div class="col-md-9">
+	        	<h3>Gravatar</h3>
 	        	<p>Your gravatar is based on an image you have associated with your email address at <a href="http://en.gravatar.com">Gravatar</a>, a free public profile service from Automattic, the same people who brought us Wordpress. If you have a gravatar associated with the email address in this profile, we will display it within KBase.</p>
 	        	<p>If you don't have a personal gravator, or prefer not to use one, you may select one of the default auto-generated gravatars provided below.</p>
 
@@ -104,7 +105,7 @@
 			           		var v = $(this).val();
 			           		if (v.length > 0) {
 			           			$('[data-field="profile.avatar.avatar_color"] option').prop('selected', false);
-			           			$('[data-field="profile.avatar.avatar_initials"]').val('');
+			           			$('[data-field="profile.avatar.avatar_phrase"] input').val('');
 			           		}
 			           	});
 			           	</script>
@@ -116,7 +117,9 @@
 		           </div>-->
 	        	</div>
 
-	        	<p>Or you may disable the gravatar service completely and use a solid color with your initials</p>
+	        	<h3>A Personal Message Box</h3>
+
+	        	<p>Or you may disable the gravatar service completely and use a solid color with a short phrase.</p>
 
 	        	<div class="form-group" data-field="profile.avatar.avatar_color">
 	        		<label for="avatar_color" class="control-label col-md-3">A Solid Color</label>
@@ -139,10 +142,10 @@
 			           	<div data-element="message" class="help-block"></div>
 		           </div>
 	        	</div>
-	        	<div class="form-group" data-field="profile.avatar.avatar_initials">
-	        		<label for="avatar-initials" class="control-label col-md-3">Your Initials</label>
+	        	<div class="form-group" data-field="profile.avatar.avatar_phrase">
+	        		<label for="avatar-phrase" class="control-label col-md-3">Your Phrase</label>
 		           <div class="col-md-9">
-		           		<input id="avatar-initials" type="text" class="form-control" value="{{userRecord.profile.avatar.avatar_initials}}">
+		           		<input id="avatar-phrase" type="text" class="form-control" value="{{userRecord.profile.avatar.avatar_phrase}}">
 		           		<div data-element="message" class="help-block"></div>
 		           </div>
 	        	</div>
