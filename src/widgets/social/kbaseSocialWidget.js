@@ -258,7 +258,7 @@ define(['nunjucks', 'jquery'], function (nunjucks, $) {
         // This is typically done before getCurrentState which might be doing a time consuming ajax call
         // to fetch data.
         // NB depends on assets.
-        renderWaitingView: {
+        renderWaitingView: { 
             value: function () {
                 this.places.content.html('<img src="assets/img/ajax-loader.gif"></img>');
             }
@@ -272,12 +272,14 @@ define(['nunjucks', 'jquery'], function (nunjucks, $) {
                         var message = this.messages[i];
                         var alertClass = 'default';
                         switch (message.type) {
-                            case 'success': alertClass = 'dismissable';break;
-                            case 'warning': alertClass = 'warn';break;
+                            case 'success': alertClass = 'success';break;
+                            case 'info': alertClass = 'info'; break;
+                            case 'warning': alertClass = 'warning';break;
+                            case 'danger':
                             case 'error': alertClass = 'danger'; break; 
                         }
                         this.places.alert.append(
-                        '<div class="alert alert-success alert-'+alertClass+'" role="alert">' +
+                        '<div class="alert alert-dismissible alert-'+alertClass+'" role="alert">' +
                         '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
                         '<strong>' + message.title + '</strong> ' + message.message + '</div>');
                     }

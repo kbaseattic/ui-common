@@ -30,11 +30,12 @@
 	  <div class="panel-body">
 	    <div class="form-group name-panel">
 	      <div class="col-md-2">
-	      	<div class="form-group" data-field="profile.title">
+	      	<div class="form-group" data-field="profile.userdata.title">
 		        <label for="field-title">Title</label>
 		        <select class="form-control" id="field-title">
-		          {% for title in env.titles %}
-		          	<option value="{{title.id}}" {% if title.id==userRecord.profile.title %} selected {% endif %}>{{title.label}}</option>
+		            <option value=""></option>
+		          {% for title in env.lists.userTitles %}
+		          	<option value="{{title.id}}" {% if title.id==userRecord.profile.userdata.title %} selected {% endif %}>{{title.label}}</option>
 		          {% endfor %}
 		        </select>
 		        <div data-element="message" class="help-block"></div>
@@ -48,26 +49,26 @@
 	        </div>
 	      </div>
 	      <div class="col-md-3">
-	      	<div class="form-group" data-field="profile.suffix">
+	      	<div class="form-group" data-field="profile.userdata.suffix">
 		        <label for="field_suffix">Suffix</label>
-		        <div class="input-group-lg"><input id="field_suffix" type="text" class="form-control" value="{{userRecord.profile.suffix}}"></div>
+		        <div class="input-group-lg"><input id="field_suffix" type="text" class="form-control" value="{{userRecord.profile.userdata.suffix}}"></div>
 		        <div data-element="message" class="help-block"></div>
 		    </div>
 	      </div>
 	    </div>
 
-	    <div class="form-group" data-field="profile.location">
+	    <div class="form-group" data-field="profile.userdata.location">
 			<label for="location-field" class="control-label col-md-3">Location</label>
 			<div class="col-md-9">
-				<input id="location-field" type="text" class="form-control" value="{{userRecord.profile.location}}">
+				<input id="location-field" type="text" class="form-control" value="{{userRecord.profile.userdata.location}}">
 			</div>	          
 			<div data-element="message" class="help-block col-md-9 col-md-push-3"></div>
 	    </div>
 
-	    <div class="form-group" data-field="profile.email">
+	    <div class="form-group" data-field="profile.userdata.email">
         	<label for="email-field" class="control-label col-md-3">Primary Email</label>
         	<div class="col-md-9">
-        		<input id="email-field" type="text" class="form-control" value="{{userRecord.profile.email}}">
+        		<input id="email-field" type="text" class="form-control" value="{{userRecord.profile.userdata.email}}">
         	</div>
         	<div class="col-md-9 col-md-push-3">
         		<div data-element="message" class="help-block"></div>
@@ -81,7 +82,7 @@
 	    <div class="panel-body">
 	      <div class="row">
 	        <div class="col-md-3">
-	        {% include "userProfile_picture.html" %}
+	        {% include "picture.html" %}
 
 	        	
 	        </div>
@@ -90,22 +91,22 @@
 	        	<p>Your gravatar is based on an image you have associated with your email address at <a href="http://en.gravatar.com">Gravatar</a>, a free public profile service from Automattic, the same people who brought us Wordpress. If you have a gravatar associated with the email address in this profile, we will display it within KBase.</p>
 	        	<p>If you don't have a personal gravator, or prefer not to use one, you may select one of the default auto-generated gravatars provided below.</p>
 
-	         	<div class="form-group" data-field="profile.avatar.gravatar_default">
+	         	<div class="form-group" data-field="profile.userdata.avatar.gravatar_default">
 		           <label for="gravatar_default" class="control-label col-md-3">Default Gravatar</label>
 		           <div class="col-md-9">
 		           
 			           	<select id="gravatar_default" class="form-control">
 		           		    <option value="">- none -</option>
-			           	{% for default in env.gravatar_defaults %}
-			           	<option value="{{default.id}}" {% if default.id==userRecord.profile.avatar.gravatar_default %} selected{% endif %}>{{default.label}}</option>
+			           	{% for default in env.lists.gravatarDefaults %}
+			           	<option value="{{default.id}}" {% if default.id==userRecord.profile.userdata.avatar.gravatar_default %} selected{% endif %}>{{default.label}}</option>
 			           	{% endfor %}
 			           	</select>
 			           	<script>
-			           	$('[data-field="profile.avatar.gravatar_default"] select').on('change', function (e) {
+			           	$('[data-field="profile.userdata.avatar.gravatar_default"] select').on('change', function (e) {
 			           		var v = $(this).val();
 			           		if (v.length > 0) {
-			           			$('[data-field="profile.avatar.avatar_color"] option').prop('selected', false);
-			           			$('[data-field="profile.avatar.avatar_phrase"] input').val('');
+			           			$('[data-field="profile.userdata.avatar.avatar_color"] option').prop('selected', false);
+			           			$('[data-field="profile.userdata.avatar.avatar_phrase"] input').val('');
 			           		}
 			           	});
 			           	</script>
@@ -121,31 +122,31 @@
 
 	        	<p>Or you may disable the gravatar service completely and use a solid color with a short phrase.</p>
 
-	        	<div class="form-group" data-field="profile.avatar.avatar_color">
+	        	<div class="form-group" data-field="profile.userdata.avatar.avatar_color">
 	        		<label for="avatar_color" class="control-label col-md-3">A Solid Color</label>
 		           	<div class="col-md-9">
 
 		           		<select id="avatar_color" class="form-control">
 		           		    <option value="">- none -</option>
-				           	{% for color in env.avatarColors %}
-				           	<option value="{{color.id}}" {% if color.id==userRecord.profile.avatar.avatar_color %} selected{% endif %}  style="background-color: {{color.color}}; color: {{color.textColor}}">{{color.label}}</option>
+				           	{% for color in env.lists.avatarColors %}
+				           	<option value="{{color.id}}" {% if color.id==userRecord.profile.userdata.avatar.avatar_color %} selected{% endif %}  style="background-color: {{color.color}}; color: {{color.textColor}}">{{color.label}}</option>
 				           	{% endfor %}
 			           	</select>
 			           	<script> 
-			           	$('[data-field="profile.avatar.avatar_color"] select').on('change', function (e) {
+			           	$('[data-field="profile.userdata.avatar.avatar_color"] select').on('change', function (e) {
 			           		var v = $(this).val();
 			           		if (v.length > 0) {
-			           			$('[data-field="profile.avatar.gravatar_default"] option').prop('selected', false);
+			           			$('[data-field="profile.userdata.avatar.gravatar_default"] option').prop('selected', false);
 			           		}
 			           	});
 			           	</script>
 			           	<div data-element="message" class="help-block"></div>
 		           </div>
 	        	</div>
-	        	<div class="form-group" data-field="profile.avatar.avatar_phrase">
+	        	<div class="form-group" data-field="profile.userdata.avatar.avatar_phrase">
 	        		<label for="avatar-phrase" class="control-label col-md-3">Your Phrase</label>
 		           <div class="col-md-9">
-		           		<input id="avatar-phrase" type="text" class="form-control" value="{{userRecord.profile.avatar.avatar_phrase}}">
+		           		<input id="avatar-phrase" type="text" class="form-control" value="{{userRecord.profile.userdata.avatar.avatar_phrase}}">
 		           		<div data-element="message" class="help-block"></div>
 		           </div>
 	        	</div>
@@ -154,15 +155,15 @@
 	    </div>
 	</div>
 
-	<div class="panel panel-default" data-field="profile.user_class"> 
+	<div class="panel panel-default" data-field="profile.userdata.user_class"> 
 	  <div class="panel-heading"><label class="control-label" style="text-align: left;">User Class</label></div>
 	    <div class="panel-body">
 	      <div class="row">
 	        <div class="col-md-12">
 	          <p>What is the primary use for this account?</p>
-	          {% for class in env.userClasses %}
+	          {% for class in env.lists.userClasses %}
 	            <div class="radio">
-	              <label><input name="profile_user_class" type="radio" value="{{class.id}}" class="radio" {% if class.id==userRecord.profile.user_class %} checked{% endif %}>{{class.label}}</label>
+	              <label><input name="profile_user_class" type="radio" value="{{class.id}}" class="radio" {% if class.id==userRecord.profile.userdata.user_class %} checked{% endif %}>{{class.label}}</label>
 	            </div>
 	          {% endfor %}
 	          <div data-element="message" class="help-block"></div>
@@ -176,16 +177,16 @@
 	  <div class="panel-heading"><h3 class="panel-title">Your Roles</h3></div>
 	    <div class="panel-body">
 	      <div class="row">
-	        <div class="col-md-12" data-field="profile.roles" data-field-type="array">
+	        <div class="col-md-12" data-field="profile.userdata.roles" data-field-type="array">
 	        <p>How are you using this account?</p>
-	          {% for role in env.roles %}
+	          {% for role in env.lists.userRoles %}
 	          <div class="checkbox">
 	            <label><input type="checkbox" name="profile_roles" class="checkbox" data-field-value="t" value="{{role.id}}">{{role.label}}</label>
 	          </div>
 	          {% endfor %}
 	          <script>
-	           {% for role in userRecord.profile.roles %}
-	          $('[data-field="profile.roles"] input[value="{{role}}"]').prop('checked', true);
+	           {% for role in userRecord.profile.userdata.roles %}
+	          $('[data-field="profile.userdata.roles"] input[value="{{role}}"]').prop('checked', true);
 	          {% endfor %}
 	          </script>
 	          <div data-element="message" class="help-block"></div>
@@ -202,10 +203,10 @@
 	  </div>
 	  <div id="affiliationPanel" class="panel-body" data-field-group="profile">
 	    <div class="row">
-	      <div class="col-md-12" data-field="profile.affiliations" data-field-group-type="array">
+	      <div class="col-md-12" data-field="profile.userdata.affiliations" data-field-group-type="array">
 	        
-	        {% for affiliation in userRecord.profile.affiliations|sort(true,true,"start_year") %}
-	        {% include "userProfile_edit_affiliation.html" %}
+	        {% for affiliation in userRecord.profile.userdata.affiliations|sort(true,true,"start_year") %}
+	        {% include "edit_affiliation.html" %}
 	        {% endfor %}
 	    
 	      </div>
@@ -226,8 +227,8 @@
 	  </div>
 	  <div class="panel-body">
 	    <div class="row">
-	      <div class="col-md-12" data-field="profile.personal_statement">
-	        <textarea id="personalStatement" class="form-control" rows="8" style="resize:vertical;">{{userRecord.profile.personal_statement}}</textarea>
+	      <div class="col-md-12" data-field="profile.userdata.personal_statement">
+	        <textarea id="personalStatement" class="form-control" rows="8" style="resize:vertical;">{{userRecord.profile.userdata.personal_statement}}</textarea>
 	        <div data-element="message" data-class="help-block"></div>
 	      </div>
 	    </div>
