@@ -149,9 +149,9 @@
                 $('<div>').addClass('col-md-6')
                     .append($('<div>').append('<h3>' + self.objData.name + '</h3>'))
                     .append($('<div>').css({'color':'#555'})
-                            .append('Workspace: ' + '<a href="#/ws/objects/' +
-                                    self.objData.workspace +
-                                    '" target="_blank">' +
+                            .append('Workspace: ' +// '<a href="#/ws/objects/' +
+//                                    self.objData.workspace +
+//                                    '" target="_blank">' +
                                     self.objData.workspace + '</a>'))
                     .append($('<div>').css({'color':'#555'}) //todo: make this a real style somewhere
                             .append('<a href="#/spec/type/' + self.objData.type +
@@ -164,7 +164,6 @@
             var $buttonDiv =
                 $('<div>').css({'margin':'10px','margin-top':'20px'});
             if (typeInfo.app != null) {
-                //TODO link to narrative
                 $buttonDiv.append($('<a href="#/narrativemanager/new?copydata='
                                         + permref + '&app=' + typeInfo.app +
                                         '">').addClass('btn btn-info')
