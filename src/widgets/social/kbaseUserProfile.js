@@ -1,4 +1,5 @@
-define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function(nunjucks, $, md5, UserProfileService) {
+define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!functional-site/config.json'], 
+       function(nunjucks, $, md5, UserProfileService, config) {
     "use strict";
 
     var ProfileWidget = Object.create({}, {
@@ -11,11 +12,13 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function(
                 if (typeof this.container === 'string') {
                     this.container = $(this.container);
                 }
+                
+                var configURLs = config[config.setup];
 
                 this.userProfileService = {
                     // host: 'dev19.berkeley.kbase.us'
                     // url:'http://dev19.berkeley.kbase.us/services/user_profile/rpc'
-                    url: 'https://kbase.us/services/user_profile/rpc'
+                    url: configURLs.user_profile_url
                 }
 
                 // Give ourselves the ability to show templates.
@@ -1788,7 +1791,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient'], function(
                         real name, location, email, user class, roles, affiliations, personal statement
                 */
                 var requiredFields = [
-                    'user.username', 'profile.userdata.email', 'profile.userdata.user_class'
+                    'user.username', 'profile.userdata.email', 'profile.userdata.user_class', 'profile.userdata.location'
                 ];
 
                 var fieldsToCheck = [

@@ -107,6 +107,7 @@ define(['nunjucks', 'jquery'], function (nunjucks, $) {
         
         go: {
             value: function () {
+              this.loadCSS();
                 this.renderLayout();
                 this.renderWaitingView();
                 this.getCurrentState({
@@ -162,7 +163,7 @@ define(['nunjucks', 'jquery'], function (nunjucks, $) {
 
         onLoggedIn: {
             value: function (e, auth) {
-                this.authToken = auth.token;
+                this.auth.authToken = auth.token;
                 this.getCurrentState({
                     success: function () {
                         this.render()
@@ -173,7 +174,7 @@ define(['nunjucks', 'jquery'], function (nunjucks, $) {
         
         onLoggedOut: {
             value: function (e, auth) {
-                this.authToken = null;
+                this.auth.authToken = null;
                 this.getCurrentState({
                     success: function () {
                         this.render()
@@ -186,7 +187,7 @@ define(['nunjucks', 'jquery'], function (nunjucks, $) {
         
         isLoggedIn: {
           value: function () {
-            if (this.authToken) {
+            if (this.auth.authToken) {
               return true;
             } else {
               return false;
@@ -262,6 +263,16 @@ define(['nunjucks', 'jquery'], function (nunjucks, $) {
             value: function () {
                 this.places.content.html('<img src="assets/img/ajax-loader.gif"></img>');
             }
+        },
+        
+        loadCSS: {
+          value: function () {
+            var link = document.createElement("link");
+            link.type = "text/css";
+            link.rel = "stylesheet";
+            link.href = '/src/widgets/social/' + this.widgetName + '/style.css';
+            document.getElementsByTagName("head")[0].appendChild(link);
+          }
         },
         
         renderMessages: {

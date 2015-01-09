@@ -81,7 +81,7 @@
 
           <div class="alert alert-warning alert-dismissible" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            Your profile is active, but is only {{env.profileCompletion.percentComplete}}% complete. The achive profile fulfillment, complete the following fields:
+            Your profile is active, but is only {{env.profileCompletion.percentComplete}}% complete. To achive profile fulfillment, complete the following fields:
             {% set comma = joiner() %}
             {% for missing in env.profileCompletion.missingFields %}{{ comma() }}{{ missing.title }}{% endfor %}
           </div>

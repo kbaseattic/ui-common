@@ -188,6 +188,28 @@ angular.module('social-directives')
     })
     
     .directive('socialusercollaborators', function($rootScope) {
+      return {
+          link: function(scope, ele, attrs) {
+            
+            require(['kbaseusercollaboratornetwork'], function(Widget) {
+              try {
+                var widget = Object.create(Widget);
+                widget.init({
+                    container: $(ele),
+                    userId: scope.params.userid,
+                    authToken: scope.params.kbCache.token,
+                    workspaceURL: scope.params.kbCache.ws_url,
+                    userProfileServiceURL: 'https://kbase.us/services/user_profile/rpc'
+                }).go();
+              } catch (ex) {
+                $(ele).html('Error: ' + ex);
+              }
+            });
+          }
+      };
+    })
+    
+    .directive('socialusercollaboratorsx', function($rootScope) {
         return {
             link: function(scope, ele, attrs) {
                 var userId = scope.params.userid;
