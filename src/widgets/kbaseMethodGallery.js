@@ -47,6 +47,16 @@ kb_define('kbaseMethodGallery',
 
             var topApp = data.shift();
 
+console.log(topApp.id);
+
+            $gal.nms.get_app_full_info({ids:[topApp.id]}, function(data) {
+                console.log("FULL INFO", data);
+            });
+
+            $gal.nms.get_app_spec({ids:['genome_annotation']}, function(data) {
+                console.log("GENOME ANNO", data);
+            });
+
                 var $topContent = $.jqElem('div')
                     .addClass('col-sm-12')
                     .append(
@@ -149,6 +159,10 @@ kb_define('kbaseMethodGallery',
                 $.each(
                     data,
                     function (idx, meth) {
+
+            $gal.nms.get_app_full_info({ids:[meth.id]}, function(data) {
+                console.log("FULL INFO", data);
+            });
 
                         var $methContent = $.jqElem('div')
                             //.css('height', '80px')

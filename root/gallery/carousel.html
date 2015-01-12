@@ -64,13 +64,14 @@ div.tile > ul > li {
 
 
                 kb_require(['kbpaths'], function() {
-                    kb_require(['jquery', 'bootstrap', 'kbaseMethodGallery', 'kbaseBox',
+                    kb_require(['jquery', 'bootstrap', 'kbaseMethodGallery', 'kbaseAppDescription', 'kbaseMethodDescription',
                         ], function($) {
                         $(function() {
 
-                        $('#gallery').kbaseMethodGallery();
+                        $('#gallery').kbaseAppDescription();
+                        //$('#meth').kbaseMethodDescription();
 
-            var nms = new NarrativeMethodStore("https://kbase.us/services/narrative_method_store/rpc");
+                            //var nms = new NarrativeMethodStore("https://kbase.us/services/narrative_method_store/rpc");
 
 
 
@@ -85,6 +86,7 @@ div.tile > ul > li {
     <body>
 
     <div id = 'gallery'></div>
+    <div id = 'meth'></div>
 
 <div id = 'box' style = 'background-color : lightgray;' class = 'container-fluid'></div>
 

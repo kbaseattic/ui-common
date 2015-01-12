@@ -15,7 +15,7 @@
         options: {
             color: "black",
             interval : 5000,
-            carousel : [
+            example_carousel : [
                 {
                     name : 'Assemble Genome from Fasta',
                     id : 'assemble_genome_from_fasta',
@@ -38,7 +38,7 @@
             this._super(options);
 
             var carousel_id = this.uuid();
-
+console.log("CAOURSEL", this.options.carousel);
             var $carousel = $.jqElem('div')
                 .addClass('carousel')
                 .addClass('slide')
@@ -86,24 +86,8 @@
                                         'font-size': '200%',
                                         'font-family': "trebuchet ms sans-serif"
                                     })
-                                    .append(
-                                        $.jqElem('a')
-                                            .on('click', $.proxy(function(e) {
-                                                e.preventDefault(); e.stopPropagation();
-
-                                                if (this.options.methodDetails) {
-                                                    this.options.methodDetails.details(val.id);
-                                                }
-                                            }, this))
-                                            .append(val.name)
-                                    )
-                            )
-                            .append(
-                                $.jqElem('div')
-                                    .addClass('carousel-caption')
-                                    .css('color', 'black')
-                                    .css('padding', '0px')
                                     .append(val.caption)
+
                             )
                     );
                 }, this)
@@ -115,6 +99,7 @@
                 .append(
                     $.jqElem('a')
                         .addClass('carousel-control')
+                        .css('color', 'black')
                         .addClass('left')
                         .attr('href', '#' + carousel_id)
                         .attr('data-slide', 'prev')
@@ -125,6 +110,7 @@
                 .append(
                     $.jqElem('a')
                         .addClass('carousel-control')
+                        .css('color', 'black')
                         .addClass('right')
                         .attr('href', '#' + carousel_id)
                         .attr('data-slide', 'next')

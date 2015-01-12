@@ -22,10 +22,75 @@ kb_define('kbaseMethodDescription',
 
             this.nms = new NarrativeMethodStore(this.options.narrativeMethodStoreURL);
 
+            if (this.options.spec == undefined) {
+                this.details_from_id('align_protein_sequences_generic');
+            }
+            else {
+                this.details(this.options.spec);
+            }
+
+            this.$elem.append('App Description');
+
             return this;
         },
 
-        details : function (m) {
+        details_from_id : function(id) {
+            var $details = this;
+
+            this.nms.get_method_full_info({ids : [id]}, function (data) {
+                $details.options.spec = data[0];
+                console.log(data);
+                $details.details($details.options.spec);
+            });
+        },
+
+        details : function(spec) {
+            var $details = this;
+
+            var steps = [];
+console.log(spec);
+            $.each(
+                spec.steps,
+                function (idx, step) {
+                    steps.push(
+                        {
+                            caption : step.description,
+                        }
+                    );
+                }
+            );
+
+            var $carouselDiv = $.jqElem('div');
+            $carouselDiv.kbaseCarousel(
+                {
+                    carousel : steps
+                }
+            );
+
+            this.$elem.empty();
+
+            this.$elem.append(
+                $.jqElem('h1').append('Description')
+            );
+
+            this.$elem.append(
+                $.jqElem('div').append(spec.info.header)
+            );
+
+            this.$elem.append($carouselDiv);
+
+            this.$elem.append(
+                $.jqElem('h1').append('Documentation')
+            );
+
+            this.$elem.append(
+                $.jqElem('div').append(spec.info.subtitle)
+            );
+
+        },
+
+        old_details : function (m) {
+
             m = {id : m};
 
             var $details = this;
