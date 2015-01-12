@@ -16,6 +16,7 @@ kb_define('kbaseAppDescription',
         options: {
             color: "black",
             narrativeMethodStoreURL : "https://kbase.us/services/narrative_method_store/rpc",
+            app_id : 'genome_assembly',
         },
 
         init: function(options) {
@@ -24,13 +25,13 @@ kb_define('kbaseAppDescription',
             this.nms = new NarrativeMethodStore(this.options.narrativeMethodStoreURL);
 
             if (this.options.spec == undefined) {
-                this.details_from_id('genome_assembly');
+                this.details_from_id(this.options.app_id);
             }
             else {
                 this.details(this.options.spec);
             }
 
-            this.$elem.append('App Description');
+            this.$elem.append('Loading description ... ').append($.jqElem('i').addClass('fa fa-spin fa-spinner'));
 
             return this;
         },
@@ -77,10 +78,24 @@ kb_define('kbaseAppDescription',
                         .append(
                             $.jqElem('div').addClass('row')
                                 .append(
+                                    $.jqElem('div').addClass('col-md-12')
+                                        .append(
+                                            $.jqElem('a')
+                                                .append($.jqElem('i').addClass('fa fa-chevron-left')
+                                                .on('click', function(e) {
+                                                    if ($details.options.gallery) {
+                                                        $details.options.gallery.reset();
+                                                    }
+                                                })
+                                            )
+                                        )
+                                )
+                                .append(
                                     $.jqElem('div').addClass('col-md-3')
                                         .append(
                                             $.jqElem('img')
                                                 .attr('src', '/static/kbase/images/kbase_logo.png')
+                                                .css({width : '128px', height : '128px'})
                                         )
                                 )
                                 .append(
@@ -119,7 +134,9 @@ kb_define('kbaseAppDescription',
                                                                     $.jqElem('a')
                                                                         .append('LAUNCH')
                                                                         .on('click', function(e) {
-                                                                            $details.trigger('methodClicked.Narrative', spec[0]);
+                                                                            if ($details.options.gallery) {
+                                                                                $details.options.gallery.launchApp(spec.info.id);
+                                                                            }
                                                                         })
                                                                 )
                                                         )
