@@ -15,6 +15,7 @@
         parent: "kbaseAuthenticatedWidget",
         version: "1.0.0",
         
+//        dontRedirect: true, //for testing
         dontRedirect: false, //for testing
 
 
@@ -70,13 +71,13 @@
             return this;
         },
         
-        showError: function(message) {
+        showError: function(error) {
             var self = this;
-            console.error(message);
+            console.error(error);
             self.$errorPanel.append($('<div>')
                     .addClass('alert alert-danger alert-dismissible')
                     .attr('role', 'alert')
-                    .append(message)
+                    .append(error.message)
                     .append($('<button>').addClass('close')
                             .attr('type', 'button')
                             .attr('data-dismiss', 'alert')
@@ -90,7 +91,7 @@
         determineActionAndDoIt: function() {
             var self = this;
             if (self.options.params == null) {
-                showError("Recieved no parameter info - cannot proceed.");
+                showError({message: "Recieved no parameter info - cannot proceed."});
                 return;
             }
             // START - load up last narrative, or start the user's first narrative
@@ -99,9 +100,9 @@
             } else if (self.options.params.action === 'new') {
                 self.createNewNarrative(self.options.params);
             } else {
-                self.showError('action "' +
+                self.showError({message: 'action "' +
                         self.options.params.action +
-                        '" not supported; only "start" or "new" accepted.');
+                        '" not supported; only "start" or "new" accepted.'});
             }
         },
         

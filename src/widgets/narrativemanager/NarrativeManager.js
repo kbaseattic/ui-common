@@ -160,7 +160,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                                         function(info) { console.log('copied'); console.log(info); },
                                                         function(error){
                                                             if (_error_callback) {
-                                                                _error_callback(error.error.message);
+                                                                _error_callback(error.error);
                                                             }
                                                         }
                                                     )
@@ -173,7 +173,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                         function(error) {
                                             console.error(error);
                                             if(_error_callback) {
-                                                _error_callback(error.error.message);
+                                                _error_callback(error.error);
                                                 }
                                         });
                                     
@@ -184,7 +184,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
                             }, function (error) {
                                 console.error(error);
                                 if(_error_callback) {
-                                    _error_callback(error.error.message);
+                                    _error_callback(error.error);
                                 }
                             });
                     },
@@ -194,7 +194,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
             function(error) {
                 console.error(error);
                 if(_error_callback) {
-                    _error_callback(error.error.message);
+                    _error_callback(error.error);
                 }
             }
         );
@@ -263,14 +263,14 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                         _callback({last_narrative:{ws_info:mine[0], nar_info:objList[0]}});
                                     } else {
                                         if (_error_callback) {
-                                            _error_callback(
-                                                    "Unable to load recent narrative.");
+                                            _error_callback({message: 
+                                                    "Unable to load recent narrative."});
                                         }
                                     }
                                 },
                                 function(error) {
                                     if (_error_callback) {
-                                        _error_callback(error.error.message);
+                                        _error_callback(error.error);
                                     }
                                 });
                 } else {
@@ -279,7 +279,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
             },
             function (error) {
                 if (_error_callback) {
-                    _error_callback(error.error.message);
+                    _error_callback(error.error);
                 }
                 console.error(error);
             });
@@ -355,7 +355,10 @@ var NarrativeManager = function(options, auth, auth_cb) {
                             else {
                                 console.error('cannot add cell '+c+', unrecognized cell content');
                                 console.error(cells[c]);
-                                if(_error_callback) { _error_callback('cannot add cell '+c+', unrecognized cell content'); }
+                                if(_error_callback) {
+                                    _error_callback({message: 'cannot add cell '
+                                        + c + ', unrecognized cell content'});
+                                }
                             }
                         }
                     } else {
@@ -463,7 +466,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
                         function(error) {
                             console.error("error getting app specs:");
                             console.error(error);
-                            if(_error_callback) { _error_callback(error.error.message); }
+                            if(_error_callback) { _error_callback(error.error); }
                         }));
             }
             if (methodSpecIds.length>0) {
@@ -477,7 +480,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
                         function(error) {
                             console.error("error getting method specs:");
                             console.error(error);
-                            if(_error_callback) { _error_callback(error.error.message); }
+                            if(_error_callback) { _error_callback(error.error); }
                         }));
             }
             
