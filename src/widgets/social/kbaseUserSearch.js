@@ -8,16 +8,7 @@ function (SocialWidget, UserProfileService) {
         cfg.title = 'Find Other Users';
         this.SocialWidget_init(cfg);
         
-        // User profile service
-        if (this.isLoggedIn()) {
-          if (this.hasConfig('user_profile_url')) {
-            this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
-                token: this.auth.authToken
-            });
-          } else {
-					  throw 'The user profile client url is not defined';
-				  }
-        }        
+        this.syncApp();
         
         return this;
       }
@@ -30,6 +21,21 @@ function (SocialWidget, UserProfileService) {
       }
     },
     
+    syncApp: {
+      value: function () {
+        // User profile service
+        if (this.isLoggedIn()) {
+          if (this.hasConfig('user_profile_url')) {
+            this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
+                token: this.auth.authToken
+            });
+          } else {
+					  throw 'The user profile client url is not defined';
+				  }
+        }        
+      }
+    },
+    
     getCurrentState: {
       value: function (options) {
         options.success();
@@ -39,12 +45,15 @@ function (SocialWidget, UserProfileService) {
     renderLayout: {
         value: function() {
           console.log('in user search layout');
-            this.container.html(this.getTemplate('layout').render(this.context));
+            this.container.html(this.renderTemplate('layout'));
             this.places = {
             	title: this.container.find('[data-placeholder="title"]'),
               alert: this.container.find('[data-placeholder="alert"]'),
             	content: this.container.find('[data-placeholder="content"]')
             };
+           
+           // Only enable the search form if the user is logged in.
+          if (this.isLoggedIn()) {
             var widget = this;
             this.container.find('[data-field="search_text"] input').on('keyup', function (e) {
               widget.params.searchText = $(this).val();
@@ -63,8 +72,10 @@ function (SocialWidget, UserProfileService) {
                 );
               }
             });
+          }
         }
     }
+    
   });  
   return widget;
 });

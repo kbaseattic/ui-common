@@ -79,10 +79,36 @@
             else {
                 chips = {};
             }
+            
+            if (field) {
+              console.log('Deprecation Warning: get_kbase_cookie should not be used to fetch a cookie field, use get_kbase_cokie_field instead.');
+            }
 
             return field == undefined
                 ? chips
                 : chips[field];
+        },
+        
+        get_session_prop : function (name) {
+            // This cookie check handles the case of logging out of kbase in some way which 
+            // does not affect localstorage.
+            // NB. This should be handled in the widget in such a way that a missing cookie also 
+            // removes the session from localStorage. Otherwise the invalid session may leak through,
+            // and it certainly is still available in the browser which might be surprising to the 
+            // curious user.
+            if (!$.cookie(this.cookieName)) {
+              return null;
+            }
+
+            var sessionString = localStorage.getItem('kbase_session');
+
+            if (sessionString === null) {
+              return null;
+            }
+            
+            var session = JSON.parse(sessionString);
+            
+            return session[name];
         },
 
         sessionId : function () {

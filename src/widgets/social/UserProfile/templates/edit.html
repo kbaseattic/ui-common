@@ -91,18 +91,18 @@
 	        	<p>Your gravatar is based on an image you have associated with your email address at <a href="http://en.gravatar.com">Gravatar</a>, a free public profile service from Automattic, the same people who brought us Wordpress. If you have a gravatar associated with the email address in this profile, we will display it within KBase.</p>
 	        	<p>If you don't have a personal gravator, or prefer not to use one, you may select one of the default auto-generated gravatars provided below.</p>
 
-	         	<div class="form-group" data-field="profile.userdata.avatar.gravatar_default">
+	         	<div class="form-group" data-field="user.avatar.gravatar_default">
 		           <label for="gravatar_default" class="control-label col-md-3">Default Gravatar</label>
 		           <div class="col-md-9">
 		           
 			           	<select id="gravatar_default" class="form-control">
 		           		    <option value="">- none -</option>
 			           	{% for default in env.lists.gravatarDefaults %}
-			           	<option value="{{default.id}}" {% if default.id==userRecord.profile.userdata.avatar.gravatar_default %} selected{% endif %}>{{default.label}}</option>
+			           	<option value="{{default.id}}" {% if default.id==userRecord.user.avatar.gravatar_default %} selected{% endif %}>{{default.label}}</option>
 			           	{% endfor %}
 			           	</select>
 			           	<script>
-			           	$('[data-field="profile.userdata.avatar.gravatar_default"] select').on('change', function (e) {
+			           	$('[data-field="user.avatar.gravatar_default"] select').on('change', function (e) {
 			           		var v = $(this).val();
 			           		if (v.length > 0) {
 			           			$('[data-field="profile.userdata.avatar.avatar_color"] option').prop('selected', false);
@@ -117,7 +117,7 @@
 		           fallback, or default, images to be displayed instead.
 		           </div>-->
 	        	</div>
-
+	        	{#
 	        	<h3>A Personal Message Box</h3>
 
 	        	<p>Or you may disable the gravatar service completely and use a solid color with a short phrase.</p>
@@ -150,6 +150,7 @@
 		           		<div data-element="message" class="help-block"></div>
 		           </div>
 	        	</div>
+	        	#}
 	        </div>
 	      </div>
 	    </div>

@@ -16,35 +16,11 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
         }
         this.params.userId = cfg.userId;
         
-        
-        
-        // Set up workspace client
-				if (this.hasConfig('workspace_url')) {
-					if (this.isLoggedIn()) {
-						this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'), {
-							token: this.auth.authToken
-						});
-					} else {
-						this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url')); 
-					}
-				} else {
-					throw 'The workspace client url is not defined';
-				}
-        
-        // User profile service
-        if (this.isLoggedIn()) {
-          if (this.hasConfig('user_profile_url')) {
-            this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
-                token: this.auth.authToken
-            });
-          } else {
-					  throw 'The user profile client url is not defined';
-				  }
-        }        
-        
         $.ajaxSetup({
             timeout: 10000
         });
+        
+        this.syncApp();
         
         return this;
 			}
@@ -57,12 +33,38 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
       }
     },
     
+    syncApp: {
+      value: function () {
+        // Set up workspace client
+				if (this.isLoggedIn()) {
+          if (this.hasConfig('workspace_url')) {
+						this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'), {
+							token: this.auth.authToken
+						});
+          } else {
+					  throw 'The workspace client url is not defined';
+				  }
+          if (this.hasConfig('user_profile_url')) {
+            this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
+                token: this.auth.authToken
+            });
+          } else {
+					  throw 'The user profile client url is not defined';
+				  }
+        }  else {
+          this.workspaceClient = null;
+          this.userProfileClient = null;
+        }      
+      }
+    },
+    
 		getCurrentState: {
 			value: function(options) {
         // this.state = {};
         // get the current user profile...
         if (!this.isLoggedIn()) {
-          options.error('Not authorized');
+          //options.error('Not authorized');
+          options.success();
           return;
         }
         

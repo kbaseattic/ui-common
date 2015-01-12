@@ -345,6 +345,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
             return this.merge(this.merge({}, this.context), {         
                   env: {
                       lists: this.lists,
+                      isOwner: this.isOwner(),
                       profileCompletion: this.calcProfileCompletion()
                   },                    
                   userRecord: this.userRecord
@@ -918,6 +919,15 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                                     type: 'string',
                                     title: 'Real Name',
                                     maxLength: 100
+                                },
+                                avatar: {
+                                  type: 'object',
+                                  properties: {
+                                    gravatar_defaults: {
+                                      type: 'string',
+                                      title: 'Gravatar Default Setting'
+                                    }
+                                  }
                                 }
                             },
                             required: ['realname']
@@ -928,7 +938,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                                 userdata: {
                                     type: 'object',
                                     properties: {
-                                        avatar: {
+                                        /*avatar: {
                                             type: 'object',
                                             properties: {
                                                 gravatar_default: {
@@ -945,6 +955,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                                                 }
                                             }
                                         },
+                                          */
                                         title: {
                                             type: 'string',
                                             title: 'Title'

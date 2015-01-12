@@ -12,24 +12,32 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
 					return this.niceElapsedTime(dateString);
         }.bind(this));
 				
-				if (this.hasConfig('workspace_url')) {
-					if (this.isLoggedIn()) {
-						this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'), {
-							token: this.auth.authToken
-						});
-					} else {
-						this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url')); 
-					}
-				} else {
-					throw 'The workspace client url is not defined';
-				}
-
 				// TODO: get this from somewhere, allow user to configure this.
 				this.params.limit = 10;
+        
+        this.syncApp();
 
         return this;
 			}
 		},
+    
+    // To be called whenever the params or auth have changed.
+    // Rebuild the widget.
+    syncApp: {
+      value: function () {
+    		if (this.isLoggedIn()) {
+          if (this.hasConfig('workspace_url')) {
+    				this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'), {
+    					token: this.auth.authToken
+    				});
+          } else {
+    			  throw 'The workspace client url is not defined';
+    		  }
+        } else {
+          this.workspaceClient = null;
+        }
+      }
+    },
     
     
     go: {
@@ -44,6 +52,12 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
 			value: function(options) {
 				// Reset or create the recent activity list.
 				var recentActivity = [];
+        
+        // We only run any queries if the session is authenticated.
+        if (!this.isLoggedIn()) {
+          options.success();
+          return;
+        }
 
 				// Note that Narratives are now associated 1-1 with a workspace. 
 				// Some new narrative attributes, such as name and (maybe) description, are actually

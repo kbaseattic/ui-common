@@ -11,21 +11,12 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
             return this.niceElapsedTime(dateString);
           }.bind(this));
 
-          // Set up workspace client
-          if (this.hasConfig('workspace_url')) {
-            if (this.isLoggedIn()) {
-              this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'), {
-                token: this.auth.authToken
-              });
-            } else {
-              this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'));
-            }
-          } else {
-            throw 'The workspace client url is not defined';
-          }
+         
 
           // TODO: get this from somewhere, allow user to configure this.
           this.params.limit = 10;
+          
+          this.syncApp();
 
           return this;
         }
@@ -38,11 +29,32 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
           return this;
         }
       },
+      
+      syncApp: {
+        value: function () {
+          // Set up workspace client
+  				if (this.isLoggedIn()) {
+            if (this.hasConfig('workspace_url')) {
+  						this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'), {
+  							token: this.auth.authToken
+  						});
+            } else {
+  					  throw 'The workspace client url is not defined';
+  				  }
+          }
+        }
+      },
 
       getCurrentState: {
-        value: function(cfg) {
+        value: function(options) {
           // Reset or create the popular narratives list.
           var popularNarratives = [];
+          
+          // We only run any queries if the session is authenticated.
+          if (!this.isLoggedIn()) {
+            options.success();
+            return;
+          }
 
           // Note that Narratives are now associated 1-1 with a workspace. 
           // Some new narrative attributes, such as name and (maybe) description, are actually
@@ -138,19 +150,19 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
                     
                     this.setState('popularNarratives', popularNarratives);
 
-                    cfg.success();
+                    options.success();
 
                   }.bind(this),
                   function(err) {
-                    cfg.error(err.error.message);
+                    options.error(err.error.message);
                   }.bind(this));
               } else {
                 // Didn't find anything, but still considered "success"
-                cfg.success();
+                options.success();
               }
             }.bind(this),
             function(err) {
-              cfg.error(err.error.message);
+              options.error(err.error.message);
             }.bind(this));
         }
       }
