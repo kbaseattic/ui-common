@@ -111,7 +111,6 @@
             
             try {
               var session = JSON.parse(sessionString);    
-              session = null;               
               return session[name];
             } catch (e) {
               if (e instanceof SyntaxError) {

@@ -175,11 +175,31 @@ angular.module('social-directives')
             }
         };
     })
-    .directive('socialuserpopularnarratives', function($rootScope) {
+    .directive('socialuserhistory', function($rootScope) {
         return {
             link: function(scope, ele, attrs) {
               
-              require(['kbaseuserpopularnarratives'], function(Widget) {
+              require(['kbaseuserrecentactivity'], function(RecentActivityWidget) {
+                try {
+                  var widget = Object.create(RecentActivityWidget);
+                  widget.init({
+                      container: $(ele),
+                      userId: scope.params.userid,
+                      authToken: scope.params.kbCache.token,
+                      workspaceURL: scope.params.kbCache.ws_url
+                  }).go();
+                } catch (ex) {
+                  $(ele).html('Error: ' + ex);
+                }
+              });
+            }
+        };
+    })
+    .directive('socialbrowsenarratives', function($rootScope) {
+        return {
+            link: function(scope, ele, attrs) {
+              
+              require(['kbaseuserbrowsenarratives'], function(Widget) {
                 try {
                   var widget = Object.create(Widget);
                   widget.init({

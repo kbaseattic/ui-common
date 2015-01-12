@@ -690,6 +690,12 @@ function (nunjucks, $, Q, config) {
             }
         },
         
+        makeWorkspaceObjectId: {
+          value: function (workspaceId, objectId) {
+            return 'ws.' + workspaceId + '.obj.' + objectId;
+          }
+        },
+        
         // KBase Service Utility Methods
         // NB: these should really be contained in the service apis, but those are automatically generated.
         // Maybe a kbase services utility module?

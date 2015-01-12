@@ -39,7 +39,6 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
       }
     },
     
-    
     go: {
       value: function () {
         this.start();
