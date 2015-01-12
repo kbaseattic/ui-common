@@ -86,7 +86,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
         var ws_name = this.user_id + ":" + id;
         var nar_name = "Narrative."+id;
         
-        console.log("creating "+name);
+        console.log("creating " + nar_name);
         
         var wsMetaData = {
             'narrative' : nar_name,
@@ -140,7 +140,8 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                 var returnData = {ws_info:ws_info, nar_info: obj_info_list[0]};
                                 
                                 // 5) now we copy everything that we need
-                                if(params.importData) {
+                                if (params.importData != null &&
+                                        params.importData != false) {
                                     var copyobjs = [];
                                     for(var cj=0; cj<params.importData.length; cj++) {
                                         copyobjs.push({ref:params.importData[cj]});
@@ -157,7 +158,11 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                                             to: { wsid:ws_info[0], name:infoList[il][1]  }
                                                         },
                                                         function(info) { console.log('copied'); console.log(info); },
-                                                        function(error){ console.error(error); }
+                                                        function(error){
+                                                            if (_error_callback) {
+                                                                _error_callback(error.error.message);
+                                                            }
+                                                        }
                                                     )
                                                 )
                                             }
@@ -167,7 +172,9 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                         },
                                         function(error) {
                                             console.error(error);
-                                            if(_error_callback) { _error_callback(error); }
+                                            if(_error_callback) {
+                                                _error_callback(error.error.message);
+                                                }
                                         });
                                     
                                 } else {
@@ -176,7 +183,9 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                 
                             }, function (error) {
                                 console.error(error);
-                                if(_error_callback) { _error_callback(error); }
+                                if(_error_callback) {
+                                    _error_callback(error.error.message);
+                                }
                             });
                     },
                     _error_callback
@@ -184,7 +193,9 @@ var NarrativeManager = function(options, auth, auth_cb) {
             },
             function(error) {
                 console.error(error);
-                if(_error_callback) { _error_callback(error); }
+                if(_error_callback) {
+                    _error_callback(error.error.message);
+                }
             }
         );
     };
@@ -203,7 +214,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
      * if there are no available narratives, this will set last_narrative:null
      *
      */
-    this.detectStartSettings = function(params, _callback, _error_callback) {
+    this.detectStartSettings = function(_callback, _error_callback) {
         var self=this;
         var emptyResult = {last_narrative:null};
         
@@ -251,17 +262,25 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                     if (objList[0]) {
                                         _callback({last_narrative:{ws_info:mine[0], nar_info:objList[0]}});
                                     } else {
-                                        _error_callback("Unable to load recent narrative.");
+                                        if (_error_callback) {
+                                            _error_callback(
+                                                    "Unable to load recent narrative.");
+                                        }
                                     }
                                 },
                                 function(error) {
-                                    _error_callback(error);
+                                    if (_error_callback) {
+                                        _error_callback(error.error.message);
+                                    }
                                 });
                 } else {
                     _callback(emptyResult);
                 }
             },
             function (error) {
+                if (_error_callback) {
+                    _error_callback(error.error.message);
+                }
                 console.error(error);
             });
     };
@@ -444,7 +463,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
                         function(error) {
                             console.error("error getting app specs:");
                             console.error(error);
-                            if(_error_callback) { _error_callback(); }
+                            if(_error_callback) { _error_callback(error.error.message); }
                         }));
             }
             if (methodSpecIds.length>0) {
@@ -458,7 +477,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
                         function(error) {
                             console.error("error getting method specs:");
                             console.error(error);
-                            if(_error_callback) { _error_callback(); }
+                            if(_error_callback) { _error_callback(error.error.message); }
                         }));
             }
             
