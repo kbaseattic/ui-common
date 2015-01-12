@@ -80,9 +80,10 @@
                 chips = {};
             }
             
-            if (field) {
-              console.log('Deprecation Warning: get_kbase_cookie should not be used to fetch a kbase session property -- use get_kbase_session_prop instead.');
-            }
+            // EAP - I don't want to do this yet without some consent -- I wonder how deprecations are handled, I haven't seen any other console messages.
+            //if (field) {
+            //  console.log('Deprecation Warning: get_kbase_cookie should not be used to fetch a kbase session property -- use get_kbase_session_prop instead.');
+            //}
 
             return field == undefined
                 ? chips
@@ -102,13 +103,24 @@
 
             var sessionString = localStorage.getItem('kbase_session');
 
-            if (sessionString === null) {
+            // LocalStorage should return null if not found, but play it safe, knowing that
+            // the 
+            if (!sessionString) {
               return null;
             }
             
-            var session = JSON.parse(sessionString);
-            
-            return session[name];
+            try {
+              var session = JSON.parse(sessionString);    
+              session = null;               
+              return session[name];
+            } catch (e) {
+              if (e instanceof SyntaxError) {
+                console.log('ERROR parsing session string: ' + e.message);
+              } else {
+                console.log('ERROR getting session property: ' + e);
+              }
+              return null;
+            }
         },
 
         sessionId : function () {
