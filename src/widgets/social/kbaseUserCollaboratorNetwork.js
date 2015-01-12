@@ -1,5 +1,5 @@
-define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient', 'kbaseuserprofileserviceclient', 'q', 'json!functional-site/config.json'], 
-       function ($, nunjucks, SocialWidget, WorkspaceService, UserProfileService,  Q, config) {
+define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient', 'kbaseuserprofileserviceclient', 'q'], 
+       function ($, nunjucks, SocialWidget, WorkspaceService, UserProfileService,  Q) {
   "use strict";
 	var Widget = Object.create(SocialWidget, {
 		init: {
@@ -8,16 +8,24 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
 				cfg.title = 'Common Collaborator Network';
 				this.SocialWidget_init(cfg);
         
-        var configURLs = config[config.setup];
+        // PARAMS
+        this.params = {}
+
+        if (!cfg.userId) {
+          throw 'The userId is required for this widget but was not provided';
+        }
+        this.params.userId = cfg.userId;
+        
+        
         
         // Set up workspace client
-				if (cfg.workspaceURL) {
-					if (this.auth.authToken) {
-						this.workspaceClient = new WorkspaceService(configURLs.workspace_url, {
+				if (this.hasConfig('workspace_url')) {
+					if (this.isLoggedIn()) {
+						this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'), {
 							token: this.auth.authToken
 						});
 					} else {
-						this.workspaceClient = new WorkspaceService(configURLs.workspace_url); 
+						this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url')); 
 					}
 				} else {
 					throw 'The workspace client url is not defined';
@@ -25,8 +33,8 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
         
         // User profile service
         if (this.isLoggedIn()) {
-          if (cfg.userProfileServiceURL) {
-            this.userProfileClient = new UserProfileService(configURLs.user_profile_url, {
+          if (this.hasConfig('user_profile_url')) {
+            this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
                 token: this.auth.authToken
             });
           } else {
@@ -42,51 +50,35 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
 			}
 		},
     
-    calcContext: {
+    go: {
       value: function () {
-        return {
-          state: this.state,
-          generatedId: this.genId()
-        }
+        this.start();
+        return this;
       }
     },
-
-		render: {
-			value: function () {
-        if (this.isLoggedIn()) {
-          console.log(this.calcContext());
-          this.places.content.html(this.getTemplate('view').render(this.calcContext()));
-        } else {
-          this.places.content.html(this.getTemplate('unauthorized').render({}));
-        }
-			}
-		},
-
+    
 		getCurrentState: {
 			value: function(options) {
-        this.state = {};
+        // this.state = {};
         // get the current user profile...
         if (!this.isLoggedIn()) {
           options.error('Not authorized');
+          return;
         }
         
         this.userProfileClient.get_user_profile([this.params.userId],
             function(data) {
               if (data) {
-                this.state.currentUserProfile = data[0];
-                
+                this.setState('currentUserProfile', data[0]);                
                 this.buildCollaboratorNetwork({
-                  success: function () {
-                    console.log('Built collaborator network...');
-                    console.log(this.state);
-                    this.render();
+                  success: function (network) {
+                    this.setState('network', network);
+                    options.success();
                   }.bind(this),
                   error: function (err) {
                     this.renderErrorView(err);
                   }.bind(this)
                 })
-                
-                options.success();
               } else {
                 options.error('User not found');
               }
@@ -103,7 +95,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
     buildCollaboratorNetwork: {
       value: function(options) {
         // step 1: list workspaces
-        this.state.network = {
+        var network = {
           workspaces: {},
           users: {},
           all_links: []
@@ -131,21 +123,21 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
                 		'r' - read.
                 		'n' - no permissions.
                 	*/
-                  this.state.network.workspaces[wsid].perms = permdata;
-                  var wsOwner = this.state.network.workspaces[wsid].owner;
+                  network.workspaces[wsid].perms = permdata;
+                  var wsOwner = network.workspaces[wsid].owner;
 
                   // save unique user list
                   for (var username in permdata) {
                     if (permdata.hasOwnProperty(username)) {
                       if (username !== "*" && permdata[username] !== "n") {
                         // Name to be filled in later.
-                        this.state.network.users[username] = {
+                        network.users[username] = {
                           name: null
                         };
                         // Store the network link with the 'owns' relationship
                         // for the current user only.
                         if (wsOwner !== username) {
-                          this.state.network.all_links.push({
+                          network.all_links.push({
                             userA: wsOwner,
                             userB: username,
                             rel: 'owns',
@@ -158,7 +150,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
                         for (var un2 in permdata) {
                           if (permdata.hasOwnProperty(un2)) {
                             if (un2 !== "*" && username !== un2) {
-                              this.state.network.all_links.push({
+                              network.all_links.push({
                                 userA: username,
                                 userB: un2,
                                 rel: "share",
@@ -183,30 +175,28 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
             for (var k = 0; k < data.length; k++) {
               //tuple<ws_id id, ws_name workspace, username owner, timestamp moddate,
               //int object, permission user_permission, permission globalread,
-              //lock_status lockstat, usermeta metadata> workspace_info
+              //lock_status lockstat, usermeta meptadata> workspace_info
               var wsid = data[k][0];
-              var wsData = {
-                name: data[k][1],
-                owner: data[k][2],
-                moddate: data[k][3],
-                size: data[k][4],
-                myPermission: data[k][5],
-                global: data[k][6],
-                lockstat: data[k][7],
-                metadata: data[k][8],
-              };
-              this.state.network.workspaces[wsid] = wsData;
-              this.state.network.users[wsData.owner] = {
-                name: null
-              };
-              userPermCalls.push(createUserPermCall(wsid));
+              var wsData = this.workspace_metadata_to_object(data[k]);
+              
+              // FIXME: Only consider workspaces which are "modern".
+              // At present this means it has a narrative_nice_name
+              if (wsData.metadata.narrative_nice_name) {
+                network.workspaces[wsid] = wsData;
+                network.users[wsData.owner] = {
+                  name: null
+                };
+                userPermCalls.push(createUserPermCall(wsid));
+              }
             }
             this.render();
             $.when.apply($, userPermCalls).done(function() {
-              this.assembleCollaborators();
+              var collaborators = this.assembleCollaborators(network);
+              network.collaborators = collaborators;
+              
               // Get user profiles for all the users, update the colloborators adding the real name.
-              var collaboratorUsers = this.set_to_array(this.state.network.collaborators);
-              console.log(collaboratorUsers);
+              var collaboratorUsers = this.set_to_array(collaborators);
+              // console.log(collaboratorUsers);
               this.userProfileClient.get_user_profile(collaboratorUsers,
                 function (data) {
                   
@@ -214,16 +204,16 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
                     for (var i=0; i<data.length; i++) {
                       var username = data[i].user.username;
                       var realname = data[i].user.realname;
-                      this.state.network.collaborators[username].realname = realname;
+                      network.collaborators[username].realname = realname;
                     }
                   
                     // Now reformat as a list with properties for easier display.
-                    this.state.network.collaboratorTable = this.obj_to_array(this.state.network.collaborators, 'username', function (x) {
+                    network.collaboratorTable = this.obj_to_array(network.collaborators, 'username', function (x) {
                       x.ws = this.set_to_array(x.ws);
                       return x;
                     }.bind(this));
             
-                    options.success();
+                    options.success(network);
                   } catch (ex) {
                     console.log('EX');
                     console.log(ex);
@@ -289,11 +279,11 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
     },
     
     assembleCollaborators: {
-      value: function() {
-        this.state.network.collaborators = {};
-        if (this.state.network.all_links) {
+      value: function(network) {
+        var collaborators = {};
+        if (network.all_links) {
           var thisUser = this.state.currentUserProfile.user.username;
-          var links = this.state.network.all_links;
+          var links = network.all_links;
         
           var $tbl = $('<table class="table table-condensed">');
           for (var k = 0; k < links.length; k++) {
@@ -309,6 +299,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
             }
           }
         }
+        return collaborators;
        
       }
     }

@@ -1,38 +1,32 @@
-define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!functional-site/config.json'], 
-       function(nunjucks, $, md5, UserProfileService, config) {
+define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileserviceclient'], 
+       function(nunjucks, $, md5, SocialWidget, UserProfileService) {
     "use strict";
 
-    var ProfileWidget = Object.create({}, {
+    var ProfileWidget = Object.create(SocialWidget, {
 
         init: {
             value: function(cfg) {
+              cfg.name = 'UserProfile';
+              cfg.title = 'User Profile';
+              this.SocialWidget_init(cfg);
+              
                 this._generatedId = 0;
 
-                this.container = cfg.container;
-                if (typeof this.container === 'string') {
-                    this.container = $(this.container);
-                }
-                
-                var configURLs = config[config.setup];
-
-                this.userProfileService = {
-                    // host: 'dev19.berkeley.kbase.us'
-                    // url:'http://dev19.berkeley.kbase.us/services/user_profile/rpc'
-                    url: configURLs.user_profile_url
-                }
-
-                // Give ourselves the ability to show templates.
-                this.templateEnv = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/social/UserProfile/templates'), {
-                    'autoescape': false
+                // User profile service
+                if (this.isLoggedIn()) {
+                  if (this.hasConfig('user_profile_url')) {
+                    this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
+                        token: this.auth.authToken
+                    });
+                  } else {
+        					  throw 'The user profile client url is not defined';
+        				  }
+                }        
+        
+                $.ajaxSetup({
+                    timeout: 10000
                 });
 
-
-                // User state:
-                this.setupAuth(cfg.token);
-
-                this.params = {
-                    userId: cfg.userId
-                }
 
                 // Create dropdown and lookup lists and maps.
                 this.createListMaps();
@@ -48,106 +42,48 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!func
                 */
 
 
-                var that = this;
-                this.templateEnv.addFilter('roleLabel', function(role) {
-                    if (that.listMaps['userRoles'][role]) {
-                        return that.listMaps['userRoles'][role].label;
+                this.templates.env.addFilter('roleLabel', function(role) {
+                    if (this.listMaps['userRoles'][role]) {
+                        return this.listMaps['userRoles'][role].label;
                     } else {
                         return role;
                     }
-                });
-                this.templateEnv.addFilter('userClassLabel', function(userClass) {
-                    if (that.listMaps['userClasses'][userClass]) {
-                        return that.listMaps['userClasses'][userClass].label;
+                }.bind(this));
+                this.templates.env.addFilter('userClassLabel', function(userClass) {
+                    if (this.listMaps['userClasses'][userClass]) {
+                        return this.listMaps['userClasses'][userClass].label;
                     } else {
                         return userClass; 
                     }
-                });
-                this.templateEnv.addFilter('titleLabel', function(title) {
-                    if (that.listMaps['userTitles'][title]) {
-                        return that.listMaps['userTitles'][title].label;
+                }.bind(this));
+                this.templates.env.addFilter('titleLabel', function(title) {
+                    if (this.listMaps['userTitles'][title]) {
+                        return this.listMaps['userTitles'][title].label;
                     } else {
                         return title;
                     }
-                });
+                }.bind(this));
                 // create a gravatar-url out of an email address and a 
                 // default option.
-                this.templateEnv.addFilter('gravatar', function(email, size, rating, gdefault) {
+                this.templates.env.addFilter('gravatar', function(email, size, rating, gdefault) {
                     // TODO: http/https.
                     var md5Hash = md5(email);
                     // window.location.protocol
                     var url = 'https://www.gravatar.com/avatar/' + md5Hash + '?s=' + size + '&amp;r=' + rating + '&d=' + gdefault
                     return url;
                 });
-                this.templateEnv.addFilter('kbmarkup', function(s) {
+                this.templates.env.addFilter('kbmarkup', function(s) {
                     s = s.replace(/\n/g, '<br>');
                     return s;
                 });
-                this.templateEnv.addFilter('avatarBackgroundColor', function(color) {
+                this.templates.env.addFilter('avatarBackgroundColor', function(color) {
                     return this.listMaps['avatarColor'][color].color;
                 }.bind(this));
-                this.templateEnv.addFilter('avatarTextColor', function(color) {
+                this.templates.env.addFilter('avatarTextColor', function(color) {
                     return this.listMaps['avatarColor'][color].textColor;
                 }.bind(this));
 
-                this.templates = {};
-
-                this.messages = [];
-
-                // Set up listeners for any kbase events we are interested in:
-                // NB: following tradition, the auth listeners are namespaced for kbase; the events
-                // are not actually emitted in the kbase namespace.
-                $(document).on('loggedIn.kbase', function(e, auth) {
-                    this.onLoggedIn(e, auth);
-                }.bind(this));
-
-                $(document).on('loggedOut.kbase', function(e, auth) {
-                    this.onLoggedOut(e, auth);
-                }.bind(this));
-
                 return this;
-            }
-        },
-
-        // STATE CHANGES
-
-        setupAuth: {
-            value: function(authToken) {
-                if (authToken) {
-                    var kbLogin = $('<div></div>').kbaseLogin();
-                    this.auth = {
-                        authToken: authToken,
-                        username: kbLogin.get_kbase_cookie('user_id'),
-                        realname: kbLogin.get_kbase_cookie('name')
-                    }
-                } else {
-                    this.auth = null;
-                }
-            }
-        },
-
-        /*
-            Calculate cached state properties.
-            Should be run after state is loaded, and after any state changes. 
-        */
-        isOwner: {
-            value: function() {
-                // the current session user is the owner if their username matches the queried username.
-                if (this.auth && this.auth.username === this.params.userId) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        },
-
-        isLoggedIn: {
-            value: function() {
-                if (this.auth && this.auth.authToken) {
-                    return true;
-                } else {
-                    return false;
-                }
             }
         },
 
@@ -202,13 +138,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!func
                     // We don't fetch any data if a user is not logged in. 
                     options.success();
                 } else {
-                    this.userProfileClient = new UserProfileService(this.userProfileService.url, {
-                        token: this.auth.authToken
-                    });
-                    $.ajaxSetup({
-                        timeout: 10000
-                    });
-                    // ASYNC
                     this.userProfileClient.get_user_profile([this.params.userId],
                         function(data) {
                             if (data[0]) {
@@ -268,33 +197,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!func
                     );
                 }
                 return this;
-            }
-        },
-
-        onLoggedIn: {
-            value: function(e, auth) {
-                this.setupAuth(auth.token);
-                this.getCurrentState({
-                    success: function() {
-                        this.render()
-                    }.bind(this),
-                    error: function(err) {
-                        this.renderErrorView(err);
-                    }.bind(this)
-                });
-            }
-        },
-        onLoggedOut: {
-            value: function(e, auth) {
-                this.setupAuth(null);
-                this.getCurrentState({
-                    success: function() {
-                        this.render()
-                    }.bind(this),
-                    error: function(err) {
-                        this.renderErrorView(err);
-                    }.bind(this)
-                });
             }
         },
 
@@ -410,6 +312,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!func
 
         go: { 
             value: function() {
+              this.renderLayout();
                 this.renderWaitingView();
                 this.getCurrentState({
                     success: function() {
@@ -432,58 +335,23 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!func
                         this.renderErrorView(err);
                     }.bind(this)
                 });
-            }
-        },
-
-        stop: {
-            value: function() {
-
-            }
-        },
-
-        // TEMPLATES
-        getTemplate: {
-            value: function(name) {
-                if (this.templates[name] === undefined) {
-                    this.templates[name] = this.templateEnv.getTemplate(name + '.html');
-                }
-                return this.templates[name];
+                return this;
             }
         },
 
         createTemplateContext: {
-            value: function() {
-                var completion = this.calcProfileCompletion();
-                return {
-                    env: {
-                        params: {
-                            userId: this.params.userId,
-                        },
-                        isOwner: this.isOwner(),
-                        lists: this.lists,
-                        profileCompletion: completion
-                    },                    
-                    userRecord: this.userRecord
-                }
-            }
+          value: function () {
+            var completion = this.calcProfileCompletion();
+            return this.merge(this.merge({}, this.context), {         
+                  env: {
+                      lists: this.lists,
+                      profileCompletion: this.calcProfileCompletion()
+                  },                    
+                  userRecord: this.userRecord
+              });
+          }
         },
-
-        renderTemplate: {
-            value: function(name, context) {
-                if (this.templates[name] === undefined) {
-                    this.templates[name] = this.templateEnv.getTemplate(name + '.html');
-                }
-                context = context ? context : this.createTemplateContext();
-                return this.templates[name].render(context);
-            }
-        },
-
-        genId: {
-            value: function() {
-                return 'gen_' + this._generatedId++;
-            }
-        },
-
+        
         lists: {
             value: {
                 userRoles: [{
@@ -1028,126 +896,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!func
 
         updateUserRecord: {
             value: function(newRecord) {
-                var merger = {
-                    init: function(obj) {
-                        this.dest = obj;
-                        return this;
-                    },
-                    getType: function(x) {
-                        var t = typeof x;
-                        if (t === 'object') {
-                            if (x === null) {
-                                return 'null';
-                            } else if (x.pop && x.push) {
-                                return 'array';
-                            } else {
-                                return 'object';
-                            }
-                        } else {
-                            return t;
-                        }
-                    },
-                    merge: function(obj) {
-                        switch (this.getType(obj)) {
-                            case 'string':
-                            case 'integer':
-                            case 'boolean':
-                            case 'null':
-                                throw "Can't merge a '" + (typeof val) + "'";
-                                break;
-                            case 'object':
-                                return this.mergeObject(obj);
-                                break;
-                            case 'array':
-                                return this.mergeArray(obj);
-                                break;
-                            default:
-                                throw "Can't merge a '" + (typeof val) + "'";
-                        }
-
-                    },
-                    mergeObject: function(obj) {
-                        var keys = Object.keys(obj);
-                        for (var i = 0; i < keys.length; i++) {
-                            var key = keys[i];
-                            var val = obj[key];
-                            var t = this.getType(val);
-                            switch (t) {
-                                case 'string':
-                                case 'number':
-                                case 'boolean':
-                                case 'null':
-                                    this.dest[key] = val;
-                                    break;
-                                case 'object':
-                                    if (!this.dest[key]) {
-                                        this.dest[key] = {};
-                                    }
-                                    this.dest[key] = Object.create(merger).init(this.dest[key]).mergeObject(obj[key]);
-                                    break;
-                                case 'array':
-                                    if (!this.dest[key]) {
-                                        this.dest[key] = [];
-                                    } else {
-                                        this.dest[key] = [];
-                                    }
-                                    this.dest[key] = Object.create(merger).init(this.dest[key]).mergeArray(obj[key]);
-                                    break;
-                                case 'undefined':
-                                    if (this.dest[key]) {
-                                        delete this.dest[key];
-                                    }
-                                    break;
-                            }
-                        }
-                        return this.dest;
-                    },
-                    mergeArray: function(arr) {
-                        var deleted = false;
-                        for (var i = 0; i < arr.length; i++) {
-                            var val = arr[i];
-                            var t = this.getType(val);
-                            switch (t) {
-                                case 'string':
-                                case 'number':
-                                case 'boolean':
-                                case 'null':
-                                    this.dest[i] = val;
-                                    break;
-                                case 'object':
-                                    if (!this.dest[i]) {
-                                        this.dest[i] = {};
-                                    }
-                                    this.dest[i] = Object.create(merger).init(this.dest[i]).mergeObject(arr[i]);
-                                    break;
-                                case 'array':
-                                    if (!this.dest[i]) {
-                                        this.dest[i] = [];
-                                    }
-                                    this.dest[i] = Object.create(merger).init(this.dest[i]).mergeArray(obj[i]);
-                                    break;
-                                case 'undefined':
-                                    if (this.dest[i]) {
-                                        this.dest[i] = undefined;
-                                    }
-                                    break;
-                            }
-                        }
-                        if (deleted) {
-                            return this.dest.filter(function(value) {
-                                if (value === undefined) {
-                                    return false;
-                                } else {
-                                    return true;
-                                }
-                            });
-                        } else {
-                            return this.dest;
-                        }
-                    }
-                };
-                var recordCopy = Object.create(merger).init({}).mergeObject(this.userRecord);
-                var merged = Object.create(merger).init(recordCopy).mergeObject(newRecord);
+                var recordCopy = this.merge({}, this.userRecord);
+                var merged = this.merge(recordCopy, newRecord);
                 return merged;
             }
         },
@@ -1633,20 +1383,13 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!func
 
         getUserAccountInfo: {
             value: function(options) {
-
                 var userProfile;
-
-                this.userProfileClient = new UserProfileService(this.userProfileService.url, {
-                    token: this.auth.authToken
-                });
-                $.ajaxSetup({
-                    timeout: 10000
-                });
                 this.userProfileClient.lookup_globus_user([options.userId],
                     function(data) {
                         if (data[options.userId]) {
                             options.success(data[options.userId]);
                         } else {
+                          console.log(data);
                             options.error({
                                 title: 'User not found',
                                 message: 'No account information found for this user (empty data).'
@@ -1662,23 +1405,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!func
                         });
                     }.bind(this)
                 );
-            }
-        },
-
-        getProp: {
-            value: function(obj, prop) {
-                var props = prop.split('.');
-
-                var temp = obj;
-                for (var i = 0; i < props.length; i++) {
-                    var key = props[i];
-                    if (temp[key] === undefined) {
-                        return obj[key];
-                    } else {
-                        temp = temp[key];
-                    }
-                }
-                return temp;
             }
         },
 
@@ -1852,29 +1578,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!func
             }
         },
 
-        isBlank: {
-            value: function(value) {
-                if (value === undefined) {
-                    return true;
-                } else if (typeof value === 'object') {
-                    if (value === null) {
-                        return true;
-                    } else if (value.push && value.pop) {
-                        if (value.length === 0) {
-                            return true;
-                        }
-                    } else {
-                        if (value.getOwnPropertyNames().length === 0) {
-                            return true;
-                        }
-                    }
-                } else if (typeof value === 'string' && value.length === 0) {
-                    return true;
-                }
-                return false;
-            }
-        },
-
+        
         // DOM QUERY
         getFieldValue: {
             value: function(name) {
@@ -2120,16 +1824,15 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!func
                     $('[data-button="create-profile"]').on('click', function(e) {
                         that.createUserRecord({
                             success: function() {
-                                this.getCurrentState({
-                                    success: function() {
-                                        this.clearMessages();
-                                        this.addSuccessMessage('Success!', 'Your user profile has been created.');
-                                        this.render();
-                                    }.bind(this),
-                                    error: function(err) {
-                                        this.renderErrorView(err);
-                                    }
-                                })
+                                this.recalcState({
+                                  success: function() {
+                                    this.clearMessages();
+                                    this.addSuccessMessage('Success!', 'Your user profile has been created.');
+                                  }.bind(this),
+                                  error: function (err) {
+                                    this.renderErrorView();
+                                  }
+                                });
                             }.bind(that),
                             error: function(err) {
                                 this.renderErrorView(err);
@@ -2180,87 +1883,21 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!func
             }
         },
 
-        renderMessages: {
-            value: function() {
-                if (this.places.alert) {
-                    this.places.alert.empty();
-                    for (var i = 0; i < this.messages.length; i++) {
-                        var message = this.messages[i];
-                        var alertClass = 'default';
-                        switch (message.type) {
-                            case 'success':
-                                alertClass = 'dismissable';
-                                break;
-                            case 'error':
-                                alertClass = 'danger';
-                                break;
-                        }
-                        this.places.alert.append(
-                            '<div class="alert alert-success alert-' + alertClass + '" role="alert">' +
-                            '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>' +
-                            '<strong>' + message.title + '</strong> ' + message.message + '</div>');
-                    }
-                }
-            }
-        },
-
-        clearMessages: {
-            value: function() {
-                this.messages = [];
-                this.renderMessages();
-            }
-        },
-
-        addSuccessMessage: {
-            value: function(title, message) {
-                if (message === undefined) {
-                    message = title;
-                    title = '';
-                }
-                this.messages.push({
-                    type: 'success',
-                    title: title,
-                    message: message
-                });
-                this.renderMessages();
-            }
-        },
-
-        addWarningMessage: {
-            value: function(title, message) {
-                if (message === undefined) {
-                    message = title;
-                    title = '';
-                }
-                this.messages.push({
-                    type: 'warning',
-                    title: title,
-                    message: message
-                });
-                this.renderMessages();
-            }
-        },
-
-        addErrorMessage: {
-            value: function(title, message) {
-                if (message === undefined) {
-                    message = title;
-                    title = '';
-                }
-                this.messages.push({
-                    type: 'error',
-                    title: title,
-                    message: message
-                });
-                this.renderMessages();
-            }
-        },
-
         renderPicture: {
             value: function() {
                 this.container
                     .find('[data-placeholder="picture"]')
                     .html(this.renderTemplate('picture'));
+            }
+        },
+        isOwner: {
+            value: function() {
+                // the current session user is the owner if their username matches the queried username.
+                if (this.auth && this.auth.username === this.params.userId) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         },
 
@@ -2289,13 +1926,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbaseuserprofileserviceclient', 'json!func
                     title: this.container.find('[data-placeholder="title"]'),
                     content: this.container.find('[data-placeholder="content"]')
                 };
-            }
-        },
-
-        renderWaitingView: {
-            value: function() {
-                this.renderLayout();
-                this.places.content.html('<img src="assets/img/ajax-loader.gif"></img>');
             }
         }
 

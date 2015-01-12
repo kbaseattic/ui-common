@@ -30,7 +30,8 @@ require.config({
       kbaseuserprofilewidget: '/src/widgets/social/kbaseUserProfile',
       kbaseuserrecentactivity: '/src/widgets/social/kbaseUserRecentActivity',
       kbaseuserpopularnarratives: '/src/widgets/social/kbaseUserPopularNarratives',
-      kbaseusercollaboratornetwork: '/src/widgets/social/kbaseUserCollaboratorNetwork'
+      kbaseusercollaboratornetwork: '/src/widgets/social/kbaseUserCollaboratorNetwork',
+      kbaseusersearch: '/src/widgets/social/kbaseUserSearch'
     },
    shim: { 
     'kbaseuserprofileserviceclient': {

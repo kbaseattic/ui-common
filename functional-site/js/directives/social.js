@@ -8,8 +8,6 @@
 
 angular.module('social-directives', []);
 angular.module('social-directives')
-
-
 .directive('socialuserprofile', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
@@ -17,8 +15,19 @@ angular.module('social-directives')
                 var widget = Object.create(userProfileWidget);
                 widget.init({
                     container: $(ele),
-                    userId: scope.params.userid,
-                    token: scope.params.kbCache.token
+                    userId: scope.params.userid
+                }).go();
+            });
+        }
+    };
+})
+.directive('socialusersearch', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            require(['kbaseusersearch'], function(UserSearchWidget) {
+              Object.create(UserSearchWidget).init({
+                    container: $(ele),
+                    userId: scope.params.userid
                 }).go();
             });
         }
@@ -175,9 +184,7 @@ angular.module('social-directives')
                   var widget = Object.create(Widget);
                   widget.init({
                       container: $(ele),
-                      userId: scope.params.userid,
-                      authToken: scope.params.kbCache.token,
-                      workspaceURL: scope.params.kbCache.ws_url
+                      userId: scope.params.userid
                   }).go();
                 } catch (ex) {
                   $(ele).html('Error: ' + ex);
@@ -196,10 +203,7 @@ angular.module('social-directives')
                 var widget = Object.create(Widget);
                 widget.init({
                     container: $(ele),
-                    userId: scope.params.userid,
-                    authToken: scope.params.kbCache.token,
-                    workspaceURL: scope.params.kbCache.ws_url,
-                    userProfileServiceURL: 'https://kbase.us/services/user_profile/rpc'
+                    userId: scope.params.userid
                 }).go();
               } catch (ex) {
                 $(ele).html('Error: ' + ex);
