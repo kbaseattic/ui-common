@@ -118,6 +118,7 @@
 				'kbaseJSONReflector'                : 'kbaseJSONReflector',
 				'kbaseLogin'                        : 'kbaseLogin',
 				'kbaseLoginFuncSite'                : 'kbaseLoginFuncSite',
+				'kbaseAppDescription'            : 'kbaseAppDescription',
 				'kbaseMethodDescription'            : 'kbaseMethodDescription',
 				'kbaseMethodGallery'                : 'kbaseMethodGallery',
 				'kbaseModal'                        : 'kbaseModal',
