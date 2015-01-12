@@ -46,17 +46,19 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
         return this;
       }
     },
-
-
+    
 		getCurrentState: {
 			value: function(options) {
 				// Reset or create the recent activity list.
+        var def = Q.defer();
+        
 				var recentActivity = [];
         
         // We only run any queries if the session is authenticated.
         if (!this.isLoggedIn()) {
-          options.success();
-          return;
+          //options.success();
+          def.resolve();
+          return def.promise;
         }
 
 				// Note that Narratives are now associated 1-1 with a workspace. 
@@ -66,12 +68,12 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
 				// to flag a compatible workspace.
 				var d = new Date();
 				d.setMonth(d.getMonth() - 3);
-				this.workspaceClient.list_workspace_info({
+        this.to_promise(this.workspaceClient, 'list_workspace_info',{
 					after: d.toISOString(),
 					showDeleted: 0,
 					owners: [this.params.userId]
-				}, 
-        function(data) {
+				})
+        .then(function(data) {
 					var workspaceIds = [];
 					var workspaceMap = {};
 					// First we both transform each ws info object into a nicer js object,
@@ -104,8 +106,9 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
 							includeMetadata: 1
 						};
 						var workspacesWithNarratives = {};
-						this.workspaceClient.list_objects(params,
-							function(data) { 
+            
+            this.to_promise(this.workspaceClient, 'list_objects', params)
+            .then(function(data) {
 								for (var i=0; i<data.length; i++) {
 									//<obj_id objid, obj_name name, type_string type,
 									//timestamp save_date, int version, username saved_by,
@@ -133,7 +136,6 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
 										}
 									}
 								}
-
 								// We should now have the list of recently active narratives.
 								// Now we sort and limit the list.
 								recentActivity.sort(function(a, b) {
@@ -141,21 +143,23 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
 									var y = new Date(b.date);
 									return ((x < y) ? 1 : ((x > y) ? -1 : 0));
 								});
-                 
                 this.setState('recentActivity', recentActivity);
-                options.success();
-							}.bind(this),
-							function(err) {
-								options.error(err.error.message);
-							}.bind(this));
+                // options.success();
+                def.resove();
+						}.bind(this))
+            .catch(function(err) {
+                def.reject(err);
+                //return def.promise
+								// options.error(err.error.message);
+						});
 					} else {
 						// Didn't find anything, but still considered "success"
-						options.success();
+						// options.success();
+            def.resolve();
+            //return def.promise;
 					}
-				}.bind(this),
-				function(err) {
-					options.error(err.error.message);
 				}.bind(this));
+        return def.promise;
 			}	
 		}
 	});

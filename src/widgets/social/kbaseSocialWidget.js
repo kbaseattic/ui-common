@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'json!functional-site/config.json'], 
-function (nunjucks, $, config) {
+define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'], 
+function (nunjucks, $, Q, config) {
     "use strict";
 
     var SocialWidget = Object.create({}, {
@@ -197,6 +197,16 @@ function (nunjucks, $, config) {
         
         recalcState: {
           value: function() {
+            var widget = this;
+            this.getCurrentState()
+            .then(function () {
+              widget.refresh();
+            })
+            .catch(function (err) {
+              widget.renderErrorView(err);
+            })
+            .done();
+            /*
             this.getCurrentState({
               success: function() {
                 this.refresh();
@@ -205,6 +215,7 @@ function (nunjucks, $, config) {
                 this.renderErrorView(err);
               }.bind(this)
             });
+            */
           }
         },
         
@@ -235,11 +246,41 @@ function (nunjucks, $, config) {
           }
         },
         
+        to_promise: {
+          value: function(client, method, arg1) {
+            var def = Q.defer();
+            client[method](arg1,
+            function(result) {
+              def.resolve(result);
+            }, 
+            function (err) {
+              def.reject(err);
+            });
+            return def.promise;
+          }
+        },
+        promise: {
+          value: function(client, method, arg1) {
+            var def = Q.defer();
+            client[method](arg1,
+            function(result) {
+              def.resolve(result);
+            }, 
+            function (err) {
+              def.reject(err);
+            });
+            return def.promise;
+          }
+        },
+        
         getCurrentState: {
             value: function (options) {
               // set the state here.
-              options.success();
-              return this;
+              var def = Q.defer();
+              def.resolve();
+              return def.promise;
+              //options.success();
+              // return this;
             }
         },
         

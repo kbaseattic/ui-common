@@ -920,7 +920,11 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                                     title: 'Real Name',
                                     maxLength: 100
                                 },
-                                avatar: {
+                                thumbnail: {
+                                  type: 'string',
+                                  
+                                }
+                                /*avatar: {
                                   type: 'object',
                                   properties: {
                                     gravatar_defaults: {
@@ -929,6 +933,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                                     }
                                   }
                                 }
+                                */
                             },
                             required: ['realname']
                         },
@@ -938,24 +943,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                                 userdata: {
                                     type: 'object',
                                     properties: {
-                                        /*avatar: {
-                                            type: 'object',
-                                            properties: {
-                                                gravatar_default: {
-                                                    type: 'string',
-                                                    title: 'Gravatar Default Setting'
-                                                },
-                                                avatar_color: {
-                                                    type: 'string',
-                                                    title: 'Avatar Background Color'
-                                                },
-                                                avatar_phrase: {
-                                                    type: 'string',
-                                                    title: 'Avatar Phrase'
-                                                }
-                                            }
-                                        },
-                                          */
                                         title: {
                                             type: 'string',
                                             title: 'Title'
@@ -988,6 +975,15 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                                             items: {
                                                 type: 'string'
                                             }
+                                        },
+                                        avatar: {
+                                          type: 'object',
+                                          properties: {
+                                            gravatar_default: {
+                                              type: 'string',
+                                              title: 'Gravatar Default Setting'
+                                            }
+                                          }
                                         },
                                         affiliations: {
                                             type: 'array',

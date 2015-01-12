@@ -60,35 +60,34 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
     
 		getCurrentState: {
 			value: function(options) {
-        // this.state = {};
+        var def = Q.defer();
+        
         // get the current user profile...
         if (!this.isLoggedIn()) {
           //options.error('Not authorized');
-          options.success();
-          return;
+          def.resolve();
+        } else {
+          this.to_promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
+          .then(function(data) {
+            if (data) {
+              this.setState('currentUserProfile', data[0]);                
+              this.buildCollaboratorNetwork()
+              .then(function(network) {
+                  this.setState('network', network);
+                  def.resolve();                  
+                }.bind(this))
+              .catch(function (err) {
+                def.reject(err);
+              });
+            } else {
+              def.reject('User not found');
+            }
+          }.bind(this))
+          .catch(function (err) {
+            def.reject(err);
+          });
         }
-        
-        this.userProfileClient.get_user_profile([this.params.userId],
-            function(data) {
-              if (data) {
-                this.setState('currentUserProfile', data[0]);                
-                this.buildCollaboratorNetwork({
-                  success: function (network) {
-                    this.setState('network', network);
-                    options.success();
-                  }.bind(this),
-                  error: function (err) {
-                    this.renderErrorView(err);
-                  }.bind(this)
-                })
-              } else {
-                options.error('User not found');
-              }
-            }.bind(this),
-            function(err) {
-              options.error(err);
-            }.bind(this)
-        );
+        return def.promise;
       }
 		},
     
@@ -96,26 +95,24 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
     
     buildCollaboratorNetwork: {
       value: function(options) {
+        var def = Q.defer();
+        
         // step 1: list workspaces
         var network = {
           workspaces: {},
           users: {},
           all_links: []
         };
-        this.workspaceClient.list_workspace_info({
-            excludeGlobal: 1
-          },
-          function(data) {
-          
+        this.to_promise(this.workspaceClient, 'list_workspace_info', {excludeGlobal: 1})
+        .then(function(data) {
             // A function which modifies the widget state to help build the network and associated
             // data objects for a single workspace. The function is returned so that it can be run
             // with others in async parallel.
             // TODO: switch from jquery to Q based promises.
             var createUserPermCall = function(wsid) {
-              return this.workspaceClient.get_permissions({
-                  id: wsid
-                },
-                function(permdata) {
+              var def = Q.defer();
+              return this.to_promise(this.workspaceClient, 'get_permissions', {id: wsId})
+              .then(function(permdata) {
                   // save perm data with the workspace
                   // NB: perm data is a map of username => permission
                 	/* Represents the permissions a user or users have to a workspace:
@@ -125,6 +122,8 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
                 		'r' - read.
                 		'n' - no permissions.
                 	*/
+                  // TODO: just return the permdata, which will be collected,
+                  // and alter loop through them all.
                   network.workspaces[wsid].perms = permdata;
                   var wsOwner = network.workspaces[wsid].owner;
 
@@ -164,11 +163,12 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
                       }
                     }
                   }
-                }.bind(this),
-                function(err) {
-                  console.error("Error in finding permissions!");
-                  console.error(err);
-                }.bind(this));
+                }.bind(this))
+                .catch(function(err) {
+                  def.reject(err);
+                  //console.error("Error in finding permissions!");
+                  //console.error(err);
+                });
             }.bind(this);
 
             // And here we assmeble the array of calls.
@@ -191,17 +191,17 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
                 userPermCalls.push(createUserPermCall(wsid));
               }
             }
-            this.render();
-            $.when.apply($, userPermCalls).done(function() {
+            // this.render();
+            Q.all(userPermCalls)
+            .then(function() {
               var collaborators = this.assembleCollaborators(network);
               network.collaborators = collaborators;
               
               // Get user profiles for all the users, update the colloborators adding the real name.
               var collaboratorUsers = this.set_to_array(collaborators);
               // console.log(collaboratorUsers);
-              this.userProfileClient.get_user_profile(collaboratorUsers,
-                function (data) {
-                  
+              this.to_promise(this.userProfileClient, 'get_user_profile', collaboratorUsers)
+              .then(function (data) {
                   try {
                     for (var i=0; i<data.length; i++) {
                       var username = data[i].user.username;
@@ -214,28 +214,23 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
                       x.ws = this.set_to_array(x.ws);
                       return x;
                     }.bind(this));
-            
-                    options.success(network);
+                    def.resolve(network)
                   } catch (ex) {
-                    console.log('EX');
-                    console.log(ex);
-                    options.error(ex);
-                  }
-                  
-                }.bind(this),
-                
-                function (err) {
-                  console.log('ERR');
-                  console.log(err);
-                  options.error(err);
-                }
-              );
-            }.bind(this));
+                    def.reject(ex);
+                  }  
+                }.bind(this))
+              .catch(function (err) {
+                def.reject(err);
+              });
+            }.bind(this))
+            .catch(function(err) {
+              def.reject(err);
+            });
 
-          }.bind(this),
-          function(err) {
-            options.error(err);
-          }.bind(this));
+          }.bind(this))
+        .catch(function(err) {
+          def.reject(err);
+        });
       }
     },
     

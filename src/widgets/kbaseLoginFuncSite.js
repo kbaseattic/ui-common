@@ -81,7 +81,7 @@
             }
             
             if (field) {
-              console.log('Deprecation Warning: get_kbase_cookie should not be used to fetch a cookie field, use get_kbase_cokie_field instead.');
+              console.log('Deprecation Warning: get_kbase_cookie should not be used to fetch a kbase session property -- use get_kbase_session_prop instead.');
             }
 
             return field == undefined

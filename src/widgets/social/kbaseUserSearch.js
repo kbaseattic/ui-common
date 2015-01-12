@@ -36,12 +36,12 @@ function (SocialWidget, UserProfileService) {
       }
     },
     
-    getCurrentState: {
-      value: function (options) {
-        options.success();
-      }
-    },
-    
+    //getCurrentState: {
+    //  value: function (options) {
+    //    options.success();
+    //  }
+    //},
+     
     renderLayout: {
         value: function() {
           console.log('in user search layout');
@@ -60,16 +60,13 @@ function (SocialWidget, UserProfileService) {
               if (widget.params.searchText && widget.params.searchText.length < 3) {
                 widget.refresh();
               } else {
-                widget.userProfileClient.filter_users({filter: widget.params.searchText}, 
-                  function (users) {
-                    console.log('got users');
-                    console.log(users);
+                widget.promise(widget.userProfileClient, 'filter_users', {filter: widget.params.searchText})
+                .then(function (users) {
                     widget.setState('searchResults', users);
-                  },
-                  function (err) {
+                })
+                .catch(function (err) {
                     widget.renderErrorView(err);
-                  }
-                );
+                })
               }
             });
           }

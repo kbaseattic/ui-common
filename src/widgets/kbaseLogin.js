@@ -64,17 +64,15 @@
         },
 
         get_kbase_cookie : function (field) {
-console.log('field 1?'); console.log(field);
+
             var chips = sessionStorage.getItem('kbase_session');
-console.log('chips'); console.log(chips);
+
             if (chips != undefined) {
                 chips = JSON.parse(chips);
             }
             else {
                 chips = {};
             }
-             
-            
 
             return field == undefined
                 ? chips
