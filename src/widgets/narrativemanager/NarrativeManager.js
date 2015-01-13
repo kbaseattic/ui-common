@@ -340,10 +340,16 @@ var NarrativeManager = function(options, auth, auth_cb) {
                     if (cells.length>0) {
                         for(var c=0; c<cells.length; c++) {
                             if (cells[c].app) {
-                                var appCell = self._buildAppCell(cell_data.length, self._specMapping.apps[cells[c].app]);
+                                var appCell = self._buildAppCell(
+                                        cell_data.length,
+                                        self._specMapping.apps[cells[c].app],
+                                        parameters); //this will only work with a 1 app narrative
                                 cell_data.push(appCell);
                             } else if (cells[c].method) {
-                                var methodCell = self._buildMethodCell(cell_data.length, self._specMapping.methods[cells[c].method]);
+                                var methodCell = self._buildMethodCell(
+                                        cell_data.length, 
+                                        self._specMapping.methods[cells[c].method],
+                                        parameters); //this will only work with a 1 method narrative
                                 cell_data.push(methodCell);
                             } else if (cells[c].markdown) {
                                 cell_data.push({
@@ -400,7 +406,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
             );
     };
     
-    this._buildAppCell = function(pos,spec) {
+    this._buildAppCell = function(pos,spec, params) {
         var cellId = 'kb-cell-'+pos+'-'+this._uuidgen();
         var cell = {
             cell_type: 'markdown',
@@ -413,12 +419,26 @@ var NarrativeManager = function(options, auth, auth_cb) {
         var cellInfo = {};
         cellInfo[this.KB_TYPE] = this.KB_APP_CELL;
         cellInfo['app'] = spec;
-        cellInfo[this.KB_STATE] = [];
+        var widgetState = [];
+        if (params) {
+            var steps = {};
+            for (var i = 0; i < params.length; i++) {
+                var stepid = 'step_' + params[i][0];
+                if (!(stepid in steps)) {
+                    steps[stepid] = {}
+                    steps[stepid]['inputState'] = {}
+                }
+                steps[stepid]['inputState'][params[i][1]] = params[i][2];
+            }
+            var state = {state: {step: steps}};
+            widgetState.push(state);
+        }
+        cellInfo[this.KB_STATE] = widgetState;
         cell.metadata[this.KB_CELL] = cellInfo;
         return cell;
     };
     
-    this._buildMethodCell = function(pos,spec) {
+    this._buildMethodCell = function(pos,spec, params) {
         var cellId = 'kb-cell-'+pos+'-'+this._uuidgen();
         var cell = {
             cell_type: 'markdown',
@@ -431,7 +451,16 @@ var NarrativeManager = function(options, auth, auth_cb) {
         var cellInfo = {};
         cellInfo[this.KB_TYPE] = this.KB_FUNCTION_CELL;
         cellInfo['method'] = spec;
-        cellInfo[this.KB_STATE] = [];
+        var widgetState = [];
+        if (params) {
+            var wparams = {};
+            for (var i = 0; i < params.length; i++) {
+                wparams[params[i][1]] = params[i][2];
+            }
+            var state = {state: wparams};
+            widgetState.push(state);
+        }
+        cellInfo[this.KB_STATE] = widgetState;
         cellInfo['widget'] = spec.widgets.input;
         cell.metadata[this.KB_CELL] = cellInfo;
         return cell;
