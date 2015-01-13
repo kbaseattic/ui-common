@@ -71,8 +71,6 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
 					owners: [this.params.userId]
 				})
         .then(function(data) {
-          console.log('DATA');
-          console.log(data);
           var narratives = [];
 					// First we both transform each ws info object into a nicer js object,
 					// and filter for modern narrative workspaces.
@@ -87,7 +85,7 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
               narratives.push({
                   obj_id: this.makeWorkspaceObjectId(wsInfo.id, wsInfo.metadata.narrative),
                   title: wsInfo.metadata.narrative_nice_name,
-                  description: wsInfo.metdata.narrative_description,
+                  description: wsInfo.metadata.narrative_description,
                   moddate: wsInfo.moddate
               });
 						}

@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileserviceclient'], 
-       function(nunjucks, $, md5, SocialWidget, UserProfileService) {
+define(['nunjucks', 'jquery', 'md5', 'q',  'kbasesocialwidget','kbaseuserprofileserviceclient'], 
+       function(nunjucks, $, md5, Q, SocialWidget, UserProfileService) {
     "use strict";
 
     var ProfileWidget = Object.create(SocialWidget, {
@@ -13,15 +13,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                 this._generatedId = 0;
 
                 // User profile service
-                if (this.isLoggedIn()) {
-                  if (this.hasConfig('user_profile_url')) {
-                    this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
-                        token: this.auth.authToken
-                    });
-                  } else {
-        					  throw 'The user profile client url is not defined';
-        				  }
-                }        
+                this.syncApp();
         
                 $.ajaxSetup({
                     timeout: 10000
@@ -86,6 +78,21 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                 return this;
             }
         },
+        
+        syncApp: {
+          value: function () {
+            if (this.isLoggedIn()) {
+              if (this.hasConfig('user_profile_url')) {
+                this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
+                    token: this.auth.authToken
+                });
+              } else {
+    					  throw 'The user profile client url is not defined';
+    				  }
+            }        
+            
+          }
+        },
 
         calcState: {
             value: function() {
@@ -115,8 +122,6 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
             }
         },
 
-
-
         resetState: {
             value: function() {
                 this.userRecord = null;
@@ -129,6 +134,8 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
         */
         getCurrentState: {
             value: function(options) {
+              var def = Q.defer();
+              var widget = this;
                 // DATA
                 // This is where we get the data to feed to the widget.
                 // Each widget has its own independent data fetch.
@@ -136,138 +143,84 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                 this.resetState();
                 if (!this.isLoggedIn()) {
                     // We don't fetch any data if a user is not logged in. 
-                    options.success();
-                } else {
-                    this.userProfileClient.get_user_profile([this.params.userId],
-                        function(data) {
-                            if (data[0]) {
-                                // profile found
-                                this.userRecord = data[0];
-
-                                // NB this should never occur in production, but in our
-                                // testing phase we are evolving profile structure so we
-                                // try to fix it up here... for now.
-                                if (!this.userRecord.profile) {
-                                    this.userRecord.profile = {
-                                        metadata: {},
-                                        userdata: null,
-                                        account: null
-                                    }
-                                }
-
-                                if (this.userRecord.profile.account) {
-                                    // this.accountRecord = this.userRecord.profile.account;
-                                    options.success();
-                                } else {
-                                    // ASYNC
-                                    this.getUserAccountInfo({
-                                        userId: this.params.userId,
-                                        success: function(data) {
-                                            // like i said, this is just a hack for now.
-                                            this.userRecord.profile.account = data;
-                                            options.success();
-                                        }.bind(this),
-                                        error: function(err) {
-                                            options.error(err);
-                                        }.bind(this)
-                                    });
-                                }
-                            } else {
-                                // ASYNC
-                                /*                              
-                                 this.getUserAccountInfo({
-                                      userId: this.params.userId, 
-                                      success: function (data) {
-                                          this.accountRecord = data;
-                                          options.success();
-                                      }.bind(this),
-                                      error: function (err) {
-                                        options.error(err);
-                                      }.bind(this)
-                                  });
-                                */
-                                options.success();
-                            }
-                        }.bind(this),
-                        function(err) {
-                            console.log('[UserProfile.sync] Error getting user profile.');
-                            console.log(err);
-                            options.error(err);
-                        }.bind(this)
-                    );
+                  def.resolve();
+                } else {                  
+                    this.promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
+                    .then(function(data) {
+                      if (data[0]) {
+                          // profile found
+                          widget.userRecord = data[0];
+                          def.resolve();
+                      } else {
+                        def.resolve();
+                      }
+                    })
+                    .catch(function (err) {
+                      console.log('[UserProfile.sync] Error getting user profile.');
+                      console.log(err);
+                      def.reject(err);
+                    });
                 }
-                return this;
+                return def.promise;
             }
         },
 
         fixProfile: {
             value: function(options) {
-
                 if (!this.isOwner()) {
                     options.error('Now profile owner, cannot fix it up.');
                     return;
                 }
-
+                var def = Q.defer();
+                
+                var widget = this;
                 if (this.userRecord) {
                     if (this.userRecord.profile.account) {
-                        // We are all good here... nothing to do.
-                        options.success();
+                        // We are all good here... nothing to do.                      
+                      def.resolve();
                     } else {
                         // No account property on user record
                         // This is not a normal state and can be removed, inciting an error
                         // condition, after testing.
-
-                        this.getUserAccountInfo({
-                            userId: this.params.userId,
-                            success: function(data) {
-                                // like i said, this is just a hack for now.
-                                this.userRecord.profile.account = data;
-
-                                this.saveUserRecord({
-                                    success: function() {
-                                        options.success();
-                                    }.bind(this),
-                                    error: function(err) {
-                                        options.error(err);
-                                    }.bind(this)
-                                });
-
-
-                            }.bind(this),
-                            error: function(err) {
-                                options.error(err);
-                            }.bind(this)
+                      this.promise(this.userProfileClient, 'lookup_globus_user', [this.params.userId])
+                      .then(function (data) {
+                        widget.userRecord.profile.account = data[this.params.userId];
+                        widget.promise(widget.userProfileClient, 'set_user_profile', {profile: widget.userRecord})
+                        .then(function() {
+                          def.resolve();
+                        })
+                        .catch(function(err) {
+                          def.reject(err);
                         });
+                      })
+                      .catch(function(err) {
+                        def.reject(err);
+                      });
                     }
                 } else {
                     // No user record for user ... so we create a stub profile.
-                    this.getUserAccountInfo({
-                        userId: this.params.userId,
-                        success: function(data) {
-
-                            this.userRecord = this.createStubProfile({
-                                username: this.accountRecord.userName,
-                                realname: this.accountRecord.fullName,
-                                accountRecord: this.accountRecord
-                            });
-
-                            // ASYNC
-                            this.saveUserRecord({
-                                success: function() {
-                                    options.success();
-                                }.bind(this),
-                                error: function(err) {
-                                    options.error(err);
-                                }.bind(this)
-                            });
-
-                            options.success();
-                        }.bind(this),
-                        error: function(err) {
-                            options.error(err);
-                        }.bind(this)
-                    });
+                    this.promise(this.userProfileClient, 'lookup_globus_user', [this.params.userId])
+                    .then(function(data) {
+                      widget.userRecord = widget.createStubProfile({
+                          username: data.userName,
+                          realname: data.fullName,
+                          accountRecord: data
+                      });
+                      
+                      this.promise(this.userProfileClient, 'set_user_profile', {profile: this.userRecord})
+                      .then(function() {
+                        def.resolve();
+                      })
+                      .catch(function(err) {
+                        def.reject(err);
+                      });
+                    })
+                    .catch(function(err) {
+                      def.reject(err);
+                    });                      
                 }
+                
+                return def.promise;
             }
         },
 
@@ -312,31 +265,34 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
 
         go: { 
             value: function() {
-              this.renderLayout();
+                this.renderLayout();
                 this.renderWaitingView();
-                this.getCurrentState({
-                    success: function() {
-                        if (this.isOwner()) {
-                            this.fixProfile({
-                                success: function() {
-                                    this.render();
-                                }.bind(this),
-                                error: function(err) {
-                                    this.calcState();
-                                    this.renderErrorView(err);
-                                }.bind(this)
-                            });
-                        } else {
-                            this.render();
-                        }
-                    }.bind(this),
-                    error: function(err) {
-                        this.calcState();
-                        this.renderErrorView(err);
-                    }.bind(this)
+                var widget = this;
+                
+                this.getCurrentState()
+                .then(function() {
+                  if (widget.isOwner()) {
+                    
+                    widget.fixProfile()
+                    .then(function () {
+                      widget.render();
+                    })
+                    .catch(function(err) {
+                      widget.calcState();
+                      widget.renderErrorView(err);
+                    });
+                  } else {
+                    widget.calcState();
+                    widget.render();
+                  }
+                })
+                .catch(function(err) {
+                  widget.calcState();
+                  widget.renderErrorView(err);
                 });
+              
                 return this;
-            }
+              }
         },
 
         createTemplateContext: {
@@ -1295,41 +1251,52 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
             }
         },
 
-        createUserRecord: {
-            value: function(options) {
-                // Get basic user account info (may already have it).
+        profileOptIn: {
+            value: function() {
+              
+              var def = Q.defer();
+              
+              var widget = this;
+              this.promise(this.userProfileClient, 'lookup_globus_user', [this.params.userId])
+              .then(function(data) {
+                
+                if (!data || !data[widget.params.userId]) {
+                  def.reject('No user account found for ' + widget.params.userId);
+                  return;
+                }
+                
+                 var userData = data[widget.params.userId];
+                 
+                 // account data has been set ... copy the account fields to the corresponding user and profile fields.
+                 widget.userRecord = widget.createProfile({
+                     username: userData.userName,
+                     realname: userData.fullName,
+                     email: userData.email,
+                     account: userData
+                 });
+                 
+                 widget.promise(widget.userProfileClient, 'set_user_profile', {profile: widget.userRecord})
+                 .then(function() {
+                   widget.calcState();
+                   def.resolve();                   
+                 })
+                 .catch(function(err) {
+                   console.log('ERROR SAVING USER PROFILE: ' + err);
+                   console.log(err);
+                   def.reject(err);
+                 });
+                 
+              })
+              .catch(function(err) {
+                def.reject(err);
+              });
+              
+              return def.promise;
 
-                this.getUserAccountInfo({
-                    userId: this.params.userId,
-                    success: function(data) {
-                        this.accountRecord = data;
-
-                        // account data has been set ... copy the account fields to the corresponding user and profile fields.
-                        this.userRecord = this.createProfile({
-                            username: data.userName,
-                            realname: data.fullName,
-                            email: data.email,
-                            account: data
-                        })
-
-                        this.saveUserRecord({
-                            success: function() {
-                                this.calcState();
-                                options.success();
-                            }.bind(this),
-                            error: function(err) {
-                                options.error(err);
-                            }.bind(this)
-                        })
-                    }.bind(this),
-                    error: function(err) {
-                        options.error(err);
-                    }.bind(this)
-                });
             }
         },
 
-        saveUserRecord: {
+        /*saveUserRecord: {
             value: function(cfg) {
                 this.userProfileClient.set_user_profile({
                         profile: this.userRecord
@@ -1346,6 +1313,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                     }.bind(this));
             }
         },
+          */
 
         setProfileField: {
             value: function(path, name, value) {
@@ -1388,6 +1356,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
             }
         },
 
+/*
         getUserAccountInfo: {
             value: function(options) {
                 var userProfile;
@@ -1414,6 +1383,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                 );
             }
         },
+        */
 
         getSchemaNode: {
             value: function (schema, propPath) {
@@ -1673,6 +1643,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                     case 'profile': 
                         // NORMAL PROFILE 
                         // Title can be be based on logged in user infor or the profile.
+                      
                         this.renderViewEditLayout();
                         this.renderInfoView();
                         break;
@@ -1683,6 +1654,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                         this.renderMessages();
                         this.renderStubProfileView();
                         break;
+                        /*
                     case 'accountonly':
                         // NO PROFILE
                         // NB: should not be here!!
@@ -1692,6 +1664,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                         // this.renderPicture();
                         this.renderNoProfileView();
                         break;
+                        */
                     case 'error': 
                         this.renderLayout();
                         this.renderErrorView('Profile is in error state');
@@ -1737,16 +1710,15 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                 this.clearMessages();
                 this.userRecord.profile.userdata = null;
                 this.userRecord.profile.metadata.modified = (new Date()).toISOString();
-                this.saveUserRecord({
-                    success: function() {
-                        this.addSuccessMessage('Your profile has been successfully removed.')
-                        this.render();
-                    }.bind(this),
-                    error: function(err) {
-                        this.renderErrorView(err);
-                    }.bind(this)
-
-                })
+                
+                this.promise(this.userProfileClient, 'set_user_profile', {profile: this.userRecord})
+                .then(function() {
+                  this.addSuccessMessage('Your profile has been successfully removed.');
+                  this.render();
+                }.bind(this))
+                .catch(function(err) {
+                    this.renderErrorView(err);
+                }.bind(this));
             }
         },
 
@@ -1771,17 +1743,18 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                 // wire up basic form crud buttons.
                 $('[data-button="save"]').on('click', function(e) {
                     if (this.updateUserRecordFromForm()) {
-                        this.saveUserRecord({
-                            success: function() {
-                                this.calcState();
-                                this.renderViewEditLayout();
-                                this.addSuccessMessage('Success!', 'Your user profile has been updated.');
-                                this.renderInfoView();
-                            }.bind(this),
-                            error: function(err) {
-                                this.renderErrorView(err);
-                            }.bind(this)
-                        });
+                      
+                      this.promise(this.userProfileClient, 'set_user_profile', {profile: this.userRecord})
+                      .then(function() {
+                        this.calcState();
+                        this.renderViewEditLayout();
+                        this.addSuccessMessage('Success!', 'Your user profile has been updated.');
+                        this.renderInfoView();
+                      }.bind(this))
+                      .catch(function(err) {
+                          this.renderErrorView(err);
+                      }.bind(this));
+                      
                     }
                 }.bind(this));
                 $('[data-button="cancel"]').on('click', function(e) {
@@ -1823,7 +1796,7 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
             }
         },
 
-        renderNoProfileView: {
+        /*renderNoProfileView: {
             value: function() {
                 this.places.content.html(this.renderTemplate('no_profile'));
                 var that = this;
@@ -1849,25 +1822,25 @@ define(['nunjucks', 'jquery', 'md5', 'kbasesocialwidget','kbaseuserprofileservic
                 }
             }
         },
+          */
 
         renderStubProfileView: {
             value: function() {
                 this.renderPicture();
                 this.places.title.html(this.userRecord.user.realname + ' (' + this.userRecord.user.username + ')');
                 this.places.content.html(this.renderTemplate('stub_profile'));
-                var that = this;
+                var widget = this;
                 if (this.isOwner()) {
                     $('[data-button="create-profile"]').on('click', function(e) {
-                        that.createUserRecord({
-                            success: function() {
-                                this.clearMessages();
-                                this.addSuccessMessage('Success!', 'Your user profile has been created.');
-                                this.render();                                
-                            }.bind(that),
-                            error: function(err) {
-                                this.renderErrorView(err);
-                            }.bind(that)
-                        });
+                      widget.profileOptIn()
+                      .then(function () {
+                        widget.clearMessages();
+                        widget.addSuccessMessage('Success!', 'Your user profile has been created.');
+                        widget.render(); 
+                      })
+                      .catch(function(err) {
+                        widget.renderErrorView(err);
+                      });
                     });
                 }
             }

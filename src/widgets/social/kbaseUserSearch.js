@@ -44,7 +44,6 @@ function (SocialWidget, UserProfileService) {
      
     renderLayout: {
         value: function() {
-          console.log('in user search layout');
             this.container.html(this.renderTemplate('layout'));
             this.places = {
             	title: this.container.find('[data-placeholder="title"]'),

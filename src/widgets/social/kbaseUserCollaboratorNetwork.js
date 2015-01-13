@@ -77,6 +77,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
                   def.resolve();                  
                 }.bind(this))
               .catch(function (err) {
+                console.log('error building collab network...'); console.log(err);
                 def.reject(err);
               });
             } else {
@@ -111,7 +112,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
             // TODO: switch from jquery to Q based promises.
             var createUserPermCall = function(wsid) {
               var def = Q.defer();
-              return this.to_promise(this.workspaceClient, 'get_permissions', {id: wsId})
+              return this.to_promise(this.workspaceClient, 'get_permissions', {id: wsid})
               .then(function(permdata) {
                   // save perm data with the workspace
                   // NB: perm data is a map of username => permission
@@ -132,6 +133,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
                     if (permdata.hasOwnProperty(username)) {
                       if (username !== "*" && permdata[username] !== "n") {
                         // Name to be filled in later.
+                        
                         network.users[username] = {
                           name: null
                         };
@@ -166,15 +168,17 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
                 }.bind(this))
                 .catch(function(err) {
                   def.reject(err);
-                  //console.error("Error in finding permissions!");
-                  //console.error(err);
+                  console.error("Error in finding permissions!");
+                  console.error(err);
                 });
+                return def.promise;
             }.bind(this);
 
-            // And here we assmeble the array of calls.
+            
+            // And here we assemble the array of calls.
             // container to store calls to get the people that have share access to each workspace
             var userPermCalls = [];
-            for (var k = 0; k < data.length; k++) {
+            for (var k=0; k<data.length; k++) {
               //tuple<ws_id id, ws_name workspace, username owner, timestamp moddate,
               //int object, permission user_permission, permission globalread,
               //lock_status lockstat, usermeta meptadata> workspace_info
@@ -183,42 +187,52 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
               
               // FIXME: Only consider workspaces which are "modern".
               // At present this means it has a narrative_nice_name
-              if (wsData.metadata.narrative_nice_name) {
-                network.workspaces[wsid] = wsData;
-                network.users[wsData.owner] = {
-                  name: null
-                };
-                userPermCalls.push(createUserPermCall(wsid));
+              try {
+                if (wsData.metadata.narrative && wsData.metadata.is_temporary !== 'true') {
+                  network.workspaces[wsid] = wsData;
+                  network.users[wsData.owner] = {
+                    name: null
+                  };
+                  userPermCalls.push(createUserPermCall(wsid));
+                }
+              } catch (e) {
+                console.log('EX: ' + e);
               }
             }
+            
             // this.render();
+            
             Q.all(userPermCalls)
             .then(function() {
-              var collaborators = this.assembleCollaborators(network);
+              try {
+                var collaborators = this.assembleCollaborators(network);
+              } catch (e) {
+                console.log('EX: '); console.log(e);
+              }
               network.collaborators = collaborators;
               
               // Get user profiles for all the users, update the colloborators adding the real name.
               var collaboratorUsers = this.set_to_array(collaborators);
-              // console.log(collaboratorUsers);
-              this.to_promise(this.userProfileClient, 'get_user_profile', collaboratorUsers)
+              this.promise(this.userProfileClient, 'get_user_profile', collaboratorUsers)
               .then(function (data) {
                   try {
                     for (var i=0; i<data.length; i++) {
                       var username = data[i].user.username;
                       var realname = data[i].user.realname;
                       network.collaborators[username].realname = realname;
-                    }
+                    } 
                   
                     // Now reformat as a list with properties for easier display.
                     network.collaboratorTable = this.obj_to_array(network.collaborators, 'username', function (x) {
                       x.ws = this.set_to_array(x.ws);
                       return x;
                     }.bind(this));
-                    def.resolve(network)
+                    def.resolve(network);
                   } catch (ex) {
+                    console.log('EX:'); console.log(ex);
                     def.reject(ex);
                   }  
-                }.bind(this))
+              }.bind(this))
               .catch(function (err) {
                 def.reject(err);
               });
@@ -231,6 +245,8 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
         .catch(function(err) {
           def.reject(err);
         });
+        
+        return def.promise;
       }
     },
     
@@ -279,6 +295,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
       value: function(network) {
         var collaborators = {};
         if (network.all_links) {
+          // This is the user that we are looking at.
           var thisUser = this.state.currentUserProfile.user.username;
           var links = network.all_links;
         
@@ -289,10 +306,10 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
             // collect links in which the current user is a participant (userA or userB).
             // use a set since there will be duplication (e.g. both relationships A-B, B-A are in the network...)
             if (links[k].userA === thisUser) {
-              this.set_prop_set(this.state.network.collaborators, [link.userB, 'ws'], link.ws);
+              this.set_prop_set(collaborators, [link.userB, 'ws'], link.ws);
             }
             if (links[k].userB === thisUser) {
-              this.set_prop_set(this.state.network.collaborators, [link.userA, 'ws'], link.ws);
+              this.set_prop_set(collaborators, [link.userA, 'ws'], link.ws);
             }
           }
         }
