@@ -92,6 +92,14 @@ var app = angular.module('landing-pages',
         });
 
 
+    // revised output widget test page
+    $stateProvider
+        .state('test', {
+          url: "/test/:type/:ws/:name",
+          templateUrl: 'views/test.html',
+          controller: 'KBaseTables'
+        })
+
     // model viewer routing
     $stateProvider
         .state('ws.mv', {
@@ -192,15 +200,6 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/ws/objs/profile.html',
           controller: 'WBLanding'
         });
-
-    // not in use
-    /*
-    $stateProvider
-        .state('favorites', {
-          url: "/favorites/",
-          templateUrl: 'views/ws/favorites.html',
-          controller: 'Favorites'
-        });*/
 
     // other pages
     $stateProvider
