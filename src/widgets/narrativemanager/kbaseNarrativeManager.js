@@ -6,7 +6,6 @@
  */
 //TODO create the workspace *after* setting everything up
 //TODO handle case when one or more workspaces have had narrative deleted but still have narrative metadata
-//TODO parameters to set field contents: step #, field name, value
 (function( $, undefined ) {
 
     $.KBWidget({
@@ -73,10 +72,16 @@
         showError: function(error) {
             var self = this;
             console.error(error);
+            var message;
+            if (typeof error == "string") {
+                message = error;
+            } else {
+                message = error.message;
+            }
             self.$errorPanel.append($('<div>')
                     .addClass('alert alert-danger alert-dismissible')
                     .attr('role', 'alert')
-                    .append(error.message)
+                    .append(message)
                     .append($('<button>').addClass('close')
                             .attr('type', 'button')
                             .attr('data-dismiss', 'alert')
@@ -99,24 +104,50 @@
             } else if (self.options.params.action === 'new') {
                 self.createNewNarrative(self.options.params);
             } else {
-                self.showError({message: 'action "' +
-                        self.options.params.action +
-                        '" not supported; only "start" or "new" accepted.'});
+                self.showError('action "' + self.options.params.action +
+                        '" not supported; only "start" or "new" accepted.');
             }
         },
         
         createNewNarrative: function(params) {
             var self = this;
+            if (params.app && params.method) {
+                self.showError("Must provide no more than one of the app or method params");
+                return;
+            }
             var importData = null;
             if (params.copydata) {
                 importData = params.copydata.split(';');
             }
+            var appData = null;
+            if (params.appparam) {
+                var tmp = params.appparam.split(';');
+                var appData = [];
+                for (var i = 0; i < tmp.length; i++) {
+                    appData[i] = tmp[i].split(',');
+                    if (appData[i].length != 3) {
+                        self.showError(
+                            "Illegal app parameter set, expected 3 parameters separated by commas: "
+                            + tmp[i]);
+                        return;
+                    }
+                    appData[i][0] = parseInt(appData[i][0]);
+                    if (isNaN(appData[i][0]) || appData[i][0] < 1) {
+                        self.showError(
+                                "Illegal app parameter set, first item in set must be an integer > 0: "
+                                + tmp[i]);
+                        return;
+                    }
+                }
+            }
             var cells = [];
             if (params.app) {
                 cells = [{app: params.app}];
+            } else if (params.method) {
+                cells = [{method: params.method}];
             }
             self.manager.createTempNarrative(
-                    {cells:cells, parameters:[], importData : importData},
+                    {cells:cells, parameters: appData, importData: importData},
                     function(info) {
                         self.redirect(info.nar_info[6], info.nar_info[0]);
                     },
