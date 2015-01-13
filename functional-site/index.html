@@ -100,7 +100,8 @@
         <script src="assets/js/kbclient/wikiScraper.js"></script>
         <script src="assets/js/kbclient/kbaseTrees.js"></script>        
         <script src="assets/js/kbclient/KBaseExpressionClient.js"></script>
-        <script src="assets/js/kbclient/shock.js"></script>        
+        <script src="assets/js/kbclient/shock.js"></script> 
+        <script src="assets/js/kbclient/user_profile_Client.js"></script>       
         <script src="assets/js/widgetMaxWidthCorrection.js"></script>        
 
         <!-- widgets -->
@@ -258,6 +259,22 @@
         <script src="../src/widgets/gwas/kbaseGWASTopVariations.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASTopVariationsTable.js"></script>
         <!-- End GWAS widgets -->
+        
+        <!-- Social widgets -->
+        <!-- <script src="../src/widgets/social/kbaseUserOverview.js"></script> -->
+        <script src="../src/widgets/social/kbaseUserPowerRanking.js"></script>
+        <!-- <script src="../src/widgets/social/kbaseUserRecentActivity.js"></script> 
+        <script src="../src/widgets/social/kbaseUserCollaboratorNetwork.js"></script>-->
+        <script src="../src/widgets/social/kbaseUserProjectMembership.js"></script>
+        <!-- <script src="../src/widgets/social/kbaseUserPopularNarratives.js"></script> -->
+        <script src="../src/widgets/social/kbaseUserTopApps.js"></script>
+        <script src="../src/widgets/social/kbaseUserResourceUsage.js"></script>
+        
+        <script src="../src/widgets/social/apps/kbaseAppOverview.js"></script>
+        <script src="../src/widgets/social/apps/kbaseAppReviews.js"></script>
+        <script src="../src/widgets/social/apps/kbaseAppUsageStats.js"></script>
+        <!-- End Social widgets -->
+        
 
         <!-- KBase new workspace client library javascript -->
         <!-- Syntax Highlighter code -->
@@ -310,7 +327,8 @@
         <script src="js/directives/narrative.js"></script>
         <script src="js/directives/autofillFix.js"></script>
         <script src="js/directives/modeling.js"></script>
-        <script src="js/directives/communities.js"></script>        
+        <script src="js/directives/communities.js"></script>       
+        <script src="js/directives/social.js"></script>         
         <script src="js/controllers.js"></script>
         <!--<script src="js/services/favorites.js"></script>-->
         <script src="js/services/workspaceUI.js"></script>
@@ -319,10 +337,13 @@
         <script src="js/services/narrativeUI.js"></script> 
         <script src="js/kbapi.js"></script>
         <script src="assets/js/header.js"></script>
-        
+              
         <!-- RequireJS should go after all other javascript imports -->
         <script src="../ext/requirejs/2.1.9/require.js"></script>
+        <script src="js/require-config.js"></script>
+        
         <!-- end application -->
+        
     </head>
 
     <body>

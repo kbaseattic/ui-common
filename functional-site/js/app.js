@@ -20,6 +20,7 @@ var cardManager = undefined;
 
 var app = angular.module('landing-pages', 
     ['lp-directives', 'card-directives',
+     'social-directives',
      'trees-directives', 
      'ws-directives', 'modeling-directives', 'angular-json-rpc',
      'communities-directives', 'narrative-directives',
@@ -530,6 +531,19 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		templateUrl: 'views/objects/msa.html',
 		controller: 'MSADetail'});
 
+    $stateProvider
+	.state('people',
+		{url: '/people/:userid',
+		templateUrl: 'views/social/sortable-rows-people.html',
+		controller: 'People'});
+    /* this app page should no longer be used....
+     *$stateProvider
+	.state('app',
+		{url: '/app/:appid',
+		templateUrl: 'views/social/sortable-rows-app.html',
+		controller: 'App'}); */
+                
+                
     $stateProvider
 	.state('kidledttype',
 		{url: '/kidledt/:mod/:type',
