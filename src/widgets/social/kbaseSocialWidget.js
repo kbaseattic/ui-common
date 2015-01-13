@@ -690,7 +690,7 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           $('<link>')
           .appendTo('head')
           .attr({type: 'text/css', rel: 'stylesheet'})
-          .attr('/src/widgets/social/' + this.widgetName + '/style.css');
+          .attr('href', '/src/widgets/social/' + this.widgetName + '/style.css');
         }
       },
 
