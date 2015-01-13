@@ -87,6 +87,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
         var nar_name = "Narrative."+id;
         
         console.log("creating " + nar_name);
+        console.log(params);
         
         var wsMetaData = {
             'narrative' : nar_name,
@@ -174,7 +175,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                             console.error(error);
                                             if(_error_callback) {
                                                 _error_callback(error.error);
-                                                }
+                                            }
                                         });
                                     
                                 } else {
@@ -469,7 +470,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
                             if(_error_callback) { _error_callback(error.error); }
                         }));
             }
-            if (methodSpecIds.length>0) {
+            if (methodSpecIds.length>0) { // currently ununsed by kbaseNarrativeManager
                 getSpecsJobs.push(
                     self.nms.get_method_spec({ids:methodSpecIds},
                         function(methodSpecs) {

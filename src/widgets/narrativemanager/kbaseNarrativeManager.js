@@ -4,7 +4,6 @@
  * @author Michael Sneddon <mwsneddon@lbl.gov>
  * @public
  */
-//TODO if the app doesn't exist, display message
 //TODO create the workspace *after* setting everything up
 //TODO handle case when one or more workspaces have had narrative deleted but still have narrative metadata
 //TODO parameters to set field contents: step #, field name, value
