@@ -50,12 +50,11 @@ $.KBWidget({
                 data: JSON.stringify(rpc),
                 beforeSend: function (xhr) {
                     if ('token' in input)
-                        xhr.setRequestHeader("Authorization", token);
+                        xhr.setRequestHeader("Authorization", input.token);
                 }
             }).then(function(data) {
                 return data.result[0];
             })
-
 
             return prom;
         }

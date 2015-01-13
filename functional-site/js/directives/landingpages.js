@@ -10,12 +10,13 @@
 
 angular.module('lp-directives', []);
 angular.module('lp-directives')
-.directive('kbTables', function() {
+.directive('kbTables', function($rootScope) {
     return {
         link: function(scope, elem, attr) {
             var params = {type: attr.kbTables,
                           ws: attr.kbTablesWs,
-                          name: attr.kbTablesName};
+                          name: attr.kbTablesName,
+                          token: $rootScope.USER_TOKEN};
 
             $(elem).kbaseTabTable(params);
         }

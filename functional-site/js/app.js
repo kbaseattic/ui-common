@@ -635,6 +635,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     //kb.nar.ensure_home_project(USER_ID);
 
     $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
+    $rootScope.USER_TOKEN = USER_TOKEN;
 
     // global state object to store state
     state = new State();
