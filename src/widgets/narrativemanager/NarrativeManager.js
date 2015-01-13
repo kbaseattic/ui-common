@@ -86,7 +86,8 @@ var NarrativeManager = function(options, auth, auth_cb) {
         var ws_name = this.user_id + ":" + id;
         var nar_name = "Narrative."+id;
         
-        console.log("creating "+name);
+        console.log("creating " + nar_name);
+        console.log(params);
         
         var wsMetaData = {
             'narrative' : nar_name,
@@ -140,7 +141,8 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                 var returnData = {ws_info:ws_info, nar_info: obj_info_list[0]};
                                 
                                 // 5) now we copy everything that we need
-                                if(params.importData) {
+                                if (params.importData != null &&
+                                        params.importData != false) {
                                     var copyobjs = [];
                                     for(var cj=0; cj<params.importData.length; cj++) {
                                         copyobjs.push({ref:params.importData[cj]});
@@ -157,7 +159,11 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                                             to: { wsid:ws_info[0], name:infoList[il][1]  }
                                                         },
                                                         function(info) { console.log('copied'); console.log(info); },
-                                                        function(error){ console.error(error); }
+                                                        function(error){
+                                                            if (_error_callback) {
+                                                                _error_callback(error.error);
+                                                            }
+                                                        }
                                                     )
                                                 )
                                             }
@@ -167,7 +173,9 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                         },
                                         function(error) {
                                             console.error(error);
-                                            if(_error_callback) { _error_callback(error); }
+                                            if(_error_callback) {
+                                                _error_callback(error.error);
+                                            }
                                         });
                                     
                                 } else {
@@ -176,7 +184,9 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                 
                             }, function (error) {
                                 console.error(error);
-                                if(_error_callback) { _error_callback(error); }
+                                if(_error_callback) {
+                                    _error_callback(error.error);
+                                }
                             });
                     },
                     _error_callback
@@ -184,7 +194,9 @@ var NarrativeManager = function(options, auth, auth_cb) {
             },
             function(error) {
                 console.error(error);
-                if(_error_callback) { _error_callback(error); }
+                if(_error_callback) {
+                    _error_callback(error.error);
+                }
             }
         );
     };
@@ -203,7 +215,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
      * if there are no available narratives, this will set last_narrative:null
      *
      */
-    this.detectStartSettings = function(params, _callback, _error_callback) {
+    this.detectStartSettings = function(_callback, _error_callback) {
         var self=this;
         var emptyResult = {last_narrative:null};
         
@@ -251,17 +263,25 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                     if (objList[0]) {
                                         _callback({last_narrative:{ws_info:mine[0], nar_info:objList[0]}});
                                     } else {
-                                        _error_callback("Unable to load recent narrative.");
+                                        if (_error_callback) {
+                                            _error_callback({message: 
+                                                    "Unable to load recent narrative."});
+                                        }
                                     }
                                 },
                                 function(error) {
-                                    _error_callback(error);
+                                    if (_error_callback) {
+                                        _error_callback(error.error);
+                                    }
                                 });
                 } else {
                     _callback(emptyResult);
                 }
             },
             function (error) {
+                if (_error_callback) {
+                    _error_callback(error.error);
+                }
                 console.error(error);
             });
     };
@@ -336,7 +356,10 @@ var NarrativeManager = function(options, auth, auth_cb) {
                             else {
                                 console.error('cannot add cell '+c+', unrecognized cell content');
                                 console.error(cells[c]);
-                                if(_error_callback) { _error_callback('cannot add cell '+c+', unrecognized cell content'); }
+                                if(_error_callback) {
+                                    _error_callback({message: 'cannot add cell '
+                                        + c + ', unrecognized cell content'});
+                                }
                             }
                         }
                     } else {
@@ -444,10 +467,10 @@ var NarrativeManager = function(options, auth, auth_cb) {
                         function(error) {
                             console.error("error getting app specs:");
                             console.error(error);
-                            if(_error_callback) { _error_callback(); }
+                            if(_error_callback) { _error_callback(error.error); }
                         }));
             }
-            if (methodSpecIds.length>0) {
+            if (methodSpecIds.length>0) { // currently ununsed by kbaseNarrativeManager
                 getSpecsJobs.push(
                     self.nms.get_method_spec({ids:methodSpecIds},
                         function(methodSpecs) {
@@ -458,7 +481,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
                         function(error) {
                             console.error("error getting method specs:");
                             console.error(error);
-                            if(_error_callback) { _error_callback(); }
+                            if(_error_callback) { _error_callback(error.error); }
                         }));
             }
             
