@@ -5,6 +5,9 @@ define('jquery', [], function() {
 define('kbaseuserprofileserviceclient', [], function() {
   return UserProfile;
 });
+define('kbaseworkspaceserviceclient', [], function() {
+  return Workspace;
+})
 require.config({
     baseUrl: '/',
     catchError: true,
@@ -14,9 +17,11 @@ require.config({
     paths: {
       nunjucks: '/ext/nunjucks/nunjucks.min',
       md5: '/ext/md5/md5',
+      q: '/ext/q/q.min',
 
       domReady: '/ext/require-plugins/domReady', 
     	text: '/ext/require-plugins/text',
+      json: '/ext/require-plugins/json', 
 
 
       // widgets
@@ -24,16 +29,23 @@ require.config({
       kbasesocialwidget: '/src/widgets/social/kbaseSocialWidget',
       kbaseuserprofilewidget: '/src/widgets/social/kbaseUserProfile',
       kbaseuserrecentactivity: '/src/widgets/social/kbaseUserRecentActivity',
-      kbaseuserpopularnarratives: '/src/widgets/social/kbaseUserPopularNarratives'
+      kbaseuserpopularnarratives: '/src/widgets/social/kbaseUserPopularNarratives',
+      kbaseusercollaboratornetwork: '/src/widgets/social/kbaseUserCollaboratorNetwork',
+      kbaseusersearch: '/src/widgets/social/kbaseUserSearch',
+      kbaseuserbrowsenarratives: '/src/widgets/social/kbaseUserBrowseNarratives',
+      kbaseusersummary: '/src/widgets/social/kbaseUserSummary'
     },
    shim: { 
     'kbaseuserprofileserviceclient': {
       exports: 'UserProfile'
-    },
-    jsx: {
-      fileExtension: '.jsx',
-      harmony: true,
-      stripTypes: true
-    }
-  }
+     },
+     'kbaseworkspaceserviceclient': {
+       exports: 'Workspace'
+      },
+     q: {
+       exports: 'Q'
+     }
+   }
+    
+  
 });

@@ -79,10 +79,47 @@
             else {
                 chips = {};
             }
+            
+            // EAP - I don't want to do this yet without some consent -- I wonder how deprecations are handled, I haven't seen any other console messages.
+            //if (field) {
+            //  console.log('Deprecation Warning: get_kbase_cookie should not be used to fetch a kbase session property -- use get_kbase_session_prop instead.');
+            //}
 
             return field == undefined
                 ? chips
                 : chips[field];
+        },
+        
+        get_session_prop : function (name) {
+            // This cookie check handles the case of logging out of kbase in some way which 
+            // does not affect localstorage.
+            // NB. This should be handled in the widget in such a way that a missing cookie also 
+            // removes the session from localStorage. Otherwise the invalid session may leak through,
+            // and it certainly is still available in the browser which might be surprising to the 
+            // curious user.
+            if (!$.cookie(this.cookieName)) {
+              return null;
+            }
+
+            var sessionString = localStorage.getItem('kbase_session');
+
+            // LocalStorage should return null if not found, but play it safe, knowing that
+            // the 
+            if (!sessionString) {
+              return null;
+            }
+            
+            try {
+              var session = JSON.parse(sessionString);    
+              return session[name];
+            } catch (e) {
+              if (e instanceof SyntaxError) {
+                console.log('ERROR parsing session string: ' + e.message);
+              } else {
+                console.log('ERROR getting session property: ' + e);
+              }
+              return null;
+            }
         },
 
         sessionId : function () {

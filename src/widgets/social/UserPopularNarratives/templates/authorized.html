@@ -1,8 +1,8 @@
 <table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped">
 
-{% if data.popularNarratives | length > 0 %}
+{% if state.popularNarratives | length > 0 %}
 
-{% for narrative in data.popularNarratives %}
+{% for narrative in state.popularNarratives %}
 	<tr>
 		{# <td>{{narrative.type | typeIcon }}</td> 
 		<td><b>{{narrative.type}}</b> - {{narrative.name}}<br><i>modified on {{narrative.save_date | dateFormat }}</i></td>
