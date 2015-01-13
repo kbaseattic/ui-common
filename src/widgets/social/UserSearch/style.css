@@ -17,11 +17,17 @@
   right: 0; 
   border: 1px silver solid; 
 }
-.UserSearch .search-results .results-wrapper .results {
+.UserSearch .search-results .results {
   background-color: #FFF; 
   padding: 10px; 
   width: 100%;
 }
+.UserSearch .search-results .results {
+ 
+}
+.UserSearch .search-results .results td {
+  padding: 4px;
+}
 .UserSearch .search-results .avatar {
-  width: 50px;
+  width: 40px;
 }

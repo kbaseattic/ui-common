@@ -6,9 +6,6 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbasesocialwidget', 'kbaseuserprofile
 
       init: {
         value: function(cfg) {
-          console.log('config in user profile');
-           console.log(cfg);
-          
           cfg.name = 'UserProfile';
           cfg.title = 'User Profile';
           

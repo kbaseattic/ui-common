@@ -5,9 +5,9 @@
 	{% else %}
 
 		<p>Found {{ state.searchResults | length }} users.</p>
-		<div style="position: relative; z-index: 2; left:0; right: 0 ">
-			<div style="position: absolute; max-height: 300px; overflow-y:auto; left:0; right: 0; border: 1px silver solid; ">
-				<table class="table table-striped" style="background-color: #FFF; padding: 10px; width: 100%">
+		<div class="results-wrapper">
+			<div class="results-container">
+				<table class="results" >
 				{% for result in state.searchResults %}
 					<tr>
 					  <td>

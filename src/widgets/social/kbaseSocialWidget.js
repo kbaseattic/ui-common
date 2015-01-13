@@ -144,11 +144,6 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           if (typeof this.container === 'string') {
             this.container = $(this.container);
           }
-          
-          console.log('container');
-          console.log(this.container);
-          
-          
 
           // OTHER CONFIG
           // The widget requires a name to use for various purposes.
@@ -690,7 +685,7 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           $('<link>')
           .appendTo('head')
           .attr({type: 'text/css', rel: 'stylesheet'})
-          .attr('href', '/src/widgets/social/' + this.widgetName + '/style.css');
+          .attr('href', '/src/widgets/social/' + this.widgetName + '/style.css?force='+this.genId());
         }
       },
 
