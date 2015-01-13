@@ -1,11 +1,15 @@
 
+<div class="container">
+	<h4>This is a page to test new or refactored output widgets</h4>
+	<br>
 
-<h4>This is a page to test new or refactored output widgets</h4>
-<br>
+	<b>type:</b> {{info.type}} <br>
+	<b>workspace:</b> {{info.ws}} <br>
+	<b>object name:</b> {{info.name}} <br>
+	<br>
 
-<b>type:</b> {{info.type}} <br>
-<b>workspace:</b> {{info.ws}} <br>
-<b>object name:</b> {{info.name}} <br>
-
-
-<div kb-tables="{{info.type}}" kb-tables-ws="{{info.ws}}" kb-tables-name="{{info.name}}"></div>
+	<div kb-tables="{{info.type}}"
+		 kb-tables-ws="{{info.ws}}"
+		 kb-tables-name="{{info.name}}">
+	</div>
+</div>

@@ -135,7 +135,8 @@ $.KBWidget({
             var settings = {dom: '<"top"lf>rt<"bottom"ip><"clear">',
                             aaData: data[tab.key],
                             aoColumns: tableColumns,
-                            oLanguage: {sSearch: 'Search '+tab.name+':'}}
+                            language: { search: "_INPUT_",
+                                        searchPlaceholder: 'Search '+tab.name}}
 
             // add any events
             for (var i=0; i<tab.columns.length; i++) {
@@ -218,6 +219,11 @@ $.KBWidget({
 
             for (var i=0; i<rows.length; i++) {
                 var row = rows[i];
+
+                // don't display undefined things in vertical table
+                if ('data' in row && typeof row.data == 'undefined' ||
+                    'key' in row && typeof data[row.key] == 'undefined')
+                    continue
 
                 // if the data is in the row definition, use it
                 if ('data' in row)
