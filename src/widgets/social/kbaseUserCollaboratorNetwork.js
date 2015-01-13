@@ -50,39 +50,38 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
       }
     },
     
-		setCurrentState: {
+		setInitialState: {
 			value: function(options) {
-        var def = Q.defer();
-        
-        // get the current user profile...
-        if (!this.isLoggedIn()) {
-          //options.error('Not authorized');
-          def.resolve();
-        } else {
-          //def.resolve();
-          //return def.promise;
-          this.promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
-          .then(function(data) {
-            if (data && data[0]) {
-              this.setState('currentUserProfile', data[0]);                
-              this.buildCollaboratorNetwork()
-              .then(function(network) {
-                  this.setState('network', network);
-                  def.resolve();                  
-                }.bind(this))
-              .catch(function (err) {
-                console.log('error building collab network...'); console.log(err);
-                def.reject(err);
-              });
-            } else {
-              def.reject('User not found');
-            }
-          }.bind(this))
-          .catch(function (err) {
-            def.reject(err);
-          });
-        }
-        return def.promise;
+        return Q.Promise(function (resolve, reject, notify) {
+          // console.log(this.initConfig);
+          
+          if (!this.isLoggedIn()) {
+            resolve();
+          } else {
+            this.promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
+            .then(function(data) {
+              if (data && data[0]) {
+                this.setState('currentUserProfile', data[0]);    
+                      
+                this.buildCollaboratorNetwork()
+                .then(function(network) {
+                    this.setState('network', network);
+                    resolve();                  
+                  }.bind(this))
+                .catch(function (err) {
+                  console.log('error building collab network...'); console.log(err);
+                  reject(err);
+                });
+              } else {
+                reject('User not found');
+              }
+            }.bind(this))
+            .catch(function (err) {
+              console.log('error'); console.log(err);
+              reject(err);
+            });
+          }
+        }.bind(this));
       }
 		},
     

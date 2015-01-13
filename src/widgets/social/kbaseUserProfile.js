@@ -96,7 +96,6 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbasesocialwidget', 'kbaseuserprofile
           this.setupUI();
           this.renderWaitingView();
           var widget = this;
-
           this.setInitialState()
           .then(function() {
             
