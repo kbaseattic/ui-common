@@ -22,12 +22,14 @@
         typereg: {'KBaseFile.SingleEndLibrary':
                        {nicetype: 'Single End Read Library',
                         app_name: 'Assembly and Annotation',
-                        app: 'genome_assembly'
+                        app: 'genome_assembly',
+                        appParam: '1,read_library,'
                         },
                    'KBaseFile.PairedEndLibrary':
                        {nicetype: 'Paired End Read Library',
                         app_name: 'Assembly and Annotation',
-                        app: 'genome_assembly'
+                        app: 'genome_assembly',
+                        appParam: '1,read_library,'
                         },
                    'KBaseFile.AssemblyFile':
                        {nicetype: 'Assembly File',
@@ -166,6 +168,8 @@
             if (typeInfo.app != null) {
                 $buttonDiv.append($('<a href="#/narrativemanager/new?copydata='
                                         + permref + '&app=' + typeInfo.app +
+                                        '&appparam=' + typeInfo.appParam +
+                                        self.objData.name +
                                         '">').addClass('btn btn-info')
                             .css({'margin':'5px'})
                             .append('Launch ' + typeInfo.app_name + ' App'));
