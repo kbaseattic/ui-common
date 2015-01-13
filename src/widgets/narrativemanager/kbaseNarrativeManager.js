@@ -6,7 +6,7 @@
  */
 //TODO create the workspace *after* setting everything up
 //TODO handle case when one or more workspaces have had narrative deleted but still have narrative metadata
-//TODO parameters to set field contents: step #, field name, value
+//TODO handle parameters in narr method creation method
 (function( $, undefined ) {
 
     $.KBWidget({
