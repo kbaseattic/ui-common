@@ -544,13 +544,12 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		{url: '/people/:userid',
 		templateUrl: 'views/social/sortable-rows-people.html',
 		controller: 'People'});
-    /* this app page should no longer be used....
-     *$stateProvider
-	.state('app',
-		{url: '/app/:appid',
-		templateUrl: 'views/social/sortable-rows-app.html',
-		controller: 'App'}); */
-                
+    
+    $stateProvider
+	.state('narrativestore',
+		{url: '/narrativestore/:type/:id',
+		templateUrl: 'views/narrative/narrative-store.html',
+		controller: 'NarrativeStore'});
                 
     $stateProvider
 	.state('kidledttype',

@@ -1639,4 +1639,33 @@ angular.module('lp-directives')
 })
 
 
+
+.directive('narrativestore', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            
+            
+            /* don't use the draggable rows style because there is just one row!
+            /*var p = $(ele).kbasePanel({title: 'Imported JGI Data',
+                                           rightLabel: '', //scope.params.ws,
+                                           subText: '' }); //scope.params.obj});*/
+            
+            /* simplified panel that cannot be closed or dragged */
+            var $panel = $('<div class="panel panel-default">'+
+                                '<div class="panel-heading">'+
+                                    '<span class="panel-title"></span>'+
+                                '</div>'+
+                                '<div class="panel-body"></div>'+
+                           '</div>');
+            $(ele).append($panel);
+            $panel.find('.panel-title').append('Narrative Apps and Methods Documentation');
+            $panel.find('.panel-body').KBaseNarrativeStoreView({
+                    ws:   scope.params.ws,
+                    obj:  scope.params.obj,
+                    loadingImage: "assets/img/ajax-loader.gif"
+                });
+        }
+    };
+})
+
 ;

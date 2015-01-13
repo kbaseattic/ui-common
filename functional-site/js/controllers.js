@@ -802,6 +802,10 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     $scope.params = $stateParams;
 })
 
+.controller('NarrativeStore', function($scope, $stateParams) {
+    $scope.params = $stateParams;
+})
+
 
 function LPHelp($scope, $stateParams, $location) {
     // Fixme: move out of controller
