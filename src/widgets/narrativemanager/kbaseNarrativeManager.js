@@ -6,7 +6,6 @@
  */
 //TODO create the workspace *after* setting everything up
 //TODO handle case when one or more workspaces have had narrative deleted but still have narrative metadata
-//TODO handle parameters in narr method creation method
 (function( $, undefined ) {
 
     $.KBWidget({
@@ -112,6 +111,10 @@
         
         createNewNarrative: function(params) {
             var self = this;
+            if (params.app && params.method) {
+                self.showError("Must provide no more than one of the app or method params");
+                return;
+            }
             var importData = null;
             if (params.copydata) {
                 importData = params.copydata.split(';');
@@ -140,6 +143,8 @@
             var cells = [];
             if (params.app) {
                 cells = [{app: params.app}];
+            } else if (params.method) {
+                cells = [{method: params.method}];
             }
             self.manager.createTempNarrative(
                     {cells:cells, parameters: appData, importData: importData},

@@ -439,7 +439,6 @@ var NarrativeManager = function(options, auth, auth_cb) {
     };
     
     this._buildMethodCell = function(pos,spec, params) {
-        //TODO handle params
         var cellId = 'kb-cell-'+pos+'-'+this._uuidgen();
         var cell = {
             cell_type: 'markdown',
@@ -452,7 +451,16 @@ var NarrativeManager = function(options, auth, auth_cb) {
         var cellInfo = {};
         cellInfo[this.KB_TYPE] = this.KB_FUNCTION_CELL;
         cellInfo['method'] = spec;
-        cellInfo[this.KB_STATE] = [];
+        var widgetState = [];
+        if (params) {
+            var wparams = {};
+            for (var i = 0; i < params.length; i++) {
+                wparams[params[i][1]] = params[i][2];
+            }
+            var state = {state: wparams};
+            widgetState.push(state);
+        }
+        cellInfo[this.KB_STATE] = widgetState;
         cellInfo['widget'] = spec.widgets.input;
         cell.metadata[this.KB_CELL] = cellInfo;
         return cell;
