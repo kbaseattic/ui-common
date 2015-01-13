@@ -1,3 +1,4 @@
+/* Edit template */
 .user-profile-widget .profile-editor .name-panel .form-group {
 	margin: 0 10px;
 }
@@ -33,23 +34,23 @@
     display: block;
 }
 */
-.user-profile-widget .profile-info h2 {
+.user-profile-widget .profile-view-view h2 {
     margin: 0;
 }
 
 /* View Template */
-.user-profile-widget .profile-info h3 {
+.user-profile-widget .profile-view-view h3 {
     font-size: 130%;
     margin: 10px 0 5px 0;
     text-decoration: underline;
   }
-.user-profile-widget .profile-info ul {
+.user-profile-widget .profile-view-view ul {
     padding: 0;
   }
-.user-profile-widget .profile-info ul li {
+.user-profile-widget .profile-view-view ul li {
     margin: 0;
   }
-.user-profile-widget .profile-info .personal-statement {
+.user-profile-widget .profile-view-view .personal-statement {
     margin: 20px 0 0 0;
     line-height: 1.5;
   }

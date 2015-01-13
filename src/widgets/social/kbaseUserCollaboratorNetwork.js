@@ -8,20 +8,6 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
 				cfg.title = 'Common Collaborator Network';
 				this.SocialWidget_init(cfg);
         
-        // PARAMS
-        this.params = {}
-
-        if (!cfg.userId) {
-          throw 'The userId is required for this widget but was not provided';
-        }
-        this.params.userId = cfg.userId;
-        
-        $.ajaxSetup({
-            timeout: 10000
-        });
-        
-        this.syncApp();
-        
         return this;
 			}
 		},
@@ -33,7 +19,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
       }
     },
     
-    syncApp: {
+    setup: {
       value: function () {
         // Set up workspace client
 				if (this.isLoggedIn()) {
@@ -51,14 +37,20 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
           } else {
 					  throw 'The user profile client url is not defined';
 				  }
-        }  else {
+          
+          if (!this.hasConfig('userId')) {
+            throw 'The userId is required for this widget but was not provided';
+          }
+          this.setParam('userId', this.getConfig('userId'));
+          
+        } else {
           this.workspaceClient = null;
           this.userProfileClient = null;
         }      
       }
     },
     
-		getCurrentState: {
+		setCurrentState: {
 			value: function(options) {
         var def = Q.defer();
         
@@ -69,7 +61,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
         } else {
           //def.resolve();
           //return def.promise;
-          this.to_promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
+          this.promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
           .then(function(data) {
             if (data && data[0]) {
               this.setState('currentUserProfile', data[0]);                
@@ -106,7 +98,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
           users: {},
           all_links: []
         };
-        this.to_promise(this.workspaceClient, 'list_workspace_info', {excludeGlobal: 1})
+        this.promise(this.workspaceClient, 'list_workspace_info', {excludeGlobal: 1})
         .then(function(data) {
             // A function which modifies the widget state to help build the network and associated
             // data objects for a single workspace. The function is returned so that it can be run
@@ -114,7 +106,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
             // TODO: switch from jquery to Q based promises.
             var createUserPermCall = function(wsid) {
               var def = Q.defer();
-              return this.to_promise(this.workspaceClient, 'get_permissions', {id: wsid})
+              return this.promise(this.workspaceClient, 'get_permissions', {id: wsid})
               .then(function(permdata) {
                   // save perm data with the workspace
                   // NB: perm data is a map of username => permission

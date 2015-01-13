@@ -11,8 +11,9 @@ angular.module('social-directives')
 .directive('socialuserprofile', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            require(['kbaseuserprofilewidget'], function(userProfileWidget) {
-                var widget = Object.create(userProfileWidget);
+          "use strict";
+            require(['kbaseuserprofilewidget', 'jquery'], function(W, $) {
+                var widget = Object.create(W);
                 widget.init({
                     container: $(ele),
                     userId: scope.params.userid
