@@ -1,0 +1,25 @@
+<table class="table table-bordered table-striped" id="collaborator_table_{{generatedId}}">
+	<thead>
+	<tr>
+		<th>Name</th>
+		<th>Username</th>
+		<th>In common</th>
+	</tr>
+	</thead>
+	<tbody>
+{% for user in state.network.collaboratorTable %}
+	<tr>
+		<td>{{user.realname}}</td>
+		<td>{{user.username}}</td>
+		<td>{{user.ws | length}}</td>
+	</tr>
+{% endfor %}
+	</tbody>
+</table>
+
+<script>
+require(['jquery'], function ($) {
+	$('#collaborator_table_{{generatedId}}').DataTable();
+});
+
+</script>
