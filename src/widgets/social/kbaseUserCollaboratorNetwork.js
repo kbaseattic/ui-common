@@ -67,9 +67,11 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
           //options.error('Not authorized');
           def.resolve();
         } else {
+          //def.resolve();
+          //return def.promise;
           this.to_promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
           .then(function(data) {
-            if (data) {
+            if (data && data[0]) {
               this.setState('currentUserProfile', data[0]);                
               this.buildCollaboratorNetwork()
               .then(function(network) {

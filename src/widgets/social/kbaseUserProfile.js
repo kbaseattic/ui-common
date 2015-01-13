@@ -100,10 +100,14 @@ define(['nunjucks', 'jquery', 'md5', 'q',  'kbasesocialwidget','kbaseuserprofile
                 if (this.isLoggedIn()) {
                     if (this.userRecord) {
                         if (this.userRecord.user) {
-                            if (this.userRecord.profile.userdata) {
-                                this.profileStatus = 'profile';
+                            if (this.userRecord.profile) {
+                              if (this.userRecord.profile.userdata) {
+                                  this.profileStatus = 'profile';
+                              } else {
+                                  this.profileStatus = 'stub';
+                              }                              
                             } else {
-                                this.profileStatus = 'stub';
+                              this.profileStatus = 'stub';
                             }
                         } else {
                             if (this.userRecord.profile.account) {
@@ -175,7 +179,7 @@ define(['nunjucks', 'jquery', 'md5', 'q',  'kbasesocialwidget','kbaseuserprofile
                 
                 var widget = this;
                 if (this.userRecord) {
-                    if (this.userRecord.profile.account) {
+                    if (this.userRecord.profile && this.userRecord.profile.account) { 
                         // We are all good here... nothing to do.                      
                       def.resolve();
                     } else {
@@ -184,7 +188,12 @@ define(['nunjucks', 'jquery', 'md5', 'q',  'kbasesocialwidget','kbaseuserprofile
                         // condition, after testing.
                       this.promise(this.userProfileClient, 'lookup_globus_user', [this.params.userId])
                       .then(function (data) {
-                        widget.userRecord.profile.account = data[this.params.userId];
+                        if (!widget.userRecord.profile) {
+                          widget.userRecord.profile = {
+                            account: data[widget.params.userId]
+                          }
+                        } 
+                        // widget.userRecord.profile.account = data[this.params.userId];
                         widget.promise(widget.userProfileClient, 'set_user_profile', {profile: widget.userRecord})
                         .then(function() {
                           def.resolve();
@@ -265,14 +274,16 @@ define(['nunjucks', 'jquery', 'md5', 'q',  'kbasesocialwidget','kbaseuserprofile
 
         go: { 
             value: function() {
+              
                 this.renderLayout();
                 this.renderWaitingView();
                 var widget = this;
-                
+               
                 this.getCurrentState()
                 .then(function() {
+                 
                   if (widget.isOwner()) {
-                    
+                     
                     widget.fixProfile()
                     .then(function () {
                       widget.render();
@@ -282,6 +293,7 @@ define(['nunjucks', 'jquery', 'md5', 'q',  'kbasesocialwidget','kbaseuserprofile
                       widget.renderErrorView(err);
                     });
                   } else {
+                    
                     widget.calcState();
                     widget.render();
                   }
