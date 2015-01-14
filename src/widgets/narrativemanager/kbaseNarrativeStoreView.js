@@ -126,8 +126,10 @@
                             });
 		    },
 		    function(err) {
-			self.showError(err);
+                        // try loading it as an app, temp hack since app page is new ...
 			console.error(err);
+                        self.fetchAppInfoAndRender();
+			//self.showError(err);
 		    });
 	},
         
@@ -143,7 +145,7 @@
 	    var $header = $('<div>').addClass("row").css("width","95%");
 	    var $basicInfo = $('<div>').addClass("col-md-8");
 	    
-	    $basicInfo.append('<div><h2>'+m['name']+'</h2>');
+	    $basicInfo.append('<div><h2>App - '+m['name']+'</h2>');
 	    if (m['subtitle']) {
 		$basicInfo.append('<div><h4>'+m['subtitle']+'</h4></div>');
 	    }
@@ -291,7 +293,7 @@
 	    var $header = $('<div>').addClass("row").css("width","95%");
 	    var $basicInfo = $('<div>').addClass("col-md-8");
 	    
-	    $basicInfo.append('<div><h2>'+m['name']+'</h2>');
+	    $basicInfo.append('<div><h2>Method - '+m['name']+'</h2>');
 	    if (m['subtitle']) {
 		$basicInfo.append('<div><h4>'+m['subtitle']+'</h4></div>');
 	    }
