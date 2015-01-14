@@ -9,7 +9,7 @@
 	<tbody>
 {% for user in state.network.collaboratorTable %}
 	<tr>
-		<td>{{user.realname}}</td>
+		<td><a href="/functional-site/#/people/{{user.username}}">{{user.realname}}</a></td>
 		<td>{{user.username}}</td>
 		<td>{{user.ws | length}}</td>
 	</tr>

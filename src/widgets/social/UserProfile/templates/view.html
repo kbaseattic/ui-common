@@ -1,28 +1,10 @@
-
-<style type="text/css">
-  .profile-info h3 {
-    font-size: 130%;
-    margin: 10px 0 5px 0;
-    text-decoration: underline;
-  }
-  .profile-info ul {
-    padding: 0;
-  }
-  .profile-info ul li {
-    margin: 0;
-  }
-  .profile-info .personal-statement {
-    margin: 20px 0 0 0;
-    line-height: 1.5;
-  }
-</style>
-<div class="profile-info">
+<div class="profile-view-view">
   <div class="row">
-    <div class="col-md-9">
+    <div class="col-md-8">
       <h2>{% if userRecord.profile.userdata.title %}{{userRecord.profile.userdata.title | titleLabel }} {% endif %}{{userRecord.user.realname | e}}{% if userRecord.profile.userdata.suffix %}, {{userRecord.profile.userdata.suffix | e}}{% endif %}</h2>
       {% if env.isOwner and userRecord.user.realname != userRecord.profile.account.fullName %}<p class="text-warning">Note: The name on your account is <i>{{ userRecord.profile.account.fullName }}</i>.</p>{% endif %}
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
 
       {% if env.isOwner %}
       <div class="btn-group pull-right">
