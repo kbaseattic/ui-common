@@ -393,3 +393,6 @@ function KBase_FBAModel(modeltabs) {
     };
 
 }
+
+// make method of base class
+KBObjects.prototype.KBaseFBA_FBAModel = KBase_FBAModel;

@@ -59,15 +59,13 @@ $.KBWidget({
             return prom;
         }
 
+        // base class for workspace object classes
+        var kbObjects = new KBObjects();
 
         //
-        // 1) Looks at the type and instantiate the object
+        // 1) Use type (periods replaced with underscores) to instantiate object
         //
-        var obj;
-        if (type == "KBaseFBA.FBAModel")
-            obj = new KBase_FBAModel(self);
-        else if (type == "KBaseFBA.FBA")
-            obj = new KBase_FBA(self);
+        obj = new kbObjects[type.replace(/\./g, '_')](self);
 
         //
         // 2) add the tabs
@@ -354,3 +352,5 @@ $.KBWidget({
     }
 })
 }( jQuery ) );
+
+
