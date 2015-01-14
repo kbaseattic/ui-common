@@ -1,3 +1,13 @@
+{% if env.isOwner %}
+	<p>This table shows your "Collaborators" - other KBase users who have access to Narratives to which you also have access.</p>
+{% else %} 
+	<p>This shows your "Common Collborators" - other KBase users who have access to  
+Narratives to which both you and {{state.currentUserProfile.user.realname}} have access.
+</p>
+	<p>To see all of your collaborators, visit <a href="/functional-site/#/people/{{env.loggedInUser}}">your profile.</a>
+</p>
+{% endif %}
+
 <table class="table table-bordered table-striped" id="collaborator_table_{{generatedId}}">
 	<thead>
 	<tr>

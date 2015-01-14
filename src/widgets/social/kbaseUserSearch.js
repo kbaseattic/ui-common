@@ -58,6 +58,18 @@ function (SocialWidget, UserProfileService) {
               } else {
                 widget.promise(widget.userProfileClient, 'filter_users', {filter: widget.params.searchText})
                 .then(function (users) {
+                    users.sort(function(a, b) {
+                      var aName = a.realname.toLowerCase();
+                      var bName = b.realname.toLowerCase();
+                      if (aName < bName) {
+                        return -1;
+                      } else if (aName > bName) {
+                        return 1;
+                      } else {
+                        return 0;
+                      }
+                    });
+                  
                     widget.setState('searchResults', users);
                 })
                 .catch(function (err) {
