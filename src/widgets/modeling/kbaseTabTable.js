@@ -49,7 +49,7 @@ $.KBWidget({
                 processData: false,
                 data: JSON.stringify(rpc),
                 beforeSend: function (xhr) {
-                    if ('token' in input)
+                    if ('token' in input && input.token)
                         xhr.setRequestHeader("Authorization", input.token);
                 }
             }).then(function(data) {
