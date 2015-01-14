@@ -1707,9 +1707,10 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbasesocialwidget', 'kbaseuserprofile
 
       renderInfoView: {
         value: function() {
-          if (this.userOwnsProfile) {
-            this.places.title.html('You - ' + this.loggedInName + ' (' + this.userRecord.user.username + ')');
+          if (this.isOwner()) {
+            this.places.title.html('You - ' + this.auth.realname + ' (' + this.auth.username + ')');
           } else {
+            console.log(this.state);
             this.places.title.html(this.userRecord.user.realname + ' (' + this.userRecord.user.username + ')');
           }
           this.renderPicture();
@@ -1718,7 +1719,7 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbasesocialwidget', 'kbaseuserprofile
             this.clearMessages();
             this.renderEditView();
           }.bind(this));
-          this.places.content.find('[data-button="optout"]').on('click', function(e) {
+          this.places.content.find('[data-button="optout"]').on('click', function(e) { 
             this.deleteProfile();
           }.bind(this));
         }

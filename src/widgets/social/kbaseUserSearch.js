@@ -47,7 +47,7 @@ function (SocialWidget, UserProfileService) {
           if (this.isLoggedIn()) {
             var widget = this;
             this.container.find('[data-field="search_text"] input').on('keyup', function (e) {
-              if (e.key === 'Esc' || e.key === 'Escape') {
+              if ((e.key === undefined && e.keyCode === 27) || e.key === 'Esc' || e.key === 'Escape') {
                 $(this).val('');
                 widget.setState('searchResults', []);
                 return;
