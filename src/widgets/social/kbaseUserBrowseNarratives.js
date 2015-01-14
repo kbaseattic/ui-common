@@ -15,15 +15,13 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
 				// TODO: get this from somewhere, allow user to configure this.
 				this.params.limit = 10;
         
-        this.syncApp();
-
         return this;
 			}
 		},
     
     // To be called whenever the params or auth have changed.
     // Rebuild the widget.
-    syncApp: {
+    setup: {
       value: function () {
     		if (this.isLoggedIn()) {
           if (this.hasConfig('workspace_url')) {
@@ -41,17 +39,21 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
     
     go: {
       value: function () {
-        this.start();
-        return this;
+         this.start();        
+         return this;
       }
     },
     
-		getCurrentState: {
+		setInitialState: {
 			value: function(options) {
 				// Reset or create the recent activity list.
         var def = Q.defer();
         
-				var recentActivity = [];
+        // only sync the state when it is 
+        //if (!this.isStateStatus('none')) {          
+          //def.resolve();
+          //return def.promise;
+          //}
         
         // We only run any queries if the session is authenticated.
         if (!this.isLoggedIn()) {
@@ -60,6 +62,8 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
           return def.promise;
         }
 
+				var recentActivity = [];
+        
 				// Note that Narratives are now associated 1-1 with a workspace. 
 				// Some new narrative attributes, such as name and (maybe) description, are actually
 				// stored as attributes of the workspace itself.

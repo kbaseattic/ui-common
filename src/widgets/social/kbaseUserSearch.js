@@ -8,8 +8,6 @@ function (SocialWidget, UserProfileService) {
         cfg.title = 'Find Other Users';
         this.SocialWidget_init(cfg);
         
-        this.syncApp();
-        
         return this;
       }
     },
@@ -21,7 +19,7 @@ function (SocialWidget, UserProfileService) {
       }
     },
     
-    syncApp: {
+    setup: {
       value: function () {
         // User profile service
         if (this.isLoggedIn()) {
@@ -36,12 +34,6 @@ function (SocialWidget, UserProfileService) {
       }
     },
     
-    //getCurrentState: {
-    //  value: function (options) {
-    //    options.success();
-    //  }
-    //},
-     
     renderLayout: {
         value: function() {
             this.container.html(this.renderTemplate('layout'));
@@ -55,9 +47,14 @@ function (SocialWidget, UserProfileService) {
           if (this.isLoggedIn()) {
             var widget = this;
             this.container.find('[data-field="search_text"] input').on('keyup', function (e) {
+              if ((e.key === undefined && e.keyCode === 27) || e.key === 'Esc' || e.key === 'Escape') {
+                $(this).val('');
+                widget.setState('searchResults', []);
+                return;
+              }
               widget.params.searchText = $(this).val();
               if (widget.params.searchText && widget.params.searchText.length < 3) {
-                widget.refresh();
+                widget.refresh().done();
               } else {
                 widget.promise(widget.userProfileClient, 'filter_users', {filter: widget.params.searchText})
                 .then(function (users) {

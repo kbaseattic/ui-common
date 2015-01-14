@@ -1,14 +1,12 @@
 define(['kbasesocialwidget', 'kbaseuserprofileserviceclient'], 
 function (SocialWidget, UserProfileService) {
-    "use strict";
-    var widget = Object.create(SocialWidget, {
+  "use strict";
+  var widget = Object.create(SocialWidget, {
       init: {
         value: function (cfg) {
           cfg.name = 'UserSummary';
           cfg.title = 'User Summary';
           this.SocialWidget_init(cfg);
-        
-          this.syncApp();
         
           return this;
         }
@@ -21,7 +19,7 @@ function (SocialWidget, UserProfileService) {
         }
       },
     
-      syncApp: {
+      setup: {
         value: function () {
           // User profile service
           if (this.isLoggedIn()) {
@@ -36,12 +34,6 @@ function (SocialWidget, UserProfileService) {
         }
       },
     
-      //getCurrentState: {
-      //  value: function (options) {
-      //    options.success();
-      //  }
-      //},
-     
       renderLayout: {
           value: function() {
               this.container.html(this.renderTemplate('layout'));
