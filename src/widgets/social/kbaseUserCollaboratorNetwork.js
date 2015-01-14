@@ -61,7 +61,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
             this.promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
             .then(function(data) {
               if (data && data[0]) {
-                this.setState('currentUserProfile', data[0]);    
+                this.setState('currentUserProfile', data[0], false);    
                       
                 this.buildCollaboratorNetwork()
                 .then(function(network) {
@@ -84,6 +84,39 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
         }.bind(this));
       }
 		},
+    
+    // Overriding the default, simple, render because we need to update the title
+    // TODO: make it easy for a widget to customize the title.
+    render: {
+      value: function() {
+        // Generate initial view based on the current state of this widget.
+        // Head off at the pass -- if not logged in, can't show profile.
+        if (this.error) {
+          this.renderError();
+        } else if (this.isLoggedIn()) {
+          if (this.isOwner()) {
+            this.places.title.html('Your Collaborators');
+          } else {
+            if (this.getProp(this.state, 'currentUserProfile.profile.userdata', null) !== null) {
+              if (this.state.currentUserProfile.profile.userdata.title) {
+                var title = this.state.currentUserProfile.profile.userdata.title + ' ';
+              } else{
+                var title = '';
+              }
+              this.places.title.html('Your Collaborators in Common with ' + title + this.getProp(this.state, 'currentUserProfile.user.realname', '?'));
+            } else {
+              this.places.title.html('Your Collaborators in Common with ' + this.getProp(this.state, 'currentUserProfile.user.realname', '?'));
+            }
+          }
+          this.places.content.html(this.renderTemplate('authorized'));
+        } else {
+          // no profile, no basic aaccount info
+          this.places.title.html(this.widgetTitle);
+          this.places.content.html(this.renderTemplate('unauthorized'));
+        }
+        return this;
+      }
+    },
     
     // Specialized methods
     

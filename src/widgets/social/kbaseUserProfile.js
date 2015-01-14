@@ -1895,17 +1895,7 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbasesocialwidget', 'kbaseuserprofile
             .html(this.renderTemplate('picture'));
         }
       },
-      isOwner: {
-        value: function() {
-          // the current session user is the owner if their username matches the queried username.
-          if (this.auth && this.auth.username === this.params.userId) {
-            return true;
-          } else {
-            return false;
-          }
-        }
-      },
-
+      
       renderViewEditLayout: {
         value: function() {
           nunjucks.configure({

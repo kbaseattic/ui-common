@@ -87,7 +87,7 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           // The context object is what is given to templates.
           this.context = {};
           this.context.env = {
-            loggedIn: this.isLoggedIn(),
+            
             widgetTitle: this.widgetTitle,
             widgetName: this.widgetName
           };
@@ -176,6 +176,7 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           } else {
             this.auth = null;
           }
+          
         }
       },
 
@@ -328,9 +329,11 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
         and perhaps perform some rudimentary analysis.
         */
       setState: {
-        value: function(path, value) {
+        value: function(path, value, norefresh) {
           this.setProp(this.state, path, value);
-          this.refresh().done();
+          if (!norefresh) {
+            this.refresh().done();
+          }
         }
       },
       
@@ -441,6 +444,18 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
               params: this.params
             })
             */
+          
+          // We need to ensure that the context reflects the current auth state.
+          this.context.env.loggedIn = this.isLoggedIn();
+          if (this.isLoggedIn()) {
+            this.context.env.loggedInUser = this.auth.username;
+            this.context.env.loggedInUserRealName = this.auth.realname;
+          } else {
+            delete this.context.env.loggedInUser;
+            delete this.context.env.loggedInUserRealName;
+          }
+          
+          this.context.env.isOwner = this.isOwner();
           
           if (additionalContext) {
             var temp = this.merge({}, this.context);
@@ -664,6 +679,23 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
       },
 
       getProp: {
+        value: function(obj, prop, defaultValue) {
+          var props = prop.split('.');
+
+          var temp = obj;
+          for (var i = 0; i < props.length; i++) {
+            var key = props[i];
+            if (temp[key] === undefined) {
+              return defaultValue;
+            } else {
+              temp = temp[key];
+            }
+          }
+          return temp;
+        }
+      },
+      
+      hasProp: {
         value: function(obj, prop) {
           var props = prop.split('.');
 
@@ -671,12 +703,12 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           for (var i = 0; i < props.length; i++) {
             var key = props[i];
             if (temp[key] === undefined) {
-              return temp[key];
+              return false
             } else {
               temp = temp[key];
             }
           }
-          return temp;
+          return true;
         }
       },
 
@@ -702,6 +734,23 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           return false;
         }
       },
+      
+      isOwner: {
+        value: function(paramName) {
+          // NB param name represents the property name of the parameter which currently 
+          // holds the username of the "subject" of the widget. If the current authenticated
+          // user and the subject user are the same, we say the user is the owner.
+          // The widgets use 'userId', which originates in the url as a path component,
+          // e.g. /people/myusername.
+          paramName = paramName ? paramName : 'userId';
+          if (this.auth && this.auth.username === this.params[paramName]) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      },
+      
 
 
       // DOM UPDATE
