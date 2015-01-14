@@ -44,6 +44,27 @@ function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
       }
     },
     
+    // Overriding the default, simple, render because we need to update the title
+    // TODO: make it easy for a widget to customize the title.
+    render: {
+      value: function() {
+        // Generate initial view based on the current state of this widget.
+        // Head off at the pass -- if not logged in, can't show profile.
+        if (this.error) {
+          this.renderError();
+        } else if (this.isLoggedIn()) {
+         
+          this.places.title.html(this.renderTemplate('authorized_title'));
+          this.places.content.html(this.renderTemplate('authorized')); 
+        } else {
+          // no profile, no basic aaccount info
+          this.places.title.html(this.widgetTitle);
+          this.places.content.html(this.renderTemplate('unauthorized'));
+        }
+        return this;
+      }
+    },
+    
 		setInitialState: {
 			value: function(options) {
 				// Reset or create the recent activity list.

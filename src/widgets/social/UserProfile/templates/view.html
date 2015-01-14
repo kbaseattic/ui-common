@@ -7,9 +7,22 @@
     <div class="col-md-4">
 
       {% if env.isOwner %}
-      <div class="btn-group pull-right">
+      <!-- <div class="btn-group pull-right">
         <button type="button" class="btn btn-warning" data-button="optout">Opt Out</button>
          <button type="button" class="btn btn-primary" data-button="edit">Edit Profile</button>
+      </div>
+      -->
+      <div class="btn-group pull-right">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            Options <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href="#" data-widget-menu-item="edit"><span class="glyphicon glyphicon-edit" style="font-size: 150%; color: green; margin-right: 10px"></span> Edit Profile</a></li>
+          <li class="divider"></li>
+          <li><a href="#" data-widget-menu-item="optout"><span class="glyphicon glyphicon-trash" style="font-size: 150%; color:red; margin-right: 10px"></span> Remove Profile</a></li>
+          <li class="divider"></li>
+          <li><a href="#" data-widget-menu-item="help"><span class="glyphicon glyphicon-question-sign" style="font-size: 150%; color:orange; margin-right: 10px"></span>Help</a></li>
+        </ul>
       </div>
       
       {% endif %}
@@ -54,8 +67,8 @@
 
         <div class="alert alert-warning alert-dismissible" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            Youre profile is active, but you have not completed the required minimal fields. The following required fields are missing: 
-            {% set comma = joiner() %}
+            Youre profile is active, but you have not completed the required minimal fields. The following required fields are missing:<br>
+            {% set comma = joiner(", ") %}
             {% for missing in env.profileCompletion.missingFields %}{{ comma() }}{{ missing.title }}{% endfor %}
           </div>      
 
@@ -63,8 +76,8 @@
 
           <div class="alert alert-warning alert-dismissible" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            Your profile is active, but is only {{env.profileCompletion.percentComplete}}% complete. To achive profile fulfillment, complete the following fields:
-            {% set comma = joiner() %}
+            Your profile is active, but is only {{env.profileCompletion.percentComplete}}% complete. To achive profile fulfillment, complete the following fields:<br>
+            {% set comma = joiner(", ") %}
             {% for missing in env.profileCompletion.missingFields %}{{ comma() }}{{ missing.title }}{% endfor %}
           </div>
 
@@ -128,6 +141,44 @@
             <i>This user does not have a personal statement</i>
           {% endif %}
         {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div class="modal fade" data-widget-modal="confirm-optout" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-widget-modal-control="deny"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Confirm Profile Removal</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to remove of your user profile? This will remove all of the profile information that you have have entered.</p>
+        <p>Note that your basic user information, your username, real name, and a blank avatar, will still appear in the KBase user interface.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-widget-modal-control="deny" data-dismiss="modal">No - don't delete my profile</button>
+        <button type="button" class="btn btn-primary" data-widget-modal-control="confirm" >Yes - remove my profile</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" data-widget-modal="help" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-widget-modal-control="deny"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">User Profile Help</h4>
+      </div>
+      <div class="modal-body">
+        <p>Help text here...</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-widget-modal-control="deny" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

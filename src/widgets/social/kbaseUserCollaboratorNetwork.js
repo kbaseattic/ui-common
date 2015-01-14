@@ -61,7 +61,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
             this.promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
             .then(function(data) {
               if (data && data[0]) {
-                this.setState('currentUserProfile', data[0]);    
+                this.setState('currentUserProfile', data[0], false);    
                       
                 this.buildCollaboratorNetwork()
                 .then(function(network) {
@@ -85,11 +85,33 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
       }
 		},
     
+    // Overriding the default, simple, render because we need to update the title
+    // TODO: make it easy for a widget to customize the title.
+    render: {
+      value: function() {
+        // Generate initial view based on the current state of this widget.
+        // Head off at the pass -- if not logged in, can't show profile.
+        if (this.error) {
+          this.renderError();
+        } else if (this.isLoggedIn()) {
+         
+          this.places.title.html(this.renderTemplate('authorized_title'));
+          this.places.content.html(this.renderTemplate('authorized'));
+        } else {
+          // no profile, no basic aaccount info
+          this.places.title.html(this.widgetTitle);
+          this.places.content.html(this.renderTemplate('unauthorized'));
+        }
+        return this;
+      }
+    },
+    
     // Specialized methods
     
     buildCollaboratorNetwork: {
       value: function(options) {
         var def = Q.defer();
+        var widget = this;
         
         // step 1: list workspaces
         var network = {
@@ -161,7 +183,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
                 }.bind(this))
                 .catch(function(err) {
                   def.reject(err);
-                  console.error("Error in finding permissions!");
+                  console.error("Error finding permissions!");
                   console.error(err);
                 });
                 return def.promise;
@@ -206,21 +228,31 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
               
               // Get user profiles for all the users, update the colloborators adding the real name.
               var collaboratorUsers = this.set_to_array(collaborators);
+              //collaboratorUsers.push('testabc'); 
               this.promise(this.userProfileClient, 'get_user_profile', collaboratorUsers)
               .then(function (data) {
                   try {
                     for (var i=0; i<data.length; i++) {
-                      var username = data[i].user.username;
-                      var realname = data[i].user.realname;
-                      network.collaborators[username].realname = realname;
+                      // it is possible that a newly registered user, not even having a stub profile,
+                      // are in this list?? If so, remove that user from the network.
+                      // TODO: we need a way to report these cases -- they should not occur or be very rare.
+                      if (!data[i] || !data[i].user) {
+                        this.logWarning('collaboratorNetwork', 'user ' + collaboratorUsers[i] + ' is a sharing partner but has no profile.');
+                        // skip this user ... remove them from the table actually.
+                        delete network.collaborators[collaboratorUsers[i]];
+                      } else {
+                        var username = data[i].user.username;
+                        var realname = data[i].user.realname;
+                        network.collaborators[username].realname = realname;
+                      }
                     } 
-                  
-                    // Now reformat as a list with properties for easier display.
-                    network.collaboratorTable = this.obj_to_array(network.collaborators, 'username', function (x) {
-                      x.ws = this.set_to_array(x.ws);
+                    
+                    network.collaboratorTable = widget.obj_to_array(network.collaborators, 'username', function (x) {
+                      x.ws = widget.set_to_array(x.ws);
                       return x;
-                    }.bind(this));
+                    });
                     def.resolve(network);
+
                   } catch (ex) {
                     console.log('EX:'); console.log(ex);
                     def.reject(ex);
