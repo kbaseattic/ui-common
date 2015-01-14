@@ -94,20 +94,8 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
         if (this.error) {
           this.renderError();
         } else if (this.isLoggedIn()) {
-          if (this.isOwner()) {
-            this.places.title.html('Your Collaborators');
-          } else {
-            if (this.getProp(this.state, 'currentUserProfile.profile.userdata', null) !== null) {
-              if (this.state.currentUserProfile.profile.userdata.title) {
-                var title = this.state.currentUserProfile.profile.userdata.title + ' ';
-              } else{
-                var title = '';
-              }
-              this.places.title.html('Your Collaborators in Common with ' + title + this.getProp(this.state, 'currentUserProfile.user.realname', '?'));
-            } else {
-              this.places.title.html('Your Collaborators in Common with ' + this.getProp(this.state, 'currentUserProfile.user.realname', '?'));
-            }
-          }
+         
+          this.places.title.html(this.renderTemplate('authorized_title'));
           this.places.content.html(this.renderTemplate('authorized'));
         } else {
           // no profile, no basic aaccount info
