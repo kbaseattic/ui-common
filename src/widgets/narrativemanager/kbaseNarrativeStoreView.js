@@ -128,8 +128,12 @@
 		    function(err) {
                         // try loading it as an app, temp hack since app page is new ...
 			console.error(err);
-                        self.fetchAppInfoAndRender();
-			//self.showError(err);
+                        if (err.error.message.indexOf('No such file or directory')>=0) {
+                            // if it could not be found, then check if it is an app
+                            self.fetchAppInfoAndRender();
+                        } else {
+                            self.showError(err);
+                        }
 		    });
 	},
         
