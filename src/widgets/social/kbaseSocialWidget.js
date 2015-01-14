@@ -927,6 +927,30 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
             return null;
           }
         }
+      },
+      
+      logNotice: {
+        value: function (source, message) {
+          console.log('NOTICE: ['+source+'] ' + message);          
+        }
+      },
+      
+      logDeprecation: {
+        value: function (source, message) {
+          console.log('DEPRECATION: ['+source+'] ' + message);          
+        }
+      },
+      
+      
+      logWarning: {
+        value: function (source, message) {
+          console.log('WARNING: ['+source+'] ' + message);          
+        }
+      },
+      logError: {
+        value: function (source, message) {
+          console.log('ERROR: ['+source+'] ' + message);          
+        }
       }
 
     });
