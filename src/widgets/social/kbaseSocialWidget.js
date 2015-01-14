@@ -165,12 +165,16 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
 
       setupAuth: {
         value: function() {
-          var loginWidget = $('<div></div>').kbaseLogin();
-          this.auth = {
-            authToken: loginWidget.get_session_prop('token'),
-            userId: loginWidget.get_session_prop('user_id'),
-            username: loginWidget.get_session_prop('user_id'),
-            realname: loginWidget.get_session_prop('name')
+          var session = this.getSession();
+          if (session) {
+            this.auth = {
+              authToken: session.token,
+              userId: session.user_id,
+              username: session.user_id,
+              realname: session.name
+            }
+          } else {
+            this.auth = null;
           }
         }
       },
@@ -381,7 +385,7 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
 
       setInitialState: {
         value: function(options) {
-          // The base method just resolves immediately (well, on the next turn.)
+          // The base method just resolves immediately (well, on the next turn.) 
           return Q.Promise(function (resolve, reject, notify) {
             resolve();
           });
@@ -410,7 +414,7 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
 
       isLoggedIn: {
         value: function() {
-          if (this.auth.authToken) {
+          if (this.auth && this.auth.authToken) {
             return true;
           } else {
             return false;
@@ -881,6 +885,47 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
             ref: data[7] + '/' + data[1],
             obj_id: 'ws.' + data[6] + '.obj.' + data[0]
           };
+        }
+      },
+      
+      getSession: {
+        value: function() {
+          var cookieName = 'kbase_session';
+          if (!$.cookie(cookieName)) {
+            return null;
+          }
+
+          var sessionString = localStorage.getItem(cookieName);
+          if (sessionString === null) {
+            return null;
+          }
+          
+          try {
+            return JSON.parse(sessionString);
+          } catch (e) {
+            if (e instanceof SyntaxError) {
+              console.log('ERROR parsing session string: ' + e.message);
+            } else {
+              console.log('ERROR getting session property: ' + e);
+            }
+            return null;
+          }
+        }
+      },
+      
+      getSessionProp: {
+        value: function (name) {
+          try {
+            var session = this.getSession();
+            return session[name];
+          } catch (e) {
+            if (e instanceof SyntaxError) {
+              console.log('ERROR parsing session string: ' + e.message);
+            } else {
+              console.log('ERROR getting session property: ' + e);
+            }
+            return null;
+          }
         }
       }
 

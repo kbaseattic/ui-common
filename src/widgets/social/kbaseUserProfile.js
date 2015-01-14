@@ -1710,7 +1710,6 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbasesocialwidget', 'kbaseuserprofile
           if (this.isOwner()) {
             this.places.title.html('You - ' + this.auth.realname + ' (' + this.auth.username + ')');
           } else {
-            console.log(this.state);
             this.places.title.html(this.userRecord.user.realname + ' (' + this.userRecord.user.username + ')');
           }
           this.renderPicture();
