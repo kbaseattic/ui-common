@@ -162,9 +162,9 @@
 		var $authors = $('<div>');
 		for(var k=0; k<m['authors'].length; k++) {
 		    if (k==0) {
-			$authors.append('<strong>Authors: </strong>&nbsp&nbsp'+m['authors'][k]);
+			$authors.append('<strong>Authors: </strong>&nbsp&nbsp<a href="#/people/'+m['authors'][k]+'" target="_blank">'+m['authors'][k]+"</a>");
 		    } else {
-			$authors.append(', '+m['authors'][k]);
+			$authors.append(', <a href="#/people/'+m['authors'][k]+'" target="_blank'>+m['authors'][k]+"</a>");
 		    }
 		}
 		$basicInfo.append($authors);
@@ -226,7 +226,7 @@
 	    if (m['screenshots']) {
 		var imgHtml = '';
 		for(var s=0; s<m['screenshots'].length; s++) {
-		    imgHtml += '<td style="padding:10px;"><div style="border: 1px solid #ccc; width: 350px; height:250px;">'+
+		    imgHtml += '<td style="padding:10px;"><div style="border: 1px solid #ccc;">'+
 			'<img src="'+self.options.narrativeStoreUrl + m['screenshots'][s]['url']  +'" width="100%">' +
 			'</div></td>';
 		}
@@ -254,14 +254,6 @@
 		self.$mainPanel.append($('<div>').addClass("row").css({"width":"95%","margin-top":"15px"}).append($publications));
 	    }
             
-            if (spec['parameters']) {
-		var $parameters = $('<div>')
-					.append("<hr><h4>Parameters</h4>");
-                for(var k=0; k<spec.parameters.length; k++) {
-                    $parameters.append('<b>['+(k+1)+']: '+spec.parameters[k].ui_name+'</b> - '+spec.parameters[k].short_hint+"<br>");
-		}
-		self.$mainPanel.append($parameters);
-	    }
             
 	    if (m['technical_description']) {
 		var $techDetailsDiv = $('<div>')
@@ -310,13 +302,27 @@
 		var $authors = $('<div>');
 		for(var k=0; k<m['authors'].length; k++) {
 		    if (k==0) {
-			$authors.append('<strong>Authors: </strong>&nbsp&nbsp'+m['authors'][k]);
+			$authors.append('<strong>Authors: </strong>&nbsp&nbsp<a href="#/people/'+m['authors'][k]+'" target="_blank">'+m['authors'][k]+"</a>");
 		    } else {
-			$authors.append(', '+m['authors'][k]);
+			$authors.append(', <a href="#/people/'+m['authors'][k]+'" target="_blank'>+m['authors'][k]+"</a>");
 		    }
 		}
 		$basicInfo.append($authors);
 	    }
+            
+            if (m['kb_contributers']) {
+		var $authors = $('<div>');
+		for(var k=0; k<m['kb_contributers'].length; k++) {
+		    if (k==0) {
+			$authors.append('<strong>KBase Contributers: </strong>&nbsp&nbsp<a href="#/people/'+m['kb_contributers'][k]+'" target="_blank">'+m['kb_contributers'][k]+"</a>");
+		    } else {
+			$authors.append(', <a href="#/people/'+m['kb_contributers'][k]+'" target="_blank'>+m['kb_contributers'][k]+"</a>");
+		    }
+		}
+		$basicInfo.append($authors);
+	    }
+            
+            
             
             
 	    var $topButtons = $('<div>').addClass("col-md-4").css("text-align","right")
@@ -348,7 +354,7 @@
 	    if (m['screenshots']) {
 		var imgHtml = '';
 		for(var s=0; s<m['screenshots'].length; s++) {
-		    imgHtml += '<td style="padding:10px;"><div style="border: 1px solid #ccc; width: 350px; height:250px;">'+
+		    imgHtml += '<td style="padding:10px;"><div style="border: 1px solid #ccc;">'+
 			'<img src="'+self.options.narrativeStoreUrl + m['screenshots'][s]['url']  +'" width="100%">' +
 			'</div></td>';
 		}
@@ -380,7 +386,23 @@
 		var $parameters = $('<div>')
 					.append("<hr><h4>Parameters</h4>");
                 for(var k=0; k<spec.parameters.length; k++) {
+                    var moreInfo = "<b>Required?</b> "; if (spec.parameters[k].optional) { moreInfo += 'no'; } else { moreInfo += 'yes'; }
+                    moreInfo += ", <b>Advanced?</b> "; if (spec.parameters[k].advanced) { moreInfo += 'yes'; } else { moreInfo += 'no'; }
+                    if (spec.parameters[k].text_options) {
+                        if (spec.parameters[k].text_options.valid_ws_types) {
+                            if (spec.parameters[k].text_options.valid_ws_types.length>0) {
+                                if (spec.parameters[k].text_options.is_output_name) {
+                                    moreInfo += ", Is an Output Data Name ";
+                                } else {
+                                    moreInfo += ", Is an Input Data Object ";
+                                }
+                                moreInfo += JSON.stringify(spec.parameters[k].text_options.valid_ws_types);
+                            }
+                        }
+                    }
                     $parameters.append('<b>['+(k+1)+']: '+spec.parameters[k].ui_name+'</b> - '+spec.parameters[k].short_hint+"<br>");
+                    $parameters.append(moreInfo+"<br>");
+                    $parameters.append(' <u>Full Description</u>: '+spec.parameters[k].description+'<br><br>');
 		}
 		self.$mainPanel.append($parameters);
 	    }
