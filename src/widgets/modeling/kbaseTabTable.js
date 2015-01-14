@@ -76,7 +76,12 @@ $.KBWidget({
 
         var uiTabs = [];
         for (var i = 0; i < tabList.length; i++) {
-            var content = $('<table class="table table-bordered table-striped">');
+            var tab = tabList[i];
+            if (tab.type == 'dataTable')
+                var content = $('<table class="table table-bordered table-striped">');
+            else
+                var content = $('<div>');
+
             uiTabs.push({name: tabList[i].name, content: content});
         }
 
@@ -97,10 +102,8 @@ $.KBWidget({
                       var key = spec.key;
                       var data = obj[key];
 
-
                       var table = self.verticalTable({rows: spec.rows, data: data});
-                      tabs.tabContent(spec.name)
-                          .find('table').append(table)
+                      tabs.tabContent(spec.name).append(table)
                   }
               }
           })
@@ -225,13 +228,29 @@ $.KBWidget({
                     'key' in row && typeof data[row.key] == 'undefined')
                     continue
 
+                var r = $('<tr>');
+                r.append('<td><b>'+row.label+'</b></td>')
+
                 // if the data is in the row definition, use it
                 if ('data' in row)
-                    table.append('<tr><td><b>'+row.label+'</b></td><td>'+row.data+'</td></tr>');
-                else if ('key' in row)
-                    table.append('<tr><td><b>'+row.label+'</b></td><td>'+data[row.key]+'</td></tr>');
-                else if (row.type == 'pictureEquation')
-                    table.append('<tr><td><b>'+row.label+'</b></td><td>'+pictureEquation(row.data)+'</td></tr>');
+                    r.append('<td>'+row.data+'</td>');
+                else if ('key' in row) {
+                    if (row.type == 'wstype') {
+                        var ref = data[row.key];
+                        var cell = $('<td data-ref="'+ref+'">loading...</td>');
+
+                        getLink(data[row.key]).done(function(url) {
+                            var name = url.split('/')[2]
+                            cell.html('<a href="#/test/'+url+'">'+name+'</a>');
+                        })
+                        r.append(cell);
+                    } else {
+                        r.append('<td>'+data[row.key]+'</td>');
+                    }
+                } else if (row.type == 'pictureEquation')
+                    r.append('<td>'+pictureEquation(row.data)+'</td>');
+
+                table.append(r);
             }
 
             return table;
@@ -322,6 +341,14 @@ $.KBWidget({
             return cpds;
         }
 
+        function getLink(ref) {
+            return self.kbapi('ws', 'get_object_info_new',
+                        {objects: [{ref: ref}]})
+                        .then(function(data){
+                            var a = data[0];
+                            return a[2].split('-')[0]+'/'+a[7]+'/'+a[1];
+                        })
+        }
 
         return this;
     }

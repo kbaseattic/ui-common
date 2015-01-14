@@ -9,7 +9,7 @@ function KBase_FBAModel(modeltabs) {
                          instance: data[4],
                          moddate: data[3]}
 
-        // if there is user metadata, add it;
+        // if there is user metadata, add it
         if ('Name' in data[10]) {
             this.usermeta = {name: data[10]["Name"],
                              source: data[10]["Source"]+"/"+data[10]["Source ID"],
@@ -54,7 +54,6 @@ function KBase_FBAModel(modeltabs) {
             "label": "Genome",
             "key": "genome",
             "type": "wstype",
-            "wstype": "KBaseGenomes.Genome"
         },{
             "label": "Model type",
             "key": "modeltype"
@@ -78,6 +77,7 @@ function KBase_FBAModel(modeltabs) {
     }, {
         "key": "modelreactions",
         "name": "Reactions",
+        "type": "dataTable",
         "columns": [{
             "label": "Reaction",
             "type": "tabLink",
@@ -102,6 +102,7 @@ function KBase_FBAModel(modeltabs) {
     }, {
         "key": "modelcompounds",
         "name": "Compounds",
+        "type": "dataTable",
         "columns": [{
             "label": "Compound",
             "key": "id",
@@ -127,6 +128,7 @@ function KBase_FBAModel(modeltabs) {
     }, {
         "key": "modelgenes",
         "name": "Genes",
+        "type": "dataTable",
         "columns": [{
             "label": "Gene",
             "key": "id",
@@ -141,6 +143,7 @@ function KBase_FBAModel(modeltabs) {
     }, {
         "key": "modelcompartments",
         "name": "Compartments",
+        "type": "dataTable",
         "columns": [{
             "label": "Compartment",
             "key": "id",
@@ -159,6 +162,7 @@ function KBase_FBAModel(modeltabs) {
     }, {
         "key": "biomasscpds",
         "name": "Biomass",
+        "type": "dataTable",
         "columns": [{
             "label": "Biomass",
             "key": "biomass",
@@ -184,6 +188,7 @@ function KBase_FBAModel(modeltabs) {
     }, {
         "key": "gapfillings",
         "name": "Gapfilling",
+        "type": "dataTable",
         "columns": [{
             "label": "Gapfill",
             "key": "id",
