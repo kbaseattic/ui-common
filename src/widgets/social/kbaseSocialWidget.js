@@ -1000,6 +1000,166 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
         value: function (source, message) {
           console.log('ERROR: ['+source+'] ' + message);          
         }
+      },
+      
+      lists: {
+        value: {
+          userRoles: [{
+            id: 'pi',
+            label: 'Principal Investigator'
+          }, {
+            id: 'gradstudent',
+            label: 'Graduate Student'
+          }, {
+            id: 'developer',
+            label: 'Developer'
+          }, {
+            id: 'tester',
+            label: 'Tester'
+          }, {
+            id: 'documentation',
+            label: 'Documentation'
+          }, {
+            id: 'general',
+            label: 'General Interest'
+          }],
+          userClasses: [{
+            id: 'pi',
+            label: 'Principal Investigator'
+          }, {
+            id: 'gradstudent',
+            label: 'Graduate Student'
+          }, {
+            id: 'kbase-internal',
+            label: 'KBase Staff'
+          }, {
+            id: 'kbase-test',
+            label: 'KBase Test/Beta User'
+          }, {
+            id: 'commercial',
+            label: 'Commercial User'
+          }],
+          userTitles: [{
+            id: 'mr',
+            label: 'Mr.'
+          }, {
+            id: 'ms',
+            label: 'Ms.'
+          }, {
+            id: 'dr',
+            label: 'Dr.'
+          }, {
+            id: 'prof',
+            label: 'Prof.'
+          }],
+          gravatarDefaults: [{
+            id: 'mm',
+            label: 'Mystery Man - simple, cartoon-style silhouetted outline'
+          }, {
+            id: 'identicon',
+            label: 'Identicon - a geometric pattern based on an email hash'
+          }, {
+            id: 'monsterid',
+            label: 'MonsterID - generated "monster" with different colors, faces, etc'
+          }, {
+            id: 'wavatar',
+            label: 'Wavatar - generated faces with differing features and backgrounds'
+          }, {
+            id: 'retro',
+            label: 'Retro - 8-bit arcade-style pixelated faces'
+          }, {
+            id: 'blank',
+            label: 'Blank - A Blank Space'
+          }],
+          avatarColors: [{
+            id: 'maroon',
+            label: 'maroon',
+            color: '#800000',
+            textColor: '#FFF'
+          }, {
+            id: 'red',
+            label: 'red',
+            color: '#ff0000',
+            textColor: '#FFF'
+          }, {
+            id: 'orange',
+            label: 'orange',
+            color: '#ffA500',
+            textColor: '#FFF'
+          }, {
+            id: 'yellow',
+            label: 'yellow',
+            color: '#ffff00',
+            textColor: '#000'
+          }, {
+            id: 'olive',
+            label: 'olive',
+            color: '#808000',
+            textColor: '#FFF'
+          }, {
+            id: 'purple',
+            label: 'purple',
+            color: '#800080',
+            textColor: '#FFF'
+          }, {
+            id: 'fuchsia',
+            label: 'fuchsia',
+            color: '#ff00ff',
+            textColor: '#FFF'
+          }, {
+            id: 'white',
+            label: 'white',
+            color: '#ffffff',
+            textColor: '#000'
+          }, {
+            id: 'lime',
+            label: 'lime',
+            color: '#00ff00',
+            textColor: '#000'
+          }, {
+            id: 'green',
+            label: 'green',
+            color: '#008000',
+            textColor: '#FFF'
+          }, {
+            id: 'navy',
+            label: 'navy',
+            color: '#000080',
+            textColor: '#FFF'
+          }, {
+            id: 'blue',
+            label: 'blue',
+            color: '#0000ff',
+            textColor: '#FFF'
+          }, {
+            id: 'aqua',
+            label: 'aqua',
+            color: '#00ffff',
+            textColor: '#000'
+          }, {
+            id: 'teal',
+            label: 'teal',
+            color: '#008080',
+            textColor: '#FFF'
+          }, {
+            id: 'black',
+            label: 'black',
+            color: '#000000',
+            textColor: '#FFF'
+          }, {
+            id: 'silver',
+            label: 'silver',
+            color: '#c0c0c0',
+            textColor: '#000'
+          }, {
+            id: 'gray',
+            label: 'gray',
+            color: '#808080',
+            textColor: '#FFF'
+          }]
+
+
+        }
       }
 
     });
