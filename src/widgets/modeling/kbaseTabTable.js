@@ -62,7 +62,6 @@ $.KBWidget({
         // base class for workspace object classes
         var kbObjects = new KBObjects();
 
-        console.log('type!', type)
         //
         // 1) Use type (periods replaced with underscores) to instantiate object
         //
@@ -76,12 +75,12 @@ $.KBWidget({
         var uiTabs = [];
         for (var i = 0; i < tabList.length; i++) {
             var tab = tabList[i];
-            if (tab.type == 'dataTable')
-                var content = $('<table class="table table-bordered table-striped">');
-            else
-                var content = $('<div>');
 
-            uiTabs.push({name: tabList[i].name, content: content});
+            // add loading status
+            var placeholder = $('<div>')
+            placeholder.loading();
+
+            uiTabs.push({name: tabList[i].name, content: placeholder});
         }
 
         uiTabs[0].active = true;
@@ -98,11 +97,13 @@ $.KBWidget({
                   var spec = tabList[i];
 
                   if (spec.type == 'verticaltbl') {
-                      var key = spec.key;
-                      var data = obj[key];
+                      var key = spec.key,
+                          data = obj[key],
+                          tabPane = tabs.tabContent(spec.name);
 
                       var table = self.verticalTable({rows: spec.rows, data: data});
-                      tabs.tabContent(spec.name).append(table)
+                      tabPane.rmLoading();
+                      tabPane.append(table)
                   }
               }
           })
@@ -112,27 +113,40 @@ $.KBWidget({
         //
         self.kbapi('ws', 'get_objects', [{workspace: input.ws, name: input.name}])
           .done(function(data){
-              obj.setData(data[0].data).done(function() {
+              var setMethod = obj.setData(data[0].data);
+              console.log('setMethod', setMethod)
 
-
-              //5) Iterates over the entries in the spec and instantiates the table tabs
-              for (var i = 0; i < tabList.length; i++) {
-                  var tabSpec = tabList[i];
-
-                  // skip any vertical tabls or widgets for now
-                  if (tabSpec.type == 'verticaltbl') continue;
-                  if (tabSpec.widget) continue;
-
-                  var settings = self.getTableSettings(tabSpec, obj.data);
-
-                  tabs.tabContent(tabSpec.name)
-                      .find('table').dataTable(settings);
+              // see if setData method returns promise or not
+              if (setMethod && 'done' in setMethod) {
+                  setMethod.done(function() {
+                    buildContent()
+                })
+              } else {
+                  buildContent();
               }
 
-              } )
 
 
         })
+
+        function buildContent() {
+            //5) Iterates over the entries in the spec and instantiates the table tabs
+            for (var i = 0; i < tabList.length; i++) {
+                var tabSpec = tabList[i];
+
+                // skip any vertical tabls or widgets for now
+                if (tabSpec.type == 'verticaltbl') continue;
+                if (tabSpec.widget) continue;
+
+                var settings = self.getTableSettings(tabSpec, obj.data);
+                var tabPane = tabs.tabContent(tabSpec.name);
+
+                tabPane.rmLoading();
+
+                var table = $('<table class="table table-bordered table-striped">');
+                tabPane.append( table.dataTable(settings) );
+            }
+        }
 
         // takes table spec and prepared data, returns datatables settings object
         this.getTableSettings = function(tab, data) {
@@ -355,6 +369,20 @@ $.KBWidget({
                             var a = data[0];
                             return a[2].split('-')[0]+'/'+a[7]+'/'+a[1];
                         })
+        }
+
+
+        $.fn.loading = function(text) {
+            $(this).rmLoading()
+
+            if (typeof text != 'undefined')
+                $(this).append('<p class="text-muted loader">'+
+                     '<img src="assets/img/ajax-loader.gif"> '+text+'</p>');
+            else
+                $(this).append('<p class="text-muted loader">'+
+                     '<img src="assets/img/ajax-loader.gif"> loading...</p>')
+
+            return this;
         }
 
         return this;

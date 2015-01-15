@@ -626,13 +626,13 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     // sign in button
     $('#signin-button').kbaseLogin({login_callback: finish_login,
                                     logout_callback: finish_logout});
-    $('#signin-button').css('padding', '0');  // Jim!
+    $('#signin-button').css('padding', '0');
 
+    // not under rootscope for kbase widgets
     USER_ID = $("#signin-button").kbaseLogin('session').user_id;
     USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
-    console.log('token', {token: USER_TOKEN})
+
     kb = new KBCacheClient(USER_TOKEN);
-    //kb.nar.ensure_home_project(USER_ID);
 
     $rootScope.USER_ID = (typeof USER_ID == 'undefined' ? false : USER_ID);
     $rootScope.USER_TOKEN = USER_TOKEN;
