@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
-  function(nunjucks, $, Q, config) {
+define(['nunjucks', 'jquery', 'q', 'kbasesession', 'json!functional-site/config.json'],
+  function(nunjucks, $, Q, Session, config) {
     "use strict";
 
     var SocialWidget = Object.create({}, {
@@ -22,7 +22,8 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           
           this.initConfig = cfg || {};
           
-          this.setupConfig();        
+          this.setupConfig(); 
+              
 
 
           // PARAMS          
@@ -67,6 +68,9 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
             status: 'none',
             timestamp: new Date()
           }
+          
+          // Creates maps out of lists.
+          this.createListMaps();
 
           // Set up the templating system.
           // NB the templating requires a dedicated widget resources directory in 
@@ -155,6 +159,9 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
 
           this.widgetTitle = this.getConfig('title');
           
+          
+          this.instanceId = this.genId();   
+          
           $.ajaxSetup({
             timeout: this.getConfig('ajaxTimeout')
           });
@@ -165,18 +172,17 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
 
       setupAuth: {
         value: function() {
-          var session = this.getSession();
+          var session = Session.getSession();
           if (session) {
             this.auth = {
-              authToken: session.token,
-              userId: session.user_id,
-              username: session.user_id,
-              realname: session.name
+              authToken: session.getAuthToken(),
+              userId: session.getUsername(),
+              username: session.getUsername(),
+              realname: session.getUserRealName()
             }
           } else {
             this.auth = null;
           }
-          
         }
       },
 
@@ -454,6 +460,8 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
             delete this.context.env.loggedInUser;
             delete this.context.env.loggedInUserRealName;
           }
+          
+          this.context.env.instanceId = this.instanceId;
           
           this.context.env.isOwner = this.isOwner();
           
@@ -781,14 +789,14 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
       // such as title and content.
       renderLayout: {
         value: function() {
-          this.container.html(this.getTemplate('layout').render(this.context));
+          this.container.html(this.getTemplate('layout').render(this.createTemplateContext()));
           this.places = {
             title: this.container.find('[data-placeholder="title"]'),
             alert: this.container.find('[data-placeholder="alert"]'),
             content: this.container.find('[data-placeholder="content"]')
           };
         }
-      },
+      }, 
 
       // Render a waiting icon while.
       // This is typically done before getCurrentState which might be doing a time consuming ajax call
@@ -802,10 +810,16 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
 
       loadCSS: {
         value: function() {
+          // Load social widget css.
           $('<link>')
           .appendTo('head')
           .attr({type: 'text/css', rel: 'stylesheet'})
-          .attr('href', '/src/widgets/social/' + this.widgetName + '/style.css?force='+this.genId());
+          .attr('href', '/src/widgets/social/style.css');
+          // Load specific widget css.
+          $('<link>')
+          .appendTo('head')
+          .attr({type: 'text/css', rel: 'stylesheet'})
+          .attr('href', '/src/widgets/social/' + this.widgetName + '/style.css');
         }
       },
 
@@ -936,48 +950,7 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           };
         }
       },
-      
-      getSession: {
-        value: function() {
-          var cookieName = 'kbase_session';
-          if (!$.cookie(cookieName)) {
-            return null;
-          }
 
-          var sessionString = localStorage.getItem(cookieName);
-          if (sessionString === null) {
-            return null;
-          }
-          
-          try {
-            return JSON.parse(sessionString);
-          } catch (e) {
-            if (e instanceof SyntaxError) {
-              console.log('ERROR parsing session string: ' + e.message);
-            } else {
-              console.log('ERROR getting session property: ' + e);
-            }
-            return null;
-          }
-        }
-      },
-      
-      getSessionProp: {
-        value: function (name) {
-          try {
-            var session = this.getSession();
-            return session[name];
-          } catch (e) {
-            if (e instanceof SyntaxError) {
-              console.log('ERROR parsing session string: ' + e.message);
-            } else {
-              console.log('ERROR getting session property: ' + e);
-            }
-            return null;
-          }
-        }
-      },
-      
       logNotice: {
         value: function (source, message) {
           console.log('NOTICE: ['+source+'] ' + message);          
@@ -1001,6 +974,22 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           console.log('ERROR: ['+source+'] ' + message);          
         }
       },
+      
+      createListMaps: {
+        value: function() {
+          this.listMaps = {};
+          for (var listId in this.lists) {
+            var list = this.lists[listId];
+
+            this.listMaps[listId] = {};
+
+            for (var i in list) {
+              this.listMaps[listId][list[i].id] = list[i];
+            }
+          }
+        }
+      },
+      
       
       lists: {
         value: {

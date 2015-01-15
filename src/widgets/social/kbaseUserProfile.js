@@ -17,9 +17,6 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbasesocialwidget', 'kbaseuserprofile
           // setup is called whenever the config or params have changed.
           // this.setup();
 
-
-          this.createListMaps();
-
           // Set up nunjucks templating.
           /*
           Note that we do not use autoescaping. This means we need to inspect all places where
@@ -327,21 +324,7 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbasesocialwidget', 'kbaseuserprofile
 
      
 
-      createListMaps: {
-        value: function() {
-          this.listMaps = {};
-          for (var listId in this.lists) {
-            var list = this.lists[listId];
-
-            this.listMaps[listId] = {};
-
-            for (var i in list) {
-              this.listMaps[listId][list[i].id] = list[i];
-            }
-          }
-        }
-      },
-
+      
       // MODEL UPDATE
 
       /*

@@ -33,7 +33,8 @@ require.config({
       kbaseusercollaboratornetwork: '/src/widgets/social/kbaseUserCollaboratorNetwork',
       kbaseusersearch: '/src/widgets/social/kbaseUserSearch',
       kbaseuserbrowsenarratives: '/src/widgets/social/kbaseUserBrowseNarratives',
-      kbaseusersummary: '/src/widgets/social/kbaseUserSummary'
+      kbaseusersummary: '/src/widgets/social/kbaseUserSummary',
+      kbasesession: '/src/widgets/social/kbaseSession'
     },
    shim: { 
     'kbaseuserprofileserviceclient': {
