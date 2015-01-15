@@ -62,6 +62,7 @@ $.KBWidget({
         // base class for workspace object classes
         var kbObjects = new KBObjects();
 
+        console.log('type!', type)
         //
         // 1) Use type (periods replaced with underscores) to instantiate object
         //
@@ -91,7 +92,7 @@ $.KBWidget({
         //
         self.kbapi('ws', 'get_object_info_new', {objects: [{workspace: input.ws, name: input.name}], includeMetadata: 1})
           .done(function(res) {
-              obj.set_metadata(res[0]);
+              obj.setMetadata(res[0]);
 
               for (var i = 0; i < tabList.length; i++) {
                   var spec = tabList[i];
@@ -111,7 +112,8 @@ $.KBWidget({
         //
         self.kbapi('ws', 'get_objects', [{workspace: input.ws, name: input.name}])
           .done(function(data){
-              obj.set_data(data[0].data);
+              obj.setData(data[0].data).done(function() {
+
 
               //5) Iterates over the entries in the spec and instantiates the table tabs
               for (var i = 0; i < tabList.length; i++) {
@@ -126,6 +128,9 @@ $.KBWidget({
                   tabs.tabContent(tabSpec.name)
                       .find('table').dataTable(settings);
               }
+
+              } )
+
 
         })
 
@@ -267,6 +272,10 @@ $.KBWidget({
                        .then(function(data) {
                           return data[0];
                        })
+        }
+
+        this.getBiochemCompounds = function(ids) {
+            return self.kbapi('fba', 'get_compounds', {compounds: ids})
         }
 
         this.compoundImage = function(id) {

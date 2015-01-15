@@ -1,8 +1,8 @@
-function KBase_FBAModel(modeltabs) {
+function KBaseFBA_FBAModel(modeltabs) {
     var self = this;
     this.modeltabs = modeltabs;
 
-    this.set_metadata = function (data) {
+    this.setMetadata = function (data) {
         this.overview = {wsid: data[7]+"/"+data[1],
                          objecttype: data[2],
                          owner: data[5],
@@ -294,7 +294,7 @@ function KBase_FBAModel(modeltabs) {
     }
 
 
-    this.set_data = function (indata) {
+    this.setData = function (indata) {
         this.data = indata;
         this.modelreactions = this.data.modelreactions;
         this.modelcompounds = this.data.modelcompounds;
@@ -395,4 +395,4 @@ function KBase_FBAModel(modeltabs) {
 }
 
 // make method of base class
-KBObjects.prototype.KBaseFBA_FBAModel = KBase_FBAModel;
+KBObjects.prototype.KBaseFBA_FBAModel = KBaseFBA_FBAModel;
