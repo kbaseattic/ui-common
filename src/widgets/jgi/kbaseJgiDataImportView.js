@@ -35,7 +35,7 @@
                        {nicetype: 'Assembly File',
                         app_name: 'Assembly File to ContigSet',
                         method: 'convert_annotation_file_to_contig_set',
-                        appParam: '1,output_contigset,' //1 is ignored
+                        appParam: '1,input_assyfile,' //1 is ignored
                         },
 //                   'KBaseFile.AnnotationFile':
 //                       {nicetype: 'Annotation File',
