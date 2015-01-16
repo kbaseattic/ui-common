@@ -3,7 +3,8 @@ define(['jquery', 'q'], function ($, Q) {
     
     init: {
       value: function (cfg) {
-        return this.getSession();
+        this.importSession();
+        return this;
       }
     }, 
     
@@ -123,5 +124,5 @@ define(['jquery', 'q'], function ($, Q) {
      }
   });
   
-  return Session;
+  return Session.init();
 })

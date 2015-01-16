@@ -1,5 +1,5 @@
-define(['jquery', 'nunjucks', 'kbasesocialwidget',  'kbaseworkspaceserviceclient', 'q'], 
-function ($, nunjucks, SocialWidget, WorkspaceService, Q) {
+define(['jquery', 'nunjucks', 'kbaseutils', 'kbasesocialwidget',  'kbaseworkspaceserviceclient', 'q'], 
+function ($, nunjucks, Utils, SocialWidget, WorkspaceService, Q) {
 	var RecentActivityWidget = Object.create(SocialWidget, {
 		init: {
 			value: function (cfg) {
