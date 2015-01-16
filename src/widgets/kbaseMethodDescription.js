@@ -5,6 +5,7 @@ kb_define('kbaseMethodDescription',
     	'narrativeMethodStore',
     	'kbaseAccordion',
     	'kbaseLineSerieschart',
+    	'kbaseCarousel',
     ],
     function ($) {
 
@@ -15,6 +16,7 @@ kb_define('kbaseMethodDescription',
         options: {
             color: "black",
             narrativeMethodStoreURL : "https://kbase.us/services/narrative_method_store/rpc",
+            method_id : 'align_protein_sequences_generic',
         },
 
         init: function(options) {
@@ -22,14 +24,9 @@ kb_define('kbaseMethodDescription',
 
             this.nms = new NarrativeMethodStore(this.options.narrativeMethodStoreURL);
 
-            if (this.options.spec == undefined) {
-                this.details_from_id('align_protein_sequences_generic');
-            }
-            else {
-                this.details(this.options.spec);
-            }
+            this.details_from_id(this.options.method_id);
 
-            this.$elem.append('App Description');
+            this.$elem.append('Loading description ... ').append($.jqElem('i').addClass('fa fa-spin fa-spinner'));
 
             return this;
         },
@@ -37,69 +34,27 @@ kb_define('kbaseMethodDescription',
         details_from_id : function(id) {
             var $details = this;
 
-            this.nms.get_method_full_info({ids : [id]}, function (data) {
-                $details.options.spec = data[0];
-                console.log(data);
-                $details.details($details.options.spec);
+            this.nms.get_method_full_info({ids : [id]}, function (meth) {
+                meth = meth[0];
+
+                $details.nms.get_method_spec({ids : [id]}, function (spec) {
+                    $details.details(meth, spec);
+                });
+
             });
         },
 
-        details : function(spec) {
-            var $details = this;
 
-            var steps = [];
-console.log(spec);
-            $.each(
-                spec.steps,
-                function (idx, step) {
-                    steps.push(
-                        {
-                            caption : step.description,
-                        }
-                    );
-                }
-            );
 
-            var $carouselDiv = $.jqElem('div');
-            $carouselDiv.kbaseCarousel(
-                {
-                    carousel : steps
-                }
-            );
+        details : function (meth, spec) {
 
-            this.$elem.empty();
-
-            this.$elem.append(
-                $.jqElem('h1').append('Description')
-            );
-
-            this.$elem.append(
-                $.jqElem('div').append(spec.info.header)
-            );
-
-            this.$elem.append($carouselDiv);
-
-            this.$elem.append(
-                $.jqElem('h1').append('Documentation')
-            );
-
-            this.$elem.append(
-                $.jqElem('div').append(spec.info.subtitle)
-            );
-
-        },
-
-        old_details : function (m) {
-
-            m = {id : m};
+//            m = {id : m};
 
             var $details = this;
 
-            this.nms.get_method_full_info({ids:[m.id]}, function(data) {
 
-            $details.nms.get_method_spec({ids:[m.id]}, function (spec) {
-console.log("DETAILED SPEC IS ", spec);
-            var meth = data[0];
+
+
 
             var $res =
                 $.jqElem('div');
@@ -153,16 +108,13 @@ console.log("DETAILED SPEC IS ", spec);
                                 $.jqElem('div')
                                     .addClass('col-md-2')
                                     .append(
-                                        $.jqElem('button')
-                                            .addClass('btn btn-primary')
+                                        $.jqElem('a')
+                                            .append('LAUNCH')
                                             .on('click', function(e) {
-                                                if ($details.options.sidePanel) {
-                                                    $details.options.sidePanel.toggleOverlay();
+                                                if ($details.options.gallery) {
+                                                    $details.options.gallery.launchMethod(spec[0].info.id);
                                                 }
-                                                $details.trigger('methodClicked.Narrative', spec[0]);
                                             })
-                                            .append('Add to narrative')
-
                                     )
                             )
                     )
@@ -275,10 +227,13 @@ console.log("DETAILED SPEC IS ", spec);
                 : [];
 
 
-            var method_stats = stats.by_method[m.id];
+            var method_stats = stats.by_method
+                ? stats.by_method[meth.id]
+                : undefined;
+
             if (method_stats) {
                 $stats = $.jqElem('div')
-                    .append(stats.by_method[m.id].total_count + ' total calls');
+                    .append(stats.by_method[meth.id].total_count + ' total calls');
 
                 var $linechart = $.jqElem('div')
                     .css({width : '500px', height : '300px'});
@@ -287,7 +242,7 @@ console.log("DETAILED SPEC IS ", spec);
                 var labels = [];
                 var idx = 0;
                 $.each(
-                    stats.by_method[m.id].accesses_by_month,
+                    stats.by_method[meth.id].accesses_by_month,
                     function (month, accesses) {
                         lineData.push({x : idx++, xLabel : month, y : accesses});
                         labels.push(month);
@@ -362,18 +317,23 @@ console.log("DETAILED SPEC IS ", spec);
             );
 
             $details.$elem.empty();
-            $details.$elem.append($methAccordion.$elem);
 
-        });},
-        //error
-        function(e) {
-            $details.$elem.empty();
-            $details.$elem.append(
-                $.jqElem('div')
-                    .addClass('alert alert-warning')
-                    .append("No information available for " + m.id)
-            );
-        });
+            $details.$elem
+                .append(
+                    $.jqElem('div').addClass('col-md-12')
+                        .append(
+                            $.jqElem('a')
+                                .append($.jqElem('i').addClass('fa fa-chevron-left')
+                                .on('click', function(e) {
+                                    if ($details.options.gallery) {
+                                        $details.options.gallery.reset();
+                                    }
+                                })
+                            )
+                        )
+                )
+            ;
+            $details.$elem.append($methAccordion.$elem);
     }
 
     });
