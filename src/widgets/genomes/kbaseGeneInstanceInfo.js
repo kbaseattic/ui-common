@@ -176,11 +176,11 @@
                 //else
                 //    self.$infoTable.append(self.makeRow("Protein Families", "None found"));
 
-                //self.$buttonPanel.find("button#domains").click(
-                //    function(event) { 
-                //        self.trigger("showDomains", { event: event, featureID: self.options.featureID }) 
-                //    }
-                //);
+                self.$buttonPanel.find("button#domains").click(
+                    function(event) { 
+                        self.trigger("showDomains", { event: event, featureID: self.options.featureID }) 
+                    }
+                );
                 //self.$buttonPanel.find("button#operons").click(
                 //    function(event) { 
                 //        self.trigger("showOperons", { event: event, featureID: self.options.featureID }) 

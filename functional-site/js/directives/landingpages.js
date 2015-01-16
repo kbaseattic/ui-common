@@ -1083,6 +1083,19 @@ angular.module('lp-directives')
         }
     };
 })
+.directive('sortablegenedomains', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Domains',
+                                           rightLabel: scope.ws,
+                                           subText: scope.fid});
+            p.loading();
+            $(p.body()).KBaseGeneDomains(
+                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
 .directive('sortablepdbstructure', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
