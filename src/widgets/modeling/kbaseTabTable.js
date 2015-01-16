@@ -129,18 +129,28 @@ $.KBWidget({
         })
 
         function buildContent() {
-            //5) Iterates over the entries in the spec and instantiates the table tabs
+            //5) Iterates over the entries in the spec and instantiate things
             for (var i = 0; i < tabList.length; i++) {
                 var tabSpec = tabList[i];
-
-                // skip any vertical tabls or widgets for now
-                if (tabSpec.type == 'verticaltbl') continue;
-                if (tabSpec.widget) continue;
-
-                var settings = self.getTableSettings(tabSpec, obj.data);
-                console.log('settings', settings)
                 var tabPane = tabs.tabContent(tabSpec.name);
 
+                // skip any vertical tables for now
+                if (tabSpec.type == 'verticaltbl') continue;
+
+                // if widget, invoke widget with arguments
+                if (tabSpec.widget) {
+                    var keys = tabSpec.keys.split(/\,\s+/g);
+                    var params = {};
+                    tabSpec.arguments.split(/\,\s+/g).forEach(function(arg, i) {
+                        console.log('keys', keys)
+                        params[arg] = obj[keys[i]];
+                    })
+
+                    tabPane[tabSpec.widget](params);
+                    continue;
+                }
+
+                var settings = self.getTableSettings(tabSpec, obj.data);
                 tabPane.rmLoading();
 
                 // note: must add table first
@@ -239,16 +249,15 @@ $.KBWidget({
                                 if (type == 'tabLinkArray') {
                                     var links = [];
                                     value.forEach(function(id) {
-                                        links.push('<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
-                                            id+'</a>')
+                                        links.push('<a class="id-click" data-id="'+id+
+                                                    '" data-method="'+method+'">'+
+                                                    id+'</a>');
                                     })
-                                    return links.join(', ')
+                                    return links.join(', ');
                                 }
 
-                                return d[key].join(', ')
+                                return d[key].join(', ');
                             }
-
-
 
                             return value;
                         }

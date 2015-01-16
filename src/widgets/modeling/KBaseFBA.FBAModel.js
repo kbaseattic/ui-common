@@ -3,7 +3,11 @@ function KBaseFBA_FBAModel(modeltabs) {
     this.modeltabs = modeltabs;
 
     this.setMetadata = function (data) {
+        this.workspace = data[7];
+        this.objName = data[1];
         this.overview = {wsid: data[7]+"/"+data[1],
+                         ws: data[7],
+                         obj_name: data[1],
                          objecttype: data[2],
                          owner: data[5],
                          instance: data[4],
@@ -208,7 +212,9 @@ function KBaseFBA_FBAModel(modeltabs) {
         }]
     }, {
         "name": "Pathways",
-        "widget": "kbasePathways"
+        "widget": "kbasePathways",
+        "keys": "workspace, objName",  //uh, let's do this?
+        "arguments": "model_ws, model_name"
     }];
 
 
@@ -395,17 +401,12 @@ function KBaseFBA_FBAModel(modeltabs) {
 
                 if (genes.indexOf(gene) == -1)
                     this.modelgenes.push({id: gene, reactions: [rxn.name]});
-                else {
+                else
                     this.modelgenes[genes.indexOf(gene)].reactions.push(rxn.name)
-                }
             }
-
-
 
             rxn.equation = reactants+" "+sign+" "+products;
         }
-
-        console.log(this.modelgenes)
 
     };
 
