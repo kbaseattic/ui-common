@@ -806,6 +806,14 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     $scope.params = $stateParams;
 })
 
+.controller('JsonDetail', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
+})
+
+.controller('ContigSetDetail', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
+})
+
 
 function LPHelp($scope, $stateParams, $location) {
     // Fixme: move out of controller

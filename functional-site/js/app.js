@@ -569,6 +569,18 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		templateUrl: 'views/jgi/jgi_obj_info.html',
 		controller: 'JGI'});
 
+    $stateProvider
+    .state('json', {
+            url: '/json/:ws/:id',
+            templateUrl: 'views/objects/json.html',
+            controller: 'JsonDetail'});
+
+    $stateProvider
+    .state('contigset', {
+            url: '/contigsets/:ws/:id',
+            templateUrl: 'views/objects/contigset.html',
+            controller: 'ContigSetDetail'});
+
     $urlRouterProvider.when('', '/login/')
                       .when('/', '/login/')
                       .when('#', '/login/');

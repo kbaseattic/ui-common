@@ -487,6 +487,28 @@ angular.module('card-directives')
             }
         };
     })
+    .directive('jsoncards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "json", 
+                    data: scope.params
+                });
+            }
+        };
+    })
+    .directive('contigsetcards', function($rootScope) {
+        return {
+            link: function(scope, element, attrs) {
+                if (cardManager) cardManager.destroy();
+                cardManager = $(element).KBaseCardLayoutManager({
+                    template: "contigset", 
+                    data: scope.params
+                });
+            }
+        };
+    })
 ;
 
 
