@@ -104,8 +104,6 @@ kb_define('kbaseMethodGallery',
             var $details = $.jqElem('div');
             $details.kbaseMethodDescription({app_id : id, gallery : this});
 
-            this.
-
             this.$elem.empty();
             this.$elem.append($details);
 
