@@ -35,17 +35,60 @@
         	$.when(p).done(function(data) {
         		console.log(data);
         		self.loading(true);
-        		self.$elem.append('<b>Sorry!</b> No landing page is available for this object.');
-        		var panel = $('<div style="overflow: auto; position: absolute; zoom: 1; left: 0px; top: 30px; right: 0px; bottom: 0px; border: 1px solid rgb(204, 204, 204);">');
+        		self.$elem.append('<b>Sorry! No custom viewer is available for this data.</b>');
+        		var panel = $('<div>');// style="overflow: auto; position: absolute; zoom: 1; left: 0px; top: 30px; right: 0px; bottom: 0px; border: 1px solid rgb(204, 204, 204);">');
         		self.$elem.append(panel);
-        		panel.append('<h3>Metadata</h3><br>');
+        		panel.append('<h3>Metadata and Basic Info</h3><br>');
         		var c1 = $('<div id="metadata">');
         		panel.append(c1);
-        		c1.JSONView(JSON.stringify(data[0].info[10]));
+        		c1.JSONView(JSON.stringify(data[0].info));
+			
+        		panel.append('<h3>Provenance</h3><br>');
+			var c3 = $('<div id="provenance">');
+        		panel.append(c3);
+        		c3.JSONView(JSON.stringify(data[0].provenance));
+			
+			// from http://stackoverflow.com/questions/1248302/javascript-object-size
+			function roughSizeOfObject( object ) {
+				var objectList = [];
+				var stack = [ object ];
+				var bytes = 0;
+				while ( stack.length ) {
+				    var value = stack.pop();
+			    
+				    if ( typeof value === 'boolean' ) {
+					bytes += 4;
+				    }
+				    else if ( typeof value === 'string' ) {
+					bytes += value.length * 2;
+				    }
+				    else if ( typeof value === 'number' ) {
+					bytes += 8;
+				    }
+				    else if
+				    (
+					typeof value === 'object'
+					&& objectList.indexOf( value ) === -1
+				    )
+				    {
+					objectList.push( value );
+			    
+					for( var i in value ) {
+					    stack.push( value[ i ] );
+					}
+				    }
+				}
+				return bytes;
+			}
         		panel.append('<h3>Data</h3><br>');
         		var c2 = $('<div id="data">');
         		panel.append(c2);
-        		c2.JSONView(JSON.stringify(data[0].data))
+			if (roughSizeOfObject(data[0].data)>10000) {
+			    c2.append($('<pre>').append($('<code>')
+					    .append(JSON.stringify(data[0].data,null,'  '))));
+			} else {
+			    c2.JSONView(JSON.stringify(data[0].data));
+			}
         	}).fail(function(e){
         		self.loading(true);
         		self.$elem.append('<div class="alert alert-danger">'+

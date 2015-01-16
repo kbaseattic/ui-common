@@ -1681,4 +1681,24 @@ angular.module('lp-directives')
     };
 })
 
+
+.directive('jsoncards', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var $panel = $('<div class="panel panel-default">'+
+                                '<div class="panel-heading">'+
+                                    '<span class="panel-title"></span>'+
+                                '</div>'+
+                                '<div class="panel-body"></div>'+
+                           '</div>');
+            $(ele).append($panel);
+            $panel.find('.panel-title').append('Raw Data JSON Viewer');
+            $panel.find('.panel-body').kbaseJsonView({
+                    ws: scope.params.ws,
+            	    id: scope.params.id
+                });
+        }
+    };
+})
+
 ;
