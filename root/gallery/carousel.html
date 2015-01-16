@@ -71,7 +71,10 @@ div.tile > ul > li {
                         $('#gallery').kbaseAppDescription();
                         //$('#meth').kbaseMethodDescription();
 
-                            //var nms = new NarrativeMethodStore("https://kbase.us/services/narrative_method_store/rpc");
+                            var nms = new NarrativeMethodStore("https://kbase.us/services/narrative_method_store/rpc");
+                            nms.list_categories({}, function(data) {
+                                console.log("CATS ARE", data);
+                            });
 
 
 
