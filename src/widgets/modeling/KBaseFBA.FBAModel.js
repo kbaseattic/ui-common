@@ -220,7 +220,6 @@ function KBaseFBA_FBAModel(modeltabs) {
         var p = this.modeltabs
                     .getBiochemReaction(id)
                     .then(function(rxn){
-                        console.log('rxn', rxn)
                         return [{
                                    "label": "ID",
                                     "data": rxn.id
@@ -241,7 +240,6 @@ function KBaseFBA_FBAModel(modeltabs) {
 
     this.GeneTab = function (id) {
         var gene = this.genehash[id];
-        console.log('gene', gene)
         return [{
                 "label": "ID",
                 "data": gene.id
@@ -381,19 +379,34 @@ function KBaseFBA_FBAModel(modeltabs) {
                     }
                 }
             }
+
             rxn.dispfeatures = "";
             rxn.genes = [];
-
             for (var gene in rxn.ftrhash) {
                 if (rxn.dispfeatures.length > 0) {
                     rxn.dispfeatures += "<br>";
                 }
                 rxn.genes.push(gene);
+
+                var genes = [];
+                this.modelgenes.forEach(function(item) {
+                    genes.push(item.id)
+                })
+
+                if (genes.indexOf(gene) == -1)
+                    this.modelgenes.push({id: gene, reactions: [rxn.name]});
+                else {
+                    this.modelgenes[genes.indexOf(gene)].reactions.push(rxn.name)
+                }
             }
+
 
 
             rxn.equation = reactants+" "+sign+" "+products;
         }
+
+        console.log(this.modelgenes)
+
     };
 
 }

@@ -138,6 +138,7 @@ $.KBWidget({
                 if (tabSpec.widget) continue;
 
                 var settings = self.getTableSettings(tabSpec, obj.data);
+                console.log('settings', settings)
                 var tabPane = tabs.tabContent(tabSpec.name);
 
                 tabPane.rmLoading();
@@ -156,7 +157,7 @@ $.KBWidget({
             var tableColumns = getColSettings(tab);
 
             var settings = {dom: '<"top"lf>rt<"bottom"ip><"clear">',
-                            aaData: data[tab.key],
+                            aaData: obj[tab.key],
                             aoColumns: tableColumns,
                             language: { search: "_INPUT_",
                                         searchPlaceholder: 'Search '+tab.name}}
@@ -232,10 +233,24 @@ $.KBWidget({
                                             id+'</a> ('+compart+')';
                             }
 
-                            if ($.isArray(d[key]))
-                                return d[key].join(', ')
+                            var value = d[key];
 
-                            return d[key];
+                            if ($.isArray(value)) {
+                                if (type == 'tabLinkArray') {
+                                    var links = [];
+                                    value.forEach(function(id) {
+                                        links.push('<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
+                                            id+'</a>')
+                                    })
+                                    return links.join(', ')
+                                }
+
+                                return d[key].join(', ')
+                            }
+
+
+
+                            return value;
                         }
             }
 
