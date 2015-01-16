@@ -1,5 +1,6 @@
-define(['jquery', 'nunjucks', 'kbaseutils', 'kbasesocialwidget',  'kbaseworkspaceserviceclient', 'q'], 
-function ($, nunjucks, Utils, SocialWidget, WorkspaceService, Q) {
+define(['jquery', 'nunjucks', 'kbaseutils', 'kbasesocialwidget',  'kbaseworkspaceserviceclient', 'kbasesession', 'q'], 
+function ($, nunjucks, Utils, SocialWidget, WorkspaceService, Session, Q) {
+  "use strict";
 	var RecentActivityWidget = Object.create(SocialWidget, {
 		init: {
 			value: function (cfg) {
@@ -23,10 +24,10 @@ function ($, nunjucks, Utils, SocialWidget, WorkspaceService, Q) {
     // Rebuild the widget.
     setup: {
       value: function () {
-    		if (this.isLoggedIn()) {
+    		if (Session.isLoggedIn()) {
           if (this.hasConfig('workspace_url')) {
     				this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'), {
-    					token: this.auth.authToken
+    					token: Session.getAuthToken()
     				});
           } else {
     			  throw 'The workspace client url is not defined';
@@ -52,8 +53,7 @@ function ($, nunjucks, Utils, SocialWidget, WorkspaceService, Q) {
         // Head off at the pass -- if not logged in, can't show profile.
         if (this.error) {
           this.renderError();
-        } else if (this.isLoggedIn()) {
-         
+        } else if (Session.isLoggedIn()) {
           this.places.title.html(this.renderTemplate('authorized_title'));
           this.places.content.html(this.renderTemplate('authorized')); 
         } else {
@@ -77,7 +77,7 @@ function ($, nunjucks, Utils, SocialWidget, WorkspaceService, Q) {
           //}
         
         // We only run any queries if the session is authenticated.
-        if (!this.isLoggedIn()) {
+        if (!Session.isLoggedIn()) {
           //options.success();
           def.resolve();
           return def.promise;

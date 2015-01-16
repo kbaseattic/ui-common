@@ -17,14 +17,14 @@ function (SocialWidget, UserProfileService, Session) {
           return this;
         }
       },
-    
+     
       setup: {
         value: function () {
           // User profile service
-          if (this.isLoggedIn()) {
+          if (Session.isLoggedIn()) { 
             if (this.hasConfig('user_profile_url')) {
               this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
-                  token: this.auth.authToken
+                  token: Session.getAuthToken()
               });
             } else {
   					  throw 'The user profile client url is not defined';
@@ -35,12 +35,11 @@ function (SocialWidget, UserProfileService, Session) {
       
       createTemplateContext: {
         value: function () {
-          var session = Session.getSession();
           var context = {
             session: {
-              isLoggedIn: session.isLoggedIn(),
-              isReady: session.isReady(),
-              username: session.getUsername()
+              isLoggedIn: Session.isLoggedIn(),
+              isReady: Session.isReady(),
+              username: Session.getUsername()
             }
           }
           return context;

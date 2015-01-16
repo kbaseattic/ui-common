@@ -76,7 +76,7 @@ define(['jquery', 'q'], function ($, Q) {
         if (this.hasExpired(sessionObject)) {
           return false;
         }
-        return true;
+        return sessionObject;
       }
     },
     
@@ -92,7 +92,6 @@ define(['jquery', 'q'], function ($, Q) {
           }
           var expiryDate = new Date(expirySec*1000);
           var diff = expiryDate - new Date();
-          console.log(diff);
           if (diff <= 0) {
             return true;
           } else {

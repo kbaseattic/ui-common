@@ -172,13 +172,12 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
 
       setupAuth: {
         value: function() {
-          var session = Session.getSession();
-          if (session.isLoggedIn()) {
+          if (Session.isLoggedIn()) {
             this.auth = {
-              authToken: session.getAuthToken(),
-              userId: session.getUsername(),
-              username: session.getUsername(),
-              realname: session.getUserRealName()
+              authToken: Session.getAuthToken(),
+              userId: Session.getUsername(),
+              username: Session.getUsername(),
+              realname: Session.getUserRealName()
             }
           } else {
             this.auth = null;
@@ -402,16 +401,6 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
 
       // STATE CALCULATIONS
 
-      isLoggedIn: {
-        value: function() {
-          if (this.auth && this.auth.authToken) {
-            return true;
-          } else {
-            return false;
-          }
-        }
-      },
-
       // TEMPLATES
       getTemplate: {
         value: function(name) {
@@ -433,13 +422,13 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
             */
           
           // We need to ensure that the context reflects the current auth state.
-          this.context.env.loggedIn = this.isLoggedIn();
-          if (this.isLoggedIn()) {
-            this.context.env.loggedInUser = this.auth.username;
-            this.context.env.loggedInUserRealName = this.auth.realname;
+          this.context.env.loggedIn = Session.isLoggedIn();
+          if (Session.isLoggedIn()) {
+            this.context.env.loggedInUser = Session.getUsername();
+            //this.context.env.loggedInUserRealName = Session.getUserRealName();
           } else {
             delete this.context.env.loggedInUser;
-            delete this.context.env.loggedInUserRealName;
+            //delete this.context.env.loggedInUserRealName;
           }
           
           this.context.env.instanceId = this.instanceId;
@@ -555,7 +544,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
           // The widgets use 'userId', which originates in the url as a path component,
           // e.g. /people/myusername.
           paramName = paramName ? paramName : 'userId';
-          if (this.auth && this.auth.username === this.params[paramName]) {
+          if (Session.isLoggedIn() && Session.getUsername() === this.params[paramName]) {
             return true;
           } else {
             return false;
@@ -575,7 +564,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
           // Head off at the pass -- if not logged in, can't show profile.
           if (this.error) {
             this.renderError();
-          } else if (this.isLoggedIn()) {
+          } else if (Session.isLoggedIn()) {
             this.places.title.html(this.widgetTitle);
             this.places.content.html(this.renderTemplate('authorized'));
           } else {

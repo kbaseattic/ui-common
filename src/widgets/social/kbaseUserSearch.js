@@ -1,6 +1,6 @@
-define(['kbasesocialwidget', 'kbaseuserprofileserviceclient'], 
-function (SocialWidget, UserProfileService) {
-  
+define(['kbasesocialwidget', 'kbaseuserprofileserviceclient', 'kbasesession'], 
+function (SocialWidget, UserProfileService, Session) {
+  "use strict";
   var widget = Object.create(SocialWidget, {
     init: {
       value: function (cfg) {
@@ -22,10 +22,10 @@ function (SocialWidget, UserProfileService) {
     setup: {
       value: function () {
         // User profile service
-        if (this.isLoggedIn()) {
+        if (Session.isLoggedIn()) {
           if (this.hasConfig('user_profile_url')) {
             this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
-                token: this.auth.authToken
+                token: Session.getAuthToken()
             });
           } else {
 					  throw 'The user profile client url is not defined';
@@ -44,7 +44,7 @@ function (SocialWidget, UserProfileService) {
             };
            
            // Only enable the search form if the user is logged in.
-          if (this.isLoggedIn()) {
+          if (Session.isLoggedIn()) {
             var widget = this;
             this.container.find('[data-field="search_text"] input').on('keyup', function (e) {
               if ((e.key === undefined && e.keyCode === 27) || e.key === 'Esc' || e.key === 'Escape') {
