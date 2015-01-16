@@ -145,6 +145,9 @@ $.KBWidget({
 
                 var table = $('<table class="table table-bordered table-striped">');
                 tabPane.append( table.dataTable(settings) );
+
+                // add any events
+                newTabEvents(tabSpec);
             }
         }
 
@@ -162,34 +165,40 @@ $.KBWidget({
             for (var i=0; i<tab.columns.length; i++) {
                 var col = tab.columns[i];
 
-                if (col.type == "tabLink") {
-                    settings.fnDrawCallback = function() {
-                        var tabPane = tabs.tabContent(tab.name).find('.id-click');
-                        tabPane.unbind('click');
-                        tabPane.click(function() {
-                            var id = $(this).data('id'),
-                                method = $(this).data('method');
-
-                            var content = $('<div>');
-
-                            if (method) {
-                                var prom = obj[method](id);
-
-                                $.when(prom).done(function(rows) {
-                                    var table = self.verticalTable({rows: rows});
-                                    content.append(table);
-                                })
-                            }
-
-                            tabs.addTab({name: id, content: content, removable: true});
-                            tabs.showTab(id);
-                        });
-                    }
+                settings.drawCallback = function() {
+                    newTabEvents(tab)
                 }
             }
 
             return settings;
         }
+
+
+        function newTabEvents(tab) {
+            var ids = tabs.tabContent(tab.name).find('.id-click');
+
+            ids.unbind('click');
+            ids.click(function() {
+                console.log('clicked')
+                var id = $(this).data('id'),
+                    method = $(this).data('method');
+
+                var content = $('<div>');
+
+                if (method) {
+                    var prom = obj[method](id);
+
+                    $.when(prom).done(function(rows) {
+                        var table = self.verticalTable({rows: rows});
+                        content.append(table);
+                    })
+                }
+
+                tabs.addTab({name: id, content: content, removable: true});
+                tabs.showTab(id);
+            });
+        }
+
 
         // takes table spec, returns datatables column settings
         function getColSettings(tab) {

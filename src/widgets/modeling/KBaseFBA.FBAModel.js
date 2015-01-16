@@ -217,6 +217,7 @@ function KBaseFBA_FBAModel(modeltabs) {
         if (id.search(/rxn\d+/g) == -1)
             return;
 
+        console.log('id', id)
         // This needs to be a promise or the design needs to change
         var p = this.modeltabs
                     .getBiochemReaction(id)

@@ -9,7 +9,7 @@ $.KBWidget({
         this._super(options);
         var self = this;
         var media = options.name;
-        var ws = options.ws;        
+        var ws = options.ws;
 
         var container = this.$elem;
 
@@ -17,8 +17,8 @@ $.KBWidget({
         var prom = kb.fba.get_media({medias: [media], workspaces: [ws]})
         $.when(prom).done(function(data) {
             container.rmLoading();
-            var mediadata = data[0];  // fixme: refactor 
-
+            var mediadata = data[0];  // fixme: refactor
+            console.log(data[0])
             media_view(container, data[0]);
         })
 
@@ -31,7 +31,7 @@ $.KBWidget({
                 '<button class="btn btn-default pull-right edit-media">Edit</button><br><br>');
 
             var table = $('<table class="table table-striped table-bordered">')
-           
+
             table.append('<tr><th>Compound</th><th>Concentration</th><th>min_flux</th><th>max_flux</th></tr>')
             for (var i in data.media_compounds) {
                 table.append('<tr><td>"'+data.media_compounds[i].name+'"</td>\
@@ -42,7 +42,7 @@ $.KBWidget({
             container.append(table);
 
             $('.edit-media').click(function() {
-                container.html('');                
+                container.html('');
                 media_view_editable(container, data)
             })
         }
@@ -52,10 +52,10 @@ $.KBWidget({
             $('.loader-rxn').remove();
 
             container.append('<b>Name: </b>'+data.id+' <b>pH: </b>'+data.pH+
-                '<button class="btn btn-default pull-right cancel-edit-media">Cancel</button><br><br>');           
+                '<button class="btn btn-default pull-right cancel-edit-media">Cancel</button><br><br>');
 
             var table = $('<table class="table table-striped table-bordered">')
-           
+
             table.append('<tr><th>Compound</th><th>Concentration</th><th>min_flux</th><th>max_flux</th><th>Delete/Add</th></tr>')
             for (var i in data.media_compounds) {
                 table.append('<tr><td><input id="cmpds'+i+'" class="form-control" value="'+data.media_compounds[i].name+'"></input></td>\
@@ -97,15 +97,15 @@ $.KBWidget({
 
 
            });
-    
+
 
             container.append('<a class="btn btn-primary save-to-ws-btn">Save to a workspace -></a>');
             events();
 
             $('.cancel-edit-media').click(function() {
-                container.html('');                
+                container.html('');
                 media_view(container, data)
-            })            
+            })
         }
 
         function events() {
@@ -144,7 +144,7 @@ $.KBWidget({
                 			name: cmpds[i],
                 			concentrations: conc[i],
                 			min_flux: minflux[i],
-                			max_flux: maxflux[i]          	
+                			max_flux: maxflux[i]
                 		});
                 	}
             	}
@@ -192,7 +192,7 @@ $.KBWidget({
                 }
             });
         }
-  
+
         function get_genome_id(ws_id) {
             var pos = ws_id.indexOf('.');
             var ws_id = ws_id.slice(0, ws_id.indexOf('.', pos+1));
