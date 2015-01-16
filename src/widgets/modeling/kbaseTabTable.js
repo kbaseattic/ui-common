@@ -114,7 +114,6 @@ $.KBWidget({
         self.kbapi('ws', 'get_objects', [{workspace: input.ws, name: input.name}])
           .done(function(data){
               var setMethod = obj.setData(data[0].data);
-              console.log('setMethod', setMethod)
 
               // see if setData method returns promise or not
               if (setMethod && 'done' in setMethod) {
@@ -143,8 +142,9 @@ $.KBWidget({
 
                 tabPane.rmLoading();
 
-                var table = $('<table class="table table-bordered table-striped">');
-                tabPane.append( table.dataTable(settings) );
+                // note: must add table first
+                tabPane.append('<table class="table table-bordered table-striped">');
+                tabPane.find('table').dataTable(settings)
 
                 // add any events
                 newTabEvents(tabSpec);
@@ -165,7 +165,7 @@ $.KBWidget({
             for (var i=0; i<tab.columns.length; i++) {
                 var col = tab.columns[i];
 
-                settings.drawCallback = function() {
+                settings.fnDrawCallback = function() {
                     newTabEvents(tab)
                 }
             }
@@ -231,6 +231,10 @@ $.KBWidget({
                                 return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
                                             id+'</a> ('+compart+')';
                             }
+
+                            if ($.isArray(d[key]))
+                                return d[key].join(', ')
+
                             return d[key];
                         }
             }

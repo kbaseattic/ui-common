@@ -93,12 +93,12 @@ function KBaseFBA_FBAModel(modeltabs) {
             "key": "equation",
             "type": "tabLink",
             "linkformat": "linkequation",
-        }, /*{
+        }, {
             "label": "Genes",
             "key": "genes",
             "type": "tabLinkArray",
             "method": "GeneTab",
-        }*/]
+        }]
     }, {
         "key": "modelcompounds",
         "name": "Compounds",
@@ -217,11 +217,10 @@ function KBaseFBA_FBAModel(modeltabs) {
         if (id.search(/rxn\d+/g) == -1)
             return;
 
-        console.log('id', id)
-        // This needs to be a promise or the design needs to change
         var p = this.modeltabs
                     .getBiochemReaction(id)
                     .then(function(rxn){
+                        console.log('rxn', rxn)
                         return [{
                                    "label": "ID",
                                     "data": rxn.id
@@ -242,6 +241,7 @@ function KBaseFBA_FBAModel(modeltabs) {
 
     this.GeneTab = function (id) {
         var gene = this.genehash[id];
+        console.log('gene', gene)
         return [{
                 "label": "ID",
                 "data": gene.id
@@ -383,12 +383,15 @@ function KBaseFBA_FBAModel(modeltabs) {
             }
             rxn.dispfeatures = "";
             rxn.genes = [];
+
             for (var gene in rxn.ftrhash) {
                 if (rxn.dispfeatures.length > 0) {
                     rxn.dispfeatures += "<br>";
                 }
                 rxn.genes.push(gene);
             }
+
+
             rxn.equation = reactants+" "+sign+" "+products;
         }
     };
