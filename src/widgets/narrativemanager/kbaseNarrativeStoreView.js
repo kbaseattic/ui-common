@@ -46,6 +46,15 @@
             var self = this;
             this.narstore.status(
                     function(status) {
+                        var url = status.git_spec_url+"/tree/"+status.git_spec_branch;
+                        if (self.options.type==='app') {
+                            url+="/apps/"+self.options.id;
+                        }
+                        if (self.options.type==='method') {
+                            url+="/methods/"+self.options.id;
+                        }
+                        
+                        
                         self.$narMethodStoreInfo.append(
                             $('<table>').css({border:'1px solid #bbb', margin:'10px', padding:'10px'})
                                 .append($('<tr>')
@@ -57,6 +66,9 @@
                                 .append($('<tr>')
                                             .append($('<th>').append('Method Spec Branch  '))
                                             .append($('<td>').append(status.git_spec_branch)))
+                                .append($('<tr>')
+                                            .append($('<th>').append('Yaml/Spec Location '))
+                                            .append($('<td>').append('<a href="'+url+'" target="_blank">'+url+"</a>")))
                                 .append($('<tr>')
                                             .append($('<th>').append('Method Spec Commit  '))
                                             .append($('<td>').append(status.git_spec_commit.replace(/(?:\r\n|\r|\n)/g, '<br>'))))
