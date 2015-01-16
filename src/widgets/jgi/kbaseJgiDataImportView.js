@@ -34,7 +34,8 @@
                    'KBaseFile.AssemblyFile':
                        {nicetype: 'Assembly File',
                         app_name: 'Assembly File to ContigSet',
-                        app: null
+                        method: 'convert_annotation_file_to_contig_set',
+                        appParam: '1,output_contigset,' //1 is ignored
                         },
 //                   'KBaseFile.AnnotationFile':
 //                       {nicetype: 'Annotation File',
@@ -165,9 +166,16 @@
 
             var $buttonDiv =
                 $('<div>').css({'margin':'10px','margin-top':'20px'});
-            if (typeInfo.app != null) {
+            if (typeInfo.app != null && typeInfo.method != null) {
+                self.showError({error: {message:
+                        "typeInfo app and method are mutally exclusive"}});
+                return;
+            }
+            if (typeInfo.app != null || typeInfo.method != null) {
+                var param = typeInfo.app ? '&app=' : '&method=';
+                var app = typeInfo.app ? typeInfo.app : typeInfo.method;
                 $buttonDiv.append($('<a href="#/narrativemanager/new?copydata='
-                                        + permref + '&app=' + typeInfo.app +
+                                        + permref + param + app +
                                         '&appparam=' + typeInfo.appParam +
                                         self.objData.name +
                                         '">').addClass('btn btn-info')
