@@ -12,13 +12,27 @@ define(['jquery', 'q'], function ($, Q) {
       value: function () {
         var sessionName = 'kbase_session';
         var sessionCookie = $.cookie(sessionName);
+        // console.log(sessionCookie);
         if (!sessionCookie) {
           this.isAuthenticated = false;
         } else {
-          this.isAuthenticated = true;          
-          this.sessionObject = this.decodeSessionString(sessionCookie);
+          this.sessionObject = this.validateSession(this.decodeSessionString(sessionCookie))
+          if (this.sessionObject) {
+            this.isAuthenticated = true;
+          } else {
+            this.isAuthenticated = false;
+          }
         }
         this.isSessionProcessed = true;      
+      }
+    },
+    
+    // This may need to be called during auth state changes, e.g. 
+    // a login widget.
+    refreshSession: {
+      value: function () {
+        this.isSessionProcessed = false;
+        this.importSession();
       }
     },
     
@@ -49,8 +63,42 @@ define(['jquery', 'q'], function ($, Q) {
       value: function (s) {
         var session = this.decodeToken(s);
         session.token = session.token.replace(/PIPESIGN/g, '|').replace(/EQUALSSIGN/g, '=');
+        session.tokenObject = this.decodeToken(session.token);
         return session;
       }
+    },
+    
+    validateSession: {
+      value: function (sessionObject) {
+        if (!sessionObject) {
+          return false;
+        }
+        if (this.hasExpired(sessionObject)) {
+          return false;
+        }
+        return true;
+      }
+    },
+    
+    hasExpired : {
+      value: function (sessionObject) {          
+          var expirySec = sessionObject.tokenObject.expiry;
+          if (!expirySec) {
+            return false;
+          }
+          expirySec = parseInt(expirySec);
+          if (isNaN(expirySec)) {
+            return false;
+          }
+          var expiryDate = new Date(expirySec*1000);
+          var diff = expiryDate - new Date();
+          console.log(diff);
+          if (diff <= 0) {
+            return true;
+          } else {
+            return false;
+          }
+        }
     },
     
     isSessionProcessed: {
@@ -105,17 +153,7 @@ define(['jquery', 'q'], function ($, Q) {
         }
       }
     },
-    
-    nothing: {
-      value: function () {
-        if (this.sessionObject === null) {
-           this.importSession();
-        } else {
-          return false;
-        }
-      }
-    },
-      
+          
     getProp: {
       value: function (name) {
          var session = this.getSession();

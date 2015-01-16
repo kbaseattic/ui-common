@@ -85,7 +85,6 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
           this.renderWaitingView();
           this.setInitialState()
           .then(function() {
-            console.log('about to refresh...');
             this.refresh().done();
                 // Disable for now...
                 /*
@@ -136,8 +135,6 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
               resolve();
             } else {
               this.userProfile = Object.create(UserProfile).init({username: this.params.userId});
-              console.log('user profile has been set ');
-              console.log(this.userProfile);
               this.userProfile.loadProfile()
               .then(function(found) {
                 resolve();
@@ -1061,7 +1058,6 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
               modal
               .modal('hide')
               .on('hidden.bs.modal', function (e) {
-                console.log('modal hidden');
                 widget.deleteProfile();
               });
             });
@@ -1260,7 +1256,7 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
           var widget = this;
           if (this.isOwner()) {
             $('[data-button="create-profile"]').on('click', function(e) {
-              widget.userProfile.profileOptIn()
+              widget.userProfile.createProfile()
               .then(function() {
                   widget.clearMessages();
                   widget.addSuccessMessage('Success!', 'Your user profile has been created.');

@@ -114,9 +114,9 @@
               return session[name];
             } catch (e) {
               if (e instanceof SyntaxError) {
-                console.log('ERROR parsing session string: ' + e.message);
+                console.log('[get_session_prop] ERROR parsing session string: ' + e.message);
               } else {
-                console.log('ERROR getting session property: ' + e);
+                console.log('[get_session_prop] ERROR getting session property: ' + e);
               }
               return null;
             }
@@ -1032,59 +1032,42 @@
                                     
                                     var widget = this;
                                     
-                                    require(['kbaseutils', 'kbaseuserprofileserviceclient', 'kbaseuserprofilewidget', 'json!functional-site/config.json'], 
-                                    function(Utils, UserProfileService, UserProfileWidget, Config) {
-                                      var config = Config[Config.setup];
-                                      var userProfileClient = new UserProfileService(Utils.getProp(config, 'user_profile_url'), {
-                                         token: authToken
-                                      });
-                                     
-                                      Utils.promise(userProfileClient, 'get_user_profile', [username])
-                                      .then(function(data) {
-                                          if (data[0]) {
-                                            console.log('[LoginWidget] Got profile');
+                                    require(['kbaseutils', 'kbaseuserprofileserviceclient', 'kbaseuserprofile', 'kbasesession', 'json!functional-site/config.json'], 
+                                    function(Utils, UserProfileService, UserProfile, Session, Config) {
+                                      console.log('session?'); console.log(Session);
+                                      Session.refreshSession();
+                                      var userProfile = Object.create(UserProfile).init({username: username});
+                                      userProfile.loadProfile()
+                                      .then(function(profile) {
+                                        switch (profile.getProfileStatus()) {
+                                        case 'stub':
+                                        case 'profile':
+                                          widget.trigger('loggedIn', widget.get_kbase_cookie());
+                                          callback.call(widget, args);
+                                          break;
+                                        case 'none':
+                                          profile.createStubProfile({createdBy: 'loginwidget'})
+                                          .then(function(users) {
                                             widget.trigger('loggedIn', widget.get_kbase_cookie());
                                             callback.call(widget, args);
-                                          } else {
-                                            console.log('[LoginWidget] No profile');
-                                            Utils.promise(userProfileClient, 'lookup_globus_user', [username])
-                                            .then(function(users) {
-                                              var user = users[username];
-                
-                                              if (!user) {
-                                                throw new Error('User ' + username + ' was not found.');
-                                              }
-                                              var userRecord = UserProfileWidget.createStubProfile({
-                                                username: user.userName,
-                                                realname: user.fullName,
-                                                account: user,
-                                                createdBy: 'automatic'
-                                              });
-
-                                              Utils.promise(userProfileClient, 'set_user_profile', {profile: userRecord})
-                                              .then(function() {
-                                                widget.trigger('loggedIn', widget.get_kbase_cookie());
-                                                callback.call(widget, args);
-                                                
-                                                console.log('[LoginWidget] Successfully created new stub profile');
-                                              })
-                                              .catch (function(err) {
-                                                console.log('[LoginWidget] Error creating new stub profile (1)');
-                                                console.log(err);
-                                              })
-                                              .done();
-                                            })
-                                            .catch (function(err) {
-                                              console.log('[LoginWidget] Error creating new stub profile (2)');
-                                              console.log(err);
-                                            })
-                                            .done();
-              
-                                          }
-                                        })
+                                          })
+                                          .catch (function(err) {
+                                            console.log('[LoginWidget] Error creating new stub profile');
+                                            console.log(err);
+                                            var errMsg = {status: 0, message: 'Error creating new stub profile'};
+                                            callback.call(this, errMsg);
+                                            widget.trigger('loggedInFailure', errMsg);
+                                          })
+                                          .done();
+                                          break;
+                                        }
+                                      })
                                       .catch (function(err) {
                                         console.log('[LoginWidget] Error getting user profile. The error follows.');
                                         console.log(err);
+                                        var errMsg = {status: 0, message: 'Error getting user profile.'};
+                                        callback.call(this, errMsg);
+                                        widget.trigger('loggedInFailure', errMsg);
                                       })
                                       .done();
                                     });

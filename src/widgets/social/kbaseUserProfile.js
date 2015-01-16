@@ -11,11 +11,9 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
             throw 'Cannot create a profile object without a username'; 
           }
           this.username = cfg.username;
-          
           if (Session.isLoggedIn()) {
             if (Config.hasConfig('user_profile_url')) {
-              console.log('auth is ');
-              console.log(Session.getAuthToken());
+              
               this.userProfileClient = new UserProfileService(Config.getConfig('user_profile_url'), {
                 token: Session.getAuthToken()
               });
@@ -32,17 +30,18 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
           return Q.Promise(function (resolve, reject, notify) {
             if (!this.userProfileClient) {
               // We don't fetch any data if a user is not logged in. 
-              resolve();
+              this.userRecord = null;
+              resolve(this);
             } else {
               Utils.promise(this.userProfileClient, 'get_user_profile', [this.username])
               .then(function(data) {
                   if (data[0]) {
                     // profile found
                     this.userRecord = data[0];
-                    resolve(true);
+                    resolve(this);
                   } else {
                     this.userRecord = null;
-                    resolve(null); 
+                    resolve(this); 
                   }
               }.bind(this))
               .catch (function(err) {
@@ -67,8 +66,6 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
       
       saveProfile: {
         value: function () {
-          console.log('about to create a promise to save...');
-          console.log(this.userRecord);
           return Utils.promise(this.userProfileClient, 'set_user_profile', {
             profile: this.userRecord
           });
@@ -195,7 +192,7 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
       },
       */
       
-      profileOptIn: {
+      createProfile: {
         value: function() {
           
           // TODO: check that the current profile is in 'stub' state.
@@ -212,7 +209,7 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
               var userData = data[this.username];
 
               // account data has been set ... copy the account fields to the corresponding user and profile fields.
-              this.userRecord = this.createProfile({
+              this.userRecord = this.makeProfile({
                 username: userData.userName,
                 realname: userData.fullName,
                 email: userData.email,
@@ -239,8 +236,51 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
           }.bind(this));
         }
       },
-
+      
       createStubProfile: {
+        value: function(options) {
+          
+          // TODO: Ensure that there is no profile?
+          return Q.Promise(function (resolve, reject, notify) {
+            Utils.promise(this.userProfileClient, 'lookup_globus_user', [this.username])
+            .then(function(data) {
+
+              if (!data || !data[this.username]) {
+                reject('No user account found for ' + this.username);
+                return;
+              }
+
+              var userData = data[this.username];
+
+              // account data has been set ... copy the account fields to the corresponding user and profile fields.
+              this.userRecord = this.makeStubProfile({
+                username: userData.userName,
+                realname: userData.fullName,
+                account: userData,
+                createdBy: options.createdBy
+              });
+
+              Utils.promise(this.userProfileClient, 'set_user_profile', {
+                profile: this.userRecord
+              })
+              .then(function() {
+                resolve();
+              })
+              .catch (function(err) {
+                console.log('ERROR SAVING USER PROFILE: ' + err);
+                console.log(err);
+                reject(err);
+              });
+
+            }.bind(this))
+            .catch (function(err) {
+              reject(err);
+            });
+          }.bind(this));
+        }
+      },
+
+      makeStubProfile: {
         value: function(baseProfile) {
           var record = {
             user: {
@@ -261,9 +301,9 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
         }
       },
 
-      createProfile: {
+      makeProfile: {
         value: function(baseProfile) {
-          var record = this.createStubProfile(baseProfile);
+          var record = this.makeStubProfile(baseProfile);
 
           record.profile.userdata = {};
 
