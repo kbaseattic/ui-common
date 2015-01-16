@@ -92,7 +92,7 @@ kb_define('kbaseMethodGallery',
 
         app_details : function(id) {
             var $details = $.jqElem('div');
-            $details.kbaseAppDescription({app_id : id, gallery : this});
+            $details.kbaseAppDescription({method_id : id, gallery : this});
 
             this.$elem.empty();
 
