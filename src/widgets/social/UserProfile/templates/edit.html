@@ -30,7 +30,7 @@
 		        <select class="form-control" id="field-title">
 		            <option value=""></option>
 		          {% for title in env.lists.userTitles %}
-		          	<option value="{{title.id}}" {% if title.id==userRecord.profile.userdata.title %} selected {% endif %}>{{title.label}}</option>
+		          	<option value="{{title.id}}" {% if title.id==userRecord.profile.userdata.title %} selected {% endif %}>{{title.label | e}}</option>
 		          {% endfor %}
 		        </select>
 		        <div data-element="message" class="help-block"></div>
@@ -39,14 +39,14 @@
 	      <div class="col-md-7">
 	        <div class="form-group" data-field="user.realname">
 	           <label for="field-realname">Your Name *</label>
-	           <div class="input-group-lg"><input id="field-realname" type="text" class="form-control" value="{{userRecord.user.realname}}"></div>
+	           <div class="input-group-lg"><input id="field-realname" type="text" class="form-control" value="{{userRecord.user.realname | e}}"></div>
 	           <div data-element="message" class="help-block"></div>
 	        </div>
 	      </div>
 	      <div class="col-md-3">
 	      	<div class="form-group" data-field="profile.userdata.suffix">
 		        <label for="field_suffix">Suffix</label>
-		        <div class="input-group-lg"><input id="field_suffix" type="text" class="form-control" value="{{userRecord.profile.userdata.suffix}}"></div>
+		        <div class="input-group-lg"><input id="field_suffix" type="text" class="form-control" value="{{userRecord.profile.userdata.suffix | e}}"></div>
 		        <div data-element="message" class="help-block"></div>
 		    </div>
 	      </div>
@@ -63,7 +63,7 @@
 	    <div class="form-group" data-field="profile.userdata.email">
         	<label for="email-field" class="control-label col-md-3">Primary Email</label>
         	<div class="col-md-9">
-        		<input id="email-field" type="text" class="form-control" value="{{userRecord.profile.userdata.email}}">
+        		<input id="email-field" type="text" class="form-control" value="{{userRecord.profile.userdata.email | e}}">
         	</div>
         	<div class="col-md-9 col-md-push-3">
         		<div data-element="message" class="help-block"></div>

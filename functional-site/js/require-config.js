@@ -27,13 +27,17 @@ require.config({
       // widgets
       // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
       kbasesocialwidget: '/src/widgets/social/kbaseSocialWidget',
-      kbaseuserprofilewidget: '/src/widgets/social/kbaseUserProfile',
+      kbaseuserprofile: '/src/widgets/social/kbaseUserProfile',
+      kbaseuserprofilewidget: '/src/widgets/social/kbaseUserProfileWidget',
       kbaseuserrecentactivity: '/src/widgets/social/kbaseUserRecentActivity',
       kbaseuserpopularnarratives: '/src/widgets/social/kbaseUserPopularNarratives',
       kbaseusercollaboratornetwork: '/src/widgets/social/kbaseUserCollaboratorNetwork',
       kbaseusersearch: '/src/widgets/social/kbaseUserSearch',
       kbaseuserbrowsenarratives: '/src/widgets/social/kbaseUserBrowseNarratives',
-      kbaseusersummary: '/src/widgets/social/kbaseUserSummary'
+      kbaseusersummary: '/src/widgets/social/kbaseUserSummary',
+      kbasesession: '/src/widgets/social/kbaseSession',
+      kbaseconfig: '/src/widgets/social/kbaseConfig', 
+      kbaseutils: '/src/widgets/social/kbaseUtils'
     },
    shim: { 
     'kbaseuserprofileserviceclient': {
