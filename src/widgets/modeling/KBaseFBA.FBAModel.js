@@ -227,33 +227,40 @@ function KBaseFBA_FBAModel(modeltabs) {
                     .getBiochemReaction(id)
                     .then(function(rxn){
                         return [{
-                                   "label": "ID",
-                                    "data": rxn.id
+                                    label: "ID",
+                                    data: rxn.id
                                 },{
-                                    "label": "Name",
-                                    "data": rxn.name
+                                    label: "Name",
+                                    data: rxn.name
                                 },{
-                                    "label": "Equation",
-                                    "data": rxn.equation,
-                                    "type": "pictureEquation"
+                                    label: "Equation",
+                                    data: rxn.equation,
+                                    type: "pictureEquation"
                                 },/*{
-                                    "label": "GPR",
-                                    "data": rxn.gpr,
+                                    label: "GPR",
+                                    data: rxn.gpr,
                             }*/];
                      })
         return p;
     }
 
     this.GeneTab = function (id) {
-        var gene = this.genehash[id];
-        return [{
-                "label": "ID",
-                "data": gene.id
-            },{
-                "label": "Reactions",
-                "data": rxn.reactions,
-                "type": "tabLinkArray"
-        }];
+        // var gene = this.genehash[id];
+        // doing this instead of creating hash
+        var data;
+        self.modelgenes.forEach(function(gene) {
+            if (gene.id == id)
+                data = [{
+                            label: "ID",
+                            data: gene.id
+                        },{
+                            label: "Reactions",
+                            data: gene.reactions,
+                            type: "tabLinkArray",
+                            method: "ReactionTab"
+                        }];
+        })
+        return data;
     }
 
     this.CompoundTab = function (id) {

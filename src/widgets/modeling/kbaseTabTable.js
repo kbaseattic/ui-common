@@ -157,7 +157,7 @@ $.KBWidget({
                 tabPane.find('table').dataTable(settings)
 
                 // add any events
-                newTabEvents(tabSpec);
+                newTabEvents(tabSpec.name);
             }
         }
 
@@ -176,7 +176,7 @@ $.KBWidget({
                 var col = tab.columns[i];
 
                 settings.fnDrawCallback = function() {
-                    newTabEvents(tab)
+                    newTabEvents(tab.name)
                 }
             }
 
@@ -184,15 +184,15 @@ $.KBWidget({
         }
 
 
-        function newTabEvents(tab) {
-            var ids = tabs.tabContent(tab.name).find('.id-click');
+        function newTabEvents(name) {
+            var ids = tabs.tabContent(name).find('.id-click');
 
             ids.unbind('click');
             ids.click(function() {
                 var id = $(this).data('id'),
                     method = $(this).data('method');
 
-                var content = $('<div>');
+                var content = $('<div>')
 
                 if (method) {
                     var prom = obj[method](id);
@@ -205,6 +205,8 @@ $.KBWidget({
 
                 tabs.addTab({name: id, content: content, removable: true});
                 tabs.showTab(id);
+
+                newTabEvents(id);
             });
         }
 
@@ -231,6 +233,11 @@ $.KBWidget({
                 settings.push(config)
             }
 
+
+            return settings
+        }
+
+
             function ref(key, type, format, method) {
                 return function(d) {
                             if (type == 'tabLink' && format == 'dispid') {
@@ -244,16 +251,8 @@ $.KBWidget({
                             var value = d[key];
 
                             if ($.isArray(value)) {
-                                if (type == 'tabLinkArray') {
-                                    var links = [];
-                                    value.forEach(function(id) {
-                                        links.push('<a class="id-click" data-id="'+id+
-                                                    '" data-method="'+method+'">'+
-                                                    id+'</a>');
-                                    })
-                                    return links.join(', ');
-                                }
-
+                                if (type == 'tabLinkArray')
+                                    return tabLinkArray(value, method)
                                 return d[key].join(', ');
                             }
 
@@ -261,9 +260,15 @@ $.KBWidget({
                         }
             }
 
-            return settings
+        function tabLinkArray(a, method) {
+            var links = [];
+            a.forEach(function(id) {
+                links.push('<a class="id-click" data-id="'+id+
+                            '" data-method="'+method+'">'+
+                            id+'</a>');
+            })
+            return links.join(', ');
         }
-
 
         this.verticalTable = function(p) {
             var data = p.data;
@@ -273,7 +278,9 @@ $.KBWidget({
 
 
             for (var i=0; i<rows.length; i++) {
-                var row = rows[i];
+                var row = rows[i],
+                    type = row.type;
+
 
                 // don't display undefined things in vertical table
                 if ('data' in row && typeof row.data == 'undefined' ||
@@ -283,10 +290,17 @@ $.KBWidget({
                 var r = $('<tr>');
                 r.append('<td><b>'+row.label+'</b></td>')
 
+                console.log('row', row)
                 // if the data is in the row definition, use it
-                if ('data' in row)
-                    r.append('<td>'+row.data+'</td>');
-                else if ('key' in row) {
+                if ('data' in row) {
+                    var value;
+                    if (type == 'tabLinkArray') {
+                        console.log('row here!a', row.data)
+                        value = tabLinkArray(row.data, row.method);
+                    }else
+                        value = row.data;
+                    r.append('<td>'+value+'</td>');
+                } else if ('key' in row) {
                     if (row.type == 'wstype') {
                         var ref = data[row.key];
                         var cell = $('<td data-ref="'+ref+'">loading...</td>');
