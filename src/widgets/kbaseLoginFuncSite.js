@@ -68,8 +68,9 @@
 
         get_kbase_cookie : function (field) {
 
-            if (!$.cookie(this.cookieName))
-                return {};
+          if (!this.is_authenticated()) {
+            return {};
+          }
 
             var chips = localStorage.getItem('kbase_session');
 
@@ -90,6 +91,18 @@
                 : chips[field];
         },
         
+        is_authenticated: function () {
+          // Use the presence of the primary cookie as the flag for
+          // authenticated.
+          if (!$.cookie(this.cookieName)) {
+            // ensure that all traces of authentication are removed.
+            this.removeAuth();
+            return false;
+          } else {
+            return true;
+          }
+        },
+        
         get_session_prop : function (name) {
             // This cookie check handles the case of logging out of kbase in some way which 
             // does not affect localstorage.
@@ -97,9 +110,10 @@
             // removes the session from localStorage. Otherwise the invalid session may leak through,
             // and it certainly is still available in the browser which might be surprising to the 
             // curious user.
-            if (!$.cookie(this.cookieName)) {
-              return null;
-            }
+          if (!this.is_authenticated()) {
+            return null;
+          }
+          
 
             var sessionString = localStorage.getItem('kbase_session');
 
@@ -114,9 +128,9 @@
               return session[name];
             } catch (e) {
               if (e instanceof SyntaxError) {
-                console.log('ERROR parsing session string: ' + e.message);
+                console.log('[get_session_prop] ERROR parsing session string: ' + e.message);
               } else {
-                console.log('ERROR getting session property: ' + e);
+                console.log('[get_session_prop] ERROR getting session property: ' + e);
               }
               return null;
             }
@@ -165,10 +179,7 @@
             if (kbaseCookie.user_id) {
 
                 if (!this.is_token_valid(this.get_kbase_cookie('token'))) {
-                    localStorage.removeItem('kbase_session');
-                    // nuke the cookie, too, just in case it's still there.
-                    $.removeCookie(this.cookieName, { path: '/', domain: '.kbase.us' });
-                    $.removeCookie(this.cookieName, { path: '/' });
+                  this.removeAuth();
                 }
                 else {
                     if (this.registerLogin) {
@@ -188,7 +199,7 @@
                 'loggedInQuery.kbase',
                 $.proxy(function (e, callback) {
 
-                var cookie = this.get_kbase_cookie()
+                  var cookie = this.get_kbase_cookie();
                     if (callback) {
                         callback(cookie);
                     }
@@ -1005,27 +1016,18 @@
 
                                 if (data.kbase_sessionid) {
 
-                                    if ($.cookie) {
-                                        // $.cookie('kbase_session',
-                                        //       'unEQUALSSIGN' + data.user_id
-                                        //     + 'PIPESIGN'
-                                        //     + 'kbase_sessionidEQUALSSIGN' + data.kbase_sessionid
-                                        //     + 'PIPESIGN'
-                                        //     + 'token_idEQUALSSIGN' + data.kbase_sessionid,
-                                        //     { expires: 60 });
-                                        var cookieString = 'un=' + data.user_id + 
-                                                           '|kbase_sessionid=' + data.kbase_sessionid +
-                                                           '|user_id=' + data.user_id +
-                                                           '|token=' + data.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
-                                        $.cookie(this.cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
-                                        $.cookie(this.cookieName, cookieString, { path: '/', expires: 60 });
-                                        $.cookie(this.narrCookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
-                                    }
-
-
-
-
-                                    // var cookieArray = [];
+                                  // NB there used to be a test "if $.cookie" here. If $.cookie, installed by a jquery
+                                  // cookie plugin, doesn't work we should bail, and that bail 
+                                  // should be before this point, so I removed it. -- EAP
+                                    var authToken = data.token;
+                                    var username = data.user_id;
+                                    var cookieString = 'un=' + data.user_id + 
+                                                       '|kbase_sessionid=' + data.kbase_sessionid +
+                                                       '|user_id=' + data.user_id +
+                                                       '|token=' + data.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
+                                    $.cookie(this.cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
+                                    $.cookie(this.cookieName, cookieString, { path: '/', expires: 60 });
+                                    $.cookie(this.narrCookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
 
                                     var args = { success : 1 };//this.get_kbase_cookie();
                                     var fields = this.options.fields;
@@ -1038,9 +1040,49 @@
 
                                     localStorage.setItem('kbase_session', jsonARGS);
                                     this.populateLoginInfo(args);
-                                    this.trigger('loggedIn', this.get_kbase_cookie());
-
-                                    callback.call(this,args);
+                                    
+                                    var widget = this;
+                                    
+                                    require(['kbaseutils', 'kbaseuserprofileserviceclient', 'kbaseuserprofile', 'kbasesession', 'json!functional-site/config.json'], 
+                                    function(Utils, UserProfileService, UserProfile, Session, Config) {
+                                      Session.refreshSession();
+                                      var userProfile = Object.create(UserProfile).init({username: username});
+                                      userProfile.loadProfile()
+                                      .then(function(profile) {
+                                        switch (profile.getProfileStatus()) {
+                                        case 'stub':
+                                        case 'profile':
+                                          widget.trigger('loggedIn', widget.get_kbase_cookie());
+                                          callback.call(widget, args);
+                                          break;
+                                        case 'none':
+                                          profile.createStubProfile({createdBy: 'loginwidget'})
+                                          .then(function(users) {
+                                            widget.trigger('loggedIn', widget.get_kbase_cookie());
+                                            callback.call(widget, args);
+                                          })
+                                          .catch (function(err) {
+                                            console.log('[LoginWidget] Error creating new stub profile');
+                                            console.log(err);
+                                            var errMsg = {status: 0, message: 'Error creating new stub profile'};
+                                            callback.call(this, errMsg);
+                                            widget.trigger('loggedInFailure', errMsg);
+                                          })
+                                          .done();
+                                          break;
+                                        }
+                                      })
+                                      .catch (function(err) {
+                                        console.log('[LoginWidget] Error getting user profile. The error follows.');
+                                        console.log(err);
+                                        var errMsg = {status: 0, message: 'Error getting user profile.'};
+                                        callback.call(this, errMsg);
+                                        widget.trigger('loggedInFailure', errMsg);
+                                      })
+                                      .done();
+                                    });
+                                    
+                                   
                                 }
                                 else {
                                     localStorage.removeItem('kbase_session');
@@ -1099,6 +1141,13 @@
                 );
             }
         },
+        
+        removeAuth: function () {
+          localStorage.removeItem(this.cookieName);
+          $.removeCookie(this.cookieName, { path: '/' });
+          $.removeCookie(this.cookieName, { path: '/', domain: 'kbase.us' });
+          $.removeCookie(this.narrCookieName, { path: '/', domain: 'kbase.us' });
+        },
 
         logout : function(rePrompt) {
 
@@ -1113,10 +1162,8 @@
                 return;
             }
 
-            localStorage.removeItem('kbase_session');
-            $.removeCookie(this.cookieName, { path: '/' });
-            $.removeCookie(this.cookieName, { path: '/', domain: 'kbase.us' });
-            $.removeCookie(this.narrCookieName, { path: '/', domain: 'kbase.us' });
+            this.removeAuth();
+            
 
             // the rest of this is just housekeeping.
 

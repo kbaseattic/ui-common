@@ -1,5 +1,5 @@
-define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient', 'kbaseuserprofileserviceclient', 'q'], 
-       function ($, nunjucks, SocialWidget, WorkspaceService, UserProfileService,  Q) {
+define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient', 'kbaseuserprofileserviceclient', 'kbasesession', 'q'], 
+       function ($, nunjucks, SocialWidget, WorkspaceService, UserProfileService, Session, Q) {
   "use strict";
 	var Widget = Object.create(SocialWidget, {
 		init: {
@@ -22,17 +22,17 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
     setup: {
       value: function () {
         // Set up workspace client
-				if (this.isLoggedIn()) {
+				if (Session.isLoggedIn()) {
           if (this.hasConfig('workspace_url')) {
 						this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'), {
-							token: this.auth.authToken
+							token: Session.getAuthToken()
 						});
           } else {
 					  throw 'The workspace client url is not defined';
 				  }
           if (this.hasConfig('user_profile_url')) {
             this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
-                token: this.auth.authToken
+                token: Session.getAuthToken()
             });
           } else {
 					  throw 'The user profile client url is not defined';
@@ -55,7 +55,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
         return Q.Promise(function (resolve, reject, notify) {
           // console.log(this.initConfig);
           
-          if (!this.isLoggedIn()) {
+          if (!Session.isLoggedIn()) {
             resolve();
           } else {
             this.promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
@@ -93,7 +93,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
         // Head off at the pass -- if not logged in, can't show profile.
         if (this.error) {
           this.renderError();
-        } else if (this.isLoggedIn()) {
+        } else if (Session.isLoggedIn()) {
          
           this.places.title.html(this.renderTemplate('authorized_title'));
           this.places.content.html(this.renderTemplate('authorized'));

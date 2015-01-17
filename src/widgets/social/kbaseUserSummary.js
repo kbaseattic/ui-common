@@ -1,5 +1,5 @@
-define(['kbasesocialwidget', 'kbaseuserprofileserviceclient'], 
-function (SocialWidget, UserProfileService) {
+define(['kbasesocialwidget', 'kbaseuserprofileserviceclient', 'kbasesession'], 
+function (SocialWidget, UserProfileService, Session) {
   "use strict";
   var widget = Object.create(SocialWidget, {
       init: {
@@ -7,7 +7,6 @@ function (SocialWidget, UserProfileService) {
           cfg.name = 'UserSummary';
           cfg.title = 'User Summary';
           this.SocialWidget_init(cfg);
-        
           return this;
         }
       },
@@ -18,19 +17,32 @@ function (SocialWidget, UserProfileService) {
           return this;
         }
       },
-    
+     
       setup: {
         value: function () {
           // User profile service
-          if (this.isLoggedIn()) {
+          if (Session.isLoggedIn()) { 
             if (this.hasConfig('user_profile_url')) {
               this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
-                  token: this.auth.authToken
+                  token: Session.getAuthToken()
               });
             } else {
   					  throw 'The user profile client url is not defined';
   				  }
           }        
+        }
+      },
+      
+      createTemplateContext: {
+        value: function () {
+          var context = {
+            session: {
+              isLoggedIn: Session.isLoggedIn(),
+              isReady: Session.isReady(),
+              username: Session.getUsername()
+            }
+          }
+          return context;
         }
       },
     

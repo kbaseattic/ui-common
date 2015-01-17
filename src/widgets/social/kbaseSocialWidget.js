@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
-  function(nunjucks, $, Q, config) {
+define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functional-site/config.json'],
+  function(nunjucks, $, Q, Session, Utils, config) {
     "use strict";
 
     var SocialWidget = Object.create({}, {
@@ -22,7 +22,8 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           
           this.initConfig = cfg || {};
           
-          this.setupConfig();        
+          this.setupConfig(); 
+              
 
 
           // PARAMS          
@@ -67,6 +68,9 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
             status: 'none',
             timestamp: new Date()
           }
+          
+          // Creates maps out of lists.
+          this.createListMaps();
 
           // Set up the templating system.
           // NB the templating requires a dedicated widget resources directory in 
@@ -155,6 +159,9 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
 
           this.widgetTitle = this.getConfig('title');
           
+          
+          this.instanceId = this.genId();   
+          
           $.ajaxSetup({
             timeout: this.getConfig('ajaxTimeout')
           });
@@ -165,18 +172,16 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
 
       setupAuth: {
         value: function() {
-          var session = this.getSession();
-          if (session) {
+          if (Session.isLoggedIn()) {
             this.auth = {
-              authToken: session.token,
-              userId: session.user_id,
-              username: session.user_id,
-              realname: session.name
+              authToken: Session.getAuthToken(),
+              userId: Session.getUsername(),
+              username: Session.getUsername(),
+              realname: Session.getUserRealName()
             }
           } else {
             this.auth = null;
           }
-          
         }
       },
 
@@ -235,8 +240,8 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
       getConfig: {
         value: function(key, defaultValue) {
           for (var i=0; i<this.configs.length; i++) {
-            if (this.getProp(this.configs[i], key) !== undefined) {
-              return this.getProp(this.configs[i], key);
+            if (Utils.getProp(this.configs[i], key) !== undefined) {
+              return Utils.getProp(this.configs[i], key);
             } 
           }
           return defaultValue;
@@ -246,14 +251,14 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
       setConfig: {
         value: function (key, value) {
           // sets it on the first config, which is the override config.
-          this.setProp(this.configs[0], key,  value);
+          Utils.setProp(this.configs[0], key,  value);
         }
       },
 
       hasConfig: {
         value: function(key) {
           for (var i=0; i<this.configs.length; i++) {
-            if (this.getProp(this.configs[i], key) !== undefined) {
+            if (Utils.getProp(this.configs[i], key) !== undefined) {
               return true;
             } 
           }
@@ -262,32 +267,13 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
       },
 
 
-      setProp: {
-        value: function(object, path, value) {
-
-          if (typeof path === 'string') {
-            path = path.split('.');
-          }
-
-          var key = path.pop();
-
-          for (var i = 0; i < path.length; i++) {
-            if (object[path] === undefined) {
-              object[path] = {};
-            }
-            object = object[path];
-          }
-
-          object[key] = value;
-        }
-      },
 
       // PARAMETERS
       // Parameters are typically passed into the init() method, and represent external values that vary for each 
       // new object. Typical use cases are url query variables.
       setParam: {
         value: function(path, value) {
-          this.setProp(this.params, path, value);
+          Utils.setProp(this.params, path, value);
           this.refresh().done();
         }
       },
@@ -330,7 +316,7 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
         */
       setState: {
         value: function(path, value, norefresh) {
-          this.setProp(this.state, path, value);
+          Utils.setProp(this.state, path, value);
           if (!norefresh) {
             this.refresh().done();
           }
@@ -415,16 +401,6 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
 
       // STATE CALCULATIONS
 
-      isLoggedIn: {
-        value: function() {
-          if (this.auth && this.auth.authToken) {
-            return true;
-          } else {
-            return false;
-          }
-        }
-      },
-
       // TEMPLATES
       getTemplate: {
         value: function(name) {
@@ -446,20 +422,22 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
             */
           
           // We need to ensure that the context reflects the current auth state.
-          this.context.env.loggedIn = this.isLoggedIn();
-          if (this.isLoggedIn()) {
-            this.context.env.loggedInUser = this.auth.username;
-            this.context.env.loggedInUserRealName = this.auth.realname;
+          this.context.env.loggedIn = Session.isLoggedIn();
+          if (Session.isLoggedIn()) {
+            this.context.env.loggedInUser = Session.getUsername();
+            //this.context.env.loggedInUserRealName = Session.getUserRealName();
           } else {
             delete this.context.env.loggedInUser;
-            delete this.context.env.loggedInUserRealName;
+            //delete this.context.env.loggedInUserRealName;
           }
+          
+          this.context.env.instanceId = this.instanceId;
           
           this.context.env.isOwner = this.isOwner();
           
           if (additionalContext) {
-            var temp = this.merge({}, this.context);
-            return this.merge(temp, additionalContext);
+            var temp = Utils.merge({}, this.context);
+            return Utils.merge(temp, additionalContext);
           } else {
             return this.context;
           }
@@ -488,7 +466,7 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
         value: function() {          
           var context = this.createTemplateContext({
             error: {
-              message: this.getProp(this.error, 'message')
+              message: Utils.getProp(this.error, 'message')
             }
           });
           this.places.content.html(this.getTemplate('error').render(context));
@@ -553,187 +531,10 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
         }
       },
 
-      merge: {
-        value: function(objA, objB) {
-          var Merger = {
-            init: function(obj) {
-              this.dest = obj;
-              return this;
-            },
-            getType: function(x) {
-              var t = typeof x;
-              if (t === 'object') {
-                if (x === null) {
-                  return 'null';
-                } else if (x.pop && x.push) {
-                  return 'array';
-                } else {
-                  return 'object';
-                }
-              } else {
-                return t;
-              }
-            },
-            merge: function(dest, obj) {
-              this.dest = dest;
-              switch (this.getType(obj)) {
-                case 'string':
-                case 'integer':
-                case 'boolean':
-                case 'null':
-                  throw "Can't merge a '" + (typeof val) + "'";
-                  break;
-                case 'object':
-                  return this.mergeObject(obj);
-                  break;
-                case 'array':
-                  return this.mergeArray(obj);
-                  break;
-                default:
-                  throw "Can't merge a '" + (typeof val) + "'";
-              }
-
-            },
-            mergeObject: function(obj) {
-              var keys = Object.keys(obj);
-              for (var i = 0; i < keys.length; i++) {
-                var key = keys[i];
-                var val = obj[key];
-                var t = this.getType(val);
-                switch (t) {
-                  case 'string':
-                  case 'number':
-                  case 'boolean':
-                  case 'null':
-                    this.dest[key] = val;
-                    break;
-                  case 'object':
-                    if (!this.dest[key]) {
-                      this.dest[key] = {};
-                    }
-                    this.dest[key] = Object.create(Merger).init(this.dest[key]).mergeObject(obj[key]);
-                    break;
-                  case 'array':
-                    if (!this.dest[key]) {
-                      this.dest[key] = [];
-                    } else {
-                      this.dest[key] = [];
-                    }
-                    this.dest[key] = Object.create(Merger).init(this.dest[key]).mergeArray(obj[key]);
-                    break;
-                  case 'undefined':
-                    if (this.dest[key]) {
-                      delete this.dest[key];
-                    }
-                    break;
-                }
-              }
-              return this.dest;
-            },
-            mergeArray: function(arr) {
-              var deleted = false;
-              for (var i = 0; i < arr.length; i++) {
-                var val = arr[i];
-                var t = this.getType(val);
-                switch (t) {
-                  case 'string':
-                  case 'number':
-                  case 'boolean':
-                  case 'null':
-                    this.dest[i] = val;
-                    break;
-                  case 'object':
-                    if (!this.dest[i]) {
-                      this.dest[i] = {};
-                    }
-                    this.dest[i] = Object.create(Merger).init(this.dest[i]).mergeObject(arr[i]);
-                    break;
-                  case 'array':
-                    if (!this.dest[i]) {
-                      this.dest[i] = [];
-                    }
-                    this.dest[i] = Object.create(Merger).init(this.dest[i]).mergeArray(obj[i]);
-                    break;
-                  case 'undefined':
-                    if (this.dest[i]) {
-                      this.dest[i] = undefined;
-                    }
-                    break;
-                }
-              }
-              if (deleted) {
-                return this.dest.filter(function(value) {
-                  if (value === undefined) {
-                    return false;
-                  } else {
-                    return true;
-                  }
-                });
-              } else {
-                return this.dest;
-              }
-            }
-          };
-          return Object.create(Merger).merge(objA, objB);
-        }
-      },
-
-      getProp: {
-        value: function(obj, prop, defaultValue) {
-          var props = prop.split('.');
-
-          var temp = obj;
-          for (var i = 0; i < props.length; i++) {
-            var key = props[i];
-            if (temp[key] === undefined) {
-              return defaultValue;
-            } else {
-              temp = temp[key];
-            }
-          }
-          return temp;
-        }
-      },
       
-      hasProp: {
-        value: function(obj, prop) {
-          var props = prop.split('.');
 
-          var temp = obj;
-          for (var i = 0; i < props.length; i++) {
-            var key = props[i];
-            if (temp[key] === undefined) {
-              return false
-            } else {
-              temp = temp[key];
-            }
-          }
-          return true;
-        }
-      },
 
-      isBlank: {
-        value: function(value) {
-          if (value === undefined) {
-            return true;
-          } else if (typeof value === 'object') {
-            if (value === null) {
-              return true;
-            } else if (value.push && value.pop) {
-              if (value.length === 0) {
-                return true;
-              }
-            } else {
-              if (value.getOwnPropertyNames().length === 0) {
-                return true;
-              }
-            }
-          } else if (typeof value === 'string' && value.length === 0) {
-            return true;
-          }
-          return false;
-        }
-      },
+     
       
       isOwner: {
         value: function(paramName) {
@@ -743,7 +544,7 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           // The widgets use 'userId', which originates in the url as a path component,
           // e.g. /people/myusername.
           paramName = paramName ? paramName : 'userId';
-          if (this.auth && this.auth.username === this.params[paramName]) {
+          if (Session.isLoggedIn() && Session.getUsername() === this.params[paramName]) {
             return true;
           } else {
             return false;
@@ -763,7 +564,7 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           // Head off at the pass -- if not logged in, can't show profile.
           if (this.error) {
             this.renderError();
-          } else if (this.isLoggedIn()) {
+          } else if (Session.isLoggedIn()) {
             this.places.title.html(this.widgetTitle);
             this.places.content.html(this.renderTemplate('authorized'));
           } else {
@@ -781,14 +582,14 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
       // such as title and content.
       renderLayout: {
         value: function() {
-          this.container.html(this.getTemplate('layout').render(this.context));
+          this.container.html(this.getTemplate('layout').render(this.createTemplateContext()));
           this.places = {
             title: this.container.find('[data-placeholder="title"]'),
             alert: this.container.find('[data-placeholder="alert"]'),
             content: this.container.find('[data-placeholder="content"]')
           };
         }
-      },
+      }, 
 
       // Render a waiting icon while.
       // This is typically done before getCurrentState which might be doing a time consuming ajax call
@@ -802,10 +603,16 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
 
       loadCSS: {
         value: function() {
+          // Load social widget css.
           $('<link>')
           .appendTo('head')
           .attr({type: 'text/css', rel: 'stylesheet'})
-          .attr('href', '/src/widgets/social/' + this.widgetName + '/style.css?force='+this.genId());
+          .attr('href', '/src/widgets/social/style.css');
+          // Load specific widget css.
+          $('<link>')
+          .appendTo('head')
+          .attr({type: 'text/css', rel: 'stylesheet'})
+          .attr('href', '/src/widgets/social/' + this.widgetName + '/style.css');
         }
       },
 
@@ -936,48 +743,7 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
           };
         }
       },
-      
-      getSession: {
-        value: function() {
-          var cookieName = 'kbase_session';
-          if (!$.cookie(cookieName)) {
-            return null;
-          }
 
-          var sessionString = localStorage.getItem(cookieName);
-          if (sessionString === null) {
-            return null;
-          }
-          
-          try {
-            return JSON.parse(sessionString);
-          } catch (e) {
-            if (e instanceof SyntaxError) {
-              console.log('ERROR parsing session string: ' + e.message);
-            } else {
-              console.log('ERROR getting session property: ' + e);
-            }
-            return null;
-          }
-        }
-      },
-      
-      getSessionProp: {
-        value: function (name) {
-          try {
-            var session = this.getSession();
-            return session[name];
-          } catch (e) {
-            if (e instanceof SyntaxError) {
-              console.log('ERROR parsing session string: ' + e.message);
-            } else {
-              console.log('ERROR getting session property: ' + e);
-            }
-            return null;
-          }
-        }
-      },
-      
       logNotice: {
         value: function (source, message) {
           console.log('NOTICE: ['+source+'] ' + message);          
@@ -999,6 +765,182 @@ define(['nunjucks', 'jquery', 'q', 'json!functional-site/config.json'],
       logError: {
         value: function (source, message) {
           console.log('ERROR: ['+source+'] ' + message);          
+        }
+      },
+      
+      createListMaps: {
+        value: function() {
+          this.listMaps = {};
+          for (var listId in this.lists) {
+            var list = this.lists[listId];
+
+            this.listMaps[listId] = {};
+
+            for (var i in list) {
+              this.listMaps[listId][list[i].id] = list[i];
+            }
+          }
+        }
+      },
+      
+      
+      lists: {
+        value: {
+          userRoles: [{
+            id: 'pi',
+            label: 'Principal Investigator'
+          }, {
+            id: 'gradstudent',
+            label: 'Graduate Student'
+          }, {
+            id: 'developer',
+            label: 'Developer'
+          }, {
+            id: 'tester',
+            label: 'Tester'
+          }, {
+            id: 'documentation',
+            label: 'Documentation'
+          }, {
+            id: 'general',
+            label: 'General Interest'
+          }],
+          userClasses: [{
+            id: 'pi',
+            label: 'Principal Investigator'
+          }, {
+            id: 'gradstudent',
+            label: 'Graduate Student'
+          }, {
+            id: 'kbase-internal',
+            label: 'KBase Staff'
+          }, {
+            id: 'kbase-test',
+            label: 'KBase Test/Beta User'
+          }, {
+            id: 'commercial',
+            label: 'Commercial User'
+          }],
+          userTitles: [{
+            id: 'mr',
+            label: 'Mr.'
+          }, {
+            id: 'ms',
+            label: 'Ms.'
+          }, {
+            id: 'dr',
+            label: 'Dr.'
+          }, {
+            id: 'prof',
+            label: 'Prof.'
+          }],
+          gravatarDefaults: [{
+            id: 'mm',
+            label: 'Mystery Man - simple, cartoon-style silhouetted outline'
+          }, {
+            id: 'identicon',
+            label: 'Identicon - a geometric pattern based on an email hash'
+          }, {
+            id: 'monsterid',
+            label: 'MonsterID - generated "monster" with different colors, faces, etc'
+          }, {
+            id: 'wavatar',
+            label: 'Wavatar - generated faces with differing features and backgrounds'
+          }, {
+            id: 'retro',
+            label: 'Retro - 8-bit arcade-style pixelated faces'
+          }, {
+            id: 'blank',
+            label: 'Blank - A Blank Space'
+          }],
+          avatarColors: [{
+            id: 'maroon',
+            label: 'maroon',
+            color: '#800000',
+            textColor: '#FFF'
+          }, {
+            id: 'red',
+            label: 'red',
+            color: '#ff0000',
+            textColor: '#FFF'
+          }, {
+            id: 'orange',
+            label: 'orange',
+            color: '#ffA500',
+            textColor: '#FFF'
+          }, {
+            id: 'yellow',
+            label: 'yellow',
+            color: '#ffff00',
+            textColor: '#000'
+          }, {
+            id: 'olive',
+            label: 'olive',
+            color: '#808000',
+            textColor: '#FFF'
+          }, {
+            id: 'purple',
+            label: 'purple',
+            color: '#800080',
+            textColor: '#FFF'
+          }, {
+            id: 'fuchsia',
+            label: 'fuchsia',
+            color: '#ff00ff',
+            textColor: '#FFF'
+          }, {
+            id: 'white',
+            label: 'white',
+            color: '#ffffff',
+            textColor: '#000'
+          }, {
+            id: 'lime',
+            label: 'lime',
+            color: '#00ff00',
+            textColor: '#000'
+          }, {
+            id: 'green',
+            label: 'green',
+            color: '#008000',
+            textColor: '#FFF'
+          }, {
+            id: 'navy',
+            label: 'navy',
+            color: '#000080',
+            textColor: '#FFF'
+          }, {
+            id: 'blue',
+            label: 'blue',
+            color: '#0000ff',
+            textColor: '#FFF'
+          }, {
+            id: 'aqua',
+            label: 'aqua',
+            color: '#00ffff',
+            textColor: '#000'
+          }, {
+            id: 'teal',
+            label: 'teal',
+            color: '#008080',
+            textColor: '#FFF'
+          }, {
+            id: 'black',
+            label: 'black',
+            color: '#000000',
+            textColor: '#FFF'
+          }, {
+            id: 'silver',
+            label: 'silver',
+            color: '#c0c0c0',
+            textColor: '#000'
+          }, {
+            id: 'gray',
+            label: 'gray',
+            color: '#808080',
+            textColor: '#FFF'
+          }]
+
+
         }
       }
 
