@@ -418,16 +418,26 @@ $.KBWidget({
                         })
         }
 
-
-        $.fn.loading = function(text) {
+        //mmmm... let's define this twice.  Why not.
+        $.fn.loading = function(text, big) {
             $(this).rmLoading()
 
-            if (typeof text != 'undefined')
-                $(this).append('<p class="text-muted loader">'+
-                     '<img src="assets/img/ajax-loader.gif"> '+text+'</p>');
-            else
-                $(this).append('<p class="text-muted loader">'+
-                     '<img src="assets/img/ajax-loader.gif"> loading...</p>')
+            if (big) {
+                if (typeof text != 'undefined') {
+                    $(this).append('<p class="text-center text-muted loader"><br>'+
+                         '<img src="assets/img/ajax-loader-big.gif"> '+text+'</p>');
+                } else {
+                    $(this).append('<p class="text-center text-muted loader"><br>'+
+                         '<img src="assets/img/ajax-loader-big.gif"> loading...</p>')
+                }
+            } else {
+                if (typeof text != 'undefined')
+                    $(this).append('<p class="text-muted loader">'+
+                         '<img src="assets/img/ajax-loader.gif"> '+text+'</p>');
+                else
+                    $(this).append('<p class="text-muted loader">'+
+                         '<img src="assets/img/ajax-loader.gif"> loading...</p>')
+            }
 
             return this;
         }
