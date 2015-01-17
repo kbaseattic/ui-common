@@ -192,12 +192,13 @@ $.KBWidget({
                 var id = $(this).data('id'),
                     method = $(this).data('method');
 
-                var content = $('<div>')
+                var content = $('<div>').loading();
 
                 if (method) {
                     var prom = obj[method](id);
 
                     $.when(prom).done(function(rows) {
+                        content.rmLoading();
                         var table = self.verticalTable({rows: rows});
                         content.append(table);
                     })
@@ -205,7 +206,6 @@ $.KBWidget({
 
                 tabs.addTab({name: id, content: content, removable: true});
                 tabs.showTab(id);
-
                 newTabEvents(id);
             });
         }
@@ -290,14 +290,12 @@ $.KBWidget({
                 var r = $('<tr>');
                 r.append('<td><b>'+row.label+'</b></td>')
 
-                console.log('row', row)
                 // if the data is in the row definition, use it
                 if ('data' in row) {
                     var value;
-                    if (type == 'tabLinkArray') {
-                        console.log('row here!a', row.data)
+                    if (type == 'tabLinkArray')
                         value = tabLinkArray(row.data, row.method);
-                    }else
+                    else
                         value = row.data;
                     r.append('<td>'+value+'</td>');
                 } else if ('key' in row) {
