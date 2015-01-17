@@ -1,11 +1,9 @@
 <style>
-
-
     .landing-page .object-name {
         margin: 10px 20px 0 0;
     }
     .panel-heading {
-        padding: 10px 15px 0px 15px;
+        padding: 5px 15px 0px 15px;
     }
     .landing-page .panel-heading .nav-tabs {
         border-bottom: none;
@@ -13,14 +11,12 @@
     .landing-page .panel-heading .nav-tabs > li {
         margin-bottom: -1px;
     }
-
 </style>
 
 <div class="container landing-page">
     <br>
 
     <div class="well">
-
         <span class="h4">
             <a ui-sref="ws.id({ws: info.ws})">{{info.ws}}</a> <span> / </span> {{info.name}}
         </span>
@@ -30,15 +26,6 @@
         </div>
     </div>
 
-    <!--
-    <h4>This is a page to test new or refactored output widgets</h4>
-    <br>
-
-    <b>type:</b> {{info.type}} <br>
-    <b>workspace:</b> {{info.ws}} <br>
-    <b>object name:</b> {{info.name}} <br>
-    <br>
-    -->
     <div class="panel panel-default">
         <div class="panel-heading">
             <span class="h4 pull-left object-name"><b>{{info.kind}}</b></span>
