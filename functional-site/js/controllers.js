@@ -9,9 +9,11 @@
 
 
 app.controller('KBaseTables', function($scope, $stateParams) {
+    $scope.tab = 'data';
     $scope.info = {type: $stateParams.type,
                    ws: $stateParams.ws,
-                   name: $stateParams.name};
+                   name: $stateParams.name,
+                   kind: $stateParams.type.split('.')[1]};
 
 })
 

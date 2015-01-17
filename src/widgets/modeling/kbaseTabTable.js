@@ -142,7 +142,6 @@ $.KBWidget({
                     var keys = tabSpec.keys.split(/\,\s+/g);
                     var params = {};
                     tabSpec.arguments.split(/\,\s+/g).forEach(function(arg, i) {
-                        console.log('keys', keys)
                         params[arg] = obj[keys[i]];
                     })
 
@@ -190,7 +189,6 @@ $.KBWidget({
 
             ids.unbind('click');
             ids.click(function() {
-                console.log('clicked')
                 var id = $(this).data('id'),
                     method = $(this).data('method');
 
