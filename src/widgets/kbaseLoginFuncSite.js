@@ -118,6 +118,11 @@
       }
     },
     
+    // NB: require for compatability with old code.
+    session: function (propName) {
+      return this.get_session_prop(propName);
+    },
+    
     get_profile_prop: function(propName, defaultValue) {
       if (this.userProfile) {
         return this.get_prop(this.userProfile, propName, defaultValue);
@@ -161,12 +166,12 @@
       // set up below, because the widget may need to respond to login and profile events.
       $(document).on('profileLoaded', function(e, profile) {
         this.userProfile = profile;
-        this.data("loggedinuser_id").html(this.getUserLabel());
+        this.data("loggedinuser_id").html(this.get_user_label());
       }.bind(this));
 
       $(document).on('loggedIn', function(e, session) {
         this.sessionObject = session;
-        this.data("loggedinuser_id").html(this.getUserLabel());
+        this.data("loggedinuser_id").html(this.get_user_label());
         this.fetchUserProfile();
       }.bind(this));
       
@@ -289,7 +294,7 @@
       return this._error;
     },
 
-    getUserLabel: function() {
+    get_user_label: function() {
       if (this.userProfile) {
         return this.get_profile_prop('user.realname') + '<br><i style="font-size=90%;">' + this.get_profile_prop('user.username') + '</i>';
       } else if (this.sessionObject) {
@@ -407,7 +412,7 @@
       this.registerLogin = function(args) {
         if (this.sessionObject) {
           this.data("loginlink").hide();
-          this.data('loggedinuser_id').html(this.getUserLabel());
+          this.data('loggedinuser_id').html(this.get_user_label());
           this.data("userdisplay").show();
           this.data('loginDialog').closePrompt();
         } else {
@@ -549,7 +554,7 @@
             this.data("entrance").hide();
             this.data('user_id').val('');
             this.data('password').val('');
-            this.data("loggedinuser_id").html(this.getUserLabel());
+            this.data("loggedinuser_id").html(this.get_user_label());
             this.data("userdisplay").show();
           } else {
 
@@ -739,7 +744,7 @@
           if (this.sessionObject) {
             this.data('loginDialog').dialogModal().trigger('clearMessages');
             this.data("entrance").hide();
-            this.data("loggedinuser_id").html(this.getUserLabel());
+            this.data("loggedinuser_id").html(this.get_user_label());
             this.data("userdisplay").show();
             this.data('loginDialog').closePrompt();
           } else {
