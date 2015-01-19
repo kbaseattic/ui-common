@@ -253,21 +253,9 @@ function ($, Q, Cookie, Config) {
             if (data.kbase_sessionid) {
               this.setSession(this.importSessionFromAuthObject(data));
               this.setAuthCookie();
-              
-              // Awaiting clients can get the session object directly, from the cookie, or query the 
-              // global singleton session object.
-              $(document).trigger('loggedIn', this.getKBaseSession());
-              
-              // And as if that is not enough there is even a calback.
-              // Call it in a promise so that it is done after we finish up here.
-              Q.Promise(function (resolve, reject, notify) {
-                options.success(this.getKBaseSession());
-                resolve();
-              }.bind(this)).done();
-             
+              options.success(this.getKBaseSession());
             } else {
-              callback.call(this, {status : 0, message : data.error_msg});
-              $(document).trigger('loggedInFailure', {status : 0, message : data.error_msg});
+              options.error({status: 0, message: data.error_msg});
             }
           }.bind(this),
           error: function (jqXHR, textStatus, errorThrown) {

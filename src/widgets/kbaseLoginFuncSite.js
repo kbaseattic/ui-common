@@ -1001,16 +1001,24 @@
           success: function(session) {
             // omg this is the callback protocol 
             session.status = 1;
+            session.success = 1;
             this.populateLoginInfo(session);
+            
+            // Awaiting clients can get the session object directly, from the cookie, or query the 
+            // global singleton session object.
+            this.trigger('loggedIn', session);
             
             callback.call(this, session);
           }.bind(this),
           error: function(err) {
             var errObject = {
               status: 0,
+              success: 0,
               message: err
             };
             this.populateLoginInfo(errObject);
+            this.trigger('loggedInFailure',errObject);
+           
             callback.call(this, errObject);
           }.bind(this)
         });

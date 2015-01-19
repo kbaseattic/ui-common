@@ -648,8 +648,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
 
 
     var finish_login = function(result) {
-        if (!result.success)
-            return;
+        //if (!result.success)
+        //    return;
 
 //        var c = $('#signin-button').kbaseLogin('get_kbase_cookie');
 //        set_cookie(c);
@@ -680,8 +680,16 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     };
 
     // sign in button
-    $('#signin-button').kbaseLogin({login_callback: finish_login,
-                                    logout_callback: finish_logout});
+    //$('#signin-button').kbaseLogin({login_callback: finish_login,
+    //                                logout_callback: finish_logout});
+    $('#signin-button').kbaseLogin();
+    $(document).on('loggedIn', function (e, session) {
+      finish_login(session);
+    });
+    $(document).on('loggedOut', function (e) {
+      finish_logout();
+    });
+    
     $('#signin-button').css('padding', '0');  // Jim!
 
     //console.log('getting session in app');
