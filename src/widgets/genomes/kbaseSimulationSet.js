@@ -11,13 +11,7 @@
     init: function(options) {
             this._super(options);
             var self = this;
-            var data = options.data
-            data = $.extend(data,{});
-            console.log (data[0])
-            //this.$elem.append(JSON.stringify(data))
-            //console.log(data[0].data.id, data[0].info[7]);
-            //var simu = data[0].data;
-            
+            var container = this.$elem
             var ws = options.ws;
             var name = options.name;
 
@@ -33,8 +27,7 @@
                 container.append('<div class="alert alert-danger">'+
                                 e.error.message+'</div>')
             });                    
-
-                    
+    
 /*
                 var table = $('<table class="table table-striped table-bordered">');
                 
@@ -83,27 +76,26 @@
                 tabs.tabContent('Overview').append(table)
 
                 var tableSettings = {
-					 "sPaginationType": "bootstrap",
-					 "iDisplayLength": 10,
-					 "aaData": simu.phenotypeSimulations,
-					 "aaSorting": [[ 3, "desc" ]],
-					 "aoColumns": [
-					   { "sTitle": "Name", 'mData': 'id'},
-					   { "sTitle": "phenoclass", 'mData': function(d) {
-						 return d.phenoclass;
-					   }},
-					   { "sTitle": "Simulated Growth", 'mData': function(d) {
-						 return d.simulatedGrowth
-					   }},
-					   { "sTitle": "Simulated Growth Fraction", 'mData': function(d) {
-						 return d.simulatedGrowthFraction
-					   }},
-					  ],                         
-					 
-				} 
+                     "sPaginationType": "bootstrap",
+                     "iDisplayLength": 10,
+                     "aaData": simu.phenotypeSimulations,
+                     "aaSorting": [[ 3, "desc" ]],
+                     "aoColumns": [
+                       { "sTitle": "Name", 'mData': 'id'},
+                       { "sTitle": "phenoclass", 'mData': function(d) {
+                         return d.phenoclass;
+                       }},
+                       { "sTitle": "Simulated Growth", 'mData': function(d) {
+                         return d.simulatedGrowth
+                       }},
+                       { "sTitle": "Simulated Growth Fraction", 'mData': function(d) {
+                         return d.simulatedGrowthFraction
+                       }},
+                      ],                         
+                }
 
 
-				simuTable.dataTable(tableSettings);
+                simuTable.dataTable(tableSettings);
 
             }
 

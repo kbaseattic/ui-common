@@ -461,6 +461,7 @@ function KBCacheClient(token) {
 
 
     self.getRoute = function(kind) {
+        var route;
         switch (kind) {
             case 'FBA': 
                 route = 'ws.fbas';
