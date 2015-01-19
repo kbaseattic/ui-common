@@ -1,16 +1,13 @@
 define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuserprofile', 'kbasesession'],
   function(nunjucks, $, md5, Q, Utils, SocialWidget, UserProfile, Session) {
     "use strict";
-
     var UserProfileWidget = Object.create(SocialWidget, {
 
       init: {
         value: function(cfg) {
           cfg.name = 'UserProfile';
-          cfg.title = 'User Profile';
-          
+          cfg.title = 'User Profile';      
           this.SocialWidget_init(cfg);
-          
 
           this._generatedId = 0;
 
@@ -127,14 +124,13 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
         value: function(options) {
           return Q.Promise(function (resolve, reject, notify) {
             // this.resetState();
-            
             if (!Session.isLoggedIn()) {
               // We don't even try to get the profile if the user isn't 
               // logged in.
               this.userProfile = null;
               resolve();
             } else {
-              this.userProfile = Object.create(UserProfile).init({username: this.params.userId});
+              this.userProfile = Object.create(UserProfile).init({username: this.params.userId}); 
               this.userProfile.loadProfile()
               .then(function(found) {
                 resolve();
@@ -1028,7 +1024,7 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
         value: function() {
           var widget = this;
           if (this.isOwner()) {
-            this.places.title.html('You - ' + this.auth.realname + ' (' + this.auth.username + ')');
+            this.places.title.html('You - ' + Session.getUserRealName() + ' (' + Session.getUsername() + ')');
           } else {
             this.places.title.html(this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')');
           }
@@ -1150,7 +1146,6 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
           $('[data-button="cancel"]').on('click', function(e) {
             
             // Do we have pending changes?
-            // console.log(widget.places.content);
             var changed = !widget.places.content
             .find('[data-button="save"]')
             .prop('disabled');

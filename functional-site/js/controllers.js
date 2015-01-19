@@ -434,9 +434,10 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     };
 
     $scope.loggedIn = function() {
-        var c = kbaseLogin.get_kbase_cookie();
-        $scope.username = c.name;
-        return (c.user_id !== undefined && c.user_id !== null);
+        var c = kbaseLogin.g();
+        $scope.username = kbaseLogin.get_session_prop('name');
+        var userId = kbaseLogin.get_session_prop('user_id');
+        return (userId !== undefined && userId !== null);
     };
 
 })

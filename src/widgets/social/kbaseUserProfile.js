@@ -1,7 +1,6 @@
-define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kbaseconfig'],
-  function(Q, Utils, Session, UserProfileService, Config) {
+define(['q', 'kbaseutils', 'kbaseuserprofileserviceclient', 'kbaseconfig', 'kbasesession'],
+function(Q, Utils, UserProfileService, Config, Session) {
     "use strict";
-
     var UserProfile = Object.create({}, {
 
       init: {
@@ -51,6 +50,12 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
               });
             }
           }.bind(this));
+        }
+      },
+      
+      getProfile: {
+        value: function () {
+          return this.userRecord;
         }
       },
       
@@ -264,8 +269,8 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
                 profile: this.userRecord
               })
               .then(function() {
-                resolve();
-              })
+                resolve(this);
+              }.bind(this))
               .catch (function(err) {
                 console.log('ERROR SAVING USER PROFILE: ' + err);
                 console.log(err);

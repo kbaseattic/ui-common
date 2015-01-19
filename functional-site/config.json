@@ -7,7 +7,12 @@
     "user_job_state_url": "https://140.221.84.180:7083",
     "search_url": "https://kbase.us/services/search/",
     "user_profile_url": "https://kbase.us/services/user_profile/rpc",
-    "login_url": "https://kbase.us/services/authorization/Sessions/Login"
+    "login_url": "https://kbase.us/services/authorization/Sessions/Login",
+    "session": {
+      "cookie": {
+         "max-age": 432000
+       }
+    }
   },
   "dev": {
     "workspace_url": "http://dev04.berkeley.kbase.us:7058",
@@ -15,7 +20,12 @@
     "user_job_state_url": "https://140.221.84.180:7083",
     "search_url": "https://search-dev.kbase.us/search/",
     "user_profile_url": "https://dev19.berkeley.kbase.us/services/user_profile/rpc",
-    "login_url": "https://kbase.us/services/authorization/Sessions/Login"
+    "login_url": "https://kbase.us/services/authorization/Sessions/Login",
+    "session": {
+      "cookie": {
+         "max-age": 432000
+       }
+    }
   },
   "wsdev": {
     "workspace_url": "http://dev04.berkeley.kbase.us:7058",
@@ -23,7 +33,12 @@
     "user_job_state_url": "https://140.221.84.180:7083",
     "search_url": "https://search-dev.kbase.us/search/",
     "user_profile_url": "https://ev19.berkeley.kbase.us/services/user_profile/rpc",
-    "login_url": "https://kbase.us/services/authorization/Sessions/Login"
+    "login_url": "https://kbase.us/services/authorization/Sessions/Login",
+    "session": {
+      "cookie": {
+         "max-age": 432000
+       }
+    }
   },
 
   "narrative_url": "//narrative.kbase.us/narrative",

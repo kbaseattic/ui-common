@@ -661,7 +661,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         // Otherwise, just login in place and reload.
         // We need to reload to make sure the USER_ID and USER_TOKEN get set properly.
         if ($location.path() === '/login/') {
-            var kbase_sessionid = $("#signin-button").kbaseLogin('session').kbase_sessionid;
+          // omg - eap
+            var kbase_sessionid = $("#signin-button").kbaseLogin('get_session_prop', 'kbase_sessionid');
             if (kbase_sessionid) { 
                 // USER_ID = $("#signin-button").kbaseLogin('session').user_id;
                 // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
@@ -683,8 +684,12 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
                                     logout_callback: finish_logout});
     $('#signin-button').css('padding', '0');  // Jim!
 
-    USER_ID = $("#signin-button").kbaseLogin('session').user_id;
-    USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
+    //console.log('getting session in app');
+    //console.log($("#signin-button").kbaseLogin('get_session'));
+    //console.log($("#signin-button").kbaseLogin('get_session_prop', 'user_id'));
+
+    USER_ID = $("#signin-button").kbaseLogin('get_session_prop', 'user_id');
+    USER_TOKEN = $("#signin-button").kbaseLogin('get_session_prop', 'token');
     kb = new KBCacheClient(USER_TOKEN);
     //kb.nar.ensure_home_project(USER_ID);
 
