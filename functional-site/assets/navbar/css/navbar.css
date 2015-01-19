@@ -2,6 +2,11 @@
 .navbar-kbase {
     border-bottom: 5px solid #E0E0E0 !important;
     padding: 8px;
+    z-index: 1;
+    height: 70px;
+}
+.navbar-fixed-top {
+  z-index: 1;
 }
 
 /* Top bar nav buttons
@@ -70,7 +75,7 @@ Although the sidebar is partially positioned with part of the navbar.
 The content area is normal flow and just needs to have a matching top margin.
 */
 .navbar-kbase {
-  height: 70px;
+ 
 }
 .sidebar {
   top: 70px;
@@ -83,9 +88,7 @@ The content area is normal flow and just needs to have a matching top margin.
 }
 
 
-.navbar-fixed-top {
-  z-index: auto;
-}
+
 .sidebar {
   z-index: auto;
   border-right: 5px solid #E0E0E0;

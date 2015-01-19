@@ -1024,7 +1024,8 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
         value: function() {
           var widget = this;
           if (this.isOwner()) {
-            this.places.title.html('You - ' + Session.getUserRealName() + ' (' + Session.getUsername() + ')');
+            // For now the user profile is available through the login widget, not the session.
+            this.places.title.html('You - ' + this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')');
           } else {
             this.places.title.html(this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')');
           }

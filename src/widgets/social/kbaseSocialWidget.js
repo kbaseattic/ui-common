@@ -28,7 +28,16 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
           this.params = {};
 
           // Also the userId is required -- this is the user for whom the social widget is concerning.
-          this.params.userId = cfg.userId;
+          // by convention, if the userId is empty, we use the current logged in user.
+          // This allows creating links to social widgets in some contexts in which the username can't be
+          // placed onto the url.
+          if (!cfg.userId) {
+            if (Session.isLoggedIn()) {
+              this.params.userId = Session.getUsername();
+            } 
+          } else {
+            this.params.userId = cfg.userId;
+          }
           
           
           // AUTH
@@ -518,11 +527,6 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
           return shortMonths[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear() + " at " + time;
         }
       },
-
-      
-
-
-     
       
       isOwner: {
         value: function(paramName) {
@@ -539,8 +543,6 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
           }
         }
       },
-      
-
 
       // DOM UPDATE
 

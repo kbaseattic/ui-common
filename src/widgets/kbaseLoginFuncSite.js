@@ -70,13 +70,8 @@
     userProfile: null,
 
     get_kbase_cookie: function(field) {
-      // NB: do we want to support components that may need to refresh based on a change in cookie state during this
-      // page render?
-      // We should probably have a timer which monitors for cookie state change and issues a logout or login event.
-      this.get_session();
-
       if (this.sessionObject) {
-        return this.get_session_prop(this.sessionObject, field);
+        return this.get_session_prop(field);
       }
     },
 
@@ -376,7 +371,8 @@
                   $('<a></a>')
                   .attr('id', 'loggedinuser_id')
                   .css('font-weight', 'bold')
-                  .attr('href', 'https://gologin.kbase.us/account/UpdateProfile')
+                  .attr('href', '/functional-site/#/people/')
+                  //.attr('href', 'https://gologin.kbase.us/account/UpdateProfile')
                   .attr('target', '_blank')
                   .css('padding-right', '0px')
                   .css('padding-left', '0px')
@@ -406,7 +402,7 @@
             )
           )
       );
-
+      
       this._rewireIds($prompt, this);
 
       this.registerLogin = function(args) {

@@ -336,14 +336,6 @@ function ($, Q, Cookie, Config) {
       }
     },
     
-    getUserRealName: {
-      value: function () {
-        if (this.isAuthenticated) {
-          return "Not Yet";
-        }
-      }
-    },
-    
     getAuthToken: {
       value: function () {
         if (this.isAuthenticated) {
