@@ -683,6 +683,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     //$('#signin-button').kbaseLogin({login_callback: finish_login,
     //                                logout_callback: finish_logout});
     $('#signin-button').kbaseLogin();
+     $('#signin-button').css('padding', '0');  // Jim!
     $(document).on('loggedIn', function (e, session) {
       finish_login(session);
     });
@@ -690,12 +691,6 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
       finish_logout();
     });
     
-    $('#signin-button').css('padding', '0');  // Jim!
-
-    //console.log('getting session in app');
-    //console.log($("#signin-button").kbaseLogin('get_session'));
-    //console.log($("#signin-button").kbaseLogin('get_session_prop', 'user_id'));
-
     USER_ID = $("#signin-button").kbaseLogin('get_session_prop', 'user_id');
     USER_TOKEN = $("#signin-button").kbaseLogin('get_session_prop', 'token');
     kb = new KBCacheClient(USER_TOKEN);
