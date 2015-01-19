@@ -7,7 +7,7 @@ function ($, Q, Cookie, Config) {
         this.sessionObject = undefined;
         this.setSession(this.importSessionFromCookie());
         // 1 hour is the default cookie max age.
-        this.cookieMaxAge = Config.getConfig('session.cookie.max-age', 5);
+        this.cookieMaxAge = Config.getConfig('session.cookie.max-age', 60*60);
         
         return this;
       }
@@ -113,17 +113,22 @@ function ($, Q, Cookie, Config) {
       }
     },
     
+    getSessionObject: {
+      value: function () {
+        return this.sessionObject;
+      }
+    },
+    
     getKBaseSession: {
       value: function () {
-        var session = this.getSession();
-        if (!session) {
+        if (!this.sessionObject) {
           return null;
         }
         return {
-          un: session.username,
-          user_id: session.username,
-          token: session.token,
-          kbase_sessionid: session.sessionId
+          un: this.sessionObject.username,
+          user_id: this.sessionObject.username,
+          token: this.sessionObject.token,
+          kbase_sessionid: this.sessionObject.sessionId
         }
       }
     },

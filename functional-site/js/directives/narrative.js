@@ -142,9 +142,10 @@ angular.module('narrative-directives')
             $(element).loading()
 
             scope.loadRecentNarratives = function() {
+             
                 var p = kb.ws.list_objects({type: kb.nar_type}).fail(function(e){
-                    $(ele).rmLoading();
-                    $(ele).append('<div class="alert alert-danger">'+
+                    $(element).rmLoading();
+                    $(element).append('<div class="alert alert-danger">'+
                                     e.error.message+'</div>')
                 });
 

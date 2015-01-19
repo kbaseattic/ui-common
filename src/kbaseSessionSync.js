@@ -22,6 +22,15 @@
     narrCookieName: {
       value: 'kbase_narr_session'
     },
+    
+    // Note that THIS session just uses the original kbase
+    // session object without transforming it to the canonical form
+    // used in the real kbaseSession
+    getKBaseSession: {
+      value: function () {
+        return this.sessionObject;
+      }
+    },
    
     
     importSessionFromCookie: {

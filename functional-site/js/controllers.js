@@ -385,8 +385,10 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
             user.username,
             user.password,
             function(args) {
-                if (args.success === 1) {
-
+                // The "args" object returned is either the session object or an error object
+                // like {success: 0, message: 'my error message'}
+                if (args.status) {
+                    // Note that 'this' is the login widget.
                     this.registerLogin(args);
                     //this.data('_session', kbaseCookie);
 
@@ -403,8 +405,8 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
                     //this.data('_session', c);
 
-                    USER_ID = $("#signin-button").kbaseLogin('session').user_id;
-                    USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
+                    USER_ID = $("#signin-button").kbaseLogin('get_session_prop', 'user_id');
+                    USER_TOKEN = $("#signin-button").kbaseLogin('get_session_prop', 'token');
 
                     //kb = new KBCacheClient(USER_TOKEN);
                     //kb.nar.ensure_home_project(USER_ID);
@@ -415,6 +417,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
                 } else {
                     console.log("error logging in");
+                    console.log(args);
                     $("#loading-indicator").hide();
                     var errormsg = args.message;
                     if (errormsg == "LoginFailure: Authentication failed.") {
@@ -434,7 +437,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     };
 
     $scope.loggedIn = function() {
-        var c = kbaseLogin.g();
+        // var c = kbaseLogin.g();
         $scope.username = kbaseLogin.get_session_prop('name');
         var userId = kbaseLogin.get_session_prop('user_id');
         return (userId !== undefined && userId !== null);

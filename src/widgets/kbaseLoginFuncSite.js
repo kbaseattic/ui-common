@@ -76,7 +76,7 @@
       this.get_session();
 
       if (this.sessionObject) {
-        return this.sessionObject[field];
+        return this.get_session_prop(this.sessionObject, field);
       }
     },
 
@@ -93,98 +93,36 @@
       }
     },
 
-    /* stolen from kbaseSession */
-    decodeToken: function(token) {
-      var parts = token.split('|');
-      var map = {};
-      for (var i = 0; i < parts.length; i++) {
-        var fieldParts = parts[i].split('=');
-        var key = fieldParts[0];
-        var value = fieldParts[1];
-        map[key] = value;
-      }
-      return map;
-    },
-
-    decodeSessionString: function(s) {
-      var session = this.decodeToken(s);
-      if (session.token) {
-        session.token = session.token.replace(/PIPESIGN/g, '|').replace(/EQUALSSIGN/g, '=');
-        session.tokenObject = this.decodeToken(session.token);
-      }
-      return session;
-    },
-
-    set_session_from_cookie: function(cookie) {
-      var sessionObject = this.decodeSessionString(cookie);
-      // We need to test that the session object was created
-      // by this widget -- the auth service cookie does not include
-      // the token. 
-      if (this.validateSession(sessionObject)) {
-        this.sessionObject = sessionObject;
-      } else {
-        this.sessionObject = null;
-        KBaseSessionSync.removeAuth();
-      }
+    get_session: function(options) {
       return this.sessionObject;
     },
-
-    load_session: function() {
-      var cookie = $.cookie(this.cookieName);
-      if (!cookie) {
-        return null;
-      }
-      this.set_session_from_cookie(cookie);
-      
-      // The profile is loaded asynchronously, but that is the best we can do
-      // since session setup is synchronous in the app.
-      var widget = this;
-      
-      require(['kbaseutils', 'kbaseuserprofileserviceclient', 'kbaseuserprofile', 'kbasesession', 'json!functional-site/config.json'],
-        function(Utils, UserProfileService, UserProfile, Session, Config) {
-          Session.refreshSession();
-          var userProfile = Object.create(UserProfile).init({
-            username: Session.getUsername()
-          });
-          userProfile.loadProfile()
-            .then(function(profile) {
-              switch (profile.getProfileStatus()) {
-                case 'stub':
-                case 'profile':
-                  widget.userProfile = profile.getProfile();
-                  // widget.trigger('profileLoaded', widget);
-                  break;
-                case 'none':
-                  widget.trigger('error', 'No profile found for user');
-                  break;
-              }
-            })
-            .
-          catch (function(err) {
-            widget.trigger('error', 'Error getting user profile.');
-          })
-            .done();
-        });
-    },
-
-    get_session: function(options) {
-      if (options && options.force) {
-        this.sessionObject = null;
-      }
-      if (this.sessionObject) {
-        if (this.validateSession()) {
-          return this.sessionObject;
+    
+    get_prop: function(obj, propName, defaultValue) {
+      var props = propName.split('.');
+      for (var i = 0; i < props.length; i++) {
+        var key = props[i];
+        if (obj[key] === undefined) {
+          return defaultValue;
+        } else {
+          obj = obj[key];
         }
       }
-      this.load_session();
-      return this.sessionObject;
+      return obj;
     },
 
-    get_session_prop: function(name) {
-      this.get_session();
-      
+    get_session_prop: function(propName, defaultValue) {
       if (this.sessionObject) {
-        return this.sessionObject[name];
+        return this.get_prop(this.sessionObject, propName, defaultValue);
+      } else {
+        return defaultValue;
+      }
+    },
+    
+    get_profile_prop: function(propName, defaultValue) {
+      if (this.userProfile) {
+        return this.get_prop(this.userProfile, propName, defaultValue);
+      } else {
+        return defaultValue;
       }
     },
 
@@ -194,48 +132,6 @@
 
     token: function() {
       return this.get_session_prop('token');
-    },
-
-    /**
-     * Token validity is tested by the 'expiry' tag in the token.
-     * That tag is followed by the number of seconds in the time when it expires.
-     * So, pull that out, multiply x1000, and make a Date() out of it. If that Date is greater than
-     * the current one, it's still good.
-     * If not, or if there is no 'expiry' field, it's not a valid token.
-     */
-    hasExpired: function(sessionObject) {
-      // NB: missing or invalid expiry count as expired (invalid).
-      var expirySec = sessionObject.tokenObject.expiry;
-      if (!expirySec) {
-        return true;
-      }
-      expirySec = parseInt(expirySec);
-      if (isNaN(expirySec)) {
-        return true;
-      }
-      var expiryDate = new Date(expirySec * 1000);
-      var diff = expiryDate - new Date();
-      if (diff <= 0) {
-        return true;
-      } else {
-        return false;
-      }
-    },
-
-    validateSession: function(sessionObject) {
-      if (sessionObject === undefined) {
-        sessionObject = this.sessionObject;
-      }
-      if (!sessionObject) {
-        return false;
-      }
-      if (!(sessionObject.kbase_sessionid && sessionObject.un && sessionObject.user_id && sessionObject.token && sessionObject.tokenObject)) {
-        return false;
-      }
-      if (this.hasExpired(sessionObject)) {
-        return false;
-      }
-      return true;
     },
 
     init: function(options) {
@@ -274,10 +170,14 @@
         this.fetchUserProfile();
       }.bind(this));
       
-      this.sessionObject = Object.create($.KBaseSessionSync).init().sessionObject;
-      if (!this.sessionObject) {
-        $.KBaseSessionSync.removeAuth();
-      } else { 
+      // Initial load of the session is through the synchronous kbase session sync object.
+      // This object is compatible with the full kbase session object, but is loaded 
+      // at index load time and so available here.
+      // We use it for the initial state, but after that all other session interactions
+      // are asynchronous, and session state is communicated via jquery messages.
+      // The session object will either be the authenticated session object or null.
+      this.sessionObject = Object.create($.KBaseSessionSync).init().getKBaseSession();
+      if (this.sessionObject) {
         if (this.registerLogin) {
           this.registerLogin();
         }
@@ -290,7 +190,6 @@
         // TODO: this should be something like sessionLoaded or sessionAvailable
         this.trigger('loggedIn', this.sessionObject);
       }
-
       
       $(document).on(
         'loggedInQuery.kbase',
@@ -392,11 +291,12 @@
 
     getUserLabel: function() {
       if (this.userProfile) {
-        var name = this.userProfile.user.realname + '<br>' + this.userProfile.user.username;
+        return this.get_profile_prop('user.realname') + '<br><i style="font-size=90%;">' + this.get_profile_prop('user.username') + '</i>';
+      } else if (this.sessionObject) {
+        return this.get_session_prop('user_id');
       } else {
-        var name = this.sessionObject.user_id;
+        return '';
       }
-      return name;
     },
 
     openDialog: function() {
@@ -751,7 +651,7 @@
           this.data('loginDialog').closePrompt();
 
           this.data('loginbutton').tooltip({
-            title: 'Logged in as ' + this.userProfile.user.realname
+            title: 'Logged in as ' + this.get_profile_prop('user.realname')
           });
 
           this.data('loginicon').removeClass().addClass('icon-user');
@@ -1064,7 +964,7 @@
         .then(function(profile) {
           switch (profile.getProfileStatus()) {
             case 'stub':
-            case 'profile':         
+            case 'profile':
                $(document).trigger('profileLoaded', profile.getProfile());       
               break;
             case 'none':
