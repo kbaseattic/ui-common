@@ -39,7 +39,8 @@ require.config({
       kbaseconfig: '/src/kbaseConfig', 
       kbaseutils: '/src/kbaseUtils',
       kbasecookie: '/src/kbaseCookie',
-      kbasetest: '/src/kbaseTest'
+      kbasetest: '/src/kbaseTest',
+      kbasenavbar: '/src/widgets/kbaseNavbar'
     },
    shim: { 
     'kbaseuserprofileserviceclient': {

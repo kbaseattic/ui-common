@@ -316,6 +316,11 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     
 })
 
+.controller('NavTest', function($scope, $stateParams) {
+    $scope.params = { 'appid':$stateParams.appid, 'kbCache' : kb }
+   
+})
+
 .controller('App', function($scope, $stateParams) {
     $scope.params = { 'appid':$stateParams.appid, 'kbCache' : kb }
     $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder", 

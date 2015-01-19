@@ -536,6 +536,13 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		{url: '/people/:userid',
 		templateUrl: 'views/social/sortable-rows-people.html',
 		controller: 'People'});
+    
+    $stateProvider
+	.state('navtest',
+		{url: '/navtest/:param1',
+		templateUrl: 'views/navtest/view.html',
+		controller: 'NavTest'});
+    
     /* this app page should no longer be used....
      *$stateProvider
 	.state('app',
