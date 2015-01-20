@@ -1,6 +1,7 @@
-define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuserprofile', 'kbasesession'],
-  function(nunjucks, $, md5, Q, Utils, SocialWidget, UserProfile, Session) {
+define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuserprofile', 'kbasesession', 'kbasenavbar'],
+  function(nunjucks, $, Q, Utils, SocialWidget, UserProfile, Session, Navbar) {
     "use strict";
+    var NAVBAR = Object.create(Navbar).init({container: '#kbase-navbar'});
     var UserProfileWidget = Object.create(SocialWidget, {
 
       init: {
@@ -48,11 +49,8 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
           // default option.
           this.templates.env.addFilter('gravatar', function(email, size, rating, gdefault) {
             // TODO: http/https.
-            var md5Hash = md5(email);
-            // window.location.protocol
-            var url = 'https://www.gravatar.com/avatar/' + md5Hash + '?s=' + size + '&amp;r=' + rating + '&d=' + gdefault
-            return url;
-          });
+            return UserProfile.makeGravatarURL(email, size, rating, gdefault);
+          }.bind(this));
           this.templates.env.addFilter('kbmarkup', function(s) {
             s = s.replace(/\n/g, '<br>');
             return s;
@@ -67,6 +65,8 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
           return this;
         }
       },
+      
+     
 
       setup: {
         value: function() {
@@ -1026,13 +1026,14 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
           if (this.isOwner()) {
             // For now the user profile is available through the login widget, not the session.
             this.places.title.html('You - ' + this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')');
+            NAVBAR.setTitle('Viewing your profile');
           } else {
-            this.places.title.html(this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')');
+            var title = this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')';
+            this.places.title.html(title);
+            NAVBAR.setTitle('Viewing profile for ' + title);
           }
           this.renderPicture();
           this.places.content.html(this.renderTemplate('view'));
-          
-          
           
           this.places.content
           .find('[data-widget-menu-item="edit"]')
@@ -1125,6 +1126,9 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
       
       renderEditView: {
         value: function() {
+          
+          NAVBAR.setTitle('Editing your profile');
+          
           this.places.content.html(this.renderTemplate('edit'));
           
           var widget = this;

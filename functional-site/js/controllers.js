@@ -451,7 +451,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     $(document).on('profileLoaded', function (e, profile) {
       // console.log('profile has been loaded'); console.log(profile.user.realname);
       $scope.$apply(function () {
-        $scope.username = profile.user.realname;
+        $scope.username = profile.getProp('user.realname');
         // console.log($scope.username);
       });
     });

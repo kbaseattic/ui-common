@@ -1,5 +1,5 @@
-define(['q', 'kbaseutils', 'kbaseuserprofileserviceclient', 'kbaseconfig', 'kbasesession'],
-function(Q, Utils, UserProfileService, Config, Session) {
+define(['q', 'kbaseutils', 'md5', 'kbaseuserprofileserviceclient', 'kbaseconfig', 'kbasesession'],
+function(Q, Utils, md5,  UserProfileService, Config, Session) {
     "use strict";
     var UserProfile = Object.create({}, {
 
@@ -321,7 +321,28 @@ function(Q, Utils, UserProfileService, Config, Session) {
         }
       },
 
-     
+      getAvatarURL: {
+        value: function (options) {
+          if (!this.userRecord) {
+            return 'assets/images/nouserpic.png';
+          };
+          var gdefault = this.getProp('profile.userdata.avatar.gravatar_default');
+          var email = this.getProp('profile.userdata.email');
+          if (gdefault && email) {
+            return this.makeGravatarURL(email, options.size || 100, options.rating || 'pg', gdefault);
+          } else {
+            return 'assets/images/nouserpic.png';
+          }
+        }
+      },
+      
+      makeGravatarURL: {
+        value: function(email, size, rating, gdefault) {
+          var md5Hash = md5(email);
+          var url = 'https://www.gravatar.com/avatar/' + md5Hash + '?s=' + size + '&amp;r=' + rating + '&d=' + gdefault
+          return url;
+        }
+      },
 
       getUserProfileSchema: {
         value: function() {
@@ -446,8 +467,15 @@ function(Q, Utils, UserProfileService, Config, Session) {
         }
       },
   
-     
-
+      getProp: {
+        value: function (propName, defaultValue) {
+          if (this.userRecord) {
+            return Utils.getProp(this.userRecord, propName, defaultValue);
+          } else {
+            return defaultValue;
+          }
+        }
+      },
      
       calcProfileCompletion: {
         value: function() {

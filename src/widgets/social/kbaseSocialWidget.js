@@ -39,11 +39,6 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
             this.params.userId = cfg.userId;
           }
           
-          console.log('Widget: ' + this.getConfig('name'));
-          console.log(this.params);
-          console.log(cfg);
-          
-          
           // AUTH
           // Auth information is derived from the auth widget.
           // Auth state can change at any time -- the syncAuth method knows how to 

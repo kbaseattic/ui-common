@@ -160,8 +160,12 @@
       // These need to go after the elementis built, but before session is 
       // set up below, because the widget may need to respond to login and profile events.
       $(document).on('profileLoaded', function(e, profile) {
-        this.userProfile = profile;
+        this.userProfile = profile.getProfile();
+        // NB: KB widgets "rewire" ids -- tranform ids into data- attributes.
         this.data("loggedinuser_id").html(this.get_user_label());
+        var url = profile.getAvatarURL({size: 40, rating: 'pg'});
+        $('#signin-button img.login-button-avatar').attr('src', url);
+        
       }.bind(this));
 
       $(document).on('loggedIn', function(e, session) {
@@ -343,7 +347,8 @@
             .addClass('btn btn-default')
             .addClass('btn-xs')
             .addClass('dropdown-toggle')
-            .append($('<span></span>').addClass('glyphicon glyphicon-user'))
+            //.append($('<span></span>').addClass('glyphicon glyphicon-user'))
+            .append('<img src="assets/images/nouserpic.png" style="width: 40px;" class="login-button-avatar"></img>')
             .append($('<span></span>').addClass('caret'))
             .bind('click',
               //$.proxy(
@@ -968,12 +973,12 @@
           switch (profile.getProfileStatus()) {
             case 'stub':
             case 'profile':
-               $(document).trigger('profileLoaded', profile.getProfile());       
+               $(document).trigger('profileLoaded', profile);       
               break;
             case 'none':
               profile.createStubProfile({createdBy: 'session'})
               .then(function(profile) {
-                $(document).trigger('profileLoaded', profile.getProfile());  
+                $(document).trigger('profileLoaded',  profile);  
               })
               .catch (function(err) {
                  $(document).trigger('profileLoadFailure', {status : 0, message : err}); 
