@@ -313,6 +313,7 @@ function KBaseFBA_FBAModel(modeltabs) {
         this.modelgenes = [];
         this.modelcompartments = this.data.modelcompartments;
         this.biomasses = this.data.biomasses;
+        this.biomasscpds = [];
         this.gapfillings = this.data.gapfillings;
         this.cpdhash = {};
         this.rxnhash = {};
@@ -334,6 +335,20 @@ function KBaseFBA_FBAModel(modeltabs) {
             if (cpd.cpdkbid != "cpd00000") {
                 this.cpdhash[cpd.cpdkbid+"_"+cpd.cmpkbid] = cpd;
             }
+        }
+        for (var i=0; i < this.biomasses.length; i++) {
+        	var biomass = this.biomasses[i];
+        	biomass.dispid = biomass.id;
+        	for(var j=0; j < biomass.biomasscompounds.length; j++) {
+        		var biocpd = biomass.biomasscompounds[j];
+        		biocpd.id = biocpd.modelcompound_ref.split("/").pop();
+        		biocpd.name = this.cpdhash[biocpd.id].name+"<br>("+biocpd.id+")";
+        		biocpd.formula = this.cpdhash[biocpd.id].formula;
+        		biocpd.charge = this.cpdhash[biocpd.id].charge;
+        		biocpd.cmpkbid = this.cpdhash[biocpd.id].cmpkbid;
+        		biocpd.biomass = biomass.id;
+        		this.biomasscpds.push(biocpd);
+        	}
         }
         for (var i=0; i< this.modelreactions.length; i++) {
             var rxn = this.modelreactions[i];
