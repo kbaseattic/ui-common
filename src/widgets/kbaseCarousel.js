@@ -38,7 +38,7 @@
             this._super(options);
 
             var carousel_id = this.uuid();
-console.log("CAOURSEL", this.options.carousel);
+
             var $carousel = $.jqElem('div')
                 .addClass('carousel')
                 .addClass('slide')

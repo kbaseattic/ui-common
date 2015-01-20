@@ -148,7 +148,13 @@ kb_define('kbaseMethodGallery',
 
                     var topApp = data.shift();
 
-                    var $topContent = $.jqElem('div')
+                    var topIcon = '/static/kbase/images/kbase_logo.png';
+                    if (topApp.icon != undefined) {
+                        topIcon = topApp.icon;
+                    }
+
+                    var $topContent = $.jqElem('div');
+                    $topContent
                         .css({
                                 width: '630px',
                                 height: '250px',
@@ -160,6 +166,13 @@ kb_define('kbaseMethodGallery',
                                 .on('click', function(e) {
                                     $gal.app_details(topApp.id);
                                 })
+                                .on('mouseover', function(e) {
+                                    $topContent.css('box-shadow', '3px 3px 3px #ccc');
+                                })
+                                .on('mouseout', function(e) {
+                                    $topContent.css('box-shadow', '1px 1px 1px #ccc');
+                                })
+
                         .append(
                             $.jqElem('div')
                                 .css(
@@ -174,7 +187,7 @@ kb_define('kbaseMethodGallery',
                                 .append(
                                     $.jqElem('img')
                                         .css('height', '190px')
-                                        .attr('src', '/static/kbase/images/kbase_logo.png')
+                                        .attr('src', topIcon)
                                 )
                         )
                         .append(
@@ -470,7 +483,13 @@ kb_define('kbaseMethodGallery',
 
                 var truncated = app.subtitle;//.substring(0,50);
 
-                var $card = $.jqElem('div')
+                var cardIcon = '/static/kbase/images/kbase_logo.png';
+                if (app.icon != undefined) {
+                    cardIcon = app.icon;
+                }
+
+                var $card = $.jqElem('div');
+                $card
                     .css(
                         {
                         	width: '270px',
@@ -484,6 +503,12 @@ kb_define('kbaseMethodGallery',
                     )
                     .on('click', function(e) {
                         $gal.app_details(app.id);
+                    })
+                    .on('mouseover', function(e) {
+                        $card.css('box-shadow', '3px 3px 3px #ccc');
+                    })
+                    .on('mouseout', function(e) {
+                        $card.css('box-shadow', '1px 1px 1px #ccc');
                     })
                     .append(
                         $.jqElem('div')
@@ -500,7 +525,7 @@ kb_define('kbaseMethodGallery',
                                         'padding-top': '10px'
                                     })
                                     .css('height', '80px')
-                                    .attr('src', '/static/kbase/images/kbase_logo.png')
+                                    .attr('src', cardIcon)
                             )
                     )
                     .append(
@@ -532,7 +557,8 @@ kb_define('kbaseMethodGallery',
 
                 var truncated = meth.subtitle;//.substring(0,50);
 
-                var $card = $.jqElem('div')
+                var $card = $.jqElem('div');
+                $card
                     .css(
                         {
                         	width: '270px',
@@ -547,6 +573,13 @@ kb_define('kbaseMethodGallery',
                     .on('click', function(e) {
                         $gal.method_details(meth.id);
                     })
+                    .on('mouseover', function(e) {
+                        $card.css('box-shadow', '3px 3px 3px #ccc');
+                    })
+                    .on('mouseout', function(e) {
+                        $card.css('box-shadow', '1px 1px 1px #ccc');
+                    })
+
                     .append(
                         $.jqElem('div').css({'font-weight' : 'bold', 'font-size' : '110%'}).append(meth.name)
                     )
@@ -624,7 +657,7 @@ kb_define('kbaseMethodGallery',
                         }
                     );
 
-                    if (match) {
+                    if (match && Object.keys($gal.searches).length) {
                         if (val.type == 'app') {
                             newApps.push(val.id);
                         }
