@@ -31,13 +31,17 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
           // by convention, if the userId is empty, we use the current logged in user.
           // This allows creating links to social widgets in some contexts in which the username can't be
           // placed onto the url.
-          if (!cfg.userId) {
+          if (Utils.isBlank(cfg.userId)) {
             if (Session.isLoggedIn()) {
               this.params.userId = Session.getUsername();
-            } 
+            }
           } else {
             this.params.userId = cfg.userId;
           }
+          
+          console.log('Widget: ' + this.getConfig('name'));
+          console.log(this.params);
+          console.log(cfg);
           
           
           // AUTH

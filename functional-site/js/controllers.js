@@ -381,7 +381,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 .controller('Login', function($scope, $stateParams, $location, kbaseLogin, $modal) {
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives
-
+    
     // callback for ng-click 'loginUser':
     $scope.loginUser = function (user) {
         $("#loading-indicator").show();
@@ -443,10 +443,18 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
     $scope.loggedIn = function() {
         // var c = kbaseLogin.g();
-        $scope.username = kbaseLogin.get_session_prop('name');
+        // $scope.username = kbaseLogin.get_session_prop('name');
         var userId = kbaseLogin.get_session_prop('user_id');
         return (userId !== undefined && userId !== null);
     };
+    
+    $(document).on('profileLoaded', function (e, profile) {
+      // console.log('profile has been loaded'); console.log(profile.user.realname);
+      $scope.$apply(function () {
+        $scope.username = profile.user.realname;
+        // console.log($scope.username);
+      });
+    });
 
 })
 

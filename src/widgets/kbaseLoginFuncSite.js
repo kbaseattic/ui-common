@@ -217,6 +217,7 @@
         }, this)
       ); 
       
+      /*
       // Finally listen for user activity in order to tickle the session.
       // But only tickle at the most every 5 seconds.
       
@@ -233,6 +234,7 @@
           this.tickleSession();
         }
       }.bind(this), checkInterval);
+      */
 
       return this;
 

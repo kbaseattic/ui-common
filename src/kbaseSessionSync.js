@@ -137,6 +137,8 @@
         $.removeCookie(this.cookieName, {path: '/'});
         $.removeCookie(this.cookieName, {path: '/', domain: 'kbase.us'});
         $.removeCookie(this.narrCookieName, {path: '/', domain: 'kbase.us'});
+        // For compatability
+        localStorage.removeItem(this.cookieName);
       }
     }
     

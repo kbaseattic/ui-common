@@ -75,7 +75,7 @@ function ($, Q, Cookie, Config) {
       value: function (kbaseSession) {
         // Auth object has fields un, user_id, kbase_sessionid, token. If any are missing, we void the session (if any)
         // cookies and pretend we have nothing.
-        // NB: the objec returned from the auth service does NOT have the un field.
+        // NB: the object returned from the auth service does NOT have the un field.
         if (! (kbaseSession.kbase_sessionid && kbaseSession.user_id && kbaseSession.token) ) {
           // throw new Error('Invalid Kbase Session Cookie');
           this.removeAuth();
@@ -83,6 +83,7 @@ function ($, Q, Cookie, Config) {
         }
         var newSession = {
           username: kbaseSession.user_id,
+          realname: kbaseSession.name,
           token: kbaseSession.token,
           tokenObject: this.decodeToken(kbaseSession.token),
           sessionId: kbaseSession.kbase_sessionid
@@ -127,6 +128,7 @@ function ($, Q, Cookie, Config) {
         return {
           un: this.sessionObject.username,
           user_id: this.sessionObject.username,
+          name: this.sessionObject.realname,
           token: this.sessionObject.token,
           kbase_sessionid: this.sessionObject.sessionId
         }
@@ -207,6 +209,14 @@ function ($, Q, Cookie, Config) {
           Cookie.setItem(this.cookieName, cookieString, this.cookieMaxAge, '/');
           Cookie.setItem(this.cookieName, cookieString, this.cookieMaxAge, '/', 'kbase.us');
           Cookie.setItem(this.narrCookieName, cookieString, this.cookieMaxAge, '/', 'kbase.us');
+          // Set the same cookie in localStorage for compatability.
+          var kbaseSession = this.getKBaseSession();
+          // This is for compatability with the current state of the narrative ui, which uses this
+          // as a flag for being authenticated.
+          kbaseSession.success = 1;
+          console.log('saving to local storage...');
+          console.log(kbaseSession);
+          localStorage.setItem(this.cookieName, JSON.stringify(kbaseSession));
         }
       }
     },
@@ -233,7 +243,7 @@ function ($, Q, Cookie, Config) {
           user_id : options.username, 
           password: options.password,
           cookie: 0,
-          fields: 'un,token,user_id,kbase_sessionid',
+          fields: 'un,token,user_id,kbase_sessionid,name',
           status : 1
         };
         
@@ -251,6 +261,8 @@ function ($, Q, Cookie, Config) {
           },
           success: function (data,res,jqXHR) {
             if (data.kbase_sessionid) {
+              console.log('LOGGED IN WITH...');
+              console.log(data);
               this.setSession(this.importSessionFromAuthObject(data));
               this.setAuthCookie();
               options.success(this.getKBaseSession());
@@ -348,6 +360,8 @@ function ($, Q, Cookie, Config) {
          Cookie.removeItem(this.cookieName, '/');
          Cookie.removeItem(this.cookieName, '/', 'kbase.us');
          Cookie.removeItem(this.narrCookieName, '/', 'kbase.us');
+         // Remove the localStorage session for compatability.
+         localStorage.removeItem(this.cookieName);
        }
      },
   });
