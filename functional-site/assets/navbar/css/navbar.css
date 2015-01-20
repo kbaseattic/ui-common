@@ -60,13 +60,23 @@
 }
 
 /* Own */
-#navbar-title {
+#kbase-navbar .navbar-title {
   padding-left: 20px;
   border-left: 2px solid #e0e0e0;
+  font-size: 120%;
+  font-weight: bold;
 }
-#navbar-title .title {
+#kbase-navbar .navbar-title .title {
   font-weight: bold;
   font-size: 120%;
+}
+
+
+#kbase-navbar .navbar-buttons {
+  display: inline-block; 
+  padding-right: 15px; 
+  margin-right: 15px;
+  border-right: 2px solid #e0e0e0;
 }
 
 /* Tweak navbar, sidebar and main content areas to fit together 

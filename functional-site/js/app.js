@@ -534,7 +534,7 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
     $stateProvider
 	.state('people',
 		{url: '/people/:userid',
-		templateUrl: 'views/social/sortable-rows-people.html',
+		templateUrl: 'views/social/user-page.html',
 		controller: 'People'});
     
     $stateProvider

@@ -1027,6 +1027,45 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
             // For now the user profile is available through the login widget, not the session.
             this.places.title.html('You - ' + this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')');
             NAVBAR.setTitle('Viewing your profile');
+            NAVBAR.clearButtons();
+            NAVBAR.addButton({
+              name: 'edit', 
+              xlabel: 'Edit',
+              style: 'primary',
+              icon: 'edit',
+              callback: function () {
+                widget.clearMessages();
+                widget.renderEditView();
+              }.bind(this)
+            });
+            NAVBAR.addDropdown({
+              place: 'end',
+              name: 'options', style: 'default', icon: null, label: 'Options',
+              items: [
+                {name: 'optout', icon: 'trash', color: 'green', label: 'Remove Profile',
+                 callback: function (e) {
+                   e.preventDefault();
+                   var modal = $('.UserProfileWidget [data-widget-modal="confirm-optout"]')
+                   .modal('show');
+            
+                   // NB the deny button is already wired as [data-dismiss="modal"] which will 
+                   // close the modal, and without further intervention, do nothing.
+                   modal.find('[data-widget-modal-control="confirm"]').on('click', function (e) {
+                     modal
+                     .modal('hide')
+                     .on('hidden.bs.modal', function (e) {
+                       widget.deleteProfile();
+                     });
+                   });
+                 }.bind(this)},
+                {type: 'divider'},
+                {name: 'help', icon: 'question', color: 'orange', label: 'Help', callback: function (e) {
+                  e.preventDefault();
+                  var modal = $('.UserProfileWidget [data-widget-modal="help"]')
+                  .modal('show');
+                }}
+              ]
+            });
           } else {
             var title = this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')';
             this.places.title.html(title);
@@ -1126,8 +1165,58 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
       
       renderEditView: {
         value: function() {
-          
+          var W = this;
           NAVBAR.setTitle('Editing your profile');
+          NAVBAR.clearButtons();
+          NAVBAR.addButton({
+            name: 'save', 
+            xlabel: 'Save',
+            style: 'primary',
+            icon: 'save',
+            callback: function () {
+              if (W.updateUserProfileFromForm()) {
+                W.userProfile.saveProfile()
+                .then(function() {
+                    W.renderViewEditLayout();
+                    W.addSuccessMessage('Success!', 'Your user profile has been updated.');
+                    W.renderInfoView();
+                })
+                .catch (function(err) {
+                  W.renderErrorView(err);
+                })
+                .done();
+              }
+            }
+          });
+          NAVBAR.addButton({
+            name: 'cancel', 
+            xlabel: 'Cancel',
+            style: 'default',
+            icon: 'ban',
+            callback: function () {
+              // Do we have pending changes?
+              var changed = !W.places.content
+                .find('[data-button="save"]')
+                .prop('disabled');
+            
+              if (changed) {
+                var modal = $('.UserProfileWidget [data-widget-modal="confirm-cancel"]')
+                .modal('show');
+            
+                modal.find('[data-widget-modal-control="confirm-cancel"]').on('click', function (e) {
+                  modal
+                  .modal('hide')
+                  .on('hidden.bs.modal', function (e) {
+                    W.clearMessages();
+                    W.renderInfoView();
+                  });
+                });
+              } else {
+                W.clearMessages();
+                W.renderInfoView();
+              }
+            }
+          });
           
           this.places.content.html(this.renderTemplate('edit'));
           
@@ -1212,9 +1301,10 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
             // For now we can also use this as a flag for whether to require confirmation
             // to leave the profile.
             
-            widget.places.content
-            .find('[data-button="save"]')
-            .removeAttr('disabled');
+            //widget.places.content
+            //.find('[data-button="save"]')
+            //.removeAttr('disabled');
+            NAVBAR.findButton('save').removeAttr('disabled');
           });
           
         }

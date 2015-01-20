@@ -313,7 +313,10 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 .controller('People', function($scope, $stateParams) {
     $scope.params = { 'userid':$stateParams.userid, 'kbCache' : kb }
-    
+    $('<link>')
+    .appendTo('head')
+    .attr({type: 'text/css', rel: 'stylesheet'})
+    .attr('href', 'views/social/user-page/style.css');
 })
 
 .controller('NavTest', function($scope, $stateParams) {

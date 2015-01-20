@@ -354,10 +354,11 @@
     <body>
         <div id="wrap">
             <div id="content">
+                <!-- SB only one on page, so we can use the id here -->
                 <div class="navbar-kbase navbar-fixed-top" id="kbase-navbar">
                     <div class="container-fluid">
                         <!-- main menu -->
-                        <div class="navbar-header" id="navbar-menu">
+                        <div class="navbar-header navbar-menu">
                             <div style="display:inline-block">
                                 <button id="kb-nav-menu" class="btn btn-default navbar-btn kb-nav-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <span class="fa fa-navicon"></span>
@@ -380,12 +381,14 @@
                         </div>
 
                         <!-- title area -->
-                        <div class="navbar-text -title" id="navbar-title">
+                        <div class="navbar-text navbar-title">
                            <span class="title"></span>
                         </div>
 
                         <!-- button area -->
-                        <div class="navbar-right -buttons" id="navbar-buttons">
+                        <div class="navbar-right">
+                            <span class="navbar-buttons">
+                            </span>
                            
                             <!--<button id="kb-save-btn" class="btn btn-default navbar-btn kb-nav-btn">
                                 <div class="fa fa-save"></div>

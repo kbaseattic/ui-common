@@ -343,28 +343,35 @@
           .attr('id', 'userdisplay')
           .css('display', 'none')
           .append(
-            $('<button></button>')
-            .addClass('btn btn-default')
-            .addClass('btn-xs')
-            .addClass('dropdown-toggle')
-            //.append($('<span></span>').addClass('glyphicon glyphicon-user'))
-            .append('<img src="assets/images/nouserpic.png" style="width: 40px;" class="login-button-avatar"></img>')
-            .append($('<span></span>').addClass('caret'))
-            .bind('click',
-              //$.proxy(
+            $('<div></div>')
+            .addClass('dropdown')
+            .append(
+                $('<button></button>')
+                .addClass('btn btn-default')
+                .addClass('btn-xs')
+                .addClass('dropdown-toggle')
+                .attr('data-toggle', 'dropdown')
+                .attr('type', 'button')
+                //.append($('<span></span>').addClass('glyphicon glyphicon-user'))
+                .append('<img src="assets/images/nouserpic.png" style="width: 40px;" class="login-button-avatar"></img>')
+                .append($('<span></span>').addClass('caret'))
+                .bind('click',
+                  //$.proxy(
 
-              function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                $(this).next().toggle(); //slideToggle('fast');
-              }
-              //, this)
-            )
-          )
-          .append(
+                  function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $(this).next().toggle(); //slideToggle('fast');
+                  }
+                  //, this)
+                )
+                
+              )
+              .append(
             $('<ul></ul>')
             .addClass('dropdown-menu')
             .addClass('pull-right')
+            .attr('role', 'menu')
             .css('padding', '3px')
             .attr('id', 'login-dropdown-menu')
             .append(
@@ -408,6 +415,7 @@
               )
             )
           )
+        )
       );
       
       this._rewireIds($prompt, this);
