@@ -128,16 +128,20 @@ kb_define('kbaseMethodGallery',
                 }
             );
             this.nms.list_apps({}, function(data) {
+
                 if ($gal.options.topApps == undefined) {
                     $gal.options.topApps = [];
                     $.each(
                         data,
                         function (idx, app) {
-                            $gal.options.topApps.push(app.id);
+                            if (app.loading_error == undefined) {
+                                $gal.options.topApps.push(app.id);
+                            }
                         }
                     );
                 }
 
+//$gal.options.topApps = ["plant_annotation"];
                 $gal.nms.get_app_full_info({ids:$gal.options.topApps}, function(data) {
 
                     data = data.sort($gal.sortByKey('name'));
@@ -443,7 +447,6 @@ kb_define('kbaseMethodGallery',
 
                 });
             });
-
 
         },
 
