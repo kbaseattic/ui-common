@@ -1,4 +1,4 @@
-function KBase_FBA(modeltabs) {
+function KBaseFBA_FBA(modeltabs) {
     var self = this;
 	this.modeltabs = modeltabs;
 	this.tabList = [{
@@ -29,7 +29,7 @@ function KBase_FBA(modeltabs) {
 			"key": "objectivefunction"
 		},{
 			"label": "Model",
-			"key": "model"
+			"key": "model",
 			"type": "wslink"
 		},{
 			"label": "Media",
@@ -109,7 +109,7 @@ function KBase_FBA(modeltabs) {
 			"label": "Reaction",
 			"key": "dispid",
 			"type": "tabLink",
-			"tabLinkKey": "id"
+			"tabLinkKey": "id",
 			"function": "ReactionTab",
 			"width": "15%",
 			"visible": 1
@@ -123,7 +123,7 @@ function KBase_FBA(modeltabs) {
 			"visible": 1
 		}, {
 			"label": "Max flux<br>(Upper bound)",
-			"key": "disp_max_flux",
+			"key": "disp_high_flux",
 			"visible": 1
 		}, {
 			"label": "Class",
@@ -141,7 +141,7 @@ function KBase_FBA(modeltabs) {
 			"visible": 1
 		}]
 	}, {
-		"key": "modelcompounds",
+		"key": "compoundFluxes",
 		"name": "Compounds",
 		"visible": 1,
 		"columns": [{
@@ -156,16 +156,15 @@ function KBase_FBA(modeltabs) {
 			"visible": 1
 		}, {
 			"label": "Uptake flux",
-			"key": "flux",
+			"key": "uptake",
 			"visible": 1
 		}, {
 			"label": "Min flux<br>(Lower bound)",
 			"key": "disp_low_flux",
 			"visible": 1
-		}
 		}, {
 			"label": "Max flux<br>(Upper bound)",
-			"key": "disp_max_flux",
+			"key": "disp_high_flux",
 			"visible": 1
 		}, {
 			"label": "Class",
@@ -181,7 +180,7 @@ function KBase_FBA(modeltabs) {
 			"visible": 1
 		}, {
 			"label": "Compartment",
-			"key": "compartment",
+			"key": "cmpkbid",
 			"type": "tabLink",
 			"function": "CompartmentTab",
 			"visible": 1
@@ -207,7 +206,7 @@ function KBase_FBA(modeltabs) {
 		}]
 	}, {
 		"key": "biomasscpds",
-		"name": "Biomass reactions",
+		"name": "Biomass compounds",
 		"visible": 1,
 		"columns": [{
 			"label": "Biomass",
@@ -229,7 +228,7 @@ function KBase_FBA(modeltabs) {
 			"visible": 1
 		}, {
 			"label": "Compartment",
-			"key": "compartment",
+			"key": "cmpkbid",
 			"type": "tabLink",
 			"function": "CompartmentTab",
 			"visible": 1
@@ -241,234 +240,251 @@ function KBase_FBA(modeltabs) {
 	}];
 	
 	this.setMetadata = function (indata) {
-		this.workspace = data[7];
-        this.objName = data[1];
-        this.overview = {wsid: data[7]+"/"+data[1],
-                         ws: data[7],
-                         obj_name: data[1],
-                         objecttype: data[2],
-                         owner: data[5],
-                         instance: data[4],
-                         moddate: data[3]}
+		this.workspace = indata[7];
+        this.objName = indata[1];
+        this.overview = {wsid: indata[7]+"/"+indata[1],
+                         ws: indata[7],
+                         obj_name: indata[1],
+                         objecttype: indata[2],
+                         owner: indata[5],
+                         instance: indata[4],
+                         moddate: indata[3]}
 
         // if there is user metadata, add it
-        if ('Model' in data[10]) {
-            this.usermeta = {objective: data[10]["Objective"],
-                             model: data[10]["Model"],
-                             media: data[10]["Media"],
-                             singleko: data[10]["Combination deletions"],
-                             numreactions: data[10]["Number reaction variables"],
-                             numcompounds: data[10]["Number compound variables"],
-                             numgeneko: data[10]["Number gene KO"],
-                             numrxnko: data[10]["Number reaction KO"],
-                             numcpdbounds: data[10]["Number compound bounds"],
-                             numconstraints: data[10]["Number constraints"],
-                             numaddnlcpds: data[10]["Number additional compounds"]}
+        if ('Model' in indata[10]) {
+            this.usermeta = {objective: indata[10]["Objective"],
+                             model: indata[10]["Model"],
+                             media: indata[10]["Media"],
+                             singleko: indata[10]["Combination deletions"],
+                             numreactions: indata[10]["Number reaction variables"],
+                             numcompounds: indata[10]["Number compound variables"],
+                             numgeneko: indata[10]["Number gene KO"],
+                             numrxnko: indata[10]["Number reaction KO"],
+                             numcpdbounds: indata[10]["Number compound bounds"],
+                             numconstraints: indata[10]["Number constraints"],
+                             numaddnlcpds: indata[10]["Number additional compounds"]}
                              
             $.extend(this.overview, this.usermeta)
         }
 	};
-		
-	this.setData = function (indata) {
-		this.data = indata;
-		this.modeltabs.kbapi('ws', 'get_objects', [{ref: indata.fbamodel_ref}])
-          .done(function(data){
-			  this.model = new KBaseFBA.FBAModel(this.modeltabs);
-			  this.model.setMetadata(data[0].info);
-			  var setMethod = this.model.setData(data[0].data);
-              // see if setData method returns promise or not
-              if (setMethod && 'done' in setMethod) {
-                  setMethod.done(function() {
-                    this.formatObject()
-                })
-              } else {
-                  this.formatObject();
-              }
-        })
-    }
         
     this.formatObject = function () {
-    	this.usermeta.model = indata.fbamodel_ref;
-		this.usermeta.media = indata.media_ref;
-		this.usermeta.objective = indata.objectiveValue;
-		this.usermeta.minfluxes = indata.fluxMinimization;
-		this.usermeta.findminmedia = indata.findMinimalMedia;
-		this.usermeta.minimizerxn = indata.minimize_reactions;
-		this.usermeta.allreversible = indata.allReversible;
-		this.usermeta.simplethermo = indata.simpleThermoConstraints;
-		this.usermeta.objfraction = indata.objectiveConstraintFraction;
-		this.usermeta.regulome = indata.regulome_ref;
-		this.usermeta.promconstraint = indata.promconstraint_ref;
-		this.usermeta.expression = indata.tintlesample_ref;
-		this.usermeta.phenotypeset = indata.phenotypeset_ref;
-		this.usermeta.phenotypesimulationset = indata.phenotypesimulationset_ref;		
-		this.usermeta.singleko = indata.comboDeletions;
-		this.usermeta.defaultmaxflux = indata.defaultMaxFlux;
-		this.usermeta.defaultmaxdrain = indata.defaultMaxDrainFlux;
-		this.usermeta.defaultmindrain = indata.defaultMinDrainFlux;
-		this.usermeta.phenotypesimulationset = indata.phenotypesimulationset_ref;		
+    	console.log(this);
+    	this.usermeta.model = self.data.fbamodel_ref;
+		this.usermeta.media = self.data.media_ref;
+		this.usermeta.objective = self.data.objectiveValue;
+		this.usermeta.minfluxes = self.data.fluxMinimization;
+		this.usermeta.findminmedia = self.data.findMinimalMedia;
+		this.usermeta.minimizerxn = self.data.minimize_reactions;
+		this.usermeta.allreversible = self.data.allReversible;
+		this.usermeta.simplethermo = self.data.simpleThermoConstraints;
+		this.usermeta.objfraction = self.data.objectiveConstraintFraction;
+		this.usermeta.regulome = self.data.regulome_ref;
+		this.usermeta.promconstraint = self.data.promconstraint_ref;
+		this.usermeta.expression = self.data.tintlesample_ref;
+		this.usermeta.phenotypeset = self.data.phenotypeset_ref;
+		this.usermeta.phenotypesimulationset = self.data.phenotypesimulationset_ref;		
+		this.usermeta.singleko = self.data.comboDeletions;
+		this.usermeta.defaultmaxflux = self.data.defaultMaxFlux;
+		this.usermeta.defaultmaxdrain = self.data.defaultMaxDrainFlux;
+		this.usermeta.defaultmindrain = self.data.defaultMinDrainFlux;
+		this.usermeta.phenotypesimulationset = self.data.phenotypesimulationset_ref;		
 		this.usermeta.uptakelimits = "";
-		for (var key in indata.uptakelimits) {
+		for (var key in self.data.uptakelimits) {
 			if (this.usermeta.uptakelimits.length > 0) {
 				this.usermeta.uptakelimits += "<br>";
 			}
 			this.usermeta.uptakelimits += key+":"+this.uptakelimits[key];
 		}
 		this.usermeta.objectivefunction = "Minimize{";
-		if (indata.maximizeObjective == 1) {
+		if (self.data.maximizeObjective == 1) {
 			this.usermeta.objectivefunction = "Maximize{";
 		}
-		for (var key in indata.compoundflux_objterms) {
-			this.usermeta.objectivefunction += " ("+indata.compoundflux_objterms[key]+") "+key;
+		for (var key in self.data.compoundflux_objterms) {
+			this.usermeta.objectivefunction += " ("+self.data.compoundflux_objterms[key]+") "+key;
 		}
-		for (var key in indata.reactionflux_objterms) {
-			this.usermeta.objectivefunction += " ("+indata.reactionflux_objterms[key]+") "+key;
+		for (var key in self.data.reactionflux_objterms) {
+			this.usermeta.objectivefunction += " ("+self.data.reactionflux_objterms[key]+") "+key;
 		}
-		for (var key in indata.biomassflux_objterms) {
-			this.usermeta.objectivefunction += " ("+indata.biomassflux_objterms[key]+") "+key;
+		for (var key in self.data.biomassflux_objterms) {
+			this.usermeta.objectivefunction += " ("+self.data.biomassflux_objterms[key]+") "+key;
 		}
 		this.usermeta.objectivefunction += "}";
 		this.modelreactions = this.model.modelreactions;
 		this.modelcompounds = this.model.modelcompounds;
+		this.biomasses = this.model.biomasses;
 		this.biomasscpds = this.model.biomasscpds;
 		this.modelgenes = this.model.modelgenes;
-		this.FBAConstraints = indata.FBAConstraints;
-		this.FBAMinimalMediaResults = indata.FBAMinimalMediaResults;
-		this.FBAMinimalReactionsResults = indata.FBAMinimalReactionsResults;
-		var rxnhash;
-		for (var i=0; i < indata.FBAReactionVariables.length; i++) {
-			var rxnid = indata.FBAReactionVariables[i].modelreaction_ref.split("/").pop();
-			indata.FBAReactionVariables[i].ko = 0;
-			rxnhash[rxnid] = indata.FBAReactionVariables[i];
+		this.FBAConstraints = self.data.FBAConstraints;
+		this.FBAMinimalMediaResults = self.data.FBAMinimalMediaResults;
+		this.FBAMinimalReactionsResults = self.data.FBAMinimalReactionsResults;
+		this.FBAMetaboliteProductionResults = self.data.FBAMetaboliteProductionResults;
+		this.rxnhash = {};
+		for (var i=0; i < self.data.FBAReactionVariables.length; i++) {
+			var rxnid = self.data.FBAReactionVariables[i].modelreaction_ref.split("/").pop();
+			self.data.FBAReactionVariables[i].ko = 0;
+			this.rxnhash[rxnid] = self.data.FBAReactionVariables[i];
 		}
-		for (var i=0; i < indata.reactionKO_refs.length; i++) {
-			var rxnid = indata.reactionKO_refs[i].split("/").pop();
-			rxnhash[rxnid].ko = 1;
+		for (var i=0; i < self.data.reactionKO_refs.length; i++) {
+			var rxnid = self.data.reactionKO_refs[i].split("/").pop();
+			this.rxnhash[rxnid].ko = 1;
 		}
-		var cpdhash;
-		for (var i=0; i < indata.FBACompoundBounds.length; i++) {
-			var cpdid = indata.FBACompoundBounds[i].modelcompound_ref.split("/").pop();
-			indata.FBACompoundBounds[i].additionalcpd = 0;
-			cpdhash[cpdid] = indata.FBACompoundBounds[i];
+		this.cpdhash = {};
+		for (var i=0; i < self.data.FBACompoundVariables.length; i++) {
+			var cpdid = self.data.FBACompoundVariables[i].modelcompound_ref.split("/").pop();
+			self.data.FBACompoundVariables[i].additionalcpd = 0;
+			this.cpdhash[cpdid] = self.data.FBACompoundVariables[i];
 		}
-		for (var i=0; i < indata.additionalCpd_refs.length; i++) {
-			var cpdid = indata.additionalCpd_refs[i].split("/").pop();
-			cpdhash[cpdid].additionalcpd = 1;
+		for (var i=0; i < self.data.additionalCpd_refs.length; i++) {
+			var cpdid = self.data.additionalCpd_refs[i].split("/").pop();
+			this.cpdhash[cpdid].additionalcpd = 1;
 		}
-		var biohash;
-		for (var i=0; i < indata.FBABiomassVariables.length; i++) {
-			var bioid = indata.FBABiomassVariables[i].biomass_ref.split("/").pop();
-			biohash[bioid] = indata.FBABiomassVariables[i];
+		this.biohash = {};
+		for (var i=0; i < self.data.FBABiomassVariables.length; i++) {
+			var bioid = self.data.FBABiomassVariables[i].biomass_ref.split("/").pop();
+			this.biohash[bioid] = self.data.FBABiomassVariables[i];
 		}
 		this.maxpod = 0;
-		var metprodhash;
+		this.metprodhash = {};
 		for (var i=0; i < this.FBAMetaboliteProductionResults.length; i++) {
-			var metprod = indata.FBAMetaboliteProductionResults[i];
+			this.tabList[4].columns[5].visible = 1;
+			var metprod = self.data.FBAMetaboliteProductionResults[i];
 			var cpdid = metprod.modelcompound_ref.split("/").pop();
-			metprodhash[cpdid] = metprod;
+			this.metprodhash[cpdid] = metprod;
 		}
-		var genehash;
+		this.genehash = {};
 		for (var i=0; i < this.modelgenes.length; i++) {
-			genehash[this.modelgenes[i].id] = this.modelgenes[i];
-			genehash[this.modelgenes[i].id].ko = 0;
+			this.genehash[this.modelgenes[i].id] = this.modelgenes[i];
+			this.genehash[this.modelgenes[i].id].ko = 0;
 		}
-		for (var i=0; i < indata.geneKO_refs.length; i++) {
-			var geneid = indata.geneKO_refs[i].split("/").pop();
+		for (var i=0; i < self.data.geneKO_refs.length; i++) {
+			var geneid = self.data.geneKO_refs[i].split("/").pop();
 			genehash[geneid].ko = 1;
 		}
-		var delhash;
-		for (var i=0; i < indata.FBADeletionResults.length; i++) {
-			var geneid = indata.FBADeletionResults[i].feature_refs[0].split("/").pop();
-			delhash[geneid] = indata.FBADeletionResults[i];
+		this.delhash = {};
+		for (var i=0; i < self.data.FBADeletionResults.length; i++) {
+			var geneid = self.data.FBADeletionResults[i].feature_refs[0].split("/").pop();
+			this.delhash[geneid] = self.data.FBADeletionResults[i];
 		}
-		var cpdboundhash;
-		for (var i=0; i < indata.FBACompoundBounds.length; i++) {
-			var cpdid = indata.FBACompoundBounds[i].modelcompound_ref.split("/").pop();
-			cpdboundhash[cpdid] = indata.FBACompoundBounds[i];
+		this.cpdboundhash = {};
+		for (var i=0; i < self.data.FBACompoundBounds.length; i++) {
+			var cpdid = self.data.FBACompoundBounds[i].modelcompound_ref.split("/").pop();
+			this.cpdboundhash[cpdid] = self.data.FBACompoundBounds[i];
 		}
-		var rxnboundhash;
-		for (var i=0; i < indata.FBAReactionBounds.length; i++) {
-			var rxnid = indata.FBAReactionBounds[i].modelreaction_ref.split("/").pop();
-			rxnboundhash[rxnid] = indata.FBAReactionBounds[i];
+		this.rxnboundhash = {};
+		for (var i=0; i < self.data.FBAReactionBounds.length; i++) {
+			var rxnid = self.data.FBAReactionBounds[i].modelreaction_ref.split("/").pop();
+			this.rxnboundhash[rxnid] = self.data.FBAReactionBounds[i];
 		}
 		for (var i=0; i< this.modelgenes.length; i++) {
 			var mdlgene = this.modelgenes[i];
-			if (genehash[mdlgene.id]) {
-				mdlgene.ko = genehash[mdlgene.id].ko;
+			if (this.genehash[mdlgene.id]) {
+				mdlgene.ko = this.genehash[mdlgene.id].ko;
 			}
-			if (delhash[mdlgene.id]) {
-				mdlgene.growthFraction = delhash[mdlgene.id].growthFraction;
+			if (this.delhash[mdlgene.id]) {
+				mdlgene.growthFraction = this.delhash[mdlgene.id].growthFraction;
 			}
 		}
 		for (var i=0; i< this.modelreactions.length; i++) {
 			var mdlrxn = this.modelreactions[i];
-			if (rxnhash[mdlrxn.id]) {
-				mdlrxn.upperFluxBound = rxnhash[mdlrxn.id].upperFluxBound;
-				mdlrxn.lowerFluxBound = rxnhash[mdlrxn.id].lowerFluxBound;
-				mdlrxn.fluxMin = rxnhash[mdlrxn.id].min;
-				mdlrxn.fluxMax = rxnhash[mdlrxn.id].max;
-				mdlrxn.flux = rxnhash[mdlrxn.id].value;
-				mdlrxn.fluxClass = rxnhash[mdlrxn.id].class;
+			if (this.rxnhash[mdlrxn.id]) {
+				mdlrxn.upperFluxBound = this.rxnhash[mdlrxn.id].upperBound;
+				mdlrxn.lowerFluxBound = this.rxnhash[mdlrxn.id].lowerBound;
+				mdlrxn.fluxMin = this.rxnhash[mdlrxn.id].min;
+				mdlrxn.fluxMax = this.rxnhash[mdlrxn.id].max;
+				mdlrxn.flux = this.rxnhash[mdlrxn.id].value;
+				mdlrxn.fluxClass = this.rxnhash[mdlrxn.id].class;
 				mdlrxn.disp_low_flux = mdlrxn.fluxMin + "<br>(" + mdlrxn.lowerFluxBound + ")";
 				mdlrxn.disp_high_flux = mdlrxn.fluxMax + "<br>(" + mdlrxn.upperFluxBound + ")";
 			}
-			if (rxnboundhash[mdlrxn.id]) {
-				mdlrxn.customUpperBound = rxnboundhash[mdlrxn.id].upperBound;
-				mdlrxn.customLowerBound = rxnboundhash[mdlrxn.id].lowerBound;
+			if (this.rxnboundhash[mdlrxn.id]) {
+				mdlrxn.customUpperBound = this.rxnboundhash[mdlrxn.id].upperBound;
+				mdlrxn.customLowerBound = this.rxnboundhash[mdlrxn.id].lowerBound;
 			}
 		}
 		this.compoundFluxes = [];
-		var cpdfluxhash;
+		this.cpdfluxhash = {};
 		for (var i=0; i< this.modelcompounds.length; i++) {
 			var mdlcpd = this.modelcompounds[i];
-			if (cpdhash[mdlcpd.id]) {
-				mdlcpd.upperFluxBound = cpdhash[mdlcpd.id].upperBound;
-				mdlcpd.lowerFluxBound = cpdhash[mdlcpd.id].lowerBound;
-				mdlcpd.fluxMin = cpdhash[mdlcpd.id].min;
-				mdlcpd.fluxMax = cpdhash[mdlcpd.id].max;
-				mdlcpd.uptake = cpdhash[mdlcpd.id].value;
-				mdlcpd.fluxClass = cpdhash[mdlcpd.id].class;
+			if (this.cpdhash[mdlcpd.id]) {
+				mdlcpd.upperFluxBound = this.cpdhash[mdlcpd.id].upperBound;
+				mdlcpd.lowerFluxBound = this.cpdhash[mdlcpd.id].lowerBound;
+				mdlcpd.fluxMin = this.cpdhash[mdlcpd.id].min;
+				mdlcpd.fluxMax = this.cpdhash[mdlcpd.id].max;
+				mdlcpd.uptake = this.cpdhash[mdlcpd.id].value;
+				mdlcpd.fluxClass = this.cpdhash[mdlcpd.id].class;
 				mdlcpd.disp_low_flux = mdlcpd.fluxMin + "<br>(" + mdlcpd.lowerFluxBound + ")";
 				mdlcpd.disp_high_flux = mdlcpd.fluxMax + "<br>(" + mdlcpd.upperFluxBound + ")";
-				cpdfluxhash[mdlcpd.id] = mdlcpd;
+				this.cpdfluxhash[mdlcpd.id] = mdlcpd;
 				this.compoundFluxes.push(mdlcpd);
 			}
-			if (metprodhash[mdlcpd.id]) {
-				mdlcpd.maxProd = metprodhash[mdlcpd.id].maximumProduction;
-				if (!cpdfluxhash[mdlcpd.id]) {
-					this.compoundFluxes.push(mdlcpd);
-				}
+			if (this.metprodhash[mdlcpd.id]) {
+				mdlcpd.maxProd = this.metprodhash[mdlcpd.id].maximumProduction;
+				//if (!this.cpdfluxhash[mdlcpd.id]) {
+				//	this.compoundFluxes.push(mdlcpd);
+				//}
 			}
-			if (cpdboundhash[mdlcpd.id]) {
-				mdlcpd.customUpperBound = cpdboundhash[mdlcpd.id].upperBound;
-				mdlcpd.customLowerBound = cpdboundhash[mdlcpd.id].lowerBound;
-				if (!cpdfluxhash[mdlcpd.id]) {
+			if (this.cpdboundhash[mdlcpd.id]) {
+				mdlcpd.customUpperBound = this.cpdboundhash[mdlcpd.id].upperBound;
+				mdlcpd.customLowerBound = this.cpdboundhash[mdlcpd.id].lowerBound;
+				if (!this.cpdfluxhash[mdlcpd.id]) {
 					this.compoundFluxes.push(mdlcpd);
 				}
 			}
 		}
 		for (var i=0; i< this.biomasses.length; i++) {
 			var bio = this.biomasses[i];
-			if (biohash[bio.id]) {
-				bio.upperFluxBound = biohash[mdlcpd.id].upperBound;
-				bio.lowerFluxBound = biohash[mdlcpd.id].lowerBound;
-				bio.fluxMin = biohash[mdlcpd.id].min;
-				bio.fluxMax = biohash[mdlcpd.id].max;
-				bio.uptake = biohash[mdlcpd.id].value;
-				bio.fluxClass = biohash[mdlcpd.id].class;
+			if (this.biohash[bio.id]) {
+				bio.upperFluxBound = this.biohash[bio.id].upperBound;
+				bio.lowerFluxBound = this.biohash[bio.id].lowerBound;
+				bio.fluxMin = this.biohash[bio.id].min;
+				bio.fluxMax = this.biohash[bio.id].max;
+				bio.flux = this.biohash[bio.id].value;
+				bio.fluxClass = this.biohash[bio.id].class;
+				this.modelreactions.push(bio);
+			} else {
+				this.biohash[bio.id] = bio;
+				bio.upperFluxBound = 1000;
+				bio.lowerFluxBound = 0;
+				bio.fluxMin = 0;
+				bio.fluxMax = 1000;
+				bio.flux = 0;
+				bio.fluxClass = "Blocked";
 				this.modelreactions.push(bio);
 			}
+			bio.disp_low_flux = bio.fluxMin + "<br>(" + bio.lowerFluxBound + ")";
+			bio.disp_high_flux = bio.fluxMax + "<br>(" + bio.upperFluxBound + ")";
 		}
 		for (var i=0; i < this.biomasscpds.length; i++) {
 			var biocpd = this.biomasscpds[i];
-			if (biohash[biocpd.biomass.id]) {
-				biocpd[i].bioflux = biohash[biocpd.biomass.id].value;	
+			if (this.biohash[biocpd.biomass]) {
+				biocpd.bioflux = this.biohash[biocpd.biomass].flux;	
 			}
-			if (metprodhash[biocpd.cpdid]) {
-				biocpd[i].maxprod = metprodhash[mdlcpd.id].maximumProduction;
+			if (this.metprodhash[biocpd.id]) {
+				biocpd.maxprod = this.metprodhash[biocpd.id].maximumProduction;
 			}
 		}
 	};
+	
+	this.setData = function (indata) {
+		self.data = indata;
+		var p = self.modeltabs.kbapi('ws', 'get_objects', [{ref: indata.fbamodel_ref}])
+                    .done(function(data){
+                        var kbObjects = new KBObjects();
+			  			self.model = new kbObjects["KBaseFBA_FBAModel"](self.modeltabs);
+			  			self.model.setMetadata(data[0].info);
+			  			var setMethod = self.model.setData(data[0].data);
+              			// see if setData method returns promise or not
+              			if (setMethod && 'done' in setMethod) {
+                  			setMethod.done(function() {
+                    			self.formatObject()
+                			})
+              			} else {
+                  			self.formatObject();
+              			}
+        })
+        return p;
+    };
 	
 	this.ReactionTab = function (id) {
         var rxn = this.rxnhash[id];
@@ -494,7 +510,7 @@ function KBase_FBA(modeltabs) {
                             }*/];
                      })
         return p;
-    }
+    };
 
     this.GeneTab = function (id) {
         var gene = this.genehash[id];
@@ -506,7 +522,7 @@ function KBase_FBA(modeltabs) {
                 "data": rxn.reactions,
                 "type": "tabLinkArray"
         }];
-    }
+    };
 
     this.CompoundTab = function (id) {
         var cpd = this.cpdhash[id];
@@ -536,17 +552,20 @@ function KBase_FBA(modeltabs) {
                      })
         return p;
 
-    }
+    };
 
     this.CompartmentTab = function (id) {
         return [[]];
-    }
+    };
 
     this.BiomassTab = function (id) {
         return [[]];
-    }
+    };
 
     this.GapfillTab = function (id) {
         return [[]];
-    }    
+    };
 }
+
+// make method of base class
+KBObjects.prototype.KBaseFBA_FBA = KBaseFBA_FBA;
