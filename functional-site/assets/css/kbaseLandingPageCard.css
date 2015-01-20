@@ -36,6 +36,8 @@
 	background-position: -80px -128px;
 }
 
+.no-close .ui-dialog-titlebar-close  { display: none; }
+
 .ui-widget-content a {
 	color: #428bca;
 }
@@ -143,18 +145,22 @@
  */
 .kbcb-feature {
 	stroke: #000;
-	fill: #f00;
+	fill: #ccc;
 }
 
 .kbcb-operon {
-	fill: #0f0;
+	stroke-width: 2;
+	stroke: #0f0;
+	/*fill: #0f0;*/
 }
 
 .kbcb-center {
-	fill: #00f;
+	stroke-width: 3;
+	/*fill: #00f;*/
 }
 
 .kbcb-highlight {
+	stroke-width: 3;
 	fill: #fff;
 }
 

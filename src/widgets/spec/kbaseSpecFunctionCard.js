@@ -1,7 +1,7 @@
 (function( $, undefined ) { 
     $.KBWidget({ 
         name: "KBaseSpecFunctionCard", 
-        parent: "kbaseWidget", 
+        parent: "kbaseAuthenticatedWidget", 
         version: "1.0.0",
         timer: null,
 
@@ -14,11 +14,13 @@
 
         init: function(options) {
             this._super(options);
+            if (!this.options.token)
+            	this.options.token = this.authToken();
             var self = this;
             var container = this.$elem;
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace(newWorkspaceServiceUrlForSpec, {token: options.token});
+            var kbws = new Workspace(newWorkspaceServiceUrlForSpec, {token: self.options.token});
             var funcName = this.options.id;
             var funcVer = null;
             if (funcName.indexOf('-') >= 0) {
@@ -79,7 +81,7 @@
                     		{
                     			kind: "module", 
                     			id : moduleId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -96,7 +98,7 @@
                     		{
                     			kind: "type", 
                     			id : aTypeId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -125,27 +127,26 @@
             		var aTypeId = data.used_type_defs[i];
             		var aTypeName = aTypeId.substring(0, aTypeId.indexOf('-'));
             		var aTypeVer = aTypeId.substring(aTypeId.indexOf('-') + 1);
-            		subsData[subsData.length] = {name: '<a onclick="specClicks[\''+pref+'subs-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer};
+            		subsData.push({name: '<a onclick="specClicks[\''+pref+'subs-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer});
             	}
                 var subsSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
-                        "aaData": [],
+                        "aaData": subsData,
                         "oLanguage": {
                             "sSearch": "Search type:",
                             "sEmptyTable": "No types used by this type."
                         }
                     };
                 var subsTable = $('#'+pref+'subs-table').dataTable(subsSettings);
-                subsTable.fnAddData(subsData);
                 specClicks[pref+'subs-click'] = (function(elem, e) {
                     var aTypeId = $(elem).data('typeid');
                     self.trigger('showSpecElement', 
                     		{
                     			kind: "type", 
                     			id : aTypeId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -163,27 +164,26 @@
                 	} else {
                 		link = '<a onclick="specClicks[\''+pref+'vers-click\'](this,event); return false;" data-funcid="'+aFuncId+'">'+aFuncId+'</a>';
                 	}
-            		versData[versData.length] = {name: link};
+            		versData.push({name: link});
             	}
                 var versSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function version", mData: "name"}],
-                        "aaData": [],
+                        "aaData": versData,
                         "oLanguage": {
                             "sSearch": "Search version:",
                             "sEmptyTable": "No versions registered."
                         }
                     };
                 var versTable = $('#'+pref+'vers-table').dataTable(versSettings);
-                versTable.fnAddData(versData);
                 specClicks[pref+'vers-click'] = (function(elem, e) {
                     var aFuncId = $(elem).data('funcid');
                     self.trigger('showSpecElement', 
                     		{
                     			kind: "function", 
                     			id : aFuncId,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 });
@@ -200,7 +200,7 @@
         getData: function() {
             return {
                 type: "KBaseSpecFunctionCard",
-                id: this.options.name,
+                id: this.options.id,
                 workspace: 'specification',
                 title: "Function Object Specification"
             };

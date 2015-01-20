@@ -1,5 +1,5 @@
 /**
- * @class KBaseContigBrowser
+ * @CLASS KBaseContigBrowser
  *
  * A KBase widget that displays an interactive view of a single contig. It 
  * comes with hooks for navigating up and downstream, and a number of
@@ -47,28 +47,59 @@
             onClickUrl: null,
             allowResize: true,
 
-            svgWidth: 500,              // all numbers = pixels.
-            svgHeight: 100,
+	    //svgWidth: 500,              // all numbers = pixels.
+            svgWidth: 600,              // all numbers = pixels.
+            svgHeight: 70,
             trackMargin: 5,
-            trackThickness: 15,
+	    //trackThickness: 15,
+            trackThickness: 20,
             leftMargin: 5,
             topMargin: 20,
-            arrowSize: 10,
+	    //arrowSize: 10,
+            arrowSize: 15,
 
             start: 1,                   // except these two - they're contig positions
-            length: 10000,
+	    //length: 10000,
+            length: 16750,
 
             embedInCard: false,
-            showButtons: false,
+	    //showButtons: false,
+            showButtons: true,
             cardContainer: null,
             onClickFunction: null,
 
-            width: 550,
+	    //width: 550,
+	    width: 525,
 
             workspaceId: null,
             genomeId: null,
             kbCache: null,
         },
+        
+        $contigViewPanel : null,
+
+	/** SEED ontology mappings
+	//
+	// NOTE: for now we're just going to use the first annotation in
+	// subsystems_data, and first parent in each level of the hierarchy.
+	//
+	// seedOntology:  mapping from Role to 3 levels of parents in ontology,
+	// each level is list of parents (non-unique), with level 0 the 
+	// broadest (e.g. "Carbohydrates"), level 1 whatever that's called,
+	// level 2 the "Subsystem"s, and Role is level 3 and for convenience
+	// in the code we map it to itself
+	//
+	// seedTermsUniq: an ordered list of the uniq terms at each level of
+	// the ontology
+	//
+	// seedColors:  mapping for 4 levels of seed ontology to their order
+	// (for consistency in coloring), with level 0 the broadest (e.g.
+	// "Carbohydrates")
+	*/
+	seedOntology:[],
+	seedTermsUniq:[],
+	seedColors:[],
+
 
         cdmiURL: "http://kbase.us/services/cdmi_api",
         proteinInfoURL: "http://kbase.us/services/protein_info_service",
@@ -76,12 +107,16 @@
         operonFeatures: [],
         $messagePane: null,
 
+
         init: function(options) {
             this._super(options);
+	    var self = this;
 
             // 1. Check that needed options are present (basically contig)
             if (this.options.contig === null) {
                 // throw an error.
+		//console.log ("kbaseContigBrowser.js: FATAL: missing contig");
+		console.log ("kbaseContigBrowser.js: missing contig.  Will set from feature");
             }
 
             this.$messagePane = $("<div/>")
@@ -89,27 +124,42 @@
                                 .addClass("kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
+            
+            var $contigViewPanelWrapper = $('<div/>');
+            this.$contigViewPanel = $('<div id="contigmainview" align="center"/>').css({'overflow' : 'auto'});
+            $contigViewPanelWrapper
+                .append(this.$contigViewPanel)
+	        .append("<div>").KBaseContigBrowserButtons({ browser: self });
+	    
+            this.$elem.append($contigViewPanelWrapper);
+            
+            
+           /* if (!options.contig) {
+                options.kbCache.ws.get
+            }*/
+            
+            
             this.cdmiClient = new CDMI_API(this.cdmiURL);
             this.proteinInfoClient = new ProteinInfo(this.proteinInfoURL);
 
-            this.render();
+	    // load SEED info and render
+	    this.loadSeedOntology(this.wait_for_seed_load);
 
-            var self = this;
-            if (this.options.showButtons) {
-                this.$elem.KBaseContigBrowserButtons({ browser: self });
-            }
 
-            this.options.onClickFunction = function(svgElement, feature) {
-                self.trigger("featureClick", { 
-                    feature: feature, 
-                    featureElement: svgElement,
-                    genomeId: self.options.genomeId,
-                    workspaceId: self.options.workspaceId,
-                    kbCache: self.options.kbCache,
-                } );
-            }
             return this;
         },
+
+
+	wait_for_seed_load : function () {
+
+	    // fill seedColors
+	    this.assignSeedColors (this.seedTermsUniq);
+
+	    // display
+	    this.render();
+
+	    return true;
+	},
 
 
         /**
@@ -125,12 +175,13 @@
                              .classed("kbcb-tooltip", true);
 
             // Init the SVG container to be the right size.
-            this.svg = d3.select(this.$elem[0])
+            this.svg = d3.select(this.$contigViewPanel[0])
                          .append("svg")
                          .attr("width", this.options.svgWidth)
                          .attr("height", this.options.svgHeight)
                          .classed("kbcb-widget", true);
 
+	    //console.log ("BUILDING TRACK");   // DEBUG
             this.trackContainer = this.svg.append("g");
 
             this.xScale = d3.scale.linear()
@@ -152,20 +203,44 @@
                 self.resize();
             });
 
-            if (this.options.workspaceId && this.options.genomeId) {
-                this.setWorkspaceContig(this.options.workspaceId, this.options.genomeId, this.options.contig);
-            }
-            else {
-                this.setCdmiContig();
-            }
-
             // Kickstart the whole thing
             if (this.options.centerFeature != null)
                 this.setCenterFeature(this.options.centerFeature);
 
+            if (this.options.workspaceId && this.options.genomeId) {
+                this.setWorkspaceContig(this.options.workspaceId, this.options.genomeId, this.options.contig);
+		//console.log ("kbaseContigBrowser.js: workspaceId: '" + this.options.workspaceId + "' genomeId: '" + this.options.genomeId +"'");  // DEBUG
+            }
+            else {
+		//console.log ("kbaseContigBrowser.js: WTF?"); // DEBUG
+                this.setCdmiContig();
+            }
+
+
+	    // track click event handling
+	    //
+            this.options.onClickFunction = function(svgElement, feature, workspaceId, genomeId) {
+		var self = this;
+		console.log ("in onClickFunction");  // DEBUG
+		var winPop = window.open("/functional-site/#/genes/" + workspaceId + "/" + genomeId + "/" + feature.feature_id);
+		    //var winPop = window.open("/functional-site/#/genes/" + self.options.workspaceId + "/" + self.options.genomeId + "/" + feature.feature_id);
+
+                /* deprecated
+		self.trigger("featureClick", { 
+                    feature: feature, 
+                    featureElement: svgElement,
+                    genomeId: self.options.genomeId,
+                    workspaceId: self.options.workspaceId,
+                    kbCache: self.options.kbCache,
+                } );
+		*/
+            }
+
+	    //console.log ("RENDER OF CONTIG BROWSER COMPLETE");
 
             return this;
         },
+
 
         /**
          * An internal class used to define and calculate which features belong on which tracks.
@@ -269,6 +344,7 @@
 
             if (this.options.centerFeature) {
                 this.setCenterFeature();
+                this.update(true);
             }
             else {
                 this.update();
@@ -298,6 +374,7 @@
         },
 
         setWorkspaceContig: function(workspaceId, genomeId, contigId) {
+            var self = this;
             if (contigId && this.options.contig !== contigId) {
                 this.options.centerFeature = null;
                 this.operonFeatures = [];
@@ -317,6 +394,25 @@
                 // can fetch the list of features in some range.
                 genome = genome[0];
 
+                if(self.options.centerFeature) {
+                    for (var i=0; i<genome.data.features.length; i++) {
+                        var f = genome.data.features[i];
+                        if (f.id === self.options.centerFeature) {
+                            if (f.location && f.location.length > 0) {
+                                self.options.contig = f.location[0][0];
+                                contigId = f.location[0][0];
+                            }
+                        }
+                    }
+                } else if (!self.options.contig) {
+                     if (genome.data.contig_ids && genome.data.contig_ids.length > 0) {
+                        self.options.contig = genome.data.contig_ids[0];
+                        contigId = self.options.contig;
+                    }
+                }
+                
+                
+                
                 this.contigLength = -1; // LOLOLOL.
                 // figure out contig length here, while cranking out the feature mapping.
                 if (genome.data.contig_ids && genome.data.contig_ids.length > 0) {
@@ -334,10 +430,12 @@
                             var range = this.calcFeatureRange(f.location);
                             // store the range in the feature!
                             // this HURTS MY SOUL to do, but we need to make workspace features look like CDMI features.
-                            f.feature_location = f.location;
-                            f.feature_function = f.function;
                             f.feature_id = f.id;
+			    f.feature_type = f.type;
+                            f.feature_location = f.location;
                             f.range = range;
+                            f.feature_function = f.function;
+			    f.subsystem_data = f.subsystem_data;
                             this.wsFeatureSet[f.id] = f;
 
                             // if (!this.wsFeatureSet[range[0]])
@@ -356,6 +454,7 @@
 
                 if (this.options.centerFeature) {
                     this.setCenterFeature();
+		    this.update(true);
                 }
                 else {
                     this.update();
@@ -369,6 +468,9 @@
             // if we're getting a new center feature, make sure to update the operon features, too.
             if (centerFeature)
                 this.options.centerFeature = centerFeature;
+
+	    // skip rest for now and update above code block
+	    return;
 
             if (this.options.workspaceId && this.options.genomeId) {
                 this.update(true);
@@ -467,10 +569,12 @@
                 else {
                     window.alert("Error: fid '" + self.options.centerFeature + "' not found! Continuing with original range...");
                 }
+		// Um... what is this cdmiClient method doing here?
                 self.cdmiClient.region_to_fids([self.options.contig, self.options.start, '+', self.options.length], getFeatureData);
             };
 
             var getFeatureData = function(fids) {
+		// Um... what is this cdmiClient method doing here?
                 self.cdmiClient.fids_to_feature_data(fids, getOperonData);
             };
 
@@ -491,7 +595,7 @@
 
                 if (self.options.centerFeature && useCenter) {
                     // make a region around the center and use it.
-                    var f = this.wsFeatureSet[self.options.centerFeature];
+                    var f = self.wsFeatureSet[self.options.centerFeature];
                     if (f) {
                         self.options.start = Math.max(0, Math.floor(parseInt(f.location[0][1]) + (parseInt(f.location[0][3])/2) - (self.options.length/2)));
                         region = [self.options.start, self.options.start + self.options.length - 1];
@@ -580,40 +684,49 @@
                                               .data(features, function(d) { return d.feature_id; });
 
             trackSet.enter()
-                    .append("path")
-                         .classed("kbcb-feature", true)  // incl feature_type later (needs call to get_entity_Feature?)
-                         .classed("kbcb-operon", function(d) { return self.isOperonFeature(d); })
-                         .classed("kbcb-center", function(d) { return self.isCenterFeature(d); })
-                         .attr("id", function(d) { return d.feature_id; })
-                         .on("mouseover", 
-                                function(d) { 
-                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
-                                    self.tooltip = self.tooltip.text(d.feature_id + ": " + d.feature_function);
-                                    return self.tooltip.style("visibility", "visible"); 
-                                }
-                            )
-                         .on("mouseout", 
-                                function() { 
-                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
-                                    return self.tooltip.style("visibility", "hidden"); 
-                                }
-                            )
-                         .on("mousemove", 
-                                function() { 
-                                    return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
-                                }
-                            )
-                         .on("click", 
-                                function(d) { 
-                                    if (self.options.onClickFunction) {
-                                        self.options.onClickFunction(this, d);
-                                    }
-                                    else {
-                                        self.highlight(this, d); 
-                                    }
-                                }
-                            );
-
+		.append("path")
+		.classed("kbcb-feature", true)  // incl feature_type later (needs call to get_entity_Feature?)
+		.classed("kbcb-operon", function(d) { return self.isOperonFeature(d); })
+		.classed("kbcb-center", function(d) { return self.isCenterFeature(d); })
+		//.style("fill", function (d) { return self.calcFillColor(d); })
+		// just use first annotation for now.  will need to split arrows when multiple annotations
+		//.style("fill", function (d) { return self.calcFillColorByProtAnnot(d); })
+		.style("fill", function (d) { return self.calcFillColorByProtAnnot(d,0); })  
+		.attr("id", function(d) { return d.feature_id; })
+		.on("mouseover", 
+		    function(d) { 
+			d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
+			self.tooltip = self.tooltip.text(d.feature_id + ": " + d.feature_function);
+			return self.tooltip.style("visibility", "visible"); 
+		    }
+		    )
+		.on("mouseout", 
+		    function() { 
+			d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
+			return self.tooltip.style("visibility", "hidden"); 
+		    }
+		    )
+		.on("mousemove", 
+		    function() { 
+			return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
+		    }
+		    )
+		.on("click", 
+		    function(d) { 
+			if (self.options.onClickFunction) {
+			    if (d.feature_id !== self.options.centerFeature) {
+				self.options.onClickFunction(this, d, self.options.workspaceId, self.options.genomeId);
+			    }
+			    else {
+				self.highlight(this, d); 
+			    }
+			}
+			else {
+			    self.highlight(this, d); 
+			}
+		    }
+	    );
+	    
             trackSet.exit()
                     .remove();
 
@@ -750,14 +863,219 @@
             return feature.isInOperon;
         },
 
-        calcFillColor : function(feature) {
+		calcFillColor : function(feature) {               // DEPRECATED
             if (feature.feature_id === this.options.centerFeature)
-                return "#00F";
+                return "#CCC";
             if (feature.isInOperon === 1)
-                return "#0F0";
-            return "#F00";
+                return "#FFF";
+	    if (feature.feature_type === "CDS")
+		return "#CCC";
+            return "#000";
             // should return color based on feature type e.g. CDS vs. PEG vs. RNA vs. ...
         },
+
+	calcFillColorByProtAnnot : function(feature,annot_num) {
+	    if (feature.feature_type !== "CDS")    // only paint protein coding
+                return "#000";
+	    
+	    // SEED
+	    //
+	    // SEED has 4 levels of classification. We are defining 0 as broadest category (e.g. "Carbohydrates") and 3 as the Subsystem Role (e.g. "Beta-galactosidase (EC 3.2.1.23)")
+	    this.options.annot_namespace = "SEED";     // should be input param
+	    //this.options.annot_level = 0;          // should be input param
+	    this.options.annot_level = 3;          // should be input param
+	    return this.colorByAnnot (feature, this.options.annot_namespace, this.options.annot_level, annot_num);
+        },
+
+	colorByAnnot : function(feature,namespace,level,annot_num) {
+	    if (namespace === "SEED") {
+		//if (! feature.subsystem_data)
+		if (! feature.feature_function)
+		    return "#CCC";
+		//typedef tuple<string subsystem, string variant, string role> subsystem_data;
+		//var seed_role_pos = 2;
+		//return this.seedColorLookup (feature.subsystem_data[annot_num][seed_role_pos], level);
+		var first_feature_function = feature.feature_function.replace(/\s+\/.+/,"").replace(/\s+\#.*/,"");
+
+		return this.seedColorLookup (first_feature_function, level);
+	    }
+
+	    //if (namespace === "COG") {
+	    //}
+	    //if (namespace === "PFAM") {
+	    //}
+	    //if (namespace === "TIGRFAM") {
+	    //}
+
+	    return "#CCC";
+	},
+
+	seedColorLookup : function (annot,level) {
+	    var self = this;
+	    var alt_class_i;
+
+	    // take first classification rather than go through list (save that fight for another day when we have multi-colored arrows)
+	    alt_class_i = 0;
+	    //for (var alt_class_i=0; alt_class_i < this.seedOntology[annot][level].length; alt_class_i++) {
+
+	    if (self.seedOntology[annot] === undefined)
+		return "#CCC";
+	    var seedClassification = self.seedOntology[annot][level][alt_class_i];
+	    //}
+	    
+	    return self.seedColors[level][seedClassification];
+	},
+
+
+	/**
+          I need to load the SEED subsystem ontology. I am going to use
+          the "subsys.txt" file I found at: 
+                ftp.theseed.org/subsystems/subsys.txt
+          
+          Note that this file is updated weekly, but not versioned. It's 
+          possible that errors will arise because the subsystems assigned
+          in the genome object are out of date relative to the current
+          subsys.txt file.
+
+          file format is:
+          Level 1 \t Level 2 \t Level 3 \t Level 4\t Optional GO id \t Optional GO desc \n
+
+          ontologyDepth is set to 4 for SEED
+
+          SEED is not a strict heirarchy, some nodes have multiple parents
+
+          loadSeedOntology() function will parse file and populate the seedOntology and seedTermsUniq data structures
+	*/
+	loadSeedOntology: function(wait_for_seed_load) {
+		var seedOntology = this.seedOntology;
+		var seedTermsUniq = this.seedTermsUniq;
+		var self = this;
+		var seedTermSeen = [];
+		var ROLE_INDEX = 3;
+		//var PARENT_DEPTH = 3;
+		var ONTOLOGY_DEPTH = 4;
+
+		// init seed term structures
+		//seedTermSeen[ROLE_INDEX] = [];
+		//seedTermsUniq[ROLE_INDEX] = [];
+		//for (var j=0; j < PARENT_DEPTH; j++) {
+		for (var j=0; j < ONTOLOGY_DEPTH; j++) {
+		    seedTermSeen[j] = [];
+		    seedTermsUniq[j] = [];
+		}
+
+		// read subsys.txt into seedOntology and seedTermsUniq objs
+		d3.text("assets/data/subsys.txt", function(text) {
+			var data = d3.tsv.parseRows(text);
+
+			var seedRole = "";
+			for (var i=0; i < data.length; i++) {
+			    if (data[i][ROLE_INDEX] === "")
+				continue;
+			    seedRole = data[i][ROLE_INDEX];
+			    if (seedOntology[seedRole] === undefined) 
+				seedOntology[seedRole] = [];
+			    if (seedTermSeen[ROLE_INDEX][seedRole] === undefined) {
+				seedTermSeen[ROLE_INDEX][seedRole] = true;
+				seedTermsUniq[ROLE_INDEX].push(seedRole);
+			    }
+			    //for (j = 0; j < PARENT_DEPTH; j++) {
+			    for (j = 0; j < ONTOLOGY_DEPTH; j++) {
+				if (seedOntology[seedRole][j] === undefined) {
+				    seedOntology[seedRole][j] = [];
+				}
+
+				// some node names are an empty string "".
+				// set to a modified version of their parent
+				data[i][j] = (data[i][j] === "") ? "--- " + data[i][j-1] + " ---" : data[i][j]; 
+
+				seedOntology[seedRole][j].push(data[i][j]);
+
+				if (seedTermSeen[j][data[i][j]] === undefined) {
+				    seedTermSeen[j][data[i][j]] = true;
+				    seedTermsUniq[j].push(data[i][j]);
+				}
+			    }
+			}
+
+			// wait to enforce completion of async d3 method
+			self.wait_for_seed_load();
+		}); 
+
+		// DEBUG
+		/*
+		  for (var k in seedTermSeen[0]) {
+		    console.log ("seedTermSeen 0: " + k);
+		}
+		for (j = 0; j < PARENT_DEPTH; j++) {
+		    for (i=0; i < seedTermsUniq[j].length; i++) {
+			console.log ("seedTermsUniq " + j + " " + seedTermsUniq[j][i]);
+		    }
+		}
+		*/
+
+		return true;
+	 },
+
+	/**
+	   assign colors to seed ontology
+	*/
+	assignSeedColors: function(seedTermsUniq) {
+		var seedColors = this.seedColors;
+		var self = this;
+		// there are 30 top level SEED categories.  Need 30 colors
+		var colorWheel = ["#F00", // red              # carb
+				  "#900", // dark red         # respiration
+				  "#C30", // light brown      # nucleosides
+				  "#F60", // orange           # stress
+				  "#F90", // pumpkin          # protein metab
+				  "#FC0", // yellow           # regulation
+				  "#CF3", // yellow green     # cell wall
+				  "#9FC", // aqua             # misc
+				  "#9F9", // light green      # photosyn
+				  "#0C0", // green            # aromatics
+				  "#393", // darker green     # clust subsys
+				  "#060", // darkest green    # phosporus
+				  "#0F9", // blue green       # mobile elts 1
+				  "#0CF", // cyan             # secondary
+				  "#F39", // pink             # dormancy spore
+				  "#39F", // light blue       # amino acids
+				  "#69F", // light matte blue # iron
+				  "#36C", // matte blue       # mobile elts 2
+				  "#00F", // blue             # cell cycle
+				  "#33C", // dark blue        # membrane trans
+				  "#00C", // darkest blue     # nitrogen
+				  "#FC9", // tan              # sulfur
+				  "#96F", // violet           # dna metabolism
+				  "#C9F", // light violet     # cofactors
+				  "#60C", // dark violet      # fatty acids
+				  "#C0C", // magenta          # vir, dis, def
+				  "#F99", // light coral      # potassium
+				  "#F66", // dark coral       # motility
+				  "#909"  // deep purple      # virulence
+				  ];
+		var maxColor = colorWheel.length;
+		var SEED_LEVELS = 4;    // parents (3) + subsystem role col (1)
+
+		for (var j=0; j < SEED_LEVELS; j++) {
+		    if (seedColors[j] === undefined)
+			seedColors[j] = [];
+		    for (var i=0; i < seedTermsUniq[j].length; i++) {
+			//console.log (j + " " + i + " " + seedTermsUniq[j][i] + " " + colorWheel[i % maxColor]);
+			seedColors[j][seedTermsUniq[j][i]] = colorWheel[i % maxColor];
+		    }
+		}
+
+
+		/*for (var i=0; i < seedTermsUniq[0].length; i++) {
+		    console.log (i + " " + seedColors[0][seedTermsUniq[0][i]] + " " + seedTermsUniq[0][i]);
+		}*/
+
+		//this.seedColors = seedColors;
+		
+		return true;
+	},
+
 
         highlight : function(element, feature) {
             // unhighlight others - only highlight one at a time.
@@ -767,19 +1085,19 @@
             this.recenter(feature);
             return; // skip the rest for now.
 
-            // if (d3.select(element).attr("id") === feature.feature_id &&
-            //  d3.select(element).classed("highlight")) {
-            //  this.recenter(feature);
-            // }
-            // else {
-            //  d3.select(".highlight")
-            //    .classed("highlight", false)
-            //    .style("fill", function(d) { return calcFillColor(d); } );
+	    if (d3.select(element).attr("id") === feature.feature_id &&
+		d3.select(element).classed("highlight")) {
+		this.recenter(feature);
+	    }
+	    else {
+		d3.select(".highlight")
+		    .classed("highlight", false)
+		    .style("fill", function(d) { return calcFillColor(d); } );
 
-            //  d3.select(element)
-            //    .classed("highlight", true)
-            //    .style("fill", "yellow");
-            // }
+		d3.select(element)
+		    .classed("highlight", true)
+		    .style("fill", "yellow");
+	    }
         },
 
         recenter : function(feature) {
@@ -793,6 +1111,8 @@
         resize : function() {
             var newWidth = Math.min(this.$elem.parent().width(), this.options.svgWidth);
             this.svg.attr("width", newWidth);
+
+
         },
 
         moveLeftEnd : function() {

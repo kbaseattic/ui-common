@@ -1,0 +1,9 @@
+
+<h3>Communities Collection</h3>
+<b>Name:</b> {{name}}<br>
+<b>Created:</b> {{created}}<br>
+<div communities-collection>
+	<ul ng-repeat="member in members">
+		<li><a href="./communities/metagenome.html?metagenome={{member.ID}}">{{member.ID}}</a></li>
+	</ul>
+</div>

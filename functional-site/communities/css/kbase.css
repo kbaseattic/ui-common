@@ -1,0 +1,164 @@
+body {
+    font-family: 'OxygenRegular',Arial,sans-serif;
+}
+.ico {
+    padding: 10px;
+    border-radius: 10px;
+    background-image: linear-gradient(to bottom, #CCCCCC, #AAAAAA);
+    margin-bottom: 5px;
+    opacity: 0.5;
+    cursor: pointer;
+    width: 32px;
+}
+
+.ico:hover {
+    opacity: 1;
+}
+	
+.icorow {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+    width: 500px;
+}
+
+.icorow > div {
+    float: left;
+}
+	
+.icospan {
+    text-align: center;
+    color: #666;
+}
+
+.icospan > span {
+    margin-left: 5px;
+    color: white;
+    display: none;
+    font-size: 20px;
+    font-weight: 200;
+}
+	
+.icoactive {
+    opacity: 1;
+    cursor: default;
+}
+
+.icoactivespan > span {
+    display: inline;
+}
+
+.sidebar {
+    float: right;
+    position: absolute;
+    top: 100px;
+    bottom: 40px;
+    right: 40px;
+    box-shadow: 4px 4px 4px #666666;
+    padding: 0;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px;
+    overflow-y: auto;
+}
+
+.tab-pane {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.borderlayout {
+    bottom: 40px;
+    left: 40px;
+    overflow-y: auto;
+    position: absolute;
+    right: 460px;
+    top: 70px;
+    overflow-x: auto;
+}
+
+#content {
+    margin-top: 10px;
+}
+
+.kbase_nav {
+    font-family: 'RobotoBlack',Arial,sans-serif;
+    list-style: none outside none;
+    float: left;
+    margin: 0px;
+}
+
+.kbase_nav > li {
+    float: left;
+    padding: 15px;
+}
+
+.kbase_nav a {
+    color: #428bca;
+}
+
+.kbase_nav a:hover {
+    color: #2a6496;
+    text-decoration: none;
+}
+
+.btn-new {
+    -moz-user-select: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857;
+    margin-bottom: 0;
+    padding: 6px 12px;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.btn-primary-new {
+    background-color: #428bca;
+    border-color: #357ebd;
+    color: #ffffff;
+    font-family: 'OxygenRegular',Arial,sans-serif;
+}
+
+.btn-primary-new:hover {
+    background-color: #3267b1;
+    border-color: #285e8e;
+}
+
+.btn-primary-new:active {
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.125) inset;
+}
+
+.btn-default {
+    background-color: #ffffff;
+    border-color: #cccccc;
+    color: #333333;
+    font-family: 'OxygenRegular',Arial,sans-serif;
+}
+
+.btn-default:hover {
+    background-color: #ebebeb;
+    border-color: #adadad;
+}
+
+.btn-default:active {
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.125) inset;
+}
+
+@font-face {
+    font-family: "RobotoBlack";
+    font-style: normal;
+    font-weight: normal;
+    src: url("Roboto-Black-webfont.eot?#iefix") format("embedded-opentype"), url("Roboto-Black-webfont.woff") format("woff"), url("Roboto-Black-webfont.ttf") format("truetype"), url("Roboto-Black-webfont.svg#RobotoBlack") format("svg");
+}
+
+@font-face {
+    font-family: "OxygenRegular";
+    font-style: normal;
+    font-weight: normal;
+    src: url("Oxygen-webfont.eot?#iefix") format("embedded-opentype"), url("Oxygen-webfont.woff") format("woff"), url("Oxygen-webfont.ttf") format("truetype"), url("Oxygen-webfont.svg#OxygenRegular") format("svg");
+}

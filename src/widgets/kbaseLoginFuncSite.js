@@ -52,7 +52,7 @@
 
     $.KBWidget({
 
-		  name: "kbaseLogin",
+	    name: "kbaseLogin",
 
         version: "1.0.0",
         options: {
@@ -63,11 +63,17 @@
             fields : ['name', 'kbase_sessionid', 'user_id', 'token'],
         },
 
+        cookieName : 'kbase_session',
+        narrCookieName : 'kbase_narr_session',
+
         get_kbase_cookie : function (field) {
+
+            if (!$.cookie(this.cookieName))
+                return {};
 
             var chips = localStorage.getItem('kbase_session');
 
-            if (chips != undefined) {
+            if (chips != undefined  && chips != null) {
                 chips = JSON.parse(chips);
             }
             else {
@@ -124,7 +130,8 @@
                 if (!this.is_token_valid(this.get_kbase_cookie('token'))) {
                     localStorage.removeItem('kbase_session');
                     // nuke the cookie, too, just in case it's still there.
-                    $.cookie('kbase_session', null);
+                    $.removeCookie(this.cookieName, { path: '/', domain: '.kbase.us' });
+                    $.removeCookie(this.cookieName, { path: '/' });
                 }
                 else {
                     if (this.registerLogin) {
@@ -961,17 +968,27 @@
 
                                 if (data.kbase_sessionid) {
 
-									// if ($.cookie) {
-         //                                $.cookie('kbase_session',
-         //                                      'unEQUALSSIGN' + data.user_id
-         //                                    + 'PIPESIGN'
-         //                                    + 'kbase_sessionidEQUALSSIGN' + data.kbase_sessionid
-         //                                    + 'PIPESIGN'
-         //                                    + 'token_idEQUALSSIGN' + data.kbase_sessionid,
-         //                                    { expires: 60 });
-         //                            }
+                                    if ($.cookie) {
+                                        // $.cookie('kbase_session',
+                                        //       'unEQUALSSIGN' + data.user_id
+                                        //     + 'PIPESIGN'
+                                        //     + 'kbase_sessionidEQUALSSIGN' + data.kbase_sessionid
+                                        //     + 'PIPESIGN'
+                                        //     + 'token_idEQUALSSIGN' + data.kbase_sessionid,
+                                        //     { expires: 60 });
+                                        var cookieString = 'un=' + data.user_id + 
+                                                           '|kbase_sessionid=' + data.kbase_sessionid +
+                                                           '|user_id=' + data.user_id +
+                                                           '|token=' + data.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
+                                        $.cookie(this.cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
+                                        $.cookie(this.cookieName, cookieString, { path: '/', expires: 60 });
+                                        $.cookie(this.narrCookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
+                                    }
 
-                                    var cookieArray = [];
+
+
+
+                                    // var cookieArray = [];
 
                                     var args = { success : 1 };//this.get_kbase_cookie();
                                     var fields = this.options.fields;
@@ -983,9 +1000,7 @@
                                     var jsonARGS = JSON.stringify(args);
 
                                     localStorage.setItem('kbase_session', jsonARGS);
-
                                     this.populateLoginInfo(args);
-
                                     this.trigger('loggedIn', this.get_kbase_cookie());
 
                                     callback.call(this,args);
@@ -993,6 +1008,7 @@
                                 else {
                                     localStorage.removeItem('kbase_session');
                                     this.populateLoginInfo({});
+
                                     callback.call(this, {status : 0, message : data.error_msg});
 
                                     this.trigger('loggedInFailure', {status : 0, message : data.error_msg});
@@ -1004,14 +1020,28 @@
                         error: $.proxy(
                             function (jqXHR, textStatus, errorThrown) {
 
-                                // If we have a useless error message, replace with
-                                // friendly, but useless error message
-
+                                /* Some error cases
+                                 * status == 401 - show "uid/pw = wrong!" message
+                                 * status is not 401, 
+                                 *     and we have a responseJSON - if that's the "LoginFailure: Auth fail" error, show the same uid/pw wrong msg.
+                                 *     and we do not have a responseJSON (or it's something else): show a generic message
+                                 */
                                 var errmsg = textStatus;
-                                if (jqXHR.responseJSON) {
-                                    errmsg = jqXHR.responseJSON.error_msg;
+                                var wrongPwMsg = "Login Failed: your username/password is incorrect.";
+                                if (jqXHR.status && jqXHR.status === 401) {
+                                    errmsg = wrongPwMsg;
                                 }
-
+                                else if (jqXHR.responseJSON) {
+                                    // if it has an error_msg field, use it
+                                    if (jqXHR.responseJSON.error_msg) {
+                                        errmsg = jqXHR.responseJSON.error_msg;
+                                    }
+                                    // if that's the unclear auth fail message, update it
+                                    if (errmsg === "LoginFailure: Authentication failed.") {
+                                        errmsg = wrongPwMg;
+                                    }
+                                }
+                                // if we get through here and still have a useless error message, update that, too.
                                 if (errmsg == "error") {
                                     errmsg = "Error connecting to KBase login server";
                                 }
@@ -1047,7 +1077,9 @@
             }
 
             localStorage.removeItem('kbase_session');
-            $.removeCookie('kbase_session', { path: '/' });
+            $.removeCookie(this.cookieName, { path: '/' });
+            $.removeCookie(this.cookieName, { path: '/', domain: 'kbase.us' });
+            $.removeCookie(this.narrCookieName, { path: '/', domain: 'kbase.us' });
 
             // the rest of this is just housekeeping.
 

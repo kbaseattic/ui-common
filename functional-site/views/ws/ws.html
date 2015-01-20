@@ -1,25 +1,13 @@
 
 <div class="row">
-
     <div class="col-sm-3 col-md-3 sidebar">
-        
-        <!--<ul class="nav nav-tabs">
-            <li ng-class="{ active: $state.includes('narratives')}">
-                <a ui-sref="narratives" >Narratives</a>
-            </li>
-            <li ng-class="{ active: $state.includes('ws')}">
-                <a ui-sref="ws">Workspaces</a>
-            </li>
-        </ul>-->
+        <div class="pull-right" show-hide-sidebar></div>
         <div class="ws-sidebar" wsselector></div>
     </div>
 
-    <div class="col-md-9 col-md-offset-3 main" >
+    <div class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main" >
+
         <div class="object-view" ui-view>
-            <!--<div ng-show="!selected_ws">
-                <span class="text-danger">No Workspace Selected</span><br>
-                <small>Please select a workspace from the left.</small>
-            </div>-->
 
             <div class="well">
                 <h1>Welcome to the Workspace Browser <small>v1.05</small></h1> 
@@ -33,8 +21,7 @@
                 <li>Organize columns via dragging</li>
                 <li>Display columns via settings dropdown</li>
                 <li>Save settings state of tables</li>
-                <li>Access filtered table via URL. (<a href="#/ws/objtable/chenryExample?type=FBA">Click Me</a>)</li>
-                <li>Rough prototype of Organism page and KEGG Maps. (<a href="#/ws/mv/model/chenryExample/kb%7Cg.0.fbamdl">Click Me</a>)</li>
+                <li>Access filtered table via URL. (<a href="#/ws/objects/chenryExample?type=FBA">Click Me</a>)</li>
                 <li>UX/Styling improvements</li>
                 <li>Bug fixes</li>
             </ul>
@@ -49,16 +36,16 @@
                     <li>The "View HTML" has been replaced with direct links to KBase "Landing Pages".<br> Object details and download can be found by hovering over an object and selecting "more".</li>
                     <li>View object history</li>
                     <li>View deleted objects</li>
-                    <li>Access workspaces via url.  (<a href="#/ws/objtable/chenryExample">Click Me</a>)</li>
+                    <li>Access workspaces via url.  (<a href="#/ws/objects/chenryExample">Click Me</a>)</li>
                     <li>Workspaces are now stored as username<b>:</b>workspace_name by default when creating a workspace in the WB</li>
                 </ul>
             </div>
 
-            <!--<a href="assets/images/ws/slide1.png" role="button" target="_blank">Screenshot of Features</a>-->
-
             <br><br>
+            <!--
             <h5>Looking for the old Workspace Browser?</h5>
-            The old Workspace Browser is still temporarily available <a href="http://140.221.84.142/">here</a>, but is no longer maintained and KBase services no longer use these workspaces. All of the data from the old Workspace Service is safe and is in the process of being transferred to new WS.  The old Workspace Browser will go offline in ~2 months.  Read more <a href="http://kbase.us/news/blog/new-workspace-service-and-workspace-browser/">here</a>.-->
+            The old Workspace Browser is still temporarily available <a href="http://140.221.84.142/">here</a>, but is no longer maintained and KBase services no longer use these workspaces. All of the data from the old Workspace Service is safe and is in the process of being transferred to new WS.  The old Workspace Browser will go offline in ~2 months.  Read more <a href="http://kbase.us/news/blog/new-workspace-service-and-workspace-browser/">here</a>.
+            -->
 
         </div>
     </div>

@@ -49,7 +49,7 @@
                                 .addClass("kbwidget-message-pane kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
-            this.$infoPanel = $("<div>");
+            this.$infoPanel = $("<div>").css("overflow","auto");
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
 
@@ -94,7 +94,7 @@
 
         makeRow: function(name, value) {
             var $row = $("<tr>")
-                       .append($("<td>").append(name))
+                       .append($("<th>").append(name))
                        .append($("<td>").append(value));
             return $row;
         },
@@ -128,17 +128,53 @@
                         }
                     }
 
-                    var subsysStr = "No subsystem info found.";
-                    if (feature.subsystems) {
+		    // Function
+		    var func = feature['function'];
+		    if (!func)
+			func = "Unknown";
+		    this.$infoTable.append(this.makeRow("Function", func));
 
-                    }
-                    this.$infoTable.append(this.makeRow("Subsystems", subsysStr));
+		    // Subsystems, single string
+                    //var subsysSumStr = "No subsystem summary found.";
+                    //if (feature.subsystems) {
+		    //subsysSumStr = feature.subsystems;
+                    //}
+                    //this.$infoTable.append(this.makeRow("Subsystems Summary", subsysSumStr));
 
-                    var rolesStr = "No roles info found.";
-                    if (feature.roles) {
-                        
+		    // Subsystem, detailed
+                    var subsysDataStr = "No subsystem data found.";
+                    if (feature.subsystem_data) {
+			subsysDataStr = "";
+			for (var i=0; i<feature.subsystem_data.length; i++) {
+			    var subsys = feature.subsystem_data[i];
+			    // typedef tuple<string subsystem, string variant, string role> subsystem_data;
+			    subsysDataStr += "<p>" + "Subsystem: " + subsys[0] + "<br>" + "Variant: " + subsys[1] + "<br>" + "Role: " + subsys[2];
+			}
                     }
-                    this.$infoTable.append(this.makeRow("Roles", rolesStr));
+                    this.$infoTable.append(this.makeRow("Subsystems", subsysDataStr));
+
+		    // Annotation
+                    var annotationsStr = "No annotation comments found.";
+                    if (feature.annotations) {
+			annotationsStr = "";
+			for (var i=0; i<feature.annotations.length; i++) {
+			    var annot = feature.annotations[i];
+			    // typedef tuple<string comment, string annotator, int annotation_time> annotation;
+			    annotationsStr += annot[0] + " (" + annot[1] + ", timestamp:" + annot[2] + ")" + "<br>";
+			}
+                    }
+                    this.$infoTable.append(this.makeRow("Annotation Comments", annotationsStr));
+
+		    // Protein families list.
+		    //var proteinFamilies = "None found";
+		    //if (feature.protein_families) {
+		    //proteinFamilies = "";
+		    //for (var i=0; i<feature.protein_families.length; i++) {
+		    //    var fam = feature.protein_families[i];
+		    //    proteinFamilies += fam.id + ": " + fam.subject_description + "<br>";
+		    //}
+		    //}
+		    //this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
 
                 }
                 else {

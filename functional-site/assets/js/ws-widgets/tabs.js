@@ -3,7 +3,7 @@
 
     // Instantiation
     // optional: content, active, removable
-    // you can make all tabs removable or individual tabs
+    // you can make all tabs or individual tabs removable
 
         var tabs = $('#ele').tabs();
 
@@ -32,10 +32,9 @@
 
     // manually show a tab
     // Tab panes are shown when clicked automatically.
-    // This programmatic way of showing a tab.
+    // This is a programmatic way of showing a tab.
 
         tabs.showTab('tab_name');
-
 */
 
 (function( $, undefined ) {
@@ -45,10 +44,11 @@
         version: "1.0.0",
         init: function(options) {
             this._super(options);
+            if (!options) options = {};
             var container = this.$elem;
             var self = this;
 
-            var tabs = $('<ul class="nav nav-tabs">');
+            var tabs = $('<ul class="nav nav-'+(options.pills ? 'pills' : 'tabs')+'">');
             var tab_contents = $('<div class="tab-content">');
             container.append(tabs, tab_contents);
 
@@ -59,12 +59,18 @@
                     return;
                 }
 
-                // tab
                 var tab = $('<li class="'+(p.active ? 'active' :'')+'">');
                 var tab_link = $('<a data-toggle="tab" data-id="'+p.name+'">'+p.name+'</a>');
-                tab.append(tab_link).hide();
-                tabs.append(tab);
-                tab.toggle('slide', {direction: 'down', duration: 'fast'});
+
+                // animate by sliding tab up
+                if (p.animate === false) {
+                    tab.append(tab_link)                    
+                    tabs.append(tab);              
+                } else {
+                    tab.append(tab_link).hide();
+                    tabs.append(tab);
+                    tab.toggle('slide', {direction: 'down', duration: 'fast'});
+                }
 
                 // add close button if needed
                 if (p.removable || options.removable) {
@@ -80,7 +86,13 @@
                 var c = $('<div class="tab-pane '+(p.active ? 'active' :'')+'" data-id="'+p.name+'">')
                 c.append((p.content ? p.content : ''))
                 tab_contents.append(c);
-                events();
+                
+                tab.click(function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var id = $(this).find('a').data('id');
+                    self.showTab(id);
+                })
 
                 return p.content;
             }
@@ -90,7 +102,7 @@
                 var tab = tabs.find('a[data-id="'+name+'"]').parent('li');
                 var tab_content = tab_contents.children('[data-id="'+name+'"]')
 
-                // show the next or prev tab
+                // get previous or next tab
                 if (tab.next().length > 0) {
                     var id = tab.next().children('a').data('id');
                 } else {
@@ -100,6 +112,9 @@
                 // remove the tab
                 tab.remove();
                 tab_content.remove();
+
+                // show prev or next tab
+                self.showTab(id);
             }
 
             // returns tab
@@ -122,31 +137,26 @@
 
             // highlights tab and shows content
             this.showTab = function(id) {
-                tabs.find('li').removeClass('active');
-                tab_contents.find('.tab-pane').removeClass('active');
+                tabs.children('li').removeClass('active');
+                tab_contents.children('.tab-pane').removeClass('active');
 
                 tabs.find('a[data-id="'+id+'"]').parent().addClass('active');
                 tab_contents.children('[data-id="'+id+'"]').addClass('active');                
             }
 
+            this.getTabNav = function() {
+                return tabs;
+            }
+
             // if tabs are supplied, add them
-            if (options.tabs) {
+            // don't animate intial tabs
+            if ('tabs' in options) {
                 for (var i in options.tabs) {
-                    this.addTab(options.tabs[i])
+                    var p = $.extend(options.tabs[i], {animate: false})
+                    this.addTab(p)
                 }
             }
 
-            // events for showing tabs
-            function events() {
-                tabs.find('a').unbind('click')
-                tabs.find('a').click(function (e) {
-                    e.preventDefault();
-
-                    // show tab and content
-                    var id = $(this).data('id');
-                    self.showTab(id);
-                })
-            }
 
             return this;
         },

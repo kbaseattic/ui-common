@@ -13,9 +13,6 @@ $.KBWidget({
         var ws = options.ws;   
         var title = options.title ? options.title : "Set formulation";
 
-        var fba = new fbaModelServices('http://140.221.85.73:4043/');
-        var kbws = new workspaceService('http://kbase.us/services/workspace_service/');
-
         var container = $('<div id="kbase-formulation-form" class="panel panel-default">\
                                 <div class="panel-heading">\
                                     <h4 class="panel-title">'+title+'</h4>\

@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>KBase Narrative Interface (prototype)</title>
+        <link rel="icon" type="image/x-icon" href="functional-site/assets/img/KBase_favicon.ico">
+        <link rel="stylesheet" type="text/css" href="ext/bootstrap/3.0.0/css/bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="functional-site/assets/css/landing-pages.css" />
+    </head>
+    <body>
+        <div style="text-align:center;">
+            <div style="margin-top: 20%">
+                <img id="loader" src="functional-site/assets/img/kbase_animated_logo.gif"></img>
+                <div id="text" style="font-size:146.5%; color:#006698; font-family:'OxygenBold', Arial, sans-serif">
+                    <br>
+                    Starting a new Narrative session for you
+                    <br>
+                    Please wait...
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script src="ext/jquery/jquery-1.10.2.min.js"></script>
+    <script>
+        (function( $, undefined ) {
+            var maxTries = 20;
+            var stateFlag = 0;
+            var retryTime = 1000; //ms
+            var numTries = 0;
+            var narrUrl = window.location.href.slice(window.location.href.indexOf('?') + 1);
+            var siteReady = false;
+            narrUrl = decodeURIComponent(narrUrl.split('=')[1]);
+            narrUrl = narrUrl.replace(/https?\:/, window.location.protocol); // in case the server didn't get the memo that this is supposed to be https!
+
+            var interval = null;
+            var pokeNarrative = function(url) {
+                $.ajax({
+                    type: 'GET',
+                    async: false,
+                    url: url,
+                    success: function(res) {
+                        // on success, take us there!
+                        siteReady = true;
+                        // if (interval)
+                        //     clearInterval(interval);
+                        // window.location.replace(url);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                        // look at error. if it's a 500, probably not allowed to see it (parse error and try)
+                        // otherwise, keep trying!
+                        if(error.status === 500) {
+                            if (interval)
+                                clearInterval(interval);
+
+                            var permErr = '<br>Sorry, it looks like you don\'t have permission to view that Narrative.' +
+                                          '<br>If you see this error after coming through an outside link,' +
+                                          '<br>please try to access this Narrative through the main site <a href="/">here</a>.';
+
+                            var customErr = function(msg) {
+                                return '<br>Sorry, an error occurred while loading your narrative:' +
+                                       '<br>Error message: <b>' + msg + '</b>' +
+                                       '<br>Please try again later, or look <a href="//kbase.us/user-support/report-issue/">here</a> for help!';
+                            };
+
+                            var defaultErr = '<br>Sorry, it appears an error occurred while setting up your narrative.' +
+                                             '<br>Please try again later, or look <a href="//kbase.us/user-support/report-issue/">here</a> help!';
+
+                            var errorMsg = defaultErr;
+
+                            if (error.responseText) {
+                                var $errorHTML = $($.parseHTML(error.responseText));
+                                var msg = $errorHTML.find('#error-message > h3').text();
+                                if (msg.indexOf('may not read workspace') !== -1)
+                                    errorMsg = permErr;
+                                else
+                                    errorMsg = customErr(msg);
+                            }
+
+                            $('#text').html(errorMsg);
+
+                        }
+                        numTries++;
+                    },
+                });
+            };
+
+            if (narrUrl) {
+                interval = setInterval( function() { 
+                    if (siteReady) {
+                        clearInterval(interval);
+
+                        var ua = navigator.userAgent.toLowerCase();
+                        if (ua.indexOf('safari') != -1 && ua.indexOf('chrome') == -1) {
+                            $('#text').html('<br><a href="' + narrUrl + '?">Click here to enter the Narrative Interface!</a>');
+                            $('#loader').attr('src', 'functional-site/assets/images/doodle.png')
+                        }
+                        else {
+                            window.location.replace(narrUrl);
+                        }
+                    }
+                    else {
+                        pokeNarrative(narrUrl); 
+                        if (numTries > maxTries/2 && stateFlag === 0) {
+                            $('#text').html('<br>Sorry, this is taking longer than expected.<br>Please be patient.');
+                            stateFlag++;
+                        }
+                        if (numTries > maxTries && stateFlag === 1) {
+                            $('#text').html('<br>Sorry, it appears an error occurred while setting up your narrative.<br>Please try again later, or look <a href="//kbase.us/user-support/report-issue/">Here</a> for some help!');
+                            stateFlag++;
+                            clearInterval(interval);
+                        }
+                    }
+                }, retryTime );
+            }
+        })(jQuery);        
+    </script>
+</html>

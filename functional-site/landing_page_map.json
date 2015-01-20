@@ -38,7 +38,7 @@
 
     "KBaseExpression" : {
         "ExpressionSample" : null,
-        "ExpressionSeries" : null,
+        "ExpressionSeries" : "ws/expression_series",
         "ExpressionReplicateGroup" : null,
         "ExpressionPlatform" : null
     },
@@ -53,28 +53,30 @@
 
     "KBaseFBA" : {
         "Gapfilling" : null,
-        "FBA" : "fbas",
+        "FBA" : "ws/fbas",
         "ReactionSensitivityAnalysis" : null,
-        "FBAModel" : "models",
+        "FBAModel" : "ws/models",
         "Gapgeneration" : null,
         "ModelTemplate" : null,
-        "ETC" : "etc"
+        "ETC" : "etc",
+        "PromConstraint" : "ws/promconstraint"
     },
 
     "KBaseGenomes" : {
         "ProbabilisticAnnotation" : null,
         "ContigSet" : null,
         "Genome" : "genomes",
-        "MetagenomeAnnotation" : null
+        "MetagenomeAnnotation" : null,
+        "Pangenome" : "pangenome"
     },
 
     "KBaseGwasData" : {
-        "GwasGeneList" : null,
-        "GwasPopulationVariation" : null,
-        "GwasPopulationVariation" : null,
-        "GwasPopulationTrait" : null,
-        "GwasPopulationKinship" : null,
-        "GwasTopVariations" : null
+        "GwasPopulation" : "gptype",
+        "GwasPopulationVariation" : "gvtype",
+        "GwasPopulationTrait" : "gttype",
+        "GwasPopulationKinship" : "gpktype",
+        "GwasTopVariations" : "gtvtype",
+        "GwasGeneList" : "ggltype"
     },
 
     "KBaseNarrative" : {
@@ -95,7 +97,7 @@
     },
 
     "KBasePhenotypes" : {
-        "PhenotypeSet" : null,
+        "PhenotypeSet" : "ws/phenotype",
         "PhenotypeSimulationSet" : null
     },
 
@@ -125,9 +127,13 @@
         "ExpressionDataSample" : null,
         "ExpressionDataPoint" : null,
         "MAKResult" : "mak",
-        "MAKBicluster" : null,
+        "MAKBicluster" : "mak",
         "ExpressionDataSeries" : null,
-        "MAKBiclusterSet" : null
+        "MAKBiclusterSet" : "mak",
+        "FloatDataTable" : "floatdatatable",
+        "FloatDataTableContainer" : null,
+        "StringDataTable" : null,
+        "StringDataTableContainer" : null
     },
 
     "MEME" : {
@@ -148,6 +154,11 @@
     "Meta" : {
         "RxnProbs" : null,
         "ProbAnno" : null
-    }    
+    },
+    
+    "KBaseTrees" : {
+    	"Tree" : "tree",
+    	"MSA" : "msa"
+    }
 
 }

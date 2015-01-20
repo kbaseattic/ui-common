@@ -1,0 +1,81 @@
+{
+   "nbformat_minor" : 0,
+   "worksheets" : [
+      {
+         "cells" : [
+            {
+               "source" : "<div class='panel kb-func-panel kb-cell-run' id='kb-cell-1-14307f97-8d58-43a8-bb83-f1f87995ddf9'><div class='panel-heading'><div class='kb-func-desc'><h1><b>Insert Genome into Species Tree</b></h1><span class='pull-right kb-func-timestamp' id='last-run'></span><button class='btn btn-default btn-xs' type='button' data-toggle='collapse' data-target='#kb-cell-1-14307f97-8d58-43a8-bb83-f1f87995ddf9-method-details'>...</button><div><h2 class='collapse' id='kb-cell-1-14307f97-8d58-43a8-bb83-f1f87995ddf9-method-details'>Insert a Genome into a global genome tree composed of 49 conserved COGs [20]</h2></div></div></div><div class='panel-body'><div id='inputs'></div></div><div class='panel-footer' style='overflow:hidden'><div id='kb-func-progress' class='pull-left' style='display:none;'><div class='progress progress-striped active kb-cell-progressbar'><div class='progress-bar progress-bar-success' role='progressbar' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100' style='width:0%'/></div><p class='text-success'/></div><div class='buttons pull-right'><button id='kb-cell-1-14307f97-8d58-43a8-bb83-f1f87995ddf9-delete' type='button' value='Delete' class='btn btn-default'>Delete</button> <button id='kb-cell-1-14307f97-8d58-43a8-bb83-f1f87995ddf9-run' type='button' value='Run' class='btn btn-primary'>Run</button></div></div></div>\n<script>$('#kb-cell-1-14307f97-8d58-43a8-bb83-f1f87995ddf9 > div > div#inputs').kbaseDefaultNarrativeInput({ method:'{\"properties\":{\"widgets\":{\"input\":null,\"output\":\"kbaseTree\"},\"parameters\":{\"param2\":{\"default\":\"\",\"ui_name\":\"Output species tree ID\",\"type\":\"KBaseTrees.Tree\",\"description\":\"Output species tree ID. If empty, an ID will be chosen randomly. [20.3]\"},\"param1\":{\"default\":\"\",\"ui_name\":\"Neighbor public genome count\",\"type\":\"string\",\"description\":\"number of closest public genomes the tree will contain. (optional, default value is 100) [20.2]\"},\"param0\":{\"default\":\"\",\"ui_name\":\"Genome ID\",\"type\":\"KBaseGenomes.Genome\",\"description\":\"a Genome to insert into the tree [20.1]\"}}},\"returns\":{\"output0\":{\"type\":\"string\",\"description\":\"Species Tree Result\"}},\"type\":\"object\",\"description\":\"Insert a Genome into a global genome tree composed of 49 conserved COGs [20]\",\"title\":\"Insert Genome into Species Tree\",\"service\":\"Microbes Services\"}'});</script>",
+               "metadata" : {
+                  "kb-cell" : {
+                     "widget" : "kbaseDefaultNarrativeInput",
+                     "type" : "function_input",
+                     "method" : {
+                        "returns" : {
+                           "output0" : {
+                              "type" : "string",
+                              "description" : "Species Tree Result"
+                           }
+                        },
+                        "type" : "object",
+                        "title" : "Insert Genome into Species Tree",
+                        "service" : "Microbes Services",
+                        "description" : "Insert a Genome into a global genome tree composed of 49 conserved COGs [20]",
+                        "properties" : {
+                           "widgets" : {
+                              "input" : null,
+                              "output" : "kbaseTree"
+                           },
+                           "parameters" : {
+                              "param0" : {
+                                 "ui_name" : "Genome ID",
+                                 "type" : "KBaseGenomes.Genome",
+                                 "default" : "",
+                                 "description" : "a Genome to insert into the tree [20.1]"
+                              },
+                              "param2" : {
+                                 "ui_name" : "Output species tree ID",
+                                 "type" : "KBaseTrees.Tree",
+                                 "default" : "",
+                                 "description" : "Output species tree ID. If empty, an ID will be chosen randomly. [20.3]"
+                              },
+                              "param1" : {
+                                 "ui_name" : "Neighbor public genome count",
+                                 "type" : "string",
+                                 "default" : "",
+                                 "description" : "number of closest public genomes the tree will contain. (optional, default value is 100) [20.2]"
+                              }
+                           }
+                        }
+                     },
+                     "widget_state" : [
+                        {
+                           "time" : 1406177928212,
+                           "state" : {
+                              "param0" : "",
+                              "param2" : "",
+                              "param1" : ""
+                           }
+                        }
+                     ]
+                  }
+               },
+               "cell_type" : "markdown"
+            }
+         ],
+         "metadata" : {}
+      }
+   ],
+   "metadata" : {
+      "format" : "ipynb",
+      "creator" : "wstester1",
+      "ws_name" : "wstester1:home",
+      "name" : "Build a Species Tree for my Genome",
+      "type" : "Narrative",
+      "description" : "",
+      "data_dependencies" : [
+         "KBaseGenomes.Genome kb|g.0"
+      ]
+   },
+   "nbformat" : 3
+}
+

@@ -17,6 +17,8 @@
             genomeID: null,
             kbCache: null,
             auth: null,
+            hideButtons:false,
+            width:350,
             loadingImage: "assets/img/loading.gif",
         },
 
@@ -30,6 +32,11 @@
                 return this;
             }
 
+            
+            // always setup the cdmi clients, cause for now there is a hack to get domain/operon info if available
+            // from the CDS
+            this.cdmiClient = new CDMI_API(this.cdmiURL);
+            this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
 
             this.render();
             if (this.options.workspaceID)
@@ -72,18 +79,23 @@
                                 .addClass("kbwidget-message-pane kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
-            this.$infoPanel = $("<div>");
+            this.$infoPanel = $("<div>").css("overflow","auto");
             this.$infoTable = $("<table>")
                               .addClass("table table-striped table-bordered");
             this.$buttonPanel = $("<div>")
                                 .attr("align", "center")
                                 .addClass("btn-group")
-                                .append(makeButton("domains"))
-                                .append(makeButton("operons"))
-                                .append(makeButton("biochemistry"));
+		                //.append(makeButton("domains"))
+		                 //.append(makeButton("operons"))
+                                .append(makeButton("sequence"))
+                                .append(makeButton("biochemistry"))
+                                .append(makeButton("structure"));
+
 
             this.$infoPanel.append(this.$infoTable)
-                           .append(this.$buttonPanel);
+            if (!this.options.hideButtons) {
+                this.$infoPanel.append(this.$buttonPanel);
+            }
 
             this.$elem.append(this.$infoPanel);
         },
@@ -94,10 +106,6 @@
             this.showMessage("<img src='" + this.options.loadingImage + "'>");
 
             var self = this;
-
-
-            this.cdmiClient = new CDMI_API(this.cdmiURL);
-            this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
 
             // Data fetching!
             var jobsList = [];
@@ -124,12 +132,12 @@
                 this.clientError
             ));
             // Fids to protein families job
-            jobsList.push(this.cdmiClient.fids_to_protein_families([this.options.featureID],
-                function(families) {
-                    data.families = families[self.options.featureID];
-                },
-                this.clientError
-            ));
+            //jobsList.push(this.cdmiClient.fids_to_protein_families([this.options.featureID],
+            //    function(families) {
+            //        data.families = families[self.options.featureID];
+            //    },
+            //    this.clientError
+            //));
 
             $.when.apply($, jobsList).done(function() {
                 self.$infoTable.empty();
@@ -138,36 +146,50 @@
                                                           .append(data.featureData.genome_name)
                                                           .append("<br/>")
                                                           .append(self.makeGenomeButton(data.genome))));
-                self.$infoTable.append(self.makeRow("Length", data.featureData.feature_length + " bp"));
+		var len = data.featureData.feature_length + " bp";
+		if (data.featureData.protein_translation) {
+		    len += ", " + data.featureData.protein_translation.length + " aa";
+		}
+                self.$infoTable.append(self.makeRow("Length", len));
                 self.$infoTable.append(self.makeRow("Location", $("<div/>")
-                                                            .append(self.parseLocation(data.featureData.feature_location))
-                                                            .append(self.makeContigButton(data.featureData.feature_location))));
+                                                            .append(self.parseLocation(data.featureData.feature_location))));
+		                                            //.append(self.parseLocation(data.featureData.feature_location))
+		                                            //.append(self.makeContigButton(data.featureData.feature_location))));
+                self.$infoTable.append(self.makeRow("Aliases", data.featureData.feature_aliases.join(", ")));
 
-                self.$infoTable.append(self.makeRow("GC Content", self.calculateGCContent(data.dnaSeq).toFixed(2) + "%"));
 
-                if (data.families && data.families.length != 0) {
-                    self.cdmiClient.protein_families_to_functions(data.families,
-                        function(families) {
-                            var familyStr = '';
-                            for (var fam in families) {
-                                familyStr += fam + ": " + families[fam] + "<br/>";
-                            }
-                            self.$infoTable.append(self.makeRow("Protein Families", familyStr));
-                        },
-                        self.clientError
-                    );
-                }
-                else
-                    self.$infoTable.append(self.makeRow("Protein Families", "None found"));
 
-                self.$buttonPanel.find("button#domains").click(
+                //self.$infoTable.append(self.makeRow("GC Content", self.calculateGCContent(data.dnaSeq).toFixed(2) + "%"));
+
+                //if (data.families && data.families.length != 0) {
+                //    self.cdmiClient.protein_families_to_functions(data.families,
+                //        function(families) {
+                //            var familyStr = '';
+                //            for (var fam in families) {
+                //                familyStr += fam + ": " + families[fam] + "<br/>";
+                //            }
+                //            self.$infoTable.append(self.makeRow("Protein Families", familyStr));
+                //        },
+                //        self.clientError
+                //    );
+                //}
+                //else
+                //    self.$infoTable.append(self.makeRow("Protein Families", "None found"));
+
+                //self.$buttonPanel.find("button#domains").click(
+                //    function(event) { 
+                //        self.trigger("showDomains", { event: event, featureID: self.options.featureID }) 
+                //    }
+                //);
+                //self.$buttonPanel.find("button#operons").click(
+                //    function(event) { 
+                //        self.trigger("showOperons", { event: event, featureID: self.options.featureID }) 
+                //    }
+                //);
+
+                self.$buttonPanel.find("button#sequence").click(
                     function(event) { 
-                        self.trigger("showDomains", { event: event, featureID: self.options.featureID }) 
-                    }
-                );
-                self.$buttonPanel.find("button#operons").click(
-                    function(event) { 
-                        self.trigger("showOperons", { event: event, featureID: self.options.featureID }) 
+                        self.trigger("showSequence", { event: event, featureID: self.options.featureID }) 
                     }
                 );
                 self.$buttonPanel.find("button#biochemistry").click(
@@ -175,12 +197,18 @@
                         self.trigger("showBiochemistry", { event: event, featureID: self.options.featureID }) 
                     }
                 );
+                self.$buttonPanel.find("button#structure").click(
+                     function(event) { 
+                         self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID }) 
+                     }
+                );
                 self.hideMessage();
                 self.$infoPanel.show();
             });
         },
 
         renderWorkspace: function() {
+            var self = this;
             this.$infoPanel.hide();
             this.showMessage("<img src='" + this.options.loadingImage + "'>");
 
@@ -204,13 +232,13 @@
 
                     if (feature) {
                         // FINALLY we have the feature! Hooray!
+                        console.log(JSON.stringify(feature));
                         this.$infoTable.empty();
                         /* Function
-                         * Genome + button
+                         * Genome + link
                          * Length
-                         * Location + button
-                         * GC Content (maybe)
-                         * Protein Families
+                         * Location
+			 * Aliases
                          */
 
                         // Figure out the function.
@@ -237,34 +265,90 @@
                             }
                             len += " bp";
                         }
+			if (feature.protein_translation) {
+			    len += ", " + feature.protein_translation.length + " aa";
+			}
                         this.$infoTable.append(this.makeRow("Length", len));
 
-                        // Make a contig button
                         this.$infoTable.append(this.makeRow("Location", $("<div/>")
-                                                            .append(this.parseLocation(feature.location))
-                                                            .append(this.makeContigButton(feature.location))));
+                                                            .append(this.parseLocation(feature.location))));
+			                                    //.append(this.parseLocation(feature.location))
+			                                    //.append(this.makeContigButton(feature.location))));
+
+			// Aliases
+			var aliasesStr = "No known aliases";
+			if (feature.aliases)
+			    aliasesStr = feature.aliases.join(", ");
+			self.$infoTable.append(self.makeRow("Aliases", aliasesStr));
+			// end Aliases
+
 
                         // LOL GC content. Does anyone even care these days?
-                        if (feature.dna_sequence) {
-                            var gc = this.calculateGCContent(feature.dna_sequence);
-                            this.$infoTable.append(this.makeRow("GC Content", Number(gc).toFixed(2)));
-                        }
+                        //if (feature.dna_sequence) {
+                        //    var gc = this.calculateGCContent(feature.dna_sequence);
+                        //    this.$infoTable.append(this.makeRow("GC Content", Number(gc).toFixed(2)));
+                        //}
 
                         // Protein families list.
-                        var proteinFamilies = "None found";
+                        var proteinFamilies = "";
                         if (feature.protein_families) {
-                            proteinFamilies = "";
-                            for (var i=0; i<feature.protein_families.length; i++) {
-                                var fam = feature.protein_families[i];
-                                proteinFamilies += fam.id + ": " + fam.subject_description + "<br>";
+                            if (feature.protein_families.length>0) {
+                                proteinFamilies = "";
+                                for (var i=0; i<feature.protein_families.length; i++) {
+                                    var fam = feature.protein_families[i];
+                                    proteinFamilies += fam.id + ": " + fam.subject_description + "<br>";
+                                }
                             }
                         }
-                        this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
+                        if (proteinFamilies) {
+                            this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
+                        }
 
-                        this.$buttonPanel.find("button#domains").click(function(event) { window.alert("Domain view unavailable for Workspace genes. Sorry!"); });
-                        this.$buttonPanel.find("button#operons").click(function(event) { window.alert("Operon view unavailable for Workspace genes. Sorry!"); });
-
+                        // first add handlers that say we do not have domains or operons for this gene
+                        this.$buttonPanel.find("button#domains").click(function(event) { 
+                            window.alert("No domain assignments available for this gene.  You will be able to compute domain assignments in the Narrative in the future.");
+                        });
+                        this.$buttonPanel.find("button#operons").click(function(event) {
+                            window.alert("No operon assignments available for this gene.  You will be able to compute operon assignments in the Narrative in the future.");
+                        });
+                        this.$buttonPanel.find("button#structure").click(function(event) {
+                            window.alert("No structure assignments available for this gene.  You will be able to compute structure assignments in the Narrative in the future.");
+                        });                        
+                        
+                        //determine if a feature id and its protein MD5 translation is found in the CDS- if it is,
+                        //return true.  We use this as a hack to see if we have gene info for this feature for WS objects.
+                        this.cdmiClient.fids_to_proteins([self.options.featureID],
+                                   function(prot) {
+                                        if (prot[self.options.featureID] == feature['md5'] ) {
+                                            //ok the fid and md5 match, so go to the CDS to get domain info...  what a hack!
+                                            self.$buttonPanel.find("button#domains").off("click");
+                                            self.$buttonPanel.find("button#domains").click(function(event) { 
+                                                self.trigger("showDomains", { event: event, featureID: self.options.featureID });
+                                            });
+                                            self.$buttonPanel.find("button#operons").off("click");
+                                            self.$buttonPanel.find("button#operons").click(function(event) { 
+                                                self.trigger("showOperons", { event: event, featureID: self.options.featureID });
+                                            });
+                                            self.$buttonPanel.find("button#structure").off("click");
+                                            self.$buttonPanel.find("button#structure").click(function(event) { 
+                                                self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID });
+                                            });
+                                        }
+                                   } // we don't add error function- if they don't match or this fails, do nothing.
+                        );
+                        
                         // bind button events
+                        this.$buttonPanel.find("button#sequence").click(
+                            $.proxy(function(event) { 
+                                this.trigger("showSequence", { 
+                                    event: event, 
+                                    featureID: this.options.featureID,
+                                    genomeID: this.options.genomeID,
+                                    workspaceID: this.options.workspaceID,
+                                    kbCache: this.options.kbCache 
+                                });
+                            }, this)
+                        );
                         this.$buttonPanel.find("button#biochemistry").click(
                             $.proxy(function(event) { 
                                 this.trigger("showBiochemistry", { 
@@ -298,12 +382,15 @@
 
         makeRow: function(name, value) {
             var $row = $("<tr/>")
-                       .append($("<td />").append(name))
+                       .append($("<th />").append(name))
                        .append($("<td />").append(value));
             return $row;
         },
 
         makeContigButton: function(loc) {
+            if (this.options.hideButtons) {
+                return "";
+            }
             if (loc === null || loc[0][0] === null)
                 return "";
 
@@ -336,6 +423,10 @@
             if (!workspaceID)
                 workspaceID = null;
 
+            return $("<div>")
+                .append('<a href="#/genomes/'+workspaceID+'/'+genomeID+'" target="_blank">'+workspaceID+'/<wbr>'+genomeID+'</a>');
+                
+                
             var self = this;
             var $genomeBtn = $("<button />")
                              .addClass("btn btn-default")
@@ -369,7 +460,8 @@
             }
             return gc / s.length * 100;            
         },
-
+        
+        
         /**
          * parses out the location into something visible in html, adds a button to open the contig.
          * something like:

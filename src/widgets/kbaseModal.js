@@ -4,7 +4,7 @@
     This is a helper widget for rendering modals using bootstrap v3.0.0
 
     API Example:
-        var modal = this.$elem.kbaseModal({title: 'Model Details', 
+        var modal = $('<div>').kbaseModal({title: 'Model Details', 
                                            rightLabel: 'Super Workspace,
                                            subText: 'kb|g.super.genome '});
 */
@@ -26,7 +26,7 @@ $.KBWidget({
         var body = options.body;
         var buttons = options.buttons;
 
-        var container = $('<div class="modal">\
+        var modal = $('<div class="modal">\
                               <div class="modal-dialog">\
                                   <div class="modal-content">\
                                     <div class="modal-header">\
@@ -42,19 +42,22 @@ $.KBWidget({
                               </div>\
                            </div>');
 
-        var modal_header = container.find('.modal-header');
-        var modal_title = container.find('.modal-title');
-        var modal_subtext = container.find('.modal-subtext');
-        var modal_body = container.find('.modal-body');
-        var modal_footer = container.find('.modal-footer');        
+        var modal_header = modal.find('.modal-header');
+        var modal_title = modal.find('.modal-title');
+        var modal_subtext = modal.find('.modal-subtext');
+        var modal_body = modal.find('.modal-body');
+        var modal_footer = modal.find('.modal-footer');        
 
         if (title) modal_title.append(title);
         if (subtext) modal_subtext.append(subtext);
-        if (body) modal_body.append(body);
-        if (buttons) this.buttons(buttons);
-        
-        // render modal
-        self.$elem.append(container);
+        if (body) modal_body.append(body);       
+
+        // destroy every time, unless specified otherwise
+        if (!options.noDestroy) {
+            modal.on('hidden.bs.modal', function(){
+                $(this).remove();
+            });
+        }
 
         this.header = function(data) {
             if (data) modal_header.html(data);
@@ -80,16 +83,19 @@ $.KBWidget({
             modal_footer.html('')
             for (var i in buttons) {
                 var btn = buttons[i];
+                var text = btn.text;
 
                 // make modal dismiss by default
                 if (!btn.dismiss) {
-                    var ele = $('<a class="btn" data-dismiss="modal">'+btn.text+'</a>');
+                    var ele = $('<a class="btn" data-name="'+text+'"'+
+                                            ' data-dismiss="modal">'+text+'</a>')
                 } else {
-                    var ele = $('<a class="btn">'+btn.text+'</a>');
+                    var ele = $('<a class="btn" data-name="'+text+'">'+text+'</a>')
+
                 } 
 
                 // set button colors
-                if (btn.color == 'primary') {
+                if (btn.kind == 'primary') {
                     ele.addClass('btn-primary');
                 } else {
                     ele.addClass('btn-default');                    
@@ -99,13 +105,24 @@ $.KBWidget({
             }
         }
 
+        this.button = function(name) {
+            console.log('name', name)
+            console.log(modal_footer.find('[data-name="'+name+'"]'))
+            return modal_footer.find('[data-name="'+name+'"]');
+        }
+
         this.show = function() {
-            container.modal('show');
+            modal.modal('show');
         }
 
         this.hide = function() {
-            container.modal('hide');
+            modal.modal('hide');
         }
+
+
+        // do any options
+        if (buttons) this.buttons(buttons);
+        if (options.show) this.show();
 
         return this;
     }  //end init

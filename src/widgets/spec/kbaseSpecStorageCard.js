@@ -1,7 +1,7 @@
 (function( $, undefined ) { 
     $.KBWidget({ 
         name: "KBaseSpecStorageCard", 
-        parent: "kbaseWidget", 
+        parent: "kbaseAuthenticatedWidget", 
         version: "1.0.0",
 
         options: {
@@ -13,37 +13,38 @@
         init: function(options) {
         	options.id = '';
             this._super(options);
+            if (!this.options.token)
+            	this.options.token = this.authToken();
             var self = this;
         	var pref = generateSpecPrefix();
             self.$elem.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-            var kbws = new Workspace(newWorkspaceServiceUrlForSpec, {token: options.token});
+            var kbws = new Workspace(newWorkspaceServiceUrlForSpec, {token: self.options.token});
             kbws.list_modules({}, function(data) {
                 $('.loader-table').remove();
 
                 var dataList = [];
             	for (var i = 0; i < data.length; i++)
-            		dataList[i] = {module: '<a onclick="specClicks[\''+pref+'module-click\'](this,event); return false;" data-module="'+data[i]+'">'+data[i]+'</a>'};
+            		dataList.push({module: '<a onclick="specClicks[\''+pref+'module-click\'](this,event); return false;" data-module="'+data[i]+'">'+data[i]+'</a>'});
                 self.$elem.append('<table id="'+pref+'module-table" class="table table-striped table-bordered"></table>');
                 var tableSettings = {
-                        "sPaginationType": "full_numbers",
+                        "sPaginationType": "bootstrap",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Module name", mData: "module"}],
-                        "aaData": [],
+                        "aaData": dataList,
                         "oLanguage": {
                             "sSearch": "Search module:",
                             "sEmptyTable": "No modules registered."
                         }
                     };
                 var table = $('#'+pref+'module-table').dataTable(tableSettings);
-                table.fnAddData(dataList);
                 specClicks[pref+'module-click'] = function(elem,e) {
                 	var module = $(elem).data('module');
                     self.trigger('showSpecElement', 
                     		{
                     			kind: "module", 
                     			id : module,
-                    			token: options.token,
+                    			token: self.options.token,
                     			event: e
                     		});
                 };

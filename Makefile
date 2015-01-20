@@ -14,6 +14,10 @@ FILEORDER     = ./src/file-order.txt
 SOURCES       = $(shell find ./src -name "*.js")
 SOURCES      += $(FILEORDER)
 
+default:
+	git submodule init
+	git submodule update
+	
 all:
 	@echo This Makefile is deprecated, please see README.deploy.
 

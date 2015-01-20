@@ -6,12 +6,16 @@
         options: {
             title: "MAK Bicluster",
             isInCard: false,
+			loadingImage: "assets/img/ajax-loader.gif",
             width: 600,
             height: 700
        },
+	   
+	   newWorkspaceServiceUrl: "https://kbase.us/services/ws",
+	   
         init: function(options) {
             this._super(options);
-            if (this.options.cluster === null) {
+            if (this.options.bicluster === null) {
                 //throw an error
                 return;
             }
@@ -21,174 +25,83 @@
                     .addClass("kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
-            return this.render();
+			this.workspaceClient = new Workspace(this.newWorkspaceServiceUrl, { 'token' : this.options.auth, 'user_id' : this.options.userId});
+			
+            return this.render(this.options,this);
         },
-        render: function(options) {
+        render: function(options,self) {
+		            
+			self.bicluster_index = options.bicluster[1];
+            self.bicluster = options.bicluster[0][self.bicluster_index];
+            self.bicluster_type = options.bicluster[2].bicluster_type;
 
-            var self = this;
-            self.bicluster = this.options.bicluster[0];
-			console.log(self.bicluster)
-            self.bicluster_type = this.options.bicluster[1].bicluster_type;
-            
-            self.$elem.append($("<div />")
+			var loader = $("<span style='display:none'><img src='"+options.loadingImage+"'/></span>").css({"width":"100%","margin":"0 auto"})            
+			$biclusterOverview = $("<div id='biclusterOverview' style='overflow:auto;height:450px;resize:vertical'/>")						
+
+			self.$elem.append($biclusterOverview)
+			$biclusterOverview.append(loader)
+			loader.show()
+            $biclusterOverview.append($("<div />")
 						.append($("<table/>").addClass("kbgo-table")
-					    .append($("<tr/>")
-					    	.append("<td>ID</td><td>" + self.bicluster.bicluster_id + "</td>"))
-					    .append($("<tr/>").
-					    	append("<td>Cluster type</td><td>" + self.bicluster_type + "</td>"))
-					    .append($("<tr/>").
-					    	append("<td>Number of genes</td><td>" + self.bicluster.num_genes + "</td>"))
-					    .append($("<tr/>").
-					    	append("<td>Number of conditions</td><td>" + self.bicluster.num_conditions + "</td>"))
-					    .append($("<tr/>").
-					    	append("<td>Expression mean</td><td>" + self.bicluster.exp_mean + "</td>"))
-					    .append($("<tr/>").
-					    	append("<td>Expression mean criterion value</td><td>" + self.bicluster.exp_mean_crit + "</td>"))
-					    .append($("<tr/>").
-					    	append("<td>Expression criterion value</td><td>" + self.bicluster.exp_crit + "</td>"))
-					    .append($("<tr/>").
-					    	append("<td>PPI criterion value</td><td>" + self.bicluster.ppi_crit + "</td>"))
-					    .append($("<tr/>").
-					    	append("<td>TF criterion value</td><td>" + self.bicluster.TF_crit + "</td>"))
-					    .append($("<tr/>").
-					    	append("<td>Orthology criterion value</td><td>" + self.bicluster.ortho_crit + "</td>"))
-					    .append($("<tr/>").
-					    	append("<td>Full criterion value</td><td>" + self.bicluster.full_crit + "</td>"))
-					    .append($("<tr/>").
-					    	append("<td>Fraction of missing data</td><td>" + self.bicluster.miss_frxn + "</td>"))
+					    .append(self.bicluster.bicluster_id!=-1&&self.bicluster.bicluster_id!=0 ? $("<tr/>")
+					    	.append("<td>ID</td><td>" + self.bicluster.bicluster_id + "</td>") : '')
+					    .append(self.bicluster_type!=-1&&self.bicluster_type!=0 ? $("<tr/>").
+					    	append("<td>Bicluster type</td><td>" + self.bicluster_type + "</td>") : '')
+					    .append(self.bicluster.num_genes!=-1&&self.bicluster.num_genes!=0 ? $("<tr/>").
+					    	append("<td>Rows</td><td>" + self.bicluster.num_genes + "</td>") : '')
+					    .append(self.bicluster.num_conditions!=-1&&self.bicluster.num_conditions!=0 ? $("<tr/>").
+					    	append("<td>Columns</td><td>" + self.bicluster.num_conditions + "</td>") : '')
+					    .append(self.bicluster.exp_mean!=-1&&self.bicluster.exp_mean!=0 ? $("<tr/>").
+					    	append("<td>Bicluster value mean</td><td>" + Math.round(self.bicluster.exp_mean*1000)/1000 + "</td>") : '')
+					    .append(self.bicluster.exp_mean_crit!=-1&&self.bicluster.exp_mean_crit!=0 ? $("<tr/>").
+					    	append("<td>Mean value criterion</td><td>" + Math.round(self.bicluster.exp_mean_crit*1000)/1000 + "</td>") : '')
+					    .append(self.bicluster.exp_crit!=-1&&self.bicluster.exp_crit!=0 ? $("<tr/>").
+					    	append("<td>Bicluster cohesion criterion</td><td>" + Math.round(self.bicluster.exp_crit*1000)/1000 + "</td>") : '')
+					    .append(self.bicluster.ppi_crit!=-1&&self.bicluster.ppi_crit!=0 ? $("<tr/>").
+					    	append("<td>PPI criterion</td><td>" + Math.round(self.bicluster.ppi_crit*1000)/1000 + "</td>") : '')
+					    .append(self.bicluster.TF_crit!=-1&&self.bicluster.TF_crit!=0 ? $("<tr/>").
+					    	append("<td>TF criterion</td><td>" + Math.round(self.bicluster.TF_crit*1000)/1000 + "</td>") : '')
+					    .append(self.bicluster.ortho_crit!=-1&&self.bicluster.ortho_crit!=0 ? $("<tr/>").
+					    	append("<td>Orthology criterion</td><td>" + Math.round(self.bicluster.ortho_crit*1000)/1000 + "</td>") : '')
+					    .append(self.bicluster.full_crit!=-1&&self.bicluster.full_crit!=0 ? $("<tr/>").
+					    	append("<td>Full criterion</td><td>" + Math.round(self.bicluster.full_crit*1000)/1000 + "</td>") : '')
+					    .append(self.bicluster.miss_frxn!=-1&&self.bicluster.miss_frxn!=0 ? $("<tr/>").
+					    	append("<td>Fraction of missing data</td><td>" + Math.round(self.bicluster.miss_frxn*1000)/1000 + "</td>") : '')
 			));
-
-			//Heatmap
-			self.$elem.append($("<div />")
-                    .append("<h3>Display heatmap</h3>")
-					.append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
-
-			$("#toggle_heatmap").click(function() {
-                $("#heatmap").toggle();
-            });
-
-			self.$elem.append($("<div id='heatmap' style='display:none'/>"));
-
-			var DataTable = ["DataTable", [{"bicluster_id":"kb|bicluster.4314","num_genes":173,"num_conditions":75,"condition_ids":["29","30","37","38","42","44"],"condition_labels":["In-frame deletion mutant for ORF SO3389_WT_stationary anoxic_vs._WT_aerobic mid-log","In-frame deletion mutant for ORF SO3389_WT_aerobic biofilm_vs._WT_aerobic mid-log (planktonic)","In-frame deletion mutant for ORF SO3389_Mutant_stationary anoxic (102 h)_vs._Mutant_mid-log anoxic","In-frame deletion mutant for ORF SO3389_WT_stationary anoxic_vs._WT_10 h into anoxic","Salt:NaCl_0.6_120_vs._0_120","BU0_A_BU0_A_null_vs._mean gene expression in 207 S.oneidensis experiments (M3d v4 Build 2)_null"],"gene_ids":["kb|g.371.peg.362","kb|g.371.peg.180","kb|g.371.peg.1427","kb|g.371.peg.1854","kb|g.371.peg.1241"],"gene_labels":["199208","199336","199412","199413","199414"],"exp_mean":1.2781754203886797,"score":0.9944320883479909,"miss_frxn":-1.0,"data":[[0.847005,0.729055,-1.4168,-1.52138,-1.64155,-1.16694],[0.817856,1.10411,-2.86187,-2.81284,-1.40497,-1.4577],[0.825148,0.807097,-3.23414,-6.40135,-1.5801,-2.97321],[0.856129,0.865829,-1.16332,-0.509081,-1.93448,-2.32617],[0.856129,0.865829,-1.16332,-0.509081,-1.93448,-2.32617]]}]]
 			
-			var datatable = DataTable[1][0]
-
-			var dataflat = 	[]
-			var datadict = []
-			for (var y = 0; y < datatable.data.length; y+=1) {
-				for (var x = 0; x < datatable.data[0].length; x+=1) {
-					datadict.push({
-						"condition": x,
-						"gene": y,
-						"expression": datatable.data[y][x]
-					});
-					dataflat.push(datatable.data[y][x])
-				}
-			}
+			//Heatmap			
 					
-			var genes = datatable.gene_labels,
-				conditions = datatable.condition_labels;
-				
-			var margin = { top: 300, right: 0, bottom: 100, left: 100 },
-			  width = conditions.length*100 - margin.left - margin.right,
-			  height = genes.length*100 - margin.top - margin.bottom,
-			  gridSize = Math.floor(width / 20),
-			  legendElementWidth = gridSize*2,
-			  //colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"];
-			  colors = ["#ff0000","#ff9966","#ffffff","#3399ff","#0000ff"]
-			
-			  /*var colorScale = function(d) {
-				if (d < 0) return "#ff0000";
-				return "#0000ff";
-			  };
-			  */
-			var colorScale = function(d) {
-				if (d > 2) return "#ff0000";
-				if (d > 0 && d <= 2) return "#ff9966"
-				if (d == 0) return "#ffffff";
-				if (d < 0 && d >= -2) return "#3399ff"
-				if (d < -2) return "#0000ff";
-			};
+								
+			$.when(self.workspaceClient.get_objects([{workspace: options.workspace, name: self.bicluster.bicluster_id}]))
+			.then(
+				function(data){
+					// $biclusterOverview.append($("<div />")
+							// .append("<h3>heatmap</h3>")
+							// .append($("<button />").attr('id', 'toggle_heatmap').addClass("btn btn-default").append("Toggle")));
 
-			var svg = d3.select("#heatmap").append("svg")
-				  .attr("width", width + margin.left + margin.right)
-				  .attr("height", height + margin.top + margin.bottom)
-				  .append("g")
-				  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+					// self.$elem.find("#toggle_heatmap").click(function() {
+						// loader.show()
+						
+						// if (d3.select("#heatmap").empty()) self.trigger("showHeatMap", {bicluster: data[0].data, ws: self.options.ws, id: self.bicluster.bicluster_id, tiles: tiles, mak: self.options.bicluster[0], event: event})
+						// $("#heatmap").toggle();
+						// loader.hide()
+						
+					// });
+					// if (!$("div:contains('HeatMap Card')").length) self.trigger("showHeatMap", {bicluster: data[0].data, workspace: options.workspace, id: self.bicluster.bicluster_id, tiles: tiles, mak: options.bicluster[0]})
+					loader.hide()
+				}
+			)						
 
-			var geneLabels = svg.selectAll(".geneLabel")
-				  .data(genes)
-				  .enter().append("text")
-					.text(function (d) { return d; })
-					.attr("x", 0)
-					.attr("y", function (d, i) { return i * gridSize; })
-					.style("text-anchor", "end")
-					.attr("transform", "translate(-6," + gridSize / 1.5 + ")")
-					//.attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "geneLabel mono axis axis-workweek" : "geneLabel mono axis"); });
-
-			  var conditionLabels = svg.selectAll(".conditionLabel")
-				  .data(conditions)
-				  .enter().append("text")
-					.text(function(d) { return d; })
-					.attr("x", function(d, i) { return i * gridSize; })
-					.attr("y", 0)
-					.style("text-anchor", "start")
-					.attr("transform", function(d, i) { 
-						return "scale(0.6)translate(" + (i)*gridSize/1.5 + "," + -gridSize/2 +")" +
-						"rotate(-45 "+ ((i + 0.5) * gridSize) + " " + (-6) +")";
-					} )
-					.attr("class", "conditionLabel mono axis axis-condition-up")
-					//.attr("class", function(d,i) { return ((i >= 0 && i <= 8) ? "conditionLabel mono axis axis-worktime" : "conditionLabel mono axis"); });
-			
-			  var heatMap = svg.selectAll(".gene")
-				  .data(datadict)
-				  .enter().append("rect")
-				  .attr("y", function(d) { return (d.gene) * gridSize; })
-				  .attr("x", function(d) { return (d.condition) * gridSize; })
-				  .attr("rx", 4)
-				  .attr("ry", 4)
-				  .attr("class", "gene bordered")
-				  .attr("width", gridSize)
-				  .attr("height", gridSize)
-				  .style("fill", colors[2]);
-
-			  heatMap.transition().duration(1000)
-				  .style("fill", function(d) { return colorScale(d.expression); });
-
-			  heatMap.append("title").text(function(d) { return d.expression; });
-			  
-			  var legend = svg.selectAll(".legend")
-				  .data(["-Inf",-2,0,2,"Inf"], function(d) { return d; })
-				  .enter().append("g")
-				  .attr("class", "legend");
-
-			  legend.append("rect")
-				.attr("x", function(d, i) { return legendElementWidth * i; })
-				.attr("y", height+gridSize)
-				.attr("width", legendElementWidth)
-				.attr("height", gridSize / 2)
-				.style("fill", function(d, i) { return colors[i]; });
-
-			  legend.append("text")
-				//.mouseover(function(d) {d.c
-				.attr("class", "mono")
-				.text(function(d) { return d; })
-				.attr("x", function(d, i) { return legendElementWidth * i; })
-				.attr("y", height + gridSize*2)
-				.attr("transform",function(d, i) { return "scale(0.5,0.8)translate(" + (i)*legendElementWidth+","+35+")" })
-			
-			//d3.select("#heatmap").append(svg)
-			
             //Genes
-            self.$elem.append($("<div />")
-                    .append("<h3>List of genes</h3>")
+            $biclusterOverview.append($("<div />")
+                    .append("<h3>genes</h3>")
 					.append($("<button />").attr('id', 'toggle_genes').addClass("btn btn-default").append("Toggle")));
 
 			$("#toggle_genes").click(function() {
-                $("#gene_list").toggle();
+                $("#gene_list_"+self.bicluster.bicluster_id.replace( /\D+/g, '')).toggle();
             });
-
-            var $genesTable = '<table id="genes-table' + self.bicluster.id + '" class="kbgo-table">';
+			
+            var $genesTable = '<table id="genes-table-' + self.bicluster.bicluster_id.replace( /\D+/g, '') + '" class="kbgo-table">';
             $genesTable += "<tr><th>Gene ID</th><th>Gene label</th></tr>";
 
             for (var i = 0; i < self.bicluster.num_genes; i++) {
@@ -197,11 +110,11 @@
 
             $genesTable += "</table>";
 			
-            self.$elem.append($("<div id='gene_list' style='display:none'/>").append($genesTable));
+            $biclusterOverview.append($("<div id='gene_list_"+self.bicluster.bicluster_id.replace( /\D+/g, '')+"' style='display:none'/>").append($genesTable));
 			
             //Conditions
-            self.$elem.append($("<div />")
-                    .append("<h3>List of conditions</h3>")
+            $biclusterOverview.append($("<div />")
+                    .append("<h3>conditions</h3>")
 					.append($("<button />").attr('id', 'toggle_conditions').addClass("btn btn-default").append("Toggle")));
 			
 			$("#toggle_conditions").click(function() {
@@ -217,38 +130,38 @@
 
             $conditionsTable += "</table>";
 
-            self.$elem.append($("<div id='condition_list' style='display:none'/>").append($conditionsTable));
+            $biclusterOverview.append($("<div id='condition_list' style='display:none'/>").append($conditionsTable));
             
             //Enriched terms
-            self.$elem.append($("<div />")
-                    .append("<h3>List of enriched terms</h3>")
+            $biclusterOverview.append($("<div />")
+                    .append("<h3>enriched terms</h3>")
 					.append($("<button />").attr('id', 'toggle_terms').addClass("btn btn-default").append("Toggle")));
 					
 			$("#toggle_terms").click(function() {
                 $("#term_list").toggle();
             });
 			
-            var $termsTable = '<table id="terms-table' + self.bicluster.id + '" class="kbgo-table">';
-            $termsTable += "<tr><th>Key</th><th>Value</th></tr>";
-
-            for (var enrichedTerm in self.bicluster.enriched_terms) {
-                $termsTable += "<tr><td>" + enrichedTerm.key + "</td><td>" + enrichedTerm.value + "</td></tr>";
-            }
-
-            $termsTable += "</table>";
+			if (Object.keys(self.bicluster.enriched_terms).length) {
+				var $termsTable = '<table id="terms-table' + self.bicluster.id + '" class="kbgo-table">';
+				$termsTable += "<tr><th>Term Type</th><th>Term</th></tr>";			
+				for (var enrichedTerm in self.bicluster.enriched_terms) {
+					$termsTable += "<tr><td>" + enrichedTerm + "</td><td>" + self.bicluster.enriched_terms[enrichedTerm] + "</td></tr>";
+				}
+				$termsTable += "</table>";
+			}
+			else {
+				var $termsTable = "<b><i>No enriched terms for this bicluster.</i></b>";
+			}            
 			
-            self.$elem.append($("<div id='term_list' style='display:none'/>").append($termsTable));
-
-            self.$elem.append($("<div />")
-                    .append("&nbsp;"));
+            $biclusterOverview.append($("<div id='term_list' style='display:none'/>").append($termsTable));
 
             return this;
         },
         getData: function() {
             return {
                 type: "MAKBicluster",
-                id: this.options.bicluster.id,
-                workspace: this.options.workspace_id,
+                id: this.options.bicluster[0][this.options.bicluster[1]].bicluster_id,
+                workspace: this.options.workspace,
                 title: "MAK Bicluster"
             };
         },

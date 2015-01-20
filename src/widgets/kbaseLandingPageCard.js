@@ -13,6 +13,7 @@
         parent: "kbaseWidget",
         version: "1.0.0",
         options: { 
+            resizable: true,
             draggable: true,
             autoOpen: true,
             closeOnEscape: false,
@@ -31,6 +32,11 @@
             }
 
             var self = this;
+
+            //console.log(options);
+            if (options.hasOwnProperty("dialogClass") && options.dialogClass !== null) {
+                this.options.dialogClass = options.dialogClass;
+            }
             
             this.options.close = function(event, ui) {
                 self.$elem.dialog("destroy");

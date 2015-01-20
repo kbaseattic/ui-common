@@ -1,6 +1,859 @@
 
 
-//https://kbase.us/services/fba_model_services/ //production fba service not deployed
+function KBCacheClient(token) {
+    var self = this;
+    var auth = {};
+    auth.token = token;
+
+    if (typeof configJSON != 'undefined') {
+        if (configJSON.setup == 'dev') {
+            fba_url = configJSON.dev.fba_url;
+            ws_url = configJSON.dev.workspace_url;
+            ujs_url = configJSON.dev.user_job_state_url;
+            search_url = configJSON.dev.search_url;
+        } else if (configJSON.setup == 'prod') {
+            fba_url = configJSON.prod.fba_url;
+            ws_url = configJSON.prod.workspace_url;
+            ujs_url = configJSON.prod.user_job_state_url;
+            search_url = configJSON.prod.search_url;
+        }
+    } else {
+        fba_url = "http://kbase.us/services/KBaseFBAModeling/"
+        ws_url = "https://kbase.us/services/ws/"
+        //ujs_url = "http://140.221.84.180:7083"
+        search_url = "http://dev07.berkeley.kbase.us/search/"
+    }
+
+    console.log('FBA URL is:', fba_url);
+    console.log('Workspace URL is:', ws_url);
+    //console.log('User Job State URL is:', ujs_url);
+    console.log('Search Service URL is:', search_url);    
+
+    var fba = new fbaModelServices(fba_url, auth);
+    var kbws = new Workspace(ws_url, auth);
+    //var ujs = new UserAndJobState(ujs_url, auth);
+
+    var cache = new Cache();
+
+    // some kbase apis
+    self.fba = fba;
+    self.ws = kbws;
+    //self.ujs = ujs;
+    self.nar = new ProjectAPI(ws_url, token);
+
+    // some accessible variables
+    self.ws_url = ws_url;
+    self.search_url = search_url;    
+    self.token = token;
+    self.nar_type = 'KBaseNarrative.Narrative';
+    self.metagenome_url = "./communities/metagenome.html?metagenome=";
+
+    // some accessible helper methods
+    self.ui = new UIUtils();
+
+    // this is an experiment in caching promises 
+    self.req = function(service, method, params) {
+        // see if api call has already been made        
+        var data = cache.get(service, method, params);
+
+        // return the promise ojbect if it has
+        if (data) return data.prom;
+
+        // otherwise, make request
+        var prom = undefined;
+        if (service == 'fba') {
+            console.log('Making request:', 'fba.'+method+'('+JSON.stringify(params)+')');
+            var prom = fba[method](params);
+        } else if (service == 'ws') {
+            console.log('Making request:', 'kbws.'+method+'('+JSON.stringify(params)+')');
+            var prom = kbws[method](params);
+        }
+
+        // save the request and it's promise objct
+        cache.put(service, method, params, prom)
+        return prom;
+    }
+
+    self.narrative_prom = undefined;
+    self.my_narratives = false;
+    self.shared_narratives = false;
+    self.public_narratives = false;        
+
+    this.getNarratives = function() {
+        // if narratives have been cached, return;
+        //if (self.narratives) {
+        //    return self.narratives;
+        //}
+
+        // get all workspaces, filter by mine, shared, and public
+        var prom = kb.ws.list_workspace_info({});    
+        var p = $.when(prom).then(function(workspaces) {
+            var my_list = [];
+            var shared_list = [];
+            var public_list = [];
+
+            for (var i in workspaces) {
+                var a = workspaces[i];
+                var ws = a[1];
+                var owner = a[2];
+                var perm = a[5];
+                var global_perm = a[6]
+
+                if (owner == USER_ID) {
+                    my_list.push(ws)
+                }
+
+                // shared lists need to be filtered again, as a shared narrative
+                // is any narrative you have 'a' or 'w', but also not your own
+                if ( (perm == 'a' || perm == 'w') && owner != USER_ID) {
+                    shared_list.push(ws)
+                }
+                if (global_perm == 'r') {
+                    public_list.push(ws)
+                }
+            }
+
+
+            return [my_list, shared_list, public_list];
+        })
+
+
+        // next get all narratives from these "project" workspaces
+        // fixme: backend!
+        var last_prom = $.when(p).then(function(data) {
+            var mine_ws = data[0];
+            var shared_ws = data[1];
+            var public_ws = data[2];
+
+            var my_nar_prom = kb.ws.list_objects({workspaces: mine_ws, 
+                                              type: self.nar_type,
+                                              showHidden: 1});
+
+            var shared_nar_prom = kb.ws.list_objects({workspaces: shared_ws, 
+                                                  type: self.nar_type,
+                                                  showHidden: 1});        
+
+            var public_nar_prom = kb.ws.list_objects({workspaces: public_ws, 
+                                                  type: self.nar_type,
+                                                  showHidden: 1});
+
+            // filter down to unique workspaces that have narrative objects, 
+            // and also make get_permissions calls
+            var ws_prom = $.when(my_nar_prom, shared_nar_prom, public_nar_prom)
+                           .then(function(d1, d2, d3) {
+
+                var ws1 = [];
+                for (var i in d1) {
+                    ws1.push(d1[i][7])
+                }
+                var my_ws_list = ws1.filter( unique )
+
+                var ws2 = [];
+                for (var i in d2) {
+                    ws2.push(d2[i][7])
+                }
+                var shared_ws_list = ws2.filter( unique )
+
+                return my_ws_list.concat(shared_ws_list);//[my_ws_list, shared_ws_list];
+            })
+
+
+            function unique(value, index, self) { 
+                return self.indexOf(value) === index;
+            }
+
+            var ws_list;
+            var all_proms = $.when(ws_prom).then(function(ws_list) {
+                ws_list = ws_list;
+                // get permissions on all workspaces if logged in
+                var perm_proms = [];
+                if (USER_ID) {
+                    for (var i in ws_list) {
+                        var prom =  kb.ws.get_permissions({workspace: ws_list[i]});
+                        perm_proms.push(prom);
+                    }
+                } 
+
+                var all_proms = [my_nar_prom, shared_nar_prom, public_nar_prom].concat(perm_proms)                
+
+                var p = $.when.apply($, all_proms).then(function() { 
+                    // fill counts now (since there's no api for this)
+
+                    var mine = arguments[0];
+                    var shared = arguments[1];
+                    var pub = arguments[2];
+
+                    var perms = {};
+
+
+                    for (var i = 0; i<ws_list.length; i++) {
+                        perms[ws_list[i]] = arguments[3+i]
+                    }
+
+
+                    $('.my-nar-count').addClass('badge').text(mine.length)
+                    $('.shared-nar-count').addClass('badge').text(shared.length);  
+                    $('.public-nar-count').addClass('badge').text(pub.length);            
+
+                    var all_data = {my_narratives: mine, 
+                                    shared_narratives: shared, 
+                                    public_narratives: pub, 
+                                    perms: perms};
+
+                    return all_data;
+                });
+
+                return p
+            }) 
+            return all_proms
+        })
+
+        // cache prom
+        //self.narratives = last_prom;
+
+        // bam, return promise for [my_nars, shared_nars, public_nars]
+        self.narrative_prom = last_prom
+        return last_prom;
+    }
+
+
+    self.getNarrativeDeps = function(params) {
+        var ws = params.ws;
+        var name = params.name;
+
+        var p = self.ws.get_object_info([{workspace: ws, name: name}], 1)
+            .then(function(info) {
+                var deps = JSON.parse(info[0][10].data_dependencies);
+
+                var d = [];
+                for (var i in deps) {
+                    var obj = {};
+                    var o = deps[i].split(' ');
+                    obj.type = o[0];
+                    obj.name = o[1];
+                    d.push(obj)
+                }
+
+                return d;
+            })
+        return p;
+    }
+
+
+    // cached objects
+    var c = new WSCache();
+    self.get_fba = function(ws, name) {
+
+        // if reference, get by ref
+        if (ws.indexOf('/') != -1) {
+            // if prom already exists, return it
+            //var prom = c.get({ref: ws});
+            //if (prom) return prom;
+
+            var p = self.ws.get_objects([{ref: ws}]);
+            //c.put({ref: ws, prom: p});            
+        } else {
+            //var prom = c.get({ws: ws, name: name, type: 'FBA'});
+            //if (prom) return prom;            
+
+            var p = self.ws.get_objects([{workspace: ws, name: name}]);
+            //c.put({ws: ws, name:name, type: 'FBA', prom: prom});            
+        }
+
+        // get fba object
+        var prom =  $.when(p).then(function(f_obj) {
+            var model_ref = f_obj[0].data.fbamodel_ref;
+
+            // get model object from ref in fba object
+            var modelAJAX = self.get_model(model_ref).then(function(m) {
+                var rxn_objs = m[0].data.modelreactions
+                var cpd_objs = m[0].data.modelcompounds
+
+                // for each reaction, get reagents and 
+                // create equation by using the model compound objects
+                var eqs = self.createEQs(cpd_objs, rxn_objs, 'modelReactionReagents')
+
+                // add equations to fba object
+                var rxn_vars = f_obj[0].data.FBAReactionVariables;
+                for (var i in rxn_vars) {
+                    var obj = rxn_vars[i];
+                    var id = obj.modelreaction_ref.split('/')[5];
+                    obj.eq = eqs[id]
+                }
+
+                // fixme: hack to get org name, should be on backend
+                f_obj[0].org_name = m[0].data.name;
+
+                return f_obj;
+            })
+            return modelAJAX;
+        })
+
+        return prom;
+    }
+
+    self.get_model = function(ws, name){
+
+        if (ws && ws.indexOf('/') != -1) {
+            //var prom = c.get({ref: ws});
+            //if (prom) return prom; 
+
+            var p = self.ws.get_objects([{ref: ws}]);
+            //c.put({ref: ws, prom: p}); 
+        } else {
+            //var prom = c.get({ws: ws, name: name, type: 'Model'});
+            //if (prom) return prom; 
+
+            var p = self.ws.get_objects([{workspace: ws, name: name}]);
+            //c.put({ws: ws, name:name, type:'Model', prom:p});              
+        }
+
+        var prom = $.when(p).then(function(m) {
+            console.log('model', m)
+            var m_obj = m[0].data
+            var rxn_objs = m_obj.modelreactions;
+            var cpd_objs = m_obj.modelcompounds
+
+            // for each reaction, get reagents and 
+            // create equation by using the model compound objects
+            var eqs = self.createEQs(cpd_objs, rxn_objs, 'modelReactionReagents')
+
+            // add equations to modelreactions object
+            var rxn_vars = m_obj.modelreactions;
+            for (var i in rxn_vars) {
+                var obj = rxn_vars[i];
+                obj.eq = eqs[obj.id];
+            }
+
+            // add equations to biomasses object
+
+            var biomass_objs = m_obj.biomasses;
+            var eqs = self.createEQs(cpd_objs, biomass_objs, 'biomasscompounds')
+            for (var i in biomass_objs) {
+                var obj = biomass_objs[i];
+                obj.eq = eqs[obj.id];
+            }
+
+            return m;
+        })
+
+        return prom;
+    }
+
+
+    self.createEQs = function(cpd_objs, rxn_objs, key) {
+        // create a mapping of cpd ids to names
+        var mapping = {};
+        for (var i in cpd_objs) {
+            mapping[cpd_objs[i].id.split('_')[0]] = cpd_objs[i].name.split('_')[0];
+        }
+
+        var eqs = {}
+        for (var i in rxn_objs) {
+            var rxn_obj = rxn_objs[i];
+            var rxn_id = rxn_obj.id;
+
+            var rxnreagents = rxn_obj[key];
+            var direction = rxn_obj.direction;
+
+            var lhs = []
+            var rhs = []
+            for (var j in rxnreagents) {
+                var reagent = rxnreagents[j];
+                var coef = reagent.coefficient;
+                var ref = reagent.modelcompound_ref;
+                var cpd = ref.split('/')[3].split('_')[0]
+                var human_cpd = mapping[cpd];
+                var compart = ref.split('_')[1]
+
+                if (coef < 0) { 
+                    lhs.push( (coef == -1 ? human_cpd+'['+compart+']' 
+                                : '('+(-1*coef)+')'+human_cpd+'['+compart+']') );
+                } else {
+                    rhs.push( (coef == 1 ? human_cpd+'['+compart+']' 
+                                : '('+coef+')'+human_cpd+'['+compart+']')  );
+                }
+            }
+
+            var arrow;
+            if (direction === '=' || direction === '<=>') arrow = ' <=> ';
+            if (direction === '<' || direction === '<=') arrow = ' <= ';
+            if (direction === '>' || direction === '=>') arrow = ' => ';
+
+            var eq = lhs.join(' + ')+arrow+rhs.join(' + ');
+            eqs[rxn_id] = eq
+        }
+        return eqs
+    }
+
+
+    self.getRoute = function(kind) {
+        switch (kind) {
+            case 'FBA': 
+                return 'ws.fbas';
+            case 'FBAModel': 
+                return 'ws.models';
+            case 'Media': 
+                return 'ws.media';
+            case 'MetabolicMap': 
+                return 'ws.maps';
+            case 'Media': 
+                return 'ws.media';
+            case 'PromConstraint':
+                return 'ws.promconstraint';
+            case 'Regulome':
+                return 'ws.regulome';
+            case 'ExpressionSeries':
+                return 'ws.expression_series';
+            case 'PhenotypeSet':
+                return 'ws.phenotype';
+            case 'PhenotypeSimulationSet': 
+                return 'ws.simulation';
+            case 'Pangenome':
+                return 'ws.pangenome';
+            case 'Genome': 
+                return 'genomesbyid';
+            case 'MAKResult':
+                return 'mak';
+            case 'FloatDataTable':
+                return 'floatdatatable';
+            case 'Metagenome':
+                return 'ws.metagenome';
+            case 'Collection':
+                return 'ws.collection';
+            case 'Profile':
+                return 'ws.profile';
+        }
+        return undefined;
+    }
+
+
+    self.getWorkspaceSelector = function(all) {
+        if (all) {
+            var p = self.ws.list_workspace_info({});
+        } else {
+            var p = self.ws.list_workspace_info({perm: 'w'});            
+        }
+        
+        var prom = $.when(p).then(function(workspaces){
+            var workspaces = workspaces.sort(compare)
+
+            function compare(a,b) {
+                var t1 = kb.ui.getTimestamp(b[3]) 
+                var t2 = kb.ui.getTimestamp(a[3]) 
+                if (t1 < t2) return -1;
+                if (t1 > t2) return 1;
+                return 0;
+            }
+
+            var wsSelect = $('<form class="form-horizontal" role="form">'+
+                                '<div class="form-group">'+
+                                    '<label class="col-sm-5 control-label">Workspace</label>'+                                
+                                    '<div class="input-group col-sm-5">'+
+                                        '<input type="text" class="select-ws-input form-control focusedInput" placeholder="search">'+
+                                        '<span class="input-group-btn">'+
+                                            '<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">'+
+                                                '<span class="caret"></span>'+
+                                            '</button>'+
+                                        '</span>'+
+                                    //'<a class="btn-new-ws pull-right">New WS</a>'+
+                                    '</div>'+
+                            '</div>');
+
+            var select = $('<ul class="dropdown-menu select-ws-dd" role="menu">');
+            for (var i in workspaces) {
+                select.append('<li><a>'+workspaces[i][1]+'</a></li>');
+            }
+
+            wsSelect.find('.input-group-btn').append(select);
+
+            var dd = wsSelect.find('.select-ws-dd');
+            var input = wsSelect.find('input');
+
+            var not_found = $('<li class="select-ws-dd-not-found"><a><b>Not Found</b></a></li>');
+            dd.append(not_found);
+            input.keyup(function() {
+                dd.find('li').show();
+
+                wsSelect.find('.input-group-btn').addClass('open');
+
+                var input = $(this).val();
+                dd.find('li').each(function(){
+                    if ($(this).text().toLowerCase().indexOf(input.toLowerCase()) != -1) {
+                        return true;
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                if (dd.find('li').is(':visible') == 1) {
+                    not_found.hide();
+                } else {
+                    not_found.show();
+                }
+            }) 
+
+            dd.find('li').click(function() {
+                dd.find('li').removeClass('active');
+
+                if (!$(this).hasClass('select-ws-dd-not-found')) {
+                    $(this).addClass('active');                    
+
+                    var val = $(this).text();
+                    input.val(val);
+                }
+            })
+
+            return wsSelect;
+        })
+
+        return prom;
+    }
+
+}
+
+
+// Collection of simple (Bootstrap/jQuery based) UI helper methods
+function UIUtils() {
+
+    // this method will display an absolutely position notification
+    // in the app on the 'body' tag.  This is useful for api success/failure 
+    // notifications
+    this.notify = function(text, type, keep) {
+        var ele = $('<div id="notification-container">'+
+                        '<div id="notification" class="'+type+'">'+
+                            (keep ? ' <small><div class="close">'+
+                                        '<span class="glyphicon glyphicon-remove pull-right">'+
+                                        '</span>'+
+                                    '</div></small>' : '')+
+                            text+
+                        '</div>'+
+                    '</div>');
+
+        $(ele).find('.close').click(function() {
+             $('#notification').animate({top: 0}, 200, 'linear');
+        })
+
+        $('body').append(ele)
+        $('#notification')
+              .delay(200)
+              .animate({top: 50}, 400, 'linear',
+                        function() {
+                            if (!keep) {
+                                $('#notification').delay(2000)
+                                                  .animate({top: 0}, 200, 'linear', function() {
+                                                    $(this).remove();
+                                                  })
+
+                            }
+                        })
+    }
+
+    var msecPerMinute = 1000 * 60;
+    var msecPerHour = msecPerMinute * 60;
+    var msecPerDay = msecPerHour * 24;
+    var dayOfWeek = {0: 'Sun', 1: 'Mon', 2:'Tues',3:'Wed',
+                     4:'Thurs', 5:'Fri', 6: 'Sat'};
+    var months = {0: 'Jan', 1: 'Feb', 2: 'March', 3: 'April', 4: 'May',
+                  5:'June', 6: 'July', 7: 'Aug', 8: 'Sept', 9: 'Oct', 
+                  10: 'Nov', 11: 'Dec'};
+    this.formateDate = function(timestamp) {
+        var date = new Date()
+
+        var interval =  date.getTime() - timestamp;
+
+        var days = Math.floor(interval / msecPerDay );
+        interval = interval - (days * msecPerDay);
+
+        var hours = Math.floor(interval / msecPerHour);
+        interval = interval - (hours * msecPerHour);
+
+        var minutes = Math.floor(interval / msecPerMinute);
+        interval = interval - (minutes * msecPerMinute);
+
+        var seconds = Math.floor(interval / 1000);
+
+        if (days == 0 && hours == 0 && minutes == 0) {
+            return seconds + " secs ago";
+        } else if (days == 0 && hours == 0) {
+            if (minutes == 1) return "1 min ago";
+            return  minutes + " mins ago";
+        } else if (days == 0) {
+            if (hours == 1) return "1 hour ago";
+            return hours + " hours ago"
+        } else if (days == 1) {
+            var d = new Date(timestamp);
+            var t = d.toLocaleTimeString().split(':');        
+            return 'yesterday at ' + t[0]+':'+t[1]+' '+t[2].split(' ')[1]; //check
+        } else if (days < 7) {
+            var d = new Date(timestamp);        
+            var day = dayOfWeek[d.getDay()]
+            var t = d.toLocaleTimeString().split(':');
+            return day + " at " + t[0]+':'+t[1]+' '+t[2].split(' ')[1]; //check
+        } else  {
+            var d = new Date(timestamp);
+            return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear(); //check
+        }
+    }
+
+    // takes mod date time (2014-03-24T22:20:23)
+    // and returns unix (epoch) time
+    this.getTimestamp = function(datetime){
+        if (!datetime) return; 
+        var ymd = datetime.split('T')[0].split('-');
+        var hms = datetime.split('T')[1].split(':');
+        hms[2] = hms[2].split('+')[0];  
+        return Date.UTC(ymd[0],ymd[1]-1,ymd[2],hms[0],hms[1],hms[2]);  
+    }
+
+    // interesting solution from http://stackoverflow.com/questions
+    // /15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript 
+    this.readableSize = function(bytes) {
+       var units = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+       if (bytes == 0) return '0 Bytes';
+       var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+       return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + units[i];
+    };    
+
+    this.objTable = function(p) {
+        var obj = p.obj;
+        var keys = p.keys;
+
+        // option to use nicely formated keys as labels
+        if (p.keysAsLabels ) {
+            var labels = []            
+            for (var i in keys) {
+                var str = keys[i].key.replace(/(id|Id)/g, 'ID')
+                var words = str.split(/_/g);
+                for (var j in words) {
+                    words[j] = words[j].charAt(0).toUpperCase() + words[j].slice(1)
+                }
+                var name = words.join(' ')
+                labels.push(name);
+            }
+        } else if ('labels' in p) {
+            var labels = p.labels;
+        } else {
+            // if labels are specified in key objects, use them
+            for (var i in keys) {
+                var key_obj = keys[i];
+                if ('label' in key_obj) {
+                    labels.push(key_obj.label);                    
+                } else {
+                    labels.push(key_obj.key)
+                }   
+
+            }
+        }
+
+
+        var table = $('<table class="table table-striped table-bordered">');
+//        style="margin-left: auto; margin-right: auto;"
+
+        for (var i in keys) {
+            var key = keys[i];
+            var row = $('<tr>');
+
+            if (p.bold) {
+                var label = $('<td><b>'+labels[i]+'</b></td>')
+            } else {
+                var label = $('<td>'+labels[i]+'</td>');
+            }
+
+            var value = $('<td>');
+
+            if ('format' in key) {
+                var val = key.format(obj)
+                value.append(val)
+            } else if (key.type == 'bool') {
+                value.append((obj[key.key] == 1 ? 'True' : 'False'))
+            } else {
+                value.append(obj[key.key])
+            }
+            row.append(label, value);
+
+            table.append(row);
+        }
+
+        return table;
+    }
+
+    this.listTable = function(p) {
+        var array = p.array;
+        var labels = p.labels;
+        var bold = (p.bold ? true : false);
+
+        var table = $('<table class="table table-striped table-bordered" \
+                              style="margin-left: auto; margin-right: auto;"></table>');
+        for (var i in labels) {
+            table.append('<tr><td>'+(bold ? '<b>'+labels[i]+'</b>' : labels[i])+'</td> \
+                          <td>'+array[i]+'</td></tr>');
+        }
+
+        return table;
+    }
+
+    // this takes a list of refs and creates <workspace_name>/<object_name>
+    // if links is true, hrefs are returned as well
+    this.translateRefs = function(reflist, links) {
+        var obj_refs = []
+        for (var i in reflist) {
+            obj_refs.push({ref: reflist[i]})
+        }
+
+        var prom = kb.ws.get_object_info(obj_refs)
+        var p = $.when(prom).then(function(refinfo) {
+            var refhash = {};
+            for (var i=0; i<refinfo.length; i++) {
+                var item = refinfo[i];
+                var full_type = item[2];
+                var module = full_type.split('.')[0];
+                var type = full_type.slice(full_type.indexOf('.')+1);
+                var kind = type.split('-')[0];
+                var label = item[7]+"/"+item[1];
+                var route;
+                switch (kind) {
+                    case 'FBA': 
+                        sub = 'fbas/';
+                        break;
+                    case 'FBAModel': 
+                        sub = 'models/';
+                        break;
+                    case 'Media': 
+                        route = 'media/';
+                        break;
+                    case 'Genome': 
+                        route = 'genomes/';
+                        break;
+                    case 'MetabolicMap': 
+                        route = 'maps/';
+                        break;
+                    case 'PhenotypeSet': 
+                        route = 'phenotype/';
+                        break; 
+                }
+
+                var link = '<a href="#/'+route+label+'">'+label+'</a>';
+                refhash[reflist[i]] = {link: link, label: label};
+            }
+            return refhash
+        })
+        return p;
+    }
+
+    this.refsToJson = function(ref_list) {
+        var obj_refs = []
+        for (var i in ref_list) {
+            obj_refs.push({ref: ref_list[i]})
+        }
+
+        var obj = {}
+        var prom = kb.ws.get_object_info(obj_refs)
+        var p = $.when(prom).then(function(refinfo) {
+            for (var i=0; i<refinfo.length; i++) {
+                var item = refinfo[i];
+                var full_type = item[2];
+                var module = full_type.split('.')[0];
+                var type = full_type.slice(full_type.indexOf('.')+1);
+                var kind = type.split('-')[0];
+                var label = item[7]+"/"+item[1];
+
+                if ( !(kind in obj) )  obj[kind] = [];
+
+                obj[kind].push(label);
+            }
+            return obj;
+        })
+        return p;
+    }
+
+           
+    this.formatUsers = function(perms, mine) {
+        var users = []
+        for (var user in perms) {
+            if (user == USER_ID && !mine && !('*' in perms)) {
+                users.push('You');
+                continue;
+            } else if (user == USER_ID) {
+                continue;
+            } 
+            users.push(user);
+        }
+
+        // if not shared, return 'nobody'
+        if (users.length == 0) {
+            return 'Nobody';
+        };
+
+        // number of users to show before +x users link
+        var n = 3;
+        var share_str = ''
+        if (users.length > n) {
+            /*if (users.slice(n).length == 1) {*/
+                share_str = users.slice(0, n).join(', ')+', '+
+                        ' <a class="btn-share-with" data-users="'+users+'">+'
+                        +users.slice(n).length+' user</a>';  
+            /*} else if (users.slice(2).length > 1) {
+                share_str = users.slice(0, n).join(', ')+ ', '+
+                        ' <a class="btn-share-with" data-users="'+users+'"> +'
+                        +users.slice(n).length+' users</a>';
+            }*/
+
+        } else if (users.length > 0 && users.length <= n) {
+            share_str = users.slice(0, n).join(', ');
+        }
+        return share_str;
+    }
+
+    this.globalPermDropDown = function(perm) {
+        var dd = $('<select class="form-control create-permission" data-value="n">\
+                        <option value="n">None</option>\
+                        <option value="r">Read</option>\
+                    </select>')
+        if (perm == 'n') {
+            dd.find("option[value='n']").attr('selected', 'selected');
+        } else if (perm == 'r') {
+            dd.find("option[value='r']").attr('selected', 'selected');                        
+        } else {
+            dd.find("option[value='n']").attr('selected', 'selected');
+        }
+
+        return $('<div>').append(dd).html();
+    }
+
+    // jQuery plugins that you can use to add and remove a 
+    // loading giff to a dom element.
+    $.fn.loading = function(text, big) {
+        $(this).rmLoading()
+
+        if (big) {
+            if (typeof text != 'undefined') {
+                $(this).append('<p class="text-center text-muted loader"><br>'+
+                     '<img src="assets/img/ajax-loader-big.gif"> '+text+'</p>');
+            } else {
+                $(this).append('<p class="text-center text-muted loader"><br>'+
+                     '<img src="assets/img/ajax-loader-big.gif"> loading...</p>')        
+            }
+        } else {
+            if (typeof text != 'undefined') {
+                $(this).append('<p class="text-muted loader">'+
+                     '<img src="assets/img/ajax-loader.gif"> '+text+'</p>');
+            } else {
+                $(this).append('<p class="text-muted loader">'+
+                     '<img src="assets/img/ajax-loader.gif"> loading...</p>')        
+            }
+
+        }
+        return this;
+    }
+    $.fn.rmLoading = function() {
+        $(this).find('.loader').remove();
+    }
+
+
+
+
+}
 
 // This saves a request by service name, method, params, and promise
 // Todo: Make as module
@@ -78,760 +931,6 @@ function WSCache() {
         }
     }
 }
-
-
-function KBCacheClient(token) {
-    var self = this;
-    var auth = {};
-    auth.token = token;
-
-    if (typeof configJSON != 'undefined') {
-        if (configJSON.setup == 'dev') {
-            fba_url = configJSON.dev.fba_url;
-            ws_url = configJSON.dev.workspace_url;
-            ujs_url = configJSON.dev.user_job_state_url;
-        } else if (configJSON.setup == 'prod') {
-            fba_url = configJSON.prod.fba_url;
-            ws_url = configJSON.prod.workspace_url;
-            ujs_url = configJSON.prod.user_job_state_url;
-        }
-    } else {
-        fba_url = "http://140.221.85.73:4043/"
-        ws_url = "https://kbase.us/services/ws/"
-        ujs_url = "http://140.221.84.180:7083"
-    }
-
-    console.log('FBA URL is:', fba_url);
-    console.log('Workspace URL is:', ws_url);
-    console.log('User Job State URL is:', ujs_url);
-
-    var fba = new fbaModelServices(fba_url, auth);
-    var kbws = new Workspace(ws_url, auth);
-    var ujs = new UserAndJobState(ujs_url, auth);
-
-    var cache = new Cache();
-
-    self.fba = fba;
-    self.ws = kbws;
-    self.ujs = ujs
-    self.nar = new ProjectAPI(ws_url, token);
-    self.token = token;
-    self.ui = new UIUtils();
-
-    self.req = function(service, method, params) {
-        if (service == 'fba') { 
-            // use whatever workspace server that was configured.
-            // this makes it possible to use the production workspace server
-            // with the fba server.   Fixme: fix once production fba server is ready.
-            params.wsurl = ws_url;
-        }
-
-        // see if api call has already been made        
-        var data = cache.get(service, method, params);
-
-        // return the promise ojbect if it has
-        if (data) return data.prom;
-
-        // otherwise, make request
-        var prom = undefined;
-        if (service == 'fba') {
-            console.log('Making request:', 'fba.'+method+'('+JSON.stringify(params)+')');
-            var prom = fba[method](params);
-        } else if (service == 'ws') {
-            console.log('Making request:', 'kbws.'+method+'('+JSON.stringify(params)+')');
-            var prom = kbws[method](params);
-        }
-
-        // save the request and it's promise objct
-        cache.put(service, method, params, prom)
-        return prom;
-    }
-
-    self.narrative_prom = undefined;
-    self.my_narratives = false;
-    self.shared_narratives = false;
-    self.public_narratives = false;        
-
-    this.getNarratives = function() {
-        // if narratives have been cached, return;
-        //if (self.narratives) {
-        //    return self.narratives;
-        //}
-
-        // get all workspaces, filter by mine, shared, and public
-        var prom = kb.ws.list_workspace_info({});
-        var p = $.when(prom).then(function(workspaces) {
-            var my_list = [];
-            var shared_list = [];
-            var public_list = [];
-
-            for (var i in workspaces) {
-                var a = workspaces[i];
-                var ws = a[1];
-                var owner = a[2];
-                var perm = a[5];
-                var global_perm = a[6]
-
-                if (owner == USER_ID) {
-                    my_list.push(ws)
-                }
-
-                // shared lists need to be filtered again, as a shared narrative
-                // is any narrative you have 'a' or 'w', but also not your own
-                if ( (perm == 'a' || perm == 'w') && owner != USER_ID) {
-                    shared_list.push(ws)
-                }
-                if (global_perm == 'r') {
-                    public_list.push(ws)
-                }
-            }
-
-
-            return [my_list, shared_list, public_list];
-        })
-
-
-        /*
-        var next_prom = $.when(p).then(function(data) {
-            var my_list = data[0];
-            var shared_list = data[1];
-            var public_list = data[2];
-
-            var my_prom = kb.ws.list_objects({workspaces: my_list, 
-                                               type: 'KBaseNarrative.Metadata',
-                                               showHidden: 1});
-
-            var shared_prom = kb.ws.list_objects({workspaces: shared_list, 
-                                               type: 'KBaseNarrative.Metadata',
-                                               showHidden: 1});        
-
-            var public_prom = kb.ws.list_objects({workspaces: public_list, 
-                                               type: 'KBaseNarrative.Metadata',
-                                               showHidden: 1});        
-
-            var p = $.when(my_prom, shared_prom, public_prom).then(function(d1, d2, d3) {
-                var my_nars_ws = [];
-                var shared_nars_ws = [];
-                var public_nars_ws = [];
-
-                for (var i in d1) {
-                    var a = d1[i]
-                    var ws = a[7];
-                    my_nars_ws.push(ws);
-                }
-
-                for (var i in d2) {
-                    var a = d2[i]
-                    var ws = a[7];
-                    shared_nars_ws.push(ws);
-                }
-
-                for (var i in d3) {
-                    var a = d3[i]
-                    var ws = a[7];
-                    public_nars_ws.push(ws);
-                }
-
-                return [my_nars_ws, shared_nars_ws, public_nars_ws];         
-            })
-
-            return p;
-        });*/
-
-
-        // next get all narratives from these "project" workspaces
-        // fixme: backend!
-        var last_prom = $.when(p).then(function(data) {
-            var mine_ws = data[0];
-            var shared_ws = data[1];
-            var public_ws = data[2];
-
-            var my_prom = kb.ws.list_objects({workspaces: mine_ws, 
-                                              type: 'KBaseNarrative.Narrative',
-                                              showHidden: 1});
-
-            var shared_prom = kb.ws.list_objects({workspaces: shared_ws, 
-                                                  type: 'KBaseNarrative.Narrative',
-                                                  showHidden: 1});        
-
-            var public_prom = kb.ws.list_objects({workspaces: public_ws, 
-                                                  type: 'KBaseNarrative.Narrative',
-                                                  showHidden: 1});
-
-            // get permissions on all workspaces if logged in
-            var perm_proms = [];
-            var all_ws = mine_ws.concat(shared_ws, public_ws);
-            if (USER_ID) {
-                for (var i in all_ws) {
-                    var prom =  kb.ws.get_permissions({workspace: all_ws[i]});
-                    perm_proms.push(prom);
-                }
-            } else {
-                for (var i in all_ws) {
-                    perm_proms.push(undefined);
-                }
-            }
-
-
-            var all_proms = [my_prom, shared_prom, public_prom].concat(perm_proms)
-
-            var p = $.when.apply($, all_proms).then(function() { 
-                // fill counts now (since there's no api for this)
-
-                var mine = arguments[0];
-                var shared = arguments[1];
-                var pub = arguments[2];
-
-                var perms = {};
-
-                if (USER_ID) {
-                    for (var i = 0; i<all_ws.length; i++) {
-                        perms[all_ws[i]] = arguments[3+i]
-                    }
-                } else {
-                    for (var i = 0; i<all_ws.length; i++) {
-                        perms[all_ws[i]] = {'Everybody': 'r'}
-                    }                    
-                }
-
-                $('.my-nar-count').text(mine.length)
-                $('.shared-nar-count').text(shared.length);  
-                $('.public-nar-count').text(pub.length);            
-
-                return {my_narratives: mine, 
-                        shared_narratives: shared, 
-                        public_narratives: pub, 
-                        perms: perms};
-            });
-
-           return p;
-        })
-
-        // cache prom
-        //self.narratives = last_prom;
-
-        // bam, return promise for [my_nars, shared_nars, public_nars]
-        self.narrative_prom = last_prom
-        return last_prom;
-    }
-
-    // cached objects
-    var c = new WSCache();
-    self.get_fba = function(ws, name) {
-
-        // if reference, get by ref
-        if (ws.indexOf('/') != -1) {
-            // if prom already exists, return it
-            //var prom = c.get({ref: ws});
-            //if (prom) return prom;
-
-            var p = self.ws.get_objects([{ref: ws}]);
-            //c.put({ref: ws, prom: p});            
-        } else {
-            //var prom = c.get({ws: ws, name: name, type: 'FBA'});
-            //if (prom) return prom;            
-
-            var p = self.ws.get_objects([{workspace: ws, name: name}]);
-            //c.put({ws: ws, name:name, type: 'FBA', prom: prom});            
-        }
-
-        // get fba object
-        var prom =  $.when(p).then(function(f_obj) {
-            var model_ref = f_obj[0].data.fbamodel_ref;
-
-            // get model object from ref in fba object
-            var modelAJAX = self.get_model(model_ref).then(function(m) {
-                var rxn_objs = m[0].data.modelreactions
-                var cpd_objs = m[0].data.modelcompounds
-
-                // for each reaction, get reagents and 
-                // create equation by using the model compound objects
-                var eqs = self.createEQs(cpd_objs, rxn_objs, 'modelReactionReagents')
-
-                // add equations to fba object
-                var rxn_vars = f_obj[0].data.FBAReactionVariables;
-                for (var i in rxn_vars) {
-                    var obj = rxn_vars[i];
-                    var id = obj.modelreaction_ref.split('/')[5];
-                    obj.eq = eqs[id]
-                }
-
-                // fixme: hack to get org name, should be on backend
-                f_obj[0].org_name = m[0].data.name;
-
-                return f_obj;
-            })
-            return modelAJAX;
-        })
-
-        return prom;
-    }
-
-    self.get_model = function(ws, name){
-        if (ws && ws.indexOf('/') != -1) {
-            //var prom = c.get({ref: ws});
-            //if (prom) return prom; 
-
-            var p = self.ws.get_objects([{ref: ws}]);
-            //c.put({ref: ws, prom: p}); 
-        } else {
-            //var prom = c.get({ws: ws, name: name, type: 'Model'});
-            //if (prom) return prom; 
-
-            var p = self.ws.get_objects([{workspace: ws, name: name}]);
-            //c.put({ws: ws, name:name, type:'Model', prom:p});              
-        }
-
-        var prom = $.when(p).then(function(m) {
-            var m_obj = m[0].data
-            var rxn_objs = m_obj.modelreactions;
-            var cpd_objs = m_obj.modelcompounds
-
-            // for each reaction, get reagents and 
-            // create equation by using the model compound objects
-            var eqs = self.createEQs(cpd_objs, rxn_objs, 'modelReactionReagents')
-
-            // add equations to modelreactions object
-            var rxn_vars = m_obj.modelreactions;
-            for (var i in rxn_vars) {
-                var obj = rxn_vars[i];
-                obj.eq = eqs[obj.id];
-            }
-
-            // add equations to biomasses object
-            var biomass_objs = m_obj.biomasses;
-            var eqs = self.createEQs(cpd_objs, biomass_objs, 'biomasscompounds')
-            for (var i in biomass_objs) {
-                var obj = biomass_objs[i];
-                obj.eq = eqs[obj.id];
-            }
-
-            return m;
-        })
-
-        return prom;
-    }
-
-
-    self.createEQs = function(cpd_objs, rxn_objs, key) {
-        // create a mapping of cpd ids to names
-        var mapping = {};
-        for (var i in cpd_objs) {
-            mapping[cpd_objs[i].id.split('_')[0]] = cpd_objs[i].name.split('_')[0];
-        }
-
-        var eqs = {}
-        for (var i in rxn_objs) {
-            var rxn_obj = rxn_objs[i];
-            var rxn_id = rxn_obj.id;
-            var rxnreagents = rxn_obj[key];
-            var direction = rxn_obj.direction;
-
-            var lhs = []
-            var rhs = []
-            for (var j in rxnreagents) {
-                var reagent = rxnreagents[j];
-                var coef = reagent.coefficient;
-                var ref = reagent.modelcompound_ref;
-                var cpd = ref.split('/')[3].split('_')[0]
-                var human_cpd = mapping[cpd];
-                var compart = ref.split('_')[1]
-
-                if (coef < 0) { 
-                    lhs.push( (coef == -1 ? human_cpd+'['+compart+']' 
-                                : '('+(-1*coef)+')'+human_cpd+'['+compart+']') );
-                } else {
-                    rhs.push( (coef == 1 ? human_cpd+'['+compart+']' 
-                                : '('+coef+')'+human_cpd+'['+compart+']')  );
-                }
-            }
-
-            var arrow;
-            switch (direction) {
-                case '=': arrow = ' <=> ';
-                case '<': arrow = ' <= ';
-                case '>': arrow = ' => ';
-            }
-
-            var eq = lhs.join(' + ')+arrow+rhs.join(' + ');
-            eqs[rxn_id] = eq
-        }
-        return eqs
-    }
-
-
-    self.getRoute = function(kind) {
-        var route;
-        switch (kind) {
-            case 'FBA': 
-                route = 'ws.fbas';
-                break;
-            case 'FBAModel': 
-                route = 'ws.mv.model';
-                break;
-            case 'Media': 
-                route = 'ws.media';
-                break;
-            case 'MetabolicMap': 
-                route = 'ws.maps';
-                break;
-            case 'Media': 
-                route = 'ws.media';
-                break; 
-            case 'PhenotypeSet':
-                route = 'ws.phenotype';
-                break; 
-            case 'PhenotypeSimulationSet': 
-                route = 'ws.simulation';
-                break;     
-            case 'Pangenome':
-                route = 'ws.pangenome';
-                break;                            
-            case 'Genome': 
-                route = 'genomesbyid';
-                break;
-        }
-        return route;
-    }
-
-    self.getWorkspaceSelector = function(all) {
-        if (all) {
-            var p = self.ws.list_workspace_info({});
-        } else {
-            var p = self.ws.list_workspace_info({perm: 'w'});            
-        }
-        
-        var prom = $.when(p).then(function(workspaces){
-            var workspaces = workspaces.sort(compare)
-
-            function compare(a,b) {
-                var t1 = kb.ui.getTimestamp(b[3]) 
-                var t2 = kb.ui.getTimestamp(a[3]) 
-                if (t1 < t2) return -1;
-                if (t1 > t2) return 1;
-                return 0;
-            }
-
-            var wsSelect = $('<form class="form-horizontal" role="form">'+
-                                '<div class="form-group">'+
-                                    '<label class="col-sm-5 control-label">Destination Workspace</label>'+
-                                    '<div class="input-group col-sm-5">'+
-                                        '<input type="text" class="select-ws-input form-control focusedInput" placeholder="search">'+
-                                        '<span class="input-group-btn">'+
-                                            '<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">'+
-                                                '<span class="caret"></span>'+
-                                            '</button>'+
-                                        '</span>'+
-                                    '</div>'+
-                            '</div>');
-
-            var select = $('<ul class="dropdown-menu select-ws-dd" role="menu">');
-            for (var i in workspaces) {
-                select.append('<li><a>'+workspaces[i][1]+'</a></li>');
-            }
-
-            wsSelect.find('.input-group-btn').append(select);
-
-            var dd = wsSelect.find('.select-ws-dd');
-            var input = wsSelect.find('input');
-
-            var not_found = $('<li class="select-ws-dd-not-found"><a><b>Not Found</b></a></li>');
-            dd.append(not_found);
-            input.keyup(function() {
-                dd.find('li').show();
-
-                wsSelect.find('.input-group-btn').addClass('open');
-
-                var input = $(this).val();
-                dd.find('li').each(function(){
-                    if ($(this).text().toLowerCase().indexOf(input.toLowerCase()) != -1) {
-                        return true;
-                    } else {
-                        $(this).hide();
-                    }
-                });
-
-                if (dd.find('li').is(':visible') == 1) {
-                    not_found.hide();
-                } else {
-                    not_found.show();
-                }
-            }) 
-
-            dd.find('li').click(function() {
-                dd.find('li').removeClass('active');
-
-                if (!$(this).hasClass('select-ws-dd-not-found')) {
-                    $(this).addClass('active');                    
-
-                    var val = $(this).text();
-                    input.val(val);
-                }
-            })
-
-            return wsSelect;
-        })
-
-        return prom;
-    }
-}
-
-
-// Collection of simple (Bootstrap/jQuery based) UI helper methods
-function UIUtils() {
-
-    // this method will display an absolutely position notification
-    // in the app on the 'body' tag.  This is useful for api success/failure 
-    // notifications
-    this.notify = function(text, type, keep) {
-        var ele = $('<div id="notification-container">'+
-                        '<div id="notification" class="'+type+'">'+
-                            (keep ? ' <small><div class="close">'+
-                                        '<span class="glyphicon glyphicon-remove pull-right">'+
-                                        '</span>'+
-                                    '</div></small>' : '')+
-                            text+
-                        '</div>'+
-                    '</div>');
-
-        $(ele).find('.close').click(function() {
-             $('#notification').animate({top: 0}, 200, 'linear');
-        })
-
-        $('body').append(ele)
-        $('#notification')
-              .delay(200)
-              .animate({top: 50}, 400, 'linear',
-                        function() {
-                            if (!keep) {
-                                $('#notification').delay(2000)
-                                                  .animate({top: 0}, 200, 'linear', function() {
-                                                    $(this).remove();
-                                                  })
-
-                            }
-                        })
-    }
-
-
-
-    var msecPerMinute = 1000 * 60;
-    var msecPerHour = msecPerMinute * 60;
-    var msecPerDay = msecPerHour * 24;
-    var dayOfWeek = {0: 'Sun', 1: 'Mon', 2:'Tues',3:'Wed',
-                     4:'Thurs', 5:'Fri', 6: 'Sat'};
-    var months = {0: 'Jan', 1: 'Feb', 2: 'March', 3: 'April', 4: 'May',
-                  5:'June', 6: 'July', 7: 'Aug', 8: 'Sept', 9: 'Oct', 
-                  10: 'Nov', 11: 'Dec'};
-    this.formateDate = function(timestamp) {
-        var date = new Date()
-
-        var interval =  date.getTime() - timestamp;
-
-        var days = Math.floor(interval / msecPerDay );
-        interval = interval - (days * msecPerDay);
-
-        var hours = Math.floor(interval / msecPerHour);
-        interval = interval - (hours * msecPerHour);
-
-        var minutes = Math.floor(interval / msecPerMinute);
-        interval = interval - (minutes * msecPerMinute);
-
-        var seconds = Math.floor(interval / 1000);
-
-        if (days == 0 && hours == 0 && minutes == 0) {
-            return seconds + " secs ago.";
-        } else if (days == 0 && hours == 0) {
-            if (minutes == 1) return "1 min ago";
-            return  minutes + " mins ago";
-        } else if (days == 0) {
-            if (hours == 1) return "1 hour ago";
-            return hours + " hours ago"
-        } else if (days == 1) {
-            var d = new Date(timestamp);
-            var t = d.toLocaleTimeString().split(':');        
-            return 'yesterday at ' + t[0]+':'+t[1]+' '+t[2].split(' ')[1]; //check
-        } else if (days < 7) {
-            var d = new Date(timestamp);        
-            var day = dayOfWeek[d.getDay()]
-            var t = d.toLocaleTimeString().split(':');
-            return day + " at " + t[0]+':'+t[1]+' '+t[2].split(' ')[1]; //check
-        } else  {
-            var d = new Date(timestamp);
-            return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear(); //check
-        }
-    }
-
-    // takes mod date time (2014-03-24T22:20:23)
-    // and returns unix (epoch) time
-    this.getTimestamp = function(datetime){
-        if (!datetime) return; 
-        var ymd = datetime.split('T')[0].split('-');
-        var hms = datetime.split('T')[1].split(':');
-        hms[2] = hms[2].split('+')[0];  
-        return Date.UTC(ymd[0],ymd[1]-1,ymd[2],hms[0],hms[1],hms[2]);  
-    }
-
-    this.objTable = function(table_id, obj, keys, labels) {
-        var table = $('<table class="table table-striped table-bordered" \
-                              style="margin-left: auto; margin-right: auto;"></table>');
-        for (var i in keys) {
-            var key = keys[i];
-            var row = $('<tr>');
-
-            var label = $('<td>'+labels[i]+'</td>')
-            var value = $('<td>')
-
-            if (key.type == 'bool') {
-                value.append((obj[key.key] == 1 ? 'True' : 'False'))
-            } else {
-                value.append(obj[key.key])
-            }
-            row.append(label, value);
-
-            table.append(row);
-        }
-
-        return table;
-    }
-
-    this.listTable = function(table_id, array, labels, bold) {
-        var table = $('<table id="'+table_id+'" class="table table-striped table-bordered" \
-                              style="margin-left: auto; margin-right: auto;"></table>');
-        for (var i in labels) {
-            table.append('<tr><td>'+(bold ? '<b>'+labels[i]+'</b>' : labels[i])+'</td> \
-                          <td>'+array[i]+'</td></tr>');
-        }
-
-        return table;
-    }
-
-    // this takes a list of refs and creates <workspace_name>/<object_name>
-    // if links is true, hrefs are returned as well
-    this.translateRefs = function(reflist, links) {
-        var obj_refs = []
-        for (var i in reflist) {
-            obj_refs.push({ref: reflist[i]})
-        }
-
-        var prom = kb.ws.get_object_info(obj_refs)
-        var p = $.when(prom).then(function(refinfo) {
-            var refhash = {};
-            for (var i=0; i<refinfo.length; i++) {
-                var item = refinfo[i];
-                var full_type = item[2];
-                var module = full_type.split('.')[0];
-                var type = full_type.slice(full_type.indexOf('.')+1);
-                var kind = type.split('-')[0];
-                var label = item[7]+"/"+item[1];
-
-                switch (kind) {
-                    case 'FBA': 
-                        sub = 'fbas/';
-                        break;
-                    case 'FBAModel': 
-                        sub = 'models/';
-                        break;
-                    case 'Media': 
-                        route = 'media/';
-                        break;
-                    case 'Genome': 
-                        route = 'genomes/';
-                        break;
-                    case 'MetabolicMap': 
-                        route = 'maps/';
-                        break;
-                    case 'PhenotypeSet': 
-                        route = 'phenotype/';
-                        break; 
-                }
-
-                var link = '<a href="#/'+route+label+'">'+label+'</a>'
-                refhash[reflist[i]] = {link: link, label: label};
-            }
-            return refhash
-        })
-        return p;
-    }
-
-           
-    this.formatUsers = function(perms, mine) {
-        var users = []
-        for (var user in perms) {
-            if (user == USER_ID && !mine && !('*' in perms)) {
-                users.push('You');
-                continue;
-            } else if (user == USER_ID) {
-                continue;
-            } 
-            users.push(user);
-        }
-
-        // if not shared, return 'nobody'
-        if (users.length == 0) {
-            return 'Nobody';
-        };
-
-        // number of users to show before +x users link
-        var n = 3;
-        var share_str = ''
-        if (users.length > n) {
-            /*if (users.slice(n).length == 1) {*/
-                share_str = users.slice(0, n).join(', ')+', '+
-                        ' <a class="btn-share-with" data-users="'+users+'">+'
-                        +users.slice(n).length+' user</a>';  
-            /*} else if (users.slice(2).length > 1) {
-                share_str = users.slice(0, n).join(', ')+ ', '+
-                        ' <a class="btn-share-with" data-users="'+users+'"> +'
-                        +users.slice(n).length+' users</a>';
-            }*/
-
-        } else if (users.length > 0 && users.length <= n) {
-            share_str = users.slice(0, n).join(', ');
-        }
-        return share_str;
-    }
-
-
-
-    // jQuery plugins that you can use to add and remove a 
-    // loading giff to a dom element.  This is easier to maintain, and likely less 
-    // code than using CSS classes.
-    $.fn.loading = function(text, big) {
-        $(this).rmLoading()
-
-        if (big) {
-            if (typeof text != 'undefined') {
-                $(this).append('<p class="text-center text-muted loader"><br>'+
-                     '<img src="assets/img/ajax-loader-big.gif"> '+text+'</p>');
-            } else {
-                $(this).append('<p class="text-center text-muted loader"><br>'+
-                     '<img src="assets/img/ajax-loader-big.gif"> loading...</p>')        
-            }
-        } else {
-            if (typeof text != 'undefined') {
-                $(this).append('<p class="text-muted loader">'+
-                     '<img src="assets/img/ajax-loader.gif"> '+text+'</p>');
-            } else {
-                $(this).append('<p class="text-muted loader">'+
-                     '<img src="assets/img/ajax-loader.gif"> loading...</p>')        
-            }
-
-        }
-
-
-
-        return this;
-    }
-
-    $.fn.rmLoading = function() {
-        $(this).find('.loader').remove();
-    }
-
-
-}
-
-
 
 function getBio(type, loaderDiv, callback) {
     var fba = new fbaModelServices('https://kbase.us/services/fba_model_services/');
@@ -997,102 +1096,17 @@ function ProjectAPI(ws_url, token) {
         data : { description : '' },
         workspace : undefined,
         meta : {},
-	provenance : [],
-	hidden : 1
+    provenance : [],
+    hidden : 1
     };
 
-
-    // id of the div containing the kbase login widget to query for auth
-    // info. Set this to a different value if the div has been named differently.
-
-    // Common error handler callback
-    var error_handler = function() {
-        // neat trick to pickup all arguments passed in
-        var results = [].slice.call(arguments);
-        console.log( "Error in method call. Response was: ", results);
-    };
-
-
-
-    /*
-     * This is a handler to pickup get_workspaces() results and
-     * filter out anything that isn't a project workspace
-     * (basically only include it if it has a _project object
-     * within)
-     */
-    var filter_wsobj = function (p_in) {
-        console.log('p_in', p_in)
-      
-        /*
-        for (var i in p_in.res) {
-            var ws = p_in.res[i];
-
-            // if there is global read or any permissions
-            if (ws[4] == "r" || ws[5].match(/r|w|a/)) {
-
-            }
-        }
-        */
-
-        var prom = ws_client.list_objects({type: 'KBaseNarrative.Metadata', 
-                                           showHidden: 1});
-        return prom
-    };
-
-    /*
-
-  var def_params = {perms : ['r', 'w', 'a'],
-                          filter_tag : ws_tag.project};
-        var p = $.extend( def_params, p_in);
-
-        var ignore = /^core/;
-
-        // ignore any workspace with the name prefix of "core"
-        // and ignore workspace that doesn't match perms
-        var reduce_ws_meta = function ( prev, curr) {
-            if ( ignore.test(curr[0])) { 
-                return( prev);
-            }
-            if ( p.perms.indexOf(curr[4]) >= 0 ) {
-                return( prev.concat([curr]));
-            } else {
-                return( prev);
-            }
-       };
-
-        // get non-core workspaces with correct permissions
-        var ws_match = p.res.reduce(reduce_ws_meta,[]);
-        // extract workspace ids into a list
-        var ws_ids = ws_match.map( function(v) { return v[0]});
-        */    
 
     /**
      * Ensures that a USER_ID:home workspace exists and is tagged as a project.
      * If one does not exist, it calls 'new_project' and makes one.
      */
     this.ensure_home_project = function(userId) {
-
-        // if we don't have a userid, don't do anything.
-        if (!userId)
-            return;
-
-        var projId = userId + ":home";
-
-        var prom = ws_client.get_object({ type: ws_tag_type,
-                                          workspace: projId,
-                                          id: ws_tag.project });
-        $.when(prom).then(
-            undefined,                  // don't need to do anything if it already has one. 
-            $.proxy(function(error) {   // if no project USER_ID:home exists, make one
-                this.new_project({
-                    project_id: projId,
-                    error_callback: function(error) {  // Just fails more or less silently for now
-                        console.debug("Error while creating home project!"); 
-                        console.debug(error); 
-                    },
-                });
-            }, this)
-        );
+        alert('ensure_home_project has been removed!')
     };
 
     // Get all the workspaces that match the values of the
@@ -1503,6 +1517,7 @@ function ProjectAPI(ws_url, token) {
         res.description = meta.description;
         res.name = meta.name;
         var temp = $.parseJSON(meta.data_dependencies);
+
         //deps should really be stored as an id, not a name, since names can change
         var deps = temp.reduce( function(prev,curr,index) {
             var dep = curr.split(" ");

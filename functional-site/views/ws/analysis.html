@@ -1,0 +1,251 @@
+
+<div class="row">
+    <div class="col-sm-3 col-md-3 sidebar">
+        <!--<div class="pull-right" show-hide-sidebar></div>-->
+
+        <div class="btn-toolbar ws-toolbar">
+
+            <div ws="ws" ws-selector></div>
+
+            <ul class="nav nav-pills">
+                <li ng-class="{ active: tab == 'upload' }" >
+                    <a ui-sref="analysis({ws:ws, tab:'upload'})">Upload</a>
+                </li>
+                <li ng-class="{ active: tab == 'tasks' }" >
+                    <a ui-sref="analysis({ws:ws, tab:'tasks'})" >
+                        Running Tasks 
+                        <span animate-on-change="narrative.tasks.length">({{narrative.tasks.length}})</span>
+                    </a>
+                </li>                
+
+            </ul>
+
+            <br>
+
+            <ul class="nav nav-tabs" >
+                asdfasdfasdf safd 
+                asdf asdf 
+
+
+                
+                <li ng-class="{ active: tab == 'apps' }" >
+                    <a ui-sref="analysis.apps({ws:ws})">Apps</a>
+                </li>
+                <li ng-class="{ active: tab == 'methods' }">
+                    <a ui-sref="analysis.builder({ws:ws})">App Builder</a>
+                </li>                  
+                <li ng-class="{ active: tab == 'data' }">
+                    <a ui-sref="analysis.data({ws:ws})">Data 
+                        (<span class="">{{narrative.ws_objects.length}}</span>)
+                    </a>
+                </li>
+            </ul>
+
+            <div>
+                <div ui-view></div>
+            </div>
+
+
+            <div ng-if="tab == 'data'">
+
+                <input ng-model="query" type="text" class="form-control obj-filter" placeholder="Search objects">
+
+                <div class="mini-obj-table overflow-y">
+                    <table class="table">
+                        <tr ng-repeat="obj in narrative.ws_objects | filter:query">
+                            <td>{{obj.1}}</td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main" >
+
+        <div class="analysis-view">
+
+            <div ng-if="tab == 'apps' || tab == 'methods' || tab == 'data'">
+                <div ng-if="narrative.cells.length == 0">
+                    <div class="">
+                        <h1>Analysis <small>v. Alpha</small></h1> 
+                        <h4 class="text-muted">Workspace-inspired, rough prototype of how modeling could be done.</h4>
+                    </div>
+
+                    <h5>Version Alpha:</h5>
+                    <ul>
+                        <li>Just getting started</li>
+                    </ul>
+                </div>
+
+                <div ng-if="narrative.cells.length > 0">
+                      <div ng-repeat="cell in narrative.cells track by $index" class="narrative-cell-container">
+                        
+                            <div class="panel panel-default" narrative-cell>
+                                <div class="panel-heading">
+                                    <span class="panel-title pull-left">{{cell.title}}</span> 
+                                    
+                                    <div class="pull-right text-muted">
+                                        <a ng-click="flip($event)">
+                                            <i class="fa fa-question" ></i>
+                                        </a>
+                                        <a ng-click="minimize($event)">
+                                            <i class="fa fa-minus"></i>
+                                            <!--<span class="glyphicon glyphicon-minus"></span>-->
+                                        </a>                                    
+                                        <a ng-click="narrative.removeCell($index)">
+                                            <i class="fa fa-times"></i>
+                                            <!--<span class="glyphicon glyphicon-remove"></span>-->
+                                        </a>
+
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+
+                                <div class="narrative-cell-container">
+                                    <div class="narrative-cell">
+                                        <div class="panel-body">
+          
+                                            <figure class="front">
+                                                <form class="form-horizontal" role="form">
+                                                  <div class="form-group" ng-repeat="field in cell.params">
+                                                    <label class="col-sm-3 control-label">{{field.ui_name}}</label>
+                                                    <div class="col-sm-9">
+                                                      <input ng-model="fields[field.ui_name]" type="text" class="form-control" placeholder="">
+                                                    </div>
+                                                  </div>
+
+                                                  <div class="form-group">
+                                                    <div class="col-sm-offset-3 col-sm-9">
+                                                      <button ng-click="runCell($index, cell)" type="submit" class="btn btn-primary pull-right">Run</button>
+                                                    </div>
+                                                  </div>
+                                                </form>
+                                            </figure>
+                                            
+                                            <!-- back side of cell / documentation -->
+                                            <figure class="back">
+                                               {{cell.description}}
+                                            </figure>
+
+                                        </div> 
+                                    </div> 
+                                </div> <!-- end body container-->
+
+                            </div> <!-- end cell -->
+                        </div>
+                    </div>
+
+                </div>  <!-- end narrative cells -->
+            </div>
+
+
+            <div ng-if="tab == 'upload'">
+
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="dashboard-info blue">
+                            <i class="fa fa-cloud-upload fa-5x pull-left"></i>
+                            <div class="h1" upload-count>0</div>
+                            <div class="h4">Uploading</div>
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-md-offset-1">
+                        <div class="dashboard-info green">
+                            <i class="fa fa-check-square fa-5x pull-left"></i>
+                            <div class="h1" upload-count>0</div>
+                            <span class="h4">Completed</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <br>
+
+                <div class="row">
+                    <div class="col-md-5">
+                        <div flow-init="{target: 'http://localhost:5000/upload'}"
+                             flow-files-submitted="$flow.upload()"
+                             flow-file-success="$file.msg = $message">
+
+                            <div class="text-center">
+                                <div class="alert" flow-drop flow-drag-enter="class='alert-success'" flow-drag-leave="class=''" ng-class="class">
+                                    Drag and Drop your file here
+                                </div>
+                                <b>or</b><br>
+                                <br>
+                                <span class="btn btn-primary btn-sm" flow-btn>Upload File</span>
+                            </div>
+
+                            <table>
+                                <tr ng-repeat="file in $flow.files">
+                                    <td>{{$index+1}}</td>
+                                    <td>{{file.name}}</td>
+                                    <td>{{file.msg}}</td>
+                                </tr>
+                            </table>
+                        </div> <!-- end flow upload -->
+                    </div>
+                </div>
+
+
+
+            </div>
+
+            <div ng-if="tab == 'tasks'">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="dashboard-info blue">
+                            <i class="fa fa-tasks fa-5x pull-left"></i>
+                            <div class="h1">{{narrative.tasks.length}}</div>
+                            <div class="h4">Running Tasks</div>
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-md-offset-1">
+                        <div class="dashboard-info green">
+                            <i class="fa fa-check-square fa-5x pull-left"></i>
+                            <div class="h1" tasks-count>0</div>
+                            <div class="h4">Completed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <br><br>
+                <div ng-if="narrative.tasks.length> 0">
+                    <div class="row">
+                        <div class="col-md-12"> 
+                            <table class="table task-table">
+                                <tr>
+                                    <th><b>Task</b></th>
+                                    <th><b>Time Started</b></th>
+                                <tr>
+                                <tr ng-repeat="task in narrative.tasks">
+                                    <td>{{task.name}}</td>
+                                    <td>some time</td>
+                                </tr>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+                <div ng-if="narrative.tasks.length == 0">
+                    You have no tasks.  You may want to run tasks (analysis) via the 
+                    <a ui-sref="analysis({s: 'apps'})">Apps</a> tab.
+                </div>
+
+
+
+            </div>
+
+            <!-- upload page -->
+
+
+        </div>
+    </div>
+</div>
+
+
