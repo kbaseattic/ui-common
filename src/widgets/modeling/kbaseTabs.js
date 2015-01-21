@@ -55,16 +55,14 @@
             // adds a single tab and content
             this.addTab = function(p) {
                 // if tab exists, don't add
-                if ( tabs.find('a[data-id="'+p.name+'"]').length > 0) {
+                if ( tabs.find('a[data-id="'+p.name+'"]').length > 0)
                     return;
-                }
 
                 var tab = $('<li class="'+(p.active ? 'active' :'')+'">');
                 var tab_link = $('<a data-toggle="tab" data-id="'+p.name+'">'+p.name+'</a>');
 
                 // animate by sliding tab up
                 if (p.animate === false) {
-                    console.log('do not animate')
                     tab.append(tab_link)
                     tabs.append(tab);
                 } else {
@@ -104,11 +102,10 @@
                 var tab_content = tab_contents.children('[data-id="'+name+'"]')
 
                 // get previous or next tab
-                if (tab.next().length > 0) {
+                if (tab.next().length > 0)
                     var id = tab.next().children('a').data('id');
-                } else {
+                else
                     var id = tab.prev().children('a').data('id');
-                }
 
                 // remove the tab
                 tab.remove();
