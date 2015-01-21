@@ -161,7 +161,8 @@ $.KBWidget({
                 tabPane.rmLoading();
 
                 // note: must add table first
-                tabPane.append('<table class="table table-bordered table-striped">');
+                // doing style margins for
+                tabPane.append('<table class="table table-bordered table-striped" style="margin-left: auto; margin-right: auto;">');
                 tabPane.find('table').dataTable(settings)
 
                 // add any events
