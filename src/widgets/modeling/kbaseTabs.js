@@ -7,7 +7,7 @@
 
         var tabs = $('#ele').tabs();
 
-        //or 
+        //or
 
         var tabs = $('#ele').tabs({tabs: [
                                 {name: 'tab1', content: 'foo text or html', active: true},
@@ -15,19 +15,19 @@
                                 ]
                               });
 
-    // Add a new tab 
+    // Add a new tab
     // optional: content, active
 
         tabs.addTab({name: 'tab3', content: 'new content'})
 
-    // Retrieve a tab button 
+    // Retrieve a tab button
     // (useful for adding events or other stuff)
 
         var mytab = tabs.tab('tab1')
-    
+
     // Add content to existing tab
     // (useful for ajax/event stuff)
-        
+
         tabs.tab({name: 'tab3', content: 'blah blah blah'})
 
     // manually show a tab
@@ -64,8 +64,9 @@
 
                 // animate by sliding tab up
                 if (p.animate === false) {
-                    tab.append(tab_link)                    
-                    tabs.append(tab);              
+                    console.log('do not animate')
+                    tab.append(tab_link)
+                    tabs.append(tab);
                 } else {
                     tab.append(tab_link).hide();
                     tabs.append(tab);
@@ -77,8 +78,8 @@
                     var rm_btn = $('<span class="glyphicon glyphicon-remove">');
                     tab_link.append(rm_btn);
 
-                    rm_btn.click(function(e) { 
-                        self.rmTab(p.name) 
+                    rm_btn.click(function(e) {
+                        self.rmTab(p.name)
                     })
                 }
 
@@ -86,7 +87,7 @@
                 var c = $('<div class="tab-pane '+(p.active ? 'active' :'')+'" data-id="'+p.name+'">')
                 c.append((p.content ? p.content : ''))
                 tab_contents.append(c);
-                
+
                 tab.click(function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -108,7 +109,7 @@
                 } else {
                     var id = tab.prev().children('a').data('id');
                 }
-                
+
                 // remove the tab
                 tab.remove();
                 tab_content.remove();
@@ -141,7 +142,7 @@
                 tab_contents.children('.tab-pane').removeClass('active');
 
                 tabs.find('a[data-id="'+id+'"]').parent().addClass('active');
-                tab_contents.children('[data-id="'+id+'"]').addClass('active');                
+                tab_contents.children('[data-id="'+id+'"]').addClass('active');
             }
 
             this.getTabNav = function() {
