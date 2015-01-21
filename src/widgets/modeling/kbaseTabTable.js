@@ -2,6 +2,7 @@
 
 $.KBWidget({
     name: "kbaseTabTable",
+    parent: "kbaseAuthenticatedWidget",
     version: "1.0.0",
     options: {
     },
@@ -19,10 +20,9 @@ $.KBWidget({
         this._super(input);
         var self = this;
 
-        var imageURL = "http://bioseed.mcs.anl.gov/~chenry/jpeg/";
-
         var type = input.type;
 
+        // tab widget
         var tabs;
 
         // 0) No more clients.  Make this global.  please.
@@ -49,8 +49,8 @@ $.KBWidget({
                 processData: false,
                 data: JSON.stringify(rpc),
                 beforeSend: function (xhr) {
-                    if ('token' in input && input.token)
-                        xhr.setRequestHeader("Authorization", input.token);
+                    if (self.authToken())
+                        xhr.setRequestHeader("Authorization", self.authToken());
                 }
             }).then(function(data) {
                 return data.result[0];
@@ -96,7 +96,6 @@ $.KBWidget({
 
         self.kbapi('ws', 'get_object_info_new', {objects: [param], includeMetadata: 1})
           .done(function(res) {
-            console.log(res)
               obj.setMetadata(res[0]);
 
               for (var i = 0; i < tabList.length; i++) {
@@ -247,27 +246,27 @@ $.KBWidget({
         }
 
 
-            function ref(key, type, format, method) {
-                return function(d) {
-                            if (type == 'tabLink' && format == 'dispid') {
-                                var id = d[key].split('_')[0];
-                                var compart = d[key].split('_')[1];
+        function ref(key, type, format, method) {
+            return function(d) {
+                        if (type == 'tabLink' && format == 'dispid') {
+                            var id = d[key].split('_')[0];
+                            var compart = d[key].split('_')[1];
 
-                                return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
-                                            id+'</a> ('+compart+')';
-                            }
-
-                            var value = d[key];
-
-                            if ($.isArray(value)) {
-                                if (type == 'tabLinkArray')
-                                    return tabLinkArray(value, method)
-                                return d[key].join(', ');
-                            }
-
-                            return value;
+                            return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
+                                        id+'</a> ('+compart+')';
                         }
-            }
+
+                        var value = d[key];
+
+                        if ($.isArray(value)) {
+                            if (type == 'tabLinkArray')
+                                return tabLinkArray(value, method)
+                            return d[key].join(', ');
+                        }
+
+                        return value;
+                    }
+        }
 
         function tabLinkArray(a, method) {
             var links = [];
@@ -352,6 +351,7 @@ $.KBWidget({
             return 'http://bioseed.mcs.anl.gov/~chenry/jpeg/'+id+'.jpeg';
         }
 
+        var imageURL = "http://bioseed.mcs.anl.gov/~chenry/jpeg/";
         this.pictureEquation = function(eq) {
             var cpds = get_cpds(eq);
 
