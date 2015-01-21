@@ -161,7 +161,7 @@ $.KBWidget({
                 tabPane.rmLoading();
 
                 // note: must add table first
-                // doing style margins for
+                // doing style margins for narrative
                 tabPane.append('<table class="table table-bordered table-striped" style="margin-left: auto; margin-right: auto;">');
                 tabPane.find('table').dataTable(settings)
 
@@ -283,7 +283,7 @@ $.KBWidget({
             var data = p.data;
             var rows = p.rows;
 
-            var table = $('<table class="table table-bordered">');
+            var table = $('<table class="table table-bordered" style="margin-left: auto; margin-right: auto;">');
 
 
             for (var i=0; i<rows.length; i++) {
