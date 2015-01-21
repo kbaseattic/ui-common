@@ -89,8 +89,14 @@ $.KBWidget({
         //
         // 3) get meta data, add any metadata tables
         //
-        self.kbapi('ws', 'get_object_info_new', {objects: [{workspace: input.ws, name: input.name}], includeMetadata: 1})
+        if (isNaN(input.ws) && isNaN(input.name) )
+            var param = {workspace: input.ws, name: input.name};
+        else if (!isNaN(input.ws) && !isNaN(input.name) )
+            var param = {ref: input.ws+'/'+input.name};
+
+        self.kbapi('ws', 'get_object_info_new', {objects: [param], includeMetadata: 1})
           .done(function(res) {
+            console.log(res)
               obj.setMetadata(res[0]);
 
               for (var i = 0; i < tabList.length; i++) {
@@ -111,7 +117,13 @@ $.KBWidget({
         //
         // 4) get object data, create tabs
         //
-        self.kbapi('ws', 'get_objects', [{workspace: input.ws, name: input.name}])
+
+        if (isNaN(input.ws) && isNaN(input.name) )
+            var param = {workspace: input.ws, name: input.name};
+        else if (!isNaN(input.ws) && !isNaN(input.name) )
+            var param = {ref: input.ws+'/'+input.name};
+
+        self.kbapi('ws', 'get_objects', [param])
           .done(function(data){
               var setMethod = obj.setData(data[0].data);
 
@@ -123,9 +135,6 @@ $.KBWidget({
               } else {
                   buildContent();
               }
-
-
-
         })
 
         function buildContent() {
