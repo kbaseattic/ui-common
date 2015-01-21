@@ -85,12 +85,26 @@ kb_define('kbaseMethodGallery',
 
             });
 
-            this.appendUI(this.$elem);
+            if (this.options.method_id) {
+                this.method_details(this.options.method_id);
+            }
+            else if (this.options.app_id) {
+                this.app_details(this.options.app_id);
+            }
+            else {
+                this.appendUI(this.$elem);
+            }
 
             return this;
         },
 
         app_details : function(id) {
+
+            window.open(
+                '/functional-site/#/narrativestore/app/' + id
+            );
+            return;
+
             var $details = $.jqElem('div');
             $details.kbaseAppDescription({app_id : id, gallery : this});
 
@@ -101,6 +115,12 @@ kb_define('kbaseMethodGallery',
         },
 
         method_details : function(id) {
+
+            window.open(
+                '/functional-site/#/narrativestore/method/' + id
+            );
+            return;
+
             var $details = $.jqElem('div');
             $details.kbaseMethodDescription({method_id : id, gallery : this});
 
