@@ -286,7 +286,6 @@
             self.$mainPanel.append($ssPanel);
         }
 
-
         if (m.description) {
             self.$mainPanel
                 .append(
@@ -369,6 +368,14 @@
 
 	    }*/
 
+        $.each(
+            self.$mainPanel.find('[data-method-id]'),
+            function (idx, link) {
+                var method_id = $(link).data('method-id');
+                $(link).attr('target', '_blank');
+                $(link).attr('href', "#/narrativestore/method/" + method_id);
+            }
+        );
 
 	},
 
@@ -611,6 +618,15 @@
 
             self.$mainPanel.append($pubsDiv.append($publications));
         }
+
+        $.each(
+            self.$mainPanel.find('[data-method-id]'),
+            function (idx, link) {
+                var method_id = $(link).data('method-id');
+                $(link).attr('target', '_blank');
+                $(link).attr('href', "#/narrativestore/method/" + method_id);
+            }
+        );
 
 	    /*if (m['technical_description']) {
 		var $techDetailsDiv = $('<div>')
