@@ -1,7 +1,6 @@
 function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
     var self = this;
     this.tabwidget = tabwidget;
-    console.log('loading widget')
 
     this.setMetadata = function (data) {
         //console.log('meta', data)
