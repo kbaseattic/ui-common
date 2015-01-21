@@ -222,9 +222,9 @@ var NarrativeManager = function(options, auth, auth_cb) {
         // get the full list of workspaces
         
         self.ws.list_workspace_info(
-            {excludeGlobal:1},
+            {owners: [self.user_id]}, //only check ws owned by user
             function(wsList) {
-                var mine = [];
+                var workspaces = [];
                 /*WORKSPACE INFO
                     0: ws_id id
                     1: ws_name workspace
@@ -235,45 +235,25 @@ var NarrativeManager = function(options, auth, auth_cb) {
                     6: permission globalread,
                     7: lock_status lockstat
                     8: usermeta metadata*/
-                
                 for (var i=0; i<wsList.length; i++) {
                     if (wsList[i][8]) { // must have metadata or else we skip
                         // we could exclude temporary narratives in the future...
                         /*if (wsList[i][8].is_temporary) { if (wsList[i][8].is_temporary === 'true') { continue; } } */
                         //must have the new narrative tag, or else we skip
                         if (wsList[i][8].narrative) {
-                            // only check for narratives owned by this user
-                            if (wsList[i][2]===self.user_id) {
-                                mine.push(wsList[i]);
-                            }
+                            workspaces.push(wsList[i]);
                         }
                     }
                 }
-                if (mine.length>0) {
+                if (workspaces.length>0) {
                     // we have existing narratives, so we load 'em up
-                    mine.sort(function(a,b) { //sort by date
+                    workspaces.sort(function(a,b) { //sort by date
                         if (a[3] > b[3]) return -1;
                         if (a[3] < b[3]) return 1;
                         return 0;
                     });
-                    
-                    self.ws.get_object_info(
-                        [{ref:mine[0][0]+"/"+mine[0][8].narrative}],0,
-                                function(objList) {
-                                    if (objList[0]) {
-                                        _callback({last_narrative:{ws_info:mine[0], nar_info:objList[0]}});
-                                    } else {
-                                        if (_error_callback) {
-                                            _error_callback({message: 
-                                                    "Unable to load recent narrative."});
-                                        }
-                                    }
-                                },
-                                function(error) {
-                                    if (_error_callback) {
-                                        _error_callback(error.error);
-                                    }
-                                });
+                    self._findRecentValidNarrative(workspaces, 0, _callback,
+                            _error_callback);
                 } else {
                     _callback(emptyResult);
                 }
@@ -286,7 +266,39 @@ var NarrativeManager = function(options, auth, auth_cb) {
             });
     };
     
-    
+    this._findRecentValidNarrative = function(workspaces, index,
+            _callback, _error_callback) {
+        var self = this;
+        if (index >= workspaces.length) {
+            _callback({last_narrative: null});
+            return;
+        }
+        var ref = workspaces[index][0] + "/" + workspaces[index][8].narrative;
+        self.ws.get_object_info_new(
+                {objects: [{ref: ref}],
+                 includeMetadata: 1,
+                 ignoreErrors: 1
+                 },
+                function (objList) {
+                     //this case should generally never happen, so we just
+                     //check one workspace at a time to keep the load light
+                     if (objList[0] == null) {
+                         return self._findRecentValidNarrative(
+                                 workspaces, index + 1,
+                                 _callback, _error_callback);
+                     } else {
+                         _callback({last_narrative:
+                                     {ws_info: workspaces[index],
+                                      nar_info: objList[0]
+                                     }
+                         });
+                     }
+                },
+                function (error) {
+                     _error_callback(error.error);
+                }
+        )
+    },
     
     
     this.discardTempNarrative = function(params, _callback, _error_callback) {
