@@ -89,10 +89,10 @@ $.KBWidget({
         //
         // 3) get meta data, add any metadata tables
         //
-        if (isNaN(input.ws) && isNaN(input.name) )
-            var param = {workspace: input.ws, name: input.name};
-        else if (!isNaN(input.ws) && !isNaN(input.name) )
-            var param = {ref: input.ws+'/'+input.name};
+        if (isNaN(input.ws) && isNaN(input.obj) )
+            var param = {workspace: input.ws, name: input.obj};
+        else if (!isNaN(input.ws) && !isNaN(input.obj) )
+            var param = {ref: input.ws+'/'+input.obj};
 
         self.kbapi('ws', 'get_object_info_new', {objects: [param], includeMetadata: 1})
           .done(function(res) {
@@ -117,10 +117,10 @@ $.KBWidget({
         // 4) get object data, create tabs
         //
 
-        if (isNaN(input.ws) && isNaN(input.name) )
-            var param = {workspace: input.ws, name: input.name};
-        else if (!isNaN(input.ws) && !isNaN(input.name) )
-            var param = {ref: input.ws+'/'+input.name};
+        if (isNaN(input.ws) && isNaN(input.obj) )
+            var param = {workspace: input.ws, name: input.obj};
+        else if (!isNaN(input.ws) && !isNaN(input.obj) )
+            var param = {ref: input.ws+'/'+input.obj};
 
         self.kbapi('ws', 'get_objects', [param])
           .done(function(data){
