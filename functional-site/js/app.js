@@ -690,7 +690,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     //$('#signin-button').kbaseLogin({login_callback: finish_login,
     //                                logout_callback: finish_logout});
     $('#signin-button').kbaseLogin();
-     $('#signin-button').css('padding', '0');  // Jim!
+    // $('#signin-button').css('padding', '0');  // Jim!
     $(document).on('loggedIn', function (e, session) {
       finish_login(session);
     });

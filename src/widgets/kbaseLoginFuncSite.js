@@ -341,46 +341,36 @@
           $('<div></div>')
           .addClass('btn-group')
           .attr('id', 'userdisplay')
-          .css('display', 'none')
+          //.css('display', 'none')
           .append(
             $('<div></div>')
             .addClass('dropdown')
             .append(
                 $('<button></button>')
                 .addClass('btn btn-default')
-                .addClass('btn-xs')
+                //.addClass('btn-xs')
                 .addClass('dropdown-toggle')
                 .attr('data-toggle', 'dropdown')
                 .attr('type', 'button')
                 //.append($('<span></span>').addClass('glyphicon glyphicon-user'))
                 .append('<img src="assets/images/nouserpic.png" style="width: 40px;" class="login-button-avatar"></img>')
                 .append($('<span></span>').addClass('caret'))
-                .bind('click',
-                  //$.proxy(
-
-                  function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    $(this).next().toggle(); //slideToggle('fast');
-                  }
-                  //, this)
-                )
+               
                 
               )
               .append(
             $('<ul></ul>')
             .addClass('dropdown-menu')
-            .addClass('pull-right')
+            //.addClass('pull-right')
             .attr('role', 'menu')
-            .css('padding', '3px')
+            //.css('padding', '3px')
             .attr('id', 'login-dropdown-menu')
             .append(
               $('<li></li>')
-              .css('border-bottom', '1px solid lightgray')
               .css('white-space', 'nowrap')
               .append(
                 $.jqElem('div') //so as to style the link in blue.
-                .css('text-align', 'right')
+                //.css('text-align', 'right')
                 .append(
                   $('<a></a>')
                   .attr('id', 'loggedinuser_id')
@@ -388,20 +378,21 @@
                   .attr('href', '/functional-site/#/people/')
                   //.attr('href', 'https://gologin.kbase.us/account/UpdateProfile')
                   .attr('target', '_blank')
-                  .css('padding-right', '0px')
-                  .css('padding-left', '0px')
+                  //.css('padding-right', '0px')
+                  //.css('padding-left', '0px')
                 )
               )
             )
+            .append($('<li class="divider"></div>'))
             .append(
               $('<li></li>')
-              .addClass('pull-right')
+              //.addClass('pull-right')
               .append(
                 $('<span></span>')
                 .append(
                   $('<a></a>')
-                  .css('padding-right', '0px')
-                  .css('padding-left', '0px')
+                  //.css('padding-right', '0px')
+                  //.css('padding-left', '0px')
                   .append('Sign out')
                 )
                 .bind('click',
