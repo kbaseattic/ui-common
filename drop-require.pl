@@ -16,7 +16,7 @@ foreach my $file (@ARGV) {
     if ($widget =~ /kb_define/) {
 
         $widget =~ s/kb_define.+?function\s*\(\s*\$?\s*\)\s*{/(function( \$, undefined ) {/s;
-        $widget =~ s/}\s*\)\s*;\s*$/}( jQuery ) );/m;
+        $widget =~ s/}\s*\)\s*;\s*$/}( jQuery ) );/;
 
         open my $fh, '>', $file;
         print $fh $widget;
