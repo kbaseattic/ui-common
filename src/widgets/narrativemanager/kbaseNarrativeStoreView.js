@@ -1,5 +1,5 @@
-(function( $, undefined ) { 
-    $.KBWidget({ 
+(function( $, undefined ) {
+    $.KBWidget({
         name: "KBaseNarrativeStoreView",
         parent: "kbaseAuthenticatedWidget",
 
@@ -12,25 +12,25 @@
 
         $mainPanel: null,
         $errorPanel: null,
-        
+
         narstore: null,
 
         init: function(options) {
             this._super(options);
 
-            
+
             this.$errorPanel = $('<div>').addClass('alert alert-danger').hide();
             this.$elem.append(this.$errorPanel);
 
             this.$mainPanel = $("<div>");
             this.$elem.append(this.$mainPanel);
-            
+
             this.$narMethodStoreInfo = $("<div>").css({margin:'10px', padding:'10px'});
             this.$elem.append(this.$narMethodStoreInfo);
-            
+
             this.narstore = new NarrativeMethodStore(this.options.narrativeStoreUrl+"/rpc");
             this.getNarMethodStoreInfo();
-        
+
             if (options.type==='app') {
                 this.fetchAppInfoAndRender();
             } else if (options.type==='method') {
@@ -38,12 +38,15 @@
             } else {
                 this.showError({error:{message:'Must specify either "app" or "method" in url, as in narrativestore/app/app_id.'}});
             }
-        
+
             return this;
         },
 
         getNarMethodStoreInfo: function() {
             var self = this;
+
+            return;
+
             this.narstore.status(
                     function(status) {
                         var url = status.git_spec_url+"/tree/"+status.git_spec_branch;
@@ -53,8 +56,8 @@
                         if (self.options.type==='method') {
                             url+="/methods/"+self.options.id;
                         }
-                        
-                        
+
+
                         self.$narMethodStoreInfo.append(
                             $('<table>').css({border:'1px solid #bbb', margin:'10px', padding:'10px'})
                                 .append($('<tr>')
@@ -78,8 +81,8 @@
                         this.showError(err);
                     });
         },
-        
-        
+
+
         appFullInfo: null,
         appSpec: null,
         appMethodSpecs: null,
@@ -118,8 +121,8 @@
 			console.error(err);
 		    });
 	},
-        
-        
+
+
         methodFullInfo: null,
         methodSpec: null,
         fetchMethodInfoAndRender: function() {
@@ -148,33 +151,59 @@
                         }
 		    });
 	},
-        
+
         renderApp: function() {
 	    var self = this;
 	    var m = self.appFullInfo;
 	    var spec = self.appSpec;
             var methodSpecs = self.appMethodSpecs;
-	    console.log(m);
-	    console.log(spec);
-            console.log(methodSpecs);
-	    
+
+        var $header =
+            $.jqElem('div')
+                .addClass('row')
+                .css('width', '95%')
+        ;
+
+        var $basicInfo =
+            $.jqElem('div')
+                .addClass('col-md-8')
+        ;
+
 	    var $header = $('<div>').addClass("row").css("width","95%");
 	    var $basicInfo = $('<div>').addClass("col-md-8");
-	    
-	    $basicInfo.append('<div><h2>App - '+m['name']+'</h2>');
-	    if (m['subtitle']) {
-		$basicInfo.append('<div><h4>'+m['subtitle']+'</h4></div>');
+
+	    $basicInfo
+	        .append(
+	            $.jqElem('div')
+	                .append($.jqElem('h2').append('App - ' + m.name))
+	        )
+	    ;
+
+	    if (m.subtitle) {
+	        $basicInfo
+	            .append(
+	                $.jqElem('div')
+	                    .append($.jqElem('h4').append(m.subtitle))
+	            )
+	    };
+
+
+	    //if (m['ver']) {
+		//$basicInfo.append('<div><strong>Version: </strong>&nbsp&nbsp'+m['ver']+"</div>");
+	    //}
+
+	    if (m.contact) {
+		    $basicInfo
+		        .append('<div>')
+		            .append('<strong>Help or Questions? Contact: </strong>&nbsp&nbsp')
+                    .append(
+                        $.jqElem('a')
+                        .attr('href', 'mailto:' + m.contact)
+                        .append(m.contact))
 	    }
-	    if (m['ver']) {
-		$basicInfo.append('<div><strong>Version: </strong>&nbsp&nbsp'+m['ver']+"</div>");
-	    }
-	    
-	    if (m['contact']) {
-		$basicInfo.append('<div><strong>Help or Questions? Contact: </strong>&nbsp&nbsp'+m['contact']+"</div>");
-	    }
-	    
-            
-            if (m['authors']) {
+
+
+        /*if (m['authors']) {
 		var $authors = $('<div>');
 		for(var k=0; k<m['authors'].length; k++) {
 		    if (k==0) {
@@ -184,149 +213,9 @@
 		    }
 		}
 		$basicInfo.append($authors);
-	    }
-            
-            
-	    var $topButtons = $('<div>').addClass("col-md-4").css("text-align","right")
-				    .append(
-				      '<div class="btn-group">' +
-					//'<button id="launchmethod" class="btn btn-default">Launch in New Narrative</button>' +
-				      '</div>'  
-				    );
-	    
-	    $topButtons.find("#launchmethod").click(function(e) {
-		    e.preventDefault(); //to prevent standard click event
-		    alert("This should create a new narrative populated with this Method.");
-		});
-	    
-	    $header.append($basicInfo);
-	    $header.append($topButtons);
-	    
-	    self.$mainPanel.append($header);
-	    
-	    
-	    var $descriptionPanels = $('<div>').addClass("row").css("width","95%");
-	    var $description = $('<div>').addClass("col-md-12");
-	    if (m['description']) {
-		$description.append('<div><hr>'+m['description']+"</div>");
-	    }
-	    $descriptionPanels.append($description);
-	    self.$mainPanel.append($descriptionPanels);
-            
-            
-            var $headerPanels = $('<div>').addClass("row").css("width","95%");
-	    var $header = $('<div>').addClass("col-md-12");
-	    if (m['header']) {
-		$header.append("<hr><h4>In-App Instructions</h4>");
-		$header.append('<div>'+m['header']+"</div>");
-	    }
-	    $headerPanels.append($header);
-	    self.$mainPanel.append($headerPanels);
-            
-            
-            var $stepsContainer = $('<div>').css("width","95%");
-	    if (spec.steps) {
-		$stepsContainer.append("<hr><h4>App Steps</h4>");
-                for(var k=0; k<spec.steps.length; k++) {
-                    var method_spec = methodSpecs[spec.steps[k].method_id];
-                    var $step = $('<div>').addClass("col-md-12");
-                    $step.append('<strong>Step '+(k+1)+' - <a href="#/narrativestore/method/'+method_spec.id+'">'+method_spec.name + '</a></strong><br>');
-                    $step.append($('<div>').css({margin:'5px', 'margin-bottom':'10px'}).append(method_spec.subtitle));
-                    $stepsContainer.append($('<div>').addClass('row').append($step));
-                }
-	    }
-	    self.$mainPanel.append($stepsContainer);
-            
-            
-            
-	    if (m['screenshots']) {
-		var imgHtml = '';
-		for(var s=0; s<m['screenshots'].length; s++) {
-		    imgHtml += '<td style="padding:10px;"><div style="border: 1px solid #ccc;">'+
-			'<img src="'+self.options.narrativeStoreUrl + m['screenshots'][s]['url']  +'" width="100%">' +
-			'</div></td>';
-		}
-		var $ssPanel = $("<div>").append(
-		    '<br><br><div style="width:95%;overflow:auto;">'+
-			'<table style="border:0px;"><tr>'+
-			imgHtml +
-			'</tr></table>'+
-		    '</div>'
-		);
-	       
-		self.$mainPanel.append($ssPanel);
-	    }
-            
-            
-            if (m['publications']) {
-		var $publications = $('<div>').addClass("col-md-12");
-		for(var k=0; k<m['publications'].length; k++) {
-		    if (k==0) {
-			$publications.append('<strong>Related Publications: </strong><br><br>');
-		    }
-                    $publications.append('&nbsp;&nbsp;&nbsp;&nbsp;'+m['publications'][k].display_text + ' <a href="'+m['publications'][k].link+'" target="_blank">'+m['publications'][k].link+'</a><br><br>');
-                    
-		}
-		self.$mainPanel.append($('<div>').addClass("row").css({"width":"95%","margin-top":"15px"}).append($publications));
-	    }
-            
-            
-	    if (m['technical_description']) {
-		var $techDetailsDiv = $('<div>')
-					.append("<hr><h4>Technical Details</h4>")
-					.append(m['technical_description']+"<br>");
-		self.$mainPanel.append($techDetailsDiv);
-	    }
-            
-            
-            var $entireInfo = $('<div>')
-					.append("<hr><h4>Full App Info</h4>")
-					.append($("<pre>").append(JSON.stringify(m, null, '\t')));
-	    self.$mainPanel.append($entireInfo);
-            
-            var $entireSpec = $('<div>')
-					.append("<hr><h4>Full App Specification</h4>")
-					.append($("<pre>").append(JSON.stringify(spec, null, '\t')));
-	    self.$mainPanel.append($entireSpec);
-	},
-        
-        
-        renderMethod: function() {
-	    var self = this;
-	    var m = self.methodFullInfo;
-	    var spec = self.methodSpec;
-	    console.log(m);
-	    console.log(spec);
-	    
-	    var $header = $('<div>').addClass("row").css("width","95%");
-	    var $basicInfo = $('<div>').addClass("col-md-8");
-	    
-	    $basicInfo.append('<div><h2>Method - '+m['name']+'</h2>');
-	    if (m['subtitle']) {
-		$basicInfo.append('<div><h4>'+m['subtitle']+'</h4></div>');
-	    }
-	    if (m['ver']) {
-		$basicInfo.append('<div><strong>Version: </strong>&nbsp&nbsp'+m['ver']+"</div>");
-	    }
-	    
-	    if (m['contact']) {
-		$basicInfo.append('<div><strong>Help or Questions? Contact: </strong>&nbsp&nbsp'+m['contact']+"</div>");
-	    }
-	    
-            
-            if (m['authors']) {
-		var $authors = $('<div>');
-		for(var k=0; k<m['authors'].length; k++) {
-		    if (k==0) {
-			$authors.append('<strong>Authors: </strong>&nbsp&nbsp<a href="#/people/'+m['authors'][k]+'" target="_blank">'+m['authors'][k]+"</a>");
-		    } else {
-			$authors.append(', <a href="#/people/'+m['authors'][k]+'" target="_blank'>+m['authors'][k]+"</a>");
-		    }
-		}
-		$basicInfo.append($authors);
-	    }
-            
-            if (m['kb_contributers']) {
+	    }*/
+
+        /*if (m['kb_contributers']) {
 		var $authors = $('<div>');
 		for(var k=0; k<m['kb_contributers'].length; k++) {
 		    if (k==0) {
@@ -336,113 +225,404 @@
 		    }
 		}
 		$basicInfo.append($authors);
-	    }
-            
-            
-            
-            
-	    var $topButtons = $('<div>').addClass("col-md-4").css("text-align","right")
-				    .append(
-				      '<div class="btn-group">' +
-					//'<button id="launchmethod" class="btn btn-default">Launch in New Narrative</button>' +
-				      '</div>'  
-				    );
-	    
-	    $topButtons.find("#launchmethod").click(function(e) {
-		    e.preventDefault(); //to prevent standard click event
-		    alert("This should create a new narrative populated with this Method.");
-		});
-	    
+	    }*/
+
+
+        var $topButtons =
+            $.jqElem('div')
+                .addClass('col-md-4')
+                .css('text-align', 'right')
+                .append(
+                    $.jqElem('div')
+                        .addClass('btn-group')
+                        /*.append(
+                            $.jqElem('button')
+                                .addClass('btn btn-default')
+                                .append('Launch in New Narrative')
+                                .on('click', function (e) {
+                                    e.preventDefault(); e.stopPropagation();
+                                    alert('Add it to narrative, somehow!');
+                                })
+                        )*/
+                )
+        ;
+
+
 	    $header.append($basicInfo);
 	    $header.append($topButtons);
-	    
+
 	    self.$mainPanel.append($header);
-	    
-	    
-	    var $descriptionPanels = $('<div>').addClass("row").css("width","95%");
-	    var $description = $('<div>').addClass("col-md-12");
-	    if (m['description']) {
-		$description.append('<div><hr>'+m['description']+"</div>");
+	    //self.$mainPanel.append('<hr>');
+
+
+        if (m.screenshots && m.screenshots.length) {
+            var $ssPanel = $.jqElem('div');
+            $.each(
+                m.screenshots,
+                function (idx, s) {
+                    $ssPanel
+                        .append(
+                            $.jqElem('a')
+                                .attr('href', self.options.narrativeStoreUrl + s.url)
+                                .attr('target', '_blank')
+                                .append(
+                                    $.jqElem('img')
+                                        .attr('src', self.options.narrativeStoreUrl + s.url)
+                                        .attr('width', '300')
+                                )
+                        )
+                }
+            );
+
+            self.$mainPanel.append($ssPanel);
+        }
+
+
+        if (m.description) {
+            self.$mainPanel
+                .append(
+                    $.jqElem('div')
+                            .addClass('row')
+                            .css('width', '95%')
+                            .append(
+                                $.jqElem('div')
+                                    .addClass('col-md-12')
+                                        .append(
+                                            $.jqElem('div')
+                                                .append($.jqElem('hr'))
+                                                .append(m.description)
+                                        )
+                            )
+                )
+                .append($.jqElem('hr'))
+        }
+
+        if (spec.steps && spec.steps.length) {
+            var $stepsContainer =
+                $.jqElem('div')
+                    .css('width', '95%')
+                    .append($.jqElem('h4').append('App Steps'))
+            ;
+
+            var $stepList = $.jqElem('ul')
+                .css('list-style-type', 'none')
+                .css('padding-left', '0px')
+            ;
+            $stepsContainer.append($stepList);
+
+            $.each(
+                spec.steps,
+                function (idx, step) {
+                    var $li = $.jqElem('li');//.append('Parameter ' + (idx + 1)));
+
+                    var method_spec = methodSpecs[step.method_id];
+
+                    $li.append(
+                        $.jqElem('ul')
+                            .css('list-style-type', 'none')
+                                .append(
+                                    $.jqElem('li')
+                                        .append($.jqElem('b').append('Step ' + (idx + 1) + '. '))
+                                        .append(
+                                            $.jqElem('a')
+                                                .attr('href', "#/narrativestore/method/" + method_spec.id )
+                                                .attr('target', '_blank')
+                                                .append(method_spec.name)
+                                        )
+                                        .append(
+                                            $.jqElem('ul')
+                                                .css('list-style-type', 'none')
+                                                .append($.jqElem('li').append(method_spec.subtitle))
+                                        )
+                                )
+                    );
+
+                    $stepList.append($li);
+
+                }
+            );
+
+            self.$mainPanel.append($stepsContainer.append($stepList));
+        }
+
+        /*var $stepsContainer = $('<div>').css("width","95%");
+	    if (spec.steps) {
+		$stepsContainer.append("<h4>App Steps</h4>");
+                for(var k=0; k<spec.steps.length; k++) {
+                    var method_spec = methodSpecs[spec.steps[k].method_id];
+                    var $step = $('<div>').addClass("col-md-12");
+                    $step.append('<strong>Step '+(k+1)+' - <a href="#/narrativestore/method/'+method_spec.id+'">'+method_spec.name + '</a></strong><br>');
+                    $step.append($('<div>').css({margin:'5px', 'margin-bottom':'10px'}).append(method_spec.subtitle));
+                    $stepsContainer.append($('<div>').addClass('row').append($step));
+                }
 	    }
-	    $descriptionPanels.append($description);
-	    self.$mainPanel.append($descriptionPanels);
-            
-	    if (m['screenshots']) {
-		var imgHtml = '';
-		for(var s=0; s<m['screenshots'].length; s++) {
-		    imgHtml += '<td style="padding:10px;"><div style="border: 1px solid #ccc;">'+
-			'<img src="'+self.options.narrativeStoreUrl + m['screenshots'][s]['url']  +'" width="100%">' +
-			'</div></td>';
-		}
-		var $ssPanel = $("<div>").append(
-		    '<br><br><div style="width:95%;overflow:auto;">'+
-			'<table style="border:0px;"><tr>'+
-			imgHtml +
-			'</tr></table>'+
-		    '</div>'
-		);
-	       
-		self.$mainPanel.append($ssPanel);
+	    self.$mainPanel.append($stepsContainer);
+
+	    }*/
+
+
+	},
+
+
+        renderMethod: function() {
+	    var self = this;
+	    var m = self.methodFullInfo;
+	    var spec = self.methodSpec;
+
+        var $header =
+            $.jqElem('div')
+                .addClass('row')
+                .css('width', '95%')
+        ;
+
+        var $basicInfo =
+            $.jqElem('div')
+                .addClass('col-md-8')
+        ;
+
+	    var $header = $('<div>').addClass("row").css("width","95%");
+	    var $basicInfo = $('<div>').addClass("col-md-8");
+
+	    $basicInfo
+	        .append(
+	            $.jqElem('div')
+	                .append($.jqElem('h2').append('Method - ' + m.name))
+	        )
+	    ;
+
+	    if (m.subtitle) {
+	        $basicInfo
+	            .append(
+	                $.jqElem('div')
+	                    .append($.jqElem('h4').append(m.subtitle))
+	            )
+	    };
+
+
+	    //if (m['ver']) {
+		//$basicInfo.append('<div><strong>Version: </strong>&nbsp&nbsp'+m['ver']+"</div>");
+	    //}
+
+	    if (m.contact) {
+		    $basicInfo
+		        .append('<div>')
+		            .append('<strong>Help or Questions? Contact: </strong>&nbsp&nbsp')
+                    .append(
+                        $.jqElem('a')
+                        .attr('href', 'mailto:' + m.contact)
+                        .append(m.contact))
 	    }
-            
-            
-            if (m['publications']) {
-		var $publications = $('<div>').addClass("col-md-12");
-		for(var k=0; k<m['publications'].length; k++) {
+
+
+        /*if (m['authors']) {
+		var $authors = $('<div>');
+		for(var k=0; k<m['authors'].length; k++) {
 		    if (k==0) {
-			$publications.append('<strong>Related Publications: </strong><br><br>');
+			$authors.append('<strong>Authors: </strong>&nbsp&nbsp<a href="#/people/'+m['authors'][k]+'" target="_blank">'+m['authors'][k]+"</a>");
+		    } else {
+			$authors.append(', <a href="#/people/'+m['authors'][k]+'" target="_blank'>+m['authors'][k]+"</a>");
 		    }
-                    $publications.append('&nbsp;&nbsp;&nbsp;&nbsp;'+m['publications'][k].display_text + ' <a href="'+m['publications'][k].link+'" target="_blank">'+m['publications'][k].link+'</a><br><br>');
-                    
 		}
-		self.$mainPanel.append($('<div>').addClass("row").css({"width":"95%","margin-top":"15px"}).append($publications));
-	    }
-            
-            if (spec['parameters']) {
-		var $parameters = $('<div>')
-					.append("<hr><h4>Parameters</h4>");
-                for(var k=0; k<spec.parameters.length; k++) {
-                    var moreInfo = "<b>Required?</b> "; if (spec.parameters[k].optional) { moreInfo += 'no'; } else { moreInfo += 'yes'; }
-                    moreInfo += ", <b>Advanced?</b> "; if (spec.parameters[k].advanced) { moreInfo += 'yes'; } else { moreInfo += 'no'; }
-                    if (spec.parameters[k].text_options) {
-                        if (spec.parameters[k].text_options.valid_ws_types) {
-                            if (spec.parameters[k].text_options.valid_ws_types.length>0) {
-                                if (spec.parameters[k].text_options.is_output_name) {
-                                    moreInfo += ", Is an Output Data Name ";
-                                } else {
-                                    moreInfo += ", Is an Input Data Object ";
-                                }
-                                moreInfo += JSON.stringify(spec.parameters[k].text_options.valid_ws_types);
-                            }
-                        }
-                    }
-                    $parameters.append('<b>['+(k+1)+']: '+spec.parameters[k].ui_name+'</b> - '+spec.parameters[k].short_hint+"<br>");
-                    $parameters.append(moreInfo+"<br>");
-                    $parameters.append(' <u>Full Description</u>: '+spec.parameters[k].description+'<br><br>');
+		$basicInfo.append($authors);
+	    }*/
+
+        /*if (m['kb_contributers']) {
+		var $authors = $('<div>');
+		for(var k=0; k<m['kb_contributers'].length; k++) {
+		    if (k==0) {
+			$authors.append('<strong>KBase Contributers: </strong>&nbsp&nbsp<a href="#/people/'+m['kb_contributers'][k]+'" target="_blank">'+m['kb_contributers'][k]+"</a>");
+		    } else {
+			$authors.append(', <a href="#/people/'+m['kb_contributers'][k]+'" target="_blank'>+m['kb_contributers'][k]+"</a>");
+		    }
 		}
-		self.$mainPanel.append($parameters);
-	    }
-            
-	    if (m['technical_description']) {
+		$basicInfo.append($authors);
+	    }*/
+
+
+        var $topButtons =
+            $.jqElem('div')
+                .addClass('col-md-4')
+                .css('text-align', 'right')
+                .append(
+                    $.jqElem('div')
+                        .addClass('btn-group')
+                        /*.append(
+                            $.jqElem('button')
+                                .addClass('btn btn-default')
+                                .append('Launch in New Narrative')
+                                .on('click', function (e) {
+                                    e.preventDefault(); e.stopPropagation();
+                                    alert('Add it to narrative, somehow!');
+                                })
+                        )*/
+                )
+        ;
+
+
+	    $header.append($basicInfo);
+	    $header.append($topButtons);
+
+	    self.$mainPanel.append($header);
+	    //self.$mainPanel.append('<hr>');
+
+        if (m.screenshots && m.screenshots.length) {
+            var $ssPanel = $.jqElem('div');
+            $.each(
+                m.screenshots,
+                function (idx, s) {
+
+                    $ssPanel
+                        .append(
+                            $.jqElem('a')
+                                .attr('href', self.options.narrativeStoreUrl + s.url)
+                                .attr('target', '_blank')
+                                .append(
+                                    $.jqElem('img')
+                                        .attr('src', self.options.narrativeStoreUrl + s.url)
+                                        .attr('width', '300')
+                                )
+                        )
+                }
+            );
+
+            self.$mainPanel.append($ssPanel);
+        }
+
+        if (m.description) {
+            self.$mainPanel
+                .append(
+                    $.jqElem('div')
+                            .addClass('row')
+                            .css('width', '95%')
+                            .append(
+                                $.jqElem('div')
+                                    .addClass('col-md-12')
+                                        .append(
+                                            $.jqElem('div')
+                                                .append($.jqElem('hr'))
+                                                .append(m.description)
+                                        )
+                            )
+                )
+                .append($.jqElem('hr'))
+        }
+
+
+        if (spec.parameters && spec.parameters.length) {
+
+            var $parametersDiv =
+                $.jqElem('div')
+                    .append($.jqElem('h4').append('Parameters'))
+            ;
+
+            var $paramList = $.jqElem('ul')
+                .css('list-style-type', 'none')
+                .css('padding-left', '0px')
+            ;
+            $parametersDiv.append($paramList);
+
+            $.each(
+                spec.parameters,
+                function (idx, param) {
+                    var $li = $.jqElem('li');//.append('Parameter ' + (idx + 1)));
+                    $li.append(
+                        $.jqElem('ul')
+                            .css('list-style-type', 'none')
+                                .append(
+                                    $.jqElem('li')
+                                        .append(
+                                            $.jqElem('b').append(param.ui_name)
+                                        )
+                                        .append(
+                                            $.jqElem('ul')
+                                                .css('list-style-type', 'none')
+                                                .append($.jqElem('li').append(param.short_hint))
+                                                .append($.jqElem('li').append(param.long_hint))
+                                        )
+                                )
+                    );
+
+                    $paramList.append($li);
+
+
+                }
+            );
+
+            self.$mainPanel.append($parametersDiv.append('<hr>'));
+
+
+        }
+
+        if (m.publications && m.publications.length) {
+            var $pubsDiv =
+                $.jqElem('div')
+                    .append($.jqElem('strong').append('Related publications'))
+            var $publications =
+                $.jqElem('ul')
+                    //.css('list-style-type', 'none')
+                    //.css('padding-left', '0px')
+            ;
+            $.each(
+                m.publications,
+                function (idx, pub) {
+                    $publications.append(
+                        $.jqElem('li')
+                            .append(pub.display_text)
+                            .append(
+                                $.jqElem('a')
+                                    .attr('href', pub.link)
+                                    .attr('target', '_blank')
+                                    .append(pub.link)
+                            )
+                    );
+                }
+            );
+
+            self.$mainPanel.append($pubsDiv.append($publications));
+        }
+
+        if (m.kb_contributors.length) {
+            var $contributorsDiv =
+                $.jqElem('div')
+                    .append($.jqElem('strong').append('Team members'))
+            var $contributors =
+                $.jqElem('ul')
+                    //.css('list-style-type', 'none')
+                    //.css('padding-left', '0px')
+            ;
+            $.each(
+                m.publications,
+                function (idx, name) {
+                    $publications.append(
+                        $.jqElem('li')
+                            .append(name)
+                    );
+                }
+            );
+
+            self.$mainPanel.append($pubsDiv.append($publications));
+        }
+
+	    /*if (m['technical_description']) {
 		var $techDetailsDiv = $('<div>')
 					.append("<hr><h4>Technical Details</h4>")
 					.append(m['technical_description']+"<br>");
 		self.$mainPanel.append($techDetailsDiv);
 	    }
-            
-            
+
+
             var $entireInfo = $('<div>')
 					.append("<hr><h4>Full Method Info</h4>")
 					.append($("<pre>").append(JSON.stringify(m, null, '\t')));
 	    self.$mainPanel.append($entireInfo);
-            
+
             var $entireSpec = $('<div>')
 					.append("<hr><h4>Full Method Specification</h4>")
 					.append($("<pre>").append(JSON.stringify(spec, null, '\t')));
-	    self.$mainPanel.append($entireSpec);
+	    self.$mainPanel.append($entireSpec);*/
 	},
-        
-        
+
+
         loggedInCallback: function(event, auth) {
             return this;
         },
