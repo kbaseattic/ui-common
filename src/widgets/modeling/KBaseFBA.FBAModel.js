@@ -227,33 +227,40 @@ function KBaseFBA_FBAModel(modeltabs) {
                     .getBiochemReaction(id)
                     .then(function(rxn){
                         return [{
-                                   "label": "ID",
-                                    "data": rxn.id
+                                    label: "ID",
+                                    data: rxn.id
                                 },{
-                                    "label": "Name",
-                                    "data": rxn.name
+                                    label: "Name",
+                                    data: rxn.name
                                 },{
-                                    "label": "Equation",
-                                    "data": rxn.equation,
-                                    "type": "pictureEquation"
+                                    label: "Equation",
+                                    data: rxn.equation,
+                                    type: "pictureEquation"
                                 },/*{
-                                    "label": "GPR",
-                                    "data": rxn.gpr,
+                                    label: "GPR",
+                                    data: rxn.gpr,
                             }*/];
                      })
         return p;
     }
 
     this.GeneTab = function (id) {
-        var gene = this.genehash[id];
-        return [{
-                "label": "ID",
-                "data": gene.id
-            },{
-                "label": "Reactions",
-                "data": rxn.reactions,
-                "type": "tabLinkArray"
-        }];
+        // var gene = this.genehash[id];
+        // doing this instead of creating hash
+        var data;
+        self.modelgenes.forEach(function(gene) {
+            if (gene.id == id)
+                data = [{
+                            label: "ID",
+                            data: gene.id
+                        },{
+                            label: "Reactions",
+                            data: gene.reactions,
+                            type: "tabLinkArray",
+                            method: "ReactionTab"
+                        }];
+        })
+        return data;
     }
 
     this.CompoundTab = function (id) {
@@ -306,6 +313,7 @@ function KBaseFBA_FBAModel(modeltabs) {
         this.modelgenes = [];
         this.modelcompartments = this.data.modelcompartments;
         this.biomasses = this.data.biomasses;
+        this.biomasscpds = [];
         this.gapfillings = this.data.gapfillings;
         this.cpdhash = {};
         this.rxnhash = {};
@@ -327,6 +335,20 @@ function KBaseFBA_FBAModel(modeltabs) {
             if (cpd.cpdkbid != "cpd00000") {
                 this.cpdhash[cpd.cpdkbid+"_"+cpd.cmpkbid] = cpd;
             }
+        }
+        for (var i=0; i < this.biomasses.length; i++) {
+        	var biomass = this.biomasses[i];
+        	biomass.dispid = biomass.id;
+        	for(var j=0; j < biomass.biomasscompounds.length; j++) {
+        		var biocpd = biomass.biomasscompounds[j];
+        		biocpd.id = biocpd.modelcompound_ref.split("/").pop();
+        		biocpd.name = this.cpdhash[biocpd.id].name+"<br>("+biocpd.id+")";
+        		biocpd.formula = this.cpdhash[biocpd.id].formula;
+        		biocpd.charge = this.cpdhash[biocpd.id].charge;
+        		biocpd.cmpkbid = this.cpdhash[biocpd.id].cmpkbid;
+        		biocpd.biomass = biomass.id;
+        		this.biomasscpds.push(biocpd);
+        	}
         }
         for (var i=0; i< this.modelreactions.length; i++) {
             var rxn = this.modelreactions[i];

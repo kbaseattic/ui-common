@@ -2,6 +2,7 @@
 
 $.KBWidget({
     name: "kbaseTabTable",
+    parent: "kbaseAuthenticatedWidget",
     version: "1.0.0",
     options: {
     },
@@ -19,10 +20,9 @@ $.KBWidget({
         this._super(input);
         var self = this;
 
-        var imageURL = "http://bioseed.mcs.anl.gov/~chenry/jpeg/";
-
         var type = input.type;
 
+        // tab widget
         var tabs;
 
         // 0) No more clients.  Make this global.  please.
@@ -49,8 +49,8 @@ $.KBWidget({
                 processData: false,
                 data: JSON.stringify(rpc),
                 beforeSend: function (xhr) {
-                    if ('token' in input && input.token)
-                        xhr.setRequestHeader("Authorization", input.token);
+                    if (self.authToken())
+                        xhr.setRequestHeader("Authorization", self.authToken());
                 }
             }).then(function(data) {
                 return data.result[0];
@@ -89,7 +89,12 @@ $.KBWidget({
         //
         // 3) get meta data, add any metadata tables
         //
-        self.kbapi('ws', 'get_object_info_new', {objects: [{workspace: input.ws, name: input.name}], includeMetadata: 1})
+        if (isNaN(input.ws) && isNaN(input.name) )
+            var param = {workspace: input.ws, name: input.name};
+        else if (!isNaN(input.ws) && !isNaN(input.name) )
+            var param = {ref: input.ws+'/'+input.name};
+
+        self.kbapi('ws', 'get_object_info_new', {objects: [param], includeMetadata: 1})
           .done(function(res) {
               obj.setMetadata(res[0]);
 
@@ -111,7 +116,13 @@ $.KBWidget({
         //
         // 4) get object data, create tabs
         //
-        self.kbapi('ws', 'get_objects', [{workspace: input.ws, name: input.name}])
+
+        if (isNaN(input.ws) && isNaN(input.name) )
+            var param = {workspace: input.ws, name: input.name};
+        else if (!isNaN(input.ws) && !isNaN(input.name) )
+            var param = {ref: input.ws+'/'+input.name};
+
+        self.kbapi('ws', 'get_objects', [param])
           .done(function(data){
               var setMethod = obj.setData(data[0].data);
 
@@ -123,9 +134,6 @@ $.KBWidget({
               } else {
                   buildContent();
               }
-
-
-
         })
 
         function buildContent() {
@@ -142,7 +150,6 @@ $.KBWidget({
                     var keys = tabSpec.keys.split(/\,\s+/g);
                     var params = {};
                     tabSpec.arguments.split(/\,\s+/g).forEach(function(arg, i) {
-                        console.log('keys', keys)
                         params[arg] = obj[keys[i]];
                     })
 
@@ -158,7 +165,7 @@ $.KBWidget({
                 tabPane.find('table').dataTable(settings)
 
                 // add any events
-                newTabEvents(tabSpec);
+                newTabEvents(tabSpec.name);
             }
         }
 
@@ -177,7 +184,7 @@ $.KBWidget({
                 var col = tab.columns[i];
 
                 settings.fnDrawCallback = function() {
-                    newTabEvents(tab)
+                    newTabEvents(tab.name)
                 }
             }
 
@@ -185,21 +192,21 @@ $.KBWidget({
         }
 
 
-        function newTabEvents(tab) {
-            var ids = tabs.tabContent(tab.name).find('.id-click');
+        function newTabEvents(name) {
+            var ids = tabs.tabContent(name).find('.id-click');
 
             ids.unbind('click');
             ids.click(function() {
-                console.log('clicked')
                 var id = $(this).data('id'),
                     method = $(this).data('method');
 
-                var content = $('<div>');
+                var content = $('<div>').loading();
 
                 if (method) {
                     var prom = obj[method](id);
 
                     $.when(prom).done(function(rows) {
+                        content.rmLoading();
                         var table = self.verticalTable({rows: rows});
                         content.append(table);
                     })
@@ -207,6 +214,7 @@ $.KBWidget({
 
                 tabs.addTab({name: id, content: content, removable: true});
                 tabs.showTab(id);
+                newTabEvents(id);
             });
         }
 
@@ -233,39 +241,42 @@ $.KBWidget({
                 settings.push(config)
             }
 
-            function ref(key, type, format, method) {
-                return function(d) {
-                            if (type == 'tabLink' && format == 'dispid') {
-                                var id = d[key].split('_')[0];
-                                var compart = d[key].split('_')[1];
-
-                                return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
-                                            id+'</a> ('+compart+')';
-                            }
-
-                            var value = d[key];
-
-                            if ($.isArray(value)) {
-                                if (type == 'tabLinkArray') {
-                                    var links = [];
-                                    value.forEach(function(id) {
-                                        links.push('<a class="id-click" data-id="'+id+
-                                                    '" data-method="'+method+'">'+
-                                                    id+'</a>');
-                                    })
-                                    return links.join(', ');
-                                }
-
-                                return d[key].join(', ');
-                            }
-
-                            return value;
-                        }
-            }
 
             return settings
         }
 
+
+        function ref(key, type, format, method) {
+            return function(d) {
+                        if (type == 'tabLink' && format == 'dispid') {
+                            var id = d[key].split('_')[0];
+                            var compart = d[key].split('_')[1];
+
+                            return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
+                                        id+'</a> ('+compart+')';
+                        }
+
+                        var value = d[key];
+
+                        if ($.isArray(value)) {
+                            if (type == 'tabLinkArray')
+                                return tabLinkArray(value, method)
+                            return d[key].join(', ');
+                        }
+
+                        return value;
+                    }
+        }
+
+        function tabLinkArray(a, method) {
+            var links = [];
+            a.forEach(function(id) {
+                links.push('<a class="id-click" data-id="'+id+
+                            '" data-method="'+method+'">'+
+                            id+'</a>');
+            })
+            return links.join(', ');
+        }
 
         this.verticalTable = function(p) {
             var data = p.data;
@@ -275,7 +286,9 @@ $.KBWidget({
 
 
             for (var i=0; i<rows.length; i++) {
-                var row = rows[i];
+                var row = rows[i],
+                    type = row.type;
+
 
                 // don't display undefined things in vertical table
                 if ('data' in row && typeof row.data == 'undefined' ||
@@ -286,9 +299,14 @@ $.KBWidget({
                 r.append('<td><b>'+row.label+'</b></td>')
 
                 // if the data is in the row definition, use it
-                if ('data' in row)
-                    r.append('<td>'+row.data+'</td>');
-                else if ('key' in row) {
+                if ('data' in row) {
+                    var value;
+                    if (type == 'tabLinkArray')
+                        value = tabLinkArray(row.data, row.method);
+                    else
+                        value = row.data;
+                    r.append('<td>'+value+'</td>');
+                } else if ('key' in row) {
                     if (row.type == 'wstype') {
                         var ref = data[row.key];
                         var cell = $('<td data-ref="'+ref+'">loading...</td>');
@@ -333,6 +351,7 @@ $.KBWidget({
             return 'http://bioseed.mcs.anl.gov/~chenry/jpeg/'+id+'.jpeg';
         }
 
+        var imageURL = "http://bioseed.mcs.anl.gov/~chenry/jpeg/";
         this.pictureEquation = function(eq) {
             var cpds = get_cpds(eq);
 
@@ -408,16 +427,26 @@ $.KBWidget({
                         })
         }
 
-
-        $.fn.loading = function(text) {
+        //mmmm... let's define this twice.  Why not.
+        $.fn.loading = function(text, big) {
             $(this).rmLoading()
 
-            if (typeof text != 'undefined')
-                $(this).append('<p class="text-muted loader">'+
-                     '<img src="assets/img/ajax-loader.gif"> '+text+'</p>');
-            else
-                $(this).append('<p class="text-muted loader">'+
-                     '<img src="assets/img/ajax-loader.gif"> loading...</p>')
+            if (big) {
+                if (typeof text != 'undefined') {
+                    $(this).append('<p class="text-center text-muted loader"><br>'+
+                         '<img src="assets/img/ajax-loader-big.gif"> '+text+'</p>');
+                } else {
+                    $(this).append('<p class="text-center text-muted loader"><br>'+
+                         '<img src="assets/img/ajax-loader-big.gif"> loading...</p>')
+                }
+            } else {
+                if (typeof text != 'undefined')
+                    $(this).append('<p class="text-muted loader">'+
+                         '<img src="assets/img/ajax-loader.gif"> '+text+'</p>');
+                else
+                    $(this).append('<p class="text-muted loader">'+
+                         '<img src="assets/img/ajax-loader.gif"> loading...</p>')
+            }
 
             return this;
         }
