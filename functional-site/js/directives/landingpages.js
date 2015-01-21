@@ -15,7 +15,7 @@ angular.module('lp-directives')
         link: function(scope, elem, attr) {
             var params = {type: attr.kbTables,
                           ws: attr.kbTablesWs,
-                          name: attr.kbTablesName,
+                          obj: attr.kbTablesName,
                           token: $rootScope.USER_TOKEN};
 
             $(elem).kbaseTabTable(params);

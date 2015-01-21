@@ -205,17 +205,17 @@ function KBaseFBA_FBAModel(modeltabs) {
             "label": "Media",
             "key": "media_ref",
             "type": "wslink"
-        }, {
+        }, /*{
             "label": "FBA",
             "key": "fba_ref",
             "type": "wslink"
-        }]
-    }, {
+        }*/]
+    }, /*{
         "name": "Pathways",
         "widget": "kbasePathways",
-        "keys": "workspace, objName",  //uh, let's do this?
+        "keys": "workspace, objName",
         "arguments": "model_ws, model_name"
-    }];
+    }*/];
 
 
     this.ReactionTab = function (id) {

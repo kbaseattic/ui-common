@@ -89,10 +89,10 @@ $.KBWidget({
         //
         // 3) get meta data, add any metadata tables
         //
-        if (isNaN(input.ws) && isNaN(input.name) )
-            var param = {workspace: input.ws, name: input.name};
-        else if (!isNaN(input.ws) && !isNaN(input.name) )
-            var param = {ref: input.ws+'/'+input.name};
+        if (isNaN(input.ws) && isNaN(input.obj) )
+            var param = {workspace: input.ws, name: input.obj};
+        else if (!isNaN(input.ws) && !isNaN(input.obj) )
+            var param = {ref: input.ws+'/'+input.obj};
 
         self.kbapi('ws', 'get_object_info_new', {objects: [param], includeMetadata: 1})
           .done(function(res) {
@@ -117,10 +117,10 @@ $.KBWidget({
         // 4) get object data, create tabs
         //
 
-        if (isNaN(input.ws) && isNaN(input.name) )
-            var param = {workspace: input.ws, name: input.name};
-        else if (!isNaN(input.ws) && !isNaN(input.name) )
-            var param = {ref: input.ws+'/'+input.name};
+        if (isNaN(input.ws) && isNaN(input.obj) )
+            var param = {workspace: input.ws, name: input.obj};
+        else if (!isNaN(input.ws) && !isNaN(input.obj) )
+            var param = {ref: input.ws+'/'+input.obj};
 
         self.kbapi('ws', 'get_objects', [param])
           .done(function(data){
@@ -161,7 +161,8 @@ $.KBWidget({
                 tabPane.rmLoading();
 
                 // note: must add table first
-                tabPane.append('<table class="table table-bordered table-striped">');
+                // doing style margins for narrative
+                tabPane.append('<table class="table table-bordered table-striped" style="margin-left: auto; margin-right: auto;">');
                 tabPane.find('table').dataTable(settings)
 
                 // add any events
@@ -282,7 +283,7 @@ $.KBWidget({
             var data = p.data;
             var rows = p.rows;
 
-            var table = $('<table class="table table-bordered">');
+            var table = $('<table class="table table-bordered" style="margin-left: auto; margin-right: auto;">');
 
 
             for (var i=0; i<rows.length; i++) {
