@@ -5,7 +5,7 @@
     $.KBWidget({
         name: "KBaseGeneDomains",
         parent: "kbaseWidget",
-        version: "1.0.0",
+        version: "1.0.1",
 
         options: {
             featureID: null,
@@ -14,7 +14,8 @@
             loadingImage: "assets/img/loading.gif",
             genomeID: null,
             workspaceID: null,
-            kbCache: null
+            kbCache: null,
+	    maxDescriptionLength: 100
         },
 
         init: function(options) {
@@ -36,7 +37,6 @@
 
             // Launch the first step in processing the data for the table
             this.processDomainAnnotationObjects();
-
         },
             
         processDomainAnnotationObjects: function(){
@@ -161,7 +161,7 @@
                                     if(uniqueDomains[domainSignature] == undefined){
                                         uniqueDomains[domainSignature] = "";
                                     } else {
-                                        // Because we mingh have several SAME domain annotations that came from 
+                                        // Because we might have several SAME domain annotations that came from 
                                         // different DomainAnnotation objects linked to a given genome
                                         continue;
                                     } 
@@ -198,9 +198,9 @@
                 // if there domain annotation objects then proceed to the next step: collect domain descriptions
                 if( annotatedDomainsArray.length > 0){
                     self.processDomainDescirptions(annotatedDomainsArray, domainModelSetRefs);
-                }  
+                }
                                
-            });            
+            });          
         },
 
         processDomainDescirptions: function(annotatedDomainsArray, domainModelSetRefs){
@@ -226,25 +226,30 @@
             }
 
             var domainDescriptions = {};
+            var shortDomainDescriptions = {};
             // Get domain annotations
             self.wsClient.get_object_subset(subObjectIdentities, function(data){
                 
                 //Get a hash of domain description
                 for(var i = 0 ; i < data.length; i++){
-
-                    
                     var _domainDescriptions = data[i].data.domain_accession_to_description;
                     if(_domainDescriptions == undefined) continue;
                     for(var domainId in _domainDescriptions){
                         domainDescriptions[domainId] = _domainDescriptions[domainId];
+                        shortDomainDescriptions[domainId] = _domainDescriptions[domainId];
+			if (shortDomainDescriptions[domainId].length > self.options.maxDescriptionLength) {
+			    shortDomainDescriptions[domainId] = shortDomainDescriptions[domainId].substring(0,self.options.maxDescriptionLength) + "&#8230;";
+			}
                     }
                 }
 
-                // Update descriptions of domains in annotatedDomainsArray                
-                for(var i = 0; i < annotatedDomainsArray.length; i++){
-                    var domainDescription = domainDescriptions[annotatedDomainsArray[i].domainId];
+                // Update descriptions of domains in annotatedDomainsArray
+		for(var i = 0; i < annotatedDomainsArray.length; i++){
+                    var domainDescription = shortDomainDescriptions[annotatedDomainsArray[i].domainId];
                     if(domainDescription != undefined){
                         annotatedDomainsArray[i].domainDescription = domainDescription;
+                        annotatedDomainsArray[i].shortDomainDescription = domainDescription;
+                        annotatedDomainsArray[i].longDomainDescription = domainDescriptions[annotatedDomainsArray[i].domainId];
                     }
                 }
 
@@ -252,7 +257,6 @@
                 if( annotatedDomainsArray.length > 0){
                     self.bindDomainData(annotatedDomainsArray);
                 }  
-                               
             }); 
         },
 
@@ -279,8 +283,20 @@
                 ],
                 "aaData": annotatedDomainsArray
             };
-            self.$elem.find('#ref-table').dataTable(tblSettings);            
-
+            var domainTable = self.$elem.find('#ref-table').dataTable(tblSettings);
+	    var showLong = [];
+	    $('#ref-table tbody td').click(function(event) {
+		var rowID = domainTable.fnGetPosition(event.target)[0];
+		if (showLong[rowID] == undefined)
+		    showLong[rowID] = 0;
+		showLong[rowID] = 1-showLong[rowID];
+		if (showLong[rowID]==1) {
+		    domainTable.fnUpdate(annotatedDomainsArray[rowID].longDomainDescription,rowID,1);
+		}
+		else {
+		    domainTable.fnUpdate(annotatedDomainsArray[rowID].shortDomainDescription,rowID,1);
+		}
+	    });
         },        
 
         buildObjectIdentity: function(workspaceID, objectID) {
