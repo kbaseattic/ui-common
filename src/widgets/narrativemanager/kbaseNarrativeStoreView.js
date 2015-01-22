@@ -66,10 +66,15 @@
                             url+="/methods/"+self.options.id;
                         }
 
+                        //truncate out the commit comments. We're guesing about where those start...
+                        //assume first four lines are valid header info.
+                        var commit = status.git_spec_commit.split(/\r\n|\r|\n/);
+                        commit = [ commit[0], commit[1], commit[2], commit[3] ].join('<br>\n');
+
 
                         self.$narMethodStoreInfo.append(
                             $('<table>').css({border:'1px solid #bbb', margin:'10px', padding:'10px'})
-                                .append($('<tr>')
+                                /*.append($('<tr>')
                                             .append($('<th>').append('Method Store URL  '))
                                             .append($('<td>').append(self.options.narrativeStoreUrl)))
                                 .append($('<tr>')
@@ -77,13 +82,13 @@
                                             .append($('<td>').append(status.git_spec_url)))
                                 .append($('<tr>')
                                             .append($('<th>').append('Method Spec Branch  '))
-                                            .append($('<td>').append(status.git_spec_branch)))
+                                            .append($('<td>').append(status.git_spec_branch)))*/
                                 .append($('<tr>')
-                                            .append($('<th>').append('Yaml/Spec Location '))
+                                            .append($('<th style = "vertical-align : top; padding-right : 5px">').append('Yaml/Spec Location '))
                                             .append($('<td>').append('<a href="'+url+'" target="_blank">'+url+"</a>")))
                                 .append($('<tr>')
-                                            .append($('<th>').append('Method Spec Commit  '))
-                                            .append($('<td>').append(status.git_spec_commit.replace(/(?:\r\n|\r|\n)/g, '<br>'))))
+                                            .append($('<th style = "vertical-align : top; padding-right : 5px">').append('Method Spec Commit  '))
+                                            .append($('<td>').append(commit)))
                                 );
                     },
                     function(err) {
