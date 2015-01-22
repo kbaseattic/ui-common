@@ -67,12 +67,15 @@ function ($, nunjucks, Session) {
         //   iconStyle += 'color: ' + cfg.color + ';';
         //}
         
-        var button = $('<button data-kbase-button="'+cfg.name+'" id="kb-'+cfg.name+'-btn" class="btn btn-'+(cfg.style || 'default')+' navbar-btn kb-nav-btn">'+
+        var button = $('<button data-button="'+cfg.name+'" id="kb-'+cfg.name+'-btn" class="btn btn-'+(cfg.style || 'default')+' navbar-btn kb-nav-btn">'+
                        '  <div class="fa fa-'+cfg.icon+'" style="'+iconStyle+'"></div>' + label + '</button>')
         .on('click', function (e) {
           e.preventDefault();
           cfg.callback();
         });
+        if (cfg.disabled) {
+          button.prop('disabled', true);
+        }
         if (cfg.place === 'end') {
           this.container.find('.navbar-buttons').append(button);
         } else {
@@ -82,8 +85,7 @@ function ($, nunjucks, Session) {
     },
     findButton: {
       value: function (name) {
-        var button = this.container.find('[data-kbase-button="'+name+'"]');
-        return button;
+        return this.container.find('.navbar-buttons [data-button="'+name+'"]');
       }
     },
     addDropdown: {

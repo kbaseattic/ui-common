@@ -1087,6 +1087,7 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
           this.renderPicture();
           this.places.content.html(this.renderTemplate('view'));
           
+          /*
           this.places.content
           .find('[data-widget-menu-item="edit"]')
           .on('click', function (e) {
@@ -1120,7 +1121,7 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
             var modal = $('.UserProfileWidget [data-widget-modal="help"]')
             .modal('show');
           });
-          
+          */
           /*this.places.content.find('[data-button="edit"]').on('click', function(e) {
             widget.clearMessages();
             widget.renderEditView();
@@ -1186,6 +1187,7 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
             xlabel: 'Save',
             style: 'primary',
             icon: 'save',
+            disabled: true,
             callback: function () {
               if (W.updateUserProfileFromForm()) {
                 W.userProfile.saveProfile()
@@ -1235,6 +1237,7 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
           
           var widget = this;
 
+/*
           // wire up basic form crud buttons.
           $('[data-button="save"]').on('click', function(e) {
             if (widget.updateUserProfileFromForm()) {
@@ -1275,9 +1278,9 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
             }
            
           });
-
+          */
           // wire up affiliation add/remove buttons.
-          $('[data-button="add-affiliation"]').on('click', function(e) {
+          this.places.content.find('[data-button="add-affiliation"]').on('click', function(e) {
             // grab the container 
             var affiliations = this.places.content.find('[data-field="profile.userdata.affiliations"]');
 
@@ -1307,7 +1310,6 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
 
             panel.find('.panel-title').html(title + ' @ ' + institution + ', ' + startYear + '-' + endYear);
           });
-          
           // Monitor changes on the entire form ... if any field is changed we flag the profile as dirty.
           this.places.content.find('form').on('input change', function (e) {
              // enable the save button.
@@ -1317,7 +1319,8 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
             //widget.places.content
             //.find('[data-button="save"]')
             //.removeAttr('disabled');
-            NAVBAR.findButton('save').removeAttr('disabled');
+           
+            NAVBAR.findButton('save').prop('disabled', false);
           });
           
         }
