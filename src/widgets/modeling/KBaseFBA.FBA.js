@@ -100,14 +100,14 @@ function KBaseFBA_FBA(modeltabs) {
 		},{
 			"label": "Objective fraction",
 			"key": "objfraction"
-		}]		
+		}]
 	}, {
 		"key": "modelreactions",
 		"name": "Reactions",
 		"visible": 1,
 		"columns": [{
 			"label": "Reaction",
-			"key": "dispid",
+			"key": "dispIDCompart",
 			"type": "tabLink",
 			"tabLinkKey": "id",
 			"function": "ReactionTab",
@@ -238,7 +238,7 @@ function KBaseFBA_FBA(modeltabs) {
 			"visible": 0
 		}]
 	}];
-	
+
 	this.setMetadata = function (indata) {
 		this.workspace = indata[7];
         this.objName = indata[1];
@@ -263,11 +263,11 @@ function KBaseFBA_FBA(modeltabs) {
                              numcpdbounds: indata[10]["Number compound bounds"],
                              numconstraints: indata[10]["Number constraints"],
                              numaddnlcpds: indata[10]["Number additional compounds"]}
-                             
+
             $.extend(this.overview, this.usermeta)
         }
 	};
-        
+
     this.formatObject = function () {
     	console.log(this);
     	this.usermeta.model = self.data.fbamodel_ref;
@@ -283,12 +283,12 @@ function KBaseFBA_FBA(modeltabs) {
 		this.usermeta.promconstraint = self.data.promconstraint_ref;
 		this.usermeta.expression = self.data.tintlesample_ref;
 		this.usermeta.phenotypeset = self.data.phenotypeset_ref;
-		this.usermeta.phenotypesimulationset = self.data.phenotypesimulationset_ref;		
+		this.usermeta.phenotypesimulationset = self.data.phenotypesimulationset_ref;
 		this.usermeta.singleko = self.data.comboDeletions;
 		this.usermeta.defaultmaxflux = self.data.defaultMaxFlux;
 		this.usermeta.defaultmaxdrain = self.data.defaultMaxDrainFlux;
 		this.usermeta.defaultmindrain = self.data.defaultMinDrainFlux;
-		this.usermeta.phenotypesimulationset = self.data.phenotypesimulationset_ref;		
+		this.usermeta.phenotypesimulationset = self.data.phenotypesimulationset_ref;
 		this.usermeta.uptakelimits = "";
 		for (var key in self.data.uptakelimits) {
 			if (this.usermeta.uptakelimits.length > 0) {
@@ -458,14 +458,14 @@ function KBaseFBA_FBA(modeltabs) {
 		for (var i=0; i < this.biomasscpds.length; i++) {
 			var biocpd = this.biomasscpds[i];
 			if (this.biohash[biocpd.biomass]) {
-				biocpd.bioflux = this.biohash[biocpd.biomass].flux;	
+				biocpd.bioflux = this.biohash[biocpd.biomass].flux;
 			}
 			if (this.metprodhash[biocpd.id]) {
 				biocpd.maxprod = this.metprodhash[biocpd.id].maximumProduction;
 			}
 		}
 	};
-	
+
 	this.setData = function (indata) {
 		self.data = indata;
 		var p = self.modeltabs.kbapi('ws', 'get_objects', [{ref: indata.fbamodel_ref}])
@@ -485,7 +485,7 @@ function KBaseFBA_FBA(modeltabs) {
         })
         return p;
     };
-	
+
 	this.ReactionTab = function (id) {
         var rxn = this.rxnhash[id];
         if (id.search(/rxn\d+/g) == -1)

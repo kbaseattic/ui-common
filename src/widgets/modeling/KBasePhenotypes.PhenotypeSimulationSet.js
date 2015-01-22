@@ -80,7 +80,7 @@ function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
 		    "label": "PhenotypeRef",
 		    "type": "tabLink",
 		    "method": "PhenotypeSetTab",
-		    "linkformat": "dispid",
+		    "linkformat": "dispID",
 		    "key": "phenotype_ref",
 		    "visible": 1
 		}, {
@@ -106,7 +106,7 @@ function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
         return p;
 
     }
-    
+
 }
 
 

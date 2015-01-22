@@ -16,10 +16,10 @@ function KBasePhenotypes_PhenotypeSet(modeltabs) {
                              source: data[10]["Source"]+"/"+data[10]["Source ID"],
                              numphenotypes: data[10]["Number phenotypes"],
                              type: data[10]["Type"]}
-                           
+
             $.extend(this.overview, this.usermeta)}
     };
-		
+
     this.setData = function (indata) {
 	this.data = indata;
 	this.phenotypes = this.data.phenotypes;
@@ -38,10 +38,10 @@ function KBasePhenotypes_PhenotypeSet(modeltabs) {
 	}
 
 	var promise = this.modeltabs.getBiochemCompounds(cpd_refs)
-	.then(function(cpds){ 
+	.then(function(cpds){
 		var addcpd_names_hash = {};
 		for (var j=0; j<cpds.length; j++) {
-			addcpd_names_hash[cpds[j].id] = cpds[j].name; 
+			addcpd_names_hash[cpds[j].id] = cpds[j].name;
 		    }
 		for (var i=0; i< self.phenotypes.length; i++) {
 		    var refs = self.phenotypes[i].additionalcompound_refs;
@@ -55,7 +55,7 @@ function KBasePhenotypes_PhenotypeSet(modeltabs) {
 
 	return promise;
     }
-        
+
     this.tabList = [{
 		"key": "overview",
 		"name": "Overview",
@@ -88,7 +88,7 @@ function KBasePhenotypes_PhenotypeSet(modeltabs) {
 		},{
 			"label": "Phenotype type",
 			"key": "type"
-		}]	
+		}]
 	}, {
 		"key": "phenotypes",
 		"name": "Phenotypes",

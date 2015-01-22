@@ -247,27 +247,32 @@ $.KBWidget({
         }
 
 
-            function ref(key, type, format, method) {
-                return function(d) {
-                            if (type == 'tabLink' && format == 'dispid') {
-                                var id = d[key].split('_')[0];
-                                var compart = d[key].split('_')[1];
+        function ref(key, type, format, method) {
+            return function(d) {
+                        if (type == 'tabLink' && format == 'dispIDCompart') {
+                            var id = d[key].split('_')[0];
+                            var compart = d[key].split('_')[1];
 
-                                return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
-                                            id+'</a> ('+compart+')';
-                            }
-
-                            var value = d[key];
-
-                            if ($.isArray(value)) {
-                                if (type == 'tabLinkArray')
-                                    return tabLinkArray(value, method)
-                                return d[key].join(', ');
-                            }
-
-                            return value;
+                            return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
+                                        id+'</a> ('+compart+')';
+                        } else if (type == 'tabLink' && format == 'dispID') {
+                            var id = d[key];
+                            return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
+                                        id+'</a>';
                         }
-            }
+
+
+                        var value = d[key];
+
+                        if ($.isArray(value)) {
+                            if (type == 'tabLinkArray')
+                                return tabLinkArray(value, method)
+                            return d[key].join(', ');
+                        }
+
+                        return value;
+                    }
+        }
 
         function tabLinkArray(a, method) {
             var links = [];
@@ -410,7 +415,7 @@ $.KBWidget({
         }
 
         function get_cpds(equation) {
-            var cpds = {}
+            var cpds = {};
             var sides = equation.split('=');
             cpds.left = sides[0].match(/cpd\d*/g);
             cpds.right = sides[1].match(/cpd\d*/g);
