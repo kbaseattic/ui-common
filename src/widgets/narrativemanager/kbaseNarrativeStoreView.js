@@ -277,8 +277,31 @@
                     $ssPanel
                         .append(
                             $.jqElem('a')
-                                .attr('href', self.options.narrativeStoreUrl + s.url)
-                                .attr('target', '_blank')
+                                //.attr('href', self.options.narrativeStoreUrl + s.url)
+                                //.attr('target', '_blank')
+                                .on('click', function(e) {
+
+                                    var $img = $.jqElem('img')
+                                        .attr('src', self.options.narrativeStoreUrl + s.url)
+                                        .css('width', '100%')
+                                    ;
+
+                                    var $prompt = $.jqElem('div').kbasePrompt(
+                                        {
+                                            body : $img
+                                        }
+                                    );
+
+                                    $prompt.dialogModal()
+                                        .css('width', '100%')
+                                    ;
+
+                                    $prompt.dialogModal().find('.modal-dialog')
+                                        .css('width', '100%')
+                                    ;
+
+                                    $prompt.openPrompt();
+                                })
                                 .append(
                                     $.jqElem('img')
                                         .attr('src', self.options.narrativeStoreUrl + s.url)
@@ -490,12 +513,34 @@
             $.each(
                 m.screenshots,
                 function (idx, s) {
-
                     $ssPanel
                         .append(
                             $.jqElem('a')
-                                .attr('href', self.options.narrativeStoreUrl + s.url)
-                                .attr('target', '_blank')
+                                //.attr('href', self.options.narrativeStoreUrl + s.url)
+                                //.attr('target', '_blank')
+                                .on('click', function(e) {
+
+                                    var $img = $.jqElem('img')
+                                        .attr('src', self.options.narrativeStoreUrl + s.url)
+                                        .css('width', '100%')
+                                    ;
+
+                                    var $prompt = $.jqElem('div').kbasePrompt(
+                                        {
+                                            body : $img
+                                        }
+                                    );
+
+                                    $prompt.dialogModal()
+                                        .css('width', '100%')
+                                    ;
+
+                                    $prompt.dialogModal().find('.modal-dialog')
+                                        .css('width', '100%')
+                                    ;
+
+                                    $prompt.openPrompt();
+                                })
                                 .append(
                                     $.jqElem('img')
                                         .attr('src', self.options.narrativeStoreUrl + s.url)
@@ -507,6 +552,7 @@
 
             self.$mainPanel.append($ssPanel);
         }
+
 
         if (m.description) {
             self.$mainPanel
