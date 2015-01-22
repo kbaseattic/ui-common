@@ -78,7 +78,9 @@ function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
 		    "type": "wstype"
 		}, {
 		    "label": "PhenotypeRef",
-		    "type": "wstype",
+		    "type": "tabLink",
+		    "method": "PhenotypeSetTab",
+		    "linkformat": "dispid",
 		    "key": "phenotype_ref",
 		    "visible": 1
 		}, {
@@ -92,6 +94,19 @@ function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
 		    "visible": 1
 		}]
 	}];
+
+    this.PhenotypeSetTab = function (ref) {
+	var objIdentity = {"obj_ref": ref};
+	var p = tabwidget.kbapi('ws', 'get_objects', [objIdentity])
+	.then(function(data) {
+		console.log(data);
+		return [];
+	    });
+
+        return p;
+
+    }
+    
 }
 
 
