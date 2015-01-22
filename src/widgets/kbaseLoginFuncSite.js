@@ -181,7 +181,6 @@
       // set up below, because the widget may need to respond to login and profile events.
       $(document).on('profileLoaded.kbase', function(e, profile) {
         this.userProfile = profile.getProfile();
-        console.log('profile loaded');
         // NB: KB widgets "rewire" ids -- tranform ids into data- attributes.
         this.$elem.find('[data-element="user-label"]').html(this.get_user_label());
         var url = profile.getAvatarURL({size: 40, rating: 'pg'});

@@ -451,7 +451,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
         return (userId !== undefined && userId !== null);
     };
     
-    $(document).on('profileLoaded', function (e, profile) {
+    $(document).on('profileLoaded.kbase', function (e, profile) {
       // console.log('profile has been loaded'); console.log(profile.user.realname);
       $scope.$apply(function () {
         $scope.username = profile.getProp('user.realname');
