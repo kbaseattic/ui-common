@@ -80,12 +80,12 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
           NAVBAR.addDefaultMenu({
             search: true, narrative: true
           });
-          NAVBAR.addMenuItem({
-            name: 'test',
-            label: 'Test',
-            callback: function () {
-              alert('This is indeed a test');
-            }
+          NAVBAR.addHelpMenuItem({
+            name: 'bugreport',
+            label: 'New Issue',
+            icon: 'bug',
+            external: true,
+            url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
           });
          
           

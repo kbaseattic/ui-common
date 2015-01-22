@@ -201,12 +201,32 @@ function ($, nunjucks, Session) {
       }
     },
     addHelpMenuItem: {
-      value: function (cfg) {
-        var item = $('<li></li>')
-        .append($('<a></a>')
-          .attr('href', cfg.url)
-          .text(cfg.label)
-          .attr('data-menu-item', cfg.name));
+      value: function (cfg) { 
+        if (cfg.type === 'divider') {
+          var item = $('<li  role="presentation" class="divider"></li>').attr('data-menu-item', cfg.name);
+        } else {
+          if (cfg.url) {       
+            var link = $('<a></a>')
+            .attr('href', cfg.url)
+            .text(cfg.label)
+            .attr('data-menu-item', cfg.name);
+            if (cfg.external) {
+              link.attr('target', '_blank');
+            }
+          } else if (cfg.callback) {
+           var link = $('<a></a>')
+              .attr('href', '#')
+              .text(cfg.label)
+              .attr('data-menu-item', cfg.name)
+              .on('click', function (e) {
+                e.preventDefault();
+                cfg.callback();
+              });
+          } else {
+            var link = $('<span></span>').text(cfg.label);
+          }
+          var item = $('<li></li>').append(link);
+        }
         if (cfg.place === 'end') {
           var menu = this.container.find('.navbar-menu .dropdown-menu');
           if (!menu) {
