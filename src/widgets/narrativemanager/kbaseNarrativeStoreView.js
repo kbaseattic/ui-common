@@ -414,7 +414,6 @@
 	            )
 	    };
 
-
 	    //if (m['ver']) {
 		//$basicInfo.append('<div><strong>Version: </strong>&nbsp&nbsp'+m['ver']+"</div>");
 	    //}
@@ -584,6 +583,14 @@
                         sortedParams[ui_class],
                         function (idx, param) {
 
+                            var types = '';
+
+                            if (param.text_options && param.text_options.valid_ws_types) {
+                                types = $.jqElem('i')
+                                    .append(' ' + param.text_options.valid_ws_types.join(', '))
+                                ;
+                            }
+
                             var $li = $.jqElem('li');//.append('Parameter ' + (idx + 1)));
                             $li.append(
                                 $.jqElem('ul')
@@ -593,6 +600,7 @@
                                                 .append(
                                                     $.jqElem('b').append(param.ui_name)
                                                 )
+                                                .append(types)
                                                 .append(
                                                     $.jqElem('ul')
                                                         .css('list-style-type', 'none')
