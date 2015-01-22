@@ -1,7 +1,7 @@
 define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuserprofile', 'kbasesession', 'kbasenavbar'],
-  function(nunjucks, $, Q, Utils, SocialWidget, UserProfile, Session, Navbar) {
+  function(nunjucks, $, Q, Utils, SocialWidget, UserProfile, Session, NAVBAR) {
     "use strict";
-    var NAVBAR = Object.create(Navbar).init({container: '#kbase-navbar'});
+    // var NAVBAR = Object.create(Navbar).init({container: '#kbase-navbar'});
     var UserProfileWidget = Object.create(SocialWidget, {
 
       init: {
@@ -1210,9 +1210,7 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
             icon: 'ban',
             callback: function () {
               // Do we have pending changes?
-              var changed = !W.places.content
-                .find('[data-button="save"]')
-                .prop('disabled');
+              var changed = !NAVBAR.findButton('save').prop('disabled');
             
               if (changed) {
                 var modal = $('.UserProfileWidget [data-widget-modal="confirm-cancel"]')
@@ -1319,7 +1317,6 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
             //widget.places.content
             //.find('[data-button="save"]')
             //.removeAttr('disabled');
-           
             NAVBAR.findButton('save').prop('disabled', false);
           });
           

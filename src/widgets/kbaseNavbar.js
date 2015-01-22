@@ -10,6 +10,7 @@ function ($, nunjucks, Session) {
           this.container = cfg.container;
         }
         
+        // Looks like a widget ... acts like a widget ...
         this.widgetTitle = 'Navbar Widget';
         this.widgetName = 'Navbar';
         
@@ -32,6 +33,8 @@ function ($, nunjucks, Session) {
           widgetTitle: this.widgetTitle,
           widgetName: this.widgetName
         };
+        
+        this.loadCSS();
         return this;
       }
     },
@@ -41,6 +44,14 @@ function ($, nunjucks, Session) {
     getVersion: { 
       value: function () {
         return this.version;
+      }
+    },
+    loadCSS: {
+      value: function() {
+        $('<link>')
+        .appendTo('head')
+        .attr({type: 'text/css', rel: 'stylesheet'})
+        .attr('href', '/src/widgets/' + this.widgetName + '/style.css');
       }
     },
     setTitle: {
@@ -307,5 +318,6 @@ function ($, nunjucks, Session) {
       }
     }
   });
-  return Navbar;
+  var TheNavbar = Object.create(Navbar).init({container: '#kbase-navbar'});
+  return TheNavbar;
 });

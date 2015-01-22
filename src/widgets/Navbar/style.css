@@ -19,8 +19,15 @@
     border: none;
     text-shadow: none !important;
     margin: 0;
+    vertical-align: middle;
+    /* 
     box-shadow: 0 0 3px #CECECE;
+    */
     margin-right: 5px;
+}
+.btn-primary.kb-nav-btn[disabled] {
+  background-color: #FFF;
+  color: silver;
 }
 #kb-nav-menu { /* don't add shadows here */
   box-shadow: none;

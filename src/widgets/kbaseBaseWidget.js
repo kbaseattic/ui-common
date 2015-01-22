@@ -591,15 +591,15 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
       loadCSS: {
         value: function() {
           // Load  widget css.
+          //$('<link>')
+          //.appendTo('head')
+          //.attr({type: 'text/css', rel: 'stylesheet'})
+          //.attr('href', '/src/widgets/social/style.css');
+          // Load specific widget css.
           $('<link>')
           .appendTo('head')
           .attr({type: 'text/css', rel: 'stylesheet'})
-          .attr('href', '/src/widgets/social/style.css');
-          // Load specific widget css.
-         // $('<link>')
-        //  .appendTo('head')
-        //  .attr({type: 'text/css', rel: 'stylesheet'})
-        //  .attr('href', '/src/widgets/social/' + this.widgetName + '/style.css');
+          .attr('href', '/src/widgets/' + this.widgetName + '/style.css');
         }
       },
 
