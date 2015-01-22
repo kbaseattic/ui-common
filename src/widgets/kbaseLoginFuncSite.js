@@ -146,34 +146,6 @@
       // which should be loaded towards the top of the index file, certainly before this one.
       // syncronously load the session.
       
-
-      // Select which version of the widget to show.
-      this.$elem.empty();
-      var style = '_' + this.options.style + 'Style';
-      this.ui = this[style]();
-      if (this.ui) {
-        this.$elem.append(this.ui);
-      }
-      
-      // EVENT LISTENERS
-      
-      // These need to go after the elementis built, but before session is 
-      // set up below, because the widget may need to respond to login and profile events.
-      $(document).on('profileLoaded', function(e, profile) {
-        this.userProfile = profile.getProfile();
-        // NB: KB widgets "rewire" ids -- tranform ids into data- attributes.
-        this.data("loggedinuser_id").html(this.get_user_label());
-        var url = profile.getAvatarURL({size: 40, rating: 'pg'});
-        $('#signin-button img.login-button-avatar').attr('src', url);
-        
-      }.bind(this));
-
-      $(document).on('loggedIn', function(e, session) {
-        this.sessionObject = session;
-        this.data("loggedinuser_id").html(this.get_user_label());
-        this.fetchUserProfile();
-      }.bind(this));
-      
       // Initial load of the session is through the synchronous kbase session sync object.
       // This object is compatible with the full kbase session object, but is loaded 
       // at index load time and so available here.
@@ -181,6 +153,70 @@
       // are asynchronous, and session state is communicated via jquery messages.
       // The session object will either be the authenticated session object or null.
       this.sessionObject = Object.create($.KBaseSessionSync).init().getKBaseSession();
+      
+ 
+      // Select which version of the widget to show.
+      // NB this widget just shows one state per instantiation -- 
+      // the login form when the session is unauthenticated.
+      this.$elem.empty();
+      var style = '_' + this.options.style + 'Style';
+      this[style](function (content) {
+        if (content !== null) {
+          this.$elem.html(content);
+        }
+        this.afterInit();
+      }.bind(this));
+      //if (this.ui) {
+      //    this.$elem.append(this.ui);
+      //  }
+      // console.log('DONE?');
+
+      return this;
+    },
+    
+    afterInit: function () {
+      // EVENT LISTENERS
+      
+      // These need to go after the element is built, but before session is 
+      // set up below, because the widget may need to respond to login and profile events.
+      $(document).on('profileLoaded.kbase', function(e, profile) {
+        this.userProfile = profile.getProfile();
+        console.log('profile loaded');
+        // NB: KB widgets "rewire" ids -- tranform ids into data- attributes.
+        this.$elem.find('[data-element="user-label"]').html(this.get_user_label());
+        var url = profile.getAvatarURL({size: 40, rating: 'pg'});
+        this.$elem.find('[data-element="avatar"]').attr('src', url);
+      }.bind(this));
+
+      $(document).on('loggedIn.kbase', function(e, session) {
+        this.sessionObject = session;
+        this.$elem.find('[data-element="user-label"]').html(this.get_user_label());
+        this.fetchUserProfile();
+      }.bind(this));
+      
+      $(document).on('loggedOut.kbase', function(e) {
+        this.sessionObject = null;
+        var elem = this.$elem;
+        require(['kbaseloginwidget', 'kbasesession'], function (LoginWidget, Session) {
+          try {
+            var w = LoginWidget.init({
+              container: elem,
+              name: 'LoginWidget',
+              title: 'Login Widget'
+            });
+            w.render();
+          } catch (e) {
+            console.log('Error');
+            console.log(e);
+          }
+        });
+      }.bind(this));
+      
+      //return;
+      if (this.sessionObject) {
+        this.fetchUserProfile();
+      }
+      
       if (this.sessionObject) {
         if (this.registerLogin) {
           this.registerLogin();
@@ -192,31 +228,24 @@
         
         // Funny, loggedIn called when the session is loaded/
         // TODO: this should be something like sessionLoaded or sessionAvailable
-        this.trigger('loggedIn', this.sessionObject);
+        //this.trigger('loggedIn', this.sessionObject);
       }
       
-      $(document).on(
-        'loggedInQuery.kbase',
-        $.proxy(function(e, callback) {
+      $(document).on('loggedInQuery.kbase', $.proxy(function(e, callback) {
           if (callback) {
             callback(this.sessionObject);
           }
         }, this)
       );
 
-      $(document).on(
-        'promptForLogin.kbase',
-        $.proxy(function(e, args) {
-          if (args.user_id) {
-            this.data('passed_user_id', args.user_id);
-          }
-          this.openDialog();
-        }, this)
-      );
+      $(document).on('promptForLogin.kbase', function(e, args) {
+        if (args && args.user_id) {
+          this.data('passed_user_id', args.user_id);
+        }
+        this.openDialog();
+      }.bind(this));
 
-      $(document).on(
-        'logout.kbase',
-        $.proxy(function(e, rePrompt) {
+      $(document).on('logout.kbase', $.proxy(function(e, rePrompt) {
           this.logout(rePrompt);
         }, this)
       ); 
@@ -239,9 +268,6 @@
         }
       }.bind(this), checkInterval);
       */
-
-      return this;
-
     },
     
     tickleSession: function () {
@@ -313,121 +339,52 @@
         $ld.dialogModal().data("user_id").val(userId);
         delete this.options.user_id;
         // this.session('user_id',undefined);
-        $ld.dialogModal().trigger('clearMessages');
+        $ld.dialogModal().trigger('clearMessages.kbase');
         this.data('loginDialog').openPrompt();
       }
     },
 
-    _textStyle: function() {
+    _textStyle: function(callback) {
+      // console.log('in text style');
       this._createLoginDialog();
 
-      this.$elem.css('padding', '9px 15px 7px 10px');
-
-      var $prompt = $('<span></span>')
-        .append(
-          $('<a></a>')
-          .attr('id', 'loginlink')
-          .attr('href', '#')
-          .text('Sign In')
-          .bind('click',
-            $.proxy(function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              this.openDialog();
-            }, this)
-          )
-      )
-        .append(
-          $('<div></div>')
-          .addClass('btn-group')
-          .attr('id', 'userdisplay')
-          //.css('display', 'none')
-          .append(
-            $('<div></div>')
-            .addClass('dropdown')
-            .append(
-                $('<button></button>')
-                .addClass('btn btn-default')
-                //.addClass('btn-xs')
-                .addClass('dropdown-toggle')
-                .attr('data-toggle', 'dropdown')
-                .attr('type', 'button')
-                //.append($('<span></span>').addClass('glyphicon glyphicon-user'))
-                .append('<img src="assets/images/nouserpic.png" style="width: 40px;" class="login-button-avatar"></img>')
-                .append($('<span></span>').addClass('caret'))
-               
-                
-              )
-              .append(
-            $('<ul></ul>')
-            .addClass('dropdown-menu')
-            //.addClass('pull-right')
-            .attr('role', 'menu')
-            //.css('padding', '3px')
-            .attr('id', 'login-dropdown-menu')
-            .append(
-              $('<li></li>')
-              .css('white-space', 'nowrap')
-              .append(
-                $.jqElem('div') //so as to style the link in blue.
-                //.css('text-align', 'right')
-                .append(
-                  $('<a></a>')
-                  .attr('id', 'loggedinuser_id')
-                  .css('font-weight', 'bold')
-                  .attr('href', '/functional-site/#/people/')
-                  //.attr('href', 'https://gologin.kbase.us/account/UpdateProfile')
-                  .attr('target', '_blank')
-                  //.css('padding-right', '0px')
-                  //.css('padding-left', '0px')
-                )
-              )
-            )
-            .append($('<li class="divider"></div>'))
-            .append(
-              $('<li></li>')
-              //.addClass('pull-right')
-              .append(
-                $('<span></span>')
-                .append(
-                  $('<a></a>')
-                  //.css('padding-right', '0px')
-                  //.css('padding-left', '0px')
-                  .append('Sign out')
-                )
-                .bind('click',
-                  $.proxy(function(e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    this.data('login-dropdown-menu').hide(); //slideUp('fast');
-                    this.logout();
-                  }, this)
-                )
-              )
-            )
-          )
-        )
-      );
+      // this.$elem.css('padding', '9px 15px 7px 10px');
       
-      this._rewireIds($prompt, this);
+      var elem = this.$elem;
+      require(['kbaseloginwidget'], function (LoginWidget) {
+        try {
+          var w = LoginWidget.init({
+            container: elem,
+            name: 'LoginWidget',
+            title: 'Login Widget'
+          });
+          w.render();
+          callback(null);
+        } catch (e) {
+          console.log('Error');
+          console.log(e);
+        }
+      });
+      
+      // this._rewireIds($prompt, this);
 
       this.registerLogin = function(args) {
         if (this.sessionObject) {
-          this.data("loginlink").hide();
-          this.data('loggedinuser_id').html(this.get_user_label());
-          this.data("userdisplay").show();
+          //this.data("loginlink").hide();
+          //this.data('loggedinuser_id').html(this.get_user_label());
+          //this.data("userdisplay").show();
           this.data('loginDialog').closePrompt();
         } else {
-          this.data('loginDialog').dialogModal().trigger('error', args.message);
+          this.data('loginDialog').dialogModal().trigger('error.kbase', args.message);
         }
       };
 
       this.specificLogout = function(args) {
-        this.data("userdisplay").hide();
-        this.data("loginlink").show();
+        //this.data("userdisplay").hide();
+        // this.data("loginlink").show();
       };
 
-      return $prompt;
+  
 
     },
 
@@ -437,7 +394,7 @@
         if (args.success) {
           this.data('loginDialog').closePrompt();
         } else {
-          this.data('loginDialog').dialogModal().trigger('error', args.message);
+          this.data('loginDialog').dialogModal().trigger('error.kbase', args.message);
         }
       };
 
@@ -654,7 +611,7 @@
 
       this.registerLogin = function(args) {
         if (this.sessionObject) {
-          this.data('loginDialog').dialogModal().trigger('clearMessages');
+          this.data('loginDialog').dialogModal().trigger('clearMessages.kbase');
           this.data('loginDialog').closePrompt();
 
           this.data('loginbutton').tooltip({
@@ -668,7 +625,7 @@
               this.logout();
             }, this));
         } else {
-          this.data('loginDialog').dialogModal().trigger('error', args.message);
+          this.data('loginDialog').dialogModal().trigger('error.kbase', args.message);
         }
       };
 
@@ -744,13 +701,13 @@
       this.registerLogin =
         function() {
           if (this.sessionObject) {
-            this.data('loginDialog').dialogModal().trigger('clearMessages');
+            this.data('loginDialog').dialogModal().trigger('clearMessages.kbase');
             this.data("entrance").hide();
             this.data("loggedinuser_id").html(this.get_user_label());
             this.data("userdisplay").show();
             this.data('loginDialog').closePrompt();
           } else {
-            this.data('loginDialog').dialogModal().trigger('error', this._error);
+            this.data('loginDialog').dialogModal().trigger('error.kbase', this._error);
           }
       };
 
@@ -777,7 +734,7 @@
               var user_id = this.data('loginDialog').dialogModal().data('user_id').val();
               var password = this.data('loginDialog').dialogModal().data('password').val();
 
-              this.data('loginDialog').dialogModal().trigger('message', user_id);
+              this.data('loginDialog').dialogModal().trigger('message.kbase', user_id);
               this.login(user_id, password, function(args) {
 
                 if (this.registerLogin) {
@@ -929,7 +886,7 @@
 
       $ld.dialogModal().bind('error',
         function(event, msg) {
-          $(this).trigger('clearMessages');
+          $(this).trigger('clearMessages.kbase');
           $(this).data("error").show();
           $(this).data("errormsg").html(msg);
         }
@@ -937,7 +894,7 @@
 
       $ld.dialogModal().bind('message',
         function(event, msg) {
-          $(this).trigger('clearMessages');
+          $(this).trigger('clearMessages.kbase');
           $(this).data("pending").show();
           $(this).data("pendinguser").html(msg);
         }
@@ -972,15 +929,15 @@
           switch (profile.getProfileStatus()) {
             case 'stub':
             case 'profile':
-               $(document).trigger('profileLoaded', profile);       
+               $(document).trigger('profileLoaded.kbase', profile);       
               break;
             case 'none':
               profile.createStubProfile({createdBy: 'session'})
               .then(function(profile) {
-                $(document).trigger('profileLoaded',  profile);  
+                $(document).trigger('profileLoaded.kbase',  profile);  
               })
               .catch (function(err) {
-                 $(document).trigger('profileLoadFailure', {status : 0, message : err}); 
+                 $(document).trigger('profileLoadFailure.kbase', {status : 0, message : err}); 
               })
               .done();
               break;
@@ -989,7 +946,7 @@
         .catch (function(err) {
           var errMsg = 'Error getting user profile';
           // KBase Event Interface
-          $(document).trigger('profileLoadFailure', {status : 0, message : err}); 
+          $(document).trigger('profileLoadFailure.kbase', {status : 0, message : err}); 
         })
         .done();
       });
@@ -1008,7 +965,7 @@
             
             // Awaiting clients can get the session object directly, from the cookie, or query the 
             // global singleton session object.
-            this.trigger('loggedIn', session);
+            this.trigger('loggedIn.kbase', session);
             
             callback.call(this, session);
           }.bind(this),
@@ -1019,7 +976,7 @@
               message: err
             };
             this.populateLoginInfo(errObject);
-            this.trigger('loggedInFailure',errObject);
+            this.trigger('loggedInFailure.kbase',errObject);
            
             callback.call(this, errObject);
           }.bind(this)
@@ -1029,14 +986,17 @@
 
     logout: function(rePrompt) {
       require(['kbasesession'], function (Session) {
+        console.log('here 1');
         Session.removeAuth();
 
         // the rest of this is just housekeeping.
         if (this.specificLogout) {
           this.specificLogout();
         }
+        console.log('here 2');
 
         this.populateLoginInfo();
+        console.log('here 3');
 
         //automatically prompt to log in again
         // rePrompt = false;
@@ -1055,11 +1015,13 @@
         }
         */
 
-        this.trigger('loggedOut');
-
-        if (this.options.logout_callback) {
-          this.options.logout_callback.call(this);
-        }
+        this.trigger('loggedOut.kbase');
+        console.log('here 4');
+        
+        // need this?
+        //if (this.options.logout_callback) {
+        //  this.options.logout_callback.call(this);
+        //}
       }.bind(this));
     }
 

@@ -214,8 +214,6 @@ function ($, Q, Cookie, Config) {
           // This is for compatability with the current state of the narrative ui, which uses this
           // as a flag for being authenticated.
           kbaseSession.success = 1;
-          console.log('saving to local storage...');
-          console.log(kbaseSession);
           localStorage.setItem(this.cookieName, JSON.stringify(kbaseSession));
         }
       }
@@ -261,8 +259,6 @@ function ($, Q, Cookie, Config) {
           },
           success: function (data,res,jqXHR) {
             if (data.kbase_sessionid) {
-              console.log('LOGGED IN WITH...');
-              console.log(data);
               this.setSession(this.importSessionFromAuthObject(data));
               this.setAuthCookie();
               options.success(this.getKBaseSession());
@@ -344,6 +340,14 @@ function ($, Q, Cookie, Config) {
       value: function () {
         if (this.isAuthenticated) {
           return this.sessionObject.username;
+        }
+      }
+    },
+    
+    getRealname: {
+      value: function () {
+        if (this.isAuthenticated) {
+          return this.sessionObject.realname;
         }
       }
     },

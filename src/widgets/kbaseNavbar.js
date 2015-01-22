@@ -114,6 +114,125 @@ function ($, nunjucks, Session) {
         }
       }
     },
+    
+    addDefaultMenu: {
+      value: function (cfg) {
+        if (!cfg.search === false) {
+          this.addMenuItem({
+            name: 'search',
+            label: 'Search Data',
+            url: '/functional-site/#/search/?q=*',
+            place: 'end' 
+          });
+        }
+        if (!cfg.narrative === false) {
+          this.addMenuItem({
+            name: 'narrative',
+            label: 'Narrative',
+            url: '/functional-site/#/narrativemanager/start',
+            place: 'end'
+          });
+        }
+          this.addMenuItem({
+            type: 'divider', 
+            name: 'help',
+            place: 'end'
+          });
+         
+          this.addHelpMenuItem({
+            name: 'contactus',
+            label: 'Contact Us',
+            url: 'http://staging.kbase.us/contact-us',
+            place: 'end'
+          });
+          this.addHelpMenuItem({
+            name: 'about',
+            label: 'About KBase',
+            url: 'http://staging.kbase.us/about/why-kbase'
+          });
+      }
+    },
+    
+    addMenuItem: {
+      value: function (cfg) {
+        var menu = this.container.find('.navbar-menu .dropdown-menu');
+        if (menu) {
+          if (cfg.type === 'divider') {
+            var item = $('<li  role="presentation" class="divider"></li>').attr('data-menu-item', cfg.name);
+          } else {
+            var item = $('<li></li>');
+            
+            if (cfg.url) {
+             item.append($('<a></a>')
+                .attr('href', cfg.url)
+                .text(cfg.label)
+                .attr('data-menu-item', cfg.name));
+            } else if (cfg.callback) {
+             item.append($('<a></a>')
+                .attr('href', '#')
+                .text(cfg.label)
+                .attr('data-menu-item', cfg.name))
+              .on('click', function (e) {
+                e.preventDefault();
+                cfg.callback();
+              });
+            }
+          }
+        }
+        if (!item) {
+          return;
+        }
+        if (cfg.place === 'end') {
+          menu.append(item);
+        } else {
+          menu.prepend(item);
+        }
+      }
+    },
+    
+    removeMenuItem: {
+      value: function (cfg) {
+        
+      }
+    },
+    setAboutURL: {
+      value: function (cfg) {
+        
+      }
+    },
+    addHelpMenuItem: {
+      value: function (cfg) {
+        var item = $('<li></li>')
+        .append($('<a></a>')
+          .attr('href', cfg.url)
+          .text(cfg.label)
+          .attr('data-menu-item', cfg.name));
+        if (cfg.place === 'end') {
+          var menu = this.container.find('.navbar-menu .dropdown-menu');
+          if (!menu) {
+            return;
+          }
+          menu.append(item);
+        } else {
+          var helpDivider = this.container.find('.navbar-menu .dropdown-menu [data-menu-item="help"]');
+          if (!helpDivider) {
+            return;
+          }
+          helpDivider.after(item);
+        }
+      }
+    },
+    removeHelpMenuItem: {
+      value: function (cfg) {
+        
+      }
+    },
+    clearMenu: {
+      value: function (cfg) {
+        this.container.find('.navbar-menu .dropdown-menu').empty();
+      }
+    },
+    
     // TEMPLATES
     getTemplate: {
       value: function(name) {

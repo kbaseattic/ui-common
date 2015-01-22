@@ -76,6 +76,19 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
       
       go: {
         value: function() {
+          NAVBAR.clearMenu();
+          NAVBAR.addDefaultMenu({
+            search: true, narrative: true
+          });
+          NAVBAR.addMenuItem({
+            name: 'test',
+            label: 'Test',
+            callback: function () {
+              alert('This is indeed a test');
+            }
+          });
+         
+          
           // Show the user we are doing something, since we are about to launch a 
           // query for profile data.
           this.setupUI();

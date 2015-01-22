@@ -40,7 +40,9 @@ require.config({
       kbaseutils: '/src/kbaseUtils',
       kbasecookie: '/src/kbaseCookie',
       kbasetest: '/src/kbaseTest',
-      kbasenavbar: '/src/widgets/kbaseNavbar'
+      kbasenavbar: '/src/widgets/kbaseNavbar',
+      kbasebasewidget: '/src/widgets/kbaseBaseWidget',
+      kbaseloginwidget: '/src/widgets/kbaseLoginWidget'
     },
    shim: { 
     'kbaseuserprofileserviceclient': {

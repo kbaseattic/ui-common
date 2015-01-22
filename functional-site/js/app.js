@@ -682,7 +682,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
 
     var finish_logout = function() {
         $location.path('/login/');
-//        $rootScope.$apply();
+        $rootScope.$apply();
         window.location.reload();
     };
 
@@ -691,10 +691,17 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     //                                logout_callback: finish_logout});
     $('#signin-button').kbaseLogin();
     // $('#signin-button').css('padding', '0');  // Jim!
-    $(document).on('loggedIn', function (e, session) {
+    
+    // This is an important part of the app lifecycle!
+    // Login and out events trigger a refresh of the entire page. 
+    // In addition, logout will redirect to the login page.
+    // Although views and widgets should be prepared to render in an unauthenticated state
+    // (and a view would need to redirect to /login if it doesn't want to be seen)
+    // in practice they may never be seen thus.
+    $(document).on('loggedIn.kbase', function (e, session) {
       finish_login(session);
     });
-    $(document).on('loggedOut', function (e) {
+    $(document).on('loggedOut.kbase', function (e) {
       finish_logout();
     });
     
