@@ -52,6 +52,8 @@ function KBasePhenotypes_PhenotypeSet(modeltabs) {
 		    self.phenotypes[i].additionalcompound_names = names;
 		}
 	    });
+
+	return promise;
     }
         
     this.tabList = [{
