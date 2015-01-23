@@ -4,6 +4,7 @@ function ($, nunjucks, Session) {
   var Navbar = Object.create({},{
     init: {
       value: function (cfg) {
+        console.log('in navbar');
         if (typeof cfg.container === 'string') {
           this.container = $(cfg.container);
         } else {
@@ -34,7 +35,13 @@ function ($, nunjucks, Session) {
           widgetName: this.widgetName
         };
         
-        this.loadCSS();
+        console.log('About to load css?');
+        
+        // Don't load css dynamically for now. There are parts of the functional
+        // site which don't know about this widget yet. And perhaps it will be
+        // best practice to load the css for core ui components statically so that
+        // the layout doesn't jump around as components load.
+        // this.loadCSS();
         return this;
       }
     },
@@ -48,6 +55,7 @@ function ($, nunjucks, Session) {
     },
     loadCSS: {
       value: function() {
+        console.log('loading css'); console.log('/src/widgets/' + this.widgetName + '/style.css');
         $('<link>')
         .appendTo('head')
         .attr({type: 'text/css', rel: 'stylesheet'})
