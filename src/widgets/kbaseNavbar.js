@@ -68,6 +68,11 @@ function ($, nunjucks, Session) {
         this.container.find('.navbar-title').html(title);
       }
     },
+    clearTitle: {
+      value: function () {
+        this.container.find('.navbar-title').empty();
+      }
+    },
     clearButtons: {
       value: function () {
         this.container.find('.navbar-buttons').empty();
@@ -153,7 +158,8 @@ function ($, nunjucks, Session) {
     
     addDefaultMenu: {
       value: function (cfg) {
-        if (!cfg.search === false) {
+        cfg = cfg || {};
+        if (cfg.search !== false) {
           this.addMenuItem({
             name: 'search',
             label: 'Search Data',
@@ -161,7 +167,7 @@ function ($, nunjucks, Session) {
             place: 'end' 
           });
         }
-        if (!cfg.narrative === false) {
+        if (cfg.narrative !== false) {
           this.addMenuItem({
             name: 'narrative',
             label: 'Narrative',
