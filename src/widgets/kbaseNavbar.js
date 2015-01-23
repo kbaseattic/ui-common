@@ -117,11 +117,9 @@ function ($, nunjucks, Session) {
             menu.append('<li class="divider"></li>');
           } else {
             var menuItem = $('<li><a href="#" data-widget-menu-item="'+item.name+'"><span class="fa fa-'+item.icon+'" style="font-size: 150%; color:'+item.color+'; margin-right: 10px;"></span>' + item.label + '</a></li>');
-            menuItem.on('click', function (e) {
-              if (item.callback) {
-                item.callback(e);
-              }
-            });
+            if (item.callback) {
+              menuItem.on('click', item.callback);
+            }
             menu.append(menuItem);
           }
         }

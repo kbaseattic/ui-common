@@ -156,3 +156,9 @@ The content area is normal flow and just needs to have a matching top margin.
     width: 75%;
 }
 */
+
+.navbar-kbase .btn.btn-default {
+  border-color: transparent;
+  border-size: 0;
+  border-style: none;
+}
