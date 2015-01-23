@@ -264,7 +264,13 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
       calcProfileCompletion: {
         value: function () {
           if (Session.isLoggedIn()) {
-            return this.userProfile.calcProfileCompletion();
+            var completion =  this.userProfile.calcProfileCompletion();
+            var lastSave = this.userProfile.nthHistory(1);
+            if (completion.status === 'complete' && lastSave && lastSave.completionStatus === completion.status) {
+              return null;
+            } else {
+              return completion;
+            }
           } else {
             return 'notloggedin';
           }
