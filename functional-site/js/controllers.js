@@ -419,7 +419,8 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
                     //kb = new KBCacheClient(USER_TOKEN);
                     //kb.nar.ensure_home_project(USER_ID);
 
-                    $location.path('/narratives/featured');
+                    //$location.path('/narratives/featured');
+		    $location.path('/narrativemanager/start');  // new routing to narrativemanager instead of old narrative list
                     $scope.$apply();
                     window.location.reload();
 
@@ -800,6 +801,28 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
                      'mod': $stateParams.mod};
 })
 
+.controller('JGI', function($scope, $stateParams) {
+    $scope.params = {'ws': $stateParams.ws,
+                     'obj': $stateParams.obj};
+})
+
+
+
+.controller('narrativemanager', function($scope, $stateParams) {
+    $scope.params = $stateParams;
+})
+
+.controller('NarrativeStore', function($scope, $stateParams) {
+    $scope.params = $stateParams;
+})
+
+.controller('JsonDetail', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
+})
+
+.controller('ContigSetDetail', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
+})
 
 
 function LPHelp($scope, $stateParams, $location) {

@@ -760,6 +760,10 @@
                 this.showMSACards();
             else if (this.options.template.toLowerCase() === "kidledt")
                 this.showKidlEdtCards();
+            else if (this.options.template.toLowerCase() === "json")
+                this.showJsonCards();
+            else if (this.options.template.toLowerCase() === "contigset")
+                this.showContigSetCards();
             else {
                 // throw an error for an unknown template. modal dialog, maybe?
             }
@@ -1510,6 +1514,32 @@
                     {	type: this.options.data.type,
             			mod: this.options.data.mod,
                         isInCard: true
+                    },
+                    {   my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+
+        showJsonCards: function() {
+            this.addNewCard("kbaseJsonView",
+                    {	ws: this.options.data.ws,
+            			id: this.options.data.id
+                    },
+                    {   my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+
+        showContigSetCards: function() {
+            this.addNewCard("kbaseContigSetView",
+                    {	ws: this.options.data.ws,
+            			id: this.options.data.id
                     },
                     {   my: "left top",
                         at: "left bottom",

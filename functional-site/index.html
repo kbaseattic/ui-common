@@ -139,6 +139,15 @@
 
         <script src="../src/widgets/workspaces/kbaseWSFbaTable.js"></script>
         <script src="../src/widgets/workspaces/kbaseWSMediaTable.js"></script>
+        
+        <script src="../src/widgets/jgi/kbaseJgiDataImportView.js"></script>
+    
+        <!-- narrative related widgets/sources -->
+        <script src="../src/widgets/narrativemanager/kbaseNarrativeManager.js"></script>
+        <script src="../src/widgets/narrativemanager/NarrativeManager.js"></script>
+        <script src="../src/widgets/narrativemanager/NarrativeMethodStore.js"></script>
+        <script src="../src/widgets/narrativemanager/kbaseNarrativeStoreView.js"></script>
+    
     
         <!-- ws obj reference related widgets -->
         <script src="../ext/d3/sankey.js"></script> <!-- this is a d3 plugin -->
@@ -303,6 +312,9 @@
         <script  src="../src/widgets/networks/kbaseNetworkCard.js"></script>
         <!-- End Network widgets -->
 
+        <script  src="../src/widgets/json/kbaseJsonView.js"></script>
+        <script  src="../src/widgets/contigset/kbaseContigSetView.js"></script>
+
         <!-- app -->
         <script src="assets/js/file-upload-1.6.12/angular-file-upload-shim.min.js"></script>
         <script src="js/angular-1.2.14/angular.min.js"></script>
@@ -384,32 +396,17 @@
 
                         <!-- title area -->
                         <div class="navbar-text navbar-title">
+                           <!-- views and widgets can add title content here -->
                            <span class="title"></span>
                         </div>
 
                         <!-- button area -->
                         <div class="navbar-right">
+
+ 			    <!-- views and widets can place buttons here, see kbaseNavbar.js -->
                             <span class="navbar-buttons">
                             </span>
-                           
-                            <!--<button id="kb-save-btn" class="btn btn-default navbar-btn kb-nav-btn">
-                                <div class="fa fa-save"></div>
-                                <div class="kb-nav-btn-txt">save</div>
-                            </button>
-                            <button id="kb-share-btn" class="btn btn-default navbar-btn kb-nav-btn">
-                                <div class="fa fa-share-alt"></div>
-                                <div class="kb-nav-btn-txt">share</div>
-                            </button>
-                            <button id="kb-about-btn" class="btn btn-default navbar-btn kb-nav-btn">
-                                <div class="fa fa-info"></div>
-                                <div class="kb-nav-btn-txt">about</div>
-                            </button>
-                            <button id="kb-help-btn" class="btn btn-default navbar-btn kb-nav-btn" data-toggle="tooltip" data-placement="bottom" Title="Not yet!">
-                                <div class="fa fa-question"></div>
-                                <div class="kb-nav-btn-txt">help</div>
-                            </button> -->
                             <span id="signin-button"></span>
-                           
                         </div>
                     </div>
                 </div>

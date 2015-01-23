@@ -66,7 +66,15 @@ var app = angular.module('landing-pages',
           url: "featured",
           templateUrl: 'views/ws/featured.html',
           controller: 'WB'
-        })
+        });
+  
+    // new narrative manager routing
+     $stateProvider
+        .state('narrativemanager', {
+          url: "/narrativemanager/:action?app&method&copydata&appparam",
+          templateUrl: 'views/narrative/narrative-manager.html',
+          controller: 'narrativemanager'
+        });
 
     // workspace browser routing
     $stateProvider
@@ -543,13 +551,11 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		templateUrl: 'views/navtest/view.html',
 		controller: 'NavTest'});
     
-    /* this app page should no longer be used....
-     *$stateProvider
-	.state('app',
-		{url: '/app/:appid',
-		templateUrl: 'views/social/sortable-rows-app.html',
-		controller: 'App'}); */
-                
+    $stateProvider
+	.state('narrativestore',
+		{url: '/narrativestore/:type/:id',
+		templateUrl: 'views/narrative/narrative-store.html',
+		controller: 'NarrativeStore'});
                 
     $stateProvider
 	.state('kidledttype',
@@ -562,6 +568,24 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		{url: '/kidledt/:mod',
 		templateUrl: 'views/objects/kidledt.html',
 		controller: 'KidlEdtDetail'});
+  
+    $stateProvider
+	.state('jgi',
+		{url: '/jgi/import/:ws/:obj',
+		templateUrl: 'views/jgi/jgi_obj_info.html',
+		controller: 'JGI'});
+
+    $stateProvider
+    .state('json', {
+            url: '/json/:ws/:id',
+            templateUrl: 'views/objects/json.html',
+            controller: 'JsonDetail'});
+
+    $stateProvider
+    .state('contigset', {
+            url: '/contigsets/:ws/:id',
+            templateUrl: 'views/objects/contigset.html',
+            controller: 'ContigSetDetail'});
 
     $urlRouterProvider.when('', '/login/')
                       .when('/', '/login/')

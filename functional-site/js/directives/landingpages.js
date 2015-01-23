@@ -1083,6 +1083,19 @@ angular.module('lp-directives')
         }
     };
 })
+.directive('sortablegenedomains', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Domains',
+                                           rightLabel: scope.ws,
+                                           subText: scope.fid});
+            p.loading();
+            $(p.body()).KBaseGeneDomains(
+                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
+        }
+    };
+})
 .directive('sortablepdbstructure', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
@@ -1606,4 +1619,86 @@ angular.module('lp-directives')
 		}
 	};
 })
+
+
+
+.directive('jgiobjinfo', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            
+            
+            /* don't use the draggable rows style because there is just one row!
+            /*var p = $(ele).kbasePanel({title: 'Imported JGI Data',
+                                           rightLabel: '', //scope.params.ws,
+                                           subText: '' }); //scope.params.obj});*/
+            
+            /* simplified panel that cannot be closed or dragged */
+            var $panel = $('<div class="panel panel-default">'+
+                                '<div class="panel-heading">'+
+                                    '<span class="panel-title"></span>'+
+                                '</div>'+
+                                '<div class="panel-body"></div>'+
+                           '</div>');
+            $(ele).append($panel);
+            
+            $panel.find('.panel-title').append('Imported JGI Data');
+            $panel.find('.panel-body').KBaseJgiDataImportView({
+                    ws:   scope.params.ws,
+                    obj:  scope.params.obj,
+                    loadingImage: "assets/img/ajax-loader.gif"
+                });
+        }
+    };
+})
+
+
+
+.directive('narrativestore', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            
+            
+            /* don't use the draggable rows style because there is just one row!
+            /*var p = $(ele).kbasePanel({title: 'Imported JGI Data',
+                                           rightLabel: '', //scope.params.ws,
+                                           subText: '' }); //scope.params.obj});*/
+            
+            /* simplified panel that cannot be closed or dragged */
+            var $panel = $('<div class="panel panel-default">'+
+                                '<div class="panel-heading">'+
+                                    '<span class="panel-title"></span>'+
+                                '</div>'+
+                                '<div class="panel-body"></div>'+
+                           '</div>');
+            $(ele).append($panel);
+            $panel.find('.panel-title').append('Narrative Apps and Methods Documentation');
+            $panel.find('.panel-body').KBaseNarrativeStoreView({
+                    type:   scope.params.type,
+                    id:  scope.params.id,
+                    loadingImage: "assets/img/ajax-loader.gif"
+                });
+        }
+    };
+})
+
+
+.directive('jsoncards', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var $panel = $('<div class="panel panel-default">'+
+                                '<div class="panel-heading">'+
+                                    '<span class="panel-title"></span>'+
+                                '</div>'+
+                                '<div class="panel-body"></div>'+
+                           '</div>');
+            $(ele).append($panel);
+            $panel.find('.panel-title').append('Raw Data JSON Viewer');
+            $panel.find('.panel-body').kbaseJsonView({
+                    ws: scope.params.ws,
+            	    id: scope.params.id
+                });
+        }
+    };
+})
+
 ;
