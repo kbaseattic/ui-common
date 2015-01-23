@@ -1,4 +1,4 @@
-function KBaseFBA_Media(tabwidget) {
+function KBaseBiochem_Media(tabwidget) {
     var self = this;
     this.tabwidget = tabwidget;
 
@@ -131,12 +131,12 @@ function KBaseFBA_Media(tabwidget) {
         }, {
             "label": "Charge",
             "key": "charge"
-        }, {
+        },/* {
             "label": "Compartment",
             "key": "compartment",
             "type": "tabLink",
             "method": "CompartmentTab"
-        }]
+        }*/]
     }, {
         "key": "reagents",
         "name": "Reagents",
@@ -155,4 +155,4 @@ function KBaseFBA_Media(tabwidget) {
 }
 
 // make method of base class
-KBObjects.prototype.KBaseFBA_Media = KBaseFBA_Media;
+KBObjects.prototype.KBaseBiochem_Media = KBaseBiochem_Media;

@@ -65,6 +65,8 @@ $.KBWidget({
         //
         // 1) Use type (periods replaced with underscores) to instantiate object
         //
+
+        console.log('type', type.replace(/\./g, '_'))
         obj = new kbObjects[type.replace(/\./g, '_')](self);
 
         //
