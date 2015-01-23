@@ -19,8 +19,6 @@ $.KBWidget({
         this._super(input);
         var self = this;
 
-        var imageURL = "http://bioseed.mcs.anl.gov/~chenry/jpeg/";
-
         var type = input.type;
 
         var tabs;
@@ -68,7 +66,7 @@ $.KBWidget({
         obj = new kbObjects[type.replace(/\./g, '_')](self);
 
         //
-        // 2) add the tabs
+        // 2) add the tabs (at page load)
         //
         var tabList = obj.tabList;
 
@@ -96,7 +94,6 @@ $.KBWidget({
 
         self.kbapi('ws', 'get_object_info_new', {objects: [param], includeMetadata: 1})
           .done(function(res) {
-            console.log(res)
               obj.setMetadata(res[0]);
 
               for (var i = 0; i < tabList.length; i++) {
@@ -117,7 +114,6 @@ $.KBWidget({
         //
         // 4) get object data, create tabs
         //
-
         if (isNaN(input.ws) && isNaN(input.name) )
             var param = {workspace: input.ws, name: input.name};
         else if (!isNaN(input.ws) && !isNaN(input.name) )
@@ -125,6 +121,7 @@ $.KBWidget({
 
         self.kbapi('ws', 'get_objects', [param])
           .done(function(data){
+            console.log('data', data)
               var setMethod = obj.setData(data[0].data);
 
               // see if setData method returns promise or not
@@ -137,7 +134,36 @@ $.KBWidget({
               }
         })
 
+        var refLookup = {};
+        function preProcessDataTable(tabSpec) {
+            // get refs
+            var refs = [],
+                cols = tabSpec.columns;
+            cols.forEach(function(col){
+                if ((col.type == 'tabLink' || col.type == 'wstype') && col.linkformat == 'dispWSRef') {
+                    obj[tabSpec.key].forEach(function(item) {
+                        refs.push( {ref: item[col.key]} );
+                    })
+                }
+            })
+
+            // get human readable info from workspaces
+            return self.kbapi('ws', 'get_object_info_new', {objects: refs})
+                       .then(function(data) {
+                        console.log('wsdata', data)
+                            refs.forEach(function(ref, i){
+
+                                // if (ref in referenceLookup) return
+                                refLookup[ref.ref] = {name: data[i][1],
+                                                      ws: data[i][7],
+                                                      type: data[i][2].split('-')[0],
+                                                      link: data[i][2].split('-')[0]+'/'+data[i][7]+'/'+data[i][1]};
+                            })
+                       })
+        }
+
         function buildContent() {
+
             //5) Iterates over the entries in the spec and instantiate things
             for (var i = 0; i < tabList.length; i++) {
                 var tabSpec = tabList[i];
@@ -147,7 +173,7 @@ $.KBWidget({
                 if (tabSpec.type == 'verticaltbl') continue;
 
                 // if widget, invoke widget with arguments
-                if (tabSpec.widget) {
+                else if (tabSpec.widget) {
                     var keys = tabSpec.keys.split(/\,\s+/g);
                     var params = {};
                     tabSpec.arguments.split(/\,\s+/g).forEach(function(arg, i) {
@@ -158,17 +184,26 @@ $.KBWidget({
                     continue;
                 }
 
-                var settings = self.getTableSettings(tabSpec, obj.data);
-                tabPane.rmLoading();
+                // preprocess data to get workspace info on any references in class
+                preProcessDataTable(tabSpec)
+                    .done(function() {
+                        var settings = self.getTableSettings(tabSpec, obj.data);
+                        tabPane.rmLoading();
 
-                // note: must add table first
-                tabPane.append('<table class="table table-bordered table-striped">');
-                tabPane.find('table').dataTable(settings)
+                        // note: must add table first
+                        tabPane.append('<table class="table table-bordered table-striped">');
+                        tabPane.find('table').dataTable(settings)
 
-                // add any events
-                newTabEvents(tabSpec.name);
+                        // add any events
+                        newTabEvents(tabSpec.name);
+
+                    })
+
             }
         }
+
+
+
 
         // takes table spec and prepared data, returns datatables settings object
         this.getTableSettings = function(tab, data) {
@@ -198,24 +233,41 @@ $.KBWidget({
 
             ids.unbind('click');
             ids.click(function() {
-                var id = $(this).data('id'),
-                    method = $(this).data('method');
+                var info = {id: $(this).data('id'),
+                            type: $(this).data('type'),
+                            method: $(this).data('method'),
+                            ref: $(this).data('ref'),
+                            name: $(this).data('name'),
+                            ws: $(this).data('ws'),
+                            action: $(this).data('action')}
 
                 var content = $('<div>').loading();
 
-                if (method) {
-                    var prom = obj[method](id);
+                console.log('new tab info', info)
+                if (info.method && info.method != 'undefined') {
+                    var prom = obj[info.method](info);
 
                     $.when(prom).done(function(rows) {
                         content.rmLoading();
                         var table = self.verticalTable({rows: rows});
                         content.append(table);
                     })
+
+
+                    tabs.addTab({name: id, content: content, removable: true});
+                    tabs.showTab(id);
+                    newTabEvents(id);
+
+                } else if (info.action == 'openWidget') {
+                    console.log('opening widget')
+                    content.kbaseTabTable({ws: info.ws, type: info.type, name: info.name} )
+                    tabs.addTab({name: info.id, content: content, removable: true});
+                    tabs.showTab(info.id);
+                    newTabEvents(info.id);
                 }
 
-                tabs.addTab({name: id, content: content, removable: true});
-                tabs.showTab(id);
-                newTabEvents(id);
+
+
             });
         }
 
@@ -232,10 +284,11 @@ $.KBWidget({
                 var key = col.key,
                     type = col.type,
                     format = col.linkformat,
-                    method = col.method;
+                    method = col.method,
+                    action = col.action
 
                 var config = {sTitle: col.label,
-                              mData: ref(key, type, format, method)}
+                              mData: ref(key, type, format, method, action)}
 
                 if (col.width) config.sWidth = col.width;
 
@@ -247,7 +300,7 @@ $.KBWidget({
         }
 
 
-        function ref(key, type, format, method) {
+        function ref(key, type, format, method, action) {
             return function(d) {
                         if (type == 'tabLink' && format == 'dispIDCompart') {
                             var id = d[key].split('_')[0];
@@ -259,11 +312,24 @@ $.KBWidget({
                             var id = d[key];
                             return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
                                         id+'</a>';
+                        } else if (type == 'wstype' && format == 'dispWSRef') {
+                            var ws = refLookup[ d[key] ].ws,
+                                name = refLookup[ d[key] ].name
+                                wstype = refLookup[ d[key] ].type,
+                                link = refLookup[ d[key] ].link;
+                            return '<a href="#/test/'+link+
+                                     '" class="id-click"'+
+                                     '" data-ws="'+ws+
+                                     '" data-id="'+name+
+                                     '" data-ref="'+d[key]+
+                                     '" data-type="'+wstype+
+                                     '" data-action="openPage"'+
+                                     '" data-method="'+method+
+                                     '" data-name="'+name+'">'+
+                                    name+'</a>';
                         }
 
-
                         var value = d[key];
-
                         if ($.isArray(value)) {
                             if (type == 'tabLinkArray')
                                 return tabLinkArray(value, method)
@@ -357,6 +423,7 @@ $.KBWidget({
             return 'http://bioseed.mcs.anl.gov/~chenry/jpeg/'+id+'.jpeg';
         }
 
+        var imageURL = "http://bioseed.mcs.anl.gov/~chenry/jpeg/";
         this.pictureEquation = function(eq) {
             var cpds = get_cpds(eq);
 

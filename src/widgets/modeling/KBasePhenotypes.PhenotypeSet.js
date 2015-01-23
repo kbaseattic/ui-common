@@ -3,7 +3,7 @@ function KBasePhenotypes_PhenotypeSet(modeltabs) {
     this.modeltabs = modeltabs;
 
     this.setMetadata = function (data) {
-	this.workspace = data[7];
+        this.workspace = data[7];
         this.objName = data[1];
         this.overview = {wsid: data[7]+"/"+data[1],
                          objecttype: data[2],
@@ -21,101 +21,99 @@ function KBasePhenotypes_PhenotypeSet(modeltabs) {
     };
 
     this.setData = function (indata) {
-	this.data = indata;
-	this.phenotypes = this.data.phenotypes;
-	var cpd_refs_hash = {};
-	for (var i=0; i< this.phenotypes.length; i++) {
-	    var refs = this.phenotypes[i].additionalcompound_refs;
-	    for (var j=0; j<refs.length; j++) {
-		cpd_refs_hash[refs[j]] = 1;
-	    }
-	}
+        this.data = indata;
+        this.phenotypes = this.data.phenotypes;
+        var cpd_refs_hash = {};
+        for (var i=0; i< this.phenotypes.length; i++) {
+            var refs = this.phenotypes[i].additionalcompound_refs;
+            for (var j=0; j<refs.length; j++) {
+                cpd_refs_hash[refs[j]] = 1;
+            }
+        }
 
-	var cpd_refs = [];
+        var cpd_refs = [];
 
-	for (var key in cpd_refs_hash) {
-	    cpd_refs.push(key);
-	}
+        for (var key in cpd_refs_hash) {
+            cpd_refs.push(key);
+        }
 
-	var promise = this.modeltabs.getBiochemCompounds(cpd_refs)
-	.then(function(cpds){
-		var addcpd_names_hash = {};
-		for (var j=0; j<cpds.length; j++) {
-			addcpd_names_hash[cpds[j].id] = cpds[j].name;
-		    }
-		for (var i=0; i< self.phenotypes.length; i++) {
-		    var refs = self.phenotypes[i].additionalcompound_refs;
-		    var names = [];
-		    for (var j=0; j<refs.length; j++) {
-			names.push(addcpd_names_hash[refs[j].split("/").pop()]);
-		    }
-		    self.phenotypes[i].additionalcompound_names = names;
-		}
-	    });
+        var promise = this.modeltabs.getBiochemCompounds(cpd_refs)
+                          .then(function(cpds){
+                             var addcpd_names_hash = {};
+                             for (var j=0; j<cpds.length; j++) {
+                                     addcpd_names_hash[cpds[j].id] = cpds[j].name;
+                                 }
+                             for (var i=0; i< self.phenotypes.length; i++) {
+                                 var refs = self.phenotypes[i].additionalcompound_refs;
+                                 var names = [];
+                                 for (var j=0; j<refs.length; j++) {
+                                     names.push(addcpd_names_hash[refs[j].split("/").pop()]);
+                                 }
+                                 self.phenotypes[i].additionalcompound_names = names;
+                             }
+                          });
 
-	return promise;
+        return promise;
     }
 
     this.tabList = [{
-		"key": "overview",
-		"name": "Overview",
-		"type": "verticaltbl",
-		"rows": [{
-			"label": "ID",
-			"key": "wsid"
-		},{
-			"label": "Object type",
-			"key": "objecttype",
-			"type": "typelink"
-		},{
-			"label": "Owner",
-			"key": "owner"
-		},{
-			"label": "Version",
-			"key": "instance"
-		},{
-			"label": "Mod-date",
-			"key": "moddate"
-		},{
-			"label": "Name",
-			"key": "name"
-		},{
-			"label": "Source",
-			"key": "source"
-		},{
-			"label": "Number phenotypes",
-			"key": "numphenotypes"
-		},{
-			"label": "Phenotype type",
-			"key": "type"
-		}]
-	}, {
-		"key": "phenotypes",
-		"name": "Phenotypes",
-		"type": "dataTable",
-		"columns": [{
-			"label": "Name",
-			"key": "name",
-			"visible": 1
-		}, {
-			"label": "Growth condition",
-			"key": "media_ref",
-			"type": "wstype"
-		}, {
-			"label": "Gene KO",
-			"type": "wstype",
-			"key": "geneko_refs",
-			"visible": 1
-		}, {
-			"label": "Additional compounds",
-			"key": "additionalcompound_names",
-			"visible": 1
-		}, {
-			"label": "Observed normalized growth",
-			"key": "normalizedGrowth",
-			"visible": 1
-		}]
-	}];
+        "key": "overview",
+        "name": "Overview",
+        "type": "verticaltbl",
+        "rows": [{
+            "label": "ID",
+            "key": "wsid"
+        },{
+            "label": "Object type",
+            "key": "objecttype",
+            "type": "typelink"
+        },{
+            "label": "Owner",
+            "key": "owner"
+        },{
+            "label": "Version",
+            "key": "instance"
+        },{
+            "label": "Mod-date",
+            "key": "moddate"
+        },{
+            "label": "Name",
+            "key": "name"
+        },{
+            "label": "Source",
+            "key": "source"
+        },{
+            "label": "Number phenotypes",
+            "key": "numphenotypes"
+        },{
+            "label": "Phenotype type",
+            "key": "type"
+        }]
+    }, {
+        "key": "phenotypes",
+        "name": "Phenotypes",
+        "type": "dataTable",
+        "columns": [{
+            "label": "Name",
+            "key": "name"
+        }, {
+            "label": "Growth condition",
+            "key": "media_ref",
+            "linkformat": "dispWSRef",
+            "type": "wstype",
+            "wstype": "KBaseFBA.Media"
+        }, {
+            "label": "Gene KO",
+            "type": "wstype",
+            "key": "geneko_refs"
+        }, {
+            "label": "Additional compounds",
+            "key": "additionalcompound_names"
+        }, {
+            "label": "Observed normalized growth",
+            "key": "normalizedGrowth"
+        }]
+    }];
 }
 
 // make method of base class
