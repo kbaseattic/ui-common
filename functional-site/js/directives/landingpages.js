@@ -1639,7 +1639,7 @@ angular.module('lp-directives')
                                 '</div>'+
                                 '<div class="panel-body"></div>'+
                            '</div>');
-            $(ele).append($panel);
+            $(ele).append($panel).css({'margin':'10px'});;
             
             $panel.find('.panel-title').append('Imported JGI Data');
             $panel.find('.panel-body').KBaseJgiDataImportView({
@@ -1669,7 +1669,7 @@ angular.module('lp-directives')
                                     '<span class="panel-title"></span>'+
                                 '</div>'+
                                 '<div class="panel-body"></div>'+
-                           '</div>');
+                           '</div>').css({'margin':'10px'});
             $(ele).append($panel);
             $panel.find('.panel-title').append('Narrative Apps and Methods Documentation');
             $panel.find('.panel-body').KBaseNarrativeStoreView({
@@ -1690,7 +1690,7 @@ angular.module('lp-directives')
                                     '<span class="panel-title"></span>'+
                                 '</div>'+
                                 '<div class="panel-body"></div>'+
-                           '</div>');
+                           '</div>').css({'margin':'10px'});;
             $(ele).append($panel);
             $panel.find('.panel-title').append('Raw Data JSON Viewer');
             $panel.find('.panel-body').kbaseJsonView({

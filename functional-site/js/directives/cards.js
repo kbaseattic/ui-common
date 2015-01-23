@@ -413,16 +413,18 @@ angular.module('card-directives')
     .directive('wsobjgraphcenteredview', function($rootScope) {
         return {
             link: function(scope, ele, attrs) {
-		var p = $(ele).kbasePanel({title: 'Object Reference and Provenance Graph',
-                                           rightLabel: scope.params.ws,
-                                           subText: scope.params.id});
-		p.loading();
-		$(p.body()).KBaseWSObjGraphCenteredView({objNameOrId: scope.params.id, wsNameOrId: scope.params.ws, kbCache: kb});
-                /*if (cardManager) cardManager.destroy();
-                cardManager = $(element).KBaseCardLayoutManager({
-                    template: "wsobjgraphcenteredview", 
-                    data: scope.params
-                });*/
+		var $panel = $('<div class="panel panel-default">'+
+                                '<div class="panel-heading">'+
+                                    '<span class="panel-title"></span>'+
+                                '</div>'+
+                                '<div class="panel-body"></div>'+
+                           '</div>').css({'margin':'10px'});;
+		$(ele).append($panel);
+		$panel.find('.panel-title').append('Object Reference and Provenance Graph');
+		$panel.find('.panel-body').KBaseWSObjGraphCenteredView({
+		    objNameOrId: scope.params.id,
+		    wsNameOrId: scope.params.ws,
+		    kbCache: kb});
             }
         };
     })
