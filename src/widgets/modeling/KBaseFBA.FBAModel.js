@@ -85,7 +85,7 @@ function KBaseFBA_FBAModel(modeltabs) {
         "columns": [{
             "label": "Reaction",
             "type": "tabLink",
-            "linkformat": "dispid",
+            "linkformat": "dispIDCompart",
             "key": "id",
             "method": "ReactionTab",
             "width": "15%"
@@ -111,7 +111,7 @@ function KBaseFBA_FBAModel(modeltabs) {
             "label": "Compound",
             "key": "id",
             "type": "tabLink",
-            "linkformat": "dispid",
+            "linkformat": "dispIDCompart",
             "method": "CompoundTab",
             "width": "15%"
         }, {
