@@ -1,4 +1,4 @@
-function KBaseGenomes_GenomeSet(modeltabs) {
+function KBaseSearch_GenomeSet(modeltabs) {
     var self = this;
     this.modeltabs = modeltabs;
 
@@ -61,10 +61,12 @@ function KBaseGenomes_GenomeSet(modeltabs) {
 		"columns": [{
 			"label": "Genome",
 			"key": "ref",
-			"visible": 1
+			"linkformat": "dispWSRef",
+			"type": "wstype",
+			"wstype": "KBaseGenomes.Genome"
 		}]
 	}];
 }
 
 // make method of base class
-KBObjects.prototype.KBaseGenomes_GenomeSet = KBaseGenomes_GenomeSet;
+KBObjects.prototype.KBaseSearch_GenomeSet = KBaseSearch_GenomeSet;
