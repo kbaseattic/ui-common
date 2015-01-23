@@ -1,16 +1,14 @@
-define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuserprofile', 'kbasesession'],
-  function(nunjucks, $, md5, Q, Utils, SocialWidget, UserProfile, Session) {
+define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuserprofile', 'kbasesession', 'kbasenavbar'],
+  function(nunjucks, $, Q, Utils, SocialWidget, UserProfile, Session, NAVBAR) {
     "use strict";
-
+    // var NAVBAR = Object.create(Navbar).init({container: '#kbase-navbar'});
     var UserProfileWidget = Object.create(SocialWidget, {
 
       init: {
         value: function(cfg) {
           cfg.name = 'UserProfile';
-          cfg.title = 'User Profile';
-          
+          cfg.title = 'User Profile';      
           this.SocialWidget_init(cfg);
-          
 
           this._generatedId = 0;
 
@@ -51,11 +49,8 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
           // default option.
           this.templates.env.addFilter('gravatar', function(email, size, rating, gdefault) {
             // TODO: http/https.
-            var md5Hash = md5(email);
-            // window.location.protocol
-            var url = 'https://www.gravatar.com/avatar/' + md5Hash + '?s=' + size + '&amp;r=' + rating + '&d=' + gdefault
-            return url;
-          });
+            return UserProfile.makeGravatarURL(email, size, rating, gdefault);
+          }.bind(this));
           this.templates.env.addFilter('kbmarkup', function(s) {
             s = s.replace(/\n/g, '<br>');
             return s;
@@ -70,6 +65,8 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
           return this;
         }
       },
+      
+     
 
       setup: {
         value: function() {
@@ -79,6 +76,19 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
       
       go: {
         value: function() {
+          NAVBAR.clearMenu();
+          NAVBAR.addDefaultMenu({
+            search: true, narrative: true
+          });
+          NAVBAR.addHelpMenuItem({
+            name: 'bugreport',
+            label: 'New Issue',
+            icon: 'bug',
+            external: true,
+            url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
+          });
+         
+          
           // Show the user we are doing something, since we are about to launch a 
           // query for profile data.
           this.setupUI();
@@ -127,14 +137,13 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
         value: function(options) {
           return Q.Promise(function (resolve, reject, notify) {
             // this.resetState();
-            
             if (!Session.isLoggedIn()) {
               // We don't even try to get the profile if the user isn't 
               // logged in.
               this.userProfile = null;
               resolve();
             } else {
-              this.userProfile = Object.create(UserProfile).init({username: this.params.userId});
+              this.userProfile = Object.create(UserProfile).init({username: this.params.userId}); 
               this.userProfile.loadProfile()
               .then(function(found) {
                 resolve();
@@ -1028,15 +1037,59 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
         value: function() {
           var widget = this;
           if (this.isOwner()) {
-            this.places.title.html('You - ' + this.auth.realname + ' (' + this.auth.username + ')');
+            // For now the user profile is available through the login widget, not the session.
+            this.places.title.html('You - ' + this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')');
+            NAVBAR.setTitle('Viewing your profile');
+            NAVBAR.clearButtons();
+            NAVBAR.addButton({
+              name: 'edit', 
+              xlabel: 'Edit',
+              style: 'primary',
+              icon: 'edit',
+              callback: function () {
+                widget.clearMessages();
+                widget.renderEditView();
+              }.bind(this)
+            });
+            NAVBAR.addDropdown({
+              place: 'end',
+              name: 'options', style: 'default', icon: null, label: 'Options',
+              items: [
+               {name: 'changepassword', icon: 'key', label: 'Change Password', 
+                url: 'https://gologin.kbase.us/account/ChangePassword', external: true},
+                {name: 'optout', icon: 'trash', color: 'green', label: 'Remove Profile',
+                 callback: function (e) {
+                   e.preventDefault();
+                   var modal = $('.UserProfileWidget [data-widget-modal="confirm-optout"]')
+                   .modal('show');
+            
+                   // NB the deny button is already wired as [data-dismiss="modal"] which will 
+                   // close the modal, and without further intervention, do nothing.
+                   modal.find('[data-widget-modal-control="confirm"]').on('click', function (e) {
+                     modal
+                     .modal('hide')
+                     .on('hidden.bs.modal', function (e) {
+                       widget.deleteProfile();
+                     });
+                   });
+                 }.bind(this)},
+                {type: 'divider'},
+                {name: 'help', icon: 'question', color: 'orange', label: 'Help', callback: function (e) {
+                  e.preventDefault();
+                  var modal = $('.UserProfileWidget [data-widget-modal="help"]')
+                  .modal('show');
+                }}
+              ]
+            });
           } else {
-            this.places.title.html(this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')');
+            var title = this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')';
+            this.places.title.html(title);
+            NAVBAR.setTitle('Viewing profile for ' + title);
           }
           this.renderPicture();
           this.places.content.html(this.renderTemplate('view'));
           
-          
-          
+          /*
           this.places.content
           .find('[data-widget-menu-item="edit"]')
           .on('click', function (e) {
@@ -1070,7 +1123,7 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
             var modal = $('.UserProfileWidget [data-widget-modal="help"]')
             .modal('show');
           });
-          
+          */
           /*this.places.content.find('[data-button="edit"]').on('click', function(e) {
             widget.clearMessages();
             widget.renderEditView();
@@ -1128,10 +1181,63 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
       
       renderEditView: {
         value: function() {
+          var W = this;
+          NAVBAR.setTitle('Editing your profile');
+          NAVBAR.clearButtons();
+          NAVBAR.addButton({
+            name: 'save', 
+            xlabel: 'Save',
+            style: 'primary',
+            icon: 'save',
+            disabled: true,
+            callback: function () {
+              if (W.updateUserProfileFromForm()) {
+                W.userProfile.saveProfile()
+                .then(function() {
+                    W.renderViewEditLayout();
+                    W.addSuccessMessage('Success!', 'Your user profile has been updated.');
+                    W.renderInfoView();
+                })
+                .catch (function(err) {
+                  W.renderErrorView(err);
+                })
+                .done();
+              }
+            }
+          });
+          NAVBAR.addButton({
+            name: 'cancel', 
+            xlabel: 'Cancel',
+            style: 'default',
+            icon: 'ban',
+            callback: function () {
+              // Do we have pending changes?
+              var changed = !NAVBAR.findButton('save').prop('disabled');
+            
+              if (changed) {
+                var modal = $('.UserProfileWidget [data-widget-modal="confirm-cancel"]')
+                .modal('show');
+            
+                modal.find('[data-widget-modal-control="confirm-cancel"]').on('click', function (e) {
+                  modal
+                  .modal('hide')
+                  .on('hidden.bs.modal', function (e) {
+                    W.clearMessages();
+                    W.renderInfoView();
+                  });
+                });
+              } else {
+                W.clearMessages();
+                W.renderInfoView();
+              }
+            }
+          });
+          
           this.places.content.html(this.renderTemplate('edit'));
           
           var widget = this;
 
+/*
           // wire up basic form crud buttons.
           $('[data-button="save"]').on('click', function(e) {
             if (widget.updateUserProfileFromForm()) {
@@ -1150,7 +1256,6 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
           $('[data-button="cancel"]').on('click', function(e) {
             
             // Do we have pending changes?
-            // console.log(widget.places.content);
             var changed = !widget.places.content
             .find('[data-button="save"]')
             .prop('disabled');
@@ -1173,9 +1278,9 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
             }
            
           });
-
+          */
           // wire up affiliation add/remove buttons.
-          $('[data-button="add-affiliation"]').on('click', function(e) {
+          this.places.content.find('[data-button="add-affiliation"]').on('click', function(e) {
             // grab the container 
             var affiliations = this.places.content.find('[data-field="profile.userdata.affiliations"]');
 
@@ -1205,16 +1310,16 @@ define(['nunjucks', 'jquery', 'md5', 'q', 'kbaseutils', 'kbasesocialwidget', 'kb
 
             panel.find('.panel-title').html(title + ' @ ' + institution + ', ' + startYear + '-' + endYear);
           });
-          
           // Monitor changes on the entire form ... if any field is changed we flag the profile as dirty.
           this.places.content.find('form').on('input change', function (e) {
              // enable the save button.
             // For now we can also use this as a flag for whether to require confirmation
             // to leave the profile.
             
-            widget.places.content
-            .find('[data-button="save"]')
-            .removeAttr('disabled');
+            //widget.places.content
+            //.find('[data-button="save"]')
+            //.removeAttr('disabled');
+            NAVBAR.findButton('save').prop('disabled', false);
           });
           
         }

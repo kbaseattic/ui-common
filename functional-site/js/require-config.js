@@ -35,9 +35,14 @@ require.config({
       kbaseusersearch: '/src/widgets/social/kbaseUserSearch',
       kbaseuserbrowsenarratives: '/src/widgets/social/kbaseUserBrowseNarratives',
       kbaseusersummary: '/src/widgets/social/kbaseUserSummary',
-      kbasesession: '/src/widgets/social/kbaseSession',
-      kbaseconfig: '/src/widgets/social/kbaseConfig', 
-      kbaseutils: '/src/widgets/social/kbaseUtils'
+      kbasesession: '/src/kbaseSession',
+      kbaseconfig: '/src/kbaseConfig', 
+      kbaseutils: '/src/kbaseUtils',
+      kbasecookie: '/src/kbaseCookie',
+      kbasetest: '/src/kbaseTest',
+      kbasenavbar: '/src/widgets/kbaseNavbar',
+      kbasebasewidget: '/src/widgets/kbaseBaseWidget',
+      kbaseloginwidget: '/src/widgets/kbaseLoginWidget'
     },
    shim: { 
     'kbaseuserprofileserviceclient': {

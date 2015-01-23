@@ -102,7 +102,14 @@
         <script src="assets/js/kbclient/KBaseExpressionClient.js"></script>
         <script src="assets/js/kbclient/shock.js"></script> 
         <script src="assets/js/kbclient/user_profile_Client.js"></script>       
-        <script src="assets/js/widgetMaxWidthCorrection.js"></script>        
+        <script src="assets/js/widgetMaxWidthCorrection.js"></script>      
+
+        <!-- KBase support libs -->
+        <script src="../src/kbaseSessionSync.js"></script>  
+
+        <!-- NAVBAR - put in appropriate sections above when it works -->
+        <link rel="stylesheet" href="../ext/font-awesome/4.2.0/css/font-awesome.min.css" type="text/css" />
+        <link rel="stylesheet" type="text/css" href="../src/widgets/Navbar/style.css" /> 
 
         <!-- widgets -->
         <script src="../src/kbwidget.js"></script>
@@ -359,79 +366,58 @@
     <body>
         <div id="wrap">
             <div id="content">
-                <div class="nav navbar-kbase navbar-fixed-top nav-collapse nav-collapse-scrollable bs-navbar-scroll-collapse">
-                    <a href="http://www.kbase.us" class="pull-left">
-                        <img id="logo" src="assets/img/kbase_logo.png" width="46"/>
-                    </a>
-
-                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <ul class="nav navbar-nav"> 
-                            <!--<li class="dropdown" ng-class="{ active: $state.includes('narrative')}">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Narrative <b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#/narrative/">Newsfeed</a></li>                
-                                    <li><a href="#/narrative/projects/">Projects</a></li>
+                <!-- SB only one on page, so we can use the id here -->
+                <div class="navbar-kbase navbar-fixed-top" id="kbase-navbar">
+                    <div class="container-fluid">
+                        <!-- main menu -->
+                        <div class="navbar-header navbar-menu">
+                            <div style="display:inline-block">
+                                <button id="kb-nav-menu" class="btn btn-default navbar-btn kb-nav-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="fa fa-navicon"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="kb-nav-menu">
+                                 	<li><a href="/functional-site/#/search/?q=*">Search Data</a></li>
+                                    <li><a href="/functional-site/#/narrativemanager/start">Narrative</a></li>
+                                    <!--
+                                    <li><a href="/functional-site/#/ws/" id="workspace-link">Workspaces</a></li>-->
+                                   
+                                    <!--
+                                    <li><a target="_blank" href="http://kbase.us/services/docs/uploader/uploader.html">Upload</a></li>-->
+                                    <li role="presentation" class="divider"></li>
+                                    <li><a target="_blank" href="https://staging.kbase.us/about">About</a></li>
+                                    <li><a target="_blank" href="https://staging.kbase.us/narrative-guide">Narrative Tutorial</a></li>
+                                    <li><a target="_blank" href="https://staging.kbase.us/contact-us">Contact Us</a></li>
                                 </ul>
-                            </li>-->
-                            <!-- old style narrative browser
-                            <li ng-class="{ active: $state.includes('narratives')}">
-                                <a ui-sref="narratives.featured" >Narratives</a>
-                            </li> -->
-                            
-                            <!-- new style manage narratives directly in the narrative interface -->
-                            <li>
-                                <a href="#/narrativemanager/start">Narratives</a>
-                            </li>
-                            
-                            <!--
-                            <li ng-class="{ active: $state.includes('analysis')}">
-                                <a ui-sref="analysis.apps">Apps</a>
-                            </li>-->
-                            <!--<li ng-class="{ active: $state.includes('ws')}">
-                                <a ui-sref="ws">Workspaces</a>
-                            </li>-->
-                            <li ng-class="{ active: $state.includes('search')}">
-                                <a ng-click="newSearch()" ng-controller="searchBarController">Search Data</a>
-                            </li>
-                            <!--<li><a href="//kbase.us/services/docs/uploader/uploader.html">Upload</a></li>-->
-                        </ul>
+                            </div>
+                            <a href="http://www.kbase.us">
+                                <img id="logo" src="assets/navbar/images/kbase_logo.png" width="46">
+                            </a>
+                        </div>
 
-                        <!--
-                        <ul class="nav navbar-nav"> 
-                            <li ng-class="{ active: $state.includes('favorites')}"><a href="#/favorites/all/">Favorites <span class="badge  favorite-count"></span></a></li>
-                            <li class="fav-loading"></li>
-                        </ul>
-                        -->
-                 
-                        <div id="signin-button" class="pull-right"></div>
-                        <ul class="nav navbar-nav pull-right">
-                            <li class="dropdown help-dropdown">
-                                <a id="kbase_help_menu_label" href="#kbase_help_menu" class="dropdown-toggle" data-toggle="dropdown" onclick="return false;">Help <b class="caret"></b></a>
-                                <ul id="kbase_help_menu" class="dropdown-menu" role="menu" aria-labelledby="kbase_help_menu_label">
-                                    <li><a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a></li>
-                                    <!--<li><a href="#/landing-pages-help">Landing Page Documentation</a></li>-->
-                                    <li><a href="http://kbase.us/get-started/data-search-quick-start/">Search Quick Start Guide</a></li>
-                                    <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li>
-                                </ul>                        
-                            </li>
-                        </ul>
-                    </div> 
+                        <!-- title area -->
+                        <div class="navbar-text navbar-title">
+                           <!-- views and widgets can add title content here -->
+                           <span class="title"></span>
+                        </div>
+
+                        <!-- button area -->
+                        <div class="navbar-right">
+
+ 			    <!-- views and widets can place buttons here, see kbaseNavbar.js -->
+                            <span class="navbar-buttons">
+                            </span>
+                            <span id="signin-button"></span>
+                        </div>
+                    </div>
                 </div>
 
+                <div class="container-fluid">
                 <div id="app" ui-view></div>
+                </div>
 
             </div> 
             
-            <div id="footer" class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main">
-                <ul>
-                    <li><a href="//kbase.us/science/what-is-kbase/" target="_blank">About KBase</a></li>
-                    <li><a href="//kbase.us/user-support/documentation/" target="_blank">Documentation</a></li>
-                    <li><a href="//kbase.us/about/terms-and-conditions" target="_blank">Terms and Conditions</a></li>
-                    <li><a href="//kbase.us/contact-us/" target="_blank">Contact Us</a></li>
-                    <li><a href="http://science.energy.gov/" target="_blank"><img class="center-block" src="./assets/images/doe_sc_logo.png" /></a></li>
-                </ul>
-                
-            </div>
+           
         </div>
         
 

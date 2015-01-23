@@ -38,10 +38,13 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient'
 					  throw 'The user profile client url is not defined';
 				  }
           
+          /*
+          now set inthe social widget for all social widgets.
           if (!this.hasConfig('userId')) {
             throw 'The userId is required for this widget but was not provided';
           }
           this.setParam('userId', this.getConfig('userId'));
+            */
           
         } else {
           this.workspaceClient = null;

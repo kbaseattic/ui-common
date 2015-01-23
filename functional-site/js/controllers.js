@@ -313,7 +313,15 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 .controller('People', function($scope, $stateParams) {
     $scope.params = { 'userid':$stateParams.userid, 'kbCache' : kb }
-    
+    $('<link>')
+    .appendTo('head')
+    .attr({type: 'text/css', rel: 'stylesheet'})
+    .attr('href', 'views/social/user-page/style.css');
+})
+
+.controller('NavTest', function($scope, $stateParams) {
+    $scope.params = { 'appid':$stateParams.appid, 'kbCache' : kb }
+   
 })
 
 .controller('App', function($scope, $stateParams) {
@@ -376,7 +384,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 .controller('Login', function($scope, $stateParams, $location, kbaseLogin, $modal) {
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives
-
+    
     // callback for ng-click 'loginUser':
     $scope.loginUser = function (user) {
         $("#loading-indicator").show();
@@ -385,8 +393,10 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
             user.username,
             user.password,
             function(args) {
-                if (args.success === 1) {
-
+                // The "args" object returned is either the session object or an error object
+                // like {success: 0, message: 'my error message'}
+                if (args.status) {
+                    // Note that 'this' is the login widget.
                     this.registerLogin(args);
                     //this.data('_session', kbaseCookie);
 
@@ -403,8 +413,8 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
                     //this.data('_session', c);
 
-                    USER_ID = $("#signin-button").kbaseLogin('session').user_id;
-                    USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
+                    USER_ID = $("#signin-button").kbaseLogin('get_session_prop', 'user_id');
+                    USER_TOKEN = $("#signin-button").kbaseLogin('get_session_prop', 'token');
 
                     //kb = new KBCacheClient(USER_TOKEN);
                     //kb.nar.ensure_home_project(USER_ID);
@@ -416,6 +426,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
                 } else {
                     console.log("error logging in");
+                    console.log(args);
                     $("#loading-indicator").hide();
                     var errormsg = args.message;
                     if (errormsg == "LoginFailure: Authentication failed.") {
@@ -435,10 +446,19 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     };
 
     $scope.loggedIn = function() {
-        var c = kbaseLogin.get_kbase_cookie();
-        $scope.username = c.name;
-        return (c.user_id !== undefined && c.user_id !== null);
+        // var c = kbaseLogin.g();
+        // $scope.username = kbaseLogin.get_session_prop('name');
+        var userId = kbaseLogin.get_session_prop('user_id');
+        return (userId !== undefined && userId !== null);
     };
+    
+    $(document).on('profileLoaded.kbase', function (e, profile) {
+      // console.log('profile has been loaded'); console.log(profile.user.realname);
+      $scope.$apply(function () {
+        $scope.username = profile.getProp('user.realname');
+        // console.log($scope.username);
+      });
+    });
 
 })
 

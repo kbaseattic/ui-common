@@ -1,7 +1,6 @@
-define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kbaseconfig'],
-  function(Q, Utils, Session, UserProfileService, Config) {
+define(['q', 'kbaseutils', 'md5', 'kbaseuserprofileserviceclient', 'kbaseconfig', 'kbasesession'],
+function(Q, Utils, md5,  UserProfileService, Config, Session) {
     "use strict";
-
     var UserProfile = Object.create({}, {
 
       init: {
@@ -51,6 +50,12 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
               });
             }
           }.bind(this));
+        }
+      },
+      
+      getProfile: {
+        value: function () {
+          return this.userRecord;
         }
       },
       
@@ -264,8 +269,8 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
                 profile: this.userRecord
               })
               .then(function() {
-                resolve();
-              })
+                resolve(this);
+              }.bind(this))
               .catch (function(err) {
                 console.log('ERROR SAVING USER PROFILE: ' + err);
                 console.log(err);
@@ -316,7 +321,28 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
         }
       },
 
-     
+      getAvatarURL: {
+        value: function (options) {
+          if (!this.userRecord) {
+            return 'assets/images/nouserpic.png';
+          };
+          var gdefault = this.getProp('profile.userdata.avatar.gravatar_default');
+          var email = this.getProp('profile.userdata.email');
+          if (gdefault && email) {
+            return this.makeGravatarURL(email, options.size || 100, options.rating || 'pg', gdefault);
+          } else {
+            return 'assets/images/nouserpic.png';
+          }
+        }
+      },
+      
+      makeGravatarURL: {
+        value: function(email, size, rating, gdefault) {
+          var md5Hash = md5(email);
+          var url = 'https://www.gravatar.com/avatar/' + md5Hash + '?s=' + size + '&amp;r=' + rating + '&d=' + gdefault
+          return url;
+        }
+      },
 
       getUserProfileSchema: {
         value: function() {
@@ -441,8 +467,15 @@ define(['q', 'kbaseutils', 'kbasesession', 'kbaseuserprofileserviceclient', 'kba
         }
       },
   
-     
-
+      getProp: {
+        value: function (propName, defaultValue) {
+          if (this.userRecord) {
+            return Utils.getProp(this.userRecord, propName, defaultValue);
+          } else {
+            return defaultValue;
+          }
+        }
+      },
      
       calcProfileCompletion: {
         value: function() {

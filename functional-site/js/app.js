@@ -542,8 +542,14 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
     $stateProvider
 	.state('people',
 		{url: '/people/:userid',
-		templateUrl: 'views/social/sortable-rows-people.html',
+		templateUrl: 'views/social/user-page.html',
 		controller: 'People'});
+    
+    $stateProvider
+	.state('navtest',
+		{url: '/navtest/:param1',
+		templateUrl: 'views/navtest/view.html',
+		controller: 'NavTest'});
     
     $stateProvider
 	.state('narrativestore',
@@ -673,8 +679,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
 
 
     var finish_login = function(result) {
-        if (!result.success)
-            return;
+        //if (!result.success)
+        //    return;
 
 //        var c = $('#signin-button').kbaseLogin('get_kbase_cookie');
 //        set_cookie(c);
@@ -686,7 +692,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         // Otherwise, just login in place and reload.
         // We need to reload to make sure the USER_ID and USER_TOKEN get set properly.
         if ($location.path() === '/login/') {
-            var kbase_sessionid = $("#signin-button").kbaseLogin('session').kbase_sessionid;
+          // omg - eap
+            var kbase_sessionid = $("#signin-button").kbaseLogin('get_session_prop', 'kbase_sessionid');
             if (kbase_sessionid) { 
                 // USER_ID = $("#signin-button").kbaseLogin('session').user_id;
                 // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
@@ -699,17 +706,31 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
 
     var finish_logout = function() {
         $location.path('/login/');
-//        $rootScope.$apply();
+        $rootScope.$apply();
         window.location.reload();
     };
 
     // sign in button
-    $('#signin-button').kbaseLogin({login_callback: finish_login,
-                                    logout_callback: finish_logout});
-    $('#signin-button').css('padding', '0');  // Jim!
-
-    USER_ID = $("#signin-button").kbaseLogin('session').user_id;
-    USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
+    //$('#signin-button').kbaseLogin({login_callback: finish_login,
+    //                                logout_callback: finish_logout});
+    $('#signin-button').kbaseLogin();
+    // $('#signin-button').css('padding', '0');  // Jim!
+    
+    // This is an important part of the app lifecycle!
+    // Login and out events trigger a refresh of the entire page. 
+    // In addition, logout will redirect to the login page.
+    // Although views and widgets should be prepared to render in an unauthenticated state
+    // (and a view would need to redirect to /login if it doesn't want to be seen)
+    // in practice they may never be seen thus.
+    $(document).on('loggedIn.kbase', function (e, session) {
+      finish_login(session);
+    });
+    $(document).on('loggedOut.kbase', function (e) {
+      finish_logout();
+    });
+    
+    USER_ID = $("#signin-button").kbaseLogin('get_session_prop', 'user_id');
+    USER_TOKEN = $("#signin-button").kbaseLogin('get_session_prop', 'token');
     kb = new KBCacheClient(USER_TOKEN);
     //kb.nar.ensure_home_project(USER_ID);
 

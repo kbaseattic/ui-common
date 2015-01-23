@@ -292,6 +292,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     $scope.logout = function() {
         $('#signin-button').kbaseLogin('logout');
         $('#signin-button').on('loggedOut', function () {
+          console.log('SEARCH: logged out');
             $state.go('search');       
         });
     };
