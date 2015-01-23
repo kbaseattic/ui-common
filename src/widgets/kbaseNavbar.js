@@ -109,18 +109,35 @@ function ($, nunjucks, Session) {
     },
     addDropdown: {
       value: function (cfg) {
-        var button = $('<button type="button" class="btn btn-'+cfg.style+' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'+cfg.label+'<span class="caret"></span></button>');
+        var button = $('<button type="button" class="btn btn-'+cfg.style+' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'+cfg.label+' <span class="caret"></span></button>');
         var menu = $('<ul class="dropdown-menu" role="menu"></ul>');
         for (var i=0; i<cfg.items.length; i++) {
           var item = cfg.items[i];
           if (item.type === 'divider') {
             menu.append('<li class="divider"></li>');
           } else {
-            var menuItem = $('<li><a href="#" data-widget-menu-item="'+item.name+'"><span class="fa fa-'+item.icon+'" style="font-size: 150%; color:'+item.color+'; margin-right: 10px;"></span>' + item.label + '</a></li>');
-            if (item.callback) {
-              menuItem.on('click', item.callback);
+            var menuItem = $('<li></li>');
+            
+            if (item.url) {
+             var link = $('<a></a>')
+                .attr('href', item.url)
+                .attr('data-menu-item', item.name);
+            } else if (item.callback) {
+             var link = $('<a></a>')
+                .attr('href', '#')
+                .attr('data-menu-item', item.name)
+                .on('click', item.callback);
+            } 
+            if (item.external) {
+              link.attr('target', '_blank');
+            }           
+            
+            var icon = $('<div class="navbar-icon" style=""></div>');
+            if (item.icon) {
+              icon.append($('<span class="fa fa-'+item.icon+'"  class="navbar-icon"></span>'));
             }
-            menu.append(menuItem);
+            
+            menu.append(menuItem.append(link.append(icon).append(item.label)));
           }
         }
         

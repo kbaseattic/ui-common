@@ -162,3 +162,13 @@ The content area is normal flow and just needs to have a matching top margin.
   border-size: 0;
   border-style: none;
 }
+
+.navbar-kbase .navbar-icon {
+  display:inline-block; 
+  width: 30px; 
+  vertical-align: top;
+  margin-right: 4px;
+}
+.navbar-kbase .navbar-icon .fa {
+  font-size: 150%;
+}

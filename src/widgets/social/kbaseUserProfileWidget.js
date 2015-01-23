@@ -1055,6 +1055,8 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
               place: 'end',
               name: 'options', style: 'default', icon: null, label: 'Options',
               items: [
+               {name: 'changepassword', icon: 'key', label: 'Change Password', 
+                url: 'https://gologin.kbase.us/account/ChangePassword', external: true},
                 {name: 'optout', icon: 'trash', color: 'green', label: 'Remove Profile',
                  callback: function (e) {
                    e.preventDefault();
