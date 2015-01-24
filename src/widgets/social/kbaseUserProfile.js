@@ -20,6 +20,8 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
               throw 'The user profile client url is not defined';
             }
           }
+          
+          this.userRecordHistory = [];
           return this;
         }
       },
@@ -88,9 +90,19 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
         value: function(newRecord) {
           var recordCopy = Utils.merge({}, this.userRecord);
           var merged = Utils.merge(recordCopy, newRecord);
+          if (this.userRecordHistory.length === 10) {
+            this.userRecordHistory.pop();
+          }
+          this.userRecordHistory.unshift({
+            userRecord: this.userRecord,
+            status: this.getProfileStatus(),
+            completionStatus: this.calcProfileCompletion().status
+          });
           this.userRecord = merged;
         }
       },
+      
+      
       
 
       getProfileStatus: {
@@ -473,6 +485,16 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
             return Utils.getProp(this.userRecord, propName, defaultValue);
           } else {
             return defaultValue;
+          }
+        }
+      },
+      
+      nthHistory: {
+        value: function (n) {
+          // n is how many saves back to get it.
+          // e.g. n=1 means the most recent save
+          if (n <= this.userRecordHistory.length) {
+            return this.userRecordHistory[n-1]; 
           }
         }
       },

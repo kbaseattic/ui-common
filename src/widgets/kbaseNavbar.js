@@ -4,7 +4,6 @@ function ($, nunjucks, Session) {
   var Navbar = Object.create({},{
     init: {
       value: function (cfg) {
-        console.log('in navbar');
         if (typeof cfg.container === 'string') {
           this.container = $(cfg.container);
         } else {
@@ -35,7 +34,6 @@ function ($, nunjucks, Session) {
           widgetName: this.widgetName
         };
         
-        console.log('About to load css?');
         
         // Don't load css dynamically for now. There are parts of the functional
         // site which don't know about this widget yet. And perhaps it will be
@@ -55,7 +53,6 @@ function ($, nunjucks, Session) {
     },
     loadCSS: {
       value: function() {
-        console.log('loading css'); console.log('/src/widgets/' + this.widgetName + '/style.css');
         $('<link>')
         .appendTo('head')
         .attr({type: 'text/css', rel: 'stylesheet'})
@@ -66,6 +63,11 @@ function ($, nunjucks, Session) {
       value: function (title) {
         // okay, we are punning on a class set on this element.
         this.container.find('.navbar-title').html(title);
+      }
+    },
+    clearTitle: {
+      value: function () {
+        this.container.find('.navbar-title').empty();
       }
     },
     clearButtons: {
@@ -153,7 +155,8 @@ function ($, nunjucks, Session) {
     
     addDefaultMenu: {
       value: function (cfg) {
-        if (!cfg.search === false) {
+        cfg = cfg || {};
+        if (cfg.search !== false) {
           this.addMenuItem({
             name: 'search',
             label: 'Search Data',
@@ -161,7 +164,7 @@ function ($, nunjucks, Session) {
             place: 'end' 
           });
         }
-        if (!cfg.narrative === false) {
+        if (cfg.narrative !== false) {
           this.addMenuItem({
             name: 'narrative',
             label: 'Narrative',

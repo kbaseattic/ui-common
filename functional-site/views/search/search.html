@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid kbase-view kbase-search-view">
     <div class="row search-sections">
         <div class="col-sm-3 col-md-3 col-lg-3 search-left-nav search-leftarea-size"> <!-- left navigation columns -->
             <div class="search-leftarea-size"> <!-- workspace selected -->                            
@@ -82,7 +82,7 @@
                         <h3 data-toggle="tooltip" data-placement="right" tooltip="Select options to help narrow your search results." tooltip-placement="right">Filters</h3>                    
                         <button type="button" class="btn btn-danger btn-xs search-filter-remove-button" ng-click="removeAllFacets()" ng-if="options.active_facets[options.selectedCategory] && Object.keys(options.active_facets[options.selectedCategory]).length > 0" data-toggle="tooltip" data-placement="top" tooltip="Use this button to remove all the filters you have selected." tooltip-placement="top"><span class="glyphicon glyphicon-remove"></span></button>
                     </div>
-                    <div class="col-xs-offset-1 search-leftarea-size search-filter-groups">
+                    <div class="search-leftarea-size search-filter-groups">
                         <div id="{{facet.key}}" class="panel-group" ng-repeat="facet in options.facets" ng-if="facet.count > 0">                            
                             <div class="panel panel-filter-content">
                                 <div class="panel-heading panel-filter-heading">

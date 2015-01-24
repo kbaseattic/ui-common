@@ -296,6 +296,13 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $state.go('search');       
         });
     };
+    
+    require(['kbasenavbar'], function (Navbar) {
+      Navbar.clearMenu();
+      Navbar.addDefaultMenu({search: false});
+      Navbar.clearTitle();
+      Navbar.clearButtons();
+    });
 
 
     $scope.saveUserState = function() {

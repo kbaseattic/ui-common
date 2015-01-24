@@ -1,3 +1,9 @@
+/* Search view container */
+
+.kbase-search-view {
+  padding: 10px;
+}
+
 /*** link styling ***/
 
 a.search-selected-category-link { color: #468847; }
