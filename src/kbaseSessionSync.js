@@ -3,7 +3,7 @@
   var SessionSync = Object.create({}, {
     init: {
       value: function (cfg) {
-        this.sessionObject = this.importSessionFromCookie();
+        this.refreshSession();
         return this;
       }
     },
@@ -28,24 +28,43 @@
     // used in the real kbaseSession
     getKBaseSession: {
       value: function () {
-        return this.sessionObject;
+        return this.refreshSession();
       }
     },
    
+    refreshSession: {
+      value: function () {
+        if (this.sessionChanged()) {
+          this.sessionObject = this.importSessionFromCookie();
+        }
+        if (this.sessionObject && this.isExpired()) {
+          this.removeAuth();
+          this.sessionObject = null;
+        }
+        return this.sessionObject;
+      }
+    },
+    
+    sessionChanged: {
+      value: function ()  {
+        var sessionCookie = $.cookie(this.cookieName);
+        if (this.sessionCookie === sessionCookie) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    },
     
     importSessionFromCookie: {
       value: function () {
-         var sessionCookie = $.cookie(this.cookieName);
+        var sessionCookie = $.cookie(this.cookieName);
+
         if (!sessionCookie) {
           return null;
         }
         // first pass just break out the string into fields.
         var session = this.decodeToken(sessionCookie);
-        
-        if (! (session.kbase_sessionid && session.un && session.user_id && session.token) ) {
-          this.removeAuth();
-          return null;
-        }
         
         session.token = session.token.replace(/PIPESIGN/g, '|').replace(/EQUALSSIGN/g, '=');
 
@@ -53,9 +72,11 @@
         
         session.tokenObject = this.decodeToken(session.token);
         
-        if (this.validateSession(session)) {
+        if (this.validateSessionObject(session)) {
           return session;
         } else {
+          // zap cookies if we had a bad cookie.
+          this.removeAuth();
           return null;
         }
       }
@@ -93,29 +114,22 @@
       }
     },
     
-    validateSession: {
+    validateSessionObject: {
       value: function (sessionObject) {
-        if (sessionObject === undefined) {
-          sessionObject = this.sessionObject;
-        }
         if (!sessionObject) {
           return false;
         }
+        // Validate the structure.
         if (! (sessionObject.kbase_sessionid && sessionObject.un && sessionObject.user_id && sessionObject.token && sessionObject.tokenObject) ) {
-          // We should not get here.
-          this.removeAuth();
-          return false;
-        }
-        if (this.hasExpired(sessionObject)) {
           return false;
         }
         return true;
       }
     },
     
-    hasExpired : {
-      value: function (sessionObject) {          
-          var expirySec = sessionObject.tokenObject.expiry;
+    isExpired : {
+      value: function () {          
+          var expirySec = this.sessionObject.tokenObject.expiry;
           if (!expirySec) {
             return false;
           }
@@ -143,5 +157,5 @@
     }
     
   });
-  $.KBaseSessionSync = SessionSync;
+  $.KBaseSessionSync = SessionSync.init();
 }(jQuery));

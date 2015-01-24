@@ -26,6 +26,11 @@
         init: function(options) {
 
             this._super(options);
+            
+            // An authenticated widget needs to get the initial auth state
+            // from the KBaseSessionSync jquery extension.
+            var sessionObject = $.KBaseSessionSync.getKBaseSession();
+            var auth = this.setAuth(sessionObject);
 
             $(document).on(
                 'loggedIn.kbase',

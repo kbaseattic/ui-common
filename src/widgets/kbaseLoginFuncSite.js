@@ -152,7 +152,7 @@
       // We use it for the initial state, but after that all other session interactions
       // are asynchronous, and session state is communicated via jquery messages.
       // The session object will either be the authenticated session object or null.
-      this.sessionObject = Object.create($.KBaseSessionSync).init().getKBaseSession();
+      this.sessionObject = $.KBaseSessionSync.getKBaseSession();
       
  
       // Select which version of the widget to show.
