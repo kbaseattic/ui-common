@@ -176,6 +176,7 @@ function KBaseFBA_FBAModel(modeltabs) {
             "label": "Compound",
             "key": "id",
             "type": "tabLink",
+            "linkformat": "dispIDCompart",
             "method": "CompoundTab"
         }, {
             "label": "Name",
@@ -276,13 +277,13 @@ function KBaseFBA_FBAModel(modeltabs) {
                                      "data": cpd.id,
                                  }, {
                                      "label": "Name",
-                                     "data": "name"
+                                     "data": cpd.name
                                  }, {
                                      "label": "Formula",
-                                     "data": "formula"
+                                     "data": cpd.formula
                                  }, {
                                      "label": "Charge",
-                                     "data": "charge"
+                                     "data": cpd.charge
                                  }, {
                                      "label": "Compartment",
                                      "data": cpd.compartment,

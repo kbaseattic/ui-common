@@ -273,7 +273,6 @@ function KBaseFBA_FBA(modeltabs) {
     };
 
     this.formatObject = function () {
-        console.log(this);
         this.usermeta.model = self.data.fbamodel_ref;
         this.usermeta.media = self.data.media_ref;
         this.usermeta.objective = self.data.objectiveValue;
@@ -361,7 +360,6 @@ function KBaseFBA_FBA(modeltabs) {
             this.genehash[this.modelgenes[i].id] = this.modelgenes[i];
             this.genehash[this.modelgenes[i].id].ko = 0;
         }
-        console.log('genehash', this.genehash)
         /*
         for (var i=0; i < self.data.geneKO_refs.length; i++) {
             var geneid = self.data.geneKO_refs[i].split("/").pop();
@@ -544,13 +542,13 @@ function KBaseFBA_FBA(modeltabs) {
                                      "data": cpd.id,
                                  }, {
                                      "label": "Name",
-                                     "data": "name"
+                                     "data": cpd.name
                                  }, {
                                      "label": "Formula",
-                                     "data": "formula"
+                                     "data": cpd.formula
                                  }, {
                                      "label": "Charge",
-                                     "data": "charge"
+                                     "data": cpd.charge
                                  }, {
                                      "label": "Compartment",
                                      "data": cpd.compartment,
