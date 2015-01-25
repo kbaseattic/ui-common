@@ -32,6 +32,7 @@ function KBaseBiochem_Media(tabwidget) {
 
         var p = this.tabwidget.getBiochemCompounds(cpdarray)
                     .done(function(cpds) {
+
                         for (var i=0; i< self.mediacompounds.length; i++) {
                             var cpd = self.mediacompounds[i];
                             cpd.name = cpds[i].name;
@@ -46,32 +47,34 @@ function KBaseBiochem_Media(tabwidget) {
         return p;
     };
 
-    this.CompoundTab = function (id) {
-        var cpd = this.cpdhash[id];
+    this.CompoundTab = function (info) {
+        var cpd = this.cpdhash[info.id];
+        console.log('info', cpd)
+
         return [{
             "label": "Compound",
             "data": cpd.id,
         }, {
             "label": "Name",
-            "key": "name"
+            "data": cpd.name
         }, {
             "label": "Formula",
-            "key": "formula"
+            "data": cpd.formula
         }, {
             "label": "Charge",
-            "key": "charge"
+            "data": cpd.charge
         }, {
             "label": "deltaG",
-            "key": "deltaG"
+            "data": cpd.deltaG
         }, {
             "label": "Max flux",
-            "key": "maxFlux"
+            "data": cpd.maxFlux
         }, {
             "label": "Min flux",
-            "key": "minFlux"
+            "data": cpd.minFlux
         }, {
             "label": "Concentration",
-            "key": "concentration"
+            "data": cpd.concentration
         }];
     }
 
@@ -119,6 +122,7 @@ function KBaseBiochem_Media(tabwidget) {
             "label": "Compound",
             "key": "id",
             "type": "tabLink",
+            "linkformat": "dispID",
             "method": "CompoundTab",
         }, {
             "label": "Name",

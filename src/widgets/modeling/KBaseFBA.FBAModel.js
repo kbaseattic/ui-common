@@ -218,13 +218,12 @@ function KBaseFBA_FBAModel(modeltabs) {
     }*/];
 
 
-    this.ReactionTab = function (id) {
-        var rxn = this.rxnhash[id];
-        if (id.search(/rxn\d+/g) == -1)
+    this.ReactionTab = function (info) {
+        if (info.id.search(/rxn\d+/g) == -1)
             return;
 
         var p = this.modeltabs
-                    .getBiochemReaction(id)
+                    .getBiochemReaction(info.id)
                     .then(function(rxn){
                         return [{
                                     label: "ID",
@@ -244,12 +243,12 @@ function KBaseFBA_FBAModel(modeltabs) {
         return p;
     }
 
-    this.GeneTab = function (id) {
+    this.GeneTab = function (info) {
         // var gene = this.genehash[id];
         // doing this instead of creating hash
         var data;
         self.modelgenes.forEach(function(gene) {
-            if (gene.id == id)
+            if (gene.id == info.id)
                 data = [{
                             label: "ID",
                             data: gene.id
@@ -263,12 +262,14 @@ function KBaseFBA_FBAModel(modeltabs) {
         return data;
     }
 
-    this.CompoundTab = function (id) {
-        var cpd = this.cpdhash[id];
+    this.CompoundTab = function (info) {
+        var cpd = this.cpdhash[info.id];
+        if (info.id.search(/cpd\d+/g) == -1)
+            return;
 
          // your hash includes the compartement, so cpd.compartment (or cpd.cmpkbid?) is missing
         var p = this.modeltabs
-                    .getBiochemCompound(id)
+                    .getBiochemCompound(info.id)
                     .then(function(cpd){
                         return [{
                                      "label": "Compound",
@@ -293,15 +294,15 @@ function KBaseFBA_FBAModel(modeltabs) {
 
     }
 
-    this.CompartmentTab = function (id) {
+    this.CompartmentTab = function (info) {
         return [[]];
     }
 
-    this.BiomassTab = function (id) {
+    this.BiomassTab = function (info) {
         return [[]];
     }
 
-    this.GapfillTab = function (id) {
+    this.GapfillTab = function (info) {
         return [[]];
     }
 

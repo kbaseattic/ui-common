@@ -492,13 +492,12 @@ function KBaseFBA_FBA(modeltabs) {
         return p;
     };
 
-    this.ReactionTab = function (id) {
-        var rxn = this.rxnhash[id];
-        if (id.search(/rxn\d+/g) == -1)
+    this.ReactionTab = function (info) {
+        if (info.id.search(/rxn\d+/g) == -1)
             return;
 
         var p = this.modeltabs
-                    .getBiochemReaction(id)
+                    .getBiochemReaction(info.id)
                     .then(function(rxn){
                         return [{
                                    "label": "ID",
@@ -519,22 +518,26 @@ function KBaseFBA_FBA(modeltabs) {
     };
 
     this.GeneTab = function (info) {
+        var gene = this.genehash[info.id];
+
         return [{
                 "label": "ID",
                 "data": info.id
             },{
                 "label": "Reactions",
-                "data": rxn.reactions,
+                "data": gene.reactions,
                 "type": "tabLinkArray"
         }];
     };
 
-    this.CompoundTab = function (id) {
-        var cpd = this.cpdhash[id];
+    this.CompoundTab = function (info) {
+        var cpd = this.cpdhash[info.id];
+        if (info.id.search(/cpd\d+/g) == -1)
+            return;
 
          // your hash includes the compartement, so cpd.compartment (or cpd.cmpkbid?) is missing
         var p = this.modeltabs
-                    .getBiochemCompound(id)
+                    .getBiochemCompound(info.id)
                     .then(function(cpd){
                         return [{
                                      "label": "Compound",

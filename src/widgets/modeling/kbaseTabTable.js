@@ -66,7 +66,6 @@ $.KBWidget({
         // 1) Use type (periods replaced with underscores) to instantiate object
         //
 
-        console.log('type', type.replace(/\./g, '_'))
         obj = new kbObjects[type.replace(/\./g, '_')](self);
 
         //
@@ -254,21 +253,28 @@ $.KBWidget({
                             ws: $(this).data('ws'),
                             action: $(this).data('action')}
 
-                var content = $('<div>').loading();
+                var content = $('<div>');
 
                 if (info.method && info.method != 'undefined') {
-                    var prom = obj[info.method](info);
+                    var res = obj[info.method](info);
 
-                    $.when(prom).done(function(rows) {
-                        content.rmLoading();
-                        var table = self.verticalTable({rows: rows});
+                    if (res && 'done' in res) {
+                        content = $('<div>').loading();
+                        $.when(res).done(function(rows) {
+                            content.rmLoading();
+                            var table = self.verticalTable({rows: rows});
+                            content.append(table);
+                        })
+                    } else if (res == undefined) {
+                        content.append('<br>No data found for '+info.id);
+                    } else {
+                        var table = self.verticalTable({rows: res});
                         content.append(table);
-                    })
+                    }
 
-
-                    tabs.addTab({name: id, content: content, removable: true});
-                    tabs.showTab(id);
-                    newTabEvents(id);
+                    tabs.addTab({name: info.id, content: content, removable: true});
+                    tabs.showTab(info.id);
+                    newTabEvents(info.id);
 
                 } else if (info.action == 'openWidget') {
                     content.kbaseTabTable({ws: info.ws, type: info.type, obj: info.name} )
@@ -317,8 +323,12 @@ $.KBWidget({
                             var id = d[key].split('_')[0];
                             var compart = d[key].split('_')[1];
 
-                            return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
-                                        id+'</a> ('+compart+')';
+                            if (id.search(/rxn\d+/g) != -1 || id.search(/cpd\d+/g) != -1)
+                                return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
+                                             id+'</a> ('+compart+')';
+                            else
+                                return id+' ('+compart+')';
+
                         } else if (type == 'tabLink' && format == 'dispID') {
                             var id = d[key];
                             return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
@@ -372,7 +382,6 @@ $.KBWidget({
             for (var i=0; i<rows.length; i++) {
                 var row = rows[i],
                     type = row.type;
-
 
                 // don't display undefined things in vertical table
                 if ('data' in row && typeof row.data == 'undefined' ||
