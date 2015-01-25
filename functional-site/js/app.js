@@ -96,7 +96,8 @@ var app = angular.module('landing-pages',
     $stateProvider
         .state('test', {
           url: "/test/",
-          templateUrl: 'views/test-landing.html'
+          templateUrl: 'views/test-landing.html',
+          controller: 'KBaseExamples'
         }).state('landing', {
           url: "/test/:type/:ws/:name",
           templateUrl: 'views/test.html',

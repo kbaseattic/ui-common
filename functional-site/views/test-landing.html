@@ -6,83 +6,48 @@
 
 <div class="container landing-page">
     <h3>Examples</h3>
-    Below are some links to example tabbed table widgets.  These are used in testing functionality.  Please update as you see fit.
+    Below are some links to example tabbed table widgets.  These are used in testing functionality.  Please update as you see fit.<br>
+    <br>
 
 
-    <h4>Genome Set</h4>
-    <ul>
-        <li>
-            <a ui-sref="landing({type: 'KBaseSearch.GenomeSet', ws: 'chenry:SingleGenomeNarrative', name: 'Rhodobacter_Pangenome_Set'})">
-                Rhodobacter_Pangenome_Set
-            </a>
+
+    <ul class="nav nav-tabs">
+        <li ng-click="tab = 'Narrative Examples'" ng-class="{active: tab == 'Narrative Examples'}" >
+            <a>KBase Examples</a>
+        </li>
+        <li ng-click="tab = 'Other Examples'" ng-class="{active: tab == 'Other Examples'}" >
+            <a>Other Examples</a>
         </li>
     </ul>
 
+    <div ng-show="tab == 'Narrative Examples'">
+        <div ng-repeat="type in typeOrder">
+            <h4>{{type.split('-')[0].split('.')[1]}}</h4>
+            <div ng-repeat="example in examples[type]">
+                <ul>
+                    <li>
+                        <a ui-sref="landing({type: type, ws: example.ws, name: example.obj})">
+                            {{example.obj}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-    <h4>Media</h4>
-    <ul>
-        <li>
-            <a ui-sref="landing({type: 'KBaseBiochem.Media', ws: 'chenrydemo', name: 'QuantOptMedia-Acetoin'})">
-                QuantOptMedia-Acetoin
-            </a>
-        </li>
-        <li>
-            <a ui-sref="landing({type: 'KBaseBiochem.Media', ws: 'chenrydemo', name: 'mediaexample'})">
-                mediaexample
-            </a>
-        </li>
-        <li>
-            <a ui-sref="landing({type: 'KBaseBiochem.Media', ws: 'KBaseMedia', name: 'PlantHeterotrophicMedia'})">
-                PlantHeterotrophicMedia
-            </a>
-        </li>
-    </ul>
-
-
-    <h4>Models</h4>
-    <ul>
-        <li>
-            <a ui-sref="landing({type: 'KBaseFBA.FBAModel', ws: 'nconrad:testObjects', name: 'iBsu1103'})">
-                iBsu1103
-            </a>
-        </li>
-        <li>
-            <a ui-sref="landing({type: 'KBaseFBA.FBAModel', ws: 'PublishedFBAModels', name: 'iJO1366'})">
-                iJO1366
-            </a>
-        </li>
-
-
-    </ul>
-
-
-    <h4>FBA</h4>
-    <ul>
-        <li>
-            <a ui-sref="landing({type: 'KBaseBiochem.Media', ws: 'KBaseMedia', name: 'PlantHeterotrophicMedia'})">
-                PlantHeterotrophicMedia
-            </a>
-        </li>
-    </ul>
-
-    <h4>Phenotype Set</h4>
-    <ul>
-        <li>
-            <a ui-sref="landing({type: 'KBasePhenotypes.PhenotypeSet', ws: 'chenrydemo', name: 'testpheno'})">
-                testpheno
-            </a>
-        </li>
-    </ul>
-
-
-    <h4>Phenotype Simulation Set</h4>
-    <ul>
-        <li>
-            <a ui-sref="landing({type: 'KBasePhenotypes.PhenotypeSimulationSet', ws: 'dejongh:COBRA2014', name: 'Rsp-biolog.simulation'})">
-                Rsp-biolog.simulation
-            </a>
-        </li>
-    </ul>
-
+    <div ng-show="tab == 'Other Examples'">
+        <div ng-repeat="type in typeOrder">
+            <h4>{{type.split('-')[0].split('.')[1]}}</h4>
+            <div ng-repeat="example in otherExamples[type]">
+                <ul>
+                    <li>
+                        <a ui-sref="landing({type: type, ws: example.ws, name: example.obj})">
+                            {{example.obj}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
 </div>

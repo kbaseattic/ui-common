@@ -16,8 +16,51 @@ app.controller('KBaseTables', function($scope, $stateParams) {
                    kind: $stateParams.type.split('.')[1]};
 
 })
+.controller('KBaseExamples', function($scope, $stateParams) {
+    $scope.tab = "Narrative Examples";
+
+    // order in which examples are dsiplayed
+    $scope.typeOrder = ['KBaseSearch.GenomeSet',
+                        'KBaseBiochem.Media',
+                        'KBaseFBA.FBAModel',
+                        'KBaseFBA.FBA',
+                        'KBasePhenotypes.PhenotypeSet',
+                        'KBasePhenotypes.PhenotypeSimulationSet']
+
+    // example objects from KBaseExampleData
+    kb.ws.list_objects({workspaces: ['KBaseExampleData']})
+        .done(function(data){
+            console.log('data', data)
+
+            var examples = {}; // by type
+            data.forEach(function(obj) {
+                var type = obj[2].split('-')[0],
+                    name = obj[1],
+                    ws = obj[7];
 
 
+                if (type in examples)
+                    examples[type].push({obj: name, ws: ws});
+                else
+                    examples[type] = [{obj: name, ws: ws}];
+            })
+
+            $scope.$apply(function() {
+                $scope.examples = examples;
+            })
+        })
+
+    $scope.otherExamples =
+        {'KBaseSearch.GenomeSet': [{ws: 'chenry:SingleGenomeNarrative', obj: 'Rhodobacter_Pangenome_Set'}],
+         'KBaseBiochem.Media': [{ws: 'chenry:SingleGenomeNarrative', obj: 'QuantOptMedia-Acetoin'},
+                                {ws: 'chenrydemo', obj: 'mediaexample'},
+                                {ws: 'KBaseMedia', obj: 'PlantHeterotrophicMedia'}],
+          'KBaseFBA.FBAModel': [{ws: 'nconrad:testObjects', obj: 'iBsu1103'},
+                                {ws: 'PublishedFBAModels', obj: 'iJO1366'}],
+          'KBasePhenotypes.PhenotypeSet': [{ws: 'chenrydemo', obj: 'testpheno'}],
+          'KBasePhenotypes.PhenotypeSimulationSet': [{ ws: 'dejongh:COBRA2014', obj: 'Rsp-biolog.simulation'}]
+        };
+})
 .controller('Analysis', function($scope, $state, $stateParams, $location, narrative, $http) {
     // service for narrative (builder) state
     $scope.narrative = narrative;
