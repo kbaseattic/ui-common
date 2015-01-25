@@ -271,7 +271,6 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     $scope.options = searchOptionsService;
     $scope.workspace_service;
 
-
     $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
         if (toState.name === "search") {
             //console.log($scope.options.userState);
@@ -279,14 +278,31 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $scope.startSearch();      
         }  
     });
+    
+    postal.channel('session').subscribe('login.success', function (session) {
+      $state.go('search');
+      $scope.$apply();
+    });
+    
+    postal.channel('session').subscribe('logout.success', function (session) {
+      $state.go('search');
+      $scope.$apply();
+    });
+    
+    $scope.login = function() {
+      postal.channel('loginwidget').publish('login.prompt');
+    }
+    
+    
 
-
+/*
     $scope.login = function() {
         $('#signin-button').kbaseLogin('openDialog');
         $('#signin-button').on('loggedIn', function () {
             $state.go('search');       
         });
     };
+    
 
 
     $scope.logout = function() {
@@ -296,6 +312,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $state.go('search');       
         });
     };
+    */
     
     require(['kbasenavbar'], function (Navbar) {
       Navbar.clearMenu();

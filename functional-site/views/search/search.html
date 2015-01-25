@@ -8,18 +8,9 @@
                             <a ng-click='login()'>Sign in</a> to select data and send to your workspaces
                         </div>
                     </div>
-                    <div ng-show="options.userState.longterm.loggedIn" class="alert alert-success search-logout">
-                        <div id="logout-message" class="text-center">                        
-                            Logged in as <strong>{{options.userState.longterm.user_id}}</strong>                                                
-                        </div>
-                        <div class="text-center">
-                            <a ng-click='logout()'>Sign out</a>
-                        </div>
-                    </div>
+                  
 
                     <div ng-show="options.userState.longterm.loggedIn">
-                        <hr class="search-leftarea-size"></hr>
-
                         <div class='text-center search-selections-title'>
                             <h3 data-toggle="tooltip" data-placement="right" tooltip="Here you can see what data you have selected, organize it, and send it to workspaces." tooltip-placement="right">Selections</h3>
                         </div>
