@@ -30,30 +30,32 @@
             // An authenticated widget needs to get the initial auth state
             // from the KBaseSessionSync jquery extension.
             var sessionObject = $.KBaseSessionSync.getKBaseSession();
+            if (this.loggedInQueryCallback) {
+              this.loggedInQueryCallback(sessionObject);
+            }
             var auth = this.setAuth(sessionObject);
 
-            $(document).on(
-                'loggedIn.kbase',
-                $.proxy(function (e, auth) {
-//console.log("LI");
-                    this.setAuth(auth);
-                    if (this.loggedInCallback) {
-                        this.loggedInCallback(e, auth);
-                    }
-                }, this)
-            );
+            postal.channel('session').subscribe('login.success', function (session) {
+                this.setAuth(session);
+                if (this.loggedInCallback) {
+                    this.loggedInCallback(e, session);
+                }
+              }.bind(this));
 
-            $(document).on(
-                'loggedOut.kbase',
-                $.proxy(function (e) {
-//console.log("LO");
-                    this.setAuth(undefined);
-                    if (this.loggedOutCallback) {
-                        this.loggedOutCallback(e);
-                    }
-                }, this)
-            );
+            postal.channel('session').subscribe('login.success', function (session) {
+                this.setAuth(undefined);
+                if (this.loggedOutCallback) {
+                    this.loggedOutCallback();
+                }
+              }.bind(this)); 
 
+            /*
+            TODO:used anywhere?
+            NB: used to initialize the session in this widget, but 
+            it relies on the SYNCHRONOUS nature of jquery events.
+            IMHO this is not good, because it obscures the nature
+            of what is going on here -- a simple method call of a 
+            global object which knows about session state.
             $(document).trigger(
                 'loggedInQuery',
                 $.proxy(function (auth) {
@@ -71,6 +73,7 @@
                     }
                 }, this)
             );
+            */
 
             return this;
 

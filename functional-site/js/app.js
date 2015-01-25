@@ -706,16 +706,20 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
 
     $('#signin-button').kbaseLogin();
     
+    postal.channel('session').subscribe('#', function (data, env) {
+      console.log(env);
+    });
+    
     // This is an important part of the app lifecycle!
     // Login and out events trigger a refresh of the entire page. 
     // In addition, logout will redirect to the login page.
     // Although views and widgets should be prepared to render in an unauthenticated state
     // (and a view would need to redirect to /login if it doesn't want to be seen)
     // in practice they may never be seen thus.
-    $(document).on('loggedIn.kbase', function (e, session) {
-      finish_login(session);
+    postal.channel('session').subscribe('login.success', function (data) {
+      finish_login(data.session);
     });
-    $(document).on('loggedOut.kbase', function (e) {
+    postal.channel('session').subscribe('logout.success', function (data) {
       finish_logout();
     });
     
