@@ -16,7 +16,6 @@ function KBaseBiochem_Media(tabwidget) {
     };
 
     this.setData = function (data) {
-        console.log('data', data)
         this.data = data;
         this.mediacompounds = this.data.mediacompounds;
         this.reagents = this.data.reagents;
@@ -33,7 +32,6 @@ function KBaseBiochem_Media(tabwidget) {
 
         var p = this.tabwidget.getBiochemCompounds(cpdarray)
                     .done(function(cpds) {
-                        console.log('cpds', cpds)
                         for (var i=0; i< self.mediacompounds.length; i++) {
                             var cpd = self.mediacompounds[i];
                             cpd.name = cpds[i].name;

@@ -1,11 +1,9 @@
 function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
     var self = this;
     this.tabwidget = tabwidget;
-    console.log('loading widget')
 
-	this.setMetadata = function (data) {
-        //console.log('meta', data)
-	this.workspace = data[7];
+    this.setMetadata = function (data) {
+        this.workspace = data[7];
         this.objName = data[1];
         this.overview = {wsid: data[7]+"/"+data[1],
                          objecttype: data[2],
@@ -23,85 +21,81 @@ function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
     };
 
     this.setData = function (indata) {
-	console.log('mydata', indata);
-	this.data = indata;
-	this.phenotypes = this.data.phenotypeSimulations;
-
-
-	console.log('mydata1',this.phenotypes);
+        this.data = indata;
+        this.phenotypes = this.data.phenotypeSimulations;
     }
 
     this.tabList = [{
-	    "key": "overview",
-	    "name": "Overview",
-	    "type": "verticaltbl",
-	    "rows": [{
-		    "label": "ID",
-		    "key": "wsid"
-		},{
-		    "label": "Object type",
-		    "key": "objecttype",
-		    "type": "typelink"
-		},{
-		    "label": "Owner",
-		    "key": "owner"
-		},{
-		    "label": "Version",
-		    "key": "instance"
-		},{
-		    "label": "Mod-date",
-		    "key": "moddate"
-		},{
-		    "label": "Name",
-		    "key": "name"
-		},{
-		    "label": "Source",
-		    "key": "source"
-		},{
-		    "label": "Number phenotypes",
-		    "key": "numphenotypes"
-		},{
-		    "label": "Phenotype type",
-		    "key": "type"
-		}]
-	}, {
-	    "key": "phenotypes",
-	    "name": "Phenotypes",
-	    "type": "dataTable",
-	    "columns": [{
-		    "label": "Phenotype Simulation id",
-		    "key": "id",
-		    "visible": 1
-		}, {
-		    "label": "Experimental Growth",
-		    "key": "phenoclass",
-		    "type": "wstype"
-		}, {
-		    "label": "PhenotypeRef",
-		    "type": "tabLink",
-		    "method": "PhenotypeSetTab",
-		    "linkformat": "dispID",
-		    "key": "phenotype_ref",
-		    "visible": 1
-		}, {
-		    "label": "Predicted Growth",
-		    "key": "simulatedGrowth",
-		    "type": "wstype",
-		    "visible": 1
-		}, {
-		    "label": "Simulated Growth Fraction",
-		    "key": "simulatedGrowthFraction",
-		    "visible": 1
-		}]
-	}];
+        "key": "overview",
+        "name": "Overview",
+        "type": "verticaltbl",
+        "rows": [{
+            "label": "ID",
+            "key": "wsid"
+        },{
+            "label": "Object type",
+            "key": "objecttype",
+            "type": "typelink"
+        },{
+            "label": "Owner",
+            "key": "owner"
+        },{
+            "label": "Version",
+            "key": "instance"
+        },{
+            "label": "Mod-date",
+            "key": "moddate"
+        },{
+            "label": "Name",
+            "key": "name"
+        },{
+            "label": "Source",
+            "key": "source"
+        },{
+            "label": "Number phenotypes",
+            "key": "numphenotypes"
+        },{
+            "label": "Phenotype type",
+            "key": "type"
+        }]
+    }, {
+        "key": "phenotypes",
+        "name": "Phenotypes",
+        "type": "dataTable",
+        "columns": [{
+            "label": "Phenotype Simulation id",
+            "key": "id",
+            "visible": 1
+        }, {
+            "label": "Experimental Growth",
+            "key": "phenoclass",
+            "type": "wstype"
+        }, {
+            "label": "PhenotypeRef",
+            "type": "tabLink",
+            "method": "PhenotypeSetTab",
+            "linkformat": "dispID",
+            "key": "phenotype_ref",
+            "visible": 1
+        }, {
+            "label": "Predicted Growth",
+            "key": "simulatedGrowth",
+            "type": "wstype",
+            "visible": 1
+        }, {
+            "label": "Simulated Growth Fraction",
+            "key": "simulatedGrowthFraction",
+            "visible": 1
+        }]
+    }];
 
     this.PhenotypeSetTab = function (ref) {
-	var objIdentity = {"obj_ref": ref};
-	var p = tabwidget.kbapi('ws', 'get_objects', [objIdentity])
-	.then(function(data) {
-		console.log(data);
-		return [];
-	    });
+        var objIdentity = {"obj_ref": ref};
+        var p = tabwidget.kbapi('ws', 'get_objects', [objIdentity])
+                         .then(function(data) {
+
+                         return [];
+                });
 
         return p;
 

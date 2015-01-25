@@ -95,6 +95,9 @@ var app = angular.module('landing-pages',
     // revised output widget test page
     $stateProvider
         .state('test', {
+          url: "/test/",
+          templateUrl: 'views/test-landing.html'
+        }).state('landing', {
           url: "/test/:type/:ws/:name",
           templateUrl: 'views/test.html',
           controller: 'KBaseTables'
