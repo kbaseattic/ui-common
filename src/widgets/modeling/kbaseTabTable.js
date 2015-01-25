@@ -526,10 +526,10 @@ $.KBWidget({
             } else {
                 if (typeof text != 'undefined')
                     $(this).append('<p class="text-muted loader">'+
-                         '<img src="assets/img/ajax-loader.gif"> '+text+'</p>');
+                         '<img src="//narrative.kbase.us/narrative/static/kbase/images/ajax-loader.gif"> '+text+'</p>');
                 else
                     $(this).append('<p class="text-muted loader">'+
-                         '<img src="assets/img/ajax-loader.gif"> loading...</p>')
+                         '<img src="//narrative.kbase.us/narrative/static/kbase/images/ajax-loader.gif"> loading...</p>')
             }
 
             return this;
