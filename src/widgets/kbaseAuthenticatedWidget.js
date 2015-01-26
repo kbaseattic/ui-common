@@ -96,7 +96,7 @@
 
         loggedInQueryCallback : function(args) {
             if (this.loggedInCallback) {
-                this.loggedInCallback({},args);
+                this.loggedInCallback(undefined,args);
             }
         },
 
