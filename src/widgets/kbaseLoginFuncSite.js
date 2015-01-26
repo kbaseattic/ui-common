@@ -115,7 +115,11 @@
     
     // NB: require for compatability with old code.
     session: function (propName) {
-      return this.get_session_prop(propName);
+      if (propName === undefined) {
+        return this.sessionObject;
+      } else {
+        return this.get_session_prop(propName);
+      }
     },
     
     get_profile_prop: function(propName, defaultValue) {
@@ -152,7 +156,7 @@
       // We use it for the initial state, but after that all other session interactions
       // are asynchronous, and session state is communicated via jquery messages.
       // The session object will either be the authenticated session object or null.
-      this.sessionObject = Object.create($.KBaseSessionSync).init().getKBaseSession();
+      this.sessionObject = $.KBaseSessionSync.getKBaseSession();
       
  
       // Select which version of the widget to show.
@@ -179,24 +183,29 @@
       
       // These need to go after the element is built, but before session is 
       // set up below, because the widget may need to respond to login and profile events.
-      $(document).on('profileLoaded.kbase', function(e, profile) {
+      postal.channel('session').subscribe('profile.loaded', function(data) {
+      // $(document).on('profileLoaded.kbase', function(e, profile) {
+        var profile = data.profile;
         this.userProfile = profile.getProfile();
         // NB: KB widgets "rewire" ids -- tranform ids into data- attributes.
         this.$elem.find('[data-element="user-label"]').html(this.get_user_label());
         var url = profile.getAvatarURL({size: 40, rating: 'pg'});
         this.$elem.find('[data-element="avatar"]').attr('src', url);
       }.bind(this));
-
-      $(document).on('loggedIn.kbase', function(e, session) {
+      
+      postal.channel('session').subscribe('login.success', function (data) {
+        var session = data.session;
+      // $(document).on('loggedIn.kbase', function(e, session) {
         this.sessionObject = session;
         this.$elem.find('[data-element="user-label"]').html(this.get_user_label());
         this.fetchUserProfile();
       }.bind(this));
       
-      $(document).on('loggedOut.kbase', function(e) {
+      postal.channel('session').subscribe('logout.success', function() {
+      // $(document).on('loggedOut.kbase', function(e) {
         this.sessionObject = null;
         var elem = this.$elem;
-        require(['kbaseloginwidget', 'kbasesession'], function (LoginWidget, Session) {
+        require(['kbaseloginwidget'], function (LoginWidget) {
           try {
             var w = LoginWidget.init({
               container: elem,
@@ -230,24 +239,30 @@
         //this.trigger('loggedIn', this.sessionObject);
       }
       
-      $(document).on('loggedInQuery.kbase', $.proxy(function(e, callback) {
+      /*
+      TODO: are these used anywwhere?????
+      postal.channel('session').subscribe('login.query', function (data) {
+        //$(document).on('loggedInQuery.kbase', $.proxy(function(e, callback) {
           if (callback) {
             callback(this.sessionObject);
           }
         }, this)
       );
-
-      $(document).on('promptForLogin.kbase', function(e, args) {
-        if (args && args.user_id) {
-          this.data('passed_user_id', args.user_id);
-        }
+     
+       */
+      
+      postal.channel('loginwidget').subscribe('login.prompt', function (data) {
+      // TODO: is this used anywhere?
+        //if (args && args.user_id) {
+        //    this.data('passed_user_id', args.user_id);
+        //  }
         this.openDialog();
       }.bind(this));
+      
 
-      $(document).on('logout.kbase', $.proxy(function(e, rePrompt) {
-          this.logout(rePrompt);
-        }, this)
-      ); 
+      postal.channel('session').subscribe('logout.request', function (data) {
+          this.logout();
+        }.bind(this));
       
       /*
       // Finally listen for user activity in order to tickle the session.
@@ -928,15 +943,18 @@
           switch (profile.getProfileStatus()) {
             case 'stub':
             case 'profile':
-               $(document).trigger('profileLoaded.kbase', profile);       
+              postal.channel('session').publish('profile.loaded', {profile: profile});
+              //  $(document).trigger('profileLoaded.kbase', profile);       
               break;
             case 'none':
               profile.createStubProfile({createdBy: 'session'})
               .then(function(profile) {
-                $(document).trigger('profileLoaded.kbase',  profile);  
+                postal.channel('session').publish('profile.loaded', {profile: profile});
+                // $(document).trigger('profileLoaded.kbase',  profile);  
               })
               .catch (function(err) {
-                 $(document).trigger('profileLoadFailure.kbase', {status : 0, message : err}); 
+                postal.channel('session').publish('profile.loadfailure', {message: err});
+                //  $(document).trigger('profileLoadFailure.kbase', {status : 0, message : err}); 
               })
               .done();
               break;
@@ -945,7 +963,8 @@
         .catch (function(err) {
           var errMsg = 'Error getting user profile';
           // KBase Event Interface
-          $(document).trigger('profileLoadFailure.kbase', {status : 0, message : err}); 
+          postal.channel('session').publish('profile.loadfailure', {message: err});
+          // $(document).trigger('profileLoadFailure.kbase', {status : 0, message : err}); 
         })
         .done();
       });
@@ -964,7 +983,8 @@
             
             // Awaiting clients can get the session object directly, from the cookie, or query the 
             // global singleton session object.
-            this.trigger('loggedIn.kbase', session);
+            postal.channel('session').publish('login.success', {session: session});
+            // this.trigger('loggedIn.kbase', session);
             
             callback.call(this, session);
           }.bind(this),
@@ -975,7 +995,8 @@
               message: err
             };
             this.populateLoginInfo(errObject);
-            this.trigger('loggedInFailure.kbase',errObject);
+            postal.channel('session').publish('login.failure', {error: errObject});
+            // this.trigger('loggedInFailure.kbase',errObject);
            
             callback.call(this, errObject);
           }.bind(this)
@@ -985,17 +1006,14 @@
 
     logout: function(rePrompt) {
       require(['kbasesession'], function (Session) {
-        console.log('here 1');
         Session.removeAuth();
 
         // the rest of this is just housekeeping.
         if (this.specificLogout) {
           this.specificLogout();
         }
-        console.log('here 2');
 
         this.populateLoginInfo();
-        console.log('here 3');
 
         //automatically prompt to log in again
         // rePrompt = false;
@@ -1014,8 +1032,9 @@
         }
         */
 
-        this.trigger('loggedOut.kbase');
-        console.log('here 4');
+        console.log('about to publish the logout...');
+        postal.channel('session').publish('logout.success');
+        // this.trigger('loggedOut.kbase');
         
         // need this?
         //if (this.options.logout_callback) {

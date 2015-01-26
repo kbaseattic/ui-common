@@ -1,0 +1,33 @@
+---
+
+file: kbaseSession.js
+
+module: KBase Session
+
+dependencies:
+    - jquery
+    - q
+    - kbasecookie
+    - kbaseconfig
+    
+constants:
+  - name: cookieName
+    type: string
+    desc: The standard name for the kbase session cookie
+    
+  - name: narrCookieName
+    type: string
+    desc: The standard name for the kbase session cookie used in the Narrative.
+    
+object_properties:
+  - name: cookieMaxAge
+    writable: true
+    type: integer
+    
+instance_properties:
+methods:
+  - name: init
+    type: initialization
+    desc: Sets up the object, adds properties.
+    
+  

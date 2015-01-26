@@ -1,4 +1,4 @@
-define(['kbasebasewidget', 'kbasesession', 'jquery'], function (BaseWidget, Session, $) {
+define(['kbasebasewidget', 'kbasesession', 'jquery', 'postal'], function (BaseWidget, Session, $, Postal) {
   // make a widget ... on the fly?
   var W = Object.create(BaseWidget, {
     init: {
@@ -42,13 +42,15 @@ define(['kbasebasewidget', 'kbasesession', 'jquery'], function (BaseWidget, Sess
           this.container.html(this.renderTemplate('loggedin'));
           this.container.find('[data-menu-item="logout"]').on('click', function (e) {
             e.preventDefault();
-            $(this).trigger('logout.kbase');
+            Postal.channel('session').publish('logout.request');
+            // $(this).trigger('logout.kbase');
           });
         } else {
           this.container.html(this.renderTemplate('loggedout'));
           this.container.find('[data-menu-item="signin"]').on('click', function (e) {
             e.preventDefault();
-            $(this).trigger('promptForLogin.kbase');
+            Postal.channel('loginwidget').publish('login.prompt');
+            // $(this).trigger('promptForLogin.kbase');
           });
         }
         return this;

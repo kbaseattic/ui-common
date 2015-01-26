@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functional-site/config.json'],
-  function(nunjucks, $, Q, Session, Utils, config) {
+define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json!functional-site/config.json'],
+  function(nunjucks, $, Q, Session, Utils, Postal, config) {
     "use strict";
     var SocialWidget = Object.create({}, {
 
@@ -105,12 +105,12 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
           // Set up listeners for any kbase events we are interested in:
           // NB: following tradition, the auth listeners are namespaced for kbase; the events
           // are not actually emitted in the kbase namespace.
-          $(document).on('loggedIn.kbase', function(e, auth) {
-            this.onLoggedIn(e, auth);
+          Postal.channel('session').subscribe('login.success', function(data) {
+            this.onLoggedIn(data.session);
           }.bind(this));
-
-          $(document).on('loggedOut.kbase', function(e, auth) {
-            this.onLoggedOut(e, auth);
+          
+          Postal.channel('session').subscribe('logout.success', function() {
+            this.onLoggedout();
           }.bind(this));
 
           return this;
@@ -375,7 +375,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
       // EVENT HANDLERS
 
       onLoggedIn: {
-        value: function(e, auth) {
+        value: function(auth) {
           this.setupAuth();
           this.setup();
           this.setInitialState({force: true})
@@ -386,7 +386,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'json!functiona
       },
 
       onLoggedOut: {
-        value: function(e, auth) {
+        value: function() {
           this.setupAuth();
           this.setup();
           this.setInitialState({force: true}).then(function () {

@@ -7,7 +7,10 @@ define('kbaseuserprofileserviceclient', [], function() {
 });
 define('kbaseworkspaceserviceclient', [], function() {
   return Workspace;
-})
+});
+define('postal', [], function () {
+  return postal;
+});
 require.config({
     baseUrl: '/',
     catchError: true,
@@ -18,6 +21,8 @@ require.config({
       nunjucks: '/ext/nunjucks/nunjucks.min',
       md5: '/ext/md5/md5',
       q: '/ext/q/q.min',
+      lodash: '/ext/lodash/lodash-2.4.1.min',
+     //  postal: '/ext/postal/postal-0.12.4.min',
 
       domReady: '/ext/require-plugins/domReady', 
     	text: '/ext/require-plugins/text',
@@ -53,6 +58,9 @@ require.config({
       },
      q: {
        exports: 'Q'
+     },
+     postal: {
+       exports: 'postal'
      }
    }
     

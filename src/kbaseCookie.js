@@ -16,7 +16,7 @@ define([], function() {
       }
     },
     setItem: {
-      value: function(sKey, sValue, vEnd, sPath, sDomain, bSecure) {
+      value: function(sKey, sValue, vEnd, sPath, sDomain, bSecure, bNoEncode) {
         if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) {
           return false;
         }
@@ -34,7 +34,14 @@ define([], function() {
               break;
           }
         }
-        document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
+        if (bNoEncode) {
+          // For compatability with services which do not decode cookies yet create cookies
+          // save for not encoding. Aka - Globus.
+          document.cookie = sKey + "=" + sValue + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
+        } else {
+          document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
+        }
+ 
         return true;
       }
     },

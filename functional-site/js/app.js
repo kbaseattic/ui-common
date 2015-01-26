@@ -678,13 +678,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     });
 
 
-    var finish_login = function(result) {
-        //if (!result.success)
-        //    return;
-
-//        var c = $('#signin-button').kbaseLogin('get_kbase_cookie');
-//        set_cookie(c);
-
+    var finish_login = function(session) {
         // If we're changing state from the login page, and we have a valid 
         // session (i.e.: we're logging IN and not OUT), then forward us to
         // the /narrative/ state.
@@ -692,15 +686,15 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         // Otherwise, just login in place and reload.
         // We need to reload to make sure the USER_ID and USER_TOKEN get set properly.
         if ($location.path() === '/login/') {
-          // omg - eap
-            var kbase_sessionid = $("#signin-button").kbaseLogin('get_session_prop', 'kbase_sessionid');
-            if (kbase_sessionid) { 
-                // USER_ID = $("#signin-button").kbaseLogin('session').user_id;
-                // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
-                $location.path('/narratives/featured');
-            }
-            $rootScope.$apply();
+          // Are these used anywhere?
+          USER_ID = session.user_id;
+          USER_TOKEN = session.token;
+            // USER_ID = $("#signin-button").kbaseLogin('session').user_id;
+            // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
+            // $location.path('/narratives/featured');
+            $location.path('/narrativemanager/start');
         }
+        $rootScope.$apply();
         window.location.reload();
     };
 
@@ -710,11 +704,11 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         window.location.reload();
     };
 
-    // sign in button
-    //$('#signin-button').kbaseLogin({login_callback: finish_login,
-    //                                logout_callback: finish_logout});
     $('#signin-button').kbaseLogin();
-    // $('#signin-button').css('padding', '0');  // Jim!
+    
+    postal.channel('session').subscribe('#', function (data, env) {
+      console.log(env);
+    });
     
     // This is an important part of the app lifecycle!
     // Login and out events trigger a refresh of the entire page. 
@@ -722,10 +716,10 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     // Although views and widgets should be prepared to render in an unauthenticated state
     // (and a view would need to redirect to /login if it doesn't want to be seen)
     // in practice they may never be seen thus.
-    $(document).on('loggedIn.kbase', function (e, session) {
-      finish_login(session);
+    postal.channel('session').subscribe('login.success', function (data) {
+      finish_login(data.session);
     });
-    $(document).on('loggedOut.kbase', function (e) {
+    postal.channel('session').subscribe('logout.success', function (data) {
       finish_logout();
     });
     
