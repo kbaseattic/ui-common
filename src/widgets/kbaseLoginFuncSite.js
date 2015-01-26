@@ -115,7 +115,11 @@
     
     // NB: require for compatability with old code.
     session: function (propName) {
-      return this.get_session_prop(propName);
+      if (propName === undefined) {
+        return this.sessionObject;
+      } else {
+        return this.get_session_prop(propName);
+      }
     },
     
     get_profile_prop: function(propName, defaultValue) {

@@ -3,6 +3,41 @@ define(['jquery', 'q', 'kbasecookie', 'kbaseconfig'],
         'use strict';
         var Session = Object.create({}, {
    
+           
+            
+            // Property Constants
+            
+            /**
+            * The standard name of the KBase session cookie.
+            * type: string
+            */
+            cookieName: {
+                value: 'kbase_session'
+            },
+            
+            /**
+            * The standard name of the KBase session cookie used in the Narrative.
+            * type: string
+            */
+            narrCookieName: {
+                value: 'kbase_narr_session'
+            },
+            
+            // Property Variables
+
+            /**
+            * The span, from the instant a session cookie is created, after which the cookie will 
+            * be deleted from the browser. Corresponds to the max-age attribute of a cookie. 
+            * type: integer
+            * nb: this is set in @init from the configuration object.
+            */
+            cookieMaxAge: {
+                value: null,
+                writable: true
+            },
+            
+            // Initializer
+            
             /**
             * Initialize the object to a well defined starting state.
             * This includes creating instance properties, initializing data, setting 
@@ -21,32 +56,14 @@ define(['jquery', 'q', 'kbasecookie', 'kbaseconfig'],
                     return this;
                 }
             },
-
-            /**
-            * @property {integer} The span, from the instant a session cookie is created, after which the cookie will 
-            * be deleted from the browser. Corresponds to the max-age attribute of a cookie. 
-            */
-            cookieMaxAge: {
-                value: null,
-                writable: true
-            },
-
-            /**
-            * @property {string} The name of the kbase session cookie.
-            */
-            cookieName: {
-                value: 'kbase_session'
-            },
             
-            /**
-            * @property {string} The name of the session cookie used by the Narrative.
-            */
-            narrCookieName: {
-                value: 'kbase_narr_session'
-            },
+            
+            // API Methods
 
-            /**{@link [[Link]] [[Description]]}function
-            */
+
+           // Implementation Methods
+            
+            
             setSession: {
                 value: function (obj) {
                     if (this.validateSession(obj)) {
@@ -223,14 +240,13 @@ define(['jquery', 'q', 'kbasecookie', 'kbaseconfig'],
                     }
                 }
             },
-            
+
             setAuthCookie: {
                 value: function () {
                     if (this.sessionObject) {
                         var cookieString = this.makeAuthCookie();
                         Cookie.setItem(this.cookieName, cookieString, this.cookieMaxAge, '/');
                         Cookie.setItem(this.cookieName, cookieString, this.cookieMaxAge, '/', 'kbase.us');
-                        // Cookie.setItem('access_token', this.sessionObject.token, this.cookieMaxAge, '/', 'kbase.us');
                         Cookie.setItem(this.narrCookieName, cookieString, this.cookieMaxAge, '/', 'kbase.us');
                         // Set the same cookie in localStorage for compatability.
                         var kbaseSession = this.getKBaseSession();
