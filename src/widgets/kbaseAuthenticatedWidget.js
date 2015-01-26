@@ -30,10 +30,11 @@
             // An authenticated widget needs to get the initial auth state
             // from the KBaseSessionSync jquery extension.
             var sessionObject = $.KBaseSessionSync.getKBaseSession();
-            if (this.loggedInQueryCallback) {
+            this.setAuth(sessionObject);
+            if (this.loggedInQueryCallback && this.sessionObject &&this.sessionObject.token) {
               this.loggedInQueryCallback(sessionObject);
             }
-            var auth = this.setAuth(sessionObject);
+           
 
             postal.channel('session').subscribe('login.success', function (session) {
                 this.setAuth(session);
@@ -42,7 +43,7 @@
                 }
               }.bind(this));
 
-            postal.channel('session').subscribe('login.success', function (session) {
+            postal.channel('session').subscribe('logout.success', function (session) {
                 this.setAuth(undefined);
                 if (this.loggedOutCallback) {
                     this.loggedOutCallback();
@@ -80,10 +81,12 @@
         },
 
         setAuth : function (newAuth) {
-            this.setValueForKey('auth', newAuth);
-            if (newAuth == undefined) {
-                newAuth = {};
+            if (!newAuth) {
+              newAuth = {};
             }
+            this.setValueForKey('auth', newAuth);
+           
+           
             this.sessionId(newAuth.kbase_sessionid);
             this.authToken(newAuth.token);
             this.user_id(newAuth.user_id);
@@ -93,7 +96,7 @@
 
         loggedInQueryCallback : function(args) {
             if (this.loggedInCallback) {
-                this.loggedInCallback(undefined,args);
+                this.loggedInCallback({},args);
             }
         },
 
