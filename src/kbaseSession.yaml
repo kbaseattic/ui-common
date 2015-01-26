@@ -1,0 +1,9 @@
+---
+
+file: kbaseSession.js
+module: KBase Session
+dependencies:
+    - jquery
+    - q
+    - kbasecookie
+    - kbaseconfig
