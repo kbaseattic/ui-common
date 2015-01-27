@@ -4,7 +4,7 @@
 
 (function( $, undefined ) {
 
-
+  'use strict';
     $.KBWidget({
 
 		  name: "kbaseAuthenticatedWidget",
@@ -25,24 +25,31 @@
 
         init: function(options) {
 
-            this._super(options);
+            this._super(options); 
             
             // An authenticated widget needs to get the initial auth state
             // from the KBaseSessionSync jquery extension.
             var sessionObject = $.KBaseSessionSync.getKBaseSession();
-            if (this.loggedInQueryCallback) {
-              this.loggedInQueryCallback(sessionObject);
+            this.setAuth(sessionObject);
+            
+            // This is how to pull the value out of the auth attribute.
+            var auth = this.auth();
+            if (this.loggedInQueryCallback && auth && auth.token) {
+              this.callAfterInit(function () {
+                // use the current auth attribute value, since this is run asynchronously, and who knows,
+                // it may have changed.
+                 this.loggedInQueryCallback(this.auth());
+              }.bind(this));
             }
-            var auth = this.setAuth(sessionObject);
-
+           
             postal.channel('session').subscribe('login.success', function (session) {
                 this.setAuth(session);
                 if (this.loggedInCallback) {
-                    this.loggedInCallback(e, session);
+                    this.loggedInCallback(undefined, this.auth());
                 }
               }.bind(this));
 
-            postal.channel('session').subscribe('login.success', function (session) {
+            postal.channel('session').subscribe('logout.success', function (session) {
                 this.setAuth(undefined);
                 if (this.loggedOutCallback) {
                     this.loggedOutCallback();
@@ -80,10 +87,12 @@
         },
 
         setAuth : function (newAuth) {
-            this.setValueForKey('auth', newAuth);
-            if (newAuth == undefined) {
-                newAuth = {};
+            if (!newAuth) {
+              newAuth = {};
             }
+            this.setValueForKey('auth', newAuth);
+           
+           
             this.sessionId(newAuth.kbase_sessionid);
             this.authToken(newAuth.token);
             this.user_id(newAuth.user_id);
