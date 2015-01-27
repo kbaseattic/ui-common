@@ -706,10 +706,6 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
 
     $('#signin-button').kbaseLogin();
     
-    postal.channel('session').subscribe('#', function (data, env) {
-      console.log(env);
-    });
-    
     // This is an important part of the app lifecycle!
     // Login and out events trigger a refresh of the entire page. 
     // In addition, logout will redirect to the login page.

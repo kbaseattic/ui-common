@@ -4,7 +4,7 @@
 
 (function( $, undefined ) {
 
-
+  'use strict';
     $.KBWidget({
 
 		  name: "kbaseAuthenticatedWidget",
@@ -32,14 +32,16 @@
             var sessionObject = $.KBaseSessionSync.getKBaseSession();
             this.setAuth(sessionObject);
             if (this.loggedInQueryCallback && this.sessionObject &&this.sessionObject.token) {
-              this.loggedInQueryCallback(sessionObject);
+              this.callAfterInit(function () {
+                this.loggedInQueryCallback(sessionObject);
+              }.bind(this));
             }
            
 
             postal.channel('session').subscribe('login.success', function (session) {
                 this.setAuth(session);
                 if (this.loggedInCallback) {
-                    this.loggedInCallback(e, session);
+                    this.loggedInCallback(undefined, session);
                 }
               }.bind(this));
 
