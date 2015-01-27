@@ -385,16 +385,16 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 .controller('Login', function($scope, $stateParams, $location, kbaseLogin, $modal) {
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives
     
-    $(document).on('loggedInFailure.kbase', function (e, err) {
+    postal.channel('session').subscribe('login.failure', function (data) {
       // TODO: wow, these jquery calls need to be scoped!
       $("#loading-indicator").hide();
-      var errormsg = err.message;
+      var errormsg = data.error.message;
       if (errormsg == "LoginFailure: Authentication failed.") {
           errormsg = "Login Failed: your username/password is incorrect.";
       }
       $("#login_error").html(errormsg);
       $("#login_error").show();
-    })
+    });
     
     // callback for ng-click 'loginUser':
     $scope.loginUser = function (user) {

@@ -683,7 +683,9 @@
             postal.channel('session').publish('login.failure', {error: errObject});
             // this.trigger('loggedInFailure.kbase',errObject);
            
-            callback.call(this, errObject);
+            if (callback) {
+              callback.call(this, errObject);
+            }
           }.bind(this)
         });
       }.bind(this));
