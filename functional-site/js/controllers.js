@@ -414,9 +414,9 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
         return (userId !== undefined && userId !== null);
     };
     
-    $(document).on('profileLoaded.kbase', function (e, profile) {
+    postal.channel('session').subscribe('profile.loaded', function (data) {
       $scope.$apply(function () {
-        $scope.username = profile.getProp('user.realname');
+        $scope.username = data.profile.getProp('user.realname');
       });
     });
 

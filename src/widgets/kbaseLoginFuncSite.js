@@ -68,76 +68,7 @@
 
     sessionObject: null,
     userProfile: null,
-
-    get_kbase_cookie: function(field) {
-      if (this.sessionObject) {
-        return this.get_session_prop(field);
-      }
-    },
-
-    is_authenticated: function() {
-      // Use the presence of the primary cookie as the flag for
-      // authenticated.
-
-      if (!this.get_session()) {
-        // ensure that all traces of authentication are removed.
-        $.KBaseSessionSync.removeAuth();
-        return false;
-      } else {
-        return true;
-      }
-    },
-
-    get_session: function(options) {
-      return this.sessionObject;
-    },
     
-    get_prop: function(obj, propName, defaultValue) {
-      var props = propName.split('.');
-      for (var i = 0; i < props.length; i++) {
-        var key = props[i];
-        if (obj[key] === undefined) {
-          return defaultValue;
-        } else {
-          obj = obj[key];
-        }
-      }
-      return obj;
-    },
-
-    get_session_prop: function(propName, defaultValue) {
-      if (this.sessionObject) {
-        return this.get_prop(this.sessionObject, propName, defaultValue);
-      } else {
-        return defaultValue;
-      }
-    },
-    
-    // NB: require for compatability with old code.
-    session: function (propName) {
-      if (propName === undefined) {
-        return this.sessionObject;
-      } else {
-        return this.get_session_prop(propName);
-      }
-    },
-    
-    get_profile_prop: function(propName, defaultValue) {
-      if (this.userProfile) {
-        return this.get_prop(this.userProfile, propName, defaultValue);
-      } else {
-        return defaultValue;
-      }
-    },
-
-    sessionId: function() {
-      return this.get_session_prop('kbase_sessionid');
-    },
-
-    token: function() {
-      return this.get_session_prop('token');
-    },
-
     init: function(options) {
       this._super(options);
 
@@ -283,6 +214,77 @@
       }.bind(this), checkInterval);
       */
     },
+
+    get_kbase_cookie: function(field) {
+      if (this.sessionObject) {
+        return this.get_session_prop(field);
+      }
+    },
+
+    is_authenticated: function() {
+      // Use the presence of the primary cookie as the flag for
+      // authenticated.
+
+      if (!this.get_session()) {
+        // ensure that all traces of authentication are removed.
+        $.KBaseSessionSync.removeAuth();
+        return false;
+      } else {
+        return true;
+      }
+    },
+
+    get_session: function(options) {
+      return this.sessionObject;
+    },
+    
+    get_prop: function(obj, propName, defaultValue) {
+      var props = propName.split('.');
+      for (var i = 0; i < props.length; i++) {
+        var key = props[i];
+        if (obj[key] === undefined) {
+          return defaultValue;
+        } else {
+          obj = obj[key];
+        }
+      }
+      return obj;
+    },
+
+    get_session_prop: function(propName, defaultValue) {
+      if (this.sessionObject) {
+        return this.get_prop(this.sessionObject, propName, defaultValue);
+      } else {
+        return defaultValue;
+      }
+    },
+    
+    // NB: require for compatability with old code.
+    session: function (propName) {
+      if (propName === undefined) {
+        return this.sessionObject;
+      } else {
+        return this.get_session_prop(propName);
+      }
+    },
+    
+    get_profile_prop: function(propName, defaultValue) {
+      if (this.userProfile) {
+        return this.get_prop(this.userProfile, propName, defaultValue);
+      } else {
+        return defaultValue;
+      }
+    },
+
+    sessionId: function() {
+      return this.get_session_prop('kbase_sessionid');
+    },
+
+    token: function() {
+      return this.get_session_prop('token');
+    },
+
+   
     
     tickleSession: function () {
       require(['kbasesession'], function (Session) {
@@ -415,324 +417,7 @@
       return undefined;
     },
 
-    _slimStyle: function() {
-      this.data('loginDialog', undefined);
-
-      var $prompt = $('<span></span>')
-        .addClass('form-inline')
-        .append(
-          $('<span></span>')
-          .attr('id', 'entrance')
-          .append(
-            $('<span></span>')
-            .addClass('input-group')
-            .append(
-              $('<span></span>')
-              .addClass('input-group-addon')
-              .append('username: ')
-              .bind('click',
-                function(e) {
-                  $(this).next().focus();
-                }
-              )
-            )
-            .append(
-              $('<input>')
-              .attr('type', 'text')
-              .attr('name', 'user_id')
-              .attr('id', 'user_id')
-              .attr('size', '20')
-              .val(this.options.user_id)
-            )
-            .append(
-              $('<span></span>')
-              .addClass('input-group-addon')
-              .append(' password: ')
-              .bind('click',
-                function(e) {
-                  $(this).next().focus();
-                }
-              )
-            )
-            .append(
-              $('<input>')
-              .attr('type', 'password')
-              .attr('name', 'password')
-              .attr('id', 'password')
-              .attr('size', '20')
-            )
-            //.append('&nbsp;')
-            .append(
-              $('<button></button>')
-              .attr('id', 'loginbutton')
-              .addClass('btn btn-primary')
-              .append(
-                $('<i></i>')
-                .attr('id', 'loginicon')
-                .addClass('icon-lock')
-              )
-            )
-          )
-      )
-        .append(
-          $('<span></span>')
-          .attr('id', 'userdisplay')
-          .attr('style', 'display : none;')
-          .addClass('input-group')
-          .append(
-            $('<span></span>')
-            .addClass('input-group-addon')
-            //.attr('style', 'text-align : center')
-            .append('Logged in as ')
-            .append(
-              $('<span></span>')
-              .attr('id', 'loggedinuser_id')
-              .attr('style', 'font-weight : bold')
-              .append('user_id\n')
-            )
-          )
-          .append(
-            $('<button></button>')
-            .addClass('btn btn-default')
-            .attr('id', 'logoutbutton')
-            .append(
-              $('<i></i>')
-              .attr('id', 'logouticon')
-              .addClass('icon-signout')
-            )
-          )
-      );
-
-
-      this._rewireIds($prompt, this);
-
-      this.data('password').keypress(
-        $.proxy(
-          function(e) {
-            if (e.keyCode == 13.) {
-              this.data('loginbutton').trigger("click");
-              e.stopPropagation();
-            }
-          },
-          this
-        )
-      );
-
-      this.registerLogin =
-        function(args) {
-
-          this.data('loginicon').removeClass().addClass('icon-lock');
-
-          if (this.sessionObject) {
-            this.data("entrance").hide();
-            this.data('user_id').val('');
-            this.data('password').val('');
-            this.data("loggedinuser_id").html(this.get_user_label());
-            this.data("userdisplay").show();
-          } else {
-
-            var $errorModal = $('<div></div>').kbasePrompt({
-              title: 'Login failed',
-              body: $('<div></div>')
-                .attr('class', 'alert alert-error')
-                .append(
-                  $('<div></div>')
-                  .append(
-                    $('<div></div>')
-                    .addClass('pull-left')
-                    .append(
-                      $('<i></i>')
-                      .addClass('icon-warning-sign')
-                      .attr('style', 'float: left; margin-right: .3em;')
-                    )
-                  )
-                  .append(
-                    $('<div></div>')
-                    .append(
-                      $('<strong></strong>').append(args.message)
-                    )
-                  )
-              ),
-              controls: ['okayButton'],
-            });
-            $errorModal.openPrompt();
-
-          }
-      };
-
-      this.specificLogout = function(args) {
-        this.data("userdisplay").hide();
-        this.data("entrance").show();
-      };
-
-      this.data('loginbutton').bind(
-        'click',
-        $.proxy(
-          function(evt) {
-
-            this.data('loginicon').removeClass().addClass('icon-refresh');
-
-            this.login(this.data('user_id').val(), this.data('password').val(),
-              function(args) {
-                this.registerLogin(args);
-                if (this.options.login_callback) {
-                  this.options.login_callback.call(this, args);
-                }
-              }
-            );
-
-          },
-          this
-        )
-      );
-
-      this.data('logoutbutton').bind('click',
-        $.proxy(
-          function(e) {
-            this.logout();
-            this.data('user_id').focus();
-          },
-          this
-        )
-      );
-
-      return $prompt;
-
-    },
-
-    _microStyle: function() {
-      var $prompt = $('<span></span>')
-        .append(
-          $('<button></button>')
-          .addClass('btn btn-primary')
-          .attr('id', 'loginbutton')
-          .append(
-            $('<i></i>')
-            .attr('id', 'loginicon')
-            .addClass('icon-lock')
-          )
-      );
-
-      this._rewireIds($prompt, this);
-
-      this._createLoginDialog();
-
-      this.data('loginbutton').bind('click',
-        $.proxy(function(evt) {
-          this.openDialog();
-        }, this)
-      );
-
-      this.registerLogin = function(args) {
-        if (this.sessionObject) {
-          this.data('loginDialog').dialogModal().trigger('clearMessages.kbase');
-          this.data('loginDialog').closePrompt();
-
-          this.data('loginbutton').tooltip({
-            title: 'Logged in as ' + this.get_profile_prop('user.realname')
-          });
-
-          this.data('loginicon').removeClass().addClass('icon-user');
-
-          this.data('loginbutton').bind('click',
-            $.proxy(function(evt) {
-              this.logout();
-            }, this));
-        } else {
-          this.data('loginDialog').dialogModal().trigger('error.kbase', args.message);
-        }
-      };
-
-      this.specificLogout = function() {
-        this.data('loginbutton').tooltip('destroy');
-        this.data('loginicon').removeClass().addClass('icon-lock');
-      };
-
-      return $prompt;
-    },
-
-    _buttonStyle: function() {
-      var $prompt = $('<div></div>')
-        .attr('style', 'width : 250px; border : 1px solid gray')
-        .append(
-          $('<h4></h4>')
-          .attr('style', 'padding : 5px; margin-top : 0px; background-color : lightgray ')
-          .addClass('text-center')
-          .append('User\n')
-      )
-        .append(
-          $('<div></div>')
-          .attr('id', 'entrance')
-          .append(
-            $('<p></p>')
-            .attr('style', 'text-align : center')
-            .append(
-              $('<button></button>')
-              .attr('id', 'loginbutton')
-              .append('Login')
-              .addClass('btn btn-primary')
-            )
-          )
-      )
-        .append(
-          $('<div></div>')
-          .attr('id', 'userdisplay')
-          .attr('style', 'display : none;')
-          .append(
-            $('<p></p>')
-            .attr('style', 'text-align : center')
-            .append('Logged in as ')
-            .append(
-              $('<span></span>')
-              .attr('id', 'loggedinuser_id')
-              .attr('style', 'font-weight : bold')
-              .append('user_id\n')
-            )
-            .append(
-              $('<button></button>')
-              .attr('id', 'logoutbutton')
-              .append('Logout\n')
-              .addClass('btn btn-default')
-            )
-          )
-      );
-
-      this._rewireIds($prompt, this);
-
-      this._createLoginDialog();
-
-      this.data('loginbutton').bind('click',
-        $.proxy(
-          function(event) {
-            this.openDialog();
-          },
-          this
-        )
-      );
-
-      this.data('logoutbutton').bind('click', $.proxy(this.logout, this));
-
-      this.registerLogin =
-        function() {
-          if (this.sessionObject) {
-            this.data('loginDialog').dialogModal().trigger('clearMessages.kbase');
-            this.data("entrance").hide();
-            this.data("loggedinuser_id").html(this.get_user_label());
-            this.data("userdisplay").show();
-            this.data('loginDialog').closePrompt();
-          } else {
-            this.data('loginDialog').dialogModal().trigger('error.kbase', this._error);
-          }
-      };
-
-      this.specificLogout = function(args) {
-        this.data("userdisplay").hide();
-        this.data("entrance").show();
-      };
-
-      return $prompt;
-    },
-
+   
     _createLoginDialog: function() {
 
       var $elem = this.$elem;
