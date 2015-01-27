@@ -31,17 +31,21 @@
             // from the KBaseSessionSync jquery extension.
             var sessionObject = $.KBaseSessionSync.getKBaseSession();
             this.setAuth(sessionObject);
-            if (this.loggedInQueryCallback && sessionObject && sessionObject.token) {
+            
+            // This is how to pull the value out of the auth attribute.
+            var auth = this.auth();
+            if (this.loggedInQueryCallback && auth && auth.token) {
               this.callAfterInit(function () {
-                 this.loggedInQueryCallback(sessionObject);
+                // use the current auth attribute value, since this is run asynchronously, and who knows,
+                // it may have changed.
+                 this.loggedInQueryCallback(this.auth());
               }.bind(this));
             }
            
-
             postal.channel('session').subscribe('login.success', function (session) {
                 this.setAuth(session);
                 if (this.loggedInCallback) {
-                    this.loggedInCallback(undefined, session);
+                    this.loggedInCallback(undefined, this.auth());
                 }
               }.bind(this));
 
