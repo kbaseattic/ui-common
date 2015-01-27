@@ -25,15 +25,15 @@
 
         init: function(options) {
 
-            this._super(options);
+            this._super(options); 
             
             // An authenticated widget needs to get the initial auth state
             // from the KBaseSessionSync jquery extension.
             var sessionObject = $.KBaseSessionSync.getKBaseSession();
             this.setAuth(sessionObject);
-            if (this.loggedInQueryCallback && this.sessionObject &&this.sessionObject.token) {
+            if (this.loggedInQueryCallback && sessionObject && sessionObject.token) {
               this.callAfterInit(function () {
-                this.loggedInQueryCallback(sessionObject);
+                 this.loggedInQueryCallback(sessionObject);
               }.bind(this));
             }
            
