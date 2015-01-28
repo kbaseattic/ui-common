@@ -305,6 +305,7 @@ $.KBWidget({
                     action = col.action
 
                 var config = {sTitle: col.label,
+                              sDefaultContent: '-',
                               mData: ref(key, type, format, method, action)}
 
                 if (col.width) config.sWidth = col.width;
