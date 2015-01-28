@@ -30,8 +30,6 @@ app.controller('KBaseTables', function($scope, $stateParams) {
     // example objects from KBaseExampleData
     kb.ws.list_objects({workspaces: ['KBaseExampleData']})
         .done(function(data){
-            console.log('data', data)
-
             var examples = {}; // by type
             data.forEach(function(obj) {
                 var type = obj[2].split('-')[0],
