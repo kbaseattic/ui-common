@@ -108,7 +108,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
           }.bind(this));
           
           Postal.channel('session').subscribe('logout.success', function() {
-            this.onLoggedout();
+            this.onLoggedOut();
           }.bind(this));
 
           return this;

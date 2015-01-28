@@ -90,8 +90,23 @@ define(['jquery', 'q', 'kbasecookie', 'kbaseconfig'],
                         this.removeAuth();
                         return null;
                     }
-
                     session.token = session.token.replace(/PIPESIGN/g, '|').replace(/EQUALSSIGN/g, '=');
+                    
+                    // Ensure that we localStorage.
+                   
+                    var storageSession = localStorage.getItem(this.cookieName);
+                    if (!storageSession) {
+                      console.log('WARNING: Local Storage Cookie missing -- resetting session');
+                      this.removeAuth();
+                      return null;
+                    }
+
+                    if (session.token !== storageSession.token) {
+                      console.log('WARNING: Local Storage Cookie auth different than cookie -- resetting session');
+                      this.removeAuth();
+                      return null;          
+                    }
+                           
 
                     // now we have a session object equivalent to the one returned by the auth service.
 

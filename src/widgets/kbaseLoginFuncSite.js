@@ -153,6 +153,7 @@
       
       //return;
       if (this.sessionObject) {
+        console.log('SESSION'); console.log(this.sessionObject);
         this.fetchUserProfile();
       }
       
