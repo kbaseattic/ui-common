@@ -322,21 +322,31 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     
     // Set up the navbar menu
     require(['kbasenavbar'], function (NAVBAR) {
-      NAVBAR.clearMenu();
-      NAVBAR.addDefaultMenu({
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
         search: true, narrative: true
-      });
-      NAVBAR.addHelpMenuItem({
+      })
+      .addHelpMenuItem({
         type: 'divider'
-      });
-      NAVBAR.addHelpMenuItem({
+      })
+      .addHelpMenuItem({
+        name: 'navtest',
+        label: 'Navbar Test',
+        icon: 'bug',
+        url: '#/navtest/x'
+      })
+      .addHelpMenuItem({
         name: 'bugreport',
         label: 'New JIRA Ticket',
         icon: 'bug',
         external: true,
         url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
       });
+      
+      
     });
+    
+   
 })
 
 .controller('NavTest', function($scope, $stateParams) {

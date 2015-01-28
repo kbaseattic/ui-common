@@ -733,9 +733,28 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
     $rootScope.kb = kb;     
-    $rootScope.Object = Object;       
+    $rootScope.Object = Object;      
+    
+    
+    require(['kbasenavbar'], function (NAVBAR) {
+      // Make sure we clear the navbar upon exit.
+      // We have to use angular here, because it seems to 
+      // eat hashchange for a[href] clicks.
+      $rootScope.$on('$locationChangeSuccess', function () {
+          NAVBAR.clear()
+          .addDefaultMenu({
+            search: true, narrative: true
+          });
+          $(document).find('head title').text('Narrative Interface | KBase'); 
+      });
+      $rootScope.$apply();
+    }); 
+    
+   
 
 });
+
+
 
 
 /*

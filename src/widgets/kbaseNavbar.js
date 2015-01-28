@@ -57,22 +57,34 @@ function ($, nunjucks, Session) {
         .appendTo('head')
         .attr({type: 'text/css', rel: 'stylesheet'})
         .attr('href', '/src/widgets/' + this.widgetName + '/style.css');
+        return this;
       }
     },
     setTitle: {
       value: function (title) {
         // okay, we are punning on a class set on this element.
         this.container.find('.navbar-title').html(title);
+        return this;
+      }
+    },
+    clear: {
+      value: function () {
+        this.clearMenu();
+        this.clearTitle();
+        this.clearButtons();
+        return this;
       }
     },
     clearTitle: {
       value: function () {
         this.container.find('.navbar-title').empty();
+        return this;
       }
     },
     clearButtons: {
       value: function () {
         this.container.find('.navbar-buttons').empty();
+        return this;
       }
     },
     addButton: {
@@ -102,6 +114,7 @@ function ($, nunjucks, Session) {
         } else {
           this.container.find('.navbar-buttons').prepend(button);          
         }
+        return this;
       }
     },
     findButton: {
@@ -150,6 +163,7 @@ function ($, nunjucks, Session) {
         } else {
           this.container.find('.navbar-buttons').prepend(dropdown);
         }
+        return this;
       }
     },
     
@@ -160,7 +174,7 @@ function ($, nunjucks, Session) {
           this.addMenuItem({
             name: 'search',
             label: 'Search Data',
-            url: '/functional-site/#/search/?q=*',
+            url: '#/search/?q=*',
             place: 'end' 
           });
         }
@@ -168,7 +182,7 @@ function ($, nunjucks, Session) {
           this.addMenuItem({
             name: 'narrative',
             label: 'Narrative',
-            url: '/functional-site/#/narrativemanager/start',
+            url: '#/narrativemanager/start',
             place: 'end'
           });
         }
@@ -189,6 +203,7 @@ function ($, nunjucks, Session) {
             label: 'About KBase',
             url: 'http://staging.kbase.us/about/why-kbase'
           });
+          return this;
       }
     },
     
@@ -226,6 +241,7 @@ function ($, nunjucks, Session) {
         } else {
           menu.prepend(item);
         }
+        return this;
       }
     },
     
@@ -279,6 +295,7 @@ function ($, nunjucks, Session) {
           }
           helpDivider.after(item);
         }
+        return this;
       }
     },
     removeHelpMenuItem: {
@@ -289,6 +306,7 @@ function ($, nunjucks, Session) {
     clearMenu: {
       value: function (cfg) {
         this.container.find('.navbar-menu .dropdown-menu').empty();
+        return this;
       }
     },
     

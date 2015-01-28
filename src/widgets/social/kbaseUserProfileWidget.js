@@ -76,8 +76,7 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
       
       go: {
         value: function() {
-         
-         
+                
           
           // Show the user we are doing something, since we are about to launch a 
           // query for profile data.
@@ -986,13 +985,18 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
             case 'profile':
               // NORMAL PROFILE 
               // Title can be be based on logged in user infor or the profile.
-
+              // set window title.
+              var realname = this.userProfile.getProp('user.realname');
+              $(document).find('head title').text('User Profile for '+realname+' | KBase');   
+              
               this.renderViewEditLayout();
               this.renderInfoView();
               break;
             case 'stub':
               // STUB PROFILE
               // Title can be be based on logged in user infor or the profile.
+              var realname = this.userProfile.getProp('user.realname');
+              $(document).find('head title').text('User Profile for '+realname+' | KBase');   
               this.renderViewEditLayout();
               this.renderMessages();
               this.renderStubProfileView();
@@ -1034,7 +1038,7 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
           var widget = this;
           if (this.isOwner()) {
             // For now the user profile is available through the login widget, not the session.
-            this.places.title.html('You - ' + this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')');
+            this.places.title.html('You - ' + this.userProfile.getProp('user.realname') + ' (' + this.userProfile.getProp('user.username') + ')');
             NAVBAR.setTitle('Viewing your profile');
             NAVBAR.clearButtons();
             NAVBAR.addButton({
@@ -1078,13 +1082,13 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
               ]
             });
           } else {
-            var title = this.userProfile.userRecord.user.realname + ' (' + this.userProfile.userRecord.user.username + ')';
+            var title = this.userProfile.getProp('user.realname') + ' (' + this.userProfile.getProp('user.username') + ')';
             this.places.title.html(title);
             NAVBAR.setTitle('Viewing profile for ' + title);
           }
           this.renderPicture();
           this.places.content.html(this.renderTemplate('view'));
-          
+           
           /*
           this.places.content
           .find('[data-widget-menu-item="edit"]')
