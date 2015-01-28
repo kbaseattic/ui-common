@@ -94,15 +94,18 @@ define(['jquery', 'q', 'kbasecookie', 'kbaseconfig'],
                     
                     // Ensure that we localStorage.
                    
-                    var storageSession = localStorage.getItem(this.cookieName);
-                    if (!storageSession) {
+                    var storageSessionString = localStorage.getItem(this.cookieName);
+                    if (!storageSessionString) {
                       console.log('WARNING: Local Storage Cookie missing -- resetting session');
                       this.removeAuth();
                       return null;
-                    }
-
+                    } 
+        
+                    var storageSession = JSON.parse(storageSessionString);
                     if (session.token !== storageSession.token) {
                       console.log('WARNING: Local Storage Cookie auth different than cookie -- resetting session');
+                      console.log(session.token);
+                      console.log(storageSession)
                       this.removeAuth();
                       return null;          
                     }

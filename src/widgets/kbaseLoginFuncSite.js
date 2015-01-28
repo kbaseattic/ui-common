@@ -153,7 +153,6 @@
       
       //return;
       if (this.sessionObject) {
-        console.log('SESSION'); console.log(this.sessionObject);
         this.fetchUserProfile();
       }
       
@@ -670,9 +669,10 @@
             // Awaiting clients can get the session object directly, from the cookie, or query the 
             // global singleton session object.
             postal.channel('session').publish('login.success', {session: session});
-            // this.trigger('loggedIn.kbase', session);
             
-            callback.call(this, session);
+            if (callback) {
+              callback.call(this, session);
+            }
           }.bind(this),
           error: function(err) {
             var errObject = {
@@ -682,7 +682,6 @@
             };
             this.populateLoginInfo(errObject);
             postal.channel('session').publish('login.failure', {error: errObject});
-            // this.trigger('loggedInFailure.kbase',errObject);
            
             if (callback) {
               callback.call(this, errObject);
