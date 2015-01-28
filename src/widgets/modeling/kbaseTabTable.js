@@ -7,15 +7,6 @@ $.KBWidget({
     options: {
     },
 
-    getData: function() {
-        return {
-            id: this.options.id,
-            type: "Model",
-            workspace: this.options.ws,
-            title: this.options.title
-        };
-    },
-
     init: function(input) {
         this._super(input);
         var self = this;
@@ -143,7 +134,7 @@ $.KBWidget({
                 cols = tabSpec.columns;
             cols.forEach(function(col){
                 if ((col.type == 'tabLink' || col.type == 'wstype') && col.linkformat == 'dispWSRef') {
-                    obj[tabSpec.key].forEach(function(item) {
+                    self.obj[tabSpec.key].forEach(function(item) {
                         refs.push( {ref: item[col.key]} );
                     })
                 }
@@ -181,7 +172,7 @@ $.KBWidget({
                     var keys = tabSpec.keys.split(/\,\s+/g);
                     var params = {};
                     tabSpec.arguments.split(/\,\s+/g).forEach(function(arg, i) {
-                        params[arg] = obj[keys[i]];
+                        params[arg] = self.obj[keys[i]];
                     })
 
                     tabPane[tabSpec.widget](params);
@@ -253,7 +244,7 @@ $.KBWidget({
                 var content = $('<div>');
 
                 if (info.method && info.method != 'undefined') {
-                    var res = obj[info.method](info);
+                    var res = self.obj[info.method](info);
 
                     if (res && 'done' in res) {
                         content = $('<div>').loading();
