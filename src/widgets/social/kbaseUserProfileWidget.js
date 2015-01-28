@@ -255,7 +255,7 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
           if (Session.isLoggedIn()) {
             var completion =  this.userProfile.calcProfileCompletion();
             var lastSave = this.userProfile.nthHistory(1);
-            if (completion.status === 'complete' && lastSave && lastSave.completionStatus === completion.status) {
+            if (completion.status === 'complete' && (!lastSave || (lastSave && lastSave.completionStatus === completion.status))) {
               return null;
             } else {
               return completion;
