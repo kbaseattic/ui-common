@@ -264,8 +264,9 @@ define(['jquery', 'q', 'kbasecookie', 'kbaseconfig'],
                     if (this.sessionObject) {
                         var cookieString = this.makeAuthCookie();
                         Cookie.setItem(this.cookieName, cookieString, this.cookieMaxAge, '/');
-                        Cookie.setItem(this.cookieName, cookieString, this.cookieMaxAge, '/', 'kbase.us');
-                        Cookie.setItem(this.narrCookieName, cookieString, this.cookieMaxAge, '/', 'kbase.us');
+                        //Cookie.setItem(this.cookieName, cookieString, this.cookieMaxAge, '/', 'kbase.us');
+                        Cookie.setItem(this.narrCookieName, cookieString, this.cookieMaxAge, '/');
+                        // Cookie.setItem(this.narrCookieName, cookieString, this.cookieMaxAge, '/', 'kbase.us');
                         // Set the same cookie in localStorage for compatability.
                         var kbaseSession = this.getKBaseSession();
                         // This is for compatability with the current state of the narrative ui, which uses this
@@ -297,7 +298,6 @@ define(['jquery', 'q', 'kbasecookie', 'kbaseconfig'],
                     var loginParams = {
                         user_id: options.username,
                         password: options.password,
-                        cookie: 0,
                         fields: 'un,token,user_id,kbase_sessionid,name',
                         status: 1
                     };
