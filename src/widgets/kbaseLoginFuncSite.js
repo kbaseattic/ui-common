@@ -719,7 +719,6 @@
         }
         */
 
-        console.log('about to publish the logout...');
         postal.channel('session').publish('logout.success');
         // this.trigger('loggedOut.kbase');
         

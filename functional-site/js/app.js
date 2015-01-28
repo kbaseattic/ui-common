@@ -38,7 +38,7 @@ var app = angular.module('landing-pages',
 
     $stateProvider
         .state('login', {
-          url: "/login/",
+          url: "/login/?nextURL",
           templateUrl: 'views/login.html',
           controller: 'Login'
         });
@@ -686,20 +686,27 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         // Otherwise, just login in place and reload.
         // We need to reload to make sure the USER_ID and USER_TOKEN get set properly.
         if ($location.path() === '/login/') {
-          // Are these used anywhere?
+           // Are these used anywhere?
           USER_ID = session.user_id;
           USER_TOKEN = session.token;
+          if ($location.search().nextURL) {
+            $location.path($location.search().nextURL);
+          } else {
+             $location.path('/narrativemanager/start');
+          }
+       
             // USER_ID = $("#signin-button").kbaseLogin('session').user_id;
             // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
             // $location.path('/narratives/featured');
-            $location.path('/narrativemanager/start');
+           
         }
         $rootScope.$apply();
         window.location.reload();
     };
 
     var finish_logout = function() {
-        $location.path('/login/');
+        $location.url('/login/?nextURL='+$location.path());
+        //$location.path('/login/');
         $rootScope.$apply();
         window.location.reload();
     };
@@ -740,12 +747,18 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
       // Make sure we clear the navbar upon exit.
       // We have to use angular here, because it seems to 
       // eat hashchange for a[href] clicks.
-      $rootScope.$on('$locationChangeSuccess', function () {
+      $rootScope.$on('$locationChangeSuccess', function (e, next, current) {
+        // Work around an apparent problem in Angular. If the $location changes via a link to the same url
+        // Angular fires this (even though location hasn't actually changed), but does not call the
+        // controller. The effect is that the Navbar is reset, but not rebuilt by the controller. 
+        // We just try to avoid that.
+        if (next !== current) {
           NAVBAR.clear()
           .addDefaultMenu({
             search: true, narrative: true
           });
           $(document).find('head title').text('Narrative Interface | KBase'); 
+        }
       });
       $rootScope.$apply();
     }); 
