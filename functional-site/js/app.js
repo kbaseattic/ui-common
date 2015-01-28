@@ -38,7 +38,7 @@ var app = angular.module('landing-pages',
 
     $stateProvider
         .state('login', {
-          url: "/login/?nextURL",
+          url: "/login/?nextPath",
           templateUrl: 'views/login.html',
           controller: 'Login'
         });
@@ -689,8 +689,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
            // Are these used anywhere?
           USER_ID = session.user_id;
           USER_TOKEN = session.token;
-          if ($location.search().nextURL) {
-            $location.path($location.search().nextURL);
+          if ($location.search().nextPath) {
+            $location.path($location.search().nextPath);
           } else {
              $location.path('/narrativemanager/start');
           }
@@ -705,7 +705,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     };
 
     var finish_logout = function() {
-        $location.url('/login/?nextURL='+$location.path());
+        $location.url('/login/?nextPath='+$location.path());
         //$location.path('/login/');
         $rootScope.$apply();
         window.location.reload();

@@ -415,9 +415,9 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 .controller('Login', function($scope, $stateParams, $location, kbaseLogin, $modal) {
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives
     
-    $scope.nextURL = $stateParams.nextURL;
+    $scope.nextPath = $stateParams.nextPath;
     
-    console.log($stateParams.nextURL);
+    console.log($stateParams.nextPath);
     
     postal.channel('session').subscribe('login.failure', function (data) {
       // TODO: wow, these jquery calls need to be scoped!
@@ -431,7 +431,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     });
     
     // callback for ng-click 'loginUser':
-    $scope.loginUser = function (user, nextURL) {
+    $scope.loginUser = function (user, nextPath) {
         $("#loading-indicator").show();
         kbaseLogin.login(
             user.username,
