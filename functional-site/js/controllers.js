@@ -313,10 +313,30 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 .controller('People', function($scope, $stateParams) {
     $scope.params = { 'userid':$stateParams.userid, 'kbCache' : kb }
+    
+    // Set the styles for the user page
     $('<link>')
     .appendTo('head')
     .attr({type: 'text/css', rel: 'stylesheet'})
     .attr('href', 'views/social/user-page/style.css');
+    
+    // Set up the navbar menu
+    require(['kbasenavbar'], function (NAVBAR) {
+      NAVBAR.clearMenu();
+      NAVBAR.addDefaultMenu({
+        search: true, narrative: true
+      });
+      NAVBAR.addHelpMenuItem({
+        type: 'divider'
+      });
+      NAVBAR.addHelpMenuItem({
+        name: 'bugreport',
+        label: 'New JIRA Ticket',
+        icon: 'bug',
+        external: true,
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
+      });
+    });
 })
 
 .controller('NavTest', function($scope, $stateParams) {

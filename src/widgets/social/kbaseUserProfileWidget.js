@@ -76,17 +76,7 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
       
       go: {
         value: function() {
-          NAVBAR.clearMenu();
-          NAVBAR.addDefaultMenu({
-            search: true, narrative: true
-          });
-          NAVBAR.addHelpMenuItem({
-            name: 'bugreport',
-            label: 'New Issue',
-            icon: 'bug',
-            external: true,
-            url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
-          });
+         
          
           
           // Show the user we are doing something, since we are about to launch a 
