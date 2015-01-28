@@ -66,12 +66,12 @@ $.KBWidget({
         // 1) Use type (periods replaced with underscores) to instantiate object
         //
 
-        obj = new kbObjects[type.replace(/\./g, '_')](self);
+        this.obj = new kbObjects[type.replace(/\./g, '_')](self);
 
         //
         // 2) add the tabs (at page load)
         //
-        var tabList = obj.tabList;
+        var tabList = this.obj.tabList;
 
         var uiTabs = [];
         for (var i = 0; i < tabList.length; i++) {
@@ -97,14 +97,14 @@ $.KBWidget({
 
         self.kbapi('ws', 'get_object_info_new', {objects: [param], includeMetadata: 1})
           .done(function(res) {
-              obj.setMetadata(res[0]);
+              self.obj.setMetadata(res[0]);
 
               for (var i = 0; i < tabList.length; i++) {
                   var spec = tabList[i];
 
                   if (spec.type == 'verticaltbl') {
                       var key = spec.key,
-                          data = obj[key],
+                          data = self.obj[key],
                           tabPane = tabs.tabContent(spec.name);
 
                       var table = self.verticalTable({rows: spec.rows, data: data});
@@ -124,7 +124,7 @@ $.KBWidget({
 
         self.kbapi('ws', 'get_objects', [param])
           .done(function(data){
-              var setMethod = obj.setData(data[0].data);
+              var setMethod = self.obj.setData(data[0].data);
 
               // see if setData method returns promise or not
               if (setMethod && 'done' in setMethod) {
@@ -203,7 +203,7 @@ $.KBWidget({
 
         // creates a datatable on a tabPane
         function createDataTable(tabSpec, tabPane) {
-            var settings = self.getTableSettings(tabSpec, obj.data);
+            var settings = self.getTableSettings(tabSpec, self.obj.data);
             tabPane.rmLoading();
 
             // note: must add table first
@@ -214,15 +214,12 @@ $.KBWidget({
             newTabEvents(tabSpec.name);
         }
 
-
-
-
         // takes table spec and prepared data, returns datatables settings object
         this.getTableSettings = function(tab, data) {
             var tableColumns = getColSettings(tab);
 
             var settings = {dom: '<"top"lf>rt<"bottom"ip><"clear">',
-                            aaData: obj[tab.key],
+                            aaData: self.obj[tab.key],
                             aoColumns: tableColumns,
                             language: { search: "_INPUT_",
                                         searchPlaceholder: 'Search '+tab.name}}
