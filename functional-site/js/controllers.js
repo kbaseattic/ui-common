@@ -313,10 +313,80 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 .controller('People', function($scope, $stateParams) {
     $scope.params = { 'userid':$stateParams.userid, 'kbCache' : kb }
+    
+    // Set the styles for the user page
     $('<link>')
     .appendTo('head')
     .attr({type: 'text/css', rel: 'stylesheet'})
     .attr('href', 'views/social/user-page/style.css');
+    
+    // Set up the navbar menu
+    require(['kbasenavbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      })
+      .addHelpMenuItem({
+        type: 'divider'
+      })
+      .addHelpMenuItem({
+        name: 'navtest',
+        label: 'Navbar Test',
+        icon: 'bug',
+        url: '#/navtest/x'
+      })
+      .addHelpMenuItem({
+        name: 'bugreport',
+        label: 'New JIRA Ticket',
+        icon: 'bug',
+        external: true,
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
+      });
+      
+      
+    });
+    
+   
+})
+
+.controller('Dashboard', function($scope, $stateParams) {
+    $scope.params = { 'kbCache' : kb }
+    
+    
+    // Set the styles for the user page
+    $('<link>')
+    .appendTo('head')
+    .attr({type: 'text/css', rel: 'stylesheet'})
+    .attr('href', 'views/dashboard/dashboard/style.css');
+    
+    // Set up the navbar menu
+    require(['kbasenavbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      })
+      .addHelpMenuItem({
+        type: 'divider'
+      })
+      .addHelpMenuItem({
+        name: 'navtest',
+        label: 'Navbar Test',
+        icon: 'bug',
+        url: '#/navtest/x'
+      })
+      .addHelpMenuItem({
+        name: 'bugreport',
+        label: 'New JIRA Ticket',
+        icon: 'bug',
+        external: true,
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
+      })
+      .setTitle('Dashboard');
+      
+      
+    });
+    
+   
 })
 
 .controller('NavTest', function($scope, $stateParams) {
@@ -385,19 +455,21 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 .controller('Login', function($scope, $stateParams, $location, kbaseLogin, $modal) {
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives
     
-    $(document).on('loggedInFailure.kbase', function (e, err) {
+    $scope.nextPath = $stateParams.nextPath;
+    
+    postal.channel('session').subscribe('login.failure', function (data) {
       // TODO: wow, these jquery calls need to be scoped!
       $("#loading-indicator").hide();
-      var errormsg = err.message;
+      var errormsg = data.error.message;
       if (errormsg == "LoginFailure: Authentication failed.") {
           errormsg = "Login Failed: your username/password is incorrect.";
       }
       $("#login_error").html(errormsg);
       $("#login_error").show();
-    })
+    });
     
     // callback for ng-click 'loginUser':
-    $scope.loginUser = function (user) {
+    $scope.loginUser = function (user, nextPath) {
         $("#loading-indicator").show();
         kbaseLogin.login(
             user.username,
@@ -414,9 +486,9 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
         return (userId !== undefined && userId !== null);
     };
     
-    $(document).on('profileLoaded.kbase', function (e, profile) {
+    postal.channel('session').subscribe('profile.loaded', function (data) {
       $scope.$apply(function () {
-        $scope.username = profile.getProp('user.realname');
+        $scope.username = data.profile.getProp('user.realname');
       });
     });
 

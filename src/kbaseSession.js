@@ -90,8 +90,26 @@ define(['jquery', 'q', 'kbasecookie', 'kbaseconfig'],
                         this.removeAuth();
                         return null;
                     }
-
                     session.token = session.token.replace(/PIPESIGN/g, '|').replace(/EQUALSSIGN/g, '=');
+                    
+                    // Ensure that we localStorage.
+                   
+                    var storageSessionString = localStorage.getItem(this.cookieName);
+                    if (!storageSessionString) {
+                      console.log('WARNING: Local Storage Cookie missing -- resetting session');
+                      this.removeAuth();
+                      return null;
+                    } 
+        
+                    var storageSession = JSON.parse(storageSessionString);
+                    if (session.token !== storageSession.token) {
+                      console.log('WARNING: Local Storage Cookie auth different than cookie -- resetting session');
+                      console.log(session.token);
+                      console.log(storageSession)
+                      this.removeAuth();
+                      return null;          
+                    }
+                           
 
                     // now we have a session object equivalent to the one returned by the auth service.
 
@@ -246,8 +264,9 @@ define(['jquery', 'q', 'kbasecookie', 'kbaseconfig'],
                     if (this.sessionObject) {
                         var cookieString = this.makeAuthCookie();
                         Cookie.setItem(this.cookieName, cookieString, this.cookieMaxAge, '/');
-                        Cookie.setItem(this.cookieName, cookieString, this.cookieMaxAge, '/', 'kbase.us');
-                        Cookie.setItem(this.narrCookieName, cookieString, this.cookieMaxAge, '/', 'kbase.us');
+                        //Cookie.setItem(this.cookieName, cookieString, this.cookieMaxAge, '/', 'kbase.us');
+                        Cookie.setItem(this.narrCookieName, cookieString, this.cookieMaxAge, '/');
+                        // Cookie.setItem(this.narrCookieName, cookieString, this.cookieMaxAge, '/', 'kbase.us');
                         // Set the same cookie in localStorage for compatability.
                         var kbaseSession = this.getKBaseSession();
                         // This is for compatability with the current state of the narrative ui, which uses this
@@ -279,7 +298,6 @@ define(['jquery', 'q', 'kbasecookie', 'kbaseconfig'],
                     var loginParams = {
                         user_id: options.username,
                         password: options.password,
-                        cookie: 0,
                         fields: 'un,token,user_id,kbase_sessionid,name',
                         status: 1
                     };

@@ -43,14 +43,9 @@
             this._super(options);
 
             // must be logged in!
-            if (!this._attributes.auth) {
+            if (!this.authToken()) {
                 window.location.replace("#/login/");
-            }
-            if (!this._attributes.auth.token) {
-                window.location.replace("#/login/");
-            }
-            if (!this._attributes.auth.user_id) {
-                window.location.replace("#/login/");
+                return;
             }
 
             this.$errorPanel = $('<div>');

@@ -24,18 +24,23 @@
 </ul>
 
 <h2>Standard App Layout</h2>
+<p><a href="#test">test link</a></p>
 <p>The functional site is laid out in three basic regions: the navbar, sidebar, and content areas.</p>
 <p>The navbar and sidebar are displayed in fixed mode. This means that they are positioned absolutely on the page with reference to the viewport. Note that this is different than absolute positioning, which is relative to the page or a container (another absolute or relatively positioned node.) They will stay fixed at that position in the viewport and will not scroll away. </p>
 <p>The main content area is a standard block</p>
+<p id="test">here we go</p>
 
 <script>
 require(['jquery', 'kbasenavbar'],
-function($, Navbar) { 
-  var navbar = Object.create(Navbar).init({container: '.navbar-kbase'});
-  navbar.setTitle('This is the Navbar widget, and it\'s version is ' + navbar.getVersion());
+function($, NAVBAR) { 
   
-  navbar.addButton({
-    name: 'about', type: 'default', icon: 'info', label: 'about'
+  NAVBAR.clear()
+  .addDefaultMenu()
+  .setTitle('This is the Navbar widget, and it\'s version is ' + NAVBAR.getVersion())
+  .addButton({
+    name: 'about', type: 'default', icon: 'info', label: 'About NavTest', callback: function () {
+      alert('This is the Navbar Test Page');
+    }
   });
 });
 </script>

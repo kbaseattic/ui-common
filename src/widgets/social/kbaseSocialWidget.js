@@ -92,9 +92,9 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
           // The context object is what is given to templates.
           this.context = {};
           this.context.env = {
-            
             widgetTitle: this.widgetTitle,
-            widgetName: this.widgetName
+            widgetName: this.widgetName,
+            docsite: this.getConfig('docsite')
           };
           // NB this means that when clearing state or params, the object
           // should not be blown away.
