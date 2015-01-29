@@ -485,7 +485,16 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
         var userId = kbaseLogin.get_session_prop('user_id');
         return (userId !== undefined && userId !== null);
     };
-    
+  
+    postal.channel('session').request({
+      topic: 'profile.get',
+      timeout: 10000
+    })
+    .then(function(profile) {
+      $scope.username = profile.getProp('user.realname');
+    })
+    .done();
+
     postal.channel('session').subscribe('profile.loaded', function (data) {
       $scope.$apply(function () {
         $scope.username = data.profile.getProp('user.realname');

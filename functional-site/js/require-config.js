@@ -11,6 +11,9 @@ define('kbaseworkspaceserviceclient', [], function() {
 define('postal', [], function () {
   return postal;
 });
+define('q', [], function () {
+  return Q;
+});
 require.config({
     baseUrl: '/',
     catchError: true,
@@ -20,9 +23,10 @@ require.config({
     paths: {
       nunjucks: '/ext/nunjucks/nunjucks.min',
       md5: '/ext/md5/md5',
-      q: '/ext/q/q.min',
       lodash: '/ext/lodash/lodash-2.4.1.min',
      //  postal: '/ext/postal/postal-0.12.4.min',
+      'postal.request-response': '/ext/postal/postal.request-response.min',
+      postaldeluxe: '/src/postal/postal-deluxe',
 
       domReady: '/ext/require-plugins/domReady', 
     	text: '/ext/require-plugins/text',
@@ -69,9 +73,6 @@ require.config({
       },
      q: {
        exports: 'Q'
-     },
-     postal: {
-       exports: 'postal'
      }
    }
     
