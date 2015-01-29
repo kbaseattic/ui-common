@@ -28,6 +28,8 @@ require.config({
     	text: '/ext/require-plugins/text',
       json: '/ext/require-plugins/json', 
 
+      // Service Clients
+      kbase_narrative_method_store_client: '/functional-site/assets/js/kbclient/narrative_method_store_Client',
 
       // widgets
       // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
@@ -47,7 +49,13 @@ require.config({
       kbasetest: '/src/kbaseTest',
       kbasenavbar: '/src/widgets/kbaseNavbar',
       kbasebasewidget: '/src/widgets/kbaseBaseWidget',
-      kbaseloginwidget: '/src/widgets/kbaseLoginWidget'
+      kbaseloginwidget: '/src/widgets/kbaseLoginWidget',
+      // Dashboard widgets
+      dashboard_widget: '/src/widgets/dashboard/DashboardWidget',
+      dashboard_profile_widget: '/src/widgets/dashboard/ProfileWidget',
+      dashboard_narratives_widget: '/src/widgets/dashboard/NarrativesWidget',
+      dashboard_apps_widget: '/src/widgets/dashboard/AppsWidget',
+      dashboard_data_widget: '/src/widgets/dashboard/DataWidget'
     },
    shim: { 
     'kbaseuserprofileserviceclient': {
@@ -55,6 +63,9 @@ require.config({
      },
      'kbaseworkspaceserviceclient': {
        exports: 'Workspace'
+      },
+      'kbase_narrative_method_store_client': {
+        exports: 'NarrativeMethodStore'
       },
      q: {
        exports: 'Q'

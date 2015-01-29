@@ -20,7 +20,7 @@ var cardManager = undefined;
 
 var app = angular.module('landing-pages', 
     ['lp-directives', 'card-directives',
-     'social-directives',
+     'social-directives','dashboard-directives',
      'trees-directives', 
      'ws-directives', 'modeling-directives', 'angular-json-rpc',
      'communities-directives', 'narrative-directives',
@@ -544,6 +544,12 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		{url: '/people/:userid',
 		templateUrl: 'views/social/user-page.html',
 		controller: 'People'});
+    
+	$stateProvider.state('dashboard', {
+    url: '/dashboard',
+		templateUrl: 'views/dashboard/dashboard.html',
+		controller: 'Dashboard'
+  });
     
     $stateProvider
 	.state('navtest',

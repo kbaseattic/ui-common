@@ -349,6 +349,46 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
    
 })
 
+.controller('Dashboard', function($scope, $stateParams) {
+    $scope.params = { 'kbCache' : kb }
+    
+    
+    // Set the styles for the user page
+    $('<link>')
+    .appendTo('head')
+    .attr({type: 'text/css', rel: 'stylesheet'})
+    .attr('href', 'views/dashboard/dashboard/style.css');
+    
+    // Set up the navbar menu
+    require(['kbasenavbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      })
+      .addHelpMenuItem({
+        type: 'divider'
+      })
+      .addHelpMenuItem({
+        name: 'navtest',
+        label: 'Navbar Test',
+        icon: 'bug',
+        url: '#/navtest/x'
+      })
+      .addHelpMenuItem({
+        name: 'bugreport',
+        label: 'New JIRA Ticket',
+        icon: 'bug',
+        external: true,
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
+      })
+      .setTitle('Dashboard');
+      
+      
+    });
+    
+   
+})
+
 .controller('NavTest', function($scope, $stateParams) {
     $scope.params = { 'appid':$stateParams.appid, 'kbCache' : kb }
    
@@ -416,8 +456,6 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives
     
     $scope.nextPath = $stateParams.nextPath;
-    
-    console.log($stateParams.nextPath);
     
     postal.channel('session').subscribe('login.failure', function (data) {
       // TODO: wow, these jquery calls need to be scoped!

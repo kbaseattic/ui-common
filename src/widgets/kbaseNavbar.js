@@ -186,6 +186,14 @@ function ($, nunjucks, Session) {
             place: 'end'
           });
         }
+        if (cfg.dashboard !== false) {
+          this.addMenuItem({
+            name: 'dashboard',
+            label: 'Dashboard',
+            url: '#/dashboard',
+            place: 'end'
+          });
+        }
           this.addMenuItem({
             type: 'divider', 
             name: 'help',
@@ -284,16 +292,14 @@ function ($, nunjucks, Session) {
         }
         if (cfg.place === 'end') {
           var menu = this.container.find('.navbar-menu .dropdown-menu');
-          if (!menu) {
-            return;
+          if (menu) {
+             menu.append(item);
           }
-          menu.append(item);
         } else {
           var helpDivider = this.container.find('.navbar-menu .dropdown-menu [data-menu-item="help"]');
-          if (!helpDivider) {
-            return;
+          if (helpDivider) {
+            helpDivider.after(item);
           }
-          helpDivider.after(item);
         }
         return this;
       }

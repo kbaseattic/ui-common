@@ -1,0 +1,17 @@
+This is the apps widget.<br>
+<table class="table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Ver</th>
+</tr>
+</thead>
+<tbody>
+{% for app in state.appList %}
+<tr>
+<td>{{ app.name }}</td>
+<td>{{ app.ver }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>

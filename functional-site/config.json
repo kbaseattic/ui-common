@@ -12,6 +12,12 @@
       "cookie": {
          "max-age": 432000
        }
+    },
+    "docsite": {
+      "url": "http://kbase.us",
+      "about": "/about/what-is-kbase",
+      "contact": "/contact-us",
+      "browserSupport": "/supported-browsers"
     }
   },
   "dev": {
@@ -25,6 +31,12 @@
       "cookie": {
          "max-age": 432000
        }
+    },
+    "docsite": {
+      "url": "http://staging.kbase.us",
+      "about": "/about/what-is-kbase",
+      "contact": "/contact-us",
+      "browserSupport": "/supported-browsers"
     }
   },
   "wsdev": {
@@ -38,6 +50,12 @@
       "cookie": {
          "max-age": 432000
        }
+    },
+    "docsite": {
+      "url": "http://staging.kbase.us",
+      "about": "/about/what-is-kbase",
+      "contact": "/contact-us",
+      "browserSupport": "/supported-browsers"
     }
   },
 

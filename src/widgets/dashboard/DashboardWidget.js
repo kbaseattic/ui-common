@@ -1,11 +1,11 @@
 define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json!functional-site/config.json'],
   function(nunjucks, $, Q, Session, Utils, Postal, config) {
     "use strict";
-    var SocialWidget = Object.create({}, {
+    var DashboardWidget = Object.create({}, {
 
       // The init function interfaces this object with the caller, and sets up any 
       // constants and constant state.
-      SocialWidget_init: {
+      DashboardWidget_init: {
         value: function(cfg) {
           this._generatedId = 0;
 
@@ -77,7 +77,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
           // NB the templating requires a dedicated widget resources directory in 
           //   /src/widgets/WIDGETNAME/templates
           this.templates = {};
-          this.templates.env = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/social/' + this.widgetName + '/templates'), {
+          this.templates.env = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/dashboard/' + this.widgetName + '/templates'), {
             'autoescape': false
           });
           this.templates.env.addFilter('kbmarkup', function(s) {
@@ -179,18 +179,20 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
       // LIFECYCLE
 
       start: {
-        value: function() {          
+        value: function() {      
           // This creates the initial UI -- loads the css, inserts layout html.
           // For simple widgets this is all the setup needed.
           // For more complex one, parts of the UI may be swapped out.
           this.setupUI();
           this.renderWaitingView();
-
           this.setInitialState()
           .then(function() {
             return this.refresh()
           }.bind(this))
           .catch(function(err) {
+            console.log('ERROR');
+            console.log(err);
+            
             this.setError(err);
           }.bind(this))
           .done();
@@ -492,6 +494,24 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
           this.places.content.html(this.getTemplate('error').render(context));
         }
       },
+      
+      iso8601ToDate: {
+        value: function (dateString) {
+          var isoRE = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)([\+\-])(\d\d\d\d)/;
+          var dateParts = isoRE.exec(dateString);
+          if (!dateParts) {
+            throw '** Invalid Date Format **';
+          } else if (dateParts[8] !== '0000') {
+            throw '** Invalid Date TZ Offset ' + dateParts[8] + ' **';
+          }
+
+          var newDateString = dateParts[1] + '-' + dateParts[2] + '-' + dateParts[3] + 'T' + dateParts[4] + ':' + dateParts[5] + ':' + dateParts[6];
+          
+          console.log(newDateString);
+
+          return new Date(newDateString);
+        }
+      },
 
       niceElapsedTime: {
         value: function(dateString) {
@@ -596,12 +616,12 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
           $('<link>')
           .appendTo('head')
           .attr({type: 'text/css', rel: 'stylesheet'})
-          .attr('href', '/src/widgets/social/style.css');
+          .attr('href', '/src/widgets/dashboard/style.css');
           // Load specific widget css.
           $('<link>')
           .appendTo('head')
           .attr({type: 'text/css', rel: 'stylesheet'})
-          .attr('href', '/src/widgets/social/' + this.widgetName + '/style.css');
+          .attr('href', '/src/widgets/dashboard/' + this.widgetName + '/style.css');
         }
       },
 
@@ -713,7 +733,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
         }
       },
 
-      narrative_info_to_object: {
+      object_info_to_object: { 
         value: function(data) {
           return {
             id: data[0],
@@ -933,5 +953,5 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
 
     });
 
-    return SocialWidget;
+    return DashboardWidget;
   });
