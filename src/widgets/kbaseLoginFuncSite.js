@@ -104,7 +104,7 @@
       //if (this.ui) {
       //    this.$elem.append(this.ui);
       //  }
-      // console.log('DONE?');
+      // console.log('DONE?'); 
 
       return this;
     },
@@ -117,11 +117,18 @@
       postal.channel('session').subscribe('profile.loaded', function(data) {
       // $(document).on('profileLoaded.kbase', function(e, profile) {
         var profile = data.profile;
+        this.profile = data.profile;
         this.userProfile = profile.getProfile();
         // NB: KB widgets "rewire" ids -- tranform ids into data- attributes.
         this.$elem.find('[data-element="user-label"]').html(this.get_user_label());
         var url = profile.getAvatarURL({size: 40, rating: 'pg'});
         this.$elem.find('[data-element="avatar"]').attr('src', url);
+      }.bind(this));
+      
+      postal.channel('session').subscribe('profile.get', function (data, envelope) {
+        console.log('returning...');
+        envelope.reply(null, this.profile);
+        
       }.bind(this));
       
       postal.channel('session').subscribe('login.success', function (data) {
