@@ -420,6 +420,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
             */
           
           // We need to ensure that the context reflects the current auth state.
+            this.context.env.generatedId = this.genId();
           this.context.env.loggedIn = Session.isLoggedIn();
           if (Session.isLoggedIn()) {
             this.context.env.loggedInUser = Session.getUsername();
@@ -507,8 +508,6 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
 
           var newDateString = dateParts[1] + '-' + dateParts[2] + '-' + dateParts[3] + 'T' + dateParts[4] + ':' + dateParts[5] + ':' + dateParts[6];
           
-          console.log(newDateString);
-
           return new Date(newDateString);
         }
       },

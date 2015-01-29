@@ -14,10 +14,11 @@
      <tr>
          <th>Title</th>
          <th>Ver.</th>
-         <th>Public?</th>
-         <th>Shared With</th>
+         <th>Owner</th>
+         <th>You Can</th>
+         <th>Also Shared With</th>
          <th># objects</th>
-         <th>Last Saved</th>
+         <th>Last Saved</th> 
      </tr>
  </thead>
   
@@ -35,11 +36,14 @@
             {{narrative.object.version}}
 		</td>
 		<td>
-            {% if narrative.workspace.globalread == 'r' %}*
-            {% elif narrative.workspace.globalread == 'w' %}* 
-            {% else %}
+            {{narrative.workspace.owner}}
+        </td>
+        <td>
+            {% if narrative.workspace.user_permission == 'r'%}View
+            {% elif narrative.workspace.user_permission == 'w' %}Edit
+            {% elif narrative.workspace.user_permission == 'a' %}Edit and Share
             {% endif %}
-		</td>
+        </td>
 		<td>
 		    x
 		</td>

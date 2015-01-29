@@ -330,19 +330,28 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
         type: 'divider'
       })
       .addHelpMenuItem({
+        name: 'featurerequest',
+        label: 'Request Feature',
+        external: true,
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=2&priority=4&components=10108&assignee=eapearson&summary=Feature%20Request%20on%20User%20Page'
+      })
+      .addHelpMenuItem({
+        name: 'bugreport',
+        label: 'Report BUG',
+        icon: 'bug',
+        external: true,
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&priority=3&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
+      });
+      
+      /*
+      .addHelpMenuItem({
         name: 'navtest',
         label: 'Navbar Test',
         icon: 'bug',
         url: '#/navtest/x'
       })
-      .addHelpMenuItem({
-        name: 'bugreport',
-        label: 'New JIRA Ticket',
-        icon: 'bug',
-        external: true,
-        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
-      });
-      
+      */
+    
       
     });
     
@@ -369,17 +378,17 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
         type: 'divider'
       })
       .addHelpMenuItem({
-        name: 'navtest',
-        label: 'Navbar Test',
-        icon: 'bug',
-        url: '#/navtest/x'
+        name: 'featurerequest',
+        label: 'Request Feature',
+        external: true,
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=2&priority=4&components=10108&assignee=eapearson&summary=Feature%20Request%20on%20UDashboard'
       })
       .addHelpMenuItem({
         name: 'bugreport',
-        label: 'New JIRA Ticket',
+        label: 'Report BUG',
         icon: 'bug',
         external: true,
-        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&priority=3&components=10108&assignee=eapearson&summary=Bug%20on%20Dashboard'
       })
       .setTitle('Dashboard');
       

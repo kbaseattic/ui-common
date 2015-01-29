@@ -1,11 +1,11 @@
-define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaceserviceclient', 'kbasesession', 'q'],
-    function ($, nunjucks, Utils, DashboardWidget, WorkspaceService, Session, Q) {
+define(['jquery', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaceserviceclient', 'kbasesession', 'q'],
+    function ($, Utils, DashboardWidget, WorkspaceService, Session, Q) {
         "use strict";
         var widget = Object.create(DashboardWidget, {
             init: {
                 value: function (cfg) {
-                    cfg.name = 'NarrativesWidget';
-                    cfg.title = 'Your Narratives';
+                    cfg.name = 'SharedNarrativesWidget';
+                    cfg.title = 'Narratives Shared with You';
                     this.DashboardWidget_init(cfg);
 
                     // Prepare templating.
@@ -15,7 +15,6 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
 
                     // TODO: get this from somewhere, allow user to configure this.
                     this.params.limit = 10;
-
 
                     return this;
                 }
@@ -72,15 +71,12 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
 
                         var recentActivity = [];
 
-                        // Note that Narratives are now associated 1-1 with a workspace. 
-                        // Some new narrative attributes, such as name and (maybe) description, are actually
-                        // stored as attributes of the workspace itself.
-                        // At present we can just use the presence of "narrative_nice_name" metadata attribute 
-                        // to flag a compatible workspace.
-                        //
+                        // 
+                        // Get all workspaces, filter out those owned by the user,
+                        // and those that are public
+                        // 
                         this.promise(this.workspaceClient, 'list_workspace_info', {
                                 showDeleted: 0,
-                                owners: [Session.getUsername()]
                             })
                             .then(function (data) {
                                 // collect then into a map because we need to query for object details
@@ -94,12 +90,25 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
                                     //lock_status lockstat, usermeta metadata> workspace_info
                                     var wsInfo = this.workspace_metadata_to_object(data[i]);
                                     
-                                    // make sure a modern narrative.
-                                    if (wsInfo.metadata.narrative && wsInfo.metadata.is_temporary !== 'true') {
-                                        workspacesWithNarratives.push(wsInfo.id);
-                                        narrativesByWorkspace[wsInfo.id] = {
-                                            workspace: wsInfo
-                                        }
+                                    // Ensures we have a narrative workspace.
+                                    if (!wsInfo.metadata.narrative) {
+                                        continue;
+                                    }
+                                    // Ensures we are not including "unsaved" narratives.
+                                    if (wsInfo.metadata.is_temporary === 'true') {
+                                        continue;
+                                    }
+                                    // Ensures we are not including workspaces owned by this user.
+                                    if (wsInfo.owner === Session.getUsername()) {
+                                        continue;
+                                    }
+                                    if (wsInfo.globalread !== 'n') {
+                                        continue;
+                                    }
+                                    
+                                    workspacesWithNarratives.push(wsInfo.id);
+                                    narrativesByWorkspace[wsInfo.id] = {
+                                        workspace: wsInfo
                                     }
                                         
                                      /*   narratives.push({

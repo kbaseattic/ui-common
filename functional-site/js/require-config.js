@@ -57,6 +57,7 @@ require.config({
       // Dashboard widgets
       dashboard_widget: '/src/widgets/dashboard/DashboardWidget',
       dashboard_profile_widget: '/src/widgets/dashboard/ProfileWidget',
+      dashboard_shared_narratives_widget: '/src/widgets/dashboard/SharedNarrativesWidget',
       dashboard_narratives_widget: '/src/widgets/dashboard/NarrativesWidget',
       dashboard_apps_widget: '/src/widgets/dashboard/AppsWidget',
       dashboard_data_widget: '/src/widgets/dashboard/DataWidget'
