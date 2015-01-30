@@ -144,7 +144,6 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
                                        });
                                           
                                        narrativesByWorkspace[wsId].permissions = permissionsList;
-                                       console.log(permissionsList);
                                     }
 
                                     // Now convert to an array in order to be sortable, and for rendering.
