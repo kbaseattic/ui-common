@@ -1,15 +1,10 @@
 <div class="collapse" id="more-info-{{env.instanceId}}"> 
 	<div class="well">
-	{% if env.isOwner %}
-		<p>This panel shows narratives that you have created.</p>
-	{% else %}
-		<p>This panel shows narratives created by this user which you have some access to. They are either public or have been shared with you.</p>
-		<p>To see all of <i>your</i> narratives, visit <a href="/functional-site/#/people/{{env.loggedInUser}}">your profile</a>.</p>
-	{% endif %}
+		<p>This panel shows Narratives that have been shared with you.</p>
 	</div>
 </div>
 
-<table class="table table-bordered table-striped" id="dashboard-shared-narratives-widgets-{{env.generatedId}}">
+<table class="table table-bordered table-striped" id="dashboard-shared-narratives-widgets-{{env.instanceId}}">
  <thead>
      <tr>
          <th>Title</th>
@@ -66,7 +61,7 @@ No Narratives
 </table>
 <script>
 require(['jquery'], function ($) {
-	var table = $('#dashboard-shared-narratives-widgets-{{env.generatedId}}');
+	var table = $('#dashboard-shared-narratives-widgets-{{env.instanceId}}');
     table.DataTable({
         initComplete: function (settings) {
             var api = this.api();
