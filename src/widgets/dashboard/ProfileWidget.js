@@ -48,9 +48,7 @@ function (DashboardWidget, UserProfile, UserProfileService, Session, Utils, Q) {
       
       go: {
         value: function () {
-          console.log('go...');
           this.start();
-          console.log('started...');
           return this;
         }
       },
@@ -92,12 +90,9 @@ function (DashboardWidget, UserProfile, UserProfileService, Session, Utils, Q) {
               this.userProfile = null;
               resolve();
             } else {
-              console.log('getting user profile...');
-              console.log(Session.getUsername());
               this.userProfile = Object.create(UserProfile).init({username: Session.getUsername()}); 
               this.userProfile.loadProfile()
               .then(function(found) {
-                console.log('got it...');
                 resolve();
               })
               .catch (function(err) {
