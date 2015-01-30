@@ -157,18 +157,26 @@ The content area is normal flow and just needs to have a matching top margin.
 }
 */
 
+.navbar-kbase .bn {
+    vertical-align: middle;
+}
+
 .navbar-kbase .btn.btn-default {
   border-color: transparent;
-  border-size: 0;
+  border-width: 0;
   border-style: none;
 }
 
-.navbar-kbase .navbar-icon {
+.navbar-kbase .dropdown-menu  .navbar-icon {
   display:inline-block; 
-  width: 30px; 
-  vertical-align: top;
-  margin-right: 4px;
+  width: 26px; 
+  text-align: center;
+  vertical-align: middle;
+  margin-right: 10px;
 }
-.navbar-kbase .navbar-icon .fa {
+.navbar-kbase .dropdown-menu .navbar-icon .fa {
   font-size: 150%;
+}
+.navbar-kbase .dropdown-menu li a {
+    vertical-align: middle;
 }

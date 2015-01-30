@@ -333,6 +333,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
         name: 'featurerequest',
         label: 'Request Feature',
         external: true,
+        icon: 'thumbs-o-up',
         url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=2&priority=4&components=10108&assignee=eapearson&summary=Feature%20Request%20on%20User%20Page'
       })
       .addHelpMenuItem({
@@ -381,6 +382,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
         name: 'featurerequest',
         label: 'Request Feature',
         external: true,
+        icon: 'thumbs-o-up',
         url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=2&priority=4&components=10108&assignee=eapearson&summary=Feature%20Request%20on%20UDashboard'
       })
       .addHelpMenuItem({
