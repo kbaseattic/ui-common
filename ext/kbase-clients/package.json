@@ -1,0 +1,15 @@
+{
+  "name": "kbase-client-api",
+  "version": "1.0.0",
+  "description": "Javascript clients for the KBase API",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kbase"
+  }
+  "author": "DoE Systems Biology Knowledgebase",
+  "devDependencies": {
+    "grunt-contrib-uglify": "^0.7.0",
+    "grunt-contrib-watch": "^0.6.1"
+  }
+}
+
