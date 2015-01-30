@@ -9,7 +9,7 @@
 	</div>
 </div>
 
-<table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped" id="dashboard-narratives-{{env.generatedId}}">
+<table class="table table-bordered table-striped" id="dashboard-shared-narratives-widgets-{{env.generatedId}}">
  <thead>
      <tr>
          <th>Title</th>
@@ -64,10 +64,20 @@ No Narratives
 {% endif %}
 
 </table>
-
-
 <script>
 require(['jquery'], function ($) {
-	$('#dashboard-narratives-{{env.generatedId}}').DataTable();
+	var table = $('#dashboard-shared-narratives-widgets-{{env.generatedId}}');
+    table.DataTable({
+        initComplete: function (settings) {
+            var api = this.api();
+            var rowCount = api.data().length;
+            var pageSize = api.page.len();
+            var wrapper = api.settings()[0].nTableWrapper;
+            if (rowCount <= pageSize) {
+                $(wrapper).find('.dataTables_paginate').closest('.row').hide();
+                $(wrapper).find('.dataTables_filter').closest('.row').hide();
+            }
+        }
+    });
 });
 </script>

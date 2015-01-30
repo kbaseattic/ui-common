@@ -52,6 +52,7 @@ function (DashboardWidget, UserProfileService, Session, NarrativeMethodStore, Q)
               
               this.promise(this.methodStore, 'list_apps_full_info', {})
               .then(function(data) {
+                  console.log(data);
                 widget.setState('appList', data);
               }).
               catch(function(err) {

@@ -9,7 +9,15 @@
         <!-- jquery-ui-1.10.0.custom.css is needed for the landing page card layout, some old landing pages still use this style -->
         <link rel="stylesheet" type="text/css" href="../ext/jquery-ui/1.10.3/css/custom-theme/jquery-ui-1.10.0.custom.css">
         
-        <link rel="stylesheet" type="text/css" href="assets/css/dataTables.bootstrap.css" />
+        <!-- DataTable 1.10.4 css dependencies. 2014-01-29 eap -->
+        <!-- <link rel="stylesheet" type="text/css" href="assets/css/dataTables.bootstrap.css" /> -->
+        <!-- NB: should not include dataTables css if using bootstrap integration -->
+        <link rel="stylesheet" type="text/css" href="/ext/dataTables/1.10.4/extensions/ColReorder/dataTables.colReorder.min.css" />
+        <link rel="stylesheet" type="text/css" href="/ext/dataTables/1.10.4/extensions/ColVis/dataTables.colVis.min.css" />
+        <!--<link rel="stylesheet" type="text/css" href="/ext/dataTables/1.10.4/css/jquery.dataTables.bootstrap.css" />-->
+        <link rel="stylesheet" type="text/css" href="/ext/dataTables/1.10.4/plugins/integration/bootstrap/dataTables.bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="/ext/dataTables/1.10.4/plugins/integration/font-awesome/dataTables.fontAwesome.css" />
+        
         <link rel="stylesheet" type="text/css" href="assets/css/ws-browser.css" />
         <!--<link rel="stylesheet" type="text/css" href="assets/js/acute-select/acute/acute.select/acute.select.css" />-->
 
@@ -81,10 +89,18 @@
         <script src="../ext/d3/d3.v3.min.js"></script>
 
         <!-- datatables -->
+        <!--
         <script src="../ext/dataTables/1.10.1/js/jquery.dataTables.min.js"></script>
         <script src="../ext/dataTables/1.10.1/js/dataTables.colReorder.min.js"></script>                
         <script src="../ext/dataTables/1.10.1/js/dataTables.colVis.min.js"></script>                        
         <script src="assets/js/dataTables.bootstrap.js"></script>
+        -->
+        <!-- DataTables 1.10.4 -->
+        <script src="/ext/dataTables/1.10.4/js/jquery.dataTables.min.js"></script>
+        <script src="/ext/dataTables/1.10.4/extensions/ColReorder/js/dataTables.colReorder.min.js"></script>
+        <script src="/ext/dataTables/1.10.4/extensions/ColVis/js/dataTables.colVis.min.js"></script>
+        <script src="/ext/dataTables/1.10.4/plugins/integration/bootstrap/dataTables.bootstrap.min.js"></script>
+        
         <!--<script src="assets/js/FixedHeader.min.js"></script>-->
 
 

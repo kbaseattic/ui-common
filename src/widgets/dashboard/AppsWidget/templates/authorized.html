@@ -1,17 +1,39 @@
-This is the apps widget.<br>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th>Ver</th>
-</tr>
-</thead>
-<tbody>
-{% for app in state.appList %}
-<tr>
-<td>{{ app.name }}</td>
-<td>{{ app.ver }}</td>
-</tr>
-{% endfor %}
-</tbody>
+<table class="table table-bordered table-striped" id="dashboard-apps-widget-{{env.generatedId}}">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Narratives</th>
+            <th>Last Updated</th>
+            <th>Current Version</th>
+        </tr>
+    </thead>
+    <tfoot>
+        
+    </tfoot>
+    <tbody>
+        {% for app in state.appList %}
+        <tr>
+            <td>{{ app.name }}</td>
+            <td>x</td>
+            <td>x</td>
+            <td>{{ app.ver }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
+<script>
+require(['jquery'], function ($) {
+	$('#dashboard-apps-widget-{{env.generatedId}}').DataTable({
+        initComplete: function (settings) {
+            var api = this.api();
+            var rowCount = api.data().length;
+            var pageSize = api.page.len();
+            var wrapper = api.settings()[0].nTableWrapper;
+            if (rowCount <= pageSize) {
+                $(wrapper).find('.dataTables_paginate').closest('.row').hide();
+                $(wrapper).find('.dataTables_filter').closest('.row').hide();
+            }
+        }
+    });
+});
+</script>

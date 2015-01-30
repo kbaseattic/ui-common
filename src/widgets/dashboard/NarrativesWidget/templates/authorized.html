@@ -64,6 +64,17 @@ No Narratives
 
 <script>
 require(['jquery'], function ($) {
-	$('#dashboard-narratives-{{env.generatedId}}').DataTable();
+	$('#dashboard-narratives-{{env.generatedId}}').DataTable({
+        initComplete: function (settings) {
+            var api = this.api();
+            var rowCount = api.data().length;
+            var pageSize = api.page.len();
+            var wrapper = api.settings()[0].nTableWrapper;
+            if (rowCount <= pageSize) {
+                $(wrapper).find('.dataTables_paginate').closest('.row').hide();
+                $(wrapper).find('.dataTables_filter').closest('.row').hide();
+            }
+        }
+    });
 });
 </script>
