@@ -25,10 +25,10 @@
 		<td>
 		    <a target="_blank" href="/functional-site/#/narrativemanager/start?objid={{narrative.object.obj_id}}">{{narrative.workspace.metadata.narrative_nice_name}}</a>
 		</td>
-		<td>
+		<td style="text-align: right; padding-right: 1em;">
             {{narrative.object.version}}
 		</td>
-		<td>
+		<td style="text-align: center;">
             {% if narrative.workspace.globalread == 'r' %}<span class="fa fa-check"></span> 
             {% elif narrative.workspace.globalread == 'w' %}<span class="fa fa-check"></span> 
             {% else %}
@@ -44,10 +44,10 @@
            </select>
            {% endif %}
 		</td>
-		<td>
+		<td style="text-align: right; padding-right: 1em;">
             {{narrative.workspace.object_count}}
 		</td>
-		<td>
+		<td style="text-align: right; padding-right: 1em;">
 		     {{narrative.workspace.moddate | dateFormat }}
         </td>
 	</tr>
