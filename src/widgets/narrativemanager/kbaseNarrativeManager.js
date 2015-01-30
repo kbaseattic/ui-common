@@ -187,9 +187,9 @@
                     }
             );
         },
-        redirect: function(objid) {
+        redirectToNarrative: function(objid) {
             var path = '/narrative/'+objid;
-            this.$mainPanel.html('Redirecting to <a href="'+path+'">'+path+'</a>';
+            this.$mainPanel.html('Redirecting to <a href="'+path+'">'+path+'</a>');
             if (!self.dontRedirect) {
                 window.location.replace(path);
             }
