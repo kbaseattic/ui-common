@@ -71,7 +71,7 @@ var app = angular.module('landing-pages',
     // new narrative manager routing
      $stateProvider
         .state('narrativemanager', {
-          url: "/narrativemanager/:action?app&method&copydata&appparam&objid",
+          url: "/narrativemanager/:action?app&method&copydata&appparam",
           templateUrl: 'views/narrative/narrative-manager.html',
           controller: 'narrativemanager'
         });

@@ -95,7 +95,7 @@
             }
             // START - load up last narrative, or start the user's first narrative
             if (self.options.params.action === 'start') {
-                self.startOrCreateEmptyNarrative(self.options.params);
+                self.startOrCreateEmptyNarrative();
             } else if (self.options.params.action === 'new') {
                 self.createNewNarrative(self.options.params);
             } else {
@@ -152,22 +152,16 @@
             );
         },
         
-        startOrCreateEmptyNarrative: function(params) {
+        startOrCreateEmptyNarrative: function() {
             var self = this;
             self.manager.detectStartSettings(
                     function(result) {
                         console.log(result);
                         if (result.last_narrative) {
-                           // if we have a narrative objectid we go there.
-                           if (params.objid) {
-                              self.redirectToNarrative(params.objid);
-                           } else {
-                           // otherwise the last opened
                             // we have a last_narrative, so go there
                             //console.log('should redirect...');
                             self.redirect(result.last_narrative.ws_info[0],
                                     result.last_narrative.nar_info[0]);
-                           }
                         } else {
                             //we need to construct a new narrative- we have a first timer
                             self.manager.createTempNarrative(
@@ -186,13 +180,6 @@
                         self.showError(error);
                     }
             );
-        },
-        redirectToNarrative: function(objid) {
-            var path = '/narrative/'+objid;
-            this.$mainPanel.html('Redirecting to <a href="'+path+'">'+path+'</a>');
-            if (!self.dontRedirect) {
-                window.location.replace(path);
-            }
         },
         
         redirect: function(workspaceId, objId) {
