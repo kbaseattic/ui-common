@@ -698,7 +698,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
           if ($location.search().nextPath) {
             $location.path($location.search().nextPath);
           } else {
-             $location.path('/narrativemanager/start');
+             $location.path('/dashboard');
           }
        
             // USER_ID = $("#signin-button").kbaseLogin('session').user_id;

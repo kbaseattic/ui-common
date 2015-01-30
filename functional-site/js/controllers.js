@@ -462,6 +462,14 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 
 .controller('Login', function($scope, $stateParams, $location, kbaseLogin, $modal) {
+    
+    // If we are logged in and landing here we redirect to the dashboard.
+    // I guess we can use the supplied kbaseLogin...
+    if ($.KBaseSessionSync.isLoggedIn()) {
+        $location.path('/dashboard');
+        return;
+    }
+    
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives
     
     $scope.nextPath = $stateParams.nextPath;
