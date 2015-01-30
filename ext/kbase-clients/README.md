@@ -8,7 +8,7 @@ the whole batch is not straightforward in all cases, so they've been included
 here.
 
 This also has a Gruntfile that will concatenate, uglify, and minify all of them
-into a single kbase-client-api.min.js file (instructions below).
+into a single kbase-client-api.js and kbase-client-api.min.js file (instructions below).
 
 Here's the list of the included service client names. Except for AweClient and 
 ShockClient, which were constructed by hand, they all follow the same idiom for 
@@ -76,5 +76,5 @@ this directory. Now, all you need to do to get the clients minified is:
 
 And you're ready to go.
 
-Of course, this is all kinda moot since the end product is also included in this
+Of course, this is all kinda moot since the end products are also included in this
 git repo. But this is a useful thing to document.
