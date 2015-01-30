@@ -69,7 +69,8 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
                      resolve();
                      return;
                   }
-
+                  
+                  var sessionUsername = Session.getUsername();
                   var recentActivity = [];
 
                   // Note that Narratives are now associated 1-1 with a workspace. 
@@ -80,7 +81,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
                   //
                   this.promise(this.workspaceClient, 'list_workspace_info', {
                         showDeleted: 0,
-                        owners: [Session.getUsername()]
+                        owners: [sessionUsername]
                      })
                      .then(function (data) {
                         // collect then into a map because we need to query for object details
@@ -109,6 +110,10 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
                            })
                            .then(function (data) {
                               var permissionsPromises = [];
+                              // we need to keep a stash of narratives in the same order as we
+                              // build the promises, because the WS client does not return the wsId 
+                              // with the response.
+                              var narrativeObjects = [];
                               for (var i = 0; i < data.length; i++) {
                                  // Filter for just narratives.
                                  // TODO: Oops, the object id is provide in the ws metadata!
@@ -119,6 +124,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
                                        console.log('WARNING: more than one narrative in this workspace: ' + wsObject.wsid);
                                     } else {
                                        narrativesByWorkspace[wsObject.wsid].object = wsObject;
+                                       narrativeObjects.push(wsObject);
                                        permissionsPromises.push(this.promise(this.workspaceClient, 'get_permissions', {
                                           id: wsObject.wsid
                                        }));
@@ -131,8 +137,18 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
                                  .then(function (permissions) {
                                     // add the permissions to the master table of narratives keyed by workspace.
                                     for (var i = 0; i < permissions.length; i++) {
-                                       var wsId = workspacesWithNarratives[i];
+                                       var wsId = narrativeObjects[i].wsid;
                                        var permissionsList = this.object_to_array(permissions[i], 'username', 'permission');
+                                       permissionsList = permissionsList.filter(function (x) {
+                                          if (x.username === sessionUsername) {
+                                             return false;
+                                          } else if (x.username === '*') {
+                                             // permissions for public are recorded as username '*'.
+                                             return false;
+                                          } else {
+                                             return true;
+                                          }
+                                       });
                                        permissionsList = permissionsList.sort(function (a,b) {
                                           if (a.username < b.username) {
                                              return -1;

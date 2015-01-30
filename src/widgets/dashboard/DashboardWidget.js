@@ -328,8 +328,10 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
                     } else if (typeof errorValue === 'object') {
                         if (errorValue.message) {
                             errorText = errorValue.message;
+                        } else if (errorValue.error && errorValue.error.message) {
+                            errorText = errorValue.error.message;
                         } else {
-                            errorText = '' + error;
+                           errorText = 'Unknown error';
                         }
                     }
                     this.error = {
