@@ -722,6 +722,20 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
                     return 'ws.' + workspaceId + '.obj.' + objectId;
                 }
             },
+           
+            object_to_array: {
+               value: function (object, keyName, valueName) {
+                  var keys = Object.keys(object);
+                  var l = [];
+                  for (var i in keys) {
+                     var newObj = {};
+                     newObj[keyName] = keys[i];
+                     newObj[valueName] = object[keys[i]];
+                     l.push(newObj);                        
+                  }
+                  return l;
+               }
+            },
 
             // KBase Service Utility Methods
             // NB: these should really be contained in the service apis, but those are automatically generated.
