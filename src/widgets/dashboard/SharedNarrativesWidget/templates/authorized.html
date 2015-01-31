@@ -25,7 +25,7 @@
 	<tr>
 		
 		<td>
-		    <a target="_blank" href="/narrative/{{narrative.obj_id}}">{{narrative.workspace.metadata.narrative_nice_name}}</a>
+		    <a target="_blank" href="/narrative/{{narrative.object.obj_id}}">{{narrative.workspace.metadata.narrative_nice_name}}</a>
 		</td>
 		<td>
             {{narrative.object.version}}
@@ -40,7 +40,14 @@
             {% endif %}
         </td>
 		<td>
-		    x
+           {{narrative.permissions|length}} users 
+           {% if narrative.permissions|length > 0 %}
+           <select>
+              {% for perm in narrative.permissions %} 
+              <option value="{{perm.username}}">{{perm.username}} ({{perm.permission}})</option>
+              {% endfor %}
+           </select>
+           {% endif %}
 		</td>
 		<td>
             {{narrative.workspace.object_count}}
