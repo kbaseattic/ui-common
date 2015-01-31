@@ -10,7 +10,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
 
                // Prepare templating.
                this.templates.env.addFilter('dateFormat', function (dateString) {
-                  return this.niceElapsedTime(dateString);
+                  return Utils.niceElapsedTime(dateString);
                }.bind(this));
 
                // TODO: get this from somewhere, allow user to configure this.
@@ -174,8 +174,8 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
                                     }
                                     // TODO: skip this step -- the template and/or front end can handle this.
                                     narratives = narratives.sort(function (a, b) {
-                                       var x = (this.iso8601ToDate(a.object.save_date)).getTime();
-                                       var y = (this.iso8601ToDate(b.object.save_date)).getTime();
+                                       var x = (Utils.iso8601ToDate(a.object.save_date)).getTime();
+                                       var y = (Utils.iso8601ToDate(b.object.save_date)).getTime();
                                        return ((x < y) ? 1 : ((x > y) ? -1 : 0));
                                     }.bind(this));
                                     this.setState('narratives', narratives);

@@ -10,7 +10,7 @@ define(['jquery', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaceserviceclient
 
                      // Prepare templating.
                      this.templates.env.addFilter('dateFormat', function (dateString) {
-                        return this.niceElapsedTime(dateString);
+                        return Utils.niceElapsedTime(dateString);
                      }.bind(this));
 
                      // TODO: get this from somewhere, allow user to configure this.
@@ -153,6 +153,7 @@ define(['jquery', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaceserviceclient
                                           console.log(x);
                                           x.object = narrativesByWorkspace[x.workspace.id].object;
                                        });
+                                    console.logs('NARRATIVES'); console.log(narratives);
                                        this.setState('narratives', narratives);
                                        resolve();
                                     }.bind(this))

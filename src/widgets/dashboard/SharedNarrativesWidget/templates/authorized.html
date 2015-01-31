@@ -27,7 +27,7 @@
 		<td>
 		    <a target="_blank" href="/narrative/{{narrative.object.obj_id}}">{{narrative.workspace.metadata.narrative_nice_name}}</a>
 		</td>
-		<td>
+		<td class="number">
             {{narrative.object.version}}
 		</td>
 		<td>
@@ -49,10 +49,10 @@
            </select>
            {% endif %}
 		</td>
-		<td>
+		<td class="number">
             {{narrative.workspace.object_count}}
 		</td>
-		<td>
+		<td class="date">
 		     {{narrative.workspace.moddate | dateFormat }}
         </td>
 	</tr>
