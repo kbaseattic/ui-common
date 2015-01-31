@@ -72,16 +72,18 @@ define(['jquery', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaceserviceclient
                         Q.all(promises)
                            .then(function (permissions) {
                               for (var i = 0; i < permissions.length; i++) {
+                                 var narrative = narratives[i];
                                  var perms = this.object_to_array(permissions[i], 'username', 'permission').filter(function(x) {
-                                    if (x.username === username ||
-                                        x.username === '*') {
+                                    if ( x.username === username ||
+                                         x.username === '*' ||
+                                         x.username === narrative.workspace.owner ) {
                                        return false;
                                     } else {
                                        return true;
                                     }
-                                 });
-                                 
-                                 narratives[i].permissions = perms;
+                                 });                                 
+                                 narrative.permissions = perms;
+                              
                               }
                               resolve(narratives);
                            }.bind(this))
@@ -109,11 +111,11 @@ define(['jquery', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaceserviceclient
                               // and filter for modern narrative workspaces.
                               for (var i = 0; i < data.length; i++) {
                                  var wsInfo = this.workspace_metadata_to_object(data[i]);
-                                 // Ensures we have a narrative workspace.
-                                 if (!wsInfo.metadata.narrative ||
-                                     wsInfo.metadata.is_temporary === 'true'||
-                                     wsInfo.owner === Session.getUsername() ||
-                                     (!(wsInfo.user_permission === 'r' || wsInfo.user_permission === 'w'))) {
+                                 // Ensures we have a narrative workspace and that this user has some access to it.
+                                 if ( !wsInfo.metadata.narrative ||
+                                      wsInfo.metadata.is_temporary === 'true'||
+                                      wsInfo.owner === Session.getUsername() ||
+                                      (wsInfo.user_permission === 'n') ) {
                                     continue;
                                  }
                                  narratives.push({
@@ -135,7 +137,6 @@ define(['jquery', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaceserviceclient
                                  this.promise(this.workspaceClient, 'get_objects', workspaceIds)
                                     .then(function (data) {
                                        for (var i = 0; i < data.length; i++) {
-                                          console.log(data[i]);
                                           // NB this has given us all of the objects in the relevant workspaces.
                                           // Now we need to filter out just the narratives of interest
                                           var wsObject = this.object_info_to_object(data[i].info);
@@ -153,7 +154,6 @@ define(['jquery', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaceserviceclient
                                           console.log(x);
                                           x.object = narrativesByWorkspace[x.workspace.id].object;
                                        });
-                                    console.logs('NARRATIVES'); console.log(narratives);
                                        this.setState('narratives', narratives);
                                        resolve();
                                     }.bind(this))

@@ -140,9 +140,8 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
                                        var wsId = narrativeObjects[i].wsid;
                                        var permissionsList = this.object_to_array(permissions[i], 'username', 'permission');
                                        permissionsList = permissionsList.filter(function (x) {
-                                          if (x.username === sessionUsername) {
-                                             return false;
-                                          } else if (x.username === '*') {
+                                          if ( (x.username === sessionUsername) ||
+                                               (x.username === '*') ) {
                                              // permissions for public are recorded as username '*'.
                                              return false;
                                           } else {
@@ -170,16 +169,9 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
                                           console.log('WARNING: could not find narrative inside workspace: ' + wsId);
                                        } else {
                                           narratives.push(narrativesByWorkspace[wsId]);
-                                       }
+                                       } 
                                     }
-                                    // TODO: skip this step -- the template and/or front end can handle this.
-                                    narratives = narratives.sort(function (a, b) {
-                                       var x = (Utils.iso8601ToDate(a.object.save_date)).getTime();
-                                       var y = (Utils.iso8601ToDate(b.object.save_date)).getTime();
-                                       return ((x < y) ? 1 : ((x > y) ? -1 : 0));
-                                    }.bind(this));
                                     this.setState('narratives', narratives);
-                                    // Finally, resolve our promise!
                                     resolve();
                                  }.bind(this))
                                  .catch(function (err) {
