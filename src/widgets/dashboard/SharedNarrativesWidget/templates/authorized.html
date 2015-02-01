@@ -4,7 +4,15 @@
 	</div>
 </div>
 
-<table class="table table-bordered table-striped" id="dashboard-shared-narratives-widgets-{{env.instanceId}}">
+
+  
+
+
+{% if state.narratives | length > 0 %}
+
+   <p>Narrative count: {{ state.narratives | length }}</p>
+
+   <table class="table table-bordered table-striped" id="dashboard-shared-narratives-widgets-{{env.instanceId}}">
  <thead>
      <tr>
          <th>Title</th>
@@ -16,10 +24,6 @@
          <th>Last Saved</th> 
      </tr>
  </thead>
-  
-  Narrative count: {{ state.narratives | length }}<br>
-
-{% if state.narratives | length > 0 %}
 
 {% for narrative in state.narratives %}
 	<tr>
@@ -40,13 +44,23 @@
             {% endif %}
         </td>
 		<td>
-           {{narrative.permissions|length}} users 
-           {% if narrative.permissions|length > 0 %}
-           <select>
-              {% for perm in narrative.permissions %} 
-              <option value="{{perm.username}}">{{perm.username}} ({{perm.permission}})</option>
-              {% endfor %}
-           </select>
+           {% if narrative.workspace.user_permission == 'r'%}
+              No Access to Sharing 
+              <style type="text/css">
+                
+               </style>
+              <button type="button" class="btn btn-default btn-bare" data-toggle="popover" title="No Access to Sharing" data-content="For a Narrative with View permission, you may not view the list of other sharers">
+                 <span class="fa fa-info-circle"></span>
+              </button>
+           {% else %}
+              {{narrative.permissions|length}} users 
+              {% if narrative.permissions|length > 0 %}
+              <select>
+                 {% for perm in narrative.permissions %} 
+                 <option value="{{perm.username}}">{{perm.username}} ({{perm.permission | permissionLabel }})</option>
+                 {% endfor %}
+              </select>
+              {% endif %}
            {% endif %}
 		</td>
 		<td class="number">
@@ -59,13 +73,8 @@
 	
 {% endfor %}
 
-{% else %}
-
-No Narratives
-
-{% endif %}
-
 </table>
+
 <script>
 require(['jquery'], function ($) {
 	var table = $('#dashboard-shared-narratives-widgets-{{env.instanceId}}');
@@ -83,3 +92,11 @@ require(['jquery'], function ($) {
     });
 });
 </script>
+
+{% else %}
+
+<p>No Narratives have been shared with you.</p>
+
+{% endif %}
+
+

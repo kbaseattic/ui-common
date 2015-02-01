@@ -3,7 +3,15 @@
 		<p>This panel shows Narratives that you own.</p>
 	</div>
 </div>
-<table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped" id="dashboard-narratives-{{env.generatedId}}">
+
+  
+ 
+
+{% if state.narratives | length > 0 %}
+
+<p>Narrative count: {{ state.narratives | length }}</p>
+ 
+ <table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped" id="dashboard-narratives-{{env.generatedId}}">
  <thead>
      <tr>
          <th>Title</th>
@@ -12,16 +20,12 @@
          <th>Shared With</th>
          <th># objects</th>
          <th>Last Saved</th>
+         <th>By</th>
      </tr>
  </thead>
-  
-  Narrative count: {{ state.narratives | length }}<br>
-
-{% if state.narratives | length > 0 %}
 
 {% for narrative in state.narratives %}
 	<tr>
-		
 		<td>
 		    <a target="_blank" href="/narrative/{{narrative.object.obj_id}}">{{narrative.workspace.metadata.narrative_nice_name}}</a>
 		</td>
@@ -39,7 +43,7 @@
            {% if narrative.permissions|length > 0 %}
            <select>
               {% for perm in narrative.permissions %} 
-              <option value="{{perm.username}}">{{perm.username}} ({{perm.permission}})</option>
+              <option value="{{perm.username}}">{{perm.username}} ({{perm.permission|permissionLabel}})</option>
               {% endfor %}
            </select>
            {% endif %}
@@ -48,22 +52,17 @@
             {{narrative.workspace.object_count}}
 		</td>
 		<td class="date">
-		     {{narrative.workspace.moddate | dateFormat }}
+		     {{narrative.object.save_date | dateFormat }}
+        </td>
+        <td>
+           {{narrative.object.saved_by}}
         </td>
 	</tr>
-	
 {% endfor %}
 
-{% else %}
-
-No Narratives
-
-{% endif %}
-
 </table>
-
-
-<script>
+	
+	<script>
 require(['jquery'], function ($) {
 	$('#dashboard-narratives-{{env.generatedId}}').DataTable({
         initComplete: function (settings) {
@@ -79,3 +78,13 @@ require(['jquery'], function ($) {
     });
 });
 </script>
+	
+{% else %}
+
+<p>You do not own any Narratives. Why not <a href="/functional-site/#/narrativemanager/new">create your first one?</a>.</p>
+
+{% endif %}
+
+
+
+

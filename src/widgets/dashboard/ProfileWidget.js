@@ -8,40 +8,6 @@ function (DashboardWidget, UserProfile, UserProfileService, Session, Utils, Q) {
           cfg.title = 'Your Profile';
           this.DashboardWidget_init(cfg);
           
-          
-          this.templates.env.addFilter('roleLabel', function(role) {
-            if (this.listMaps['userRoles'][role]) {
-              return this.listMaps['userRoles'][role].label;
-            } else {
-              return role;
-            }
-          }.bind(this));
-          this.templates.env.addFilter('userClassLabel', function(userClass) {
-            if (this.listMaps['userClasses'][userClass]) {
-              return this.listMaps['userClasses'][userClass].label;
-            } else {
-              return userClass;
-            }
-          }.bind(this));
-          this.templates.env.addFilter('titleLabel', function(title) {
-            if (this.listMaps['userTitles'][title]) {
-              return this.listMaps['userTitles'][title].label;
-            } else {
-              return title;
-            }
-          }.bind(this));
-          // create a gravatar-url out of an email address and a 
-          // default option.
-          this.templates.env.addFilter('gravatar', function(email, size, rating, gdefault) {
-            // TODO: http/https.
-            return UserProfile.makeGravatarURL(email, size, rating, gdefault);
-          }.bind(this));
-          this.templates.env.addFilter('kbmarkup', function(s) {
-            s = s.replace(/\n/g, '<br>');
-            return s;
-          });
-        
-          
           return this;
         }
       },
@@ -63,8 +29,6 @@ function (DashboardWidget, UserProfile, UserProfileService, Session, Utils, Q) {
            return true;
           }        
       },
-      
-      
     
       renderLayout: {
           value: function() {

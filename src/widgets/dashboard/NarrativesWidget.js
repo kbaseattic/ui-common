@@ -61,6 +61,49 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
             }
          },
 
+         getPermissions: {
+            value: function (narratives) {
+               return Q.promise(function (resolve, reject, notify) {
+                  var promises = narratives.map(function (narrative) {
+                     return this.promise(this.workspaceClient, 'get_permissions', {
+                        id: narrative.workspace.id
+                     })
+                  }.bind(this));
+                  var username = Session.getUsername();
+                  Q.all(promises)
+                     .then(function (permissions) {
+                        for (var i = 0; i < permissions.length; i++) {
+                           var narrative = narratives[i];
+                           narrative.permissions = this.object_to_array(permissions[i], 'username', 'permission')
+                              .filter(function (x) {
+                                 if (x.username === username ||
+                                    x.username === '*' ||
+                                    x.username === narrative.workspace.owner) {
+                                    return false;
+                                 } else {
+                                    return true;
+                                 }
+                              })
+                              .sort(function (a, b) {
+                                 if (a.username < b.username) {
+                                    return -1;
+                                 } else if (a.username > b.username) {
+                                    return 1;
+                                 } else {
+                                    return 0
+                                 }
+                              });
+                        }
+                        resolve(narratives);
+                     }.bind(this))
+                     .catch(function (err) {
+                        reject(err);
+                     })
+                     .done();
+               }.bind(this));
+            }
+         },
+
          setInitialState: {
             value: function (options) {
                return Q.promise(function (resolve, reject, notify) {
@@ -69,7 +112,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
                      resolve();
                      return;
                   }
-                  
+
                   var sessionUsername = Session.getUsername();
                   var recentActivity = [];
 
@@ -86,7 +129,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
                      .then(function (data) {
                         // collect then into a map because we need to query for object details
                         var narrativesByWorkspace = {};
-                        var workspacesWithNarratives = [];
+                        var narratives = [];
                         // First we both transform each ws info object into a nicer js object,
                         // and filter for modern narrative workspaces.
                         for (var i = 0; i < data.length; i++) {
@@ -97,91 +140,61 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaces
 
                            // make sure a modern narrative.
                            if (wsInfo.metadata.narrative && wsInfo.metadata.is_temporary !== 'true') {
-                              workspacesWithNarratives.push(wsInfo.id);
+                              narratives.push({
+                                 workspace: wsInfo
+                              });
                               narrativesByWorkspace[wsInfo.id] = {
                                  workspace: wsInfo
                               }
                            }
                         }
+                        
+                        if (narratives.length === 0) {
+                           this.setState('narratives', []);
+                           resolve();
+                           return;
+                        }
 
-                        this.promise(this.workspaceClient, 'list_objects', {
-                              ids: workspacesWithNarratives,
-                              includeMetadata: 1
-                           })
-                           .then(function (data) {
-                              var permissionsPromises = [];
-                              // we need to keep a stash of narratives in the same order as we
-                              // build the promises, because the WS client does not return the wsId 
-                              // with the response.
-                              var narrativeObjects = [];
-                              for (var i = 0; i < data.length; i++) {
-                                 // Filter for just narratives.
-                                 // TODO: Oops, the object id is provide in the ws metadata!
-                                 var wsObject = this.object_info_to_object(data[i]);
-                                 var type = wsObject.type.split(/[-\.]/);
-                                 if (type[1] === 'Narrative') {
-                                    if (narrativesByWorkspace[wsObject.wsid].object) {
-                                       console.log('WARNING: more than one narrative in this workspace: ' + wsObject.wsid);
-                                    } else {
-                                       narrativesByWorkspace[wsObject.wsid].object = wsObject;
-                                       narrativeObjects.push(wsObject);
-                                       permissionsPromises.push(this.promise(this.workspaceClient, 'get_permissions', {
-                                          id: wsObject.wsid
-                                       }));
-                                    }
+                        // Now we need to get the object metadata.
+                        this.getPermissions(narratives)
+                           .then(function (narratives) {
+                              var workspaceIds = narratives.map(function (x) {
+                                 return {
+                                    wsid: x.workspace.id,
+                                    objid: parseInt(x.workspace.metadata.narrative)
                                  }
-                                
-                              }
-                              // Get permissions in parallel, then build up the list of narratives.
-                              Q.all(permissionsPromises)
-                                 .then(function (permissions) {
-                                    // add the permissions to the master table of narratives keyed by workspace.
-                                    for (var i = 0; i < permissions.length; i++) {
-                                       var wsId = narrativeObjects[i].wsid;
-                                       var permissionsList = this.object_to_array(permissions[i], 'username', 'permission');
-                                       permissionsList = permissionsList.filter(function (x) {
-                                          if ( (x.username === sessionUsername) ||
-                                               (x.username === '*') ) {
-                                             // permissions for public are recorded as username '*'.
-                                             return false;
-                                          } else {
-                                             return true;
-                                          }
-                                       });
-                                       permissionsList = permissionsList.sort(function (a,b) {
-                                          if (a.username < b.username) {
-                                             return -1;
-                                          } else if (a.username > b.username) {
-                                             return 1;
-                                          } else {
-                                             return 0
-                                          }
-                                       });
-                                          
-                                       narrativesByWorkspace[wsId].permissions = permissionsList;
+                              });
+                              this.promise(this.workspaceClient, 'get_objects', workspaceIds)
+                                 .then(function (data) {
+                                    for (var i = 0; i < data.length; i++) {
+                                       // NB this has given us all of the objects in the relevant workspaces.
+                                       // Now we need to filter out just the narratives of interest
+                                       var wsObject = this.object_info_to_object(data[i].info);
+                                       // console.log(narrativesByWorkspace[wsObject.wsid].workspace.metadata.narrative + '=' + wsObject.id);
+                                       // NB: we use plain == for comparison since we need type convertion. The metadata.narrative
+                                       // is a string, but wsObject.id is a number.
+                                       if (narrativesByWorkspace[wsObject.wsid].workspace.metadata.narrative != wsObject.id) {
+                                          continue;
+                                       }
+                                       // Save the object in the map...
+                                       narrativesByWorkspace[wsObject.wsid].object = wsObject;
                                     }
-
-                                    // Now convert to an array in order to be sortable, and for rendering.
-                                    var narratives = [];
-                                    for (var i = 0; i < workspacesWithNarratives.length; i++) {
-                                       var wsId = workspacesWithNarratives[i];
-                                       if (!narrativesByWorkspace[wsId].object) {
-                                          console.log('WARNING: could not find narrative inside workspace: ' + wsId);
-                                       } else {
-                                          narratives.push(narrativesByWorkspace[wsId]);
-                                       } 
-                                    }
+                                    // Now add the objects back into the narratives list.
+                                    narratives.forEach(function (x) {
+                                       console.log(x);
+                                       x.object = narrativesByWorkspace[x.workspace.id].object;
+                                    });
                                     this.setState('narratives', narratives);
                                     resolve();
                                  }.bind(this))
                                  .catch(function (err) {
+                                    console.log('ERROR');
+                                    console.log(err);
                                     reject(err);
                                  })
                                  .done();
                            }.bind(this))
                            .catch(function (err) {
-                              console.log('ERROR');
-                              console.log(err);
                               reject(err);
                            })
                            .done();

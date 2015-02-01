@@ -361,6 +361,21 @@ define(['q'],
                   }
                }
             }
+         },
+
+         getJSON: {
+            value: function (path, timeout) {
+               // web just wrap the jquery ajax promise in a REAL Q promise.
+               // JQuery ajax config handles the json conversion.
+               // If we want more control, we could just handle the jquery promise
+               // first, and then return a promise.
+               return Q($.ajax(path, {
+                  type: 'GET',
+                  dataType: 'json',
+                  timeout: timeout || 10000,
+               }));
+
+            }
          }
 
 

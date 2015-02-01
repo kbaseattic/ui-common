@@ -362,6 +362,48 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 .controller('Dashboard', function($scope, $stateParams) {
     $scope.params = { 'kbCache' : kb }
     
+    // Try this.
+    // Get the layout template.
+    // Get the layout config
+    // Render the layout template
+    // Create and attache widgets, from the layout template
+    
+    /*
+    require(['jquery', 'nunjucks', 'kbaseutils'], function ($, nunjucks, Utils) {
+       var templateEnv = new nunjucks.Environment(new nunjucks.WebLoader('/functional-site/views/dashboard/templates'), {
+         'autoescape': false
+       });
+       // For now we just have a single standard layout.
+       var layout = templateEnv.getTemplate('layout.html');
+       
+       Utils.getJSON('/functional-site/views/dashboard/dashboard.json')
+       .then(function (data) {
+          var content = layout.render(data);
+          
+       }
+       
+       
+      
+       
+       this.templates.env.addFilter('kbmarkup', function(s) {
+         if (s) {
+              s = s.replace(/\n/g, '<br>');
+            }
+            return s;
+          });
+          // This is the cache of templates.
+          this.templates.cache = {};
+
+          // The context object is what is given to templates.
+          this.context = {};
+          this.context.env = {
+            widgetTitle: this.widgetTitle,
+            widgetName: this.widgetName,
+            docsite: this.getConfig('docsite')
+          };
+    });
+    */
+    
     
     // Set the styles for the user page
     $('<link>')
@@ -396,8 +438,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
       
       
     });
-    
-   
+     
 })
 
 .controller('NavTest', function($scope, $stateParams) {

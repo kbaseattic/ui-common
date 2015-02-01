@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json!functional-site/config.json'],
-   function (nunjucks, $, Q, Session, Utils, Postal, config) {
+define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofile', 'postal', 'json!functional-site/config.json'],
+   function (nunjucks, $, Q, Session, Utils, UserProfile, Postal, config) {
       "use strict";
       var DashboardWidget = Object.create({}, {
 
@@ -80,10 +80,42 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
                this.templates.env = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/dashboard/' + this.widgetName + '/templates'), {
                   'autoescape': false
                });
-               this.templates.env.addFilter('kbmarkup', function (s) {
-                  if (s) {
-                     s = s.replace(/\n/g, '<br>');
+               this.templates.env.addFilter('roleLabel', function (role) {
+                  if (this.listMaps['userRoles'][role]) {
+                     return this.listMaps['userRoles'][role].label;
+                  } else {
+                     return role;
                   }
+               }.bind(this));
+               this.templates.env.addFilter('userClassLabel', function (userClass) {
+                  if (this.listMaps['userClasses'][userClass]) {
+                     return this.listMaps['userClasses'][userClass].label;
+                  } else {
+                     return userClass;
+                  }
+               }.bind(this));
+               this.templates.env.addFilter('titleLabel', function (title) {
+                  if (this.listMaps['userTitles'][title]) {
+                     return this.listMaps['userTitles'][title].label;
+                  } else {
+                     return title;
+                  }
+               }.bind(this));
+                this.templates.env.addFilter('permissionLabel', function (permissionFlag) {
+                  if (this.listMaps['permissionFlags'][permissionFlag]) {
+                     return this.listMaps['permissionFlags'][permissionFlag].label;
+                  } else {
+                     return permissionFlag;
+                  }
+               }.bind(this));
+               // create a gravatar-url out of an email address and a 
+               // default option.
+               this.templates.env.addFilter('gravatar', function (email, size, rating, gdefault) {
+                  // TODO: http/https.
+                  return UserProfile.makeGravatarURL(email, size, rating, gdefault);
+               }.bind(this));
+               this.templates.env.addFilter('kbmarkup', function (s) {
+                  s = s.replace(/\n/g, '<br>');
                   return s;
                });
                // This is the cache of templates.
@@ -536,6 +568,9 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
                   this.places.title.html(this.widgetTitle);
                   this.places.content.html(this.renderTemplate('unauthorized'));
                }
+               if (this.afterRender) {
+                  this.afterRender();
+               }
                return this;
             }
          },
@@ -773,159 +808,95 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
 
          lists: {
             value: {
+               permissionFlags: [{
+                     id: 'r',
+                     label: 'Read',
+                     description: 'Read Only'
+                  },
+                  {
+                     id: 'w',
+                     label: 'Write',
+                     description: 'Read and Write'
+                  },
+                  {
+                     id: 'a',
+                     label: 'Admin',
+                     description: 'Read, Write, and Share'
+                  },
+                                 {
+                     id: 'n',
+                     label: 'None',
+                     description: 'No Access'
+                  }],
                userRoles: [{
-                  id: 'pi',
-                  label: 'Principal Investigator'
-          }, {
-                  id: 'gradstudent',
-                  label: 'Graduate Student'
-          }, {
-                  id: 'developer',
-                  label: 'Developer'
-          }, {
-                  id: 'tester',
-                  label: 'Tester'
-          }, {
-                  id: 'documentation',
-                  label: 'Documentation'
-          }, {
-                  id: 'general',
-                  label: 'General Interest'
-          }],
+                     id: 'pi',
+                     label: 'Principal Investigator'
+                  },
+                  {
+                     id: 'gradstudent',
+                     label: 'Graduate Student'
+                  },
+                  {
+                     id: 'developer',
+                     label: 'Developer'
+                  }, {
+                     id: 'tester',
+                     label: 'Tester'
+                  }, {
+                     id: 'documentation',
+                     label: 'Documentation'
+                  }, {
+                     id: 'general',
+                     label: 'General Interest'
+                  }],
                userClasses: [{
                   id: 'pi',
                   label: 'Principal Investigator'
-          }, {
+               }, {
                   id: 'gradstudent',
                   label: 'Graduate Student'
-          }, {
+               }, {
                   id: 'kbase-internal',
                   label: 'KBase Staff'
-          }, {
+               }, {
                   id: 'kbase-test',
                   label: 'KBase Test/Beta User'
-          }, {
+               }, {
                   id: 'commercial',
                   label: 'Commercial User'
-          }],
+               }],
                userTitles: [{
                   id: 'mr',
                   label: 'Mr.'
-          }, {
+               }, {
                   id: 'ms',
                   label: 'Ms.'
-          }, {
+               }, {
                   id: 'dr',
                   label: 'Dr.'
-          }, {
+               }, {
                   id: 'prof',
                   label: 'Prof.'
-          }],
+               }],
                gravatarDefaults: [{
                   id: 'mm',
                   label: 'Mystery Man - simple, cartoon-style silhouetted outline'
-          }, {
+               }, {
                   id: 'identicon',
                   label: 'Identicon - a geometric pattern based on an email hash'
-          }, {
+               }, {
                   id: 'monsterid',
                   label: 'MonsterID - generated "monster" with different colors, faces, etc'
-          }, {
+               }, {
                   id: 'wavatar',
                   label: 'Wavatar - generated faces with differing features and backgrounds'
-          }, {
+               }, {
                   id: 'retro',
                   label: 'Retro - 8-bit arcade-style pixelated faces'
-          }, {
+               }, {
                   id: 'blank',
                   label: 'Blank - A Blank Space'
-          }],
-               avatarColors: [{
-                  id: 'maroon',
-                  label: 'maroon',
-                  color: '#800000',
-                  textColor: '#FFF'
-          }, {
-                  id: 'red',
-                  label: 'red',
-                  color: '#ff0000',
-                  textColor: '#FFF'
-          }, {
-                  id: 'orange',
-                  label: 'orange',
-                  color: '#ffA500',
-                  textColor: '#FFF'
-          }, {
-                  id: 'yellow',
-                  label: 'yellow',
-                  color: '#ffff00',
-                  textColor: '#000'
-          }, {
-                  id: 'olive',
-                  label: 'olive',
-                  color: '#808000',
-                  textColor: '#FFF'
-          }, {
-                  id: 'purple',
-                  label: 'purple',
-                  color: '#800080',
-                  textColor: '#FFF'
-          }, {
-                  id: 'fuchsia',
-                  label: 'fuchsia',
-                  color: '#ff00ff',
-                  textColor: '#FFF'
-          }, {
-                  id: 'white',
-                  label: 'white',
-                  color: '#ffffff',
-                  textColor: '#000'
-          }, {
-                  id: 'lime',
-                  label: 'lime',
-                  color: '#00ff00',
-                  textColor: '#000'
-          }, {
-                  id: 'green',
-                  label: 'green',
-                  color: '#008000',
-                  textColor: '#FFF'
-          }, {
-                  id: 'navy',
-                  label: 'navy',
-                  color: '#000080',
-                  textColor: '#FFF'
-          }, {
-                  id: 'blue',
-                  label: 'blue',
-                  color: '#0000ff',
-                  textColor: '#FFF'
-          }, {
-                  id: 'aqua',
-                  label: 'aqua',
-                  color: '#00ffff',
-                  textColor: '#000'
-          }, {
-                  id: 'teal',
-                  label: 'teal',
-                  color: '#008080',
-                  textColor: '#FFF'
-          }, {
-                  id: 'black',
-                  label: 'black',
-                  color: '#000000',
-                  textColor: '#FFF'
-          }, {
-                  id: 'silver',
-                  label: 'silver',
-                  color: '#c0c0c0',
-                  textColor: '#000'
-          }, {
-                  id: 'gray',
-                  label: 'gray',
-                  color: '#808080',
-                  textColor: '#FFF'
-          }]
+               }]
 
 
             }
