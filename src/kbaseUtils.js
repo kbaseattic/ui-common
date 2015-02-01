@@ -74,6 +74,9 @@ define(['q'],
          promise: {
             value: function (client, method, arg1) {
                return Q.Promise(function (resolve, reject, notify) {
+                  if (!client[method]) {
+                     throw 'Invalid KBase Client call; method "' + method +'" not found in client "'+client.constructor+'"';
+                  }
                   client[method](arg1,
                      function (result) {
                         resolve(result);

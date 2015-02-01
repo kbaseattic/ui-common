@@ -1,5 +1,5 @@
-define(['dashboard_widget', 'kbasesession', 'kbaseworkspaceserviceclient', 'q'],
-    function (DashboardWidget, Session, WorkspaceService, Q) {
+define(['dashboard_widget', 'kbaseutils', 'kbasesession', 'kbc_Workspace', 'q'],
+    function (DashboardWidget, Utils, Session, WorkspaceService, Q) {
         "use strict";
         var widget = Object.create(DashboardWidget, {
             init: {
@@ -10,7 +10,7 @@ define(['dashboard_widget', 'kbasesession', 'kbaseworkspaceserviceclient', 'q'],
 
                     // Prepare templating.
                     this.templates.env.addFilter('dateFormat', function (dateString) {
-                        return this.niceElapsedTime(dateString);
+                        return Utils.niceElapsedTime(dateString);
                     }.bind(this));
 
                     return this;
@@ -104,8 +104,8 @@ define(['dashboard_widget', 'kbasesession', 'kbaseworkspaceserviceclient', 'q'],
                                             workspaceObjects.push(this.object_info_to_object(data[i]));
                                         }
                                         workspaceObjects = workspaceObjects.sort(function (a, b) {
-                                            var x = (this.iso8601ToDate(a.save_date)).getTime();
-                                            var y = (this.iso8601ToDate(b.save_date)).getTime();
+                                            var x = (Utils.iso8601ToDate(a.save_date)).getTime();
+                                            var y = (Utils.iso8601ToDate(b.save_date)).getTime();
                                             return ((x < y) ? 1 : ((x > y) ? -1 : 0));
                                         }.bind(this));
                                         this.setState('workspaceObjects', workspaceObjects);

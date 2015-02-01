@@ -1,4 +1,4 @@
-define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbaseworkspaceserviceclient', 'kbasesession', 'q'],
+define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbc_Workspace', 'kbasesession', 'q'],
    function ($, nunjucks, Utils, DashboardWidget, WorkspaceService, Session, Q) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
