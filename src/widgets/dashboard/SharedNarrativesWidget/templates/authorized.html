@@ -53,14 +53,16 @@
                  <span class="fa fa-info-circle"></span>
               </button>
            {% else %}
-              {{narrative.permissions|length}} users 
               {% if narrative.permissions|length > 0 %}
-              <select>
-                 {% for perm in narrative.permissions %} 
-                 <option value="{{perm.username}}">{{perm.username}} ({{perm.permission | permissionLabel }})</option>
-                 {% endfor %}
-              </select>
-              {% endif %}
+           {{ narrative.permissions | length }} user{% if narrative.permissions|length > 1 %}s{% endif %}
+           <select>
+              {% for perm in narrative.permissions %} 
+              <option value="{{perm.username}}">{{perm.username}} ({{perm.permission|permissionLabel}})</option>
+              {% endfor %}
+           </select>
+           {% else %}
+             nobody
+           {% endif %}
            {% endif %}
 		</td>
 		<td class="number">
