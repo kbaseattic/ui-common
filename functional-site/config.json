@@ -13,6 +13,11 @@
          "max-age": 5184000
        }
     },
+    "kbase_clients": {
+      "defaults": {
+        "timeout": 900000
+      }
+    },
     "docsite": {
       "url": "http://kbase.us",
       "about": "/about/what-is-kbase",
@@ -27,6 +32,11 @@
     "search_url": "https://search-dev.kbase.us/search/",
     "user_profile_url": "https://dev19.berkeley.kbase.us/services/user_profile/rpc",
     "login_url": "https://kbase.us/services/authorization/Sessions/Login",
+    "kbase_clients": {
+      "defaults": {
+        "timeout": 900000
+      }
+    },
     "session": {
       "cookie": {
          "max-age": 5184000
@@ -46,6 +56,11 @@
     "search_url": "https://search-dev.kbase.us/search/",
     "user_profile_url": "https://ev19.berkeley.kbase.us/services/user_profile/rpc",
     "login_url": "https://kbase.us/services/authorization/Sessions/Login",
+    "kbase_clients": {
+      "defaults": {
+        "timeout": 900000
+      }
+    },
     "session": {
       "cookie": {
          "max-age": 5184000

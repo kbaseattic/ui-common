@@ -653,12 +653,27 @@ var Feed = angular.module('FeedLoad', ['ngResource'])
     });
 */
 
+
+// TODO: We should not be making sync ajax calls. Rather the entire app should be run asynchronously so that any 
+// async procsses like fetching json can naturally be folded in.
 configJSON = $.parseJSON( $.ajax({url: "config.json", 
                              async: false, 
                              dataType: 'json'}).responseText );
 
 
+// The current configuration key is stored on the "setup" property.
+var currentConfig = configJSON[configJSON.setup];
 
+// Set a sane AJAX timeout. The primary target of this is for KBase service client calls, which are
+// make via jQuery's ajax api. The default value is 15 minutes, or 900,000 ms.
+// Note, however, that this will affect all jQuery ajax calls. There is no way around that until
+// the type compiler provides an api route to setting the timeout per ajax call. At that time we should
+// make the default timeout much lower, and allow service calls to set a longer timeout (or have configuration
+// settings per service).
+// http://api.jquery.com/jQuery.ajax/
+ $.ajaxSetup({
+   timeout: currentConfig.kbase_clients.defaults.timeout
+ });
 
 app.run(function ($rootScope, $state, $stateParams, $location) {
 
