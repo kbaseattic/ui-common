@@ -10,7 +10,7 @@
     "login_url": "https://kbase.us/services/authorization/Sessions/Login",
     "session": {
       "cookie": {
-         "max-age": 432000
+         "max-age": 5184000
        }
     },
     "docsite": {
@@ -29,7 +29,7 @@
     "login_url": "https://kbase.us/services/authorization/Sessions/Login",
     "session": {
       "cookie": {
-         "max-age": 432000
+         "max-age": 5184000
        }
     },
     "docsite": {
@@ -48,7 +48,7 @@
     "login_url": "https://kbase.us/services/authorization/Sessions/Login",
     "session": {
       "cookie": {
-         "max-age": 432000
+         "max-age": 5184000
        }
     },
     "docsite": {
