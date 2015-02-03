@@ -24,7 +24,9 @@
          </tr>
          <tr>
             <th>In Narrative</th>
-            <td><a href="">my narrative here</a></td>
+            {% if state.workspace.metadata.narrative %}            
+            <td><a href="/narrative/ws.{{state.workspace.id}}.obj.{{state.workspace.metadata.narrative}}" target="_blank">{{state.workspace.metadata.narrative_nice_name}}</a></td>
+            {% endif %}
          </tr>
           <tr>
             <th>Version</th>

@@ -198,7 +198,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                               id: this.getParam('workspaceId')
                            })
                            .then(function (data) {
-                              console.log('WS DATA'); console.log(data);
+                              console.log('WS DATA'); console.log(APIUtils.workspace_metadata_to_object(data));
                               this.setState('workspace', APIUtils.workspace_metadata_to_object(data));
                               
                               // Other narratives this user has.
