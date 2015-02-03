@@ -35,10 +35,9 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                   throw 'Object ID is required';
                }
 
+               // Version is optional
                if (this.hasConfig('objectVersion')) {
                   this.setParam('objectVersion', this.getConfig('objectVersion'));
-               } else {
-                  throw 'Object Version is required';
                }
 
 
@@ -187,15 +186,37 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                         } else {
                            this.setState('status', 'found');
                            var obj = APIUtils.object_info_to_object(data[0]);
+                           this.setState('object', obj);
                            console.log('OBJECT');
                            console.log(obj);
-                           this.setState('object', obj);
-                           resolve();
+                          
+                           
+                           // Get more info...
+                           
+                           // The narrative this lives in.
+                           Utils.promise(this.workspaceClient, 'get_workspace_info', {
+                              id: this.getParam('workspaceId')
+                           })
+                           .then(function (data) {
+                              console.log('WS DATA'); console.log(data);
+                              this.setState('workspace', APIUtils.workspace_metadata_to_object(data));
+                              
+                              // Other narratives this user has.
+
+                              
+                               resolve();
+                              
+                              
+                           }.bind(this))
+                           .catch(function (err) {
+                              reject(err);
+                           })
+                           .done();
                         }
                      }.bind(this))
                      .catch(function (err) {
-                        console.log('ERROR');
-                        console.log(err);
+                        //console.log('ERROR');
+                        //console.log(err);
 
                         if (err.status && err.status === 500) {
                            // User probably doesn't have access -- but in any case we can just tell them
@@ -206,7 +227,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                                  type: 'client',
                                  code: 'notfound',
                                  shortMessage: 'This object does not exist',
-                                 originalMessage: err.message
+                                 originalMessage: err.error.message
                               });
                            } else if (err.error.error.match(/^us.kbase.workspace.database.exceptions.InaccessibleObjectException:/)) {
                               this.setState('status', 'denied');
@@ -214,7 +235,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                                  type: 'client',
                                  code: 'denied',
                                  shortMessage: 'You do not have access to this object',
-                                 originalMessage: err.message
+                                 originalMessage: err.error.message
                               });
                            } else {
                               this.setState('status', 'error');
@@ -222,7 +243,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                                  type: 'client',
                                  code: 'error',
                                  shortMessage: 'An unknown error occured',
-                                 originalMessage: err.message
+                                 originalMessage: err.error.message
                               });
                            }
                            resolve();

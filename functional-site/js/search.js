@@ -284,10 +284,11 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
       $scope.$apply();
     });
     
-    postal.channel('session').subscribe('logout.success', function (session) {
+    /*postal.channel('session').subscribe('logout.success', function (session) {
       $state.go('search');
       $scope.$apply();
     });
+    */
     
     $scope.login = function() {
       postal.channel('loginwidget').publish('login.prompt');

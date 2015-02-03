@@ -10,12 +10,18 @@
     <tr>
       <th>Object Name</th>
       <th>Type</th>
-      <th>ver</th>
-      <th>Narratives</th>
-      <th>Shared</th>
-      <th>Copies</th>
+      <th>Version</th>
+      <th>In Narrative</th>
+       <!--
+      <th>In Your Narratives</th>
+      <th>In Shared</th>
+      <th>In Public</th>
+     
       <th>Views</th>
       <th>Runs</th>
+      
+      -->
+      <th>Version</th>
       <th>Last Modified</th>
     </tr>
   </thead>
@@ -31,10 +37,15 @@
     <td>{{object.typeName}}</td>
     <td>{{object.typeMajorVersion}}.{{object.typeMinorVersion}}</td>
     <td>x</td>
+    <!--
     <td>x</td>
     <td>x</td>
+     
     <td>x</td>
     <td>{{object.save_by}}</td>
+    
+    -->
+    <td>{{object.version}}</td>
     <td>{{object.save_date | dateFormat}}</td>
   </tr>
   {% endfor %}
