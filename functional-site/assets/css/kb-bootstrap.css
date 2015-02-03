@@ -1,0 +1,11 @@
+/* Use alongside btn-default, btn-primary etc. to provide a frameless, flat button.
+   NB: we are still utilizing the main bs button styles for basic color, hover, active
+   states, so btn-bare cannot be used on its own.
+*/
+.btn-bare {
+   background: none;
+   border-color: transparent;
+}
+.btn-bare:hover {
+   border-color: transparent;
+}

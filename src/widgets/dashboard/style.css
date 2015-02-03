@@ -9,3 +9,13 @@
 .-col.-span-4 {
 	width: 33.3333%;
 }
+
+.kbase-dashboard-view .table td.number {
+   text-align: right;
+   padding-right: 1em;
+}
+.kbase-dashboard-view .table td.date {
+   text-align: right;
+   padding-right: 1em;
+	
+}

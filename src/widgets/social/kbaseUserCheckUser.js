@@ -1,4 +1,4 @@
-require(['jquery', 'kbaseutils', 'kbasesession','kbaseuserprofileserviceclient', 'kbaseuserprofilewidget', 'json!functional-site/config.json'],
+require(['jquery', 'kbaseutils', 'kbasesession','kbc_UserProfile', 'kbaseuserprofilewidget', 'json!functional-site/config.json'],
 function ($, Utils, Session, UserProfileService, UserProfileWidget, Config) {
   /*
   If the user is logged in
