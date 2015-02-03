@@ -127,6 +127,67 @@
 	
 	// this is crazy, but for now we just hard code this - should be loaded from a config
 	type2widget: {
+	    /* COMMUNITIES */
+	    'Communities.Collection': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'Communities.FunctionalMatrix': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'Communities.FunctionalProfile': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'Communities.Heatmap': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'Communities.Metagenome': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'Communities.PCoA': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'Communities.TaxonomicMatrix': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'Communities.TaxonomicProfile': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    
+	    
+	    'GenomeComparison.ProteomeComparison': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    
+	    
+	    'KBaseAssembly.AssemblyReport': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    
+	    /* FBA RELATED THINGS */
+	    'KBaseBiochem.Media': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'KBaseFBA.FBA': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'KBaseFBA.FBAModel': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    
+	    
 	    'KBaseGenomes.Genome': {
 		widget:'kbaseJsonView',
 		noPanel:true,
