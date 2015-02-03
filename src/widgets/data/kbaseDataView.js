@@ -129,6 +129,7 @@
 	type2widget: {
 	    'KBaseGenomes.Genome': {
 		widget:'kbaseJsonView',
+		noPanel:true,
 		options: '{"id":???id,"ws":???ws}'
 	    },
 	    'KBaseTrees.Tree': {
@@ -161,7 +162,17 @@
 			console.log('loading viewer widget "'+config.widget+'" with options ',options);
 			var $widgetDiv = $('<div>');
 			var widget = $widgetDiv[config.widget](optionsObj);
-			return $widgetDiv;
+			if (config.noPanel) { return $widgetDiv; } // no panel, so assume widget takes care of everything
+			
+			// put this all in a panel
+			var $panel = $('<div>').addClass("panel panel-default")
+					.append($('<div>').addClass('panel-heading')
+						.append($('<span>').addClass('panel-title')
+							    .append('Data View')))
+					.append($('<div>').addClass('panel-body').append($widgetDiv));
+					
+				//css({'margin':'10px'});
+			return $panel;
 		    }
 		} else {
 		    console.log('Viewer config does not have properties "widget" and "options" for: ',obj_info);
