@@ -11,7 +11,8 @@
             genome_id: null,
             ws_name: null,
             kbCache: null,
-            loadingImage: "assets/img/ajax-loader.gif"
+            loadingImage: "assets/img/ajax-loader.gif",
+            genomeInfo: null
         },
         wsUrl: "https://kbase.us/services/ws/",
 
@@ -43,9 +44,7 @@
 
             var self = this;
             
-            $.when(prom).done($.proxy(function(data) {
-        		var gnm = data[0].data;
-            	
+            var showData = function(gnm) {
             	function showGenes() {
             		container.empty();
             		////////////////////////////// Genes Tab //////////////////////////////
@@ -143,12 +142,19 @@
             	} else {
             		showGenes();
             	}
-
-            }, this));
-            $.when(prom).fail($.proxy(function(data) {
+            };
+            if (self.options.genomeInfo) {
+            	showData(self.options.genomeInfo.data);
+            } else {
+            	$.when(prom).done($.proxy(function(data) {
+            		var gnm = data[0].data;
+            		showData(gnm);
+            	}, this));
+            	$.when(prom).fail($.proxy(function(data) {
             		container.empty();
             		container.append('<p>[Error] ' + data.error.message + '</p>');
-            }, this));
+            	}, this));
+            }
             return this;
         },
         

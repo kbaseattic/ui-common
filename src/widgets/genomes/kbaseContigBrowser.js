@@ -74,6 +74,7 @@
             workspaceId: null,
             genomeId: null,
             kbCache: null,
+            genomeInfo: null
         },
         
         $contigViewPanel : null,
@@ -381,6 +382,11 @@
                 this.options.contig = contigId;
             }
 
+            if (self.options.genomeInfo) {
+                self.showData(contigId, self.options.genomeInfo);
+                return;
+            }
+            
             var obj = this.buildObjectIdentity(this.options.workspaceId, this.options.genomeId);
 
             var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
@@ -393,77 +399,80 @@
                 // but the list of features is just that - a list. we'll need an api call, eventually, that
                 // can fetch the list of features in some range.
                 genome = genome[0];
-
-                if(self.options.centerFeature) {
-                    for (var i=0; i<genome.data.features.length; i++) {
-                        var f = genome.data.features[i];
-                        if (f.id === self.options.centerFeature) {
-                            if (f.location && f.location.length > 0) {
-                                self.options.contig = f.location[0][0];
-                                contigId = f.location[0][0];
-                            }
-                        }
-                    }
-                } else if (!self.options.contig) {
-                     if (genome.data.contig_ids && genome.data.contig_ids.length > 0) {
-                        self.options.contig = genome.data.contig_ids[0];
-                        contigId = self.options.contig;
-                    }
-                }
-                
-                
-                
-                this.contigLength = -1; // LOLOLOL.
-                // figure out contig length here, while cranking out the feature mapping.
-                if (genome.data.contig_ids && genome.data.contig_ids.length > 0) {
-                    var pos = $.inArray(contigId, genome.data.contig_ids);
-                    if (pos !== -1)
-                        this.contigLength = genome.data.contig_lengths[pos];
-                }
-                // indexed by first position.
-                // takes into account direction and such.
-                this.wsFeatureSet = {};
-                for (var i=0; i<genome.data.features.length; i++) {
-                    var f = genome.data.features[i];
-                    if (f.location && f.location.length > 0) {  // assume it has at least one valid 4-tuple
-                        if (f.location[0][0] === contigId) {
-                            var range = this.calcFeatureRange(f.location);
-                            // store the range in the feature!
-                            // this HURTS MY SOUL to do, but we need to make workspace features look like CDMI features.
-                            f.feature_id = f.id;
-			    f.feature_type = f.type;
-                            f.feature_location = f.location;
-                            f.range = range;
-                            f.feature_function = f.function;
-			    f.subsystem_data = f.subsystem_data;
-                            this.wsFeatureSet[f.id] = f;
-
-                            // if (!this.wsFeatureSet[range[0]])
-                            //     this.wsFeatureSet[range[0]] = [];
-                            // this.wsFeatureSet[range[0]].push(f);
-
-                            if (range[1] > this.contigLength)
-                                this.contigLength = range[1];
-                        }
-                    }
-                }
-
-                this.options.start = 0;
-                if (this.options.length > this.contigLength)
-                    this.options.length = this.contigLength;
-
-                if (this.options.centerFeature) {
-                    this.setCenterFeature();
-		    this.update(true);
-                }
-                else {
-                    this.update();
-                }
-
+                self.showData(contigId, genome);
             }, this));
 
         },
 
+        showData: function(contigId, genome) {
+        	var self = this;
+            if(self.options.centerFeature) {
+                for (var i=0; i<genome.data.features.length; i++) {
+                    var f = genome.data.features[i];
+                    if (f.id === self.options.centerFeature) {
+                        if (f.location && f.location.length > 0) {
+                            self.options.contig = f.location[0][0];
+                            contigId = f.location[0][0];
+                        }
+                    }
+                }
+            } else if (!self.options.contig) {
+                 if (genome.data.contig_ids && genome.data.contig_ids.length > 0) {
+                    self.options.contig = genome.data.contig_ids[0];
+                    contigId = self.options.contig;
+                }
+            }
+            
+            
+            
+            this.contigLength = -1; // LOLOLOL.
+            // figure out contig length here, while cranking out the feature mapping.
+            if (genome.data.contig_ids && genome.data.contig_ids.length > 0) {
+                var pos = $.inArray(contigId, genome.data.contig_ids);
+                if (pos !== -1)
+                    this.contigLength = genome.data.contig_lengths[pos];
+            }
+            // indexed by first position.
+            // takes into account direction and such.
+            this.wsFeatureSet = {};
+            for (var i=0; i<genome.data.features.length; i++) {
+                var f = genome.data.features[i];
+                if (f.location && f.location.length > 0) {  // assume it has at least one valid 4-tuple
+                    if (f.location[0][0] === contigId) {
+                        var range = this.calcFeatureRange(f.location);
+                        // store the range in the feature!
+                        // this HURTS MY SOUL to do, but we need to make workspace features look like CDMI features.
+                        f.feature_id = f.id;
+                        f.feature_type = f.type;
+                        f.feature_location = f.location;
+                        f.range = range;
+                        f.feature_function = f.function;
+                        f.subsystem_data = f.subsystem_data;
+                        this.wsFeatureSet[f.id] = f;
+
+                        // if (!this.wsFeatureSet[range[0]])
+                        //     this.wsFeatureSet[range[0]] = [];
+                        // this.wsFeatureSet[range[0]].push(f);
+
+                        if (range[1] > this.contigLength)
+                            this.contigLength = range[1];
+                    }
+                }
+            }
+
+            this.options.start = 0;
+            if (this.options.length > this.contigLength)
+                this.options.length = this.contigLength;
+
+            if (this.options.centerFeature) {
+                this.setCenterFeature();
+                this.update(true);
+            }
+            else {
+                this.update();
+            }
+        },
+        
         setCenterFeature : function(centerFeature) {
             // if we're getting a new center feature, make sure to update the operon features, too.
             if (centerFeature)

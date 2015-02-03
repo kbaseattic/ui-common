@@ -968,6 +968,13 @@ angular.module('lp-directives')
         }
     };
 })
+.directive('sortablegenomepage', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            $(ele).KBaseGenomePage({genomeID: scope.id, workspaceID: scope.ws});
+        }
+    };
+})
 
 /* END new placement in sortable rows for genome landing page */
 
