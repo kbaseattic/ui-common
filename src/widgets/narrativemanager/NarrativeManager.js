@@ -100,7 +100,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
                 console.log(ws_info);
                 
                 // 2 - create the Narrative object
-                var narObjs = self.buildNarrativeObjects(
+                var narObjs = self._buildNarrativeObjects(
                     ws_name, params.cells, params.parameters,
                     function(narrativeObject, metadataExternal) {
                         // 3 - save the Narrative object
@@ -115,65 +115,72 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                     provenance: [
                                         {
                                             script: "NarrativeManager.js",
-                                            description: "Created new Workspace/Narrative bundle."
+                                            description: "Created new " +
+                                                "Workspace/Narrative bundle."
                                         }
                                     ],
                                     hidden:0
                                 }]
                             },
                             function(obj_info_list) {
-                                console.log('saved narrative:');
-                                console.log(obj_info_list);
-                                // 4) better to keep the narrative perm id instead of the name
-                                self.ws.alter_workspace_metadata(
-                                    {wsi:{workspace:ws_name},new:{narrative:obj_info_list[0][0]+'',
-                                                                  is_temporary: 'true'}},
-                                    function() {},
-                                    function() {});
-                                
-                                var returnData = {ws_info:ws_info, nar_info: obj_info_list[0]};
-                                
-                                // 5) now we copy everything that we need
-                                if (params.importData != null &&
-                                        params.importData != false) {
-                                    var copyobjs = [];
-                                    for(var cj=0; cj<params.importData.length; cj++) {
-                                        copyobjs.push({ref:params.importData[cj]});
-                                    }
-                                    
-                                    // we need to get obj info so that we can preserve names.. annoying that ws doesn't do this!
-                                    self.ws.get_object_info(copyobjs,0,
-                                        function(infoList) {
-                                            var copyJobs = [];
-                                            for(var il=0; il<infoList.length; il++) {
-                                                copyJobs.push(
-                                                    self.ws.copy_object({
-                                                            from: { ref:params.importData[il] }, //!! assume same ordering
-                                                            to: { wsid:ws_info[0], name:infoList[il][1]  }
-                                                        },
-                                                        function(info) { console.log('copied'); console.log(info); },
-                                                        function(error){
-                                                            if (_error_callback) {
-                                                                _error_callback(error.error);
-                                                            }
-                                                        }
-                                                    )
-                                                )
-                                            }
-                                            $.when.apply($, copyJobs).done(function() {
-                                                _callback(returnData);
-                                            });
-                                        },
-                                        function(error) {
-                                            console.error(error);
-                                            if(_error_callback) {
-                                                _error_callback(error.error);
-                                            }
-                                        });
-                                    
-                                } else {
-                                    _callback(returnData);
-                                }
+                                self._complete_new_narrative(
+                                        ws_info,
+                                        obj_info_list[0],
+                                        params,
+                                        _callback,
+                                        _error_callback);
+//                                console.log('saved narrative:');
+//                                console.log(obj_info_list);
+//                                // 4) better to keep the narrative perm id instead of the name
+//                                self.ws.alter_workspace_metadata(
+//                                    {wsi:{workspace:ws_name},new:{narrative:obj_info_list[0][0]+'',
+//                                                                  is_temporary: 'true'}},
+//                                    function() {},
+//                                    function() {});
+//                                
+//                                var returnData = {ws_info:ws_info, nar_info: obj_info_list[0]};
+//                                
+//                                // 5) now we copy everything that we need
+//                                if (params.importData != null &&
+//                                        params.importData != false) {
+//                                    var copyobjs = [];
+//                                    for(var cj=0; cj<params.importData.length; cj++) {
+//                                        copyobjs.push({ref:params.importData[cj]});
+//                                    }
+//                                    
+//                                    // we need to get obj info so that we can preserve names.. annoying that ws doesn't do this!
+//                                    self.ws.get_object_info(copyobjs,0,
+//                                        function(infoList) {
+//                                            var copyJobs = [];
+//                                            for(var il=0; il<infoList.length; il++) {
+//                                                copyJobs.push(
+//                                                    self.ws.copy_object({
+//                                                            from: { ref:params.importData[il] }, //!! assume same ordering
+//                                                            to: { wsid:ws_info[0], name:infoList[il][1]  }
+//                                                        },
+//                                                        function(info) { console.log('copied'); console.log(info); },
+//                                                        function(error){
+//                                                            if (_error_callback) {
+//                                                                _error_callback(error.error);
+//                                                            }
+//                                                        }
+//                                                    )
+//                                                )
+//                                            }
+//                                            $.when.apply($, copyJobs).done(function() {
+//                                                _callback(returnData);
+//                                            });
+//                                        },
+//                                        function(error) {
+//                                            console.error(error);
+//                                            if(_error_callback) {
+//                                                _error_callback(error.error);
+//                                            }
+//                                        });
+//                                    
+//                                } else {
+//                                    _callback(returnData);
+//                                }
                                 
                             }, function (error) {
                                 console.error(error);
@@ -194,6 +201,63 @@ var NarrativeManager = function(options, auth, auth_cb) {
         );
     };
     
+    this._complete_new_narrative = function(ws_info, obj_info, params,
+            _callback, _error_callback) {
+        var self = this;
+        console.log('saved narrative:');
+        console.log(obj_info);
+        // 4) better to keep the narrative perm id instead of the name
+        self.ws.alter_workspace_metadata(
+            {wsi: {workspace: ws_info[1]},
+             'new': {narrative: obj_info[0] + '', is_temporary: 'true'}},
+            function() {}, //TODO wrap rest of fn here
+            function() {}); //TODO add error callback
+        
+        var returnData = {ws_info:ws_info, nar_info: obj_info};
+
+        // 5) now we copy everything that we need
+        if (params.importData != null &&
+                params.importData != false) {
+            var copyobjs = [];
+            for(var cj=0; cj<params.importData.length; cj++) {
+                copyobjs.push({ref:params.importData[cj]});
+            }
+//            
+            // we need to get obj info so that we can preserve names.. annoying that ws doesn't do this!
+            self.ws.get_object_info(copyobjs,0,
+                function(infoList) {
+                    var copyJobs = [];
+                    for(var il=0; il<infoList.length; il++) {
+                        copyJobs.push(self.ws.copy_object(
+                                {from: {ref: params.importData[il] }, //!! assume same ordering
+                                 to: {wsid:ws_info[0], name: infoList[il][1]}
+                                },
+                                function(info) {
+                                    console.log('copied');
+                                    console.log(info);
+                                },
+                                function(error){
+                                    if (_error_callback) {
+                                        _error_callback(error.error);
+                                    }
+                                }
+                            )
+                        )
+                    }
+                    $.when.apply($, copyJobs).done(function() {
+                        _callback(returnData);
+                    });
+                },
+                function(error) {
+                    console.error(error);
+                    if(_error_callback) {
+                        _error_callback(error.error);
+                    }
+                });
+        } else {
+            _callback(returnData);
+        }
+    }
     
     /* looks at the user workspaces, determines which was last modified, and
      * returns this object:
@@ -324,7 +388,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
     /* private method to setup the narrative object,
     returns [narrative, metadata]
     */
-    this.buildNarrativeObjects = function(ws_name, cells, parameters, _callback, _error_callback) {
+    this._buildNarrativeObjects = function(ws_name, cells, parameters, _callback, _error_callback) {
         var self = this;
         // first thing first- we need to grap the app/method specs
         self._getSpecs(cells,
