@@ -8,7 +8,8 @@
             genomeID: null,
             workspaceID: null,
             loadingImage: "assets/img/ajax-loader.gif",
-            kbCache: null
+            kbCache: null,
+            genomeInfo: null
         },
 
         init: function(options) {
@@ -27,10 +28,10 @@
             row.append(wikidescription);
             overview.KBaseGenomeOverview({genomeID: self.options.genomeID, 
             	workspaceID: self.options.workspaceID, kbCache: self.options.kbCache,
-                loadingImage: self.options.loadingImage});
+                loadingImage: self.options.loadingImage, genomeInfo: self.options.genomeInfo});
             wikidescription.KBaseWikiDescription({genomeID: self.options.genomeID, 
             	workspaceID: self.options.workspaceID, kbCache: self.options.kbCache,
-                loadingImage: self.options.loadingImage});
+                loadingImage: self.options.loadingImage, genomeInfo: self.options.genomeInfo});
         },
 
         getData: function() {

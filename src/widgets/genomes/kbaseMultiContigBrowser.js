@@ -183,7 +183,7 @@
             
             
             this.cdmiClient = new CDMI_API(this.cdmiURL);
-            this.proteinInfoClient = new ProteinInfo(this.proteinInfoURL);
+            //this.proteinInfoClient = new ProteinInfo(this.proteinInfoURL);
 
             var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
             var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
