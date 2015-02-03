@@ -27,7 +27,12 @@ angular.module('dataview')
 .directive('dataviewvisualizer', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            $(ele).html('Viz panel here');
+            
+            $(ele).KBaseDataViewGenericViz({
+                    objid: scope.params.objid,
+                    wsid: scope.params.wsid,
+                    ver: scope.params.ver
+                });
         }
     }; 
 });
