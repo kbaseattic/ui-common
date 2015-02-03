@@ -81,8 +81,6 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
          render: {
             value: function () {
                // The state.status property is used to switch to the appropriate view.
-               console.log('STATUS');
-               console.log(this.getState('status'));
                switch (this.getState('status')) {
                case 'found':
                   var name = this.getState('object.name');
@@ -93,8 +91,6 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                      
                   var dataRef = this.getState('object.wsid') + '/' + this.getState('object.id') + '/' + this.getState('object.version');
                      
-                     console.log('dataref'); console.log(dataRef);
-
                   Navbar.addButton({
                         name: 'copy',
                         label: '+ New Narrative',
@@ -185,15 +181,14 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                         includeMetadata: 1
                      })
                      .then(function (data) {
-                        //console.log('here');
                         if (!data || data.length === 0) {
                            this.setState('status', 'notfound');
                            resolve();
                         } else {
                            this.setState('status', 'found');
                            var obj = APIUtils.object_info_to_object(data[0]);
-                           //console.log('OBJECT');
-                           //console.log(obj);
+                           console.log('OBJECT');
+                           console.log(obj);
                            this.setState('object', obj);
                            resolve();
                         }

@@ -77,17 +77,25 @@ var app = angular.module('landing-pages',
         });
        
    // New landing pages route.
-   $stateProvider
-   .state('dataview', {
-      url: '/dataview/:wsid/:objid/:ver', 
+       /*
+       ', 
       params: {
          ver: {
             value: null
          }
       }, 
+       */
+   $stateProvider
+   .state('dataview', {
+      url: '/dataview/:wsid/:objid/:ver',
       templateUrl: 'views/dataview/dataview.html',
       controller: 'Dataview'
-   });
+   })
+    .state('dataview2', {
+      url: '/dataview/:wsid/:objid',
+      templateUrl: 'views/dataview/dataview.html',
+      controller: 'Dataview'
+   })
 
     // workspace browser routing
     $stateProvider

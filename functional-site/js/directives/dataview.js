@@ -14,7 +14,6 @@ angular.module('dataview')
            "use strict";
            require(['kb.widget.dataview.overview', 'jquery'], function (W, $) {
                 var widget = Object.create(W);
-              console.log(scope.params);
                 widget.init({
                     container: $(ele),
                     workspaceId: scope.params.wsid,
