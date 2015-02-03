@@ -709,17 +709,17 @@ angular.module('lp-directives')
     return {
         link: function(scope, ele, attrs) {
             if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
-            var p = $(ele).kbasePanel({title: 'Genome Overview',
+            var p = $(ele).kbasePanel({title: 'Overview',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
             // hack until search links directly to WS objects
-            $(p.body()).KBaseGenomeOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+            $(p.body()).KBaseGenomeWideOverview({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
                                             loadingImage: "assets/img/ajax-loader.gif"});
         }
     };
 })
-.directive('sortablegenomewikidescription', function($rootScope) {
+/*.directive('sortablegenomewikidescription', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
             var p = $(ele).kbasePanel({title: 'Description',
@@ -732,7 +732,7 @@ angular.module('lp-directives')
                                             loadingImage: "assets/img/ajax-loader.gif"});
         }
     };
-})
+})*/
 
 .directive('sortableimport', function($rootScope) {
     return {
@@ -745,6 +745,21 @@ angular.module('lp-directives')
             if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3";}
 
             $(p.body()).KBaseWSButtons({objNameOrId: scope.id, wsNameOrId: scope.ws});
+        }
+    };
+})
+
+.directive('sortablegenometaxonomy', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Taxonomy',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseGenomeWideTaxonomy({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
         }
     };
 })
@@ -774,106 +789,22 @@ angular.module('lp-directives')
 
             if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
 
-            var objectIdentity = { ref:scope.ws+"/"+scope.id };
-            kb.ws.list_referencing_objects([objectIdentity], function(data) {
-            	var treeName = null;
-            	for (var i in data[0]) {
-            		var objInfo = data[0][i]
-            		var wsName = objInfo[7];
-                    var objName = objInfo[1];
-                    var type = objInfo[2].split('-')[0];
-                	//console.log("Links: " + wsName + "(" + scope.ws + ")" + "/" + objName + ", " + type);
-                    if (wsName === scope.ws && type === "KBaseTrees.Tree") {
-                    	treeName = objName;
-                    	break;
-                    }
-            	}
-            	if (treeName) {
-                    $(p.body()).kbaseTree({treeID: treeName, workspaceID: scope.ws});           		
-            	} else {
-                    
-                    var createTreeNar = function() {
-                        $(p.body()).empty();
-                        $(p.body()).append("<b> creating your narrative, please hold on...<br>");
-                                        
-                        $.getJSON( "assets/data/speciesTreeNarrativeTemplate.json", function( data ) {
-                          
-                          var narData = data;
-                          // genome name
-                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param0'] = scope.id;
-                          // number
-                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param1'] = "20";
-                          // tree name
-                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param2'] = scope.id+".tree";
-                          narData["metadata"]["data_dependencies"] = [
-                            "KBaseGenomes.Genome "+scope.id
-                          ];
-                          var metadata = {};
-                          for (var key in narData["metadata"]) {
-                            metadata[key] = narData["metadata"][key];
-                          }
-                          if (metadata["data_dependencies"]) {
-                            metadata["data_dependencies"] = JSON.stringify(metadata["data_dependencies"]);
-                          }
-                          var objSaveData = {
-                            type:"KBaseNarrative.Narrative",
-                            data:narData,
-                            name:scope.id+".tree.narrative",
-                            meta:metadata,
-                            provenance:[]
-                          };
-                          var saveParams = {
-                            objects:[objSaveData]
-                          };
-                          if (/^\d+$/.exec(scope.ws))
-                            saveParams['id'] = scope.ws;
-                          else
-                            saveParams['workspace'] = scope.ws;
-                          
-                          kb.ws.save_objects(saveParams,
-                                    function(result) {
-                                        $(p.body()).empty();
-                                        $(p.body()).append("<b> Successfully created a new Narrative named "+result[0][1]+"!<br>");
-                                        window.location.href="/narrative/ws."+result[0][6]+".obj."+result[0][0];
-                                    },
-                                    function(error) {
-                                        $(p.body()).empty();
-                                        $(p.body()).append("<b>Unable to create Narrative.</b>  You probably do not have write permissions to this workspace.</b><br><br>");
-                                        
-                                        $(p.body()).append("You should copy this Genome to a workspace that you have access to, and build a species tree there.<br><br>");
-                                        $(p.body()).append("<i>Error was:</i><br>"+error.error.message+"<br><br>");
-                                    });
-                          
-                        });
-                    }
-                    
-                    var $buildNarPanel = $("<div>").append($("<button>")
-                           .addClass("btn btn-primary")
-                           .append("Launch Species Tree Building Narrative")
-                           .attr("type", "button")
-                           .on("click", 
-                               function(event) {
-                                   createTreeNar();
-                               })
-                           );
-                    
-                    $(p.body())
-                        .append('<b>There are no species trees created for this genome, but you can use the Narrative to build a new species tree of closely related genomes.</b>');
-                        
-                    $(p.body()).append("<br><br>");
-                    $(p.body()).append($buildNarPanel);
-                    $(p.body()).append("<br><br>");
-            	}
-            },
-            function(error) {
-        		var err = '<b>Sorry!</b>  Error retreiveing species trees info';
-        		if (typeof error === "string") {
-                    err += ": " + error;
-        		} else if (error.error && error.error.message) {
-                    err += ": " + error.error.message;
-        		}
-                $(p.body()).append(err);
-            });
+            
+        }
+    };
+})
+
+.directive('sortablegenomeassemannot', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'Assembly and Annotation',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseGenomeWideAssemAnnot({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+                                            loadingImage: "assets/img/ajax-loader.gif"});
         }
     };
 })
@@ -1021,6 +952,19 @@ angular.module('lp-directives')
             // hack until search links directly to WS objects
             if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
             $(p.body()).KBaseWSObjGraphCenteredView({objNameOrId: scope.id, wsNameOrId: scope.ws, kbCache: kb});
+        }
+    };
+})
+.directive('sortablegenomecommunity', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            var p = $(ele).kbasePanel({title: 'KBase Community',
+                                           rightLabel: scope.ws,
+                                           subText: scope.id});
+            p.loading();
+            // hack until search links directly to WS objects
+            if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
+            $(p.body()).KBaseGenomeWideCommunity({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb});
         }
     };
 })
