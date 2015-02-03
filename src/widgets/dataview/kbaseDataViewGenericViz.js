@@ -33,6 +33,9 @@
         init: function(options) {
             this._super(options);
 	    
+	    // first initialize the type to widget config
+	    this.setupType2Widget();
+	    
 	    // abort and do nothing
 	    if (!options.objid || !options.wsid ) {
 		console.log('in kbaseDataViewGenericViz widget, objid or wsid param was null, options: ',options);
@@ -105,124 +108,117 @@
                     },
                     function(error) {
 			console.error(error);
-                        if(self.options.title) { self.options.title.html(self.options.objref); }
-                        self.showError(error);
                     }
 		);
 	    }
 	},
 
 	
+	type2widget: {},
 	
-	// this is crazy, but for now we just hard code this - should be loaded from a config
-	// widget : widget to use to render
-	// options : what to pass to the widget
-	// noPanel : set to true to give control of everything to the widget
-	type2widget: {
+	setupType2Widget: function() {
+	    var self = this;
 	    
-	    'Communities.Collection': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'Communities.FunctionalMatrix': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'Communities.FunctionalProfile': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'Communities.Heatmap': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    /* NEEDS A COMPLEX LANDING PAGE */
-	    'Communities.Metagenome': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'Communities.PCoA': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'Communities.TaxonomicMatrix': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'Communities.TaxonomicProfile': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
+	    // all the modeling types have the same config
+	    var modelingConfig = {
+		    widget:'kbaseTabTable',
+		    options: '{"obj":???id,"ws":???ws,"type":"???type"}'
+		};
 	    
-	    
-	    'GenomeComparison.ProteomeComparison': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    
-	    'KBaseAssembly.AssemblyReport': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    
-	    /* NEEDS A COMPLEX LANDING PAGE */
-	    'KBaseBiochem.Media': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'KBaseFBA.FBA': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    
-	    /* NEEDS A COMPLEX LANDING PAGE */
-	    'KBaseFBA.FBAModel': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    
-	    
-	    'KBaseGeneDomains.DomainAnnotation': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    
-	    'KBaseGenomes.ContigSet': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'KBaseGenomes.MetagenomeAnnotation': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'KBaseGenomes.Pangenome': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'KBaseGenomes.PhenotypeSet': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'KBaseGenomes.PhenotypeSimulationSet': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'KBaseSearch.GenomeSet': {
-		widget:'kbaseJsonView',
-		options: '{"id":???id,"ws":???ws}'
-	    },
-	    'KBaseTrees.Tree': {
-		widget:'kbaseTree',
-		options: '{"treeID":???id,"workspaceID":???ws,"treeObjVer":???ver,"loadingImage":"???loadingImage"}'
-	    },
-	    
-	    /* COMPLEX LANDING PAGE */
-	    'KBaseGenomes.Genome': {
-		widget:'KBaseGenomePage',
-		noPanel:true,
-		options: '{"genomeID":???id,"workspaceID":???ws,"loadingImage":"???loadingImage"}'
-	    },
+	    // this is crazy, but for now we just hard code this - should be loaded from a config
+	    // widget : widget to use to render
+	    // options : what to pass to the widget
+	    // noPanel : set to true to give control of everything to the widget
+	    self.type2widget = {
+		
+		'Communities.Collection': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		'Communities.FunctionalMatrix': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		'Communities.FunctionalProfile': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		'Communities.Heatmap': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		/* NEEDS A COMPLEX LANDING PAGE */
+		'Communities.Metagenome': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		'Communities.PCoA': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		'Communities.TaxonomicMatrix': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		'Communities.TaxonomicProfile': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		
+		
+		'GenomeComparison.ProteomeComparison': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		
+		'KBaseAssembly.AssemblyReport': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		
+		/* STILL NEEDS A MORE COMPLEX LANDING PAGE */
+		'KBaseBiochem.Media': modelingConfig,
+		'KBaseFBA.FBA': modelingConfig,
+		
+		/* STILL NEEDS A COMPLEX LANDING PAGE */
+		'KBaseFBA.FBAModel': modelingConfig,
+		
+		'KBaseGeneDomains.DomainAnnotation': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		
+		'KBaseGenomes.ContigSet': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		'KBaseGenomes.MetagenomeAnnotation': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		'KBaseGenomes.Pangenome': {
+		    widget:'kbaseJsonView',
+		    options: '{"id":???id,"ws":???ws}'
+		},
+		
+		'KBasePhenotypes.PhenotypeSet': modelingConfig,
+		'KBasePhenotypes.PhenotypeSimulationSet': modelingConfig,
+		'KBaseSearch.GenomeSet': modelingConfig,
+		
+		'KBaseTrees.Tree': {
+		    widget:'kbaseTree',
+		    options: '{"treeID":???id,"workspaceID":???ws,"treeObjVer":???ver,"loadingImage":"???loadingImage"}'
+		},
+		
+		/* COMPLEX LANDING PAGE */
+		'KBaseGenomes.Genome': {
+		    widget:'KBaseGenomePage',
+		    noPanel:true,
+		    options: '{"genomeID":???id,"workspaceID":???ws,"loadingImage":"???loadingImage"}'
+		},
+	    };
 	},
+	
 	
 	getVizWidgetDiv: function(obj_info, type2widget) {
 	    var type = obj_info[2].split('-')[0];
@@ -242,7 +238,7 @@
 		    try {
 			optionsObj = JSON.parse(options);
 		    } catch(err) {
-			console.log('loading viewer widget "'+config.widget+'" with unparsable options: ', options, err);
+			console.error('loading viewer widget "'+config.widget+'" with unparsable options: ', options, err);
 		    }
 		    if (optionsObj) {
 			console.log('loading viewer widget "'+config.widget+'" with options ',options);
@@ -261,22 +257,14 @@
 			return $panel;
 		    }
 		} else {
-		    console.log('Viewer config does not have properties "widget" and "options" for: ',obj_info);
+		    console.error('Viewer config does not have properties "widget" and "options" for: ',obj_info);
 		}
 	    } else {
 		console.log('No default viewer configured for: ',obj_info);
 	    }
 	    // no viewer found or there was a bad config, so don't show anything
 	    return $('<div>');
-	},
-	
-        showError: function(error) {
-            this.$errorPanel.empty();
-            this.$errorPanel.append('<strong>Error when retrieving data.</strong><br><br>');
-            this.$errorPanel.append(error.error.message);
-            this.$errorPanel.append('<br>');
-            this.$errorPanel.show();
-        }
+	}
 	
     });
 })( jQuery );
