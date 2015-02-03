@@ -1039,11 +1039,12 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
           if (this.isOwner()) {
             // For now the user profile is available through the login widget, not the session.
             this.places.title.html('You - ' + this.userProfile.getProp('user.realname') + ' (' + this.userProfile.getProp('user.username') + ')');
+             
             NAVBAR.setTitle('Viewing your profile');
             NAVBAR.clearButtons();
             NAVBAR.addButton({
               name: 'edit', 
-              xlabel: 'Edit',
+              label: 'Edit',
               style: 'primary',
               icon: 'edit',
               callback: function () {
@@ -1053,7 +1054,7 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
             });
             NAVBAR.addDropdown({
               place: 'end',
-              name: 'options', style: 'default', icon: null, label: 'Options',
+              name: 'options', style: 'default', icon: 'gears', label: 'Options',
               items: [
                {name: 'changepassword', icon: 'key', label: 'Change Password', 
                 url: 'https://gologin.kbase.us/account/ChangePassword', external: true},
@@ -1186,7 +1187,7 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
           NAVBAR.clearButtons();
           NAVBAR.addButton({
             name: 'save', 
-            xlabel: 'Save',
+            label: 'Save',
             style: 'primary',
             icon: 'save',
             disabled: true,
@@ -1207,7 +1208,7 @@ define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuser
           });
           NAVBAR.addButton({
             name: 'cancel', 
-            xlabel: 'Cancel',
+            label: 'Cancel',
             style: 'default',
             icon: 'ban',
             callback: function () {
