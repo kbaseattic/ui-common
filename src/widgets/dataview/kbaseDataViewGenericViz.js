@@ -119,7 +119,7 @@
 	// options : what to pass to the widget
 	// noPanel : set to true to give control of everything to the widget
 	type2widget: {
-	    /* COMMUNITIES */
+	    
 	    'Communities.Collection': {
 		widget:'kbaseJsonView',
 		options: '{"id":???id,"ws":???ws}'
@@ -136,6 +136,7 @@
 		widget:'kbaseJsonView',
 		options: '{"id":???id,"ws":???ws}'
 	    },
+	    /* NEEDS A COMPLEX LANDING PAGE */
 	    'Communities.Metagenome': {
 		widget:'kbaseJsonView',
 		options: '{"id":???id,"ws":???ws}'
@@ -159,13 +160,12 @@
 		options: '{"id":???id,"ws":???ws}'
 	    },
 	    
-	    /* ASSEMBLY RELATED THINGS */
 	    'KBaseAssembly.AssemblyReport': {
 		widget:'kbaseJsonView',
 		options: '{"id":???id,"ws":???ws}'
 	    },
 	    
-	    /* FBA RELATED THINGS */
+	    /* NEEDS A COMPLEX LANDING PAGE */
 	    'KBaseBiochem.Media': {
 		widget:'kbaseJsonView',
 		options: '{"id":???id,"ws":???ws}'
@@ -174,21 +174,54 @@
 		widget:'kbaseJsonView',
 		options: '{"id":???id,"ws":???ws}'
 	    },
+	    
+	    /* NEEDS A COMPLEX LANDING PAGE */
 	    'KBaseFBA.FBAModel': {
 		widget:'kbaseJsonView',
 		options: '{"id":???id,"ws":???ws}'
 	    },
 	    
 	    
-	    'KBaseGenomes.Genome': {
-		widget:'KBaseGenomePage',
-		noPanel:true,
-		options: '{"genomeID":???id,"workspaceID":???ws}'
+	    'KBaseGeneDomains.DomainAnnotation': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    
+	    'KBaseGenomes.ContigSet': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'KBaseGenomes.MetagenomeAnnotation': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'KBaseGenomes.Pangenome': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'KBaseGenomes.PhenotypeSet': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'KBaseGenomes.PhenotypeSimulationSet': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
+	    },
+	    'KBaseSearch.GenomeSet': {
+		widget:'kbaseJsonView',
+		options: '{"id":???id,"ws":???ws}'
 	    },
 	    'KBaseTrees.Tree': {
 		widget:'kbaseTree',
 		options: '{"treeID":???id,"workspaceID":???ws,"treeObjVer":???ver,"loadingImage":"???loadingImage"}'
-	    }
+	    },
+	    
+	    /* COMPLEX LANDING PAGE */
+	    'KBaseGenomes.Genome': {
+		widget:'KBaseGenomePage',
+		noPanel:true,
+		options: '{"genomeID":???id,"workspaceID":???ws,"loadingImage":"???loadingImage"}'
+	    },
 	},
 	
 	getVizWidgetDiv: function(obj_info, type2widget) {
