@@ -160,17 +160,19 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 
                            .then(function (narratives) {
                               var workspaceIds = narratives.map(function (x) {
                                  return {
-                                    wsid: x.workspace.id,
-                                    objid: parseInt(x.workspace.metadata.narrative)
+                                    ref: x.workspace.id + '/' + x.workspace.metadata.narrative
                                  }
                               });
-                              this.promise(this.workspaceClient, 'get_objects', workspaceIds)
+                              this.promise(this.workspaceClient, 'get_object_info_new',
+                                           { objects: workspaceIds, ignoreErrors: 1, includeMetadata: 1})
                                  .then(function (data) {
-                                 console.log('DATA'); console.log(data);
+                                 //console.log('DATA'); console.log(data);
                                     for (var i = 0; i < data.length; i++) {
+                                       if (!data[i]) { continue; } // can't find the narrative, just skip
+                                       
                                        // NB this has given us all of the objects in the relevant workspaces.
                                        // Now we need to filter out just the narratives of interest
-                                       var wsObject = APIUtils.object_info_to_object(data[i].info);
+                                       var wsObject = APIUtils.object_info_to_object(data[i]);
                                        // console.log(narrativesByWorkspace[wsObject.wsid].workspace.metadata.narrative + '=' + wsObject.id);
                                        // NB: we use plain == for comparison since we need type convertion. The metadata.narrative
                                        // is a string, but wsObject.id is a number.
@@ -182,7 +184,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 
                                     }
                                     // Now add the objects back into the narratives list.
                                     narratives.forEach(function (x) {
-                                       console.log(x);
+                                       //console.log(x);
                                        x.object = narrativesByWorkspace[x.workspace.id].object;
                                     });
                                     this.setState('narratives', narratives);
