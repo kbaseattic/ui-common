@@ -1,18 +1,12 @@
-
-
 /*  Controllers
  *
  *  These are the 'glue' between models and views.
  *  See: https://docs.angularjs.org/guide/controller
  *  
 */
-
-
-app.controller('methodAccordion', function ($scope, narrative, $http) {
-
-
+app
+.controller('methodAccordion', function ($scope, narrative, $http) {
 })
- 
 .controller('Analysis', function($scope, $state, $stateParams, $location, narrative, $http) {
     // service for narrative (builder) state
     $scope.narrative = narrative;
@@ -330,19 +324,29 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
         type: 'divider'
       })
       .addHelpMenuItem({
+        name: 'featurerequest',
+        label: 'Request Feature',
+        external: true,
+        icon: 'thumbs-o-up',
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=2&priority=4&components=10108&assignee=eapearson&summary=Feature%20Request%20on%20User%20Page'
+      })
+      .addHelpMenuItem({
+        name: 'bugreport',
+        label: 'Report BUG',
+        icon: 'bug',
+        external: true,
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&priority=3&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
+      });
+      
+      /*
+      .addHelpMenuItem({
         name: 'navtest',
         label: 'Navbar Test',
         icon: 'bug',
         url: '#/navtest/x'
       })
-      .addHelpMenuItem({
-        name: 'bugreport',
-        label: 'New JIRA Ticket',
-        icon: 'bug',
-        external: true,
-        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
-      });
-      
+      */
+    
       
     });
     
@@ -352,12 +356,54 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 .controller('Dashboard', function($scope, $stateParams) {
     $scope.params = { 'kbCache' : kb }
     
+    // Try this.
+    // Get the layout template.
+    // Get the layout config
+    // Render the layout template
+    // Create and attache widgets, from the layout template
+    
+    /*
+    require(['jquery', 'nunjucks', 'kbaseutils'], function ($, nunjucks, Utils) {
+       var templateEnv = new nunjucks.Environment(new nunjucks.WebLoader('/functional-site/views/dashboard/templates'), {
+         'autoescape': false
+       });
+       // For now we just have a single standard layout.
+       var layout = templateEnv.getTemplate('layout.html');
+       
+       Utils.getJSON('/functional-site/views/dashboard/dashboard.json')
+       .then(function (data) {
+          var content = layout.render(data);
+          
+       }
+       
+       
+      
+       
+       this.templates.env.addFilter('kbmarkup', function(s) {
+         if (s) {
+              s = s.replace(/\n/g, '<br>');
+            }
+            return s;
+          });
+          // This is the cache of templates.
+          this.templates.cache = {};
+
+          // The context object is what is given to templates.
+          this.context = {};
+          this.context.env = {
+            widgetTitle: this.widgetTitle,
+            widgetName: this.widgetName,
+            docsite: this.getConfig('docsite')
+          };
+    });
+    */
+    
     
     // Set the styles for the user page
     $('<link>')
     .appendTo('head')
     .attr({type: 'text/css', rel: 'stylesheet'})
-    .attr('href', 'views/dashboard/dashboard/style.css');
+    .attr('href', 'views/dashboard/style.css');
     
     // Set up the navbar menu
     require(['kbasenavbar'], function (NAVBAR) {
@@ -369,24 +415,24 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
         type: 'divider'
       })
       .addHelpMenuItem({
-        name: 'navtest',
-        label: 'Navbar Test',
-        icon: 'bug',
-        url: '#/navtest/x'
+        name: 'featurerequest',
+        label: 'Request Feature',
+        external: true,
+        icon: 'thumbs-o-up',
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=2&priority=4&components=10108&assignee=eapearson&summary=Feature%20Request%20on%20UDashboard'
       })
       .addHelpMenuItem({
         name: 'bugreport',
-        label: 'New JIRA Ticket',
+        label: 'Report BUG',
         icon: 'bug',
         external: true,
-        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&priority=3&components=10108&assignee=eapearson&summary=Bug%20on%20Dashboard'
       })
       .setTitle('Dashboard');
       
       
     });
-    
-   
+     
 })
 
 .controller('NavTest', function($scope, $stateParams) {
@@ -453,6 +499,14 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 
 .controller('Login', function($scope, $stateParams, $location, kbaseLogin, $modal) {
+    
+    // If we are logged in and landing here we redirect to the dashboard.
+    // I guess we can use the supplied kbaseLogin...
+    if ($.KBaseSessionSync.isLoggedIn()) {
+        $location.path('/dashboard');
+        return;
+    }
+    
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives
     
     $scope.nextPath = $stateParams.nextPath;

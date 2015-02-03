@@ -1,4 +1,4 @@
-define(['kbasesocialwidget', 'kbaseuserprofileserviceclient', 'kbasesession'], 
+define(['kbasesocialwidget', 'kbc_UserProfile', 'kbasesession'], 
 function (SocialWidget, UserProfileService, Session) {
   "use strict";
   var widget = Object.create(SocialWidget, {

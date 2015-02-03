@@ -1,0 +1,105 @@
+<div class="collapse" id="{{env.widgetName}}-more-info-{{env.instanceId}}">
+   <div class="well">
+      <p>This panel shows an Overview of this data object.</p>
+   </div>
+</div>
+
+<div class="row">
+   <div class="col-sm-6">
+
+      <table class="table table-striped">
+         <tr>
+            <th>Name</th>
+            <td>{{state.object.name}}</td>
+         </tr>
+         <tr>
+            <th>In Narrative</th>
+            <td></td>
+         </tr>
+         <tr>
+            <th>Type</th>
+            <td>{{state.object.typeName}}</td>
+         </tr>
+         <tr>
+            <th>Version</th>
+            <td>{{state.object.typeMajorVersion}}.{{state.object.typeMinorVersion}}</td>
+         </tr>
+         <tr>
+            <th>Imported on</th>
+            <td>{{state.object.save_date|dateFormat}}</td>
+         </tr>
+         <tr>
+            <th>Size</th>
+            <td>{{state.object.size|fileSizeFormat}}</td>
+         </tr>
+
+         <tr>
+            <th>Permanent Ref</th>
+            <td>{{state.object.wsid}}/{{state.object.id}}/{{state.object.version}}</td>
+         </tr>
+         <tr>
+            <th>Permalink</th>
+            <td><a href="/functional-site/#/dataview/{{state.object.wsid}}/{{state.object.id}}/{{state.object.version}}">{{state.object.wsid}}/{{state.object.id}}/{{state.object.version}}</a>
+            </td>
+         </tr>
+      </table>
+   </div>
+   <div class="col-sm-6">
+
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+         <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingOne">
+               <h4 class="panel-title">
+                  <span data-toggle="collapse" data-parent="#accordion"  data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne" class="collapsed">
+                     <span class="fa angle-right"></span>Raw Metadata
+                  </span>
+               </h4>
+            </div>
+
+            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+               <div class="panel-body">
+                  <table class="table table-striped">
+                    
+                     {% for key,value in state.object.metadata|dictsort %}
+                     <tr>
+                        <th>{{key}}</th>
+                        <td>{{value}}</td>
+                     </tr>
+                     {% endfor %}
+                    
+                  </table>
+               </div>
+            </div>
+         </div>
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingTwo">
+               <h4 class="panel-title">
+                  <span data-toggle="collapse" data-parent="#accordion"  data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" class="collapsed">
+                     <span class="fa angle-right"></span>Versions
+                  </span>
+               </h4>
+            </div>
+
+            <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+               <div class="panel-body">
+                  <table class="table table-striped">
+                    
+                    
+                     <tr>
+                        <th>Version</th>
+                        <th>Date</th>
+                        <th>Size</th>
+                     </tr>
+                    
+                    
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="col-sm-4">
+
+
+   </div>
+</div>
