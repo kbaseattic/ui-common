@@ -13,16 +13,32 @@
             <td>{{state.object.name}}</td>
          </tr>
          <tr>
-            <th>In Narrative</th>
-            <td></td>
-         </tr>
-         <tr>
             <th>Type</th>
-            <td>{{state.object.typeName}}</td>
+            <td>{{state.object.typeName}}
+            </td>
          </tr>
          <tr>
             <th>Version</th>
-            <td>{{state.object.typeMajorVersion}}.{{state.object.typeMinorVersion}}</td>
+            <td>{{state.object.typeMajorVersion}}.{{state.object.typeMinorVersion}}
+            </td>
+         </tr>
+         <tr>
+            <th>In Narrative</th>
+            <td><a href="">my narrative here</a></td>
+         </tr>
+          <tr>
+            <th>Version</th>
+            <td>{{state.object.version}}
+                  {% if not params.objectVersion  %} 
+              <div class="alert alert-warning">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                           <span aria-hidden="true">&times;</span>
+                        </button>
+                        The version was not specified -- showing the most recent version
+                     </div>
+               {% endif %}
+             
+            </td>
          </tr>
          <tr>
             <th>Imported on</th>

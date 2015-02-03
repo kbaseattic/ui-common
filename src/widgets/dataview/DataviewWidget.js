@@ -417,6 +417,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
                  */
 
                // We need to ensure that the context reflects the current auth state.
+               this.context.params = this.params;
                this.context.env.generatedId = this.genId();
                this.context.env.loggedIn = Session.isLoggedIn();
                if (Session.isLoggedIn()) {
