@@ -18,10 +18,10 @@
             loadingImage: "assets/img/ajax-loader.gif"
         },
 
-	objref:null,
+        objref:null,
 	
         ws: null, // the ws client
-	loggedIn: false,
+        loggedIn: false,
 
         $mainPanel: null,
         $errorPanel: null,
@@ -33,90 +33,90 @@
         init: function(options) {
             this._super(options);
 	    
-	    // first initialize the type to widget config
-	    this.setupType2Widget();
+		    // first initialize the type to widget config
+            this.setupType2Widget();
 	    
-	    // abort and do nothing
-	    if (!options.objid || !options.wsid ) {
-		console.log('in kbaseDataViewGenericViz widget, objid or wsid param was null, options: ',options);
-		return this;
-	    }
+	  	    // abort and do nothing
+            if (!options.objid || !options.wsid ) {
+                console.log('in kbaseDataViewGenericViz widget, objid or wsid param was null, options: ',options);
+                return this;
+            }
 	    
-	    this.objref = options.wsid + '/' + options.objid;
-	    if (options.ver) {
-		this.objref = this.objref + '/' + options.ver;
-	    }
-	    console.log(this.objref,options);
+            this.objref = options.wsid + '/' + options.objid;
+            if (options.ver) {
+                this.objref = this.objref + '/' + options.ver;
+            }
+            console.log(this.objref,options);
 	    
             this.$mainPanel = $("<div>");
             this.$elem.append(this.$mainPanel);
 	    
-	    if (!this.auth.token) {
-		this.ws = new Workspace(this.options.ws_url);
-		this.loggedIn = false;
-	    } else {
-		console.log(this.auth);
-		this.ws = new Workspace(this.options.ws_url, this.auth);
-		this.loggedIn = true;
-	    }
-	    this.getInfoAndRender();
+            if (!this.auth.token) {
+                this.ws = kb.ws;  //new Workspace(this.options.ws_url);
+                this.loggedIn = false;
+            } else {
+                console.log(this.auth);
+                this.ws = new Workspace(this.options.ws_url, this.auth);
+                this.loggedIn = true;
+            }
+            this.getInfoAndRender();
 	    
             return this;
         },
 
         loggedInCallback: function(event, auth) {
-            this.ws = new Workspace(this.options.ws_url, auth);
-	    this.refresh();
+            //this.ws = new Workspace(this.options.ws_url, auth);
+            //this.refresh();
             return this;
         },
         loggedOutCallback: function(event, auth) {
-            this.ws = null;
-	    this.refresh();
+            //this.ws = null;
+            //this.refresh();
             return this;
         },
 
         refresh: function() {
-	    this.getInfoAndRender();
+            this.getInfoAndRender();
         },
 
         getInfoAndRender: function() {
-	    var self = this;
-	    if (self.ws) {
-		self.ws.get_object_info(
-                    [{ref:self.objref}],1,
+            var self = this;
+            if (self.ws) {
+                self.ws.get_object_info_new({objects:[{ref:self.objref}],includeMetadata:1},
                     function(objInfoList) {
+                        console.log(objInfoList);
                         if (objInfoList[0]) {
-			    var obj_info = objInfoList[0];
-			    self.objData = {
-				obj_id: obj_info[0],
-				name: obj_info[1],
-				type: obj_info[2],
-				save_date: obj_info[3],
-				version: obj_info[4],
-				saved_by: obj_info[5],
-				wsid: obj_info[6],
-				workspace: obj_info[7],
-				chsum: obj_info[8],
-				size: obj_info[9],
-				meta: obj_info[10],
-			    };
-			    
-			    self.$mainPanel.append(self.getVizWidgetDiv(obj_info,self.type2widget));
+                            var obj_info = objInfoList[0];
+                            self.objData = {
+                                    obj_id: obj_info[0],
+                                    name: obj_info[1],
+                                    type: obj_info[2],
+                                    save_date: obj_info[3],
+                                    version: obj_info[4],
+                                    saved_by: obj_info[5],
+                                    wsid: obj_info[6],
+                                    workspace: obj_info[7],
+                                    chsum: obj_info[8],
+                                    size: obj_info[9],
+                                    meta: obj_info[10],
+                            };
+                            self.$mainPanel.empty();
+                            self.$mainPanel.append(self.getVizWidgetDiv(obj_info,self.type2widget));
                         } else {
                             //self.showError({error:{message:'An unknown error occurred while fetching data.'}});
                         }
                     },
                     function(error) {
-			console.error(error);
+                        console.error(error);
                     }
-		);
-	    }
-	},
+                );
+            }
+        },
 
 	
-	type2widget: {},
+        type2widget: {},
 	
-	setupType2Widget: function() {
+        setupType2Widget: function() {
 	    var self = this;
 	    
 	    // all the modeling types have the same config

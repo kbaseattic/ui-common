@@ -173,9 +173,8 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                return Q.Promise(function (resolve, reject, notify) {
                   Utils.promise(this.workspaceClient, 'get_object_info_new', {
                         objects: [{
-                           wsid: this.getParam('workspaceId'),
-                           objid: this.getParam('objectId'),
-                           ver: this.getParam('objectVersion')
+                           ref: this.getParam('workspaceId') + '/' + this.getParam('objectId') +
+                            (this.getParam('objectVersion') ? ('/' + this.getParam('objectVersion')) : "")
                      }],
                         includeMetadata: 1
                      })
@@ -195,7 +194,8 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                            
                            // The narrative this lives in.
                            Utils.promise(this.workspaceClient, 'get_workspace_info', {
-                              id: this.getParam('workspaceId')
+                              id: $.isNumeric(this.getParam('workspaceId')) ? this.getParam('workspaceId') : null,
+                              workspace: $.isNumeric(this.getParam('workspaceId')) ? null : this.getParam('workspaceId')
                            })
                            .then(function (data) {
                               console.log('WS DATA'); console.log(data);
