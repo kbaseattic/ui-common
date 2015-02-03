@@ -5,9 +5,9 @@
    <link rel="icon" type="image/x-icon" href="assets/img/KBase_favicon.ico">
 
    <!-- external css -->
-   <link rel="stylesheet" type="text/css" href="../ext/bootstrap/3.3.2/css/bootstrap.min.css" />
+   <link rel="stylesheet" type="text/css" href="/ext/bootstrap/3.3.2/css/bootstrap.min.css" />
    <!-- jquery-ui-1.10.0.custom.css is needed for the landing page card layout, some old landing pages still use this style -->
-   <link rel="stylesheet" type="text/css" href="../ext/jquery-ui/1.10.3/css/custom-theme/jquery-ui-1.10.0.custom.css">
+   <link rel="stylesheet" type="text/css" href="/ext/jquery-ui/1.10.3/css/custom-theme/jquery-ui-1.10.0.custom.css">
 
    <!-- DataTable 1.10.4 css dependencies. 2014-01-29 eap -->
    <!-- <link rel="stylesheet" type="text/css" href="assets/css/dataTables.bootstrap.css" /> -->
@@ -27,10 +27,10 @@
    <link rel="stylesheet" type="text/css" href="assets/css/sankeystyle.css" />
    <!-- TODO: remove this dependency ... or update cytoscape so it and kbase can be on the 
             same font-awesome -->
-   <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/font-awesome-4.0.3/css/font-awesome.css" />
-   <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.css" />
-   <link rel="stylesheet" href="../ext/animate/animate.css" />
-   <link rel="stylesheet" href="../ext/font-awesome/4.2.0/css/font-awesome.min.css" type="text/css" />
+   <link rel="stylesheet" href="/ext/cytoscape.js/2.0.4-jmc/font-awesome-4.0.3/css/font-awesome.css" />
+   <link rel="stylesheet" href="/ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.css" />
+   <link rel="stylesheet" href="/ext/animate/animate.css" />
+   <link rel="stylesheet" href="/ext/font-awesome/4.2.0/css/font-awesome.min.css" type="text/css" />
    <!-- End external css -->
 
 
@@ -58,8 +58,8 @@
 
 
    <!-- External javascript packages -->
-   <script src="../ext/bowser/bowser.min.js"></script>
-   <script src="../ext/underscore/1.6.0/underscore-min.js"></script>
+   <script src="/ext/bowser/bowser.min.js"></script>
+   <script src="/ext/underscore/1.6.0/underscore-min.js"></script>
 
    <!-- Google Analytics -->
 
@@ -102,12 +102,12 @@
       checkBrowser();
    </script>
 
-   <script src="../ext/jquery/jquery-1.10.2.min.js"></script>
+   <script src="/ext/jquery/jquery-1.10.2.min.js"></script>
    <!-- <script src="../ext/jquery-migrate/jquery-migrate-1.2.1.js"></script> -->
-   <script src="../ext/jquery-ui/1.10.3/js/jquery-ui-1.10.3.custom.min.js"></script>
-   <script src="../ext/blockUI/jquery.blockUI.js"></script>
-   <script src="../ext/bootstrap/3.3.2/js/bootstrap.js"></script>
-   <script src="../ext/d3/d3.v3.min.js"></script>
+   <script src="/ext/jquery-ui/1.10.3/js/jquery-ui-1.10.3.custom.min.js"></script>
+   <script src="/ext/blockUI/jquery.blockUI.js"></script>
+   <script src="/ext/bootstrap/3.3.2/js/bootstrap.js"></script>
+   <script src="/ext/d3/d3.v3.min.js"></script>
 
    <!-- datatables -->
    <!--
@@ -130,10 +130,36 @@
    <script src="assets/js/jquery.cookie.min.js"></script>
    <script src="assets/js/viz/raphael-min.js"></script>
 
-   <script src="../ext/q/q.min.js"></script>
-   <script src="../ext/postal/postal-0.12.4.min.js"></script>
-   <script src="../ext/postal/postal.request-response-0.3.1.min.js"></script>
-   <script src="../ext/postal/postal-deluxe.js"></script>
+   <script src="/ext/q/q.min.js"></script>
+   <script src="/ext/postal/postal-0.12.4.min.js"></script>
+   <script src="/ext/postal/postal.request-response-0.3.1.min.js"></script>
+   <script src="/ext/postal/postal-deluxe.js"></script>
+   
+   
+      <!-- angular itself -->
+   <script src="/ext/angularjs/angular-1.3.11/angular.min.js"></script>
+   <script src="/ext/angularjs/angular-1.3.11/angular-resource.min.js"></script>
+   <script src="/ext/angularjs/angular-1.3.11/angular-animate.min.js"></script>
+   
+   
+   <!-- <script src="js/angular-1.2.14/angular.js"></script> 
+
+   <script src="js/angular-1.2.14/angular-resource.min.js"></script>
+   <script src="js/angular-1.2.14/angular-animate.min.js"></script>-->
+
+   <!-- angular extensions -->
+   
+   <!-- order of angular file upload files is required -->
+   <script src="/ext/angularjs/angular-file-upload-bower-2.2.2/angular-file-upload-shim.min.js"></script>
+   <script src="/ext/angularjs/angular-file-upload-bower-2.2.2/angular-file-upload.min.js"></script>
+
+   <script src="/ext/angularjs/angular-ui-router-0.2.13.min.js"></script>
+   <script src="/ext/angularjs/ui-bootstrap-0.12.0/ui-bootstrap-tpls-0.12.0.min.js"></script>
+   
+   <!--<script src="assets/js/file-upload-1.6.12/angular-file-upload-shim.min.js"></script>
+   <script src="assets/js/file-upload-1.6.12/angular-file-upload.min.js"></script>
+   <script src="js/ui-router-0.2.10/angular-ui-router.min.js"></script>
+   <script src="js/ui-bootstrap-0.12.0/ui-bootstrap-tpls-0.12.0.min.js"></script>-->
 
 
 
@@ -194,7 +220,7 @@
 
 
    <!-- ws obj reference related widgets -->
-   <script src="../ext/d3/sankey.js"></script>
+   <script src="/ext/d3/sankey.js"></script>
    <!-- this is a d3 plugin -->
 
    <script src="../src/widgets/workspaces/kbaseWSButtons.js"></script>
@@ -308,7 +334,7 @@
    <!-- GWAS widgets -->
    <script src='../src/widgets/kbaseAuthenticatedWidget.js'></script>
    <script src="//maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
-   <script src='../ext/gmaps/gmap3.js'></script>
+   <script src='/ext/gmaps/gmap3.js'></script>
    <script src="../src/widgets/gwas/kbaseGWASPop.js"></script>
    <script src="../src/widgets/gwas/kbaseGWASPopTable.js"></script>
    <script src="../src/widgets/gwas/kbaseGWASPopMaps.js"></script>
@@ -349,12 +375,12 @@
    <script src="lib/trees/easytree.js"></script>
 
    <!-- Network widgets and dependencies -->
-   <script src="../ext/cytoscape.js/2.0.4-jmc/arbor.js"></script>
-   <script src="../ext/cytoscape.js/2.0.4-jmc/cytoscape.js"></script>
-   <script src="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.js"></script>
-   <script src="../ext/cytoscape.js/2.0.4-jmc/layout.arbor.js"></script>
-   <script src="../src/widgets/networks/kbasePPICard.js"></script>
-   <script src="../src/widgets/networks/kbaseNetworkCard.js"></script>
+   <script src="/ext/cytoscape.js/2.0.4-jmc/arbor.js"></script>
+   <script src="/ext/cytoscape.js/2.0.4-jmc/cytoscape.js"></script>
+   <script src="/ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.js"></script>
+   <script src="/ext/cytoscape.js/2.0.4-jmc/layout.arbor.js"></script>
+   <script src="/src/widgets/networks/kbasePPICard.js"></script>
+   <script src="/src/widgets/networks/kbaseNetworkCard.js"></script>
    <!-- End Network widgets -->
 
    <script src="../src/widgets/json/kbaseJsonView.js"></script>
@@ -362,29 +388,7 @@
 
    <!-- app -->
    
-   <!-- angular itself -->
-   <script src="/ext/angularjs/angular-1.3.11/angular.min.js"></script>
-   <script src="/ext/angularjs/angular-1.3.11/angular-resource.min.js"></script>
-   <script src="/ext/angularjs/angular-1.3.11/angular-animate.min.js"></script>
-   
-   
-   <!-- <script src="js/angular-1.2.14/angular.js"></script> 
 
-   <script src="js/angular-1.2.14/angular-resource.min.js"></script>
-   <script src="js/angular-1.2.14/angular-animate.min.js"></script>-->
-
-   <!-- angular extensions -->
-   
-   <script src="/ext/angularjs/angular-file-upload-bower-2.2.2/angular-file-upload-shim.min.js"></script>
-   <script src="/ext/angularjs/angular-file-upload-bower-2.2.2/angular-file-upload.min.js"></script>
-
-   <script src="/ext/angularjs/angular-ui-router-0.2.13.min.js"></script>
-   <script src="/ext/angularjs/ui-bootstrap-0.12.0/ui-bootstrap-tpls-0.12.0.min.js"></script>
-   
-   <!--<script src="assets/js/file-upload-1.6.12/angular-file-upload-shim.min.js"></script>
-   <script src="assets/js/file-upload-1.6.12/angular-file-upload.min.js"></script>
-   <script src="js/ui-router-0.2.10/angular-ui-router.min.js"></script>
-   <script src="js/ui-bootstrap-0.12.0/ui-bootstrap-tpls-0.12.0.min.js"></script>-->
 
    
    <!-- kbase angular -->
@@ -415,7 +419,7 @@
    <script src="assets/js/header.js"></script>
 
    <!-- RequireJS should go after all other javascript imports -->
-   <script src="../ext/requirejs/2.1.15/require.js"></script>
+   <script src="/ext/requirejs/2.1.15/require.js"></script>
    <script src="js/require-config.js"></script>
 
    <!-- end application -->
