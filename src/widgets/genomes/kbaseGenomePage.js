@@ -22,54 +22,49 @@
             var self = this;
             var scope = {ws: this.options.workspaceID, id: this.options.genomeID};
             ///////////////////////////////////////////////////////////////////////////////
-            var row1 = $('<div class="row">');
-            self.$elem.append(row1);
-            var cell1 = $('<div class="col-md-12 panel panel-default">');
-            row1.append(cell1);
-            var panel1 = cell1.kbasePanel({title: 'Overview', rightLabel: '', subText: ''});
-            panel1.loading();
+            var cell1 = $('<div panel panel-default">');
+            self.$elem.append(cell1);
+            var panel1 = self.makePleaseWaitPanel();
+            self.makeDecoration(cell1, 'Overview', panel1);
             ///////////////////////////////////////////////////////////////////////////////
-            var row2 = $('<div class="row">');
-            self.$elem.append(row2);
-            var cell2 = $('<div class="col-md-12 panel panel-default">');
-            row2.append(cell2);
-            var panel2 = cell2.kbasePanel({title: 'Publications', rightLabel: '', subText: ''});
-            panel2.loading();
+            var cell2 = $('<div panel panel-default">');
+            self.$elem.append(cell2);
+            var panel2 = self.makePleaseWaitPanel();
+            self.makeDecoration(cell2, 'Publications', panel2);
             ///////////////////////////////////////////////////////////////////////////////
-            var row3 = $('<div class="row">');
-            self.$elem.append(row3);
-            var cell3 = $('<div class="col-md-12 panel panel-default">');
-            row3.append(cell3);
-            var panel3 = cell3.kbasePanel({title: 'KBase Community', rightLabel: '', subText: ''});
-            panel3.loading();
+            var cell3 = $('<div panel panel-default">');
+            self.$elem.append(cell3);
+            var panel3 = self.makePleaseWaitPanel();
+            self.makeDecoration(cell3, 'KBase Community', panel3);
             ///////////////////////////////////////////////////////////////////////////////
-            var row4 = $('<div class="row">');
-            self.$elem.append(row4);
-            var cell4 = $('<div class="col-md-12 panel panel-default">');
-            row4.append(cell4);
-            var panel4 = cell4.kbasePanel({title: 'Taxonomy', rightLabel: '', subText: ''});
-            panel4.loading();
+            var cell4 = $('<div panel panel-default">');
+            self.$elem.append(cell4);
+            var panel4 = self.makePleaseWaitPanel();
+            self.makeDecoration(cell4, 'Taxonomy', panel4);
             ///////////////////////////////////////////////////////////////////////////////
-            var row5 = $('<div class="row">');
-            self.$elem.append(row5);
-            var cell5 = $('<div class="col-md-12 panel panel-default">');
-            row5.append(cell5);
-            var panel5 = cell5.kbasePanel({title: 'Assembly and Annotation', rightLabel: '', subText: ''});
-            panel5.loading();
+            var cell5 = $('<div panel panel-default">');
+            self.$elem.append(cell5);
+            var panel5 = self.makePleaseWaitPanel();
+            self.makeDecoration(cell5, 'Assembly and Annotation', panel5);
 
             var ready = function(genomeInfo) {
-            	$(panel1.body()).KBaseGenomeWideOverview({genomeID: scope.id, workspaceID: scope.ws, 
+            	panel1.empty();
+            	panel1.KBaseGenomeWideOverview({genomeID: scope.id, workspaceID: scope.ws, 
             		kbCache: kb, loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
             	var searchTerm = "";
             	if (genomeInfo && genomeInfo.data['scientific_name'])
             		searchTerm = genomeInfo.data['scientific_name'];
-            	$(panel2.body()).KBaseLitWidget({literature:searchTerm, kbCache: kb,
+            	panel2.empty();
+            	panel2.KBaseLitWidget({literature:searchTerm, kbCache: kb,
             		loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
-        	    $(panel3.body()).KBaseGenomeWideCommunity({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb, 
+            	panel3.empty();
+        	    panel3.KBaseGenomeWideCommunity({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb, 
         	    	genomeInfo: genomeInfo});
-                $(panel4.body()).KBaseGenomeWideTaxonomy({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+            	panel4.empty();
+                panel4.KBaseGenomeWideTaxonomy({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
                     loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
-                $(panel5.body()).KBaseGenomeWideAssemAnnot({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+            	panel5.empty();
+                panel5.KBaseGenomeWideAssemAnnot({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
                     loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
             };
             
@@ -92,6 +87,19 @@
             });
         },
 
+        makePleaseWaitPanel: function() {
+        	return $('<div>').append('<p class="muted ajax-loader"><img src="' +
+        			this.options.loadingImage + '"> loading...</p>');
+        },
+        
+        makeDecoration: function($panel, title, $widgetDiv) {
+        	$panel.addClass("panel panel-default")
+        		.append($('<div>').addClass('panel-heading')
+				.append($('<span>').addClass('panel-title')
+					    .append(title)))
+					    .append($('<div>').addClass('panel-body').append($widgetDiv));
+        },
+        
         getData: function() {
             return {
                 type: "Genome Page",

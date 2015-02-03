@@ -181,9 +181,9 @@
 	    
 	    
 	    'KBaseGenomes.Genome': {
-		widget:'kbaseJsonView',
+		widget:'KBaseGenomePage',
 		noPanel:true,
-		options: '{"id":???id,"ws":???ws}'
+		options: '{"genomeID":???id,"workspaceID":???ws}'
 	    },
 	    'KBaseTrees.Tree': {
 		widget:'kbaseTree',
