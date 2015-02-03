@@ -1,4 +1,4 @@
-define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbaseworkspaceserviceclient', 'kbaseuserprofileserviceclient', 'kbasesession', 'q'], 
+define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbc_Workspace', 'kbc_UserProfile', 'kbasesession', 'q'], 
        function ($, nunjucks, SocialWidget, WorkspaceService, UserProfileService, Session, Q) {
   "use strict";
 	var Widget = Object.create(SocialWidget, {

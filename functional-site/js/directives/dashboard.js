@@ -19,6 +19,17 @@ angular.module('dashboard-directives')
         }
     };
 })
+.directive('dashboardsharednarratives', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            require(['dashboard_shared_narratives_widget'], function(W) {
+              Object.create(W).init({
+                    container: $(ele)
+                }).go();
+            });
+        }
+    };
+})
 .directive('dashboardprofile', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
