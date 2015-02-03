@@ -35,12 +35,6 @@
         	container.append("<div><img src=\""+self.options.loadingImage+"\">&nbsp;&nbsp;loading genes data...</div>");
 
         	var genomeRef = "" + this.options.ws_name + "/" + this.options.genome_id;
-        	
-            var objId = {ref: genomeRef};
-            if (this.options.kbCache)
-                prom = this.options.kbCache.req('ws', 'get_objects', [objId]);
-            else
-                prom = kb.ws.get_objects([objId]);
 
             var self = this;
             
@@ -146,6 +140,12 @@
             if (self.options.genomeInfo) {
             	showData(self.options.genomeInfo.data);
             } else {
+                var objId = {ref: genomeRef};
+                if (this.options.kbCache)
+                    prom = this.options.kbCache.req('ws', 'get_objects', [objId]);
+                else
+                    prom = kb.ws.get_objects([objId]);
+            	
             	$.when(prom).done($.proxy(function(data) {
             		var gnm = data[0].data;
             		showData(gnm);
