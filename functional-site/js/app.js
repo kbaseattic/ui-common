@@ -19,7 +19,7 @@
 var cardManager = undefined;
 
 var app = angular.module('landing-pages', 
-    ['lp-directives', 'card-directives',
+    ['dataview', 'lp-directives', 'card-directives',
      'social-directives','dashboard-directives',
      'trees-directives', 
      'ws-directives', 'modeling-directives', 'angular-json-rpc',
@@ -75,6 +75,19 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/narrative/narrative-manager.html',
           controller: 'narrativemanager'
         });
+       
+   // New landing pages route.
+   $stateProvider
+   .state('dataview', {
+      url: '/dataview/:wsid/:objid/:ver', 
+      params: {
+         ver: {
+            value: null
+         }
+      }, 
+      templateUrl: 'views/dataview/dataview.html',
+      controller: 'Dataview'
+   });
 
     // workspace browser routing
     $stateProvider

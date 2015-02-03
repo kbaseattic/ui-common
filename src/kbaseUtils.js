@@ -357,12 +357,31 @@ define(['q'],
 
                   return (prefix ? prefix + ' ' : '') + measureAbs + ' ' + unit + (suffix ? ' ' + suffix : '');
                } else {
-                  if (now.getFullYear === date.getFullYear) {
+                  if (now.getFullYear() === date.getFullYear()) {
                      return shortMonths[date.getMonth()] + " " + date.getDate();
                   } else {
                      return shortMonths[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
                   }
                }
+            }
+         },
+         
+         fileSizeFormat: { 
+            value: function (num) {
+               if (typeof num === 'string') {
+                  var num = parseInt(num);
+               } 
+               
+               var pieces = [];
+               while (num > 0) {
+                  var group = num % 1000;
+                  pieces.unshift(group+'');
+                  num = Math.floor(num/1000);
+                  if (num > 0) {
+                     pieces.unshift(',');
+                  }                     
+               }
+               return pieces.join('')+ ' bytes';
             }
          },
 
@@ -379,7 +398,22 @@ define(['q'],
                }));
 
             }
-         }
+         },
+          object_to_array: {
+            value: function (object, keyName, valueName) {
+               var keys = Object.keys(object);
+               var l = [];
+               for (var i in keys) {
+                  var newObj = {};
+                  newObj[keyName] = keys[i];
+                  newObj[valueName] = object[keys[i]];
+                  l.push(newObj);
+               }
+               return l;
+            }
+         },
+
+         
 
 
       });

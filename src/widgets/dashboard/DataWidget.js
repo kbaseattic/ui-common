@@ -1,5 +1,5 @@
-define(['dashboard_widget', 'kbaseutils', 'kbasesession', 'kbc_Workspace', 'q'],
-    function (DashboardWidget, Utils, Session, WorkspaceService, Q) {
+define(['dashboard_widget', 'kbaseutils', 'kb.utils.api', 'kbasesession', 'kbc_Workspace', 'q'],
+    function (DashboardWidget, Utils, APIUtils, Session, WorkspaceService, Q) {
         "use strict";
         var widget = Object.create(DashboardWidget, {
             init: {
@@ -81,7 +81,7 @@ define(['dashboard_widget', 'kbaseutils', 'kbasesession', 'kbc_Workspace', 'q'],
                                 var workspaces = {};
                                 var workspaceList = [];
                                 for (var i = 0; i < data.length; i++) {
-                                    var wsInfo = this.workspace_metadata_to_object(data[i]);
+                                    var wsInfo = APIUtils.workspace_metadata_to_object(data[i]);
 
                                     // make sure a modern narrative.
                                     if (wsInfo.metadata.narrative && wsInfo.metadata.is_temporary !== 'true') {
@@ -101,7 +101,7 @@ define(['dashboard_widget', 'kbaseutils', 'kbasesession', 'kbc_Workspace', 'q'],
                                     })
                                     .then(function (data) {
                                         for (var i = 0; i < data.length; i++) {
-                                            workspaceObjects.push(this.object_info_to_object(data[i]));
+                                            workspaceObjects.push(APIUtils.object_info_to_object(data[i]));
                                         }
                                         workspaceObjects = workspaceObjects.sort(function (a, b) {
                                             var x = (Utils.iso8601ToDate(a.save_date)).getTime();

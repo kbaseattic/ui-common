@@ -46,6 +46,12 @@ require.config({
       domReady: '/ext/require-plugins/domReady',
       text: '/ext/require-plugins/text',
       json: '/ext/require-plugins/json',
+      
+      // kbase utils
+      kbaseutils: '/src/kbaseUtils',
+      kbasecookie: '/src/kbaseCookie',
+      kbasetest: '/src/kbaseTest',
+      'kb.utils.api': '/src/kbaseAPIUtils',
 
       // widgets
       // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
@@ -60,9 +66,6 @@ require.config({
       kbaseusersummary: '/src/widgets/social/kbaseUserSummary',
       kbasesession: '/src/kbaseSession',
       kbaseconfig: '/src/kbaseConfig',
-      kbaseutils: '/src/kbaseUtils',
-      kbasecookie: '/src/kbaseCookie',
-      kbasetest: '/src/kbaseTest',
       kbasenavbar: '/src/widgets/kbaseNavbar',
       kbasebasewidget: '/src/widgets/kbaseBaseWidget',
       kbaseloginwidget: '/src/widgets/kbaseLoginWidget',
@@ -73,7 +76,11 @@ require.config({
       dashboard_shared_narratives_widget: '/src/widgets/dashboard/SharedNarrativesWidget',
       dashboard_narratives_widget: '/src/widgets/dashboard/NarrativesWidget',
       dashboard_apps_widget: '/src/widgets/dashboard/AppsWidget',
-      dashboard_data_widget: '/src/widgets/dashboard/DataWidget'
+      dashboard_data_widget: '/src/widgets/dashboard/DataWidget',
+      
+      // Dataview widgets
+      'kb.widget.dataview.base': '/src/widgets/dataview/DataviewWidget',
+      'kb.widget.dataview.overview': '/src/widgets/dataview/OverviewWidget'
    },
    shim: {
     

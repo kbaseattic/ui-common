@@ -1,5 +1,5 @@
-define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbc_Workspace', 'kbasesession', 'q'],
-   function ($, nunjucks, Utils, DashboardWidget, WorkspaceService, Session, Q) {
+define(['jquery', 'nunjucks', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspace', 'kbasesession', 'q'],
+   function ($, nunjucks, Utils, APIUtils, DashboardWidget, WorkspaceService, Session, Q) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
@@ -74,7 +74,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbc_Workspace',
                      .then(function (permissions) {
                         for (var i = 0; i < permissions.length; i++) {
                            var narrative = narratives[i];
-                           narrative.permissions = this.object_to_array(permissions[i], 'username', 'permission')
+                           narrative.permissions = Utils.object_to_array(permissions[i], 'username', 'permission')
                               .filter(function (x) {
                                  if (x.username === username ||
                                     x.username === '*' ||
@@ -136,7 +136,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbc_Workspace',
                            //tuple<ws_id id, ws_name workspace, username owner, timestamp moddate,
                            //int object, permission user_permission, permission globalread,
                            //lock_status lockstat, usermeta metadata> workspace_info
-                           var wsInfo = this.workspace_metadata_to_object(data[i]);
+                           var wsInfo = APIUtils.workspace_metadata_to_object(data[i]);
 
                            // make sure a modern narrative.
                            if (wsInfo.metadata.narrative && wsInfo.metadata.is_temporary !== 'true') {
@@ -166,10 +166,11 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'dashboard_widget', 'kbc_Workspace',
                               });
                               this.promise(this.workspaceClient, 'get_objects', workspaceIds)
                                  .then(function (data) {
+                                 console.log('DATA'); console.log(data);
                                     for (var i = 0; i < data.length; i++) {
                                        // NB this has given us all of the objects in the relevant workspaces.
                                        // Now we need to filter out just the narratives of interest
-                                       var wsObject = this.object_info_to_object(data[i].info);
+                                       var wsObject = APIUtils.object_info_to_object(data[i].info);
                                        // console.log(narrativesByWorkspace[wsObject.wsid].workspace.metadata.narrative + '=' + wsObject.id);
                                        // NB: we use plain == for comparison since we need type convertion. The metadata.narrative
                                        // is a string, but wsObject.id is a number.

@@ -127,7 +127,25 @@ define(['jquery', 'nunjucks', 'kbasesession'],
             },
             addDropdown: {
                 value: function (cfg) {
-                    var button = $('<button type="button" class="btn btn-' + cfg.style + ' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">' + cfg.label + ' <span class="caret"></span></button>');
+                    // var button = $('<button type="button" class="btn btn-' + cfg.style + ' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">' + cfg.label + ' <span class="caret"></span></button>');
+                   var iconStyle = '';
+                    var label = '';
+                    if (cfg.label) {
+                        label = '<div class="kb-nav-btn-txt">' + cfg.label + ' <span class="caret"></span></div>';
+                    } else {
+                       label = cfg.label + ' <span class="caret"></span>';
+                        iconStyle += 'font-size: 150%;';
+                    }
+                    var button = $('<button  class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">' +
+                            '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</button>')
+                        .on('click', function (e) {
+                            e.preventDefault();
+                            cfg.callback();
+                        });
+                    if (cfg.disabled) {
+                        button.prop('disabled', true);
+                    }
+                   
                     var menu = $('<ul class="dropdown-menu" role="menu"></ul>');
                     for (var i = 0; i < cfg.items.length; i++) {
                         var item = cfg.items[i];

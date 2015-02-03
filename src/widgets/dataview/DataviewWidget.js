@@ -1,11 +1,11 @@
-define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofile', 'postal', 'json!functional-site/config.json'],
-   function (nunjucks, $, Q, Session, Utils, UserProfile, Postal, config) {
+define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api', 'postal', 'json!functional-site/config.json'],
+   function (nunjucks, $, Q, Session, Utils, APIUtils, Postal, config) {
       "use strict";
-      var DashboardWidget = Object.create({}, {
+      var widget = Object.create({}, {
 
          // The init function interfaces this object with the caller, and sets up any 
          // constants and constant state.
-         DashboardWidget_init: {
+         DataviewWidget_init: {
             value: function (cfg) {
                this._generatedId = 0;
 
@@ -77,43 +77,10 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                // NB the templating requires a dedicated widget resources directory in 
                //   /src/widgets/WIDGETNAME/templates
                this.templates = {};
-               this.templates.env = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/dashboard/' + this.widgetName + '/templates'), {
+               this.templates.env = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/dataview/' + this.widgetName + '/templates'), {
                   'autoescape': false
                });
-               this.templates.env.addFilter('roleLabel', function (role) {
-                  if (this.listMaps['userRoles'][role]) {
-                     return this.listMaps['userRoles'][role].label;
-                  } else {
-                     return role;
-                  }
-               }.bind(this));
-               this.templates.env.addFilter('userClassLabel', function (userClass) {
-                  if (this.listMaps['userClasses'][userClass]) {
-                     return this.listMaps['userClasses'][userClass].label;
-                  } else {
-                     return userClass;
-                  }
-               }.bind(this));
-               this.templates.env.addFilter('titleLabel', function (title) {
-                  if (this.listMaps['userTitles'][title]) {
-                     return this.listMaps['userTitles'][title].label;
-                  } else {
-                     return title;
-                  }
-               }.bind(this));
-                this.templates.env.addFilter('permissionLabel', function (permissionFlag) {
-                  if (this.listMaps['permissionFlags'][permissionFlag]) {
-                     return this.listMaps['permissionFlags'][permissionFlag].label;
-                  } else {
-                     return permissionFlag;
-                  }
-               }.bind(this));
-               // create a gravatar-url out of an email address and a 
-               // default option.
-               this.templates.env.addFilter('gravatar', function (email, size, rating, gdefault) {
-                  // TODO: http/https.
-                  return UserProfile.makeGravatarURL(email, size, rating, gdefault);
-               }.bind(this));
+              
                this.templates.env.addFilter('kbmarkup', function (s) {
                   s = s.replace(/\n/g, '<br>');
                   return s;
@@ -211,12 +178,12 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                this.renderWaitingView();
                this.setInitialState()
                   .then(function () {
+                     this.initialDataLoaded = true;
                      return this.refresh()
                   }.bind(this))
                   .catch(function (err) {
                      console.log('ERROR');
                      console.log(err);
-
                      this.setError(err);
                   }.bind(this))
                   .done();
@@ -294,6 +261,11 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                this.refresh().done();
             }
          },
+         getParam: {
+            value: function (path, defaultValue) {
+               return Utils.getProp(this.params, path, defaultValue);
+            }
+         },
 
          recalcState: {
             value: function () {
@@ -311,12 +283,16 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
          refresh: {
             value: function () {
                return Q.Promise(function (resolve, reject, notify) {
-                  if (!this.refreshTimer) {
-                     this.refreshTimer = window.setTimeout(function () {
-                        this.refreshTimer = null;
-                        this.render();
-                        resolve();
-                     }.bind(this), 0);
+                  if (this.initialDataLoaded) {
+                     if (!this.refreshTimer) {
+                        this.refreshTimer = window.setTimeout(function () {
+                           this.refreshTimer = null;
+                           this.render();
+                           resolve(true);
+                        }.bind(this), 0);
+                     }
+                  } else {
+                     resolve(false);
                   }
                }.bind(this));
             }
@@ -337,6 +313,12 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                if (!norefresh) {
                   this.refresh().done();
                }
+            }
+         },
+         
+         getState: {
+            value: function (path, defaultValue) {
+               return Utils.getProp(this.state, path, defaultValue);
             }
          },
 
@@ -373,21 +355,6 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                } else {
                   return false;
                }
-            }
-         },
-
-
-         promise: {
-            value: function (client, method, arg1) {
-               var def = Q.defer();
-               client[method](arg1,
-                  function (result) {
-                     def.resolve(result);
-                  },
-                  function (err) {
-                     def.reject(err);
-                  });
-               return def.promise;
             }
          },
 
@@ -460,9 +427,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                   //delete this.context.env.loggedInUserRealName;
                }
 
-               this.context.env.instanceId = this.instanceId;
-
-               this.context.env.isOwner = this.isOwner();
+               this.context.env.instanceId = this.instanceId; 
 
                if (additionalContext) {
                   var temp = Utils.merge({}, this.context);
@@ -526,22 +491,6 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
             }
          },
 
-         isOwner: {
-            value: function (paramName) {
-               // NB param name represents the property name of the parameter which currently 
-               // holds the username of the "subject" of the widget. If the current authenticated
-               // user and the subject user are the same, we say the user is the owner.
-               // The widgets use 'userId', which originates in the url as a path component,
-               // e.g. /people/myusername.
-               paramName = paramName ? paramName : 'userId';
-               if (Session.isLoggedIn() && Session.getUsername() === this.params[paramName]) {
-                  return true;
-               } else {
-                  return false;
-               }
-            }
-         },
-
          // DOM UPDATE
 
          // An example universal renderer, which inspects the state of the widget and
@@ -552,21 +501,21 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                // Head off at the pass -- if not logged in, can't show profile.
                if (this.error) {
                   this.renderError();
-               } else if (Session.isLoggedIn()) {
-                  this.places.title.html(this.widgetTitle);
-                  this.places.content.html(this.renderTemplate('authorized'));
                } else {
                   // no profile, no basic aaccount info
                   this.places.title.html(this.widgetTitle);
-                  this.places.content.html(this.renderTemplate('unauthorized'));
+                  this.places.content.html(this.renderTemplate('main'));
                }
+               // this.container.find('.collapse').collapse();
                if (this.afterRender) {
                   this.afterRender();
                }
                return this;
             }
          },
-
+         
+        
+         
          // These are some very basic renderers for common functions. 
 
          // This can provide an initial layout, such as a panel, and provide container nodes,
@@ -601,7 +550,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                      type: 'text/css',
                      rel: 'stylesheet'
                   })
-                  .attr('href', '/src/widgets/dashboard/style.css');
+                  .attr('href', '/src/widgets/dataview/style.css');
                // Load specific widget css.
                $('<link>')
                   .appendTo('head')
@@ -609,7 +558,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                      type: 'text/css',
                      rel: 'stylesheet'
                   })
-                  .attr('href', '/src/widgets/dashboard/' + this.widgetName + '/style.css');
+                  .attr('href', '/src/widgets/dataview/' + this.widgetName + '/style.css');
             }
          },
 
@@ -696,8 +645,92 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
             }
          },
 
+         makeWorkspaceObjectId: {
+            value: function (workspaceId, objectId) {
+               return 'ws.' + workspaceId + '.obj.' + objectId;
+            }
+         },
 
-        
+         object_to_array: {
+            value: function (object, keyName, valueName) {
+               var keys = Object.keys(object);
+               var l = [];
+               for (var i in keys) {
+                  var newObj = {};
+                  newObj[keyName] = keys[i];
+                  newObj[valueName] = object[keys[i]];
+                  l.push(newObj);
+               }
+               return l;
+            }
+         },
+
+         // KBase Service Utility Methods
+         // NB: these should really be contained in the service apis, but those are automatically generated.
+         // Maybe a kbase services utility module?
+         workspace_metadata_to_object: {
+            value: function (wsInfo) {
+               return {
+                  id: wsInfo[0],
+                  name: wsInfo[1],
+                  owner: wsInfo[2],
+                  moddate: wsInfo[3],
+                  object_count: wsInfo[4],
+                  user_permission: wsInfo[5],
+                  globalread: wsInfo[6],
+                  lockstat: wsInfo[7],
+                  metadata: wsInfo[8]
+               };
+            }
+         },
+         
+         /*UnspecifiedObject data;
+		object_info info;
+		list<ProvenanceAction> provenance;
+		username creator;
+		timestamp created;
+		list<obj_ref> refs;
+		obj_ref copied;
+		boolean copy_source_inaccessible;
+		mapping<id_type, list<extracted_id>> extracted_ids;
+		string handle_error;
+		string handle_stacktrace;
+        */
+         
+         workspace_object_to_object: {
+            value: function(data) {
+               data.info = this.object_info_to_object(data.info);
+               return data;
+            }
+            
+         },
+         
+         
+
+         object_info_to_object: {
+            value: function (data) {
+               var type = data[2].split(/[-\.]/);
+
+               return {
+                  id: data[0],
+                  name: data[1],
+                  type: data[2],
+                  save_date: data[3],
+                  version: data[4],
+                  saved_by: data[5],
+                  wsid: data[6],
+                  ws: data[7],
+                  checksum: data[8],
+                  size: data[9],
+                  metadata: data[10],
+                  ref: data[7] + '/' + data[1],
+                  obj_id: 'ws.' + data[6] + '.obj.' + data[0],
+                  typeName: type[1],
+                  typeMajorVersion: type[2],
+                  typeMinorVersion: type[3]
+               };
+            }
+         },
 
          logNotice: {
             value: function (source, message) {
@@ -758,76 +791,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                      id: 'n',
                      label: 'None',
                      description: 'No Access'
-                  }],
-               userRoles: [{
-                     id: 'pi',
-                     label: 'Principal Investigator'
-                  },
-                  {
-                     id: 'gradstudent',
-                     label: 'Graduate Student'
-                  },
-                  {
-                     id: 'developer',
-                     label: 'Developer'
-                  }, {
-                     id: 'tester',
-                     label: 'Tester'
-                  }, {
-                     id: 'documentation',
-                     label: 'Documentation'
-                  }, {
-                     id: 'general',
-                     label: 'General Interest'
-                  }],
-               userClasses: [{
-                  id: 'pi',
-                  label: 'Principal Investigator'
-               }, {
-                  id: 'gradstudent',
-                  label: 'Graduate Student'
-               }, {
-                  id: 'kbase-internal',
-                  label: 'KBase Staff'
-               }, {
-                  id: 'kbase-test',
-                  label: 'KBase Test/Beta User'
-               }, {
-                  id: 'commercial',
-                  label: 'Commercial User'
-               }],
-               userTitles: [{
-                  id: 'mr',
-                  label: 'Mr.'
-               }, {
-                  id: 'ms',
-                  label: 'Ms.'
-               }, {
-                  id: 'dr',
-                  label: 'Dr.'
-               }, {
-                  id: 'prof',
-                  label: 'Prof.'
-               }],
-               gravatarDefaults: [{
-                  id: 'mm',
-                  label: 'Mystery Man - simple, cartoon-style silhouetted outline'
-               }, {
-                  id: 'identicon',
-                  label: 'Identicon - a geometric pattern based on an email hash'
-               }, {
-                  id: 'monsterid',
-                  label: 'MonsterID - generated "monster" with different colors, faces, etc'
-               }, {
-                  id: 'wavatar',
-                  label: 'Wavatar - generated faces with differing features and backgrounds'
-               }, {
-                  id: 'retro',
-                  label: 'Retro - 8-bit arcade-style pixelated faces'
-               }, {
-                  id: 'blank',
-                  label: 'Blank - A Blank Space'
-               }]
+                  }]
 
 
             }
@@ -835,5 +799,5 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
 
       });
 
-      return DashboardWidget;
+      return widget;
    });

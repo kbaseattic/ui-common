@@ -12,8 +12,8 @@
    <!-- DataTable 1.10.4 css dependencies. 2014-01-29 eap -->
    <!-- <link rel="stylesheet" type="text/css" href="assets/css/dataTables.bootstrap.css" /> -->
    <!-- NB: should not include dataTables css if using bootstrap integration -->
-   <link rel="stylesheet" type="text/css" href="/ext/dataTables/1.10.4/extensions/ColReorder/dataTables.colReorder.min.css" />
-   <link rel="stylesheet" type="text/css" href="/ext/dataTables/1.10.4/extensions/ColVis/dataTables.colVis.min.css" />
+   <link rel="stylesheet" type="text/css" href="/ext/dataTables/1.10.4/extensions/ColReorder/css/dataTables.colReorder.min.css" />
+   <link rel="stylesheet" type="text/css" href="/ext/dataTables/1.10.4/extensions/ColVis/css/dataTables.colVis.min.css" />
    <!--<link rel="stylesheet" type="text/css" href="/ext/dataTables/1.10.4/css/jquery.dataTables.bootstrap.css" />-->
    <link rel="stylesheet" type="text/css" href="/ext/dataTables/1.10.4/plugins/integration/bootstrap/dataTables.bootstrap.css" />
    <link rel="stylesheet" type="text/css" href="/ext/dataTables/1.10.4/plugins/integration/font-awesome/dataTables.fontAwesome.css" />
@@ -361,18 +361,36 @@
    <script src="../src/widgets/contigset/kbaseContigSetView.js"></script>
 
    <!-- app -->
-   <script src="assets/js/file-upload-1.6.12/angular-file-upload-shim.min.js"></script>
-   <script src="js/angular-1.2.14/angular.min.js"></script>
+   
+   <!-- angular itself -->
+   <script src="/ext/angularjs/angular-1.3.11/angular.min.js"></script>
+   <script src="/ext/angularjs/angular-1.3.11/angular-resource.min.js"></script>
+   <script src="/ext/angularjs/angular-1.3.11/angular-animate.min.js"></script>
+   
+   
+   <!-- <script src="js/angular-1.2.14/angular.js"></script> 
 
    <script src="js/angular-1.2.14/angular-resource.min.js"></script>
-   <script src="js/angular-1.2.14/angular-animate.min.js"></script>
-   <script src="js/ui-router-0.2.10/angular-ui-router.min.js"></script>
-   <script src="js/ui-bootstrap-0.12.0/ui-bootstrap-tpls-0.12.0.min.js"></script>
-   <script src="assets/js/file-upload-1.6.12/angular-file-upload.min.js"></script>
+   <script src="js/angular-1.2.14/angular-animate.min.js"></script>-->
 
+   <!-- angular extensions -->
+   
+   <script src="/ext/angularjs/angular-file-upload-bower-2.2.2/angular-file-upload-shim.min.js"></script>
+   <script src="/ext/angularjs/angular-file-upload-bower-2.2.2/angular-file-upload.min.js"></script>
+
+   <script src="/ext/angularjs/angular-ui-router-0.2.13.min.js"></script>
+   <script src="/ext/angularjs/ui-bootstrap-0.12.0/ui-bootstrap-tpls-0.12.0.min.js"></script>
+   
+   <!--<script src="assets/js/file-upload-1.6.12/angular-file-upload-shim.min.js"></script>
+   <script src="assets/js/file-upload-1.6.12/angular-file-upload.min.js"></script>
+   <script src="js/ui-router-0.2.10/angular-ui-router.min.js"></script>
+   <script src="js/ui-bootstrap-0.12.0/ui-bootstrap-tpls-0.12.0.min.js"></script>-->
+
+   
+   <!-- kbase angular -->
+   
    <script src="js/app.js"></script>
    <script src="js/search.js"></script>
-
    <script src="js/directives/landingpages.js"></script>
    <script src="js/directives/cards.js"></script>
    <!--<script src="js/directives/fav.js"></script>-->
@@ -384,6 +402,9 @@
    <script src="js/directives/communities.js"></script>
    <script src="js/directives/social.js"></script>
    <script src="js/directives/dashboard.js"></script>
+   <script src="js/directives/dataview.js"></script>
+   <script src="js/dataview.js"></script>
+
    <script src="js/controllers.js"></script>
    <!--<script src="js/services/favorites.js"></script>-->
    <script src="js/services/workspaceUI.js"></script>
@@ -394,7 +415,7 @@
    <script src="assets/js/header.js"></script>
 
    <!-- RequireJS should go after all other javascript imports -->
-   <script src="../ext/requirejs/2.1.9/require.js"></script>
+   <script src="../ext/requirejs/2.1.15/require.js"></script>
    <script src="js/require-config.js"></script>
 
    <!-- end application -->
