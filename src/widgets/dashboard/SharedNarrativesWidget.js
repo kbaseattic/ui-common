@@ -163,7 +163,7 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
                                        // NB this has given us all of the objects in the relevant workspaces.
                                        // Now we need to filter out just the narratives of interest
                                        var wsObject = APIUtils.object_info_to_object(data[i]);
-                                        console.log(narrativesByWorkspace[wsObject.wsid].workspace.metadata.narrative + '=' + wsObject.id);
+                                       // console.log(narrativesByWorkspace[wsObject.wsid].workspace.metadata.narrative + '=' + wsObject.id);
                                        // NB: we use plain == for comparison since we need type convertion. The metadata.narrative
                                        // is a string, but wsObject.id is a number.
                                        if (narrativesByWorkspace[wsObject.wsid].workspace.metadata.narrative != wsObject.id) {
