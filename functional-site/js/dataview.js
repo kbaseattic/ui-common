@@ -8,7 +8,16 @@ app.controller('Dataview', function ($scope, $stateParams) {
       objid: $stateParams.objid,
       ver: $stateParams.ver
    };
+   
+   // Set up the styles for the view.
+   // Note that this is the style for all dataview views, as the actual view template
+   // is controlled by the router...
+    $('<link>')
+    .appendTo('head')
+    .attr({type: 'text/css', rel: 'stylesheet'})
+    .attr('href', 'views/dataview/style.css');
 
+   // Set up the nabar
    require(['kbasenavbar'], function (NAVBAR) {
       NAVBAR.clearMenu()
          .addDefaultMenu({
@@ -33,51 +42,7 @@ app.controller('Dataview', function ($scope, $stateParams) {
             url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&priority=3&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
          })
          .clearButtons()
-         .addButton({
-            name: 'copy',
-            label: '+ New Narrative',
-            style: 'primary',
-            icon: 'plus-square',
-            callback: function () {
-               alert('add to a new narrative');
-            }.bind(this)
-         })
-         .addButton({
-            name: 'download',
-            label: 'Download',
-            style: 'primary',
-            icon: 'download',
-            callback: function () {
-               alert('download object');
-            }.bind(this)
-         })
-         .addDropdown({
-            place: 'end',
-            name: 'options',
-            style: 'default',
-            icon: 'copy',
-            label: 'Copy',
-            items: [
-               {
-                  name: 'narrative1',
-                  icon: 'key',
-                  label: 'Narrative 1',
-                  url: 'xxx',
-                  external: true
-            },{
-                  name: 'narrative2',
-                  icon: 'key',
-                  label: 'Narrative 3',
-                  url: 'xxx',
-                  external: true
-            },{
-                  name: 'narrative3',
-                  icon: 'key',
-                  label: 'Narrative 3',
-                  url: 'xxx',
-                  external: true
-            }]
-         });
+        
 
 
    });

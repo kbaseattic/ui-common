@@ -41,6 +41,8 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                   throw 'Object Version is required';
                }
 
+
+
                return this;
             }
          },
@@ -75,13 +77,98 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
 
             }
          },
-         
-         afterRender: {
+
+         render: {
             value: function () {
-               var name = this.getState('object.name');
-               if (name) {
-                  Navbar.setTitle(name);
+               // The state.status property is used to switch to the appropriate view.
+               console.log('STATUS');
+               console.log(this.getState('status'));
+               switch (this.getState('status')) {
+               case 'found':
+                  var name = this.getState('object.name');
+                  if (name) {
+                     Navbar.setTitle(name);
+                  }
+                  this.places.content.html(this.renderTemplate('main'));
+                     
+                  var dataRef = this.getState('object.wsid') + '/' + this.getState('object.id') + '/' + this.getState('object.version');
+                     
+                     console.log('dataref'); console.log(dataRef);
+
+                  Navbar.addButton({
+                        name: 'copy',
+                        label: '+ New Narrative',
+                        style: 'primary',
+                        icon: 'plus-square',
+                        url: '/functional-site/#/narrativemanager/new?copydata='+dataRef,
+                        external: true
+                     })
+                     .addButton({
+                        name: 'download',
+                        label: 'Download',
+                        style: 'primary',
+                        icon: 'download',
+                        callback: function () {
+                           alert('download object');
+                        }.bind(this)
+                     })
+                     .addDropdown({
+                        place: 'end',
+                        name: 'options',
+                        style: 'default',
+                        icon: 'copy',
+                        label: 'Copy',
+                        items: [{
+                              name: 'narrative1',
+                              icon: 'key',
+                              label: 'Narrative 1',
+                              url: 'xxx',
+                              external: true
+                        },
+                           {
+                              name: 'narrative2',
+                              icon: 'key',
+                              label: 'Narrative 3',
+                              url: 'xxx',
+                              external: true
+                        },
+                           {
+                              name: 'narrative3',
+                              icon: 'key',
+                              label: 'Narrative 3',
+                              url: 'xxx',
+                              external: true
+                        }]
+                     });
+                  break;
+               case 'notfound':
+                  Navbar.setTitle('<span style="color: red;">This Object was Not Found</span>');
+                  Navbar.clearButtons();
+                  this.places.content.html(this.renderTemplate('error'));
+                  break;
+               case 'denied':
+                  Navbar.setTitle('<span style="color: red;">Access Denied to this Object</span>');
+                  Navbar.clearButtons();
+                  this.places.content.html(this.renderTemplate('error'));
+                  break;
+               case 'error':
+                  Navbar.setTitle('<span style="color: red;">An Error has Occurred Accessing this Object</span>');
+                  Navbar.clearButtons();
+                  this.places.content.html(this.renderTemplate('error'));
+                  break;
+               default:
+                  Navbar.setTitle('An Error has Occurred Accessing this Object');
+                  Navbar.clearButtons();
+                  this.setState('error', {
+                     type: 'internal',
+                     code: 'invalidstatus',
+                     shortMessage: 'The internal status "' + this.getState('status') + '" is not suppored',
+                     originalMessage: err.message
+                  });
+                  this.places.content.html(this.renderTemplate('error'));
+                  break;
                }
+
             }
          },
 
@@ -98,15 +185,15 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                         includeMetadata: 1
                      })
                      .then(function (data) {
-                        console.log('here');
+                        //console.log('here');
                         if (!data || data.length === 0) {
                            this.setState('status', 'notfound');
                            resolve();
                         } else {
                            this.setState('status', 'found');
                            var obj = APIUtils.object_info_to_object(data[0]);
-                           console.log('OBJECT');
-                           console.log(obj);
+                           //console.log('OBJECT');
+                           //console.log(obj);
                            this.setState('object', obj);
                            resolve();
                         }
@@ -114,8 +201,45 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                      .catch(function (err) {
                         console.log('ERROR');
                         console.log(err);
-                        reject(err);
-                     })
+
+                        if (err.status && err.status === 500) {
+                           // User probably doesn't have access -- but in any case we can just tell them
+                           // that they don't have access.
+                           if (err.error.error.match(/^us.kbase.workspace.database.exceptions.NoSuchObjectException:/)) {
+                              this.setState('status', 'notfound');
+                              this.setState('error', {
+                                 type: 'client',
+                                 code: 'notfound',
+                                 shortMessage: 'This object does not exist',
+                                 originalMessage: err.message
+                              });
+                           } else if (err.error.error.match(/^us.kbase.workspace.database.exceptions.InaccessibleObjectException:/)) {
+                              this.setState('status', 'denied');
+                              this.setState('error', {
+                                 type: 'client',
+                                 code: 'denied',
+                                 shortMessage: 'You do not have access to this object',
+                                 originalMessage: err.message
+                              });
+                           } else {
+                              this.setState('status', 'error');
+                              this.setState('error', {
+                                 type: 'client',
+                                 code: 'error',
+                                 shortMessage: 'An unknown error occured',
+                                 originalMessage: err.message
+                              });
+                           }
+                           resolve();
+                        } else {
+                           this.setState('error', {
+                              type: 'general',
+                              code: 'error',
+                              shortMessage: 'An unknown error occured'
+                           });
+                           reject(err);
+                        }
+                     }.bind(this))
                      .done();
                }.bind(this));
             }

@@ -1,18 +1,12 @@
-
-
 /*  Controllers
  *
  *  These are the 'glue' between models and views.
  *  See: https://docs.angularjs.org/guide/controller
  *  
 */
-
-
-app.controller('methodAccordion', function ($scope, narrative, $http) {
-
-
+app
+.controller('methodAccordion', function ($scope, narrative, $http) {
 })
- 
 .controller('Analysis', function($scope, $state, $stateParams, $location, narrative, $http) {
     // service for narrative (builder) state
     $scope.narrative = narrative;
@@ -409,7 +403,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     $('<link>')
     .appendTo('head')
     .attr({type: 'text/css', rel: 'stylesheet'})
-    .attr('href', 'views/dashboard/dashboard/style.css');
+    .attr('href', 'views/dashboard/style.css');
     
     // Set up the navbar menu
     require(['kbasenavbar'], function (NAVBAR) {
