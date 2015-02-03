@@ -747,8 +747,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     };
 
     var finish_logout = function() {
-        $location.url('/login/?nextPath='+$location.path());
-        //$location.path('/login/');
+        // $location.url('/login/?nextPath='+$location.path());
+        $location.path('/login/');
         $rootScope.$apply();
         window.location.reload();
     };
