@@ -123,11 +123,17 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                 }]
                             },
                             function(obj_info_list) {
+                                console.log('saved narrative:');
+                                console.log(obj_info_list[0]);
+                                var returnData = {ws_info: ws_info,
+                                                  nar_info: obj_info_list[0]};
                                 self._complete_new_narrative(
-                                        ws_info,
-                                        obj_info_list[0],
-                                        params,
-                                        _callback,
+                                        ws_info[0],          //ws id
+                                        obj_info_list[0][0], //obj id
+                                        params.importData,
+                                        function() {
+                                            _callback(returnData)
+                                        },
                                         _error_callback);
                             }, function (error) {
                                 console.error(error);
@@ -148,17 +154,23 @@ var NarrativeManager = function(options, auth, auth_cb) {
         );
     };
     
-    this._complete_new_narrative = function(ws_info, obj_info, params,
+    this._complete_new_narrative = function(ws_id, obj_id, importData,
             _callback, _error_callback) {
         var self = this;
-        console.log('saved narrative:');
-        console.log(obj_info);
         // 4) better to keep the narrative perm id instead of the name
         self.ws.alter_workspace_metadata(
-            {wsi: {workspace: ws_info[1]},
-             'new': {narrative: obj_info[0] + '', is_temporary: 'true'}
+            {wsi: {id: ws_id},
+             'new': {narrative: obj_id + '', is_temporary: 'true'}
             },
-            function() {}, //TODO wrap rest of fn here
+            function() {
+                //should really do this first - fix later
+                    self._copy_to_narrative(
+                            ws_id,
+                            importData,
+                            _callback,
+                            _error_callback
+                    )
+            },
             function(error) {
                 console.error(error);
                 if (_error_callback) {
@@ -166,16 +178,6 @@ var NarrativeManager = function(options, auth, auth_cb) {
                 }
             }
         );
-        
-        var returnData = {ws_info:ws_info, nar_info: obj_info};
-        self._copy_to_narrative(
-                ws_info[0],
-                params.importData,
-                function() {
-                    _callback(returnData);
-                },
-                _error_callback
-        )
     }
 
      
@@ -197,7 +199,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
                     for(var il = 0; il < infoList.length; il++) {
                         copyJobs.push(self.ws.copy_object(
                                 {from: {ref: importData[il]}, //!! assume same ordering
-                                 to: {wsid:ws_id, name: infoList[il][1]}
+                                 to: {wsid: ws_id, name: infoList[il][1]}
                                 },
                                 function(info) {
                                     console.log('copied');
