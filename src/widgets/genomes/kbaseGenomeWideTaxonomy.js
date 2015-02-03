@@ -8,7 +8,8 @@
             genomeID: null,
             workspaceID: null,
             loadingImage: "assets/img/ajax-loader.gif",
-            kbCache: null
+            kbCache: null,
+            genomeInfo: null
         },
 
         init: function(options) {
@@ -27,7 +28,7 @@
             row.append(tree);
             taxonomyinfo.KBaseGenomeLineage({genomeID: self.options.genomeID, 
             	workspaceID: self.options.workspaceID, kbCache: self.options.kbCache,
-                loadingImage: self.options.loadingImage});
+                loadingImage: self.options.loadingImage, genomeInfo: self.options.genomeInfo});
             this.prepareTree({ws: self.options.workspaceID, id: self.options.genomeID}, tree);
         },
 
@@ -47,7 +48,7 @@
                     }
             	}
             	if (treeName) {
-                    $div.kbaseTree({treeID: treeName, workspaceID: scope.ws});           		
+                    $div.kbaseTree({treeID: treeName, workspaceID: scope.ws, genomeInfo: self.options.genomeInfo});           		
             	} else {
                     
                     var createTreeNar = function() {

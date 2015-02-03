@@ -8,7 +8,8 @@
             genomeID: null,
             workspaceID: null,
             loadingImage: "assets/img/ajax-loader.gif",
-            kbCache: null
+            kbCache: null,
+            genomeInfo: null
         },
 
         init: function(options) {
@@ -34,10 +35,10 @@
             row1.append(genetable);
             seedannotations.KBaseSEEDFunctions({objNameOrId: self.options.genomeID, 
             	wsNameOrId: self.options.workspaceID, objVer: null, kbCache: self.options.kbCache,
-                loadingImage: self.options.loadingImage});
+                loadingImage: self.options.loadingImage, genomeInfo: self.options.genomeInfo});
             genetable.KBaseGenomeGeneTable({genome_id: self.options.genomeID, 
             	ws_name: self.options.workspaceID, kbCache: self.options.kbCache,
-                loadingImage: self.options.loadingImage});
+                loadingImage: self.options.loadingImage, genomeInfo: self.options.genomeInfo});
         },
 
         getData: function() {
