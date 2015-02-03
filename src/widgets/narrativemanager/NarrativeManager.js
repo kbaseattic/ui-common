@@ -89,19 +89,11 @@ var NarrativeManager = function(options, auth, auth_cb) {
         console.log("creating " + nar_name);
         console.log(params);
         
-        var wsMetaData = {
-            'narrative' : nar_name,
-            'is_temporary' : 'true'
-            //'pending_shared_users': '[]',
-            //'rejected_shared_users': '[]'
-        };
-        
         // 1 - create ws
         self.ws.create_workspace(
             {
                 workspace: ws_name,
-                description: "",
-                meta: wsMetaData
+                description: ""
             },
             function(ws_info) {
                 console.log("workspace created:");
@@ -134,7 +126,8 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                 console.log(obj_info_list);
                                 // 4) better to keep the narrative perm id instead of the name
                                 self.ws.alter_workspace_metadata(
-                                    {wsi:{workspace:ws_name},new:{narrative:obj_info_list[0][0]+''}},
+                                    {wsi:{workspace:ws_name},new:{narrative:obj_info_list[0][0]+'',
+                                                                  is_temporary: 'true'}},
                                     function() {},
                                     function() {});
                                 
