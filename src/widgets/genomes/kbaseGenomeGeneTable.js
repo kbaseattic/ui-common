@@ -100,7 +100,7 @@
             			}
             		}
             		var genesSettings = {
-            				//"sPaginationType": "full_numbers",
+            				"sPaginationType": "full_numbers",
             				"iDisplayLength": 10,
             				"aaSorting" : [[1,'asc'],[2,'asc']],  // [[0,'asc']],
             				"sDom": 't<fip>',

@@ -78,7 +78,7 @@
                 //Code for loading the phenotype list table
                 pheno = data[0].data;
                 var tableSettings = {
-                     "sPaginationType": "bootstrap",
+                     "sPaginationType": "full_numbers",
                      "iDisplayLength": 10,
                      "aaData": pheno.phenotypes,
                      "aaSorting": [[ 3, "desc" ]],
