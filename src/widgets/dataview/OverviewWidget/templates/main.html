@@ -29,7 +29,7 @@
             {% endif %}
          </tr>
           <tr>
-            <th>Version</th>
+            <th>Object Version (saves)</th>
             <td>{{state.object.version}}
                   {% if not params.objectVersion  %} 
               <div class="alert alert-warning">
@@ -43,7 +43,7 @@
             </td>
          </tr>
          <tr>
-            <th>Imported on</th>
+            <th>Saved</th>
             <td>{{state.object.save_date|dateFormat}}</td>
          </tr>
          <tr>
@@ -57,7 +57,8 @@
          </tr>
          <tr>
             <th>Permalink</th>
-            <td><a href="/functional-site/#/dataview/{{state.object.wsid}}/{{state.object.id}}/{{state.object.version}}">{{state.object.wsid}}/{{state.object.id}}/{{state.object.version}}</a>
+            {% set permalink = env.browser.location.scheme + "://" +env.browser.location.host + "/functional-site/#/dataview/" + state.object.wsid + "/" + state.object.id + "/" + state.object.version %}
+            <td><a href="{{permalink}}">{{permalink}}</a>
             </td>
          </tr>
       </table>

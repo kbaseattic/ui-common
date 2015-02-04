@@ -89,11 +89,19 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
                this.templates.cache = {};
 
                // The context object is what is given to templates.
-               this.context = {};
+               this.context = {};console.log('LOC'); console.log(window.location);
                this.context.env = {
                   widgetTitle: this.widgetTitle,
                   widgetName: this.widgetName,
-                  docsite: this.getConfig('docsite')
+                  docsite: this.getConfig('docsite'),
+                  browser: {
+                     location: {
+                        scheme: window.location.protocol,
+                        host: window.location.host,
+                        path: window.location.pathname
+                        
+                     }
+                  }
                };
                // NB this means that when clearing state or params, the object
                // should not be blown away.

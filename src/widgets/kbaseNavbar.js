@@ -1,5 +1,5 @@
-define(['jquery', 'nunjucks', 'kbasesession'],
-   function ($, nunjucks, Session) {
+define(['jquery', 'nunjucks', 'kbasesession', 'kbaseconfig'],
+   function ($, nunjucks, Session, Config) {
       "use strict";
       var Navbar = Object.create({}, {
          init: {
@@ -44,7 +44,7 @@ define(['jquery', 'nunjucks', 'kbasesession'],
             }
          },
          version: {
-            value: "0.0.1"
+            value: "0.0.2"
          },
          getVersion: {
             value: function () {
@@ -109,13 +109,13 @@ define(['jquery', 'nunjucks', 'kbasesession'],
                      cfg.target = '_blank';
                   }
                   if (cfg.target) {
-                     var target = 'target="'+cfg.target+'"';
+                     var target = 'target="' + cfg.target + '"';
                   } else {
                      var target = '';
                   }
-                   var button = $('<a data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn" role="button" href="'+cfg.url+'" '+target+'>' +
-                        '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</a>')
-                     
+                  var button = $('<a data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn" role="button" href="' + cfg.url + '" ' + target + '>' +
+                     '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</a>')
+
                } else {
                   var button = $('<button data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn">' +
                         '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</button>')
@@ -243,14 +243,14 @@ define(['jquery', 'nunjucks', 'kbasesession'],
                   name: 'contactus',
                   label: 'Contact Us',
                   icon: 'envelope-o',
-                  url: 'http://staging.kbase.us/contact-us',
+                  url: Config.getConfig('docsite.baseUrl')  + Config.getConfig('docsite.paths.contact'),
                   place: 'end'
                });
                this.addHelpMenuItem({
                   name: 'about',
                   label: 'About KBase',
                   icon: 'info-circle',
-                  url: 'http://staging.kbase.us/about/why-kbase'
+                  url: Config.getConfig('docsite.baseUrl')  + Config.getConfig('docsite.paths.about'),
                });
                return this;
             }
