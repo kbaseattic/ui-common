@@ -32,9 +32,9 @@
       <tr>
          <td><a href="/functional-site/#/narrativemanager/new?app={{app.id}}" target="_blank">{{ app.name }}</a>
          </td>
-         <td>x</td>
-         <td>x</td>
-         <td>x</td>
+         <td>{{app.narrativeCount.owned.narratives|length2}}</td>
+         <td>{{app.narrativeCount.shared.narratives|length2}}</td>
+         <td>{{app.narrativeCount.public.narratives|length2}}</td>
          <!--<td>x</td>
          
          <td>{{ app.ver }}</td>

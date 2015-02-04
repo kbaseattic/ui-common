@@ -8,6 +8,7 @@
       "search_url": "https://kbase.us/services/search/",
       "user_profile_url": "https://kbase.us/services/user_profile/rpc",
       "login_url": "https://kbase.us/services/authorization/Sessions/Login",
+      "narrative_method_store_url": "https://kbase.us/services/narrative_method_store/rpc",
       "session": {
          "cookie": {
             "max-age": 5184000
@@ -35,6 +36,7 @@
       "search_url": "https://search-dev.kbase.us/search/",
       "user_profile_url": "https://dev19.berkeley.kbase.us/services/user_profile/rpc",
       "login_url": "https://kbase.us/services/authorization/Sessions/Login",
+      "narrative_method_store_url": "https://kbase.us/services/narrative_method_store/rpc",
       "kbase_clients": {
          "defaults": {
             "timeout": 900000
@@ -62,6 +64,7 @@
       "search_url": "https://search-dev.kbase.us/search/",
       "user_profile_url": "https://dev19.berkeley.kbase.us/services/user_profile/rpc",
       "login_url": "https://kbase.us/services/authorization/Sessions/Login",
+      "narrative_method_store_url": "https://kbase.us/services/narrative_method_store/rpc",
       "kbase_clients": {
          "defaults": {
             "timeout": 900000

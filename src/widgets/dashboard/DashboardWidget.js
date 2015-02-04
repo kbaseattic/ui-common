@@ -108,6 +108,15 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                      return permissionFlag;
                   }
                }.bind(this));
+                this.templates.env.addFilter('length2', function (x) {
+                  if (x) {
+                     if (x instanceof Array) {
+                        return x.length;
+                     } else if (x instanceof Object) {
+                        return Object.keys(x).length;
+                     }
+                  }
+               }.bind(this));
                // create a gravatar-url out of an email address and a 
                // default option.
                this.templates.env.addFilter('gravatar', function (email, size, rating, gdefault) {
