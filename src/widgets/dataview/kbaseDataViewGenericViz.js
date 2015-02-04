@@ -249,7 +249,7 @@
 			var $panel = $('<div>').addClass("panel panel-default")
 					.append($('<div>').addClass('panel-heading')
 						.append($('<span>').addClass('panel-title')
-							    .append('Data Visualization')))
+							    .append('Data View')))
 					.append($('<div>').addClass('panel-body').append($widgetDiv));
 					
 				//css({'margin':'10px'});
