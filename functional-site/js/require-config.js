@@ -52,6 +52,7 @@ require.config({
       kbasecookie: '/src/kbaseCookie',
       kbasetest: '/src/kbaseTest',
       'kb.utils.api': '/src/kbaseAPIUtils',
+      'kb.alert': '/src/widgets/kbaseAlert',
 
       // widgets
       // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
@@ -83,9 +84,6 @@ require.config({
       'kb.widget.dataview.overview': '/src/widgets/dataview/OverviewWidget'
    },
    shim: {
-    
-      
-      
       // Better standard naming: Prefix with kbc_ (KBase Client), followed
       // by the global object / base filename the client lib.
      

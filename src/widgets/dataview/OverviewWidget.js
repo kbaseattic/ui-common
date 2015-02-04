@@ -5,7 +5,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
          init: {
             value: function (cfg) {
                cfg.name = 'OverviewWidget';
-               cfg.title = 'Data Overview';
+               cfg.title = 'Data Object Summary';
                this.DataviewWidget_init(cfg);
 
                this.templates.env.addFilter('dateFormat', function (dateString) {
@@ -20,6 +20,15 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                      return '';
                   } else {
                      return Utils.fileSizeFormat(numberString);
+                  }
+               }.bind(this));
+               this.templates.env.addFilter('length2', function (x) {
+                  if (x) {
+                     if (x instanceof Array) {
+                        return x.length;
+                     } else if (x instanceof Object) {
+                        return Object.keys(x).length;
+                     }
                   }
                }.bind(this));
 
@@ -90,7 +99,9 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
 
                   var dataRef = this.getState('object.wsid') + '/' + this.getState('object.id') + '/' + this.getState('object.version');
 
-                  Navbar.addButton({
+                  Navbar
+                  .clearButtons()
+                  .addButton({
                         name: 'copy',
                         label: '+ New Narrative',
                         style: 'primary',
@@ -110,8 +121,6 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
 
 
                   var narratives = this.getState('writableNarratives');
-                  console.log('NAR');
-                  console.log(narratives.length);
                   var items = [];
                   if (narratives) {
 
@@ -132,8 +141,6 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                            }.bind(this))(narrative.id)
                         });
                      }
-                     console.log('ITEMS');
-                     console.log(items);
                      Navbar.addDropdown({
                         place: 'end',
                         name: 'options',
@@ -178,11 +185,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
          getObjectRef: {
             value: function () {
                if (this.hasState('object')) {
-                  if (this.hasState('object.version')) {
-                     return this.getState('object.wsid') + '/' + this.getState('object.id') + '/' + this.getState('object.version');
-                  } else {
-                     return this.getState('object.wsid') + '/' + this.getState('object.id');
-                  }
+                  return APIUtils.makeWorkspaceObjectRef(this.getParam('workspace.id'), this.getParam('object.id'), this.getParam('object.version'))
                }
             }
          },
@@ -219,6 +222,49 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
 
             }
          },
+         
+         fetchVersions: {
+            value: function () {
+               
+               Utils.promise(this.workspaceClient, 'get_object_info_new', {
+                  objects: [{ref: APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'))}]
+               })
+               .then(function (data) {
+                  if (data.length !== 1) {
+                     return;
+                  }
+                  var object = APIUtils.object_info_to_object(data[0]);
+                  if (object.version === 1) {
+                     this.setState('versions', [object]);
+                     return;
+                  } 
+                  var versions = [];
+                  for (var i=0; i<object.version; i++) {
+                     versions.push(i);
+                  }
+                  Utils.promise(this.workspaceClient, 'get_object_info_new', {
+                     objects: versions.map(function (x) {
+                        return {ref: APIUtils.makeWorkspaceObjectRef(object.wsid, object.id, x)}
+                     })
+                  }).then(function (data) {
+                     var versions = data.map(function (x) {
+                        return APIUtils.object_info_to_object(x);
+                     });
+                     this.setState('versions', versions.sort(function (a,b) {return a.version-b.version}));
+                  }.bind(this)).catch(function(err) {
+                     console.log('ERROR');
+                     console.log(err);
+                  }).done();
+               }.bind(this))
+               .catch(function (err) {
+                  console.log('ERROR'); 
+                  console.log(err);
+               })
+               .done();
+              
+              
+            }
+         },
 
          setInitialState: {
             value: function () {
@@ -226,12 +272,12 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                return Q.Promise(function (resolve, reject, notify) {
                   Utils.promise(this.workspaceClient, 'get_object_info_new', {
                         objects: [{
-                           ref: this.getParam('workspaceId') + '/' + this.getParam('objectId') +
-                            (this.getParam('objectVersion') ? ('/' + this.getParam('objectVersion')) : "")
-                     }],
+                           ref:  APIUtils.makeWorkspaceObjectRef(this.getParam('workspaceId'), this.getParam('objectId'), this.getParam('objectVersion'))
+                        }], 
                         includeMetadata: 1
                      })
                      .then(function (data) {
+                           console.log('DATA'); console.log(data);
                         if (!data || data.length === 0) {
                            this.setState('status', 'notfound');
                            resolve();
@@ -239,32 +285,35 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                            this.setState('status', 'found');
                            var obj = APIUtils.object_info_to_object(data[0]);
                            this.setState('object', obj);
-                           //console.log('OBJECT');
-                           //console.log(obj);
-
+                           console.log('OBJECT'); console.log(obj);
 
                            // Get more info...
 
                            // The narrative this lives in.
+                           var workspaceId = this.getParam('workspaceId');
+                           var isIntegerId = /^\d+$/.test(workspaceId);
                            Utils.promise(this.workspaceClient, 'get_workspace_info', {
-
-                                 id: $.isNumeric(this.getParam('workspaceId')) ? this.getParam('workspaceId') : null,
-                                 workspace: $.isNumeric(this.getParam('workspaceId')) ? null : this.getParam('workspaceId')
+                                 id:  isIntegerId ? workspaceId : null,
+                                 workspace: isIntegerId ? null : workspaceId
                               })
                               .then(function (data) {
-                                 //console.log('WS DATA'); console.log(APIUtils.workspace_metadata_to_object(data));
                                  this.setState('workspace', APIUtils.workspace_metadata_to_object(data));
-
+                              
+                              
+                                 // Okay, the rest doens't really have to be done here ... 
+                              
+                                 // Get versions to populate the versions panel.
+                                 this.fetchVersions();
+                              
+                              
                                  // Other narratives this user has.
                                  Utils.promise(this.workspaceClient, 'list_workspace_info', {
                                        perm: 'w'
                                     })
                                     .then(function (data) {
-                                       //console.log('GOT:'); console.log(data);
                                        var objects = data.map(function (x) {
                                           return APIUtils.workspace_metadata_to_object(x)
                                        });
-                                       //console.log('OBJS'); console.log(objects);
                                        var narratives = objects.filter(function (obj) {
                                           if (obj.metadata.narrative && (!isNaN(parseInt(obj.metadata.narrative))) &&
                                              // don't keep the current narrative workspace.
@@ -276,8 +325,10 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                                              return false;
                                           }
                                        }.bind(this));
-                                       //console.log('NAR'); console.log(narratives);
                                        this.setState('writableNarratives', narratives);
+                                    
+                                       
+                                    
                                        resolve();
                                        // FIN
                                     }.bind(this))
