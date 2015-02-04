@@ -56,6 +56,7 @@ require.config({
 
       // widgets
       // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
+      'kb.widget.buttonbar': '/src/widgets/kbaseButtonbar',
       kbasesocialwidget: '/src/widgets/social/kbaseSocialWidget',
       kbaseuserprofile: '/src/kbaseUserProfile',
       kbaseuserprofilewidget: '/src/widgets/social/kbaseUserProfileWidget',

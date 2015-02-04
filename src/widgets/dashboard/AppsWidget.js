@@ -147,7 +147,6 @@ define(['dashboard_widget', 'kbc_UserProfile', 'kbasesession', 'kbc_NarrativeMet
                            
                            this.getNarratives()
                               .then(function (narratives) {
-                                 console.log(narratives);
                                  // Now we have all the narratives this user can see.
                                  // now bin them by app.
                                  for (var i = 0; i < narratives.length; i++) {
@@ -168,7 +167,7 @@ define(['dashboard_widget', 'kbc_UserProfile', 'kbasesession', 'kbc_NarrativeMet
                                           if (!appMap[app]) {
                                              console.log('WARNING: skipped app ' + app);
                                           } else {
-                                             appMap[app][bin].count ++;
+                                             appMap[app][bin].count++;
                                              appMap[app][bin].narratives[narrative.workspace.id] = 1;
                                           }
                                        }

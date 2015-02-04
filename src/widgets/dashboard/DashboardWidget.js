@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofile', 'postal', 'json!functional-site/config.json'],
-   function (nunjucks, $, Q, Session, Utils, UserProfile, Postal, config) {
+define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api', 'kbaseuserprofile', 'kbc_Workspace', 'postal', 'json!functional-site/config.json'],
+   function (nunjucks, $, Q, Session, Utils, APIUtils,  UserProfile, Workspace, Postal, config) {
       "use strict";
       var DashboardWidget = Object.create({}, {
 
@@ -77,7 +77,11 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                // NB the templating requires a dedicated widget resources directory in 
                //   /src/widgets/WIDGETNAME/templates
                this.templates = {};
-               this.templates.env = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/dashboard/' + this.widgetName + '/templates'), {
+               var loaders = [
+                 new nunjucks.WebLoader('/src/widgets/dashboard/' + this.widgetName + '/templates', true),
+                 new nunjucks.WebLoader('/src/widgets/dashboard/DashboardWidget/templates', true)
+               ];
+               this.templates.env = new nunjucks.Environment(loaders, {
                   'autoescape': false
                });
                this.templates.env.addFilter('roleLabel', function (role) {
@@ -126,6 +130,29 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                this.templates.env.addFilter('kbmarkup', function (s) {
                   s = s.replace(/\n/g, '<br>');
                   return s;
+               });
+               this.templates.env.addFilter('dateFormat', function (dateString) {
+                  return Utils.niceElapsedTime(dateString);
+               }.bind(this));
+                this.templates.env.addFilter('jsDatestring', function (dateString) {
+                  return Utils.iso8601ToDate(dateString).toISOString();
+               }.bind(this));
+               this.templates.env.addFilter('niceRuntime', function (seconds) {
+                  if (!seconds) {
+                     return ''
+                  }
+                  var minutes = Math.floor(seconds/60);
+                  var seconds = seconds % 60;
+                  var hours = Math.floor(minutes/60);
+                  var minutes = minutes % 60;
+                  var days = Math.floor(hours/24);
+                  var hours = hours % 24;
+                  
+                  return (days?days+'d':'') + (hours?' '+hours+'h':'') + (minutes?' '+minutes+'m':'') + (seconds?' '+seconds+'s':'')
+               }.bind(this));
+               
+               this.templates.env.addGlobal('randomNumber', function (from, to) {
+                  return Math.floor(from + Math.random()*(to - from));
                });
                // This is the cache of templates.
                this.templates.cache = {};
@@ -562,11 +589,11 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                if (this.error) {
                   this.renderError();
                } else if (Session.isLoggedIn()) {
-                  this.places.title.html(this.widgetTitle);
+                 this.setTitle(this.widgetTitle);
                   this.places.content.html(this.renderTemplate('authorized'));
                } else {
                   // no profile, no basic aaccount info
-                  this.places.title.html(this.widgetTitle);
+                 this.setTitle(this.widgetTitle);
                   this.places.content.html(this.renderTemplate('unauthorized'));
                }
                if (this.afterRender) {
@@ -599,6 +626,24 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
             value: function () {
                this.places.content.html('<img src="assets/img/ajax-loader.gif"></img>');
             }
+         },
+         
+         setTitle: {
+           value: function (title) {
+             this.places.title.html(this.widgetTitle);             
+           }
+         },
+         
+         clearButtons: {
+           value: function (title) {
+             
+           }
+         },
+         
+         addButton: {
+           value: function (cfg) {
+             
+           }
          },
 
          loadCSS: {
@@ -839,6 +884,134 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kbaseuserprofi
                }]
 
 
+            }
+         },
+           isValidNarrative: {
+            value: function (ws) {
+               if (ws.metadata.narrative &&
+                  // corrupt workspaces may have narrative set to something other than the object id of the narrative
+                  /^\d+$/.test(ws.metadata.narrative) &&
+                  ws.metadata.is_temporary !== 'true') {
+                  return true;
+               } else {
+                  return false;
+               }
+            }
+         },
+
+         applyNarrativeFilter: {
+            value: function (ws, filter) {
+               return true;
+            }
+         },
+
+         getNarratives: {
+            value: function (cfg) {
+               // get all the narratives the user can see.
+               return Q.promise(function (resolve, reject, notify) {
+                  this.promise(this.workspaceClient, 'list_workspace_info', cfg.params)
+                     .then(function (data) {
+                        var workspaces = [];
+                        for (var i = 0; i < data.length; i++) {
+                           var wsInfo = APIUtils.workspace_metadata_to_object(data[i]);
+                           if (this.isValidNarrative(wsInfo) && this.applyNarrativeFilter(cfg.filter)) {
+                              workspaces.push(wsInfo);
+                           }
+                        }
+
+                        var objectRefs = workspaces.map(function (w) {
+                           return {
+                              ref: w.id + '/' + w.metadata.narrative
+                           }
+                        });
+
+                        // Now get the corresponding object metadata for each narrative workspace
+                        this.promise(this.workspaceClient, 'get_object_info_new', {
+                              objects: objectRefs,
+                              ignoreErrors: 1,
+                              includeMetadata: 1
+                           })
+                           .then(function (data) {
+                              var narratives = [];
+                              for (var i = 0; i < data.length; i++) {
+                                 // If one of the object ids from the workspace metadata (.narrative) did not actually
+                                 // result in a hit, skip it. This can occur if a narrative is corrupt -- the narrative object
+                                 // was deleted or replaced and the workspace metadata not updated.
+                                 if (!data[i]) {
+                                    console.log('WARNING: workspace ' + narratives[i].workspace.id + ' does not contain a matching narrative object');
+                                    continue;
+                                 }
+                                 // Make sure it is a valid narrative object.
+                                 var object = APIUtils.object_info_to_object(data[i]);
+                                 if (object.typeName !== 'Narrative') {
+                                    console.log('WARNING: workspace ' + object.wsid + ' object ' + object.id + ' is not a valid Narrative object'  );
+                                    continue;
+                                 }
+                                 // console.log(object.typeName);
+                                 
+                                 //if (data[i][6] === 4427) {
+                                 //   console.log('MATT'); console.log(data[i]);
+                                 //}
+                                 narratives.push({
+                                    workspace: workspaces[i],
+                                    object: object
+                                 });
+                              }
+                              resolve(narratives);
+                           }.bind(this))
+                           .catch(function (err) {
+                              reject(err);
+                           })
+                           .done();
+                     }.bind(this))
+                     .catch(function (err) {
+                        reject(err);
+                     })
+                     .done();
+               }.bind(this));
+            }
+         },
+         
+          getPermissions: {
+            value: function (narratives) {
+               return Q.promise(function (resolve, reject, notify) {
+                  var promises = narratives.map(function (narrative) {
+                     return this.promise(this.workspaceClient, 'get_permissions', {
+                        id: narrative.workspace.id
+                     })
+                  }.bind(this));
+                  var username = Session.getUsername();
+                  Q.all(promises)
+                     .then(function (permissions) {
+                        for (var i = 0; i < permissions.length; i++) {
+                           var narrative = narratives[i];
+                           narrative.permissions = Utils.object_to_array(permissions[i], 'username', 'permission')
+                              .filter(function (x) {
+                                 if (x.username === username ||
+                                    x.username === '*' ||
+                                    x.username === narrative.workspace.owner) {
+                                    return false;
+                                 } else {
+                                    return true;
+                                 }
+                              })
+                              .sort(function (a, b) {
+                                 if (a.username < b.username) {
+                                    return -1;
+                                 } else if (a.username > b.username) {
+                                    return 1;
+                                 } else {
+                                    return 0
+                                 }
+                              });
+                        }
+                        resolve(narratives);
+                     }.bind(this))
+                     .catch(function (err) {
+                        reject(err);
+                     })
+                     .done();
+               }.bind(this));
             }
          }
 

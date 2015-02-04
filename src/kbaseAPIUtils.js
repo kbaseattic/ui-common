@@ -1,5 +1,5 @@
-define([],
-   function () {
+define(['kbaseutils'],
+   function (Utils) {
       "use strict";
       return Object.create({}, {
        // KBase Service Utility Methods
@@ -16,7 +16,8 @@ define([],
                   user_permission: wsInfo[5],
                   globalread: wsInfo[6],
                   lockstat: wsInfo[7],
-                  metadata: wsInfo[8]
+                  metadata: wsInfo[8],
+                  modDate: Utils.iso8601ToDate(wsInfo[3])
                };
             }
          },
@@ -64,7 +65,8 @@ define([],
                   obj_id: 'ws.' + data[6] + '.obj.' + data[0],
                   typeName: type[1],
                   typeMajorVersion: type[2],
-                  typeMinorVersion: type[3]
+                  typeMinorVersion: type[3],
+                  saveDate: Utils.iso8601ToDate(data[3])
                };
             }
          },  
