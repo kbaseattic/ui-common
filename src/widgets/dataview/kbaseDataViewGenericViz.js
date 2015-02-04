@@ -167,8 +167,8 @@
 		
 		
 		'GenomeComparison.ProteomeComparison': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    widget:'GenomeComparisonWidget',
+		    options: '{"ws_id":???id,"ws_name":???ws}'
 		},
 		
 		'KBaseAssembly.AssemblyReport': {
@@ -226,10 +226,10 @@
 		var config = type2widget[type];
 		if (config.widget && config.options) {
 		    var options = config.options;
-		    options = options.replace(/\?\?\?ws/g, obj_info[6]);
-		    options = options.replace(/\?\?\?wsname/g, obj_info[7]);
-		    options = options.replace(/\?\?\?id/g, obj_info[0]);
-		    options = options.replace(/\?\?\?objname/g, obj_info[1]);
+		    //options = options.replace(/\?\?\?ws/g, obj_info[6]);
+		    options = options.replace(/\?\?\?ws/g, JSON.stringify(obj_info[7]));
+		    //options = options.replace(/\?\?\?id/g, obj_info[0]);
+		    options = options.replace(/\?\?\?id/g,JSON.stringify(obj_info[1]));
 		    options = options.replace(/\?\?\?ver/g, obj_info[4]);
 		    options = options.replace(/\?\?\?type/g, type);
 		    
