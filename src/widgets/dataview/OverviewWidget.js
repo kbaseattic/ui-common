@@ -86,7 +86,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                   }
                   this.places.content.html(this.renderTemplate('main'));
 
-                  var dataRef = this.getState('object.wsid') + '/' + this.getState('object.id') + '/' + this.getState('object.version');
+                  var dataRef = this.getObjectRef();
 
                   Navbar
                   .clearButtons()
@@ -107,7 +107,6 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                            alert('download object');
                         }.bind(this)
                      });
-
 
                   var narratives = this.getState('writableNarratives');
                   if (narratives) {
@@ -139,23 +138,27 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                   }
                   break;
                case 'notfound':
-                  Navbar.setTitle('<span style="color: red;">This Object was Not Found</span>');
-                  Navbar.clearButtons();
+                  Navbar
+                  .setTitle('<span style="color: red;">This Object was Not Found</span>')
+                  .clearButtons();
                   this.places.content.html(this.renderTemplate('error'));
                   break;
                case 'denied':
-                  Navbar.setTitle('<span style="color: red;">Access Denied to this Object</span>');
-                  Navbar.clearButtons();
+                  Navbar
+                  .setTitle('<span style="color: red;">Access Denied to this Object</span>')
+                  .clearButtons();
                   this.places.content.html(this.renderTemplate('error'));
                   break;
                case 'error':
-                  Navbar.setTitle('<span style="color: red;">An Error has Occurred Accessing this Object</span>');
-                  Navbar.clearButtons();
+                  Navbar
+                  .setTitle('<span style="color: red;">An Error has Occurred Accessing this Object</span>')
+                  .clearButtons();
                   this.places.content.html(this.renderTemplate('error'));
                   break;
                default:
-                  Navbar.setTitle('An Error has Occurred Accessing this Object');
-                  Navbar.clearButtons();
+                  Navbar
+                  .setTitle('An Error has Occurred Accessing this Object')
+                  .clearButtons();
                   this.setState('error', {
                      type: 'internal',
                      code: 'invalidstatus',
@@ -200,12 +203,6 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                   .then(function (data) {
                      if (data) {
 
-                        console.log('COPIED');
-                        console.log(data);
-                        console.log(to);
-                        console.log(name);
-                        console.log('COPIED');
-                        
                         var narrativeUrl = this.makeUrl('/narrative/'+APIUtils.makeWorkspaceObjectId(narrativeWs.id, narrativeWs.metadata.narrative));
                         this.alert.addSuccessMessage('Success','Successfully copied this data object to Narrative <i>' + narrativeWs.metadata.narrative_nice_name + '</i>.  <a href="'+narrativeUrl+'" target="_blank">Open this Narrative</a>');
                      } else {

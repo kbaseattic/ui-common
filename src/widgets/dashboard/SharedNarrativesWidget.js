@@ -77,7 +77,6 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
                   var username = Session.getUsername();
                   Q.all(promises)
                      .then(function (permissions) {
-                        // console.log(permissions);
                         for (var i = 0; i < permissions.length; i++) {
                            var narrative = narratives[i];
                            narrative.permissions = Utils.object_to_array(permissions[i], 'username', 'permission')
@@ -156,14 +155,12 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
                               this.promise(this.workspaceClient, 'get_object_info_new',
                                            { objects: workspaceIds, ignoreErrors: 1, includeMetadata: 1})
                                  .then(function (data) {
-                                    console.log(data);
                                     for (var i = 0; i < data.length; i++) {
                                        if (!data[i]) { continue; } // can't find the narrative, just skip
                                        
                                        // NB this has given us all of the objects in the relevant workspaces.
                                        // Now we need to filter out just the narratives of interest
                                        var wsObject = APIUtils.object_info_to_object(data[i]);
-                                       // console.log(narrativesByWorkspace[wsObject.wsid].workspace.metadata.narrative + '=' + wsObject.id);
                                        // NB: we use plain == for comparison since we need type convertion. The metadata.narrative
                                        // is a string, but wsObject.id is a number.
                                        if (narrativesByWorkspace[wsObject.wsid].workspace.metadata.narrative != wsObject.id) {
@@ -181,7 +178,6 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
                                        }
                                     }
                                     goodNarratives.forEach(function (x) {
-                                       //console.log(x);
                                        x.object = narrativesByWorkspace[x.workspace.id].object;
                                     });
                                     this.setState('narratives', goodNarratives);

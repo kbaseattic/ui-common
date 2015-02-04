@@ -6,10 +6,18 @@
 <table class="table" id="dashboard-apps-widget-{{env.generatedId}}">
    <thead>
       <tr>
-         <th>Name</th>
-         <th>In Your Narratives</th>
-         <th>In Shared Narratives</th>
-         <th>In Public Narratives</th>
+         <th rowspan="2" valign="bottom">Name</th>
+         <th colspan="3" style="text-align: center;">In Narratives</th>
+         <!--<th>Last Updated</th>
+         
+         <th>Current Version</th>
+         -->
+      </tr>
+      <tr>
+         
+         <th>Yours</th>
+         <th>Shared</th>
+         <th>Public</th>
          <!--<th>Last Updated</th>
          
          <th>Current Version</th>
@@ -37,6 +45,7 @@
 </table>
 <script>
    require(['jquery'], function ($) {
+      return;
       $('#dashboard-apps-widget-{{env.generatedId}}').DataTable({
          initComplete: function (settings) {
             var api = this.api();

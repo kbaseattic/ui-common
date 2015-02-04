@@ -1,12 +1,12 @@
-define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbc_Workspace', 'kbc_UserProfile', 'kbasesession', 'q'],
-   function ($, nunjucks, SocialWidget, WorkspaceService, UserProfileService, Session, Q) {
+define(['jquery', 'nunjucks', 'dashboard_widget', 'kbc_Workspace', 'kbc_UserProfile', 'kbasesession', 'kbaseutils', 'kb.utils.api', 'q'],
+   function ($, nunjucks, DashboardWidget, WorkspaceService, UserProfileService, Session, Utils, APIUtils, Q) {
       "use strict";
-      var Widget = Object.create(SocialWidget, {
+      var Widget = Object.create(DashboardWidget, {
          init: {
             value: function (cfg) {
-               cfg.name = 'CommonCollaboratorNetwork';
+               cfg.name = 'CollaboratorNetwork';
                cfg.title = 'Common Collaborator Network';
-               this.SocialWidget_init(cfg);
+               this.DashboardWidget_init(cfg);
 
                return this;
             }
@@ -38,14 +38,6 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbc_Workspace', 'kbc_UserPro
                      throw 'The user profile client url is not defined';
                   }
 
-                  /*
-                  now set inthe social widget for all social widgets.
-                  if (!this.hasConfig('userId')) {
-                    throw 'The userId is required for this widget but was not provided';
-                  }
-                  this.setParam('userId', this.getConfig('userId'));
-                    */
-
                } else {
                   this.workspaceClient = null;
                   this.userProfileClient = null;
@@ -61,7 +53,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbc_Workspace', 'kbc_UserPro
                   if (!Session.isLoggedIn()) {
                      resolve();
                   } else {
-                     this.promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
+                     Utils.promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
                         .then(function (data) {
                            if (data && data[0]) {
                               this.setState('currentUserProfile', data[0], false);
@@ -124,7 +116,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbc_Workspace', 'kbc_UserPro
                   users: {},
                   all_links: []
                };
-               this.promise(this.workspaceClient, 'list_workspace_info', {
+               Utils.promise(this.workspaceClient, 'list_workspace_info', {
                      excludeGlobal: 1
                   })
                   .then(function (data) {
@@ -134,7 +126,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbc_Workspace', 'kbc_UserPro
                      // TODO: switch from jquery to Q based promises.
                      var createUserPermCall = function (wsid) {
                         var def = Q.defer();
-                        return this.promise(this.workspaceClient, 'get_permissions', {
+                        return Utils.promise(this.workspaceClient, 'get_permissions', {
                               id: wsid
                            })
                            .then(function (permdata) {
@@ -207,7 +199,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbc_Workspace', 'kbc_UserPro
                         //int object, permission user_permission, permission globalread,
                         //lock_status lockstat, usermeta meptadata> workspace_info
                         var wsid = data[k][0];
-                        var wsData = this.workspace_metadata_to_object(data[k]);
+                        var wsData = APIUtils.workspace_metadata_to_object(data[k]);
 
                         // FIXME: Only consider workspaces which are "modern".
                         // At present this means it has a narrative_nice_name
@@ -239,7 +231,7 @@ define(['jquery', 'nunjucks', 'kbasesocialwidget', 'kbc_Workspace', 'kbc_UserPro
                            // Get user profiles for all the users, update the colloborators adding the real name.
                            var collaboratorUsers = this.set_to_array(collaborators);
                            //collaboratorUsers.push('testabc'); 
-                           this.promise(this.userProfileClient, 'get_user_profile', collaboratorUsers)
+                           Utils.promise(this.userProfileClient, 'get_user_profile', collaboratorUsers)
                               .then(function (data) {
                                  try {
                                     for (var i = 0; i < data.length; i++) {
