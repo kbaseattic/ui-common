@@ -52,6 +52,7 @@ require.config({
       kbasecookie: '/src/kbaseCookie',
       kbasetest: '/src/kbaseTest',
       'kb.utils.api': '/src/kbaseAPIUtils',
+      'kb.alert': '/src/widgets/kbaseAlert',
 
       // widgets
       // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
@@ -60,10 +61,11 @@ require.config({
       kbaseuserprofilewidget: '/src/widgets/social/kbaseUserProfileWidget',
       kbaseuserrecentactivity: '/src/widgets/social/kbaseUserRecentActivity',
       kbaseuserpopularnarratives: '/src/widgets/social/kbaseUserPopularNarratives',
-      kbaseusercollaboratornetwork: '/src/widgets/social/kbaseUserCollaboratorNetwork',
       kbaseusersearch: '/src/widgets/social/kbaseUserSearch',
       kbaseuserbrowsenarratives: '/src/widgets/social/kbaseUserBrowseNarratives',
       kbaseusersummary: '/src/widgets/social/kbaseUserSummary',
+      kbaseusercollaboratornetwork: '/src/widgets/social/kbaseUserCollaboratorNetwork',
+      
       kbasesession: '/src/kbaseSession',
       kbaseconfig: '/src/kbaseConfig',
       kbasenavbar: '/src/widgets/kbaseNavbar',
@@ -77,15 +79,13 @@ require.config({
       dashboard_narratives_widget: '/src/widgets/dashboard/NarrativesWidget',
       dashboard_apps_widget: '/src/widgets/dashboard/AppsWidget',
       dashboard_data_widget: '/src/widgets/dashboard/DataWidget',
+      'kb.widget.collaboratornetwork': '/src/widgets/dashboard/CollaboratorNetwork',
       
       // Dataview widgets
       'kb.widget.dataview.base': '/src/widgets/dataview/DataviewWidget',
       'kb.widget.dataview.overview': '/src/widgets/dataview/OverviewWidget'
    },
    shim: {
-    
-      
-      
       // Better standard naming: Prefix with kbc_ (KBase Client), followed
       // by the global object / base filename the client lib.
      

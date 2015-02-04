@@ -41,6 +41,8 @@ define([],
             }
             
          },
+         
+         
 
          object_info_to_object: {
             value: function (data) {
@@ -70,6 +72,12 @@ define([],
          makeWorkspaceObjectId: {
             value: function (workspaceId, objectId) {
                return 'ws.' + workspaceId + '.obj.' + objectId;
+            }
+         },
+         
+         makeWorkspaceObjectRef: {
+            value: function (workspaceId, objectId, objectVersion) {
+               return workspaceId + '/' + objectId + (objectVersion ? ('/' + objectVersion) : "");
             }
          }
       });

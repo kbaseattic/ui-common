@@ -1,83 +1,92 @@
 {
-  "setup": "prod",
+   "setup": "prod",
 
-  "prod": {
-    "workspace_url": "https://kbase.us/services/ws/",
-    "fba_url": "https://kbase.us/services/KBaseFBAModeling/",
-    "user_job_state_url": "https://140.221.84.180:7083",
-    "search_url": "https://kbase.us/services/search/",
-    "user_profile_url": "https://kbase.us/services/user_profile/rpc",
-    "login_url": "https://kbase.us/services/authorization/Sessions/Login",
-    "session": {
-      "cookie": {
-         "max-age": 5184000
-       }
-    },
-    "kbase_clients": {
-      "defaults": {
-        "timeout": 900000
+   "prod": {
+      "workspace_url": "https://kbase.us/services/ws/",
+      "fba_url": "https://kbase.us/services/KBaseFBAModeling/",
+      "user_job_state_url": "https://140.221.84.180:7083",
+      "search_url": "https://kbase.us/services/search/",
+      "user_profile_url": "https://kbase.us/services/user_profile/rpc",
+      "login_url": "https://kbase.us/services/authorization/Sessions/Login",
+      "session": {
+         "cookie": {
+            "max-age": 5184000
+         }
+      },
+      "kbase_clients": {
+         "defaults": {
+            "timeout": 900000
+         }
+      },
+      "docsite": {
+         "baseUrl": "http://staging.kbase.us",
+         "host": "staging.kbase.us",
+         "paths": {
+            "about": "/what-is-kbase",
+            "contact": "/contact-us",
+            "browserSupport": "/supported-browsers"
+         }
       }
-    },
-    "docsite": {
-      "url": "http://kbase.us",
-      "about": "/about/what-is-kbase",
-      "contact": "/contact-us",
-      "browserSupport": "/supported-browsers"
-    }
-  },
-  "dev": {
-    "workspace_url": "http://dev04.berkeley.kbase.us:7058",
-    "fba_url": "https://140.221.85.73:4043/",
-    "user_job_state_url": "https://140.221.84.180:7083",
-    "search_url": "https://search-dev.kbase.us/search/",
-    "user_profile_url": "https://dev19.berkeley.kbase.us/services/user_profile/rpc",
-    "login_url": "https://kbase.us/services/authorization/Sessions/Login",
-    "kbase_clients": {
-      "defaults": {
-        "timeout": 900000
+   },
+   "dev": {
+      "workspace_url": "http://dev04.berkeley.kbase.us:7058",
+      "fba_url": "https://140.221.85.73:4043/",
+      "user_job_state_url": "https://140.221.84.180:7083",
+      "search_url": "https://search-dev.kbase.us/search/",
+      "user_profile_url": "https://dev19.berkeley.kbase.us/services/user_profile/rpc",
+      "login_url": "https://kbase.us/services/authorization/Sessions/Login",
+      "kbase_clients": {
+         "defaults": {
+            "timeout": 900000
+         }
+      },
+      "session": {
+         "cookie": {
+            "max-age": 5184000
+         }
+      },
+      "docsite": {
+         "host": "staging.kbase.us",
+         "baseUrl": "http://staging.kbase.us",
+         "paths": {
+            "about": "/what-is-kbase",
+            "contact": "/contact-us",
+            "browserSupport": "/supported-browsers"
+         }
       }
-    },
-    "session": {
-      "cookie": {
-         "max-age": 5184000
-       }
-    },
-    "docsite": {
-      "url": "http://staging.kbase.us",
-      "about": "/about/what-is-kbase",
-      "contact": "/contact-us",
-      "browserSupport": "/supported-browsers"
-    }
-  },
-  "wsdev": {
-    "workspace_url": "http://dev04.berkeley.kbase.us:7058",
-    "fba_url": "https://kbase.us/services/KBaseFBAModeling/",
-    "user_job_state_url": "https://140.221.84.180:7083",
-    "search_url": "https://search-dev.kbase.us/search/",
-    "user_profile_url": "https://ev19.berkeley.kbase.us/services/user_profile/rpc",
-    "login_url": "https://kbase.us/services/authorization/Sessions/Login",
-    "kbase_clients": {
-      "defaults": {
-        "timeout": 900000
+   },
+   "wsdev": {
+      "workspace_url": "http://dev04.berkeley.kbase.us:7058",
+      "fba_url": "https://kbase.us/services/KBaseFBAModeling/",
+      "user_job_state_url": "https://140.221.84.180:7083",
+      "search_url": "https://search-dev.kbase.us/search/",
+      "user_profile_url": "https://dev19.berkeley.kbase.us/services/user_profile/rpc",
+      "login_url": "https://kbase.us/services/authorization/Sessions/Login",
+      "kbase_clients": {
+         "defaults": {
+            "timeout": 900000
+         }
+      },
+      "session": {
+         "cookie": {
+            "max-age": 5184000
+         }
+      },
+      "docsite": {
+         "host": "staging.kbase.us",
+         "baseUrl": "http://staging.kbase.us",
+         "paths": {
+            "about": "/what-is-kbase",
+            "contact": "/contact-us",
+            "browserSupport": "/supported-browsers"
+         }
       }
-    },
-    "session": {
-      "cookie": {
-         "max-age": 5184000
-       }
-    },
-    "docsite": {
-      "url": "http://staging.kbase.us",
-      "about": "/about/what-is-kbase",
-      "contact": "/contact-us",
-      "browserSupport": "/supported-browsers"
-    }
-  },
+   },
 
-  "narrative_url": "//narrative.kbase.us/narrative",
+   "narrative_url": "//narrative.kbase.us/narrative",
 
-  "ui": {
-    "footer": ""
-  }
+   "ui": {
+      "footer": ""
+   }
 
 }

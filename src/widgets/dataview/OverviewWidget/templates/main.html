@@ -7,7 +7,7 @@
 <div class="row">
    <div class="col-sm-6">
 
-      <table class="table table-striped">
+      <table class="table">
          <tr>
             <th>Name</th>
             <td>{{state.object.name}}</td>
@@ -24,10 +24,12 @@
          </tr>
          <tr>
             <th>In Narrative</th>
-            <td><a href="">my narrative here</a></td>
+            {% if state.workspace.metadata.narrative %}            
+            <td><a href="/narrative/ws.{{state.workspace.id}}.obj.{{state.workspace.metadata.narrative}}" target="_blank">{{state.workspace.metadata.narrative_nice_name}}</a></td>
+            {% endif %}
          </tr>
           <tr>
-            <th>Version</th>
+            <th>Object Version (saves)</th>
             <td>{{state.object.version}}
                   {% if not params.objectVersion  %} 
               <div class="alert alert-warning">
@@ -41,7 +43,7 @@
             </td>
          </tr>
          <tr>
-            <th>Imported on</th>
+            <th>Saved</th>
             <td>{{state.object.save_date|dateFormat}}</td>
          </tr>
          <tr>
@@ -55,7 +57,8 @@
          </tr>
          <tr>
             <th>Permalink</th>
-            <td><a href="/functional-site/#/dataview/{{state.object.wsid}}/{{state.object.id}}/{{state.object.version}}">{{state.object.wsid}}/{{state.object.id}}/{{state.object.version}}</a>
+            {% set permalink = env.browser.location.scheme + "//" +env.browser.location.host + "/functional-site/#/dataview/" + state.object.wsid + "/" + state.object.id + "/" + state.object.version %}
+            <td><a href="{{permalink}}">{{permalink}}</a>
             </td>
          </tr>
       </table>
@@ -74,7 +77,10 @@
 
             <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                <div class="panel-body">
-                  <table class="table table-striped">
+                 
+                  {% if state.object.metadata and state.object.metadata|length2 > 0 %}
+                 
+                  <table class="table ">
                     
                      {% for key,value in state.object.metadata|dictsort %}
                      <tr>
@@ -84,6 +90,12 @@
                      {% endfor %}
                     
                   </table>
+                  
+                  {% else %}
+                  
+                  There is no metadata for this data object.
+                  
+                  {% endif %}
                </div>
             </div>
          </div>
@@ -98,8 +110,7 @@
 
             <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                <div class="panel-body">
-                  <table class="table table-striped">
-                    
+                  <table class="table ">
                     
                      <tr>
                         <th>Version</th>
@@ -107,6 +118,13 @@
                         <th>Size</th>
                      </tr>
                     
+                     {% for versionObject in state.versions %}
+                     <tr>
+                        <td><a href="/functional-site/#/dataview/{{versionObject.wsid}}/{{versionObject.id}}/{{versionObject.version}}">{{versionObject.version}}</a></td>
+                        <td>{{versionObject.save_date}}</td>
+                        <td>{{versionObject.size|fileSizeFormat}}</td>
+                     </tr>
+                     {% endfor%}
                     
                   </table>
                </div>

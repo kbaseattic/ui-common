@@ -5,7 +5,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
          init: {
             value: function (cfg) {
                cfg.name = 'OverviewWidget';
-               cfg.title = 'Data Overview';
+               cfg.title = 'Data Object Summary';
                this.DataviewWidget_init(cfg);
 
                this.templates.env.addFilter('dateFormat', function (dateString) {
@@ -20,6 +20,15 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                      return '';
                   } else {
                      return Utils.fileSizeFormat(numberString);
+                  }
+               }.bind(this));
+               this.templates.env.addFilter('length2', function (x) {
+                  if (x) {
+                     if (x instanceof Array) {
+                        return x.length;
+                     } else if (x instanceof Object) {
+                        return Object.keys(x).length;
+                     }
                   }
                }.bind(this));
 
@@ -40,6 +49,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                   this.setParam('objectVersion', this.getConfig('objectVersion'));
                }
 
+               
 
 
                return this;
@@ -65,19 +75,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
             }
          },
 
-         renderLayout: {
-            value: function () {
-               this.container.html(this.renderTemplate('layout'));
-               this.places = {
-                  title: this.container.find('[data-placeholder="title"]'),
-                  alert: this.container.find('[data-placeholder="alert"]'),
-                  content: this.container.find('[data-placeholder="content"]')
-               };
-
-            }
-         },
-
-         render: {
+        render: {
             value: function () {
                // The state.status property is used to switch to the appropriate view.
                switch (this.getState('status')) {
@@ -87,15 +85,17 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                      Navbar.setTitle(name);
                   }
                   this.places.content.html(this.renderTemplate('main'));
-                     
-                  var dataRef = this.getState('object.wsid') + '/' + this.getState('object.id') + '/' + this.getState('object.version');
-                     
-                  Navbar.addButton({
+
+                  var dataRef = this.getObjectRef();
+
+                  Navbar
+                  .clearButtons()
+                  .addButton({
                         name: 'copy',
                         label: '+ New Narrative',
                         style: 'primary',
                         icon: 'plus-square',
-                        url: '/functional-site/#/narrativemanager/new?copydata='+dataRef,
+                        url: '/functional-site/#/narrativemanager/new?copydata=' + dataRef,
                         external: true
                      })
                      .addButton({
@@ -106,54 +106,59 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                         callback: function () {
                            alert('download object');
                         }.bind(this)
-                     })
-                     .addDropdown({
+                     });
+
+                  var narratives = this.getState('writableNarratives');
+                  if (narratives) {
+                     var items = [];
+                     for (var i = 0; i < narratives.length; i++) {
+                        var narrative = narratives[i];
+                        items.push({
+                           name: 'narrative_' + i,
+                           icon: 'file',
+                           label: narrative.metadata.narrative_nice_name,
+                           external: true,
+                           callback: (function (narrative) {
+                              var widget = this;
+                              return function (e) {
+                                 e.preventDefault();
+                                 widget.copyObjectToNarrative(narrative);
+                              }
+                           }.bind(this))(narrative)
+                        });
+                     }
+                     Navbar.addDropdown({
                         place: 'end',
                         name: 'options',
                         style: 'default',
                         icon: 'copy',
                         label: 'Copy',
-                        items: [{
-                              name: 'narrative1',
-                              icon: 'key',
-                              label: 'Narrative 1',
-                              url: 'xxx',
-                              external: true
-                        },
-                           {
-                              name: 'narrative2',
-                              icon: 'key',
-                              label: 'Narrative 3',
-                              url: 'xxx',
-                              external: true
-                        },
-                           {
-                              name: 'narrative3',
-                              icon: 'key',
-                              label: 'Narrative 3',
-                              url: 'xxx',
-                              external: true
-                        }]
+                        items: items
                      });
+                  }
                   break;
                case 'notfound':
-                  Navbar.setTitle('<span style="color: red;">This Object was Not Found</span>');
-                  Navbar.clearButtons();
+                  Navbar
+                  .setTitle('<span style="color: red;">This Object was Not Found</span>')
+                  .clearButtons();
                   this.places.content.html(this.renderTemplate('error'));
                   break;
                case 'denied':
-                  Navbar.setTitle('<span style="color: red;">Access Denied to this Object</span>');
-                  Navbar.clearButtons();
+                  Navbar
+                  .setTitle('<span style="color: red;">Access Denied to this Object</span>')
+                  .clearButtons();
                   this.places.content.html(this.renderTemplate('error'));
                   break;
                case 'error':
-                  Navbar.setTitle('<span style="color: red;">An Error has Occurred Accessing this Object</span>');
-                  Navbar.clearButtons();
+                  Navbar
+                  .setTitle('<span style="color: red;">An Error has Occurred Accessing this Object</span>')
+                  .clearButtons();
                   this.places.content.html(this.renderTemplate('error'));
                   break;
                default:
-                  Navbar.setTitle('An Error has Occurred Accessing this Object');
-                  Navbar.clearButtons();
+                  Navbar
+                  .setTitle('An Error has Occurred Accessing this Object')
+                  .clearButtons();
                   this.setState('error', {
                      type: 'internal',
                      code: 'invalidstatus',
@@ -167,15 +172,108 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
             }
          },
 
+         getObjectRef: {
+            value: function () {
+               if (this.hasState('object')) {
+                  return APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'), this.getState('object.version'))
+               }
+            }
+         },
+         
+         makeUrl: {
+            value: function (path) {
+               return window.location.protocol + '//' + window.location.host + path;
+            }
+         },
+
+         /**
+         copy the current ws object to the given narrative.
+         TODO: omit the workspace for the current data object.
+         */
+         copyObjectToNarrative: {
+            value: function (narrativeWs) {
+               var from = this.getObjectRef();
+               var to = narrativeWs.id + '';
+               var name = this.getState('object.name');
+   
+               Utils.promise(this.workspaceClient, 'copy_object', {
+                     from: {ref: from},
+                     to: {wsid: to, name: name}
+                  })
+                  .then(function (data) {
+                     if (data) {
+
+                        var narrativeUrl = this.makeUrl('/narrative/'+APIUtils.makeWorkspaceObjectId(narrativeWs.id, narrativeWs.metadata.narrative));
+                        this.alert.addSuccessMessage('Success','Successfully copied this data object to Narrative <i>' + narrativeWs.metadata.narrative_nice_name + '</i>.  <a href="'+narrativeUrl+'" target="_blank">Open this Narrative</a>');
+                     } else {
+                        this.alert.addErrorMessage('Error', 'An unknown error occurred copying the data.');
+                     }
+                  }.bind(this))
+                  .catch(function (err) {
+                     if (err.error && err.error.message) {
+                        var msg = err.error.message;
+                     } else {
+                        var msg = '';
+                     }
+                     this.alert.addErrorMessage('Error', 'Error copying the data object to the selected Narrative. ' + msg);
+                     console.log('ERROR'); console.log(err);
+                  }.bind(this))
+                  .done();
+
+            }
+         },
+         
+         fetchVersions: {
+            value: function () {
+               
+               Utils.promise(this.workspaceClient, 'get_object_info_new', {
+                  objects: [{ref: APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'))}]
+               })
+               .then(function (data) {
+                  if (data.length !== 1) {
+                     return;
+                  }
+                  var object = APIUtils.object_info_to_object(data[0]);
+                  if (object.version === 1) {
+                     this.setState('versions', [object]);
+                     return;
+                  } 
+                  var versions = [];
+                  for (var i=0; i<object.version; i++) {
+                     versions.push(i);
+                  }
+                  Utils.promise(this.workspaceClient, 'get_object_info_new', {
+                     objects: versions.map(function (x) {
+                        return {ref: APIUtils.makeWorkspaceObjectRef(object.wsid, object.id, x)}
+                     })
+                  }).then(function (data) {
+                     var versions = data.map(function (x) {
+                        return APIUtils.object_info_to_object(x);
+                     });
+                     this.setState('versions', versions.sort(function (a,b) {return a.version-b.version}));
+                  }.bind(this)).catch(function(err) {
+                     console.log('ERROR');
+                     console.log(err);
+                  }).done();
+               }.bind(this))
+               .catch(function (err) {
+                  console.log('ERROR'); 
+                  console.log(err);
+               })
+               .done();
+              
+              
+            }
+         },
+
          setInitialState: {
             value: function () {
                var widget = this;
                return Q.Promise(function (resolve, reject, notify) {
                   Utils.promise(this.workspaceClient, 'get_object_info_new', {
                         objects: [{
-                           ref: this.getParam('workspaceId') + '/' + this.getParam('objectId') +
-                            (this.getParam('objectVersion') ? ('/' + this.getParam('objectVersion')) : "")
-                     }],
+                           ref:  APIUtils.makeWorkspaceObjectRef(this.getParam('workspaceId'), this.getParam('objectId'), this.getParam('objectVersion'))
+                        }], 
                         includeMetadata: 1
                      })
                      .then(function (data) {
@@ -186,32 +284,63 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                            this.setState('status', 'found');
                            var obj = APIUtils.object_info_to_object(data[0]);
                            this.setState('object', obj);
-                           console.log('OBJECT');
-                           console.log(obj);
-                          
-                           
-                           // Get more info...
-                           
-                           // The narrative this lives in.
-                           Utils.promise(this.workspaceClient, 'get_workspace_info', {
-                              id: $.isNumeric(this.getParam('workspaceId')) ? this.getParam('workspaceId') : null,
-                              workspace: $.isNumeric(this.getParam('workspaceId')) ? null : this.getParam('workspaceId')
-                           })
-                           .then(function (data) {
-                              console.log('WS DATA'); console.log(data);
-                              this.setState('workspace', APIUtils.workspace_metadata_to_object(data));
-                              
-                              // Other narratives this user has.
 
+                           // Get more info...
+
+                           // The narrative this lives in.
+                           var workspaceId = this.getParam('workspaceId');
+                           var isIntegerId = /^\d+$/.test(workspaceId);
+                           Utils.promise(this.workspaceClient, 'get_workspace_info', {
+                                 id:  isIntegerId ? workspaceId : null,
+                                 workspace: isIntegerId ? null : workspaceId
+                              })
+                              .then(function (data) {
+                                 this.setState('workspace', APIUtils.workspace_metadata_to_object(data));
                               
-                               resolve();
+                              
+                                 // Okay, the rest doens't really have to be done here ... 
+                              
+                                 // Get versions to populate the versions panel.
+                                 this.fetchVersions();
                               
                               
-                           }.bind(this))
-                           .catch(function (err) {
-                              reject(err);
-                           })
-                           .done();
+                                 // Other narratives this user has.
+                                 Utils.promise(this.workspaceClient, 'list_workspace_info', {
+                                       perm: 'w'
+                                    })
+                                    .then(function (data) {
+                                       var objects = data.map(function (x) {
+                                          return APIUtils.workspace_metadata_to_object(x)
+                                       });
+                                       var narratives = objects.filter(function (obj) {
+                                          if (obj.metadata.narrative && (!isNaN(parseInt(obj.metadata.narrative))) &&
+                                             // don't keep the current narrative workspace.
+                                             obj.id != this.getState('workspace.id') &&
+                                             obj.metadata.narrative_nice_name &&
+                                             obj.metadata.is_temporary && obj.metadata.is_temporary !== 'true') {
+                                             return true;
+                                          } else {
+                                             return false;
+                                          }
+                                       }.bind(this));
+                                       this.setState('writableNarratives', narratives);
+                                    
+                                       
+                                    
+                                       resolve();
+                                       // FIN
+                                    }.bind(this))
+                                    .catch(function (err) {
+                                       reject(err);
+                                    })
+                                    .done();
+
+                              }.bind(this))
+                              .catch(function (err) {
+                                 reject(err);
+                              })
+                              .done();
+
                         }
                      }.bind(this))
                      .catch(function (err) {
