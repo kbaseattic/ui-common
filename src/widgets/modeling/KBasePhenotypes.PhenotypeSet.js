@@ -36,7 +36,7 @@ function KBasePhenotypes_PhenotypeSet(modeltabs) {
         for (var key in cpd_refs_hash) {
             cpd_refs.push(key);
         }
-
+        
         var promise = this.modeltabs.getBiochemCompounds(cpd_refs)
                           .then(function(cpds){
                              var addcpd_names_hash = {};
@@ -54,7 +54,7 @@ function KBasePhenotypes_PhenotypeSet(modeltabs) {
                           });
 
         return promise;
-    }
+    };
 
     this.tabList = [{
         "key": "overview",
@@ -94,9 +94,6 @@ function KBasePhenotypes_PhenotypeSet(modeltabs) {
         "name": "Phenotypes",
         "type": "dataTable",
         "columns": [{
-            "label": "Name",
-            "key": "name"
-        }, {
             "label": "Growth condition",
             "key": "media_ref",
             "linkformat": "dispWSRef",
