@@ -89,7 +89,19 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                   var dataRef = this.getObjectRef();
 
                   Navbar
-                  .clearButtons()
+                  .clearButtons();
+
+                  Navbar.addDropdown({
+                	  place: 'end',
+                	  name: 'download',
+                	  style: 'default',
+                	  icon: 'download',
+                	  label: 'Download',
+                	  widget: 'kbaseDownloadPanel',
+                	  params: {'ws': this.getState('workspace.id'), 'obj': this.getState('object.id'), 'ver': this.getState('object.version')}
+                  });
+
+                  Navbar
                   .addButton({
                         name: 'copy',
                         label: '+ New Narrative',
@@ -98,7 +110,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                         url: '/functional-site/#/narrativemanager/new?copydata=' + dataRef,
                         external: true
                      })
-                     .addButton({
+                     /*.addButton({
                         name: 'download',
                         label: 'Download',
                         style: 'primary',
@@ -106,7 +118,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                         callback: function () {
                            alert('download object');
                         }.bind(this)
-                     });
+                     })*/;
 
                   var narratives = this.getState('writableNarratives');
                   if (narratives) {

@@ -42,7 +42,6 @@ $.KBWidget({
 
     init: function(options) {
         this._super(options);
-        console.log(kb);
         this.cmpImgUrl = kb.urls.genomeCmp.replace('jsonrpc', 'image');
         this.ws_name = options.ws_name;
         this.ws_id = options.ws_id;

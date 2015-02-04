@@ -158,6 +158,7 @@ define(['jquery', 'nunjucks', 'kbasesession', 'kbaseconfig'],
                } 
 
                var menu = $('<ul class="dropdown-menu" role="menu"></ul>');
+               if (cfg.items) {
                for (var i = 0; i < cfg.items.length; i++) {
                   var item = cfg.items[i];
                   if (item.type === 'divider') {
@@ -187,13 +188,18 @@ define(['jquery', 'nunjucks', 'kbasesession', 'kbaseconfig'],
                      menu.append(menuItem.append(link.append(icon).append(item.label)));
                   }
                }
-
+               }
                var dropdown = $('<div class="dropdown" style="display: inline-block;"></div>').append(button).append(menu);
-
                if (cfg.place === 'end') {
                   this.container.find('.navbar-buttons').append(dropdown);
                } else {
                   this.container.find('.navbar-buttons').prepend(dropdown);
+               }
+               if (cfg.widget) {
+            	   var widgetName = cfg.widget;
+            	   var panel = $('<div>');
+            	   menu.append($('<li></li>').append(panel));
+            	   var widget = panel[widgetName]({dropdown: dropdown, navbar: this, params: cfg.params});
                }
                return this;
             }
