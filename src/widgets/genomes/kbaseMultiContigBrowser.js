@@ -73,6 +73,7 @@
 	    width: 525,                          // Should follow window size
 
             kbCache: null,
+            genomeInfo: null
         },
 
 	/** SEED ontology mappings
@@ -185,55 +186,17 @@
             this.cdmiClient = new CDMI_API(this.cdmiURL);
             //this.proteinInfoClient = new ProteinInfo(this.proteinInfoURL);
 
-            var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
-            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-            $.when(prom).done($.proxy(function(genome) {
-                genome = genome[0].data;
-                self.genome = genome;
-                
-                var contigsToLengths = {};
-                if (genome.contig_ids && genome.contig_ids.length > 0) {
-                    for (var i=0; i<genome.contig_ids.length; i++) {
-                        var len = "Unknown";
-                        if (genome.contig_lengths && genome.contig_lengths[i])
-                            len = genome.contig_lengths[i];
-                        contigsToLengths[genome.contig_ids[i]] = len;
-                    }
-                }
-                /************
-                 * TEMP CODE!
-                 * INFER CONTIGS FROM FEATURE LIST!
-                 * OMG THIS SUCKS THAT I HAVE TO DO THIS UNTIL FBA MODEL SERVICES IS FIXED!
-                 * LOUD NOISES!
-                 ************/
-                else if (genome.features && genome.features.length > 0) {
-                    var contigSet = {};
-                    for (var i=0; i<genome.features.length; i++) {
-                        var f = genome.features[i];
-                        if (f.location && f.location[0][0])
-                            contigsToLengths[f.location[0][0]] = "Unknown";
-                    }
-
-                }
-
-                self.populateContigSelector(contigsToLengths);
-                self.$elem.append($maindiv);
-                
-                self.hideMessage();
-                
-                // can't seem to get this working!  it always sizes it wrong, but I don't know why
-                if (genome.contig_ids.length>0) {
-                    self.contig =  genome.contig_ids[0];
-                    self.options.contig =  genome.contig_ids[0];
-                    self.render();
-                }
-                
-
-            }, this));
-            $.when(prom).fail($.proxy(function(error) { this.renderError(error); }, this));
-            
-            
-            var self = this;
+            if (self.options.genomeInfo) {
+        		self.showData(self.options.genomeInfo.data, $maindiv);
+            } else {
+            	var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
+            	var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+            	$.when(prom).done($.proxy(function(genome) {
+            		genome = genome[0].data;
+            		self.showData(genome, $maindiv);
+            	}, this));
+            	$.when(prom).fail($.proxy(function(error) { this.renderError(error); }, this));
+            }
 
             if (!this.options.onClickFunction) {
                 this.options.onClickFunction = function(svgobj,d) {
@@ -260,6 +223,47 @@
             return this;
         },
 
+        showData: function(genome, $maindiv) {
+        	var self = this;
+            self.genome = genome;
+            var contigsToLengths = {};
+            if (genome.contig_ids && genome.contig_ids.length > 0) {
+                for (var i=0; i<genome.contig_ids.length; i++) {
+                    var len = "Unknown";
+                    if (genome.contig_lengths && genome.contig_lengths[i])
+                        len = genome.contig_lengths[i];
+                    contigsToLengths[genome.contig_ids[i]] = len;
+                }
+            }
+            /************
+             * TEMP CODE!
+             * INFER CONTIGS FROM FEATURE LIST!
+             * OMG THIS SUCKS THAT I HAVE TO DO THIS UNTIL FBA MODEL SERVICES IS FIXED!
+             * LOUD NOISES!
+             ************/
+            else if (genome.features && genome.features.length > 0) {
+                var contigSet = {};
+                for (var i=0; i<genome.features.length; i++) {
+                    var f = genome.features[i];
+                    if (f.location && f.location[0][0])
+                        contigsToLengths[f.location[0][0]] = "Unknown";
+                }
+
+            }
+
+            self.populateContigSelector(contigsToLengths);
+            self.$elem.append($maindiv);
+            
+            self.hideMessage();
+            
+            // can't seem to get this working!  it always sizes it wrong, but I don't know why
+            if (genome.contig_ids.length>0) {
+                self.contig =  genome.contig_ids[0];
+                self.options.contig =  genome.contig_ids[0];
+                self.render();
+            }
+        },
+        
         addInfoRow: function(a, b) {
             return "<tr><th>" + a + "</th><td>" + b + "</td></tr>";
         },

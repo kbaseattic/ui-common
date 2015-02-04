@@ -150,17 +150,19 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
                            .then(function (narratives) {
                               var workspaceIds = narratives.map(function (x) {
                                  return {
-                                    wsid: x.workspace.id,
-                                    objid: parseInt(x.workspace.metadata.narrative)
+                                    ref: x.workspace.id + '/' + x.workspace.metadata.narrative
                                  }
                               });
-                              this.promise(this.workspaceClient, 'get_objects', workspaceIds)
+                              this.promise(this.workspaceClient, 'get_object_info_new',
+                                           { objects: workspaceIds, ignoreErrors: 1, includeMetadata: 1})
                                  .then(function (data) {
-                                 
+                                    console.log(data);
                                     for (var i = 0; i < data.length; i++) {
+                                       if (!data[i]) { continue; } // can't find the narrative, just skip
+                                       
                                        // NB this has given us all of the objects in the relevant workspaces.
                                        // Now we need to filter out just the narratives of interest
-                                       var wsObject = APIUtils.object_info_to_object(data[i].info);
+                                       var wsObject = APIUtils.object_info_to_object(data[i]);
                                        // console.log(narrativesByWorkspace[wsObject.wsid].workspace.metadata.narrative + '=' + wsObject.id);
                                        // NB: we use plain == for comparison since we need type convertion. The metadata.narrative
                                        // is a string, but wsObject.id is a number.
@@ -171,11 +173,18 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
                                        narrativesByWorkspace[wsObject.wsid].object = wsObject;
                                     }
                                     // Now add the objects back into the narratives list.
-                                    narratives.forEach(function (x) {
-                                       
+                                    // Now add the objects back into the narratives list.
+                                    var goodNarratives = [];
+                                    for(var i=0; i<narratives.length; i++) {
+                                       if (narrativesByWorkspace[narratives[i].workspace.id].object) {
+                                          goodNarratives.push(narratives[i]);
+                                       }
+                                    }
+                                    goodNarratives.forEach(function (x) {
+                                       //console.log(x);
                                        x.object = narrativesByWorkspace[x.workspace.id].object;
                                     });
-                                    this.setState('narratives', narratives);
+                                    this.setState('narratives', goodNarratives);
                                     resolve();
                                  }.bind(this))
                                  .catch(function (err) {

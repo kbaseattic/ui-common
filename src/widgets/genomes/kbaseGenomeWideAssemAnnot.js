@@ -26,7 +26,7 @@
             row0.append(contigbrowser);
             contigbrowser.KBaseMultiContigBrowser({genomeID: self.options.genomeID, 
             	workspaceID: self.options.workspaceID, kbCache: self.options.kbCache,
-                loadingImage: self.options.loadingImage});
+                loadingImage: self.options.loadingImage, genomeInfo: self.options.genomeInfo});
             var row1 = $('<div class="row">');
             self.$elem.append(row1);
             var seedannotations = $('<div class="col-md-6">');
