@@ -316,6 +316,12 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
             }
          },
          
+         hasState: {
+            value: function (path) {
+               return Utils.hasProp(this.state, path);
+            }
+         },
+         
          getState: {
             value: function (path, defaultValue) {
                return Utils.getProp(this.state, path, defaultValue);

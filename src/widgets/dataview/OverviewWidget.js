@@ -87,15 +87,15 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                      Navbar.setTitle(name);
                   }
                   this.places.content.html(this.renderTemplate('main'));
-                     
+
                   var dataRef = this.getState('object.wsid') + '/' + this.getState('object.id') + '/' + this.getState('object.version');
-                     
+
                   Navbar.addButton({
                         name: 'copy',
                         label: '+ New Narrative',
                         style: 'primary',
                         icon: 'plus-square',
-                        url: '/functional-site/#/narrativemanager/new?copydata='+dataRef,
+                        url: '/functional-site/#/narrativemanager/new?copydata=' + dataRef,
                         external: true
                      })
                      .addButton({
@@ -106,35 +106,43 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                         callback: function () {
                            alert('download object');
                         }.bind(this)
-                     })
-                     .addDropdown({
+                     });
+
+
+                  var narratives = this.getState('writableNarratives');
+                  console.log('NAR');
+                  console.log(narratives.length);
+                  var items = [];
+                  if (narratives) {
+
+                     for (var i = 0; i < narratives.length; i++) {
+                        var narrative = narratives[i];
+                        items.push({
+                           name: 'narrative_' + i,
+                           icon: 'file',
+                           label: narrative.metadata.narrative_nice_name,
+                           external: true,
+                           callback: (function (wsid) {
+                              var widget = this;
+                              return function (e) {
+                                 e.preventDefault();
+                                 widget.copyObjectToNarrative(wsid);
+                                 // alert('copying to narrative ws id ' + wsid);
+                              }
+                           }.bind(this))(narrative.id)
+                        });
+                     }
+                     console.log('ITEMS');
+                     console.log(items);
+                     Navbar.addDropdown({
                         place: 'end',
                         name: 'options',
                         style: 'default',
                         icon: 'copy',
                         label: 'Copy',
-                        items: [{
-                              name: 'narrative1',
-                              icon: 'key',
-                              label: 'Narrative 1',
-                              url: 'xxx',
-                              external: true
-                        },
-                           {
-                              name: 'narrative2',
-                              icon: 'key',
-                              label: 'Narrative 3',
-                              url: 'xxx',
-                              external: true
-                        },
-                           {
-                              name: 'narrative3',
-                              icon: 'key',
-                              label: 'Narrative 3',
-                              url: 'xxx',
-                              external: true
-                        }]
+                        items: items
                      });
+                  }
                   break;
                case 'notfound':
                   Navbar.setTitle('<span style="color: red;">This Object was Not Found</span>');
@@ -167,6 +175,51 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
             }
          },
 
+         getObjectRef: {
+            value: function () {
+               if (this.hasState('object')) {
+                  if (this.hasState('object.version')) {
+                     return this.getState('object.wsid') + '/' + this.getState('object.id') + '/' + this.getState('object.version');
+                  } else {
+                     return this.getState('object.wsid') + '/' + this.getState('object.id');
+                  }
+               }
+            }
+         },
+
+         /**
+         copy the current ws object to the given narrative.
+         TODO: omit the workspace for the current data object.
+         */
+         copyObjectToNarrative: {
+            value: function (wsid) {
+               var from = this.getObjectRef();
+               var to = wsid + '';
+               var name = this.getState('object.name');
+               
+               //alert('Copying from ' + from + ' to ' + to + ' with name ' + name);
+               //return;
+
+               Utils.promise(this.workspaceClient, 'copy_object', {
+                     from: {ref: from},
+                     to: {wsid: to, name: name}
+                  })
+                  .then(function (data) {
+                     if (data) {
+                        alert('Copied data object.');
+                     } else {
+                        alert('Data not copied?');
+                     }
+                  })
+                  .catch(function (err) {
+                  console.log('ERROR'); console.log(err);
+                     alert('Error copying data...');
+                  })
+                  .done();
+
+            }
+         },
+
          setInitialState: {
             value: function () {
                var widget = this;
@@ -187,31 +240,56 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                            this.setState('status', 'found');
                            var obj = APIUtils.object_info_to_object(data[0]);
                            this.setState('object', obj);
-                           console.log('OBJECT');
-                           console.log(obj);
-                          
-                           
+                           //console.log('OBJECT');
+                           //console.log(obj);
+
+
                            // Get more info...
-                           
+
                            // The narrative this lives in.
                            Utils.promise(this.workspaceClient, 'get_workspace_info', {
-                              id: this.getParam('workspaceId')
-                           })
-                           .then(function (data) {
-                              console.log('WS DATA'); console.log(APIUtils.workspace_metadata_to_object(data));
-                              this.setState('workspace', APIUtils.workspace_metadata_to_object(data));
-                              
-                              // Other narratives this user has.
+                                 id: this.getParam('workspaceId')
+                              })
+                              .then(function (data) {
+                                 //console.log('WS DATA'); console.log(APIUtils.workspace_metadata_to_object(data));
+                                 this.setState('workspace', APIUtils.workspace_metadata_to_object(data));
 
-                              
-                               resolve();
-                              
-                              
-                           }.bind(this))
-                           .catch(function (err) {
-                              reject(err);
-                           })
-                           .done();
+                                 // Other narratives this user has.
+                                 Utils.promise(this.workspaceClient, 'list_workspace_info', {
+                                       perm: 'w'
+                                    })
+                                    .then(function (data) {
+                                       //console.log('GOT:'); console.log(data);
+                                       var objects = data.map(function (x) {
+                                          return APIUtils.workspace_metadata_to_object(x)
+                                       });
+                                       //console.log('OBJS'); console.log(objects);
+                                       var narratives = objects.filter(function (obj) {
+                                          if (obj.metadata.narrative && (!isNaN(parseInt(obj.metadata.narrative))) &&
+                                             // don't keep the current narrative workspace.
+                                             obj.id != this.getState('workspace.id') &&
+                                             obj.metadata.narrative_nice_name &&
+                                             obj.metadata.is_temporary && obj.metadata.is_temporary !== 'true') {
+                                             return true;
+                                          } else {
+                                             return false;
+                                          }
+                                       }.bind(this));
+                                       //console.log('NAR'); console.log(narratives);
+                                       this.setState('writableNarratives', narratives);
+                                       resolve();
+                                       // FIN
+                                    }.bind(this))
+                                    .catch(function (err) {
+                                       reject(err);
+                                    })
+                                    .done();
+
+                              }.bind(this))
+                              .catch(function (err) {
+                                 reject(err);
+                              })
+                              .done();
                         }
                      }.bind(this))
                      .catch(function (err) {
