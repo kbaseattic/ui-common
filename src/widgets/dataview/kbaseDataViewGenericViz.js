@@ -189,8 +189,8 @@
 		},
 		
 		'KBaseGenomes.ContigSet': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    widget:'kbaseContigSetView',
+		    options: '{"ws_id":???id,"ws_name":???ws,"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 		'KBaseGenomes.MetagenomeAnnotation': {
 		    widget:'kbaseJsonView',
@@ -207,14 +207,14 @@
 		
 		'KBaseTrees.Tree': {
 		    widget:'kbaseTree',
-		    options: '{"treeID":???id,"workspaceID":???ws,"treeObjVer":???ver,"loadingImage":"???loadingImage"}'
+		    options: '{"treeID":???id,"workspaceID":???ws,"treeObjVer":???ver,"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 		
 		/* COMPLEX LANDING PAGE */
 		'KBaseGenomes.Genome': {
 		    widget:'KBaseGenomePage',
 		    noPanel:true,
-		    options: '{"genomeID":???id,"workspaceID":???ws,"loadingImage":"???loadingImage"}'
+		    options: '{"genomeID":???id,"workspaceID":???ws,"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 	    };
 	},
@@ -232,7 +232,6 @@
 		    options = options.replace(/\?\?\?objname/g, obj_info[1]);
 		    options = options.replace(/\?\?\?ver/g, obj_info[4]);
 		    options = options.replace(/\?\?\?type/g, type);
-		    options = options.replace(/\?\?\???loadingImage/g, this.options.loadingImage);
 		    
 		    var optionsObj;
 		    try {
