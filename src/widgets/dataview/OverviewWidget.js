@@ -49,6 +49,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                   this.setParam('objectVersion', this.getConfig('objectVersion'));
                }
 
+               
 
 
                return this;
@@ -74,19 +75,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
             }
          },
 
-         renderLayout: {
-            value: function () {
-               this.container.html(this.renderTemplate('layout'));
-               this.places = {
-                  title: this.container.find('[data-placeholder="title"]'),
-                  alert: this.container.find('[data-placeholder="alert"]'),
-                  content: this.container.find('[data-placeholder="content"]')
-               };
-
-            }
-         },
-
-         render: {
+        render: {
             value: function () {
                // The state.status property is used to switch to the appropriate view.
                switch (this.getState('status')) {
@@ -121,9 +110,8 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
 
 
                   var narratives = this.getState('writableNarratives');
-                  var items = [];
                   if (narratives) {
-
+                     var items = [];
                      for (var i = 0; i < narratives.length; i++) {
                         var narrative = narratives[i];
                         items.push({
@@ -131,14 +119,13 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                            icon: 'file',
                            label: narrative.metadata.narrative_nice_name,
                            external: true,
-                           callback: (function (wsid) {
+                           callback: (function (narrative) {
                               var widget = this;
                               return function (e) {
                                  e.preventDefault();
-                                 widget.copyObjectToNarrative(wsid);
-                                 // alert('copying to narrative ws id ' + wsid);
+                                 widget.copyObjectToNarrative(narrative);
                               }
-                           }.bind(this))(narrative.id)
+                           }.bind(this))(narrative)
                         });
                      }
                      Navbar.addDropdown({
@@ -185,8 +172,14 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
          getObjectRef: {
             value: function () {
                if (this.hasState('object')) {
-                  return APIUtils.makeWorkspaceObjectRef(this.getParam('workspace.id'), this.getParam('object.id'), this.getParam('object.version'))
+                  return APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'), this.getState('object.version'))
                }
+            }
+         },
+         
+         makeUrl: {
+            value: function (path) {
+               return window.location.protocol + '//' + window.location.host + path;
             }
          },
 
@@ -195,29 +188,39 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
          TODO: omit the workspace for the current data object.
          */
          copyObjectToNarrative: {
-            value: function (wsid) {
+            value: function (narrativeWs) {
                var from = this.getObjectRef();
-               var to = wsid + '';
+               var to = narrativeWs.id + '';
                var name = this.getState('object.name');
-               
-               //alert('Copying from ' + from + ' to ' + to + ' with name ' + name);
-               //return;
-
+   
                Utils.promise(this.workspaceClient, 'copy_object', {
                      from: {ref: from},
                      to: {wsid: to, name: name}
                   })
                   .then(function (data) {
                      if (data) {
-                        alert('Copied data object.');
+
+                        console.log('COPIED');
+                        console.log(data);
+                        console.log(to);
+                        console.log(name);
+                        console.log('COPIED');
+                        
+                        var narrativeUrl = this.makeUrl('/narrative/'+APIUtils.makeWorkspaceObjectId(narrativeWs.id, narrativeWs.metadata.narrative));
+                        this.alert.addSuccessMessage('Success','Successfully copied this data object to Narrative <i>' + narrativeWs.metadata.narrative_nice_name + '</i>.  <a href="'+narrativeUrl+'" target="_blank">Open this Narrative</a>');
                      } else {
-                        alert('Data not copied?');
+                        this.alert.addErrorMessage('Error', 'An unknown error occurred copying the data.');
                      }
-                  })
+                  }.bind(this))
                   .catch(function (err) {
-                  console.log('ERROR'); console.log(err);
-                     alert('Error copying data...');
-                  })
+                     if (err.error && err.error.message) {
+                        var msg = err.error.message;
+                     } else {
+                        var msg = '';
+                     }
+                     this.alert.addErrorMessage('Error', 'Error copying the data object to the selected Narrative. ' + msg);
+                     console.log('ERROR'); console.log(err);
+                  }.bind(this))
                   .done();
 
             }
@@ -277,7 +280,6 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                         includeMetadata: 1
                      })
                      .then(function (data) {
-                           console.log('DATA'); console.log(data);
                         if (!data || data.length === 0) {
                            this.setState('status', 'notfound');
                            resolve();
@@ -285,7 +287,6 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                            this.setState('status', 'found');
                            var obj = APIUtils.object_info_to_object(data[0]);
                            this.setState('object', obj);
-                           console.log('OBJECT'); console.log(obj);
 
                            // Get more info...
 

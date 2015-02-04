@@ -57,7 +57,7 @@
          </tr>
          <tr>
             <th>Permalink</th>
-            {% set permalink = env.browser.location.scheme + "://" +env.browser.location.host + "/functional-site/#/dataview/" + state.object.wsid + "/" + state.object.id + "/" + state.object.version %}
+            {% set permalink = env.browser.location.scheme + "//" +env.browser.location.host + "/functional-site/#/dataview/" + state.object.wsid + "/" + state.object.id + "/" + state.object.version %}
             <td><a href="{{permalink}}">{{permalink}}</a>
             </td>
          </tr>

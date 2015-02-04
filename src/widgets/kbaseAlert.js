@@ -3,17 +3,23 @@ define(['jquery'], function ($) {
 
       init: {
          value: function (cfg) {
-            if (typeof cfg.container === 'string') {
-               this.container = $(cfg.container);
-            } else {
-               this.container = cfg.container;
+            if (cfg && cfg.container) {
+               if (typeof cfg.container === 'string') {
+                  this.container = $(cfg.container);
+               } else {
+                  this.container = cfg.container;
+               }
             }
+            this.messages = [];
+            
+            return this;
          }
 
       },
 
       setContainer: {
          value: function (container) {
+            console.log('ALERT set container'); console.log(container);
              if (typeof container === 'string') {
                this.container = $(container);
             } else {
@@ -25,6 +31,7 @@ define(['jquery'], function ($) {
 
       renderMessages: {
          value: function () {
+            console.log('ALERT'); console.log(this.container);
             if (this.container) {
                this.container.empty();
                for (var i = 0; i < this.messages.length; i++) {

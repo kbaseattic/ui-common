@@ -89,7 +89,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
                this.templates.cache = {};
 
                // The context object is what is given to templates.
-               this.context = {};console.log('LOC'); console.log(window.location);
+               this.context = {};
                this.context.env = {
                   widgetTitle: this.widgetTitle,
                   widgetName: this.widgetName,
@@ -120,7 +120,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
                   this.onLoggedout();
                }.bind(this));
                
-               this.alerts = Object.create(Alert);
+               this.alert = Object.create(Alert).init();
 
                return this;
             }
@@ -546,7 +546,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
                   content: this.container.find('[data-placeholder="content"]')
                };
                // hook up the alert messages.
-               this.alerts.setContainer(this.places.alert);
+               this.alert.setContainer(this.places.alert);
             }
          },
 
