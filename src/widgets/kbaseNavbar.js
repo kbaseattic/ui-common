@@ -152,14 +152,10 @@ define(['jquery', 'nunjucks', 'kbasesession', 'kbaseconfig'],
                   iconStyle += 'font-size: 150%;';
                }
                var button = $('<button  class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">' +
-                     '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</button>')
-                  .on('click', function (e) {
-                     e.preventDefault();
-                     cfg.callback();
-                  });
+                     '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</button>');
                if (cfg.disabled) {
                   button.prop('disabled', true);
-               }
+               } 
 
                var menu = $('<ul class="dropdown-menu" role="menu"></ul>');
                for (var i = 0; i < cfg.items.length; i++) {
