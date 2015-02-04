@@ -68,7 +68,7 @@
                 tabs.tabContent('Overview').append(table)
 
                 var tableSettings = {
-                     "sPaginationType": "bootstrap",
+                     "sPaginationType": "full_numbers",
                      "iDisplayLength": 10,
                      "aaData": simu.phenotypeSimulations,
                      "aaSorting": [[ 3, "desc" ]],

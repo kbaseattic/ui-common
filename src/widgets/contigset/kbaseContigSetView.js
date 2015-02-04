@@ -89,7 +89,7 @@
             			contigsData.push({name: contig.id, length: contig.length});
             		}
             		var contigsSettings = {
-            				"sPaginationType": "bootstrap",
+            				"sPaginationType": "full_numbers",
             				"iDisplayLength": 10,
             				"aoColumns": [
             				              {sTitle: "Contig name", mData: "name"},

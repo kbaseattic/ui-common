@@ -230,7 +230,7 @@
     			}
     			
         		var tableSettings = {
-        				"sPaginationType": "bootstrap",
+        				"sPaginationType": "full_numbers",
         				"iDisplayLength": 10,
         				"aaData": orth_data,
         				"aaSorting": [[ 2, "desc" ], [0, "asc"]],
@@ -362,7 +362,7 @@
     		}
     		tab.append(table);
         	var tableSettings = {
-        			"sPaginationType": "bootstrap",
+        			"sPaginationType": "full_numbers",
         			"iDisplayLength": 10,
         			"aaData": genes,
         			"aaSorting": [[0, "asc"], [ 1, "asc" ]],
