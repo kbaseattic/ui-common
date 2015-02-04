@@ -52,7 +52,6 @@ angular.module('dataview')
             );
     
             $collapsableHeader.find('.panel-body').append($widgetDiv);
-            console.log($collapsableHeader)
             /*var $group = $('<div class="panel-group" id="prov_accordion_group">');
             
             var $title = $('<div>').addClass('panel-heading')
