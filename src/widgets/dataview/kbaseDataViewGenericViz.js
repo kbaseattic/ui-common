@@ -122,7 +122,7 @@
 	    // all the modeling types have the same config
 	    var modelingConfig = {
 		    widget:'kbaseTabTable',
-		    options: '{"obj":???id,"ws":???ws,"type":"???type"}'
+		    options: '{"obj":???objname,"ws":???wsname,"type":"???type"}'
 		};
 	    
 	    // this is crazy, but for now we just hard code this - should be loaded from a config
@@ -133,47 +133,47 @@
 		
 		'Communities.Collection': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'Communities.FunctionalMatrix': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'Communities.FunctionalProfile': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'Communities.Heatmap': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		/* NEEDS A COMPLEX LANDING PAGE */
 		'Communities.Metagenome': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'Communities.PCoA': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'Communities.TaxonomicMatrix': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'Communities.TaxonomicProfile': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		
 		
 		'GenomeComparison.ProteomeComparison': {
 		    widget:'GenomeComparisonWidget',
-		    options: '{"ws_id":???id,"ws_name":???ws}'
+		    options: '{"ws_id":???objname,"ws_name":???wsname}'
 		},
 		
 		'KBaseAssembly.AssemblyReport': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		
 		/* STILL NEEDS A MORE COMPLEX LANDING PAGE */
@@ -185,20 +185,20 @@
 		
 		'KBaseGeneDomains.DomainAnnotation': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		
 		'KBaseGenomes.ContigSet': {
 		    widget:'kbaseContigSetView',
-		    options: '{"ws_id":???id,"ws_name":???ws,"loadingImage":"'+this.options.loadingImage+'"}'
+		    options: '{"ws_id":???objname,"ws_name":???wsname,"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 		'KBaseGenomes.MetagenomeAnnotation': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'KBaseGenomes.Pangenome': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		
 		'KBasePhenotypes.PhenotypeSet': modelingConfig,
@@ -207,14 +207,14 @@
 		
 		'KBaseTrees.Tree': {
 		    widget:'kbaseTree',
-		    options: '{"treeID":???id,"workspaceID":???ws,"treeObjVer":???ver,"loadingImage":"'+this.options.loadingImage+'"}'
+		    options: '{"treeID":???objname,"workspaceID":???wsname,"treeObjVer":???ver,"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 		
 		/* COMPLEX LANDING PAGE */
 		'KBaseGenomes.Genome': {
 		    widget:'KBaseGenomePage',
 		    noPanel:true,
-		    options: '{"genomeID":???id,"workspaceID":???ws,"loadingImage":"'+this.options.loadingImage+'"}'
+		    options: '{"genomeID":???objname,"workspaceID":???wsname,"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 	    };
 	},
@@ -226,10 +226,10 @@
 		var config = type2widget[type];
 		if (config.widget && config.options) {
 		    var options = config.options;
-		    //options = options.replace(/\?\?\?ws/g, obj_info[6]);
-		    options = options.replace(/\?\?\?ws/g, JSON.stringify(obj_info[7]));
-		    //options = options.replace(/\?\?\?id/g, obj_info[0]);
-		    options = options.replace(/\?\?\?id/g,JSON.stringify(obj_info[1]));
+		    options = options.replace(/\?\?\?wsid/g, obj_info[6]);
+		    options = options.replace(/\?\?\?wsname/g, JSON.stringify(obj_info[7]));
+		    options = options.replace(/\?\?\?objid/g, obj_info[0]);
+		    options = options.replace(/\?\?\?objname/g, JSON.stringify(obj_info[1]));
 		    options = options.replace(/\?\?\?ver/g, obj_info[4]);
 		    options = options.replace(/\?\?\?type/g, type);
 		    
