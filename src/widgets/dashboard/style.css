@@ -98,3 +98,10 @@
     height: 100%;
     text-align: center;
  }
+
+.navbar-group {
+   display: inline-block;
+}
+.navbar-group.navbar-form {
+   margin: 0;
+}

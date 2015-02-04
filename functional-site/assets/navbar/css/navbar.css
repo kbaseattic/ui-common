@@ -2,11 +2,11 @@
 .navbar-kbase {
     border-bottom: 5px solid #E0E0E0 !important;
     padding: 8px;
-    z-index: 1;
+    z-index: 3;
     height: 70px;
 }
 .navbar-fixed-top {
-  z-index: 1;
+  z-index: 3;
 }
 
 /* Top bar nav buttons

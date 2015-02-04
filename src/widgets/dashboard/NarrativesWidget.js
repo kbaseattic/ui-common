@@ -93,10 +93,10 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 
                   //   name: 'newnarrative',
                   //   label: 'New Narrative',
                   //   icon: 'plus-circle',
-                 //    style: 'primary',
+                  //    style: 'primary',
                   //   url: '/functional-site/#/narrativemanager/new',
                   //   external: true
-                 // })
+                  // })
                   .addRadioToggle({
                      buttons: [
                         {
@@ -113,9 +113,35 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 
                               this.view = 'table';
                               this.refresh();
                            }.bind(this)
-                              }
-                  ]
+                              }]
+                  })
+                  .addInput({
+                     placeholder: 'Search',
+                     onkeyup: function (e) {
+                        this.filterState({
+                           search: $(e.target).val()
+                        });
+                     }.bind(this)
                   });
+            }
+         },
+
+         filterState: {
+            value: function (options) {
+               if (!options.search || options.search.length === 0) {
+                  this.setState('narratives', this.narratives);
+                  return;
+               }
+
+               var searchRe = new RegExp(options.search, 'i');
+               var nar = this.narratives.filter(function (x) {
+                  if (x.workspace.metadata.narrative_nice_name.match(searchRe)) {
+                     return true;
+                  } else {
+                     return false;
+                  }
+               });
+               this.setState('narratives', nar);
             }
          },
 
@@ -137,6 +163,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 
                      })
                      .then(function (narratives) {
                         if (narratives.length === 0) {
+                           this.narratives = [];
                            this.setState('narratives', []);
                            resolve();
                            return;
@@ -146,6 +173,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 
                               narratives = narratives.sort(function (a, b) {
                                  return b.object.saveDate.getTime() - a.object.saveDate.getTime();
                               });
+                              this.narratives = narratives;
                               this.setState('narratives', narratives);
                               resolve();
                            }.bind(this))

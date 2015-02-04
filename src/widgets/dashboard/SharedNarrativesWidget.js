@@ -50,9 +50,8 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
                };
 
                this.buttonbar = Object.create(Buttonbar).init({
-                  container: this.container.find('[data-placeholder="buttonbar"]')
-               });
-               this.buttonbar
+                     container: this.container.find('[data-placeholder="buttonbar"]')
+                  })
                   .clear()
                   .addRadioToggle({
                      buttons: [
@@ -70,10 +69,16 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
                               this.view = 'table';
                               this.refresh();
                            }.bind(this)
-                              }
-                  ]
+                              }]
+                  })
+                  .addInput({
+                     placeholder: 'Search',
+                     onkeyup: function (e) {
+                        this.filterState({
+                           search: $(e.target).val()
+                        });
+                     }.bind(this)
                   });
-
             }
          },
 
@@ -97,46 +102,24 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
             }
          },
 
-         xgetPermissions: {
-            value: function (narratives) {
-               return Q.promise(function (resolve, reject, notify) {
-                  var promises = narratives.map(function (narrative) {
-                     return this.promise(this.workspaceClient, 'get_permissions', {
-                        id: narrative.workspace.id
-                     })
-                  }.bind(this));
-                  var username = Session.getUsername();
-                  Q.all(promises)
-                     .then(function (permissions) {
-                        for (var i = 0; i < permissions.length; i++) {
-                           var narrative = narratives[i];
-                           narrative.permissions = Utils.object_to_array(permissions[i], 'username', 'permission')
-                              .filter(function (x) {
-                                 if (x.username === username ||
-                                    x.username === '*' ||
-                                    x.username === narrative.workspace.owner) {
-                                    return false;
-                                 } else {
-                                    return true;
-                                 }
-                              })
-                              .sort(function (a, b) {
-                                 if (a.username < b.username) {
-                                    return -1;
-                                 } else if (a.username > b.username) {
-                                    return 1;
-                                 } else {
-                                    return 0
-                                 }
-                              });
-                        }
-                        resolve(narratives);
-                     }.bind(this))
-                     .catch(function (err) {
-                        reject(err);
-                     })
-                     .done();
-               }.bind(this));
+
+
+         filterState: {
+            value: function (options) {
+               if (!options.search || options.search.length === 0) {
+                  this.setState('narratives', this.narratives);
+                  return;
+               }
+
+               var searchRe = new RegExp(options.search, 'i');
+               var nar = this.narratives.filter(function (x) {
+                  if (x.workspace.metadata.narrative_nice_name.match(searchRe)) {
+                     return true;
+                  } else {
+                     return false;
+                  }
+               });
+               this.setState('narratives', nar);
             }
          },
 
@@ -175,6 +158,7 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
                               narratives = narratives.sort(function (a, b) {
                                  return b.object.saveDate.getTime() - a.object.saveDate.getTime();
                               });
+                              this.narratives = narratives;
                               this.setState('narratives', narratives);
                               resolve();
                            }.bind(this))

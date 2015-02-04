@@ -99,7 +99,7 @@ define(['jquery'],
          
          addRadioToggle: {
             value: function (cfg) {
-               var group = $('<div class="btn-group" data-toggle="buttons"></div>');
+               var group = $('<div class="btn-group navbar-left" data-toggle="buttons"></div>');
                for (var i=0; i<cfg.buttons.length; i++) {
                   var button = cfg.buttons[i];
                   
@@ -205,6 +205,27 @@ define(['jquery'],
                   item.append(link.append(icon).append(cfg.label));
                }
                return item;
+            }
+         },
+         
+         addInput: {
+            value: function (cfg) {
+               // i made up navbar group to have the form be inline-block
+               var form = $('<form class="navbar-form navbar-group" role="form"></form>');
+               form.append('<div class="form-group"><input type="text" class="form-control" placeholder="'+(cfg.placeholder?cfg.placeholder:'')+'"</div>');
+               if (cfg.onkeyup) {
+                  form.on('keyup', (function (cb) {
+                     return function (e) {
+                        cb(e);
+                     }
+                  })(cfg.onkeyup));
+               }
+                if (cfg.place === 'end') {
+                  this.container.append(form);
+               } else {
+                  this.container.prepend(form);
+               }             
+               return this;
             }
          }
 
