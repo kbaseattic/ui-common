@@ -12,7 +12,7 @@
       
       <table class="table">
          <tr>
-            <th>Version</th>
+            <th>{% if not params.objectVersion  %}Latest {% endif %}Version</th>
             <td>{{state.object.version}}
               <!--    {% if not params.objectVersion  %} 
               <div class="alert alert-warning">
@@ -30,13 +30,12 @@
             <td><a href="#/spec/type/{{state.object.type}}" target="_blank">{{state.object.typeName}}</a><br>
             </td>
          </tr>
+         {% if state.workspace.metadata.narrative %} 
          <tr>
-            <th>In Narrative</th>
-            {% if state.workspace.metadata.narrative %}            
+            <th>In Narrative</th>         
             <td><a href="/narrative/ws.{{state.workspace.id}}.obj.{{state.workspace.metadata.narrative}}" target="_blank">{{state.workspace.metadata.narrative_nice_name}}</a></td>
-            {% endif %}
          </tr>
-          
+         {% endif %}
          <tr>
             <th>Last updated</th>
             <td>{{state.object.save_date|dateFormat}} by <a href="#/people/{{state.object.saved_by}}">{{state.object.saved_by}}</a></td>
@@ -137,22 +136,24 @@
             <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                <div class="panel-body">
                   {% if state.references and state.references|length2 > 0 %}
-                  <table class="table ">
-                     <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th></th>
-                     </tr>
-                    
-                     {% for ref in state.references %}
-                     <tr>
-                        <td><a href="/functional-site/#/dataview/{{ref.wsid}}/{{ref.id}}/{{ref.version}}">{{ref.name}}</a></td>
-                        <td><a href="#/spec/type/{{ref.type}}" target="_blank">{{ref.typeName}}</a></td>
-                        <td>Saved on {{ref.save_date|dateFormat}} by <a href="#/people/{{ref.saved_by}}">{{ref.saved_by}}</a></td>
-                     </tr>
-                     {% endfor%}
-                    
-                  </table>
+                  <div style="height:400px;overflow-y: auto;">
+                     <table class="table ">
+                        <tr>
+                           <th>Name</th>
+                           <th>Type</th>
+                           <th></th>
+                        </tr>
+                       
+                        {% for ref in state.references %}
+                        <tr>
+                           <td><a href="/functional-site/#/dataview/{{ref.wsid}}/{{ref.id}}/{{ref.version}}">{{ref.name}}</a></td>
+                           <td><a href="#/spec/type/{{ref.type}}" target="_blank">{{ref.typeName}}</a></td>
+                           <td>Saved on {{ref.save_date|dateFormat}} by <a href="#/people/{{ref.saved_by}}">{{ref.saved_by}}</a></td>
+                        </tr>
+                        {% endfor%}
+                       
+                     </table>
+                  </div>
                   
                   {% else %}
                   
