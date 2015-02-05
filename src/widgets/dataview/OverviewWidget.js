@@ -238,36 +238,17 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
          fetchVersions: {
             value: function () {
                
-               // Note: we should just use the workspace method get_object_history, which returns the object info for all versions -mike
-               Utils.promise(this.workspaceClient, 'get_object_info_new', {
-                  objects: [{ref: APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'))}]
-               })
-               .then(function (data) {
-                  if (data.length !== 1) {
-                     return;
-                  }
-                  var object = APIUtils.object_info_to_object(data[0]);
-                  if (object.version === 1) {
-                     this.setState('versions', [object]);
-                     return;
-                  } 
-                  var versions = [];
-                  for (var i=0; i<object.version; i++) {
-                     versions.push(i);
-                  }
-                  Utils.promise(this.workspaceClient, 'get_object_info_new', {
-                     objects: versions.map(function (x) {
-                        return {ref: APIUtils.makeWorkspaceObjectRef(object.wsid, object.id, x)}
-                     })
-                  }).then(function (data) {
-                     var versions = data.map(function (x) {
+               // Note: we can just get the object history in one call :) -mike
+               Utils.promise(this.workspaceClient, 'get_object_history', 
+                  {ref: APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'))}
+               )
+               .then(function (dataList) {
+                  
+                  var versions = dataList.map(function (x) {
                         return APIUtils.object_info_to_object(x);
                      });
-                     this.setState('versions', versions.sort(function (a,b) {return b.version - a.version}));
-                  }.bind(this)).catch(function(err) {
-                     console.log('ERROR');
-                     console.log(err);
-                  }).done();
+                  this.setState('versions', versions.sort(function (a,b) {return b.version - a.version}));
+                  
                }.bind(this))
                .catch(function (err) {
                   console.log('ERROR'); 
@@ -278,6 +259,33 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
               
             }
          },
+         
+         
+         fetchReferences: {
+            value: function () {
+               
+               // Note: we should just use the workspace method get_object_history, which returns the object info for all versions -mike
+               Utils.promise(this.workspaceClient, 'list_referencing_objects',
+                             [{ref: APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'))}]
+               )
+               .then(function (dataList) {
+                  console.log(dataList);
+                  var refs = [];
+                  if (dataList[0]) {
+                     for(var i=0; i<dataList[0].length; i++) {
+                        refs.push(APIUtils.object_info_to_object(dataList[0][i]));
+                     }
+                  }
+                  this.setState('references', refs.sort(function (a,b) {return b.name - a.name}));
+               }.bind(this))
+               .catch(function (err) {
+                  console.log('ERROR'); 
+                  console.log(err);
+               })
+               .done();
+            }
+         },
+         
 
          setInitialState: {
             value: function () {
@@ -315,6 +323,9 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                               
                                  // Get versions to populate the versions panel.
                                  this.fetchVersions();
+                                 
+                                 // Get the references to this object
+                                 this.fetchReferences();
                               
                               
                                  // Other narratives this user has.

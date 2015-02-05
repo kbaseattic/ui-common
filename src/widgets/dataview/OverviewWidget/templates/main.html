@@ -94,7 +94,7 @@
                </div>
             </div>
          </div>
-          <div class="panel panel-default">
+         <div class="panel panel-default">
             <div class="panel-heading" role="tab" id="headingTwo">
                <h4 class="panel-title">
                   <span data-toggle="collapse" data-parent="#accordion"  data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" class="collapsed" style="cursor:pointer;">
@@ -124,6 +124,45 @@
                </div>
             </div>
          </div>
+          
+         <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingThree">
+               <h4 class="panel-title">
+                  <span data-toggle="collapse" data-parent="#accordion"  data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" class="collapsed" style="cursor:pointer;">
+                     <span class="fa angle-right"></span>Referenced by
+                  </span>
+               </h4>
+            </div>
+
+            <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+               <div class="panel-body">
+                  {% if state.references and state.references|length2 > 0 %}
+                  <table class="table ">
+                     <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th></th>
+                     </tr>
+                    
+                     {% for ref in state.references %}
+                     <tr>
+                        <td><a href="/functional-site/#/dataview/{{ref.wsid}}/{{ref.id}}/{{ref.version}}">{{ref.name}}</a></td>
+                        <td><a href="#/spec/type/{{ref.type}}" target="_blank">{{ref.typeName}}</a></td>
+                        <td>Saved on {{ref.save_date|dateFormat}} by <a href="#/people/{{ref.saved_by}}">{{ref.saved_by}}</a></td>
+                     </tr>
+                     {% endfor%}
+                    
+                  </table>
+                  
+                  {% else %}
+                  
+                  There is no other data that references this data object.
+                  
+                  {% endif %}
+               </div>
+            </div>
+         </div> 
+         
       </div>
    </div>
    <div class="col-sm-4">
