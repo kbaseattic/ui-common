@@ -58,6 +58,8 @@ require.config({
       kbasetest: '/src/kbaseTest',
       'kb.utils.api': '/src/kbaseAPIUtils',
       'kb.alert': '/src/widgets/kbaseAlert',
+      'kb.statemachine': '/src/kbaseStateMachine',  
+      'kb.logger': '/src/kbaseLogger',
 
       // widgets
       // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
@@ -79,13 +81,14 @@ require.config({
       kbaseloginwidget: '/src/widgets/kbaseLoginWidget',
       
       // Dashboard widgets
-      dashboard_widget: '/src/widgets/dashboard/DashboardWidget',
-      dashboard_profile_widget: '/src/widgets/dashboard/ProfileWidget',
-      dashboard_shared_narratives_widget: '/src/widgets/dashboard/SharedNarrativesWidget',
-      dashboard_narratives_widget: '/src/widgets/dashboard/NarrativesWidget',
-      dashboard_apps_widget: '/src/widgets/dashboard/AppsWidget',
-      dashboard_data_widget: '/src/widgets/dashboard/DataWidget',
-      'kb.widget.collaboratornetwork': '/src/widgets/dashboard/CollaboratorNetwork',
+      'kb.widget.dashboard.base': '/src/widgets/dashboard/DashboardWidget',
+      'kb.widget.dashboard.profile': '/src/widgets/dashboard/ProfileWidget',
+      'kb.widget.dashboard.sharedNarratives': '/src/widgets/dashboard/SharedNarrativesWidget',
+      'kb.widget.dashboard.narratives': '/src/widgets/dashboard/NarrativesWidget',
+      'kb.widget.dashboard.apps': '/src/widgets/dashboard/AppsWidget',
+      'kb.widget.dashboard.data': '/src/widgets/dashboard/DataWidget',
+      'kb.widget.dashboard.collaborators': '/src/widgets/dashboard/CollaboratorsWidget', 
+      'kb.widget.dashboard.metrics': '/src/widgets/dashboard/MetricsWidget',
       
       // Dataview widgets
       'kb.widget.dataview.base': '/src/widgets/dataview/DataviewWidget',

@@ -25,13 +25,13 @@
 
    <div class="col-sm-4" style="text-align: right">
       Found 
-       {% if state.narratives|length == 1 %}
+       {% if state.narrativesFiltered|length == 1 %}
       
-      {{ state.narratives|length }} Narrative
+      {{ state.narrativesFiltered|length }} Narrative
       
-      {% elif state.narratives|length > 1 %}
+      {% elif state.narrativesFiltered|length > 1 %}
       
-       {{ state.narratives|length }} Narratives
+       {{ state.narrativesFiltered|length }} Narratives
        
       {% elif 1 %}
       
@@ -42,7 +42,7 @@
 </div>
 
  
-{% if state.narratives|length > 0 %}
+{% if state.narrativesFiltered|length > 0 %}
 
  <table cellpadding="0" cellspacing="0" border="0" class="table" id="dashboard-narratives-{{env.generatedId}}">
  <thead>
@@ -59,7 +59,7 @@
      </tr>
  </thead>
 
-{% for narrative in state.narratives %}
+{% for narrative in state.narrativesFiltered %}
 	<tr>
 		<td>
 		    <a target="_blank" href="/narrative/{{narrative.object.obj_id}}">{{narrative.workspace.metadata.narrative_nice_name}}</a>
@@ -108,6 +108,7 @@
 	<script>
 require(['jquery', 'kbaseutils'], function ($, Utils) {
 	$('#dashboard-narratives-{{env.generatedId}}').DataTable({
+       lengthMenu: [5, 10, 20],
         order: [[7, "desc"]],
         columnDefs: [
            {targets: 7, type: "date", render: {display: function(data) {return Utils.niceElapsedTime(data)}}}
