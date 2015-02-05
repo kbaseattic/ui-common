@@ -107,17 +107,16 @@
                <div class="panel-body">
                   <table class="table ">
                     
-                     <tr>
+                     <!-- tr>
                         <th>Version</th>
                         <th>Date</th>
                         <th>Size</th>
-                     </tr>
+                     </tr -->
                     
                      {% for versionObject in state.versions %}
                      <tr>
-                        <td><a href="/functional-site/#/dataview/{{versionObject.wsid}}/{{versionObject.id}}/{{versionObject.version}}">{{versionObject.version}}</a></td>
-                        <td>{{versionObject.save_date}}</td>
-                        <td>{{versionObject.size|fileSizeFormat}}</td>
+                        <td><a href="/functional-site/#/dataview/{{versionObject.wsid}}/{{versionObject.id}}/{{versionObject.version}}">v{{versionObject.version}}</a></td>
+                        <td>Saved on {{versionObject.save_date|dateFormat}} by <a href="#/people/{{versionObject.saved_by}}">{{versionObject.saved_by}}</a></td>
                      </tr>
                      {% endfor%}
                     

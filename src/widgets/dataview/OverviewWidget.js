@@ -238,6 +238,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
          fetchVersions: {
             value: function () {
                
+               // Note: we should just use the workspace method get_object_history, which returns the object info for all versions -mike
                Utils.promise(this.workspaceClient, 'get_object_info_new', {
                   objects: [{ref: APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'))}]
                })
@@ -262,7 +263,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                      var versions = data.map(function (x) {
                         return APIUtils.object_info_to_object(x);
                      });
-                     this.setState('versions', versions.sort(function (a,b) {return a.version-b.version}));
+                     this.setState('versions', versions.sort(function (a,b) {return b.version - a.version}));
                   }.bind(this)).catch(function(err) {
                      console.log('ERROR');
                      console.log(err);
