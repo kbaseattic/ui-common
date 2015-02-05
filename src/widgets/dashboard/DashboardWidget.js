@@ -330,6 +330,11 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
                this.refresh().done();
             }
          },
+         getParam: {
+            value: function (path, defaultValue) {
+               return Utils.getProp(this.params, path, defaultValue);
+            }
+         },
 
          recalcState: {
             value: function () {
@@ -409,21 +414,6 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
                } else {
                   return false;
                }
-            }
-         },
-
-
-         promise: {
-            value: function (client, method, arg1) {
-               var def = Q.defer();
-               client[method](arg1,
-                  function (result) {
-                     def.resolve(result);
-                  },
-                  function (err) {
-                     def.reject(err);
-                  });
-               return def.promise;
             }
          },
 

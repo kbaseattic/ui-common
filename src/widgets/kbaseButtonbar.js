@@ -99,7 +99,7 @@ define(['jquery'],
          
          addRadioToggle: {
             value: function (cfg) {
-               var group = $('<div class="btn-group navbar-left" data-toggle="buttons"></div>');
+               var group = $('<div class="btn-group" data-toggle="buttons"></div>');
                for (var i=0; i<cfg.buttons.length; i++) {
                   var button = cfg.buttons[i];
                   

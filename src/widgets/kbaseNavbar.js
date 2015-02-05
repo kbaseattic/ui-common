@@ -199,6 +199,7 @@ define(['jquery', 'nunjucks', 'kbasesession', 'kbaseconfig'],
             }
          },
 
+         /* TODO: This should not be here, rather in some top level module, like the app */
          addDefaultMenu: {
             value: function (cfg) {
                cfg = cfg || {};
@@ -217,6 +218,7 @@ define(['jquery', 'nunjucks', 'kbasesession', 'kbaseconfig'],
                      label: 'Narrative',
                      icon: 'file',
                      url: '#/narrativemanager/start',
+                     external: true,
                      place: 'end'
                   });
                }
@@ -268,7 +270,7 @@ define(['jquery', 'nunjucks', 'kbasesession', 'kbaseconfig'],
                         .attr('data-menu-item', cfg.name)
                         .on('click', cfg.callback);
                   }
-                  if (item.external) {
+                  if (cfg.external) {
                      link.attr('target', '_blank');
                   }
                   var icon = $('<div class="navbar-icon" style=""></div>');

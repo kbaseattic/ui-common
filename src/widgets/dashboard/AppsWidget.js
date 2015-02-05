@@ -1,5 +1,5 @@
-define(['dashboard_widget', 'kbc_UserProfile', 'kbasesession', 'kbc_NarrativeMethodStore', 'kbc_Workspace', 'kb.utils.api', 'q'],
-   function (DashboardWidget, UserProfileService, Session, NarrativeMethodStore, WorkspaceService, APIUtils, Q) {
+define(['dashboard_widget', 'kbc_UserProfile', 'kbaseutils', 'kbasesession', 'kbc_NarrativeMethodStore', 'kbc_Workspace', 'kb.utils.api', 'q'],
+   function (DashboardWidget, UserProfileService, Utils, Session, NarrativeMethodStore, WorkspaceService, APIUtils, Q) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
@@ -58,7 +58,7 @@ define(['dashboard_widget', 'kbc_UserProfile', 'kbasesession', 'kbc_NarrativeMet
             value: function () {
                // get all the narratives the user can see.
                return Q.promise(function (resolve, reject, notify) {
-                  this.promise(this.workspaceClient, 'list_workspace_info', {
+                  Utils.promise(this.workspaceClient, 'list_workspace_info', {
                         showDeleted: 0,
                      })
                      .then(function (data) {
@@ -79,7 +79,7 @@ define(['dashboard_widget', 'kbc_UserProfile', 'kbasesession', 'kbc_NarrativeMet
                         });
 
                         // Now get the objects for each narrative workspace
-                        this.promise(this.workspaceClient, 'get_object_info_new', {
+                        Utils.promise(this.workspaceClient, 'get_object_info_new', {
                               objects: objectRefs,
                               ignoreErrors: 1,
                               includeMetadata: 1
@@ -125,7 +125,7 @@ define(['dashboard_widget', 'kbc_UserProfile', 'kbasesession', 'kbc_NarrativeMet
                      resolve();
                   } else {
 
-                     this.promise(this.methodStore, 'list_apps_full_info', {})
+                     Utils.promise(this.methodStore, 'list_apps_full_info', {})
                         .then(function (data) {
                            var appMap = {};
                            data.forEach(function (x) {

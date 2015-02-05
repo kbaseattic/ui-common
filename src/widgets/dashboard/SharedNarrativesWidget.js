@@ -1,5 +1,5 @@
-define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspace', 'kbasesession', 'kb.widget.buttonbar', 'q'],
-   function ($, Utils, APIUtils, DashboardWidget, WorkspaceService, Session, Buttonbar, Q) {
+define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kb.client.workspace', 'kbasesession', 'kb.widget.buttonbar', 'q'],
+   function ($, Utils, APIUtils, DashboardWidget, Workspace, Session, Buttonbar, Q) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
@@ -26,17 +26,7 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
 
          setup: {
             value: function () {
-               if (Session.isLoggedIn()) {
-                  if (this.hasConfig('workspace_url')) {
-                     this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'), {
-                        token: Session.getAuthToken()
-                     });
-                  } else {
-                     throw 'The workspace client url is not defined';
-                  }
-               } else {
-                  this.workspaceClient = null;
-               }
+               this.workspaceClient = Object.create(Workspace).init();
             }
          },
 
@@ -73,6 +63,7 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
                   })
                   .addInput({
                      placeholder: 'Search',
+                     place: 'end',
                      onkeyup: function (e) {
                         this.filterState({
                            search: $(e.target).val()
@@ -129,7 +120,7 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
                   // Get all workspaces, filter out those owned by the user,
                   // and those that are public
 
-                  this.getNarratives({
+                  this.workspaceClient.getNarratives({
                         params: {
                            showDeleted: 0
                         }
@@ -153,7 +144,7 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kbc_Workspa
                            }
                         });
 
-                        this.getPermissions(narratives)
+                        this.workspaceClient.getPermissions(narratives)
                            .then(function (narratives) {
                               narratives = narratives.sort(function (a, b) {
                                  return b.object.saveDate.getTime() - a.object.saveDate.getTime();

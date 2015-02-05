@@ -21,11 +21,11 @@
 	</tr>
 	</thead>
 	<tbody>
-{% for user in state.network.collaboratorTable %}
+{% for user in state.collaborators %}
 	<tr>
 		<td><a href="/functional-site/#/people/{{user.username}}">{{user.realname}}</a></td>
 		<td>{{user.username}}</td>
-		<td class="number">{{user.ws | length}}</td>
+		<td class="number">{{user.count}}</td>
 	</tr>
 {% endfor %}
 	</tbody>

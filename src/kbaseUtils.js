@@ -55,6 +55,31 @@ define(['q'],
                object[key] = value;
             }
          },
+         
+         incrProp: {
+            value: function (object, path, value) {
+
+               if (typeof path === 'string') {
+                  path = path.split('.');
+               }
+
+               var key = path.pop();
+
+               for (var i = 0; i < path.length; i++) {
+                  if (object[path] === undefined) {
+                     object[path] = {};
+                  }
+                  object = object[path];
+               }
+               
+               if (object[key] === undefined) {
+                  object[key] = value?value:1;
+               } else {
+                  object[key] += value?value:1;
+               }
+            }
+
+         },
 
          deleteProp: {
             value: function (path, name) {
@@ -417,9 +442,7 @@ define(['q'],
                }
                return l;
             }
-         },
-
-         
+         }
 
 
       });
