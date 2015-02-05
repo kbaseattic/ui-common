@@ -24,6 +24,7 @@
         shockURL: null,
         exportURL: null,
         timer: null,
+        buttons : null,
         
         downloaders: {  // type -> {name: ..., external_type: ...[, transform_options: ...[, unzip: <file_ext>]}
         	'KBaseGenomes.ContigSet': [{name: 'FASTA', external_type: 'FASTA.DNA.Assembly', transform_options: {"output_file_name": "?.fasta"}}],
@@ -80,34 +81,51 @@
     				.append('<tr>')
     				.append($labeltd)
     				.append($btnTd));
-		
+
+			self.buttons = [];
+			var disableButtons = function(disable) {
+				for (var i in self.buttons) {
+					self.buttons[i].prop("disabled", disable);
+				}
+			};
+			var $cancelButton = 
+				$('<button>').addClass('kb-data-list-cancel-btn')
+							 .append('Cancel').click(function() {
+					self.stopTimer();
+					disableButtons(false);
+		            self.$statusDivContent.empty();
+					//downloadPanel.empty();
+				});
     		var addDownloader = function(descr) {
-		    $btnTd.append($('<button>').addClass('kb-data-list-btn')
+    			var btn = $('<button>').addClass('kb-data-list-btn')
     					.append(descr.name)
     					.click(function(e) {
-                        	e.preventDefault();
-						$btnTd.find('.kb-data-list-btn').prop('disabled', true);
-    						self.runDownloader(self.type, self.wsId, self.objId, descr);
-    					}));
+    						e.stopPropagation();
+    						disableButtons(true);
+    						$btnTd.find('.kb-data-list-btn').prop('disabled', true);
+    						self.runDownloader(self.type, self.wsId, self.objId, descr, function(ok) {
+        						disableButtons(false);
+        						if (ok)
+        							$cancelButton.click();
+    						});
+    					});
+    			$btnTd.append(btn);
+    			self.buttons.push(btn);
     		};
     		var downloaders = self.prepareDownloaders(self.type, self.wsId, self.objId);
     		for (var downloadPos in downloaders)
     			addDownloader(downloaders[downloadPos]);
 
-    		$btnTd.append($('<button>').addClass('kb-data-list-btn')
+    		var jsonBtn = $('<button>').addClass('kb-data-list-btn')
     				.append('JSON')
     				.click(function(e) {
-    					e.preventDefault();
     					var url = self.exportURL + '/download?ws='+self.wsId+'&id='+self.objId+'&token='+self.token+
     					'&url='+encodeURIComponent(self.wsUrl) + "&wszip=1";
     					self.downloadFile(url);
-    				}));
-    		$btnTd.append('<br>').append($('<button>').addClass('kb-data-list-cancel-btn')
-    				.append('Cancel')
-    				.click(function() {
-    					self.stopTimer();
-    					//downloadPanel.empty();
-    				} ));
+    				});
+    		self.buttons.push(jsonBtn);
+    		$btnTd.append(jsonBtn);
+    		$btnTd.append('<br>').append($cancelButton);
 		
     		self.$statusDiv = $('<div>').css({'margin':'15px'});
     		self.$statusDivContent = $('<div>');
@@ -137,15 +155,17 @@
         	return ret;
         },
         
-        runDownloader: function(type, wsId, objId, descr) { // descr is {name: ..., external_type: ...[, transform_options: ...[, unzip: ...]]}
+        runDownloader: function(type, wsId, objId, descr, callback) { 
+        	// descr is {name: ..., external_type: ...[, transform_options: ...[, unzip: ...]]}
             var self = this;
-            self.showButtonSpinner(true);
+            //self.showButtonSpinner(true);
             self.showMessage('<img src="'+self.loadingImage+'" /> Export status: Preparing data');
             self.$statusDiv.show();
         	var transform_options = descr.transform_options;
         	if (!transform_options)
         		transform_options = {};
-        	var args = {external_type: descr.external_type, kbase_type: type, workspace_name: wsId, object_name: objId, optional_arguments: {transform: transform_options}};
+        	var args = {external_type: descr.external_type, kbase_type: type, workspace_name: wsId, 
+        			object_name: objId, optional_arguments: {transform: transform_options}};
     		console.log("Downloader data to be sent to transform service:");
     		console.log(JSON.stringify(args));
             var transformSrv = new Transform(this.transformURL, {token: this.token});
@@ -153,11 +173,13 @@
             		$.proxy(function(data) {
             			console.log(data);
             			var jobId = data[1];
-            			self.waitForJob(jobId, objId, descr.unzip);
+            			self.waitForJob(jobId, objId, descr.unzip, callback);
             		}, this),
             		$.proxy(function(data) {
             			console.log(data.error.error);
             			self.showError(data.error.error);
+						if (callback)
+							callback(false);
             		}, this)
             );
         },
@@ -169,7 +191,7 @@
         		div.append('<img src="'+this.loadingImage+'" />');
         },
         
-        waitForJob: function(jobId, wsObjectName, unzip) {
+        waitForJob: function(jobId, wsObjectName, unzip, callback) {
             var self = this;
             var jobSrv = new UserAndJobState(this.ujsURL, {token: this.token});
 			var timeLst = function(event) {
@@ -188,13 +210,19 @@
 								self.$elem.find('.kb-data-list-btn').prop('disabled', false);
 								console.log(data);
 								self.downloadUJSResults(data, wsObjectName, unzip);
+								if (callback)
+									callback(true);
 							}, function(data) {
             					console.log(data.error.message);
                     			self.showError(data.error.message);
+								if (callback)
+									callback(false);
 							});
 						} else {
 							console.log(status);
 	            			self.showError(status);
+							if (callback)
+								callback(false);
 						}
 					} else {
 						console.log("Export status: " + status, true);
@@ -204,6 +232,8 @@
 					self.stopTimer();
 					console.log(data.error.message);
         			self.showError(data.error.message);
+					if (callback)
+						callback(false);
 				});
 			};
 			self.timer = setInterval(timeLst, 5000);
@@ -275,7 +305,7 @@
 				this.timer = null;
 				console.log("Timer was stopped");
 			}
-			this.showButtonSpinner(false);
+			//this.showButtonSpinner(false);
 		}
     });
 })( jQuery );
