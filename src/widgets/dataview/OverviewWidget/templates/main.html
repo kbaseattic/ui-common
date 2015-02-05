@@ -7,19 +7,27 @@
 <div class="row">
    <div class="col-sm-6">
 
+      
+      <h3>{{state.object.name}}</h3>
+      
       <table class="table">
          <tr>
-            <th>Name</th>
-            <td>{{state.object.name}}</td>
-         </tr>
-         <tr>
-            <th>Type</th>
-            <td>{{state.object.typeName}}
+            <th>Version</th>
+            <td>{{state.object.version}}
+              <!--    {% if not params.objectVersion  %} 
+              <div class="alert alert-warning">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                           <span aria-hidden="true">&times;</span>
+                        </button>
+                        The version was not specified -- showing the most recent version
+                     </div>
+               {% endif %}
+               -->
             </td>
          </tr>
          <tr>
-            <th>Version</th>
-            <td>{{state.object.typeMajorVersion}}.{{state.object.typeMinorVersion}}
+            <th>Type</th>
+            <td><a href="#/spec/type/{{state.object.type}}" target="_blank">{{state.object.typeName}}</a><br>
             </td>
          </tr>
          <tr>
@@ -28,33 +36,20 @@
             <td><a href="/narrative/ws.{{state.workspace.id}}.obj.{{state.workspace.metadata.narrative}}" target="_blank">{{state.workspace.metadata.narrative_nice_name}}</a></td>
             {% endif %}
          </tr>
-          <tr>
-            <th>Object Version (saves)</th>
-            <td>{{state.object.version}}
-                  {% if not params.objectVersion  %} 
-              <div class="alert alert-warning">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                           <span aria-hidden="true">&times;</span>
-                        </button>
-                        The version was not specified -- showing the most recent version
-                     </div>
-               {% endif %}
-             
-            </td>
-         </tr>
+          
          <tr>
-            <th>Saved</th>
-            <td>{{state.object.save_date|dateFormat}}</td>
+            <th>Last updated</th>
+            <td>{{state.object.save_date|dateFormat}} by <a href="#/people/{{state.object.saved_by}}">{{state.object.saved_by}}</a></td>
          </tr>
-         <tr>
+         <!--tr>
             <th>Size</th>
             <td>{{state.object.size|fileSizeFormat}}</td>
-         </tr>
+         </tr-->
 
-         <tr>
+         <!--tr>
             <th>Permanent Ref</th>
             <td>{{state.object.wsid}}/{{state.object.id}}/{{state.object.version}}</td>
-         </tr>
+         </tr-->
          <tr>
             <th>Permalink</th>
             {% set permalink = env.browser.location.scheme + "//" +env.browser.location.host + "/functional-site/#/dataview/" + state.object.wsid + "/" + state.object.id + "/" + state.object.version %}
