@@ -93,11 +93,24 @@
         },
         
         makeDecoration: function($panel, title, $widgetDiv) {
-        	$panel.addClass("panel panel-default")
-        		.append($('<div>').addClass('panel-heading')
-				.append($('<span>').addClass('panel-title')
-					    .append(title)))
-					    .append($('<div>').addClass('panel-body').append($widgetDiv));
+            var id = this.genUUID();
+            $panel.append(
+                    $('<div class="panel-group" id="accordion_'+id+'" role="tablist" aria-multiselectable="true">')
+                    .append($('<div class="panel panel-default">')
+                            .append(''+
+                                    '<div class="panel-heading" role="tab" id="heading_'+id+'">'+
+                                    '<h4 class="panel-title">'+
+                                    '<span data-toggle="collapse" data-parent="#accordion_'+id+'" data-target="#collapse_'+id+'" aria-expanded="false" aria-controls="collapse_'+id+'" style="cursor:pointer;">'+
+                                    '<span class="fa fa-angle-right pull-left"></span>' + title + 
+                                    '</span>'+
+                                    '</h4>'+
+                                    '</div>'
+                            )
+                            .append($('<div id="collapse_'+id+'" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_'+id+'" area-expanded="true">')
+                                    .append($('<div class="panel-body">').append($widgetDiv))
+                            )
+                    )
+            );
         },
         
         getData: function() {
@@ -107,7 +120,13 @@
                 workspace: this.options.workspaceID,
                 title: "Genome Page"
             };
-        }
+        },
 
+        genUUID: function() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                return v.toString(16);
+            });
+        }
     });
 })( jQuery );
