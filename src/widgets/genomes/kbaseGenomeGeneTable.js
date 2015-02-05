@@ -11,7 +11,8 @@
             genome_id: null,
             ws_name: null,
             kbCache: null,
-            loadingImage: "assets/img/ajax-loader.gif"
+            loadingImage: "assets/img/ajax-loader.gif",
+            genomeInfo: null
         },
         wsUrl: "https://kbase.us/services/ws/",
 
@@ -34,18 +35,10 @@
         	container.append("<div><img src=\""+self.options.loadingImage+"\">&nbsp;&nbsp;loading genes data...</div>");
 
         	var genomeRef = "" + this.options.ws_name + "/" + this.options.genome_id;
-        	
-            var objId = {ref: genomeRef};
-            if (this.options.kbCache)
-                prom = this.options.kbCache.req('ws', 'get_objects', [objId]);
-            else
-                prom = kb.ws.get_objects([objId]);
 
             var self = this;
             
-            $.when(prom).done($.proxy(function(data) {
-        		var gnm = data[0].data;
-            	
+            var showData = function(gnm) {
             	function showGenes() {
             		container.empty();
             		////////////////////////////// Genes Tab //////////////////////////////
@@ -107,7 +100,7 @@
             			}
             		}
             		var genesSettings = {
-            				//"sPaginationType": "full_numbers",
+            				"sPaginationType": "full_numbers",
             				"iDisplayLength": 10,
             				"aaSorting" : [[1,'asc'],[2,'asc']],  // [[0,'asc']],
             				"sDom": 't<fip>',
@@ -143,12 +136,25 @@
             	} else {
             		showGenes();
             	}
-
-            }, this));
-            $.when(prom).fail($.proxy(function(data) {
+            };
+            if (self.options.genomeInfo) {
+            	showData(self.options.genomeInfo.data);
+            } else {
+                var objId = {ref: genomeRef};
+                if (this.options.kbCache)
+                    prom = this.options.kbCache.req('ws', 'get_objects', [objId]);
+                else
+                    prom = kb.ws.get_objects([objId]);
+            	
+            	$.when(prom).done($.proxy(function(data) {
+            		var gnm = data[0].data;
+            		showData(gnm);
+            	}, this));
+            	$.when(prom).fail($.proxy(function(data) {
             		container.empty();
             		container.append('<p>[Error] ' + data.error.message + '</p>');
-            }, this));
+            	}, this));
+            }
             return this;
         },
         

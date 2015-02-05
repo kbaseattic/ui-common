@@ -143,7 +143,7 @@
             		funcsData.push({name: '<a onclick="specClicks[\''+pref+'funcs-click\'](this,event); return false;" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer});
             	}
                 var funcsSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function name", mData: "name"}, {sTitle: "Function version", mData: "ver"}],
                         "aaData": funcsData,
@@ -175,7 +175,7 @@
             		typesData.push({name: '<a onclick="specClicks[\''+pref+'types-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer});
             	}
                 var typesSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
                         "aaData": typesData,
@@ -207,7 +207,7 @@
             		subsData.push({name: '<a onclick="specClicks[\''+pref+'subs-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer});
             	}
                 var subsSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
                         "aaData": subsData,
@@ -244,7 +244,7 @@
             		versData.push({name: link});
             	}
                 var versSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type version", mData: "name"}],
                         "aaData": versData,

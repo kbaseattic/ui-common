@@ -35,7 +35,6 @@
         	$.when(p).done(function(data) {
         		console.log(data);
         		self.loading(true);
-        		self.$elem.append('<b>Sorry! No custom viewer is available for this data.</b>');
         		var panel = $('<div>');// style="overflow: auto; position: absolute; zoom: 1; left: 0px; top: 30px; right: 0px; bottom: 0px; border: 1px solid rgb(204, 204, 204);">');
         		self.$elem.append(panel);
         		panel.append('<h3>Metadata and Basic Info</h3><br>');

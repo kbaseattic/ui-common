@@ -1,0 +1,139 @@
+<div class="collapse" id="{{env.widgetName}}-more-info-{{env.instanceId}}">
+   <div class="well">
+      <p>This panel shows an Overview of this data object.</p>
+   </div>
+</div>
+
+<div class="row">
+   <div class="col-sm-6">
+
+      <table class="table">
+         <tr>
+            <th>Name</th>
+            <td>{{state.object.name}}</td>
+         </tr>
+         <tr>
+            <th>Type</th>
+            <td>{{state.object.typeName}}
+            </td>
+         </tr>
+         <tr>
+            <th>Version</th>
+            <td>{{state.object.typeMajorVersion}}.{{state.object.typeMinorVersion}}
+            </td>
+         </tr>
+         <tr>
+            <th>In Narrative</th>
+            {% if state.workspace.metadata.narrative %}            
+            <td><a href="/narrative/ws.{{state.workspace.id}}.obj.{{state.workspace.metadata.narrative}}" target="_blank">{{state.workspace.metadata.narrative_nice_name}}</a></td>
+            {% endif %}
+         </tr>
+          <tr>
+            <th>Object Version (saves)</th>
+            <td>{{state.object.version}}
+                  {% if not params.objectVersion  %} 
+              <div class="alert alert-warning">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                           <span aria-hidden="true">&times;</span>
+                        </button>
+                        The version was not specified -- showing the most recent version
+                     </div>
+               {% endif %}
+             
+            </td>
+         </tr>
+         <tr>
+            <th>Saved</th>
+            <td>{{state.object.save_date|dateFormat}}</td>
+         </tr>
+         <tr>
+            <th>Size</th>
+            <td>{{state.object.size|fileSizeFormat}}</td>
+         </tr>
+
+         <tr>
+            <th>Permanent Ref</th>
+            <td>{{state.object.wsid}}/{{state.object.id}}/{{state.object.version}}</td>
+         </tr>
+         <tr>
+            <th>Permalink</th>
+            {% set permalink = env.browser.location.scheme + "//" +env.browser.location.host + "/functional-site/#/dataview/" + state.object.wsid + "/" + state.object.id + "/" + state.object.version %}
+            <td><a href="{{permalink}}">{{permalink}}</a>
+            </td>
+         </tr>
+      </table>
+   </div>
+   <div class="col-sm-6">
+
+      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+         <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingOne">
+               <h4 class="panel-title">
+                  <span data-toggle="collapse" data-parent="#accordion"  data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne" class="collapsed" style="cursor:pointer;">
+                     <span class="fa angle-right"></span>Raw Metadata
+                  </span>
+               </h4>
+            </div>
+
+            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+               <div class="panel-body">
+                 
+                  {% if state.object.metadata and state.object.metadata|length2 > 0 %}
+                 
+                  <table class="table ">
+                    
+                     {% for key,value in state.object.metadata|dictsort %}
+                     <tr>
+                        <th>{{key}}</th>
+                        <td>{{value}}</td>
+                     </tr>
+                     {% endfor %}
+                    
+                  </table>
+                  
+                  {% else %}
+                  
+                  There is no metadata for this data object.
+                  
+                  {% endif %}
+               </div>
+            </div>
+         </div>
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingTwo">
+               <h4 class="panel-title">
+                  <span data-toggle="collapse" data-parent="#accordion"  data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" class="collapsed" style="cursor:pointer;">
+                     <span class="fa angle-right"></span>Versions
+                  </span>
+               </h4>
+            </div>
+
+            <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+               <div class="panel-body">
+                  <table class="table ">
+                    
+                     <tr>
+                        <th>Version</th>
+                        <th>Date</th>
+                        <th>Size</th>
+                     </tr>
+                    
+                     {% for versionObject in state.versions %}
+                     <tr>
+                        <td><a href="/functional-site/#/dataview/{{versionObject.wsid}}/{{versionObject.id}}/{{versionObject.version}}">{{versionObject.version}}</a></td>
+                        <td>{{versionObject.save_date}}</td>
+                        <td>{{versionObject.size|fileSizeFormat}}</td>
+                     </tr>
+                     {% endfor%}
+                    
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="col-sm-4">
+
+
+   </div>
+</div>

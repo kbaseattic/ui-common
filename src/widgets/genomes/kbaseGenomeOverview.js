@@ -10,6 +10,7 @@
             loadingImage: "../../widgets/images/ajax-loader.gif",
             kbCache: null,
             isInCard: false,
+            genomeInfo: null
         },
 
         token: null,
@@ -251,12 +252,7 @@
             // console.log("rendering workspace genome");
             // console.log(this.options.kbCache);
 
-            isInt = function(n) {
-                return typeof n === 'number' && n % 1 == 0;
-            };
-            
-            
-            var objForSubset = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
+            /*var objForSubset = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
             // first we try to get just the subdata that should be there
             objForSubset['included'] = ["/id","/scientific_name","/genetic_code","/domain"];
 	    self.options.kbCache.ws.get_object_subset( [ objForSubset ], function(data) {
@@ -273,80 +269,91 @@
                         }
                     }
                 },
-                function(error) { /* don't worry about it for now, let the other function handle it*/});
+                function(error) { 
+                	// don't worry about it for now, let the other function handle it
+                });*/
             
+            if (self.options.genomeInfo) {
+            	self.showData(self.options.genomeInfo.data);
+            } else {
+            	var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
+            	var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+            	$.when(prom).done($.proxy(function(genome) {
+            		// console.log(genome);
+            		self.showData(genome[0].data);
+            	}, this));
+            	$.when(prom).fail($.proxy(function(error) { this.renderError(error); }, this));
+            }
+        },
+
+        showData: function(genome) {
+        	var self = this;
+			self.pubmedQuery = genome.scientific_name
+			//console.log(self.pubmedQuery)	
             
-            
-            var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
-            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-            $.when(prom).done($.proxy(function(genome) {
-                // console.log(genome);
-                genome = genome[0].data;
-				self.pubmedQuery = genome.scientific_name
-				//console.log(self.pubmedQuery)	
-                
-				var gcContent = "Unknown";
-                var dnaLength = "Unknown";
-                if (genome.dna_size && genome.dna_size != 0) {
-                    dnaLength = genome.dna_size;
-                    if (genome.gc_content) {
-                        gcContent = Number(genome.gc_content);
-                        if (isInt(gcContent)) {
-                            if (dnaLength)
-                                gcContent = (gcContent/dnaLength*100).toFixed(2) + " %";
-                        }
-                        else
-                            gcContent = Number(gcContent.toFixed(2)) + " %";
+            var isInt = function(n) {
+                return typeof n === 'number' && n % 1 == 0;
+            };
+
+			var gcContent = "Unknown";
+            var dnaLength = "Unknown";
+            if (genome.dna_size && genome.dna_size != 0) {
+                dnaLength = genome.dna_size;
+                if (genome.gc_content) {
+                    gcContent = Number(genome.gc_content);
+                    if (isInt(gcContent)) {
+                        if (dnaLength)
+                            gcContent = (gcContent/dnaLength*100).toFixed(2) + " %";
                     }
+                    else
+                        gcContent = Number(gcContent.toFixed(2)) + " %";
+                }
+            }
+
+            var nFeatures = 0;
+            if (genome.features) {
+                nFeatures = genome.features.length;
+            }
+            this.$infoTable.empty()
+                           .append(this.addInfoRow("Name", genome.scientific_name))
+                           .append(this.addInfoRow("KBase Genome ID", genome.id))
+                           .append(this.addInfoRow("Domain", genome.domain))
+                           .append(this.addInfoRow("DNA Length", dnaLength))
+                           .append(this.addInfoRow("Source ID", genome.source + ": " + genome.source_id))
+                           .append(this.addInfoRow("Number of Contigs", genome.contig_ids ? genome.contig_ids.length : 0))
+                           .append(this.addInfoRow("GC Content", gcContent))
+                           .append(this.addInfoRow("Genetic Code", genome.genetic_code))
+                           .append(this.addInfoRow("Number of features", nFeatures));
+            self.alreadyRenderedTable = true;
+            var contigsToLengths = {};
+            if (genome.contig_ids && genome.contig_ids.length > 0) {
+                for (var i=0; i<genome.contig_ids.length; i++) {
+                    var len = "Unknown";
+                    if (genome.contig_lengths && genome.contig_lengths[i])
+                        len = genome.contig_lengths[i];
+                    contigsToLengths[genome.contig_ids[i]] = len;
+                }
+            }
+            /************
+             * TEMP CODE!
+             * INFER CONTIGS FROM FEATURE LIST!
+             * OMG THIS SUCKS THAT I HAVE TO DO THIS UNTIL FBA MODEL SERVICES IS FIXED!
+             * LOUD NOISES!
+             ************/
+            else if (genome.features && genome.features.length > 0) {
+                var contigSet = {};
+                for (var i=0; i<genome.features.length; i++) {
+                    var f = genome.features[i];
+                    if (f.location && f.location[0][0])
+                        contigsToLengths[f.location[0][0]] = "Unknown";
                 }
 
-                var nFeatures = 0;
-                if (genome.features) {
-                    nFeatures = genome.features.length;
-                }
-                this.$infoTable.empty()
-                               .append(this.addInfoRow("Name", genome.scientific_name))
-                               .append(this.addInfoRow("KBase Genome ID", genome.id))
-                               .append(this.addInfoRow("Domain", genome.domain))
-                               .append(this.addInfoRow("DNA Length", dnaLength))
-                               .append(this.addInfoRow("Source ID", genome.source + ": " + genome.source_id))
-                               .append(this.addInfoRow("Number of Contigs", genome.contig_ids ? genome.contig_ids.length : 0))
-                               .append(this.addInfoRow("GC Content", gcContent))
-                               .append(this.addInfoRow("Genetic Code", genome.genetic_code))
-                               .append(this.addInfoRow("Number of features", nFeatures));
-                self.alreadyRenderedTable = true;
-                var contigsToLengths = {};
-                if (genome.contig_ids && genome.contig_ids.length > 0) {
-                    for (var i=0; i<genome.contig_ids.length; i++) {
-                        var len = "Unknown";
-                        if (genome.contig_lengths && genome.contig_lengths[i])
-                            len = genome.contig_lengths[i];
-                        contigsToLengths[genome.contig_ids[i]] = len;
-                    }
-                }
-                /************
-                 * TEMP CODE!
-                 * INFER CONTIGS FROM FEATURE LIST!
-                 * OMG THIS SUCKS THAT I HAVE TO DO THIS UNTIL FBA MODEL SERVICES IS FIXED!
-                 * LOUD NOISES!
-                 ************/
-                else if (genome.features && genome.features.length > 0) {
-                    var contigSet = {};
-                    for (var i=0; i<genome.features.length; i++) {
-                        var f = genome.features[i];
-                        if (f.location && f.location[0][0])
-                            contigsToLengths[f.location[0][0]] = "Unknown";
-                    }
+            }
 
-                }
+            //this.populateContigSelector(contigsToLengths);
 
-                //this.populateContigSelector(contigsToLengths);
-
-                this.hideMessage();
-                this.$infoPanel.show();
-
-            }, this));
-            $.when(prom).fail($.proxy(function(error) { this.renderError(error); }, this));
+            this.hideMessage();
+            this.$infoPanel.show();
         },
 
         getData: function() {

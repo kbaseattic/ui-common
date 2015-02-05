@@ -132,11 +132,6 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
           if (!this.hasConfig('title')) {
             throw 'Widget title is required';
           }
-          
-          // Then apply defaults.
-          if (!this.hasConfig('ajaxTimeout')) {
-            this.setConfig('ajaxTimeout', 10000);
-          }
         }
       },
 
@@ -160,10 +155,6 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'postal', 'json
           
           this.instanceId = this.genId();   
           
-          $.ajaxSetup({
-            timeout: this.getConfig('ajaxTimeout')
-          });
-                   
           return;
         }
       },

@@ -89,7 +89,7 @@
 			container.rmLoading();
 			// create a table from the sample names
 			var tableSettings = {
-			    "sPaginationType": "bootstrap",
+			    "sPaginationType": "full_numbers",
 			    "iDisplayLength": 10,
 			    "aaData": sample_data,
 			    "aaSorting": [[ 0, "asc" ]],

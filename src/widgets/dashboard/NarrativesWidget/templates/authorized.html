@@ -1,33 +1,92 @@
-<div class="collapse" id="more-info-{{env.instanceId}}"> 
+<div class="collapse" id="{{env.widgetName}}-more-info-{{env.instanceId}}"> 
 	<div class="well">
-	{% if env.isOwner %}
-		<p>This panel shows narratives that you have created.</p>
-	{% else %}
-		<p>This panel shows narratives created by this user which you have some access to. They are either public or have been shared with you.</p>
-		<p>To see all of <i>your</i> narratives, visit <a href="/functional-site/#/people/{{env.loggedInUser}}">your profile</a>.</p>
-	{% endif %}
+		<p>This panel shows Narratives that you own.</p>
 	</div>
 </div>
 
-<table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped">
   
-  Narrative count: {{ state.narratives | length }}<br>
+ 
 
 {% if state.narratives | length > 0 %}
 
+<p>Narrative count: {{ state.narratives | length }}</p>
+ 
+ <table cellpadding="0" cellspacing="0" border="0" class="table" id="dashboard-narratives-{{env.generatedId}}">
+ <thead>
+     <tr>
+         <th>Title</th>
+         <th>Ver.</th>
+         <th>Public?</th>
+         <th>Shared With</th>
+         <th># objects</th>
+         <th>Last Saved</th>
+         <th>By</th>
+     </tr>
+ </thead>
+
 {% for narrative in state.narratives %}
 	<tr>
-		
-		<td><a target="_blank" href="/narrative/{{narrative.obj_id}}">{{narrative.title}}</a><br><i>modified on {{narrative.moddate | dateFormat }}
-		{% if narrative.description %}<p>{{narrative.description}}</p>{% endif %}</td>
+		<td>
+		    <a target="_blank" href="/narrative/{{narrative.object.obj_id}}">{{narrative.workspace.metadata.narrative_nice_name}}</a>
+		</td>
+		<td style="text-align: right; padding-right: 1em;">
+            {{narrative.object.version}}
+		</td>
+		<td style="text-align: center;">
+            {% if narrative.workspace.globalread == 'r' %}<span class="fa fa-check"></span> 
+            {% elif narrative.workspace.globalread == 'w' %}<span class="fa fa-check"></span> 
+            {% else %}
+            {% endif %}
+		</td>
+		<td>
+           {% if narrative.permissions|length > 0 %}
+           {{ narrative.permissions | length }} user{% if narrative.permissions|length > 1 %}s{% endif %}
+           <select>
+              {% for perm in narrative.permissions %} 
+              <option value="{{perm.username}}">{{perm.username}} ({{perm.permission|permissionLabel}})</option>
+              {% endfor %}
+           </select>
+           {% else %}
+             nobody
+           {% endif %}
+		</td>
+		<td class="number">
+            {{narrative.workspace.object_count}}
+		</td>
+		<td class="date">
+		     {{narrative.object.save_date | dateFormat }}
+        </td>
+        <td>
+           {{narrative.object.saved_by}}
+        </td>
 	</tr>
-	
 {% endfor %}
 
+</table>
+	
+	<script>
+require(['jquery'], function ($) {
+	$('#dashboard-narratives-{{env.generatedId}}').DataTable({
+        initComplete: function (settings) {
+            var api = this.api();
+            var rowCount = api.data().length;
+            var pageSize = api.page.len();
+            var wrapper = api.settings()[0].nTableWrapper;
+            if (rowCount <= pageSize) {
+                $(wrapper).find('.dataTables_paginate').closest('.row').hide();
+                $(wrapper).find('.dataTables_filter').closest('.row').hide();
+            }
+        }
+    });
+});
+</script>
+	
 {% else %}
 
-No Narratives
+<p>You do not own any Narratives. Why not <a href="/functional-site/#/narrativemanager/new">create your first one?</a>.</p>
 
 {% endif %}
 
-</table>
+
+
+

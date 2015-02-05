@@ -1,17 +1,62 @@
-This is the apps widget.<br>
-<table class="table">
-<thead>
-<tr>
-<th>Name</th>
-<th>Ver</th>
-</tr>
-</thead>
-<tbody>
-{% for app in state.appList %}
-<tr>
-<td>{{ app.name }}</td>
-<td>{{ app.ver }}</td>
-</tr>
-{% endfor %}
-</tbody>
+<div class="collapse" id="{{env.widgetName}}-more-info-{{env.instanceId}}">
+   <div class="well">
+      <p>This panel shows KBase Apps.</p>
+   </div>
+</div>
+<table class="table" id="dashboard-apps-widget-{{env.generatedId}}">
+   <thead>
+      <tr>
+         <th rowspan="2" valign="bottom">Name</th>
+         <th colspan="3" style="text-align: center;">In Narratives</th>
+         <!--<th>Last Updated</th>
+         
+         <th>Current Version</th>
+         -->
+      </tr>
+      <tr>
+         
+         <th>Yours</th>
+         <th>Shared</th>
+         <th>Public</th>
+         <!--<th>Last Updated</th>
+         
+         <th>Current Version</th>
+         -->
+      </tr>
+   </thead>
+   <tfoot>
+
+   </tfoot>
+   <tbody>
+      {% for app in state.appList %}
+      <tr>
+         <td><a href="/functional-site/#/narrativemanager/new?app={{app.id}}" target="_blank">{{ app.name }}</a>
+         </td>
+         <td>x</td>
+         <td>x</td>
+         <td>x</td>
+         <!--<td>x</td>
+         
+         <td>{{ app.ver }}</td>
+         -->
+      </tr>
+      {% endfor %}
+   </tbody>
 </table>
+<script>
+   require(['jquery'], function ($) {
+      return;
+      $('#dashboard-apps-widget-{{env.generatedId}}').DataTable({
+         initComplete: function (settings) {
+            var api = this.api();
+            var rowCount = api.data().length;
+            var pageSize = api.page.len();
+            var wrapper = api.settings()[0].nTableWrapper;
+            if (rowCount <= pageSize) {
+               $(wrapper).find('.dataTables_paginate').closest('.row').hide();
+               $(wrapper).find('.dataTables_filter').closest('.row').hide();
+            }
+         }
+      });
+   });
+</script>
