@@ -39,6 +39,7 @@ $.KBWidget({
     genome1objName: null,
     genome2wsName: null,
     genome2objName: null,
+    tooltip: null,
 
     init: function(options) {
         this._super(options);
@@ -51,8 +52,12 @@ $.KBWidget({
     
     render: function() {
         var self = this;
+        
+		self.tooltip = d3.select("body").append("div").classed("kbcb-tooltip", true);
+        
         var container = this.$elem;
     	container.empty();
+        
         if (!self.authToken()) {
         	container.append("<div>[Error] You're not logged in</div>");
         	return;
@@ -104,9 +109,9 @@ $.KBWidget({
     					count2hits++;
     			}
             	table.append(createTableRow("Comparison object", self.ws_id));
-            	table.append(createTableRow("Genome1 (x-axis)", '<a href="/functional-site/#/genomes/'+self.genome1wsName+'/'+self.genome1objName+'" target="_blank">' + genome1id + '</a>' +
+            	table.append(createTableRow("Genome1 (x-axis)", '<a href="/functional-site/#/dataview/'+self.genome1wsName+'/'+self.genome1objName+'" target="_blank">' + genome1id + '</a>' +
             			" (" + self.cmp.proteome1names.length + " genes, " + count1hits + " have hits)"));
-            	table.append(createTableRow("Genome2 (y-axis)", '<a href="/functional-site/#/genomes/'+self.genome2wsName+'/'+self.genome2objName+'" target="_blank">' + genome2id + '</a>' + 
+            	table.append(createTableRow("Genome2 (y-axis)", '<a href="/functional-site/#/dataview/'+self.genome2wsName+'/'+self.genome2objName+'" target="_blank">' + genome2id + '</a>' + 
             			" (" + self.cmp.proteome2names.length + " genes, " + count2hits + " have hits)"));
             	if (self.scale == null)
             		self.scale = self.size * 100 / Math.max(self.cmp.proteome1names.length, self.cmp.proteome2names.length);
@@ -239,28 +244,29 @@ $.KBWidget({
             	            	
             	$('#'+self.pref+'img').hover(
             			function() {
-            				$('#widget-tooltip').show();
+            				self.tip().style("visibility", "visible");
             			},
             			function() {
-            				$('#widget-tooltip').hide();
+            				self.tip().style("visibility", "hidden");
             			}
             	).mousemove(function(e) {
             		var hit = hitSearch(e);
-    				var tip = $('#widget-tooltip');
+    				var tip = self.tip();
             		if (Number(hit.bestDist) >= 0) {
             			var msg = 'X-axis: ' + self.cmp.proteome1names[Number(hit.bestI)] + 
             				', Y-axis: ' + self.cmp.proteome2names[Number(hit.bestJ)] +
             				'<br>click to see detailes...';
             			tip.html(msg);
-            			tip.css({
-            				'top': (Number(hit.scrY) + 10) + 'px',
-            				'left': (Number(hit.scrX) + 10) + 'px'
-            			});
-            			tip.show();
+            			/*tip.css({
+            				'top': (e.pageY+15) + 'px',
+            				'left': (e.pageX-10) + 'px'
+            			});*/
+						tip.style("top", (e.pageY+15) + "px").style("left", (e.pageX-10)+"px");
+            			tip.style("visibility", "visible");
             			return;
             		}
-    				tip.hide();
-        			tip.html('');
+    				tip.style("visibility", "hidden");
+        			tip.text('');
             	}).click(function(e) {
             		var hit = hitSearch(e);
             		if (Number(hit.bestDist) >= 0) {
@@ -281,6 +287,10 @@ $.KBWidget({
         return this;
     },
 
+    tip: function() {
+    	return this.tooltip;
+    },
+    
 	refreshDetailedRect: function() {
         var self = this;
 		var rect = $('#'+self.pref+'rect').append(rect);
@@ -407,10 +417,10 @@ $.KBWidget({
 		svgTd.append('<svg width="30" height="'+svgH+'">'+svgLines+'</svg>');
 		svgTd.hover(
     			function() {
-    				$('#widget-tooltip').show();
+    				self.tip().style("visibility", "visible");
     			},
     			function() {
-    				$('#widget-tooltip').hide();
+    				self.tip().style("visibility", "hidden");
     			}
     	).mousemove(function(e) {
     		var scrX = e.pageX;
@@ -436,19 +446,20 @@ $.KBWidget({
     				bestLine = l;
     			}
     		}
-			var tip = $('#widget-tooltip');
+			var tip = self.tip();
 			if (minDist && minDist <= 2) {
     			var msg = 'Gene1: ' + bestLine.gene1 + '<br>Gene2: ' + bestLine.gene2 + '<br>' + 
     					'Bit-score: ' + bestLine.bit_score + '<br>Percent of related BBH bit-score: ' + bestLine.percent_of_bbh + '%';
     			tip.html(msg);
-    			tip.css({
+    			/*tip.css({
     				'top': (Number(scrY) + 10) + 'px',
     				'left': (Number(scrX) + 10) + 'px'
-    			});
-    			tip.show();
+    			});*/
+				tip.style("top", (e.pageY+15) + "px").style("left", (e.pageX-10)+"px");
+    			tip.style("visibility", "visible");
     			return;
 			}
-			tip.hide();
+			tip.style("visibility", "hidden");
 			tip.html('');
     	});
     	$('#'+self.pref+'btn-dirI').click(function() {

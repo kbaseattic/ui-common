@@ -47,7 +47,6 @@
 
         init: function(options) {
             this._super(options);
-            console.log(options.params, options.dropdown, options.navbar);
             this.wsUrl = kb.urls.workspace_url;
             this.transformURL = kb.urls.transform;
             this.ujsURL = kb.urls.user_and_job_state;
@@ -118,7 +117,6 @@
         
         prepareDownloaders: function(type, wsId, objId) {
         	var descrList = this.downloaders[type];
-        	console.log(type, descrList);
         	var ret = [];
         	for (var descrPos in descrList) {
         		var descr = descrList[descrPos];
