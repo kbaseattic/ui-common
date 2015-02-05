@@ -196,16 +196,19 @@ function KBaseFBA_FBAModel(modeltabs) {
         "type": "dataTable",
         "columns": [{
             "label": "Gapfill",
-            "key": "id",
+            "key": "simpid",
+            "linkformat": "dispID",
             "type": "tabLink",
-            "method": "GapfillTab"
+            "method": "GapfillTab",
         }, {
             "label": "Integrated",
             "key": "integrated"
         }, {
             "label": "Media",
             "key": "media_ref",
-            "type": "wslink"
+            "linkformat": "dispWSRef",
+            "type": "wstype",
+            "wstype": "KBaseFBA.Media"
         }, /*{
             "label": "FBA",
             "key": "fba_ref",
@@ -304,10 +307,97 @@ function KBaseFBA_FBAModel(modeltabs) {
     }
 
     this.GapfillTab = function (info) {
-        return [[]];
+    	var gfid = info.id;
+        console.log(gfid);
+        var gf = self.gfhash[gfid];
+        var ref;
+        if ("gapfill_ref" in gf) {
+        	ref = gf.gapfill_ref;
+        } else if ("fba_ref" in gf) {
+        	ref = gf.fba_ref;
+        }
+        if ("output" in gf) {
+        	return gf.output;
+        }
+        var p = self.modeltabs.kbapi('ws', 'get_objects', [{ref: ref}]).then(function(data){
+			var solutions = data[0].data.gapfillingSolutions;
+			return self.parse_gf_solutions(solutions);
+		}).then (function(solutions) {
+			if (gf.integrated == "1") {
+				gf.integrated = "yes";
+			} else if (gf.integrated == "0") {
+				gf.integrated = "no";
+			}
+			gf.output = [{
+				 "label": "Gapfill ID",
+				 "data": gf.simpid,
+			 }, {
+				 "label": "Media",
+				 "linkformat": "dispWSRef",
+				 "type": "wstype",
+				 "wstype": "KBaseFBA.Media",
+				 "data": gf.media_ref
+			 }, {
+				 "label": "Integrated",
+				 "data": gf.integrated
+			 }];
+			 if (gf.integrated == "yes") {
+			 	gf.output.push({
+			 		"label": "Integrated solution",
+				 	"data": gf.integrated_solution
+			 	});
+			 }
+			 var rxns = "";
+			 for (var i=0; i < solutions.length; i++) {
+			 	var solrxns = solutions[i].gapfillingSolutionReactions;
+			 	for (var j=0; j < solrxns.length; j++) {
+			 		if (j > 0) {
+			 			rxns += "<br>";
+			 		}
+			 		rxns += solrxns[j].id;
+			 		if ("equation" in solrxns[j]) {
+			 			rxns += ":"+solrxns[j].equation;
+			 		}
+			 	}
+			 }
+			 	
+			gf.output.push({
+			 	"label": "Solution "+i,
+				"data": rxns
+			});
+			console.log(gf.output);
+			return gf.output;
+		});
+        return p;
     }
-
-
+	
+	this.parse_gf_solutions = function(solutions) {		
+		var rxnshash = {};
+		for (var i=0; i < solutions.length; i++) {
+			var solrxns = solutions[i].gapfillingSolutionReactions;
+			for (var j=0; j < solrxns.length; j++) {
+				solrxns[j].id = solrxns[j].reaction_ref.split("/").pop();
+				if (solrxns[j].id.match(/^rxn\d\d\d\d\d$/)) {
+					rxnshash[solrxns[j].id] = solrxns[j];
+				}
+			}
+		}
+		var ids = new Array();
+		for (var key in rxnshash) {
+    		ids.push(key);
+		}
+		if (ids.length > 0) {
+			var p = self.modeltabs.kbapi('fba', 'get_reactions', {reactions: ids}).then(function(data){
+				for (var i=0; i < data.length; i++) {
+					rxnshash[data[i].id].equation = data[i].definition;
+				}
+				return solutions;
+			});
+			return p;
+		}
+		return solutions;
+	};
+	
     this.setData = function (indata) {
         this.data = indata;
         this.modelreactions = this.data.modelreactions;
@@ -321,6 +411,11 @@ function KBaseFBA_FBAModel(modeltabs) {
         this.rxnhash = {};
         this.cmphash = {};
         this.genehash = {};
+        this.gfhash = {};
+        for (var i=0; i < this.gapfillings.length; i++) {
+        	this.gapfillings[i].simpid = "gf."+(i+1);
+        	this.gfhash[this.gapfillings[i].simpid] = this.gapfillings[i];
+        }
         for (var i=0; i< this.modelcompartments.length; i++) {
             var cmp = this.modelcompartments[i];
             this.cmphash[cmp.id] = cmp;
@@ -424,9 +519,9 @@ function KBaseFBA_FBAModel(modeltabs) {
                 })
 
                 if (genes.indexOf(gene) == -1)
-                    this.modelgenes.push({id: gene, reactions: [rxn.name]});
+                    this.modelgenes.push({id: gene, reactions: [rxn.dispid]});
                 else
-                    this.modelgenes[genes.indexOf(gene)].reactions.push(rxn.name)
+                    this.modelgenes[genes.indexOf(gene)].reactions.push(rxn.dispid)
             }
 
             rxn.equation = reactants+" "+sign+" "+products;
