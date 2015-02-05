@@ -43,7 +43,8 @@
             maxNumChars: 900,
             width: 400,
             maxTextHeight: 300,
-            loadingImage: null
+            loadingImage: null,
+            genomeInfo: null
         },
 
         /**
@@ -255,22 +256,38 @@
             var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
             
             obj['included'] = ["/taxonomy","/scientific_name"];
-            self.options.kbCache.ws.get_object_subset( [ obj ], 
-                function(data) {
+            
+            function onDataLoad(genome) {
+                if (genome['taxonomy']) {
+                    var tax = genome['taxonomy'];
+                    var taxList = [];
+                    var nameTokens = genome['scientific_name'].split(/\s+/);
+                    for (var i=nameTokens.length; i>0; i--) {
+                        taxList.push(nameTokens.slice(0, i).join(' '));
+                    }
+                    if (taxList && taxList !== "Unknown") {
+                        // parse the taxonomy, however it's munged together. semicolons, i think?
+                        taxList = taxList.concat(tax.split(/\;\s*/).reverse());
+                    }
+                    self.renderFromTaxonomy(taxList);
+                } else if (genome['scientific_name']) {
+                    var taxList = [];
+                    var nameTokens = genome['scientific_name'].split(/\s+/);
+                    for (var i=nameTokens.length; i>0; i--) {
+                        taxList.push(nameTokens.slice(0, i).join(' '));
+                    }
+                    self.renderFromTaxonomy(taxList);
+                }
+
+            }
+            
+            if (self.options.genomeInfo) {
+                onDataLoad(self.options.genomeInfo.data);
+            } else {
+                self.options.kbCache.ws.get_object_subset( [ obj ], 
+                        function(data) {
                     if (data[0]) {
-                        if (data[0]['data']['taxonomy']) {
-                            var tax = data[0]['data']['taxonomy'];
-                            var taxList = [];
-                            var nameTokens = data[0]['data']['scientific_name'].split(/\s+/);
-                            for (var i=nameTokens.length; i>0; i--) {
-                                taxList.push(nameTokens.slice(0, i).join(' '));
-                            }
-                            if (taxList && taxList !== "Unknown") {
-                                // parse the taxonomy, however it's munged together. semicolons, i think?
-                                taxList = taxList.concat(tax.split(/\;\s*/).reverse());
-                            }
-                            self.renderFromTaxonomy(taxList);
-                        }
+                        onDataLoad(data[0]['data']);
                     }
                 },
                 function(error) {
@@ -278,18 +295,12 @@
                     obj['included'] = ["/scientific_name"];
                     self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
                         if (data[0]) {
-                            if (data[0]['data']['scientific_name']) {
-                                var taxList = [];
-                                var nameTokens = data[0]['data']['scientific_name'].split(/\s+/);
-                                for (var i=nameTokens.length; i>0; i--) {
-                                    taxList.push(nameTokens.slice(0, i).join(' '));
-                                }
-                                self.renderFromTaxonomy(taxList);
-                            }
+                            onDataLoad(data[0]['data']);
                         }
                     },
                     function(error) {self.renderError(error);});
                 });
+            }
         },
 
         /**

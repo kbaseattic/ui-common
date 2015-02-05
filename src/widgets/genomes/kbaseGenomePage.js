@@ -35,7 +35,7 @@
             var cell3 = $('<div panel panel-default">');
             self.$elem.append(cell3);
             var panel3 = self.makePleaseWaitPanel();
-            self.makeDecoration(cell3, 'KBase Community', panel3);
+            //self.makeDecoration(cell3, 'KBase Community', panel3);
             ///////////////////////////////////////////////////////////////////////////////
             var cell4 = $('<div panel panel-default">');
             self.$elem.append(cell4);
@@ -47,43 +47,83 @@
             var panel5 = self.makePleaseWaitPanel();
             self.makeDecoration(cell5, 'Assembly and Annotation', panel5);
 
+            var objId = scope.ws + "/" + scope.id;
+            var includedNoFeat = ["/complete","/contig_ids","/contig_lengths","contigset_ref","/dna_size",
+                                  "/domain","/gc_content","/genetic_code","/id","/md5","num_contigs",
+                                  "/scientific_name","/source","/source_id","/tax_id","/taxonomy"];
+
             var ready = function(genomeInfo) {
             	panel1.empty();
-            	panel1.KBaseGenomeWideOverview({genomeID: scope.id, workspaceID: scope.ws, 
-            		kbCache: kb, loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
+            	try {
+            	    panel1.KBaseGenomeWideOverview({genomeID: scope.id, workspaceID: scope.ws, 
+            	        kbCache: kb, loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
+            	} catch (e) {
+            	    console.error(e);
+            	    self.showError(panel1, e.message);
+                }
             	var searchTerm = "";
             	if (genomeInfo && genomeInfo.data['scientific_name'])
             		searchTerm = genomeInfo.data['scientific_name'];
             	panel2.empty();
-            	panel2.KBaseLitWidget({literature:searchTerm, kbCache: kb,
-            		loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
-            	panel3.empty();
-        	    panel3.KBaseGenomeWideCommunity({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb, 
-        	    	genomeInfo: genomeInfo});
+                try {
+                    panel2.KBaseLitWidget({literature:searchTerm, kbCache: kb,
+                        loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
+                } catch (e) {
+                    console.error(e);
+                    self.showError(panel2, e.message);
+                }
+            	//panel3.empty();
+        	    //panel3.KBaseGenomeWideCommunity({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb, 
+        	    //	genomeInfo: genomeInfo});
             	panel4.empty();
-                panel4.KBaseGenomeWideTaxonomy({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
-                    loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
-            	panel5.empty();
-                panel5.KBaseGenomeWideAssemAnnot({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
-                    loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
+            	try {
+            	    panel4.KBaseGenomeWideTaxonomy({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+            	        loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
+                } catch (e) {
+                    console.error(e);
+                    self.showError(panel4, e.message);
+                }
+                if (genomeInfo && genomeInfo.data['domain'] === 'Eukaryota' ||
+                        genomeInfo && genomeInfo.data['domain'] === 'Plant') {
+                    cell5.empty();
+                } else {
+                    var includedWithFeat = includedNoFeat.concat(
+                            ["/features/[*]/aliases","/features/[*]/annotations",
+                             "/features/[*]/function","/features/[*]/id","/features/[*]/location",
+                             "/features/[*]/protein_translation_length","/features/[*]/type"]);
+                    kb.ws.get_object_subset( [ {ref:objId, included:includedWithFeat} ], function(data) {
+                        var genomeInfo = data[0];
+                        panel5.empty();
+                        try {
+                            panel5.KBaseGenomeWideAssemAnnot({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+                                loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
+                        } catch (e) {
+                            console.error(e);
+                            self.showError(panel5, e.message);
+                        }
+                    },
+                    function(error) {
+                        console.error("Error loading genome subdata");
+                        console.error(error);
+                        panel5.empty();
+                        self.showError(panel5, error);
+                    });
+                }
             };
             
-            var objId = scope.ws + "/" + scope.id;
-            var included = ["/complete","/contig_ids","/contig_lengths","contigset_ref","/dna_size",
-                            "/domain","/gc_content","/genetic_code","/id","/md5","num_contigs",
-                            "/scientific_name","/source","/source_id","/tax_id","/taxonomy",
-                            "features/[*]/aliases","features/[*]/annotations",
-                            "features/[*]/function","features/[*]/id","features/[*]/location",
-                            "features/[*]/protein_translation_length","features/[*]/type"];
-            kb.ws.get_object_subset( [ {ref:objId, included:included} ], function(data) {
+            kb.ws.get_object_subset( [ {ref:objId, included:includedNoFeat} ], function(data) {
             	var genomeInfo = data[0];
-            	console.log(genomeInfo);
             	ready(genomeInfo);
             },
             function(error) {
             	console.error("Error loading genome subdata");
             	console.error(error);
-            	ready(null);
+            	panel1.empty();
+                self.showError(panel1, error);
+                cell2.empty();
+                cell3.empty();
+                cell4.empty();
+                cell5.empty();
             });
         },
 
@@ -122,6 +162,11 @@
             };
         },
 
+        showError: function(panel, e) {
+            panel.empty();
+            panel.append("Error: " + JSON.stringify(e)); 
+        },
+        
         genUUID: function() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);

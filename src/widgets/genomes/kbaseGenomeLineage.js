@@ -14,8 +14,9 @@
             objVer: null,
             loadingImage: "../../widgets/images/ajax-loader.gif",
             kbCache: null,
-            width:600
+            width:600,
             //isInCard: false,
+            genomeInfo: null
         },
 
         token: null,
@@ -102,32 +103,35 @@
             //console.log(this.options.kbCache);
             var isInt = function (n) {
                     return typeof n === 'number' && n % 1 == 0;
-                };
+            };
             //console.log("renderWorkspace " + this.options.workspaceID + " " + this.options.genomeID);
             //console.log("obj " + obj);
 
-	    var obj = this.getObjectIdentity(this.options.workspaceID, this.options.genomeID);
-            obj['included'] = ["/taxonomy","/scientific_name"];
-	    self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
+            if (self.options.genomeInfo) {
+                self.showData(self.options.genomeInfo.data);
+            } else {
+                var obj = this.getObjectIdentity(this.options.workspaceID, this.options.genomeID);
+                obj['included'] = ["/taxonomy","/scientific_name"];
+                self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
                     if (data[0]) {
                         var genome = data[0]['data'];
-			self.showData(genome);
+                        self.showData(genome);
                     }
                 },
                 function(error) {
-                        var obj = self.buildObjectIdentity(self.options.workspaceID, self.options.genomeID);
-                        obj['included'] = ["/scientific_name"];
-                        self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
-                            if (data[0]) {
-				var genome = data[0]['data'];
-				self.showData(genome);
-			    }
-                        },
-                        function(error) {self.renderError(error);});
+                    var obj = self.buildObjectIdentity(self.options.workspaceID, self.options.genomeID);
+                    obj['included'] = ["/scientific_name"];
+                    self.options.kbCache.ws.get_object_subset( [ obj ], function(data) {
+                        if (data[0]) {
+                            var genome = data[0]['data'];
+                            self.showData(genome);
+                        }
+                    },
+                    function(error) {self.renderError(error);});
                 });
-	    
-	    // old style that waits on entire genome
-	    /*var obj = this.getObjectIdentity(this.options.workspaceID, this.options.genomeID);
+            }
+            // old style that waits on entire genome
+            /*var obj = this.getObjectIdentity(this.options.workspaceID, this.options.genomeID);
             var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
             $.when(prom).done($.proxy(function (genome) {
                 genome = genome[0].data;
