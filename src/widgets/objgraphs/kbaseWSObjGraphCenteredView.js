@@ -64,10 +64,10 @@
 	},
 	
 	typeToName: {
-	    "selected": "Latest version of the data object",
-	    "core":"Previous versions of the data object",
-	    "ref":"Data that references the selected object",
-	    "included":"Data that is referenced by the selected object",
+	    "selected": " Latest version of the data object",
+	    "core":" Previous versions of the data object",
+	    "ref":" Data that references the selected object",
+	    "included":" Data that is referenced by the selected object",
 	    //"prov":"Data that is in the provenance of the selected object"
 	},
 	
@@ -240,11 +240,10 @@
 					var savedate = new Date(info[3]);
 					var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
 					text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
-					text+= '<tr><td><b>Name</b></td><td>'+info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")</td></tr>";
+					text+= '<tr><td><b>Name</b></td><td>'+ info[1]+ ' (<a href="#/dataview/'+info[6]+"/"+info[1]+"/"+info[4] +'" target="_blank">'+info[6]+"/"+info[0]+"/"+info[4]+"</a>)</td></tr>";
 					text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
-					text+= '<tr><td><b>Workspace</b></td><td>'+info[7]+"</td></tr>";
 					text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
-					text+= '<tr><td><b>Saved by</b></td><td>'+info[5]+"</td></tr>";
+					text+= '<tr><td><b>Saved by</b></td><td><a href="#/people/'+info[5] +'" target="_blank">'+info[5]+"</td></tr>";
 					var found = false; var metadata = "<tr><td><b>Meta data</b></td><td>";
 					for( var m in info[10]) {
 					    found = true;
@@ -277,11 +276,10 @@
 					var savedate = new Date(info[3]);
 					var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
 					text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
-					text+= '<tr><td><b>Name</b></td><td>'+info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")</td></tr>";
+					text+= '<tr><td><b>Name</b></td><td>'+ info[1]+ '(<a href="#/dataview/'+info[6]+"/"+info[1]+"/"+info[4] +'" target="_blank">'+info[6]+"/"+info[0]+"/"+info[4]+"</a>)</td></tr>";
 					text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
-					text+= '<tr><td><b>Workspace</b></td><td>'+info[7]+"</td></tr>";
 					text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
-					text+= '<tr><td><b>Saved by</b></td><td>'+info[5]+"</td></tr>";
+					text+= '<tr><td><b>Saved by</b></td><td><a href="#/people/'+info[5] +'" target="_blank">'+info[5]+"</td></tr>";
 					var found = false; var metadata = "<tr><td><b>Meta data</b></td><td>";
 					for( var m in info[10]) {
 					    found = true;
