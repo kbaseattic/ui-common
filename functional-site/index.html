@@ -102,6 +102,9 @@
       }
 
       checkBrowser();
+        window.kbconfig = {
+            urls: {workspace: "https://kbase.us/services/ws"}
+        };
    </script>
 
    <script src="/ext/jquery/jquery-1.10.2.min.js"></script>
@@ -391,6 +394,7 @@
    <script src="/src/widgets/networks/kbaseNetworkCard.js"></script>
    <!-- End Network widgets -->
 
+
    <script src="../src/widgets/json/kbaseJsonView.js"></script>
    <script src="../src/widgets/contigset/kbaseContigSetView.js"></script>
    <script src="../src/widgets/protcmp/kbaseGenomeComparison.js"></script>
@@ -410,6 +414,24 @@
    <script src="../src/widgets/modeling/kbaseTabs.js"></script>
    <script src="../src/widgets/modeling/kbaseTabTable.js"></script>
    <!-- END REVISED MODELING WIDGETS -->
+   <!-- Communities Widgets and dependencies -->
+   <script src="../src/widgets/kbaseTabs.js"></script>
+   <script src="../src/widgets/communities/jquery.svg.js"></script>
+   <script src="../src/widgets/communities/rgbcolor.js"></script>
+   <script src="../src/widgets/communities/kbStandaloneGraph.js"></script>
+   <script src="../src/widgets/communities/kbStandaloneTable.js"></script>
+   <script src="../src/widgets/communities/kbStandaloneHeatmap.js"></script>
+   <script src="../src/widgets/communities/kbStandalonePlot.js"></script>
+   <script src="../src/widgets/communities/kbStandaloneTable.js"></script>
+   <script src="../src/widgets/communities/kbaseAbundanceDataBoxplot.js"></script>
+   <script src="../src/widgets/communities/kbaseAbundanceDataHeatmap.js"></script>
+   <script src="../src/widgets/communities/kbaseAbundanceDataPcoa.js"></script>
+   <script src="../src/widgets/communities/kbaseAbundanceDataTable.js"></script>
+   <script src="../src/widgets/communities/kbaseAbundanceDataView.js"></script>
+   <script src="../src/widgets/communities/kbaseCollectionView.js"></script>
+   <script src="../src/widgets/communities/kbaseMetagenomeView.js"></script>
+   <script src="../src/widgets/communities/kbaseRankAbundancePlot.js"></script>
+   <!-- End Communities Widgets -->
 
 
    <!-- kbase angular -->
