@@ -1,5 +1,5 @@
-define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kb.client.workspace', 'kbasesession', 'kb.widget.buttonbar', 'q'],
-   function ($, Utils, APIUtils, DashboardWidget, Workspace, Session, Buttonbar, Q) {
+define(['jquery', 'postal', 'kbaseutils', 'kb.utils.api', 'kb.widget.dashboard.base', 'kb.client.workspace', 'kbasesession', 'kb.widget.buttonbar', 'q'],
+   function ($, Postal, Utils, APIUtils, DashboardWidget, Workspace, Session, Buttonbar, Q) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
@@ -20,6 +20,22 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kb.client.w
          go: {
             value: function () {
                this.start();
+               
+               /*Postal.channel('dashboard.metrics')
+               .subscribe('query.sharedNarratives', function (data) {
+                  if (this.hasState('narratives')) {
+                     var count = n.length;
+                  } else {
+                     var count = null;
+                  }
+                  Postal.channel('dashboard.metrics')
+                  .publish('update.sharedNarratives', {
+                     narratives: {
+                        count: count
+                     }
+                  });
+               }.bind(this));
+               */
                return this;
             }
          },
@@ -95,24 +111,44 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kb.client.w
 
 
 
-         filterState: {
+          filterState: {
             value: function (options) {
                if (!options.search || options.search.length === 0) {
-                  this.setState('narratives', this.narratives);
+                  this.setState('narrativesFiltered', this.getState('narratives')); 
                   return;
                }
 
                var searchRe = new RegExp(options.search, 'i');
-               var nar = this.narratives.filter(function (x) {
+               var nar = this.getState('narratives').filter(function (x) {
                   if (x.workspace.metadata.narrative_nice_name.match(searchRe)) {
                      return true;
                   } else {
                      return false;
                   }
                });
-               this.setState('narratives', nar);
+               this.setState('narrativesFiltered', nar);
             }
          },
+         
+         onStateChange: {
+            value: function () {
+               var count = this.doState('narratives', function(x){return x.length}, null);
+               var filtered = this.doState('narrativesFiltered', function(x){return x.length}, null);
+              
+               this.viewState.setItem('sharedNarratives', {
+                  count: count,
+                  filtered: filtered
+               });
+               /*Postal
+               .channel('dashboard.metrics')
+               .publish('update.sharedNarratives', {
+                     count: count
+                  }
+               );
+               */
+            }
+         },
+
 
          setInitialState: {
             value: function (options) {
@@ -149,8 +185,9 @@ define(['jquery', 'kbaseutils', 'kb.utils.api', 'dashboard_widget', 'kb.client.w
                               narratives = narratives.sort(function (a, b) {
                                  return b.object.saveDate.getTime() - a.object.saveDate.getTime();
                               });
-                              this.narratives = narratives;
                               this.setState('narratives', narratives);
+                              this.setState('narrativesFiltered', narratives);
+                               
                               resolve();
                            }.bind(this))
                            .catch(function (err) {

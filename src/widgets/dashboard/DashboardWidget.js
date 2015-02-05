@@ -222,9 +222,15 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
                this.widgetName = this.getConfig('name');
 
                this.widgetTitle = this.getConfig('title');
-
-
                this.instanceId = this.genId();
+               
+               if (!this.hasConfig('stateMachine')) {
+                  throw 'The statemachine was not provided in ' + this.widgetName;
+               } else {
+                  this.viewState = this.getConfig('stateMachine');
+               }
+               
+               // Make sure method hooks are available
 
                return;
             }
@@ -243,6 +249,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
                // This creates the initial UI -- loads the css, inserts layout html.
                // For simple widgets this is all the setup needed.
                // For more complex one, parts of the UI may be swapped out.
+               // console.log('['+this.widgetName+'] starting');
                this.setupUI();
                this.renderWaitingView();
                this.setInitialState()
@@ -275,7 +282,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
                return this;
             }
          },
-
+         
          stop: {
             value: function () {
                // ???
@@ -375,8 +382,34 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
          setState: {
             value: function (path, value, norefresh) {
                Utils.setProp(this.state, path, value);
+               this.onStateChange();
                if (!norefresh) {
                   this.refresh().done();
+               }
+            }
+         },
+         onStateChange: {
+            value: function () {
+            }
+         },
+         hasState: {
+            value: function (path) {
+               return Utils.hasProp(this.state, path);
+            }
+         },
+         
+         getState: {
+            value: function (path, defaultValue) {
+               return Utils.getProp(this.state, path, defaultValue);
+            }
+         },
+
+         doState: {
+            value: function (path, fun, defaultValue) {
+               if (Utils.hasProp(this.state, path)) {
+                  return fun(Utils.getProp(this.state, path));
+               } else {
+                  return defaultValue;
                }
             }
          },
@@ -1004,6 +1037,7 @@ define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api',
                }.bind(this));
             }
          }
+         
 
       });
 
