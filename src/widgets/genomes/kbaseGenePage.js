@@ -1,10 +1,11 @@
 (function( $, undefined ) { 
     $.KBWidget({ 
-        name: "KBaseGenomePage", 
+        name: "KBaseGenePage", 
         parent: "kbaseWidget", 
         version: "1.0.0",
 
         options: {
+            featureID: null,
             genomeID: null,
             workspaceID: null,
             loadingImage: "assets/img/ajax-loader.gif"
@@ -20,34 +21,35 @@
 
         render: function() {
             var self = this;
-            var scope = {ws: this.options.workspaceID, id: this.options.genomeID};
+            var scope = {ws: this.options.workspaceID, gid: this.options.genomeID,
+                    fid: this.options.featureID};
             ///////////////////////////////////////////////////////////////////////////////
             var cell1 = $('<div panel panel-default">');
             self.$elem.append(cell1);
             var panel1 = self.makePleaseWaitPanel();
-            self.makeDecoration(cell1, 'Overview', panel1);
+            self.makeDecoration(cell1, 'Gene Overview', panel1);
             ///////////////////////////////////////////////////////////////////////////////
             var cell2 = $('<div panel panel-default">');
             self.$elem.append(cell2);
             var panel2 = self.makePleaseWaitPanel();
-            self.makeDecoration(cell2, 'Publications', panel2);
+            self.makeDecoration(cell2, 'Biochemistry', panel2);
             ///////////////////////////////////////////////////////////////////////////////
             var cell3 = $('<div panel panel-default">');
             self.$elem.append(cell3);
             var panel3 = self.makePleaseWaitPanel();
-            //self.makeDecoration(cell3, 'KBase Community', panel3);
+            self.makeDecoration(cell3, 'Sequence', panel3);
             ///////////////////////////////////////////////////////////////////////////////
             var cell4 = $('<div panel panel-default">');
             self.$elem.append(cell4);
             var panel4 = self.makePleaseWaitPanel();
-            self.makeDecoration(cell4, 'Taxonomy', panel4);
+            //self.makeDecoration(cell4, 'Taxonomy', panel4);
             ///////////////////////////////////////////////////////////////////////////////
             var cell5 = $('<div panel panel-default">');
             self.$elem.append(cell5);
             var panel5 = self.makePleaseWaitPanel();
-            self.makeDecoration(cell5, 'Assembly and Annotation', panel5);
+            //self.makeDecoration(cell5, 'Assembly and Annotation', panel5);
 
-            var objId = scope.ws + "/" + scope.id;
+            var objId = scope.ws + "/" + scope.gid;
             var includedNoFeat = ["/complete","/contig_ids","/contig_lengths","contigset_ref","/dna_size",
                                   "/domain","/gc_content","/genetic_code","/id","/md5","num_contigs",
                                   "/scientific_name","/source","/source_id","/tax_id","/taxonomy"];
@@ -55,8 +57,9 @@
             var ready = function(genomeInfo) {
             	panel1.empty();
             	try {
-            	    panel1.KBaseGenomeWideOverview({genomeID: scope.id, workspaceID: scope.ws, 
-            	        kbCache: kb, loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
+            	    panel1.KBaseGeneInstanceInfo(
+                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, 
+                                kbCache: kb, hideButtons:true, loadingImage: "assets/img/ajax-loader.gif"});
             	} catch (e) {
             	    console.error(e);
             	    self.showError(panel1, e.message);
@@ -66,49 +69,17 @@
             		searchTerm = genomeInfo.data['scientific_name'];
             	panel2.empty();
                 try {
-                    panel2.KBaseLitWidget({literature:searchTerm, kbCache: kb,
-                        loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
+                    panel2.KBaseGeneBiochemistry(
+                            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
+                                loadingImage: "assets/img/ajax-loader.gif"});
                 } catch (e) {
                     console.error(e);
                     self.showError(panel2, e.message);
                 }
-            	//panel3.empty();
-        	    //panel3.KBaseGenomeWideCommunity({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb, 
-        	    //	genomeInfo: genomeInfo});
-            	panel4.empty();
-            	try {
-            	    panel4.KBaseGenomeWideTaxonomy({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
-            	        loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
-                } catch (e) {
-                    console.error(e);
-                    self.showError(panel4, e.message);
-                }
-                if (genomeInfo && genomeInfo.data['domain'] === 'Eukaryota' ||
-                        genomeInfo && genomeInfo.data['domain'] === 'Plant') {
-                    cell5.empty();
-                } else {
-                    var includedWithFeat = includedNoFeat.concat(
-                            ["/features/[*]/aliases","/features/[*]/annotations",
-                             "/features/[*]/function","/features/[*]/id","/features/[*]/location",
-                             "/features/[*]/protein_translation_length","/features/[*]/type"]);
-                    kb.ws.get_object_subset( [ {ref:objId, included:includedWithFeat} ], function(data) {
-                        var genomeInfo = data[0];
-                        panel5.empty();
-                        try {
-                            panel5.KBaseGenomeWideAssemAnnot({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
-                                loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
-                        } catch (e) {
-                            console.error(e);
-                            self.showError(panel5, e.message);
-                        }
-                    },
-                    function(error) {
-                        console.error("Error loading genome subdata");
-                        console.error(error);
-                        panel5.empty();
-                        self.showError(panel5, error);
-                    });
-                }
+            	panel3.empty();
+        	    panel3.KBaseGeneSequence(
+        	            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
+                            loadingImage: "assets/img/ajax-loader.gif"});
             };
             
             kb.ws.get_object_subset( [ {ref:objId, included:includedNoFeat} ], function(data) {
@@ -155,10 +126,10 @@
         
         getData: function() {
             return {
-                type: "Genome Page",
-                id: this.options.genomeID,
+                type: "Gene Page",
+                id: this.options.genomeID + "/" + this.options.featureID,
                 workspace: this.options.workspaceID,
-                title: "Genome Page"
+                title: "Gene Page"
             };
         },
 

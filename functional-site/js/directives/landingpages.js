@@ -1155,6 +1155,13 @@ angular.module('lp-directives')
         }
     };
 })
+.directive('sortablegenepage', function($rootScope) {
+    return {
+        link: function(scope, ele, attrs) {
+            $(ele).KBaseGenePage({featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws});
+        }
+    };
+})
 
 
 

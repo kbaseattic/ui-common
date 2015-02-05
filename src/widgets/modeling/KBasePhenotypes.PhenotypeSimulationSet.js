@@ -20,10 +20,28 @@ function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
             $.extend(this.overview, this.usermeta)}
     };
 
-    this.setData = function (indata) {
-        this.data = indata;
-        this.phenotypes = this.data.phenotypeSimulations;
-    }
+	this.setData = function (indata) {
+        self.data = indata;
+        var p = self.tabwidget.kbapi('ws', 'get_objects', [{ref: indata.phenotypeset_ref}]).then(function(data){
+			var kbObjects = new KBObjects();
+			self.phenoset = new kbObjects["KBasePhenotypes_PhenotypeSet"](self.tabwidget);
+			self.phenoset.setMetadata(data[0].info);
+			console.log(data[0].info);
+			return self.phenoset.setData(data[0].data);
+ 		}).then (function() {
+  			self.formatObject();
+		});
+        return p;
+    };
+
+	this.formatObject = function() {
+		self.phenotypes = self.phenoset.phenotypes;
+		for (var i=0; i < self.phenotypes.length; i++) {
+			var pheno = self.phenotypes[i];
+			pheno.simulatedGrowth = self.data.phenotypeSimulations[i].simulatedGrowthFraction;
+			pheno.phenoclass = self.data.phenotypeSimulations[i].phenoclass;
+		}
+	};
 
     this.tabList = [{
         "key": "overview",
@@ -63,44 +81,29 @@ function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
         "name": "Phenotypes",
         "type": "dataTable",
         "columns": [{
-            "label": "Phenotype Simulation id",
-            "key": "id",
-            "visible": 1
-        }, {
-            "label": "Experimental Growth",
-            "key": "phenoclass",
-            "type": "wstype"
-        }, {
-            "label": "PhenotypeRef",
-            "type": "tabLink",
-            "method": "PhenotypeSetTab",
-            "linkformat": "dispID",
-            "key": "phenotype_ref",
-            "visible": 1
-        }, {
-            "label": "Predicted Growth",
-            "key": "simulatedGrowth",
+            "label": "Growth condition",
+            "key": "media_ref",
+            "linkformat": "dispWSRef",
             "type": "wstype",
-            "visible": 1
+            "wstype": "KBaseFBA.Media"
         }, {
-            "label": "Simulated Growth Fraction",
-            "key": "simulatedGrowthFraction",
-            "visible": 1
+            "label": "Gene KO",
+            "type": "wstype",
+            "key": "geneko_refs"
+        }, {
+            "label": "Additional compounds",
+            "key": "additionalcompound_names"
+        }, {
+            "label": "Observed normalized growth",
+            "key": "normalizedGrowth"
+        }, {
+            "label": "Simulated growth",
+            "key": "simulatedGrowth"
+        }, {
+            "label": "Prediction class",
+            "key": "phenoclass"
         }]
     }];
-
-    this.PhenotypeSetTab = function (ref) {
-        var objIdentity = {"obj_ref": ref};
-        var p = tabwidget.kbapi('ws', 'get_objects', [objIdentity])
-                         .then(function(data) {
-
-                         return [];
-                });
-
-        return p;
-
-    }
-
 }
 
 

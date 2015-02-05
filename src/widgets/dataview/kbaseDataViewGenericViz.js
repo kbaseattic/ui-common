@@ -11,14 +11,14 @@
         parent: "kbaseAuthenticatedWidget",
 
         options: {
-	    objid: null,
-	    wsid: null,
-	    ver: null,
+            objid: null,
+            wsid: null,
+            ver: null,
             ws_url: "https://kbase.us/services/ws",
-            loadingImage: "assets/img/ajax-loader.gif"
+            loadingImage: "assets/img/ajax-loader.gif",
+            auth: null,
         },
-
-        objref:null,
+        objref: null,
 	
         ws: null, // the ws client
         loggedIn: false,
@@ -55,18 +55,21 @@
                 this.ws = kb.ws;  //new Workspace(this.options.ws_url);
                 this.loggedIn = false;
             } else {
-                console.log(this.auth);
+                console.log(['authenticated:', this.auth]);
                 this.ws = new Workspace(this.options.ws_url, this.auth);
                 this.loggedIn = true;
+                this.getInfoAndRender();
             }
-            this.getInfoAndRender();
 	    
             return this;
         },
 
         loggedInCallback: function(event, auth) {
-            //this.ws = new Workspace(this.options.ws_url, auth);
-            //this.refresh();
+            this.options.auth = auth;
+            console.log(['authenticated:', this.options.auth]);
+            this.ws = new Workspace(this.options.ws_url, this.options.auth);
+            this.loggedIn = true;
+            this.getInfoAndRender();
             return this;
         },
         loggedOutCallback: function(event, auth) {
@@ -116,13 +119,14 @@
 	
         type2widget: {},
 	
+
         setupType2Widget: function() {
 	    var self = this;
 	    
 	    // all the modeling types have the same config
 	    var modelingConfig = {
 		    widget:'kbaseTabTable',
-		    options: '{"obj":???id,"ws":???ws,"type":"???type"}'
+		    options: '{"obj":???objname,"ws":???wsname,"type":"???type"}'
 		};
 	    
 	    // this is crazy, but for now we just hard code this - should be loaded from a config
@@ -132,48 +136,77 @@
 	    self.type2widget = {
 		
 		'Communities.Collection': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+            //no widget, yet? Doesn't work?
+            //CollectionView - takes id, ws
+		    widget:'CollectionView',
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'Communities.FunctionalMatrix': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+            /* Done! Narrative uses AbundanceDataView */
+
+            //AbundanceDataBoxplot - id, name, ws, auth
+            // expects auth, ws passed to it.
+            //AbundanceDataView - id, name, ws
+            //RankAbundancePlot - id, name [0,1], top ["10"-text], order [average, max, sum], ws, auth
+            //AbundanceDataTable - id, name, ws, auth
+		    widget:'AbundanceDataView',
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'Communities.FunctionalProfile': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+            /* Done! Narrative uses AbundanceDataView */
+
+		    widget:'AbundanceDataView',
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'Communities.Heatmap': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+            /* Done! Same as narrative */
+
+            //AbundanceDataHeatmap - id, ws
+		    widget:'AbundanceDataHeatmap',
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		/* NEEDS A COMPLEX LANDING PAGE */
 		'Communities.Metagenome': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+            /* Plugged in MetagenomeView (required a different kbaseTabs than for Neal's modeling) */
+            /* It works! */
+            //MetagenomeView - id, ws
+		    widget:'MetagenomeView',
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'Communities.PCoA': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+            /* Done! Same as what Narrative uses. Font sizes of axis labels is too big. */
+            //AbundanceDataPcoa
+            // expects id, x_axis (default 2, text), y_axis (default 2, text), ws
+		    widget:'AbundanceDataPcoa',
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'Communities.TaxonomicMatrix': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+            /* Done! Narrative uses AbundanceDataView */
+
+            //AbundanceDataBoxplot - id, name, ws, auth
+            // expects auth, ws passed to it.
+            //AbundanceDataView - id, name, ws
+            //RankAbundancePlot - id, name [0,1], top ["10"-text], order [average, max, sum], ws, auth
+            //AbundanceDataTable - id, name, ws, auth
+            widget:'AbundanceDataView',
+            options: '{"id":???objname,"ws":???wsname}'
 		},
 		'Communities.TaxonomicProfile': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+            /* Done! Narrative uses AbundanceDataView */
+
+		    widget:'AbundanceDataView',
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		
 		
 		'GenomeComparison.ProteomeComparison': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    widget:'GenomeComparisonWidget',
+		    options: '{"ws_id":???objname,"ws_name":???wsname}'
 		},
 		
 		'KBaseAssembly.AssemblyReport': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		
 		/* STILL NEEDS A MORE COMPLEX LANDING PAGE */
@@ -185,20 +218,21 @@
 		
 		'KBaseGeneDomains.DomainAnnotation': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		
 		'KBaseGenomes.ContigSet': {
 		    widget:'kbaseContigSetView',
-		    options: '{"ws_id":???id,"ws_name":???ws,"loadingImage":"'+this.options.loadingImage+'"}'
+		    options: '{"ws_id":???objname,"ws_name":???wsname,"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 		'KBaseGenomes.MetagenomeAnnotation': {
+            //AnnotationSetTable - id, ws
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'KBaseGenomes.Pangenome': {
 		    widget:'kbaseJsonView',
-		    options: '{"id":???id,"ws":???ws}'
+		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		
 		'KBasePhenotypes.PhenotypeSet': modelingConfig,
@@ -207,63 +241,71 @@
 		
 		'KBaseTrees.Tree': {
 		    widget:'kbaseTree',
-		    options: '{"treeID":???id,"workspaceID":???ws,"treeObjVer":???ver,"loadingImage":"'+this.options.loadingImage+'"}'
+		    options: '{"treeID":???objname,"workspaceID":???wsname,"treeObjVer":???ver,"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 		
 		/* COMPLEX LANDING PAGE */
 		'KBaseGenomes.Genome': {
 		    widget:'KBaseGenomePage',
 		    noPanel:true,
-		    options: '{"genomeID":???id,"workspaceID":???ws,"loadingImage":"'+this.options.loadingImage+'"}'
+		    options: '{"genomeID":???objname,"workspaceID":???wsname,"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 	    };
 	},
 	
 	
 	getVizWidgetDiv: function(obj_info, type2widget) {
-	    var type = obj_info[2].split('-')[0];
-	    if (type2widget.hasOwnProperty(type)) {
-		var config = type2widget[type];
-		if (config.widget && config.options) {
-		    var options = config.options;
-		    options = options.replace(/\?\?\?ws/g, obj_info[6]);
-		    options = options.replace(/\?\?\?wsname/g, obj_info[7]);
-		    options = options.replace(/\?\?\?id/g, obj_info[0]);
-		    options = options.replace(/\?\?\?objname/g, obj_info[1]);
-		    options = options.replace(/\?\?\?ver/g, obj_info[4]);
-		    options = options.replace(/\?\?\?type/g, type);
-		    
-		    var optionsObj;
+        var type = obj_info[2].split('-')[0];
+        if (type2widget.hasOwnProperty(type)) {
+            var config = type2widget[type];
+            if (config.widget && config.options) {
+                var options = config.options;
+                options = options.replace(/\?\?\?wsid/g, obj_info[6]);
+                options = options.replace(/\?\?\?wsname/g, JSON.stringify(obj_info[7]));
+                options = options.replace(/\?\?\?objid/g, obj_info[0]);
+                options = options.replace(/\?\?\?objname/g, JSON.stringify(obj_info[1]));
+                options = options.replace(/\?\?\?ver/g, obj_info[4]);
+                options = options.replace(/\?\?\?type/g, type);
+                // thought I needed these, but I don't - still, I left them here.
+                // options = options.replace(/\?\?\?auth/g, JSON.stringify(this.options.auth));
+                // options = options.replace(/\?\?\?token/g, '"'+this.options.auth.token+'"');
+                var optionsObj;
+                try {
+                    optionsObj = JSON.parse(options);
+                } catch(err) {
+                    console.error('loading viewer widget "'+config.widget+'" with unparsable options: ', options, err);
+                }
+                if (optionsObj) {
+                    console.log('loading viewer widget "'+config.widget+'" with options ',options);
 		    try {
-			optionsObj = JSON.parse(options);
-		    } catch(err) {
-			console.error('loading viewer widget "'+config.widget+'" with unparsable options: ', options, err);
-		    }
-		    if (optionsObj) {
-			console.log('loading viewer widget "'+config.widget+'" with options ',options);
 			var $widgetDiv = $('<div>');
 			var widget = $widgetDiv[config.widget](optionsObj);
-			if (config.noPanel) { return $widgetDiv; } // no panel, so assume widget takes care of everything
-			
+			if (config.noPanel) { 
+			    return $widgetDiv; 
+			} // no panel, so assume widget takes care of everything
+    
 			// put this all in a panel
 			var $panel = $('<div>').addClass("panel panel-default")
-					.append($('<div>').addClass('panel-heading')
-						.append($('<span>').addClass('panel-title')
-							    .append('Data Visualization')))
-					.append($('<div>').addClass('panel-body').append($widgetDiv));
-					
-				//css({'margin':'10px'});
+				     .append($('<div>').addClass('panel-heading')
+				     .append($('<span>').addClass('panel-title')
+				     .append('Data View')))
+				     .append($('<div>').addClass('panel-body').append($widgetDiv));
+    
+			//css({'margin':'10px'});
 			return $panel;
+		    } catch(err) {
+			console.error('Error rendering widget for ',obj_info);
+			console.error(err);
+			return $('<div>');
 		    }
-		} else {
-		    console.error('Viewer config does not have properties "widget" and "options" for: ',obj_info);
-		}
-	    } else {
-		console.log('No default viewer configured for: ',obj_info);
-	    }
-	    // no viewer found or there was a bad config, so don't show anything
-	    return $('<div>');
-	}
-	
-    });
+                }
+            } else {
+                console.error('Viewer config does not have properties "widget" and "options" for: ',obj_info);
+            }
+        } else {
+            console.log('No default viewer configured for: ',obj_info);
+        }
+        // no viewer found or there was a bad config, so don't show anything
+        return $('<div>');
+    }});
 })( jQuery );

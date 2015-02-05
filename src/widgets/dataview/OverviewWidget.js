@@ -89,7 +89,19 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                   var dataRef = this.getObjectRef();
 
                   Navbar
-                  .clearButtons()
+                  .clearButtons();
+
+                  Navbar.addDropdown({
+                	  place: 'end',
+                	  name: 'download',
+                	  style: 'default',
+                	  icon: 'download',
+                	  label: 'Download',
+                	  widget: 'kbaseDownloadPanel',
+                	  params: {'ws': this.getState('workspace.id'), 'obj': this.getState('object.id'), 'ver': this.getState('object.version')}
+                  });
+
+                  Navbar
                   .addButton({
                         name: 'copy',
                         label: '+ New Narrative',
@@ -98,7 +110,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                         url: '/functional-site/#/narrativemanager/new?copydata=' + dataRef,
                         external: true
                      })
-                     .addButton({
+                     /*.addButton({
                         name: 'download',
                         label: 'Download',
                         style: 'primary',
@@ -106,7 +118,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                         callback: function () {
                            alert('download object');
                         }.bind(this)
-                     });
+                     })*/;
 
                   var narratives = this.getState('writableNarratives');
                   if (narratives) {
@@ -226,35 +238,17 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
          fetchVersions: {
             value: function () {
                
-               Utils.promise(this.workspaceClient, 'get_object_info_new', {
-                  objects: [{ref: APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'))}]
-               })
-               .then(function (data) {
-                  if (data.length !== 1) {
-                     return;
-                  }
-                  var object = APIUtils.object_info_to_object(data[0]);
-                  if (object.version === 1) {
-                     this.setState('versions', [object]);
-                     return;
-                  } 
-                  var versions = [];
-                  for (var i=0; i<object.version; i++) {
-                     versions.push(i);
-                  }
-                  Utils.promise(this.workspaceClient, 'get_object_info_new', {
-                     objects: versions.map(function (x) {
-                        return {ref: APIUtils.makeWorkspaceObjectRef(object.wsid, object.id, x)}
-                     })
-                  }).then(function (data) {
-                     var versions = data.map(function (x) {
+               // Note: we can just get the object history in one call :) -mike
+               Utils.promise(this.workspaceClient, 'get_object_history', 
+                  {ref: APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'))}
+               )
+               .then(function (dataList) {
+                  
+                  var versions = dataList.map(function (x) {
                         return APIUtils.object_info_to_object(x);
                      });
-                     this.setState('versions', versions.sort(function (a,b) {return a.version-b.version}));
-                  }.bind(this)).catch(function(err) {
-                     console.log('ERROR');
-                     console.log(err);
-                  }).done();
+                  this.setState('versions', versions.sort(function (a,b) {return b.version - a.version}));
+                  
                }.bind(this))
                .catch(function (err) {
                   console.log('ERROR'); 
@@ -265,6 +259,83 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
               
             }
          },
+         
+         
+         fetchReferences: {
+            value: function () {
+               Utils.promise(this.workspaceClient, 'list_referencing_objects',
+                             [{ref: APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'))}]
+               )
+               .then(function (dataList) {
+                  var refs = [];
+                  if (dataList[0]) {
+                     for(var i=0; i<dataList[0].length; i++) {
+                        refs.push(APIUtils.object_info_to_object(dataList[0][i]));
+                     }
+                  }
+                  this.setState('references', refs.sort(function (a,b) {return b.name - a.name}));
+               }.bind(this))
+               .catch(function (err) {
+                  console.log('ERROR'); 
+                  console.log(err);
+               })
+               .done();
+            }
+         },
+         
+         createDataIcon : {
+            value: function (object_info) {
+               try {
+                  var icons = $.parseJSON(
+                     $.ajax({
+                       url: "assets/icons/icons.json", // should not be hardcoded!! but figure that out later
+                       async: false,
+                       dataType: 'json'
+                     }).responseText
+                   );
+                  //console.log(icons);
+                  
+                  var type = object_info[2].split('-')[0].split('.')[1];
+                  var $logo = $('<span>');
+                  var icon = _.has(icons.data, type) ? icons.data[type] : icons.data['DEFAULT'];
+                  
+                  var code = 0;
+                  for (var i = 0; i < type.length; code += type.charCodeAt(i++));
+                  var color =  icons.colors[code % icons.colors.length];
+                  // background circle
+                  $logo.addClass("fa-stack fa-2x")
+                    .append($('<i>')
+                      .addClass("fa fa-circle fa-stack-2x")
+                      .css({'color': color}));
+                  
+                  var isCustomIcon = (icon.length > 0 && icon[0].length > 4 &&
+                                          icon[0].substring(0, 4) == 'icon');
+                    
+                  if (isCustomIcon) {
+                      // add custom icons (more than 1 will look weird, though)
+                      _.each(icon, function (cls) {
+                          $logo.append($('<i>')
+                            .addClass("icon fa-inverse fa-stack-1x " + cls));
+                      });
+                  }
+                  else {
+                      // add stack of font-awesome icons
+                      _.each(icon, function (cls) {
+                          $logo.append($('<i>')
+                            .addClass("fa fa-inverse fa-stack-1x " + cls));
+                      });
+                  }
+                  
+                  return $('<div>').append($logo).html(); //probably a better way to do this...
+                  
+               } catch(err) {
+                  console.error("When fetching icon config: ",err);
+                  return "";
+               }
+            }
+         },
+         
+         
 
          setInitialState: {
             value: function () {
@@ -284,9 +355,12 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                            this.setState('status', 'found');
                            var obj = APIUtils.object_info_to_object(data[0]);
                            this.setState('object', obj);
+                           
+                           // create the data icon
+                           this.setState('dataicon',this.createDataIcon(data[0]));
 
                            // Get more info...
-
+                           
                            // The narrative this lives in.
                            var workspaceId = this.getParam('workspaceId');
                            var isIntegerId = /^\d+$/.test(workspaceId);
@@ -298,10 +372,13 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                                  this.setState('workspace', APIUtils.workspace_metadata_to_object(data));
                               
                               
-                                 // Okay, the rest doens't really have to be done here ... 
-                              
+                                 // Okay, the rest doens't really have to be done here ..
+                                 
                                  // Get versions to populate the versions panel.
                                  this.fetchVersions();
+                                 
+                                 // Get the references to this object
+                                 this.fetchReferences();
                               
                               
                                  // Other narratives this user has.

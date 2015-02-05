@@ -424,7 +424,7 @@
                 workspaceID = null;
 
             return $("<div>")
-                .append('<a href="#/genomes/'+workspaceID+'/'+genomeID+'" target="_blank">'+workspaceID+'/<wbr>'+genomeID+'</a>');
+                .append('<a href="#/dataview/'+workspaceID+'/'+genomeID+'" target="_blank">'+workspaceID+'/<wbr>'+genomeID+'</a>');
                 
                 
             var self = this;
