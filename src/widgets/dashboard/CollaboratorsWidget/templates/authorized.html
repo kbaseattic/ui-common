@@ -1,16 +1,16 @@
-<div class="collapse" id="more-info-{{env.instanceId}}"> 
-	<div class="well">
-	{% if env.isOwner %}
-		<p>This table shows your "Collaborators" - other KBase users who have access to Narratives to which you also have access.</p>
-	{% else %} 
-		<p>This shows your "Common Collborators" - other KBase users who have access to  
-	Narratives to which both you and {{state.currentUserProfile.user.realname}} have access.
-	</p>
-		<p>To see all of your collaborators, visit <a href="/functional-site/#/people/{{env.loggedInUser}}">your profile.</a>
-	</p>
-	{% endif %}
-	</div>
+<div class="collapse" id="{{env.widgetName}}-more-info-{{env.instanceId}}">
+   <div class="well">
+      <p>This table shows your "Collaborators" - other KBase users who have access to Narratives to which you also have access.</p>
+   </div>
 </div>
+
+{% if state.collaborators|length == 0 %}
+
+<p>
+You do not yet have any collaborators. To gain collaborators, you need to create narratives and share with other users, or be given share access to Narratives of other usrs. Your collaborators are those users who are "share partners" with all Narratives you own or share.
+</p>
+
+{% else  %}
 
 <table class="table" id="collaborator_table_{{generatedId}}">
 	<thead>
@@ -30,6 +30,8 @@
 {% endfor %}
 	</tbody>
 </table>
+
+{% endif %}
 
 <script>
 require(['jquery'], function ($) {

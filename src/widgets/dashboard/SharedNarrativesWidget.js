@@ -64,6 +64,7 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                         {
                            label: 'Slider',
                            active: true,
+                           class: 'btn-kbase',
                            callback: function (e) {
                               this.view = 'slider';
                               this.refresh();
@@ -71,6 +72,7 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                               },
                         {
                            label: 'Table',
+                           class: 'btn-kbase',
                            callback: function (e) {
                               this.view = 'table';
                               this.refresh();

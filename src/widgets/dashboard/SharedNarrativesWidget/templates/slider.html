@@ -4,7 +4,11 @@
    </div>
 </div>
 
+{% if state.narratives == 0 %} 
 
+<p>No Narratives are presently shared with you.</p>
+
+{% else %}
 <div class="slider">
    {% for narrative in state.narrativesFiltered %}
    <div class="slide">
@@ -44,3 +48,4 @@
    </div>
    {% endfor %}
 </div>
+{% endif %}
