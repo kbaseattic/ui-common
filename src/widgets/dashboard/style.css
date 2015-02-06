@@ -38,7 +38,7 @@
  
  .kbase-dashboard-view .slider .slide {
     display: inline-block;
-    white-space: normal;
+    xwhite-space: normal;
     xposition: relative;
     xfloat: left;
     xclear: none;
@@ -53,7 +53,7 @@
     /* go with the flow... */
     xborder: 1px #337ab7 solid;
     xborder-radius: 4px;
-    box-shadow: 1px 1px 1px #ccc;
+    xbox-shadow: 1px 1px 1px #ccc;
  }
  
  .kbase-dashboard-view .slide .title {

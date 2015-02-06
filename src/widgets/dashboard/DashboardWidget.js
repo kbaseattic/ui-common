@@ -147,8 +147,8 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                   var minutes = minutes % 60;
                   var days = Math.floor(hours/24);
                   var hours = hours % 24;
-                  
-                  return (days?days+'d':'') + (hours?' '+hours+'h':'') + (minutes?' '+minutes+'m':'') + (seconds?' '+seconds+'s':'')
+                  var showSeconds = false;
+                  return (days?days+'d':'') + (hours?' '+hours+'h':'') + (minutes?' '+minutes+'m':'') + (seconds && showSeconds?' '+seconds+'s':'')
                }.bind(this));
                
                this.templates.env.addGlobal('randomNumber', function (from, to) {
@@ -250,11 +250,14 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                // For simple widgets this is all the setup needed.
                // For more complex one, parts of the UI may be swapped out.
                // console.log('['+this.widgetName+'] starting');
-               this.setupUI();
+               this.renderUI();
                this.renderWaitingView();
                this.setInitialState()
                   .then(function () {
-                     return this.refresh()
+                     this.setupUI();
+               }.bind(this))
+                  .then(function () {
+                     this.refresh()
                   }.bind(this))
                   .catch(function (err) {
                      console.log('ERROR');
@@ -275,7 +278,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
             }
          },
 
-         setupUI: {
+         renderUI: {
             value: function () {
                this.loadCSS();
                this.renderLayout();
@@ -347,7 +350,10 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
             value: function () {
                this.setInitialState()
                   .then(function () {
-                     return this.refresh();
+                    this.renderUI();
+                  })
+                  .then(function () {
+                     this.refresh();
                   }.bind(this))
                   .catch(function (err) {
                      this.setError(err);
@@ -642,6 +648,12 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                   alert: this.container.find('[data-placeholder="alert"]'),
                   content: this.container.find('[data-placeholder="content"]')
                };
+            }
+         },
+         
+         setupUI: {
+            value: function () {
+               return;
             }
          },
 
