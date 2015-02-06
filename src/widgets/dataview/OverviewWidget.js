@@ -1,4 +1,4 @@
-define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession', 'kbc_Workspace', 'kbasenavbar', 'q'],
+define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb.client.workspace', 'kb.widget.navbar', 'q'],
    function (DataviewWidget, APIUtils, Utils, Session, WorkspaceService, Navbar, Q) {
       "use strict";
       var widget = Object.create(DataviewWidget, {

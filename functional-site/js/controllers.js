@@ -315,7 +315,7 @@ app
     .attr('href', 'views/social/user-page/style.css');
     
     // Set up the navbar menu
-    require(['kbasenavbar'], function (NAVBAR) {
+    require(['kb.widget.navbar'], function (NAVBAR) {
       NAVBAR.clearMenu()
       .addDefaultMenu({
         search: true, narrative: true
@@ -363,7 +363,7 @@ app
     // Create and attache widgets, from the layout template
     
     /*
-    require(['jquery', 'nunjucks', 'kbaseutils'], function ($, nunjucks, Utils) {
+    require(['jquery', 'nunjucks', 'kb.utils'], function ($, nunjucks, Utils) {
        var templateEnv = new nunjucks.Environment(new nunjucks.WebLoader('/functional-site/views/dashboard/templates'), {
          'autoescape': false
        });
@@ -399,7 +399,7 @@ app
     */
     
     
-    // Set the styles for the user page
+    // Set the styles for the dashboard page
     $('<link>')
     .appendTo('head')
     .attr({type: 'text/css', rel: 'stylesheet'})
@@ -409,10 +409,10 @@ app
    // Note that the navbar is a singleton. There is only one per page/view, and it is as persistent
    // as the page/view is. It does maintain some state, notably the dom node it is attached to. This is
    // the primary reason it is a singleton.
-    require(['kbasenavbar', 'kb.statemachine'], function (NAVBAR, StateMachine) {
+    require(['kb.widget.navbar', 'kb.statemachine'], function (NAVBAR, StateMachine) {
       NAVBAR.clearMenu()
       .addDefaultMenu({
-        search: true, narrative: true
+        search: true, narrative: true, dashboard: false
       })
       .addHelpMenuItem({
         type: 'divider'

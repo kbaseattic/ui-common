@@ -1,4 +1,4 @@
-define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.methods', 'kbc_Workspace', 'kbc_UserProfile', 'kbasesession', 'kbaseutils', 'kb.utils.api', 'q'],
+define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.methods', 'kb.client.workspace', 'kb.client.user_profile', 'kb.session', 'kb.utils', 'kb.utils.api', 'q'],
    function ($, Postal, nunjucks, DashboardWidget, ClientMethods, WorkspaceService, UserProfileService, Session, Utils, APIUtils, Q) {
       "use strict";
       var Widget = Object.create(DashboardWidget, {

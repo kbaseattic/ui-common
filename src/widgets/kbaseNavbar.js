@@ -1,4 +1,4 @@
-define(['jquery', 'nunjucks', 'kbasesession', 'kbaseconfig'],
+define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
    function ($, nunjucks, Session, Config) {
       "use strict";
       var Navbar = Object.create({}, {

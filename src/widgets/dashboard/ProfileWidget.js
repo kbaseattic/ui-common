@@ -1,4 +1,4 @@
-define(['kb.widget.dashboard.base', 'kbaseuserprofile', 'kbc_UserProfile', 'kbasesession', 'kbaseutils', 'q'], 
+define(['kb.widget.dashboard.base', 'kb.user_profile', 'kb.client.user_profile', 'kb.session', 'kb.utils', 'q'], 
 function (DashboardWidget, UserProfile, UserProfileService, Session, Utils, Q) {
   "use strict";
   var widget = Object.create(DashboardWidget, {

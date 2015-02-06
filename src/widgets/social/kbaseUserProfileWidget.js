@@ -1,4 +1,4 @@
-define(['nunjucks', 'jquery', 'q', 'kbaseutils', 'kbasesocialwidget', 'kbaseuserprofile', 'kbasesession', 'kbasenavbar'],
+define(['nunjucks', 'jquery', 'q', 'kb.utils', 'kb.widget.social.base', 'kb.user_profile', 'kb.session', 'kb.widget.navbar'],
   function(nunjucks, $, Q, Utils, SocialWidget, UserProfile, Session, NAVBAR) {
     "use strict";
     // var NAVBAR = Object.create(Navbar).init({container: '#kbase-navbar'});

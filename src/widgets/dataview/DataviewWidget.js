@@ -1,4 +1,4 @@
-define(['nunjucks', 'jquery', 'q', 'kbasesession', 'kbaseutils', 'kb.utils.api', 'kb.alert', 'postal', 'json!functional-site/config.json'],
+define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.alert', 'postal', 'json!functional-site/config.json'],
    function (nunjucks, $, Q, Session, Utils, APIUtils, Alert, Postal, config) {
       "use strict";
       var widget = Object.create({}, {

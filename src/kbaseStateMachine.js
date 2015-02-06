@@ -1,4 +1,4 @@
-define(['kbaseutils'], function (Utils) {
+define(['kb.utils'], function (Utils) {
    "use strict";
    /**
    A simple first in last out (FILO) job stack which is allowed to build up for some amount of time, after

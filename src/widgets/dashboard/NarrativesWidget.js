@@ -1,5 +1,5 @@
-define(['jquery', 'nunjucks', 'kbaseutils', 'kb.utils.api', 'kb.widget.dashboard.base', 'kb.client.workspace', 'kbasesession', 'kb.widget.buttonbar', 'q', 'postal'],
-   function ($, nunjucks, Utils, APIUtils, DashboardWidget,  Workspace, Session, Buttonbar, Q, Postal) {
+define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.base', 'kb.client.methods', 'kb.session', 'kb.widget.buttonbar', 'q', 'postal'], 
+   function ($, nunjucks, Utils, APIUtils, DashboardWidget,  KBService, Session, Buttonbar, Q, Postal) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
@@ -62,7 +62,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'kb.utils.api', 'kb.widget.dashboard
                
                // The workspace will get the common settings -- url and auth token -- from the appropriate
                // singleton modules (Session, Config)
-               this.workspaceClient = Object.create(Workspace).init();
+               this.kbservice = Object.create(KBService).init();
             }
          },
 
@@ -198,7 +198,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'kb.utils.api', 'kb.widget.dashboard
                   }
                   var sessionUsername = Session.getUsername();
                   var recentActivity = [];
-                  this.workspaceClient.getNarratives({
+                  this.kbservice.getNarratives({
                         params: {
                            showDeleted: 0,
                            owners: [sessionUsername]
@@ -211,7 +211,7 @@ define(['jquery', 'nunjucks', 'kbaseutils', 'kb.utils.api', 'kb.widget.dashboard
                            resolve();
                            return;
                         }
-                        this.workspaceClient.getPermissions(narratives)
+                        this.kbservice.getPermissions(narratives)
                            .then(function (narratives) {
                               narratives = narratives.sort(function (a, b) {
                                  return b.object.saveDate.getTime() - a.object.saveDate.getTime();

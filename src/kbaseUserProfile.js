@@ -1,6 +1,6 @@
-define(['q', 'kbaseutils', 'md5', 'kbc_UserProfile', 'kbaseconfig', 'kbasesession'],
+define(['q', 'kb.utils', 'md5', 'kb.client.user_profile', 'kb.config', 'kb.session'],
 function(Q, Utils, md5,  UserProfileService, Config, Session) {
-    "use strict";
+    "use strict"; 
     var UserProfile = Object.create({}, {
 
       init: {
