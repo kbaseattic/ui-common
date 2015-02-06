@@ -12,20 +12,20 @@
 	</div>
 </div>
 
-<table class="table table-bordered table-striped" id="collaborator_table_{{generatedId}}">
+<table class="table" id="collaborator_table_{{generatedId}}">
 	<thead>
 	<tr>
 		<th>Name</th>
 		<th>Username</th>
-		<th>In common</th>
+		<th class="number">In common</th>
 	</tr>
 	</thead>
 	<tbody>
-{% for user in state.network.collaboratorTable %}
+{% for user in state.collaborators %}
 	<tr>
 		<td><a href="/functional-site/#/people/{{user.username}}">{{user.realname}}</a></td>
 		<td>{{user.username}}</td>
-		<td>{{user.ws | length}}</td>
+		<td class="number">{{user.count}}</td>
 	</tr>
 {% endfor %}
 	</tbody>

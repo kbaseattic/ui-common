@@ -5,7 +5,12 @@ define('jquery', [], function () {
 define('kb_clients', [], function () {
    return 'KBCLIENTS DUMMY OBJECT';
 });
-
+//NB underscore, as of 1.6, inclues AMD compatible loading. However, other parts of the kbase
+// codebase may rely on underscore being loaded globally, so se just use the global version, which 
+// must already be loaded.
+define('underscore', [], function () {
+   return _;
+});
 var kbClients = [
    'NarrativeMethodStore',
    'UserProfile',
@@ -56,6 +61,7 @@ require.config({
 
       // widgets
       // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
+      'kb.widget.buttonbar': '/src/widgets/kbaseButtonbar',
       kbasesocialwidget: '/src/widgets/social/kbaseSocialWidget',
       kbaseuserprofile: '/src/kbaseUserProfile',
       kbaseuserprofilewidget: '/src/widgets/social/kbaseUserProfileWidget',
@@ -83,7 +89,11 @@ require.config({
       
       // Dataview widgets
       'kb.widget.dataview.base': '/src/widgets/dataview/DataviewWidget',
-      'kb.widget.dataview.overview': '/src/widgets/dataview/OverviewWidget'
+      'kb.widget.dataview.overview': '/src/widgets/dataview/OverviewWidget',
+      
+      // KBase clients. Wrappers around the service clients to provide packaged operations with promises.
+      'kb.client.workspace': '/src/clients/kbaseWorkspaceClient',
+      'kb.client.methods': '/src/clients/kbaseClientMethods'
    },
    shim: {
       // Better standard naming: Prefix with kbc_ (KBase Client), followed
