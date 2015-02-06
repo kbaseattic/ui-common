@@ -55,39 +55,57 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                   content: this.container.find('[data-placeholder="content"]')
                };
 
-               this.buttonbar = Object.create(Buttonbar).init({
+            }
+         },
+         
+           setupUI: {
+            value: function () {
+               console.log('have narratives?');
+               console.log(this.getState('narratives'));
+               if (this.hasState('narratives') && this.getState('narratives').length > 0) {
+                  this.buttonbar = Object.create(Buttonbar).init({
                      container: this.container.find('[data-placeholder="buttonbar"]')
-                  })
-                  .clear()
-                  .addRadioToggle({
-                     buttons: [
-                        {
-                           label: 'Slider',
-                           active: true,
-                           class: 'btn-kbase',
-                           callback: function (e) {
-                              this.view = 'slider';
-                              this.refresh();
-                           }.bind(this)
-                              },
-                        {
-                           label: 'Table',
-                           class: 'btn-kbase',
-                           callback: function (e) {
-                              this.view = 'table';
-                              this.refresh();
-                           }.bind(this)
-                              }]
-                  })
-                  .addInput({
-                     placeholder: 'Search',
-                     place: 'end',
-                     onkeyup: function (e) {
-                        this.filterState({
-                           search: $(e.target).val()
-                        });
-                     }.bind(this)
                   });
+                  this.buttonbar
+                     .clear()
+                     //.addButton({
+                     //   name: 'newnarrative',
+                     //   label: 'New Narrative',
+                     //   icon: 'plus-circle',
+                     //    style: 'primary',
+                     //   url: '/functional-site/#/narrativemanager/new',
+                     //   external: true
+                     // })
+                     .addRadioToggle({
+                        buttons: [
+                           {
+                              label: 'Slider',
+                              active: true,
+                              class: 'btn-kbase',
+                              callback: function (e) {
+                                 this.view = 'slider';
+                                 this.refresh();
+                              }.bind(this)
+                                 },
+                           {
+                              label: 'Table',
+                              class: 'btn-kbase',
+                              callback: function (e) {
+                                 this.view = 'table';
+                                 this.refresh();
+                              }.bind(this)
+                                 }]
+                     })
+                     .addInput({
+                        placeholder: 'Search',
+                        place: 'end',
+                        onkeyup: function (e) {
+                           this.filterState({
+                              search: $(e.target).val()
+                           });
+                        }.bind(this)
+                     });
+               }
             }
          },
 
