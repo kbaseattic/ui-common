@@ -249,8 +249,19 @@
 		    widget:'KBaseGenomePage',
 		    noPanel:true,
 		    options: '{"genomeID":???objname,"workspaceID":???wsname,"loadingImage":"'+this.options.loadingImage+'"}'
-		},
+		}
 	    };
+	    
+	    var list = ''; var list2=''
+	    for(var x in self.type2widget) {
+		if (self.type2widget.hasOwnProperty(x)) {
+		    list = list + x+'\n';
+		    list2 = list2 + self.type2widget[x].widget+"\n";
+		}
+	    }
+	    console.log(list);
+	    console.log(list2);
+	    
 	},
 	
 	
