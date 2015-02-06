@@ -1,4 +1,4 @@
-define(['kbasebasewidget', 'kbasesession', 'jquery', 'postal'], function (BaseWidget, Session, $, Postal) {
+define(['kb.widget.base', 'kb.session', 'jquery', 'postal'], function (BaseWidget, Session, $, Postal) {
   // make a widget ... on the fly?
   var W = Object.create(BaseWidget, {
     init: {

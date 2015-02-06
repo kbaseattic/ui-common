@@ -1,4 +1,4 @@
-define(['kbaseutils', 'json!functional-site/config.json'],
+define(['kb.utils', 'json!functional-site/config.json'],
 function(Utils, config) {
   var Config = Object.create({}, {
     config: {

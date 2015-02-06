@@ -1,4 +1,4 @@
-define(['kbaseutils'],
+define(['kb.utils'],
    function (Utils) {
       "use strict";
       return Object.create({}, {

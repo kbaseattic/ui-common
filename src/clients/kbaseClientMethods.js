@@ -1,4 +1,4 @@
-define(['q', 'kbasesession', 'kbaseutils', 'kb.utils.api', 'kbc_Workspace', 'kbc_UserProfile', 'kbaseconfig'],
+define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.client.workspace', 'kb.client.user_profile', 'kb.config'],
    function (Q, Session, Utils, APIUtils, Workspace, UserProfile, Config) {
 
       return Object.create({}, {

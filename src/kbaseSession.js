@@ -1,4 +1,4 @@
-define(['jquery', 'q', 'kbasecookie', 'kbaseconfig'],
+define(['jquery', 'q', 'kb.cookie', 'kb.config'],
     function ($, Q, Cookie, Config) {
         'use strict';
         var Session = Object.create({}, {

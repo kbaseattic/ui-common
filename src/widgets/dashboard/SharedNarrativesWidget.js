@@ -1,5 +1,5 @@
-define(['jquery', 'postal', 'kbaseutils', 'kb.utils.api', 'kb.widget.dashboard.base', 'kb.client.workspace', 'kbasesession', 'kb.widget.buttonbar', 'q'],
-   function ($, Postal, Utils, APIUtils, DashboardWidget, Workspace, Session, Buttonbar, Q) {
+define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.base', 'kb.client.methods', 'kb.session', 'kb.widget.buttonbar', 'q'],
+   function ($, Postal, Utils, APIUtils, DashboardWidget, KBService, Session, Buttonbar, Q) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
@@ -42,7 +42,7 @@ define(['jquery', 'postal', 'kbaseutils', 'kb.utils.api', 'kb.widget.dashboard.b
 
          setup: {
             value: function () {
-               this.workspaceClient = Object.create(Workspace).init();
+               this.kbservice = Object.create(KBService).init();
             }
          },
 
@@ -156,7 +156,7 @@ define(['jquery', 'postal', 'kbaseutils', 'kb.utils.api', 'kb.widget.dashboard.b
                   // Get all workspaces, filter out those owned by the user,
                   // and those that are public
 
-                  this.workspaceClient.getNarratives({
+                  this.kbservice.getNarratives({
                         params: {
                            showDeleted: 0
                         }
@@ -180,7 +180,7 @@ define(['jquery', 'postal', 'kbaseutils', 'kb.utils.api', 'kb.widget.dashboard.b
                            }
                         });
 
-                        this.workspaceClient.getPermissions(narratives)
+                        this.kbservice.getPermissions(narratives)
                            .then(function (narratives) {
                               narratives = narratives.sort(function (a, b) {
                                  return b.object.saveDate.getTime() - a.object.saveDate.getTime();
