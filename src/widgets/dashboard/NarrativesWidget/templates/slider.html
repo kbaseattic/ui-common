@@ -9,7 +9,7 @@
   
       <div class="slide">
           <table><tr><td>
-          <a role="button" class="btn btn-primary xkbtn" href="/functional-site/#/narrativemanager/new" 
+          <a role="button" class="btn btn-primary btn-kbase" href="/functional-site/#/narrativemanager/new" 
              xstyle="height: 100%; width: 100%" target="_blank">
            
             <br><span class="fa fa-plus-circle" style="font-size: 300%; " ></span><br><br>
@@ -18,6 +18,18 @@
          </td></tr></table>
          
       </div>
+      
+   {% if state.narratives == 0 %}
+    
+     <div class="slide">
+          <table><tr><td  style="max-width: 300px;">
+             <p>You do not currently own any Narratives.</p>
+             <p>It is easy to get started with a new Narrative. Just click the big button the left to launch the Narrative interface with a blank, new Narrative.</p>
+         </td></tr></table>
+         
+      </div>
+     
+   {% else %}
       
       {% for narrative in state.narrativesFiltered %}
       <div class="slide">
@@ -67,6 +79,8 @@
           
       </div>
       {% endfor %}
+      
+   {% endif %}
       
    
 </div>

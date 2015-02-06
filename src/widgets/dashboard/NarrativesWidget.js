@@ -35,7 +35,7 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                      }
                   });
                }.bind(this));
-               */
+               
                
                Postal.channel('dashboard.metrics')
                .subscribe('query.narratives', function (data) {
@@ -51,6 +51,7 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                      }
                   });
                }.bind(this));
+               */
                
                return this;
             }
@@ -106,46 +107,50 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                   alert: this.container.find('[data-placeholder="alert"]'),
                   content: this.container.find('[data-placeholder="content"]')
                };
-               this.buttonbar = Object.create(Buttonbar).init({
-                  container: this.container.find('[data-placeholder="buttonbar"]')
-               });
-               this.buttonbar
-                  .clear()
-                  //.addButton({
-                  //   name: 'newnarrative',
-                  //   label: 'New Narrative',
-                  //   icon: 'plus-circle',
-                  //    style: 'primary',
-                  //   url: '/functional-site/#/narrativemanager/new',
-                  //   external: true
-                  // })
-                  .addRadioToggle({
-                     buttons: [
-                        {
-                           label: 'Slider',
-                           active: true,
-                           callback: function (e) {
-                              this.view = 'slider';
-                              this.refresh();
-                           }.bind(this)
-                              },
-                        {
-                           label: 'Table',
-                           callback: function (e) {
-                              this.view = 'table';
-                              this.refresh();
-                           }.bind(this)
-                              }]
-                  })
-                  .addInput({
-                     placeholder: 'Search',
-                     place: 'end',
-                     onkeyup: function (e) {
-                        this.filterState({
-                           search: $(e.target).val()
-                        });
-                     }.bind(this)
+               if (this.hasState('narratives') && this.getState('narratives').length > 0) {
+                  this.buttonbar = Object.create(Buttonbar).init({
+                     container: this.container.find('[data-placeholder="buttonbar"]')
                   });
+                  this.buttonbar
+                     .clear()
+                     //.addButton({
+                     //   name: 'newnarrative',
+                     //   label: 'New Narrative',
+                     //   icon: 'plus-circle',
+                     //    style: 'primary',
+                     //   url: '/functional-site/#/narrativemanager/new',
+                     //   external: true
+                     // })
+                     .addRadioToggle({
+                        buttons: [
+                           {
+                              label: 'Slider',
+                              active: true,
+                              class: 'btn-kbase',
+                              callback: function (e) {
+                                 this.view = 'slider';
+                                 this.refresh();
+                              }.bind(this)
+                                 },
+                           {
+                              label: 'Table',
+                              class: 'btn-kbase',
+                              callback: function (e) {
+                                 this.view = 'table';
+                                 this.refresh();
+                              }.bind(this)
+                                 }]
+                     })
+                     .addInput({
+                        placeholder: 'Search',
+                        place: 'end',
+                        onkeyup: function (e) {
+                           this.filterState({
+                              search: $(e.target).val()
+                           });
+                        }.bind(this)
+                     });
+               }
             }
          },
 

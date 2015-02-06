@@ -609,20 +609,24 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
             value: function () {
                // Generate initial view based on the current state of this widget.
                // Head off at the pass -- if not logged in, can't show profile.
-               if (this.error) {
-                  this.renderError();
-               } else if (Session.isLoggedIn()) {
-                 this.setTitle(this.widgetTitle);
-                  this.places.content.html(this.renderTemplate('authorized'));
-               } else {
-                  // no profile, no basic aaccount info
-                 this.setTitle(this.widgetTitle);
-                  this.places.content.html(this.renderTemplate('unauthorized'));
+               try {
+                  if (this.error) {
+                     this.renderError();
+                  } else if (Session.isLoggedIn()) {
+                    this.setTitle(this.widgetTitle);
+                     this.places.content.html(this.renderTemplate('authorized'));
+                  } else {
+                     // no profile, no basic aaccount info
+                    this.setTitle(this.widgetTitle);
+                     this.places.content.html(this.renderTemplate('unauthorized'));
+                  }
+                  if (this.afterRender) {
+                     this.afterRender();
+                  }
+                  return this;
+               } catch (ex) {
+                  return 'Error rendering: ' + ex;
                }
-               if (this.afterRender) {
-                  this.afterRender();
-               }
-               return this;
             }
          },
 

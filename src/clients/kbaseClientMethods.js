@@ -61,6 +61,11 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.client.workspace', 'k
                               ref: w.id + '/' + w.metadata.narrative
                            }
                         });
+                     
+                     if (objectRefs.length === 0) {
+                        resolve([]);
+                        return;
+                     }
 
                         // Now get the corresponding object metadata for each narrative workspace
                         Utils.promise(this.workspaceClient, 'get_object_info_new', {
@@ -107,6 +112,10 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.client.workspace', 'k
          getPermissions: {
             value: function (narratives) {
                return Q.promise(function (resolve, reject, notify) {
+                  if (narratives.length === 0) {
+                     resolve([]);
+                     return;
+                  }
                   var promises = narratives.map(function (narrative) {
                      return Utils.promise(this.workspaceClient, 'get_permissions', {
                         id: narrative.workspace.id
