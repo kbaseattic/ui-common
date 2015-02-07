@@ -244,13 +244,13 @@
 					text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
 					text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
 					text+= '<tr><td><b>Saved by</b></td><td><a href="#/people/'+info[5] +'" target="_blank">'+info[5]+"</td></tr>";
-					var found = false; var metadata = "<tr><td><b>Meta data</b></td><td>";
+					var found = false; var metadata = '<tr><td><b>Meta data</b></td><td><div style="width:250px;word-wrap: break-word;">';
 					for( var m in info[10]) {
 					    found = true;
 					    metadata += "<b>"+m+"</b> : "+info[10][m]+"<br>"
 					}
-					if (found) { text += metadata +"</td></tr>"; }
-					text += "</td></tr></table></td><td>";
+					if (found) { text += metadata +"</div></td></tr>"; }
+					text += "</div></td></tr></table></td><td>";
 					text+= '<h4>Provenance</h4><table cellpadding="2" cellspacing="0" class="table table-bordered table-striped">'
 					if (objdata.length>0) {
 					    if (objdata[0]['provenance'].length>0) {
@@ -280,13 +280,13 @@
 					text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
 					text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
 					text+= '<tr><td><b>Saved by</b></td><td><a href="#/people/'+info[5] +'" target="_blank">'+info[5]+"</td></tr>";
-					var found = false; var metadata = "<tr><td><b>Meta data</b></td><td>";
+					var found = false; var metadata = '<tr><td><b>Meta data</b></td><td><div style="width:250px;word-wrap: break-word;">';
 					for( var m in info[10]) {
 					    found = true;
 					    metadata += "<b>"+m+"</b> : "+info[10][m]+"<br>"
 					}
-					if (found) { text += metadata +"</td></tr>"; }
-					text += "</td></tr></table></td><td>";
+					if (found) { text += metadata +"</div></td></tr>"; }
+					text += "</div></td></tr></table></td><td>";
 					text+= '<h4>Provenance</h4><table cellpadding="2" cellspacing="0" class="table table-bordered table-striped">'
 					text+= "error in fetching provenance";
 					text+='</table>';
