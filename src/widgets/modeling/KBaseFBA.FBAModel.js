@@ -271,13 +271,36 @@ function KBaseFBA_FBAModel(modeltabs) {
 		});
 		if (rxn.rxnkbid != "rxn00000") {
 			var p = self.modeltabs.kbapi('fba', 'get_reactions', {reactions: [rxn.rxnkbid]}).then(function(data) {
-				console.log(data);
+				if ("deltaG" in data[0]) {
+					output.push({
+						"label": "Delta G",
+						"data": data[0].deltaG+" ("+data[0].deltaGErr+") kcal/mol"
+					});
+				}
+				output.push({
+					"label": "Enzymes",
+					"data": data[0].enzymes.join(", ")
+				});
+				var aliashash = {};
+				var finalaliases = [];
+				for (var i=0; i < data[0].aliases.length; i++) {
+					if (!(data[0].aliases[i] in aliashash)) {
+						finalaliases.push(data[0].aliases[i]);
+						aliashash[data[0].aliases[i]] = 1;
+					}
+				}
+				output.push({
+					"label": "Aliases",
+					"data": finalaliases.join(", ")
+				});
 				return output;
 			});
 			return p;
 		}
 		return output;
     }
+    
+    
 
     this.GeneTab = function (info) {
         // var gene = this.genehash[id];
@@ -321,7 +344,25 @@ function KBaseFBA_FBAModel(modeltabs) {
 		}];
 		if (cpd.cpdkbid != "cpd00000") {
 			var p = self.modeltabs.kbapi('fba', 'get_compounds', {compounds: [cpd.cpdkbid]}).then(function(data) {
-				console.log(data);
+				if ("deltaG" in data[0]) {
+					output.push({
+						"label": "Delta G",
+						"data": data[0].deltaG+" ("+data[0].deltaGErr+") kcal/mol"
+					});
+				}
+				var aliashash = {};
+				var finalaliases = [];
+				for (var i=0; i < data[0].aliases.length; i++) {
+					if (!(data[0].aliases[i] in aliashash)) {
+						finalaliases.push(data[0].aliases[i]);
+						aliashash[data[0].aliases[i]] = 1;
+					}
+				}
+				output.push({
+					"label": "Aliases",
+					"data": finalaliases.join(", ")
+				});
+				return output;
 				return output;
 			});
 			return p;
