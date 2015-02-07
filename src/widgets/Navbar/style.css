@@ -2,12 +2,13 @@
 .navbar-kbase {
     border-bottom: 5px solid #E0E0E0 !important;
     padding: 8px;
-    z-index: 1;
+   /* NB the z index needs to be set higher than 2 -- may need further adjustment. Some bootstrap components,
+      like button active state, are set to 2 and otherwise would ride on top */
+    z-index: 3;
     height: 70px;
 }
-.navbar-fixed-top {
-  z-index: 1;
-}
+
+
 
 /* Top bar nav buttons
    --------------------------

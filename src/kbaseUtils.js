@@ -55,6 +55,31 @@ define(['q'],
                object[key] = value;
             }
          },
+         
+         incrProp: {
+            value: function (object, path, value) {
+
+               if (typeof path === 'string') {
+                  path = path.split('.');
+               }
+
+               var key = path.pop();
+
+               for (var i = 0; i < path.length; i++) {
+                  if (object[path] === undefined) {
+                     object[path] = {};
+                  }
+                  object = object[path];
+               }
+               
+               if (object[key] === undefined) {
+                  object[key] = value?value:1;
+               } else {
+                  object[key] += value?value:1;
+               }
+            }
+
+         },
 
          deleteProp: {
             value: function (path, name) {
@@ -270,10 +295,13 @@ define(['q'],
              */
          iso8601ToDate: {
             value: function (dateString) {
+               if (!dateString) {
+                  return null;
+               }
                var isoRE = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)([\+\-])(\d\d)(:?[\:]*)(\d\d)/;
                var dateParts = isoRE.exec(dateString);
                if (!dateParts) {
-                  throw 'Invalid Date Format';
+                  throw 'Invalid Date Format for ' + dateString;
                }
                // This is why we do this -- JS insists on the colon in the tz offset.
                var offset = dateParts[7] + dateParts[8] + ':' + dateParts[10];
@@ -297,8 +325,11 @@ define(['q'],
 
          niceElapsedTime: {
             value: function (dateString) {
+               // console.log('NICE'); console.log(dateString);
                // need to strip off the timezone from the string.
-               var date = this.iso8601ToDate(dateString);
+               // var date = this.iso8601ToDate(dateString);
+               // assumes a JS compatible date string.
+               var date = new Date(dateString);
                var now = new Date();
 
                var shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -411,9 +442,7 @@ define(['q'],
                }
                return l;
             }
-         },
-
-         
+         }
 
 
       });

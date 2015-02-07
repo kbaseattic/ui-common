@@ -5,23 +5,52 @@
 </div>
 
 
-  
+  <div class="row">
+   <div class="col-sm-2">
+      
+   </div>
+   <div class="col-sm-2">
+      
+   </div>
+   <div class="col-sm-2">
+      
+   </div>
+   <div class="col-sm-2">
+      
+   </div>
+
+   <div class="col-sm-4" style="text-align: right">
+      Found 
+       {% if state.narratives|length == 1 %}
+      
+      {{ state.narratives|length }} Narrative
+      
+      {% elif state.narratives|length > 1 %}
+      
+       {{ state.narratives|length }} Narratives
+       
+      {% elif 1 %}
+      
+      no narratives
+      
+      {% endif %}
+   </div>
+</div>
 
 
 {% if state.narratives | length > 0 %}
 
-   <p>Narrative count: {{ state.narratives | length }}</p>
-
+   
    <table class="table" id="dashboard-shared-narratives-widgets-{{env.instanceId}}">
  <thead>
      <tr>
          <th>Title</th>
-         <th>Ver.</th>
+         <th class="number">Ver.</th>
          <th>Owner</th>
          <th>You Can</th>
          <th>Also Shared With</th>
-         <th># objects</th>
-         <th>Last Saved</th> 
+         <th class="number"># objects</th>
+         <th class="date">Last Saved</th> 
      </tr>
  </thead>
 

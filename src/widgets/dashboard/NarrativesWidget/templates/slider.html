@@ -1,0 +1,74 @@
+<div class="collapse" id="{{env.widgetName}}-more-info-{{env.instanceId}}">
+   <div class="well">
+      <p>This panel shows Narratives that you own.</p>
+   </div>
+</div>
+
+
+<div class="slider">
+  
+      <div class="slide">
+          <table><tr><td>
+          <a role="button" class="btn btn-primary xkbtn" href="/functional-site/#/narrativemanager/new" 
+             xstyle="height: 100%; width: 100%" target="_blank">
+           
+            <br><span class="fa fa-plus-circle" style="font-size: 300%; " ></span><br><br>
+              New Narrative
+         </a>
+         </td></tr></table>
+         
+      </div>
+      
+      {% for narrative in state.narratives %}
+      <div class="slide">
+         <table >
+            <tr>
+            <td colspan="2">
+               <div class="title">
+            <a target="_blank" href="/narrative/{{narrative.object.obj_id}}">{{narrative.workspace.metadata.narrative_nice_name}}</a>
+         </div>
+               <div class="sharing">
+                  {% if narrative.permissions|length > 0 %}
+                    {{ narrative.permissions | length }}          
+                 {% else %}
+                    0
+                 {% endif %} <span class="fa fa-share-alt"></span>
+                 {% if narrative.workspace.globalread == 'r' or narrative.workspace.globalread == 'w' %}, public{% endif %}
+                 </div>
+                 <div class="count">        
+                    {{narrative.workspace.object_count - 1}} object{% if narrative.workspace.object_count - 1 > 1 %}s{% endif %}
+                 </div>
+                 <div class="date">
+                    saved {{narrative.object.save_date | jsDatestring | dateFormat }} by {% if narrative.object.saved_by == env.loggedInUser %}you{% else %}<a href="/functional-site/#/people/{{narrative.object.saved_by}}">{{narrative.object.saved_by}}</a>{% endif %}
+                 </div>
+                 <div>
+
+                 </div>
+            </td>
+            </tr>
+            <tr>
+            <td width="50%">
+               {% set jobcount = randomNumber(0, 10) %}
+               {% if jobcount > 0 %}
+               {{jobcount}} jobs <span class="fa fa-gear fa-spin" style="color:green;"></span>
+               {% else %} 
+               no jobs
+               {% endif %}
+            </td>
+            <td width="50%">
+               {{randomNumber(0, 100000) | niceRuntime}} <span class="fa fa-clock-o"></span>
+            </td>
+            </tr>
+         </table>
+        
+
+         
+           
+          
+      </div>
+      {% endfor %}
+      
+   
+</div>
+
+

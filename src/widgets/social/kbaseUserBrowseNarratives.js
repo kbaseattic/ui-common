@@ -91,7 +91,7 @@ function ($, nunjucks, Utils, SocialWidget, WorkspaceService, Session, Q) {
 				// At present we can just use the presence of "narrative_nice_name" metadata attribute 
 				// to flag a compatible workspace.
         //
-        this.promise(this.workspaceClient, 'list_workspace_info', {
+        Utils.promise(this.workspaceClient, 'list_workspace_info', {
 					showDeleted: 0,
 					owners: [this.params.userId]
 				})

@@ -240,14 +240,17 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                
                // Note: we can just get the object history in one call :) -mike
                Utils.promise(this.workspaceClient, 'get_object_history', 
-                  {ref: APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'))}
+                  {ref: APIUtils.makeWorkspaceObjectRef(
+                          this.getState('workspace.id'),
+                          this.getState('object.id'))}
                )
                .then(function (dataList) {
                   
                   var versions = dataList.map(function (x) {
                         return APIUtils.object_info_to_object(x);
                      });
-                  this.setState('versions', versions.sort(function (a,b) {return b.version - a.version}));
+                  this.setState('versions', versions.sort(
+                          function (a,b) {return b.version - a.version}));
                   
                }.bind(this))
                .catch(function (err) {
@@ -260,11 +263,18 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
             }
          },
          
-         
+//         checkRefCountAndFetchReferences: {
+//             value: function () {
+//                 Utils.promise(this.workspaceClient,
+//                         'list_referencing_objects_counts',
+//                         [{ref: }])
+//             }
+//         }
+//         
          fetchReferences: {
             value: function () {
                Utils.promise(this.workspaceClient, 'list_referencing_objects',
-                             [{ref: APIUtils.makeWorkspaceObjectRef(this.getState('workspace.id'), this.getState('object.id'))}]
+                             [{ref: this.getObjectRef()}]
                )
                .then(function (dataList) {
                   var refs = [];
@@ -370,7 +380,6 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                               })
                               .then(function (data) {
                                  this.setState('workspace', APIUtils.workspace_metadata_to_object(data));
-                              
                               
                                  // Okay, the rest doens't really have to be done here ..
                                  
