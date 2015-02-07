@@ -140,11 +140,11 @@
 
             <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                <div class="panel-body">
-                  {% if state.too_many_refs %}
+                  {% if state.too_many_inc_refs %}
                   
                   Sorry, there are too many references to this data to display.
                   
-                  {% elif state.references and state.references|length2 > 0 %}
+                  {% elif state.inc_references and state.inc_references|length2 > 0 %}
                   <div style="max-height:400px;overflow-y: auto;">
                      <table class="table ">
                         <tr>
@@ -153,7 +153,7 @@
                            <th></th>
                         </tr>
                        
-                        {% for ref in state.references %}
+                        {% for ref in state.inc_references %}
                         <tr>
                            <td><a href="/functional-site/#/dataview/{{ref.wsid}}/{{ref.id}}/{{ref.version}}">{{ref.name}}</a></td>
                            <td><a href="#/spec/type/{{ref.type}}" target="_blank">{{ref.typeName}}</a></td>
@@ -172,6 +172,51 @@
                </div>
             </div>
          </div> 
+                   
+         <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingFour">
+               <h4 class="panel-title">
+                  <span data-toggle="collapse" data-parent="#accordion"  data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour" class="collapsed" style="cursor:pointer;">
+                     <span class="fa angle-right"></span>References
+                  </span>
+               </h4>
+            </div>
+
+            <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+               <div class="panel-body">
+                  {% if state.too_many_out_refs %}
+                  
+                  Sorry, there are too many references from this data to display.
+                  
+                  {% elif state.out_references and state.out_references|length2 > 0 %}
+                  <div style="max-height:400px;overflow-y: auto;">
+                     <table class="table ">
+                        <tr>
+                           <th>Name</th>
+                           <th>Type</th>
+                           <th></th>
+                        </tr>
+                       
+                        {% for ref in state.out_references %}
+                        <tr>
+                           <td><a href="/functional-site/#/dataview/{{ref.wsid}}/{{ref.id}}/{{ref.version}}">{{ref.name}}</a></td>
+                           <td><a href="#/spec/type/{{ref.type}}" target="_blank">{{ref.typeName}}</a></td>
+                           <td>Saved on {{ref.save_date|dateFormat}} by <a href="#/people/{{ref.saved_by}}">{{ref.saved_by}}</a></td>
+                        </tr>
+                        {% endfor%}
+                       
+                     </table>
+                  </div>
+                  
+                  {% else %}
+                  
+                  This data object references no other data.
+                  
+                  {% endif %}
+               </div>
+            </div>
+         </div> 
+         
          
       </div>
    </div>

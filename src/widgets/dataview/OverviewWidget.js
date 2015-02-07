@@ -270,9 +270,9 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                          [{ref: this.getObjectRef()}])
                  .then(function(sizes) {
                      if (sizes[0] > 100) {
-                         this.setState('too_many_refs', true);
+                         this.setState('too_many_inc_refs', true);
                      } else {
-                         this.setState('too_many_refs', false);
+                         this.setState('too_many_inc_refs', false);
                          this.fetchReferences();
                      }
                  }.bind(this))
@@ -315,7 +315,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                         refs.push(APIUtils.object_info_to_object(dataList[0][i]));
                      }
                   }
-                  this.setState('references', refs.sort(function (a,b) {return b.name - a.name}));
+                  this.setState('inc_references', refs.sort(function (a,b) {return b.name - a.name}));
                }.bind(this))
                .catch(function (err) {
                   this.setError('client', err);
