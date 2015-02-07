@@ -205,7 +205,7 @@
 		},
 		
 		'KBaseAssembly.AssemblyReport': {
-		    widget:'kbaseJsonView',
+		    widget:'kbaseAssemblyView',
 		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		
@@ -216,9 +216,10 @@
 		/* STILL NEEDS A COMPLEX LANDING PAGE */
 		'KBaseFBA.FBAModel': modelingConfig,
 		
-		'KBaseGeneDomains.DomainAnnotation': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???objname,"ws":???wsname}'
+		'KBaseGeneFamilies.DomainAnnotation': {
+		    widget:'kbaseDomainAnnotation',
+		    options: '{"domainAnnotationID":???objid,"workspaceID":???wsid,"domainAnnotationVer":???ver,'+
+				'"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 		
 		'KBaseGenomes.ContigSet': {
@@ -226,13 +227,12 @@
 		    options: '{"ws_id":???objname,"ws_name":???wsname,"ver":???ver,"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 		'KBaseGenomes.MetagenomeAnnotation': {
-            //AnnotationSetTable - id, ws
-		    widget:'kbaseJsonView',
+		    widget:'AnnotationSetTable',
 		    options: '{"id":???objname,"ws":???wsname}'
 		},
 		'KBaseGenomes.Pangenome': {
-		    widget:'kbaseJsonView',
-		    options: '{"id":???objname,"ws":???wsname}'
+		    widget:'kbasePanGenome',
+		    options: '{"name":???objname,"ws":???wsname}'
 		},
 		
 		'KBasePhenotypes.PhenotypeSet': modelingConfig,
