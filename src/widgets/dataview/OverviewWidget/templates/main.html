@@ -140,7 +140,11 @@
 
             <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                <div class="panel-body">
-                  {% if state.references and state.references|length2 > 0 %}
+                  {% if state.too_many_refs %}
+                  
+                  Sorry, there are too many references to this data to display.
+                  
+                  {% elif state.references and state.references|length2 > 0 %}
                   <div style="max-height:400px;overflow-y: auto;">
                      <table class="table ">
                         <tr>

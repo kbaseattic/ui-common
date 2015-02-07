@@ -263,14 +263,46 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
             }
          },
          
-//         checkRefCountAndFetchReferences: {
-//             value: function () {
-//                 Utils.promise(this.workspaceClient,
-//                         'list_referencing_objects_counts',
-//                         [{ref: }])
-//             }
-//         }
-//         
+         checkRefCountAndFetchReferences: {
+             value: function () {
+                 Utils.promise(this.workspaceClient,
+                         'list_referencing_object_counts',
+                         [{ref: this.getObjectRef()}])
+                 .then(function(sizes) {
+                     if (sizes[0] > 100) {
+                         this.setState('too_many_refs', true);
+                     } else {
+                         this.setState('too_many_refs', false);
+                         this.fetchReferences();
+                     }
+                 }.bind(this))
+                 .catch(function(err) {
+                     this.setError('client', err);
+                 }.bind(this))
+                 .done();
+             }
+         },
+         
+         setError: {
+             value: function(type, error) {
+                 this.setState('status', 'error');
+                 var err = error.error;
+                 console.error(err);
+                 var message;
+                 if (typeof err == "string") {
+                     message = err;
+                 } else {
+                     message = err.message;
+                 }
+                 this.setState('error', {
+                     type: type,
+                     code: 'error',
+                     shortMessage: 'An unexpected error occured',
+                     originalMessage: message
+                 });
+             }
+         },
+         
          fetchReferences: {
             value: function () {
                Utils.promise(this.workspaceClient, 'list_referencing_objects',
@@ -286,9 +318,8 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                   this.setState('references', refs.sort(function (a,b) {return b.name - a.name}));
                }.bind(this))
                .catch(function (err) {
-                  console.log('ERROR'); 
-                  console.log(err);
-               })
+                  this.setError('client', err);
+               }.bind(this))
                .done();
             }
          },
@@ -387,8 +418,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                                  this.fetchVersions();
                                  
                                  // Get the references to this object
-                                 this.fetchReferences();
-                              
+                                 this.checkRefCountAndFetchReferences();
                               
                                  // Other narratives this user has.
                                  Utils.promise(this.workspaceClient, 'list_workspace_info', {
