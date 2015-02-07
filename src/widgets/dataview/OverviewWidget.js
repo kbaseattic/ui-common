@@ -263,6 +263,64 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
             }
          },
          
+         checkRefCountAndFetchOutgoingReferences: {
+             value: function () {
+                 Utils.promise(this.workspaceClient,
+                         'get_object_provenance', [{ref: this.getObjectRef()}])
+                 .then(function(provdata) {
+                     var refs = provdata[0].refs;
+                     var prov = provdata[0].provenance;
+                     for (var i = 0; i < prov.length; i++) {
+                         refs = refs.concat(prov[i].resolved_ws_objects);
+                     }
+                     if (refs.length > 100) {
+                         this.setState('too_many_out_refs', true);
+                     } else {
+                         this.setState('too_many_out_refs', false);
+                         this.fetchOutgoingReferences(refs);
+                     }
+                 }.bind(this))
+                 .catch(function(err) {
+                     this.setError('client', err);
+                 }.bind(this))
+                 .done();
+             }
+         },
+         
+         fetchOutgoingReferences: {
+             value: function(reflist) {
+                 //really need a ws method to get referenced object info
+                 //do to this correctly. For now, just dump the reference
+                 //if it's not visible
+                 if (reflist.length < 1) {
+                     return;
+                 }
+                 var objids = []
+                 for (var i = 0; i < reflist.length; i++) {
+                     objids.push({ref: reflist[i]});
+                 }
+                 Utils.promise(this.workspaceClient, 'get_object_info_new',
+                         {objects: objids, ignoreErrors: 1})
+                 .then(function (dataList) {
+                     var refs = [];
+                     if (dataList) {
+                         for(var i = 0; i < dataList.length; i++) {
+                             if (dataList[i]) { // null if not visible
+                                 refs.push(APIUtils.object_info_to_object(
+                                         dataList[i]));
+                             }
+                         }
+                     }
+                     this.setState('out_references', refs.sort(
+                             function (a,b) {return b.name - a.name}));
+                 }.bind(this))
+                 .catch(function (err) {
+                     this.setError('client', err);
+                 }.bind(this))
+                 .done();
+             }
+         },
+         
          checkRefCountAndFetchReferences: {
              value: function () {
                  Utils.promise(this.workspaceClient,
@@ -419,6 +477,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                                  
                                  // Get the references to this object
                                  this.checkRefCountAndFetchReferences();
+                                 this.checkRefCountAndFetchOutgoingReferences();
                               
                                  // Other narratives this user has.
                                  Utils.promise(this.workspaceClient, 'list_workspace_info', {
