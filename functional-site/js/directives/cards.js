@@ -420,7 +420,7 @@ angular.module('card-directives')
                                 '<div class="panel-body"></div>'+
                            '</div>').css({'margin':'10px'});;
 		$(ele).append($panel);
-		$panel.find('.panel-title').append('Data Provenance and Reference Graph');
+		$panel.find('.panel-title').append('Data Provenance and Reference Network');
 		$panel.find('.panel-body').KBaseWSObjGraphCenteredView({
 		    objNameOrId: scope.params.id,
 		    wsNameOrId: scope.params.ws,

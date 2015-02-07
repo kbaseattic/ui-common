@@ -39,7 +39,7 @@ angular.module('dataview')
                             '<div class="panel-heading" role="tab" id="provHeading">'+
                                '<h4 class="panel-title">'+
                                   '<span data-toggle="collapse" data-parent="#provAccordion"  data-target="#provCollapse" aria-expanded="false" aria-controls="provCollapse" class="collapsed" style="cursor:pointer;">'+
-                                     '<span class="fa fa-sitemap fa-rotate-90 pull-left"></span> Data Provenance and Reference Graph'+
+                                     '<span class="fa fa-sitemap fa-rotate-90 pull-left"></span> Data Provenance and Reference Network'+
                                   '</span>'+
                                '</h4>'+
                             '</div>'+

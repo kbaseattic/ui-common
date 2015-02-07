@@ -252,7 +252,7 @@
 		}
 	    };
 	    
-	    var list = ''; var list2=''
+	    /*var list = ''; var list2=''
 	    for(var x in self.type2widget) {
 		if (self.type2widget.hasOwnProperty(x)) {
 		    list = list + x+'\n';
@@ -260,7 +260,7 @@
 		}
 	    }
 	    console.log(list);
-	    console.log(list2);
+	    console.log(list2);*/
 	    
 	},
 	

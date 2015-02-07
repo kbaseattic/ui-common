@@ -239,7 +239,7 @@
 					var info = d['info'];
 					var savedate = new Date(info[3]);
 					var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
-					text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
+					text += '<h4>Data Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
 					text+= '<tr><td><b>Name</b></td><td>'+ info[1]+ ' (<a href="#/dataview/'+info[6]+"/"+info[1]+"/"+info[4] +'" target="_blank">'+info[6]+"/"+info[0]+"/"+info[4]+"</a>)</td></tr>";
 					text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
 					text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
@@ -275,7 +275,7 @@
 					var info = d['info']; 
 					var savedate = new Date(info[3]);
 					var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
-					text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
+					text += '<h4>Data Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
 					text+= '<tr><td><b>Name</b></td><td>'+ info[1]+ '(<a href="#/dataview/'+info[6]+"/"+info[1]+"/"+info[4] +'" target="_blank">'+info[6]+"/"+info[0]+"/"+info[4]+"</a>)</td></tr>";
 					text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
 					text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
@@ -316,7 +316,6 @@
 				      info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")\n"+
 				      "--------------\n"+
 				      "  type:  "+info[2]+"\n"+
-				      "  workspace:  "+info[7]+"\n"+
 				      "  saved on:  "+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"\n"+
 				      "  saved by:  "+info[5]+"\n";
 			      var found = false; var metadata = "  metadata:\n";
@@ -410,15 +409,15 @@
 	
 	getTableRow: function(rowTitle, rowContent) {
 	    var title = null;
-	    if (rowContent.length>35) {
+	    if (rowContent.length>500) {
 		title = rowContent;
-		rowContent = rowContent.substr(0,35) +" ...";
+		rowContent = rowContent.substr(0,500) +" ...";
 	    }
 	    if (title) {
 		title = title.replace(/"/g, '&quot;');
-		return "<tr><td><b>"+rowTitle+'</b></td><td><span title="'+title+'">'+rowContent+"</span></td></tr>";
+		return "<tr><td><b>"+rowTitle+'</b></td><td style="width:250px;"><span title="'+title+'" style="width:250px;word-wrap: break-word;">'+rowContent+"</span></td></tr>";
 	    }
-	    return "<tr><td><b>"+rowTitle+"</b></td><td>"+rowContent+"</td></tr>";
+	    return "<tr><td><b>"+rowTitle+'</b></td><td><div style="width:250px;word-wrap: break-word;">'+rowContent+"</div></td></tr>";
 	},
 	
 	getNodeLabel: function(info) {
@@ -683,7 +682,7 @@
 	
         
         getData: function() {
-            return {title:"Data Object Reference Graph", workspace:this.wsNameOrId, id:"This view shows the data reference connections to object "+this.options.objNameOrId};
+            return {title:"Data Object Reference Network", workspace:this.wsNameOrId, id:"This view shows the data reference connections to object "+this.options.objNameOrId};
         },
         
         
