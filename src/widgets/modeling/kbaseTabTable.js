@@ -309,15 +309,12 @@ $.KBWidget({
         function ref(key, type, format, method, action) {
             return function(d) {
                         if (type == 'tabLink' && format == 'dispIDCompart') {
-                            var id = d[key].split('_')[0];
-                            var compart = d[key].split('_')[1];
-
-                            if (id.search(/rxn\d+/g) != -1 || id.search(/cpd\d+/g) != -1)
-                                return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
-                                             id+'</a> ('+compart+')';
-                            else
-                                return id+' ('+compart+')';
-
+                            var dispid = d[key];
+                            if ("dispid" in d) {
+                            	dispid = d.dispid;
+                            }
+                            return '<a class="id-click" data-id="'+d[key]+'" data-method="'+method+'">'+
+                                             dispid+'</a>';
                         } else if (type == 'tabLink' && format == 'dispID') {
                             var id = d[key];
                             return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
@@ -353,10 +350,12 @@ $.KBWidget({
 
         function tabLinkArray(a, method) {
             var links = [];
-            a.forEach(function(id) {
-                links.push('<a class="id-click" data-id="'+id+
-                            '" data-method="'+method+'">'+
-                            id+'</a>');
+            a.forEach(function(d) {
+            	var dispid = d.id;
+				if ("dispid" in d) {
+					dispid = d.dispid;
+				}
+				links.push('<a class="id-click" data-id="'+d.id+'" data-method="'+method+'">'+dispid+'</a>');
             })
             return links.join(', ');
         }
@@ -383,10 +382,14 @@ $.KBWidget({
                 // if the data is in the row definition, use it
                 if ('data' in row) {
                     var value;
-                    if (type == 'tabLinkArray')
+                    if (type == 'tabLinkArray') {
                         value = tabLinkArray(row.data, row.method);
-                    else
+                    } else if (type == 'tabLink') {
+                        value = '<a class="id-click" data-id="'+row.data+'" data-method="'+row.method+'">'+
+                        row.dispid+'</a>';
+                    } else {
                         value = row.data;
+                    }
                     r.append('<td>'+value+'</td>');
                 } else if ('key' in row) {
                     if (row.type == 'wstype') {
@@ -412,6 +415,7 @@ $.KBWidget({
 
 
         this.getBiochemReaction = function(id) {
+        	var input = {reactions: [id]};
             return self.kbapi('fba', 'get_reactions', {reactions: [id]})
                        .then(function(data) {
                           return data[0];
