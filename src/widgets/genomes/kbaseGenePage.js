@@ -39,27 +39,20 @@
             var panel3 = self.makePleaseWaitPanel();
             self.makeDecoration(cell3, 'Sequence', panel3);
             ///////////////////////////////////////////////////////////////////////////////
-            var cell4 = $('<div panel panel-default">');
-            self.$elem.append(cell4);
-            var panel4 = self.makePleaseWaitPanel();
-            //self.makeDecoration(cell4, 'Taxonomy', panel4);
-            ///////////////////////////////////////////////////////////////////////////////
-            var cell5 = $('<div panel panel-default">');
-            self.$elem.append(cell5);
-            var panel5 = self.makePleaseWaitPanel();
-            //self.makeDecoration(cell5, 'Assembly and Annotation', panel5);
 
             var objId = scope.ws + "/" + scope.gid;
-            var includedNoFeat = ["/complete","/contig_ids","/contig_lengths","contigset_ref","/dna_size",
+            var included = ["/complete","/contig_ids","/contig_lengths","contigset_ref","/dna_size",
                                   "/domain","/gc_content","/genetic_code","/id","/md5","num_contigs",
-                                  "/scientific_name","/source","/source_id","/tax_id","/taxonomy"];
+                                  "/scientific_name","/source","/source_id","/tax_id","/taxonomy",
+                                  "/features/[*]/id"];
 
             var ready = function(genomeInfo) {
             	panel1.empty();
             	try {
             	    panel1.KBaseGeneInstanceInfo(
                             {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, 
-                                kbCache: kb, hideButtons:true, loadingImage: "assets/img/ajax-loader.gif"});
+                                kbCache: kb, hideButtons:true, loadingImage: "assets/img/ajax-loader.gif",
+                                genomeInfo: genomeInfo});
             	} catch (e) {
             	    console.error(e);
             	    self.showError(panel1, e.message);
@@ -71,7 +64,7 @@
                 try {
                     panel2.KBaseGeneBiochemistry(
                             {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
-                                loadingImage: "assets/img/ajax-loader.gif"});
+                                loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
                 } catch (e) {
                     console.error(e);
                     self.showError(panel2, e.message);
@@ -79,12 +72,39 @@
             	panel3.empty();
         	    panel3.KBaseGeneSequence(
         	            {featureID: scope.fid, genomeID: scope.gid, workspaceID: scope.ws, kbCache: kb,
-                            loadingImage: "assets/img/ajax-loader.gif"});
+                            loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
             };
             
-            kb.ws.get_object_subset( [ {ref:objId, included:includedNoFeat} ], function(data) {
+            kb.ws.get_object_subset( [ {ref:objId, included:included} ], function(data) {
             	var genomeInfo = data[0];
-            	ready(genomeInfo);
+            	var featureIdx = null;
+            	for (var pos in genomeInfo.data.features) {
+            	    var featureId = genomeInfo.data.features[pos].id;
+            	    if (featureId && featureId === scope.fid) {
+            	        featureIdx = pos;
+            	        break;
+            	    }
+            	}
+            	if (featureIdx) {
+                    kb.ws.get_object_subset( [ {ref:objId, included:["/features/"+featureIdx]} ], function(data) {
+                        var fInfo = data[0].data;
+                        genomeInfo.data.features[featureIdx] = fInfo.features[0];
+                        ready(genomeInfo);
+                    },
+                    function(error) {
+                        console.error("Error loading genome subdata");
+                        console.error(error);
+                        panel1.empty();
+                        self.showError(panel1, error);
+                        cell2.empty();
+                        cell3.empty();
+                    });
+            	} else {
+                    panel1.empty();
+                    self.showError(panel1, "Feature " + scope.fid + " is not found in genome");
+                    cell2.empty();
+                    cell3.empty();
+            	}
             },
             function(error) {
             	console.error("Error loading genome subdata");
@@ -93,8 +113,6 @@
                 self.showError(panel1, error);
                 cell2.empty();
                 cell3.empty();
-                cell4.empty();
-                cell5.empty();
             });
         },
 
