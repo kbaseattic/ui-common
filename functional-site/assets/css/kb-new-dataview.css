@@ -1080,26 +1080,28 @@ button.kb-method-run:hover {
   -moz-osx-font-smoothing: grayscale;
 }
 
+
 /* NOTE: i really don't want to adjust font sizes, but for now these icons are only in one place on
  * the landing page and need to look right. By default, they are too small, and bumping them up to
  * larger makes them look different in firefox vs chrome; so yet another temporary hack -- mike*/
+
 .icon-compare:before {
   content: "a";
   font-size: 24pt;
 }
-.icon-contigs:before {
+.icon-genome:before {
   content: "b";
   font-size: 24pt;
 }
-.icon-genome:before {
+.icon-metabolism:before {
   content: "c";
   font-size: 24pt;
 }
-.icon-metabolism:before {
+.icon-metagenome:before {
   content: "d";
   font-size: 24pt;
 }
-.icon-metagenome:before {
+.icon-reads:before {
   content: "e";
   font-size: 24pt;
 }
