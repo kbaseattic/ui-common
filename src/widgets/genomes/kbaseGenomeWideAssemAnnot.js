@@ -7,9 +7,11 @@
         options: {
             genomeID: null,
             workspaceID: null,
+            ver: null,
             loadingImage: "assets/img/ajax-loader.gif",
             kbCache: null,
-            genomeInfo: null
+            genomeInfo: null,
+            contigSetInfo: null
         },
 
         init: function(options) {
@@ -25,7 +27,7 @@
             var contigbrowser = $('<div class="col-md-12">');
             row0.append(contigbrowser);
             contigbrowser.KBaseMultiContigBrowser({genomeID: self.options.genomeID, 
-            	workspaceID: self.options.workspaceID, kbCache: self.options.kbCache,
+            	workspaceID: self.options.workspaceID, ver: self.options.ver, kbCache: self.options.kbCache,
                 loadingImage: self.options.loadingImage, genomeInfo: self.options.genomeInfo});
             var row1 = $('<div class="row">');
             self.$elem.append(row1);
@@ -37,7 +39,7 @@
             	wsNameOrId: self.options.workspaceID, objVer: null, kbCache: self.options.kbCache,
                 loadingImage: self.options.loadingImage, genomeInfo: self.options.genomeInfo});
             genetable.KBaseGenomeGeneTable({genome_id: self.options.genomeID, 
-            	ws_name: self.options.workspaceID, kbCache: self.options.kbCache,
+            	ws_name: self.options.workspaceID, ver: self.options.ver, kbCache: self.options.kbCache,
                 loadingImage: self.options.loadingImage, genomeInfo: self.options.genomeInfo});
         },
 

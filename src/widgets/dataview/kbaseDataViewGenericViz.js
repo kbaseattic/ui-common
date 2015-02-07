@@ -223,7 +223,7 @@
 		
 		'KBaseGenomes.ContigSet': {
 		    widget:'kbaseContigSetView',
-		    options: '{"ws_id":???objname,"ws_name":???wsname,"loadingImage":"'+this.options.loadingImage+'"}'
+		    options: '{"ws_id":???objname,"ws_name":???wsname,"ver":???ver,"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 		'KBaseGenomes.MetagenomeAnnotation': {
             //AnnotationSetTable - id, ws

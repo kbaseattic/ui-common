@@ -7,6 +7,7 @@
         options: {
             genomeID: null,
             workspaceID: null,
+            ver: null,
             loadingImage: "assets/img/ajax-loader.gif"
         },
 
@@ -20,7 +21,7 @@
 
         render: function() {
             var self = this;
-            var scope = {ws: this.options.workspaceID, id: this.options.genomeID};
+            var scope = {ws: this.options.workspaceID, id: this.options.genomeID, ver: this.options.ver};
             ///////////////////////////////////////////////////////////////////////////////
             var cell1 = $('<div panel panel-default">');
             self.$elem.append(cell1);
@@ -48,6 +49,8 @@
             self.makeDecoration(cell5, 'Assembly and Annotation', panel5);
 
             var objId = scope.ws + "/" + scope.id;
+            if (self.options.ver)
+                objId += "/" + self.options.ver;
             var includedNoFeat = ["/complete","/contig_ids","/contig_lengths","contigset_ref","/dna_size",
                                   "/domain","/gc_content","/genetic_code","/id","/md5","num_contigs",
                                   "/scientific_name","/source","/source_id","/tax_id","/taxonomy"];
@@ -93,13 +96,39 @@
                              "/features/[*]/protein_translation_length","/features/[*]/type"]);
                     kb.ws.get_object_subset( [ {ref:objId, included:includedWithFeat} ], function(data) {
                         var genomeInfo = data[0];
-                        panel5.empty();
-                        try {
-                            panel5.KBaseGenomeWideAssemAnnot({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
-                                loadingImage: "assets/img/ajax-loader.gif", genomeInfo: genomeInfo});
-                        } catch (e) {
-                            console.error(e);
-                            self.showError(panel5, e.message);
+                        var ready = function() {
+                            panel5.empty();
+                            try {
+                                panel5.KBaseGenomeWideAssemAnnot({genomeID: scope.id, workspaceID: scope.ws, kbCache: kb,
+                                    loadingImage: "assets/img/ajax-loader.gif", ver: scope.ver, genomeInfo: genomeInfo});
+                            } catch (e) {
+                                console.error(e);
+                                self.showError(panel5, e.message);
+                            }
+                        };
+                        var gnm = genomeInfo.data;
+                        if (gnm.contig_ids && gnm.contig_lengths && gnm.contig_ids.length == gnm.contig_lengths.length) {
+                            ready();
+                        } else {
+                            var contigSetRef = gnm.contigset_ref;
+                            kb.ws.get_object_subset([{ref: contigSetRef, included: ['contigs/[*]/id', 'contigs/[*]/length']}], function(data2) {
+                                var ctg = data2[0].data;
+                                gnm.contig_ids = [];
+                                gnm.contig_lengths = [];
+                                for (var pos in ctg.contigs) {
+                                    var contigId = ctg.contigs[pos].id;
+                                    gnm.contig_ids.push(contigId);
+                                    var contigLen = ctg.contigs[pos].length;
+                                    gnm.contig_lengths.push(contigLen);
+                                }
+                                ready();
+                            },
+                            function(error) {
+                                console.error("Error loading contigset subdata");
+                                console.error(error);
+                                panel5.empty();
+                                self.showError(panel5, error);
+                            });                            
                         }
                     },
                     function(error) {

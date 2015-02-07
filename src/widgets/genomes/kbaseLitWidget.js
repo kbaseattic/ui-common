@@ -12,6 +12,7 @@
             isInCard: false,
 			width: 600,
 			height: 700,
+			maxPubCount: 50
         },
 
 		init: function(options) {
@@ -111,7 +112,7 @@
 				loader.show()
 				$.ajax({
 					async: true,
-					url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=500&sort=pub+date&term='+lit.replace(/\s+/g, "+"),
+					url: 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax='+self.options.maxPubCount+'&sort=pub+date&term='+lit.replace(/\s+/g, "+"),
 					type: 'GET',
 					success: 
 					function(data) {
