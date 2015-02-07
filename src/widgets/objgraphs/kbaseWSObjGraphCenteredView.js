@@ -239,18 +239,18 @@
 					var info = d['info'];
 					var savedate = new Date(info[3]);
 					var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
-					text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
+					text += '<h4>Data Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
 					text+= '<tr><td><b>Name</b></td><td>'+ info[1]+ ' (<a href="#/dataview/'+info[6]+"/"+info[1]+"/"+info[4] +'" target="_blank">'+info[6]+"/"+info[0]+"/"+info[4]+"</a>)</td></tr>";
 					text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
 					text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
 					text+= '<tr><td><b>Saved by</b></td><td><a href="#/people/'+info[5] +'" target="_blank">'+info[5]+"</td></tr>";
-					var found = false; var metadata = "<tr><td><b>Meta data</b></td><td>";
+					var found = false; var metadata = '<tr><td><b>Meta data</b></td><td><div style="width:250px;word-wrap: break-word;">';
 					for( var m in info[10]) {
 					    found = true;
 					    metadata += "<b>"+m+"</b> : "+info[10][m]+"<br>"
 					}
-					if (found) { text += metadata +"</td></tr>"; }
-					text += "</td></tr></table></td><td>";
+					if (found) { text += metadata +"</div></td></tr>"; }
+					text += "</div></td></tr></table></td><td>";
 					text+= '<h4>Provenance</h4><table cellpadding="2" cellspacing="0" class="table table-bordered table-striped">'
 					if (objdata.length>0) {
 					    if (objdata[0]['provenance'].length>0) {
@@ -275,18 +275,18 @@
 					var info = d['info']; 
 					var savedate = new Date(info[3]);
 					var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
-					text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
+					text += '<h4>Data Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
 					text+= '<tr><td><b>Name</b></td><td>'+ info[1]+ '(<a href="#/dataview/'+info[6]+"/"+info[1]+"/"+info[4] +'" target="_blank">'+info[6]+"/"+info[0]+"/"+info[4]+"</a>)</td></tr>";
 					text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
 					text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
 					text+= '<tr><td><b>Saved by</b></td><td><a href="#/people/'+info[5] +'" target="_blank">'+info[5]+"</td></tr>";
-					var found = false; var metadata = "<tr><td><b>Meta data</b></td><td>";
+					var found = false; var metadata = '<tr><td><b>Meta data</b></td><td><div style="width:250px;word-wrap: break-word;">';
 					for( var m in info[10]) {
 					    found = true;
 					    metadata += "<b>"+m+"</b> : "+info[10][m]+"<br>"
 					}
-					if (found) { text += metadata +"</td></tr>"; }
-					text += "</td></tr></table></td><td>";
+					if (found) { text += metadata +"</div></td></tr>"; }
+					text += "</div></td></tr></table></td><td>";
 					text+= '<h4>Provenance</h4><table cellpadding="2" cellspacing="0" class="table table-bordered table-striped">'
 					text+= "error in fetching provenance";
 					text+='</table>';
@@ -316,7 +316,6 @@
 				      info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")\n"+
 				      "--------------\n"+
 				      "  type:  "+info[2]+"\n"+
-				      "  workspace:  "+info[7]+"\n"+
 				      "  saved on:  "+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"\n"+
 				      "  saved by:  "+info[5]+"\n";
 			      var found = false; var metadata = "  metadata:\n";
@@ -410,15 +409,15 @@
 	
 	getTableRow: function(rowTitle, rowContent) {
 	    var title = null;
-	    if (rowContent.length>35) {
+	    if (rowContent.length>500) {
 		title = rowContent;
-		rowContent = rowContent.substr(0,35) +" ...";
+		rowContent = rowContent.substr(0,500) +" ...";
 	    }
 	    if (title) {
 		title = title.replace(/"/g, '&quot;');
-		return "<tr><td><b>"+rowTitle+'</b></td><td><span title="'+title+'">'+rowContent+"</span></td></tr>";
+		return "<tr><td><b>"+rowTitle+'</b></td><td style="width:250px;"><span title="'+title+'" style="width:250px;word-wrap: break-word;">'+rowContent+"</span></td></tr>";
 	    }
-	    return "<tr><td><b>"+rowTitle+"</b></td><td>"+rowContent+"</td></tr>";
+	    return "<tr><td><b>"+rowTitle+'</b></td><td><div style="width:250px;word-wrap: break-word;">'+rowContent+"</div></td></tr>";
 	},
 	
 	getNodeLabel: function(info) {
@@ -683,7 +682,7 @@
 	
         
         getData: function() {
-            return {title:"Data Object Reference Graph", workspace:this.wsNameOrId, id:"This view shows the data reference connections to object "+this.options.objNameOrId};
+            return {title:"Data Object Reference Network", workspace:this.wsNameOrId, id:"This view shows the data reference connections to object "+this.options.objNameOrId};
         },
         
         

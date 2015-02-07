@@ -223,7 +223,7 @@
 		
 		'KBaseGenomes.ContigSet': {
 		    widget:'kbaseContigSetView',
-		    options: '{"ws_id":???objname,"ws_name":???wsname,"loadingImage":"'+this.options.loadingImage+'"}'
+		    options: '{"ws_id":???objname,"ws_name":???wsname,"ver":???ver,"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 		'KBaseGenomes.MetagenomeAnnotation': {
             //AnnotationSetTable - id, ws
@@ -249,8 +249,19 @@
 		    widget:'KBaseGenomePage',
 		    noPanel:true,
 		    options: '{"genomeID":???objname,"workspaceID":???wsname,"loadingImage":"'+this.options.loadingImage+'"}'
-		},
+		}
 	    };
+	    
+	    /*var list = ''; var list2=''
+	    for(var x in self.type2widget) {
+		if (self.type2widget.hasOwnProperty(x)) {
+		    list = list + x+'\n';
+		    list2 = list2 + self.type2widget[x].widget+"\n";
+		}
+	    }
+	    console.log(list);
+	    console.log(list2);*/
+	    
 	},
 	
 	

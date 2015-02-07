@@ -10,6 +10,7 @@
         options: {
             genome_id: null,
             ws_name: null,
+            ver: null,
             kbCache: null,
             loadingImage: "assets/img/ajax-loader.gif",
             genomeInfo: null
@@ -38,7 +39,7 @@
 
             var self = this;
             
-            var showData = function(gnm) {
+            var showData = function(gnm, cfg) {
             	function showGenes() {
             		container.empty();
             		////////////////////////////// Genes Tab //////////////////////////////

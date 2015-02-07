@@ -19,8 +19,9 @@
             genomeID: null,
             workspaceID: null,
             kbCache: null,
-	    width:950,
-	    seq_cell_height:208
+            width:950,
+            seq_cell_height:208,
+            genomeInfo: null
         },
 
         cdmiURL: "https://kbase.us/services/cdmi_api",
@@ -60,165 +61,171 @@
 
 	makeRow: function(name, value, color) {
 		var $row = $("<tr>")
-                       .append($("<th>").append(name))
-		    .append("<td>").append($("<div style='max-height:"+this.options.seq_cell_height+"px; overflow:scroll; font-family:monospace; background-color:"+color+"; border:1px solid transparent'>").append(value));
-		//.append("<td style='max-height: 100px; overflow:scroll; font-family: monospace'>").append($("<div style='max-height:100px; overflow:scroll; font-family: monospace'>").append(value));
+		    .append($("<th>").append(name))
+		    .append($("<td>").append($("<div style='max-height:"+this.options.seq_cell_height+"px; overflow:scroll; font-family:monospace; background-color:"+color+"; border:1px solid transparent'>").append(value)));
+		    //.append("<td style='max-height: 100px; overflow:scroll; font-family: monospace'>").append($("<div style='max-height:100px; overflow:scroll; font-family: monospace'>").append(value));
             return $row;
         },
 
         renderWorkspace: function() {
+            var self = this;
             this.showMessage("<img src='" + this.options.loadingImage + "'>");
             this.$infoPanel.hide();
 
-            if (!this.options.kbCache) {
-                if (kb)
-                    this.options.kbCache = kb;
-                else
-                    console.debug("No cache service found. D'oh!");
+            if (this.options.genomeInfo) {
+                self.ready(this.options.genomeInfo);
+            } else {
+                if (!this.options.kbCache) {
+                    if (kb)
+                        this.options.kbCache = kb;
+                    else
+                        console.debug("No cache service found. D'oh!");
+                }
+                var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
+
+                var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+                // on ws error
+                $.when(prom).fail($.proxy(function(error) {
+                    this.renderError(error);
+                }, this));
+                // on cache success
+                $.when(prom).done($.proxy(function(genome) {
+                    genome = genome[0];
+                    self.ready(genome);
+                }, this));
             }
-            var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
-
-            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-            // on ws error
-            $.when(prom).fail($.proxy(function(error) {
-                this.renderError(error);
-            }, this));
-            // on cache success
-            $.when(prom).done($.proxy(function(genome) {
-                genome = genome[0];
-                if (genome.data.features) {
-                    var feature = null;
-                    for (var i=0; i<genome.data.features.length; i++) {
-                        if (genome.data.features[i].id === this.options.featureID) {
-                            feature = genome.data.features[i];
-                            break;
-                        }
-                    }
-
-		    // Gene sequence
-		    //
-                    var dnaSequenceStr = "No gene sequence found.";
-                    if (feature.dna_sequence) { // get dna_sequence from object
-                        dnaSequenceStr = feature.dna_sequence;
-			// wrap seq
-			var seq_width = 50;
-			if (dnaSequenceStr.length > seq_width) {
-			    var dnaDispStr = "";
-			    var start_pos = 0;
-			    var end_pos = 0;
-			    for (var i=0; (i+1)*seq_width-1 < dnaSequenceStr.length; i++) {
-				start_pos = i*seq_width;
-				end_pos = (i+1)*seq_width - 1;
-				dnaDispStr += dnaSequenceStr.substring(start_pos,end_pos) + '<br>';
-			    }
-			    start_pos += seq_width;
-			    end_pos = dnaSequenceStr.length - 1;
-			    if (start_pos < dnaSequenceStr.length) {
-				dnaDispStr += dnaSequenceStr.substring(start_pos,end_pos) + '<br>';
-			    }
-			    dnaSequenceStr = dnaDispStr;
-			}
-
-			//this.$infoTable.append(this.makeRow("Gene", dnaSequenceStr));
-			this.$infoTable.append(
-					       this.makeRow("Gene", dnaSequenceStr, 'white')
-					       //.each(function(){$(this).css('font-family','monospace')})
-					       );
-
-                    }
-		    else {   // HACK!!! use central store (temporary solution?)
-			var self = this;
-			self.cdmiClient.fids_to_dna_sequences
-			    (
-			     [self.options.featureID],
-			     function(dna_sequences) {
-				 if (dna_sequences[self.options.featureID]) {
-				     dnaSequenceStr = dna_sequences[self.options.featureID];
-				 }
-				 // wrap seq
-				 var seq_width = 50;
-				 if (dnaSequenceStr.length > seq_width) {
-				     var dnaDispStr = "";
-				     var start_pos = 0;
-				     var end_pos = 0;
-				     for (var i=0; (i+1)*seq_width-1 < dnaSequenceStr.length; i++) {
-					 start_pos = i*seq_width;
-					 end_pos = (i+1)*seq_width - 1;
-					 dnaDispStr += dnaSequenceStr.substring(start_pos,end_pos) + '<br>';
-				     }
-				     start_pos += seq_width;
-				     end_pos = dnaSequenceStr.length - 1;
-				     if (start_pos < dnaSequenceStr.length) {
-					 dnaDispStr += dnaSequenceStr.substring(start_pos,end_pos) + '<br>';
-				     }
-				     dnaSequenceStr = dnaDispStr;
-				 }
-
-				 //self.$infoTable.append(self.makeRow("Gene", dnaSequenceStr));
-				 self.$infoTable.append(
-							self.makeRow("Gene", dnaSequenceStr, 'white')
-					   //.each(function(){$(this).css('font-family','monospace')})
-					   );
-
-				 //self.hideMessage();
-				 //self.$infoPanel.show();
-			     },
-			     
-			     self.renderError
-			 );
-		    }
-		    // end gene sequence
-
-
-		    // Protein sequence (for peg) (do first for bottom-up table build?)
-		    //
-                    var proteinTranslationStr = "No protein sequence found.";
-                    if (feature.protein_translation) {
-			proteinTranslationStr = feature.protein_translation;
-			// wrap seq
-			var seq_width = 50;
-			if (proteinTranslationStr.length > seq_width) {
-			    var protDispStr = "";
-			    var start_pos = 0;
-			    var end_pos = 0;
-			    for (var i=0; (i+1)*seq_width-1 < proteinTranslationStr.length; i++) {
-				start_pos = i*seq_width;
-				end_pos = (i+1)*seq_width - 1;
-				protDispStr += proteinTranslationStr.substring(start_pos,end_pos) + '<br>';
-			    }
-			    start_pos += seq_width;
-			    end_pos = proteinTranslationStr.length - 1;
-			    if (start_pos < proteinTranslationStr.length) {
-				protDispStr += proteinTranslationStr.substring(start_pos,end_pos) + '<br>';
-			    }
-			    proteinTranslationStr = protDispStr;
-			}
-                    }
-		    this.$infoTable.append(
-					   this.makeRow("Protein", proteinTranslationStr, '#f9f9f9')
-					   //.each(function(){$(this).css('font-family','monospace')})
-					   );
-
-                    // SOMETHING SIMILAR, BUT NOT RIGHT this.$infoTable.append(this.makeRow("Protein", proteinTranslationStr).find("td")[1].style="font-family:Courier");
-					   
-		    // end protein sequence
-
-                }
-                else {
-                    this.renderError({ error: "No genetic features found in the genome with object id: " + 
-                                              this.options.workspaceID + "/" + 
-                                              this.options.genomeID });
-                }
-
-                this.hideMessage();
-                this.$infoPanel.show();
-            }, this));
-
-
-
-
         },
 
+        ready: function(genome) {
+            var self = this;
+            if (genome.data.features) {
+                var feature = null;
+                for (var i=0; i<genome.data.features.length; i++) {
+                    if (genome.data.features[i].id === this.options.featureID) {
+                        feature = genome.data.features[i];
+                        break;
+                    }
+                }
+
+                // Gene sequence
+                //
+                var dnaSequenceStr = "No gene sequence found.";
+                if (feature.dna_sequence) { // get dna_sequence from object
+                    dnaSequenceStr = feature.dna_sequence;
+                    // wrap seq
+                    var seq_width = 50;
+                    if (dnaSequenceStr.length > seq_width) {
+                        var dnaDispStr = "";
+                        var start_pos = 0;
+                        var end_pos = 0;
+                        for (var i=0; (i+1)*seq_width-1 < dnaSequenceStr.length; i++) {
+                            start_pos = i*seq_width;
+                            end_pos = (i+1)*seq_width - 1;
+                            dnaDispStr += dnaSequenceStr.substring(start_pos,end_pos) + '<br>';
+                        }
+                        start_pos += seq_width;
+                        end_pos = dnaSequenceStr.length - 1;
+                        if (start_pos < dnaSequenceStr.length) {
+                            dnaDispStr += dnaSequenceStr.substring(start_pos,end_pos) + '<br>';
+                        }
+                        dnaSequenceStr = dnaDispStr;
+                    }
+
+                    //this.$infoTable.append(this.makeRow("Gene", dnaSequenceStr));
+                    this.$infoTable.append(
+                            this.makeRow("Gene", dnaSequenceStr, 'white')
+                            //.each(function(){$(this).css('font-family','monospace')})
+                    );
+
+                }
+                else {   // HACK!!! use central store (temporary solution?)
+                    var self = this;
+                    self.cdmiClient.fids_to_dna_sequences
+                    (
+                            [self.options.featureID],
+                            function(dna_sequences) {
+                                if (dna_sequences[self.options.featureID]) {
+                                    dnaSequenceStr = dna_sequences[self.options.featureID];
+                                }
+                                // wrap seq
+                                var seq_width = 50;
+                                if (dnaSequenceStr.length > seq_width) {
+                                    var dnaDispStr = "";
+                                    var start_pos = 0;
+                                    var end_pos = 0;
+                                    for (var i=0; (i+1)*seq_width-1 < dnaSequenceStr.length; i++) {
+                                        start_pos = i*seq_width;
+                                        end_pos = (i+1)*seq_width - 1;
+                                        dnaDispStr += dnaSequenceStr.substring(start_pos,end_pos) + '<br>';
+                                    }
+                                    start_pos += seq_width;
+                                    end_pos = dnaSequenceStr.length - 1;
+                                    if (start_pos < dnaSequenceStr.length) {
+                                        dnaDispStr += dnaSequenceStr.substring(start_pos,end_pos) + '<br>';
+                                    }
+                                    dnaSequenceStr = dnaDispStr;
+                                }
+
+                                //self.$infoTable.append(self.makeRow("Gene", dnaSequenceStr));
+                                self.$infoTable.append(
+                                        self.makeRow("Gene", dnaSequenceStr, 'white')
+                                        //.each(function(){$(this).css('font-family','monospace')})
+                                );
+
+                                //self.hideMessage();
+                                //self.$infoPanel.show();
+                            },
+
+                            self.renderError
+                    );
+                }
+                // end gene sequence
+
+
+                // Protein sequence (for peg) (do first for bottom-up table build?)
+                //
+                var proteinTranslationStr = "No protein sequence found.";
+                if (feature.protein_translation) {
+                    proteinTranslationStr = feature.protein_translation;
+                    // wrap seq
+                    var seq_width = 50;
+                    if (proteinTranslationStr.length > seq_width) {
+                        var protDispStr = "";
+                        var start_pos = 0;
+                        var end_pos = 0;
+                        for (var i=0; (i+1)*seq_width-1 < proteinTranslationStr.length; i++) {
+                            start_pos = i*seq_width;
+                            end_pos = (i+1)*seq_width - 1;
+                            protDispStr += proteinTranslationStr.substring(start_pos,end_pos) + '<br>';
+                        }
+                        start_pos += seq_width;
+                        end_pos = proteinTranslationStr.length - 1;
+                        if (start_pos < proteinTranslationStr.length) {
+                            protDispStr += proteinTranslationStr.substring(start_pos,end_pos) + '<br>';
+                        }
+                        proteinTranslationStr = protDispStr;
+                    }
+                }
+                this.$infoTable.append(
+                        this.makeRow("Protein", proteinTranslationStr, '#f9f9f9')
+                        //.each(function(){$(this).css('font-family','monospace')})
+                );
+
+                // SOMETHING SIMILAR, BUT NOT RIGHT this.$infoTable.append(this.makeRow("Protein", proteinTranslationStr).find("td")[1].style="font-family:Courier");
+
+                // end protein sequence
+
+            }
+            else {
+                this.renderError({ error: "No genetic features found in the genome with object id: " + 
+                    this.options.workspaceID + "/" + 
+                    this.options.genomeID });
+            }
+
+            this.hideMessage();
+            this.$infoPanel.show();
+        },
+        
         buildObjectIdentity: function(workspaceID, objectID) {
             var obj = {};
             if (/^\d+$/.exec(workspaceID))
