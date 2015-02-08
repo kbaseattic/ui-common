@@ -2,8 +2,6 @@
  *
  *
  *
- * This widget simply takes on objectinfo object
- *
  */ 
 (function( $, undefined ) { 
     $.KBWidget({ 
@@ -14,6 +12,7 @@
             objid: null,
             wsid: null,
             ver: null,
+	    sub: null, // for specifying subobjects: ex. feature, must be object={sub:TYPE, subid:ID}
             ws_url: "https://kbase.us/services/ws",
             loadingImage: "assets/img/ajax-loader.gif",
             auth: null,
@@ -27,8 +26,7 @@
         $errorPanel: null,
         $msgPanel: null,
         $copyDropdown: null,
-	
-        objData: null,
+	objData: null,
         
         init: function(options) {
             this._super(options);
@@ -46,7 +44,6 @@
             if (options.ver) {
                 this.objref = this.objref + '/' + options.ver;
             }
-            console.log(this.objref,options);
 	    
             this.$mainPanel = $("<div>");
             this.$elem.append(this.$mainPanel);
@@ -55,7 +52,7 @@
                 this.ws = kb.ws;  //new Workspace(this.options.ws_url);
                 this.loggedIn = false;
             } else {
-                console.log(['authenticated:', this.auth]);
+                //console.log(['authenticated:', this.auth]);
                 this.ws = new Workspace(this.options.ws_url, this.auth);
                 this.loggedIn = true;
                 this.getInfoAndRender();
@@ -66,7 +63,7 @@
 
         loggedInCallback: function(event, auth) {
             this.options.auth = auth;
-            console.log(['authenticated:', this.options.auth]);
+            //console.log(['authenticated:', this.options.auth]);
             this.ws = new Workspace(this.options.ws_url, this.options.auth);
             this.loggedIn = true;
             this.getInfoAndRender();
@@ -104,7 +101,7 @@
                                     meta: obj_info[10],
                             };
                             self.$mainPanel.empty();
-                            self.$mainPanel.append(self.getVizWidgetDiv(obj_info,self.type2widget));
+                            self.$mainPanel.append(self.getVizWidgetDiv(obj_info,self.options.sub,self.type2widget));
                         } else {
                             //self.showError({error:{message:'An unknown error occurred while fetching data.'}});
                         }
@@ -248,7 +245,14 @@
 		'KBaseGenomes.Genome': {
 		    widget:'KBaseGenomePage',
 		    noPanel:true,
-		    options: '{"genomeID":???objname,"workspaceID":???wsname,"loadingImage":"'+this.options.loadingImage+'"}'
+		    options: '{"genomeID":???objname,"workspaceID":???wsname,"loadingImage":"'+this.options.loadingImage+'"}',
+		    sub:{
+			feature: {
+			    widget:'KBaseGenePage',
+			    noPanel:true,
+			    options: '{"genomeID":???objname,"workspaceID":???wsname,"featureID":???subid,"loadingImage":"'+this.options.loadingImage+'"}'
+			}
+		    }
 		}
 	    };
 	    
@@ -261,14 +265,29 @@
 	    }
 	    console.log(list);
 	    console.log(list2);*/
-	    
 	},
 	
 	
-	getVizWidgetDiv: function(obj_info, type2widget) {
+	getVizWidgetDiv: function(obj_info, sub, type2widget) {
         var type = obj_info[2].split('-')[0];
         if (type2widget.hasOwnProperty(type)) {
             var config = type2widget[type];
+	    if (sub) {
+		if(sub.sub && sub.subid) {
+		    if (config.sub) {
+			if (config.sub.hasOwnProperty(sub.sub)) {
+			    config = config.sub[sub.sub];  // ha, crazy line, i know.
+			} else {
+			    console.log('Sub was specified, but config has no correct sub handler, sub:',sub,"config:",config);
+			}
+		    } else {
+			console.log('Sub was specified, but config has no sub handler, sub:',sub,"config:",config);
+		    }
+		} else {
+		    console.log('Something was in sub, but no sub.sub or sub.subid found',sub);
+		}
+	    }
+	    
             if (config.widget && config.options) {
                 var options = config.options;
                 options = options.replace(/\?\?\?wsid/g, obj_info[6]);
@@ -277,6 +296,9 @@
                 options = options.replace(/\?\?\?objname/g, JSON.stringify(obj_info[1]));
                 options = options.replace(/\?\?\?ver/g, obj_info[4]);
                 options = options.replace(/\?\?\?type/g, type);
+		if (sub && sub.subid) {
+		    options = options.replace(/\?\?\?subid/g, JSON.stringify(sub.subid));
+		}
                 // thought I needed these, but I don't - still, I left them here.
                 // options = options.replace(/\?\?\?auth/g, JSON.stringify(this.options.auth));
                 // options = options.replace(/\?\?\?token/g, '"'+this.options.auth.token+'"');

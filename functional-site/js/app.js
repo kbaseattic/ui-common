@@ -87,12 +87,12 @@ var app = angular.module('landing-pages',
        */
    $stateProvider
    .state('dataview', {
-      url: '/dataview/:wsid/:objid/:ver',
+      url: '/dataview/:wsid/:objid/:ver?sub&subid',
       templateUrl: 'views/dataview/dataview.html',
       controller: 'Dataview'
    })
     .state('dataview2', {
-      url: '/dataview/:wsid/:objid',
+      url: '/dataview/:wsid/:objid?sub&subid',
       templateUrl: 'views/dataview/dataview.html',
       controller: 'Dataview'
    })

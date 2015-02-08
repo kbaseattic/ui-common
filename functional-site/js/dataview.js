@@ -8,6 +8,10 @@ app.controller('Dataview', function ($scope, $stateParams) {
       objid: $stateParams.objid,
       ver: $stateParams.ver
    };
+   // handle subobjects
+   if ($stateParams.sub && $stateParams.subid) {
+      $scope.params.sub = {sub:$stateParams.sub,subid:$stateParams.subid};
+   }
    
    // Set up the styles for the view.
    // Note that this is the style for all dataview views, as the actual view template
