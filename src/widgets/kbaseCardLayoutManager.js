@@ -268,10 +268,11 @@
 
             this.$dataManager.hide();
 
-            this.$controlBox = $("<div class='container'/>")
+            this.$controlBox = $('<div>'); // do not show control box anymore
+                        /*$("<div class='container'/>")
                                .addClass("kblpc-control-box")
                                .append($("<div class='row'>").append($dropdown))
-                               .append(this.$dataManager);
+                               .append(this.$dataManager);*/
         },
 
         /**
@@ -2322,7 +2323,7 @@
          */
         addNewCard: function(cardName, options, position) {
             /** position = optional. if none given, it puts the new card in the center of the page **/
-
+            
             /* NOTE - later, have it manage where the new card comes in here.
              *
              * Should be a way to use the dialog/position jqueryUI stuff.
@@ -2371,7 +2372,7 @@
                 }
             }
 
-            this.$elem.append("<div id='" + newCardId + "'/>");
+            this.$elem.append("<div id='" + newCardId + "'>").css({margin:'30px'});
 
             var newWidget = $("#" + newCardId)[cardName](options);
 
@@ -2404,10 +2405,9 @@
                        cardTitle + 
                        "</div>" +
                        "<div class='kblpc-subtitle'>" + 
-                       cardSubtitle + 
-                       "<span class='label label-primary pull-right'>" +
-                       cardWorkspace + 
-                       "</span></div>",
+                       cardSubtitle +
+                       // we shouldn't display workspace info anymore
+                       "</div>",
                 width: cardWidth,
                 id: newCardId,
                 draggable: cardDrag,

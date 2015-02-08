@@ -8,7 +8,8 @@
         options: {
             id: "",
             name: "",
-            width: 600,
+            width: 800,
+            height: 600,
             token: null
         },
 
@@ -78,7 +79,7 @@
                 	moduleLinks[moduleLinks.length] = '<a onclick="specClicks[\''+pref+'modver-click\'](this,event); return false;" data-moduleid="'+moduleId+'">'+moduleVer+'</a>';
                 }
                 overviewTable.append('<tr><td>Module version(s)</td><td>'+moduleLinks+'</td></tr>');
-            	overviewTable.append('<tr><td>Description</td><td><textarea style="width:100%;" cols="2" rows="7" readonly>'+data.description+'</textarea></td></tr>');
+            	overviewTable.append('<tr><td>Description</td><td><textarea style="width:100%;" cols="2" rows="15" readonly>'+data.description+'</textarea></td></tr>');
             	specClicks[pref+'modver-click'] = (function(elem, e) {
                     var moduleId = $(elem).data('moduleid');
                     self.trigger('showSpecElement', 
@@ -279,7 +280,7 @@
                 type: "KBaseSpecTypeCard",
                 id: this.options.id,
                 workspace: "specification",
-                title: "Typed Object Specification"
+                title: "Data Type Specification"
             };
         }
     });

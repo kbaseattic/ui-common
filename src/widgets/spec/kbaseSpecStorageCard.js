@@ -62,7 +62,7 @@
                 type: "KBaseSpecStorageCard",
                 id: this.options.id,
                 workspace: 'specification',
-                title: "Registered Module Objects"
+                title: "Registered Data Type Modules"
             };
         }
     });
