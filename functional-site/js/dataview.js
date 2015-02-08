@@ -8,6 +8,14 @@ app.controller('Dataview', function ($scope, $stateParams) {
       objid: $stateParams.objid,
       ver: $stateParams.ver
    };
+   // handle subobjects, only allowed types!!  This needs to be refactored because it can depend on the base type!!!
+   var allowedSubobjectTypes = {'Feature':true};
+   
+   if ($stateParams.sub && $stateParams.subid) {
+      if (allowedSubobjectTypes.hasOwnProperty($stateParams.sub)) {
+         $scope.params.sub = {sub:$stateParams.sub,subid:$stateParams.subid};
+      }
+   }
    
    // Set up the styles for the view.
    // Note that this is the style for all dataview views, as the actual view template

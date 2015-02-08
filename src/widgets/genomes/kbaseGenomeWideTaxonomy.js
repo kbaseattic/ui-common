@@ -35,87 +35,42 @@
         prepareTree: function(scope, $div) {
         	var objectIdentity = { ref:scope.ws+"/"+scope.id };
             kb.ws.list_referencing_objects([objectIdentity], function(data) {
-            	var treeName = null;
+            	var treeName = null; var treeWs=null; var treeVer=null;
             	for (var i in data[0]) {
             		var objInfo = data[0][i]
             		var wsName = objInfo[7];
+            		var wsId = objInfo[6];
                     var objName = objInfo[1];
                     var type = objInfo[2].split('-')[0];
-                	//console.log("Links: " + wsName + "(" + scope.ws + ")" + "/" + objName + ", " + type);
-                    if (wsName === scope.ws && type === "KBaseTrees.Tree") {
+                	console.log("Links: " + wsName + "(" + scope.ws + ")" + "/" + objName + ", " + type);
+		    // either match exactly the string, or we match with coercion the number
+                    //if (( wsName === scope.ws || wsId===scope.ws ) && type === "KBaseTrees.Tree") {
+		    if (type === "KBaseTrees.Tree") {
                     	treeName = objName;
+			treeWs = wsId;
                     	break;
                     }
             	}
+		var $buildBtn = $("<button>")
+				.addClass("kb-primary-btn")
+				.append("Build Another Tree in a New Narrative");
+		var $buildNarPanel = $("<div>")
+		    .append($('<a href="#/narrativemanager/new?copydata='+scope.ws+'/'+scope.id+'&app=build_species_tree&appparam=1,param0,'+scope.id+'" target="_blank">')
+			.append($buildBtn));
+		
             	if (treeName) {
-                    $div.kbaseTree({treeID: treeName, workspaceID: scope.ws, genomeInfo: self.options.genomeInfo});           		
+		    var $widgetDiv = $('<div>');
+		    $div.append(
+			$('<table>').append($('<tr>')
+			    .append($('<td>')
+				.append('<h4>Showing Phylogenetic Tree: <a href="#/dataview/'+treeWs+'/'+treeName+'" target="_blank">'+treeName+'</a></h4>'))
+			    .append($('<td>')
+				.append($buildNarPanel))));
+		    
+		    $widgetDiv.kbaseTree({treeID: treeName, workspaceID: treeWs, genomeInfo: self.options.genomeInfo});   
+                    $div.append($widgetDiv);       		
             	} else {
-                    
-                    var createTreeNar = function() {
-                        $div.empty();
-                        $div.append("<b> creating your narrative, please hold on...<br>");
-                                        
-                        $.getJSON( "assets/data/speciesTreeNarrativeTemplate.json", function( data ) {
-                          
-                          var narData = data;
-                          // genome name
-                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param0'] = scope.id;
-                          // number
-                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param1'] = "20";
-                          // tree name
-                          narData["worksheets"][0]["cells"][0]["metadata"]["kb-cell"]["widget_state"][0]['state']['param2'] = scope.id+".tree";
-                          narData["metadata"]["data_dependencies"] = [
-                            "KBaseGenomes.Genome "+scope.id
-                          ];
-                          var metadata = {};
-                          for (var key in narData["metadata"]) {
-                            metadata[key] = narData["metadata"][key];
-                          }
-                          if (metadata["data_dependencies"]) {
-                            metadata["data_dependencies"] = JSON.stringify(metadata["data_dependencies"]);
-                          }
-                          var objSaveData = {
-                            type:"KBaseNarrative.Narrative",
-                            data:narData,
-                            name:scope.id+".tree.narrative",
-                            meta:metadata,
-                            provenance:[]
-                          };
-                          var saveParams = {
-                            objects:[objSaveData]
-                          };
-                          if (/^\d+$/.exec(scope.ws))
-                            saveParams['id'] = scope.ws;
-                          else
-                            saveParams['workspace'] = scope.ws;
-                          
-                          kb.ws.save_objects(saveParams,
-                                    function(result) {
-                                        $div.empty();
-                                        $div.append("<b> Successfully created a new Narrative named "+result[0][1]+"!<br>");
-                                        window.location.href="/narrative/ws."+result[0][6]+".obj."+result[0][0];
-                                    },
-                                    function(error) {
-                                        $div.empty();
-                                        $div.append("<b>Unable to create Narrative.</b>  You probably do not have write permissions to this workspace.</b><br><br>");
-                                        
-                                        $div.append("You should copy this Genome to a workspace that you have access to, and build a species tree there.<br><br>");
-                                        $div.append("<i>Error was:</i><br>"+error.error.message+"<br><br>");
-                                    });
-                          
-                        });
-                    }
-                    
-                    var $buildNarPanel = $("<div>").append($("<button>")
-                           .addClass("btn btn-primary")
-                           .append("Launch Species Tree Building Narrative")
-                           .attr("type", "button")
-                           .on("click", 
-                               function(event) {
-                                   createTreeNar();
-                               })
-                           );
-                    
+		    $buildBtn.html("Launch a new Tree Building Narrative");
                     $div
                         .append('<b>There are no species trees created for this genome, but you can use the Narrative to build a new species tree of closely related genomes.</b>');
                         

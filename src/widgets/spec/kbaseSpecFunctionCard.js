@@ -202,7 +202,7 @@
                 type: "KBaseSpecFunctionCard",
                 id: this.options.id,
                 workspace: 'specification',
-                title: "Function Object Specification"
+                title: "KBase API Function Specification"
             };
         }
     });

@@ -140,7 +140,7 @@
                                          .attr("id", this.noContigs)
                                          .append(this.noContigs));
             this.$contigButton = $("<button>")
-                                 .addClass("btn btn-primary")
+                                 .addClass("kb-primary-btn")
                                  .append("Show Contig")
                                  .click(function(event) {
                                     self.$elem.find("select option:selected").each(function() {

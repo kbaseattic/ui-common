@@ -270,7 +270,7 @@
                 type: "KBaseSpecModuleCard",
                 id: this.options.id,
                 workspace: 'specification',
-                title: "Module Object Specification"
+                title: "Data Type Module Specification"
             };
         }
     });

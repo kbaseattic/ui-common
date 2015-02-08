@@ -87,12 +87,12 @@ var app = angular.module('landing-pages',
        */
    $stateProvider
    .state('dataview', {
-      url: '/dataview/:wsid/:objid/:ver',
+      url: '/dataview/:wsid/:objid/:ver?sub&subid',
       templateUrl: 'views/dataview/dataview.html',
       controller: 'Dataview'
    })
     .state('dataview2', {
-      url: '/dataview/:wsid/:objid',
+      url: '/dataview/:wsid/:objid?sub&subid',
       templateUrl: 'views/dataview/dataview.html',
       controller: 'Dataview'
    })
@@ -382,36 +382,6 @@ var app = angular.module('landing-pages',
             {url: '/KBaseGenomes.Genome/:ws/:id',
              templateUrl: 'views/genomes/sortable-rows-landing-page.html',
              controller: 'WBLanding'});
-
-
-/*
-OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
-    $stateProvider
-        .state('genes',
-            {url: '/genes/CDS/:fid',
-             templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'});
-
-    $stateProvider
-        .state('genesbycdsgenome',
-            {url: '/genes/CDS/:gid/:fid',
-             templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'});
-
-*/
-/*
-    $stateProvider
-        .state('genesbyws',
-            {url: '/genes/:ws/:fid',
-             templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'});
-
-    $stateProvider
-        .state('genesbywsgenome',
-            {url: '/genes/:ws/:gid/:fid',
-             templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'});
-*/
 
     $stateProvider
         .state('kbgenesbyws',
