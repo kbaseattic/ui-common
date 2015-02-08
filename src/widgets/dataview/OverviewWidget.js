@@ -49,6 +49,10 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                   this.setParam('objectVersion', this.getConfig('objectVersion'));
                }
 
+               // Subobject specification is optional
+               if (this.hasConfig('sub')) {
+                  this.setParam('sub', this.getConfig('sub'));
+               }
                
 
 
@@ -346,11 +350,14 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
          },
          
          
-
          setInitialState: {
             value: function () {
                var widget = this;
                return Q.Promise(function (resolve, reject, notify) {
+                  if(this.getParam('sub')) {
+                     this.setState('sub',this.getParam('sub'));
+                  }
+                  
                   Utils.promise(this.workspaceClient, 'get_object_info_new', {
                         objects: [{
                            ref:  APIUtils.makeWorkspaceObjectRef(this.getParam('workspaceId'), this.getParam('objectId'), this.getParam('objectVersion'))

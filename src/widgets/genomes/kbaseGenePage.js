@@ -27,7 +27,7 @@
             var cell1 = $('<div panel panel-default">');
             self.$elem.append(cell1);
             var panel1 = self.makePleaseWaitPanel();
-            self.makeDecoration(cell1, 'Gene Overview', panel1);
+            self.makeDecoration(cell1, 'Feature Overview', panel1);
             ///////////////////////////////////////////////////////////////////////////////
             var cell2 = $('<div panel panel-default">');
             self.$elem.append(cell2);

@@ -130,6 +130,9 @@
 	    // widget : widget to use to render
 	    // options : what to pass to the widget
 	    // noPanel : set to true to give control of everything to the widget
+	    // sub : handler for subdata of the given object
+	    // NOTE: if you are adding new subdata pages, then you also need to add the subdatata type to the
+	    //       list of allowed types in functional-site/js/dataview.js
 	    self.type2widget = {
 		
 		'Communities.Collection': {
@@ -247,7 +250,7 @@
 		    noPanel:true,
 		    options: '{"genomeID":???objname,"workspaceID":???wsname,"loadingImage":"'+this.options.loadingImage+'"}',
 		    sub:{
-			feature: {
+			Feature: {
 			    widget:'KBaseGenePage',
 			    noPanel:true,
 			    options: '{"genomeID":???objname,"workspaceID":???wsname,"featureID":???subid,"loadingImage":"'+this.options.loadingImage+'"}'
@@ -278,13 +281,16 @@
 			if (config.sub.hasOwnProperty(sub.sub)) {
 			    config = config.sub[sub.sub];  // ha, crazy line, i know.
 			} else {
-			    console.log('Sub was specified, but config has no correct sub handler, sub:',sub,"config:",config);
+			    console.error('Sub was specified, but config has no correct sub handler, sub:',sub,"config:",config);
+			    return $('<div>');
 			}
 		    } else {
-			console.log('Sub was specified, but config has no sub handler, sub:',sub,"config:",config);
+			console.error('Sub was specified, but config has no sub handler, sub:',sub,"config:",config);
+			return $('<div>');
 		    }
 		} else {
-		    console.log('Something was in sub, but no sub.sub or sub.subid found',sub);
+		    console.error('Something was in sub, but no sub.sub or sub.subid found',sub);
+		    return $('<div>');
 		}
 	    }
 	    

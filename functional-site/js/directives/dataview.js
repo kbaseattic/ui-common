@@ -18,7 +18,8 @@ angular.module('dataview')
                     container: $(ele),
                     workspaceId: scope.params.wsid,
                     objectId: scope.params.objid,
-                    objectVersion: scope.params.ver 
+                    objectVersion: scope.params.ver,
+                    sub: scope.params.sub
                 }).go();
             });
         }

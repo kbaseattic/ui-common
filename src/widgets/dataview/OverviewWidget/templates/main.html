@@ -10,8 +10,13 @@
       <table clases="kb-dataview-header-tbl">
          <tr style="vertical-align: baseline;">
             <td>{{state.dataicon}}</td>
-            <td><h3>{{state.object.name}}</h3></td>
-            <td>v{{state.object.version}}</td>
+            {% if state.sub.subid  %}
+               <td><h3>{{state.sub.subid}}</h3></td>
+               <td>(in <a href="#/dataview/{{state.object.wsid}}/{{state.object.id}}/{{state.object.version}}">{{state.object.name}}</a>)</td>
+            {% else %}
+               <td><h3>{{state.object.name}}</h3></td>
+               <td>v{{state.object.version}}</td>
+            {% endif %}
          </tr>
       </table>
       
@@ -32,7 +37,9 @@
          </tr>
          <tr>
             <th>Type</th>
-            <td><a href="#/spec/type/{{state.object.type}}" target="_blank">{{state.object.typeName}}</a><br>
+            <td>
+               {% if state.sub.sub  %}{{state.sub.sub}} in {% endif %}
+               <a href="#/spec/type/{{state.object.type}}" target="_blank">{{state.object.typeName}}</a><br>
             </td>
          </tr>
          {% if state.workspace.metadata.narrative_nice_name %} 
@@ -56,7 +63,12 @@
          </tr-->
          <tr>
             <th>Permalink</th>
-            {% set permalink = env.browser.location.scheme + "//" +env.browser.location.host + "/functional-site/#/dataview/" + state.object.wsid + "/" + state.object.id + "/" + state.object.version %}
+            
+            {% if state.sub.subid  %}
+               {% set permalink = env.browser.location.scheme + "//" +env.browser.location.host + "/functional-site/#/dataview/" + state.object.wsid + "/" + state.object.id + "/" + state.object.version + "?sub=" + state.sub.sub+"&subid="+state.sub.subid %}
+            {% else %}
+               {% set permalink = env.browser.location.scheme + "//" +env.browser.location.host + "/functional-site/#/dataview/" + state.object.wsid + "/" + state.object.id + "/" + state.object.version %}
+            {% endif %}
             <td><a href="{{permalink}}">{{permalink}}</a>
             </td>
          </tr>
