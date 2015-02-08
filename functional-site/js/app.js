@@ -383,36 +383,6 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/genomes/sortable-rows-landing-page.html',
              controller: 'WBLanding'});
 
-
-/*
-OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
-    $stateProvider
-        .state('genes',
-            {url: '/genes/CDS/:fid',
-             templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'});
-
-    $stateProvider
-        .state('genesbycdsgenome',
-            {url: '/genes/CDS/:gid/:fid',
-             templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'});
-
-*/
-/*
-    $stateProvider
-        .state('genesbyws',
-            {url: '/genes/:ws/:fid',
-             templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'});
-
-    $stateProvider
-        .state('genesbywsgenome',
-            {url: '/genes/:ws/:gid/:fid',
-             templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'});
-*/
-
     $stateProvider
         .state('kbgenesbyws',
             {url: '/genes/:ws/:fid',

@@ -160,12 +160,14 @@ app
 })
 
 .controller('GenomeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'genomeID' : $stateParams.id,
                      'workspaceID' : $stateParams.ws,
                      'kbCache' : kb}
 })
 
 .controller('GeneDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.gid+'?sub=Feature&subid='+$stateParams.fid);
     $scope.params = {'genomeID' : $stateParams.gid,
                      'featureID' : $stateParams.fid,
                      'workspaceID' : $stateParams.ws,
@@ -175,53 +177,63 @@ app
 
 
 .controller('MediaDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
 
 .controller('ModelDetailCards', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })  
 
 .controller('MemeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
 
 .controller('CmonkeyDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
 
 .controller('InferelatorDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
 
 .controller('MAKDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'workspace': $stateParams.ws,
 					 'kbCache' : kb};
 })
 
 .controller('FloatDataTable', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'workspace': $stateParams.ws,
 					 'kbCache' : kb};
 })
 
 .controller('RegpreciseDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
 
 .controller('BambiDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'bambi_run_result_id': $stateParams.id,
                      'workspace_id': $stateParams.ws}
 })
 
 .controller('PPIDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
 		     'ws': $stateParams.ws};
 })
@@ -235,42 +247,51 @@ app
 
 
 .controller('GPTypeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
 })
 
 .controller('GTTypeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
 })
 
 .controller('GVTypeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
 })
 
 .controller('GGLTypeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
 })
 
 .controller('GTVTypeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
 })
 
 
 .controller('ModelDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
 
 .controller('ModelDetailCards', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
 
 .controller('FBADetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
 
 .controller('FBADetailCards', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
@@ -562,6 +583,8 @@ app
 
 
 .controller('WBLanding', function($scope, $stateParams) {
+    
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id)
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 
@@ -582,6 +605,7 @@ app
 
 
 .controller('WBGeneLanding', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.gid+'?sub=Feature&subid='+$stateParams.fid);
     
     $scope.ws = $stateParams.ws;
     $scope.fid = $stateParams.fid;
@@ -877,16 +901,19 @@ app
 
 
 .controller('TreeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
 
 .controller('PangenomeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
 
 .controller('MSADetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
@@ -916,6 +943,7 @@ app
 })
 
 .controller('ContigSetDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
 })
 
