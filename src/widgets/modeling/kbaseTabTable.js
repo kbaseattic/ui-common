@@ -1,5 +1,7 @@
 (function( $, undefined ) {
 
+'use strict';
+
 $.KBWidget({
     name: "kbaseTabTable",
     parent: "kbaseAuthenticatedWidget",
@@ -10,6 +12,9 @@ $.KBWidget({
     init: function(input) {
         this._super(input);
         var self = this;
+
+        // root url path for landing pages
+        var DATAVIEW_URL = '/functional-site/#/dataview/';
 
         var type = input.type;
 
@@ -152,7 +157,8 @@ $.KBWidget({
                                 refLookup[ref.ref] = {name: data[i][1],
                                                       ws: data[i][7],
                                                       type: data[i][2].split('-')[0],
-                                                      link: data[i][2].split('-')[0]+'/'+data[i][7]+'/'+data[i][1]};
+                                                      //link: data[i][2].split('-')[0]+'/'+data[i][7]+'/'+data[i][1]
+                                                      link: data[i][7]+'/'+data[i][1]};
                             })
                        })
         }
@@ -324,7 +330,7 @@ $.KBWidget({
                                 name = refLookup[ d[key] ].name
                                 wstype = refLookup[ d[key] ].type,
                                 link = refLookup[ d[key] ].link;
-                            return '<a href="#/test/'+link+
+                            return '<a href="'+DATAVIEW_URL+link+
                                      '" class="id-click"'+
                                      '" data-ws="'+ws+
                                      '" data-id="'+name+
@@ -394,13 +400,17 @@ $.KBWidget({
                 } else if ('key' in row) {
                     if (row.type == 'wstype') {
                         var ref = data[row.key];
-                        var cell = $('<td data-ref="'+ref+'">loading...</td>');
 
-                        getLink(data[row.key]).done(function(url) {
-                            var name = url.split('/')[2]
-                            cell.html('<a href="#/test/'+url+'">'+name+'</a>');
-                        })
+                        var cell = $('<td data-ref="'+ref+'">loading...</td>');
                         r.append(cell);
+
+                        getLink(ref).done(function(info) {
+                            var name = info.url.split('/')[1];
+                            var ref = info.ref;
+                            table.find("[data-ref='"+ref+"']")
+                                 .html('<a href="'+DATAVIEW_URL+info.url+'">'+name+'</a>');
+                        })
+
                     } else {
                         r.append('<td>'+data[row.key]+'</td>');
                     }
@@ -509,7 +519,7 @@ $.KBWidget({
                         {objects: [{ref: ref}]})
                         .then(function(data){
                             var a = data[0];
-                            return a[2].split('-')[0]+'/'+a[7]+'/'+a[1];
+                            return {url: a[7]+'/'+a[1], ref: a[6]+'/'+a[0]+'/'+a[4]};
                         })
         }
 
