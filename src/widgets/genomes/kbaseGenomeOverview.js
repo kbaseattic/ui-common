@@ -306,8 +306,10 @@
                             gcContent = (gcContent/dnaLength*100).toFixed(2) + " %";
                     }
                     else
-                        gcContent = Number(gcContent.toFixed(2)) + " %";
+                        gcContent = Number(gcContent * 100).toFixed(2) + " %";
                 }
+            } else if (Number(genome.gc_content) < 1.0) {
+                gcContent = Number(genome.gc_content * 100).toFixed(2) + " %";
             }
 
             var nFeatures = 0;
