@@ -15,7 +15,6 @@
             workspaceID: null,
             domainAnnotationVer: null,
             kbCache: null,
-            workspaceURL: window.kbconfig.urls.workspace,
             loadingImage: "static/kbase/images/ajax-loader.gif",
             height: null,
         },
@@ -35,13 +34,8 @@
         init: function(options) {
             this._super(options);
 
-
-            // TEMPORARY
-            if(this.options.domainAnnotationID == null){
-                this.options.domainAnnotationID = 12;
-                this.options.workspaceID = 2959;
-                this.options.domainAnnotationVer = 8;
-            }
+            this.workspaceURL = kb.urls.workspace_url;
+            this.landingPageURL = "#/dataview/";
 
             // Create a message pain
             this.$messagePane = $("<div/>").addClass("kbwidget-message-pane kbwidget-hide-message");
@@ -53,7 +47,7 @@
         loggedInCallback: function(event, auth) {
 
             // Cretae a new workspace client
-            this.ws = new Workspace(this.options.workspaceURL, auth);
+            this.ws = new Workspace(this.workspaceURL, auth);
            
             // Let's go...
             this.render();           
@@ -134,7 +128,8 @@
                     tableOver
                         .append( self.makeRow( 
                             'Annotated genome', 
-                            $('<span />').append(self.genomeName).css('font-style', 'italic') ) )
+                            $('<span />').append(self.genomeName).css('font-style', 'italic') 
+                                         .append("<br /><a href='" + self.landingPageURL + self.genomeRef + "' target='_blank'>" + self.genomeRef + "</a>") ) )
                         .append( self.makeRow( 
                             'Domain models set', 
                             self.domainSetName ) )
