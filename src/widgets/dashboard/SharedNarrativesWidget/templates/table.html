@@ -49,7 +49,28 @@
          <th>Owner</th>
          <th>You Can</th>
          <th>Share</th>
-         <th class="number"># Obj.</th>
+          <th class="number"><span class="fa-stack">
+                    <span class="fa fa-square fa-stack-2x" style="color: rgb(0, 150, 136);"></span> 
+                    <span class="fa fa-inverse fa-stack-1x fa-cubes" style=""></span> 
+                    </span></th>
+         <th class="number"><span class="fa-stack fa"  style="{% if methodCount == 0 %}opacity: 0.3; {% endif %}">
+                    <span class="fa fa-square fa-stack-2x" style="color: rgb(103, 58, 183);"></span> 
+                    <span class="fa fa-inverse fa-stack-1x fa-cube"></span> 
+                    </span></th>
+         <th class="number"><span class="fa-stack fa">
+                    <span class="fa fa-circle fa-stack-2x" style="color: #2196F3;"></span> 
+                    <span class="fa fa-inverse fa-stack-1x fa-terminal" style=""></span> 
+                    </span></th>
+         <th class="number"><span class="fa-stack fa">
+                    <span class="fa fa-circle fa-stack-2x" style="color: #2196F3;"></span> 
+                    <span class="fa fa-inverse fa-stack-1x fa-paragraph" style=""></span> 
+                    </span></th>
+         <th class="number"><span class="fa-stack fa">
+                    <span class="fa fa-square fa-stack-2x" style="color: #FFC107;"></span> 
+                    <span class="fa fa-inverse fa-stack-1x fa-file-o" style="margin: -3px 0 0 -3px; font-size: 80%;"></span> 
+                    <span class="fa fa-inverse fa-stack-1x fa-file" style="margin: 2px 0 0 3px; color: #FFC107; font-size: 80%;"></span> 
+                    <span class="fa fa-inverse fa-stack-1x fa-file-o" style="margin: 2px 0 0 3px; font-size: 80%;"></span> 
+                    </span></th>
          <th class="date">Last Saved</th> 
      </tr>
  </thead>
@@ -80,7 +101,20 @@
            {% endif %}
 		</td>
 		<td class="number">
-            {{narrative.workspace.object_count}}
+           {{narrative.object.metadata.cellInfo.app|length2}}
+		</td>
+		<td class="number">
+           {{narrative.object.metadata.cellInfo.method|length2}}
+		</td>
+		<td class="number">
+           {{narrative.object.metadata.cellInfo.ipython.code}}
+
+		</td>
+		<td class="number">
+           {{narrative.object.metadata.cellInfo.ipython.markdown}}
+		</td>
+		<td class="number">
+            {{narrative.workspace.object_count - 1}}
 		</td>
 		<td class="date">
 		     {{narrative.workspace.moddate | jsDatestring }}
@@ -96,9 +130,9 @@ require(['jquery', 'kb.utils'], function ($, Utils) {
 	var table = $('#dashboard-shared-narratives-widgets-{{env.instanceId}}'); 
     table.DataTable({ 
        lengthMenu: [5, 10, 20],
-        order: [[6, "desc"]],
+        order: [[10, "desc"]],
         columnDefs: [
-           {targets: 6, type: "date", render: {display: function(data) {return Utils.niceElapsedTime(data)}}}
+           {targets: 10, type: "date", render: {display: function(data) {return Utils.niceElapsedTime(data)}}}
         ],
         initComplete: function (settings) {
             var api = this.api();

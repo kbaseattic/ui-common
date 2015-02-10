@@ -50,6 +50,7 @@
     overflow: hidden;
     padding: 4px;
     background-color: #d9edf7;
+    box-shadow: 1px 1px 1px #ccc;
     /* go with the flow... */
     xborder: 1px #337ab7 solid;
     xborder-radius: 4px;

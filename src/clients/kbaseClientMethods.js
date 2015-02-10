@@ -89,6 +89,18 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.client.workspace', 'k
                                     console.log('WARNING: workspace ' + object.wsid + ' object ' + object.id + ' is not a valid Narrative object');
                                     continue;
                                  }
+                                 
+                                 // Convert some narrative-specific metadata properties.
+                                 //console.log('META');
+                                 //console.log(object.metadata);
+                                 if (object.metadata && object.metadata.job_info) { 
+                                    object.metadata.jobInfo = JSON.parse(object.metadata.job_info);
+                                 }
+                                 if (object.metadata && object.metadata.methods) {
+                                    //console.log('HERE');
+                                    object.metadata.cellInfo = JSON.parse(object.metadata.methods);
+                                 }
+                                 
                                  narratives.push({
                                     workspace: workspaces[i],
                                     object: object
