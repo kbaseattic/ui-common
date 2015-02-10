@@ -327,7 +327,7 @@ $.KBWidget({
                                         id+'</a>';
                         } else if (type == 'wstype' && format == 'dispWSRef') {
                             var ws = refLookup[ d[key] ].ws,
-                                name = refLookup[ d[key] ].name
+                                name = refLookup[ d[key] ].name,
                                 wstype = refLookup[ d[key] ].type,
                                 link = refLookup[ d[key] ].link;
                             return '<a href="'+DATAVIEW_URL+link+
