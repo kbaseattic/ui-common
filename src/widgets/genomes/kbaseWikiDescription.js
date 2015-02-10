@@ -515,7 +515,6 @@
                     this.wikipediaLookup(termList, successCallback, errorCallback);
                 }
                 else if (data.parse) {
-                    console.log(data);
                     // If we have valid text in the output, parse it how we want it.
                     if (data.parse.text) {
                         var hit = { 'searchTerm' : searchTerm };
@@ -558,7 +557,6 @@
                         })
                         .then(function(imageData, imageStatus) {
                             // If this is truthy, then we have a successful API call.
-                            console.log(imageData);
                             if (imageStatus) {
                                 hit['imageUri'] = null;
                                 // Really, all we want is in imageData.query.pages.<pageNum>.thumbnail.source
