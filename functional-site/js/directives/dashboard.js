@@ -11,9 +11,10 @@ angular.module('dashboard-directives')
    .directive('dashboardnarratives', function ($rootScope) {
       return {
          link: function (scope, ele, attrs) {
-            require(['dashboard_narratives_widget'], function (W) {
+            require(['kb.widget.dashboard.narratives'], function (W) {
                Object.create(W).init({
-                  container: $(ele)
+                  container: $(ele), 
+                  stateMachine: scope.stateMachine
                }).go();
             });
          }
@@ -22,9 +23,10 @@ angular.module('dashboard-directives')
    .directive('dashboardsharednarratives', function ($rootScope) {
       return {
          link: function (scope, ele, attrs) {
-            require(['dashboard_shared_narratives_widget'], function (W) {
+            require(['kb.widget.dashboard.sharedNarratives'], function (W) {
                Object.create(W).init({
-                  container: $(ele)
+                  container: $(ele),
+                  stateMachine: scope.stateMachine
                }).go();
             });
          }
@@ -34,10 +36,11 @@ angular.module('dashboard-directives')
       return {
          link: function (scope, ele, attrs) {
             "use strict";
-            require(['dashboard_profile_widget', 'jquery'], function (W, $) {
+            require(['kb.widget.dashboard.profile', 'jquery'], function (W, $) {
                var widget = Object.create(W);
                widget.init({
-                  container: $(ele)
+                  container: $(ele),
+                  stateMachine: scope.stateMachine
                }).go();
             });
          }
@@ -47,9 +50,10 @@ angular.module('dashboard-directives')
 .directive('dashboardapps', function ($rootScope) {
    return {
       link: function (scope, ele, attrs) {
-         require(['dashboard_apps_widget'], function (Widget) {
+         require(['kb.widget.dashboard.apps'], function (Widget) {
             Object.create(Widget).init({
-               container: $(ele)
+               container: $(ele),
+               stateMachine: scope.stateMachine
             }).go();
          });
       }
@@ -59,11 +63,35 @@ angular.module('dashboard-directives')
 .directive('dashboarddata', function ($rootScope) {
       return {
          link: function (scope, ele, attrs) {
-            require(['dashboard_data_widget'], function (Widget) {
+            require(['kb.widget.dashboard.data'], function (Widget) {
                Object.create(Widget).init({
-                  container: $(ele)
+                  container: $(ele),
+                  stateMachine: scope.stateMachine
                }).go();
             });
+         }
+      };
+   })
+   .directive('dashboardmetrics', function ($rootScope) {
+      return {
+         link: function (scope, ele, attrs) {
+            try {
+               require(['kb.widget.dashboard.metrics'], function (Widget) {
+                     Object.create(Widget).init({
+                        container: $(ele),
+                        stateMachine: scope.stateMachine
+                     }).go();
+                  },
+                  function (err) {
+                     $(ele).html('Exception rendering widget: ' + err);
+                     console.log('EX in require in dashboardmetrics');
+                     console.log(err);
+                  });
+            } catch (ex) {
+               $(ele).html('Exception rendering widget: ' + ex);
+               console.log('EX in dashboardmetrics');
+               console.log(ex);
+            }
          }
       };
    })
@@ -71,12 +99,13 @@ angular.module('dashboard-directives')
       return {
          link: function (scope, ele, attrs) {
 
-            require(['kb.widget.collaboratornetwork'], function (Widget) {
+            require(['kb.widget.dashboard.collaborators'], function (Widget) {
                try {
                   var widget = Object.create(Widget);
                   widget.init({
                      container: $(ele),
-                     userId: scope.params.userid
+                     userId: scope.params.userid,
+                     stateMachine: scope.stateMachine
                   }).go();
                } catch (ex) {
                   $(ele).html('Error: ' + ex);

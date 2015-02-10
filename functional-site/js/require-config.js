@@ -12,18 +12,18 @@ define('underscore', [], function () {
    return _;
 });
 var kbClients = [
-   'NarrativeMethodStore',
-   'UserProfile',
-   'Workspace'
+   ['narrative_method_store', 'NarrativeMethodStore'],
+   ['user_profile', 'UserProfile'],
+   ['workspace', 'Workspace']
 ];
 // NB need the immediate function exec below in order to avoid
 // variable capture problem with anon funcs.
 for (var i in kbClients) {
-   define('kbc_'+kbClients[i], [], (function (client) {
+   define('kb.client.'+kbClients[i][0], [], (function (client) {
       return function () {
          return client;
       };
-   })(window[kbClients[i]]));
+   })(window[kbClients[i][1]]));
       
 }
 
@@ -53,39 +53,42 @@ require.config({
       json: '/ext/require-plugins/json',
       
       // kbase utils
-      kbaseutils: '/src/kbaseUtils',
-      kbasecookie: '/src/kbaseCookie',
-      kbasetest: '/src/kbaseTest',
+      'kb.utils': '/src/kbaseUtils',
+      'kb.cookie': '/src/kbaseCookie',
+      'kb.test': '/src/kbaseTest',
       'kb.utils.api': '/src/kbaseAPIUtils',
       'kb.alert': '/src/widgets/kbaseAlert',
+      'kb.statemachine': '/src/kbaseStateMachine',  
+      'kb.logger': '/src/kbaseLogger',
 
       // widgets
       // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
       'kb.widget.buttonbar': '/src/widgets/kbaseButtonbar',
-      kbasesocialwidget: '/src/widgets/social/kbaseSocialWidget',
-      kbaseuserprofile: '/src/kbaseUserProfile',
-      kbaseuserprofilewidget: '/src/widgets/social/kbaseUserProfileWidget',
-      kbaseuserrecentactivity: '/src/widgets/social/kbaseUserRecentActivity',
-      kbaseuserpopularnarratives: '/src/widgets/social/kbaseUserPopularNarratives',
-      kbaseusersearch: '/src/widgets/social/kbaseUserSearch',
-      kbaseuserbrowsenarratives: '/src/widgets/social/kbaseUserBrowseNarratives',
-      kbaseusersummary: '/src/widgets/social/kbaseUserSummary',
-      kbaseusercollaboratornetwork: '/src/widgets/social/kbaseUserCollaboratorNetwork',
+      'kb.widget.social.base': '/src/widgets/social/kbaseSocialWidget',
+      'kb.user_profile': '/src/kbaseUserProfile',
+      'kb.widget.social.user_profile': '/src/widgets/social/kbaseUserProfileWidget',
+      //kbaseuserrecentactivity: '/src/widgets/social/kbaseUserRecentActivity',
+      //kbaseuserpopularnarratives: '/src/widgets/social/kbaseUserPopularNarratives',
+      'kb.widget.social.user_search': '/src/widgets/social/kbaseUserSearch',
+      'kb.widget.social.browse_narratives': '/src/widgets/social/kbaseUserBrowseNarratives',
+      //kbaseusersummary: '/src/widgets/social/kbaseUserSummary',
+      'kb.widget.social.collaborators': '/src/widgets/social/kbaseUserCollaboratorNetwork',
       
-      kbasesession: '/src/kbaseSession',
-      kbaseconfig: '/src/kbaseConfig',
-      kbasenavbar: '/src/widgets/kbaseNavbar',
-      kbasebasewidget: '/src/widgets/kbaseBaseWidget',
-      kbaseloginwidget: '/src/widgets/kbaseLoginWidget',
+      'kb.session': '/src/kbaseSession',
+      'kb.config': '/src/kbaseConfig',
+      'kb.widget.navbar': '/src/widgets/kbaseNavbar',
+      'kb.widget.base': '/src/widgets/kbaseBaseWidget',
+      'kb.widget.login': '/src/widgets/kbaseLoginWidget',
       
       // Dashboard widgets
-      dashboard_widget: '/src/widgets/dashboard/DashboardWidget',
-      dashboard_profile_widget: '/src/widgets/dashboard/ProfileWidget',
-      dashboard_shared_narratives_widget: '/src/widgets/dashboard/SharedNarrativesWidget',
-      dashboard_narratives_widget: '/src/widgets/dashboard/NarrativesWidget',
-      dashboard_apps_widget: '/src/widgets/dashboard/AppsWidget',
-      dashboard_data_widget: '/src/widgets/dashboard/DataWidget',
-      'kb.widget.collaboratornetwork': '/src/widgets/dashboard/CollaboratorNetwork',
+      'kb.widget.dashboard.base': '/src/widgets/dashboard/DashboardWidget',
+      'kb.widget.dashboard.profile': '/src/widgets/dashboard/ProfileWidget',
+      'kb.widget.dashboard.sharedNarratives': '/src/widgets/dashboard/SharedNarrativesWidget',
+      'kb.widget.dashboard.narratives': '/src/widgets/dashboard/NarrativesWidget',
+      'kb.widget.dashboard.apps': '/src/widgets/dashboard/AppsWidget',
+      'kb.widget.dashboard.data': '/src/widgets/dashboard/DataWidget',
+      'kb.widget.dashboard.collaborators': '/src/widgets/dashboard/CollaboratorsWidget', 
+      'kb.widget.dashboard.metrics': '/src/widgets/dashboard/MetricsWidget',
       
       // Dataview widgets
       'kb.widget.dataview.base': '/src/widgets/dataview/DataviewWidget',

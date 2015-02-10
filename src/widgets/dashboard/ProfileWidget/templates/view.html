@@ -1,3 +1,9 @@
+<div class="collapse" id="{{env.widgetName}}-more-info-{{env.instanceId}}">
+   <div class="well">
+      <p>This panel shows a condensed version of your user profile.</p>
+   </div>
+</div>
+
 <div class="profile-view-view">
   <div class="row">
    <div class="col-md-4">
@@ -11,7 +17,7 @@
     </div>
     <div class="col-md-8">
       <h2>{% if userRecord.profile.userdata.title %}{{userRecord.profile.userdata.title | titleLabel }} {% endif %}{{userRecord.user.realname | e}}{% if userRecord.profile.userdata.suffix %}, {{userRecord.profile.userdata.suffix | e}}{% endif %}</h2>
-      {% if env.isOwner and userRecord.user.realname != userRecord.profile.account.fullName %}<p class="text-warning">Note: The name on your account is <i>{{ userRecord.profile.account.fullName }}</i>.</p>{% endif %}
+      
 
        {% if userRecord.profile.userdata.location %}<i>{{userRecord.profile.userdata.location | e}}</i>{% endif %}
         {% if userRecord.profile.userdata.email %}
@@ -71,99 +77,11 @@
 
         {% endif %}
       {% endif %}
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-md-6">
-      <h3>User Class</h3>
-      {% if userRecord.profile.userdata.user_class %}
-        <ul><li>{{ userRecord.profile.userdata.user_class | userClassLabel}}</li></ul>
-      {% elif env.isOwner %}
-        <p class="text-warning">It is very useful to know what type of KBase user you are.</p>
-      {% else %}
-        <p>No user class assigned</p>  
-      {% endif %}
-
-      <h3>Roles</h3>
-      {% if userRecord.profile.userdata.roles|length > 0 %}
-        <ul>
-          {% for role in userRecord.profile.userdata.roles %}
-            <li>{{role | roleLabel }}</li>
-          {% endfor %}
-        </ul>
-      {% elif env.isOwner %}
-        <p class="text-warning">It is very useful to know what type of roles you are fulfilling with your KBase account.</p>
-      {% else %}
-        <p>No roles assigned</p>
-      {% endif %}
-    </div>
-    <div class="col-md-6">
-      <h3>Affiliations</h3>  
-      {% if userRecord.profile.userdata.affiliations|length > 0 %}  
-        {% for affiliation in userRecord.profile.userdata.affiliations|sort(true, true, "start_year") %}
-          <p><strong>{{affiliation.title | e}}</strong> ({{affiliation.start_year| e}}-{% if affiliation.end_year %}{{affiliation.userdata.end_year | e}}{% else %}present{% endif %}) @ {{affiliation.institution | e}}</p>
-        {% endfor %}
-      {% elif env.isOwner %}
-        <p class="text-warning">Show your colors! Please add one or more affiliations.</p>
-      {% else %}
-        <p>No affiliations recorded for this user</p>
-      {% endif %}
-    </div>
-  </div>
-
-
-  <div class="row">
-    <div class="col-md-12">
-      <div class="well personal-statement">    
-        {% if userRecord.profile.userdata.personal_statement %}
-          {{userRecord.profile.userdata.personal_statement | e | kbmarkup}}
-        {% else %}
-          {%if env.isOwner %}
-            You don't have a personal statement. Don't you want to let the the KBase community know a little about you?
-          {% else %}
-            <i>This user does not have a personal statement</i>
-          {% endif %}
-        {% endif %}
+      
+      <div style="text-align: center;">
+         <a role="button"  href="/functional-site/#/people/" type="button" class="btn btn-default" data-button="create-profile">Visit your Profile Page to update your KBase profile<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></a>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Modals -->
-<div class="modal fade" data-widget-modal="confirm-optout" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-widget-modal-control="deny"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Confirm Profile Removal</h4>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to remove of your user profile? This will remove all of the profile information that you have have entered.</p>
-        <p>Note that your basic user information, your username, real name, and a blank avatar, will still appear in the KBase user interface.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-widget-modal-control="deny" data-dismiss="modal">No - don't delete my profile</button>
-        <button type="button" class="btn btn-primary" data-widget-modal-control="confirm" >Yes - remove my profile</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div class="modal fade" data-widget-modal="help" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-widget-modal-control="deny"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">User Profile Help</h4>
-      </div>
-      <div class="modal-body">
-        <p>Help text here...</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-widget-modal-control="deny" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
+  

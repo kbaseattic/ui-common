@@ -26,7 +26,7 @@ app.controller('Dataview', function ($scope, $stateParams) {
     .attr('href', 'views/dataview/style.css');
 
    // Set up the nabar
-   require(['kbasenavbar'], function (NAVBAR) {
+   require(['kb.widget.navbar'], function (NAVBAR) {
       NAVBAR.clearMenu()
          .addDefaultMenu({
             search: true,

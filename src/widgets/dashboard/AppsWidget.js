@@ -1,5 +1,5 @@
-define(['dashboard_widget', 'kbc_UserProfile', 'kbaseutils', 'kbasesession', 'kbc_NarrativeMethodStore', 'kbc_Workspace', 'kb.utils.api', 'q'],
-   function (DashboardWidget, UserProfileService, Utils, Session, NarrativeMethodStore, WorkspaceService, APIUtils, Q) {
+define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.session', 'kb.client.narrative_method_store', 'kb.client.workspace', 'kb.utils.api', 'kb.logger', 'q'],
+   function (DashboardWidget, UserProfileService, Utils, Session, NarrativeMethodStore, WorkspaceService, APIUtils, Logger, Q) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
@@ -91,7 +91,11 @@ define(['dashboard_widget', 'kbc_UserProfile', 'kbaseutils', 'kbasesession', 'kb
                                  // result in a hit, skip it. This can occur if a narrative is corrupt -- the narrative object
                                  // was deleted or replaced and the workspace metadata not updated.
                                  if (!data[i]) {
-                                    console.log('WARNING: workspace ' + narratives[i].workspace.id + ' does not contain a matching narrative object');
+                                    Logger.logWarning({
+                                       source: 'AppsWidget',
+                                       title: 'Narrative Problem',
+                                       message: 'Workspace ' + narratives[i].workspace.id + ' does not contain a matching narrative object'
+                                    });
                                     continue;
                                  }
                                  narratives.push({
@@ -165,7 +169,11 @@ define(['dashboard_widget', 'kbc_UserProfile', 'kbaseutils', 'kbasesession', 'kb
                                        for (var app in apps) {
                                           // simple object, don't need to check.
                                           if (!appMap[app]) {
-                                             console.log('WARNING: skipped app ' + app);
+                                             Logger.logWarning({
+                                                source: 'AppsWidget',
+                                                title: 'Skipped App',
+                                                message: 'The app "' + app +'" was skipped because it is not in the Apps Store'
+                                             });
                                           } else {
                                              appMap[app][bin].count++;
                                              appMap[app][bin].narratives[narrative.workspace.id] = 1;

@@ -12,7 +12,7 @@ angular.module('ui')
     return {
         link: function(scope, ele, attrs) {
           "use strict";
-            require(['kbasenavbar', 'jquery'], function(W, $) {
+            require(['kb.widget.navbar', 'jquery'], function(W, $) {
                 var widget = Object.create(W);
                 widget.init({
                     container: $(ele),

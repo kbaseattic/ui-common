@@ -315,7 +315,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     };
     */
     
-    require(['kbasenavbar'], function (Navbar) {
+    require(['kb.widget.navbar'], function (Navbar) {
       Navbar.clearMenu();
       Navbar.addDefaultMenu({search: false});
       Navbar.clearTitle();

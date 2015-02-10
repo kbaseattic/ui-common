@@ -7,7 +7,7 @@
 
 <div class="row">
    <div class="col-sm-2">
-      <a role="button" class="btn btn-primary" href="/functional-site/#/narrativemanager/new">
+      <a role="button" class="btn btn-primary btn-kbase" href="/functional-site/#/narrativemanager/new">
       <span class="fa fa-plus-circle" style="font-size: 150%; margin-right: 8px;vertical-align: middle;" target="_blank"></span>
      Create New Narrative
      </a>
@@ -25,13 +25,13 @@
 
    <div class="col-sm-4" style="text-align: right">
       Found 
-       {% if state.narratives|length == 1 %}
+       {% if state.narrativesFiltered|length == 1 %}
       
-      {{ state.narratives|length }} Narrative
+      {{ state.narrativesFiltered|length }} Narrative
       
-      {% elif state.narratives|length > 1 %}
+      {% elif state.narrativesFiltered|length > 1 %}
       
-       {{ state.narratives|length }} Narratives
+       {{ state.narrativesFiltered|length }} Narratives
        
       {% elif 1 %}
       
@@ -42,7 +42,9 @@
 </div>
 
  
-{% if state.narratives|length > 0 %}
+ <div class="row">
+   <div class="col-sm-12">
+{% if state.narrativesFiltered|length > 0 %}
 
  <table cellpadding="0" cellspacing="0" border="0" class="table" id="dashboard-narratives-{{env.generatedId}}">
  <thead>
@@ -59,7 +61,7 @@
      </tr>
  </thead>
 
-{% for narrative in state.narratives %}
+{% for narrative in state.narrativesFiltered %}
 	<tr>
 		<td>
 		    <a target="_blank" href="/narrative/{{narrative.object.obj_id}}">{{narrative.workspace.metadata.narrative_nice_name}}</a>
@@ -106,8 +108,9 @@
 </table>
 	
 	<script>
-require(['jquery', 'kbaseutils'], function ($, Utils) {
+require(['jquery', 'kb.utils'], function ($, Utils) {
 	$('#dashboard-narratives-{{env.generatedId}}').DataTable({
+       lengthMenu: [5, 10, 20],
         order: [[7, "desc"]],
         columnDefs: [
            {targets: 7, type: "date", render: {display: function(data) {return Utils.niceElapsedTime(data)}}}
@@ -128,9 +131,14 @@ require(['jquery', 'kbaseutils'], function ($, Utils) {
 	
 {% else %}
 
-<p>You do not own any Narratives. Why not <a href="/functional-site/#/narrativemanager/new">create your first one?</a>.</p>
+
+<p style="margin-top: 1em;">You do not own any Narratives. Why not <a href="/functional-site/#/narrativemanager/new">create your first one?</a>.</p>
 
 {% endif %}
+
+   </div>
+</div>
+
 
 
 

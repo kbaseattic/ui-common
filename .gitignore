@@ -8,3 +8,4 @@ dist/docs
 .settings/
 /nbproject/private/
 functional-site/assets/data/maps
+narrative_version

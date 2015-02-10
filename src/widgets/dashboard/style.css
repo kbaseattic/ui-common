@@ -38,17 +38,22 @@
  
  .kbase-dashboard-view .slider .slide {
     display: inline-block;
+    xwhite-space: normal;
     xposition: relative;
     xfloat: left;
     xclear: none;
     margin: 4px;
     height: 150px;
     min-width: 150px;
-    border: 1px #337ab7 solid;
-    border-radius: 4px;
+    
+    
     overflow: hidden;
     padding: 4px;
     background-color: #d9edf7;
+    /* go with the flow... */
+    xborder: 1px #337ab7 solid;
+    xborder-radius: 4px;
+    xbox-shadow: 1px 1px 1px #ccc;
  }
  
  .kbase-dashboard-view .slide .title {
