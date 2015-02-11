@@ -34,9 +34,14 @@
 
         refreshSession: {
             value: function () {
-                if (this.sessionChanged()) {
+               try {
                     this.sessionObject = this.importSessionFromCookie();
-                }
+               } catch (ex) {
+                  console.log('ERROR: kbaseSessionSync.refreshSession');
+                  console.log('Error reading session cookie, resetting session.');
+                  this.removeAuth();
+                  this.sessionObject = null;
+               }
                 if (this.sessionObject && this.isExpired()) {
                     this.removeAuth();
                     this.sessionObject = null;
@@ -65,13 +70,17 @@
                 }
                 // first pass just break out the string into fields.
                 var session = this.decodeToken(sessionCookie);
+               
+                if (!this.validateKBaseSessionObject(session)) {
+                    // zap cookies if we had a bad cookie.
+                    this.removeAuth();
+                    return null;
+                }
 
                 session.token = session.token.replace(/PIPESIGN/g, '|').replace(/EQUALSSIGN/g, '=');
-
                 // now we have a session object equivalent to the one returned by the auth service.
-
                 session.tokenObject = this.decodeToken(session.token);
-
+               
                 if (!this.validateSessionObject(session)) {
                     // zap cookies if we had a bad cookie.
                     this.removeAuth();
@@ -129,6 +138,20 @@
                 return session;
             }
         },
+       
+        validateKBaseSessionObject: {
+            value: function (sessionObject) {
+                if (!sessionObject) {
+                    return false;
+                }
+                // Validate the structure.
+                if (!(sessionObject.kbase_sessionid && sessionObject.un && sessionObject.user_id && sessionObject.token)) {
+                    return false;
+                }                
+                return true;
+            }
+        },
+
 
         validateSessionObject: {
             value: function (sessionObject) {
@@ -139,6 +162,14 @@
                 if (!(sessionObject.kbase_sessionid && sessionObject.un && sessionObject.user_id && sessionObject.token && sessionObject.tokenObject)) {
                     return false;
                 }
+               // Validate the auth token as far as we need to. THis is only the expiry for now.
+               if (!sessionObject.tokenObject.expiry) {
+                  return false;
+               }
+               
+               if (!/^\d+$/.test(sessionObject.tokenObject.expiry)) {
+                  return false;
+               }
                 return true;
             }
         },
@@ -172,9 +203,13 @@
                     domain: 'kbase.us'
                 });
                 $.removeCookie(this.narrCookieName, {
+                    path: '/'
+                });
+                $.removeCookie(this.narrCookieName, {
                     path: '/',
                     domain: 'kbase.us'
                 });
+
                 // For compatability
                 localStorage.removeItem(this.cookieName);
             }
