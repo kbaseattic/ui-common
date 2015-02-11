@@ -331,6 +331,7 @@ $.KBWidget({
                                 wstype = refLookup[ d[key] ].type,
                                 link = refLookup[ d[key] ].link;
                             return '<a href="'+DATAVIEW_URL+link+
+                                     '" target="_blank" '+
                                      '" class="id-click"'+
                                      '" data-ws="'+ws+
                                      '" data-id="'+name+
@@ -408,7 +409,7 @@ $.KBWidget({
                             var name = info.url.split('/')[1];
                             var ref = info.ref;
                             table.find("[data-ref='"+ref+"']")
-                                 .html('<a href="'+DATAVIEW_URL+info.url+'">'+name+'</a>');
+                                 .html('<a href="'+DATAVIEW_URL+info.url+'" target="_blank">'+name+'</a>');
                         })
 
                     } else {
