@@ -31,23 +31,23 @@ function KBaseFBA_FBA(modeltabs) {
         },{
             "label": "Model",
             "key": "model",
-            "type": "wslink"
+            "type": "wstype"
         },{
             "label": "Media",
             "key": "media",
-            "type": "wslink"
+            "type": "wstype"
         },{
             "label": "Regulome",
             "key": "regulome",
-            "type": "wslink"
+            "type": "wstype"
         },{
             "label": "Prom Constraint",
             "key": "promconstraint",
-            "type": "wslink"
+            "type": "wstype"
         },{
             "label": "Expression",
             "key": "expression",
-            "type": "wslink"
+            "type": "wstype"
         },{
             "label": "Single KO",
             "key": "singleko"
@@ -103,19 +103,21 @@ function KBaseFBA_FBA(modeltabs) {
             "key": "objfraction"
         }]
     }, {
-        "key": "modelreactions",
-        "name": "Reactions",
-        "visible": 1,
+    	"key": "modelreactions",
+        "name": "Reaction fluxes",
+        "type": "dataTable",
         "columns": [{
             "label": "Reaction",
-            "key": "id",
             "type": "tabLink",
             "linkformat": "dispIDCompart",
+            "key": "id",
             "method": "ReactionTab",
-            "width": "15%",
-            "visible": 1
+            "width": "15%"
         }, {
-            "label": "Flux",
+            "label": "Name",
+            "key": "name"
+        }, {
+        	"label": "Flux",
             "key": "flux",
             "visible": 1
         }, {
@@ -133,39 +135,39 @@ function KBaseFBA_FBA(modeltabs) {
         }, {
             "label": "Equation",
             "key": "equation",
-            "visible": 1
+            "type": "tabLink",
+            "linkformat": "linkequation",
         }, {
             "label": "Genes",
             "key": "genes",
             "type": "tabLinkArray",
             "method": "GeneTab",
-            "visible": 1
         }]
     }, {
         "key": "compoundFluxes",
-        "name": "Compounds",
-        "visible": 1,
+        "name": "Exchange fluxes",
+        "type": "dataTable",
         "columns": [{
             "label": "Compound",
             "key": "id",
             "type": "tabLink",
             "linkformat": "dispIDCompart",
             "method": "CompoundTab",
-            "visible": 1
+            "width": "15%"
         }, {
-            "label": "Name",
-            "key": "name",
-            "visible": 1
+        	"label": "Exchange reaction",
+            "key": "exchangerxn",
+            "visible": 1  
         }, {
-            "label": "Uptake flux",
+            "label": "Exchange flux",
             "key": "uptake",
             "visible": 1
         }, {
-            "label": "Min flux<br>(Lower bound)",
+            "label": "Min exchange flux<br>(Lower bound)",
             "key": "disp_low_flux",
             "visible": 1
         }, {
-            "label": "Max flux<br>(Upper bound)",
+            "label": "Max exchange flux<br>(Upper bound)",
             "key": "disp_high_flux",
             "visible": 1
         }, {
@@ -174,18 +176,16 @@ function KBaseFBA_FBA(modeltabs) {
             "visible": 1
         }, {
             "label": "Formula",
-            "key": "formula",
-            "visible": 1
+            "key": "formula"
         }, {
             "label": "Charge",
-            "key": "charge",
-            "visible": 1
-        }, {
+            "key": "charge"
+        },{
             "label": "Compartment",
             "key": "cmpkbid",
             "type": "tabLink",
             "method": "CompartmentTab",
-            "visible": 1
+            "linkformat": "dispID"
         }]
     }, {
         "key": "modelgenes",
@@ -196,6 +196,7 @@ function KBaseFBA_FBA(modeltabs) {
             "key": "id",
             "type": "tabLink",
             "method": "GeneTab",
+            "linkformat": "dispID",
             "visible": 1
         }, {
             "label": "Gene knocked out",
@@ -208,32 +209,29 @@ function KBaseFBA_FBA(modeltabs) {
         }]
     }, {
         "key": "biomasscpds",
-        "name": "Biomass compounds",
-        "visible": 1,
+        "name": "Biomass",
+        "type": "dataTable",
         "columns": [{
             "label": "Biomass",
             "key": "biomass",
             "type": "tabLink",
             "method": "BiomassTab",
-            "visible": 1
+            "linkformat": "dispID"
         }, {
             "label": "Biomass flux",
             "key": "bioflux",
-            "visible": 1
-        }, {
+		}, {
             "label": "Name",
-            "key": "name",
-            "visible": 1
+            "key": "name"
         }, {
             "label": "Coefficient",
-            "key": "coefficient",
-            "visible": 1
+            "key": "coefficient"
         }, {
             "label": "Compartment",
             "key": "cmpkbid",
             "type": "tabLink",
-            "method": "CompartmentTab",
-            "visible": 1
+            "linkformat": "dispID",
+            "method": "CompartmentTab"
         }, {
             "label": "Max production",
             "key": "maxprod",
@@ -411,6 +409,7 @@ function KBaseFBA_FBA(modeltabs) {
         for (var i=0; i< this.modelcompounds.length; i++) {
             var mdlcpd = this.modelcompounds[i];
             if (this.cpdhash[mdlcpd.id]) {
+                mdlcpd.exchangerxn = " => "+mdlcpd.name+"[e]";
                 mdlcpd.upperFluxBound = this.cpdhash[mdlcpd.id].upperBound;
                 mdlcpd.lowerFluxBound = this.cpdhash[mdlcpd.id].lowerBound;
                 mdlcpd.fluxMin = this.cpdhash[mdlcpd.id].min;
@@ -470,106 +469,154 @@ function KBaseFBA_FBA(modeltabs) {
         }
     };
 
-    this.setData = function (indata) {
+	this.setData = function (indata) {
         self.data = indata;
-        var p = self.modeltabs.kbapi('ws', 'get_objects', [{ref: indata.fbamodel_ref}])
-                    .done(function(data){
-                        var kbObjects = new KBObjects();
-                        self.model = new kbObjects["KBaseFBA_FBAModel"](self.modeltabs);
-                        self.model.setMetadata(data[0].info);
-                        var setMethod = self.model.setData(data[0].data);
-                        // see if setData method returns promise or not
-                        if (setMethod && 'done' in setMethod) {
-                            setMethod.done(function() {
-                                self.formatObject()
-                            })
-                        } else {
-                            self.formatObject();
-                        }
-        })
+        var p = self.modeltabs.kbapi('ws', 'get_objects', [{ref: indata.fbamodel_ref}]).then(function(data){
+			var kbObjects = new KBObjects();
+			self.model = new kbObjects["KBaseFBA_FBAModel"](self.modeltabs);
+			self.model.setMetadata(data[0].info);
+			self.model.setData(data[0].data);
+ 			self.formatObject();
+		});
         return p;
     };
 
     this.ReactionTab = function (info) {
-        if (info.id.search(/rxn\d+/g) == -1)
-            return;
-
-        var p = this.modeltabs
-                    .getBiochemReaction(info.id)
-                    .then(function(rxn){
-                        return [{
-                                   "label": "ID",
-                                    "data": rxn.id
-                                },{
-                                    "label": "Name",
-                                    "data": rxn.name
-                                },{
-                                    "label": "Equation",
-                                    "data": rxn.equation,
-                                    "type": "pictureEquation"
-                                },/*{
-                                    "label": "GPR",
-                                    "data": rxn.gpr,
-                            }*/];
-                     })
-        return p;
+    	var rxn = self.rxnhash[info.id];
+    	if (typeof rxn == 'undefined') {
+    		rxn = self.biohash[info.id];
+    		if (typeof rxn != 'undefined') {
+    			return self.BiomassTab(info);
+    		}
+    	}
+		var output = self.model.ReactionTab(info);
+        if (output && 'done' in output) {
+        	output.then(function(data) {
+        		return self.ExtendReactionTab(info,data);
+        	})
+        	return output;
+        }
+        return self.ExtendReactionTab(info,output);
     };
-
-    this.GeneTab = function (info) {
-        var gene = this.genehash[info.id];
-
-        return [{
-                "label": "ID",
-                "data": info.id
-            },{
-                "label": "Reactions",
-                "data": gene.reactions,
-                "type": "tabLinkArray"
-        }];
+    
+    this.ExtendReactionTab = function (info,data) {
+    	var rxn = self.rxnhash[info.id];
+    	data.push({
+    		"label": "Flux",
+            "data": rxn.flux
+    	});
+    	data.push({
+    		"label": "Min flux<br>(Lower bound)",
+            "data": rxn.disp_low_flux,
+    	});
+    	data.push({
+    		"label": "Max flux<br>(Upper bound)",
+            "data": rxn.disp_high_flux,
+    	});
+    	data.push({
+    		"label": "Class",
+            "data": rxn.fluxClass,
+    	});
+    	return data;
     };
-
+    
     this.CompoundTab = function (info) {
-        var cpd = this.cpdhash[info.id];
-        if (info.id.search(/cpd\d+/g) == -1)
-            return;
-
-         // your hash includes the compartement, so cpd.compartment (or cpd.cmpkbid?) is missing
-        var p = this.modeltabs
-                    .getBiochemCompound(info.id)
-                    .then(function(cpd){
-                        return [{
-                                     "label": "Compound",
-                                     "data": cpd.id,
-                                 }, {
-                                     "label": "Name",
-                                     "data": cpd.name
-                                 }, {
-                                     "label": "Formula",
-                                     "data": cpd.formula
-                                 }, {
-                                     "label": "Charge",
-                                     "data": cpd.charge
-                                 }, {
-                                     "label": "Compartment",
-                                     "data": cpd.compartment,
-                                     "type": "tabLink",
-                                     "function": "CompartmentTab"
-                                 }];
-                     })
-        return p;
-
+		var output = self.model.CompoundTab(info);
+        if (output && 'done' in output) {
+        	output.then(function(data) {
+        		return self.ExtendCompoundTab(info,data);
+        	})
+        	return output;
+        }
+        return self.ExtendCompoundTab(info,output);
+    };
+    
+    this.ExtendCompoundTab = function (info,data) {
+    	var cpd = self.cpdhash[info.id];
+    	data.push({
+    		"label": "Exchange reaction",
+            "data": cpd.exchangerxn
+    	});
+    	data.push({
+    		"label": "Exchange flux",
+            "data": cpd.uptake
+    	});
+    	data.push({
+    		"label": "Min flux<br>(Lower bound)",
+            "data": cpd.disp_low_flux,
+    	});
+    	data.push({
+    		"label": "Max flux<br>(Upper bound)",
+            "data": cpd.disp_high_flux,
+    	});
+    	data.push({
+    		"label": "Class",
+            "data": cpd.fluxclass
+    	});
+    	return data;
+    };
+    
+    this.GeneTab = function (info) {
+		var output = self.model.GeneTab(info);
+        if (output && 'done' in output) {
+        	output.then(function(data) {
+        		return self.ExtendGeneTab(info,data);
+        	})
+        	return output;
+        }
+        return self.ExtendGeneTab(info,output);
     };
 
-    this.CompartmentTab = function (id) {
-        return [[]];
+    this.ExtendGeneTab = function (info,data) {
+        var gene = self.genehash[info.id];
+		data.push({
+    		"label": "Gene knocked out",
+            "data": gene.ko
+    	});
+    	data.push({
+    		"label": "Fraction of growth with KO",
+            "data": gene.growthFraction
+    	});
+    	return data;
+    };
+    
+    this.BiomassTab = function (info) {
+		var output = self.model.BiomassTab(info);
+        if (output && 'done' in output) {
+        	output.then(function(data) {
+        		return self.ExtendBiomassTab(info,data);
+        	})
+        	return output;
+        }
+        return self.ExtendBiomassTab(info,output);
     };
 
-    this.BiomassTab = function (id) {
-        return [[]];
+    this.ExtendBiomassTab = function (info,data) {
+        var bio = self.biohash[info.id];
+		data.push({
+    		"label": "Flux",
+            "data": bio.flux
+    	});
+    	data.push({
+    		"label": "Min flux<br>(Lower bound)",
+            "data": bio.disp_low_flux,
+            "visible": 1
+    	});
+    	data.push({
+    		"label": "Max flux<br>(Upper bound)",
+            "data": bio.disp_high_flux,
+            "visible": 1
+    	});
+    	data.push({
+    		"label": "Class",
+            "data": bio.fluxClass,
+            "visible": 1
+    	});
+    	return data;
     };
-
-    this.GapfillTab = function (id) {
-        return [[]];
+    
+    this.CompartmentTab = function (info) {
+		return self.model.CompartmentTab(info);
     };
 }
 

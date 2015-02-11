@@ -28,6 +28,21 @@ function KBaseFBA_FBAModel(modeltabs) {
         }
     };
 
+	this.cmpnamehash = {
+		"c":"Cytosol",
+		"p":"Periplasm",
+		"g":"Golgi apparatus",
+		"e":"Extracellular",
+		"r":"Endoplasmic reticulum",
+		"l":"Lysosome",
+		"n":"Nucleus",
+		"d":"Plastid",
+		"m":"Mitochondria",
+		"x":"Peroxisome",
+		"v":"Vacuole",
+		"w":"Cell wall",
+	};
+
     this.tabList = [{
         "key": "overview",
         "name": "Overview",
@@ -123,12 +138,13 @@ function KBaseFBA_FBAModel(modeltabs) {
         }, {
             "label": "Charge",
             "key": "charge"
-        },/*{
+        },{
             "label": "Compartment",
-            "key": "compartment",
+            "key": "cmpkbid",
             "type": "tabLink",
-            "method": "CompartmentTab"
-        }*/]
+            "method": "CompartmentTab",
+            "linkformat": "dispID"
+        }]
     }, {
         "key": "modelgenes",
         "name": "Genes",
@@ -152,10 +168,11 @@ function KBaseFBA_FBAModel(modeltabs) {
             "label": "Compartment",
             "key": "id",
             "type": "tabLink",
-            "method": "CompartmentTab"
+            "method": "CompartmentTab",
+            "linkformat": "dispID"
         }, {
             "label": "Name",
-            "key": "label"
+            "key": "name"
         }, {
             "label": "pH",
             "key": "pH"
@@ -170,8 +187,9 @@ function KBaseFBA_FBAModel(modeltabs) {
         "columns": [{
             "label": "Biomass",
             "key": "biomass",
-            "type": "subTabLink",
-            "method": "BiomassTab"
+            "type": "tabLink",
+            "method": "BiomassTab",
+            "linkformat": "dispID"
         }, {
             "label": "Compound",
             "key": "id",
@@ -184,12 +202,13 @@ function KBaseFBA_FBAModel(modeltabs) {
         }, {
             "label": "Coefficient",
             "key": "coefficient"
-        }, /*{
+        }, {
             "label": "Compartment",
-            "key": "compartment",
+            "key": "cmpkbid",
             "type": "tabLink",
+            "linkformat": "dispID",
             "method": "CompartmentTab"
-        }*/]
+        }]
     }, {
         "key": "gapfillings",
         "name": "Gapfilling",
@@ -209,11 +228,7 @@ function KBaseFBA_FBAModel(modeltabs) {
             "linkformat": "dispWSRef",
             "type": "wstype",
             "wstype": "KBaseFBA.Media"
-        }, /*{
-            "label": "FBA",
-            "key": "fba_ref",
-            "type": "wslink"
-        }*/]
+        }]
     }, /*{
         "name": "Pathways",
         "widget": "kbasePathways",
@@ -223,29 +238,69 @@ function KBaseFBA_FBAModel(modeltabs) {
 
 
     this.ReactionTab = function (info) {
-        if (info.id.search(/rxn\d+/g) == -1)
-            return;
-
-        var p = this.modeltabs
-                    .getBiochemReaction(info.id)
-                    .then(function(rxn){
-                        return [{
-                                    label: "ID",
-                                    data: rxn.id
-                                },{
-                                    label: "Name",
-                                    data: rxn.name
-                                },{
-                                    label: "Equation",
-                                    data: rxn.equation,
-                                    type: "pictureEquation"
-                                },/*{
-                                    label: "GPR",
-                                    data: rxn.gpr,
-                            }*/];
-                     })
-        return p;
+        var rxn = self.rxnhash[info.id];
+		var output = [{
+			"label": "Reaction",
+			"data": rxn.dispid,
+		}, {
+			"label": "Name",
+			"data": rxn.name
+		}];
+		if ("pathway" in rxn) {
+			output.push({
+				"label": "Pathway",
+				"data": rxn.pathway
+			});
+		}
+		if ("reference" in rxn) {
+			output.push({
+				"label": "Reference",
+				"data": rxn.reference
+			});
+		}
+		output.push({
+			"label": "Compartment",
+			"data": self.cmphash[rxn.cmpkbid].name+" "+self.cmphash[rxn.cmpkbid].compartmentIndex,
+		},{
+			label: "Equation",
+            data: rxn.equation,
+            type: "pictureEquation"
+		},{
+			"label": "GPR",
+			"data": rxn.gpr
+		});
+		if (rxn.rxnkbid != "rxn00000") {
+			var p = self.modeltabs.kbapi('fba', 'get_reactions', {reactions: [rxn.rxnkbid]}).then(function(data) {
+				if ("deltaG" in data[0]) {
+					output.push({
+						"label": "Delta G",
+						"data": data[0].deltaG+" ("+data[0].deltaGErr+") kcal/mol"
+					});
+				}
+				output.push({
+					"label": "Enzymes",
+					"data": data[0].enzymes.join(", ")
+				});
+				var aliashash = {};
+				var finalaliases = [];
+				for (var i=0; i < data[0].aliases.length; i++) {
+					if (!(data[0].aliases[i] in aliashash)) {
+						finalaliases.push(data[0].aliases[i]);
+						aliashash[data[0].aliases[i]] = 1;
+					}
+				}
+				output.push({
+					"label": "Aliases",
+					"data": finalaliases.join(", ")
+				});
+				return output;
+			});
+			return p;
+		}
+		return output;
     }
+    
+    
 
     this.GeneTab = function (info) {
         // var gene = this.genehash[id];
@@ -267,43 +322,109 @@ function KBaseFBA_FBAModel(modeltabs) {
     }
 
     this.CompoundTab = function (info) {
-        var cpd = this.cpdhash[info.id];
-        if (info.id.search(/cpd\d+/g) == -1)
-            return;
-
-         // your hash includes the compartement, so cpd.compartment (or cpd.cmpkbid?) is missing
-        var p = this.modeltabs
-                    .getBiochemCompound(info.id)
-                    .then(function(cpd){
-                        return [{
-                                     "label": "Compound",
-                                     "data": cpd.id,
-                                 }, {
-                                     "label": "Name",
-                                     "data": cpd.name
-                                 }, {
-                                     "label": "Formula",
-                                     "data": cpd.formula
-                                 }, {
-                                     "label": "Charge",
-                                     "data": cpd.charge
-                                 }, {
-                                     "label": "Compartment",
-                                     "data": cpd.compartment,
-                                     "type": "tabLink",
-                                     "function": "CompartmentTab"
-                                 }];
-                     })
-        return p;
-
+        var cpd = self.cpdhash[info.id];
+		var output = [{
+			"label": "Compound",
+			"data": cpd.dispid,
+		}, {
+			"label": "Name",
+			"data": cpd.name
+		 }, {
+			"label": "Formula",
+			"data": cpd.formula
+		}, {
+			"label": "Charge",
+			"data": cpd.charge
+		}, {
+			"label": "Compartment",
+			"data": cpd.cmpkbid,
+			"dispid": self.cmphash[cpd.cmpkbid].name+" "+self.cmphash[cpd.cmpkbid].compartmentIndex,
+			"type": "tabLink",
+			"function": "CompartmentTab"
+		}];
+		if (cpd.cpdkbid != "cpd00000") {
+			var p = self.modeltabs.kbapi('fba', 'get_compounds', {compounds: [cpd.cpdkbid]}).then(function(data) {
+				if ("deltaG" in data[0]) {
+					output.push({
+						"label": "Delta G",
+						"data": data[0].deltaG+" ("+data[0].deltaGErr+") kcal/mol"
+					});
+				}
+				var aliashash = {};
+				var finalaliases = [];
+				for (var i=0; i < data[0].aliases.length; i++) {
+					if (!(data[0].aliases[i] in aliashash)) {
+						finalaliases.push(data[0].aliases[i]);
+						aliashash[data[0].aliases[i]] = 1;
+					}
+				}
+				output.push({
+					"label": "Aliases",
+					"data": finalaliases.join(", ")
+				});
+				return output;
+				return output;
+			});
+			return p;
+		}
+		return output;
     }
 
     this.CompartmentTab = function (info) {
-        return [[]];
+        var cmp = self.cmphash[info.id];
+		var output = [{
+			"label": "Compartment",
+			"data": cmp.id,
+		}, {
+			"label": "Name",
+			"data": cmp.name
+		 }, {
+			"label": "pH",
+			"data": cmp.pH
+		}, {
+			"label": "potential",
+			"data": cmp.potential
+		}];
+		return output;
     }
 
     this.BiomassTab = function (info) {
-        return [[]];
+        var bio = self.biohash[info.id];
+		var output = [{
+			"label": "Biomass",
+			"data": bio.id,
+		}, {
+			"label": "Name",
+			"data": bio.name
+		}, {
+			"label": "DNA fraction",
+			"data": bio.dna
+		}, {
+			"label": "RNA fraction",
+			"data": bio.RNA
+		}, {
+			"label": "Protein fraction",
+			"data": bio.protein
+		}, {
+			"label": "Cell wall fraction",
+			"data": bio.cellwall
+		}, {
+			"label": "Lipid fraction",
+			"data": bio.lipid
+		}, {
+			"label": "Cofactor fraction",
+			"data": bio.cofactor
+		}, {
+			"label": "Other fraction",
+			"data": bio.other
+		}, {
+			"label": "Energy mols",
+			"data": bio.energy
+		}, {
+			"label": "Equation",
+			"data": bio.equation
+		}];
+		return output;
     }
 
     this.GapfillTab = function (info) {
@@ -373,11 +494,16 @@ function KBaseFBA_FBAModel(modeltabs) {
 	
 	this.parse_gf_solutions = function(solutions) {		
 		var rxnshash = {};
+		var biochemws = "kbase";
+		var biochem = "default";
 		for (var i=0; i < solutions.length; i++) {
 			var solrxns = solutions[i].gapfillingSolutionReactions;
 			for (var j=0; j < solrxns.length; j++) {
-				solrxns[j].id = solrxns[j].reaction_ref.split("/").pop();
-				if (solrxns[j].id.match(/^rxn\d\d\d\d\d$/)) {
+				var array = solrxns[j].reaction_ref.split("/");
+				solrxns[j].id = array.pop();
+				if (solrxns[j].id.match(/^rxn\d\d\d\d\d$/) && array[3] == "reactions") {
+					biochemws = array[0];
+					biochem = array[1];
 					rxnshash[solrxns[j].id] = solrxns[j];
 				}
 			}
@@ -387,9 +513,15 @@ function KBaseFBA_FBAModel(modeltabs) {
     		ids.push(key);
 		}
 		if (ids.length > 0) {
-			var p = self.modeltabs.kbapi('fba', 'get_reactions', {reactions: ids}).then(function(data){
+			var p = self.modeltabs.kbapi('fba', 'get_reactions', {
+				reactions: ids,
+				biochemistry: biochem,
+    			biochemistry_workspace: biochemws
+			}).then(function(data){
 				for (var i=0; i < data.length; i++) {
-					rxnshash[data[i].id].equation = data[i].definition;
+					if (data[i]) {
+						rxnshash[data[i].id].equation = data[i].definition;
+					}
 				}
 				return solutions;
 			});
@@ -408,58 +540,98 @@ function KBaseFBA_FBAModel(modeltabs) {
         this.biomasscpds = [];
         this.gapfillings = this.data.gapfillings;
         this.cpdhash = {};
+        this.biohash = {};
         this.rxnhash = {};
         this.cmphash = {};
         this.genehash = {};
         this.gfhash = {};
+        this.biochemws = "kbase";
+		this.biochem = "default";
         for (var i=0; i < this.gapfillings.length; i++) {
         	this.gapfillings[i].simpid = "gf."+(i+1);
         	this.gfhash[this.gapfillings[i].simpid] = this.gapfillings[i];
         }
         for (var i=0; i< this.modelcompartments.length; i++) {
             var cmp = this.modelcompartments[i];
+            cmp.cmpkbid = cmp.compartment_ref.split("/").pop();
+            cmp.name = self.cmpnamehash[cmp.cmpkbid];
             this.cmphash[cmp.id] = cmp;
         }
         for (var i=0; i< this.modelcompounds.length; i++) {
             var cpd = this.modelcompounds[i];
+            var idarray = cpd.id.split('_');
+            cpd.dispid = idarray[0]+"["+idarray[1]+"]";
             cpd.cmpkbid = cpd.modelcompartment_ref.split("/").pop();
             cpd.cpdkbid = cpd.compound_ref.split("/").pop();
             if (cpd.name === undefined) {
-                cpd.name = cpd.id;
+                cpd.name = cpd.dispid;
             }
             cpd.name = cpd.name.replace(/_[a-zA-z]\d+$/, '');
             this.cpdhash[cpd.id] = cpd;
             if (cpd.cpdkbid != "cpd00000") {
+                var array = cpd.compound_ref.split("/");
+                this.biochemws = array[0];
+                this.biochem = array[1];
                 this.cpdhash[cpd.cpdkbid+"_"+cpd.cmpkbid] = cpd;
+                if (idarray[0] != cpd.cpdkbid) {
+                	cpd.dispid += "<br>("+cpd.cpdkbid+")";
+                }
             }
         }
         for (var i=0; i < this.biomasses.length; i++) {
         	var biomass = this.biomasses[i];
+        	this.biohash[biomass.id] = biomass;
         	biomass.dispid = biomass.id;
+        	var reactants = "";
+            var products = "";
         	for(var j=0; j < biomass.biomasscompounds.length; j++) {
         		var biocpd = biomass.biomasscompounds[j];
         		biocpd.id = biocpd.modelcompound_ref.split("/").pop();
-        		biocpd.name = this.cpdhash[biocpd.id].name+"<br>("+biocpd.id+")";
+        		var idarray = biocpd.id.split('_');
+        		biocpd.dispid = idarray[0]+"["+idarray[1]+"]";
+        		biocpd.name = this.cpdhash[biocpd.id].name;
         		biocpd.formula = this.cpdhash[biocpd.id].formula;
         		biocpd.charge = this.cpdhash[biocpd.id].charge;
         		biocpd.cmpkbid = this.cpdhash[biocpd.id].cmpkbid;
         		biocpd.biomass = biomass.id;
         		this.biomasscpds.push(biocpd);
+        		if (biocpd.coefficient < 0) {
+                    if (reactants.length > 0) {
+                        reactants += " + ";
+                    }
+                    if (biocpd.coefficient != -1) {
+                        var abscoef = Math.round(-1*100*biocpd.coefficient)/100;
+                        reactants += "("+abscoef+") ";
+                    }
+                    reactants += biocpd.name+"["+biocpd.cmpkbid+"]";
+                } else {
+                    if (products.length > 0) {
+                        products += " + ";
+                    }
+                    if (biocpd.coefficient != 1) {
+                        var abscoef = Math.round(100*biocpd.coefficient)/100;
+                        products += "("+abscoef+") ";
+                    }
+                    products += biocpd.name+"["+biocpd.cmpkbid+"]";
+                }
         	}
+        	biomass.equation = reactants + " => " + products;
         }
         for (var i=0; i< this.modelreactions.length; i++) {
             var rxn = this.modelreactions[i];
+            var idarray = rxn.id.split('_');
+            rxn.dispid = idarray[0]+"["+idarray[1]+"]";
             rxn.rxnkbid = rxn.reaction_ref.split("/").pop();
             rxn.cmpkbid = rxn.modelcompartment_ref.split("/").pop();
-            rxn.dispid = rxn.id.replace(/_[a-zA-z]\d+$/, '')+"["+rxn.cmpkbid+"]";
             rxn.name = rxn.name.replace(/_[a-zA-z]\d+$/, '');
+            rxn.gpr = "";
             if (rxn.name == "CustomReaction") {
-                rxn.name = rxn.id.replace(/_[a-zA-z]\d+$/, '');
+                rxn.name = rxn.dispid;
             }
             this.rxnhash[rxn.id] = rxn;
             if (rxn.rxnkbid != "rxn00000") {
                 this.rxnhash[rxn.rxnkbid+"_"+rxn.cmpkbid] = rxn;
-                if (rxn.rxnkbid+"_"+rxn.cmpkbid != rxn.id) {
+                if (rxn.rxnkbid != idarray[0]) {
                     rxn.dispid += "<br>("+rxn.rxnkbid+")";
                 }
             }
@@ -470,6 +642,9 @@ function KBaseFBA_FBAModel(modeltabs) {
                 sign = "=>";
             } else if (rxn.direction == "<") {
                 sign = "<=";
+            }
+            if (rxn.modelReactionProteins > 0) {
+            	rxn.gpr = "";
             }
             for (var j=0; j< rxn.modelReactionReagents.length; j++) {
                 var rgt = rxn.modelReactionReagents[j];
@@ -497,21 +672,36 @@ function KBaseFBA_FBAModel(modeltabs) {
             rxn.ftrhash = {};
             for (var j=0; j< rxn.modelReactionProteins.length; j++) {
                 var prot = rxn.modelReactionProteins[j];
+                if (j > 0) {
+                   	rxn.gpr += " or ";
+                }
+                rxn.gpr += "(";
                 for (var k=0; k< prot.modelReactionProteinSubunits.length; k++) {
                     var subunit = prot.modelReactionProteinSubunits[k];
-                    for (var m=0; m< subunit.feature_refs.length; m++) {
-                        rxn.ftrhash[subunit.feature_refs[m].split("/").pop()] = 1;
+                    if (k > 0) {
+                    	rxn.gpr += " and ";
                     }
+                    rxn.gpr += "(";
+                    if (subunit.feature_refs.length == 0) {
+                    	rxn.gpr += "Unknown";
+                    }
+                    for (var m=0; m< subunit.feature_refs.length; m++) {
+                    	var ftrid = subunit.feature_refs[m].split("/").pop();
+                        rxn.ftrhash[ftrid] = 1;
+                        if (m > 0) {
+                    		rxn.gpr += " or ";
+                    	}
+                    	rxn.gpr += ftrid;
+                    }
+                    rxn.gpr += ")";
                 }
+                rxn.gpr += ")";
             }
 
             rxn.dispfeatures = "";
             rxn.genes = [];
             for (var gene in rxn.ftrhash) {
-                if (rxn.dispfeatures.length > 0) {
-                    rxn.dispfeatures += "<br>";
-                }
-                rxn.genes.push(gene);
+                rxn.genes.push({id:gene});
 
                 var genes = [];
                 this.modelgenes.forEach(function(item) {
@@ -519,9 +709,9 @@ function KBaseFBA_FBAModel(modeltabs) {
                 })
 
                 if (genes.indexOf(gene) == -1)
-                    this.modelgenes.push({id: gene, reactions: [rxn.dispid]});
+                    this.modelgenes.push({id: gene, reactions: [{id:rxn.id,dispid:rxn.dispid}]});
                 else
-                    this.modelgenes[genes.indexOf(gene)].reactions.push(rxn.dispid)
+                    this.modelgenes[genes.indexOf(gene)].reactions.push({id:rxn.id,dispid:rxn.dispid})
             }
 
             rxn.equation = reactants+" "+sign+" "+products;

@@ -26,7 +26,6 @@ function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
 			var kbObjects = new KBObjects();
 			self.phenoset = new kbObjects["KBasePhenotypes_PhenotypeSet"](self.tabwidget);
 			self.phenoset.setMetadata(data[0].info);
-			console.log(data[0].info);
 			return self.phenoset.setData(data[0].data);
  		}).then (function() {
   			self.formatObject();

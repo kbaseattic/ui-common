@@ -1,5 +1,7 @@
 (function( $, undefined ) {
 
+'use strict';
+
 $.KBWidget({
     name: "kbaseTabTable",
     parent: "kbaseAuthenticatedWidget",
@@ -11,6 +13,9 @@ $.KBWidget({
         this._super(input);
         var self = this;
 
+        // root url path for landing pages
+        var DATAVIEW_URL = '/functional-site/#/dataview/';
+
         var type = input.type;
 
         // tab widget
@@ -20,10 +25,10 @@ $.KBWidget({
         this.kbapi = function(service, method, params) {
             var url, method;
             if (service == 'ws') {
-                url = kb.urls.workspace_url;
+                url = "https://kbase.us/services/ws/";
                 method = 'Workspace.'+method;
-            } else if (service == 'fba') { 
-                url = kb.urls.fba_url;
+            } else if (service == 'fba') {
+                url = "https://kbase.us/services/KBaseFBAModeling/";
                 method = 'fbaModelServices.'+method;
             }
 
@@ -152,7 +157,8 @@ $.KBWidget({
                                 refLookup[ref.ref] = {name: data[i][1],
                                                       ws: data[i][7],
                                                       type: data[i][2].split('-')[0],
-                                                      link: data[i][2].split('-')[0]+'/'+data[i][7]+'/'+data[i][1]};
+                                                      //link: data[i][2].split('-')[0]+'/'+data[i][7]+'/'+data[i][1]
+                                                      link: data[i][7]+'/'+data[i][1]};
                             })
                        })
         }
@@ -309,25 +315,23 @@ $.KBWidget({
         function ref(key, type, format, method, action) {
             return function(d) {
                         if (type == 'tabLink' && format == 'dispIDCompart') {
-                            var id = d[key].split('_')[0];
-                            var compart = d[key].split('_')[1];
-
-                            if (id.search(/rxn\d+/g) != -1 || id.search(/cpd\d+/g) != -1)
-                                return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
-                                             id+'</a> ('+compart+')';
-                            else
-                                return id+' ('+compart+')';
-
+                            var dispid = d[key];
+                            if ("dispid" in d) {
+                            	dispid = d.dispid;
+                            }
+                            return '<a class="id-click" data-id="'+d[key]+'" data-method="'+method+'">'+
+                                             dispid+'</a>';
                         } else if (type == 'tabLink' && format == 'dispID') {
                             var id = d[key];
                             return '<a class="id-click" data-id="'+id+'" data-method="'+method+'">'+
                                         id+'</a>';
                         } else if (type == 'wstype' && format == 'dispWSRef') {
                             var ws = refLookup[ d[key] ].ws,
-                                name = refLookup[ d[key] ].name
+                                name = refLookup[ d[key] ].name,
                                 wstype = refLookup[ d[key] ].type,
                                 link = refLookup[ d[key] ].link;
-                            return '<a href="#/test/'+link+
+                            return '<a href="'+DATAVIEW_URL+link+
+                                     '" target="_blank" '+
                                      '" class="id-click"'+
                                      '" data-ws="'+ws+
                                      '" data-id="'+name+
@@ -353,10 +357,12 @@ $.KBWidget({
 
         function tabLinkArray(a, method) {
             var links = [];
-            a.forEach(function(id) {
-                links.push('<a class="id-click" data-id="'+id+
-                            '" data-method="'+method+'">'+
-                            id+'</a>');
+            a.forEach(function(d) {
+            	var dispid = d.id;
+				if ("dispid" in d) {
+					dispid = d.dispid;
+				}
+				links.push('<a class="id-click" data-id="'+d.id+'" data-method="'+method+'">'+dispid+'</a>');
             })
             return links.join(', ');
         }
@@ -383,21 +389,29 @@ $.KBWidget({
                 // if the data is in the row definition, use it
                 if ('data' in row) {
                     var value;
-                    if (type == 'tabLinkArray')
+                    if (type == 'tabLinkArray') {
                         value = tabLinkArray(row.data, row.method);
-                    else
+                    } else if (type == 'tabLink') {
+                        value = '<a class="id-click" data-id="'+row.data+'" data-method="'+row.method+'">'+
+                        row.dispid+'</a>';
+                    } else {
                         value = row.data;
+                    }
                     r.append('<td>'+value+'</td>');
                 } else if ('key' in row) {
                     if (row.type == 'wstype') {
                         var ref = data[row.key];
-                        var cell = $('<td data-ref="'+ref+'">loading...</td>');
 
-                        getLink(data[row.key]).done(function(url) {
-                            var name = url.split('/')[2]
-                            cell.html('<a href="#/test/'+url+'">'+name+'</a>');
-                        })
+                        var cell = $('<td data-ref="'+ref+'">loading...</td>');
                         r.append(cell);
+
+                        getLink(ref).done(function(info) {
+                            var name = info.url.split('/')[1];
+                            var ref = info.ref;
+                            table.find("[data-ref='"+ref+"']")
+                                 .html('<a href="'+DATAVIEW_URL+info.url+'" target="_blank">'+name+'</a>');
+                        })
+
                     } else {
                         r.append('<td>'+data[row.key]+'</td>');
                     }
@@ -412,6 +426,7 @@ $.KBWidget({
 
 
         this.getBiochemReaction = function(id) {
+        	var input = {reactions: [id]};
             return self.kbapi('fba', 'get_reactions', {reactions: [id]})
                        .then(function(data) {
                           return data[0];
@@ -505,7 +520,7 @@ $.KBWidget({
                         {objects: [{ref: ref}]})
                         .then(function(data){
                             var a = data[0];
-                            return a[2].split('-')[0]+'/'+a[7]+'/'+a[1];
+                            return {url: a[7]+'/'+a[1], ref: a[6]+'/'+a[0]+'/'+a[4]};
                         })
         }
 
