@@ -549,11 +549,9 @@
 			    }
 			),
 			self.ws.get_object_provenance(
-			//self.ws.get_objects(
 			    objIdentities,
 			    function(objdata) {
 				var uniqueRefs = {}; var uniqueRefObjectIdentities = []; var links = [];
-				// first get refs from the 
 				//console.log(objdata);
 				for(var i=0; i<objdata.length; i++) {
 				    // extract the references contained within the object
@@ -712,6 +710,10 @@
 	    var self = this;
 	    //loop over graph nodes, get next version, if it is in our node list, then add it
 	    for(var i=0; i<self.graph.nodes.length; i++) {
+		//console.log(self.graph.nodes[i]);
+		if (self.graph.nodes[i].nodeType==='copied') {
+		    continue;
+		}
 		//0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
 		var expectedNextVersion = self.graph.nodes[i]['info'][4] + 1;
 		var expectedNextId = self.graph.nodes[i]['info'][6]+"/"+self.graph.nodes[i]['info'][0]+"/"+expectedNextVersion;
