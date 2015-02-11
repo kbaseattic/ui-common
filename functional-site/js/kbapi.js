@@ -20,10 +20,10 @@ function KBCacheClient(token) {
     }
     self.urls = urls;
     
-    console.log('FBA URL is:', fba_url);
-    console.log('Workspace URL is:', ws_url);
+    //console.log('FBA URL is:', fba_url);
+    //console.log('Workspace URL is:', ws_url);
     //console.log('User Job State URL is:', ujs_url);
-    console.log('Search Service URL is:', search_url);    
+    //console.log('Search Service URL is:', search_url);    
 
     var fba = new fbaModelServices(fba_url, auth);
     var kbws = new Workspace(ws_url, auth);

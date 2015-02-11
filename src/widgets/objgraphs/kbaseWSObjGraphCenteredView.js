@@ -329,12 +329,11 @@
 			.html(function(d) {
 			      //0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
 			      var info = d['info'];
-			      var savedate = new Date(info[3]);
 			      var text =
 				      info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")\n"+
 				      "--------------\n"+
 				      "  type:  "+info[2]+"\n"+
-				      "  saved on:  "+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"\n"+
+				      "  saved on:  "+self.getTimeStampStr(info[3])+"\n"+
 				      "  saved by:  "+info[5]+"\n";
 			      var found = false; var metadata = "  metadata:\n";
 			      for( var m in info[10]) {
@@ -433,16 +432,7 @@
 	
 	
 	getTableRow: function(rowTitle, rowContent) {
-	    var title = null;
-	    if (rowContent.length>500) {
-		title = rowContent;
-		rowContent = rowContent.substr(0,500) +" ...";
-	    }
-	    if (title) {
-		title = title.replace(/"/g, '&quot;');
-		return "<tr><td><b>"+rowTitle+'</b></td><td style="width:250px;"><div style="width:250px;word-wrap: break-word;">'+rowContent+"</div></td></tr>";
-	    }
-	    return "<tr><td><b>"+rowTitle+'</b></td><td><div style="width:250px;word-wrap: break-word;">'+rowContent+"</div></td></tr>";
+	    return "<tr><td><b>"+rowTitle+'</b></td><td style="width:250px;"><div style="width:250px;max-height:250px;overflow-y:auto;word-wrap: break-word;">'+rowContent+"</div></td></tr>";
 	},
 	
 	getNodeLabel: function(info) {
@@ -584,7 +574,6 @@
 						uniqueRefs[objdata[i].copied] = 'copied'; // TODO switch to prov??
 						uniqueRefObjectIdentities.push({ref:objdata[i].copied});
 					    }
-					    console.log('adding copy link from ',objdata[i].copied, 'to ', objIdentities[i]['ref'] )
 					    links.push({source:objdata[i].copied, target:objIdentities[i]['ref'], value:1});
 					}
 				    }
@@ -740,7 +729,32 @@
             return {ref:wsNameOrId+"/"+objNameOrId } ;
         },
         
-        monthLookup : ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep","Oct", "Nov", "Dec"]
-
+	
+	
+	// edited from: http://stackoverflow.com/questions/3177836/how-to-format-time-since-xxx-e-g-4-minutes-ago-similar-to-stack-exchange-site
+        getTimeStampStr: function (objInfoTimeStamp) {
+            var date = new Date(objInfoTimeStamp);
+            var seconds = Math.floor((new Date() - date) / 1000);
+            
+            // f-ing safari, need to add extra ':' delimiter to parse the timestamp
+            if (isNaN(seconds)) {
+                var tokens = objInfoTimeStamp.split('+');  // this is just the date without the GMT offset
+                var newTimestamp = tokens[0] + '+'+tokens[0].substr(0,2) + ":" + tokens[1].substr(2,2);
+                date = new Date(newTimestamp);
+                seconds = Math.floor((new Date() - date) / 1000);
+                if (isNaN(seconds)) {
+                    // just in case that didn't work either, then parse without the timezone offset, but
+                    // then just show the day and forget the fancy stuff...
+                    date = new Date(tokens[0]);
+                    return this.monthLookup[date.getMonth()]+" "+date.getDate()+", "+date.getFullYear();
+                }
+            }
+            
+            // keep it simple, just give a date
+            return this.monthLookup[date.getMonth()]+" "+date.getDate()+", "+date.getFullYear();
+        },
+        
+        monthLookup : ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep","Oct", "Nov", "Dec"],
+        
     });
 })( jQuery )

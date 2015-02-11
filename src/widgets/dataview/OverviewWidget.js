@@ -8,11 +8,40 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb
                cfg.title = 'Data Object Summary';
                this.DataviewWidget_init(cfg);
 
+               
+               
+               
+               var monthLookup = ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep","Oct", "Nov", "Dec"];
                this.templates.env.addFilter('dateFormat', function (dateString) {
                   if (Utils.isBlank(dateString)) {
                      return '';
                   } else {
-                     return Utils.niceElapsedTime(dateString);
+                     // not sure where utils is coming from, but it doesn't work in safari because the workspace timestamp, despite
+                     // being properly formatted iso timestamp, for whatever reason doesn't work in safari.  This is a fix we've added
+                     // in a number of places now- ug we so need a refactor --mike
+                     
+                     // edited from: http://stackoverflow.com/questions/3177836/how-to-format-time-since-xxx-e-g-4-minutes-ago-similar-to-stack-exchange-site
+                     var date = new Date(dateString);
+                     var seconds = Math.floor((new Date() - date) / 1000);
+            
+                     // f-ing safari, need to add extra ':' delimiter to parse the timestamp
+                     if (isNaN(seconds)) {
+                         var tokens = dateString.split('+');  // this is just the date without the GMT offset
+                         var newTimestamp = tokens[0] + '+'+tokens[0].substr(0,2) + ":" + tokens[1].substr(2,2);
+                         date = new Date(dateString);
+                         seconds = Math.floor((new Date() - date) / 1000);
+                         if (isNaN(seconds)) {
+                             // just in case that didn't work either, then parse without the timezone offset, but
+                             // then just show the day and forget the fancy stuff...
+                             date = new Date(tokens[0]);
+                             return monthLookup[date.getMonth()]+" "+date.getDate()+", "+date.getFullYear();
+                         }
+                     }
+                     
+                     // keep it simple, just give a date without time: look in narrative data list if we want to switch to 'time ago' format.
+                     return monthLookup[date.getMonth()]+" "+date.getDate()+", "+date.getFullYear();
+                  
+                     //return Utils.niceElapsedTime(dateString);
                   }
                }.bind(this));
                this.templates.env.addFilter('fileSizeFormat', function (numberString) {
