@@ -6,13 +6,13 @@
 .sankeynode text {
   font-weight:bold;
   pointer-events: none;
-  text-shadow: 0 1px 0 #fff;
+  text-shadow: 0 0 5px #fff;
 }
 .sankeylink {
   fill: none;
-  stroke: #000;
+  stroke: #777;
   stroke-opacity: .2;
 }
 .sankeylink:hover {
-  stroke-opacity: .4;
+  stroke-opacity: .6;
 }
