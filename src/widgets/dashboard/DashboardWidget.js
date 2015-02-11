@@ -172,6 +172,34 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                      return false;
                   }
                });
+                this.templates.env.addFilter('isEmpty', function (x) {
+                   if (x === null || x === undefined || (typeof x === 'string' && x.length === 0)) {
+                     return true;
+                  } else if (x.push && x.pop && x.length === 0) {
+                     return true;
+                  } else if (Object.keys(x).length === 0) {
+                     return true;
+                  } else {
+                     return false;
+                  }
+               });
+               this.templates.env.addFilter('sort', function (x) {
+                  //console.log('X'); console.log(x);
+                  if (typeof x === 'object' && x.pop && x.push) {
+                    // console.log('sorting...');
+                     return x.sort(function (a,b) {
+                        if (a < b) {
+                           return 1;
+                        } else if (a > b) {
+                           return -1;
+                        } else {
+                           return 0;
+                        }
+                     });
+                  } else {
+                     return x;
+                  }
+               });
                
                this.templates.env.addGlobal('randomNumber', function (from, to) {
                   return Math.floor(from + Math.random()*(to - from));
@@ -635,8 +663,6 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
          // displays the appropriate content.
          render: {
             value: function () {
-               // Generate initial view based on the current state of this widget.
-               // Head off at the pass -- if not logged in, can't show profile.
                try {
                   if (this.error) {
                      this.renderError();

@@ -35,16 +35,23 @@
     white-space: nowrap;
     xbackground: silver;
  }
- 
- .kbase-dashboard-view .slider .slide {
+
+ .kbase-dashboard-view .slider .-card {
     display: inline-block;
+    position: relative;
+    vertical-align: top;
     xwhite-space: normal;
     xposition: relative;
     xfloat: left;
     xclear: none;
     margin: 4px;
-    height: 150px;
-    min-width: 150px;
+    xheight: 150px;
+    xmin-width: 150px;
+    
+    height: 200px;
+    xmin-width: 200px;
+    xmax-width: 400px;
+    width: 250px;
     
     
     overflow: hidden;
@@ -55,6 +62,82 @@
     xborder: 1px #337ab7 solid;
     xborder-radius: 4px;
     xbox-shadow: 1px 1px 1px #ccc;
+ }
+.slider .-card .-inner {
+   position: relative;
+}
+
+.kbase-dashboard-view .slider .-card .-title {
+   position: absolute;
+   top: 0;
+   left: 0;
+   height: 30px;
+   width: 250px;
+   font-weight: bold;
+   padding: 5px;
+   xborder: 1px red solid;
+}
+.kbase-dashboard-view .slider .-card .-body {
+   position: absolute;
+   top: 30px;
+   left: 0;
+   height: 130px;
+   width: 250px;
+   xoverflow-x: auto;
+   xoverflow-y: hidden;
+   padding: 3px;
+   xborder: 1px red solid;
+}
+.kbase-dashboard-view .slider .-card .-saved {
+   position: absolute;
+   top: 160px;
+   left: 0;
+   height: 20px;
+   width: 250px;
+   text-align: center;
+   xborder: 1px red solid;
+   
+}
+.kbase-dashboard-view .slider .-card .-footer {
+   position: absolute;
+   top: 180px;
+   left: 0;
+   height: 20px;
+   width: 250px;
+   xborder: 1px red solid;
+   
+}
+
+.kbase-dashboard-view .slider .-card table {
+    height: 100%;
+    width: 100%;
+ }
+ 
+
+
+ .kbase-dashboard-view .slider .slide {
+    display: inline-block;
+    xwhite-space: normal;
+    xposition: relative;
+    xfloat: left;
+    xclear: none;
+    margin: 4px;
+    height: 150px;
+    min-width: 150px;
+    
+    overflow: hidden;
+    padding: 4px;
+    background-color: #d9edf7;
+    box-shadow: 1px 1px 1px #ccc;
+    /* go with the flow... */
+    xborder: 1px #337ab7 solid;
+    xborder-radius: 4px;
+    xbox-shadow: 1px 1px 1px #ccc;
+ }
+
+ .kbase-dashboard-view .slider .slide table {
+    width: 200px;
+    overflow: hidden;
  }
  
  .kbase-dashboard-view .slide .title {

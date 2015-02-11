@@ -3,8 +3,10 @@ define(['q'],
       "use strict";
       var Utils = Object.create({}, {
          getProp: {
-            value: function (obj, prop, defaultValue) {
-               var props = prop.split('.');
+            value: function (obj, props, defaultValue) {
+               if (typeof props === 'string') {
+                  props = props.split('.');
+               }
 
                var temp = obj;
                for (var i = 0; i < props.length; i++) {
@@ -20,8 +22,10 @@ define(['q'],
          },
 
          hasProp: {
-            value: function (obj, prop) {
-               var props = prop.split('.');
+            value: function (obj, props) {
+               if (typeof props === 'string') {
+                  props = props.split('.');
+               }
 
                var temp = obj;
                for (var i = 0; i < props.length; i++) {
