@@ -64,7 +64,7 @@
 	
 	typeToName: {
 	    "selected": " Current version",
-	    "core":" Previous versions",
+	    "core":" All Versions of this Data",
 	    "ref":" Data Referencing this Data",
 	    "included":" Data Referenced by this Data",
 	    "copied":"Copied From"
@@ -86,6 +86,7 @@
 			    '<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td valign=\"top\"><table cellpadding="2" cellspacing="0" border="0" id="graphkey" \
 				style="">'
 		for(var t in self.typeToName) {
+		    if (t==='selected') { continue; }
 		    html += "<tr><td><svg width=\"40\" height=\"20\"><rect x=\"0\" y=\"0\" width=\"40\" height=\"20\" fill=\""+self.typeToColor[t] +"\" \
 		     /></svg></td><td valign=\"middle\"><b> \
 		    "+self.typeToName[t]+"</b></td></tr>";
