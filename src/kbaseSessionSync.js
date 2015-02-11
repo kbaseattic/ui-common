@@ -80,7 +80,7 @@
                 session.token = session.token.replace(/PIPESIGN/g, '|').replace(/EQUALSSIGN/g, '=');
                 // now we have a session object equivalent to the one returned by the auth service.
                 session.tokenObject = this.decodeToken(session.token);
-
+               
                 if (!this.validateSessionObject(session)) {
                     // zap cookies if we had a bad cookie.
                     this.removeAuth();
