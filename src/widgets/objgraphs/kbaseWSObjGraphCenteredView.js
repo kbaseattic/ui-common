@@ -263,7 +263,7 @@
 					
 					
 					if (objdata.length>0) {
-					    console.log(objdata[0]);
+					    //console.log(objdata[0]);
 					    if (objdata[0].copied) {
 						text+=self.getTableRow("Copied from",'<a href="#/dataview/'+objdata[0].copied+'" target="_blank">'+objdata[0].copied+'</a>');
 					    }
