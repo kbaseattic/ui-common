@@ -393,8 +393,7 @@
 		text += self.getTableRow(prefix+"Method",provenanceAction['method']);
 	    }
 	    if ('method_params' in provenanceAction) {
-		text += self.getTableRow(prefix+"Method Parameters",JSON.stringify(self.scrub(provenanceAction['method_params'])));
-		
+		text += self.getTableRow(prefix+"Method Parameters",JSON.stringify(self.scrub(provenanceAction['method_params']),null,'  '));
 	    }
 	    
 	    if ('script' in provenanceAction) {
@@ -409,16 +408,16 @@
 	    
 	    if ('intermediate_incoming' in provenanceAction) {
 		if (provenanceAction['intermediate_incoming'].length>0)
-		    text += self.getTableRow(prefix+"Action Input",JSON.stringify(provenanceAction['intermediate_incoming']));
+		    text += self.getTableRow(prefix+"Action Input",JSON.stringify(provenanceAction['intermediate_incoming'],null,'  '));
 	    }
 	    if ('intermediate_outgoing' in provenanceAction) {
 		if (provenanceAction['intermediate_outgoing'].length>0)
-		    text += self.getTableRow(prefix+"Action Output",JSON.stringify(provenanceAction['intermediate_outgoing']));
+		    text += self.getTableRow(prefix+"Action Output",JSON.stringify(provenanceAction['intermediate_outgoing'],null,'  '));
 	    }
 	    
 	    if ('external_data' in provenanceAction) {
 		if (provenanceAction['external_data'].length>0)
-		    text += self.getTableRow(prefix+"External Data",JSON.stringify(provenanceAction['external_data']));
+		    text += self.getTableRow(prefix+"External Data",JSON.stringify(provenanceAction['external_data'],null,'  '));
 	    }
 	    
 	    if ('time' in provenanceAction) {
@@ -443,7 +442,7 @@
 	},
 	
 	getTableRow: function(rowTitle, rowContent) {
-	    return "<tr><td><b>"+rowTitle+'</b></td><td style="width:250px;"><div style="width:250px;max-height:250px;overflow-y:auto;word-wrap: break-word;">'+rowContent+"</div></td></tr>";
+	    return "<tr><td><b>"+rowTitle+'</b></td><td style="width:250px;"><div style="width:250px;max-height:250px;overflow-y:auto;white-space:pre;word-wrap: break-word;">'+rowContent+"</div></td></tr>";
 	},
 	
 	getNodeLabel: function(info) {
