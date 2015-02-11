@@ -63,7 +63,7 @@ define(['jquery'],
                   } else {
                      var target = '';
                   }
-                  var button = $('<a data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + ' xnavbar-btn xkb-nav-btn" role="button" href="' + cfg.url + '" ' + target + '>' +
+                  var button = $('<a data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + (cfg.class?' '+cfg.class:'')+' xnavbar-btn xkb-nav-btn" role="button" href="' + cfg.url + '" ' + target + '>' +
                      '  <span class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></span>' + label + '</a>')
 
                } else {
@@ -103,7 +103,7 @@ define(['jquery'],
                for (var i=0; i<cfg.buttons.length; i++) {
                   var button = cfg.buttons[i];
                   
-                  var toggle = $('<label class="btn btn-primary'+(button.active?' active':'')+'"><input type="radio" name="temp" autocomplete="off">' + button.label  + '</label>')
+                  var toggle = $('<label class="btn btn-primary'+(button.active?' active':'')+ (button.class?' '+button.class:'')+'"><input type="radio" name="temp" autocomplete="off">' + button.label  + '</label>')
                   .on('click', (function (cb) {
                      return function (e) {
                         e.preventDefault();

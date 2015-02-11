@@ -12,7 +12,7 @@ angular.module('social-directives')
       return {
          link: function (scope, ele, attrs) {
             "use strict";
-            require(['kbaseuserprofilewidget', 'jquery'], function (W, $) {
+            require(['kb.widget.social.user_profile', 'jquery'], function (W, $) {
                var widget = Object.create(W);
                widget.init({
                   container: $(ele),
@@ -25,7 +25,7 @@ angular.module('social-directives')
    .directive('socialusersearch', function ($rootScope) {
       return {
          link: function (scope, ele, attrs) {
-            require(['kbaseusersearch'], function (UserSearchWidget) {
+            require(['kb.widget.social.user_search'], function (UserSearchWidget) {
                Object.create(UserSearchWidget).init({
                   container: $(ele),
                   userId: scope.params.userid
@@ -34,7 +34,7 @@ angular.module('social-directives')
          }
       };
    })
-   .directive('socialusersummary', function ($rootScope) {
+   /*.directive('kb.widget.social.user_summary', function ($rootScope) {
       return {
          link: function (scope, ele, attrs) {
             require(['kbaseusersummary'], function (Widget) {
@@ -46,11 +46,12 @@ angular.module('social-directives')
          }
       };
    })
+   */
    .directive('socialbrowsenarratives', function ($rootScope) {
       return {
          link: function (scope, ele, attrs) {
 
-            require(['kbaseuserbrowsenarratives'], function (Widget) {
+            require(['kb.widget.social.browse_narratives'], function (Widget) {
                try {
                   var widget = Object.create(Widget);
                   widget.init({
@@ -69,7 +70,7 @@ angular.module('social-directives')
    return {
       link: function (scope, ele, attrs) {
 
-         require(['kbaseusercollaboratornetwork'], function (Widget) {
+         require(['kb.widget.social.collaborators'], function (Widget) {
             try {
                var widget = Object.create(Widget);
                widget.init({

@@ -143,7 +143,7 @@
       // $(document).on('loggedOut.kbase', function(e) {
         this.sessionObject = null;
         var elem = this.$elem;
-        require(['kbaseloginwidget'], function (LoginWidget) {
+        require(['kb.widget.login'], function (LoginWidget) {
           try {
             var w = LoginWidget.init({
               container: elem,
@@ -294,7 +294,7 @@
    
     
     tickleSession: function () {
-      require(['kbasesession'], function (Session) {
+      require(['kb.session'], function (Session) {
         Session.setAuthCookie();
       })
     },
@@ -374,7 +374,7 @@
       // this.$elem.css('padding', '9px 15px 7px 10px');
       
       var elem = this.$elem;
-      require(['kbaseloginwidget'], function (LoginWidget) {
+      require(['kb.widget.login'], function (LoginWidget) {
         try {
           var w = LoginWidget.init({
             container: elem,
@@ -627,7 +627,7 @@
     },
     
     fetchUserProfile: function () {
-      require(['kbaseuserprofile', 'kbasesession'], 
+      require(['kb.user_profile', 'kb.session'], 
       function(UserProfile, Session) {
         var userProfile = Object.create(UserProfile).init({username: Session.getUsername()});
         userProfile.loadProfile()
@@ -663,7 +663,7 @@
     },
     
     login: function(user_id, password, callback) {
-      require(['kbasesession', 'q'], function(Session, Q) {
+      require(['kb.session', 'q'], function(Session, Q) {
         Session.login({
           username: user_id,
           password: password,
@@ -699,7 +699,7 @@
     },
 
     logout: function(rePrompt) {
-      require(['kbasesession'], function (Session) {
+      require(['kb.session'], function (Session) {
         Session.removeAuth();
 
         // the rest of this is just housekeeping.

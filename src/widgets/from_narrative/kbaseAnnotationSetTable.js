@@ -11,15 +11,15 @@
 	        id: null,
 	        ws: null
         },
-	    ws_url: window.kbconfig.urls.workspace,
 	    loading_image: "static/kbase/images/ajax-loader.gif",
         
 	    init: function(options) {
             this._super(options);
+	        this.ws_url = kb.urls.workspace_url;
             return this;
         },
 	
-        render: function() {
+        render: function() {            
 	        var self = this;
 	        var container = this.$elem;
 	        container.empty();
@@ -34,7 +34,10 @@
 	            container.empty();
 		        // parse data
 		        if (data.length == 0) {
-		            var msg = "[Error] Object "+self.options.id+" does not exist in workspace "+self.options.ws;
+		            //var msg = "[Error] Object "+self.options.id+" does not exist in workspace "+self.options.ws;
+                    
+                    // We are moving away from "workspace"
+		            var msg = "[Error] Object "+self.options.id+" can not be found";
 		            container.append('<div><p>'+msg+'>/p></div>');
 		        } else {
 		            var otus = data[0]['data']['otus'];

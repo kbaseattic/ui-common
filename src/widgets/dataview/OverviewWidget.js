@@ -1,4 +1,4 @@
-define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession', 'kbc_Workspace', 'kbasenavbar', 'q'],
+define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb.client.workspace', 'kb.widget.navbar', 'q'],
    function (DataviewWidget, APIUtils, Utils, Session, WorkspaceService, Navbar, Q) {
       "use strict";
       var widget = Object.create(DataviewWidget, {
@@ -267,14 +267,104 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
             }
          },
          
-//         checkRefCountAndFetchReferences: {
-//             value: function () {
-//                 Utils.promise(this.workspaceClient,
-//                         'list_referencing_objects_counts',
-//                         [{ref: }])
-//             }
-//         }
-//         
+         checkRefCountAndFetchOutgoingReferences: {
+             value: function () {
+                 Utils.promise(this.workspaceClient,
+                         'get_object_provenance', [{ref: this.getObjectRef()}])
+                 .then(function(provdata) {
+                     var refs = provdata[0].refs;
+                     var prov = provdata[0].provenance;
+                     for (var i = 0; i < prov.length; i++) {
+                         refs = refs.concat(prov[i].resolved_ws_objects);
+                     }
+                     if (refs.length > 100) {
+                         this.setState('too_many_out_refs', true);
+                     } else {
+                         this.setState('too_many_out_refs', false);
+                         this.fetchOutgoingReferences(refs);
+                     }
+                 }.bind(this))
+                 .catch(function(err) {
+                     this.setError('client', err);
+                 }.bind(this))
+                 .done();
+             }
+         },
+         
+         fetchOutgoingReferences: {
+             value: function(reflist) {
+                 //really need a ws method to get referenced object info
+                 //do to this correctly. For now, just dump the reference
+                 //if it's not visible
+                 if (reflist.length < 1) {
+                     return;
+                 }
+                 var objids = []
+                 for (var i = 0; i < reflist.length; i++) {
+                     objids.push({ref: reflist[i]});
+                 }
+                 Utils.promise(this.workspaceClient, 'get_object_info_new',
+                         {objects: objids, ignoreErrors: 1})
+                 .then(function (dataList) {
+                     var refs = [];
+                     if (dataList) {
+                         for(var i = 0; i < dataList.length; i++) {
+                             if (dataList[i]) { // null if not visible
+                                 refs.push(APIUtils.object_info_to_object(
+                                         dataList[i]));
+                             }
+                         }
+                     }
+                     this.setState('out_references', refs.sort(
+                             function (a,b) {return b.name - a.name}));
+                 }.bind(this))
+                 .catch(function (err) {
+                     this.setError('client', err);
+                 }.bind(this))
+                 .done();
+             }
+         },
+         
+         checkRefCountAndFetchReferences: {
+             value: function () {
+                 Utils.promise(this.workspaceClient,
+                         'list_referencing_object_counts',
+                         [{ref: this.getObjectRef()}])
+                 .then(function(sizes) {
+                     if (sizes[0] > 100) {
+                         this.setState('too_many_inc_refs', true);
+                     } else {
+                         this.setState('too_many_inc_refs', false);
+                         this.fetchReferences();
+                     }
+                 }.bind(this))
+                 .catch(function(err) {
+                     this.setError('client', err);
+                 }.bind(this))
+                 .done();
+             }
+         },
+         
+         setError: {
+             value: function(type, error) {
+                 this.setState('status', 'error');
+                 var err = error.error;
+                 console.error(err);
+                 var message;
+                 if (typeof err == "string") {
+                     message = err;
+                 } else {
+                     message = err.message;
+                 }
+                 this.setState('error', {
+                     type: type,
+                     code: 'error',
+                     shortMessage: 'An unexpected error occured',
+                     originalMessage: message
+                 });
+             }
+         },
+         
          fetchReferences: {
             value: function () {
                Utils.promise(this.workspaceClient, 'list_referencing_objects',
@@ -287,12 +377,11 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                         refs.push(APIUtils.object_info_to_object(dataList[0][i]));
                      }
                   }
-                  this.setState('references', refs.sort(function (a,b) {return b.name - a.name}));
+                  this.setState('inc_references', refs.sort(function (a,b) {return b.name - a.name}));
                }.bind(this))
                .catch(function (err) {
-                  console.log('ERROR'); 
-                  console.log(err);
-               })
+                  this.setError('client', err);
+               }.bind(this))
                .done();
             }
          },
@@ -394,8 +483,8 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kbaseutils', 'kbasesession',
                                  this.fetchVersions();
                                  
                                  // Get the references to this object
-                                 this.fetchReferences();
-                              
+                                 this.checkRefCountAndFetchReferences();
+                                 this.checkRefCountAndFetchOutgoingReferences();
                               
                                  // Other narratives this user has.
                                  Utils.promise(this.workspaceClient, 'list_workspace_info', {

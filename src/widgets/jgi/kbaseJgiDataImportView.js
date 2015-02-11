@@ -21,19 +21,19 @@
         
         typereg: {'KBaseFile.SingleEndLibrary':
                        {nicetype: 'Single End Read Library',
-                        app_name: 'Assembly and Annotation',
+                        app_name: 'Assembly and Annotation app',
                         app: 'genome_assembly',
                         appParam: '1,read_library,'
                         },
                    'KBaseFile.PairedEndLibrary':
                        {nicetype: 'Paired End Read Library',
-                        app_name: 'Assembly and Annotation',
+                        app_name: 'Assembly and Annotation app',
                         app: 'genome_assembly',
                         appParam: '1,read_library,'
                         },
                    'KBaseFile.AssemblyFile':
                        {nicetype: 'Assembly File',
-                        app_name: 'Assembly File to ContigSet',
+                        app_name: 'Assembly File to ContigSet method',
                         method: 'convert_annotation_file_to_contig_set',
                         appParam: '1,input_assyfile,' //1 is ignored
                         },
@@ -180,7 +180,7 @@
                                         self.objData.name +
                                         '">').addClass('btn btn-info')
                             .css({'margin':'5px'})
-                            .append('Launch ' + typeInfo.app_name + ' App'));
+                            .append('Launch ' + typeInfo.app_name));
             }
             self.addCopyDropdown($buttonDiv);
 

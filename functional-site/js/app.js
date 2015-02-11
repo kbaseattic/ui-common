@@ -755,7 +755,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     $rootScope.Object = Object;      
     
     
-    require(['kbasenavbar'], function (NAVBAR) {
+    require(['kb.widget.navbar'], function (NAVBAR) {
       // Make sure we clear the navbar upon exit.
       // We have to use angular here, because it seems to 
       // eat hashchange for a[href] clicks.

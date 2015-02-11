@@ -1,10 +1,10 @@
-define(['jquery', 'nunjucks', 'dashboard_widget', 'kb.client.methods', 'kbc_Workspace', 'kbc_UserProfile', 'kbasesession', 'kbaseutils', 'kb.utils.api', 'q'],
-   function ($, nunjucks, DashboardWidget, ClientMethods, WorkspaceService, UserProfileService, Session, Utils, APIUtils, Q) {
+define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.methods', 'kb.client.workspace', 'kb.client.user_profile', 'kb.session', 'kb.utils', 'kb.utils.api', 'q'],
+   function ($, Postal, nunjucks, DashboardWidget, ClientMethods, WorkspaceService, UserProfileService, Session, Utils, APIUtils, Q) {
       "use strict";
       var Widget = Object.create(DashboardWidget, {
          init: {
             value: function (cfg) {
-               cfg.name = 'CollaboratorNetwork';
+               cfg.name = 'CollaboratorsWidget';
                cfg.title = 'Common Collaborator Network';
                this.DashboardWidget_init(cfg);
 
@@ -15,6 +15,21 @@ define(['jquery', 'nunjucks', 'dashboard_widget', 'kb.client.methods', 'kbc_Work
          go: {
             value: function () {
                this.start();
+               /*Postal.channel('dashboard.metrics')
+               .subscribe('query.collaborators', function (data) {
+                  if (this.hasState('collaborators')) {
+                     var count = n.length;
+                  } else {
+                     var count = null;
+                  }
+                  Postal.channel('dashboard.metrics')
+                  .publish('update.collaborators', {
+                     count: count
+                  });
+               }.bind(this));
+               */
+
+               
                return this;
             }
          },
@@ -38,12 +53,33 @@ define(['jquery', 'nunjucks', 'dashboard_widget', 'kb.client.methods', 'kbc_Work
                }
             }
          },
+         
+         onStateChange: {
+            value: function () {
+               if (this.hasState('collaborators')) {
+                  var count = this.getState('collaborators').length;
+               } else {
+                  var count = null;
+               }
+               
+               this.viewState.setItem('collaborators', {
+                  filtered: count,
+                  count: count
+               });
+               /*
+               Postal
+               .channel('dashboard.metrics')
+               .publish('update.collaborators', {
+                     count: count
+                  }
+               );
+               */
+            }
+         },
 
          setInitialState: {
             value: function (options) {
                return Q.Promise(function (resolve, reject, notify) {
-                  // console.log(this.initConfig);
-
                   if (!Session.isLoggedIn()) {
                      resolve();
                   } else {

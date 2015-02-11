@@ -20,12 +20,11 @@
             job_id: null
         },
         loadingImage: "assets/img/ajax-loader.gif",
-        wsUrl: window.kbconfig.urls.workspace,
         timer: null,
 
         init: function(options) {
             this._super(options);
-
+            this.wsUrl = kb.urls.workspace_url;
             this.ws_name = options.ws_name;
             this.ws_id = options.ws_id;
             if (options.job_id)

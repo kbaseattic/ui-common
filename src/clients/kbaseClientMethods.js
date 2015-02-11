@@ -1,4 +1,4 @@
-define(['q', 'kbasesession', 'kbaseutils', 'kb.utils.api', 'kbc_Workspace', 'kbc_UserProfile', 'kbaseconfig'],
+define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.client.workspace', 'kb.client.user_profile', 'kb.config'],
    function (Q, Session, Utils, APIUtils, Workspace, UserProfile, Config) {
 
       return Object.create({}, {
@@ -61,6 +61,11 @@ define(['q', 'kbasesession', 'kbaseutils', 'kb.utils.api', 'kbc_Workspace', 'kbc
                               ref: w.id + '/' + w.metadata.narrative
                            }
                         });
+                     
+                     if (objectRefs.length === 0) {
+                        resolve([]);
+                        return;
+                     }
 
                         // Now get the corresponding object metadata for each narrative workspace
                         Utils.promise(this.workspaceClient, 'get_object_info_new', {
@@ -84,6 +89,18 @@ define(['q', 'kbasesession', 'kbaseutils', 'kb.utils.api', 'kbc_Workspace', 'kbc
                                     console.log('WARNING: workspace ' + object.wsid + ' object ' + object.id + ' is not a valid Narrative object');
                                     continue;
                                  }
+                                 
+                                 // Convert some narrative-specific metadata properties.
+                                 //console.log('META');
+                                 //console.log(object.metadata);
+                                 if (object.metadata && object.metadata.job_info) { 
+                                    object.metadata.jobInfo = JSON.parse(object.metadata.job_info);
+                                 }
+                                 if (object.metadata && object.metadata.methods) {
+                                    //console.log('HERE');
+                                    object.metadata.cellInfo = JSON.parse(object.metadata.methods);
+                                 }
+                                 
                                  narratives.push({
                                     workspace: workspaces[i],
                                     object: object
@@ -107,6 +124,10 @@ define(['q', 'kbasesession', 'kbaseutils', 'kb.utils.api', 'kbc_Workspace', 'kbc
          getPermissions: {
             value: function (narratives) {
                return Q.promise(function (resolve, reject, notify) {
+                  if (narratives.length === 0) {
+                     resolve([]);
+                     return;
+                  }
                   var promises = narratives.map(function (narrative) {
                      return Utils.promise(this.workspaceClient, 'get_permissions', {
                         id: narrative.workspace.id
