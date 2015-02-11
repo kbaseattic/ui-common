@@ -165,12 +165,12 @@
             var id = this.genUUID();
             $panel.append(
                     $('<div class="panel-group" id="accordion_'+id+'" role="tablist" aria-multiselectable="true">')
-                    .append($('<div class="panel panel-default">')
+                    .append($('<div class="panel panel-default kb-widget">')
                             .append(''+
                                     '<div class="panel-heading" role="tab" id="heading_'+id+'">'+
                                     '<h4 class="panel-title">'+
                                     '<span data-toggle="collapse" data-parent="#accordion_'+id+'" data-target="#collapse_'+id+'" aria-expanded="false" aria-controls="collapse_'+id+'" style="cursor:pointer;">'+
-                                    '<span class="fa fa-angle-right pull-left"></span>' + title + 
+                                    ' ' + title + 
                                     '</span>'+
                                     '</h4>'+
                                     '</div>'

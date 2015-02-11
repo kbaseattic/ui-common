@@ -36,13 +36,15 @@ angular.module('dataview')
             
             var $collapsableHeader = $(
                     '<div class="panel-group" id="provAccordion" role="tablist" aria-multiselectable="true">'+
-                         '<div class="panel panel-default">'+
+                         '<div class="panel panel-default kb-widget">'+
                             '<div class="panel-heading" role="tab" id="provHeading">'+
-                               '<h4 class="panel-title">'+
-                                  '<span data-toggle="collapse" data-parent="#provAccordion"  data-target="#provCollapse" aria-expanded="false" aria-controls="provCollapse" class="collapsed" style="cursor:pointer;">'+
-                                     '<span class="fa fa-sitemap fa-rotate-90 pull-left"></span> Data Provenance and Reference Network'+
-                                  '</span>'+
-                               '</h4>'+
+                                '<div class="row"><div class="col-sm-12">' +
+                                    '<h4 class="panel-title">'+
+                                       '<span data-toggle="collapse" data-parent="#provAccordion"  data-target="#provCollapse" aria-expanded="false" aria-controls="provCollapse" class="collapsed" style="cursor:pointer;">'+
+                                          '<span class="fa fa-sitemap fa-rotate-90" style="margin-left:10px;margin-right:10px;"></span> Data Provenance and Reference Network'+
+                                       '</span>'+
+                                    '</h4>'+
+                                '</div></div>'+
                             '</div>'+
                             '<div id="provCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="provHeading">'+
                                '<div class="panel-body">'+
@@ -53,18 +55,6 @@ angular.module('dataview')
             );
     
             $collapsableHeader.find('.panel-body').append($widgetDiv);
-            /*var $group = $('<div class="panel-group" id="prov_accordion_group">');
-            
-            var $title = $('<div>').addClass('panel-heading')
-                                        .append($('<span>').addClass('panel-title')
-                                                    .append('<a data-toggle="collapse" href="#provcontent">Data Provenance and Reference Graph</a>'));
-            var $body = $('<div id="provcontent" class="panel-collapse collapse in">')
-                            $('<div>').addClass('panel-body').append($widgetDiv);
-            
-            var $panel = $('<div>').addClass("panel panel-default")
-			    .append($title)
-			    .append($body);*/
-                            
             $(ele).append($collapsableHeader);
         }
     }; 
