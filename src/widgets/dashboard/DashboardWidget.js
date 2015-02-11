@@ -148,8 +148,30 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                   var days = Math.floor(hours/24);
                   var hours = hours % 24;
                   var showSeconds = false;
-                  return (days?days+'d':'') + (hours?' '+hours+'h':'') + (minutes?' '+minutes+'m':'') + (seconds && showSeconds?' '+seconds+'s':'')
+                   if (days) {
+                     return (days?days+'d':'') + (hours?' '+hours+'h':'')
+                  } else if (hours) {
+                     return (hours?' '+hours+'h':'') + (minutes?' '+minutes+'m':'')
+                  } else {
+                      return (minutes?' '+minutes+'m':'') + (seconds && showSeconds?' '+seconds+'s':'')
+                  }
+                  
+                  // return (days?days+'d':'') + (hours?' '+hours+'h':'') + (minutes?' '+minutes+'m':'') + (seconds && showSeconds?' '+seconds+'s':'')
                }.bind(this));
+               this.templates.env.addFilter('defaultDash', function(x) {
+                  if (x === null || x === undefined || (typeof x === 'string' && x.length === 0)) {
+                     return '-';
+                  } else {
+                     return x;
+                  }
+               });
+               this.templates.env.addFilter('isBlank', function (x) {
+                   if (x === null || x === undefined || (typeof x === 'string' && x.length === 0)) {
+                     return true;
+                  } else {
+                     return false;
+                  }
+               });
                
                this.templates.env.addGlobal('randomNumber', function (from, to) {
                   return Math.floor(from + Math.random()*(to - from));
