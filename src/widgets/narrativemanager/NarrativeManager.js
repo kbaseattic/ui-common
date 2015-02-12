@@ -619,8 +619,8 @@ var NarrativeManager = function(options, auth, auth_cb) {
     //     "<b>More Questions?</b> Email: [help@kbase.us](mailto:help@kbase.us)\n\n\n";
     this.docBaseUrl = kb.urls ? kb.urls.docsite.baseUrl : "http://staging.kbase.us";
     this.introText = 
-        "![KBase Logo](/static/kbase/images/kbase_logo.png) Welcome to the " +
-        "Narrative Interface!\n" +
+        "![KBase Logo](" + this.docBaseUrl + "/wp-content/uploads/2014/11/kbase-logo-web.png)\n" +
+        "Welcome to the Narrative Interface!\n" +
         "===\n\n" + 
         "<a href='" + this.docBaseUrl + "/narrative-guide/' style='text-decoration:underline'>What's a Narrative?</a>\n" +
         "---\n" +
