@@ -507,6 +507,13 @@ app
     $scope.ws = $stateParams.ws;
     $scope.type = $stateParams.type;
 
+    require(['kb.widget.navbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      });
+    });
+    
     $scope.nar_url = configJSON.narrative_url;
 
     var sub = $location.path().split('/')[1];
