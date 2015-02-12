@@ -462,6 +462,10 @@
                 }
                 rethtml += '<br/>';
             }
+            if ('resource_version' in edu) {
+                rethtml += "<b>Resource Version</b><br/>";
+                rethtml += edu["resource_version"] + "<br/>";
+            }
             if ('resource_release_date' in edu) {
                 rethtml += "<b>Resource Release Date</b><br/>";
                 rethtml += self.getTimeStampStr(edu["resource_release_date"]) + "<br/>";
