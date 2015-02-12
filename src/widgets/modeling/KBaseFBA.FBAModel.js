@@ -270,7 +270,11 @@ function KBaseFBA_FBAModel(modeltabs) {
 			"data": rxn.gpr
 		});
 		if (rxn.rxnkbid != "rxn00000") {
-			var p = self.modeltabs.kbapi('fba', 'get_reactions', {reactions: [rxn.rxnkbid]}).then(function(data) {
+			var p = self.modeltabs.kbapi('fba', 'get_reactions', {
+				reactions: [rxn.rxnkbid],
+				biochemistry: self.biochem,
+    			biochemistry_workspace: self.biochemws
+			}).then(function(data) {
 				if ("deltaG" in data[0]) {
 					output.push({
 						"label": "Delta G",
@@ -343,7 +347,11 @@ function KBaseFBA_FBAModel(modeltabs) {
 			"function": "CompartmentTab"
 		}];
 		if (cpd.cpdkbid != "cpd00000") {
-			var p = self.modeltabs.kbapi('fba', 'get_compounds', {compounds: [cpd.cpdkbid]}).then(function(data) {
+			var p = self.modeltabs.kbapi('fba', 'get_compounds', {
+				compounds: [cpd.cpdkbid],
+				biochemistry: self.biochem,
+    			biochemistry_workspace: self.biochemws
+			}).then(function(data) {
 				if ("deltaG" in data[0]) {
 					output.push({
 						"label": "Delta G",
