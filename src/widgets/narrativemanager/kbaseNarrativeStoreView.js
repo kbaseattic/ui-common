@@ -249,21 +249,21 @@
                 .append(
                     $.jqElem('div')
                         .addClass('btn-group')
-                        /*.append(
-                            $.jqElem('button')
-                                .addClass('btn btn-default')
-                                .append('Launch in New Narrative')
-                                .on('click', function (e) {
-                                    e.preventDefault(); e.stopPropagation();
-                                    alert('Add it to narrative, somehow!');
-                                })
-                        )*/
+                        .append(
+			    $('<a href="#/narrativemanager/new?app='+m.id+'" target="_blank">')
+			    .append(
+				$.jqElem('button')
+				    .addClass('kb-primary-btn')
+				    .append('<span class="fa fa-plus"></span> Launch in New Narrative')
+			    )
+                        )
                 )
         ;
 
-
 	    $header.append($basicInfo);
-	    $header.append($topButtons);
+	    if (self.auth() && self.auth().token) {
+		$header.append($topButtons);
+	    }
 
 	    self.$mainPanel.append($header);
 	    //self.$mainPanel.append('<hr>');
