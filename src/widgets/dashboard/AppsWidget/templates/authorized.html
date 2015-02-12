@@ -30,7 +30,7 @@
    <tbody>
       {% for app in state.appList %}
       <tr>
-         <td><a href="/functional-site/#/narrativemanager/new?app={{app.id}}" target="_blank">{{ app.name }}</a>
+         <td><a href="/functional-site/#/narrativestore/app/{{app.id}}" target="_blank">{{ app.name }}</a>
          </td>
          <td class="number">{{app.narrativeCount.owned.count}}</td>
          <td class="number">{{app.narrativeCount.shared.count}}</td>
