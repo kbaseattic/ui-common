@@ -417,8 +417,12 @@
 	    }
 	    
 	    if ('external_data' in provenanceAction) {
-		if (provenanceAction['external_data'].length>0)
-		    text += self.getTableRow(prefix+"External Data",JSON.stringify(provenanceAction['external_data'],null,'  '));
+	        if (provenanceAction['external_data'].length>0) {
+	            text += self.getTableRow(prefix+"External Data",
+	                    self.formatProvenanceExternalData(
+	                            provenanceAction['external_data']),
+	                    null , '  ');
+	        }
 	    }
 	    
 	    if ('time' in provenanceAction) {
@@ -427,6 +431,64 @@
 	    
 	    return text;
 	},
+	
+	formatProvenanceExternalData: function(extData) {
+	    /*
+	     * string resource_name - the name of the resource, for example JGI.
+         * string resource_url - the url of the resource, for example
+         *      http://genome.jgi.doe.gov
+         * string resource_version - version of the resource
+         * timestamp resource_release_date - the release date of the resource
+         * string data_url - the url of the data, for example
+         *      http://genome.jgi.doe.gov/pages/dynamicOrganismDownload.jsf?
+         *      organism=BlaspURHD0036
+         * string data_id - the id of the data, for example
+         *    7625.2.79179.AGTTCC.adnq.fastq.gz
+         * string description - a free text description of the data.
+         */
+        var self = this
+        var rethtml = '';
+        for (var i = 0; i < extData.length; i++) {
+            edu = extData[i];
+            if ('resource_name' in edu) {
+                rethtml += '<b>Resource Name</b><br/>';
+                if ('resource_url' in edu) {
+                    rethtml += '<a target="_blank" href=' + edu['resource_url'];
+                    rethtml += '>';
+                }
+                rethtml += edu["resource_name"];
+                if ('resource_url' in edu) {
+                    rethtml += '</a>';
+                }
+                rethtml += '<br/>';
+            }
+            if ('resource_version' in edu) {
+                rethtml += "<b>Resource Version</b><br/>";
+                rethtml += edu["resource_version"] + "<br/>";
+            }
+            if ('resource_release_date' in edu) {
+                rethtml += "<b>Resource Release Date</b><br/>";
+                rethtml += self.getTimeStampStr(edu["resource_release_date"]) + "<br/>";
+            }
+            if ('data_id' in edu) {
+                rethtml += '<b>Data ID</b><br/>';
+                if ('data_url' in edu) {
+                    rethtml += '<a target="_blank" href=' + edu['data_url'];
+                    rethtml += '>';
+                }
+                rethtml += edu["data_id"];
+                if ('data_url' in edu) {
+                    rethtml += '</a>';
+                }
+                rethtml += '<br/>';
+            }
+            if ('description' in edu) {
+                rethtml += "<b>Description</b><br/>";
+                rethtml += edu["description"] + "<br/>";
+            }
+        }
+        return rethtml;
+    },
 	
 	// removes any keys named 'auth'
 	scrub: function(objectList) {
