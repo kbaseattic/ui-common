@@ -154,10 +154,25 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
                return col;
             });
             
-            // user scaled to histogram
-            var user = {
-               scale: 100 * userValue/(bins.max - bins.min),
-               value: userValue
+            // user scaled to histogram.
+            // put user value into the correct bin.
+            var userBin;
+            for (var i=0; i<bins.bins.length; i++) {
+               var bin = bins.bins[i];
+               // console.log('test');console.log(userValue); console.log(bin.lower); console.log(bin.upper); console.log(bin.upperInclusive);
+               if (userValue >= bin.lower && ( (bin.upperInclusive && userValue <= bin.upper) || (userValue < bin.upper))) {
+                  userBin = i;
+                  break;
+               }
+            }
+            // console.log('user?'); console.log(userBin);
+            if (userBin !== undefined) {            
+               var user = {
+                  scale: userBin * width + width/2,
+                  value: userValue
+               }
+            } else {
+               var user = {scale: 0, value: 0}
             }
             
             this.setState('histogram.narrative', {

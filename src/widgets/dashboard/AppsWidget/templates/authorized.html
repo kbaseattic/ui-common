@@ -3,46 +3,90 @@
       <p>This panel shows KBase Apps.</p>
    </div>
 </div>
-<table class="table" id="dashboard-apps-widget-{{env.generatedId}}">
-   <thead>
-      <tr>
-         <th rowspan="2" valign="bottom">Name</th>
-         <th colspan="3" style="text-align: center;">In Narratives You Have Access To</th>
-         <!--<th>Last Updated</th>
-         
-         <th>Current Version</th>
-         -->
-      </tr>
-      <tr>
-         
-         <th class="number">Yours</th>
-         <th class="number">Shared</th>
-         <th class="number">Public</th>
-         <!--<th>Last Updated</th>
-         
-         <th>Current Version</th>
-         -->
-      </tr>
-   </thead>
-   <tfoot>
 
-   </tfoot>
-   <tbody>
-      {% for app in state.appList %}
-      <tr>
-         <td><a href="/functional-site/#/narrativemanager/new?app={{app.id}}" target="_blank">{{ app.name }}</a>
-         </td>
-         <td class="number">{{app.narrativeCount.owned.count}}</td>
-         <td class="number">{{app.narrativeCount.shared.count}}</td>
-         <td class="number">{{app.narrativeCount.public.count}}</td>
-         <!--<td>x</td>
-         
-         <td>{{ app.ver }}</td>
-         -->
-      </tr>
-      {% endfor %}
-   </tbody>
+<table width="100%">
+   <tr>
+      <th width="33%" valign="top">
+         <h4 style="text-align: center;">Your Favorite Apps</h4>         
+      </th>
+      <th width="33%" valign="top">
+         <h4 style="text-align: center;">Your Collaborators' Favorite Apps</h4>         
+      </th>
+       <th width="33%" valign="top">
+         <h4 style="text-align: center;">Popular in KBase</h4>         
+      </th>
+   </tr>
+   <tr>
+      <td width="33%" valign="top">
+         <table class="table table-striped">
+            {% for app in state.appList %} {% if app.narrativeCount.owned.count > 0 %}
+            <tr>
+               <td valign="baseline" style="vertical-align: middle;">
+               <a href="/functional-site/#/narrativestore/app/{{app.id}}" target="_blank">{{ app.name }}</a>
+               </td>
+               <td width="20px" valign="baseline" style="vertical-align: middle;"> 
+                                 
+                  <a href="/functional-site/#/narrativemanager/new?app={{app.id}}" class="btn btn-default btn-link" target="_blank"  data-toggle="tooltip" data-placement="auto" title="Create a new Narrative using this App" data-container="body">
+                    <span style="font-size: 80%;">
+                     <span class="fa-stack">
+                     <i class="fa fa-file fa-stack-2x"></i>
+                     <i class="fa fa-plus fa-inverse fa-stack-1x" style="margin-top: 2px;"></i>
+                     </span>
+                     </span>
+                  </a>
+               </td>
+            </tr>
+            {% endif %} {% endfor %}
+         </table>
+      </td>
+       <td width="33%" valign="top">
+         <table class="table table-striped">
+            {% for app in state.appList %} {% if app.narrativeCount.shared.count > 0 %}
+            <tr>
+               <td valign="baseline" style="vertical-align: middle;">
+               <a href="/functional-site/#/narrativestore/app/{{app.id}}" target="_blank">{{ app.name }}</a>
+               </td>
+               <td width="20px" valign="baseline" style="vertical-align: middle;"> 
+                                 
+                  <a href="/functional-site/#/narrativemanager/new?app={{app.id}}" class="btn btn-default btn-link" target="_blank"  data-toggle="tooltip" data-placement="auto" title="Create a new Narrative using this App" data-container="body">
+                    <span style="font-size: 80%;">
+                     <span class="fa-stack">
+                     <i class="fa fa-file fa-stack-2x"></i>
+                     <i class="fa fa-plus fa-inverse fa-stack-1x" style="margin-top: 2px;"></i>
+                     </span>
+                     </span>
+                  </a>
+               </td>
+            </tr>
+            {% endif %} {% endfor %}
+         </table>
+      </td>
+       <td width="33%" valign="top">
+         <table class="table table-striped">
+            {% for app in state.appList %} {% if app.narrativeCount.public.count > 0 %}
+            <tr>
+               <td valign="baseline" style="vertical-align: middle;">
+               <a href="/functional-site/#/narrativestore/app/{{app.id}}" target="_blank">{{ app.name }}</a>
+               </td>
+               <td width="20px" valign="baseline" style="vertical-align: middle;"> 
+                                 
+                  <a href="/functional-site/#/narrativemanager/new?app={{app.id}}" class="btn btn-default btn-link" target="_blank"  data-toggle="tooltip" data-placement="auto" title="Create a new Narrative using this App" data-container="body">
+                    <span style="font-size: 80%;">
+                     <span class="fa-stack">
+                     <i class="fa fa-file fa-stack-2x"></i>
+                     <i class="fa fa-plus fa-inverse fa-stack-1x" style="margin-top: 2px;"></i>
+                     </span>
+                     </span>
+                  </a>
+               </td>
+            </tr>
+            {% endif %} {% endfor %}
+         </table>
+      </td>
+   </tr>
 </table>
+
+
 <script>
    require(['jquery'], function ($) {
       return;
