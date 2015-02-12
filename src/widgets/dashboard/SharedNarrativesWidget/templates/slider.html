@@ -5,8 +5,10 @@
    {% if state.narratives == 0 %}
     
      <div class="-card">
-          <p>No narratives have been <br>
-             shared with you</p>
+          <p>No Narratives have been <br>
+             shared with you.</p>
+          <p>When a Narrative has been shared with<br>
+             you, it will appear in this panel.</p>
          
       </div>
      
@@ -57,23 +59,25 @@
          <div class="-footer">
             <div style="display:inline-block; width: 33%;text-align: center;">
                {% if narrative.workspace.user_permission == 'r' %}
-                  <span class="fa fa-minus dimmed"  style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="Sharing information not available for this Narrative" data-container="body"></span> {% else %} {% if narrative.permissions|length > 0 %} {{ narrative.permissions | length }} {% else %} 0 {% endif %} <span class="fa fa-share-alt"></span> {% endif %} {% if narrative.workspace.globalread == 'r' or narrative.workspace.globalread == 'w' %} P{% endif %}
+                  <span class="fa fa-minus dimmed"  style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="Sharing information not available for this Narrative" data-container="body"></span> {% else %} {% if narrative.permissions|length > 0 %} {{ narrative.permissions | length }} {% else %} 0 {% endif %} <span class="fa fa-share-alt"  data-toggle="tooltip" data-placement="auto" title="The number of other users with whom this Narrative has been shared" data-container="body"></span> {% endif %} {% if narrative.workspace.globalread == 'r' or narrative.workspace.globalread == 'w' %} P{% endif %}
             </div><div style="display:inline-block; width: 33%;text-align: center;">
-               {% set jobcount = narrative.object.metadata.jobInfo.running %}
-               {% if jobcount > 0 %}
-                  {{jobcount}} <span class="fa fa-gear fa-spin" style="color:green;"></span>
-               {% else %}
-                 <span class="fa fa-minus dimmed" style="opacity: 0.4;"></span>                  
+           
+               {% set runningJobs = narrative.object.metadata.jobInfo.running %}
+               {% set errorJobs = narrative.object.metadata.jobInfo.error %}
+               {% if (runningJobs == 0 or runningJobs|isBlank) and (runningJobs|isBlank or runningJobs == 0) %}
+                  <span class="fa fa-minus dimmed" style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="There are no jobs currently running for this Narrative" data-container="body"></span> 
                {% endif %}
-               {% set jobcount = narrative.object.metadata.jobInfo.error %}
-               {% if jobcount > 0 %}
-                  {{jobcount}} <span class="fa fa-exclamation-circle fa-spin" style="color:red;"></span>
+               {% if runningJobs > 0 %}
+                  {{runningJobs}} <span class="fa fa-gear fa-spin" style="color:green;"  data-toggle="tooltip" data-placement="auto" title="These are the jobs currently running for this Narrative" data-container="body"></span>
+               {% endif %}
+               {% if errorJobs > 0 %}
+                  {{errorJobs}} <span class="fa fa-exclamation-circle fa-spin" style="color:red;" data-toggle="tooltip" data-placement="auto" title="These are jobs which encountered an error while running" data-container="body"></span>
                {% endif %}
             </div><div style="display:inline-block; width: 33%;text-align: center;">
                {% if narrative.object.metadata.jobInfo.run_time %}
-		       {{narrative.object.metadata.jobInfo.run_time | niceRuntime}} <span class="fa fa-clock-o"></span>
+		       {{narrative.object.metadata.jobInfo.run_time | niceRuntime}} <span class="fa fa-clock-o" data-toggle="tooltip" data-placement="auto" title="This is the total wall clock run time for jobs in this Narrative" data-container="body"></span>
               {% else %}
-                <span class="fa fa-minus dimmed" style="opacity: 0.4;"></span> 
+                <span class="fa fa-minus dimmed" style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="This narrative has accumulated no job run time" data-container="body"></span> 
                {% endif %} 
             </div>
          </div>

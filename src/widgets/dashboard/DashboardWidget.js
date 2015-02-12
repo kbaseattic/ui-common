@@ -137,10 +137,11 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                 this.templates.env.addFilter('jsDatestring', function (dateString) {
                   return Utils.iso8601ToDate(dateString).toISOString();
                }.bind(this));
-               this.templates.env.addFilter('niceRuntime', function (seconds) {
-                  if (!seconds) {
+               this.templates.env.addFilter('niceRuntime', function (ms) {
+                  if (!ms) {
                      return ''
                   }
+                  var seconds = ms/1000;
                   var minutes = Math.floor(seconds/60);
                   var seconds = seconds % 60;
                   var hours = Math.floor(minutes/60);

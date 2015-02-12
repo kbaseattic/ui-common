@@ -185,7 +185,16 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                                  data.forEach(function (x) {
                                     x.narrativeCount = appMap[x.id];
                                  });
-                                 widget.setState('appList', data);
+                                 var appList = data.sort(function (a,b) {
+                                    if (a.name < b.name) {
+                                       return -1;
+                                    } else if (a.name > b.name) {
+                                       return 1;
+                                    } else {
+                                       return 0;
+                                    }
+                                 });
+                                 widget.setState('appList', appList);
 
                                  resolve();
                               })

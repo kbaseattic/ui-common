@@ -1,5 +1,5 @@
 <div class="slider">
-  
+  {% if state.narratives == 0 %}
       <div class="-card">
           
           <a role="button" class="btn btn-primary btn-kbase" href="/functional-site/#/narrativemanager/new" 
@@ -11,12 +11,12 @@
           
       </div>
       
-   {% if state.narratives == 0 %}
+   
     
      <div class="-card">
           <table><tr><td  style="max-width: 200px;margin: 0; padding: 0;">
-             <p>You do not currently own any Narratives.</p>
-             <p>It is easy to get started with a new Narrative.</p>
+             <p>You do not currently own any<br>Narratives.</p>
+             <p>It is easy to get started.</p>
              <p> <span class="fa fa-arrow-left"></span> Just click the big button to the left.</p>
          </td></tr></table>
          
@@ -75,7 +75,7 @@
             </div><div style="display:inline-block; width: 33%;text-align: center;">
                {% set runningJobs = narrative.object.metadata.jobInfo.running %}
                {% set errorJobs = narrative.object.metadata.jobInfo.error %}
-               {% if runningJobs + errorJobs == 0 %}
+               {% if (runningJobs == 0 or runningJobs|isBlank) and (runningJobs|isBlank or runningJobs == 0) %}
                   <span class="fa fa-minus dimmed" style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="There are no jobs currently running for this Narrative" data-container="body"></span> 
                {% endif %}
                {% if runningJobs > 0 %}

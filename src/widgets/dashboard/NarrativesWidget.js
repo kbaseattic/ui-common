@@ -131,8 +131,6 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
          
          setupUI: {
             value: function () {
-               //console.log('have narratives?');
-               //console.log(this.getState('narratives'));
                if (this.hasState('narratives') && this.getState('narratives').length > 0) {
                   this.buttonbar = Object.create(Buttonbar).init({
                      container: this.container.find('[data-placeholder="buttonbar"]')
