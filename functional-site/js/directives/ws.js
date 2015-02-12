@@ -395,7 +395,8 @@ angular.module('ws-directives')
                                 { sTitle: "Module", bVisible: false }];
 
                 var tableSettings = {
-                    sPaginationType: "bootstrap",
+                    //sPaginationType: "bootstrap",
+                    sPaginationType: "full_numbers",
                     stateSave: (USER_ID ? true : false),
                     stateSaveParams: function (settings, data) {
                         //don't save search filter
@@ -505,7 +506,7 @@ angular.module('ws-directives')
                 }
 
                 var tableSettings = {
-                    sPaginationType: "bootstrap",
+                    sPaginationType: "full_numbers",
                     stateSave: (USER_ID ? true : false),
                     stateSaveParams: function (settings, data) {
                         //don't save search filter
@@ -1254,8 +1255,8 @@ angular.module('ws-directives')
             var trashbin;
             function displayTrashBin() {
                 var tableSettings = {
-                    "sPaginationType": "bootstrap",
-                    //"sPaginationType": "full_numbers",
+                    //"sPaginationType": "bootstrap",
+                    "sPaginationType": "full_numbers",
                     "iDisplayLength": 10,
                     "aaData": [],
                     //"fnDrawCallback": events,
