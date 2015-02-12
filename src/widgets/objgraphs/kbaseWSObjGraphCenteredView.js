@@ -505,7 +505,7 @@
 	},
 	
 	getTableRow: function(rowTitle, rowContent) {
-	    return "<tr><td><b>"+rowTitle+'</b></td><td style="width:250px;"><div style="width:250px;max-height:250px;overflow-y:auto;white-space:pre;word-wrap: break-word;">'+rowContent+"</div></td></tr>";
+	    return '<tr><td style="max-width:250px;"><b>'+rowTitle+'</b></td><td style="max-width:300px;"><div style="max-width:300px;max-height:250px;overflow-y:auto;white-space:pre;word-wrap: break-word;">'+rowContent+"</div></td></tr>";
 	},
 	
 	getNodeLabel: function(info) {
