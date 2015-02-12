@@ -243,6 +243,12 @@ app
         'kind' : $stateParams.kind,
         'id' : $stateParams.id
     };
+    require(['kb.widget.navbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      });
+    });
 })
 
 
@@ -933,16 +939,34 @@ app
 .controller('JGI', function($scope, $stateParams) {
     $scope.params = {'ws': $stateParams.ws,
                      'obj': $stateParams.obj};
+    require(['kb.widget.navbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      });
+    });
 })
 
 
 
 .controller('narrativemanager', function($scope, $stateParams) {
     $scope.params = $stateParams;
+    require(['kb.widget.navbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      });
+    });
 })
 
 .controller('NarrativeStore', function($scope, $stateParams) {
     $scope.params = $stateParams;
+    require(['kb.widget.navbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      });
+    });
 })
 
 .controller('JsonDetail', function($scope, $stateParams) {
