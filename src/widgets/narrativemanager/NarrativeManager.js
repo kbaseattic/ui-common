@@ -641,7 +641,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
         "to your data list. Add to your results by running follow-on apps or methods.\n\n" +
         "<a href='" + this.docBaseUrl + "/narrative-guide/share-narratives/' style='text-decoration:underline'>Save and Share Your Narrative</a>\n" +
         "---\n" +
-        "Be sure to save your Narrative frequently. When you’re ready, click " + 
+        "Be sure to save your Narrative frequently. When you&apos;re ready, click " + 
         "the share button above to let collaborators view your analysis steps " +
         "and results. Or better yet, make your Narrative public and help expand " +
         "the social web that KBase is building to make systems biology research " +
