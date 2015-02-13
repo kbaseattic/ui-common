@@ -1,27 +1,18 @@
-<div class="container-fluid">
+<div class="container-fluid kbase-view kbase-search-view">
     <div class="row search-sections">
         <div class="col-sm-3 col-md-3 col-lg-3 search-left-nav search-leftarea-size"> <!-- left navigation columns -->
-            <div class="search-leftarea-size"> <!-- workspace selected -->                            
+            <div class="search-leftarea-size"> <!-- Narrative selected -->                            
                 <div class="col-sm-12 col-md-12 col-lg-12 search-leftarea-size">
                     <div ng-hide="options.userState.longterm.loggedIn" class="alert alert-warning search-login">
                         <div id="login-message" class="text-center">
-                            <a ng-click='login()'>Sign in</a> to select data and send to your workspaces
+                            <a ng-click='login()'>Sign in</a> to select data and send to your Narratives
                         </div>
                     </div>
-                    <div ng-show="options.userState.longterm.loggedIn" class="alert alert-success search-logout">
-                        <div id="logout-message" class="text-center">                        
-                            Logged in as <strong>{{options.userState.longterm.user_id}}</strong>                                                
-                        </div>
-                        <div class="text-center">
-                            <a ng-click='logout()'>Sign out</a>
-                        </div>
-                    </div>
+                  
 
                     <div ng-show="options.userState.longterm.loggedIn">
-                        <hr class="search-leftarea-size"></hr>
-
                         <div class='text-center search-selections-title'>
-                            <h3 data-toggle="tooltip" data-placement="right" tooltip="Here you can see what data you have selected, organize it, and send it to workspaces." tooltip-placement="right">Selections</h3>
+                            <h3 data-toggle="tooltip" data-placement="right" tooltip="Here you can see what data you have selected, organize it, and send it to Narratives." tooltip-placement="right">Selections</h3>
                         </div>
 
                         <div class="text-center">
@@ -33,17 +24,17 @@
                     
                         <div class="text-center">
                             <div style="margin-bottom: 5px;">
-                                <button rel="tooltip" tooltip="Transfer my selections to workspaces." tooltip-placement="bottom" data-placement="bottom" data-toggle="modal" data-target="#transferPanel" type="button" ng-class="{'disabled': options.userState.session.data_cart.size < 1}" class='btn btn-primary' ng-click="listWorkspaces()">
+                                <button rel="tooltip" tooltip="Transfer my selections to Narratives." tooltip-placement="bottom" data-placement="bottom" data-toggle="modal" data-target="#transferPanel" type="button" ng-class="{'disabled': options.userState.session.data_cart.size < 1}" class='btn btn-primary' ng-click="listWorkspaces()">
                                     <span class="glyphicon glyphicon-hdd"></span><span> </span><span class="glyphicon glyphicon-transfer"></span>
                                 </button>
                                 <button data-toggle="tooltip" data-placement="bottom" tooltip="Discard my data selections." tooltip-placement="bottom" type="button" ng-class="{'disabled': options.userState.session.data_cart.size < 1}" class='btn btn-danger' ng-click='emptyCart()'>
                                     <span class="glyphicon glyphicon-trash"></span>
                                 </button>              
-                            </div> <!-- end workspace send button group -->
+                            </div> <!-- end Narrative send button group -->
                         </div>
                     </div>
-                </div> <!-- end all workspace button groups -->
-            </div> <!-- end workspace-selected area -->
+                </div> <!-- end all Narrative button groups -->
+            </div> <!-- end Narrative-selected area -->
         
             <div ng-show="getTotalCount() > 0 && options.selectedCategory" class="col-sm-12 col-md-12 col-lg-12 search-categories search-leftarea-size"> <!-- categories -->
                 <hr class="search-leftarea-size"></hr>
@@ -82,7 +73,7 @@
                         <h3 data-toggle="tooltip" data-placement="right" tooltip="Select options to help narrow your search results." tooltip-placement="right">Filters</h3>                    
                         <button type="button" class="btn btn-danger btn-xs search-filter-remove-button" ng-click="removeAllFacets()" ng-if="options.active_facets[options.selectedCategory] && Object.keys(options.active_facets[options.selectedCategory]).length > 0" data-toggle="tooltip" data-placement="top" tooltip="Use this button to remove all the filters you have selected." tooltip-placement="top"><span class="glyphicon glyphicon-remove"></span></button>
                     </div>
-                    <div class="col-xs-offset-1 search-leftarea-size search-filter-groups">
+                    <div class="search-leftarea-size search-filter-groups">
                         <div id="{{facet.key}}" class="panel-group" ng-repeat="facet in options.facets" ng-if="facet.count > 0">                            
                             <div class="panel panel-filter-content">
                                 <div class="panel-heading panel-filter-heading">
@@ -247,7 +238,7 @@
                     <button type="button" class="close pull-right" data-dismiss="modal" aria-hidden="true" ng-hide="options.objectsTransferred > 0 && options.objectsTransferred < options.transfer_cart.size " ng-click="emptyTransfers()">&times;</button>            
             
                     <ul class="nav nav-tabs" role="tablist">
-                        <li class="active"><a>Copy Data to Workspaces</a></li>
+                        <li class="active"><a>Copy Data to Narratives</a></li>
                         <li class="disabled"><a>Create Sets of Objects</a></li>
                     </ul>
 
@@ -258,7 +249,7 @@
                                     <div class="row search-transfer-workspace-select">
                                         <div ng-show="!options.userState.session.selectedWorkspace" class="text-center">
                                             <h3>                                    
-                                                <span class="search-cart-label">Select a workspace to continue.</span>
+                                                <span class="search-cart-label">Select a Narrative to continue.</span>
                                             </h3>
 
                                             <div class="text-center">
@@ -272,7 +263,7 @@
                                                 <h3>              
                                                     <button type="button" class="btn btn-danger" ng-click="options.userState.session.selectedWorkspace = undefined; listWorkspaces();" ng-show="options.userState.session.transfer_cart.size == 0 && !options.transferring"><span class="glyphicon glyphicon-remove-sign"></span></button>
                                                     <span class="glyphicon glyphicon-hdd"></span>
-                                                    <span class="search-cart-label">{{options.userState.session.selectedWorkspace}}</span>
+                                                    <span class="search-cart-label">{{options.userState.session.selectedWorkspaceName}}</span>
                                                     <span class="badge badge-info" ng-repeat="w in options.userState.longterm.workspaces" ng-if="w[1] == options.userState.session.selectedWorkspace">{{w[4]}}</span>
                                                 </h3>
                                             </div>
@@ -307,7 +298,7 @@
                                                 <a ng-click='selectWorkspace(w)'>
                                                     <div class="text-left">
                                                         <span class="glyphicon glyphicon-hdd"></span>
-                                                        <span>{{w[1]}}</span>
+                                                        <span>{{w[8].narrative_nice_name}}</span>
                                                         <span class='badge pull-right'>{{w[4]}}</span>
                                                     </div>
                                                 </a>
@@ -323,7 +314,7 @@
                                             <span class="badge search-cart-count">{{options.userState.session.data_cart.size | number}}</span>
                                             <button type="button" class="btn btn-danger btn-xs" ng-click="removeCartSelected()" ng-class="{'disabled': options.userState.session.transfer_cart.size < 0}" data-toggle="tooltip" data-placement="top" tooltip="Remove currently selected items from your cart." tooltip-placement="top"><span class="glyphicon glyphicon-trash"></span></button>
                                         </h3>
-                                        <div><span class="search-duplicate-icon"></span> This row color indicates data already present in your selected workspace.</div>    
+                                        <div><span class="search-duplicate-icon"></span> This row color indicates data already present in your selected Narrative.</div>    
                                     </div>
 
                                     <tabset type="pills"> 

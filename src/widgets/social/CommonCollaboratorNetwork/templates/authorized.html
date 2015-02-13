@@ -1,0 +1,39 @@
+<div class="collapse" id="more-info-{{env.instanceId}}"> 
+	<div class="well">
+	{% if env.isOwner %}
+		<p>This table shows your "Collaborators" - other KBase users who have access to Narratives to which you also have access.</p>
+	{% else %} 
+		<p>This shows your "Common Collborators" - other KBase users who have access to  
+	Narratives to which both you and {{state.currentUserProfile.user.realname}} have access.
+	</p>
+		<p>To see all of your collaborators, visit <a href="/functional-site/#/people/{{env.loggedInUser}}">your profile.</a>
+	</p>
+	{% endif %}
+	</div>
+</div>
+
+<table class="table table-bordered table-striped" id="collaborator_table_{{generatedId}}">
+	<thead>
+	<tr>
+		<th>Name</th>
+		<th>Username</th>
+		<th>In common</th>
+	</tr>
+	</thead>
+	<tbody>
+{% for user in state.collaborators %}
+	<tr>
+		<td><a href="/functional-site/#/people/{{user.username}}">{{user.realname}}</a></td>
+       <td><a href="/functional-site/#/people/{{user.username}}">{{user.username}}</a></td>
+		<td>{{user.count}}</td>
+	</tr>
+{% endfor %}
+	</tbody>
+</table>
+
+<script>
+require(['jquery'], function ($) {
+	$('#collaborator_table_{{generatedId}}').DataTable();
+});
+
+</script>

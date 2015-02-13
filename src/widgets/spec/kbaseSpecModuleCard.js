@@ -130,7 +130,7 @@
             		typesData.push({name: '<a onclick="specClicks[\''+pref+'types-click\'](this,event); return false;" data-typeid="'+typeId+'">'+typeName+'</a>', ver: typeVer});
             	}
                 var typesSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
                         "aaData": typesData,
@@ -162,7 +162,7 @@
             		funcsData.push({name: '<a onclick="specClicks[\''+pref+'funcs-click\'](this,event); return false;" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer});
             	}
                 var funcsSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function name", mData: "name"}, {sTitle: "Function version", mData: "ver"}],
                         "aaData": funcsData,
@@ -193,7 +193,7 @@
             		incsData.push({name: '<a onclick="specClicks[\''+pref+'incs-click\'](this,event); return false;" data-incid="'+incId+'">'+incName+'</a>', ver: incVer});
             	}
                 var incsSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Module name", mData: "name"}, {sTitle: "Module version", mData: "ver"}],
                         "aaData": incsData,
@@ -233,7 +233,7 @@
                 		versData.push({ver: link, date: verDate});
                 	}
                     var versSettings = {
-                            "sPaginationType": "bootstrap",
+                            "sPaginationType": "full_numbers",
                             "iDisplayLength": 10,
                             "aoColumns": [{sTitle: "Module version", mData: "ver"}, {sTitle: "Upload date", mData: "date"}],
                             "aaData": versData,
@@ -270,7 +270,7 @@
                 type: "KBaseSpecModuleCard",
                 id: this.options.id,
                 workspace: 'specification',
-                title: "Module Object Specification"
+                title: "Data Type Module Specification"
             };
         }
     });

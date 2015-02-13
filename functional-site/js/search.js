@@ -271,7 +271,6 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     $scope.options = searchOptionsService;
     $scope.workspace_service;
 
-
     $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
         if (toState.name === "search") {
             //console.log($scope.options.userState);
@@ -279,22 +278,49 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $scope.startSearch();      
         }  
     });
+    
+    postal.channel('session').subscribe('login.success', function (session) {
+      $state.go('search');
+      $scope.$apply();
+    });
+    
+    /*postal.channel('session').subscribe('logout.success', function (session) {
+      $state.go('search');
+      $scope.$apply();
+    });
+    */
+    
+    $scope.login = function() {
+      postal.channel('loginwidget').publish('login.prompt');
+    }
+    
+    
 
-
+/*
     $scope.login = function() {
         $('#signin-button').kbaseLogin('openDialog');
         $('#signin-button').on('loggedIn', function () {
             $state.go('search');       
         });
     };
+    
 
 
     $scope.logout = function() {
         $('#signin-button').kbaseLogin('logout');
         $('#signin-button').on('loggedOut', function () {
+          console.log('SEARCH: logged out');
             $state.go('search');       
         });
     };
+    */
+    
+    require(['kb.widget.navbar'], function (Navbar) {
+      Navbar.clearMenu();
+      Navbar.addDefaultMenu({search: false});
+      Navbar.clearTitle();
+      Navbar.clearButtons();
+    });
 
 
     $scope.saveUserState = function() {
@@ -1120,9 +1146,19 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $scope.workspace_service.list_workspace_info({"perm": "w"})
                 .then(function(info, status, xhr) {
                     $scope.$apply(function () {
+                        var temp = [];
+                        for (var i = 0; i < info.length; i++) {
+                            var narname = info[i][8].narrative_nice_name;
+                            if (narname != null) {
+                                temp.push(info[i]);
+                            }
+                        }
+                        info = temp;
                         $scope.options.userState.longterm.workspaces = info.sort(function (a,b) {
-                            if (a[1].toLowerCase() < b[1].toLowerCase()) return -1;
-                            if (a[1].toLowerCase() > b[1].toLowerCase()) return 1;
+                            var namea = a[8].narrative_nice_name;
+                            var nameb = b[8].narrative_nice_name;
+                            if (namea.toLowerCase() < nameb.toLowerCase()) return -1;
+                            if (namea.toLowerCase() > nameb.toLowerCase()) return 1;
                             return 0;
                         });
                     });
@@ -1152,10 +1188,14 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
 
     $scope.selectWorkspace = function(workspace_info) {
-        if (workspace_info.length === 10) {
+        if (workspace_info.length === 10) { //I don't think this case can ever happen
+            $scope.options.userState.session.selectedWorkspaceName =
+                workspace_info[9].narrative_nice_name;
             $scope.options.userState.session.selectedWorkspace = workspace_info[2];
         }
         else {
+            $scope.options.userState.session.selectedWorkspaceName =
+                workspace_info[8].narrative_nice_name;
             $scope.options.userState.session.selectedWorkspace = workspace_info[1];
         }
     

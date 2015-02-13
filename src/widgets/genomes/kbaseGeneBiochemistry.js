@@ -19,6 +19,7 @@
             genomeID: null,
             workspaceID: null,
             kbCache: null,
+            genomeInfo: null
         },
 
         cdmiURL: "https://kbase.us/services/cdmi_api",
@@ -100,98 +101,104 @@
         },
 
         renderWorkspace: function() {
+            var self = this;
             this.showMessage("<img src='" + this.options.loadingImage + "'>");
             this.$infoPanel.hide();
 
-            if (!this.options.kbCache) {
-                if (kb)
-                    this.options.kbCache = kb;
-                else
-                    console.debug("No cache service found. D'oh!");
+            if (this.options.genomeInfo) {
+                self.ready(this.options.genomeInfo);
+            } else {
+                if (!this.options.kbCache) {
+                    if (kb)
+                        this.options.kbCache = kb;
+                    else
+                        console.debug("No cache service found. D'oh!");
+                }
+                var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
+
+                var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+                // on ws error
+                $.when(prom).fail($.proxy(function(error) {
+                    this.renderError(error);
+                }, this));
+                // on cache success
+                $.when(prom).done($.proxy(function(genome) {
+                    genome = genome[0];
+                    self.ready(genome);
+                }, this));
             }
-            var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
-
-            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-            // on ws error
-            $.when(prom).fail($.proxy(function(error) {
-                this.renderError(error);
-            }, this));
-            // on cache success
-            $.when(prom).done($.proxy(function(genome) {
-                genome = genome[0];
-                if (genome.data.features) {
-                    var feature = null;
-                    for (var i=0; i<genome.data.features.length; i++) {
-                        if (genome.data.features[i].id === this.options.featureID) {
-                            feature = genome.data.features[i];
-                            break;
-                        }
-                    }
-
-		    // Function
-		    var func = feature['function'];
-		    if (!func)
-			func = "Unknown";
-		    this.$infoTable.append(this.makeRow("Function", func));
-
-		    // Subsystems, single string
-                    //var subsysSumStr = "No subsystem summary found.";
-                    //if (feature.subsystems) {
-		    //subsysSumStr = feature.subsystems;
-                    //}
-                    //this.$infoTable.append(this.makeRow("Subsystems Summary", subsysSumStr));
-
-		    // Subsystem, detailed
-                    var subsysDataStr = "No subsystem data found.";
-                    if (feature.subsystem_data) {
-			subsysDataStr = "";
-			for (var i=0; i<feature.subsystem_data.length; i++) {
-			    var subsys = feature.subsystem_data[i];
-			    // typedef tuple<string subsystem, string variant, string role> subsystem_data;
-			    subsysDataStr += "<p>" + "Subsystem: " + subsys[0] + "<br>" + "Variant: " + subsys[1] + "<br>" + "Role: " + subsys[2];
-			}
-                    }
-                    this.$infoTable.append(this.makeRow("Subsystems", subsysDataStr));
-
-		    // Annotation
-                    var annotationsStr = "No annotation comments found.";
-                    if (feature.annotations) {
-			annotationsStr = "";
-			for (var i=0; i<feature.annotations.length; i++) {
-			    var annot = feature.annotations[i];
-			    // typedef tuple<string comment, string annotator, int annotation_time> annotation;
-			    annotationsStr += annot[0] + " (" + annot[1] + ", timestamp:" + annot[2] + ")" + "<br>";
-			}
-                    }
-                    this.$infoTable.append(this.makeRow("Annotation Comments", annotationsStr));
-
-		    // Protein families list.
-		    //var proteinFamilies = "None found";
-		    //if (feature.protein_families) {
-		    //proteinFamilies = "";
-		    //for (var i=0; i<feature.protein_families.length; i++) {
-		    //    var fam = feature.protein_families[i];
-		    //    proteinFamilies += fam.id + ": " + fam.subject_description + "<br>";
-		    //}
-		    //}
-		    //this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
-
-                }
-                else {
-                    this.renderError({ error: "No genetic features found in the genome with object id: " + 
-                                              this.options.workspaceID + "/" + 
-                                              this.options.genomeID });
-                }
-
-                this.hideMessage();
-                this.$infoPanel.show();
-            }, this));
-
-
-
-
         },
 
+        ready: function(genome) {
+            var self = this;
+            if (genome.data.features) {
+                var feature = null;
+                for (var i=0; i<genome.data.features.length; i++) {
+                    if (genome.data.features[i].id === this.options.featureID) {
+                        feature = genome.data.features[i];
+                        break;
+                    }
+                }
+
+                // Function
+                var func = feature['function'];
+                if (!func)
+                    func = "Unknown";
+                this.$infoTable.append(this.makeRow("Function", func));
+
+                // Subsystems, single string
+                //var subsysSumStr = "No subsystem summary found.";
+                //if (feature.subsystems) {
+                //subsysSumStr = feature.subsystems;
+                //}
+                //this.$infoTable.append(this.makeRow("Subsystems Summary", subsysSumStr));
+
+                // Subsystem, detailed
+                var subsysDataStr = "No subsystem data found.";
+                if (feature.subsystem_data) {
+                    subsysDataStr = "";
+                    for (var i=0; i<feature.subsystem_data.length; i++) {
+                        var subsys = feature.subsystem_data[i];
+                        // typedef tuple<string subsystem, string variant, string role> subsystem_data;
+                        subsysDataStr += "<p>" + "Subsystem: " + subsys[0] + "<br>" + "Variant: " + subsys[1] + "<br>" + "Role: " + subsys[2];
+                    }
+                }
+                this.$infoTable.append(this.makeRow("Subsystems", subsysDataStr));
+
+                // Annotation
+                var annotationsStr = "No annotation comments found.";
+                if (feature.annotations) {
+                    annotationsStr = "";
+                    for (var i=0; i<feature.annotations.length; i++) {
+                        var annot = feature.annotations[i];
+                        // typedef tuple<string comment, string annotator, int annotation_time> annotation;
+                        annotationsStr += annot[0] + " (" + annot[1] + ", timestamp:" + annot[2] + ")" + "<br>";
+                    }
+                }
+                this.$infoTable.append(this.makeRow("Annotation Comments", annotationsStr));
+
+                // Protein families list.
+                //var proteinFamilies = "None found";
+                //if (feature.protein_families) {
+                //proteinFamilies = "";
+                //for (var i=0; i<feature.protein_families.length; i++) {
+                //    var fam = feature.protein_families[i];
+                //    proteinFamilies += fam.id + ": " + fam.subject_description + "<br>";
+                //}
+                //}
+                //this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
+
+            }
+            else {
+                this.renderError({ error: "No genetic features found in the genome with object id: " + 
+                    this.options.workspaceID + "/" + 
+                    this.options.genomeID });
+            }
+
+            this.hideMessage();
+            this.$infoPanel.show();
+        },
+        
         buildObjectIdentity: function(workspaceID, objectID) {
             var obj = {};
             if (/^\d+$/.exec(workspaceID))

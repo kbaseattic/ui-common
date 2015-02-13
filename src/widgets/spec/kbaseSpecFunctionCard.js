@@ -130,7 +130,7 @@
             		subsData.push({name: '<a onclick="specClicks[\''+pref+'subs-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer});
             	}
                 var subsSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
                         "aaData": subsData,
@@ -167,7 +167,7 @@
             		versData.push({name: link});
             	}
                 var versSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function version", mData: "name"}],
                         "aaData": versData,
@@ -202,7 +202,7 @@
                 type: "KBaseSpecFunctionCard",
                 id: this.options.id,
                 workspace: 'specification',
-                title: "Function Object Specification"
+                title: "KBase API Function Specification"
             };
         }
     });

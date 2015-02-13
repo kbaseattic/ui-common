@@ -19,7 +19,8 @@
 var cardManager = undefined;
 
 var app = angular.module('landing-pages', 
-    ['lp-directives', 'card-directives',
+    ['dataview', 'lp-directives', 'card-directives',
+     'social-directives','dashboard-directives',
      'trees-directives', 
      'ws-directives', 'modeling-directives', 'angular-json-rpc',
      'communities-directives', 'narrative-directives',
@@ -37,7 +38,7 @@ var app = angular.module('landing-pages',
 
     $stateProvider
         .state('login', {
-          url: "/login/",
+          url: "/login/?nextPath",
           templateUrl: 'views/login.html',
           controller: 'Login'
         });
@@ -74,6 +75,27 @@ var app = angular.module('landing-pages',
           templateUrl: 'views/narrative/narrative-manager.html',
           controller: 'narrativemanager'
         });
+       
+   // New landing pages route.
+       /*
+       ', 
+      params: {
+         ver: {
+            value: null
+         }
+      }, 
+       */
+   $stateProvider
+   .state('dataview', {
+      url: '/dataview/:wsid/:objid/:ver?sub&subid',
+      templateUrl: 'views/dataview/dataview.html',
+      controller: 'Dataview'
+   })
+    .state('dataview2', {
+      url: '/dataview/:wsid/:objid?sub&subid',
+      templateUrl: 'views/dataview/dataview.html',
+      controller: 'Dataview'
+   })
 
     // workspace browser routing
     $stateProvider
@@ -361,36 +383,6 @@ var app = angular.module('landing-pages',
              templateUrl: 'views/genomes/sortable-rows-landing-page.html',
              controller: 'WBLanding'});
 
-
-/*
-OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
-    $stateProvider
-        .state('genes',
-            {url: '/genes/CDS/:fid',
-             templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'});
-
-    $stateProvider
-        .state('genesbycdsgenome',
-            {url: '/genes/CDS/:gid/:fid',
-             templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'});
-
-*/
-/*
-    $stateProvider
-        .state('genesbyws',
-            {url: '/genes/:ws/:fid',
-             templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'});
-
-    $stateProvider
-        .state('genesbywsgenome',
-            {url: '/genes/:ws/:gid/:fid',
-             templateUrl: 'views/objects/gene.html',
-             controller: 'GeneDetail'});
-*/
-
     $stateProvider
         .state('kbgenesbyws',
             {url: '/genes/:ws/:fid',
@@ -539,6 +531,30 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		controller: 'MSADetail'});
 
     $stateProvider
+	.state('people',
+		{url: '/people/:userid',
+		templateUrl: 'views/social/user-page.html',
+		controller: 'People'});
+    
+	$stateProvider.state('dashboard', {
+    url: '/dashboard',
+		templateUrl: 'views/dashboard/dashboard.html',
+		controller: 'Dashboard'
+  });
+    
+    $stateProvider
+	.state('navtest',
+		{url: '/navtest/:param1',
+		templateUrl: 'views/navtest/view.html',
+		controller: 'NavTest'});
+    
+    $stateProvider
+	.state('narrativestore',
+		{url: '/narrativestore/:type/:id',
+		templateUrl: 'views/narrative/narrative-store.html',
+		controller: 'NarrativeStore'});
+                
+    $stateProvider
 	.state('kidledttype',
 		{url: '/kidledt/:mod/:type',
 		templateUrl: 'views/objects/kidledt.html',
@@ -555,6 +571,18 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 		{url: '/jgi/import/:ws/:obj',
 		templateUrl: 'views/jgi/jgi_obj_info.html',
 		controller: 'JGI'});
+
+    $stateProvider
+    .state('json', {
+            url: '/json/:ws/:id',
+            templateUrl: 'views/objects/json.html',
+            controller: 'JsonDetail'});
+
+    $stateProvider
+    .state('contigset', {
+            url: '/contigsets/:ws/:id',
+            templateUrl: 'views/objects/contigset.html',
+            controller: 'ContigSetDetail'});
 
     $urlRouterProvider.when('', '/login/')
                       .when('/', '/login/')
@@ -616,12 +644,27 @@ var Feed = angular.module('FeedLoad', ['ngResource'])
     });
 */
 
+
+// TODO: We should not be making sync ajax calls. Rather the entire app should be run asynchronously so that any 
+// async procsses like fetching json can naturally be folded in.
 configJSON = $.parseJSON( $.ajax({url: "config.json", 
                              async: false, 
                              dataType: 'json'}).responseText );
 
 
+// The current configuration key is stored on the "setup" property.
+var currentConfig = configJSON[configJSON.setup];
 
+// Set a sane AJAX timeout. The primary target of this is for KBase service client calls, which are
+// make via jQuery's ajax api. The default value is 15 minutes, or 900,000 ms.
+// Note, however, that this will affect all jQuery ajax calls. There is no way around that until
+// the type compiler provides an api route to setting the timeout per ajax call. At that time we should
+// make the default timeout much lower, and allow service calls to set a longer timeout (or have configuration
+// settings per service).
+// http://api.jquery.com/jQuery.ajax/
+ $.ajaxSetup({
+   timeout: currentConfig.kbase_clients.defaults.timeout
+ });
 
 app.run(function ($rootScope, $state, $stateParams, $location) {
 
@@ -647,13 +690,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     });
 
 
-    var finish_login = function(result) {
-        if (!result.success)
-            return;
-
-//        var c = $('#signin-button').kbaseLogin('get_kbase_cookie');
-//        set_cookie(c);
-
+    var finish_login = function(session) {
         // If we're changing state from the login page, and we have a valid 
         // session (i.e.: we're logging IN and not OUT), then forward us to
         // the /narrative/ state.
@@ -661,30 +698,48 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         // Otherwise, just login in place and reload.
         // We need to reload to make sure the USER_ID and USER_TOKEN get set properly.
         if ($location.path() === '/login/') {
-            var kbase_sessionid = $("#signin-button").kbaseLogin('session').kbase_sessionid;
-            if (kbase_sessionid) { 
-                // USER_ID = $("#signin-button").kbaseLogin('session').user_id;
-                // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
-                $location.path('/narratives/featured');
-            }
-            $rootScope.$apply();
+           // Are these used anywhere?
+          USER_ID = session.user_id;
+          USER_TOKEN = session.token;
+          if ($location.search().nextPath) {
+            $location.path($location.search().nextPath);
+          } else {
+             $location.path('/dashboard');
+          }
+       
+            // USER_ID = $("#signin-button").kbaseLogin('session').user_id;
+            // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
+            // $location.path('/narratives/featured');
+           
         }
+        $rootScope.$apply();
         window.location.reload();
     };
 
     var finish_logout = function() {
+        // $location.url('/login/?nextPath='+$location.path());
         $location.path('/login/');
-//        $rootScope.$apply();
+        $rootScope.$apply();
         window.location.reload();
     };
 
-    // sign in button
-    $('#signin-button').kbaseLogin({login_callback: finish_login,
-                                    logout_callback: finish_logout});
-    $('#signin-button').css('padding', '0');  // Jim!
-
-    USER_ID = $("#signin-button").kbaseLogin('session').user_id;
-    USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
+    $('#signin-button').kbaseLogin();
+    
+    // This is an important part of the app lifecycle!
+    // Login and out events trigger a refresh of the entire page. 
+    // In addition, logout will redirect to the login page.
+    // Although views and widgets should be prepared to render in an unauthenticated state
+    // (and a view would need to redirect to /login if it doesn't want to be seen)
+    // in practice they may never be seen thus.
+    postal.channel('session').subscribe('login.success', function (data) {
+      finish_login(data.session);
+    });
+    postal.channel('session').subscribe('logout.success', function (data) {
+      finish_logout();
+    });
+    
+    USER_ID = $("#signin-button").kbaseLogin('get_session_prop', 'user_id');
+    USER_TOKEN = $("#signin-button").kbaseLogin('get_session_prop', 'token');
     kb = new KBCacheClient(USER_TOKEN);
     //kb.nar.ensure_home_project(USER_ID);
 
@@ -697,9 +752,34 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     $rootScope.$state = $state;
     $rootScope.$stateParams = $stateParams;
     $rootScope.kb = kb;     
-    $rootScope.Object = Object;       
+    $rootScope.Object = Object;      
+    
+    
+    require(['kb.widget.navbar'], function (NAVBAR) {
+      // Make sure we clear the navbar upon exit.
+      // We have to use angular here, because it seems to 
+      // eat hashchange for a[href] clicks.
+      $rootScope.$on('$locationChangeSuccess', function (e, next, current) {
+        // Work around an apparent problem in Angular. If the $location changes via a link to the same url
+        // Angular fires this (even though location hasn't actually changed), but does not call the
+        // controller. The effect is that the Navbar is reset, but not rebuilt by the controller. 
+        // We just try to avoid that.
+        if (next !== current) {
+          NAVBAR.clear()
+          .addDefaultMenu({
+            search: true, narrative: true
+          });
+          $(document).find('head title').text('Narrative Interface | KBase'); 
+        }
+      });
+      $rootScope.$apply();
+    }); 
+    
+   
 
 });
+
+
 
 
 /*

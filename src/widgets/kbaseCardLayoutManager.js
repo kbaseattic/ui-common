@@ -268,10 +268,11 @@
 
             this.$dataManager.hide();
 
-            this.$controlBox = $("<div class='container'/>")
+            this.$controlBox = $('<div>'); // do not show control box anymore
+                        /*$("<div class='container'/>")
                                .addClass("kblpc-control-box")
                                .append($("<div class='row'>").append($dropdown))
-                               .append(this.$dataManager);
+                               .append(this.$dataManager);*/
         },
 
         /**
@@ -760,6 +761,10 @@
                 this.showMSACards();
             else if (this.options.template.toLowerCase() === "kidledt")
                 this.showKidlEdtCards();
+            else if (this.options.template.toLowerCase() === "json")
+                this.showJsonCards();
+            else if (this.options.template.toLowerCase() === "contigset")
+                this.showContigSetCards();
             else {
                 // throw an error for an unknown template. modal dialog, maybe?
             }
@@ -1510,6 +1515,32 @@
                     {	type: this.options.data.type,
             			mod: this.options.data.mod,
                         isInCard: true
+                    },
+                    {   my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+
+        showJsonCards: function() {
+            this.addNewCard("kbaseJsonView",
+                    {	ws: this.options.data.ws,
+            			id: this.options.data.id
+                    },
+                    {   my: "left top",
+                        at: "left bottom",
+                        of: "#app"
+                    }
+                );
+            return this;
+        },
+
+        showContigSetCards: function() {
+            this.addNewCard("kbaseContigSetView",
+                    {	ws: this.options.data.ws,
+            			id: this.options.data.id
                     },
                     {   my: "left top",
                         at: "left bottom",
@@ -2292,7 +2323,7 @@
          */
         addNewCard: function(cardName, options, position) {
             /** position = optional. if none given, it puts the new card in the center of the page **/
-
+            
             /* NOTE - later, have it manage where the new card comes in here.
              *
              * Should be a way to use the dialog/position jqueryUI stuff.
@@ -2341,7 +2372,7 @@
                 }
             }
 
-            this.$elem.append("<div id='" + newCardId + "'/>");
+            this.$elem.append("<div id='" + newCardId + "'>").css({margin:'30px'});
 
             var newWidget = $("#" + newCardId)[cardName](options);
 
@@ -2374,10 +2405,9 @@
                        cardTitle + 
                        "</div>" +
                        "<div class='kblpc-subtitle'>" + 
-                       cardSubtitle + 
-                       "<span class='label label-primary pull-right'>" +
-                       cardWorkspace + 
-                       "</span></div>",
+                       cardSubtitle +
+                       // we shouldn't display workspace info anymore
+                       "</div>",
                 width: cardWidth,
                 id: newCardId,
                 draggable: cardDrag,

@@ -1,18 +1,12 @@
-
-
 /*  Controllers
  *
  *  These are the 'glue' between models and views.
  *  See: https://docs.angularjs.org/guide/controller
  *  
 */
-
-
-app.controller('methodAccordion', function ($scope, narrative, $http) {
-
-
+app
+.controller('methodAccordion', function ($scope, narrative, $http) {
 })
- 
 .controller('Analysis', function($scope, $state, $stateParams, $location, narrative, $http) {
     // service for narrative (builder) state
     $scope.narrative = narrative;
@@ -166,12 +160,14 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 })
 
 .controller('GenomeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'genomeID' : $stateParams.id,
                      'workspaceID' : $stateParams.ws,
                      'kbCache' : kb}
 })
 
 .controller('GeneDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.gid+'?sub=Feature&subid='+$stateParams.fid);
     $scope.params = {'genomeID' : $stateParams.gid,
                      'featureID' : $stateParams.fid,
                      'workspaceID' : $stateParams.ws,
@@ -181,53 +177,63 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 
 .controller('MediaDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
 
 .controller('ModelDetailCards', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })  
 
 .controller('MemeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
 
 .controller('CmonkeyDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
 
 .controller('InferelatorDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
 
 .controller('MAKDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'workspace': $stateParams.ws,
 					 'kbCache' : kb};
 })
 
 .controller('FloatDataTable', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'workspace': $stateParams.ws,
 					 'kbCache' : kb};
 })
 
 .controller('RegpreciseDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
 
 .controller('BambiDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'bambi_run_result_id': $stateParams.id,
                      'workspace_id': $stateParams.ws}
 })
 
 .controller('PPIDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
 		     'ws': $stateParams.ws};
 })
@@ -237,46 +243,61 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
         'kind' : $stateParams.kind,
         'id' : $stateParams.id
     };
+    require(['kb.widget.navbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      });
+    });
 })
 
 
 .controller('GPTypeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
 })
 
 .controller('GTTypeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
 })
 
 .controller('GVTypeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
 })
 
 .controller('GGLTypeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
 })
 
 .controller('GTVTypeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
 })
 
 
 .controller('ModelDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
 
 .controller('ModelDetailCards', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
 
 .controller('FBADetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
 
 .controller('FBADetailCards', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 })
@@ -311,7 +332,162 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     $scope.params = { 'ws':$stateParams.ws, 'id': $stateParams.id, 'kbCache' : kb }
 })
 
+.controller('People', function($scope, $stateParams) {
+    $scope.params = { 'userid':$stateParams.userid, 'kbCache' : kb }
+    
+    // Set the styles for the user page
+    $('<link>')
+    .appendTo('head')
+    .attr({type: 'text/css', rel: 'stylesheet'})
+    .attr('href', 'views/social/user-page/style.css');
+    
+    // Set up the navbar menu
+    require(['kb.widget.navbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      })
+      .addHelpMenuItem({
+        type: 'divider'
+      })
+      .addHelpMenuItem({
+        name: 'featurerequest',
+        label: 'Request Feature',
+        external: true,
+        icon: 'thumbs-o-up',
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=2&priority=4&components=10108&assignee=eapearson&summary=Feature%20Request%20on%20User%20Page'
+      })
+      .addHelpMenuItem({
+        name: 'bugreport',
+        label: 'Report BUG',
+        icon: 'bug',
+        external: true,
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&priority=3&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
+      });
+      
+      /*
+      .addHelpMenuItem({
+        name: 'navtest',
+        label: 'Navbar Test',
+        icon: 'bug',
+        url: '#/navtest/x'
+      })
+      */
+    
+      
+    });
+    
+   
+})
 
+.controller('Dashboard', function($scope, $stateParams) {
+    $scope.params = { 'kbCache' : kb }
+    
+    // Try this.
+    // Get the layout template.
+    // Get the layout config
+    // Render the layout template
+    // Create and attache widgets, from the layout template
+    
+    /*
+    require(['jquery', 'nunjucks', 'kb.utils'], function ($, nunjucks, Utils) {
+       var templateEnv = new nunjucks.Environment(new nunjucks.WebLoader('/functional-site/views/dashboard/templates'), {
+         'autoescape': false
+       });
+       // For now we just have a single standard layout.
+       var layout = templateEnv.getTemplate('layout.html');
+       
+       Utils.getJSON('/functional-site/views/dashboard/dashboard.json')
+       .then(function (data) {
+          var content = layout.render(data);
+          
+       }
+       
+       
+      
+       
+       this.templates.env.addFilter('kbmarkup', function(s) {
+         if (s) {
+              s = s.replace(/\n/g, '<br>');
+            }
+            return s;
+          });
+          // This is the cache of templates.
+          this.templates.cache = {};
+
+          // The context object is what is given to templates.
+          this.context = {};
+          this.context.env = {
+            widgetTitle: this.widgetTitle,
+            widgetName: this.widgetName,
+            docsite: this.getConfig('docsite')
+          };
+    });
+    */
+    
+    
+    // Set the styles for the dashboard page
+    $('<link>')
+    .appendTo('head')
+    .attr({type: 'text/css', rel: 'stylesheet'})
+    .attr('href', 'views/dashboard/style.css');
+    
+    // Set up the navbar menu.
+   // Note that the navbar is a singleton. There is only one per page/view, and it is as persistent
+   // as the page/view is. It does maintain some state, notably the dom node it is attached to. This is
+   // the primary reason it is a singleton.
+    require(['kb.widget.navbar', 'kb.statemachine'], function (NAVBAR, StateMachine) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true, dashboard: false
+      })
+      .addHelpMenuItem({
+        type: 'divider'
+      })
+      .addHelpMenuItem({
+        name: 'featurerequest',
+        label: 'Request Feature',
+        external: true,
+        icon: 'thumbs-o-up',
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=2&priority=4&components=10108&assignee=eapearson&summary=Feature%20Request%20on%20UDashboard'
+      })
+      .addHelpMenuItem({
+        name: 'bugreport',
+        label: 'Report BUG',
+        icon: 'bug',
+        external: true,
+        url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&priority=3&components=10108&assignee=eapearson&summary=Bug%20on%20Dashboard'
+      })
+      .setTitle('Dashboard');
+       
+       // Set up the main State machine for this view.
+       var stateMachine = Object.create(StateMachine).init();
+
+       $scope.stateMachine = stateMachine;
+      
+    });
+     
+})
+
+.controller('NavTest', function($scope, $stateParams) {
+    $scope.params = { 'appid':$stateParams.appid, 'kbCache' : kb }
+   
+})
+
+.controller('App', function($scope, $stateParams) {
+    $scope.params = { 'appid':$stateParams.appid, 'kbCache' : kb }
+    $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder", 
+        handle: '.panel-heading',
+        cancel: '.panel-title,.panel-subtitle,.label,.glyphicon',
+        start: function() {
+          $(this).find('.panel-body').addClass('hide');
+          $(this).sortable('refreshPositions');
+        },
+        stop: function() {
+          $(this).find('.panel-body').removeClass('hide');
+        }
+    });
+})
 
 .controller('Trees', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
@@ -331,6 +507,13 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     $scope.ws = $stateParams.ws;
     $scope.type = $stateParams.type;
 
+    require(['kb.widget.navbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      });
+    });
+    
     $scope.nar_url = configJSON.narrative_url;
 
     var sub = $location.path().split('/')[1];
@@ -357,58 +540,35 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 
 .controller('Login', function($scope, $stateParams, $location, kbaseLogin, $modal) {
+    
+    // If we are logged in and landing here we redirect to the dashboard.
+    // I guess we can use the supplied kbaseLogin...
+    if ($.KBaseSessionSync.isLoggedIn()) {
+        $location.path('/dashboard');
+        return;
+    }
+    
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives
-
+    
+    $scope.nextPath = $stateParams.nextPath;
+    
+    postal.channel('session').subscribe('login.failure', function (data) {
+      // TODO: wow, these jquery calls need to be scoped!
+      $("#loading-indicator").hide();
+      var errormsg = data.error.message;
+      if (errormsg == "LoginFailure: Authentication failed.") {
+          errormsg = "Login Failed: your username/password is incorrect.";
+      }
+      $("#login_error").html(errormsg);
+      $("#login_error").show();
+    });
+    
     // callback for ng-click 'loginUser':
-    $scope.loginUser = function (user) {
+    $scope.loginUser = function (user, nextPath) {
         $("#loading-indicator").show();
-
         kbaseLogin.login(
             user.username,
-            user.password,
-            function(args) {
-                if (args.success === 1) {
-
-                    this.registerLogin(args);
-                    //this.data('_session', kbaseCookie);
-
-                    //set the cookie
-                    // var c = $("#login-widget").kbaseLogin('get_kbase_cookie');
-                    
-                    // var cookieName = 'kbase_session';
-                    // var cookieString = 'un=' + c.user_id + 
-                    //                    '|kbase_sessionid=' + c.kbase_sessionid +
-                    //                    '|user_id=' + c.user_id +
-                    //                    '|token=' + c.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
-                    // $.cookie(cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
-                    // $.cookie(cookieName, cookieString, { path: '/', expires: 60 });
-
-                    //this.data('_session', c);
-
-                    USER_ID = $("#signin-button").kbaseLogin('session').user_id;
-                    USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
-
-                    //kb = new KBCacheClient(USER_TOKEN);
-                    //kb.nar.ensure_home_project(USER_ID);
-
-                    //$location.path('/narratives/featured');
-		    $location.path('/narrativemanager/start');  // new routing to narrativemanager instead of old narrative list
-                    $scope.$apply();
-                    window.location.reload();
-
-                } else {
-                    console.log("error logging in");
-                    $("#loading-indicator").hide();
-                    var errormsg = args.message;
-                    if (errormsg == "LoginFailure: Authentication failed.") {
-                        errormsg = "Login Failed: your username/password is incorrect.";
-                    }
-                    $("#login_error").html(errormsg);
-                    $("#login_error").show();
-
-                }
-
-            }
+            user.password
         );
     };
 
@@ -417,10 +577,24 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
     };
 
     $scope.loggedIn = function() {
-        var c = kbaseLogin.get_kbase_cookie();
-        $scope.username = c.name;
-        return (c.user_id !== undefined && c.user_id !== null);
+        var userId = kbaseLogin.get_session_prop('user_id');
+        return (userId !== undefined && userId !== null);
     };
+  
+    postal.channel('session').request({
+      topic: 'profile.get',
+      timeout: 10000
+    })
+    .then(function(profile) {
+      $scope.username = profile.getProp('user.realname');
+    })
+    .done();
+
+    postal.channel('session').subscribe('profile.loaded', function (data) {
+      $scope.$apply(function () {
+        $scope.username = data.profile.getProp('user.realname');
+      });
+    });
 
 })
 
@@ -429,6 +603,8 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 
 .controller('WBLanding', function($scope, $stateParams) {
+    
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id)
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 
@@ -449,6 +625,7 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 
 .controller('WBGeneLanding', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.gid+'?sub=Feature&subid='+$stateParams.fid);
     
     $scope.ws = $stateParams.ws;
     $scope.fid = $stateParams.fid;
@@ -744,16 +921,19 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 
 
 .controller('TreeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
 
 .controller('PangenomeDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
 
 .controller('MSADetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'ws': $stateParams.ws};
 })
@@ -766,12 +946,43 @@ app.controller('methodAccordion', function ($scope, narrative, $http) {
 .controller('JGI', function($scope, $stateParams) {
     $scope.params = {'ws': $stateParams.ws,
                      'obj': $stateParams.obj};
+    require(['kb.widget.navbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      });
+    });
 })
 
 
 
 .controller('narrativemanager', function($scope, $stateParams) {
     $scope.params = $stateParams;
+    require(['kb.widget.navbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      });
+    });
+})
+
+.controller('NarrativeStore', function($scope, $stateParams) {
+    $scope.params = $stateParams;
+    require(['kb.widget.navbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: true, narrative: true
+      });
+    });
+})
+
+.controller('JsonDetail', function($scope, $stateParams) {
+    $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
+})
+
+.controller('ContigSetDetail', function($scope, $stateParams) {
+    window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
+    $scope.params = {'id': $stateParams.id, 'ws':$stateParams.ws}
 })
 
 

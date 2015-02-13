@@ -1,0 +1,30 @@
+ .kb-row: {
+ }
+.-col {
+	display: inline-block;
+}
+.-col.-span-8 {
+	width: 66.6666%;
+}
+.-col.-span-4 {
+	width: 33.3333%;
+}
+
+.kb-widget > .panel-heading button {
+   padding: 0;
+}
+
+.kb-widget [data-toggle="collapse"]::before {
+  font-family: "FontAwesome";
+  font-style: normal;
+  font-weight: normal;
+  font-size: 90%;
+  width: 12px;
+  color: silver;
+  line-height: 1;
+  vertical-align: baseline;
+  content: "\f078 ";
+}
+.kb-widget [data-toggle="collapse"].collapsed::before {
+  content: "\f054 ";
+}

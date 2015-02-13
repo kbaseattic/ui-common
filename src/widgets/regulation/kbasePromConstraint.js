@@ -95,7 +95,7 @@
 
 		// create a table from the reformatted promconstraint data
                 var tableSettings = {
-                     "sPaginationType": "bootstrap",
+                     "sPaginationType": "full_numbers",
                      "iDisplayLength": 10,
                      "aaData": pcdata,
                      "aaSorting": [[ 0, "asc" ]],

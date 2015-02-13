@@ -34,14 +34,24 @@ function NarrativeMethodStore(url, auth, auth_cb) {
         return json_call_ajax("NarrativeMethodStore.ver", [], 1, _callback, _error_callback);
     };
 
+    this.status = function (_callback, _errorCallback) {
+    return json_call_ajax("NarrativeMethodStore.status",
+        [], 1, _callback, _errorCallback);
+};
+
+    this.status_async = function (_callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("NarrativeMethodStore.status", [], 1, _callback, _error_callback);
+    };
+
     this.list_categories = function (params, _callback, _errorCallback) {
     return json_call_ajax("NarrativeMethodStore.list_categories",
-        [params], 3, _callback, _errorCallback);
+        [params], 4, _callback, _errorCallback);
 };
 
     this.list_categories_async = function (params, _callback, _error_callback) {
         deprecationWarning();
-        return json_call_ajax("NarrativeMethodStore.list_categories", [params], 3, _callback, _error_callback);
+        return json_call_ajax("NarrativeMethodStore.list_categories", [params], 4, _callback, _error_callback);
     };
 
     this.get_category = function (params, _callback, _errorCallback) {
@@ -134,6 +144,16 @@ function NarrativeMethodStore(url, auth, auth_cb) {
         return json_call_ajax("NarrativeMethodStore.list_app_ids_and_names", [], 1, _callback, _error_callback);
     };
 
+    this.list_types = function (params, _callback, _errorCallback) {
+    return json_call_ajax("NarrativeMethodStore.list_types",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.list_types_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("NarrativeMethodStore.list_types", [params], 1, _callback, _error_callback);
+    };
+
     this.get_method_brief_info = function (params, _callback, _errorCallback) {
     return json_call_ajax("NarrativeMethodStore.get_method_brief_info",
         [params], 1, _callback, _errorCallback);
@@ -192,6 +212,16 @@ function NarrativeMethodStore(url, auth, auth_cb) {
     this.get_app_spec_async = function (params, _callback, _error_callback) {
         deprecationWarning();
         return json_call_ajax("NarrativeMethodStore.get_app_spec", [params], 1, _callback, _error_callback);
+    };
+
+    this.get_type_info = function (params, _callback, _errorCallback) {
+    return json_call_ajax("NarrativeMethodStore.get_type_info",
+        [params], 1, _callback, _errorCallback);
+};
+
+    this.get_type_info_async = function (params, _callback, _error_callback) {
+        deprecationWarning();
+        return json_call_ajax("NarrativeMethodStore.get_type_info", [params], 1, _callback, _error_callback);
     };
  
 

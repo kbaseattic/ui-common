@@ -89,26 +89,18 @@ var NarrativeManager = function(options, auth, auth_cb) {
         console.log("creating " + nar_name);
         console.log(params);
         
-        var wsMetaData = {
-            'narrative' : nar_name,
-            'is_temporary' : 'true'
-            //'pending_shared_users': '[]',
-            //'rejected_shared_users': '[]'
-        };
-        
         // 1 - create ws
         self.ws.create_workspace(
             {
                 workspace: ws_name,
-                description: "",
-                meta: wsMetaData
+                description: ""
             },
             function(ws_info) {
                 console.log("workspace created:");
                 console.log(ws_info);
                 
                 // 2 - create the Narrative object
-                var narObjs = self.buildNarrativeObjects(
+                var narObjs = self._buildNarrativeObjects(
                     ws_name, params.cells, params.parameters,
                     function(narrativeObject, metadataExternal) {
                         // 3 - save the Narrative object
@@ -123,7 +115,8 @@ var NarrativeManager = function(options, auth, auth_cb) {
                                     provenance: [
                                         {
                                             script: "NarrativeManager.js",
-                                            description: "Created new Workspace/Narrative bundle."
+                                            description: "Created new " +
+                                                "Workspace/Narrative bundle."
                                         }
                                     ],
                                     hidden:0
@@ -131,57 +124,17 @@ var NarrativeManager = function(options, auth, auth_cb) {
                             },
                             function(obj_info_list) {
                                 console.log('saved narrative:');
-                                console.log(obj_info_list);
-                                // 4) better to keep the narrative perm id instead of the name
-                                self.ws.alter_workspace_metadata(
-                                    {wsi:{workspace:ws_name},new:{narrative:obj_info_list[0][0]+''}},
-                                    function() {},
-                                    function() {});
-                                
-                                var returnData = {ws_info:ws_info, nar_info: obj_info_list[0]};
-                                
-                                // 5) now we copy everything that we need
-                                if (params.importData != null &&
-                                        params.importData != false) {
-                                    var copyobjs = [];
-                                    for(var cj=0; cj<params.importData.length; cj++) {
-                                        copyobjs.push({ref:params.importData[cj]});
-                                    }
-                                    
-                                    // we need to get obj info so that we can preserve names.. annoying that ws doesn't do this!
-                                    self.ws.get_object_info(copyobjs,0,
-                                        function(infoList) {
-                                            var copyJobs = [];
-                                            for(var il=0; il<infoList.length; il++) {
-                                                copyJobs.push(
-                                                    self.ws.copy_object({
-                                                            from: { ref:params.importData[il] }, //!! assume same ordering
-                                                            to: { wsid:ws_info[0], name:infoList[il][1]  }
-                                                        },
-                                                        function(info) { console.log('copied'); console.log(info); },
-                                                        function(error){
-                                                            if (_error_callback) {
-                                                                _error_callback(error.error);
-                                                            }
-                                                        }
-                                                    )
-                                                )
-                                            }
-                                            $.when.apply($, copyJobs).done(function() {
-                                                _callback(returnData);
-                                            });
+                                console.log(obj_info_list[0]);
+                                var returnData = {ws_info: ws_info,
+                                                  nar_info: obj_info_list[0]};
+                                self._complete_new_narrative(
+                                        ws_info[0],          //ws id
+                                        obj_info_list[0][0], //obj id
+                                        params.importData,
+                                        function() {
+                                            _callback(returnData)
                                         },
-                                        function(error) {
-                                            console.error(error);
-                                            if(_error_callback) {
-                                                _error_callback(error.error);
-                                            }
-                                        });
-                                    
-                                } else {
-                                    _callback(returnData);
-                                }
-                                
+                                        _error_callback);
                             }, function (error) {
                                 console.error(error);
                                 if(_error_callback) {
@@ -201,6 +154,79 @@ var NarrativeManager = function(options, auth, auth_cb) {
         );
     };
     
+    this._complete_new_narrative = function(ws_id, obj_id, importData,
+            _callback, _error_callback) {
+        var self = this;
+        // 4) better to keep the narrative perm id instead of the name
+        self.ws.alter_workspace_metadata(
+            {wsi: {id: ws_id},
+             'new': {narrative: obj_id + '', is_temporary: 'true'}
+            },
+            function() {
+                //should really do this first - fix later
+                    self._copy_to_narrative(
+                            ws_id,
+                            importData,
+                            _callback,
+                            _error_callback
+                    )
+            },
+            function(error) {
+                console.error(error);
+                if (_error_callback) {
+                    _error_callback(error.error);
+                }
+            }
+        );
+    }
+
+     
+    this._copy_to_narrative = function(ws_id, importData,
+            _callback, _error_callback) {
+        var self = this;
+        // 5) now we copy everything that we need
+        if (importData != null &&
+                importData != false) {
+            var copyobjs = [];
+            for(var cj = 0; cj < importData.length; cj++) {
+                copyobjs.push({ref: importData[cj]});
+            }
+//            
+            // we need to get obj info so that we can preserve names.. annoying that ws doesn't do this!
+            self.ws.get_object_info(copyobjs,0,
+                function(infoList) {
+                    var copyJobs = [];
+                    for(var il = 0; il < infoList.length; il++) {
+                        copyJobs.push(self.ws.copy_object(
+                                {from: {ref: importData[il]}, //!! assume same ordering
+                                 to: {wsid: ws_id, name: infoList[il][1]}
+                                },
+                                function(info) {
+                                    console.log('copied');
+                                    console.log(info);
+                                },
+                                function(error){
+                                    if (_error_callback) {
+                                        _error_callback(error.error);
+                                    }
+                                }
+                            )
+                        )
+                    }
+                    $.when.apply($, copyJobs).done(function() {
+                        _callback();
+                    });
+                },
+                function(error) {
+                    console.error(error);
+                    if(_error_callback) {
+                        _error_callback(error.error);
+                    }
+                });
+        } else {
+            _callback();
+        }
+    }
     
     /* looks at the user workspaces, determines which was last modified, and
      * returns this object:
@@ -222,9 +248,9 @@ var NarrativeManager = function(options, auth, auth_cb) {
         // get the full list of workspaces
         
         self.ws.list_workspace_info(
-            {excludeGlobal:1},
+            {owners: [self.user_id]}, //only check ws owned by user
             function(wsList) {
-                var mine = [];
+                var workspaces = [];
                 /*WORKSPACE INFO
                     0: ws_id id
                     1: ws_name workspace
@@ -235,45 +261,25 @@ var NarrativeManager = function(options, auth, auth_cb) {
                     6: permission globalread,
                     7: lock_status lockstat
                     8: usermeta metadata*/
-                
                 for (var i=0; i<wsList.length; i++) {
                     if (wsList[i][8]) { // must have metadata or else we skip
                         // we could exclude temporary narratives in the future...
                         /*if (wsList[i][8].is_temporary) { if (wsList[i][8].is_temporary === 'true') { continue; } } */
                         //must have the new narrative tag, or else we skip
                         if (wsList[i][8].narrative) {
-                            // only check for narratives owned by this user
-                            if (wsList[i][2]===self.user_id) {
-                                mine.push(wsList[i]);
-                            }
+                            workspaces.push(wsList[i]);
                         }
                     }
                 }
-                if (mine.length>0) {
+                if (workspaces.length>0) {
                     // we have existing narratives, so we load 'em up
-                    mine.sort(function(a,b) { //sort by date
+                    workspaces.sort(function(a,b) { //sort by date
                         if (a[3] > b[3]) return -1;
                         if (a[3] < b[3]) return 1;
                         return 0;
                     });
-                    
-                    self.ws.get_object_info(
-                        [{ref:mine[0][0]+"/"+mine[0][8].narrative}],0,
-                                function(objList) {
-                                    if (objList[0]) {
-                                        _callback({last_narrative:{ws_info:mine[0], nar_info:objList[0]}});
-                                    } else {
-                                        if (_error_callback) {
-                                            _error_callback({message: 
-                                                    "Unable to load recent narrative."});
-                                        }
-                                    }
-                                },
-                                function(error) {
-                                    if (_error_callback) {
-                                        _error_callback(error.error);
-                                    }
-                                });
+                    self._findRecentValidNarrative(workspaces, 0, _callback,
+                            _error_callback);
                 } else {
                     _callback(emptyResult);
                 }
@@ -286,7 +292,39 @@ var NarrativeManager = function(options, auth, auth_cb) {
             });
     };
     
-    
+    this._findRecentValidNarrative = function(workspaces, index,
+            _callback, _error_callback) {
+        var self = this;
+        if (index >= workspaces.length) {
+            _callback({last_narrative: null});
+            return;
+        }
+        var ref = workspaces[index][0] + "/" + workspaces[index][8].narrative;
+        self.ws.get_object_info_new(
+                {objects: [{ref: ref}],
+                 includeMetadata: 1,
+                 ignoreErrors: 1
+                 },
+                function (objList) {
+                     //this case should generally never happen, so we just
+                     //check one workspace at a time to keep the load light
+                     if (objList[0] == null) {
+                         return self._findRecentValidNarrative(
+                                 workspaces, index + 1,
+                                 _callback, _error_callback);
+                     } else {
+                         _callback({last_narrative:
+                                     {ws_info: workspaces[index],
+                                      nar_info: objList[0]
+                                     }
+                         });
+                     }
+                },
+                function (error) {
+                     _error_callback(error.error);
+                }
+        )
+    },
     
     
     this.discardTempNarrative = function(params, _callback, _error_callback) {
@@ -319,14 +357,14 @@ var NarrativeManager = function(options, auth, auth_cb) {
     /* private method to setup the narrative object,
     returns [narrative, metadata]
     */
-    this.buildNarrativeObjects = function(ws_name, cells, parameters, _callback, _error_callback) {
+    this._buildNarrativeObjects = function(ws_name, cells, parameters, _callback, _error_callback) {
         var self = this;
         // first thing first- we need to grap the app/method specs
         self._getSpecs(cells,
             function() {
                 // now we can create the metadata and populate the cells
                 var metadata = {
-                    job_ids: { methods:[], apps:[] },
+                    job_ids: { methods:[], apps:[], job_usage: {'queue_time':0, 'run_time':0} },
                     format:'ipynb',
                     creator:self.user_id,
                     ws_name:ws_name,
@@ -557,28 +595,65 @@ var NarrativeManager = function(options, auth, auth_cb) {
     
     
     
-    this.introText =
-        "Welcome to KBase!\n============\n\n"+
-        "Add Data to this Narrative\n------------\n\n"+
-        "Click on 'Get Data' and browse for KBase data or upload your own."+
-        "Select the data and click 'Add to narrative'.  Perhaps start by "+
-        "importing your favorite Genome.  Once your data has been loaded, "+
-        "you can inspect it in the data list.\n<br>\n\n"+
-        "Perform an Analysis\n------------\n\n"+
-        "When you're ready, select an App or Method to run on your data.  "+
-        "Simply click on an App or Method on the side bar, and it will appear "+
-        "directly in your Narrative.  Fill in the parameters and click run.  "+
-        "Output will be generated and new data objects may be created and added "+
-        "to your data list.  Add and run as many Apps and Methods as you like!\n\n"+
-        "Long running computations can be tracked in your Jobs panel, located on "+
-        "the side panel under the 'Manage' tab.\n<br>\n\n"+
-        "Save & Share your Results\n------------\n\n"+
-        "When you're ready, name this Narrative and save it.  Once it is saved, "+
-        "click on the 'share' button above to let others view your analysis.  Or if you're "+
-        "brave, make it public for the world to see.\n<br><br>\n\n"+
-        "\nThat's it!\n\n"+
-        "<b>Questions?</b> Visit https://kbase.us to search for more detailed tutorials and documentation.\n\n"+
-        "<b>More Questions?</b> Email: [help@kbase.us](mailto:help@kbase.us)\n\n\n";
+    // this.introText =
+    //     "Welcome to KBase!\n============\n\n"+
+    //     "Add Data to this Narrative\n------------\n\n"+
+    //     "Click on 'Get Data' and browse for KBase data or upload your own."+
+    //     "Select the data and click 'Add to narrative'.  Perhaps start by "+
+    //     "importing your favorite Genome.  Once your data has been loaded, "+
+    //     "you can inspect it in the data list.\n<br>\n\n"+
+    //     "Perform an Analysis\n------------\n\n"+
+    //     "When you're ready, select an App or Method to run on your data.  "+
+    //     "Simply click on an App or Method on the side bar, and it will appear "+
+    //     "directly in your Narrative.  Fill in the parameters and click run.  "+
+    //     "Output will be generated and new data objects may be created and added "+
+    //     "to your data list.  Add and run as many Apps and Methods as you like!\n\n"+
+    //     "Long running computations can be tracked in your Jobs panel, located on "+
+    //     "the side panel under the 'Manage' tab.\n<br>\n\n"+
+    //     "Save & Share your Results\n------------\n\n"+
+    //     "When you're ready, name this Narrative and save it.  Once it is saved, "+
+    //     "click on the 'share' button above to let others view your analysis.  Or if you're "+
+    //     "brave, make it public for the world to see.\n<br><br>\n\n"+
+    //     "\nThat's it!\n\n"+
+    //     "<b>Questions?</b> Visit https://kbase.us to search for more detailed tutorials and documentation.\n\n"+
+    //     "<b>More Questions?</b> Email: [help@kbase.us](mailto:help@kbase.us)\n\n\n";
+    this.docBaseUrl = kb.urls ? kb.urls.docsite.baseUrl : "http://staging.kbase.us";
+    this.introText = 
+        "![KBase Logo](" + this.docBaseUrl + "/wp-content/uploads/2014/11/kbase-logo-web.png)\n" +
+        "Welcome to the Narrative Interface!\n" +
+        "===\n\n" + 
+        "<a href='" + this.docBaseUrl + "/narrative-guide/' style='text-decoration:underline'>What's a Narrative?</a>\n" +
+        "---\n" +
+        "Design and carry out collaborative computational experiments while " + 
+        "creating Narratives: interactive, shareable, and reproducible records " +
+        "of your data, computational steps, and thought processes.\n\n" +
+        "<a href='" + this.docBaseUrl + "/narrative-guide/explore-data/' style='text-decoration:underline'>Get Some Data</a>\n" +
+        "---\n" +
+        "Click the Add Data button in the Data Panel to browse for KBase data or " +
+        "upload your own. Mouse over a data object to add it to your Narrative, and " + 
+        "check out more details once the data appears in your list.\n\n" +
+        "<a href='" + this.docBaseUrl + "/narrative-guide/browse-apps-and-methods/' style='text-decoration:underline'>Analyze It</a>\n" + 
+        "---\n" +
+        "Browse available analyses that can be run using KBase apps or methods " +
+        "(apps are just multi-step methods that make some common analyses more " +
+        "convenient). Select an analysis, fill in the fields, and click Run. " +
+        "Output will be generated, and new data objects will be created and added " +
+        "to your data list. Add to your results by running follow-on apps or methods.\n\n" +
+        "<a href='" + this.docBaseUrl + "/narrative-guide/share-narratives/' style='text-decoration:underline'>Save and Share Your Narrative</a>\n" +
+        "---\n" +
+        "Be sure to save your Narrative frequently. When you&apos;re ready, click " + 
+        "the share button above to let collaborators view your analysis steps " +
+        "and results. Or better yet, make your Narrative public and help expand " +
+        "the social web that KBase is building to make systems biology research " +
+        "open, collaborative, and more effective.\n\n" +
+        "<a href='" + this.docBaseUrl + "/narrative-guide/' style='text-decoration:underline'>Find Documentation and Help</a>\n" +
+        "---\n" +
+        "For more information, please see the " +
+        "<a href='" + this.docBaseUrl + "/narrative-guide/' style='text-decoration:underline'>Narrative Interface User Guide</a> " +
+        "or the <a href='" + this.docBaseUrl + "/apps/' style='text-decoration:underline'>app/method tutorials</a>.\n\n" +
+        "Questions? <a href='" + this.docBaseUrl + "/contact-us' style='text-decoration:underline'>Contact us</a>!\n\n" +
+        "Ready to begin adding to your Narrative? You can keep this Welcome cell or " +
+        "delete it with the trash icon in the top right corner.";
 };
 
 

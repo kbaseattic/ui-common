@@ -1,0 +1,30 @@
+<div class="collapse" id="{{env.widgetName}}-more-info-{{env.instanceId}}">
+   <div class="well">
+      <p>This panel shows summary counts of your KBase presence, compared to the rest of the KBase user population.</p>
+   </div>
+</div>
+
+<table class="table">
+   <tr>
+      <th>Measure</th>
+      <th>Shown</th>
+      <th>Total</th>
+   </tr>
+
+   <tr>
+      <td>Narratives</td>
+      <td>{{state.narratives.filtered}}</td>
+      <td>{{state.narratives.count}}</td>
+   </tr>
+   <tr>
+      <td>Shared Narratives</td>
+      <td>{{state.sharedNarratives.filtered}}</td>
+      <td>{{state.sharedNarratives.count}}</td>
+   </tr>
+   <tr>
+      <td>Collaborators</td>
+      <td>{{state.collaborators.filtered}}</td>
+      <td>{{state.collaborators.count}}</td>
+   </tr>
+
+</table>

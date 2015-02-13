@@ -28,7 +28,7 @@
             		dataList.push({module: '<a onclick="specClicks[\''+pref+'module-click\'](this,event); return false;" data-module="'+data[i]+'">'+data[i]+'</a>'});
                 self.$elem.append('<table id="'+pref+'module-table" class="table table-striped table-bordered"></table>');
                 var tableSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Module name", mData: "module"}],
                         "aaData": dataList,
@@ -62,7 +62,7 @@
                 type: "KBaseSpecStorageCard",
                 id: this.options.id,
                 workspace: 'specification',
-                title: "Registered Module Objects"
+                title: "Registered Data Type Modules"
             };
         }
     });

@@ -22,7 +22,8 @@
 	    //loadingImage: "assets/img/loading.gif",
             loadingImage: "assets/img/ajax-loader.gif",
             kbCache:null,         
-            width:900         
+            width:900,
+            genomeInfo: null
         },
         
 	/*
@@ -325,19 +326,11 @@
         },
 
         render: function() {
-            var margin =  this.margin,
-                width = this.width;
-
-	    //var self = this;
-	    var container = this.$elem;
-
-	    // spinning wheel
-	    //container.prepend("<div><img src=\""+self.options.loadingImage+"\">&nbsp;&nbsp;loading genes data...</div>");
-
-
-            var SEEDTree = this.SEEDTree;
-            var subsysToGeneMap = this.subsysToGeneMap;
-
+        	var self = this;
+        	if (self.options.genomeInfo) {
+        		self.showData(self.options.genomeInfo.data);
+        		return;
+        	}
             var obj = {"ref" : this.options.wsNameOrId + "/" + this.options.objNameOrId };
             var prom;
 
@@ -354,51 +347,64 @@
             }, this));
 
             $.when(prom).done($.proxy(function(genome) {
-		container.empty();
-                var genomeObj = genome[0].data;
-		var tax_domain = genomeObj.domain;
-
-		// doesn't work for Euks yet
-		if (tax_domain === "Eukaryota") {
-		    container.prepend(('<b>Functional Categories not yet available for '+tax_domain+'</b>'));
-		    return this;
-		}
-
-		this.tree = d3.layout.tree().nodeSize([0, this.stepSize]);
-		
-		var $mainview = $('<div id="mainview">').css({'overflow-x' : 'scroll'});
-		container.append($mainview);
-		
-		this.svg = d3.select($mainview[0]).append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-                /*
-                    First I am going to iterate over the Genome Typed Object and 
-                    create a mapping of the assigned functional roles (by SEED) to
-                    an array of genes with those roles. 
-
-                    subsysToGeneMap [ SEED Role ] = Array of Gene Ids
-                */
-
-                genomeObj.features.forEach( function(f){
-
-                    // Each function can have multiple genes, creating mapping of function to list of gene ids
-                    if (subsysToGeneMap[f["function"]] === undefined) {subsysToGeneMap[f["function"]] = [];}
-                    subsysToGeneMap[f["function"]].push(f["id"]);
-
-                    // Not sure if this is necessary, but I'm going to keep track of the number of genes with
-                    // SEED assigned functions in this count variable.
-                    SEEDTree.count++; 
-                });
-
-                this.loadSEEDHierarchy();
-
+            	self.showData(genome[0].data);
             }, this));
-
         },
 
+        showData: function(genomeObj) {
+            var margin =  this.margin,
+            width = this.width;
+
+            //var self = this;
+            var container = this.$elem;
+
+            // spinning wheel
+            //container.prepend("<div><img src=\""+self.options.loadingImage+"\">&nbsp;&nbsp;loading genes data...</div>");
+
+
+            var SEEDTree = this.SEEDTree;
+            var subsysToGeneMap = this.subsysToGeneMap;
+        	container.empty();
+            var tax_domain = genomeObj.domain;
+
+            // doesn't work for Euks yet
+            if (tax_domain === "Eukaryota") {
+            	container.prepend(('<b>Functional Categories not yet available for '+tax_domain+'</b>'));
+            	return this;
+            }
+
+            this.tree = d3.layout.tree().nodeSize([0, this.stepSize]);
+	
+            var $mainview = $('<div id="mainview">').css({'overflow-x' : 'scroll'});
+            container.append($mainview);
+	
+            this.svg = d3.select($mainview[0]).append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            /*
+                First I am going to iterate over the Genome Typed Object and 
+                create a mapping of the assigned functional roles (by SEED) to
+                an array of genes with those roles. 
+
+                subsysToGeneMap [ SEED Role ] = Array of Gene Ids
+            */
+
+            genomeObj.features.forEach( function(f){
+
+                // Each function can have multiple genes, creating mapping of function to list of gene ids
+                if (subsysToGeneMap[f["function"]] === undefined) {subsysToGeneMap[f["function"]] = [];}
+                subsysToGeneMap[f["function"]].push(f["id"]);
+
+                // Not sure if this is necessary, but I'm going to keep track of the number of genes with
+                // SEED assigned functions in this count variable.
+                SEEDTree.count++; 
+            });
+
+            this.loadSEEDHierarchy();
+        },
+        
         loggedInCallback: function(event, auth) {
             this.authToken = auth;
             this.wsClient = new Workspace(this.wsUrl, this.authToken);

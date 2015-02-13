@@ -8,7 +8,8 @@
         options: {
             id: "",
             name: "",
-            width: 600,
+            width: 800,
+            height: 600,
             token: null
         },
 
@@ -78,7 +79,7 @@
                 	moduleLinks[moduleLinks.length] = '<a onclick="specClicks[\''+pref+'modver-click\'](this,event); return false;" data-moduleid="'+moduleId+'">'+moduleVer+'</a>';
                 }
                 overviewTable.append('<tr><td>Module version(s)</td><td>'+moduleLinks+'</td></tr>');
-            	overviewTable.append('<tr><td>Description</td><td><textarea style="width:100%;" cols="2" rows="7" readonly>'+data.description+'</textarea></td></tr>');
+            	overviewTable.append('<tr><td>Description</td><td><textarea style="width:100%;" cols="2" rows="15" readonly>'+data.description+'</textarea></td></tr>');
             	specClicks[pref+'modver-click'] = (function(elem, e) {
                     var moduleId = $(elem).data('moduleid');
                     self.trigger('showSpecElement', 
@@ -143,7 +144,7 @@
             		funcsData.push({name: '<a onclick="specClicks[\''+pref+'funcs-click\'](this,event); return false;" data-funcid="'+funcId+'">'+funcName+'</a>', ver: funcVer});
             	}
                 var funcsSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Function name", mData: "name"}, {sTitle: "Function version", mData: "ver"}],
                         "aaData": funcsData,
@@ -175,7 +176,7 @@
             		typesData.push({name: '<a onclick="specClicks[\''+pref+'types-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer});
             	}
                 var typesSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
                         "aaData": typesData,
@@ -207,7 +208,7 @@
             		subsData.push({name: '<a onclick="specClicks[\''+pref+'subs-click\'](this,event); return false;" data-typeid="'+aTypeId+'">'+aTypeName+'</a>', ver: aTypeVer});
             	}
                 var subsSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type name", mData: "name"}, {sTitle: "Type version", mData: "ver"}],
                         "aaData": subsData,
@@ -244,7 +245,7 @@
             		versData.push({name: link});
             	}
                 var versSettings = {
-                        "sPaginationType": "bootstrap",
+                        "sPaginationType": "full_numbers",
                         "iDisplayLength": 10,
                         "aoColumns": [{sTitle: "Type version", mData: "name"}],
                         "aaData": versData,
@@ -279,7 +280,7 @@
                 type: "KBaseSpecTypeCard",
                 id: this.options.id,
                 workspace: "specification",
-                title: "Typed Object Specification"
+                title: "Data Type Specification"
             };
         }
     });

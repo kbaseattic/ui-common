@@ -34,7 +34,7 @@
             this._super(options);
             var self = this;
 	    // show loading message
-	    self.$elem.append("<center><b><i>Mouse over objects to get more info (shown below the graph). Double click on an object to select and recenter the graph on that object. </i></b></center><br>");
+	    self.$elem.append("This is a visualization of the relationships between this piece of data and other data in KBase.  Mouse over objects to show additional information (shown below the graph). Double click on an object to select and recenter the graph on that object in a new window.<br><br>");
             self.$elem.append('<div id="loading-mssg"><p class="muted loader-table"><center><img src="assets/img/ajax-loader.gif"><br><br>building object reference graph...</center></p></div>');
 	    
 	    // load the basic things from the cache and options
@@ -54,21 +54,20 @@
 	
 	
 	typeToColor: {
-	    "selected":"#FFFF33",
-	    "core":"#FFDE88",
-	    "ref":"#D43F3F",
-	    "included":"#00ACE9",
-	    "none":'FFFFFF'
-	    //"prov": "#50d07d"
-	    //"KBaseNarratives.Narrative":"#50d07d"
+	    "selected":"#FF9800",
+	    "core":"#FF9800",
+	    "ref":"#C62828",
+	    "included":"#2196F3",
+	    "none":'FFFFFF',
+	    "copied": "#4BB856"
 	},
 	
 	typeToName: {
-	    "selected": "Latest version of the data object",
-	    "core":"Previous versions of the data object",
-	    "ref":"Data that references the selected object",
-	    "included":"Data that is referenced by the selected object",
-	    //"prov":"Data that is in the provenance of the selected object"
+	    "selected": " Current version",
+	    "core":" All Versions of this Data",
+	    "ref":" Data Referencing this Data",
+	    "included":" Data Referenced by this Data",
+	    "copied":"Copied From"
 	},
 	
 	needColorKey:false,
@@ -87,8 +86,9 @@
 			    '<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td valign=\"top\"><table cellpadding="2" cellspacing="0" border="0" id="graphkey" \
 				style="">'
 		for(var t in self.typeToName) {
+		    if (t==='selected') { continue; }
 		    html += "<tr><td><svg width=\"40\" height=\"20\"><rect x=\"0\" y=\"0\" width=\"40\" height=\"20\" fill=\""+self.typeToColor[t] +"\" \
-		    stroke=\""+ d3.rgb(self.typeToColor[t]).darker(2) +"\" /></svg></td><td valign=\"middle\"><b> \
+		     /></svg></td><td valign=\"middle\"><b> \
 		    "+self.typeToName[t]+"</b></td></tr>";
 		}
 		html += "</table></td><td><div id=\"objdetailsdiv\"></div></td></tr></table>";
@@ -112,13 +112,13 @@
 		self.objRefToNodeIdx["-1"] = 1;
 		self.graph.links.push({target:0, source:1, value:1});
 	    }
-		var margin = {top: 10, right: 10, bottom: 10, left: 10};
-		var width = self.options.width - 50 - margin.left - margin.right;
-		var height = self.graph.nodes.length*35 - margin.top - margin.bottom;
-		var color = d3.scale.category20();
-		if (height<450) {
-		    self.$elem.find("#objgraphview").height(height+40);
-		}
+	    var margin = {top: 10, right: 10, bottom: 10, left: 10};
+	    var width = self.options.width - 50 - margin.left - margin.right;
+	    var height = self.graph.nodes.length*38 - margin.top - margin.bottom;
+	    var color = d3.scale.category20();
+	    if (height<450) {
+		self.$elem.find("#objgraphview").height(height+40);
+	    }
 		/*var zoom = d3.behavior.zoom()
 		    .translate([0, 0])
 		    .scale(1)
@@ -129,25 +129,24 @@
 			//features.select(".county-border").style("stroke-width", .5 / d3.event.scale + "px");
 		    });
 		    */
-		// append the svg canvas to the page
-		d3.select(self.$elem.find("#objgraphview")[0]).html("");
-		self.$elem.find('#objgraphview').show();
-		var svg = d3.select(self.$elem.find("#objgraphview")[0]).append("svg");
+	    // append the svg canvas to the page
+	    d3.select(self.$elem.find("#objgraphview")[0]).html("");
+	    self.$elem.find('#objgraphview').show();
+	    var svg = d3.select(self.$elem.find("#objgraphview")[0]).append("svg");
 		/*svg.append("rect")
 		    .attr("class", "overlay")
 		    .attr("width",width + margin.left + margin.right)
 		    .attr("height",300)
 		    .call(zoom);*/
-		svg    
-		    .attr("width", width + margin.left + margin.right)
-		    .attr("height", height + margin.top + margin.bottom)
-		  .append("g")
-		    .attr("transform", 
-			  "translate(" + margin.left + "," + margin.top + ")");
+	    svg    
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 		    
 		// Set the sankey diagram properties
 		var sankey = d3.sankey()
-		    .nodeWidth(20)
+		    .nodeWidth(25)
 		    .nodePadding(40)
 		    .size([width, height]);
 		    
@@ -169,8 +168,18 @@
 		// add the link titles
 		link.append("title")
 		    .text(function(d) {
+			if(d.source.nodeType==='copied') {
+			    d.text = d.target.name + ' copied from ' +d.source.name;
+			} else if (d.source.nodeType==='core') {
+			    d.text = d.target.name + ' is a newer version of ' +d.source.name;
+			} else if (d.source.nodeType==='ref') {
+			    d.text = d.source.name + ' references ' +d.target.name;
+			} else if (d.source.nodeType==='included') {
+			    d.text = d.target.name + ' references ' +d.source.name;
+			}
 			return d.text;
 		    });
+		$(link).tooltip({delay: { "show": 0, "hide": 100 }});
 	
 		// add in the nodes
 		var node = svg.append("g")
@@ -237,23 +246,27 @@
 				// should refactor this so there is not all this copy paste...
 				function(objdata) {
 					var info = d['info'];
-					var savedate = new Date(info[3]);
 					var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
-					text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
-					text+= '<tr><td><b>Name</b></td><td>'+info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")</td></tr>";
+					text += '<h4>Data Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
+					text+= '<tr><td><b>Name</b></td><td>'+ info[1]+ ' (<a href="#/dataview/'+info[6]+"/"+info[1]+"/"+info[4] +'" target="_blank">'+info[6]+"/"+info[0]+"/"+info[4]+"</a>)</td></tr>";
 					text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
-					text+= '<tr><td><b>Workspace</b></td><td>'+info[7]+"</td></tr>";
-					text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
-					text+= '<tr><td><b>Saved by</b></td><td>'+info[5]+"</td></tr>";
-					var found = false; var metadata = "<tr><td><b>Meta data</b></td><td>";
+					text+= '<tr><td><b>Saved on</b></td><td>'+self.getTimeStampStr(info[3])+"</td></tr>";
+					text+= '<tr><td><b>Saved by</b></td><td><a href="#/people/'+info[5] +'" target="_blank">'+info[5]+"</td></tr>";
+					var found = false; var metadata = '<tr><td><b>Meta data</b></td><td><div style="width:250px;word-wrap: break-word;">';
 					for( var m in info[10]) {
 					    found = true;
 					    metadata += "<b>"+m+"</b> : "+info[10][m]+"<br>"
 					}
-					if (found) { text += metadata +"</td></tr>"; }
-					text += "</td></tr></table></td><td>";
+					if (found) { text += metadata +"</div></td></tr>"; }
+					text += "</div></td></tr></table></td><td>";
 					text+= '<h4>Provenance</h4><table cellpadding="2" cellspacing="0" class="table table-bordered table-striped">'
+					
+					
 					if (objdata.length>0) {
+					    //console.log(objdata[0]);
+					    if (objdata[0].copied) {
+						text+=self.getTableRow("Copied from",'<a href="#/dataview/'+objdata[0].copied+'" target="_blank">'+objdata[0].copied+'</a>');
+					    }
 					    if (objdata[0]['provenance'].length>0) {
 						var prefix = ""; 
 						for(var k=0; k<objdata[0]['provenance'].length; k++) {
@@ -263,10 +276,10 @@
 						    text+=self.getProvRows(objdata[0]['provenance'][k],prefix);
 						}
 					    } else {
-						text+= '<tr><td><b><span style="color:red">No provenance data set.</span></b></td></tr>';
+						text+= '<tr><td></td><td><b><span style="color:red">No provenance data set.</span></b></td></tr>';
 					    }
 					} else {
-					    text+= '<tr><td><b><span style="color:red">No provenance data set.</span></b></td></tr>';
+					    text+= '<tr><td></td><td><b><span style="color:red">No provenance data set.</span></b></td></tr>';
 					}
 					text+='</table>';
 					text+= "</td></tr></table>";
@@ -274,21 +287,19 @@
 				    
 				}, function(err) {
 					var info = d['info']; 
-					var savedate = new Date(info[3]);
 					var text = '<center><table cellpadding="2" cellspacing="0" class="table table-bordered"><tr><td>';
-					text += '<h4>Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
-					text+= '<tr><td><b>Name</b></td><td>'+info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")</td></tr>";
+					text += '<h4>Data Object Details</h4><table cellpadding="2" cellspacing="0" border="0" class="table table-bordered table-striped">';
+					text+= '<tr><td><b>Name</b></td><td>'+ info[1]+ '(<a href="#/dataview/'+info[6]+"/"+info[1]+"/"+info[4] +'" target="_blank">'+info[6]+"/"+info[0]+"/"+info[4]+"</a>)</td></tr>";
 					text+= '<tr><td><b>Type</b></td><td><a href="#/spec/type/'+info[2]+'">'+info[2]+'</a></td></tr>';
-					text+= '<tr><td><b>Workspace</b></td><td>'+info[7]+"</td></tr>";
-					text+= '<tr><td><b>Saved on</b></td><td>'+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"</td></tr>";
-					text+= '<tr><td><b>Saved by</b></td><td>'+info[5]+"</td></tr>";
-					var found = false; var metadata = "<tr><td><b>Meta data</b></td><td>";
+					text+= '<tr><td><b>Saved on</b></td><td>'+self.getTimeStampStr(info[3])+"</td></tr>";
+					text+= '<tr><td><b>Saved by</b></td><td><a href="#/people/'+info[5] +'" target="_blank">'+info[5]+"</td></tr>";
+					var found = false; var metadata = '<tr><td><b>Meta data</b></td><td><div style="width:250px;word-wrap: break-word;">';
 					for( var m in info[10]) {
 					    found = true;
 					    metadata += "<b>"+m+"</b> : "+info[10][m]+"<br>"
 					}
-					if (found) { text += metadata +"</td></tr>"; }
-					text += "</td></tr></table></td><td>";
+					if (found) { text += metadata +"</div></td></tr>"; }
+					text += "</div></td></tr></table></td><td>";
 					text+= '<h4>Provenance</h4><table cellpadding="2" cellspacing="0" class="table table-bordered table-striped">'
 					text+= "error in fetching provenance";
 					text+='</table>';
@@ -302,24 +313,26 @@
 	
 		// add the rectangles for the nodes
 		node.append("rect")
-		    .attr("height", function(d) { return Math.max(10,d.dy); })
+		    .attr("y", function(d) {
+			return -5; })
+		    .attr("height", function(d) {
+			return Math.abs(d.dy)+10;
+		    })
 		    .attr("width", sankey.nodeWidth())
 		    .style("fill", function(d) {
 			  return d.color = self.typeToColor[d['nodeType']];
 		    })
 		    .style("stroke", function(d) {
-			return d3.rgb(d.color).darker(2); })
+			return 0*d3.rgb(d.color).darker(2); })
 		    .append("title")
-			.text(function(d) {
+			.html(function(d) {
 			      //0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
 			      var info = d['info'];
-			      var savedate = new Date(info[3]);
 			      var text =
 				      info[1]+ " ("+info[6]+"/"+info[0]+"/"+info[4]+")\n"+
 				      "--------------\n"+
 				      "  type:  "+info[2]+"\n"+
-				      "  workspace:  "+info[7]+"\n"+
-				      "  saved on:  "+self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear()+"\n"+
+				      "  saved on:  "+self.getTimeStampStr(info[3])+"\n"+
 				      "  saved by:  "+info[5]+"\n";
 			      var found = false; var metadata = "  metadata:\n";
 			      for( var m in info[10]) {
@@ -381,7 +394,7 @@
 		text += self.getTableRow(prefix+"Method",provenanceAction['method']);
 	    }
 	    if ('method_params' in provenanceAction) {
-		text += self.getTableRow(prefix+"Method Parameters",JSON.stringify(provenanceAction['method_params']));
+		text += self.getTableRow(prefix+"Method Parameters",JSON.stringify(self.scrub(provenanceAction['method_params']),null,'  '));
 	    }
 	    
 	    if ('script' in provenanceAction) {
@@ -395,32 +408,104 @@
 	    }
 	    
 	    if ('intermediate_incoming' in provenanceAction) {
-		text += self.getTableRow(prefix+"Action Input",JSON.stringify(provenanceAction['intermediate_incoming']));
+		if (provenanceAction['intermediate_incoming'].length>0)
+		    text += self.getTableRow(prefix+"Action Input",JSON.stringify(provenanceAction['intermediate_incoming'],null,'  '));
 	    }
 	    if ('intermediate_outgoing' in provenanceAction) {
-		text += self.getTableRow(prefix+"Action Output",JSON.stringify(provenanceAction['intermediate_outgoing']));
+		if (provenanceAction['intermediate_outgoing'].length>0)
+		    text += self.getTableRow(prefix+"Action Output",JSON.stringify(provenanceAction['intermediate_outgoing'],null,'  '));
+	    }
+	    
+	    if ('external_data' in provenanceAction) {
+	        if (provenanceAction['external_data'].length>0) {
+	            text += self.getTableRow(prefix+"External Data",
+	                    self.formatProvenanceExternalData(
+	                            provenanceAction['external_data']),
+	                    null , '  ');
+	        }
 	    }
 	    
 	    if ('time' in provenanceAction) {
-		var savedate = new Date(provenanceAction['time']);
-		text += self.getTableRow(prefix+"Timestamp",self.monthLookup[savedate.getMonth()]+" "+savedate.getDate()+", "+savedate.getFullYear() );
+		text += self.getTableRow(prefix+"Timestamp",self.getTimeStampStr(provenanceAction['time']));
 	    }
 	    
 	    return text;
 	},
 	
+	formatProvenanceExternalData: function(extData) {
+	    /*
+	     * string resource_name - the name of the resource, for example JGI.
+         * string resource_url - the url of the resource, for example
+         *      http://genome.jgi.doe.gov
+         * string resource_version - version of the resource
+         * timestamp resource_release_date - the release date of the resource
+         * string data_url - the url of the data, for example
+         *      http://genome.jgi.doe.gov/pages/dynamicOrganismDownload.jsf?
+         *      organism=BlaspURHD0036
+         * string data_id - the id of the data, for example
+         *    7625.2.79179.AGTTCC.adnq.fastq.gz
+         * string description - a free text description of the data.
+         */
+        var self = this
+        var rethtml = '';
+        for (var i = 0; i < extData.length; i++) {
+            edu = extData[i];
+            if ('resource_name' in edu) {
+                rethtml += '<b>Resource Name</b><br/>';
+                if ('resource_url' in edu) {
+                    rethtml += '<a target="_blank" href=' + edu['resource_url'];
+                    rethtml += '>';
+                }
+                rethtml += edu["resource_name"];
+                if ('resource_url' in edu) {
+                    rethtml += '</a>';
+                }
+                rethtml += '<br/>';
+            }
+            if ('resource_version' in edu) {
+                rethtml += "<b>Resource Version</b><br/>";
+                rethtml += edu["resource_version"] + "<br/>";
+            }
+            if ('resource_release_date' in edu) {
+                rethtml += "<b>Resource Release Date</b><br/>";
+                rethtml += self.getTimeStampStr(edu["resource_release_date"]) + "<br/>";
+            }
+            if ('data_id' in edu) {
+                rethtml += '<b>Data ID</b><br/>';
+                if ('data_url' in edu) {
+                    rethtml += '<a target="_blank" href=' + edu['data_url'];
+                    rethtml += '>';
+                }
+                rethtml += edu["data_id"];
+                if ('data_url' in edu) {
+                    rethtml += '</a>';
+                }
+                rethtml += '<br/>';
+            }
+            if ('description' in edu) {
+                rethtml += "<b>Description</b><br/>";
+                rethtml += edu["description"] + "<br/>";
+            }
+        }
+        return rethtml;
+    },
+	
+	// removes any keys named 'auth'
+	scrub: function(objectList) {
+	    if(objectList && (objectList.constructor === Array)) {
+		for (var k=0; k<objectList.length; k++) {
+		    if (objectList[k] && typeof objectList[k] ==='object') {
+			if (objectList[k].hasOwnProperty('auth')) {
+			    delete objectList[k].auth;
+			}
+		    }
+		}
+	    }
+	    return objectList;
+	},
 	
 	getTableRow: function(rowTitle, rowContent) {
-	    var title = null;
-	    if (rowContent.length>35) {
-		title = rowContent;
-		rowContent = rowContent.substr(0,35) +" ...";
-	    }
-	    if (title) {
-		title = title.replace(/"/g, '&quot;');
-		return "<tr><td><b>"+rowTitle+'</b></td><td><span title="'+title+'">'+rowContent+"</span></td></tr>";
-	    }
-	    return "<tr><td><b>"+rowTitle+"</b></td><td>"+rowContent+"</td></tr>";
+	    return '<tr><td style="max-width:250px;"><b>'+rowTitle+'</b></td><td style="max-width:300px;"><div style="max-width:300px;max-height:250px;overflow-y:auto;white-space:pre;word-wrap: break-word;">'+rowContent+"</div></td></tr>";
 	},
 	
 	getNodeLabel: function(info) {
@@ -527,12 +612,12 @@
 			    }
 			),
 			self.ws.get_object_provenance(
-			//self.ws.get_objects(
 			    objIdentities,
 			    function(objdata) {
 				var uniqueRefs = {}; var uniqueRefObjectIdentities = []; var links = [];
-				// first get refs from the 
+				//console.log(objdata);
 				for(var i=0; i<objdata.length; i++) {
+				    // extract the references contained within the object
 				    for(var r=0; r<objdata[i]['refs'].length; r++) {
 					if (!(objdata[i]['refs'][r] in uniqueRefs)) {
 					    uniqueRefs[objdata[i]['refs'][r]] = 'included';
@@ -540,17 +625,32 @@
 					}
 					links.push({source:objdata[i]['refs'][r], target:objIdentities[i]['ref'], value:1});
 				    }
+				    // extract the references from the provenance
 				    for(var p=0; p<objdata[i]['provenance'].length; p++) {
-					if ('resolved_ws_objects' in objdata[i]['provenance'][p]) {
-					    for(var pRef = 0; pRef<objdata[i]['provenance'][p].length; pRef++) {
-						if (!(objdata[i]['provenance'][p][pRef] in uniqueRefs)) {
-						    uniqueRefs[objdata[i]['provenance'][p][pRef]] = 'included'; // TODO switch to prov??
-						    uniqueRefObjectIdentities.push({ref:objdata[i]['provenance'][p][pRef]});
+					if (objdata[i]['provenance'][p].hasOwnProperty('resolved_ws_objects')) {
+					    for(var pRef = 0; pRef<objdata[i]['provenance'][p].resolved_ws_objects.length; pRef++) {
+						if (!(objdata[i]['provenance'][p].resolved_ws_objects[pRef] in uniqueRefs)) {
+						    uniqueRefs[objdata[i]['provenance'][p].resolved_ws_objects[pRef]] = 'included'; // TODO switch to prov??
+						    uniqueRefObjectIdentities.push({ref:objdata[i]['provenance'][p].resolved_ws_objects[pRef]});
 						}
-						links.push({source:objdata[i]['provenance'][p][pRef], target:objIdentities[i]['provenance'], value:1});
+						links.push({source:objdata[i]['provenance'][p].resolved_ws_objects[pRef], target:objIdentities[i]['ref'], value:1});
 					    }
 					}
 				    }
+				    // copied from
+				    if (objdata[i].hasOwnProperty('copied')) {
+					
+					var copyShort =  objdata[i].copied.split('/')[0] + '/' + objdata[i].copied.split('/')[1];
+					var thisShort = objIdentities[i]['ref'].split('/')[0] + '/' + objIdentities[i]['ref'].split('/')[1];
+					if (copyShort !== thisShort) { // only add if it wasn't copied from an older version
+					    if (!(objdata[i].copied in uniqueRefs)) {
+						uniqueRefs[objdata[i].copied] = 'copied'; // TODO switch to prov??
+						uniqueRefObjectIdentities.push({ref:objdata[i].copied});
+					    }
+					    links.push({source:objdata[i].copied, target:objIdentities[i]['ref'], value:1});
+					}
+				    }
+				    
 				}
 				self.tempRefData = {uniqueRefs:uniqueRefs, uniqueRefObjectIdentities:uniqueRefObjectIdentities, links:links};
 				
@@ -569,11 +669,14 @@
 			if ("uniqueRefObjectIdentities" in self.tempRefData) {
 			    if (self.tempRefData["uniqueRefObjectIdentities"].length>0) {
 				var getRefInfoJobList = [
-				    self.ws.get_object_info(self.tempRefData['uniqueRefObjectIdentities'], 1, 
+				    self.ws.get_object_info_new({objects:self.tempRefData['uniqueRefObjectIdentities'],  includeMetadata:1, ignoreErrors:1}, 
 					function(objInfoList) {
 					    var objInfoStash = {};
 					    for(var i=0; i<objInfoList.length; i++) {
-						objInfoStash[objInfoList[i][6]+"/"+objInfoList[i][0]+"/"+objInfoList[i][4]] = objInfoList[i];
+						if (objInfoList[i]) {
+						    objInfoStash[objInfoList[i][6]+"/"+objInfoList[i][0]+"/"+objInfoList[i][4]] = objInfoList[i];
+						}
+						
 					    }
 					    // add the nodes
 					    var uniqueRefs = self.tempRefData['uniqueRefs'];
@@ -669,6 +772,10 @@
 	    var self = this;
 	    //loop over graph nodes, get next version, if it is in our node list, then add it
 	    for(var i=0; i<self.graph.nodes.length; i++) {
+		//console.log(self.graph.nodes[i]);
+		if (self.graph.nodes[i].nodeType==='copied') {
+		    continue;
+		}
 		//0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
 		var expectedNextVersion = self.graph.nodes[i]['info'][4] + 1;
 		var expectedNextId = self.graph.nodes[i]['info'][6]+"/"+self.graph.nodes[i]['info'][0]+"/"+expectedNextVersion;
@@ -685,7 +792,7 @@
 	
         
         getData: function() {
-            return {title:"Data Object Reference Graph", workspace:this.wsNameOrId, id:"This view shows the data reference connections to object "+this.options.objNameOrId};
+            return {title:"Data Object Reference Network", workspace:this.wsNameOrId, id:"This view shows the data reference connections to object "+this.options.objNameOrId};
         },
         
         
@@ -695,7 +802,32 @@
             return {ref:wsNameOrId+"/"+objNameOrId } ;
         },
         
-        monthLookup : ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep","Oct", "Nov", "Dec"]
-
+	
+	
+	// edited from: http://stackoverflow.com/questions/3177836/how-to-format-time-since-xxx-e-g-4-minutes-ago-similar-to-stack-exchange-site
+        getTimeStampStr: function (objInfoTimeStamp) {
+            var date = new Date(objInfoTimeStamp);
+            var seconds = Math.floor((new Date() - date) / 1000);
+            
+            // f-ing safari, need to add extra ':' delimiter to parse the timestamp
+            if (isNaN(seconds)) {
+                var tokens = objInfoTimeStamp.split('+');  // this is just the date without the GMT offset
+                var newTimestamp = tokens[0] + '+'+tokens[0].substr(0,2) + ":" + tokens[1].substr(2,2);
+                date = new Date(newTimestamp);
+                seconds = Math.floor((new Date() - date) / 1000);
+                if (isNaN(seconds)) {
+                    // just in case that didn't work either, then parse without the timezone offset, but
+                    // then just show the day and forget the fancy stuff...
+                    date = new Date(tokens[0]);
+                    return this.monthLookup[date.getMonth()]+" "+date.getDate()+", "+date.getFullYear();
+                }
+            }
+            
+            // keep it simple, just give a date
+            return this.monthLookup[date.getMonth()]+" "+date.getDate()+", "+date.getFullYear();
+        },
+        
+        monthLookup : ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep","Oct", "Nov", "Dec"],
+        
     });
 })( jQuery )

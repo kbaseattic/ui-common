@@ -1,0 +1,31 @@
+<div class="search-results">
+	{% if params.searchText | length < 3 %}
+		{% set more = 3 - params.searchText | length  %}
+		Search displayed after {{more}} more letters
+	{% else %}
+
+		<p>Found {{ state.searchResults | length }} users.</p>
+		<div class="results-wrapper">
+			<div class="results-container">
+				<table class="results" >
+				{% for result in state.searchResults %}
+					<tr>
+					  <td>
+					  {%if result.avatar.gravatar_default and result.email %} 
+							<img src="{{result.email | gravatar(64,"pg", result.avatar.gravatar_default)}}" class="avatar">
+						{% else %}
+							<img src="assets/images/nouserpic.png" class="avatar">
+						{% endif %}
+					  </td>
+					  <td>
+					    <a href="/functional-site/#/people/{{result.username}}">{{result.realname}}</a><br>
+					  	<i>{{result.username}}</i>
+					  </td>
+					</tr>
+				{% endfor %}
+				</table>
+			</div>
+		</div>
+
+	{% endif %}
+</div>

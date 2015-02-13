@@ -18,7 +18,6 @@
         },
 
         pref: null,
-        wsUrl: "https://kbase.us/services/ws/",  //"http://dev04.berkeley.kbase.us:7058",
         token: null,
         kbws: null,
         geneIndex: {},   // {genome_ref -> {feature_id -> feature_index}}
@@ -28,6 +27,8 @@
         	
         init: function(options) {
             this._super(options);
+            
+            this.wsUrl = kb.urls.workspace_url;
             this.pref = this.genUUID();
             this.token = this.authToken();
             this.geneIndex = {};
@@ -230,7 +231,7 @@
     			}
     			
         		var tableSettings = {
-        				"sPaginationType": "bootstrap",
+        				"sPaginationType": "full_numbers",
         				"iDisplayLength": 10,
         				"aaData": orth_data,
         				"aaSorting": [[ 2, "desc" ], [0, "asc"]],
@@ -241,7 +242,10 @@
         				              { "sTitle": "Genome Count", 'mData': 'genomes'}
         				              ],
         				              "oLanguage": {
-        				            	  "sEmptyTable": "No objects in workspace",
+//        				            	  "sEmptyTable": "No objects in workspace",
+                                          
+                                          // We are moving away from the workspace concept 
+        				            	  "sEmptyTable": "No objects found",
         				            	  "sSearch": "Search: "
         				              },
         				              'fnDrawCallback': events
@@ -362,7 +366,7 @@
     		}
     		tab.append(table);
         	var tableSettings = {
-        			"sPaginationType": "bootstrap",
+        			"sPaginationType": "full_numbers",
         			"iDisplayLength": 10,
         			"aaData": genes,
         			"aaSorting": [[0, "asc"], [ 1, "asc" ]],

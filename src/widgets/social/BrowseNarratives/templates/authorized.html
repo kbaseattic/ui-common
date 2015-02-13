@@ -1,0 +1,31 @@
+<div class="collapse" id="more-info-{{env.instanceId}}"> 
+	<div class="well">
+	{% if env.isOwner %}
+		<p>This panel shows narratives that you have created.</p>
+	{% else %}
+		<p>This panel shows narratives created by this user which you have some access to. They are either public or have been shared with you.</p>
+		<p>To see all of <i>your</i> narratives, visit <a href="/functional-site/#/people/{{env.loggedInUser}}">your profile</a>.</p>
+	{% endif %}
+	</div>
+</div>
+
+<table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped">
+
+{% if state.narratives | length > 0 %}
+
+{% for narrative in state.narratives %}
+	<tr>
+		
+		<td><a target="_blank" href="/narrative/{{narrative.obj_id}}">{{narrative.title}}</a><br><i>modified on {{narrative.moddate | dateFormat }}
+		{% if narrative.description %}<p>{{narrative.description}}</p>{% endif %}</td>
+	</tr>
+	
+{% endfor %}
+
+{% else %}
+
+{% if env.isOwner %}You do not own any{% else %}This user does not own any{% endif %} narratives.
+
+{% endif %}
+
+</table>

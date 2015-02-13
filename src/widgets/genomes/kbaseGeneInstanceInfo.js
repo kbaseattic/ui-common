@@ -20,6 +20,7 @@
             hideButtons:false,
             width:350,
             loadingImage: "assets/img/loading.gif",
+            genomeInfo: null
         },
 
         cdmiURL: "https://kbase.us/services/cdmi_api",
@@ -176,11 +177,11 @@
                 //else
                 //    self.$infoTable.append(self.makeRow("Protein Families", "None found"));
 
-                //self.$buttonPanel.find("button#domains").click(
-                //    function(event) { 
-                //        self.trigger("showDomains", { event: event, featureID: self.options.featureID }) 
-                //    }
-                //);
+                self.$buttonPanel.find("button#domains").click(
+                    function(event) { 
+                        self.trigger("showDomains", { event: event, featureID: self.options.featureID }) 
+                    }
+                );
                 //self.$buttonPanel.find("button#operons").click(
                 //    function(event) { 
                 //        self.trigger("showOperons", { event: event, featureID: self.options.featureID }) 
@@ -211,173 +212,181 @@
             var self = this;
             this.$infoPanel.hide();
             this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            
+            if (self.options.genomeInfo) {
+                self.ready(self.options.genomeInfo);
+            } else {
+                var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
+                var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+                $.when(prom).fail($.proxy(function(error) {
+                    this.renderError(error);
+                    console.log(error);
+                }, this));
+                $.when(prom).done($.proxy(function(genome) {
+                    genome = genome[0];
+                    self.ready(genome);
+                }, this));
+            }
+        },
 
-            var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
-
-            var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-            $.when(prom).fail($.proxy(function(error) {
-                this.renderError(error);
-                console.log(error);
-            }, this));
-            $.when(prom).done($.proxy(function(genome) {
-                genome = genome[0];
-                var feature = null;
-                if (genome.data.features) {
-                    for (var i=0; i<genome.data.features.length; i++) {
-                        if (genome.data.features[i].id === this.options.featureID) {
-                            feature = genome.data.features[i];
-                            break;
-                        }
+        ready: function(genome) {
+            var self = this;
+            var feature = null;
+            if (genome.data.features) {
+                for (var i=0; i<genome.data.features.length; i++) {
+                    if (genome.data.features[i].id === this.options.featureID) {
+                        feature = genome.data.features[i];
+                        break;
                     }
+                }
 
-                    if (feature) {
-                        // FINALLY we have the feature! Hooray!
-                        console.log(JSON.stringify(feature));
-                        this.$infoTable.empty();
-                        /* Function
-                         * Genome + link
-                         * Length
-                         * Location
-			 * Aliases
-                         */
+                if (feature) {
+                    // FINALLY we have the feature! Hooray!
+                    console.log(JSON.stringify(feature));
+                    this.$infoTable.empty();
+                    /* Function
+                     * Genome + link
+                     * Length
+                     * Location
+                     * Aliases
+                     */
 
-                        // Figure out the function.
-                        var func = feature['function'];
-                        if (!func) 
-                            func = "Unknown";
-                        this.$infoTable.append(this.makeRow("Function", func));
+                    // Figure out the function.
+                    var func = feature['function'];
+                    if (!func) 
+                        func = "Unknown";
+                    this.$infoTable.append(this.makeRow("Function", func));
 
-                        // Show the genome and a button for it.
-                        this.$infoTable.append(this.makeRow("Genome", $("<div/>")
-                                                                      .append(genome.data.scientific_name)
-                                                                      .append("<br>")
-                                                                      .append(this.makeGenomeButton(this.options.genomeID, this.options.workspaceID))));
-                        // Figure out the feature length
-                        var len = "Unknown";
-                        if (feature.dna_sequence_length)
-                            len = feature.dna_sequence_length + " bp";
-                        else if (feature.dna_sequence)
-                            len = feature.dna_sequence.length + " bp";
-                        else if (feature.location && feature.location.length > 0) {
-                            len = 0;
-                            for (var i=0; i<feature.location.length; i++) {
-                                len += feature.location[i][3];
+                    // Show the genome and a button for it.
+                    this.$infoTable.append(this.makeRow("Genome", $("<div/>")
+                                                                  .append(genome.data.scientific_name)
+                                                                  .append("<br>")
+                                                                  .append(this.makeGenomeButton(this.options.genomeID, this.options.workspaceID))));
+                    // Figure out the feature length
+                    var len = "Unknown";
+                    if (feature.dna_sequence_length)
+                        len = feature.dna_sequence_length + " bp";
+                    else if (feature.dna_sequence)
+                        len = feature.dna_sequence.length + " bp";
+                    else if (feature.location && feature.location.length > 0) {
+                        len = 0;
+                        for (var i=0; i<feature.location.length; i++) {
+                            len += feature.location[i][3];
+                        }
+                        len += " bp";
+                    }
+                    if (feature.protein_translation) {
+                        len += ", " + feature.protein_translation.length + " aa";
+                    }
+                    this.$infoTable.append(this.makeRow("Length", len));
+
+                    this.$infoTable.append(this.makeRow("Location", $("<div/>")
+                                                        .append(this.parseLocation(feature.location))));
+                                            //.append(this.parseLocation(feature.location))
+                                            //.append(this.makeContigButton(feature.location))));
+
+                    // Aliases
+                    var aliasesStr = "No known aliases";
+                    if (feature.aliases)
+                        aliasesStr = feature.aliases.join(", ");
+                    self.$infoTable.append(self.makeRow("Aliases", aliasesStr));
+                    // end Aliases
+
+
+                    // LOL GC content. Does anyone even care these days?
+                    //if (feature.dna_sequence) {
+                    //    var gc = this.calculateGCContent(feature.dna_sequence);
+                    //    this.$infoTable.append(this.makeRow("GC Content", Number(gc).toFixed(2)));
+                    //}
+
+                    // Protein families list.
+                    var proteinFamilies = "";
+                    if (feature.protein_families) {
+                        if (feature.protein_families.length>0) {
+                            proteinFamilies = "";
+                            for (var i=0; i<feature.protein_families.length; i++) {
+                                var fam = feature.protein_families[i];
+                                proteinFamilies += fam.id + ": " + fam.subject_description + "<br>";
                             }
-                            len += " bp";
                         }
-			if (feature.protein_translation) {
-			    len += ", " + feature.protein_translation.length + " aa";
-			}
-                        this.$infoTable.append(this.makeRow("Length", len));
-
-                        this.$infoTable.append(this.makeRow("Location", $("<div/>")
-                                                            .append(this.parseLocation(feature.location))));
-			                                    //.append(this.parseLocation(feature.location))
-			                                    //.append(this.makeContigButton(feature.location))));
-
-			// Aliases
-			var aliasesStr = "No known aliases";
-			if (feature.aliases)
-			    aliasesStr = feature.aliases.join(", ");
-			self.$infoTable.append(self.makeRow("Aliases", aliasesStr));
-			// end Aliases
-
-
-                        // LOL GC content. Does anyone even care these days?
-                        //if (feature.dna_sequence) {
-                        //    var gc = this.calculateGCContent(feature.dna_sequence);
-                        //    this.$infoTable.append(this.makeRow("GC Content", Number(gc).toFixed(2)));
-                        //}
-
-                        // Protein families list.
-                        var proteinFamilies = "";
-                        if (feature.protein_families) {
-                            if (feature.protein_families.length>0) {
-                                proteinFamilies = "";
-                                for (var i=0; i<feature.protein_families.length; i++) {
-                                    var fam = feature.protein_families[i];
-                                    proteinFamilies += fam.id + ": " + fam.subject_description + "<br>";
-                                }
-                            }
-                        }
-                        if (proteinFamilies) {
-                            this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
-                        }
-
-                        // first add handlers that say we do not have domains or operons for this gene
-                        this.$buttonPanel.find("button#domains").click(function(event) { 
-                            window.alert("No domain assignments available for this gene.  You will be able to compute domain assignments in the Narrative in the future.");
-                        });
-                        this.$buttonPanel.find("button#operons").click(function(event) {
-                            window.alert("No operon assignments available for this gene.  You will be able to compute operon assignments in the Narrative in the future.");
-                        });
-                        this.$buttonPanel.find("button#structure").click(function(event) {
-                            window.alert("No structure assignments available for this gene.  You will be able to compute structure assignments in the Narrative in the future.");
-                        });                        
-                        
-                        //determine if a feature id and its protein MD5 translation is found in the CDS- if it is,
-                        //return true.  We use this as a hack to see if we have gene info for this feature for WS objects.
-                        this.cdmiClient.fids_to_proteins([self.options.featureID],
-                                   function(prot) {
-                                        if (prot[self.options.featureID] == feature['md5'] ) {
-                                            //ok the fid and md5 match, so go to the CDS to get domain info...  what a hack!
-                                            self.$buttonPanel.find("button#domains").off("click");
-                                            self.$buttonPanel.find("button#domains").click(function(event) { 
-                                                self.trigger("showDomains", { event: event, featureID: self.options.featureID });
-                                            });
-                                            self.$buttonPanel.find("button#operons").off("click");
-                                            self.$buttonPanel.find("button#operons").click(function(event) { 
-                                                self.trigger("showOperons", { event: event, featureID: self.options.featureID });
-                                            });
-                                            self.$buttonPanel.find("button#structure").off("click");
-                                            self.$buttonPanel.find("button#structure").click(function(event) { 
-                                                self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID });
-                                            });
-                                        }
-                                   } // we don't add error function- if they don't match or this fails, do nothing.
-                        );
-                        
-                        // bind button events
-                        this.$buttonPanel.find("button#sequence").click(
-                            $.proxy(function(event) { 
-                                this.trigger("showSequence", { 
-                                    event: event, 
-                                    featureID: this.options.featureID,
-                                    genomeID: this.options.genomeID,
-                                    workspaceID: this.options.workspaceID,
-                                    kbCache: this.options.kbCache 
-                                });
-                            }, this)
-                        );
-                        this.$buttonPanel.find("button#biochemistry").click(
-                            $.proxy(function(event) { 
-                                this.trigger("showBiochemistry", { 
-                                    event: event, 
-                                    featureID: this.options.featureID,
-                                    genomeID: this.options.genomeID,
-                                    workspaceID: this.options.workspaceID,
-                                    kbCache: this.options.kbCache 
-                                });
-                            }, this)
-                        );
-
                     }
-                    else {
-                        this.renderError({ error: "Gene '" + this.options.featureID + 
-                                                  "' not found in the genome with object id: " +
-                                                  this.options.workspaceID + "/" + this.options.genomeID });
+                    if (proteinFamilies) {
+                        this.$infoTable.append(this.makeRow("Protein Families", proteinFamilies));
                     }
+
+                    // first add handlers that say we do not have domains or operons for this gene
+                    this.$buttonPanel.find("button#domains").click(function(event) { 
+                        window.alert("No domain assignments available for this gene.  You will be able to compute domain assignments in the Narrative in the future.");
+                    });
+                    this.$buttonPanel.find("button#operons").click(function(event) {
+                        window.alert("No operon assignments available for this gene.  You will be able to compute operon assignments in the Narrative in the future.");
+                    });
+                    this.$buttonPanel.find("button#structure").click(function(event) {
+                        window.alert("No structure assignments available for this gene.  You will be able to compute structure assignments in the Narrative in the future.");
+                    });                        
+                    
+                    //determine if a feature id and its protein MD5 translation is found in the CDS- if it is,
+                    //return true.  We use this as a hack to see if we have gene info for this feature for WS objects.
+                    this.cdmiClient.fids_to_proteins([self.options.featureID],
+                               function(prot) {
+                                    if (prot[self.options.featureID] == feature['md5'] ) {
+                                        //ok the fid and md5 match, so go to the CDS to get domain info...  what a hack!
+                                        self.$buttonPanel.find("button#domains").off("click");
+                                        self.$buttonPanel.find("button#domains").click(function(event) { 
+                                            self.trigger("showDomains", { event: event, featureID: self.options.featureID });
+                                        });
+                                        self.$buttonPanel.find("button#operons").off("click");
+                                        self.$buttonPanel.find("button#operons").click(function(event) { 
+                                            self.trigger("showOperons", { event: event, featureID: self.options.featureID });
+                                        });
+                                        self.$buttonPanel.find("button#structure").off("click");
+                                        self.$buttonPanel.find("button#structure").click(function(event) { 
+                                            self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID });
+                                        });
+                                    }
+                               } // we don't add error function- if they don't match or this fails, do nothing.
+                    );
+                    
+                    // bind button events
+                    this.$buttonPanel.find("button#sequence").click(
+                        $.proxy(function(event) { 
+                            this.trigger("showSequence", { 
+                                event: event, 
+                                featureID: this.options.featureID,
+                                genomeID: this.options.genomeID,
+                                workspaceID: this.options.workspaceID,
+                                kbCache: this.options.kbCache 
+                            });
+                        }, this)
+                    );
+                    this.$buttonPanel.find("button#biochemistry").click(
+                        $.proxy(function(event) { 
+                            this.trigger("showBiochemistry", { 
+                                event: event, 
+                                featureID: this.options.featureID,
+                                genomeID: this.options.genomeID,
+                                workspaceID: this.options.workspaceID,
+                                kbCache: this.options.kbCache 
+                            });
+                        }, this)
+                    );
 
                 }
                 else {
-                    this.renderError({ error: "No genetic features found in the genome with object id: " + 
-                                              this.options.workspaceID + "/" + 
-                                              this.options.genomeID });
+                    this.renderError({ error: "Gene '" + this.options.featureID + 
+                                              "' not found in the genome with object id: " +
+                                              this.options.workspaceID + "/" + this.options.genomeID });
                 }
 
-                this.hideMessage();
-                this.$infoPanel.show();
-            }, this));
+            }
+            else {
+                this.renderError({ error: "No genetic features found in the genome with object id: " + 
+                                          this.options.workspaceID + "/" + 
+                                          this.options.genomeID });
+            }
+
+            this.hideMessage();
+            this.$infoPanel.show();
         },
 
         makeRow: function(name, value) {
@@ -424,7 +433,7 @@
                 workspaceID = null;
 
             return $("<div>")
-                .append('<a href="#/genomes/'+workspaceID+'/'+genomeID+'" target="_blank">'+workspaceID+'/<wbr>'+genomeID+'</a>');
+                .append('<a href="#/dataview/'+workspaceID+'/'+genomeID+'" target="_blank">'+workspaceID+'/<wbr>'+genomeID+'</a>');
                 
                 
             var self = this;
