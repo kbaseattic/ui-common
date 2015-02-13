@@ -263,7 +263,7 @@
                                                 <h3>              
                                                     <button type="button" class="btn btn-danger" ng-click="options.userState.session.selectedWorkspace = undefined; listWorkspaces();" ng-show="options.userState.session.transfer_cart.size == 0 && !options.transferring"><span class="glyphicon glyphicon-remove-sign"></span></button>
                                                     <span class="glyphicon glyphicon-hdd"></span>
-                                                    <span class="search-cart-label">{{options.userState.session.selectedWorkspace}}</span>
+                                                    <span class="search-cart-label">{{options.userState.session.selectedWorkspaceName}}</span>
                                                     <span class="badge badge-info" ng-repeat="w in options.userState.longterm.workspaces" ng-if="w[1] == options.userState.session.selectedWorkspace">{{w[4]}}</span>
                                                 </h3>
                                             </div>
@@ -298,7 +298,7 @@
                                                 <a ng-click='selectWorkspace(w)'>
                                                     <div class="text-left">
                                                         <span class="glyphicon glyphicon-hdd"></span>
-                                                        <span>{{w[1]}}</span>
+                                                        <span>{{w[8].narrative_nice_name}}</span>
                                                         <span class='badge pull-right'>{{w[4]}}</span>
                                                     </div>
                                                 </a>
