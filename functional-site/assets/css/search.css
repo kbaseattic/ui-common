@@ -1,9 +1,3 @@
-/* Search view container */
-
-.kbase-search-view {
-  padding: 10px;
-}
-
 /*** link styling ***/
 
 a.search-selected-category-link { color: #468847; }
@@ -29,6 +23,11 @@ a.search-checkbox-link:visited { color: #555; }
 a.search-checkbox-link.disabled { color: #eee; }
 
 /*** general spacing ***/
+
+/* Search view container */
+.kbase-search-view {
+  padding: 10px;
+}
 
 .search-categories-row > .tooltip.top.fade {
     margin-top: -30px;
@@ -245,6 +244,8 @@ span .badge {
 
 .search-filter-groups {
     margin-bottom: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .search-filter-collapse-icon {
@@ -964,6 +965,63 @@ table.search-transfer-table {
     width: 50px;
     margin-right: 9px;
 }
+
+
+.fba_model_id_header {
+    width: 100px;
+}
+
+.fba_model_id {
+    width: 92px;
+    margin-right: 8px;
+}
+
+.model-scientific-name-header {
+    width: 300px;
+}
+
+.model-scientific-name {
+    width: 290px;
+    margin-right: 8px;
+}
+
+
+.number_of_reactions_header {
+    width: 100px;
+}
+
+.number_of_reactions {
+    width: 90px;
+    margin-right: 8px;
+}
+
+.number_of_features_header {
+    width: 90px;
+}
+
+.number_of_features {
+    width: 80px;
+    margin-right: 8px;
+}
+
+.number_of_gapfillings_header {
+    width: 90px;
+}
+
+.number_of_gapfillings {
+    width: 80px;
+    margin-right: 8px;
+}
+
+.number_of_compounds_header {
+    width: 90px;
+}
+
+.number_of_compounds {
+    width: 80px;
+    margin-right: 8px;
+}
+
 
 
 .facet-scroll {
