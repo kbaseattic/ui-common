@@ -346,7 +346,8 @@ app
       NAVBAR.clearMenu()
       .addDefaultMenu({
         search: true, narrative: true
-      })
+      });
+      /*
       .addHelpMenuItem({
         type: 'divider'
       })
@@ -364,6 +365,7 @@ app
         external: true,
         url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&priority=3&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
       });
+       */
       
       /*
       .addHelpMenuItem({
@@ -441,6 +443,9 @@ app
       .addDefaultMenu({
         search: true, narrative: true, dashboard: false
       })
+      .setTitle('Dashboard');
+
+       /*
       .addHelpMenuItem({
         type: 'divider'
       })
@@ -458,7 +463,7 @@ app
         external: true,
         url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&priority=3&components=10108&assignee=eapearson&summary=Bug%20on%20Dashboard'
       })
-      .setTitle('Dashboard');
+      */
        
        // Set up the main State machine for this view.
        var stateMachine = Object.create(StateMachine).init();
