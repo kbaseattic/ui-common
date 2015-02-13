@@ -12,8 +12,26 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                this.params.limit = 10;
 
                this.view = 'slider';
+               
+                this.templates.env.addFilter('appName', function (x) {
+                  return this.getState(['appsMap', x, 'name'], x); 
+               }.bind(this));
+                this.templates.env.addFilter('methodName', function (x) {
+                  return this.getState(['methodsMap', x, 'name'], x); 
+               }.bind(this));
 
                return this;
+            }
+         },
+         
+         getAppName: {
+            value: function (name) {
+               return this.getState(['appsMap', name, 'name'], name); 
+            }
+         },
+         getMethodName: {
+            value: function (name) {
+               return this.getState(['methodsMap', name, 'name'], name); 
             }
          },
 
@@ -113,23 +131,22 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
          
          setupUI: {
             value: function () {
-               console.log('have narratives?');
-               console.log(this.getState('narratives'));
                if (this.hasState('narratives') && this.getState('narratives').length > 0) {
                   this.buttonbar = Object.create(Buttonbar).init({
                      container: this.container.find('[data-placeholder="buttonbar"]')
                   });
                   this.buttonbar
                      .clear()
-                     //.addButton({
-                     //   name: 'newnarrative',
-                     //   label: 'New Narrative',
-                     //   icon: 'plus-circle',
-                     //    style: 'primary',
-                     //   url: '/functional-site/#/narrativemanager/new',
-                     //   external: true
-                     // })
-                     .addRadioToggle({
+                     .addButton({
+                        name: 'newnarrative',
+                        label: 'New Narrative',
+                        icon: 'plus-circle',
+                         style: 'primary',
+                        class: 'btn-kbase',
+                        url: '/functional-site/#/narrativemanager/new',
+                        external: true
+                      })
+                     /*.addRadioToggle({
                         buttons: [
                            {
                               label: 'Slider',
@@ -149,8 +166,9 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                               }.bind(this)
                                  }]
                      })
+                     */
                      .addInput({
-                        placeholder: 'Search',
+                        placeholder: 'Search Your Narratives',
                         place: 'end',
                         onkeyup: function (e) {
                            this.filterState({
@@ -168,15 +186,33 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                   this.setState('narrativesFiltered', this.getState('narratives')); 
                   return;
                }
-
                var searchRe = new RegExp(options.search, 'i');
                var nar = this.getState('narratives').filter(function (x) {
-                  if (x.workspace.metadata.narrative_nice_name.match(searchRe)) {
+                  if (x.workspace.metadata.narrative_nice_name.match(searchRe) ||
+                      (x.object.metadata.cellInfo &&
+                      (function (apps) {
+                         for (var i in apps) {
+                            var app = apps[i];
+                            if (app.match(searchRe) || this.getAppName(app).match(searchRe)) {
+                               return true;
+                            }
+                         }
+                       }.bind(this))(Object.keys(x.object.metadata.cellInfo.app))) ||
+                      (x.object.metadata.cellInfo &&
+                       (function (methods) {
+                         for (var i in methods) {
+                            var method = methods[i];
+                            if (method.match(searchRe) || this.getMethodName(method).match(searchRe)) {
+                               return true;
+                            }
+                         }
+                        }.bind(this))(Object.keys(x.object.metadata.cellInfo.method))) )
+                      {
                      return true;
                   } else {
                      return false;
                   }
-               });
+               }.bind(this));
                this.setState('narrativesFiltered', nar);
             }
          },
@@ -211,13 +247,33 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                   }
                   var sessionUsername = Session.getUsername();
                   var recentActivity = [];
-                  this.kbservice.getNarratives({
-                        params: {
-                           showDeleted: 0,
-                           owners: [sessionUsername]
-                        }
-                     })
-                     .then(function (narratives) {
+                  Q.all([this.kbservice.getNarratives({
+                           params: {
+                              showDeleted: 0,
+                              owners: [sessionUsername]
+                           }
+                        }),
+                        this.kbservice.getApps(),
+                        this.kbservice.getMethods()])
+                     .then(function (result) { 
+                        var narratives = result[0];
+                        var apps = result[1];
+                        var methods = result[2];
+                     
+                        this.setState('apps', apps);
+                        var appsMap = {};
+                        apps.forEach(function (app) {
+                           appsMap[app.id] = app;
+                        });
+                        this.setState('appsMap', appsMap);
+                     
+                        this.setState('methods', methods);
+                        var methodsMap = {};
+                        methods.forEach(function (method) {
+                           methodsMap[method.id] = method;
+                        }); 
+                        this.setState('methodsMap', methodsMap);
+                        
                         if (narratives.length === 0) {
                            this.setState('narratives', []);
                            this.setState('narrativesFiltered', []);

@@ -1,5 +1,5 @@
-define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.client.workspace', 'kb.client.user_profile', 'kb.config'],
-   function (Q, Session, Utils, APIUtils, Workspace, UserProfile, Config) {
+define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.client.workspace', 'kb.client.user_profile', 'kb.client.narrative_method_store', 'kb.config'],
+   function (Q, Session, Utils, APIUtils, Workspace, UserProfile, NarrativeMethodStore, Config) {
 
       return Object.create({}, {
          init: {
@@ -11,14 +11,20 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.client.workspace', 'k
                } else {
                   throw 'The workspace client url is not defined';
                }
-               if (Config.hasConfig('workspace_url')) {
+               if (Config.hasConfig('user_profile_url')) {
                   this.userProfileClient = new UserProfile(Config.getConfig('user_profile_url'), {
                      token: Session.getAuthToken()
                   });
                } else {
                   throw 'The user profile client url is not defined';
                }
-
+               if (Config.hasConfig('narrative_method_store_url')) {
+                  this.narrativeMethodStoreClient = new NarrativeMethodStore(Config.getConfig('narrative_method_store_url'), {
+                     token: Session.getAuthToken()
+                  });
+               } else {
+                  throw 'The narrative method store client url is not defined';
+               }
                return this;
             }
          },
@@ -167,7 +173,19 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.client.workspace', 'k
                }.bind(this));
             }
          },
-
+         
+         getApps: {
+            value: function () {
+               return Utils.promise(this.narrativeMethodStoreClient, 'list_apps', {});
+            }
+         },
+         
+         getMethods: {
+            value: function () {
+               return Utils.promise(this.narrativeMethodStoreClient, 'list_methods', {});
+            }
+         },
+         
          getCollaborators: {
             value: function (options) {
                var users = (options && options.users)?options.users:[];

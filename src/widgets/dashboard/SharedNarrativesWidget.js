@@ -12,11 +12,25 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                this.params.limit = 10;
 
                this.view = 'slider';
-
+               this.templates.env.addFilter('appName', function (x) {
+                  return this.getState(['appsMap', x, 'name'], x); 
+               }.bind(this));
+                this.templates.env.addFilter('methodName', function (x) {
+                  return this.getState(['methodsMap', x, 'name'], x); 
+               }.bind(this));
                return this;
             }
          },
-
+         getAppName: {
+            value: function (name) {
+               return this.getState(['appsMap', name, 'name'], name); 
+            }
+         },
+         getMethodName: {
+            value: function (name) {
+               return this.getState(['methodsMap', name, 'name'], name); 
+            }
+         },
          go: {
             value: function () {
                this.start();
@@ -60,23 +74,14 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
          
            setupUI: {
             value: function () {
-               console.log('have narratives?');
-               console.log(this.getState('narratives'));
                if (this.hasState('narratives') && this.getState('narratives').length > 0) {
                   this.buttonbar = Object.create(Buttonbar).init({
                      container: this.container.find('[data-placeholder="buttonbar"]')
                   });
                   this.buttonbar
                      .clear()
-                     //.addButton({
-                     //   name: 'newnarrative',
-                     //   label: 'New Narrative',
-                     //   icon: 'plus-circle',
-                     //    style: 'primary',
-                     //   url: '/functional-site/#/narrativemanager/new',
-                     //   external: true
-                     // })
-                     .addRadioToggle({
+                    
+                     /*.addRadioToggle({
                         buttons: [
                            {
                               label: 'Slider',
@@ -96,6 +101,7 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                               }.bind(this)
                                  }]
                      })
+                     */
                      .addInput({
                         placeholder: 'Search',
                         place: 'end',
@@ -131,21 +137,39 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
 
 
 
-          filterState: {
+           filterState: {
             value: function (options) {
                if (!options.search || options.search.length === 0) {
                   this.setState('narrativesFiltered', this.getState('narratives')); 
                   return;
                }
-
                var searchRe = new RegExp(options.search, 'i');
                var nar = this.getState('narratives').filter(function (x) {
-                  if (x.workspace.metadata.narrative_nice_name.match(searchRe)) {
+                  if (x.workspace.metadata.narrative_nice_name.match(searchRe) ||
+                      (x.object.metadata.cellInfo &&
+                      (function (apps) {
+                         for (var i in apps) {
+                            var app = apps[i];
+                            if (app.match(searchRe) || this.getAppName(app).match(searchRe)) {
+                               return true;
+                            }
+                         }
+                       }.bind(this))(Object.keys(x.object.metadata.cellInfo.app))) ||
+                      (x.object.metadata.cellInfo &&
+                       (function (methods) {
+                         for (var i in methods) {
+                            var method = methods[i];
+                            if (method.match(searchRe) || this.getMethodName(method).match(searchRe)) {
+                               return true;
+                            }
+                         }
+                        }.bind(this))(Object.keys(x.object.metadata.cellInfo.method))) )
+                      {
                      return true;
                   } else {
                      return false;
                   }
-               });
+               }.bind(this));
                this.setState('narrativesFiltered', nar);
             }
          },
@@ -175,13 +199,35 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                return Q.promise(function (resolve, reject, notify) {
                   // Get all workspaces, filter out those owned by the user,
                   // and those that are public
-
-                  this.kbservice.getNarratives({
-                        params: {
-                           showDeleted: 0
-                        }
-                     })
-                     .then(function (narratives) {
+                  
+                  Q.all([this.kbservice.getNarratives({
+                           params: {
+                              showDeleted: 0,
+                           }
+                        }),
+                        this.kbservice.getApps(),
+                        this.kbservice.getMethods()])
+                     .then(function (result) {
+                        var narratives = result[0];
+                        var apps = result[1];
+                        var methods = result[2];
+                     
+                     
+                      this.setState('apps', apps);
+                        var appsMap = {};
+                        apps.forEach(function (app) {
+                           appsMap[app.id] = app;
+                        });
+                        this.setState('appsMap', appsMap);
+                     
+                        this.setState('methods', methods);
+                        var methodsMap = {};
+                        methods.forEach(function (method) {
+                           methodsMap[method.id] = method;
+                        }); 
+                        this.setState('methodsMap', methodsMap);
+                     
+                     
                         if (narratives.length === 0) {
                            this.setState('narratives', []);
                            resolve();
@@ -207,7 +253,7 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                               });
                               this.setState('narratives', narratives);
                               this.setState('narrativesFiltered', narratives);
-                               
+                           
                               resolve();
                            }.bind(this))
                            .catch(function (err) {

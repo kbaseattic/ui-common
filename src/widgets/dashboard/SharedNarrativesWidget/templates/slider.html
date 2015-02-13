@@ -1,115 +1,87 @@
-<div class="collapse" id="{{env.widgetName}}-more-info-{{env.instanceId}}">
-   <div class="well">
-      <p>This panel shows Narratives that are shared with you.</p>
-   </div>
-</div>
-
-{% if state.narratives == 0 %} 
-
-<p>No Narratives are presently shared with you.</p>
-<style type="text/css">
-fa.dimmed {
-   opacity: 0.4;
-}
-</style>
-
-{% else %}
 <div class="slider">
-   {% for narrative in state.narrativesFiltered %}
-   <div class="slide">
-      <table border="0" cellpadding="0" cellspacing="0">
-         <tr>
-            <td colspan="3">
-               <div class="title" style="margin-bottom: 8px;">
-                  <a target="_blank" href="/narrative/{{narrative.object.obj_id}}">{{narrative.workspace.metadata.narrative_nice_name}}</a>
-               </div>
-               
-                <div class="counts">
-               
-               {% set appCount = narrative.object.metadata.cellInfo.app|length2 %}
-               <span style="{% if appCount|isBlank or appCount == 0 %}opacity: 0.3; {% endif %}">      
-               {{appCount|defaultDash}}<span class="fa-stack">
+  
+    
+      
+   {% if state.narratives == 0 %}
+    
+     <div class="-card">
+          <p>No Narratives have been <br>
+             shared with you.</p>
+          <p>When a Narrative has been shared with<br>
+             you, it will appear in this panel.</p>
+         
+      </div>
+     
+   {% else %}
+      
+      {% for narrative in state.narrativesFiltered %}
+      <div class="-card">
+         <div class="-title">
+            <a target="_blank" href="/narrative/{{narrative.object.obj_id}}">{{narrative.workspace.metadata.narrative_nice_name}}</a>
+         </div>
+         <div class="-body">
+            <div class="apps">
+               {% if narrative.object.metadata.cellInfo.app|isEmpty and narrative.object.metadata.cellInfo.method|isEmpty %}
+                  <div style="text-align: center; font-style: italic;">no apps or methods</div>
+               {% endif %}
+                {% for app, i in narrative.object.metadata.cellInfo.app %}
+               <div class="app">
+                   <span style="font-size: 80%;">      
+                   <span class="fa-stack">
                     <span class="fa fa-square fa-stack-2x" style="color: rgb(0, 150, 136);"></span> 
                     <span class="fa fa-inverse fa-stack-1x fa-cubes" style=""></span> 
                     </span>
                   </span>
-                    
-               {% set methodCount = narrative.object.metadata.cellInfo.method|length2 %}
-               <span style="{% if methodCount|isBlank or methodCount == 0 %}opacity: 0.3; {% endif %}">      
-                  {{methodCount|defaultDash}}<span class="fa-stack fa"  style="{% if methodCount == 0 %}opacity: 0.3; {% endif %}">
+                {{app|appName}}
+                </div>
+                 {% endfor %}
+            </div>
+
+            <div class="methods">
+                {% for method, i in narrative.object.metadata.cellInfo.method %}
+               <div class="method">
+                   <span style="font-size: 80%;">      
+                   <span class="fa-stack">
                     <span class="fa fa-square fa-stack-2x" style="color: rgb(103, 58, 183);"></span> 
-                    <span class="fa fa-inverse fa-stack-1x fa-cube"></span> 
+                    <span class="fa fa-inverse fa-stack-1x fa-cube" style=""></span> 
                     </span>
                   </span>
-                    
-               {% set codeCellCount = narrative.object.metadata.cellInfo.ipython.code %}
-               <span style="{% if codeCellCount|isBlank or codeCellCount == 0 %}opacity: 0.3; {% endif %}">                
-                  {{codeCellCount|defaultDash}}<span class="fa-stack fa">
-                    <span class="fa fa-circle fa-stack-2x" style="color: #2196F3;"></span> 
-                    <span class="fa fa-inverse fa-stack-1x fa-terminal" style=""></span> 
-                    </span>
-               </span>
-                
-                 {% set markdownCellCount = narrative.object.metadata.cellInfo.ipython.markdown %}
-                  <span style="{% if markdownCellCount|isBlank or markdownCellCount == 0 %}opacity: 0.3; {% endif %}">                
-                  {{markdownCellCount|defaultDash}}<span class="fa-stack fa">
-                    <span class="fa fa-circle fa-stack-2x" style="color: #2196F3;"></span> 
-                    <span class="fa fa-inverse fa-stack-1x fa-paragraph" style=""></span> 
-                    </span>
-                  </span>
-                    
-                  
-                  {% set objectCount = narrative.workspace.object_count - 1 %}
-                  <span style="{% if objectCount|isBlank or objectCount == 0 %}opacity: 0.3; {% endif %}">     
-                  {{objectCount|defaultDash}}<span class="fa-stack fa">
-                    <span class="fa fa-square fa-stack-2x" style="color: #FFC107;"></span> 
-                    <span class="fa fa-inverse fa-stack-1x fa-file-o" style="margin: -3px 0 0 -3px; font-size: 80%;"></span> 
-                    <span class="fa fa-inverse fa-stack-1x fa-file" style="margin: 2px 0 0 3px; color: #FFC107; font-size: 80%;"></span> 
-                    <span class="fa fa-inverse fa-stack-1x fa-file-o" style="margin: 2px 0 0 3px; font-size: 80%;"></span> 
-                    </span>
-                  </span>
-               </div>
-               <div class="date" style="font-style: italic;">
-                  saved {{narrative.object.save_date | jsDatestring | dateFormat }} by {% if narrative.object.saved_by == env.loggedInUser %}you{% else %}<a href="#/people/{{narrative.object.saved_by}}">{{narrative.object.saved_by}}</a>{% endif %}
-               </div>
-
-               <div class="sharing">
-                  {% if narrative.workspace.user_permission == 'r'%}view {% elif narrative.workspace.user_permission == 'w' %}edit {% elif narrative.workspace.user_permission == 'a' %}edit+share {% endif %}
-               </div>
-               
-               
-               <div>
-
-               </div>
-            </td>
-         </tr>
-         <tr>
-           <td width="33%" style="text-align: center; xbackground-color: white;">
+                {{method|methodName}}
+                </div>
+                 {% endfor %}
+            </div>
+         </div>
+         <div class="-saved">
+            <div class="date" style="font-style: italic;">
+                    saved {{narrative.object.save_date | jsDatestring | dateFormat }} by {% if narrative.object.saved_by == env.loggedInUser %}you{% else %}<a href="#/people/{{narrative.object.saved_by}}">{{narrative.object.saved_by}}</a>{% endif %}
+            </div>
+         </div>
+         <div class="-footer">
+            <div style="display:inline-block; width: 33%;text-align: center;">
                {% if narrative.workspace.user_permission == 'r' %}
-                  <span class="fa fa-minus dimmed"  style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="Sharing information not available for this Narrative" data-container="body"></span> {% else %} {% if narrative.permissions|length > 0 %} {{ narrative.permissions | length }} {% else %} 0 {% endif %} <span class="fa fa-share-alt"></span> {% endif %} {% if narrative.workspace.globalread == 'r' or narrative.workspace.globalread == 'w' %} P{% endif %}
-            </td>
-            <td width="33%" style="text-align: center; xbackground-color: white;">
-               {% set jobcount = narrative.object.metadata.jobInfo.running %}
-               {% if jobcount > 0 %}
-                  {{jobcount}} <span class="fa fa-gear fa-spin" style="color:green;"></span>
-               {% else %}
-                 <span class="fa fa-minus dimmed" style="opacity: 0.4;"></span>                  
+                  <span class="fa fa-minus dimmed"  style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="Sharing information not available for this Narrative" data-container="body"></span> {% else %} {% if narrative.permissions|length > 0 %} {{ narrative.permissions | length }} {% else %} 0 {% endif %} <span class="fa fa-share-alt"  data-toggle="tooltip" data-placement="auto" title="The number of other users with whom this Narrative has been shared" data-container="body"></span> {% endif %} {% if narrative.workspace.globalread == 'r' or narrative.workspace.globalread == 'w' %} P{% endif %}
+            </div><div style="display:inline-block; width: 33%;text-align: center;">
+           
+               {% set runningJobs = narrative.object.metadata.jobInfo.running %}
+               {% set errorJobs = narrative.object.metadata.jobInfo.error %}
+               {% if (runningJobs == 0 or runningJobs|isBlank) and (runningJobs|isBlank or runningJobs == 0) %}
+                  <span class="fa fa-minus dimmed" style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="There are no jobs currently running for this Narrative" data-container="body"></span> 
                {% endif %}
-               {% set jobcount = narrative.object.metadata.jobInfo.error %}
-               {% if jobcount > 0 %}
-                  {{jobcount}} <span class="fa fa-exclamation-circle fa-spin" style="color:red;"></span>
+               {% if runningJobs > 0 %}
+                  {{runningJobs}} <span class="fa fa-gear fa-spin" style="color:green;"  data-toggle="tooltip" data-placement="auto" title="These are the jobs currently running for this Narrative" data-container="body"></span>
                {% endif %}
-            </td>
-            <td width="33%" style="text-align: center; xbackground-color: white;">
+               {% if errorJobs > 0 %}
+                  {{errorJobs}} <span class="fa fa-exclamation-circle fa-spin" style="color:red;" data-toggle="tooltip" data-placement="auto" title="These are jobs which encountered an error while running" data-container="body"></span>
+               {% endif %}
+            </div><div style="display:inline-block; width: 33%;text-align: center;">
                {% if narrative.object.metadata.jobInfo.run_time %}
-		       {{narrative.object.metadata.jobInfo.run_time | niceRuntime}} <span class="fa fa-clock-o"></span>
+		       {{narrative.object.metadata.jobInfo.run_time | niceRuntime}} <span class="fa fa-clock-o" data-toggle="tooltip" data-placement="auto" title="This is the total wall clock run time for jobs in this Narrative" data-container="body"></span>
               {% else %}
-                <span class="fa fa-minus dimmed" style="opacity: 0.4;"></span> 
+                <span class="fa fa-minus dimmed" style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="This narrative has accumulated no job run time" data-container="body"></span> 
                {% endif %} 
-            </td>
-         </tr>
-      </table>
-   </div>
-   {% endfor %}
+            </div>
+         </div>
+      </div>
+      {% endfor %}
+   {% endif %}
 </div>
-{% endif %}
