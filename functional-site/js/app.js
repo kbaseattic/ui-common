@@ -775,7 +775,24 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
       $rootScope.$apply();
     }); 
     
-   
+   /* KBase App State Management
+      [eap] I put this in place in order to better manage conflicting state changes.
+      In today's case, the act of logging will cause an async request for a profile load.
+      For a first time user, this will also cause the creation of a stub profile.
+      However, by the time the user has arrived at the dashboard, the profile will not have been
+      created yet. Since every logged in session will have a profile loaded (and maybe stub profile created)
+      eventually, the app state object will contain that state... blah blah blah.
+      App state objects:
+      Session & Auth
+      User Profile
+      Config
+      
+      
+   */ 
+   require(['kb.appstate'], function (AppState) {
+      // just by loading the AppState for the first time, it will be initialized and usable.
+      // There isn't anything useful we can do with it here...
+   });
 
 });
 

@@ -1,5 +1,5 @@
-define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.methods', 'kb.client.workspace', 'kb.client.user_profile', 'kb.session', 'kb.utils', 'kb.utils.api', 'q'],
-   function ($, Postal, nunjucks, DashboardWidget, ClientMethods, WorkspaceService, UserProfileService, Session, Utils, APIUtils, Q) {
+define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.methods', 'kb.client.workspace', 'kb.client.user_profile', 'kb.appstate', 'kb.utils', 'kb.utils.api', 'q'],
+   function ($, Postal, nunjucks, DashboardWidget, ClientMethods, WorkspaceService, UserProfileService,  AppState, Utils, APIUtils, Q) {
       "use strict";
       var Widget = Object.create(DashboardWidget, {
          init: {
@@ -37,12 +37,12 @@ define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.m
          setup: {
             value: function () {
                // Set up workspace client
-               if (Session.isLoggedIn()) {
+               if (AppState.getItem('session').isLoggedIn()) {
                   this.clientMethods = Object.create(ClientMethods).init();
                   
                   if (this.hasConfig('user_profile_url')) {
                      this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
-                        token: Session.getAuthToken()
+                        token: AppState.getItem('session').getAuthToken()
                      });
                   } else {
                      throw 'The user profile client url is not defined';
@@ -80,33 +80,26 @@ define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.m
          setInitialState: {
             value: function (options) {
                return Q.Promise(function (resolve, reject, notify) {
-                  if (!Session.isLoggedIn()) {
+                  if (!AppState.getItem('session').isLoggedIn()) {
                      resolve();
                   } else {
-                     Utils.promise(this.userProfileClient, 'get_user_profile', [this.params.userId])
-                        .then(function (data) {
-                           if (data && data[0]) {
-                              this.setState('currentUserProfile', data[0], false);
-
-                              this.clientMethods.getCollaborators()
-                                 .then(function (collaborators) {
-                                    this.setState('collaborators', collaborators);
-                                    resolve();
-                                 }.bind(this))
-                                 .catch(function (err) {
-                                    console.log('error building collab network...');
-                                    console.log(err);
-                                    reject(err);
-                                 });
-                           } else {
-                              reject('User not found');
-                           }
+                     AppState.whenItem('userprofile')
+                     .then(function (profile) {
+                        this.setState('currentUserProfile', profile, false);
+                        this.clientMethods.getCollaborators()
+                        .then(function (collaborators) {
+                           this.setState('collaborators', collaborators);
+                           resolve();
                         }.bind(this))
                         .catch(function (err) {
-                           console.log('error');
-                           console.log(err);
                            reject(err);
                         });
+                     }.bind(this))
+                     .catch(function(err) {
+                        reject(err);
+                     })
+                     .done();   
+                     
                   }
                }.bind(this));
             }
@@ -120,7 +113,7 @@ define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.m
                // Head off at the pass -- if not logged in, can't show profile.
                if (this.error) {
                   this.renderError();
-               } else if (Session.isLoggedIn()) {
+               } else if (AppState.getItem('session').isLoggedIn()) {
 
                   this.places.title.html(this.renderTemplate('authorized_title'));
                   this.places.content.html(this.renderTemplate('authorized'));

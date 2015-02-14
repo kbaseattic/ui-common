@@ -19,68 +19,91 @@
    <tr>
       <td width="33%" valign="top">
          <table class="table table-striped">
-            {% for app in state.appList %} {% if app.narrativeCount.owned.count > 0 %}
-            <tr>
-               <td valign="baseline" style="vertical-align: middle;">
-               <a href="/functional-site/#/narrativestore/app/{{app.id}}" target="_blank">{{ app.name }}</a>
-               </td>
-               <td width="20px" valign="baseline" style="vertical-align: middle;"> 
-                                 
-                  <a href="/functional-site/#/narrativemanager/new?app={{app.id}}" class="btn btn-default btn-link" target="_blank"  data-toggle="tooltip" data-placement="auto" title="Create a new Narrative using this App" data-container="body">
-                    <span style="font-size: 80%;">
-                     <span class="fa-stack">
-                     <i class="fa fa-file fa-stack-2x"></i>
-                     <i class="fa fa-plus fa-inverse fa-stack-1x" style="margin-top: 2px;"></i>
-                     </span>
-                     </span>
-                  </a>
-               </td>
-            </tr>
-            {% endif %} {% endfor %}
+           
+            {% if state.appOwnership.owned|isEmpty %} 
+               <i>You don't have any Apps in Narratives you may have created.</i>
+            {% else %}
+               {% for app in state.appOwnership.owned|sort("count") %} {% if app.count > 0 %}
+               <tr>
+                   <td valign="baseline" style="vertical-align: middle;">
+                  <a href="#/narrativestore/app/{{app.app.id}}" target="_blank">{{ app.app.name }}</a>
+                  </td>
+                  <td width="10px" valign="baseline" style="vertical-align: middle; color: gray;" >
+                     {{app.count}}
+                  </td>
+                  <td width="20px" valign="baseline" style="vertical-align: middle;"> 
+
+                     <a href="#/narrativemanager/new?app={{app.app.id}}" class="btn btn-default btn-link" target="_blank"  data-toggle="tooltip" data-placement="auto" title="Create a new Narrative using this App" data-container="body">
+                       <span style="font-size: 80%;">
+                        <span class="fa-stack">
+                        <i class="fa fa-file fa-stack-2x"></i>
+                        <i class="fa fa-plus fa-inverse fa-stack-1x" style="margin-top: 2px;"></i>
+                        </span>
+                        </span>
+                     </a>
+                  </td>
+               </tr>
+               {% endif %} {% endfor %}
+            {% endif %}
          </table>
       </td>
        <td width="33%" valign="top">
          <table class="table table-striped">
-            {% for app in state.appList %} {% if app.narrativeCount.shared.count > 0 %}
-            <tr>
-               <td valign="baseline" style="vertical-align: middle;">
-               <a href="/functional-site/#/narrativestore/app/{{app.id}}" target="_blank">{{ app.name }}</a>
-               </td>
-               <td width="20px" valign="baseline" style="vertical-align: middle;"> 
-                                 
-                  <a href="/functional-site/#/narrativemanager/new?app={{app.id}}" class="btn btn-default btn-link" target="_blank"  data-toggle="tooltip" data-placement="auto" title="Create a new Narrative using this App" data-container="body">
-                    <span style="font-size: 80%;">
-                     <span class="fa-stack">
-                     <i class="fa fa-file fa-stack-2x"></i>
-                     <i class="fa fa-plus fa-inverse fa-stack-1x" style="margin-top: 2px;"></i>
-                     </span>
-                     </span>
-                  </a>
-               </td>
-            </tr>
-            {% endif %} {% endfor %}
+           
+            {% if state.appOwnership.shared|isEmpty %} 
+               <i>There are no Apps in Narratives shared with you.</i>
+            {% else %}
+               {% for app in state.appOwnership.shared|sort("count") %} {% if app.count > 0 %}
+               <tr>
+                   <td valign="baseline" style="vertical-align: middle;">
+                  <a href="#/narrativestore/app/{{app.app.id}}" target="_blank">{{ app.app.name }}</a>
+                  </td>
+                   <td width="10px" valign="baseline" style="vertical-align: middle; color: gray;" >
+                     {{app.count}}
+                  </td>
+                  <td width="20px" valign="baseline" style="vertical-align: middle;"> 
+
+                     <a href="#/narrativemanager/new?app={{app.app.id}}" class="btn btn-default btn-link" target="_blank"  data-toggle="tooltip" data-placement="auto" title="Create a new Narrative using this App" data-container="body">
+                       <span style="font-size: 80%;">
+                        <span class="fa-stack">
+                        <i class="fa fa-file fa-stack-2x"></i>
+                        <i class="fa fa-plus fa-inverse fa-stack-1x" style="margin-top: 2px;"></i>
+                        </span>
+                        </span>
+                     </a>
+                  </td>
+               </tr>
+               {% endif %} {% endfor %}
+            {% endif %}
          </table>
       </td>
        <td width="33%" valign="top">
          <table class="table table-striped">
-            {% for app in state.appList %} {% if app.narrativeCount.public.count > 0 %}
-            <tr>
-               <td valign="baseline" style="vertical-align: middle;">
-               <a href="/functional-site/#/narrativestore/app/{{app.id}}" target="_blank">{{ app.name }}</a>
-               </td>
-               <td width="20px" valign="baseline" style="vertical-align: middle;"> 
-                                 
-                  <a href="/functional-site/#/narrativemanager/new?app={{app.id}}" class="btn btn-default btn-link" target="_blank"  data-toggle="tooltip" data-placement="auto" title="Create a new Narrative using this App" data-container="body">
-                    <span style="font-size: 80%;">
-                     <span class="fa-stack">
-                     <i class="fa fa-file fa-stack-2x"></i>
-                     <i class="fa fa-plus fa-inverse fa-stack-1x" style="margin-top: 2px;"></i>
-                     </span>
-                     </span>
-                  </a>
-               </td>
-            </tr>
-            {% endif %} {% endfor %}
+            {% if state.appOwnership.public|isEmpty %} 
+               <i>That is strange, there are no Apps in public Narratives.</i>
+            {% else %}
+               {% for app in state.appOwnership.public|sort("count") %} {% if app.count > 0 %}
+               <tr>
+                  <td valign="baseline" style="vertical-align: middle;">
+                  <a href="#/narrativestore/app/{{app.app.id}}" target="_blank">{{ app.app.name }}</a>
+                  </td>
+                   <td width="10px" valign="baseline" style="vertical-align: middle; color: gray;" >
+                     {{app.count}}
+                  </td>
+                  <td width="20px" valign="baseline" style="vertical-align: middle;"> 
+
+                     <a href="#/narrativemanager/new?app={{app.app.id}}" class="btn btn-default btn-link" target="_blank"  data-toggle="tooltip" data-placement="auto" title="Create a new Narrative using this App" data-container="body">
+                       <span style="font-size: 80%;">
+                        <span class="fa-stack">
+                        <i class="fa fa-file fa-stack-2x"></i>
+                        <i class="fa fa-plus fa-inverse fa-stack-1x" style="margin-top: 2px;"></i>
+                        </span>
+                        </span>
+                     </a>
+                  </td>
+               </tr>
+               {% endif %} {% endfor %}
+            {% endif %}
          </table>
       </td>
    </tr>

@@ -86,7 +86,7 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.client.workspace', 'k
                                  // result in a hit, skip it. This can occur if a narrative is corrupt -- the narrative object
                                  // was deleted or replaced and the workspace metadata not updated.
                                  if (!data[i]) {
-                                    console.log('WARNING: workspace ' + narratives[i].workspace.id + ' does not contain a matching narrative object');
+                                    console.log('WARNING: workspace ' + object.wsid + ' does not contain a matching narrative object');
                                     continue;
                                  }
                                  // Make sure it is a valid narrative object.
