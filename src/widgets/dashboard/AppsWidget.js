@@ -149,9 +149,7 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                                        }
                                     });
                                  });
-                              console.log(appOwnership);
                                  widget.setState('appOwnership', appOwnership);
-
                                  resolve();
                               })
                               .catch(function (err) {

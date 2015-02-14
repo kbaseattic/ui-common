@@ -126,11 +126,11 @@
       }.bind(this));
        
       postal.channel('session').subscribe('profile.saved', function(data) {
+         console.log('saved...');
          this.fetchUserProfile();
       }.bind(this));
       
       postal.channel('session').subscribe('profile.get', function (data, envelope) {
-        console.log('returning...');
         envelope.reply(null, this.profile);
         
       }.bind(this));

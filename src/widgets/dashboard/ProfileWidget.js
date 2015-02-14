@@ -62,9 +62,6 @@ define(['kb.widget.dashboard.base', 'kb.user_profile', 'kb.client.user_profile',
                   .catch(function (err) {
                      reject(err);
                   })
-                  .finally(function (x) {
-                     console.log('FINALLY'); console.log(x);
-                  })
                   .done();
                   
                }.bind(this));
