@@ -21,7 +21,7 @@
          <table class="table table-striped">
            
             {% if state.appOwnership.owned|isEmpty %} 
-               <i>You don't have any Apps in Narratives you may have created.</i>
+               <i>There are no Apps in Narratives that you own.</i>
             {% else %}
                {% for app in state.appOwnership.owned|sort("count") %} {% if app.count > 0 %}
                <tr>

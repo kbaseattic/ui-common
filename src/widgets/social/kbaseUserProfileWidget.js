@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'q', 'kb.utils', 'kb.widget.social.base', 'kb.user_profile', 'kb.session', 'kb.widget.navbar'],
-  function(nunjucks, $, Q, Utils, SocialWidget, UserProfile, Session, NAVBAR) {
+define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base', 'kb.user_profile', 'kb.session', 'kb.widget.navbar'],
+  function(nunjucks, $, Q, Postal, Utils, SocialWidget, UserProfile, Session, NAVBAR) {
     "use strict";
     // var NAVBAR = Object.create(Navbar).init({container: '#kbase-navbar'});
     var UserProfileWidget = Object.create(SocialWidget, {
@@ -1198,6 +1198,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.utils', 'kb.widget.social.base', 'kb.user
                     W.renderViewEditLayout();
                     W.addSuccessMessage('Success!', 'Your user profile has been updated.');
                     W.renderInfoView();
+                    postal.channel('session').publish('profile.saved');
                 })
                 .catch (function(err) {
                   W.renderErrorView(err);

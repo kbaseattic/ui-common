@@ -124,6 +124,10 @@
         var url = profile.getAvatarURL({size: 40, rating: 'pg'});
         this.$elem.find('[data-element="avatar"]').attr('src', url);
       }.bind(this));
+       
+      postal.channel('session').subscribe('profile.saved', function(data) {
+         this.fetchUserProfile();
+      }.bind(this));
       
       postal.channel('session').subscribe('profile.get', function (data, envelope) {
         console.log('returning...');
