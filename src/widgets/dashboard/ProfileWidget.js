@@ -15,6 +15,15 @@ define(['kb.widget.dashboard.base', 'kb.user_profile', 'kb.client.user_profile',
          go: {
             value: function () {
                this.start();
+               
+               // NB: this uses the old original state-on-object rather than
+               // the set/get/has state mechanism that most like-minded
+               // widgets use.
+               AppState.listenForItem('userprofile', function (profile) {
+                  this.userProfile = profile;
+                  this.refresh();
+               }.bind(this));
+               
                return this;
             }
          },

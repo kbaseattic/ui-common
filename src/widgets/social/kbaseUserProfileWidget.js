@@ -1156,6 +1156,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
         value: function() {
           this.userProfile.deleteUserdata()       
           .then(function() {
+             Postal.channel('session').publish('profile.saved');
             this.addSuccessMessage('Your profile has been successfully removed.');
             this.render();
           }.bind(this))
@@ -1365,6 +1366,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
             $('[data-button="create-profile"]').on('click', function(e) {
               widget.userProfile.createProfile()
               .then(function() {
+                  Postal.channel('session').publish('profile.saved');
                   widget.clearMessages();
                   widget.addSuccessMessage('Success!', 'Your user profile has been created.');
                   widget.render();
