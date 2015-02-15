@@ -1,0 +1,110 @@
+{
+    "meta": {
+        "generated": 1424166189
+    },
+    "histogram": {
+        "bins": [
+            {
+                "count": 34,
+                "label": "[1-2)",
+                "lower": 1,
+                "upper": 2
+            },
+            {
+                "count": 14,
+                "label": "[2-3)",
+                "lower": 2,
+                "upper": 3
+            },
+            {
+                "count": 20,
+                "label": "[3-5)",
+                "lower": 3,
+                "upper": 5
+            },
+            {
+                "count": 2,
+                "label": "[5-6)",
+                "lower": 5,
+                "upper": 6
+            },
+            {
+                "count": 5,
+                "label": "[6-8)",
+                "lower": 6,
+                "upper": 8
+            },
+            {
+                "count": 1,
+                "label": "[8-9)",
+                "lower": 8,
+                "upper": 9
+            },
+            {
+                "count": 2,
+                "label": "[9-11)",
+                "lower": 9,
+                "upper": 11
+            },
+            {
+                "count": 0,
+                "label": "[11-12)",
+                "lower": 11,
+                "upper": 12
+            },
+            {
+                "count": 1,
+                "label": "[12-14)",
+                "lower": 12,
+                "upper": 14
+            },
+            {
+                "count": 1,
+                "label": "[14-16)",
+                "lower": 14,
+                "upper": 16,
+                "upperInclusive": 16
+            }
+        ],
+        "min": 1,
+        "max": 16,
+        "binSize": 1.5,
+        "binCount": 10,
+        "count": 80,
+        "binned": [
+            34,
+            14,
+            20,
+            2,
+            5,
+            1,
+            2,
+            0,
+            1,
+            1
+        ],
+        "labels": [
+            "[1-2)",
+            "[2-3)",
+            "[3-5)",
+            "[5-6)",
+            "[6-8)",
+            "[8-9)",
+            "[9-11)",
+            "[11-12)",
+            "[12-14)",
+            "[14-16)"
+        ],
+        "unbinnable": [
+
+        ]
+    },
+    "summary": {
+        "min": 1,
+        "max": 16,
+        "mean": 2.8125,
+        "count": 80,
+        "median": 2,
+        "stddev": 0.059654961936243
+    }
+}
