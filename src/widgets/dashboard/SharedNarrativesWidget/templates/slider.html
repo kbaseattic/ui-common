@@ -1,4 +1,4 @@
-<div class="slider">
+<div class="slider shared-narratives-slider">
   
     
       
@@ -86,3 +86,27 @@
       {% endfor %}
    {% endif %}
 </div>
+<script>
+   require(['jquery'], function ($) {
+      $('.slider.shared-narratives-slider .-body')
+      .on('mouseover', function (e) {
+         $(this).addClass('-active');
+         $(this).addClass('-autoOverflow');
+      })
+      .on('mouseout', function (e) {
+         $(this).removeClass('-active');
+         $(this).removeClass('-autoOverflow');
+      });
+      
+      $('.kbase-dashboard-view .slider')
+       .on('mouseover', function (e) {
+         $(this).addClass('-active');
+         $(this).addClass('-autoOverflow');
+      })
+      .on('mouseout', function (e) {
+         $(this).removeClass('-active');
+         $(this).removeClass('-autoOverflow');
+      });
+      
+   });
+</script>

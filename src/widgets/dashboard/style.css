@@ -35,6 +35,12 @@
     white-space: nowrap;
     xbackground: silver;
  }
+.kbase-dashboard-view .slider::-webkit-scrollbar {
+   visibility: hidden;
+}
+.kbase-dashboard-view .slider.-autoOverflow::-webkit-scrollbar {
+   visibility: visible;
+}
 
  .kbase-dashboard-view .slider .-card {
     display: inline-block;
@@ -54,7 +60,7 @@
     width: 250px;
     
     
-    overflow: hidden;
+    xoverflow: hidden;
     padding: 4px;
     
     /* go with the flow... */
@@ -82,45 +88,19 @@
    height: 150px;
    width: 250px;
    background-color: #FFF; 
-    box-shadow: 1px 1px 1px #ccc;
-   overflow:hidden;
-   xoverflow-x: auto;
-   xoverflow-y: hidden;
-   padding: 3px;
-}
-.kbase-dashboard-view .slider .-card .-box {
-   position: absolute;
-   top: 25px;
-   left: 25px;
-   height: 200px;
-   width: 200px;
-   background-color: #FFF; 
-    box-shadow: 1px 1px 1px #ccc;
-   overflow:hidden;
-   xoverflow-x: auto;
-   xoverflow-y: hidden;
-   padding: 3px;
-}
-.kbase-dashboard-view .slider .-card .-message {
-   position: absolute;
-   display: block;
-   top: 25px;
-   left: 25px;
-   height: 200px;
-   width: 200px;
-   background-color: #FFF; 
    box-shadow: 1px 1px 1px #ccc;
-   overflow:hidden;
+   overflow: hidden;
    xoverflow-x: auto;
    xoverflow-y: hidden;
    padding: 3px;
-   white-space: normal;
+   xborder: 1px red solid;
 }
-.kbase-dashboard-view .slider .-card .-message p {
-   overflow: none;
-   width: 194px;
-   xheight: 200px;
-   padding: 3px;
+ .slider .-card .-body.-active {
+   xbackground-color: #ececec;
+   box-shadow: inset 1px 1px 1px #ccc;
+}
+.slider .-card .-body.-autoOverflow {
+   overflow:auto;
 }
 .kbase-dashboard-view .slider .-card .-saved {
    position: absolute;

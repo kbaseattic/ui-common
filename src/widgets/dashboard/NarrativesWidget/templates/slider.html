@@ -1,4 +1,4 @@
-<div class="slider">
+<div class="slider your-narratives-slider">
   {% if state.narratives == 0 %}
       <div class="-card">
           <div class="-box">
@@ -74,8 +74,19 @@
          <div class="-footer">
             <div style="display:inline-block; width: 33%;text-align: center;">
                {% if narrative.workspace.user_permission == 'r' %}
-                  <span class="fa fa-minus dimmed"  style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="Sharing information not available for this Narrative" data-container="body"></span> {% else %} {% if narrative.permissions|length > 0 %} {{ narrative.permissions | length }} {% else %} 0 {% endif %} <span class="fa fa-share-alt"  data-toggle="tooltip" data-placement="auto" title="The number of other users with whom this Narrative has been shared" data-container="body"></span> {% endif %} {% if narrative.workspace.globalread == 'r' or narrative.workspace.globalread == 'w' %} P{% endif %}
-            </div><div style="display:inline-block; width: 33%;text-align: center;">
+                  <span class="fa fa-minus dimmed"  style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="Sharing information not available for this Narrative" data-container="body"></span> 
+               {% else %} 
+                  {% if narrative.permissions|length > 0 %} 
+                    {{ narrative.permissions | length }} 
+                  {% else %} 
+                     0 
+                  {% endif %} 
+                  <span class="fa fa-share-alt"  data-toggle="tooltip" data-placement="auto" title="The number of other users with whom this Narrative has been shared" data-container="body"></span> 
+               {% endif %} 
+               {% if narrative.workspace.globalread == 'r' or narrative.workspace.globalread == 'w' %} 
+               P
+               {% endif %}
+             </div><div style="display:inline-block; width: 33%;text-align: center;">
                {% set runningJobs = narrative.object.metadata.jobInfo.running %}
                {% set errorJobs = narrative.object.metadata.jobInfo.error %}
                {% if (runningJobs == 0 or runningJobs|isBlank) and (runningJobs|isBlank or runningJobs == 0) %}
@@ -99,3 +110,17 @@
       {% endfor %}
    {% endif %}
 </div>
+
+<script>
+   require(['jquery'], function ($) {
+      $('.slider.your-narratives-slider .-body')
+      .on('mouseover', function (e) {
+         $(this).addClass('-active');
+         $(this).addClass('-autoOverflow');
+      })
+      .on('mouseout', function (e) {
+         $(this).removeClass('-active');
+         $(this).removeClass('-autoOverflow');
+      })
+   });
+</script>
