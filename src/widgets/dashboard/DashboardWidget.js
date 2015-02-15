@@ -205,6 +205,14 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                      return x;
                   }
                });
+               this.templates.env.addFilter('plural', function (x, suffix) {
+                  if (typeof x === 'number') {
+                     if (x !== 1) {
+                        return suffix||'s';
+                     }
+                  }
+                  return '';
+               });
                
                this.templates.env.addGlobal('randomNumber', function (from, to) {
                   return Math.floor(from + Math.random()*(to - from));

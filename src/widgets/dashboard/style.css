@@ -80,6 +80,7 @@
    width: 250px;
    font-weight: bold;
    padding: 5px;
+   overflow: hidden;
 }
 .kbase-dashboard-view .slider .-card .-body {
    position: absolute;
@@ -101,6 +102,33 @@
 }
 .slider .-card .-body.-autoOverflow {
    overflow:auto;
+}
+.kbase-dashboard-view .slider .-card .-box {
+   position: absolute;
+   top: 25px;
+   left: 0;
+   height: 200px;
+   width: 250px;
+   background-color: #FFF; 
+   box-shadow: 1px 1px 1px #ccc;
+   overflow: hidden;
+   padding: 3px;
+}
+.kbase-dashboard-view .slider .-card .-message {
+   position: absolute;
+   top: 25px;
+   left: 0;
+   height: 200px;
+   width: 250px;
+   background-color: #FFF; 
+   box-shadow: 1px 1px 1px #ccc;
+   overflow: hidden;
+   padding: 3px;
+}
+.kbase-dashboard-view .slider .-card .-message p {
+   white-space: normal;
+   padding: 3px;
+   overflow: none;
 }
 .kbase-dashboard-view .slider .-card .-saved {
    position: absolute;

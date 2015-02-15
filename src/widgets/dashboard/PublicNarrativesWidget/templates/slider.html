@@ -1,21 +1,15 @@
-<div class="slider your-narratives-slider">
-  {% if state.narratives == 0 %}
-
-      <div class="-card">
-          <div class="-box">
-             <a role="button" class="btn btn-primary btn-kbase" href="/functional-site/#/narrativemanager/new" 
-                style="height: 100%; width: 100%; padding-top: 30px;" target="_blank">
-               <br><span class="fa fa-plus-circle" style="font-size: 300%; " ></span><br><br>
-                 New Narrative
-            </a>
-         </div>
-      </div>
+<div class="slider shared-narratives-slider">
+  
+    
+      
+   {% if state.narratives == 0 %}
+    
      <div class="-card">
-         <div class="-message">
-             <p>You do not currently own any Narratives.</p>
-             <p>It is easy to get started.</p>
-             <p> <span class="fa fa-arrow-left"></span> Just click the big button to the left.</p>
-         </div>
+          <p>No Narratives have been <br>
+             shared with you.</p>
+          <p>When a Narrative has been shared with<br>
+             you, it will appear in this panel.</p>
+         
       </div>
      
    {% else %}
@@ -27,7 +21,7 @@
          </div>
          <div class="-body">
             <div class="apps">
-                {% if narrative.object.metadata.cellInfo.app|isEmpty and narrative.object.metadata.cellInfo.method|isEmpty %}
+               {% if narrative.object.metadata.cellInfo.app|isEmpty and narrative.object.metadata.cellInfo.method|isEmpty %}
                   <div style="text-align: center; font-style: italic;">no apps or methods</div>
                {% endif %}
                 {% for app, i in narrative.object.metadata.cellInfo.app %}
@@ -44,8 +38,7 @@
             </div>
 
             <div class="methods">
-               {% if narrative.object.metadata.cellInfo.method %}
-                {% for method, i in narrative.object.metadata.cellInfo.method|dictsort %}
+                {% for method, i in narrative.object.metadata.cellInfo.method %}
                <div class="method">
                    <span style="font-size: 80%;">      
                    <span class="fa-stack">
@@ -56,7 +49,6 @@
                 {{method|methodName}}
                 </div>
                  {% endfor %}
-               {% endif %}
             </div>
          </div>
          <div class="-saved">
@@ -67,22 +59,9 @@
          <div class="-footer">
             <div style="display:inline-block; width: 33%;text-align: center;">
                {% if narrative.workspace.user_permission == 'r' %}
-                  <span class="fa fa-minus dimmed"  style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="Sharing information not available for this Narrative" data-container="body"></span> 
-               {% else %} 
-                  <span  data-toggle="tooltip" data-placement="auto" title="This narrative has been shared with {{narrative.permissions|length}} user{{narrative.permissions|length|plural('s')}}." data-container="body">
-                     
-                  {% if narrative.permissions|length > 0 %} 
-                    {{ narrative.permissions | length }} 
-                  {% else %} 
-                     0 
-                  {% endif %} 
-                  <span class="fa fa-share-alt"></span> 
-               </span>
-               {% endif %} 
-               {% if narrative.workspace.globalread == 'r' or narrative.workspace.globalread == 'w' %} 
-               <span class="fa fa-globe"  data-toggle="tooltip" data-placement="auto" title="This narrative is Publicly available (read-only)" data-container="body"></span>
-               {% endif %}
-             </div><div style="display:inline-block; width: 33%;text-align: center;">
+                  <span class="fa fa-minus dimmed"  style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="Sharing information not available for this Narrative" data-container="body"></span> {% else %} {% if narrative.permissions|length > 0 %} {{ narrative.permissions | length }} {% else %} 0 {% endif %} <span class="fa fa-share-alt"  data-toggle="tooltip" data-placement="auto" title="The number of other users with whom this Narrative has been shared" data-container="body"></span> {% endif %} {% if narrative.workspace.globalread == 'r' or narrative.workspace.globalread == 'w' %} P{% endif %}
+            </div><div style="display:inline-block; width: 33%;text-align: center;">
+           
                {% set runningJobs = narrative.object.metadata.jobInfo.running %}
                {% set errorJobs = narrative.object.metadata.jobInfo.error %}
                {% if (runningJobs == 0 or runningJobs|isBlank) and (runningJobs|isBlank or runningJobs == 0) %}
@@ -106,10 +85,9 @@
       {% endfor %}
    {% endif %}
 </div>
-
 <script>
    require(['jquery'], function ($) {
-      $('.slider.your-narratives-slider .-body')
+      $('.slider.shared-narratives-slider .-body')
       .on('mouseover', function (e) {
          $(this).addClass('-active');
          $(this).addClass('-autoOverflow');
@@ -117,6 +95,17 @@
       .on('mouseout', function (e) {
          $(this).removeClass('-active');
          $(this).removeClass('-autoOverflow');
+      });
+      
+      $('.kbase-dashboard-view .slider')
+       .on('mouseover', function (e) {
+         $(this).addClass('-active');
+         $(this).addClass('-autoOverflow');
       })
+      .on('mouseout', function (e) {
+         $(this).removeClass('-active');
+         $(this).removeClass('-autoOverflow');
+      });
+      
    });
 </script>

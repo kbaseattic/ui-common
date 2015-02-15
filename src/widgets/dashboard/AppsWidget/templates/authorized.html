@@ -21,7 +21,8 @@
          <table class="table table-borderless hoverable">
            
             {% if state.appOwnership.owned|isEmpty %} 
-               <i>There are no Apps in Narratives that you own.</i>
+              
+               <div style="font-style: italic;text-align: center;">No Apps found in Narratives that you own.</div>
             {% else %}
                {% for app in state.appOwnership.owned|sort("count") %} {% if app.count > 0 %}
                <tr>
@@ -54,7 +55,7 @@
          <table class="table table-borderless hoverable">
            
             {% if state.appOwnership.shared|isEmpty %} 
-               <i>There are no Apps in Narratives shared with you.</i>
+              <div style="font-style: italic; text-align: center;">No Apps found in Narratives shared with you.</div>
             {% else %}
                {% for app in state.appOwnership.shared|sort("count") %} {% if app.count > 0 %}
                <tr>

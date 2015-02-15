@@ -200,6 +200,10 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
                this.viewState.listen('sharedNarratives', function (value) {
                   this.setState('sharedNarratives', value);
                }.bind(this));
+               
+               this.viewState.listen('publicNarratives', function (value) {
+                  this.setState('publicNarratives', value);
+               }.bind(this));
 
                this.viewState.listen('collaborators', function (value) {
                   this.setState('collaborators', value);
