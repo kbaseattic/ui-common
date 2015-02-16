@@ -1,0 +1,88 @@
+<style>
+    .landing-page .object-name {
+        margin: 10px 20px 0 0;
+    }
+    .panel-heading {
+        padding: 5px 15px 0px 15px;
+    }
+    .landing-page .panel-heading .nav-tabs {
+        border-bottom: none;
+    }
+    .landing-page .panel-heading .nav-tabs > li {
+        margin-bottom: -1px;
+    }
+</style>
+
+<div class="container landing-page">
+    <br>
+
+    <div class="well">
+        <span class="h4">
+            <a ui-sref="ws.id({ws: info.ws})">{{info.ws}}</a> <span> / </span> {{info.name}}
+        </span>
+
+        <div class="pull-right">
+            buttons can go here
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="h4 pull-left object-name"><b>{{info.kind}}</b></span>
+
+            <ul class="nav nav-tabs">
+                <li ng-click="tab = 'data'" ng-class="{active: tab == 'data'}" >
+                    <a>Data</a>
+                </li>
+                <li ng-click="tab = 'activity'" ng-class="{active: tab == 'activity'}" >
+                    <a>KBase and Community Activity</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="panel-body">
+            <div ng-show="tab == 'data'">
+                <div kb-tables="{{info.type}}"
+                     kb-tables-ws="{{info.ws}}"
+                     kb-tables-name="{{info.name}}">
+                </div>
+            </div>
+
+            <div ng-show="tab == 'activity'">
+                <ul class="nav nav-tabs" ng-init="subtab = 'tools'">
+                    <li ng-click="subtab = 'tools'" ng-class="{active: subtab == 'tools'}" >
+                        <a>KBase Tools</a>
+                    </li>
+                    <li ng-click="subtab = 'objects'" ng-class="{active: subtab == 'objects'}" >
+                        <a>Associated Objects</a>
+                    </li>
+                    <li ng-click="subtab = 'users'" ng-class="{active: subtab == 'users'}" >
+                        <a>Associated Users</a>
+                    </li>
+                    <li ng-click="subtab = 'provenance'" ng-class="{active: subtab == 'provenance'}" >
+                        <a>Provenance</a>
+                    </li>
+                </ul>
+
+
+                <div ng-show="subtab == 'tools'">
+                    <br>related tools goes here
+                </div>
+                <div ng-show="subtab == 'objects'">
+                    <br>related objecgs goes here
+                </div>
+                <div ng-show="subtab == 'users'">
+                    <br>related users goes
+                </div>
+                <div ng-show="subtab == 'provenance'">
+                    <br>provenance widget goes here
+                </div>
+
+            </div>
+
+
+        </div>
+     </div>
+
+
+</div>

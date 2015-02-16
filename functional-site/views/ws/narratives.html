@@ -18,8 +18,7 @@
 
             <div class="narrative-filters">
                 <a ui-sref="narratives.featured" ng-class="{ active: $state.includes('narratives.featured')}" class="select-nar">
-                    <div class="badge">11</div> 
-                    <span> <b>Featured Narratives</b></span>
+                    <span><b>Apps</b></span>
                     <span class="glyphicon glyphicon-chevron-right pull-right"></span>
                 </a> 
             </div>
@@ -48,7 +47,7 @@
                 <div recentnarratives>
                     <ul class="recent-nars" ng-repeat="nar in narratives | orderBy:'timestamp':true | limitTo:5">
                         <li>
-                            <a href="{{nar_url}}/narrative/ws.{{nar.wsid}}.obj.{{nar.id}}" target="_blank" class="ellipsis">{{nar.name}}</a><br>
+                            <a href="{{nar_url}}/ws.{{nar.wsid}}.obj.{{nar.id}}" target="_blank" class="ellipsis">{{nar.name}}</a><br>
                             <div class="recent-nar-time text-muted">
                                 <i>{{nar.owner}}</i> <span class="pull-right"><i>{{nar.nealtime}}</i></span>
                             </div>

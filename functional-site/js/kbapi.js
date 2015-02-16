@@ -309,6 +309,7 @@ function KBCacheClient(token) {
         }
 
         var prom = $.when(p).then(function(m) {
+            console.log('model', m)
             var m_obj = m[0].data
             var rxn_objs = m_obj.modelreactions;
             var cpd_objs = m_obj.modelcompounds
@@ -375,9 +376,9 @@ function KBCacheClient(token) {
             }
 
             var arrow;
-            if (direction === '=') arrow = ' <=> ';
-            if (direction === '<') arrow = ' <= ';
-            if (direction === '>') arrow = ' => ';
+            if (direction === '=' || direction === '<=>') arrow = ' <=> ';
+            if (direction === '<' || direction === '<=') arrow = ' <= ';
+            if (direction === '>' || direction === '=>') arrow = ' => ';
 
             var eq = lhs.join(' + ')+arrow+rhs.join(' + ');
             eqs[rxn_id] = eq

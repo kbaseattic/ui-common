@@ -1,0 +1,88 @@
+<style>
+    .landing-page ul {
+        list-style: none;
+    }
+</style>
+
+<div class="container landing-page">
+    <h3>Examples</h3>
+    Below are some links to example tabbed table widgets.  These are used in testing functionality.  Please update as you see fit.<br>
+    <br>
+
+
+    <ul class="nav nav-tabs">
+        <li ng-click="tab = 'Narrative Examples'" ng-class="{active: tab == 'Narrative Examples'}" >
+            <a>Narrative Examples</a>
+        </li>
+        <li ng-click="tab = 'Other Examples'" ng-class="{active: tab == 'Other Examples'}" >
+            <a>Other Examples</a>
+        </li>
+        <li ng-click="tab = 'mutliple'" ng-class="{active: tab == 'mutliple'}" >
+            <a>Test Multiple</a>
+        </li>
+    </ul>
+
+    <div ng-show="tab == 'Narrative Examples'">
+        <div ng-repeat="type in typeOrder">
+            <h4>{{type.split('-')[0].split('.')[1]}}</h4>
+            <div ng-repeat="example in examples[type]">
+                <ul>
+                    <li>
+                        <a ui-sref="landing({type: type, ws: example.ws, name: example.obj})">
+                            {{example.obj}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="tab == 'Other Examples'">
+        <div ng-repeat="type in typeOrder">
+            <h4>{{type.split('-')[0].split('.')[1]}}</h4>
+            <div ng-repeat="example in otherExamples[type]">
+                <ul>
+                    <li>
+                        <a ui-sref="landing({type: type, ws: example.ws, name: example.obj})">
+                            {{example.obj}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="tab == 'Other Examples'">
+        <div ng-repeat="type in typeOrder">
+            <h4>{{type.split('-')[0].split('.')[1]}}</h4>
+            <div ng-repeat="example in otherExamples[type]">
+                <ul>
+                    <li>
+                        <a ui-sref="landing({type: type, ws: example.ws, name: example.obj})">
+                            {{example.obj}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="tab == 'mutliple'">
+        <br>
+        <div kb-tables="KBaseBiochem.Media"
+             kb-tables-ws="KBaseExampleData"
+             kb-tables-name="PlantHeterotrophicMedia">
+        </div>
+        <br>
+        <div kb-tables="KBaseFBA.FBAModel"
+             kb-tables-ws="KBaseExampleData"
+             kb-tables-name="CACIA_model_kbase">
+        </div>
+        <br>
+        <div kb-tables="KBaseFBA.FBA"
+             kb-tables-ws="KBaseExampleData"
+             kb-tables-name="iRsp1140-fba">
+        </div>
+    </div>
+
+</div>
