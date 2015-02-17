@@ -1,0 +1,217 @@
+<html>
+
+<head>
+   <!-- load just the basic support -->
+   <script src="/ext/jquery/jquery-1.10.2.min.js"></script>
+   <script src="/ext/q/q.min.js"></script>
+   <script src="/ext/underscore/1.7.0/underscore-min.js"></script>
+
+
+   <script src="/ext/postal/postal-0.12.4.min.js"></script>
+   <script src="/ext/postal/postal.request-response-0.3.1.min.js"></script>
+   <script src="/ext/postal/postal-deluxe.js"></script>
+   <script src="/ext/requirejs/2.1.15/require.js"></script>
+   <script src="/functional-site/js/require-config.js"></script>
+
+   <script src="/ext/kbase-clients/kbase-client-api.min.js"></script>
+
+   <script>
+   define('tester', [], function () {
+      return Object.create({}, {
+         init: {
+            value: function (cfg) {
+               this.id = cfg.id;
+               this.expected = cfg.expected;
+               this.getResult = cfg.getResult;
+               this.testResult = cfg.testResult;
+               this.container = document.querySelector('[data-test="'+this.id+'"]');
+               this.displayLayout();
+               return this;
+            } 
+         },
+         
+         run: {
+            value: function () {
+               var result;
+               try {
+                  result = this.getResult();
+                  this.status = 'ok';
+                  this.result = result;
+               } catch(ex) {
+                  this.status = 'error';
+                  this.error = ex;
+               }
+               
+               var testResult;
+               try {
+                  testResult = this.testResult.call(this);
+                  this.status = 'ok';
+                  this.testResult = testResult;
+               } catch(ex) {
+                  this.status = 'error';
+                  this.error = ex;
+               }
+               
+               this.setText('id', this.id);
+               this.setText('status', this.status);
+               this.setText('expected', this.expected);
+               this.setText('result', this.result);
+               this.setText('testResult', this.testResult);
+            }
+         },
+         
+         
+         getText: {
+            value: function(field) {
+               return this.container.querySelector('[data-field="'+field+'"]').textContent
+            }
+         },
+         setText: {
+            value: function(field, value) {
+               this.container.querySelector('[data-field="'+field+'"]').textContent = value;
+            }
+         },
+         setComment: {
+            value: function(comment) {
+               this.setText('comments', comment);
+            }
+         },
+         displayLayout: {
+            value: function () {
+               var l = '<div>Test: <span data-field="id"></span></div>\
+                        <div>Status: <span data-field="status"></span></div>\
+                        <div>Expecting: <span data-field="expected"></span></div>\
+                         <div>Result: <span data-field="result"></span></div>\
+                         <div>Test Result:  <span data-field="testResult"></span></div>\
+                         <div>Comments: <span data-field="comments"></span></div>\
+               ';
+               this.container.innerHTML = l;
+            }
+         },
+         displayResults: {
+            value: function () {
+               
+            }
+         }
+      });
+   });
+   </script>
+
+</head>
+
+<body>
+
+   <h1>Testing for statemachine</h1>
+   <h2>Presence of the Module</h2>
+   <div data-test="presence">
+      <div>Result:</div>
+      <div data-field="result"></div>
+   </div>
+   <script>
+      require(['kb.statemachine'], function (StateMachine) {
+         if (StateMachine) {
+            document.querySelector('[data-test="presence"] [data-field="result"]').innerHTML = 'success';
+         } else {
+            document.querySelector('[data-test="presence"] [data-field="result"]').innerHTML = 'failure';
+         }
+      });
+   </script>
+
+   <h2>Version - static</h2>
+   <div data-test="version-static"></div>
+   <script>
+      require(['kb.statemachine', 'tester'], function (StateMachine, Tester) {
+         var T = Object.create(Tester).init({
+            id: 'version-static',
+            expected: '0.0.1',
+            getResult: function() {
+               return StateMachine.version;
+            },
+            testResult: function () {
+               return (this.expected === this.result);
+            }
+         }).run();
+      });
+   </script>
+   
+   <h2>Version - new object</h2>
+   <div data-test="version"></div>
+   <script>
+      require(['kb.statemachine', 'tester'], function (StateMachine, Tester) {
+         var T = Object.create(Tester).init({
+            id: 'version',
+            expected: '0.0.1',
+            getResult: function () {
+               var sm = Object.create(StateMachine).init();
+               var version = sm.version; 
+               return version;
+            },
+            testResult: function () {
+               return (this.expected === this.result);
+            }
+         }).run();
+      });
+   </script>
+   
+   <h2>Set and Get Synchronous</h2>
+   <p>This tests setting and getting a property on the StateMachine object.</p>
+   <div data-test="setget_sync"></div>
+   <script>
+      require(['kb.statemachine', 'tester'], function (StateMachine, Tester) {
+         var T = Object.create(Tester).init({
+            id: 'setget_sync',
+            expected: 'synchronous_set',
+            getResult: function () {
+               var sm = Object.create(StateMachine).init();
+               sm.setItem('test', 'synchronous_set');
+               return sm.getItem('test');
+            },
+            testResult: function () {
+               return (this.expected === this.result);
+            }
+         }).run();
+      });
+   </script>
+   
+   <h2>Get without set</h2>
+   <p>Get a property without setting it first. Should get 'undefined' or the defaultValue supplied</p>
+   <div data-test="get_without_set"></div>
+   <script>
+      require(['kb.statemachine', 'tester'], function (StateMachine, Tester) {
+         var T = Object.create(Tester).init({
+            id: 'get_without_set',
+            expected: undefined,
+            getResult: function () {
+               var sm = Object.create(StateMachine).init();
+               return sm.getItem('test');
+            },
+            testResult: function () {
+               return (this.expected === this.result);
+            }
+         }).run();
+      });
+   </script>
+   
+   
+   <h2>Get without set, using default value</h2>
+   <p>Get a property without setting it first, but supply a default value.</p>
+   <div data-test="get_without_set_with_defaultvalue"></div>
+   <script>
+      require(['kb.statemachine', 'tester'], function (StateMachine, Tester) {
+         var T = Object.create(Tester).init({
+            id: 'get_without_set_with_defaultvalue',
+            expected: 'mydefaultvalue',
+            getResult: function () {
+               var sm = Object.create(StateMachine).init();
+               return sm.getItem('test', 'mydefaultvalue');
+            },
+            testResult: function () {
+               return (this.expected === this.result);
+            }
+         }).run();
+      });
+   </script>
+
+</body>
+
+</html>

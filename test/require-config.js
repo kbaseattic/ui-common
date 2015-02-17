@@ -2,9 +2,6 @@
 define('jquery', [], function () {
    return jQuery;
 });
-define('kb_clients', [], function () {
-   return 'KBCLIENTS DUMMY OBJECT';
-});
 //NB underscore, as of 1.6, inclues AMD compatible loading. However, other parts of the kbase
 // codebase may rely on underscore being loaded globally, so se just use the global version, which 
 // must already be loaded.

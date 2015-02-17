@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'q', 'kb.utils', 'kb.widget.social.base', 'kb.user_profile', 'kb.session', 'kb.widget.navbar'],
-  function(nunjucks, $, Q, Utils, SocialWidget, UserProfile, Session, NAVBAR) {
+define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base', 'kb.user_profile', 'kb.session', 'kb.widget.navbar'],
+  function(nunjucks, $, Q, Postal, Utils, SocialWidget, UserProfile, Session, NAVBAR) {
     "use strict";
     // var NAVBAR = Object.create(Navbar).init({container: '#kbase-navbar'});
     var UserProfileWidget = Object.create(SocialWidget, {
@@ -1156,6 +1156,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.utils', 'kb.widget.social.base', 'kb.user
         value: function() {
           this.userProfile.deleteUserdata()       
           .then(function() {
+             Postal.channel('session').publish('profile.saved');
             this.addSuccessMessage('Your profile has been successfully removed.');
             this.render();
           }.bind(this))
@@ -1198,6 +1199,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.utils', 'kb.widget.social.base', 'kb.user
                     W.renderViewEditLayout();
                     W.addSuccessMessage('Success!', 'Your user profile has been updated.');
                     W.renderInfoView();
+                    postal.channel('session').publish('profile.saved');
                 })
                 .catch (function(err) {
                   W.renderErrorView(err);
@@ -1364,6 +1366,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.utils', 'kb.widget.social.base', 'kb.user
             $('[data-button="create-profile"]').on('click', function(e) {
               widget.userProfile.createProfile()
               .then(function() {
+                  Postal.channel('session').publish('profile.saved');
                   widget.clearMessages();
                   widget.addSuccessMessage('Success!', 'Your user profile has been created.');
                   widget.render();

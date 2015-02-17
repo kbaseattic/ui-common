@@ -1,5 +1,5 @@
-define(['kb.widget.dashboard.base', 'kb.user_profile', 'kb.client.user_profile', 'kb.session', 'kb.utils', 'q'],
-   function (DashboardWidget, UserProfile, UserProfileService, Session, Utils, Q) {
+define(['kb.widget.dashboard.base', 'kb.user_profile', 'kb.client.user_profile', 'kb.session', 'kb.appstate', 'kb.utils', 'q'],
+   function (DashboardWidget, UserProfile, UserProfileService, Session, AppState, Utils, Q) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
@@ -15,6 +15,15 @@ define(['kb.widget.dashboard.base', 'kb.user_profile', 'kb.client.user_profile',
          go: {
             value: function () {
                this.start();
+               
+               // NB: this uses the old original state-on-object rather than
+               // the set/get/has state mechanism that most like-minded
+               // widgets use.
+               AppState.listenForItem('userprofile', function (profile) {
+                  this.userProfile = profile;
+                  this.refresh();
+               }.bind(this));
+               
                return this;
             }
          },
@@ -44,30 +53,17 @@ define(['kb.widget.dashboard.base', 'kb.user_profile', 'kb.client.user_profile',
 
          setInitialState: {
             value: function (options) {
-               // TODO: We might be able to rely on the profile loaded with the page.
-               // But for now, be independent.
                return Q.Promise(function (resolve, reject, notify) {
-                  // this.resetState();
-                  if (!Session.isLoggedIn()) {
-                     // We don't even try to get the profile if the user isn't 
-                     // logged in.
-                     this.userProfile = null;
+                  AppState.whenItem('userprofile')
+                  .then(function(profile) {
+                     this.userProfile = profile;
                      resolve();
-                  } else {
-                     this.userProfile = Object.create(UserProfile).init({
-                        username: Session.getUsername()
-                     });
-                     this.userProfile.loadProfile()
-                        .then(function (found) {
-                           resolve();
-                        })
-                        .catch(function (err) {
-                           console.log('[UserProfile.sync] Error getting user profile.');
-                           console.log(err);
-                           reject(err);
-                        })
-                        .done();
-                  }
+                  }.bind(this))
+                  .catch(function (err) {
+                     reject(err);
+                  })
+                  .done();
+                  
                }.bind(this));
             }
          },
@@ -131,7 +127,11 @@ define(['kb.widget.dashboard.base', 'kb.user_profile', 'kb.client.user_profile',
          getProfileStatus: {
             value: function () {
                if (Session.isLoggedIn()) {
-                  return this.userProfile.getProfileStatus();
+                  if (this.userProfile) {
+                     return this.userProfile.getProfileStatus();
+                  } else {
+                     return 'none';
+                  }
                } else {
                   return 'notloggedin';
                }
