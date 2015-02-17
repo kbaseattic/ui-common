@@ -11,7 +11,7 @@
             isInCard: true,
             width: 2000,
             height: 500,
-	     loadingImage: "../../widgets/images/ajax-loader.gif",
+	     loadingImage: "assets/img/ajax-loader.gif",
 		    kbCache: null,
 
         },

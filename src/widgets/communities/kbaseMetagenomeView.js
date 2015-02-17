@@ -12,7 +12,7 @@
 	        ws: null
         },
 	    ws_url: window.kbconfig.urls.workspace,
-	    loading_image: "static/kbase/images/ajax-loader.gif",
+	    loading_image: "assets/img/ajax-loader.gif",
         
 	    init: function(options) {
             this._super(options);

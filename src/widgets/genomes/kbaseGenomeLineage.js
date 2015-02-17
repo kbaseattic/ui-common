@@ -12,7 +12,7 @@
             genomeID: null,
             workspaceID: null,
             objVer: null,
-            loadingImage: "../../widgets/images/ajax-loader.gif",
+            loadingImage: "assets/img/ajax-loader.gif",
             kbCache: null,
             width:600,
             //isInCard: false,

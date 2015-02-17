@@ -18,7 +18,7 @@ $.KBWidget({
     },
 
     cmpImgUrl: null,
-    loadingImage: "static/kbase/images/ajax-loader.gif",
+    loadingImage: "assets/img/ajax-loader.gif",
     timer: null,
     geneRows: 21,
     geneRowH: 21,
