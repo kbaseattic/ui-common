@@ -541,7 +541,7 @@ button.kb-method-run {
     moz-box-shadow: 1px 1px 1px #ccc;
 }
 button.kb-method-run:hover {
-    background-color: #1E88E5;;
+    background-color: #1E88E5;
 }
 
 
@@ -722,7 +722,7 @@ button.kb-method-run:hover {
     margin: 5px;
 }
 .kb-data-list-btn:hover {
-    background-color: #1E88E5;;
+    background-color: #1E88E5;
 }
 .kb-data-list-btn[disabled] {
     box-shadow: none;
@@ -743,7 +743,7 @@ button.kb-method-run:hover {
     margin: 5px;
 }
 .kb-data-list-cancel-btn:hover {
-    background-color: #CECECE;;
+    background-color: #CECECE;
 }
 
 .kb-data-list-row-hr {
@@ -1019,7 +1019,7 @@ button.kb-method-run:hover {
 }
 
 .kb-import-info {
-    font-weight:
+    font-weight: 700;
 }
 
 .kb-import-status {

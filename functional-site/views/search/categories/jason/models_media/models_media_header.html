@@ -54,7 +54,7 @@
 </div>
 <div class="btn-group search-result-column-header col-xs-1 col-sm-1 col-md-1 col-lg-1 number_of_compounds_header">
     <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
-        <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['number_of_compounds']}"><strong>Compounds</strong></div>
+        <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['number_of_compounds']}"><strong>%GC</strong></div>
         <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['number_of_compounds'], 'glyphicon-sort-by-order': options.active_sorts[options.selectedCategory].sorts['number_of_compounds'].direction == 'asc', 'glyphicon-sort-by-order-alt': options.active_sorts[options.selectedCategory].sorts['number_of_compounds'].direction == 'desc'}"></span>                
         <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['number_of_compounds'].order}}</span>
     </button>
@@ -81,7 +81,7 @@
 </div>
 <div class="btn-group search-result-column-header col-xs-1 col-sm-1 col-md-1 col-lg-1 media_type_header">
     <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
-        <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['media_type']}"><strong>Type</strong></div>
+        <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['media_type']}"><strong>Contigs</strong></div>
         <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['media_type'], 'glyphicon-sort-by-order': options.active_sorts[options.selectedCategory].sorts['media_type'].direction == 'asc', 'glyphicon-sort-by-order-alt': options.active_sorts[options.selectedCategory].sorts['media_type'].direction == 'desc'}"></span>                
         <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['media_type'].order}}</span>
     </button>
@@ -154,6 +154,33 @@
         </li>
         <li>
             <a ng-click="removeSort(options.selectedCategory, 'is_defined', true)">
+                <span class="glyphicon glyphicon-remove"/>
+                <span>Clear this sort</span>
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="btn-group search-result-column-header col-xs-1 col-sm-1 col-md-1 col-lg-1 is_aerobic_header">
+    <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
+        <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['is_aerobic']}"><strong>Aerobic</strong></div>
+        <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['is_aerobic'], 'glyphicon-sort-by-order': options.active_sorts[options.selectedCategory].sorts['is_aerobic'].direction == 'asc', 'glyphicon-sort-by-order-alt': options.active_sorts[options.selectedCategory].sorts['is_aerobic'].direction == 'desc'}"></span>                
+        <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['is_aerobic'].order}}</span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+        <li>
+            <a ng-click="addSort(options.selectedCategory, 'is_aerobic', 'asc')">
+                <span class="glyphicon glyphicon-sort-by-order"/>
+                <span>Sort ascending</span>
+            </a>
+        </li>
+        <li>
+            <a ng-click="addSort(options.selectedCategory, 'is_aerobic', 'desc')">
+                <span class="glyphicon glyphicon-sort-by-order-alt"/>
+                <span>Sort descending</span>
+            </a>
+        </li>
+        <li>
+            <a ng-click="removeSort(options.selectedCategory, 'is_aerobic', true)">
                 <span class="glyphicon glyphicon-remove"/>
                 <span>Clear this sort</span>
             </a>

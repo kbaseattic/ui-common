@@ -94,6 +94,27 @@ span .badge {
     padding-bottom: 5px;
 }
 
+.btn-setcopy {
+    color: #ffffff;
+    background-color: #6f5499;
+    padding-bottom: 5px;
+}
+
+.btn-setcopy.disabled {
+    color: #999;
+    background-color: #6f5499;
+    padding-bottom: 5px;
+}
+
+
+.btn-setcopy:focus,
+.btn-setcopy:active,
+.btn-setcopy.active {
+    color: #ffffff;
+    background-color: #6f5499;
+}
+
+
 .pagination {
     display: inline-block;
     margin-left: -30px;
@@ -184,6 +205,7 @@ span .badge {
 
 .workspace-area {
     height: 400px;
+    width: 246px;
     bottom: 0px;
 }
 
@@ -493,7 +515,8 @@ table.search-transfer-table {
 }
 
 .search-result-row-even {    
-    background-color: #efefef;
+    #background-color: #efefef;
+    background-color: #f5f5f5;
     width: 100%;
 }
 
@@ -513,8 +536,8 @@ table.search-transfer-table {
 
 
 .search-result-column-expanded {
-    color: #3a87ad;
-    background-color: #d9edf7;
+    #color: #3a87ad;
+    background-color: #f2fbff;
     border-style: none;
     border-radius: 4px;
     margin-top: 5px;
@@ -524,7 +547,7 @@ table.search-transfer-table {
 
 .search-result-column-expanded-entry table{
     color: #3a87ad;
-    background-color: #d9edf7;
+    #background-color: #d9edf7;
     border-color: #bce8f1;
     border-radius: 4px;
     width: 80%;
@@ -532,8 +555,8 @@ table.search-transfer-table {
 }
 
 .search-result-column-expanded-entry-cell {
-    color: #3a87ad;
-    background-color: #d9edf7;
+    color: #666666;
+    #background-color: #d9edf7;
     padding-bottom: 10px;
     vertical-align:top;
 }
@@ -574,6 +597,11 @@ table.search-transfer-table {
     color: #c09853;
     background-color: #fcf8e3;
     text-align: left;
+
+    background-image: -webkit-linear-gradient(top, #fcf8e3 0%, #fefcf5 100%);
+    background-image: linear-gradient(to bottom, #fcf8e3 0%, #fefcf5 100%);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fcf8e3', endColorstr='#fefcf5', GradientType=0);        
 }
 
 .search-result-column-header-toggle.disabled {
@@ -584,7 +612,7 @@ table.search-transfer-table {
     display: block;
     border-width: 0px;
     color: #c09853;
-    background-color: #fcf8e3;
+    #background-color: #fcf8e3;
     text-align: left;
 }
 
@@ -608,8 +636,13 @@ table.search-transfer-table {
     display: block;
     border-width: 0px;
     color: #c09853;
-    background-color: #fcf8e3;
+    #background-color: #fcf8e3;
     text-align: left;
+
+    background-image: -webkit-linear-gradient(top, #fcf8e3 0%, #fefcf5 100%);
+    background-image: linear-gradient(to bottom, #fcf8e3 0%, #fefcf5 100%);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fcf8e3', endColorstr='#fefcf5', GradientType=0);        
 }
 
 .search-result-column-header-btn.disabled {
@@ -636,8 +669,13 @@ table.search-transfer-table {
     display: block;
     border-width: 0px;
     color: #c09853;
-    background-color: #F6EAAC;
+    #background-color: #F6EAAC;
     text-align: left;
+
+    background-image: -webkit-linear-gradient(top, #fcf8e3 0%, #fefcf5 100%);
+    background-image: linear-gradient(to bottom, #fcf8e3 0%, #fefcf5 100%);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fcf8e3', endColorstr='#fefcf5', GradientType=0);        
 }
 
 .search-checkbox {
@@ -699,11 +737,11 @@ table.search-transfer-table {
 }
 
 .genome-scientific-name-header {
-    min-width: 330px;
+    min-width: 290px;
 }
 
 .genome-scientific-name {
-    min-width: 320px;
+    min-width: 282px;
     margin-right: 8px;
 }
 
@@ -739,6 +777,14 @@ table.search-transfer-table {
 }
 
 .metagenome_expanded_header {
+    width: 120px;
+}
+
+.model_expanded_header {
+    width: 120px;
+}
+
+.media_expanded_header {
     width: 120px;
 }
 
@@ -788,6 +834,15 @@ table.search-transfer-table {
 
 .genome_id {
     width: 80px;
+    margin-right: 8px;
+}
+
+.cs_db_version_header {
+    width: 40px;
+}
+
+.cs_db_version {
+    width: 32px;
     margin-right: 8px;
 }
 
@@ -859,8 +914,8 @@ table.search-transfer-table {
 }
 
 .domain {
-    width: 60px;
-    margin-right: 10px;
+    width: 62px;
+    margin-right: 8px;
 }
 
 .metagenome_id_header {
@@ -868,7 +923,7 @@ table.search-transfer-table {
 }
 
 .metagenome_id {
-    width: 110px;
+    width: 112px;
     margin-right: 8px;
 }
 
@@ -877,26 +932,26 @@ table.search-transfer-table {
 }
 
 .metagenome_name {
-    width: 190px;
-    margin-right: 9px;
+    width: 192px;
+    margin-right: 8px;
 }
 
-.project_name_header {
-    width: 300px;
+.metagenome_sequence_type_header {
+    width: 100px;
 }
 
-.project_name {
-    width: 290px;
-    margin-right: 10px;
+.metagenome_sequence_type {
+    width: 92px;
+    margin-right: 8px;
 }
 
-.sample_name_header {
-    width: 157px;
+.metagenome_biome_header {
+    width: 358px;
 }
 
-.sample_name {
-    width: 146px;
-    margin-right: 10px;
+.metagenome_biome {
+    width: 340px;
+    margin-right: 8px;
 }
 
 .object_id_header {
@@ -944,7 +999,7 @@ table.search-transfer-table {
 }
 
 .genome_dna_size {
-    width: 110px;
+    width: 100px;
     margin-right: 0px;
 }
 
@@ -967,40 +1022,94 @@ table.search-transfer-table {
 }
 
 
-.fba_model_id_header {
+.media_id_header {
     width: 100px;
 }
 
-.fba_model_id {
+.media_id {
     width: 92px;
     margin-right: 8px;
 }
 
-.model-scientific-name-header {
-    width: 300px;
+.media_name_header {
+    width: 200px;
 }
 
-.model-scientific-name {
-    width: 290px;
+.media_name {
+    width: 192px;
+    margin-right: 8px;
+}
+
+.media_type_header {
+    width: 100px;
+}
+
+.media_type {
+    width: 92px;
+    margin-right: 8px;
+}
+
+.is_defined_header {
+    width: 190px;
+}
+
+.is_defined {
+    width: 162px;
+    margin-right: 8px;
+}
+
+.is_minimal_header {
+    width: 100px;
+}
+
+.is_minimal {
+    width: 92px;
     margin-right: 8px;
 }
 
 
-.number_of_reactions_header {
-    width: 100px;
+.fba_model_id_header {
+    width: 160px;
 }
 
-.number_of_reactions {
-    width: 90px;
+.fba_model_id {
+    width: 152px;
+    margin-right: 8px;
+}
+
+.model-scientific-name-header {
+    width: 280px;
+}
+
+.model-scientific-name {
+    width: 272px;
+    margin-right: 8px;
+}
+
+.model-domain-header {
+    width: 80px;
+}
+
+.model-domain {
+    width: 72px;
     margin-right: 8px;
 }
 
 .number_of_features_header {
-    width: 90px;
+    width: 80px;
 }
 
 .number_of_features {
-    width: 80px;
+    width: 72px;
+    margin-right: 8px;
+}
+
+.number_of_reactions_header {
+    width: 90px;
+}
+
+.number_of_reactions {
+    width: 82px;
     margin-right: 8px;
 }
 
@@ -1009,7 +1118,7 @@ table.search-transfer-table {
 }
 
 .number_of_gapfillings {
-    width: 80px;
+    width: 72px;
     margin-right: 8px;
 }
 
@@ -1018,7 +1127,7 @@ table.search-transfer-table {
 }
 
 .number_of_compounds {
-    width: 80px;
+    width: 82px;
     margin-right: 8px;
 }
 

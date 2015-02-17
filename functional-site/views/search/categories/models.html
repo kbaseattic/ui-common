@@ -1,11 +1,13 @@
 <section ng-show="options.categoryCounts['models']">
     <div class='row'>                        
         <table>
-            <h3>Metabolic Models and Media</h3>
+            <h3>Metabolic Models and Media that match <i>{{options.searchOptions.general.q}}</i></h3>
+<!--
             <tr>
                 <th><h4>Category</h4></th>
                 <th class="search-space-left"><h4 class="search-space-left">Objects found</h4></th>
             </tr>
+-->
             <tr ng-show="options.searchCategories[p] && options.categoryCounts[p] > 0" ng-repeat="p in options.categoryRelationships.models.children">
                 <td class="search-category-title" ng-click="selectCategory(p)">
                     <a><span>{{options.searchCategories[p].label}}</span></a>
