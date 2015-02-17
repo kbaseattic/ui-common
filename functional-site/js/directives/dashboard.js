@@ -32,6 +32,18 @@ angular.module('dashboard-directives')
          }
       };
    })
+ .directive('dashboardpublicnarratives', function ($rootScope) {
+      return {
+         link: function (scope, ele, attrs) {
+            require(['kb.widget.dashboard.publicNarratives'], function (W) {
+               Object.create(W).init({
+                  container: $(ele),
+                  stateMachine: scope.stateMachine
+               }).go();
+            });
+         }
+      };
+   })
    .directive('dashboardprofile', function ($rootScope) {
       return {
          link: function (scope, ele, attrs) {

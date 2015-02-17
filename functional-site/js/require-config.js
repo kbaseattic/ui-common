@@ -88,6 +88,7 @@ require.config({
       'kb.widget.dashboard.profile': '/src/widgets/dashboard/ProfileWidget',
       'kb.widget.dashboard.sharedNarratives': '/src/widgets/dashboard/SharedNarrativesWidget',
       'kb.widget.dashboard.narratives': '/src/widgets/dashboard/NarrativesWidget',
+      'kb.widget.dashboard.publicNarratives': '/src/widgets/dashboard/PublicNarrativesWidget',
       'kb.widget.dashboard.apps': '/src/widgets/dashboard/AppsWidget',
       'kb.widget.dashboard.data': '/src/widgets/dashboard/DataWidget',
       'kb.widget.dashboard.collaborators': '/src/widgets/dashboard/CollaboratorsWidget', 
