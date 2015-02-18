@@ -69,6 +69,10 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
                      (i === bins.bins.length-1)
                    )) {
                   userBin = i;
+                  if ( (i === bins.bins.length-1) && (userValue > bin.upper) ) {                     
+                     bin.upper = userValue;
+                     bin.label = '(' + bin.lower + '-' + bin.upper + ']';
+                  }
                   break;
                }
             }
@@ -115,23 +119,34 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
                return col;
             });
             
-            console.log(bins);
-            
-            
             // user scaled to histogram.
             // put user value into the correct bin.
+            
             var userBin;
             for (var i=0; i<bins.bins.length; i++) {
                var bin = bins.bins[i];
-               if (userValue >= bin.lower && ( (bin.upperInclusive && userValue <= bin.upper) || (userValue < bin.upper))) {
+               if (userValue >= bin.lower && 
+                   ( (bin.upperInclusive && userValue <= bin.upper) || 
+                     (userValue < bin.upper) ||
+                     (i === bins.bins.length-1)
+                   )) {               
                   userBin = i;
+                  
+                  if ( (i === bins.bins.length-1) && (userValue > bin.upper) ) {                     
+                     bin.upper = userValue;
+                     bin.label = '(' + bin.lower + '-' + bin.upper + ']';
+                  }
+                  
                   break;
                }
             }
-            if (userBin !== undefined) {            
+             if (userBin !== undefined) {            
                var user = {
-                  scale: userBin * width + width/2,
-                  value: userValue
+                  scale: userBin * width + width/2 ,
+                  value: userValue,
+                  bin: userBin,
+                  side: (userBin < bins.bins.length/2 ? 'right':'left')
+                  
                }
             } else {
                var user = {scale: 0, value: 0}
