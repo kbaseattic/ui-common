@@ -143,6 +143,7 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
             });
          }
       },
+      
       setInitialState: {
          value: function () {
             return Q.promise(function (resolve, reject, notify) {

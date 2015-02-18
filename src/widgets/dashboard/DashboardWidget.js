@@ -316,19 +316,19 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                this.renderUI();
                this.renderWaitingView();
                this.setInitialState()
-                  .then(function () {
-                     this.setupUI();
+               .then(function () {
+                  this.initialStateSet = true;
+                  this.setupUI();
                }.bind(this))
-                  .then(function () {
-                     this.refresh()
-                  }.bind(this))
-                  .catch(function (err) {
-                     console.log('ERROR');
-                     console.log(err);
-
-                     this.setError(err);
-                  }.bind(this))
-                  .done();
+               .then(function () {
+                  this.refresh()
+               }.bind(this))
+               .catch(function (err) {
+                  console.log('ERROR');
+                  console.log(err);
+                  this.setError(err);
+               }.bind(this))
+               .done();
             }
          },
 
@@ -433,7 +433,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                         this.refreshTimer = null;
                         this.render();
                         resolve();
-                     }.bind(this), 0);
+                     }.bind(this), 100);
                   }
                }.bind(this));
             }
@@ -680,12 +680,16 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                   if (this.error) {
                      this.renderError();
                   } else if (Session.isLoggedIn()) {
-                    this.setTitle(this.widgetTitle);
-                     this.places.content.html(this.renderTemplate('authorized'));
+                     if (this.initialStateSet) {
+                        this.setTitle(this.widgetTitle);
+                        this.places.content.html(this.renderTemplate('authorized'));
+                     }
                   } else {
-                     // no profile, no basic aaccount info
-                    this.setTitle(this.widgetTitle);
-                     this.places.content.html(this.renderTemplate('unauthorized'));
+                     if (this.initialStateSet) {
+                        // no profile, no basic aaccount info
+                        this.setTitle(this.widgetTitle);
+                        this.places.content.html(this.renderTemplate('unauthorized'));
+                     }
                   }
                   if (this.afterRender) {
                      this.afterRender();

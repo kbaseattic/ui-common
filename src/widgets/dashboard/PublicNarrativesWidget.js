@@ -13,28 +13,28 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
 
                this.view = 'slider';
                this.templates.env.addFilter('appName', function (x) {
-                  return this.getState(['appsMap', x, 'name'], x); 
+                  return this.getState(['appsMap', x, 'name'], x);
                }.bind(this));
-                this.templates.env.addFilter('methodName', function (x) {
-                  return this.getState(['methodsMap', x, 'name'], x); 
+               this.templates.env.addFilter('methodName', function (x) {
+                  return this.getState(['methodsMap', x, 'name'], x);
                }.bind(this));
                return this;
             }
          },
          getAppName: {
             value: function (name) {
-               return this.getState(['appsMap', name, 'name'], name); 
+               return this.getState(['appsMap', name, 'name'], name);
             }
          },
          getMethodName: {
             value: function (name) {
-               return this.getState(['methodsMap', name, 'name'], name); 
+               return this.getState(['methodsMap', name, 'name'], name);
             }
          },
          go: {
             value: function () {
                this.start();
-               
+
                /*Postal.channel('dashboard.metrics')
                .subscribe('query.sharedNarratives', function (data) {
                   if (this.hasState('narratives')) {
@@ -71,8 +71,8 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
 
             }
          },
-         
-           setupUI: {
+
+         setupUI: {
             value: function () {
                if (this.hasState('narratives') && this.getState('narratives').length > 0) {
                   this.buttonbar = Object.create(Buttonbar).init({
@@ -80,37 +80,47 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                   });
                   this.buttonbar
                      .clear()
-                    
-                     /*.addRadioToggle({
-                        buttons: [
-                           {
-                              label: 'Slider',
-                              active: true,
-                              class: 'btn-kbase',
-                              callback: function (e) {
-                                 this.view = 'slider';
-                                 this.refresh();
-                              }.bind(this)
-                                 },
-                           {
-                              label: 'Table',
-                              class: 'btn-kbase',
-                              callback: function (e) {
-                                 this.view = 'table';
-                                 this.refresh();
-                              }.bind(this)
-                                 }]
-                     })
-                     */
-                     .addInput({
-                        placeholder: 'Search',
-                        place: 'end',
-                        onkeyup: function (e) {
-                           this.filterState({
-                              search: $(e.target).val()
-                           });
-                        }.bind(this)
-                     });
+
+                  /*.addRadioToggle({
+                     buttons: [
+                        {
+                           label: 'Slider',
+                           active: true,
+                           class: 'btn-kbase',
+                           callback: function (e) {
+                              this.view = 'slider';
+                              this.refresh();
+                           }.bind(this)
+                              },
+                        {
+                           label: 'Table',
+                           class: 'btn-kbase',
+                           callback: function (e) {
+                              this.view = 'table';
+                              this.refresh();
+                           }.bind(this)
+                              }]
+                  })
+                  */
+                  .addInput({
+                     placeholder: 'Search',
+                     place: 'end',
+                     onkeyup: function (e) {
+                        // little hack to make sure the public narratives is opened up.
+                        var collapse = this.places.title;
+                        // console.log(collapse.hasClass('collapsed'));
+                        if (collapse.hasClass('collapsed')) {
+                           var id = collapse.attr('data-target');
+                           $(id).collapse('show');
+                           //console.log('opening...');
+                           //collapse.collapse('show');
+                        }
+
+                        this.filterState({
+                           search: $(e.target).val()
+                        });
+                     }.bind(this)
+                  });
                }
             }
          },
@@ -135,36 +145,33 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
             }
          },
 
-
-
-           filterState: {
+         filterState: {
             value: function (options) {
                if (!options.search || options.search.length === 0) {
-                  this.setState('narrativesFiltered', this.getState('narratives')); 
+                  this.setState('narrativesFiltered', this.getState('narratives'));
                   return;
                }
                var searchRe = new RegExp(options.search, 'i');
                var nar = this.getState('narratives').filter(function (x) {
                   if (x.workspace.metadata.narrative_nice_name.match(searchRe) ||
-                      (x.object.metadata.cellInfo &&
-                      (function (apps) {
-                         for (var i in apps) {
-                            var app = apps[i];
-                            if (app.match(searchRe) || this.getAppName(app).match(searchRe)) {
-                               return true;
-                            }
-                         }
-                       }.bind(this))(Object.keys(x.object.metadata.cellInfo.app))) ||
-                      (x.object.metadata.cellInfo &&
-                       (function (methods) {
-                         for (var i in methods) {
-                            var method = methods[i];
-                            if (method.match(searchRe) || this.getMethodName(method).match(searchRe)) {
-                               return true;
-                            }
-                         }
-                        }.bind(this))(Object.keys(x.object.metadata.cellInfo.method))) )
-                      {
+                     (x.object.metadata.cellInfo &&
+                        (function (apps) {
+                           for (var i in apps) {
+                              var app = apps[i];
+                              if (app.match(searchRe) || this.getAppName(app).match(searchRe)) {
+                                 return true;
+                              }
+                           }
+                        }.bind(this))(Object.keys(x.object.metadata.cellInfo.app))) ||
+                     (x.object.metadata.cellInfo &&
+                        (function (methods) {
+                           for (var i in methods) {
+                              var method = methods[i];
+                              if (method.match(searchRe) || this.getMethodName(method).match(searchRe)) {
+                                 return true;
+                              }
+                           }
+                        }.bind(this))(Object.keys(x.object.metadata.cellInfo.method)))) {
                      return true;
                   } else {
                      return false;
@@ -173,12 +180,16 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                this.setState('narrativesFiltered', nar);
             }
          },
-         
+
          onStateChange: {
             value: function () {
-               var count = this.doState('narratives', function(x){return x.length}, null);
-               var filtered = this.doState('narrativesFiltered', function(x){return x.length}, null);
-              
+               var count = this.doState('narratives', function (x) {
+                  return x.length
+               }, null);
+               var filtered = this.doState('narrativesFiltered', function (x) {
+                  return x.length
+               }, null);
+
                this.viewState.setItem('publicNarratives', {
                   count: count,
                   filtered: filtered
@@ -193,13 +204,12 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
             }
          },
 
-
          setInitialState: {
             value: function (options) {
                return Q.promise(function (resolve, reject, notify) {
                   // Get all workspaces, filter out those owned by the user,
                   // and those that are public
-                  
+
                   Q.all([this.kbservice.getNarratives({
                            params: {
                               showDeleted: 0,
@@ -212,23 +222,23 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                         var narratives = result[0];
                         var apps = result[1];
                         var methods = result[2];
-                     
-                     
-                      this.setState('apps', apps);
+
+
+                        this.setState('apps', apps);
                         var appsMap = {};
                         apps.forEach(function (app) {
                            appsMap[app.id] = app;
                         });
                         this.setState('appsMap', appsMap);
-                     
+
                         this.setState('methods', methods);
                         var methodsMap = {};
                         methods.forEach(function (method) {
                            methodsMap[method.id] = method;
-                        }); 
+                        });
                         this.setState('methodsMap', methodsMap);
-                     
-                     
+
+
                         if (narratives.length === 0) {
                            this.setState('narratives', []);
                            resolve();
@@ -255,7 +265,7 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                               });
                               this.setState('narratives', narratives);
                               this.setState('narrativesFiltered', narratives);
-                           
+
                               resolve();
                            }.bind(this))
                            .catch(function (err) {

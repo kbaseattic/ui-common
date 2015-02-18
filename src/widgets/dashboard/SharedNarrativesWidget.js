@@ -122,19 +122,22 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                if (this.error) {
                   this.renderError();
                } else if (Session.isLoggedIn()) {
-                  this.places.title.html(this.widgetTitle);
-                  this.places.content.html(this.renderTemplate(this.view));
+                  if (this.initialStateSet) {
+                     this.places.title.html(this.widgetTitle);
+                     this.places.content.html(this.renderTemplate(this.view));
+                  }
                } else {
-                  // no profile, no basic aaccount info
-                  this.places.title.html(this.widgetTitle);
-                  this.places.content.html(this.renderTemplate('unauthorized'));
+                  if (this.initialStateSet) {
+                     // no profile, no basic aaccount info
+                     this.places.title.html(this.widgetTitle);
+                     this.places.content.html(this.renderTemplate('unauthorized'));
+                  }
                }
                this.container.find('[data-toggle="popover"]').popover();
                this.container.find('[data-toggle="tooltip"]').tooltip();
                return this;
             }
          },
-
 
 
            filterState: {

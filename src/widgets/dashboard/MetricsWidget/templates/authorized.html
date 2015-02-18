@@ -49,7 +49,8 @@
 <div style="width: 100%; height: 100px; border: 0px dashed red; position: relative; margin-top: 20px;">
    <div style="width: 100%; height: 100px;">
       {% for chart in state.histogram.narratives.chart %}
-         <div style="position: absolute; bottom: 0; left: {{loop.index0 * chart.width}}%; width: {{chart.width}}%; width: {{chart.width}}%; height: {{chart.height}}%;  background-color: #CECECE;"> 
+         <div style="position: absolute; bottom: 0; left: {{loop.index0 * chart.width}}%; width: {{chart.width}}%; width: {{chart.width}}%; height: {{chart.height}}%;"> 
+            <div style="position: absolute; top: 0; left:5px; right: 5px; bottom: 0;    background-color: #CECECE;"></div>
             <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.count}}</div>
             
             <!-- bin boundaries commented out 
@@ -63,9 +64,9 @@
       {% endfor %}
 
       <!-- The user's value here -->
-      <div style="position: absolute; bottom: 0; left: {{state.histogram.narratives.user.scale|round}}%; width: 6px; height: 100%; background-color: green;">
+      <div style="position: absolute; bottom: 0; left: {{state.histogram.narratives.user.scale|round}}%; width: 6px; height: 100%; background-color: rgba(75,184,86,0.7);">
          
-         <div style="position: absolute; top: 0; left; 0;"><span class="label label-default" style="opacity: 0.5;">You - {{state.histogram.narratives.user.value}}</span></div>
+         <div style="position: absolute; top: 0; left: 6px;"><div class="" style="color: #fff; font-weight: bold; font-size: 80%; background-color: rgba(75,184,86,0.7); white-space: nowrap; padding:  3px 6px 3px 3px;">You - {{state.histogram.narratives.user.value}}</div></div>
          
       </div>
 
@@ -105,23 +106,24 @@
 <div style="width: 100%; height: 100px; border: 0px dashed red; position: relative; margin-bottom: 20px;">
    <div style="width: 100%; height: 100px;">
       {% for chart in state.histogram.sharedNarratives.chart %}
-         <div style="position: absolute; bottom: 0; left: {{loop.index0 * chart.width}}%; width: {{chart.width}}%; width: {{chart.width}}%; height: {{chart.height}}%;  background-color: #CECECE;"> 
-             <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.count}}</div>
+         <div style="position: absolute; bottom: 0; left: {{loop.index0 * chart.width}}%; width: {{chart.width}}%; width: {{chart.width}}%; height: {{chart.height}}%;"> 
+            <div style="position: absolute; top: 0; left:5px; right: 5px; bottom: 0;    background-color: #CECECE;"></div>
+            <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.count}}</div>
             
             <!-- bin boundaries commented out 
              <div style="position: absolute; bottom: 0; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.label}}</div>
              -->
-              {% if loop.first %}
+            {% if loop.first %}
                <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: left;">{{chart.lower}}</div>
             {% endif %}
              <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: right;">{{chart.upper}}</div>
          </div>
       {% endfor %}
 
-      <!-- The user's value here -->
-      <div style="position: absolute; bottom: 0; left: {{state.histogram.sharedNarratives.user.scale|round}}%; width: 6px; height: 100%; background-color: green;">
+     <!-- The user's value here -->
+      <div style="position: absolute; bottom: 0; left: {{state.histogram.sharedNarratives.user.scale|round}}%; width: 6px; height: 100%; background-color: rgba(75,184,86,0.7);">
          
-         <div style="position: absolute; top: 0; left; 0;"><span class="label label-default" style="opacity: 0.5;">You - {{state.histogram.sharedNarratives.user.value}}</span></div>
+         <div style="position: absolute; top: 0; left: 6px;"><div class="" style="color: #fff; font-weight: bold; font-size: 80%; background-color: rgba(75,184,86,0.7); white-space: nowrap; padding: 3px 6px 3px 3px;">You - {{state.histogram.sharedNarratives.user.value}}</div></div>
          
       </div>
 

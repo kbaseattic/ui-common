@@ -55,8 +55,6 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
             }
          },
 
-         
-
          setInitialState: {
             value: function () {
                var widget = this;
@@ -170,8 +168,6 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                }.bind(this));
             }
          }
-
-
       });
 
       return widget;
