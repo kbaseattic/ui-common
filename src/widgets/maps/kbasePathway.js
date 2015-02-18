@@ -582,7 +582,7 @@ $.KBWidget({
                 .attr("dy", ".35em")
                 .style('font-size', '8pt')
                 .attr("transform", function(d) {
-                    if (d.label_x &&  d.label_y)
+                    if (d.label_x || d.label_y)
                         return "translate(" + d.label_x + "," + d.label_y + ")";
                 })
                 .text(function(d) { return d.name; });
