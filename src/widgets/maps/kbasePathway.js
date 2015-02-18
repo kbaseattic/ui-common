@@ -1,5 +1,7 @@
 (function( $, undefined ) {
 
+'use strict';
+
 $.KBWidget({
     name: "kbasePathway",
     version: "1.0.0",
@@ -9,7 +11,9 @@ $.KBWidget({
     init: function(options) {
         var self = this;
         this._super(options);
+        var container = this.$elem;
 
+        // params
         self.model_ws = options.model_ws;
         self.model_name = options.model_name;
         self.fba_ws = options.fba_ws;
@@ -18,7 +22,7 @@ $.KBWidget({
         self.map_name = options.map_name;
         self.image = options.image;
 
-
+        // optional params
         self.models = options.models;
         self.fbas = options.fbas;
 
@@ -31,19 +35,34 @@ $.KBWidget({
 
         self.map_id = options.mapID;
 
-        var container = this.$elem;
+        var stroke_color = '#888',
+            strokeColorDark = '#000',
+            highlight = 'steelblue';
 
-        var stroke_color = '#666';
-        var stroke_color2 = '#000';
-        var stroke_width = '1px';
-        var highlight = 'steelblue';
+        var flux_threshold = 0.001,
+            negFluxColors = ['#910000', '#e52222', '#ff4444', '#fc8888', '#fcabab'],
+            fluxColors = ['#0d8200', '#1cd104','#93e572','#99db9d', '#c7e8cd'],
+            bounds = [1000, 500, 200, 25, 0, -25, -200, -500, -1000],
+            gapfill_color = '#f000ff',
+            gene_stroke = '#777',
+            g_present_color = '#8bc7e5';
 
-        var flux_threshold = 0.001;
-        var heat_colors = ['#8A0000','#AD3333', '#C26666', '#E0B2B2', '#f28e8e'];
-        var neg_heat_colors = ['#007A00','#19A319', '#80CC80', '#B2E0B2', '#dded00'];
-        var gapfill_color = '#f000ff';
-        var gene_stroke = '#777';
-        var g_present_color = '#8bc7e5';
+        // globals
+        var groups,    // groups of reactions
+            rxns,      // reactions
+            cpds,      // compounds
+            maplinks;  // lines from reactions to maps and visa versa
+
+
+        var oset = 12,       // off set for arrows
+            threshold = 2,   // threshold for deciding if connection is linear
+            r = 12,          // radial offset from circle.  Hooray for math degrees.
+            max_x = 0,       // used for canvas size
+            max_y = 0,       // used for canvas size
+            c_pad = 200,     // padding around max_x/max_y
+            svg = undefined; // svg element for map
+
+        var fba_objs
 
         // if data was sent to widget, don't fetch.  I know, it's crazy
         if (!self.models) {
@@ -80,20 +99,13 @@ $.KBWidget({
 
             console.log('so the models are ', self.models, self.fbas)
             self.map_data = self.map_data[0].data;
-            rxns = self.map_data.reactions;
-            cpds = self.map_data.compounds;
+
+            rxns = self.map_data.reactions,
+            cpds = self.map_data.compounds,
             maplinks = self.map_data.linkedmaps;
             groups = self.map_data.groups;
 
-            oset = 12, // off set for arrows
-                threshold = 2, // threshold for deciding if connection is linear
-                r = 12, // radial offset from circle.  Hooray for math degrees.
-                max_x = 0,  // used for canvas size
-                max_y = 0,  // used for canvas size
-                c_pad = 200,  // padding around max_x/max_y
-                svg = undefined;
-
-            data = []
+            var data = []
             for (var i in rxns) {
                 data.push({'products': rxns[i].product_refs, 'substrates': rxns[i].substrate_refs});
             }
@@ -101,16 +113,18 @@ $.KBWidget({
             self.drawMap()
         }
 
-
         self.drawMap = function() {
             container.html('')
-            container.html('<img class="pathway-png" src="data/map/'+self.map_name+'.png">');
-            container.append('<div id="'+self.map_name+'_pathway" class="pathway"></div>');
 
+            if (self.image)
+                container.html('<img class="pathway-png" src="data/map/'+self.map_name+'.png">');
 
-            svg = d3.select('#'+self.map_name+'_pathway').append("svg")
-                                        .attr("width", 800)
-                                       .attr("height", 1000);
+            container.append('<div id="'+self.map_name+'_pathway" class="pathway">');
+
+            svg = d3.select('#'+self.map_name+'_pathway')
+                                    .append("svg")
+                                    .attr("width", 800)
+                                    .attr("height", 1000);
 
             // add arrow markers for use
             svg.append("svg:defs").selectAll("marker")
@@ -120,8 +134,8 @@ $.KBWidget({
                 .attr("viewBox", "0 -5 10 10")
                 .attr("refX", 16)
                 .attr("refY", 0)
-                .attr("markerWidth", 7)
-                .attr("markerHeight", 7)
+                .attr("markerWidth", 10)
+                .attr("markerHeight", 10)
                 .attr("orient", "auto")
                 .attr('fill', '#666')
               .append("svg:path")
@@ -147,9 +161,8 @@ $.KBWidget({
             svg.attr("width", max_x)
                .attr("height", max_y);
 
-            if (options.editable) {
+            if (options.editable)
                 editable()
-            }
         }
 
 
@@ -194,76 +207,96 @@ $.KBWidget({
 
         // draw reactions
         function drawReactions() {
+            var count = self.models.length;
 
             // for each rxn on the map
-            for (var i in rxns) {
+            for (var i=0; i<rxns.length; i++) {
                 var color = '#fff'
 
                 var rxn = rxns[i];
 
-                var x = rxn.x - rxn.w/2,
-                    y = rxn.y - rxn.h/2,
-                    w = rxn.w+2,
-                    h = rxn.h+2;
+                // adjust boxes
+                var x = rxn.x - rxn.w/2 - 1,
+                    y = rxn.y - rxn.h/2 - 1.5,
+                    w = rxn.w + 2,
+                    h = rxn.h + 2;
+
+
+                // adjust canvas size
                 if (x > max_x) max_x = x+w+c_pad;
                 if (y > max_y) max_y = y+h+c_pad;
 
                 var group = svg.append('g').attr('class', 'rect');
 
-                // draw reactions (rectangles)
+                // draw enzymes (rectangles)
                 var outer_rect = group.append('rect')
                                   .attr('class', 'rxn')
-                                  .attr('x', x-1)
-                                  .attr('y', y-1)
-                                  .attr('width', w+1)
-                                  .attr('height', h+1)
-                                  .attr('stroke-width', stroke_width)
+                                  .attr('x', x)
+                                  .attr('y', y)
+                                  .attr('width', w)
+                                  .attr('height', h);
 
-                found_rxns = getModelRxns(rxn.rxns);
+                var found_rxns = getModelRxns(rxn.rxns);
 
                 // divide box for number of models being displayed
                 if (self.models) {
-                    var w = rxn.w / self.models.length;
+                    var w = rxn.w / count;
 
-                    for (var i in found_rxns) {
-                        var found_rxn = found_rxns[i];
-                            var rect = group.append('rect')
-                                        .attr('x', x+((w+1)*i)-1)
-                                        .attr('y', y-1)
-                                        .attr('width', w+2)
-                                        .attr('height', h+1)
+                    for (var j=0; j<found_rxns.length; j++) {
+                        var found_rxn = found_rxns[j];
+
+                        var rect = group.append('rect')
+                                    .attr('class', 'rxn-divider')
+                                    .attr('x', function() {
+                                        if (j == 0) return x + (w*j) + 1;
+                                        return x + (w*j)
+                                    })
+                                    .attr('y', y+1)
+                                    .attr('width', function() {
+                                        if (j == count) return w;
+                                        return w + 1
+                                    })
+                                    .attr('height', h-1.5)
+
 
                         if (found_rxn.length > 0) {
                             rect.attr('fill', '#bbe8f9');
-                            rect.attr('stroke', stroke_color2);
-                            outer_rect.remove()
+                            rect.attr('stroke', strokeColorDark);
+                            //outer_rect.remove()
                         } else {
                             rect.attr('fill', '#fff')
-                            rect.attr('stroke', stroke_color2);
+                            rect.attr('stroke', strokeColorDark);
                         }
 
-                        tooltip(rect.node(), rxn);
+                        var title = '<h5>'+self.models[j].name+'<br>'+
+                                    '<small>'+self.models[j].source_id+'</small></h5>';
+                        tooltip(rect.node(), title, rxn);
                     }
                 }
 
-                fba_rxns = getFbaRxns(rxn.rxns);
-
-
+                var fba_rxns = getFbaRxns(rxn.rxns);
 
                 // color flux depending on rxns found for each modle
+
                 if (self.fbas) {
                     var w = rxn.w / self.fbas.length;
-
-                    for (var i in fba_rxns) {
+                    console.log('fba_rxns', fba_rxns)
+                    for (var j=0; j<fba_rxns.length; j++) {
                         var flux;
-                        var found_rxns = fba_rxns[i];
+                        var found_rxn = fba_rxns[i];
                         var rect = group.append('rect')
-                                        .attr('x',  x+((w+1)*i)-1)
-                                        .attr('y', y-1)
-                                        .attr('width', w+2)
-                                        .attr('height', h+1);
+                                    .attr('x', function() {
+                                        if (j == 0) return x + (w*j) + 1;
+                                        return x + (w*j)
+                                    })
+                                    .attr('y', y+1)
+                                    .attr('width', function() {
+                                        if (j == count) return w;
+                                        return w + 1
+                                    })
+                                    .attr('height', h-1.5)
 
-
+                        /*
                         if (found_rxns.length) {
                             //find largest magnitude flux
                             flux = 0
@@ -271,38 +304,39 @@ $.KBWidget({
                                 if (Math.abs(found_rxns[j].value) > Math.abs(flux) )
                                     flux = found_rxns[j].value;
                             }
-
-                        }
-
-
-                        if (flux)
-                            var color = get_heat_color(flux);
+                        }*/
 
 
-                        //$('.col-md-9').append('flux: '+ flux + ' color: '+color + '  '+JSON.stringify(found_rxns)+'<br>')
-                        //$('.col-md-9').append('rxn '+ JSON.stringify(rxn.rxns)+' color: '+ color+'<br>')
+                        if (flux) var color = getColor(flux);
+
                         rect.attr('fill', color);
-                        if (color != '#fff') {
-                            rect.attr('stroke', stroke_color2);
-                            outer_rect.remove();
-                        }
+                        //if (color != '#fff') {
+                        //    rect.attr('stroke', stroke_color);
+                            //outer_rect.remove();
+                        //}
 
-                        tooltip(rect.node(), rxn, flux);
+                        //var title = self.fbas[i].info[1];
+                        //var title = self.models[i].name+'<br>'+self.models[i].source_id;
+                        //tooltip(rect.node(), title, rxn, flux, self.fbas[i]);
                     }
                 }
 
 
+                var text = group.append('text')
+                                .attr('x', x+2)
+                                .attr('y', y+h/2+6)
+                                .text(rxn.name)
+                                .attr('class', 'rxn-label');
 
+
+                //if ($('[data-type=rxn-label]').attr('checked')) {
                 // hide and show text on hoverover
-                $(group.node()).hover(function() {
-                    if ($('[data-type=rxn-label]').attr('checked')) {
-                        $(this).find('text').hide();
-                    }
+                /*$(group.node()).hover(function() {
+                    $(this).find('text').hide();
                 }, function() {
-                    if ($('[data-type=rxn-label]').attr('checked')) {
-                        $(this).find('text').show();
-                    }
-                })
+                    $(this).find('text').show();
+
+                })*/
             }
 
             // bad attempt at adding data for use later
@@ -311,7 +345,7 @@ $.KBWidget({
         }
 
 
-        function tooltip(container, rxn, flux) {
+        function tooltip(container, title, rxn, flux, obj) {
             // get substrates and products
             var subs = []
             for (var i in rxn.substrate_refs) {
@@ -322,6 +356,7 @@ $.KBWidget({
                 prods.push(rxn.product_refs[i].compound_ref);
             }
 
+
             // add reaction label
             //var text = group.append('text').text(rxn.name)
             //                  .attr('x', x+2)
@@ -330,14 +365,15 @@ $.KBWidget({
 
 
             //content for tooltip
-            var content = 'ID: ' + rxn.id+'<br>'+
-                          'Rxns: ' + rxn.rxns.join(', ')+'<br>'+
-                          'Substrates: ' + subs.join(', ')+'<br>'+
-                          'Products: ' + prods.join(', ')+'<br><br>'+
-                          'Flux: '+ (flux ? flux : 'None');
+            var content = '<table class="table table-condensed">'+
+                              '<tr><td><b>ID</b></td><td>'+rxn.id+'</td></tr>'+
+                              '<tr><td><b>Rxns</b></td><td>'+ rxn.rxns.join(', ')+'</td></tr>'+
+                              '<tr><td><b>Substrates</b></td><td>'+subs.join(', ')+'</td></tr>'+
+                              '<tr><td><b>Products</b></td><td>'+prods.join(', ')+'</td></tr>'+
+                              (typeof flux != 'undefined' ? '<tr><td>Flux</td><td>'+flux+'</td></tr>' : '')+
+                           '</table>'
 
-
-            $(container).popover({html: true, content: content, animation: false,
+            $(container).popover({html: true, content: content, animation: false, title: title,
                                     container: 'body', trigger: 'hover'});
         }
 
@@ -385,7 +421,7 @@ $.KBWidget({
                 var prods = rxn.product_refs;
                 var subs = rxn.substrate_refs;
 
-                // draw substrate lines
+                // create substrate line (links)
                 for (var i in subs) {
                     var sub_id = subs[i].id
 
@@ -436,7 +472,7 @@ $.KBWidget({
                     }
                 }
 
-                // draw product lines
+                // create product lines (links)
                 for (var i in prods) {
                     var prod_id = prods[i].id
 
@@ -484,26 +520,26 @@ $.KBWidget({
                 }
             }
 
-
             // the following does all the drawing
-            force = d3.layout.force()
-                            .nodes(nodes)
-                            .links(links)
-                            .charge(-400)
-                            .linkDistance(40)
-                            .on('tick', tick)
-                            .start()
+            var force = d3.layout.force()
+                          .nodes(nodes)
+                          .links(links)
+                          .charge(-400)
+                          .linkDistance(40)
+                          .on('tick', tick)
+                          .start()
 
             // define connections between compounds and reactions (nodes)
             var link = svg.selectAll(".link")
                   .data(links)
                 .enter().append("g").append('line')
                   .attr("class", "link")
-                  .style("stroke-width", stroke_width)
-                  .style('stroke', function(d) {
+
+                  /*.style('stroke', function(d) {
                         c = '#666';
 
                         // if there is fba data, color lines
+
                         if (self.fbas) {
                             // fixme: this only works for one model
                             var found_rxns = getFbaRxns(d.rxns)[0]
@@ -528,7 +564,7 @@ $.KBWidget({
                         } else {
                             return c;
                         }
-                  })
+                  })*/
 
             var node = svg.selectAll(".node")
                   .data(nodes)
@@ -537,16 +573,18 @@ $.KBWidget({
                   .call(force.drag)
 
             node.append("circle")
-                  .attr('fill', '#fff')
-                  .style('stroke-width', stroke_width)
-                  .attr('stroke', stroke_color)
+                .attr('class', 'cpd')
 
+            //fix me!  tranform dep?
             node.append("text")
                 .attr("class", "cpd-label")
                 .attr("x", 10)
                 .attr("dy", ".35em")
                 .style('font-size', '8pt')
-                .attr("transform", function(d) { return "translate(" + d.label_x + "," + d.label_y + ")"; })
+                .attr("transform", function(d) {
+                    if (d.label_x &&  d.label_y)
+                        return "translate(" + d.label_x + "," + d.label_y + ")";
+                })
                 .text(function(d) { return d.name; });
 
 
@@ -567,26 +605,26 @@ $.KBWidget({
 
                 // size the circles depending on kind of point
                 node.select('circle').attr("r", function(d) {
-                        if (d.style == "point") {
+                        if (d.style == "point")
                             return 0;
-                        } else if (d.style == "reaction") {
+                        else if (d.style == "reaction")
                             return 1;
-                        } else {
+                        else
                             return 7;
-                        }
                     })
             };
 
         } // end draw connections
 
         function drawMapLinks() {
-            for (var i in maplinks) {
+            for (var i=0; i<maplinks.length; i++) {
                 var map = maplinks[i];
 
                 var x = map.x - map.w/2,
                     y = map.y - map.h/2,
                     w = parseInt(map.w)+2,
                     h = parseInt(map.h)+2;
+
                 if (x > max_x) max_x = x+w+c_pad;
                 if (y > max_y) max_y = y+h+c_pad;
 
@@ -607,7 +645,6 @@ $.KBWidget({
                                   .attr('x', x+2)
                                   .attr('y', y+10)
                                   .call(wrap, w+2);
-
             }
 
         }
@@ -656,12 +693,12 @@ $.KBWidget({
             // for each model, look for model data
             for (var j in self.models) {
                 var model = self.models[j];
-                rxn_objs = model.modelreactions;
+                var rxn_objs = model.modelreactions;
 
                 // see if we can find the rxn in that model's list of reactions
                 var found_rxn = [];
                 for (var i in rxn_objs) {
-                    rxn_obj = rxn_objs[i];
+                    var rxn_obj = rxn_objs[i];
                     if (rxn_ids.indexOf(rxn_obj.id.split('_')[0]) != -1) {
                         found_rxn.push(rxn_obj);
                     }
@@ -674,8 +711,6 @@ $.KBWidget({
         }
 
         function getFbaRxns(rxn_ids) {
-            console.log('rxn_ids', rxn_ids);
-
             // get a list of fba arrays (or undefined)
             // for each model supplied
             var found_rxns = [];
@@ -686,16 +721,14 @@ $.KBWidget({
                 var fba = self.fbas[j];
                 if (!fba) continue;
                 fba_objs = fba.data.FBAReactionVariables;
-                console.log('fba_objs', fba_objs)
 
                 // see if we can find the rxn in that fbas's list of reactions
                 var found_rxn = [];
 
                 for (var i in fba_objs) {
-                    fba_obj = fba_objs[i];
-                    if (rxn_ids.indexOf(fba_obj.modelreaction_ref.split('/')[5].split('_')[0]) != -1) {
+                    var fba_obj = fba_objs[i];
+                    if (rxn_ids.indexOf(fba_obj.modelreaction_ref.split('/')[5].split('_')[0]) != -1)
                         found_rxn.push(fba_obj);
-                    }
                 }
 
                 found_rxns.push(found_rxn); // either an reaction object or undefined
@@ -703,28 +736,35 @@ $.KBWidget({
             return found_rxns;
         }
 
-        function get_heat_color(flux) {
-            if (flux >= 100){
-                var color = heat_colors[0];
-            } else if (flux >= 50) {
-                var color = heat_colors[1];
-            } else if (flux >= 10) {
-                var color = heat_colors[2];
-            } else if (flux >= 5) {
-                var color = heat_colors[3];
-            } else if (flux <= -5) {
-                var color = neg_heat_colors[0]
-            } else if (flux <= -10) {
-                var color = neg_heat_colors[1]
-            } else if (flux <= -50) {
-                var color = neg_heat_colors[2]
-            } else if (flux <= -100) {
-                var color = neg_heat_colors[3]
-            } else {
-                var color = '#fff';
-            }
+        function getColor(v) {
+            // ignore values 'close' to 0
+            if (Math.abs(v) <= .0001)
+                return undefined;
 
-            return color;
+            if (v >= bounds[0])
+                return fluxColors[0];
+            else if (v >= bounds[1])
+                return fluxColors[1];
+            else if (v >= bounds[2])
+                return fluxColors[2];
+            else if (v >= bounds[3])
+                return fluxColors[3];
+            else if (v > bounds[4])
+                return fluxColors[4];
+            else if (v == bounds[4])
+                return gene_color;
+            else if (v <= bounds[5])
+                return negFluxColors[0];
+            else if (v <= bounds[6])
+                return negFluxColors[1];
+            else if (v <= bounds[7])
+                return negFluxColors[2];
+            else if (v <= bounds[8])
+                return negFluxColors[3];
+            else if (v < 0)
+                return negFluxColors[4];
+
+            return undefined;
         }
 
 

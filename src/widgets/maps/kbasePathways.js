@@ -1,5 +1,7 @@
 (function( $, undefined ) {
 
+'use strict';
+
 $.KBWidget({
     name: "kbasePathways",
     version: "1.0.0",
@@ -40,22 +42,21 @@ $.KBWidget({
                     "aaSorting": [[ 1, "asc" ]],
                     "aoColumns": [
                         { sTitle: 'Name', mData: function(d) {
-                            return '<a class="pathway-link" data-map_id="'+d[1]+'">'+d[10].name+'</a>';
+                            return '<a class="pathway-link" data-map-id="'+d[1]+'">'+d[10].name+'</a>';
                         }},
                         { sTitle: 'Map ID', mData: 1},
                         { sTitle: 'Rxn Count', sWidth: '10%', mData: function(d){
-                            if ('reaction_ids' in d[10]){
+                            if ('reaction_ids' in d[10])
                                 return d[10].reaction_ids.split(',').length;
-                            } else {
+                            else
                                 return 'N/A';
-                            }
                         }},
                         { sTitle: 'Cpd Count', sWidth: '10%', mData: function(d) {
-                            if ('compound_ids' in d[10]) {
+                            if ('compound_ids' in d[10])
                                 return d[10].compound_ids.split(',').length;
-                            } else {
+                            else
                                 return 'N/A';
-                            }
+
                         }} ,
                         { sTitle: "Source","sWidth": "10%", mData: function(d) {
                             return "KEGG";
@@ -84,14 +85,14 @@ $.KBWidget({
             // event for clicking on pathway link
             container.find('.pathway-link').unbind('click')
             container.find('.pathway-link').click(function() {
-                var map_id = $(this).data('map_id');
-                var name = $(this).text();
+                var mapID = $(this).data('map-id'),
+                    name = $(this).text();
                 var exists;
 
-                var container = $('<div id="path-'+map_id+'" class="path-container">');
+                var container = $('<div id="path-'+mapID+'" class="path-container">');
                 container.loading();
                 tabs.addTab({name: name, removable: true, content: container});
-                load_map(map_id, container);
+                load_map(mapID, container);
                 tabs.showTab(name);
             });
 
