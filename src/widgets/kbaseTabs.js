@@ -122,7 +122,7 @@
             }
 
             var $tab = $('<div></div>')
-                .addClass('tab-pane fade')
+                .addClass('tab-pane')
                 .append(tab.content);
 
             if (this.options.border) {
@@ -255,14 +255,15 @@
         shouldShowTab : function (tab) { return 1; },
 
         deletePrompt : function(tabName) {
-            var $deleteModal = $('<div></div>').kbaseDeletePrompt(
+	    this.removeTab(tabName);
+            /*var $deleteModal = $('<div></div>').kbaseDeletePrompt(
                 {
                     name     : tabName,
                     callback : this.deleteTabCallback(tabName),
                 }
             );
 
-            $deleteModal.openPrompt();
+            $deleteModal.openPrompt();*/
         },
 
         deleteTabCallback : function (tabName) {
