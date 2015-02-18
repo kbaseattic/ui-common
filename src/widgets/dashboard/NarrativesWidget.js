@@ -307,6 +307,7 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                               });
                               this.setState('narratives', narratives);
                               this.setState('narrativesFiltered', narratives);
+                           console.log(narratives);
                               resolve();
                            }.bind(this))
                            .catch(function (err) {

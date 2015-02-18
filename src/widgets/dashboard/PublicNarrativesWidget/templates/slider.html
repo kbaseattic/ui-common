@@ -30,7 +30,13 @@
          <div class="-body">
             <div class="apps">
                {% if narrative.object.metadata.cellInfo.app|isEmpty and narrative.object.metadata.cellInfo.method|isEmpty %}
-                  <div style="text-align: center; font-style: italic;">no apps or methods</div>
+                   <span style="font-size: 80%;">      
+                      <span class="fa-stack">
+                       <span class="fa fa-square fa-stack-2x" style="color: #CECECE ;"></span> 
+                       <span class="fa fa-inverse fa-stack-1x fa-ban" style=""></span> 
+                       </span>
+                     </span>
+                       <span style="font-style: italic;">no apps or methods</span>
                {% endif %}
                 {% for app, i in narrative.object.metadata.cellInfo.app %}
                <div class="app">
@@ -58,6 +64,30 @@
                 </div>
                  {% endfor %}
             </div>
+            
+             {% if narrative.object.metadata.cellInfo.ipython.markdown %}
+               <div class="markdown-cells">
+                  <span style="font-size: 80%;">      
+                   <span class="fa-stack">
+                    <span class="fa fa-circle fa-stack-2x" style="color: #2196F3"></span> 
+                    <span class="fa fa-inverse fa-stack-1x fa-paragraph" style=""></span> 
+                    </span>
+                  </span>
+                  {{narrative.object.metadata.cellInfo.ipython.markdown}} markdown cell{{narrative.object.metadata.cellInfo.ipython.markdown|plural}}
+               </div>
+               {% endif %}
+               {% if narrative.object.metadata.cellInfo.ipython.code %}
+               <div class="code-cells">
+                  <span style="font-size: 80%;">      
+                   <span class="fa-stack">
+                    <span class="fa fa-circle fa-stack-2x" style="color: #2196F3"></span> 
+                    <span class="fa fa-inverse fa-stack-1x fa-terminal" style=""></span> 
+                    </span>
+                  </span>
+                  {{narrative.object.metadata.cellInfo.ipython.code}} code cell{{narrative.object.metadata.cellInfo.ipython.code|plural}}
+               </div>
+               {% endif %}
+            
          </div>
          <div class="-saved">
             <div class="date" style="font-style: italic;">
