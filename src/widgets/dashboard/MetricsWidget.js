@@ -1,4 +1,4 @@
-define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal) {
+define(['kb.widget.dashboard.base', 'postal', 'kb.config'], function (DashboardWidget, Postal, Config) {
    return Object.create(DashboardWidget, {
       init: {
          value: function (cfg) {
@@ -58,21 +58,31 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
                return col;
             });
             
-            
             // user scaled to histogram.
             // put user value into the correct bin.
             var userBin;
             for (var i=0; i<bins.bins.length; i++) {
                var bin = bins.bins[i];
-               if (userValue >= bin.lower && ( (bin.upperInclusive && userValue <= bin.upper) || (userValue < bin.upper))) {
+               if (userValue >= bin.lower && 
+                   ( (bin.upperInclusive && userValue <= bin.upper) || 
+                     (userValue < bin.upper) ||
+                     (i === bins.bins.length-1)
+                   )) {
                   userBin = i;
+                  if ( (i === bins.bins.length-1) && (userValue > bin.upper) ) {                     
+                     bin.upper = userValue;
+                     bin.label = '(' + bin.lower + '-' + bin.upper + ']';
+                  }
                   break;
                }
             }
             if (userBin !== undefined) {            
                var user = {
-                  scale: userBin * width + width/2,
-                  value: userValue
+                  scale: userBin * width + width/2 ,
+                  value: userValue,
+                  bin: userBin,
+                  side: (userBin < bins.bins.length/2 ? 'right':'left')
+                  
                }
             } else {
                var user = {scale: 0, value: 0}
@@ -109,29 +119,104 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
                return col;
             });
             
-            console.log(bins);
-            
-            
             // user scaled to histogram.
             // put user value into the correct bin.
+            
             var userBin;
             for (var i=0; i<bins.bins.length; i++) {
                var bin = bins.bins[i];
-               if (userValue >= bin.lower && ( (bin.upperInclusive && userValue <= bin.upper) || (userValue < bin.upper))) {
+               if (userValue >= bin.lower && 
+                   ( (bin.upperInclusive && userValue <= bin.upper) || 
+                     (userValue < bin.upper) ||
+                     (i === bins.bins.length-1)
+                   )) {               
                   userBin = i;
+                  
+                  if ( (i === bins.bins.length-1) && (userValue > bin.upper) ) {                     
+                     bin.upper = userValue;
+                     bin.label = '(' + bin.lower + '-' + bin.upper + ']';
+                  }
+                  
                   break;
                }
             }
-            if (userBin !== undefined) {            
+             if (userBin !== undefined) {            
                var user = {
-                  scale: userBin * width + width/2,
-                  value: userValue
+                  scale: userBin * width + width/2 ,
+                  value: userValue,
+                  bin: userBin,
+                  side: (userBin < bins.bins.length/2 ? 'right':'left')
+                  
                }
             } else {
                var user = {scale: 0, value: 0}
             }
                          
             this.setState('histogram.sharedNarratives', {
+               maxBinSize: maxBinSize, 
+               minBinSize: minBinSize,
+               chartMax: chartHeight,
+               binData: bins, 
+               chart: setup,
+               user: user
+            });
+         }
+      },
+        calcSharingNarrativeMetrics: {
+         value: function (userValue) {
+            // Just dummy data for now.
+            var bins = this.getState('sharingNarrativesStats').histogram;
+            // var data = bins.binned;
+            // Calculate widths, height.
+            var width = 100/bins.binned.length;
+            var maxBinSize = Math.max.apply(null, bins.binned);
+            var minBinSize = Math.min.apply(null, bins.binned);
+            
+            // consider the user's value in max/min too.
+            maxBinSize = Math.max(maxBinSize, userValue);
+            minBinSize = Math.min(minBinSize, userValue);
+
+            var chartHeight = maxBinSize + maxBinSize/10;
+            var setup = bins.bins.map(function (col) {
+               col.width = width;
+               col.height = Math.round(100*col.count/chartHeight);
+               return col;
+            });
+            
+            // user scaled to histogram.
+            // put user value into the correct bin.
+            
+            var userBin;
+            for (var i=0; i<bins.bins.length; i++) {
+               var bin = bins.bins[i];
+               if (userValue >= bin.lower && 
+                   ( (bin.upperInclusive && userValue <= bin.upper) || 
+                     (userValue < bin.upper) ||
+                     (i === bins.bins.length-1)
+                   )) {               
+                  userBin = i;
+                  
+                  if ( (i === bins.bins.length-1) && (userValue > bin.upper) ) {                     
+                     bin.upper = userValue;
+                     bin.label = '(' + bin.lower + '-' + bin.upper + ']';
+                  }
+                  
+                  break;
+               }
+            }
+             if (userBin !== undefined) {            
+               var user = {
+                  scale: userBin * width + width/2 ,
+                  value: userValue,
+                  bin: userBin,
+                  side: (userBin < bins.bins.length/2 ? 'right':'left')
+                  
+               }
+            } else {
+               var user = {scale: 0, value: 0}
+            }
+                         
+            this.setState('histogram.sharingNarratives', {
                maxBinSize: maxBinSize, 
                minBinSize: minBinSize,
                chartMax: chartHeight,
@@ -199,23 +284,27 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
                // We don't really have any initial state, it is all fed in from postal.
                
                // Get the json stuff.
-               Q.all([Q($.get('/metricsData/narrative_histogram.json')),
-                      Q($.get('/metricsData/narrative_shared_histogram.json'))])
+               Q.all([Q($.get(Config.getConfig('dashboard_metrics_url') + '/narrative_histogram.json')),
+                      Q($.get(Config.getConfig('dashboard_metrics_url') + '/narrative_shared_histogram.json')),
+                      Q($.get(Config.getConfig('dashboard_metrics_url') + '/narrative_sharing_histogram.json'))])
                .then(function(data) {
                   this.setState('narrativesStats', data[0]);
                   this.setState('sharedNarrativesStats', data[1]);
+                  this.setState('sharingNarrativesStats', data[2]);
                   
                    // hey, cool, these calls may return immediately IF the state machine 
                   // already has values for these properties.
                   this.viewState.listen('narratives', function (value) {
                      this.setState('narratives', value);
                      this.calcNarrativeMetrics(value.count);
+                     this.calcSharingNarrativeMetrics(value.sharingCount);
                   }.bind(this));
 
                   this.viewState.listen('sharedNarratives', function (value) {
                      this.setState('sharedNarratives', value);
                       this.calcSharedNarrativeMetrics(value.count);
                   }.bind(this));
+                  
 
                   /*this.viewState.listen('publicNarratives', function (value) {
                      this.setState('publicNarratives', value);

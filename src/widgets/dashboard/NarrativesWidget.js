@@ -223,11 +223,26 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
          
           onStateChange: {
             value: function () {
-                var count = this.doState('narratives', function(x){return x.length}, null);
+               var count = this.doState('narratives', function(x){return x.length}, null);
                var filtered = this.doState('narrativesFiltered', function(x){return x.length}, null);
+               
+               var sharingCount = this.doState('narratives', function (narratives) {
+                  if (!narratives) {
+                     return 0;
+                  }
+                  var sharingCount = 0;
+                  for (var i=0; i<narratives.length; i++) {
+                     var nar = narratives[i];      
+                     if (nar.permissions.length > 0) {
+                        sharingCount++;
+                     }
+                  }
+                  return sharingCount;
+               });
               
                this.viewState.setItem('narratives', {
                   count: count,
+                  sharingCount: sharingCount,
                   filtered: filtered
                });
                /*

@@ -9,4 +9,4 @@ dist/docs
 /nbproject/private/
 functional-site/assets/data/maps
 narrative_version
-metricsData
+metricsData/*.json

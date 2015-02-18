@@ -34,22 +34,6 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
          go: {
             value: function () {
                this.start();
-               
-               /*Postal.channel('dashboard.metrics')
-               .subscribe('query.sharedNarratives', function (data) {
-                  if (this.hasState('narratives')) {
-                     var count = n.length;
-                  } else {
-                     var count = null;
-                  }
-                  Postal.channel('dashboard.metrics')
-                  .publish('update.sharedNarratives', {
-                     narratives: {
-                        count: count
-                     }
-                  });
-               }.bind(this));
-               */
                return this;
             }
          },
@@ -80,28 +64,6 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                   });
                   this.buttonbar
                      .clear()
-                    
-                     /*.addRadioToggle({
-                        buttons: [
-                           {
-                              label: 'Slider',
-                              active: true,
-                              class: 'btn-kbase',
-                              callback: function (e) {
-                                 this.view = 'slider';
-                                 this.refresh();
-                              }.bind(this)
-                                 },
-                           {
-                              label: 'Table',
-                              class: 'btn-kbase',
-                              callback: function (e) {
-                                 this.view = 'table';
-                                 this.refresh();
-                              }.bind(this)
-                                 }]
-                     })
-                     */
                      .addInput({
                         placeholder: 'Search',
                         place: 'end',
@@ -181,21 +143,13 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
             value: function () {
                var count = this.doState('narratives', function(x){return x.length}, null);
                var filtered = this.doState('narrativesFiltered', function(x){return x.length}, null);
-              
+               
                this.viewState.setItem('sharedNarratives', {
                   count: count,
                   filtered: filtered
                });
-               /*Postal
-               .channel('dashboard.metrics')
-               .publish('update.sharedNarratives', {
-                     count: count
-                  }
-               );
-               */
             }
          },
-
 
          setInitialState: {
             value: function (options) {
