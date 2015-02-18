@@ -14,7 +14,7 @@
 
         getDataModel: function(objData){
             var model = {
-                description : "This data object is a reference to the uploaded paired end read library",
+                description : "This data object is a reference to a paired end read library",
                 items: []
             };           
             
