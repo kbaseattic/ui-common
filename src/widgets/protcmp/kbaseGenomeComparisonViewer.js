@@ -11,8 +11,8 @@
             id: null,
             ws: null
         },
-        wsUrl: window.kbconfig.urls.workspace,
-        loadingImage: "static/kbase/images/ajax-loader.gif",
+        wsUrl: "https://kbase.us/services/ws", // we need to stop doing this!
+        loadingImage: "assets/img/ajax-loader.gif",
 
         init: function(options) {
             this._super(options);

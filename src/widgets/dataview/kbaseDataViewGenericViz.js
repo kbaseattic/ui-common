@@ -204,6 +204,11 @@
 		    options: '{"ws_id":???objname,"ws_name":???wsname}'
 		},
 		
+		'KBaseGenomes.GenomeComparison': {
+		    widget:'kbaseGenomeComparisonViewer',
+		    options: '{"id":???objname,"ws":???wsname}'
+		},
+		
 		'KBaseAssembly.AssemblyReport': {
 		    widget:'kbaseAssemblyView',
 		    options: '{"id":???objname,"ws":???wsname}'

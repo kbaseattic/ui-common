@@ -216,7 +216,7 @@
             }
         },
 
-        closeIcon : function () { return 'icon-remove'; },
+        closeIcon : function () { return 'fa fa-close'; },
 
         deleteTabToolTip : function (tabName) {
             return 'Remove ' + tabName;
