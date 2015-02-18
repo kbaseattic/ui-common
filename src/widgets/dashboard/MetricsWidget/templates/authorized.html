@@ -53,13 +53,15 @@
             <div style="position: absolute; top: 0; left:5px; right: 5px; bottom: 0;    background-color: #CECECE;"></div>
             <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.count}}</div>
             
-            <!-- bin boundaries commented out 
-             <div style="position: absolute; bottom: 0; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.label}}</div>
-             -->
+            
+             <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.label}}</div>
+            
+            <!-- comment out the actual bounds ... use labels instead.
             {% if loop.first %}
                <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: left;">{{chart.lower}}</div>
             {% endif %}
              <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: right;">{{chart.upper}}</div>
+            -->
          </div>
       {% endfor %}
 
@@ -110,13 +112,13 @@
             <div style="position: absolute; top: 0; left:5px; right: 5px; bottom: 0;    background-color: #CECECE;"></div>
             <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.count}}</div>
             
-            <!-- bin boundaries commented out 
-             <div style="position: absolute; bottom: 0; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.label}}</div>
-             -->
+            <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.label}}</div>
+            <!--
             {% if loop.first %}
                <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: left;">{{chart.lower}}</div>
             {% endif %}
              <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: right;">{{chart.upper}}</div>
+             -->
          </div>
       {% endfor %}
 

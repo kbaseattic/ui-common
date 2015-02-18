@@ -64,13 +64,11 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
             var userBin;
             for (var i=0; i<bins.bins.length; i++) {
                var bin = bins.bins[i];
-               // console.log('test');console.log(userValue); console.log(bin.lower); console.log(bin.upper); console.log(bin.upperInclusive);
                if (userValue >= bin.lower && ( (bin.upperInclusive && userValue <= bin.upper) || (userValue < bin.upper))) {
                   userBin = i;
                   break;
                }
             }
-            // console.log('user?'); console.log(userBin);
             if (userBin !== undefined) {            
                var user = {
                   scale: userBin * width + width/2,
@@ -90,7 +88,60 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
             });
          }
       },
-      calcSharedNarrativeMetrics: {
+       calcSharedNarrativeMetrics: {
+         value: function (userValue) {
+            // Just dummy data for now.
+            var bins = this.getState('sharedNarrativesStats').histogram;
+            // var data = bins.binned;
+            // Calculate widths, height.
+            var width = 100/bins.binned.length;
+            var maxBinSize = Math.max.apply(null, bins.binned);
+            var minBinSize = Math.min.apply(null, bins.binned);
+            
+            // consider the user's value in max/min too.
+            maxBinSize = Math.max(maxBinSize, userValue);
+            minBinSize = Math.min(minBinSize, userValue);
+
+            var chartHeight = maxBinSize + maxBinSize/10;
+            var setup = bins.bins.map(function (col) {
+               col.width = width;
+               col.height = Math.round(100*col.count/chartHeight);
+               return col;
+            });
+            
+            console.log(bins);
+            
+            
+            // user scaled to histogram.
+            // put user value into the correct bin.
+            var userBin;
+            for (var i=0; i<bins.bins.length; i++) {
+               var bin = bins.bins[i];
+               if (userValue >= bin.lower && ( (bin.upperInclusive && userValue <= bin.upper) || (userValue < bin.upper))) {
+                  userBin = i;
+                  break;
+               }
+            }
+            if (userBin !== undefined) {            
+               var user = {
+                  scale: userBin * width + width/2,
+                  value: userValue
+               }
+            } else {
+               var user = {scale: 0, value: 0}
+            }
+                         
+            this.setState('histogram.sharedNarratives', {
+               maxBinSize: maxBinSize, 
+               minBinSize: minBinSize,
+               chartMax: chartHeight,
+               binData: bins, 
+               chart: setup,
+               user: user
+            });
+         }
+      },
+      calcSharedNarrativeMetricsx: {
          value: function (userValue) {
             // Just dummy data for now.
             var bins = this.getState('sharedNarrativesStats').histogram;
@@ -117,13 +168,11 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
             var userBin;
             for (var i=0; i<bins.bins.length; i++) {
                var bin = bins.bins[i];
-               // console.log('test');console.log(userValue); console.log(bin.lower); console.log(bin.upper); console.log(bin.upperInclusive);
                if (userValue >= bin.lower && ( (bin.upperInclusive && userValue <= bin.upper) || (userValue < bin.upper))) {
                   userBin = i;
                   break;
                }
             }
-            // console.log('user?'); console.log(userBin);
             if (userBin !== undefined) {            
                var user = {
                   scale: userBin * width + width/2,
@@ -150,8 +199,8 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
                // We don't really have any initial state, it is all fed in from postal.
                
                // Get the json stuff.
-               Q.all([Q($.get('/data/narrative_histogram.json')),
-                      Q($.get('/data/narrative_shared_histogram.json'))])
+               Q.all([Q($.get('/metricsData/narrative_histogram.json')),
+                      Q($.get('/metricsData/narrative_shared_histogram.json'))])
                .then(function(data) {
                   this.setState('narrativesStats', data[0]);
                   this.setState('sharedNarrativesStats', data[1]);
