@@ -5,15 +5,23 @@
    {% if state.narratives == 0 %}
     
      <div class="-card">
-          <p>No Narratives have been <br>
-             shared with you.</p>
-          <p>When a Narrative has been shared with<br>
-             you, it will appear in this panel.</p>
-         
+         <div class="-message">
+          <p>No public Narratives found.</p>
+          <p>When a public Narrative has been created, it will appear in this panel.</p>
+         </div>
       </div>
      
    {% else %}
       
+   {% if state.narrativesFiltered|length == 0 %}
+    
+     <div class="-card">
+         <div class="-message">
+          <p>No Narratives match your search.</p>
+         </div>
+      </div>
+     
+   {% else %}
       {% for narrative in state.narrativesFiltered %}
       <div class="-card">
          <div class="-title">
@@ -83,6 +91,7 @@
          </div>
       </div>
       {% endfor %}
+   {% endif %}
    {% endif %}
 </div>
 <script>

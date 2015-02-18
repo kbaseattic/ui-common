@@ -1,4 +1,5 @@
-<div class="collapse" id="{{env.widgetName}}-more-info-{{env.instanceId}}">
+<!--
+  <div class="collapse" id="{{env.widgetName}}-more-info-{{env.instanceId}}">
    <div class="well">
       <p>This panel shows summary counts of your KBase presence, compared to the rest of the KBase user population.</p>
    </div>
@@ -7,29 +8,160 @@
 <table class="table">
    <tr>
       <th>Measure</th>
-      <th>Shown</th>
-      <th>Total</th>
+      <th>Yours</th>
+      <th>KBase Mean</th>
+      <th>Median</th>
    </tr>
 
    <tr>
       <td>Narratives</td>
-      <td>{{state.narratives.filtered}}</td>
       <td>{{state.narratives.count}}</td>
+      <td>{{state.narrativesStats.summary.mean|round(1)}}</td>
+      <td>{{state.narrativesStats.summary.median|round(1)}}</td>
    </tr>
    <tr>
       <td>Shared Narratives</td>
-      <td>{{state.sharedNarratives.filtered}}</td>
       <td>{{state.sharedNarratives.count}}</td>
+      <td>{{state.sharedNarrativesStats.summary.mean|round(1)}}</td>
+      <td>{{state.sharedNarrativesStats.summary.median|round(1)}}</td>
    </tr>
-    <tr>
-      <td>Public Narratives</td>
-      <td>{{state.publicNarratives.filtered}}</td>
-      <td>{{state.publicNarratives.count}}</td>
-   </tr>
-   <tr>
-      <td>Collaborators</td>
-      <td>{{state.collaborators.filtered}}</td>
-      <td>{{state.collaborators.count}}</td>
-   </tr>
-
 </table>
+-->
+
+<!--
+<table border="1" width="100%">
+   <tr>
+      {% for bin in state.narrativesStats.histogram.bins %}<td>{{bin.count}}</td>{% endfor %}
+   </tr>
+</table>
+
+
+<table border="1" width="100%">
+   <tr>
+      {% for bin in state.sharedNarrativesStats.histogram.bins %}<td>{{bin.count}}</td>{% endfor %}
+   </tr>
+</table>
+-->
+
+
+{% if state.histogram.narratives %}
+
+<h3>Narratives</h3>
+
+<div style="position: relative; height: 150px; width: 100%;">
+<div style="width: 100%; height: 100px; border: 0px dashed red; position: relative; top: 20px; xmargin-bottom: 20px; xmargin-top: 20px;">
+   <div style="width: 100%; height: 100px;">
+      {% for chart in state.histogram.narratives.chart %}
+         <div style="position: absolute; bottom: 0; left: {{loop.index0 * chart.width}}%; width: {{chart.width}}%; width: {{chart.width}}%; height: {{chart.height}}%;"> 
+            <div style="position: absolute; top: 0; left:5px; right: 5px; bottom: 0;    background-color: #CECECE;"></div>
+            <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.count}}</div>
+            
+            
+             <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.label}}</div>
+            
+            <!-- comment out the actual bounds ... use labels instead.
+            {% if loop.first %}
+               <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: left;">{{chart.lower}}</div>
+            {% endif %}
+             <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: right;">{{chart.upper}}</div>
+            -->
+         </div>
+      {% endfor %}
+
+      <!-- The user's value here -->
+      <div style="position: absolute; bottom: 0; left: {{state.histogram.narratives.user.scale|round}}%; width: 6px; height: 100%; background-color: rgba(75,184,86,0.7);">
+         
+         <div style="position: absolute; top: 0; left: 6px;"><div class="" style="color: #fff; font-weight: bold; font-size: 80%; background-color: rgba(75,184,86,0.7); white-space: nowrap; padding:  3px 6px 3px 3px;">You - {{state.histogram.narratives.user.value}}</div></div>
+         
+      </div>
+
+      <!-- y axis scale, inside -->
+      <div style="position: absolute; bottom: 0; left: 0; width: 5%; height: 100%; background-color: transaprent;">
+        
+         <!-- min max commented out 
+         <div style="position: absolute; top: 0; left: 0; color: red;"><span class="label label-default" style="opacity: 0.5;">{{state.histogram.narratives.chartMax}}</span></div>
+         
+         
+         <div style="position: absolute; bottom: 0; left: 0;color: red;"><span class="label label-default" style="opacity: 0.5;">{{state.histogram.narratives.min}}</span></div>
+         -->
+         
+         
+         <!--
+           <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; border: 1px red solid;">
+            
+            <div style="position: absolute; bottom: 0; left: 0;">
+               x min
+            </div>
+            <div style="position: absolute; bottom: 0; right: 0;">
+               x max
+            </div>
+            
+         </div>
+         -->
+      </div>
+   </div>
+</div>
+</div>
+
+   {% endif %}
+   
+   
+   {% if state.histogram.sharedNarratives %}
+
+<h3 >Shared Narratives</h3>
+
+<div style="position: relative; height: 150px; width: 100%;">
+<div style="width: 100%; height: 100px; border: 0px dashed red; position: relative; top: 20px;">
+   <div style="width: 100%; height: 100px;">
+      {% for chart in state.histogram.sharedNarratives.chart %}
+         <div style="position: absolute; bottom: 0; left: {{loop.index0 * chart.width}}%; width: {{chart.width}}%; width: {{chart.width}}%; height: {{chart.height}}%;"> 
+            <div style="position: absolute; top: 0; left:5px; right: 5px; bottom: 0;    background-color: #CECECE;"></div>
+            <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.count}}</div>
+            
+            <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.label}}</div>
+            <!--
+            {% if loop.first %}
+               <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: left;">{{chart.lower}}</div>
+            {% endif %}
+             <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: right;">{{chart.upper}}</div>
+             -->
+         </div>
+      {% endfor %}
+
+     <!-- The user's value here -->
+      <div style="position: absolute; bottom: 0; left: {{state.histogram.sharedNarratives.user.scale|round}}%; width: 6px; height: 100%; background-color: rgba(75,184,86,0.7);">
+         
+         <div style="position: absolute; top: 0; left: 6px;"><div class="" style="color: #fff; font-weight: bold; font-size: 80%; background-color: rgba(75,184,86,0.7); white-space: nowrap; padding: 3px 6px 3px 3px;">You - {{state.histogram.sharedNarratives.user.value}}</div></div>
+         
+      </div>
+
+      <!-- y axis scale, inside -->
+      <div style="position: absolute; bottom: 0; left: 0; width: 5%; height: 100%; background-color: transaprent;">
+        
+        <!-- min max commented out 
+         <div style="position: absolute; top: 0; left: 0; color: red;"><span class="label label-default" style="opacity: 0.5;">{{state.histogram.sharedNarratives.chartMax}}</span></div>
+         
+         
+         <div style="position: absolute; bottom: 0; left: 0;color: red;"><span class="label label-default" style="opacity: 0.5;">{{state.histogram.sharedNarratives.min}}</span></div>
+         -->
+      
+         
+         <!--
+           <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; border: 1px red solid;">
+            
+            <div style="position: absolute; bottom: 0; left: 0;">
+               x min
+            </div>
+            <div style="position: absolute; bottom: 0; right: 0;">
+               x max
+            </div>
+            
+         </div>
+         -->
+      </div>
+   </div>
+   </div>
+</div>
+
+   {% endif %}
+

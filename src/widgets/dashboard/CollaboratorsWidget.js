@@ -15,21 +15,6 @@ define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.m
          go: {
             value: function () {
                this.start();
-               /*Postal.channel('dashboard.metrics')
-               .subscribe('query.collaborators', function (data) {
-                  if (this.hasState('collaborators')) {
-                     var count = n.length;
-                  } else {
-                     var count = null;
-                  }
-                  Postal.channel('dashboard.metrics')
-                  .publish('update.collaborators', {
-                     count: count
-                  });
-               }.bind(this));
-               */
-
-               
                return this;
             }
          },
@@ -66,14 +51,6 @@ define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.m
                   filtered: count,
                   count: count
                });
-               /*
-               Postal
-               .channel('dashboard.metrics')
-               .publish('update.collaborators', {
-                     count: count
-                  }
-               );
-               */
             }
          },
 
@@ -103,31 +80,7 @@ define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.m
                   }
                }.bind(this));
             }
-         },
-
-         // Overriding the default, simple, render because we need to update the title
-         // TODO: make it easy for a widget to customize the title.
-         render: {
-            value: function () {
-               // Generate initial view based on the current state of this widget.
-               // Head off at the pass -- if not logged in, can't show profile.
-               if (this.error) {
-                  this.renderError();
-               } else if (AppState.getItem('session').isLoggedIn()) {
-
-                  this.places.title.html(this.renderTemplate('authorized_title'));
-                  this.places.content.html(this.renderTemplate('authorized'));
-               } else {
-                  // no profile, no basic aaccount info
-                  this.places.title.html(this.widgetTitle);
-                  this.places.content.html(this.renderTemplate('unauthorized'));
-               }
-               return this;
-            }
          }
-         
-
-
       });
 
       return Widget;

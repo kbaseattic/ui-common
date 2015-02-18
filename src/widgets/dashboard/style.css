@@ -168,3 +168,19 @@
 .navbar-group.navbar-form {
    margin: 0;
 }
+
+.kbase-dashboard-view [data-toggle="collapse"]::after {
+  margin-left: 6px;
+  font-family: "FontAwesome";
+  font-style: normal;
+  font-weight: normal;
+  font-size: 90%;
+  width: 12px;
+  color: silver;
+  line-height: 1;
+  vertical-align: baseline;
+  content: "\f078 ";
+}
+.kbase-dashboard-view [data-toggle="collapse"].collapsed::after {
+  content: "\f054 ";
+}
