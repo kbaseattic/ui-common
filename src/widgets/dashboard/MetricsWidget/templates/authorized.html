@@ -42,134 +42,139 @@
    </tr>
 </table>
 -->
+<style type="text/css">
+.rotate-90 {
 
+/* Safari */
+-webkit-transform: rotate(-90deg);
+
+/* Firefox */
+-moz-transform: rotate(-90deg);
+
+/* IE */
+-ms-transform: rotate(-90deg);
+
+/* Opera */
+-o-transform: rotate(-90deg);
+
+/* Internet Explorer */
+filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+
+}.rotate {
+
+/* Safari */
+-webkit-transform: rotate(-90deg);
+
+/* Firefox */
+-moz-transform: rotate(-90deg);
+
+/* IE */
+-ms-transform: rotate(-90deg);
+
+/* Opera */
+-o-transform: rotate(-90deg);
+
+/* Internet Explorer */
+filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+
+}
+</style>
 
 {% if state.histogram.narratives %}
 
-<h3>Narratives per User</h3>
+<h3>Total Narratives</h3>
 
-<div style="position: relative; height: 150px; width: 100%;">
-<div style="width: 100%; height: 100px; border: 0px dashed red; position: relative; top: 20px; xmargin-bottom: 20px; xmargin-top: 20px;">
-   <div style="width: 100%; height: 100px;">
-      {% for chart in state.histogram.narratives.chart %}
-         <div style="position: absolute; bottom: 0; left: {{loop.index0 * chart.width}}%; width: {{chart.width}}%; width: {{chart.width}}%; height: {{chart.height}}%;"> 
-            <div style="position: absolute; top: 0; left:5px; right: 5px; bottom: 0;    background-color: #CECECE;"></div>
-            <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.count}}</div>
-            
-            
-             <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.label}}</div>
-            
-            <!-- comment out the actual bounds ... use labels instead.
-            {% if loop.first %}
-               <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: left;">{{chart.lower}}</div>
-            {% endif %}
-             <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: right;">{{chart.upper}}</div>
-            -->
-         </div>
-      {% endfor %}
+<div style="margin-left: 20px;">
+   <div style="position: relative; height: 150px; width: 100%;">
+      <div style="width: 100%; height: 100px; border: 0px dashed red; position: relative; top: 20px; ">
+         <div style="width: 100%; height: 100px; margin-left: 40px;">
+            {% for chart in state.histogram.narratives.chart %}
+               <div style="position: absolute; bottom: 0; left: {{loop.index0 * chart.width|round(4)}}%; width: {{chart.width|round(4)}}%; height: {{chart.height|round(4)}}%;"> 
+                  <div style="position: absolute; top: 0; left:5px; right: 5px; bottom: 0;    background-color: #CECECE;"></div>
+                  <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
+                     {{chart.count}}
+                  </div>
+                  <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
+                     {{chart.label}}
+                  </div>
+               </div>
+            {% endfor %}
 
-      <!-- The user's value here -->
-      <div style="position: absolute; bottom: 0; left: {{state.histogram.narratives.user.scale|round}}%; width: 6px; height: 100%; background-color: rgba(75,184,86,0.7);">
-         
-         {% if state.histogram.narratives.user.side == 'left' %}
-         <div style="position: absolute; top: 0; right: 6px;"><div class="" style="color: #fff; font-weight: bold; font-size: 80%; background-color: rgba(75,184,86,0.7); white-space: nowrap; padding:  3px 6px 3px 3px;">You - {{state.histogram.narratives.user.value}}</div></div>
-         {% else %}
-         <div style="position: absolute; top: 0; left: 6px;"><div class="" style="color: #fff; font-weight: bold; font-size: 80%; background-color: rgba(75,184,86,0.7); white-space: nowrap; padding:  3px 6px 3px 3px;">You - {{state.histogram.narratives.user.value}}</div></div>
-         {% endif %}
-         
-      </div>
+            <!-- The user's value here -->
+            <div style="position: absolute; bottom: 0; left: {{state.histogram.narratives.user.scale|round}}%; width: 6px; height: 100%; background-color: rgba(75,184,86,0.7);">
 
-      <!-- y axis scale, inside -->
-      <div style="position: absolute; bottom: 0; left: 0; width: 5%; height: 100%; background-color: transaprent;">
-        
-         <!-- min max commented out 
-         <div style="position: absolute; top: 0; left: 0; color: red;"><span class="label label-default" style="opacity: 0.5;">{{state.histogram.narratives.chartMax}}</span></div>
-         
-         
-         <div style="position: absolute; bottom: 0; left: 0;color: red;"><span class="label label-default" style="opacity: 0.5;">{{state.histogram.narratives.min}}</span></div>
-         -->
-         
-         
-         <!--
-           <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; border: 1px red solid;">
-            
-            <div style="position: absolute; bottom: 0; left: 0;">
-               x min
+               {% if state.histogram.narratives.user.side == 'left' %}
+               <div style="position: absolute; top: 0; right: 6px;"><div class="" style="color: #fff; font-weight: bold; font-size: 80%; background-color: rgba(75,184,86,0.7); white-space: nowrap; padding:  3px 6px 3px 3px;">You - {{state.histogram.narratives.user.value}}</div></div>
+               {% else %}
+               <div style="position: absolute; top: 0; left: 6px;"><div class="" style="color: #fff; font-weight: bold; font-size: 80%; background-color: rgba(75,184,86,0.7); white-space: nowrap; padding:  3px 6px 3px 3px;">You - {{state.histogram.narratives.user.value}}</div></div>
+               {% endif %}
+
             </div>
-            <div style="position: absolute; bottom: 0; right: 0;">
-               x max
+
+            <!-- y axis scale, inside -->
+            <div style="position: absolute; bottom: 0; left: 0; width: 5%; height: 100%; background-color: transaprent;">
             </div>
-            
          </div>
-         -->
+          <div style="position: absolute; bottom: -35px; left: 0; color: gray; font-size: 80%; width:100%; text-align: center;">
+            Narratives per User
+          </div>
+          <div style="position: absolute; top: 0; left: -20px; color: gray; font-size: 80%; height: 100px; width: 20px;"  >
+             <div class="rotate-90" style="white-space: nowrap; text-align: left; position: relative; right: 0; top: 70px;">Number of Users</div>   
+          </div>
       </div>
    </div>
-</div>
 </div>
 
    {% endif %}
    
    
-   {% if state.histogram.sharedNarratives %}
+   
+  {% if state.histogram.sharingNarratives %}
 
-<h3>Narratives Shared per User</h3>
+<h3>Shared Narratives</h3>
 
-<div style="position: relative; height: 150px; width: 100%;">
-<div style="width: 100%; height: 100px; border: 0px dashed red; position: relative; top: 20px;">
-   <div style="width: 100%; height: 100px;">
-      {% for chart in state.histogram.sharedNarratives.chart %}
-         <div style="position: absolute; bottom: 0; left: {{loop.index0 * chart.width}}%; width: {{chart.width}}%; width: {{chart.width}}%; height: {{chart.height}}%;"> 
-            <div style="position: absolute; top: 0; left:5px; right: 5px; bottom: 0;    background-color: #CECECE;"></div>
-            <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.count}}</div>
-            
-            <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">{{chart.label}}</div>
-            <!--
-            {% if loop.first %}
-               <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: left;">{{chart.lower}}</div>
-            {% endif %}
-             <div style="position: absolute; bottom: -20px; left: 0; color: red; font-size: 80%; width:100%; text-align: right;">{{chart.upper}}</div>
-             -->
-         </div>
-      {% endfor %}
+<div style="margin-left: 20px;">
+   <div style="position: relative; height: 150px; width: 100%;">
+      <div style="width: 100%; height: 100px; border: 0px dashed red; position: relative; top: 20px; ">
+         <div style="width: 100%; height: 100px; margin-left: 40px;">
+            {% for chart in state.histogram.sharingNarratives.chart %}
+               <div style="position: absolute; bottom: 0; left: {{loop.index0 * chart.width|round(4)}}%; width: {{chart.width|round(4)}}%; height: {{chart.height|round(4)}}%;"> 
+                  <div style="position: absolute; top: 0; left:5px; right: 5px; bottom: 0;    background-color: #CECECE;"></div>
+                  <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
+                     {{chart.count}}
+                  </div>
+                  <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
+                     {{chart.label}}
+                  </div>
+               </div>
+            {% endfor %}
 
-     <!-- The user's value here -->
-      <div style="position: absolute; bottom: 0; left: {{state.histogram.sharedNarratives.user.scale|round}}%; width: 6px; height: 100%; background-color: rgba(75,184,86,0.7);">
-         
-          {% if state.histogram.sharedNarratives.user.side == 'left' %}
-         <div style="position: absolute; top: 0; right: 6px;"><div class="" style="color: #fff; font-weight: bold; font-size: 80%; background-color: rgba(75,184,86,0.7); white-space: nowrap; padding:  3px 6px 3px 3px;">You - {{state.histogram.sharedNarratives.user.value}}</div></div>
-         {% else %}
-         <div style="position: absolute; top: 0; left: 6px;"><div class="" style="color: #fff; font-weight: bold; font-size: 80%; background-color: rgba(75,184,86,0.7); white-space: nowrap; padding:  3px 6px 3px 3px;">You - {{state.histogram.sharedNarratives.user.value}}</div></div>
-         {% endif %}
-         
-      </div>
+            <!-- The user's value here -->
+            <div style="position: absolute; bottom: 0; left: {{state.histogram.sharingNarratives.user.scale|round}}%; width: 6px; height: 100%; background-color: rgba(75,184,86,0.7);">
 
-      <!-- y axis scale, inside -->
-      <div style="position: absolute; bottom: 0; left: 0; width: 5%; height: 100%; background-color: transaprent;">
-        
-        <!-- min max commented out 
-         <div style="position: absolute; top: 0; left: 0; color: red;"><span class="label label-default" style="opacity: 0.5;">{{state.histogram.sharedNarratives.chartMax}}</span></div>
-         
-         
-         <div style="position: absolute; bottom: 0; left: 0;color: red;"><span class="label label-default" style="opacity: 0.5;">{{state.histogram.sharedNarratives.min}}</span></div>
-         -->
-      
-         
-         <!--
-           <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; border: 1px red solid;">
-            
-            <div style="position: absolute; bottom: 0; left: 0;">
-               x min
+               {% if state.histogram.sharingNarratives.user.side == 'left' %}
+               <div style="position: absolute; top: 0; right: 6px;"><div class="" style="color: #fff; font-weight: bold; font-size: 80%; background-color: rgba(75,184,86,0.7); white-space: nowrap; padding:  3px 6px 3px 3px;">You - {{state.histogram.sharingNarratives.user.value}}</div></div>
+               {% else %}
+               <div style="position: absolute; top: 0; left: 6px;"><div class="" style="color: #fff; font-weight: bold; font-size: 80%; background-color: rgba(75,184,86,0.7); white-space: nowrap; padding:  3px 6px 3px 3px;">You - {{state.histogram.sharingNarratives.user.value}}</div></div>
+               {% endif %}
+
             </div>
-            <div style="position: absolute; bottom: 0; right: 0;">
-               x max
+
+            <!-- y axis scale, inside -->
+            <div style="position: absolute; bottom: 0; left: 0; width: 5%; height: 100%; background-color: transaprent;">
             </div>
-            
          </div>
-         -->
+          <div style="position: absolute; bottom: -35px; left: 0; color: gray; font-size: 80%; width:100%; text-align: center;">
+            Narratives Shared per User
+          </div>
+          <div style="position: absolute; top: 0; left: -20px; color: gray; font-size: 80%; height: 100px; width: 20px;"  >
+             <div class="rotate-90" style="white-space: nowrap; text-align: left; position: relative; right: 0; top: 70px;">Number of Users</div>   
+          </div>
       </div>
-   </div>
    </div>
 </div>
 
-   {% endif %}
 
+   {% endif %}
+   
+   
