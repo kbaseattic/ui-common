@@ -16,7 +16,7 @@
             token: null,
             kbCache: null,
             workspaceURL: "https://kbase.us/services/ws",  //"http://dev04.berkeley.kbase.us:7058",
-            loadingImage: "static/kbase/images/ajax-loader.gif",
+            loadingImage: "assets/img/ajax-loader.gif",
             ujsServiceURL: "https://kbase.us/services/userandjobstate/",
             width: 1045,
             height: 600
@@ -25,7 +25,7 @@
         treeWsRef: null,
         pref: null,
         timer: null,
-        loadingImage: "static/kbase/images/ajax-loader.gif",
+        loadingImage: "assets/img/ajax-loader.gif",
 
         init: function(options) {
             this._super(options);

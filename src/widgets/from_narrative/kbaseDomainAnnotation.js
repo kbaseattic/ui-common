@@ -15,7 +15,7 @@
             workspaceID: null,
             domainAnnotationVer: null,
             kbCache: null,
-            loadingImage: "static/kbase/images/ajax-loader.gif",
+            loadingImage: "assets/img/ajax-loader.gif",
             height: null,
         },
 
