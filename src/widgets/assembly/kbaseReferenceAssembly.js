@@ -14,7 +14,7 @@
 
         getDataModel: function(objData){
             var model = {
-                description : "This data object is a reference to the uploaded assemebly",
+                description : "This data object is a reference to a reference assembly that can be used when assembling reads",
                 items: []
             };           
             
