@@ -220,7 +220,9 @@
 		
 		/* STILL NEEDS A COMPLEX LANDING PAGE */
 		'KBaseFBA.FBAModel': modelingConfig,
-		
+            
+		'KBaseFBA.FBAModelSet': modelingConfig,		            
+            
 		'KBaseGeneFamilies.DomainAnnotation': {
 		    widget:'kbaseDomainAnnotation',
 		    options: '{"domainAnnotationID":???objid,"workspaceID":???wsid,"domainAnnotationVer":???ver,'+
