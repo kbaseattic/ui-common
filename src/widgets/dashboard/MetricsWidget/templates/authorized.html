@@ -87,17 +87,35 @@ filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
 <div style="margin-left: 20px;">
    <div style="position: relative; height: 150px; width: 100%;">
       <div style="width: 100%; height: 100px; border: 0px dashed red; position: relative; top: 20px; ">
-         <div style="width: 100%; height: 100px; ">
-         <div stle="width: 100%; margin-left: 30px;">
+         <div style="width: 100%; height: 100px; border-bottom: 1px #CECECE  solid;   ">
+         <div stle="width: 100%; margin-left: 30px; border-bottom: 1px #888 solid;"> 
             {% for chart in state.histogram.narratives.chart %}
                <div style="position: absolute; bottom: 0; left: {{loop.index0 * chart.width|round(4)}}%; width: {{chart.width|round(4)}}%; height: {{chart.height|round(4)}}%;"> 
                   <div style="position: absolute; top: 0; left:5px; right: 5px; bottom: 0;    background-color: #CECECE;"></div>
-                  <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
-                     {{chart.count}}
+                  <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; font-style: italic; width:100%; text-align: center;">
+                       {% if chart.count > 0 %}
+                        {{chart.count}}
+                     {% endif %}
                   </div>
-                  <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
-                     {{chart.label}}
-                  </div>
+                  
+                  
+                  {% if chart.upper - chart.lower == 1 %} 
+                    <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
+                        {{chart.lower}}
+                     </div>
+                  {% else %}
+                       
+                     {% if loop.last %}
+                       <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
+                           {{chart.lower}} - {{chart.upper}}
+                        </div>  
+                     {% else %}
+                        <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
+                           {{chart.lower}} - {{chart.upper-1}}
+                        </div>  
+                     {% endif %}
+                  {% endif %}
+                 
                </div>
             {% endfor %}
 
@@ -138,17 +156,33 @@ filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
 <div style="margin-left: 20px;">
    <div style="position: relative; height: 150px; width: 100%;">
       <div style="width: 100%; height: 100px; border: 0px dashed red; position: relative; top: 20px; ">
-         <div style="width: 100%; height: 100px; ">
+         <div style="width: 100%; height: 100px; border-bottom: 1px #CECECE  solid;   ">
          <div stle="width: 100%; margin-left: 30px;">
             {% for chart in state.histogram.sharingNarratives.chart %}
                <div style="position: absolute; bottom: 0; left: {{loop.index0 * chart.width|round(4)}}%; width: {{chart.width|round(4)}}%; height: {{chart.height|round(4)}}%;"> 
                   <div style="position: absolute; top: 0; left:5px; right: 5px; bottom: 0;    background-color: #CECECE;"></div>
-                  <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
-                     {{chart.count}}
+                  <div style="position: absolute; top: -20px; left: 0;color: gray; font-size: 80%; font-style: italic; width:100%; text-align: center;">
+                     {% if chart.count > 0 %}
+                        {{chart.count}}
+                     {% endif %}
                   </div>
-                  <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
-                     {{chart.label}}
-                  </div>
+                  
+                   {% if chart.upper - chart.lower == 1 %} 
+                    <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
+                        {{chart.lower}}
+                     </div>
+                  {% else %}
+                       
+                     {% if loop.last %}
+                       <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
+                           {{chart.lower}} - {{chart.upper}}
+                        </div>  
+                     {% else %}
+                        <div style="position: absolute; bottom: -20px; left: 0;color: gray; font-size: 80%; width:100%; text-align: center;">
+                           {{chart.lower}}
+                        </div>  
+                     {% endif %}
+                  {% endif %}
                </div>
             {% endfor %}
 
@@ -164,7 +198,16 @@ filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
             </div>
 
             <!-- y axis scale, inside -->
-            <div style="position: absolute; bottom: 0; left: 0; width: 5%; height: 100%; background-color: transaprent;">
+            <div style="position: absolute; bottom: 0; left: 0; width: 5%; height: 100%; background-color: transaprent; border-left: 0px #cecece solid;">
+            
+               <!--<div style="position: absolute; top: -20px; left: 0; color: #888; font-size: 80%;">
+                  {{state.histogram.narratives.chartMax}}
+               </div>
+               -->
+         
+         
+            <!--<div style="position: absolute; bottom: 0; left: 0;color: red;"><span class="label label-default" style="opacity: 0.5;">{{state.histogram.narratives.min}}</span></div>-->
+        
             </div>
          </div>
           <div style="position: absolute; bottom: -35px; left: 0; color: gray; font-size: 80%; width:100%; text-align: center;">
@@ -176,6 +219,10 @@ filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
       </div>
       </div>
    </div>
+</div>
+
+<div style="margin-top: 30px; font-style: italic; color: #888;">
+   KBase usage statistics current as of {{state.histogram.sharingNarratives.stats.meta.originalGenerated|unixNiceTime}}
 </div>
 
 
