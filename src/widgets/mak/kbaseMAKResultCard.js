@@ -5,7 +5,7 @@
         version: "1.0.0",
 
         options: {
-            loadingImage: "../../widgets/images/ajax-loader.gif",
+            loadingImage: "assets/img/ajax-loader.gif",
             title: "MAK Result Overview",
             isInCard: false,
             width: 400,

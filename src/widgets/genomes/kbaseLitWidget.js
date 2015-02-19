@@ -8,7 +8,7 @@
             genomeID: null,
             workspaceID: null,
 			kbCache: null,
-            loadingImage: "../../widgets/images/ajax-loader.gif",
+            loadingImage: "assets/img/ajax-loader.gif",
             isInCard: false,
 			width: 600,
 			height: 700,

@@ -1,4 +1,4 @@
-define(['kb.utils'], function (Utils) {
+define(['kb.utils', 'q'], function (Utils, Q) {
    "use strict";
    /**
    A simple first in last out (FILO) job stack which is allowed to build up for some amount of time, after
@@ -57,7 +57,6 @@ define(['kb.utils'], function (Utils) {
 
    });
    
-   
 
    var StateMachine = Object.create({}, {
       init: {
@@ -68,22 +67,37 @@ define(['kb.utils'], function (Utils) {
             return this;
          }
       },
+      version: {
+         value: '0.0.1',
+         writable: false
+      },
+
       setItem: {
          value: function (key, value) {
-            var listeners = this.listeners[key];
             var oldValue = Utils.getProp(this.state, key);
-            if (listeners) {
-               listeners.forEach(function (x) {
+            if (this.listeners[key]) {
+               var newListeners = [];
+               this.listeners[key].forEach(function (item) {
                   this.queue.addItem({
-                     info: 'key: '+key+', value: '+value,
+                     info: {key: key, value: value},
                      onrun: (function (fun, value, oldvalue, machine) {
                         return function () {
-                           fun(value, oldvalue, machine);
+                           try {
+                              fun(value, oldvalue, machine);
+                           } catch (ex) {
+                              console.log('EX running onrun handler');
+                              console.log(ex);
+                           }
                         }
-                     })(x.hear, value, oldValue, this)
+                     })(item.hear, value, oldValue, this)
                   });
+                  if (!item.oneTime) {
+                     newListeners.push(item);
+                  }
                }.bind(this));
+               this.listeners[key] = newListeners;
             }
+            
             Utils.setProp(this.state, key, value);
          }
       },
@@ -100,23 +114,52 @@ define(['kb.utils'], function (Utils) {
       delItem: {
          value: function (key) {}
       },
-      listen: { 
+      listen: {
+         value: function (key, cfg) {
+            return this.listenForItem(key, cfg);
+         }
+      },
+      listenForItem: { 
          value: function (key, cfg) {
             if (typeof cfg === 'function') {
                cfg = {hear: cfg};
             }
-            if (!this.listeners.key) {
+             if (this.hasItem(key)) {
+               cfg.hear(this.getItem(key));
+               if (cfg.oneTime) {
+                  return;
+               }
+            }
+            if (this.listeners[key] === undefined) {
                this.listeners[key] = [];
             }
             this.listeners[key].push(cfg);
-            if (this.hasItem(key)) {
-               cfg.hear(this.getItem(key));
-            }
             return this;
          }
       },
+      whenItem: {
+         // This differs from listen in that it returns a promise that is 
+         // fulfilled either now (the item is available) or when it is
+         // first set (via a set of one-time listeners).
+         value: function (key) {
+            return Q.Promise(function (resolve, reject, notify) {
+               if (this.hasItem(key)) {
+                  resolve(this.getItem(key));
+               } else {
+                  this.listenForItem(key, {
+                     oneTime: true,
+                     addedAt: (new Date()).getTime(),
+                     hear: function (value) {
+                        resolve(value);
+                     }
+                  });
+               }
+            }.bind(this));
+         }
+      },
       ignore: {
-         value: function (key, id) {}
+         value: function (key, id) {
+         }
       }
    });
    return StateMachine;

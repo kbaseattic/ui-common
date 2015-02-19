@@ -571,11 +571,13 @@
 					    self.objRefToNodeIdx[objId] = nodeId;
 					    
 					    // add the link now too
-					    self.graph['links'].push({
-						source:self.objRefToNodeIdx[objIdentities[i]['ref']],
-						target:nodeId,
-						value:1,
-					    });
+					    if (self.objRefToNodeIdx[objIdentities[i]['ref']]!=null) {  // only add the link if it is visible
+						self.graph['links'].push({
+						    source:self.objRefToNodeIdx[objIdentities[i]['ref']],
+						    target:nodeId,
+						    value:1,
+						});
+					    }
 					    break;
 					}
 					
@@ -594,12 +596,13 @@
 					self.objRefToNodeIdx[objId] = nodeId;
 					
 					// add the link now too
-					self.graph['links'].push({
-					    source:self.objRefToNodeIdx[objIdentities[i]['ref']],
-					    target:nodeId,
-					    value:1,
-					});
-					
+					if (self.objRefToNodeIdx[objIdentities[i]['ref']]!=null) {  // only add the link if it is visible
+					    self.graph['links'].push({
+						source:self.objRefToNodeIdx[objIdentities[i]['ref']],
+						target:nodeId,
+						value:1,
+					    });
+					}
 				    }
 				}
 			    }, function(err) {
@@ -682,27 +685,35 @@
 					    var uniqueRefs = self.tempRefData['uniqueRefs'];
 					    for(var ref in uniqueRefs) {
 						var refInfo = objInfoStash[ref];
-						//0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
-						var t = refInfo[2].split("-")[0];
-						var objId = refInfo[6] + "/" + refInfo[0] + "/" + refInfo[4];
-						var nodeId = self.graph['nodes'].length;
-						self.graph['nodes'].push({
-						    node : nodeId,
-						    name : self.getNodeLabel(refInfo),
-						    info : refInfo,
-						    nodeType : uniqueRefs[ref],
-						    objId : objId
-						});
-						self.objRefToNodeIdx[objId] = nodeId;
+						if (refInfo) {
+						    //0:obj_id, 1:obj_name, 2:type ,3:timestamp, 4:version, 5:username saved_by, 6:ws_id, 7:ws_name, 8 chsum, 9 size, 10:usermeta
+						    var t = refInfo[2].split("-")[0];
+						    var objId = refInfo[6] + "/" + refInfo[0] + "/" + refInfo[4];
+						    var nodeId = self.graph['nodes'].length;
+						    self.graph['nodes'].push({
+							node : nodeId,
+							name : self.getNodeLabel(refInfo),
+							info : refInfo,
+							nodeType : uniqueRefs[ref],
+							objId : objId
+						    });
+						    self.objRefToNodeIdx[objId] = nodeId;
+						} else {
+						    // there is a reference, but we no longer have access; could do something better
+						    // here, but instead we just skip
+						}
 					    }
 					    // add the link info
 					    var links = self.tempRefData['links'];
+						console.log(links);
 					    for(var i=0; i<links.length; i++) {
-						self.graph['links'].push({
-						    source:self.objRefToNodeIdx[links[i]['source']],
-						    target:self.objRefToNodeIdx[links[i]['target']],
-						    value:links[i]['value']
-						});
+						if (self.objRefToNodeIdx[links[i]['source']]!=null && self.objRefToNodeIdx[links[i]['target']]!=null) {
+						    self.graph['links'].push({
+							source:self.objRefToNodeIdx[links[i]['source']],
+							target:self.objRefToNodeIdx[links[i]['target']],
+							value:links[i]['value']
+						    });
+						}
 					    }
 					},
 					function (err) {
@@ -806,6 +817,7 @@
 	
 	// edited from: http://stackoverflow.com/questions/3177836/how-to-format-time-since-xxx-e-g-4-minutes-ago-similar-to-stack-exchange-site
         getTimeStampStr: function (objInfoTimeStamp) {
+	    if (!objInfoTimeStamp) { return ''; }
             var date = new Date(objInfoTimeStamp);
             var seconds = Math.floor((new Date() - date) / 1000);
             

@@ -88,6 +88,7 @@
 
         objData: null,
 
+        //should break this into two methods... later
         getDataAndRender: function() {
             var self = this;
             self.ws.get_object_info(
@@ -108,7 +109,35 @@
                                     meta: objInfoList[0][10],
                                     };
                             console.log(self.objData);
-                            self.render();
+                            self.ws.get_workspace_info(
+                                    {id: self.objData.wsid},
+                                    function(wsInfo) {
+                                        self.wsData = {
+                                                id: wsInfo[0],
+                                                workspace: wsInfo[1],
+                                                owner: wsInfo[2],
+                                                moddate: wsInfo[3],
+                                                objects: wsInfo[4],
+                                                user_permission: wsInfo[5],
+                                                globalread: wsInfo[6],
+                                                lockstat: wsInfo[7],
+                                                metadata: wsInfo[8]
+                                        }
+                                        var narname = self.wsData.metadata
+                                            .narrative_nice_name;
+                                        if (narname != null) {
+                                            self.wsData.narname = narname;
+                                        } else {
+                                            self.wsData.narname = "(data only) "
+                                                + self.wsData.workspace
+                                        }
+                                        console.log(self.wsData);
+                                        self.render();
+                                    },
+                                    function(error) {
+                                        self.showError(error);
+                                    }
+                            );
                         } else {
                             self.showError({error:{message:
                                 'Could not fetch the data information for some reason.'}});
@@ -152,10 +181,8 @@
                 $('<div>').addClass('col-md-6')
                     .append($('<div>').append('<h3>' + self.objData.name + '</h3>'))
                     .append($('<div>').css({'color':'#555'})
-                            .append('Workspace: ' +// '<a href="#/ws/objects/' +
-//                                    self.objData.workspace +
-//                                    '" target="_blank">' +
-                                    self.objData.workspace + '</a>'))
+                            .append('Narrative: ' + self.wsData.narname +
+                                    '</a>'))
                     .append($('<div>').css({'color':'#555'}) //todo: make this a real style somewhere
                             .append('<a href="#/spec/type/' + self.objData.type +
                                     '" target="_blank">' + typeNameNice + '</a>'))

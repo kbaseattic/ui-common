@@ -15,7 +15,7 @@
             jobID: null,
             kbCache: null,
             workspaceURL: "https://kbase.us/services/ws/",  //"http://dev04.berkeley.kbase.us:7058",
-            loadingImage: "static/kbase/images/ajax-loader.gif",
+            loadingImage: "assets/img/ajax-loader.gif",
             ujsServiceURL: "https://kbase.us/services/userandjobstate/",
             height: null,
             width: 1000
@@ -24,7 +24,7 @@
         msaWsRef: null,
         pref: null,
         timer: null,
-        loadingImage: "static/kbase/images/ajax-loader.gif",
+        loadingImage: "assets/img/ajax-loader.gif",
         token: null,
         aminoAcidColors: {
         	//// Pos.charged ////////

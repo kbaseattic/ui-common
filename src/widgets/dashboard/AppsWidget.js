@@ -1,11 +1,12 @@
-define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.session', 'kb.client.narrative_method_store', 'kb.client.workspace', 'kb.utils.api', 'kb.logger', 'q'],
-   function (DashboardWidget, UserProfileService, Utils, Session, NarrativeMethodStore, WorkspaceService, APIUtils, Logger, Q) {
+define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.session', 'kb.client.narrative_method_store', 'kb.client.workspace', 'kb.client.methods', 'kb.utils.api', 'kb.logger', 'q'],
+   function (DashboardWidget, UserProfileService, Utils, Session, NarrativeMethodStore, WorkspaceService, Narratives, APIUtils, Logger, Q) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
             value: function (cfg) {
                cfg.name = 'AppsWidget';
                cfg.title = 'KBase Apps';
+               Narratives.init();
                this.DashboardWidget_init(cfg);
                return this;
             }
@@ -54,72 +55,6 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
             }
          },
 
-         getNarratives: {
-            value: function () {
-               // get all the narratives the user can see.
-               return Q.promise(function (resolve, reject, notify) {
-                  Utils.promise(this.workspaceClient, 'list_workspace_info', {
-                        showDeleted: 0,
-                     })
-                     .then(function (data) {
-                        var workspaces = [];
-                        for (var i = 0; i < data.length; i++) {
-                           var wsInfo = APIUtils.workspace_metadata_to_object(data[i]);
-                           if (wsInfo.metadata.narrative &&
-                              /^\d+$/.test(wsInfo.metadata.narrative) && // corrupt workspaces may have narrative set to something other than the object id of the narrative
-                              wsInfo.metadata.is_temporary !== 'true') { // Don't include "unsaved" narratives.
-                              workspaces.push(wsInfo);
-                           }
-                        }
-
-                        var objectRefs = workspaces.map(function (w) {
-                           return {
-                              ref: w.id + '/' + w.metadata.narrative
-                           }
-                        });
-
-                        // Now get the objects for each narrative workspace
-                        Utils.promise(this.workspaceClient, 'get_object_info_new', {
-                              objects: objectRefs,
-                              ignoreErrors: 1,
-                              includeMetadata: 1
-                           })
-                           .then(function (data) {
-                              var narratives = [];
-                              for (var i = 0; i < data.length; i++) {
-                                 // If one of the object ids from the workspace metadata (.narrative) did not actually
-                                 // result in a hit, skip it. This can occur if a narrative is corrupt -- the narrative object
-                                 // was deleted or replaced and the workspace metadata not updated.
-                                 if (!data[i]) {
-                                    Logger.logWarning({
-                                       source: 'AppsWidget',
-                                       title: 'Narrative Problem',
-                                       message: 'Workspace ' + narratives[i].workspace.id + ' does not contain a matching narrative object'
-                                    });
-                                    continue;
-                                 }
-                                 narratives.push({
-                                    workspace: workspaces[i],
-                                    object: APIUtils.object_info_to_object(data[i])
-                                 });
-                              }
-                              resolve(narratives);
-                           }.bind(this))
-                           .catch(function (err) {
-                              console.log('ERROR');
-                              console.log(err);
-                              reject(err);
-                           })
-                           .done();
-                     }.bind(this))
-                     .catch(function (err) {
-                        reject(err);
-                     })
-                     .done();
-               }.bind(this));
-            }
-         },
-
          setInitialState: {
             value: function () {
                var widget = this;
@@ -130,9 +65,10 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                   } else {
 
                      Utils.promise(this.methodStore, 'list_apps_full_info', {})
-                        .then(function (data) {
+                        .then(function (allApps) {
                            var appMap = {};
-                           data.forEach(function (x) {
+                           
+                           allApps.forEach(function (x) {
                               appMap[x.id] = {
                                  owned: {
                                     count: 0,
@@ -146,10 +82,13 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                                     count: 0,
                                     narratives: {}
                                  }
-                              }
+                              };                              
                            });
                            
-                           this.getNarratives()
+                           
+                           Narratives.getNarratives({
+                              params: {showDeleted: 0}
+                           })
                               .then(function (narratives) {
                                  // Now we have all the narratives this user can see.
                                  // now bin them by app.
@@ -182,10 +121,10 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                                     }
                                  }
      
-                                 data.forEach(function (x) {
+                                 allApps.forEach(function (x) {
                                     x.narrativeCount = appMap[x.id];
                                  });
-                                 var appList = data.sort(function (a,b) {
+                                 var appList = allApps.sort(function (a,b) {
                                     if (a.name < b.name) {
                                        return -1;
                                     } else if (a.name > b.name) {
@@ -195,7 +134,20 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                                     }
                                  });
                                  widget.setState('appList', appList);
-
+                              
+                                 // Now twist this and get narrative count per app by ownership category.
+                                 var appOwnership = {owned: [], shared: [], public: []};
+                                 allApps.forEach(function (app) {
+                                    ['owned', 'shared', 'public'].forEach(function (ownerType) {
+                                       if (app.narrativeCount[ownerType].count > 0) {
+                                          appOwnership[ownerType] .push({
+                                             count: app.narrativeCount[ownerType].count,
+                                             app: app
+                                          });
+                                       }
+                                    });
+                                 });
+                                 widget.setState('appOwnership', appOwnership);
                                  resolve();
                               })
                               .catch(function (err) {
@@ -216,8 +168,6 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                }.bind(this));
             }
          }
-
-
       });
 
       return widget;

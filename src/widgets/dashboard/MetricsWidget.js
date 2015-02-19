@@ -1,4 +1,4 @@
-define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal) {
+define(['kb.widget.dashboard.base', 'postal', 'kb.config'], function (DashboardWidget, Postal, Config) {
    return Object.create(DashboardWidget, {
       init: {
          value: function (cfg) {
@@ -40,103 +40,8 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
       calcNarrativeMetrics: {
          value: function (userValue) {
             // Just dummy data for now.
-            var bins = {
-                "bins": [
-                    {
-                        "count": 38,
-                        "label": "[1-2)",
-                        "lower": 1,
-                        "upper": 2
-                    },
-                    {
-                        "count": 29,
-                        "label": "[2-4)",
-                        "lower": 2,
-                        "upper": 4
-                    },
-                    {
-                        "count": 10,
-                        "label": "[4-5)",
-                        "lower": 4,
-                        "upper": 5
-                    },
-                    {
-                        "count": 14,
-                        "label": "[5-7)",
-                        "lower": 5,
-                        "upper": 7
-                    },
-                    {
-                        "count": 1,
-                        "label": "[7-9)",
-                        "lower": 7,
-                        "upper": 9
-                    },
-                    {
-                        "count": 3,
-                        "label": "[9-11)",
-                        "lower": 9,
-                        "upper": 11
-                    },
-                    {
-                        "count": 3,
-                        "label": "[11-13)",
-                        "lower": 11,
-                        "upper": 13
-                    },
-                    {
-                        "count": 2,
-                        "label": "[13-14)",
-                        "lower": 13,
-                        "upper": 14
-                    },
-                    {
-                        "count": 0,
-                        "label": "[14-16)",
-                        "lower": 14,
-                        "upper": 16
-                    },
-                    {
-                        "count": 5,
-                        "label": "[16-19)",
-                        "lower": 16,
-                        "upper": 19,
-                        "upperInclusive": 19
-                    }
-                ],
-                "min": 1,
-                "max": 19,
-                "binSize": 1.8,
-                "binCount": 10,
-                "count": 105,
-                "binned": [
-                    38,
-                    29,
-                    10,
-                    14,
-                    1,
-                    3,
-                    3,
-                    2,
-                    0,
-                    5
-                ],
-                "labels": [
-                    "[1-2)",
-                    "[2-4)",
-                    "[4-5)",
-                    "[5-7)",
-                    "[7-9)",
-                    "[9-11)",
-                    "[11-13)",
-                    "[13-14)",
-                    "[14-16)",
-                    "[16-19)"
-                ],
-                "unbinnable": [
-
-                ]
-            };
+            var stats = this.getState('narrativesStats');
+            var bins = stats.histogram;
             // var data = bins.binned;
             // Calculate widths, height.
             var width = 100/bins.binned.length;
@@ -159,13 +64,206 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
             var userBin;
             for (var i=0; i<bins.bins.length; i++) {
                var bin = bins.bins[i];
-               // console.log('test');console.log(userValue); console.log(bin.lower); console.log(bin.upper); console.log(bin.upperInclusive);
+               if (userValue >= bin.lower && 
+                   ( (bin.upperInclusive && userValue <= bin.upper) || 
+                     (userValue < bin.upper) ||
+                     (i === bins.bins.length-1)
+                   )) {
+                  userBin = i;
+                  if ( (i === bins.bins.length-1) && (userValue > bin.upper) ) {                     
+                     bin.upper = userValue;
+                     bin.label = '(' + bin.lower + '-' + bin.upper + ']';
+                  }
+                  break;
+               }
+            }
+            if (userBin !== undefined) {            
+               var user = {
+                  scale: userBin * width + width/2 ,
+                  value: userValue,
+                  bin: userBin,
+                  side: (userBin < bins.bins.length/2 ? 'right':'left')
+                  
+               }
+            } else {
+               var user = {scale: 0, value: 0}
+            }
+                         
+            this.setState('histogram.narratives', {
+               maxBinSize: maxBinSize, 
+               minBinSize: minBinSize,
+               chartMax: chartHeight,
+               binData: bins, 
+               chart: setup,
+               user: user,
+               stats: stats
+            });
+         }
+      },
+       calcSharedNarrativeMetrics: {
+         value: function (userValue) {
+            // Just dummy data for now.
+             var stats = this.getState('sharedNarrativesStats');
+            var bins = stats.histogram;
+            // var data = bins.binned;
+            // Calculate widths, height.
+            var width = 100/bins.binned.length;
+            var maxBinSize = Math.max.apply(null, bins.binned);
+            var minBinSize = Math.min.apply(null, bins.binned);
+            
+            // consider the user's value in max/min too.
+            maxBinSize = Math.max(maxBinSize, userValue);
+            minBinSize = Math.min(minBinSize, userValue);
+
+            var chartHeight = maxBinSize + maxBinSize/10;
+            var setup = bins.bins.map(function (col) {
+               col.width = width;
+               col.height = Math.round(100*col.count/chartHeight);
+               return col;
+            });
+            
+            // user scaled to histogram.
+            // put user value into the correct bin.
+            
+            var userBin;
+            for (var i=0; i<bins.bins.length; i++) {
+               var bin = bins.bins[i];
+               if (userValue >= bin.lower && 
+                   ( (bin.upperInclusive && userValue <= bin.upper) || 
+                     (userValue < bin.upper) ||
+                     (i === bins.bins.length-1)
+                   )) {               
+                  userBin = i;
+                  
+                  if ( (i === bins.bins.length-1) && (userValue > bin.upper) ) {                     
+                     bin.upper = userValue;
+                     bin.label = '(' + bin.lower + '-' + bin.upper + ']';
+                  }
+                  
+                  break;
+               }
+            }
+             if (userBin !== undefined) {            
+               var user = {
+                  scale: userBin * width + width/2 ,
+                  value: userValue,
+                  bin: userBin,
+                  side: (userBin < bins.bins.length/2 ? 'right':'left')
+                  
+               }
+            } else {
+               var user = {scale: 0, value: 0}
+            }
+                         
+            this.setState('histogram.sharedNarratives', {
+               maxBinSize: maxBinSize, 
+               minBinSize: minBinSize,
+               chartMax: chartHeight,
+               binData: bins, 
+               chart: setup,
+               user: user,
+               stats: stats
+            });
+         }
+      },
+        calcSharingNarrativeMetrics: {
+         value: function (userValue) {
+            // Just dummy data for now.
+            var stats = this.getState('sharingNarrativesStats');
+            var bins = stats.histogram;
+            // var data = bins.binned;
+            // Calculate widths, height.
+            var width = 100/bins.binned.length;
+            var maxBinSize = Math.max.apply(null, bins.binned);
+            var minBinSize = Math.min.apply(null, bins.binned);
+            
+            // consider the user's value in max/min too.
+            maxBinSize = Math.max(maxBinSize, userValue);
+            minBinSize = Math.min(minBinSize, userValue);
+
+            var chartHeight = maxBinSize + maxBinSize/10;
+            var setup = bins.bins.map(function (col) {
+               col.width = width;
+               col.height = Math.round(100*col.count/chartHeight);
+               return col;
+            });
+            
+            // user scaled to histogram.
+            // put user value into the correct bin.
+            
+            var userBin;
+            for (var i=0; i<bins.bins.length; i++) {
+               var bin = bins.bins[i];
+               if (userValue >= bin.lower && 
+                   ( (bin.upperInclusive && userValue <= bin.upper) || 
+                     (userValue < bin.upper) ||
+                     (i === bins.bins.length-1)
+                   )) {               
+                  userBin = i;
+                  
+                  if ( (i === bins.bins.length-1) && (userValue > bin.upper) ) {                     
+                     bin.upper = userValue;
+                     bin.label = '(' + bin.lower + '-' + bin.upper + ']';
+                  }
+                  
+                  break;
+               }
+            }
+             if (userBin !== undefined) {            
+               var user = {
+                  scale: userBin * width + width/2 ,
+                  value: userValue,
+                  bin: userBin,
+                  side: (userBin < bins.bins.length/2 ? 'right':'left')
+                  
+               }
+            } else {
+               var user = {scale: 0, value: 0}
+            }
+                         
+            this.setState('histogram.sharingNarratives', {
+               maxBinSize: maxBinSize, 
+               minBinSize: minBinSize,
+               chartMax: chartHeight,
+               binData: bins, 
+               chart: setup,
+               user: user,
+               stats: stats
+            });
+         }
+      },
+      calcSharedNarrativeMetricsx: {
+         value: function (userValue) {
+            // Just dummy data for now.
+            var bins = this.getState('sharedNarrativesStats').histogram;
+            // var data = bins.binned;
+            // Calculate widths, height.
+            var width = 100/bins.binned.length;
+            var maxBinSize = Math.max.apply(null, bins.binned);
+            var minBinSize = Math.min.apply(null, bins.binned);
+            
+            // consider the user's value in max/min too.
+            maxBinSize = Math.max(maxBinSize, userValue);
+            minBinSize = Math.min(minBinSize, userValue);
+
+            var chartHeight = maxBinSize + maxBinSize/10;
+            var setup = bins.bins.map(function (col) {
+               col.width = width;
+               col.height = Math.round(100*col.count/chartHeight);
+               return col;
+            });
+            
+            
+            // user scaled to histogram.
+            // put user value into the correct bin.
+            var userBin;
+            for (var i=0; i<bins.bins.length; i++) {
+               var bin = bins.bins[i];
                if (userValue >= bin.lower && ( (bin.upperInclusive && userValue <= bin.upper) || (userValue < bin.upper))) {
                   userBin = i;
                   break;
                }
             }
-            // console.log('user?'); console.log(userBin);
             if (userBin !== undefined) {            
                var user = {
                   scale: userBin * width + width/2,
@@ -174,8 +272,8 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
             } else {
                var user = {scale: 0, value: 0}
             }
-            
-            this.setState('histogram.narrative', {
+                         
+            this.setState('histogram.sharedNarratives', {
                maxBinSize: maxBinSize, 
                minBinSize: minBinSize,
                chartMax: chartHeight,
@@ -185,28 +283,49 @@ define(['kb.widget.dashboard.base', 'postal'], function (DashboardWidget, Postal
             });
          }
       },
+      
       setInitialState: {
          value: function () {
-            return Q.promise(function (resolve) {
+            return Q.promise(function (resolve, reject, notify) {
                // We don't really have any initial state, it is all fed in from postal.
-
-               // hey, cool, these calls may return immediately IF the state machine 
-               // already has values for these properties.
-               this.viewState.listen('narratives', function (value) {
-                  this.setState('narratives', value);
-                  this.calcNarrativeMetrics(value.count);
-               }.bind(this));
-
-               this.viewState.listen('sharedNarratives', function (value) {
-                  this.setState('sharedNarratives', value);
-               }.bind(this));
-
-               this.viewState.listen('collaborators', function (value) {
-                  this.setState('collaborators', value);
-               }.bind(this));
-
                
+               // Get the json stuff.
+               Q.all([Q($.get(Config.getConfig('dashboard_metrics_url') + '/narrative_histogram.json')),
+                      Q($.get(Config.getConfig('dashboard_metrics_url') + '/narrative_shared_histogram.json')),
+                      Q($.get(Config.getConfig('dashboard_metrics_url') + '/narrative_sharing_histogram.json'))])
+               .then(function(data) {
+                  this.setState('narrativesStats', data[0]);
+                  this.setState('sharedNarrativesStats', data[1]);
+                  this.setState('sharingNarrativesStats', data[2]);
+                  
+                   // hey, cool, these calls may return immediately IF the state machine 
+                  // already has values for these properties.
+                  this.viewState.listen('narratives', function (value) {
+                     this.setState('narratives', value);
+                     this.calcNarrativeMetrics(value.count);
+                     this.calcSharingNarrativeMetrics(value.sharingCount);
+                  }.bind(this));
 
+                  this.viewState.listen('sharedNarratives', function (value) {
+                     this.setState('sharedNarratives', value);
+                      this.calcSharedNarrativeMetrics(value.count);
+                  }.bind(this));
+                  
+
+                  /*this.viewState.listen('publicNarratives', function (value) {
+                     this.setState('publicNarratives', value);
+                  }.bind(this));
+
+                  this.viewState.listen('collaborators', function (value) {
+                     this.setState('collaborators', value);
+                  }.bind(this));*/
+
+               }.bind(this))
+               .catch(function (err) {
+                  console.log('ERROR'); console.log(err);
+                  reject (err);
+               })
+               .done();
 
                   /*Postal.channel('dashboard.metrics')
                   .publish('query.narratives', function (data) {});

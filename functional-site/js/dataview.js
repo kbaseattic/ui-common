@@ -28,28 +28,11 @@ app.controller('Dataview', function ($scope, $stateParams) {
    // Set up the nabar
    require(['kb.widget.navbar'], function (NAVBAR) {
       NAVBAR.clearMenu()
+         .clear()
          .addDefaultMenu({
             search: true,
             narrative: true
-         })
-         .addHelpMenuItem({
-            type: 'divider'
-         })
-         .addHelpMenuItem({
-            name: 'featurerequest',
-            label: 'Request Feature',
-            external: true,
-            icon: 'thumbs-o-up',
-            url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=2&priority=4&components=10108&assignee=eapearson&summary=Feature%20Request%20on%20User%20Page'
-         })
-         .addHelpMenuItem({
-            name: 'bugreport',
-            label: 'Report BUG',
-            icon: 'bug',
-            external: true,
-            url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&priority=3&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
-         })
-         .clearButtons()
+         });
         
 
 

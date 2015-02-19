@@ -124,9 +124,12 @@
         var url = profile.getAvatarURL({size: 40, rating: 'pg'});
         this.$elem.find('[data-element="avatar"]').attr('src', url);
       }.bind(this));
+       
+      postal.channel('session').subscribe('profile.saved', function(data) {
+         this.fetchUserProfile();
+      }.bind(this));
       
       postal.channel('session').subscribe('profile.get', function (data, envelope) {
-        console.log('returning...');
         envelope.reply(null, this.profile);
         
       }.bind(this));
@@ -627,26 +630,25 @@
     },
     
     fetchUserProfile: function () {
-      require(['kb.user_profile', 'kb.session'], 
-      function(UserProfile, Session) {
+      require(['kb.user_profile', 'kb.session', 'kb.appstate'], 
+      function(UserProfile, Session, AppState) {
         var userProfile = Object.create(UserProfile).init({username: Session.getUsername()});
         userProfile.loadProfile()
         .then(function(profile) {
           switch (profile.getProfileStatus()) {
             case 'stub':
             case 'profile':
+              AppState.setItem('userprofile', profile);
               postal.channel('session').publish('profile.loaded', {profile: profile});
-              //  $(document).trigger('profileLoaded.kbase', profile);       
               break;
             case 'none':
               profile.createStubProfile({createdBy: 'session'})
               .then(function(profile) {
+                AppState.setItem('userprofile', profile);
                 postal.channel('session').publish('profile.loaded', {profile: profile});
-                // $(document).trigger('profileLoaded.kbase',  profile);  
               })
               .catch (function(err) {
                 postal.channel('session').publish('profile.loadfailure', {message: err});
-                //  $(document).trigger('profileLoadFailure.kbase', {status : 0, message : err}); 
               })
               .done();
               break;
@@ -654,9 +656,7 @@
         })
         .catch (function(err) {
           var errMsg = 'Error getting user profile';
-          // KBase Event Interface
           postal.channel('session').publish('profile.loadfailure', {message: err});
-          // $(document).trigger('profileLoadFailure.kbase', {status : 0, message : err}); 
         })
         .done();
       });

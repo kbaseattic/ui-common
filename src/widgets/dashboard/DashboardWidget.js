@@ -131,6 +131,16 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                   s = s.replace(/\n/g, '<br>');
                   return s;
                });
+               this.templates.env.addFilter('unixNiceTime', function (dateString) {
+                  if (dateString) {
+                     var seconds = parseInt(dateString);
+                     //return '' + seconds;
+                     if (seconds && !isNaN(seconds)) {
+                        // return (new Date(seconds*1000)).toLocaleString();
+                        return Utils.niceElapsedTime(seconds*1000)
+                     }
+                  }
+               });
                this.templates.env.addFilter('dateFormat', function (dateString) {
                   return Utils.niceElapsedTime(dateString);
                }.bind(this));
@@ -184,11 +194,15 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                      return false;
                   }
                });
-               this.templates.env.addFilter('sort', function (x) {
+               this.templates.env.addFilter('sort', function (x, prop) {
                   //console.log('X'); console.log(x);
                   if (typeof x === 'object' && x.pop && x.push) {
                     // console.log('sorting...');
                      return x.sort(function (a,b) {
+                        if (prop) {
+                           a = a[prop];
+                           b = b[prop];
+                        }
                         if (a < b) {
                            return 1;
                         } else if (a > b) {
@@ -200,6 +214,14 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                   } else {
                      return x;
                   }
+               });
+               this.templates.env.addFilter('plural', function (x, suffix) {
+                  if (typeof x === 'number') {
+                     if (x !== 1) {
+                        return suffix||'s';
+                     }
+                  }
+                  return '';
                });
                
                this.templates.env.addGlobal('randomNumber', function (from, to) {
@@ -304,19 +326,19 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                this.renderUI();
                this.renderWaitingView();
                this.setInitialState()
-                  .then(function () {
-                     this.setupUI();
+               .then(function () {
+                  this.initialStateSet = true;
+                  this.setupUI();
                }.bind(this))
-                  .then(function () {
-                     this.refresh()
-                  }.bind(this))
-                  .catch(function (err) {
-                     console.log('ERROR');
-                     console.log(err);
-
-                     this.setError(err);
-                  }.bind(this))
-                  .done();
+               .then(function () {
+                  this.refresh()
+               }.bind(this))
+               .catch(function (err) {
+                  console.log('ERROR');
+                  console.log(err);
+                  this.setError(err);
+               }.bind(this))
+               .done();
             }
          },
 
@@ -421,7 +443,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                         this.refreshTimer = null;
                         this.render();
                         resolve();
-                     }.bind(this), 0);
+                     }.bind(this), 100);
                   }
                }.bind(this));
             }
@@ -668,19 +690,23 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                   if (this.error) {
                      this.renderError();
                   } else if (Session.isLoggedIn()) {
-                    this.setTitle(this.widgetTitle);
-                     this.places.content.html(this.renderTemplate('authorized'));
+                     if (this.initialStateSet) {
+                        this.setTitle(this.widgetTitle);
+                        this.places.content.html(this.renderTemplate('authorized'));
+                     }
                   } else {
-                     // no profile, no basic aaccount info
-                    this.setTitle(this.widgetTitle);
-                     this.places.content.html(this.renderTemplate('unauthorized'));
+                     if (this.initialStateSet) {
+                        // no profile, no basic aaccount info
+                        this.setTitle(this.widgetTitle);
+                        this.places.content.html(this.renderTemplate('unauthorized'));
+                     }
                   }
                   if (this.afterRender) {
                      this.afterRender();
                   }
                   return this;
                } catch (ex) {
-                  return 'Error rendering: ' + ex;
+                  this.setError(ex);
                }
             }
          },
@@ -1026,7 +1052,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                                  // result in a hit, skip it. This can occur if a narrative is corrupt -- the narrative object
                                  // was deleted or replaced and the workspace metadata not updated.
                                  if (!data[i]) {
-                                    console.log('WARNING: workspace ' + narratives[i].workspace.id + ' does not contain a matching narrative object');
+                                    console.log('WARNING: workspace ' + objectRefs[i] + ' does not contain a matching narrative object');
                                     continue;
                                  }
                                  // Make sure it is a valid narrative object.

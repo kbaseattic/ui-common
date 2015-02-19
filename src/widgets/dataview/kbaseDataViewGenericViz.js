@@ -204,6 +204,11 @@
 		    options: '{"ws_id":???objname,"ws_name":???wsname}'
 		},
 		
+		'KBaseGenomes.GenomeComparison': {
+		    widget:'kbaseGenomeComparisonViewer',
+		    options: '{"id":???objname,"ws":???wsname}'
+		},
+		
 		'KBaseAssembly.AssemblyReport': {
 		    widget:'kbaseAssemblyView',
 		    options: '{"id":???objname,"ws":???wsname}'
@@ -222,6 +227,34 @@
 				'"loadingImage":"'+this.options.loadingImage+'"}'
 		},
 		
+        /* ASSEMBLY datatypes*/
+        'KBaseAssembly.AssemblyInput': {
+		    widget:'kbaseAssemblyInput',
+		    options: '{"objId":???objid,"workspaceId":???wsid,"objVer":???ver,'+
+				'"loadingImage":"'+this.options.loadingImage+'"}'
+		},    
+        'KBaseAssembly.PairedEndLibrary': {
+		    widget:'kbasePairedEndLibrary',
+		    options: '{"objId":???objid,"workspaceId":???wsid,"objVer":???ver,'+
+				'"loadingImage":"'+this.options.loadingImage+'"}'
+		},     
+        'KBaseAssembly.ReferenceAssembly': {
+		    widget:'kbaseReferenceAssembly',
+		    options: '{"objId":???objid,"workspaceId":???wsid,"objVer":???ver,'+
+				'"loadingImage":"'+this.options.loadingImage+'"}'
+		},     
+        'KBaseAssembly.SingleEndLibrary': {
+		    widget:'kbaseSingleEndLibrary',
+		    options: '{"objId":???objid,"workspaceId":???wsid,"objVer":???ver,'+
+				'"loadingImage":"'+this.options.loadingImage+'"}'
+		},     
+        'KBaseFile.PairedEndLibrary': {
+		    widget:'kbaseFilePairedEndLibrary',
+		    options: '{"objId":???objid,"workspaceId":???wsid,"objVer":???ver,'+
+				'"loadingImage":"'+this.options.loadingImage+'"}'
+		},                 
+            
+            
 		'KBaseGenomes.ContigSet': {
 		    widget:'kbaseContigSetView',
 		    options: '{"ws_id":???objname,"ws_name":???wsname,"ver":???ver,"loadingImage":"'+this.options.loadingImage+'"}'

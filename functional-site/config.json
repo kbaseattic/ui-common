@@ -17,6 +17,7 @@
       "transform": "https://kbase.us/services/transform", 
       "trees": "https://kbase.us/services/trees", 
       "user_profile": "https://kbase.us/services/user_profile/rpc", 
+      "dashboard_metrics_url": "/userMetrics",
       "session": {
          "cookie": {
             "max-age": 5184000
@@ -53,6 +54,7 @@
       "transform": "https://kbase.us/services/transform", 
       "trees": "https://kbase.us/services/trees", 
       "user_profile": "https://kbase.us/services/user_profile/rpc", 
+      "dashboard_metrics_url": "/userMetrics",
       "kbase_clients": {
          "defaults": {
             "timeout": 900000
@@ -89,6 +91,7 @@
       "transform": "https://kbase.us/services/transform", 
       "trees": "https://kbase.us/services/trees", 
       "user_profile": "https://kbase.us/services/user_profile/rpc", 
+      "dashboard_metrics_url": "/userMetrics",
       "kbase_clients": {
          "defaults": {
             "timeout": 900000

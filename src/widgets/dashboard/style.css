@@ -35,6 +35,12 @@
     white-space: nowrap;
     xbackground: silver;
  }
+.kbase-dashboard-view .slider::-webkit-scrollbar {
+   visibility: hidden;
+}
+.kbase-dashboard-view .slider.-autoOverflow::-webkit-scrollbar {
+   visibility: visible;
+}
 
  .kbase-dashboard-view .slider .-card {
     display: inline-block;
@@ -54,7 +60,7 @@
     width: 250px;
     
     
-    overflow: hidden;
+    xoverflow: hidden;
     padding: 4px;
     
     /* go with the flow... */
@@ -74,7 +80,7 @@
    width: 250px;
    font-weight: bold;
    padding: 5px;
-   xborder: 1px red solid;
+   overflow: hidden;
 }
 .kbase-dashboard-view .slider .-card .-body {
    position: absolute;
@@ -83,12 +89,46 @@
    height: 150px;
    width: 250px;
    background-color: #FFF; 
-    box-shadow: 1px 1px 1px #ccc;
-   overflow:hidden;
+   box-shadow: 1px 1px 1px #ccc;
+   overflow: hidden;
    xoverflow-x: auto;
    xoverflow-y: hidden;
    padding: 3px;
    xborder: 1px red solid;
+}
+ .slider .-card .-body.-active {
+   xbackground-color: #ececec;
+   box-shadow: inset 1px 1px 1px #ccc;
+}
+.slider .-card .-body.-autoOverflow {
+   overflow:auto;
+}
+.kbase-dashboard-view .slider .-card .-box {
+   position: absolute;
+   top: 25px;
+   left: 0;
+   height: 200px;
+   width: 250px;
+   background-color: #FFF; 
+   box-shadow: 1px 1px 1px #ccc;
+   overflow: hidden;
+   padding: 3px;
+}
+.kbase-dashboard-view .slider .-card .-message {
+   position: absolute;
+   top: 25px;
+   left: 0;
+   height: 200px;
+   width: 250px;
+   background-color: #FFF; 
+   box-shadow: 1px 1px 1px #ccc;
+   overflow: hidden;
+   padding: 3px;
+}
+.kbase-dashboard-view .slider .-card .-message p {
+   white-space: normal;
+   padding: 3px;
+   overflow: none;
 }
 .kbase-dashboard-view .slider .-card .-saved {
    position: absolute;
@@ -97,8 +137,6 @@
    height: 20px;
    width: 250px;
    text-align: center;
-   xborder: 1px red solid;
-   
 }
 .kbase-dashboard-view .slider .-card .-footer {
    position: absolute;
@@ -106,8 +144,6 @@
    left: 0;
    height: 20px;
    width: 250px;
-   xborder: 1px red solid;
-   
 }
 
 .kbase-dashboard-view .slider .-card table {
@@ -116,70 +152,6 @@
  }
  
 
-
- .kbase-dashboard-view .slider .slide {
-    display: inline-block;
-    xwhite-space: normal;
-    xposition: relative;
-    xfloat: left;
-    xclear: none;
-    margin: 4px;
-    height: 150px;
-    min-width: 150px;
-    
-    overflow: hidden;
-    padding: 4px;
-    background-color: #d9edf7;
-    box-shadow: 1px 1px 1px #ccc;
-    /* go with the flow... */
-    xborder: 1px #337ab7 solid;
-    xborder-radius: 4px;
-    xbox-shadow: 1px 1px 1px #ccc;
- }
-
- .kbase-dashboard-view .slider .slide table {
-    width: 200px;
-    overflow: hidden;
- }
- 
- .kbase-dashboard-view .slide .title {
-    font-weight: bold;
- }
- 
- .kbase-dashboard-view .slide .sharing {}
- 
- .kbase-dashboard-view .slide .count {}
- 
- .kbase-dashboard-view .slide .date {}
- 
- .kbase-dashboard-view .slide .savedby {}
- 
- .kbase-dashboard-view .slide table {
-    height: 100%;
-    width: 100%;
-    xborder: 1px red solid;
- }
- 
- .kbase-dashboard-view .slide tr,
- .slide td {
-    height: 100%;
- }
- 
- .kbase-dashboard-view .slide table tr:nth-child(1) td {
-    vertical-align: top;
- }
- 
- .kbase-dashboard-view .slide table tr:nth-child(2) td {
-    vertical-align: bottom;
-    text-align: center;
- }
- 
- .kbase-dashboard-view .slide .btn {
-    padding: 0;
-    width: 100%;
-    height: 100%;
- }
- 
  .kbase-dashboard-view .kbtn {
     background-color: #337ab7;
     border: 1px solid #2e6da4;
@@ -195,4 +167,20 @@
 }
 .navbar-group.navbar-form {
    margin: 0;
+}
+
+.kbase-dashboard-view [data-toggle="collapse"]::after {
+  margin-left: 6px;
+  font-family: "FontAwesome";
+  font-style: normal;
+  font-weight: normal;
+  font-size: 90%;
+  width: 12px;
+  color: silver;
+  line-height: 1;
+  vertical-align: baseline;
+  content: "\f078 ";
+}
+.kbase-dashboard-view [data-toggle="collapse"].collapsed::after {
+  content: "\f054 ";
 }

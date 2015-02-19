@@ -137,9 +137,9 @@
    <script src="assets/js/viz/raphael-min.js"></script>
 
    <script src="/ext/q/q.min.js"></script>
-   <script src="/ext/postal/postal-0.12.4.min.js"></script>
-   <script src="/ext/postal/postal.request-response-0.3.1.min.js"></script>
-   <script src="/ext/postal/postal-deluxe.js"></script>
+   <script src="/ext/postal/1.0.0/postal.min.js"></script>
+   <script src="/ext/postal/postal.request-response-0.3.1.min.js"></script> 
+   <script src="/ext/postal/postal-config.js"></script>
 
 
    <!-- angular itself -->
@@ -171,7 +171,7 @@
 
    <!-- KBase client library javascript -->
    <script src="assets/js/kbclient/wikiScraper.js"></script>
-   <script src="/ext/kbase-clients/kbase-client-api.js"></script>
+   <script src="/ext/kbase-clients/kbase-client-api.min.js"></script>
    <!-- The following are supserseded by /ext/js/kbase-clients/kbase-client-api[.min].js -->
    <!-- <script src="assets/js/kbclient/kbase.js"></script>-->
    <!--<script src="assets/js/kbclient/workspaceDeluxe-0.2.1.js"></script>-->
@@ -399,6 +399,7 @@
    <script src="../src/widgets/json/kbaseJsonView.js"></script>
    <script src="../src/widgets/contigset/kbaseContigSetView.js"></script>
    <script src="../src/widgets/protcmp/kbaseGenomeComparison.js"></script>
+   <script src="../src/widgets/protcmp/kbaseGenomeComparisonViewer.js"></script>
 
    <script src="../src/widgets/dataview/kbaseDataViewGenericViz.js"></script>
    <script src="../src/widgets/dataview/kbaseDownloadPanel.js"></script>
@@ -415,6 +416,22 @@
    <script src="../src/widgets/modeling/kbaseTabs.js"></script>
    <script src="../src/widgets/modeling/kbaseTabTable.js"></script>
    <!-- END REVISED MODELING WIDGETS -->
+    
+    
+   <!-- Assembly widgets -->    
+   <script src="../src/widgets/assembly/kbaseSingleObjectBasicWidget.js"></script>
+   <script src="../src/widgets/assembly/kbaseAssemblyInput.js"></script>
+   <script src="../src/widgets/assembly/kbasePairedEndLibrary.js"></script>
+   <script src="../src/widgets/assembly/kbaseReferenceAssembly.js"></script>
+   <script src="../src/widgets/assembly/kbaseSingleEndLibrary.js"></script>
+   <script src="../src/widgets/assembly/kbaseFilePairedEndLibrary.js"></script>
+    
+    
+   <!-- END Assembly widgets -->
+    
+    
+    
+    
    <!-- Communities Widgets and dependencies -->
    <script src="../src/widgets/kbaseTabs.js"></script>
    <script src="../src/widgets/communities/jquery.svg.js"></script>

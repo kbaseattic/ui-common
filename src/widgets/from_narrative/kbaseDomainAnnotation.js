@@ -15,7 +15,7 @@
             workspaceID: null,
             domainAnnotationVer: null,
             kbCache: null,
-            loadingImage: "static/kbase/images/ajax-loader.gif",
+            loadingImage: "assets/img/ajax-loader.gif",
             height: null,
         },
 
@@ -38,7 +38,7 @@
             this.landingPageURL = "#/dataview/";
 
             // Create a message pain
-            this.$messagePane = $("<div/>").addClass("kbwidget-message-pane kbwidget-hide-message");
+            this.$messagePane = $("<div/>"); //.addClass("kbwidget-message-pane kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
 
             return this;
@@ -358,7 +358,7 @@
         },
 
         showMessage: function(message) {
-            var span = $("<span/>").append(message);
+            var span = $("<span>").append(message);
 
             this.$messagePane.append(span);
             this.$messagePane.show();

@@ -23,7 +23,7 @@ $.KBWidget({
 
         var panel_body = container.find('.panel-body');
         //panel_body.append('<p class="muted loader-rxn"> \
-        //        <img src="../common/img/ajax-loader.gif"> loading...</p>')
+        //        <img src="assets/img/ajax-loader.gif"> loading...</p>')
 
         var test = [{label: "media", tag: 'input', type:'text', placeholder: 'optional', id: 'media'},
                     {label: "additionalcpds", tag: 'input', type:'text', placeholder: 'optional', id: 'additionalcpds'},

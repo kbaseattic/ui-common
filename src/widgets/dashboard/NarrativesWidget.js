@@ -104,12 +104,16 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                if (this.error) {
                   this.renderError();
                } else if (Session.isLoggedIn()) {
-                  this.places.title.html(this.widgetTitle);
-                  this.places.content.html(this.renderTemplate(this.view));
+                  if (this.initialStateSet) {
+                     this.places.title.html(this.widgetTitle);
+                     this.places.content.html(this.renderTemplate(this.view));
+                  }
                } else {
-                  // no profile, no basic aaccount info
-                  this.places.title.html(this.widgetTitle);
-                  this.places.content.html(this.renderTemplate('unauthorized'));
+                  if (this.initialStateSet) {
+                     // no profile, no basic aaccount info
+                     this.places.title.html(this.widgetTitle);
+                     this.places.content.html(this.renderTemplate('unauthorized'));
+                  }
                }
                this.container.find('[data-toggle="popover"]').popover();
                this.container.find('[data-toggle="tooltip"]').tooltip();
@@ -219,11 +223,26 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
          
           onStateChange: {
             value: function () {
-                var count = this.doState('narratives', function(x){return x.length}, null);
+               var count = this.doState('narratives', function(x){return x.length}, null);
                var filtered = this.doState('narrativesFiltered', function(x){return x.length}, null);
+               
+               var sharingCount = this.doState('narratives', function (narratives) {
+                  if (!narratives) {
+                     return 0;
+                  }
+                  var sharingCount = 0;
+                  for (var i=0; i<narratives.length; i++) {
+                     var nar = narratives[i];      
+                     if (nar.permissions.length > 0) {
+                        sharingCount++;
+                     }
+                  }
+                  return sharingCount;
+               });
               
                this.viewState.setItem('narratives', {
                   count: count,
+                  sharingCount: sharingCount,
                   filtered: filtered
                });
                /*
@@ -259,7 +278,6 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                         var narratives = result[0];
                         var apps = result[1];
                         var methods = result[2];
-                     
                         this.setState('apps', apps);
                         var appsMap = {};
                         apps.forEach(function (app) {
@@ -275,11 +293,13 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                         this.setState('methodsMap', methodsMap);
                         
                         if (narratives.length === 0) {
+                          
                            this.setState('narratives', []);
                            this.setState('narrativesFiltered', []);
                            resolve();
                            return;
                         }
+
                         this.kbservice.getPermissions(narratives)
                            .then(function (narratives) {
                               narratives = narratives.sort(function (a, b) {
@@ -287,7 +307,7 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                               });
                               this.setState('narratives', narratives);
                               this.setState('narrativesFiltered', narratives);
-                             
+                           console.log(narratives);
                               resolve();
                            }.bind(this))
                            .catch(function (err) {
@@ -297,6 +317,8 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                            })
                      }.bind(this))
                      .catch(function (err) {
+                         console.log('ERROR');
+                        console.log(err);
                         reject(err);
                      })
                      .done();

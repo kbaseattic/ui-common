@@ -7,7 +7,7 @@
         options: {
             genomeID: null,
             workspaceID: null,
-            loadingImage: "../../widgets/images/ajax-loader.gif",
+            loadingImage: "assets/img/ajax-loader.gif",
             kbCache: null,
             isInCard: false,
             genomeInfo: null
