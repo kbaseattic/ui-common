@@ -373,7 +373,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         Navbar.clearButtons();
         
         Navbar.setTitle("Search");
-        Navbar.addButton("Help");
+        //Navbar.addButton("Help");
         //Navbar.addHelpMenuItem({title: "Search User Guide"});
 
     });

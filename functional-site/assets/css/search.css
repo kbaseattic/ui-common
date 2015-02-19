@@ -220,6 +220,7 @@ span .badge {
 }
 
 
+
 /*** Selections ***/
       
 .search-selections-title h3 {
@@ -737,11 +738,11 @@ table.search-transfer-table {
 }
 
 .genome-scientific-name-header {
-    min-width: 290px;
+    min-width: 330px;
 }
 
 .genome-scientific-name {
-    min-width: 282px;
+    min-width: 322px;
     margin-right: 8px;
 }
 
@@ -1068,11 +1069,11 @@ table.search-transfer-table {
 }
 
 
-.fba_model_id_header {
+.fba_model_name_header {
     width: 160px;
 }
 
-.fba_model_id {
+.fba_model_name {
     width: 152px;
     margin-right: 8px;
 }

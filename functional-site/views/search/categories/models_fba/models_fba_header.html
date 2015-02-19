@@ -1,24 +1,24 @@
-<div class="btn-group search-result-column-header col-xs-2 col-sm-2 col-md-1 col-lg-1 fba_model_id_header">
+<div class="btn-group search-result-column-header col-xs-2 col-sm-2 col-md-1 col-lg-1 fba_model_name_header">
     <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">                
-        <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['fba_model_id']}"><strong>FBA Model Id</strong></div>
-        <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['fba_model_id'], 'glyphicon-sort-by-alphabet': options.active_sorts[options.selectedCategory].sorts['fba_model_id'].direction == 'asc', 'glyphicon-sort-by-alphabet-alt': options.active_sorts[options.selectedCategory].sorts['fba_model_id'].direction == 'desc'}"></span>                
-        <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['fba_model_id'].order}}</span>
+        <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['fba_model_name']}"><strong>FBA Model Name</strong></div>
+        <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['fba_model_name'], 'glyphicon-sort-by-alphabet': options.active_sorts[options.selectedCategory].sorts['fba_model_name'].direction == 'asc', 'glyphicon-sort-by-alphabet-alt': options.active_sorts[options.selectedCategory].sorts['fba_model_name'].direction == 'desc'}"></span>                
+        <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['fba_model_name'].order}}</span>
     </button>
     <ul class="dropdown-menu" role="menu">
         <li>
-            <a ng-click="addSort(options.selectedCategory, 'fba_model_id', 'asc')">
+            <a ng-click="addSort(options.selectedCategory, 'fba_model_name', 'asc')">
                 <span class="glyphicon glyphicon-sort-by-alphabet"/>
                 <span>Sort ascending</span>
             </a>
         </li>
         <li>
-            <a ng-click="addSort(options.selectedCategory, 'fba_model_id', 'desc')">
+            <a ng-click="addSort(options.selectedCategory, 'fba_model_name', 'desc')">
                 <span class="glyphicon glyphicon-sort-by-alphabet-alt"/>
                 <span>Sort descending</span>
             </a>
         </li>
         <li>
-            <a ng-click="removeSort(options.selectedCategory, 'fba_model_id', true)">
+            <a ng-click="removeSort(options.selectedCategory, 'fba_model_name', true)">
                 <span class="glyphicon glyphicon-remove"/>
                 <span>Clear this sort</span>
             </a>

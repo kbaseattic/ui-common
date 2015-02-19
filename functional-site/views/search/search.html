@@ -65,7 +65,7 @@
                         </div>
                     </div>
 
-                    <div class="workspace-area" ng-show="options.userState.session.displayWorkspaces">
+                    <div class="workspace-area" ng-class="{'panelAnimateOut': options.userState.session.displayWorkspaces, 'panelAnimateIn': !options.userState.session.displayWorkspaces}" ng-show="options.userState.session.displayWorkspaces">
                         <ul class='nav nav-pills nav-stacked scroll-menu'>
                             <li id="{{w[1].replace(':','_')}}_{{w[4]}}" ng-repeat="w in options.userState.longterm.workspaces" ng-class="{'workspace-chosen': '{{options.userState.session.selectedWorkspace}}' == '{{w[1]}}'}">
                                 <a ng-click='selectWorkspace(w)'>
