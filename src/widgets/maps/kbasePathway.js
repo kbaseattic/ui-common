@@ -278,7 +278,6 @@ $.KBWidget({
                 if (self.fbas) {
                     var fba_rxns = getFbaRxns(rxn.rxns);
 
-                    //console.log('rxn.id', rxn.id, fba_rxns)
                     if ([].concat.apply([], fba_rxns).length == 0 ) continue;
 
                     var w = rxn.w / self.fbas.length;
@@ -312,10 +311,8 @@ $.KBWidget({
                                 }
                             }
 
-                            if (Math.abs(flux) > 499) {
-                                console.log('setting light label', rxn.id, flux)
+                            if (Math.abs(flux) > 499)
                                 lightLabel = true;
-                            }
                         }
 
                         if (typeof flux != 'undefined') {
@@ -1318,85 +1315,4 @@ $.KBWidget({
 
 })
 }( jQuery ) );
-
-
-
-
-
-
-    // for when centers are "on" the same x axis, don't offset the y, etc
-    /*var g = svg.append('g').attr('class', 'line')
-    var line = g.append("line")
-             .attr("x1", x)
-             .attr("y1", y)
-             .attr("stroke-width", stroke_width)
-             .attr("stroke", stroke_color)
-             .attr("fill", stroke_color)
-             .attr('marker-end', "url(#end-arrow)");
-    if (Math.abs(cpd.x-x) < threshold) {
-        var line = line.attr("x2", cpd.x)
-                       .attr("y2", (cpd.y  > y ? cpd.y-oset : cpd.y+oset));
-    } else if (Math.abs(cpd.y-y) < threshold) {
-        var line = line.attr("x2", (cpd.x  > x ? cpd.x-oset : cpd.x+oset))
-                       .attr("y2", cpd.y);
-    } else {
-        var d = Math.abs( Math.sqrt( Math.pow(cpd.y - y,2)+Math.pow(cpd.x - x,2) ) )
-        var line = line.attr("x2", cpd.x - (r/d)*(cpd.x - x) )
-                       .attr("y2", cpd.y - (r/d)*(cpd.y - y) )
-    } */
-
-
-
-
-                        // for when centers are "on" the same x axis, don't off setthe y, etc
-                        /*
-                        var g = svg.append('g').attr('class','line')
-                        var line = g.append("line").attr("x2", x)
-                                 .attr("y2", y)
-                                 .attr("stroke-width", stroke_width)
-                                 .attr("stroke", stroke_color)
-                                 .attr("fill", stroke_color);
-
-                        if (Math.abs(cpd.x-x) < threshold) {
-                            var line = line.attr("x1", cpd.x)
-                                           .attr("y1", (cpd.y  > y ? cpd.y-oset : cpd.y+oset) )
-                        } else if (Math.abs(cpd.y-y) < threshold) {
-                            var line = line.attr("x1", (cpd.x  > x ? cpd.x-oset : cpd.x+oset))
-                                          .attr("y1", cpd.y );
-                        } else {
-                            var d = Math.abs( Math.sqrt( Math.pow(cpd.y - y,2)+Math.pow(cpd.x - x,2) ) );
-                            var line = line.attr("x1", cpd.x - (r/d)*(cpd.x - x) )
-                                           .attr("y1", cpd.y - (r/d)*(cpd.y - y) )
-                        }
-                        */
-   /*
-                svg.on('click', function() {
-                    var x = d3.mouse(this)[0];
-                    var y = d3.mouse(this)[1];
-                    console.log(d3.mouse(this))
-                    svg.append("circle")
-                      .attr("r", 1e-6)
-                      .attr("cx", x)
-                      .attr("cy", y)
-                      .style("fill", "#F00")
-                      .attr('fill-opacity', .3)
-                      .attr('stroke', '#000')
-                      .attr('stroke-width', 1)
-                    .transition()
-                      .duration(750)
-                      .ease("elastic")
-                      .attr("r", 6.5)
-
-
-                    var g = svg.append('g').attr('class', 'line');
-                    var line = g.append("line")
-                                 .attr("x1", x2)
-                                 .attr("y1", y2)
-                                 .attr("x2", x)
-                                 .attr("y2", y)
-                                 .attr("stroke-width", stroke_width)
-                                 .attr("stroke", stroke_color)
-                                 .attr("fill", stroke_color)
-                                 .attr('marker-end', "url(#end-arrow)")
-                })*/
 
