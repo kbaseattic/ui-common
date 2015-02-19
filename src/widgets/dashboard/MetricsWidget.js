@@ -40,7 +40,8 @@ define(['kb.widget.dashboard.base', 'postal', 'kb.config'], function (DashboardW
       calcNarrativeMetrics: {
          value: function (userValue) {
             // Just dummy data for now.
-            var bins = this.getState('narrativesStats').histogram;
+            var stats = this.getState('narrativesStats');
+            var bins = stats.histogram;
             // var data = bins.binned;
             // Calculate widths, height.
             var width = 100/bins.binned.length;
@@ -94,14 +95,16 @@ define(['kb.widget.dashboard.base', 'postal', 'kb.config'], function (DashboardW
                chartMax: chartHeight,
                binData: bins, 
                chart: setup,
-               user: user
+               user: user,
+               stats: stats
             });
          }
       },
        calcSharedNarrativeMetrics: {
          value: function (userValue) {
             // Just dummy data for now.
-            var bins = this.getState('sharedNarrativesStats').histogram;
+             var stats = this.getState('sharedNarrativesStats');
+            var bins = stats.histogram;
             // var data = bins.binned;
             // Calculate widths, height.
             var width = 100/bins.binned.length;
@@ -158,14 +161,16 @@ define(['kb.widget.dashboard.base', 'postal', 'kb.config'], function (DashboardW
                chartMax: chartHeight,
                binData: bins, 
                chart: setup,
-               user: user
+               user: user,
+               stats: stats
             });
          }
       },
         calcSharingNarrativeMetrics: {
          value: function (userValue) {
             // Just dummy data for now.
-            var bins = this.getState('sharingNarrativesStats').histogram;
+            var stats = this.getState('sharingNarrativesStats');
+            var bins = stats.histogram;
             // var data = bins.binned;
             // Calculate widths, height.
             var width = 100/bins.binned.length;
@@ -222,7 +227,8 @@ define(['kb.widget.dashboard.base', 'postal', 'kb.config'], function (DashboardW
                chartMax: chartHeight,
                binData: bins, 
                chart: setup,
-               user: user
+               user: user,
+               stats: stats
             });
          }
       },

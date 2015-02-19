@@ -571,7 +571,7 @@
 					    self.objRefToNodeIdx[objId] = nodeId;
 					    
 					    // add the link now too
-					    if (self.objRefToNodeIdx[objIdentities[i]['ref']]) {  // only add the link if it is visible
+					    if (self.objRefToNodeIdx[objIdentities[i]['ref']]!=null) {  // only add the link if it is visible
 						self.graph['links'].push({
 						    source:self.objRefToNodeIdx[objIdentities[i]['ref']],
 						    target:nodeId,
@@ -596,7 +596,7 @@
 					self.objRefToNodeIdx[objId] = nodeId;
 					
 					// add the link now too
-					if (self.objRefToNodeIdx[objIdentities[i]['ref']]) {  // only add the link if it is visible
+					if (self.objRefToNodeIdx[objIdentities[i]['ref']]!=null) {  // only add the link if it is visible
 					    self.graph['links'].push({
 						source:self.objRefToNodeIdx[objIdentities[i]['ref']],
 						target:nodeId,
@@ -705,8 +705,9 @@
 					    }
 					    // add the link info
 					    var links = self.tempRefData['links'];
+						console.log(links);
 					    for(var i=0; i<links.length; i++) {
-						if (self.objRefToNodeIdx[links[i]['source']] && self.objRefToNodeIdx[links[i]['target']]) {
+						if (self.objRefToNodeIdx[links[i]['source']]!=null && self.objRefToNodeIdx[links[i]['target']]!=null) {
 						    self.graph['links'].push({
 							source:self.objRefToNodeIdx[links[i]['source']],
 							target:self.objRefToNodeIdx[links[i]['target']],

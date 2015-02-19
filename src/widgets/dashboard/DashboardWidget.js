@@ -131,6 +131,16 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                   s = s.replace(/\n/g, '<br>');
                   return s;
                });
+               this.templates.env.addFilter('unixNiceTime', function (dateString) {
+                  if (dateString) {
+                     var seconds = parseInt(dateString);
+                     //return '' + seconds;
+                     if (seconds && !isNaN(seconds)) {
+                        // return (new Date(seconds*1000)).toLocaleString();
+                        return Utils.niceElapsedTime(seconds*1000)
+                     }
+                  }
+               });
                this.templates.env.addFilter('dateFormat', function (dateString) {
                   return Utils.niceElapsedTime(dateString);
                }.bind(this));
@@ -682,7 +692,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                   } else if (Session.isLoggedIn()) {
                      if (this.initialStateSet) {
                         this.setTitle(this.widgetTitle);
-                        var showAsD3 = false;
+                        var showAsD3 = true;
                         var context0 = this.createTemplateContext();
                         if (showAsD3 && context0.state.histogram && context0.state.histogram.narratives) {
                             context0.state.histogram.narratives.id = 'dbrd_hist_my_narr';

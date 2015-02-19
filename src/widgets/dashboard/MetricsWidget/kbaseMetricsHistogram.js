@@ -24,7 +24,7 @@
                 'display': 'inline-block',
                 'position': 'relative',
                 'width': '100%',
-                'padding-bottom': '38%', /* aspect ratio */
+                'padding-bottom': '30%', /* aspect ratio */
                 'vertical-align': 'top',
                 'overflow': 'hidden'
             });
