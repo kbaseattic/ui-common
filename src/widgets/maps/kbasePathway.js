@@ -97,7 +97,6 @@ $.KBWidget({
             var models = [];
             var fbas = [];
 
-            console.log('so the models are ', self.models, self.fbas)
             self.map_data = self.map_data[0].data;
 
             rxns = self.map_data.reactions,
@@ -105,10 +104,10 @@ $.KBWidget({
             maplinks = self.map_data.linkedmaps;
             groups = self.map_data.groups;
 
-            var data = []
+            /*var data = []
             for (var i in rxns) {
                 data.push({'products': rxns[i].product_refs, 'substrates': rxns[i].substrate_refs});
-            }
+            }*/
 
             self.drawMap()
         }
@@ -211,7 +210,8 @@ $.KBWidget({
 
             // for each rxn on the map
             for (var i=0; i<rxns.length; i++) {
-                var color = '#fff'
+                var color = '#fff',
+                    lightLabel = undefined;
 
                 var rxn = rxns[i];
 
@@ -246,7 +246,7 @@ $.KBWidget({
                         var found_rxn = found_rxns[j];
 
                         var rect = group.append('rect')
-                                    .attr('class', 'rxn-divider')
+                                    .attr('class', 'rxn-divider-stroke')
                                     .attr('x', function() {
                                         if (j == 0) return x + (w*j) + 1;
                                         return x + (w*j)
@@ -274,17 +274,20 @@ $.KBWidget({
                     }
                 }
 
-                var fba_rxns = getFbaRxns(rxn.rxns);
-
-                // color flux depending on rxns found for each modle
-
+                // color flux depending on rxns found for each fba
                 if (self.fbas) {
+                    var fba_rxns = getFbaRxns(rxn.rxns);
+
+                    //console.log('rxn.id', rxn.id, fba_rxns)
+                    if ([].concat.apply([], fba_rxns).length == 0 ) continue;
+
                     var w = rxn.w / self.fbas.length;
-                    console.log('fba_rxns', fba_rxns)
+
+                    // for each fba result
                     for (var j=0; j<fba_rxns.length; j++) {
-                        var flux;
-                        var found_rxn = fba_rxns[i];
+                        var found_rxn = fba_rxns[j];
                         var rect = group.append('rect')
+                                    .attr('class', 'rxn-divider-stroke')
                                     .attr('x', function() {
                                         if (j == 0) return x + (w*j) + 1;
                                         return x + (w*j)
@@ -296,28 +299,37 @@ $.KBWidget({
                                     })
                                     .attr('height', h-1.5)
 
-                        /*
-                        if (found_rxns.length) {
-                            //find largest magnitude flux
-                            flux = 0
-                            for (var j in found_rxns) {
-                                if (Math.abs(found_rxns[j].value) > Math.abs(flux) )
-                                    flux = found_rxns[j].value;
+
+                        var flux;
+
+                        // there may be more than one fba result on a box,
+                        // so find the largest magnitude flux
+                        if (found_rxn.length > 0) {
+                            var flux = found_rxn[0].value;
+                            for (var k=1; k<found_rxn.length; k++) {
+                                if (Math.abs(found_rxn[k].value) > Math.abs(flux) ) {
+                                    flux = found_rxn[k].value;
+                                }
                             }
-                        }*/
 
+                            if (Math.abs(flux) > 499) {
+                                console.log('setting light label', rxn.id, flux)
+                                lightLabel = true;
+                            }
+                        }
 
-                        if (flux) var color = getColor(flux);
-
-                        rect.attr('fill', color);
-                        //if (color != '#fff') {
-                        //    rect.attr('stroke', stroke_color);
-                            //outer_rect.remove();
-                        //}
+                        if (typeof flux != 'undefined') {
+                            var color = getColor(flux);
+                            if (color)
+                                rect.attr('fill', color);
+                            else
+                                rect.attr('fill', '#fff');
+                        }
 
                         //var title = self.fbas[i].info[1];
-                        //var title = self.models[i].name+'<br>'+self.models[i].source_id;
-                        //tooltip(rect.node(), title, rxn, flux, self.fbas[i]);
+                        var title = '<h5>'+self.models[j].name+'<br>'+
+                                    '<small>'+self.models[j].source_id+'</small></h5>';
+                        tooltip(rect.node(), title, rxn, flux, self.fbas[j]);
                     }
                 }
 
@@ -326,22 +338,15 @@ $.KBWidget({
                                 .attr('x', x+2)
                                 .attr('y', y+h/2+6)
                                 .text(rxn.name)
-                                .attr('class', 'rxn-label');
+                                .attr('class', (lightLabel ? 'rxn-label-light' : 'rxn-label') );
 
-
-                //if ($('[data-type=rxn-label]').attr('checked')) {
-                // hide and show text on hoverover
-                /*$(group.node()).hover(function() {
+                $(group.node()).hover(function() {
                     $(this).find('text').hide();
                 }, function() {
                     $(this).find('text').show();
+                })
+            } // end loop
 
-                })*/
-            }
-
-            // bad attempt at adding data for use later
-            //var rects = svg.selectAll("rect");
-            //rects.data(data);
         }
 
 
@@ -374,7 +379,7 @@ $.KBWidget({
                            '</table>'
 
             $(container).popover({html: true, content: content, animation: false, title: title,
-                                    container: 'body', trigger: 'hover'});
+                                  container: 'body', trigger: 'hover'});
         }
 
         function drawCompounds() {
@@ -390,8 +395,8 @@ $.KBWidget({
 
                 var content = 'ID: ' + cpd.id+'<br>'+
                               'kegg id: ' + cpd.name;
-                $(circle.node()).popover({html: true, content: content, animation: false,
-                                        container: 'body', trigger: 'hover'});
+                //$(circle.node()).popover({html: true, content: content, animation: false,
+                //                        container: 'body', trigger: 'hover'});
             }
         }
 
@@ -680,8 +685,6 @@ $.KBWidget({
         }
 
 
-
-
         function getModelRxns(rxn_ids) {
             // get a list of rxn objects (or undefined)
             // for each model supplied
@@ -715,11 +718,10 @@ $.KBWidget({
             // for each model supplied
             var found_rxns = [];
 
-            // for each model, look for model data
-
-            for (var j in self.fbas) {
+            // for each fba, look for model data
+            for (var j=0; j<self.fbas.length; j++) {
                 var fba = self.fbas[j];
-                if (!fba) continue;
+                //if (!fba) continue;
                 fba_objs = fba.data.FBAReactionVariables;
 
                 // see if we can find the rxn in that fbas's list of reactions
