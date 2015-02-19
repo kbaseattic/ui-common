@@ -43,6 +43,17 @@
 </table>
 -->
 <style type="text/css">
+
+.axis path,.axis line {
+    display: none;
+}
+
+.axis text {
+    font-family: 'Arial';
+    font-size: 9px;
+    fill: gray;
+}
+
 .rotate-90 {
 
 /* Safari */
@@ -84,7 +95,7 @@ filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
 
 <h3>Total Narratives</h3>
 
-<div style="margin-left: 20px;">
+<div id="{{state.histogram.narratives.id}}" style="margin-left: 20px;">
    <div style="position: relative; height: 150px; width: 100%;">
       <div style="width: 100%; height: 100px; border: 0px dashed red; position: relative; top: 20px; ">
          <div style="width: 100%; height: 100px; ">
@@ -127,6 +138,19 @@ filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
    </div>
 </div>
 
+{% if state.histogram.narratives.id %}
+<script type="text/javascript">
+    try {
+        var histNarrDiv = $('#{{state.histogram.narratives.id}}');
+        data = $.parseJSON('{{state.histogram.narrativesJson}}');
+        if (histNarrDiv.length == 1 && histNarrDiv.is(':visible'))
+            histNarrDiv['kbaseMetricsHistogram']({state: data, x_axis: 'Narratives per User'});
+    } catch (e) {
+        console.error(e);
+    }
+</script>
+{% endif %}
+
    {% endif %}
    
    
@@ -135,7 +159,7 @@ filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
 
 <h3>Shared Narratives</h3>
 
-<div style="margin-left: 20px;">
+<div id="{{state.histogram.sharingNarratives.id}}" style="margin-left: 20px;">
    <div style="position: relative; height: 150px; width: 100%;">
       <div style="width: 100%; height: 100px; border: 0px dashed red; position: relative; top: 20px; ">
          <div style="width: 100%; height: 100px; ">
@@ -178,6 +202,18 @@ filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
    </div>
 </div>
 
+{% if state.histogram.sharingNarratives.id %}
+<script type="text/javascript">
+    try {
+        var histNarrDiv = $('#{{state.histogram.sharingNarratives.id}}');
+        data = $.parseJSON('{{state.histogram.sharingNarrativesJson}}');
+        if (histNarrDiv.length == 1 && histNarrDiv.is(':visible'))
+            histNarrDiv['kbaseMetricsHistogram']({state: data, x_axis: 'Narratives Shared per User'});
+    } catch (e) {
+        console.error(e);
+    }
+</script>
+{% endif %}
 
    {% endif %}
    

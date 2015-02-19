@@ -682,6 +682,16 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                   } else if (Session.isLoggedIn()) {
                      if (this.initialStateSet) {
                         this.setTitle(this.widgetTitle);
+                        var showAsD3 = false;
+                        var context0 = this.createTemplateContext();
+                        if (showAsD3 && context0.state.histogram && context0.state.histogram.narratives) {
+                            context0.state.histogram.narratives.id = 'dbrd_hist_my_narr';
+                            context0.state.histogram.narrativesJson = JSON.stringify(context0.state.histogram.narratives);
+                        }
+                        if (showAsD3 && context0.state.histogram && context0.state.histogram.sharingNarratives) {
+                            context0.state.histogram.sharingNarratives.id = 'dbrd_hist_shared_narr';
+                            context0.state.histogram.sharingNarrativesJson = JSON.stringify(context0.state.histogram.sharingNarratives);
+                        }
                         this.places.content.html(this.renderTemplate('authorized'));
                      }
                   } else {
