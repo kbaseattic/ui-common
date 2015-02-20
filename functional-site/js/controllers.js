@@ -334,6 +334,14 @@ app
 
 .controller('People', function($scope, $stateParams) {
     $scope.params = { 'userid':$stateParams.userid, 'kbCache' : kb }
+   
+    // NB need to use KBaseSessionSync here and not kb -- because kb is only valid at page load
+    // time. On angular path changes, it will not have been updated. So, e.g., after a user logs 
+    // out and goes backing over their history...
+    if (!$.KBaseSessionSync.isLoggedIn()) {
+       window.location.href = "#/login/";
+       return;
+    }
     
     // Set the styles for the user page
     $('<link>')
