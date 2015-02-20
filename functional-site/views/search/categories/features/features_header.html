@@ -25,6 +25,35 @@
         </li>
     </ul>
 </div>
+<!--
+<div class="btn-group search-result-column-header cs_db_version_header col-xs-3 col-sm-3 col-md-2 col-lg-2">
+    <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
+        <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['cs_db_version']}"><strong>DB</strong></div>
+        <span class="glyphicon search-sort-icon" ng-class="{'glyphicon-sort': !options.active_sorts[options.selectedCategory].sorts['cs_db_version'], 'glyphicon-sort-by-alphabet': options.active_sorts[options.selectedCategory].sorts['cs_db_version'].direction == 'asc', 'glyphicon-sort-by-alphabet-alt': options.active_sorts[options.selectedCategory].sorts['cs_db_version'].direction == 'desc'}"></span>                
+        <span class="badge search-sort-badge" ng-show="options.active_sorts[options.selectedCategory] && options.active_sorts[options.selectedCategory].count > 1">{{options.active_sorts[options.selectedCategory].sorts['feature_source_id'].order}}</span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+        <li>
+            <a ng-click="addSort(options.selectedCategory, 'cs_db_version', 'asc')">
+                <span class="glyphicon glyphicon-sort-by-alphabet"/>
+                <span>Sort ascending</span>
+            </a>
+        </li>
+        <li>
+            <a ng-click="addSort(options.selectedCategory, 'cs_db_version', 'desc')">
+                <span class="glyphicon glyphicon-sort-by-alphabet-alt"/>
+                <span>Sort descending</span>
+            </a>
+        </li>
+        <li>
+            <a ng-click="removeSort(options.selectedCategory, 'cs_db_version', true)">
+                <span class="glyphicon glyphicon-remove"/>
+                <span>Clear this sort</span>
+            </a>
+        </li>
+    </ul>
+</div>
+-->
 <div class="btn-group search-result-column-header feature_source_id_header col-xs-3 col-sm-3 col-md-2 col-lg-2">
     <button type="button" class="btn btn-default dropdown-toggle search-result-column-header-btn" data-toggle="dropdown">
         <div class="search-column-name" ng-class="{'search-sort-activated': options.active_sorts[options.selectedCategory].sorts['feature_source_id']}"><strong>Feature Source Id</strong></div>
