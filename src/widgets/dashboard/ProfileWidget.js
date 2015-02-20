@@ -54,6 +54,10 @@ define(['kb.widget.dashboard.base', 'kb.user_profile', 'kb.client.user_profile',
          setInitialState: {
             value: function (options) {
                return Q.Promise(function (resolve, reject, notify) {
+                   if (!Session.isLoggedIn()) {
+                     resolve();
+                     return;
+                  }
                   AppState.whenItem('userprofile')
                   .then(function(profile) {
                      this.userProfile = profile;
