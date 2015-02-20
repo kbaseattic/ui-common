@@ -120,7 +120,7 @@
       <h3>Affiliations</h3>  
       {% if userRecord.profile.userdata.affiliations|length > 0 %}  
         {% for affiliation in userRecord.profile.userdata.affiliations|sort(true, true, "start_year") %}
-          <p><strong>{{affiliation.title | e}}</strong> ({{affiliation.start_year| e}}-{% if affiliation.end_year %}{{affiliation.userdata.end_year | e}}{% else %}present{% endif %}) @ {{affiliation.institution | e}}</p>
+          <p><strong>{{affiliation.title | e}}</strong> ({{affiliation.start_year| e}}-{% if affiliation.end_year %}{{affiliation.end_year | e}}{% else %}present{% endif %}) @ {{affiliation.institution | e}}</p>
         {% endfor %}
       {% elif env.isOwner %}
         <p class="text-warning">Show your colors! Please add one or more affiliations.</p>
