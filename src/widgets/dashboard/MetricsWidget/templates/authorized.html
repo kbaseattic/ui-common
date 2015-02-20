@@ -44,8 +44,15 @@
 -->
 <style type="text/css">
 
-.axis path,.axis line {
+.axis line {
     display: none;
+}
+
+.axis path {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
 }
 
 .axis text {
@@ -252,7 +259,7 @@ filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
         var histNarrDiv = $('#{{state.histogram.sharingNarratives.id}}');
         data = $.parseJSON('{{state.histogram.sharingNarrativesJson}}');
         if (histNarrDiv.length == 1 && histNarrDiv.is(':visible'))
-            histNarrDiv['kbaseMetricsHistogram']({state: data, x_axis: 'Narratives Shared per User'});
+            histNarrDiv['kbaseMetricsHistogram']({state: data, x_axis: 'Shared Narratives per User'});
     } catch (e) {
         console.error(e);
     }
