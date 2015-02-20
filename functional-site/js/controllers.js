@@ -385,6 +385,11 @@ app
 .controller('Dashboard', function($scope, $stateParams) {
     $scope.params = { 'kbCache' : kb }
     
+    if (!$.KBaseSessionSync.isLoggedIn()) {
+       window.location.href = "#/login/";
+       return;
+    }
+    
     // Try this.
     // Get the layout template.
     // Get the layout config

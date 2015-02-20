@@ -209,7 +209,10 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                return Q.promise(function (resolve, reject, notify) {
                   // Get all workspaces, filter out those owned by the user,
                   // and those that are public
-
+                  if (!Session.isLoggedIn()) {
+                     resolve();
+                     return;
+                  }
                   Q.all([this.kbservice.getNarratives({
                            params: {
                               showDeleted: 0,
