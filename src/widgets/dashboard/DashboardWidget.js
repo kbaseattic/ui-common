@@ -333,6 +333,9 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                .then(function () {
                   this.refresh()
                }.bind(this))
+               .then(function () {
+                  this.startHeartbeat();
+               }.bind(this))
                .catch(function (err) {
                   console.log('ERROR');
                   console.log(err);
@@ -341,7 +344,26 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                .done();
             }
          },
-
+          
+         startHeartbeat: {
+            value: function () {
+               window.setInterval(function () {
+                  if (this.setInitialState) {
+                     this.setInitialState()
+                     .then(function () {
+                        this.refresh();
+                     }.bind(this))
+                     .catch(function (err) {
+                        console.log('ERROR');
+                        console.log(err);
+                        this.setError(err);
+                     }.bind(this))
+                     .done();
+                  }
+               }.bind(this), 60000);
+            }
+         },
+         
          setup: {
             value: function () {
                // does whatever the widget needs to do to set itself up
@@ -410,12 +432,23 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
          setParam: {
             value: function (path, value) {
                Utils.setProp(this.params, path, value);
-               this.refresh().done();
+               // this.refresh().done();
+               if (this.onParamChange) {
+                  this.onParamChange();
+               }
             }
          },
          getParam: {
             value: function (path, defaultValue) {
                return Utils.getProp(this.params, path, defaultValue);
+            }
+         },
+         
+          onParamChange: {
+            value: function () {
+               if (this.filterState) {
+                  this.filterState();
+               }
             }
          },
 
@@ -448,8 +481,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                }.bind(this));
             }
          },
-
-
+         
          // STATE CHANGES
 
          /*
@@ -460,10 +492,12 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
            */
          setState: {
             value: function (path, value, norefresh) {
-               Utils.setProp(this.state, path, value);
-               this.onStateChange();
-               if (!norefresh) {
-                  this.refresh().done();
+               if (!_.isEqual(Utils.getProp(this.state,path), value)) {
+                  Utils.setProp(this.state, path, value);
+                  this.onStateChange();
+                  if (!norefresh) {
+                     this.refresh().done();
+                  }
                }
             }
          },
@@ -492,6 +526,8 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                }
             }
          },
+         
+       
 
          setError: {
             value: function (errorValue) {

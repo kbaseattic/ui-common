@@ -175,22 +175,25 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                         placeholder: 'Search Your Narratives',
                         place: 'end',
                         onkeyup: function (e) {
-                           this.filterState({
-                              search: $(e.target).val()
-                           });
+                           this.setParam('filter', $(e.target).val());
+                           //this.filterState({
+                           //   
+                           //   search: $(e.target).val()
+                           //});
                         }.bind(this)
                      });
                }
             }
          },
 
-         filterState: {
-            value: function (options) {
-               if (!options.search || options.search.length === 0) {
+         filterNarratives: {
+            value: function () {
+               var search = this.getParam('filter');
+               if (!search || search.length === 0) {
                   this.setState('narrativesFiltered', this.getState('narratives')); 
                   return;
                }
-               var searchRe = new RegExp(options.search, 'i');
+               var searchRe = new RegExp(search, 'i');
                var nar = this.getState('narratives').filter(function (x) {
                   if (x.workspace.metadata.narrative_nice_name.match(searchRe) ||
                       (x.object.metadata.cellInfo &&
@@ -217,12 +220,20 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                      return false;
                   }
                }.bind(this));
-               this.setState('narrativesFiltered', nar);
+              this.setState('narrativesFiltered', nar);
+            }
+         },
+         
+         onParamChange: {
+            value: function () {
+               this.filterNarratives();
             }
          },
          
           onStateChange: {
             value: function () {
+               
+               // Need to filter narratives?
                var count = this.doState('narratives', function(x){return x.length}, null);
                var filtered = this.doState('narrativesFiltered', function(x){return x.length}, null);
                
@@ -264,12 +275,10 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                      resolve();
                      return;
                   }
-                  var sessionUsername = Session.getUsername();
-                  var recentActivity = [];
                   Q.all([this.kbservice.getNarratives({
                            params: {
                               showDeleted: 0,
-                              owners: [sessionUsername]
+                              owners: [Session.getUsername()]
                            }
                         }),
                         this.kbservice.getApps(),
@@ -306,8 +315,7 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                                  return b.object.saveDate.getTime() - a.object.saveDate.getTime();
                               });
                               this.setState('narratives', narratives);
-                              this.setState('narrativesFiltered', narratives);
-                           console.log(narratives);
+                              this.filterNarratives();
                               resolve();
                            }.bind(this))
                            .catch(function (err) {
@@ -325,6 +333,7 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                }.bind(this));
             }
          }
+         
 
       });
 
