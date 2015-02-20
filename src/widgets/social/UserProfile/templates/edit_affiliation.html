@@ -11,7 +11,7 @@
      <div class="panel-body" >
 
          <div class="form-group" data-field="title">
-             <label for="affiliation-title-{{affid}}" class="control-label col-md-3">Title</label>
+             <label for="affiliation-title-{{affid}}" class="control-label col-md-3">Title *</label>
              <div class="col-md-9">
                  <input id="affiliation-title-{{affid}}" type="text" class="form-control" value="{{affiliation.title | e}}">
              </div>
@@ -21,7 +21,7 @@
          </div>
 
          <div class="form-group" data-field="institution">
-             <label for="affiliation-institution-{{affid}}" class="control-label col-md-3">Institution</label>
+             <label for="affiliation-institution-{{affid}}" class="control-label col-md-3">Institution *</label>
              <div class="col-md-9">
                  <input id="affiliation-institution-{{affid}}" type="text" class="form-control" value="{{affiliation.institution | e}}">
              </div>
@@ -32,7 +32,7 @@
 
          <div class="form-group">
              <div class="col-md-6" data-field="start_year">
-                 <label for="affiliation-start_year-{{affid}}" class="control-label col-md-6">Starting in Year</label>
+                 <label for="affiliation-start_year-{{affid}}" class="control-label col-md-6">Starting in Year *</label>
                  <div class="col-md-6">                
                      <input id="affiliation-start_year-{{affid}}" type="text" class="form-control" value="{{affiliation.start_year}}">
                      <div data-element="message" class="help-block"></div>
@@ -47,7 +47,6 @@
                  </div>
              </div>
          </div>
-
      </div>
  </fieldset>
 
