@@ -504,6 +504,64 @@ var NarrativeManager = function(options, auth, auth_cb) {
         return cell;
     };
     
+    /**
+     * Create genome set object based on list of references to genome obejcts stored in target workspace.
+     * There is no need to define target workspace parameter because genome references (in list_of_genome_refs)
+     * are already pointing to this workspace.
+     * Parameters: 
+     *  list<string> list_of_genome_refs - list of references pointing to genome objects in target workspace,
+     *  string description - please use empty string in case there is no description for this genomeset,
+     *  string target_genome_set_object_name - name of genome set object which will be created,
+     *  function callback - callback on success (optional)
+     *  function errorCallback - callback on error (optional)
+     * Example code:
+     *           var nmParams = {};
+     *           var auth = ...;  // for instance {token: tokenString}
+     *           var nm = new NarrativeManager(nmParams, auth);
+     *           nm.createGenomeSet(["1234/567/1", "1234/568/1", "1234/569/1"], 
+     *                   "Super genome set!!!", "genomeset.3", function(data) {
+     *               console.log("success", data);
+     *           }, function(error) {
+     *               console.error("error", data);
+     *           }); 
+     */
+    this.createGenomeSet = function(list_of_genome_refs, description, 
+            target_genome_set_object_name, callback, errorCallback) {
+        var elems = {};
+        var save_objects_params = {};
+        for (var pos in list_of_genome_refs) {
+            var ref = list_of_genome_refs[pos];
+            if (pos == 0) {
+                var workspace = ref.split('/')[0];
+                if (isNormalInteger(workspace)) {
+                    save_objects_params['id'] = Number(workspace);
+                } else {
+                    save_objects_params['workspace'] = workspace;
+                }
+            }
+            var key = "param" + pos;
+            elems[key] = {ref: ref};
+        }
+        var gset = {
+                description: description,
+                elements: elems
+        };
+        save_objects_params['objects'] = 
+            [{type: 'KBaseSearch.GenomeSet', name: target_genome_set_object_name, data: gset}];
+        this.ws.save_objects(save_objects_params, function(data) {
+            if (callback)
+                callback(data);
+        }, function(data) {
+            if (errorCallback)
+                errorCallback(data);
+        });
+        
+        function isNormalInteger(str) {
+            var n = ~~Number(str);
+            return String(n) === str;
+        }
+    };
+    
     // map the app ID to the spec, map method id to spec
     this._specMapping = {
         apps : {},
