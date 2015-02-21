@@ -6,6 +6,7 @@ kbaseNarrativeManager.factory('NarrativeManager', function() {
     return kbaseNarrativeManager();
 });
 
+
 // define Search as its own module, and what it depends on
 var searchApp = angular.module('search', ['ui.router','ui.bootstrap','NarrativeManager']);
 
@@ -62,6 +63,33 @@ searchApp.config(function($httpProvider,$stateProvider,$provide) {
     }
 );
 
+
+searchApp.factory("require", function($rootScope) {
+    function requireProxy(dependencies, successCallback, errorCallback) {
+        successCallback = (successCallback || angular.noop);
+        errorCallback = (errorCallback || angular.noop);
+
+        require( (dependencies || []), 
+            function successCallbackProxy() {
+                var args = arguments;
+
+                $rootScope.$apply(function() {
+                    successCallback.apply(this, args);
+                });
+            },
+            function errorCallbackProxy() {
+                var args = arguments;
+
+                $rootScope.$apply(function() {
+                    errorCallback.apply( this, args );
+                });
+            }
+        );
+
+    }
+
+    return( requireProxy );
+});
 
 
 /* Services */
@@ -216,6 +244,15 @@ searchApp.service('searchOptionsService', function searchOptionsService() {
                            "metagenomes": metagenomesWorkspace
                           },
         landingPagePrefix: "/functional-site/#/dataview/",
+        iconMapping: {
+            "metagenomes": "<span class='fa-stack'><i class='fa fa-circle fa-stack-2x' style='color: rgb(255, 193, 7);'></i><i class='icon fa-inverse fa-stack-1x icon-metagenome kb-data-icon-dnudge'></i></span>",
+            "genomes": "<span class='fa-stack'><i class='fa fa-circle fa-stack-2x' style='color: rgb(63, 81, 181);'></i><i class='icon fa-inverse fa-stack-1x icon-genome kb-data-icon-dnudge'></i></span>",
+            "features": "<span class='fa-stack'><i class='fa fa-circle fa-stack-2x' style='color: rgb(63, 81, 181);'></i><i class='icon fa-inverse fa-stack-1x icon-genome kb-data-icon-dnudge'></i></span>",
+            "models_fba": "<span class='fa-stack'><i class='fa fa-circle fa-stack-2x' style='color: rgb(0, 96, 100);'></i><i class='icon fa-inverse fa-stack-1x icon-metabolism kb-data-icon-dnudge'></i></span>",
+            "models_media": "<span class='fa-stack'><i class='fa fa-circle fa-stack-2x' style='color: rgb(244, 67, 54);'></i><i class='fa fa-inverse fa-stack-1x fa-flask'></i></span>",
+            "models": "<span class='fa-stack'><i class='fa fa-circle fa-stack-2x' style='color: rgb(0, 96, 100);'></i><i class='icon fa-inverse fa-stack-1x icon-metabolism kb-data-icon-dnudge'></i></span>",
+            "all": "<span class='fa-stack'><img id='logo' src='assets/navbar/images/kbase_logo.png' width='46'></span>"
+        },        
         resultJSON : {},
         objectCopyInfo : null,
         resultsAvailable : false,
@@ -306,7 +343,7 @@ searchApp.controller('searchBarController', function searchBarCtrl($rootScope, $
 /*
  *  The main Search controller that is responsible for content inside the Search view.
  */
-searchApp.controller('searchController', function searchCtrl($rootScope, $scope, $q, $timeout, $http, $state, $stateParams, searchCategoryLoadService, searchOptionsService, searchKBaseClientsService) {
+searchApp.controller('searchController', function searchCtrl($rootScope, $scope, $q, $timeout, $http, $state, $stateParams, searchCategoryLoadService, searchOptionsService, searchKBaseClientsService, require) {
     $scope.options = searchOptionsService;
     $scope.workspace_service;
     $scope.narrative_manager;
@@ -366,17 +403,20 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     };
 
     
-    require(['kb.widget.navbar'], function (Navbar) {
-        Navbar.clearMenu();
-        Navbar.addDefaultMenu({search: false});
-        Navbar.clearTitle();
-        Navbar.clearButtons();
-        
-        Navbar.setTitle("Search");
-        //Navbar.addButton("Help");
-        //Navbar.addHelpMenuItem({title: "Search User Guide"});
+    $scope.setNavbarTitle = function(title) {
+        require(['kb.widget.navbar'], function (Navbar) {
+            $scope.navbar = Navbar;
+            $scope.navbar.clearMenu();
+            $scope.navbar.addDefaultMenu({search: false});
+            $scope.navbar.clearTitle();
+            $scope.navbar.clearButtons();
 
-    });
+            $scope.navbar.setTitle(title);
+                        
+            //Navbar.addButton("Help");
+            //Navbar.addHelpMenuItem({title: "Search User Guide"});
+        });
+    };
     
 
     $scope.saveUserState = function() {
@@ -786,7 +826,11 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
             // apply category selection
             if ($stateParams.category !== null && $stateParams.category in $scope.options.searchCategories) {
-                $scope.options.selectedCategory = $stateParams.category;
+                $scope.options.selectedCategory = $stateParams.category;                
+
+                $scope.setNavbarTitle("Search <span class='search-navbar-title'>" + 
+                                      $scope.options.iconMapping[$scope.options.selectedCategory] + 
+                                      $scope.options.searchCategories[$stateParams.category]["label"] + "</span>");
 
                 if ($scope.options.selectedCategory && !$scope.options.searchOptions.perCategory.hasOwnProperty($scope.options.selectedCategory)) {
                     $scope.options.searchOptions.perCategory[$scope.options.selectedCategory] = {"page": 1};
@@ -807,6 +851,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 }
             }
             else {
+                $scope.setNavbarTitle("Search <span class='search-navbar-title'>All Data Categories<span>");                    
                 $scope.options.reset();
             }            
     
@@ -1254,7 +1299,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
 
 
     $scope.copyGenome = function(n) {
-        return $scope.workspace_service.get_object_info([{"name": $scope.options.userState.session.data_cart.data[n]["genome_id"], "workspace": $scope.options.publicWorkspaces['genomes']}])
+        return $scope.workspace_service.get_object_info([{"name": $scope.options.userState.session.data_cart.data[n]["genome_id"], "workspace": $scope.options.userState.session.data_cart.data[n]["workspace_name"].split("Rich").join("")}])
             .fail(function (xhr, status, error) {
                 console.log(xhr);
                 console.log(status);
@@ -1269,7 +1314,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
                 var copy_genome = function () {
                     $scope.workspace_service.copy_object({
                         "from": {
-                                 "workspace": $scope.options.publicWorkspaces['genomes'], 
+                                 "workspace": $scope.options.userState.session.data_cart.data[n]["workspace_name"].split("Rich").join(""), 
                                  "name": info[0][1]
                                 }, 
                         "to": {
@@ -1365,7 +1410,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         //console.log($scope.options.userState.session.data_cart.data[n]["genome_id"] + ".featureset");
         
         return $scope.workspace_service.get_object_subset([{"name": $scope.options.userState.session.data_cart.data[n]["genome_id"] + ".featureset",
-                                                            "workspace": $scope.options.publicWorkspaces['search_genome'], 
+                                                            "workspace": $scope.options.userState.session.data_cart.data[n]["workspace_name"].split("Rich").join(""), 
                                                             "included": ["/features/" + split_id[2]]
                                                           }])
             .fail(function (xhr, status, error) {
