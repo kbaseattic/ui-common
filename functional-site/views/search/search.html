@@ -21,7 +21,7 @@
                     -->
 
 
-                    <div ng-hide="options.userState.session.selectedWorkspace" class="alert alert-warning">
+                    <div ng-hide="!options.userState.session.token || options.userState.session.selectedWorkspace" class="alert alert-warning">
                         <div class="text-center">
                             <span class="search-cart-label"><a ng-click="options.userState.session.selectedWorkspace = undefined; listWorkspaces();">Select a Narrative</a></span>
                         </div>
@@ -30,8 +30,10 @@
                         <div class="text-center">
                             <span>Copy to Narrative</span>
                         </div>
+                        <div>
+                            <button type="button" class="btn-xs btn-danger btn-select-narrative" ng-click="options.userState.session.selectedWorkspace = undefined" ng-show="options.userState.session.transfer_cart.size == 0 && !options.transferring"><span class="glyphicon glyphicon-remove-sign"></span></button>
+                        </div>
                         <div class="text-center">
-                            <button type="button" class="btn-xs btn-danger" ng-click="options.userState.session.selectedWorkspace = undefined; listWorkspaces();" ng-show="options.userState.session.transfer_cart.size == 0 && !options.transferring"><span class="glyphicon glyphicon-remove-sign"></span></button>
                             <span class="glyphicon glyphicon-hdd"></span>
                             <span class="search-cart-label">{{options.userState.session.selectedWorkspaceName}}</span>
                             <span class="badge badge-info" ng-repeat="w in options.userState.longterm.workspaces" ng-if="w[1] == options.userState.session.selectedWorkspace">{{w[4]}}</span>
@@ -103,6 +105,7 @@
                                     <span> </span>
                                     <span class="glyphicon glyphicon-file"></span>
                                 </button>
+                                <!--
                                 <button rel="tooltip" tooltip="Transfer my selections as a set to Narratives." tooltip-placement="bottom" data-placement="bottom" data-toggle="modal" data-target="#transferPanel" type="button" ng-class="{'disabled': options.userState.session.data_cart.size < 1 || !options.userState.session.selectedWorkspace || !options.userState.session.set[options.selectedCategory]}" class='btn btn-setcopy' ng-click="copySet(options.selectedCategory)">
                                     <span class="glyphicon glyphicon-hdd"></span>
                                     <span> </span>
@@ -110,6 +113,7 @@
                                     <span> </span>
                                     <span class="glyphicon glyphicon-book"></span>
                                 </button>
+                                -->
                                 <button data-toggle="tooltip" data-placement="bottom" tooltip="Discard my data selections." tooltip-placement="bottom" type="button" ng-class="{'disabled': options.userState.session.data_cart.size < 1}" class='btn btn-danger' ng-click='emptyCart()'>
                                     <span class="glyphicon glyphicon-trash"></span>
                                 </button>              
@@ -228,12 +232,6 @@
                         <div class="row">                        
                             <table>
                                 <h3>Objects that match <i>{{options.searchOptions.general.q}}</i></h3>
-<!--                                
-                                <tr>
-                                    <th><h4>Category</h4></th>
-                                    <th class="search-space-left"><h4 class="search-space-left">Objects found</h4></th>
-                                </tr>
--->
                                 <tr ng-if="options.searchCategories[p.category] && options.categoryCounts[p.category] > 0" ng-repeat="p in options.categoryInfo.displayTree['unauthenticated'].children">
                                     <td class="search-category-title" ng-click="selectCategory(p.category)">
                                         <a><span>{{p.label}}</span></a>

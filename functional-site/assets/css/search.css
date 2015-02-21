@@ -106,12 +106,19 @@ span .badge {
     padding-bottom: 5px;
 }
 
-
 .btn-setcopy:focus,
 .btn-setcopy:active,
 .btn-setcopy.active {
     color: #ffffff;
     background-color: #6f5499;
+}
+
+
+.btn-select-narrative {
+    position: relative;
+    font-size: 12px!important;
+    left: -16px;
+    top: -37px;
 }
 
 
@@ -137,6 +144,11 @@ span .badge {
     padding: 0px;
 }
 
+.search-navbar-title {
+    padding-left: 40px;
+    font-size: 20px;
+    color: gray;    
+}
 
 /*** Login ***/
 
@@ -938,20 +950,20 @@ table.search-transfer-table {
 }
 
 .metagenome_sequence_type_header {
-    width: 100px;
+    width: 110px;
 }
 
 .metagenome_sequence_type {
-    width: 92px;
+    width: 102px;
     margin-right: 8px;
 }
 
 .metagenome_biome_header {
-    width: 358px;
+    width: 348px;
 }
 
 .metagenome_biome {
-    width: 340px;
+    width: 330px;
     margin-right: 8px;
 }
 
