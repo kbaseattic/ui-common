@@ -74,13 +74,12 @@ define(['kb.utils', 'q'], function (Utils, Q) {
 
       setItem: {
          value: function (key, value) {
-            var oldValue = Utils.getProp(this.state, key);
+            var oldState = Utils.getProp(this.state, key);
             if (this.listeners[key]) {
                var newListeners = [];
                this.listeners[key].forEach(function (item) {
                   this.queue.addItem({
-                     info: {key: key, value: value},
-                     onrun: (function (fun, value, oldvalue, machine) {
+										onrun: (function (fun, value, oldvalue, machine) {
                         return function () {
                            try {
                               fun(value, oldvalue, machine);
@@ -89,7 +88,7 @@ define(['kb.utils', 'q'], function (Utils, Q) {
                               console.log(ex);
                            }
                         }
-                     })(item.hear, value, oldValue, this)
+                     })(item.onSet, value, (oldState && oldState.value), this)
                   });
                   if (!item.oneTime) {
                      newListeners.push(item);
@@ -98,12 +97,20 @@ define(['kb.utils', 'q'], function (Utils, Q) {
                this.listeners[key] = newListeners;
             }
             
-            Utils.setProp(this.state, key, value);
+            Utils.setProp(this.state, key, {status: 'set', value: value, time: new Date()});
          }
       },
       getItem: {
          value: function (key, defaultValue) {
-            return Utils.getProp(this.state, key, defaultValue);
+				 	var item = Utils.getProp(this.state, key);
+				 	if (item) {
+						 if (item.status === 'set') {
+							 return item.value;
+						 }
+						 // what to do if not set?
+					 } else {
+						 return defaultValue;
+					 }
          }
       },
       hasItem: {
@@ -111,8 +118,50 @@ define(['kb.utils', 'q'], function (Utils, Q) {
             return Utils.hasProp(this.state, key);
          }
       },
+			setError: {
+        value: function (key, err) {
+				
+           var oldState = Utils.getProp(this.state, key);
+           if (this.listeners[key]) {
+              var newListeners = [];
+              this.listeners[key].forEach(function (item, machine) {
+								
+                 this.queue.addItem({
+									 onrun: (function (fun, err, machine) {
+                       return function () {
+                          try {
+                             fun(err); 
+                          } catch (ex) {
+                             console.log('EX running onrun handler');
+                             console.log(ex);
+                          }
+                       }
+                    })(item.onError, err, this)
+                 });
+                 if (!item.oneTime) {
+                    newListeners.push(item);
+                 }
+              }.bind(this));
+              this.listeners[key] = newListeners;
+           }
+           
+           Utils.setProp(this.state, key, {status: 'error', error: err, time: new Date()});
+        }
+			},
+			hasError: {
+				value: function (key) {
+					var item = Utils.getProp(this.state, key);
+					if (item && item.status === 'error') {
+						return true;
+					} else {
+						return false;
+					}
+				}
+			},
       delItem: {
-         value: function (key) {}
+         value: function (key) {
+					 Utils.deleteProp(this.state, key);
+				 }
       },
       listen: {
          value: function (key, cfg) {
@@ -122,13 +171,27 @@ define(['kb.utils', 'q'], function (Utils, Q) {
       listenForItem: { 
          value: function (key, cfg) {
             if (typeof cfg === 'function') {
-               cfg = {hear: cfg};
+               cfg = {onSet: cfg};
             }
-             if (this.hasItem(key)) {
-               cfg.hear(this.getItem(key));
-               if (cfg.oneTime) {
-                  return;
-               }
+						var item = Utils.getProp(this.state, key);
+             if (item) {							 
+							 if (cfg.hear) {
+	               cfg.hear(item.value);
+	               if (cfg.oneTime) {
+	                  return;
+	               }
+							 } else {
+								 switch (item.status) {
+								 case 'set':
+									 cfg.onSet(item.value);
+									 break;
+								 case 'error':
+									 cfg.onError(item.error);
+									 break;
+								 default:
+									 throw 'Invalid status: ' + item.status;
+								 }
+							 }
             }
             if (this.listeners[key] === undefined) {
                this.listeners[key] = [];
@@ -141,20 +204,33 @@ define(['kb.utils', 'q'], function (Utils, Q) {
          // This differs from listen in that it returns a promise that is 
          // fulfilled either now (the item is available) or when it is
          // first set (via a set of one-time listeners).
-         value: function (key) {
-            return Q.Promise(function (resolve, reject, notify) {
-               if (this.hasItem(key)) {
-                  resolve(this.getItem(key));
+         value: function (key, timeout) {
+            var p =  Q.Promise(function (resolve, reject, notify) {
+               if (Utils.hasProp(this.state, key)) {
+								 var item = Utils.getProp(this.state, key);
+								 if (item.status === 'error') {
+									 reject(item.error);
+								 } else {
+									 resolve(item.value);
+								}
                } else {
                   this.listenForItem(key, {
                      oneTime: true,
                      addedAt: (new Date()).getTime(),
-                     hear: function (value) {
+                     onSet: function (value) {
                         resolve(value);
-                     }
+                     },
+										 onError: function (err) {
+											 reject(err);
+										 }
                   });
                }
             }.bind(this));
+						if (timeout) {
+							return p.timeout(timeout);
+						} else {
+							return p;
+						}
          }
       },
       ignore: {

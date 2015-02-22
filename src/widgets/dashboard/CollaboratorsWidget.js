@@ -12,13 +12,6 @@ define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.m
             }
          },
 
-         go: {
-            value: function () {
-               this.start();
-               return this;
-            }
-         },
-
          setup: {
             value: function () {
                // Set up workspace client
@@ -38,22 +31,7 @@ define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.m
                }
             }
          },
-         
-         onStateChange: {
-            value: function () {
-               if (this.hasState('collaborators')) {
-                  var count = this.getState('collaborators').length;
-               } else {
-                  var count = null;
-               }
-               
-               this.viewState.setItem('collaborators', {
-                  filtered: count,
-                  count: count
-               });
-            }
-         },
-
+       
          setInitialState: {
             value: function (options) {
                return Q.Promise(function (resolve, reject, notify) {

@@ -6,93 +6,154 @@
  *
  */
 
+// TODO: Handle failures and ensure that widget.destroy is called if need be.
+
 angular.module('dashboard-directives', []);
 angular.module('dashboard-directives')
    .directive('dashboardnarratives', function ($rootScope) {
+		 "use strict";
       return {
          link: function (scope, ele, attrs) {
             require(['kb.widget.dashboard.narratives'], function (W) {
-               Object.create(W).init({
+               var widget = Object.create(W).init({
                   container: $(ele), 
-                  stateMachine: scope.stateMachine
-               }).go();
+                  viewState: scope.viewState
+               }).start();
+							 scope.$on('$destroy', function () {
+								 if (widget) {
+									 try {
+										 widget.stop();
+									 } finally {
+										 // What do do here?
+									 }
+								 }
+							 });
             });
          }
       };
    })
    .directive('dashboardsharednarratives', function ($rootScope) {
+		  "use strict";
       return {
          link: function (scope, ele, attrs) {
             require(['kb.widget.dashboard.sharedNarratives'], function (W) {
-               Object.create(W).init({
+               var widget = Object.create(W).init({
                   container: $(ele),
-                  stateMachine: scope.stateMachine
-               }).go();
+                  viewState: scope.viewState
+               }).start();
+							 scope.$on('$destroy', function () {
+								 if (widget) {
+									 try {
+										 widget.stop();
+									 } finally {
+										 // What do do here?
+									 }
+								 }
+							 });
             });
          }
       };
    })
  .directive('dashboardpublicnarratives', function ($rootScope) {
+	 	"use strict";
       return {
          link: function (scope, ele, attrs) {
             require(['kb.widget.dashboard.publicNarratives'], function (W) {
-               Object.create(W).init({
+               var widget = Object.create(W).init({
                   container: $(ele),
-                  stateMachine: scope.stateMachine
-               }).go();
+                  viewState: scope.viewState
+               }).start();
+							 scope.$on('$destroy', function () {
+								 if (widget) {
+									 try {
+										 widget.stop();
+									 } finally {
+										 // What do do here?
+									 }
+								 }
+							 });
             });
          }
       };
    })
    .directive('dashboardprofile', function ($rootScope) {
+		 "use strict";
       return {
          link: function (scope, ele, attrs) {
-            "use strict";
             require(['kb.widget.dashboard.profile', 'jquery'], function (W, $) {
-               var widget = Object.create(W);
-               widget.init({
+               var widget = Object.create(W).init({
                   container: $(ele),
-                  stateMachine: scope.stateMachine
-               }).go();
+                  viewState: scope.viewState
+               }).start();
+							 scope.$on('$destroy', function () {
+								 if (widget) {
+									 try {
+										 widget.stop();
+									 } finally {
+										 // What do do here?
+									 }
+								 }
+							 });
             });
          }
       };
    })
 
 .directive('dashboardapps', function ($rootScope) {
+	"use strict";
    return {
       link: function (scope, ele, attrs) {
          require(['kb.widget.dashboard.apps'], function (Widget) {
-            Object.create(Widget).init({
+            var widget = Object.create(Widget).init({
                container: $(ele),
-               stateMachine: scope.stateMachine
-            }).go();
+               viewState: scope.viewState
+            }).start();
+					 scope.$on('$destroy', function () {
+						 if (widget) {
+							 try {
+								 widget.stop();
+							 } finally {
+								 // What do do here?
+							 }
+						 }
+					 });
          });
       }
    };
 })
 
-.directive('dashboarddata', function ($rootScope) {
+/*.directive('dashboarddata', function ($rootScope) {
       return {
          link: function (scope, ele, attrs) {
             require(['kb.widget.dashboard.data'], function (Widget) {
                Object.create(Widget).init({
                   container: $(ele),
-                  stateMachine: scope.stateMachine
+                  viewState: scope.viewState
                }).go();
             });
          }
       };
    })
+   */
    .directive('dashboardmetrics', function ($rootScope) {
+		 "use strict";
       return {
          link: function (scope, ele, attrs) {
             try {
                require(['kb.widget.dashboard.metrics'], function (Widget) {
-                     Object.create(Widget).init({
+                     var widget = Object.create(Widget).init({
                         container: $(ele),
-                        stateMachine: scope.stateMachine
-                     }).go();
+                        viewState: scope.viewState
+                     }).start();
+										 scope.$on('$destroy', function () {
+											 if (widget) {												 
+												 try {			
+													 widget.stop();
+												 } finally {
+													 // What do do here?
+												 }
+											 }
+										 });
                   },
                   function (err) {
                      $(ele).html('Exception rendering widget: ' + err);
@@ -108,17 +169,25 @@ angular.module('dashboard-directives')
       };
    })
    .directive('dashboardcollaboratornetwork', function ($rootScope) {
+		 "use strict";
       return {
          link: function (scope, ele, attrs) {
-
             require(['kb.widget.dashboard.collaborators'], function (Widget) {
                try {
-                  var widget = Object.create(Widget);
-                  widget.init({
+                  var widget = Object.create(Widget).init({
                      container: $(ele),
                      userId: scope.params.userid,
-                     stateMachine: scope.stateMachine
-                  }).go();
+                     viewState: scope.viewState
+                  }).start();
+								 scope.$on('$destroy', function () {
+									 if (widget) {
+										 try {
+											 widget.stop();
+										 } finally {
+											 // What do do here?
+										 }
+									 }
+								 });
                } catch (ex) {
                   $(ele).html('Error: ' + ex);
                }

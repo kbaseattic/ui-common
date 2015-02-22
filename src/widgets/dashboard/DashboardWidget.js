@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.user_profile', 'kb.client.workspace', 'postal', 'json!functional-site/config.json'],
-   function (nunjucks, $, Q, Session, Utils, APIUtils,  UserProfile, Workspace, Postal, config) {
+define(['nunjucks', 'jquery', 'q', 'underscore', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.user_profile', 'kb.client.workspace', 'postal', 'json!functional-site/config.json'],
+   function (nunjucks, $, Q, _, Session, Utils, APIUtils,  UserProfile, Workspace, Postal, config) {
       "use strict";
       var DashboardWidget = Object.create({}, {
 
@@ -128,8 +128,11 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                   return UserProfile.makeGravatarURL(email, size, rating, gdefault);
                }.bind(this));
                this.templates.env.addFilter('kbmarkup', function (s) {
-                  s = s.replace(/\n/g, '<br>');
-                  return s;
+								 if (s) {
+                  return s.replace(/\n/g, '<br>');
+								 } else {
+									 return '';
+								 }
                });
                this.templates.env.addFilter('unixNiceTime', function (dateString) {
                   if (dateString) {
@@ -195,9 +198,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                   }
                });
                this.templates.env.addFilter('sort', function (x, prop) {
-                  //console.log('X'); console.log(x);
                   if (typeof x === 'object' && x.pop && x.push) {
-                    // console.log('sorting...');
                      return x.sort(function (a,b) {
                         if (prop) {
                            a = a[prop];
@@ -229,6 +230,11 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                });
                // This is the cache of templates.
                this.templates.cache = {};
+							 
+							 this.templates.env.addFilter('test', function (t) {
+								 console.log(t);
+								 return 'TEST';
+							 });
 
                // The context object is what is given to templates.
                this.context = {};
@@ -241,18 +247,28 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                // should not be blown away.
                this.context.state = this.state;
                this.context.params = this.params;
+							 
+							 // HEARTBEAT
+							 
+							 // refreshBeat is a one minute (or whatever) approximate timer for 
+							 // refreshing more expensive data.
+							 this.refreshBeat = 0;
 
 
-               // Set up listeners for any kbase events we are interested in:
-               // NB: following tradition, the auth listeners are namespaced for kbase; the events
-               // are not actually emitted in the kbase namespace.
-               Postal.channel('session').subscribe('login.success', function (data) {
-                  this.onLoggedIn(data.session);
-               }.bind(this));
-
-               Postal.channel('session').subscribe('logout.success', function () {
-                  this.onLoggedout();
-               }.bind(this));
+							 // STATUS
+							 
+							 // Now use a status flag ...
+							/*
+							 new - newly created
+							 ready - ready for rendering and looping into the heartbeat 
+							 dirty - state changed, need refresh
+							 clean - view reflects state, no need to re-render
+							 error - error state, don't fetch or refresh without user intervention (?)
+							 stopped - stop call has been made in preparation for destroying
+							 */
+							 this.status = 'new';
+							 
+              
 
                return this;
             }
@@ -297,10 +313,10 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                this.widgetTitle = this.getConfig('title');
                this.instanceId = this.genId();
                
-               if (!this.hasConfig('stateMachine')) {
-                  throw 'The statemachine was not provided in ' + this.widgetName;
+               if (!this.hasConfig('viewState')) {
+                  throw 'The View State was not provided in ' + this.widgetName;
                } else {
-                  this.viewState = this.getConfig('stateMachine');
+                  this.viewState = this.getConfig('viewState');
                }
                
                // Make sure method hooks are available
@@ -322,47 +338,117 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                // This creates the initial UI -- loads the css, inserts layout html.
                // For simple widgets this is all the setup needed.
                // For more complex one, parts of the UI may be swapped out.
-               // console.log('['+this.widgetName+'] starting');
                this.renderUI();
                this.renderWaitingView();
                this.setInitialState()
                .then(function () {
-                  this.initialStateSet = true;
+								  this.status = 'dirty';
                   this.setupUI();
-               }.bind(this))
-               .then(function () {
-                  this.refresh()
-               }.bind(this))
-               .then(function () {
-                  this.startHeartbeat();
-               }.bind(this))
+               }.bind(this))              
                .catch(function (err) {
-                  console.log('ERROR');
-                  console.log(err);
                   this.setError(err);
                }.bind(this))
-               .done();
-            }
-         },
-          
-         startHeartbeat: {
-            value: function () {
-               window.setInterval(function () {
-                  if (this.setInitialState) {
-                     this.setInitialState()
-                     .then(function () {
-                        this.refresh();
-                     }.bind(this))
-                     .catch(function (err) {
-                        console.log('ERROR');
-                        console.log(err);
-                        this.setError(err);
-                     }.bind(this))
-                     .done();
+							 .finally(function() {
+								 this.startSubscriptions();
+                  if (this.afterStart) {
+                     this.afterStart();
                   }
-               }.bind(this), 60000);
+							 }.bind(this))
+               .done();
+							 return this;
             }
          },
+				 
+				 startSubscriptions: {
+					 value: function () {
+             // Set up listeners for any kbase events we are interested in:
+						 this.subscriptions = [];
+             this.subscriptions.push(Postal.channel('session').subscribe('login.success', function (data) {
+                this.onLoggedIn(data.session);
+             }.bind(this)));
+
+             this.subscriptions.push(Postal.channel('session').subscribe('logout.success', function () {
+                this.onLoggedout();
+             }.bind(this)));
+						 
+						 this.subscriptions.push(Postal.channel('app').subscribe('heartbeat', function (data) {
+							 this.handleHeartbeat(data);
+						 }.bind(this)));
+						 
+					 }
+				 },
+				 
+				 stopSubscriptions: {
+					 value: function () {
+						 if (this.subscriptions) {
+					 	   this.subscriptions.forEach(function(sub) {
+								 sub.unsubscribe();
+					 	   });
+						 }
+					 }
+				 },
+				 
+				 stop: {
+					 value: function () {
+						 if (this.heartbeatSubscription) {
+							 this.heartbeatSubscription.unsubscribe();
+						 }
+						 if (this.onStop) {
+							 this.onStop();
+						 }
+					 }
+				 },
+				 
+				 handleHeartbeat: {
+					 value: function (data) {
+						 if (this.refreshBeat >= 60) {
+							 if (this.onRefreshbeat) {
+							 	 this.onRefreshbeat(data);
+								 this.refreshBeat = 0;
+							 }
+						 }
+						 this.refreshBeat++;
+						 if (this.onHeartbeat) {
+					 	 	this.onHeartbeat(data);
+						}
+					 }
+				 },
+				 
+				 onHeartbeat: {
+					 value: function (data) {
+						 if (this.status === 'dirty') {
+							 this.refresh()
+							 .then(function () {
+								 this.status = 'clean';
+							 }.bind(this))
+							 .catch(function (err) {
+								 this.setError(err);
+							 }.bind(this))
+							 .done();
+						 } else if (this.status === 'error') {
+							 this.refresh()
+							 .then(function () {
+								 this.status = 'errorshown';
+							 }.bind(this))
+							 .catch(function (err) {
+								 this.setError(err);
+							 }.bind(this))
+							 .done();
+						 	
+						 }
+					 }
+				 },
+				 
+				 onRefreshbeat: {
+					 value: function () {
+             this.setInitialState()
+             .catch(function (err) {
+                this.setError(err);
+             }.bind(this))
+             .done();
+						 return this;
+					 }
+				 },
          
          setup: {
             value: function () {
@@ -381,11 +467,6 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
             }
          },
          
-         stop: {
-            value: function () {
-               // ???
-            }
-         },
 
          destroy: {
             value: function () {
@@ -452,52 +533,25 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
             }
          },
 
-         recalcState: {
-            value: function () {
-               this.setInitialState()
-                  .then(function () {
-                    this.renderUI();
-                  })
-                  .then(function () {
-                     this.refresh();
-                  }.bind(this))
-                  .catch(function (err) {
-                     this.setError(err);
-                  }.bind(this))
-                  .done();
-            }
-         },
-
          refresh: {
             value: function () {
                return Q.Promise(function (resolve, reject, notify) {
-                  if (!this.refreshTimer) {
-                     this.refreshTimer = window.setTimeout(function () {
-                        this.refreshTimer = null;
-                        this.render();
-                        resolve();
-                     }.bind(this), 100);
-                  }
+                   this.render();
+									 resolve();
                }.bind(this));
             }
          },
          
          // STATE CHANGES
 
-         /*
-           getCurrentState
-           This should do prepare the internal state to the point at
-           which rendering can occur. It will typically fetch all data and stache it, 
-           and perhaps perform some rudimentary analysis.
-           */
          setState: {
             value: function (path, value, norefresh) {
-               if (!_.isEqual(Utils.getProp(this.state,path), value)) {
+               if (!Utils.isEqual(Utils.getProp(this.state,path), value)) {
                   Utils.setProp(this.state, path, value);
                   this.onStateChange();
-                  if (!norefresh) {
-                     this.refresh().done();
-                  }
+ 								  this.status = 'dirty';
+               } else {
+                  //console.log('no difference ... not saving ' + path); 
                }
             }
          },
@@ -516,6 +570,13 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                return Utils.getProp(this.state, path, defaultValue);
             }
          },
+				 
+				 deleteState: {
+					 value: function () {
+						 this.state = {};
+						 this.status = 'dirty';
+					 }
+				 },
 
          doState: {
             value: function (path, fun, defaultValue) {
@@ -526,14 +587,14 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                }
             }
          },
-         
-       
 
          setError: {
             value: function (errorValue) {
-               if (!errorValue) {
-                  return;
-               }
+              
+							 
+							 this.status = 'error';
+							 this.error = errorValue;
+							 return;
 
                var errorText;
                if (typeof errorValue === 'string') {
@@ -541,17 +602,22 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                } else if (typeof errorValue === 'object') {
                   if (errorValue.message) {
                      errorText = errorValue.message;
-                  } else if (errorValue.error && errorValue.error.message) {
+                  } else if (errorValue.status  && errorValue.error && errorValue.error.message) {
+										// a service error:
+										 errorTitle = 'Service Error ' + errorValue.status;
                      errorText = errorValue.error.message;
                   } else {
                      errorText = 'Unknown error';
                   }
                }
                this.error = {
+								 title: errorTitle,
                   message: errorText,
                   original: errorValue
                }
-               this.refresh().done();
+							 this.status = 'error';
+							 this.render();
+               // this.refresh().done();
             }
          },
 
@@ -576,6 +642,11 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
 
          // EVENT HANDLERS
 
+         /*
+            AUTH
+            Auth state changes force a complete refetching of all data, and refreshing
+            of the visual state.
+         */
          onLoggedIn: {
             value: function (auth) {
                this.setupAuth();
@@ -584,8 +655,13 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                      force: true
                   })
                   .then(function () {
-                     this.refresh();
-                  }.bind(this));
+										this.status = 'dirty';
+                     // this.refresh();
+                  }.bind(this))
+									.catch(function (err) {
+										this.setError(err);
+									}.bind(this))
+									.done();
             }
          },
 
@@ -595,9 +671,15 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                this.setup();
                this.setInitialState({
                   force: true
-               }).then(function () {
-                  this.refresh();
-               }.bind(this));
+               })
+               .then(function () {
+								 this.status = 'dirty';
+                  // this.refresh();
+               }.bind(this))
+							 .catch(function(err) {
+							 	this.setError(err)
+							 }.bind(this))
+							 .done();
             }
          },
 
@@ -636,14 +718,18 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
 
                this.context.env.instanceId = this.instanceId;
 
-               this.context.env.isOwner = this.isOwner();
-
                if (additionalContext) {
                   var temp = Utils.merge({}, this.context);
-                  return Utils.merge(temp, additionalContext);
+                  var context = Utils.merge(temp, additionalContext);
                } else {
-                  return this.context;
+                  var context =  this.context;
                }
+							 
+							 if (this.onCreateTemplateContext) {
+								 return this.onCreateTemplateContext(context);
+							 } else{
+								 return context;
+							 }
             }
          },
 
@@ -667,52 +753,48 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
 
          renderError: {
             value: function () {
-               var context = this.createTemplateContext({
-                  error: {
-                     message: Utils.getProp(this.error, 'message')
-                  }
-               });
-               this.places.content.html(this.getTemplate('error').render(context));
+							this.renderErrorView(this.error);
             }
          },
 
          renderErrorView: {
-            value: function (error) {
+            value: function (errorObj) {
                // Very simple error view.
-
-               if (error) {
+               if (errorObj) {
                   var errorText;
-                  if (typeof error === 'string') {
-                     errorText = error;
-                  } else if (typeof error === 'object') {
-                     if (error instanceof Error) {
-                        errorText = error.message;
+                  if (typeof errorObj === 'string') {
+										var error = {
+											title: 'Error', message: errorObj
+										}
+                  } else if (typeof errorObj === 'object') {
+                     if (errorObj instanceof Error) {
+                        var error = {
+													title: 'Error',
+													message: errorObj.message
+												}
+                     } else if (errorObj.status && errorObj.error) {
+                     	// this is a service error
+											 var error = {
+												 title: 'Service Error ' + errorObj.status,
+												 message: errorObj.error
+											 }
                      } else {
-                        error = '' + error;
+											 var error = {
+												 title: 'Unknown Error',
+												 message: '' + errorObj
+											 }
                      }
                   }
+               } else {
+								 var error = {
+									 title: 'Unknown Error',
+									 message: '' 
+								 }
                }
-
                var context = this.createTemplateContext({
-                  error: errorText
+                  error: error
                });
                this.places.content.html(this.getTemplate('error').render(context));
-            }
-         },
-
-         isOwner: {
-            value: function (paramName) {
-               // NB param name represents the property name of the parameter which currently 
-               // holds the username of the "subject" of the widget. If the current authenticated
-               // user and the subject user are the same, we say the user is the owner.
-               // The widgets use 'userId', which originates in the url as a path component,
-               // e.g. /people/myusername.
-               paramName = paramName ? paramName : 'userId';
-               if (Session.isLoggedIn() && Session.getUsername() === this.params[paramName]) {
-                  return true;
-               } else {
-                  return false;
-               }
             }
          },
 
@@ -723,19 +805,19 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
          render: {
             value: function () {
                try {
-                  if (this.error) {
+                  if (this.status === 'error' || this.error) {
                      this.renderError();
                   } else if (Session.isLoggedIn()) {
-                     if (this.initialStateSet) {
+                     //if (this.initialStateSet) {
                         this.setTitle(this.widgetTitle);
                         this.places.content.html(this.renderTemplate('authorized'));
-                     }
+                     //}
                   } else {
-                     if (this.initialStateSet) {
+                     //if (this.initialStateSet) {
                         // no profile, no basic aaccount info
                         this.setTitle(this.widgetTitle);
                         this.places.content.html(this.renderTemplate('unauthorized'));
-                     }
+                     //}
                   }
                   if (this.afterRender) {
                      this.afterRender();
@@ -795,25 +877,28 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
              
            }
          },
+         
+         loadCSSResource: {
+            value: function (url) {
+               if (!this.cssLoaded) {
+                  this.cssLoaded = {};
+               }
+               if (this.cssLoaded[url]) {
+                  return;
+               }
+               $('<link>')
+                  .appendTo('head')
+                  .attr({
+                     type: 'text/css',
+                     rel: 'stylesheet'
+                  })
+                  .attr('href', url);
+            }
+         },
 
          loadCSS: {
             value: function () {
-               // Load social widget css.
-               $('<link>')
-                  .appendTo('head')
-                  .attr({
-                     type: 'text/css',
-                     rel: 'stylesheet'
-                  })
-                  .attr('href', '/src/widgets/dashboard/style.css');
-               // Load specific widget css.
-               $('<link>')
-                  .appendTo('head')
-                  .attr({
-                     type: 'text/css',
-                     rel: 'stylesheet'
-                  })
-                  .attr('href', '/src/widgets/dashboard/' + this.widgetName + '/style.css');
+               this.loadCSSResource('/src/widgets/dashboard/' + this.widgetName + '/style.css');
             }
          },
 
@@ -899,9 +984,6 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                this.renderMessages();
             }
          },
-
-
-        
 
          logNotice: {
             value: function (source, message) {
@@ -1035,137 +1117,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
 
 
             }
-         },
-           isValidNarrative: {
-            value: function (ws) {
-               if (ws.metadata.narrative &&
-                  // corrupt workspaces may have narrative set to something other than the object id of the narrative
-                  /^\d+$/.test(ws.metadata.narrative) &&
-                  ws.metadata.is_temporary !== 'true') {
-                  return true;
-               } else {
-                  return false;
-               }
-            }
-         },
-
-         applyNarrativeFilter: {
-            value: function (ws, filter) {
-               return true;
-            }
-         },
-
-         getNarratives: {
-            value: function (cfg) {
-               // get all the narratives the user can see.
-               return Q.promise(function (resolve, reject, notify) {
-                  this.promise(this.workspaceClient, 'list_workspace_info', cfg.params)
-                     .then(function (data) {
-                        var workspaces = [];
-                        for (var i = 0; i < data.length; i++) {
-                           var wsInfo = APIUtils.workspace_metadata_to_object(data[i]);
-                           if (this.isValidNarrative(wsInfo) && this.applyNarrativeFilter(cfg.filter)) {
-                              workspaces.push(wsInfo);
-                           }
-                        }
-
-                        var objectRefs = workspaces.map(function (w) {
-                           return {
-                              ref: w.id + '/' + w.metadata.narrative
-                           }
-                        });
-
-                        // Now get the corresponding object metadata for each narrative workspace
-                        this.promise(this.workspaceClient, 'get_object_info_new', {
-                              objects: objectRefs,
-                              ignoreErrors: 1,
-                              includeMetadata: 1
-                           })
-                           .then(function (data) {
-                              var narratives = [];
-                              for (var i = 0; i < data.length; i++) {
-                                 // If one of the object ids from the workspace metadata (.narrative) did not actually
-                                 // result in a hit, skip it. This can occur if a narrative is corrupt -- the narrative object
-                                 // was deleted or replaced and the workspace metadata not updated.
-                                 if (!data[i]) {
-                                    console.log('WARNING: workspace ' + objectRefs[i] + ' does not contain a matching narrative object');
-                                    continue;
-                                 }
-                                 // Make sure it is a valid narrative object.
-                                 var object = APIUtils.object_info_to_object(data[i]);
-                                 if (object.typeName !== 'Narrative') {
-                                    console.log('WARNING: workspace ' + object.wsid + ' object ' + object.id + ' is not a valid Narrative object'  );
-                                    continue;
-                                 }
-                                 // console.log(object.typeName);
-                                 
-                                 //if (data[i][6] === 4427) {
-                                 //   console.log('MATT'); console.log(data[i]);
-                                 //}
-                                 narratives.push({
-                                    workspace: workspaces[i],
-                                    object: object
-                                 });
-                              }
-                              resolve(narratives);
-                           }.bind(this))
-                           .catch(function (err) {
-                              reject(err);
-                           })
-                           .done();
-                     }.bind(this))
-                     .catch(function (err) {
-                        reject(err);
-                     })
-                     .done();
-               }.bind(this));
-            }
-         },
-         
-          getPermissions: {
-            value: function (narratives) {
-               return Q.promise(function (resolve, reject, notify) {
-                  var promises = narratives.map(function (narrative) {
-                     return this.promise(this.workspaceClient, 'get_permissions', {
-                        id: narrative.workspace.id
-                     })
-                  }.bind(this));
-                  var username = Session.getUsername();
-                  Q.all(promises)
-                     .then(function (permissions) {
-                        for (var i = 0; i < permissions.length; i++) {
-                           var narrative = narratives[i];
-                           narrative.permissions = Utils.object_to_array(permissions[i], 'username', 'permission')
-                              .filter(function (x) {
-                                 if (x.username === username ||
-                                    x.username === '*' ||
-                                    x.username === narrative.workspace.owner) {
-                                    return false;
-                                 } else {
-                                    return true;
-                                 }
-                              })
-                              .sort(function (a, b) {
-                                 if (a.username < b.username) {
-                                    return -1;
-                                 } else if (a.username > b.username) {
-                                    return 1;
-                                 } else {
-                                    return 0
-                                 }
-                              });
-                        }
-                        resolve(narratives);
-                     }.bind(this))
-                     .catch(function (err) {
-                        reject(err);
-                     })
-                     .done();
-               }.bind(this));
-            }
          }
-         
-
       });
 
       return DashboardWidget;

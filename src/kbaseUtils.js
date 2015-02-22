@@ -2,7 +2,12 @@ define(['q'],
    function (Q) {
       "use strict";
       var Utils = Object.create({}, {
+         version: {
+            value: '0.0.1',
+            writable: false
+         },
          getProp: {
+            
             value: function (obj, props, defaultValue) {
                if (typeof props === 'string') {
                   props = props.split('.');
@@ -445,6 +450,101 @@ define(['q'],
                   l.push(newObj);
                }
                return l;
+            }
+         },
+         mapAnd: {
+            value: function (arrs, fun) {
+               var keys = Object.keys(arrs[0]);
+               for (var i=0; i<arrs[0].length; i++) {
+                  var args = [];
+                  for (var j=0; j<arrs.length; j++) {
+                     args.push(arrs[j][i]);
+                     if (!fun.call(null, args)) {
+                        return false;
+                     }
+                  }
+               }
+               return true;
+            }
+         },
+         isEqual: {
+            value: function (v1, v2) {
+               var _this = this;
+               var path = [];
+               var iseq = function (v1, v2) {
+                  
+                  var t1 = typeof v1;
+                  var t2 = typeof v2;
+                  if (t1 !== t2) {
+                 //    console.log('1');
+                     return false;
+                  }
+                  switch (t1) {
+                        case 'string': 
+                        case 'number':
+                        case 'boolean':
+                           if (v1 !== v2) {
+                 //    console.log('2');
+               //   console.log('T: ' + t1+','+t2);
+                              return false;
+                           }
+                           break;
+                        case 'undefined': 
+                           if (t2 !== 'undefined') {
+                 //    console.log('3');
+               //   console.log('T: ' + t1+','+t2);
+                              return false;
+                           }
+                           break;
+                        case 'object':
+                           if (v1 instanceof Array) {
+                              if (v1.length !== v2.length) {
+                 //    console.log('4');
+               //   console.log('T: ' + t1+','+t2);
+                                 return false;
+                              } else {
+                                 for (var i=0; i<v1.length; i++) {
+                                    path.push(i);
+                                    if (!iseq(v1[i], v2[i])) {
+                 //    console.log('5');
+               //   console.log('T: ' + t1+','+t2);
+                                       return false;
+                                    }
+                                    path.pop();
+                                 }
+                              }
+                           } else if (v1 === null) {
+                              if (v2 !== null) {
+                                 return v2;
+                              }
+                           } else {
+                              var k1 = Object.keys(v1);
+                              var k2 = Object.keys(v2);
+                              if (k1.length !== k2.length) {
+                 //    console.log('6: '+k1+':'+k2);
+               //   console.log('T: ' + t1+','+t2);
+                                 return false;
+                              }
+                              for (var i=0; i<k1.length; i++) {
+                                 path.push(k1[i]);
+                                 if (!iseq(v1[k1[i]], v2[k1[i]])) {
+                 //    console.log('7: '+k1[i]+', '+v1[k1[i]]+':'+v2[k1[i]]);
+               //   console.log('T: ' + t1+','+t2);
+                                    return false;
+                                 }
+                                 path.pop();
+                              }
+                              return true;
+                           }
+                  };
+                  return true;
+               }.bind(this);
+               var result =  iseq(v1, v2);
+               //if (!result) {
+               //   console.log('NOT EQUAL');
+               //   console.log(path);
+               //}
+               return result;
             }
          }
 
