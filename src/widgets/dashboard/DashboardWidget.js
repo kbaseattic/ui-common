@@ -252,7 +252,10 @@ define(['nunjucks', 'jquery', 'q', 'underscore', 'kb.session', 'kb.utils', 'kb.u
 							 
 							 // refreshBeat is a one minute (or whatever) approximate timer for 
 							 // refreshing more expensive data.
-							 this.refreshBeat = 0;
+							 // this.refreshBeat = 0;
+							 //
+							 this.refreshInterval = 60000
+							 this.refreshLastTime;
 
 
 							 // STATUS
@@ -401,13 +404,16 @@ define(['nunjucks', 'jquery', 'q', 'underscore', 'kb.session', 'kb.utils', 'kb.u
 				 
 				 handleHeartbeat: {
 					 value: function (data) {
-						 if (this.refreshBeat >= 60) {
+						 var now = (new Date()).getTime();
+						 if (!this.refreshLastTime) {
+							 this.refreshLastTime = now;							 
+						 }
+						 if (now - this.refreshLastTime >= this.refreshInterval) {
 							 if (this.onRefreshbeat) {
 							 	 this.onRefreshbeat(data);
-								 this.refreshBeat = 0;
+								 this.refreshLastTime = now;	
 							 }
 						 }
-						 this.refreshBeat++;
 						 if (this.onHeartbeat) {
 					 	 	this.onHeartbeat(data);
 						}
