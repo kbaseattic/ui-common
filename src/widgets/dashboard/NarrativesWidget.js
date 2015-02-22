@@ -1,5 +1,5 @@
-define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.base', 'kb.client.methods', 'kb.session', 'kb.widget.buttonbar', 'q', 'postal'], 
-   function ($, nunjucks, Utils, APIUtils, DashboardWidget,  KBService, Session, Buttonbar, Q, Postal) {
+define(['jquery', 'q', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.base', 'kb.client.methods', 'kb.session', 'kb.widget.buttonbar'], 
+   function ($, Q, Postal, Utils, APIUtils, DashboardWidget,  KBService, Session, Buttonbar) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
@@ -34,47 +34,7 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                return this.getState(['methodsMap', name, 'name'], name); 
             }
          },
-
-         go: {
-            value: function () {
-               this.start();
-               
-               /*Postal.channel('dashboard')
-               .subscribe('metrics.query', function (data, envelope) {
-                  var n = this.getState('narratives');
-                  if (n) {
-                     var count = n.length;
-                  } else {
-                     var count = null;
-                  }
-                  envelope.reply(null, {
-                     narratives: {
-                        count: count
-                     }
-                  });
-               }.bind(this));
-               
-               
-               Postal.channel('dashboard.metrics')
-               .subscribe('query.narratives', function (data) {
-                  if (this.hasState('narratives')) {
-                     var count = n.length;
-                  } else {
-                     var count = null;
-                  }
-                  Postal.channel('dashboard.metrics')
-                  .publish('update.narratives', {
-                     narratives: {
-                        count: count
-                     }
-                  });
-               }.bind(this));
-               */
-               
-               return this;
-            }
-         },
-
+				 
          setup: {
             value: function () {
                // User profile service
@@ -104,32 +64,20 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                if (this.error) {
                   this.renderError();
                } else if (Session.isLoggedIn()) {
-                  if (this.initialStateSet) {
+                  //if (this.initialStateSet) {
                      this.places.title.html(this.widgetTitle);
                      this.places.content.html(this.renderTemplate(this.view));
-                  }
+                  //}
                } else {
-                  if (this.initialStateSet) {
+                  //if (this.initialStateSet) {
                      // no profile, no basic aaccount info
                      this.places.title.html(this.widgetTitle);
                      this.places.content.html(this.renderTemplate('unauthorized'));
-                  }
+                  //}
                }
                this.container.find('[data-toggle="popover"]').popover();
                this.container.find('[data-toggle="tooltip"]').tooltip();
                return this;
-            }
-         },
-
-         renderLayout: {
-            value: function () {
-               this.container.html(this.renderTemplate('layout'));
-               this.places = {
-                  title: this.container.find('[data-placeholder="title"]'),
-                  alert: this.container.find('[data-placeholder="alert"]'),
-                  content: this.container.find('[data-placeholder="content"]')
-               };
-               
             }
          },
          
@@ -251,11 +199,13 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                   return sharingCount;
                });
               
-               this.viewState.setItem('narratives', {
-                  count: count,
-                  sharingCount: sharingCount,
-                  filtered: filtered
-               });
+               if (this.hasState('narratives')) {
+                  this.viewState.setItem('narratives', {
+                     count: count,
+                     sharingCount: sharingCount,
+                     filtered: filtered
+                  });
+               }
                /*
                Postal
                .channel('dashboard.metrics')
@@ -272,6 +222,8 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                return Q.promise(function (resolve, reject, notify) {
                   // We only run any queries if the session is authenticated.
                   if (!Session.isLoggedIn()) {
+										// ensure that all state is zapped.
+										this.deleteState();
                      resolve();
                      return;
                   }
@@ -283,17 +235,16 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                         }),
                         this.kbservice.getApps(),
                         this.kbservice.getMethods()])
-                     .then(function (result) { 
-                        var narratives = result[0];
-                        var apps = result[1];
-                        var methods = result[2];
+                     .spread(function (narratives, apps, methods) { 
+                        // Set the apps as state, and then create a map of app names to app spec.
                         this.setState('apps', apps);
                         var appsMap = {};
                         apps.forEach(function (app) {
                            appsMap[app.id] = app;
                         });
                         this.setState('appsMap', appsMap);
-                     
+
+                        // Same for methods.
                         this.setState('methods', methods);
                         var methodsMap = {};
                         methods.forEach(function (method) {
@@ -301,40 +252,37 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.b
                         }); 
                         this.setState('methodsMap', methodsMap);
                         
-                        if (narratives.length === 0) {
-                          
+                        // If we get no narratives back, we just ensure that
+                        // our state objects are empty. Otheriwse, we need to 
+                        // populate the permissions on the narratives, and then 
+                        // run any filters.
+                        if (narratives.length === 0) {                          
                            this.setState('narratives', []);
                            this.setState('narrativesFiltered', []);
                            resolve();
-                           return;
+                        } else {
+                           this.kbservice.getPermissions(narratives)
+                              .then(function (narratives) {
+                                 narratives = narratives.sort(function (a, b) {
+                                    return b.object.saveDate.getTime() - a.object.saveDate.getTime();
+                                 });
+                                 this.setState('narratives', narratives);
+                                 this.filterNarratives();
+                                 resolve();
+                              }.bind(this))
+                              .catch(function (err) {
+                                 reject(err);
+                              })
                         }
-
-                        this.kbservice.getPermissions(narratives)
-                           .then(function (narratives) {
-                              narratives = narratives.sort(function (a, b) {
-                                 return b.object.saveDate.getTime() - a.object.saveDate.getTime();
-                              });
-                              this.setState('narratives', narratives);
-                              this.filterNarratives();
-                              resolve();
-                           }.bind(this))
-                           .catch(function (err) {
-                              console.log('ERROR');
-                              console.log(err);
-                              reject(err);
-                           })
                      }.bind(this))
-                     .catch(function (err) {
-                         console.log('ERROR');
-                        console.log(err);
+                     .catch(function (err) {											 
+		                    this.viewState.setError('narratives', new Error('Error getting Narratives'));
                         reject(err);
-                     })
+                     }.bind(this))
                      .done();
                }.bind(this));
             }
          }
-         
-
       });
 
       return widget;

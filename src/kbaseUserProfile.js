@@ -46,8 +46,6 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
                   }
               }.bind(this))
               .catch (function(err) {
-                console.log('[UserProfile.loadProfile] Error getting user profile.');
-                console.log(err);
                 reject(err);
               });
             }
@@ -606,8 +604,6 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
           for (var i = 0; i < fieldsToCheck.length; i++) {
             var value = Utils.getProp(this.userRecord, fieldsToCheck[i]);
             if (fieldsToCheck[i] === 'profile.userdata.personal_statement') {
-              // console.log('PERSONAL: ');
-              // console.log(value);
             }
             if (Utils.isBlank(value)) {
               var field = Utils.getSchemaNode(formSchema, fieldsToCheck[i]);

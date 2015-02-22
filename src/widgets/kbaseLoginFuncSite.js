@@ -101,10 +101,6 @@
         }
         this.afterInit();
       }.bind(this));
-      //if (this.ui) {
-      //    this.$elem.append(this.ui);
-      //  }
-      // console.log('DONE?'); 
 
       return this;
     },
@@ -143,7 +139,6 @@
       }.bind(this));
       
       postal.channel('session').subscribe('logout.success', function() {
-      // $(document).on('loggedOut.kbase', function(e) {
         this.sessionObject = null;
         var elem = this.$elem;
         require(['kb.widget.login'], function (LoginWidget) {
@@ -371,11 +366,8 @@
     },
 
     _textStyle: function(callback) {
-      // console.log('in text style');
       this._createLoginDialog();
 
-      // this.$elem.css('padding', '9px 15px 7px 10px');
-      
       var elem = this.$elem;
       require(['kb.widget.login'], function (LoginWidget) {
         try {
@@ -648,7 +640,7 @@
                 postal.channel('session').publish('profile.loaded', {profile: profile});
               })
               .catch (function(err) {
-                postal.channel('session').publish('profile.loadfailure', {message: err});
+                postal.channel('session').publish('profile.loadfailure', {error: err});
               })
               .done();
               break;
@@ -656,7 +648,7 @@
         })
         .catch (function(err) {
           var errMsg = 'Error getting user profile';
-          postal.channel('session').publish('profile.loadfailure', {message: err});
+          postal.channel('session').publish('profile.loadfailure', {error: err, message: errMsg});
         })
         .done();
       });

@@ -446,6 +446,11 @@ app
     .appendTo('head')
     .attr({type: 'text/css', rel: 'stylesheet'})
     .attr('href', 'views/dashboard/style.css');
+   
+    $('<link>')
+    .appendTo('head')
+    .attr({type: 'text/css', rel: 'stylesheet'})
+    .attr('href', '/src/widgets/dashboard/style.css');
     
     // Set up the navbar menu.
    // Note that the navbar is a singleton. There is only one per page/view, and it is as persistent
@@ -479,9 +484,26 @@ app
       */
        
        // Set up the main State machine for this view.
-       var stateMachine = Object.create(StateMachine).init();
-
-       $scope.stateMachine = stateMachine;
+       $scope.viewState = Object.create(StateMachine).init();
+			 
+			 // a cheap hartbeat for now...
+			 var heartbeat = 0;
+			 $scope.heartbeatTimer = window.setInterval(function () {
+				 heartbeat++;
+				 postal.channel('app').publish('heartbeat', {heartbeat: heartbeat});
+			 }, 1000);
+			 
+			 // Now remove them.
+			 $scope.$on('$destroy', function () {
+				 console.log('destroying the scope for the dashboard.');
+			 		// tear down the state machine
+				 	// Umm, this happen naturally when the object goes out of scope.
+				 
+				 // But the heartbeat timer will need to be stopped manually.
+				 window.clearInterval($scope.heartbeatTimer);
+				 
+				 
+			 });
       
     });
      
