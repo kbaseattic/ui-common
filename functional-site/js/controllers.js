@@ -452,7 +452,6 @@ app
 			 
 			 // Now remove them.
 			 $scope.$on('$destroy', function () {
-				 console.log('destroying the scope for the dashboard.');
 			 		// tear down the state machine
 				 	// Umm, this happen naturally when the object goes out of scope.
 				 

@@ -7,22 +7,26 @@ define(['q'],
             writable: false
          },
          getProp: {
-            
             value: function (obj, props, defaultValue) {
                if (typeof props === 'string') {
                   props = props.split('.');
                }
-
-               var temp = obj;
-               for (var i = 0; i < props.length; i++) {
-                  var key = props[i];
-                  if (temp[key] === undefined) {
-                     return defaultValue;
-                  } else {
-                     temp = temp[key];
-                  }
-               }
-               return temp;
+							 var i=0;
+							 while (i < props.length) {
+                 if ( (obj === undefined) ||
+									   (typeof obj !== 'object') ||
+									   (obj === null) ) {
+                    return defaultValue;
+                 } else {
+									 obj = obj[props[i]];
+                 }
+								 i++;
+							 }
+							 if (obj === undefined) {
+								 return defaultValue;
+							 } else {
+								 return obj;
+							 }
             }
          },
 
@@ -31,17 +35,22 @@ define(['q'],
                if (typeof props === 'string') {
                   props = props.split('.');
                }
-
-               var temp = obj;
-               for (var i = 0; i < props.length; i++) {
-                  var key = props[i];
-                  if (temp[key] === undefined) {
-                     return false
-                  } else {
-                     temp = temp[key];
-                  }
-               }
-               return true;
+							 var i=0;
+							 while (i < props.length) {
+                 if ( (obj === undefined) ||
+									   (typeof obj !== 'object') ||
+									   (obj === null) ) {
+                    return false;
+                 } else {
+									 obj = obj[props[i]];
+                 }
+								 i++;
+							 }
+							 if (obj === undefined) {
+								 return false;
+							 } else {
+								 return true;
+							 }
             }
          },
 
