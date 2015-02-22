@@ -333,9 +333,6 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
 
       getAvatarURL: {
         value: function (options) {
-          if (!this.userRecord) {
-            return 'assets/images/nouserpic.png';
-          };
           var gdefault = this.getProp('profile.userdata.avatar.gravatar_default');
           var email = this.getProp('profile.userdata.email');
           if (gdefault && email) {
@@ -480,6 +477,7 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
       getProp: {
         value: function (propName, defaultValue) {
           if (this.userRecord) {
+						console.log('getting prop ' + propName);
             return Utils.getProp(this.userRecord, propName, defaultValue);
           } else {
             return defaultValue;

@@ -51,6 +51,7 @@ define(['jquery', 'postal', 'nunjucks', 'kb.widget.dashboard.base', 'kb.client.m
                         });
                      }.bind(this))
                      .catch(function(err) {
+											 console.log('ERROR'); console.log(err);
                         reject(err);
                      })
                      .done();   

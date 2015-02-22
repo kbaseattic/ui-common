@@ -45,6 +45,8 @@ define(['kb.widget.dashboard.base', 'kb.user_profile', 'kb.client.user_profile',
                      resolve();
                   }.bind(this))
                   .catch(function (err) {
+
+									 console.log('ERROR'); console.log(err);
                      reject(err);
                   })
                   .done();
@@ -100,6 +102,7 @@ define(['kb.widget.dashboard.base', 'kb.user_profile', 'kb.client.user_profile',
                  this.renderError();
 							 } else {
 									if (this.hasState('userProfile')) {
+										console.log('profile status: ' + this.getState('userProfile').getProfileStatus());
 		               switch (this.getState('userProfile').getProfileStatus()) {
 		               case 'profile':
 		                  // NORMAL PROFILE 
