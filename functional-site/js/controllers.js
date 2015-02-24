@@ -334,6 +334,14 @@ app
 
 .controller('People', function($scope, $stateParams) {
     $scope.params = { 'userid':$stateParams.userid, 'kbCache' : kb }
+   
+    // NB need to use KBaseSessionSync here and not kb -- because kb is only valid at page load
+    // time. On angular path changes, it will not have been updated. So, e.g., after a user logs 
+    // out and goes backing over their history...
+    if (!$.KBaseSessionSync.isLoggedIn()) {
+       window.location.href = "#/login/";
+       return;
+    }
     
     // Set the styles for the user page
     $('<link>')
@@ -382,57 +390,24 @@ app
    
 })
 
-.controller('Dashboard', function($scope, $stateParams) {
+.controller('Dashboard', function($scope, $stateParams, $location) {
     $scope.params = { 'kbCache' : kb }
     
-    // Try this.
-    // Get the layout template.
-    // Get the layout config
-    // Render the layout template
-    // Create and attache widgets, from the layout template
-    
-    /*
-    require(['jquery', 'nunjucks', 'kb.utils'], function ($, nunjucks, Utils) {
-       var templateEnv = new nunjucks.Environment(new nunjucks.WebLoader('/functional-site/views/dashboard/templates'), {
-         'autoescape': false
-       });
-       // For now we just have a single standard layout.
-       var layout = templateEnv.getTemplate('layout.html');
-       
-       Utils.getJSON('/functional-site/views/dashboard/dashboard.json')
-       .then(function (data) {
-          var content = layout.render(data);
-          
-       }
-       
-       
-      
-       
-       this.templates.env.addFilter('kbmarkup', function(s) {
-         if (s) {
-              s = s.replace(/\n/g, '<br>');
-            }
-            return s;
-          });
-          // This is the cache of templates.
-          this.templates.cache = {};
-
-          // The context object is what is given to templates.
-          this.context = {};
-          this.context.env = {
-            widgetTitle: this.widgetTitle,
-            widgetName: this.widgetName,
-            docsite: this.getConfig('docsite')
-          };
-    });
-    */
-    
+    if (!$.KBaseSessionSync.isLoggedIn()) {
+			$location.path('/login/');
+       return;
+    }
     
     // Set the styles for the dashboard page
     $('<link>')
     .appendTo('head')
     .attr({type: 'text/css', rel: 'stylesheet'})
     .attr('href', 'views/dashboard/style.css');
+   
+    $('<link>')
+    .appendTo('head')
+    .attr({type: 'text/css', rel: 'stylesheet'})
+    .attr('href', '/src/widgets/dashboard/style.css');
     
     // Set up the navbar menu.
    // Note that the navbar is a singleton. There is only one per page/view, and it is as persistent
@@ -466,9 +441,23 @@ app
       */
        
        // Set up the main State machine for this view.
-       var stateMachine = Object.create(StateMachine).init();
-
-       $scope.stateMachine = stateMachine;
+       $scope.viewState = Object.create(StateMachine).init();
+			 
+			 // a cheap hartbeat for now... and just for the dashboard.
+			 var heartbeat = 0;
+			 $scope.heartbeatTimer = window.setInterval(function () {
+				 heartbeat++;
+				 postal.channel('app').publish('heartbeat', {heartbeat: heartbeat});
+			 }, 100);
+			 
+			 // Now remove them.
+			 $scope.$on('$destroy', function () {
+			 		// tear down the state machine
+				 	// Umm, this happen naturally when the object goes out of scope.
+				 
+				 // But the heartbeat timer will need to be stopped manually.
+				 window.clearInterval($scope.heartbeatTimer);
+			 });
       
     });
      

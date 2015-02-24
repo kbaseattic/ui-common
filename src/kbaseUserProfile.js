@@ -46,8 +46,6 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
                   }
               }.bind(this))
               .catch (function(err) {
-                console.log('[UserProfile.loadProfile] Error getting user profile.');
-                console.log(err);
                 reject(err);
               });
             }
@@ -335,9 +333,6 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
 
       getAvatarURL: {
         value: function (options) {
-          if (!this.userRecord) {
-            return 'assets/images/nouserpic.png';
-          };
           var gdefault = this.getProp('profile.userdata.avatar.gravatar_default');
           var email = this.getProp('profile.userdata.email');
           if (gdefault && email) {
@@ -482,6 +477,7 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
       getProp: {
         value: function (propName, defaultValue) {
           if (this.userRecord) {
+						console.log('getting prop ' + propName);
             return Utils.getProp(this.userRecord, propName, defaultValue);
           } else {
             return defaultValue;
@@ -606,8 +602,6 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
           for (var i = 0; i < fieldsToCheck.length; i++) {
             var value = Utils.getProp(this.userRecord, fieldsToCheck[i]);
             if (fieldsToCheck[i] === 'profile.userdata.personal_statement') {
-              // console.log('PERSONAL: ');
-              // console.log(value);
             }
             if (Utils.isBlank(value)) {
               var field = Utils.getSchemaNode(formSchema, fieldsToCheck[i]);

@@ -1,0 +1,302 @@
+<html>
+
+<head>
+   <!-- load just the basic support -->
+   <script src="/ext/jquery/jquery-1.10.2.min.js"></script>
+   <script src="/ext/q/q.min.js"></script>
+   <script src="/ext/underscore/1.7.0/underscore-min.js"></script>
+
+
+   <script src="/ext/postal/postal-0.12.4.min.js"></script>
+   <script src="/ext/postal/postal.request-response-0.3.1.min.js"></script>
+   <script src="/ext/postal/postal-deluxe.js"></script>
+   <script src="/ext/requirejs/2.1.15/require.js"></script>
+   <script src="/functional-site/js/require-config.js"></script>
+
+   <script src="/ext/kbase-clients/kbase-client-api.min.js"></script>
+
+   <script>
+   define('tester', [], function () {
+      return Object.create({}, {
+         init: {
+            value: function (cfg) {
+               this.id = cfg.id;
+               this.expected = cfg.expected;
+               this.getResult = cfg.getResult;
+               this.testResult = cfg.testResult;
+               this.container = document.querySelector('[data-test="'+this.id+'"]');
+               
+               this.tests = cfg.tests;
+               this.object = cfg.object;
+               this.method = cfg.method;
+               
+               return this;
+            } 
+         },
+         
+         run: {
+            value: function () {
+               var result;
+               this.displayLayout();
+               try {
+                  result = this.getResult();
+                  this.status = 'ok';
+                  this.result = result;
+               } catch(ex) {
+                  this.status = 'error';
+                  this.error = ex;
+               }
+               
+               var testResult;
+               try {
+                  testResult = this.testResult.call(this);
+                  this.status = 'ok';
+                  this.testResult = testResult;
+               } catch(ex) {
+                  this.status = 'error';
+                  this.error = ex;
+               }
+               
+               this.setText('id', this.id);
+               this.setText('status', this.status);
+               this.setText('expected', this.expected);
+               this.setText('result', this.result);
+               this.setText('testResult', this.testResult);
+            }
+         },
+         
+         
+         getText: {
+            value: function(field) {
+               return this.container.querySelector('[data-field="'+field+'"]').textContent
+            }
+         },
+         setText: {
+            value: function(field, value) {
+               this.container.querySelector('[data-field="'+field+'"]').textContent = value;
+            }
+         },
+         setComment: {
+            value: function(comment) {
+               this.setText('comments', comment);
+            }
+         },
+         displayLayout: {
+            value: function () {
+               var l = '<div>Test: <span data-field="id"></span></div>\
+                        <div>Status: <span data-field="status"></span></div>\
+                        <div>Expecting: <span data-field="expected"></span></div>\
+                         <div>Result: <span data-field="result"></span></div>\
+                         <div>Test Result:  <span data-field="testResult"></span></div>\
+                         <div>Comments: <span data-field="comments"></span></div>\
+               ';
+               this.container.innerHTML = l;
+            }
+         },
+         displayResults: {
+            value: function () {
+               
+            }
+         },
+         showResult: {
+            value: function(context) {
+               var n = document.createElement('div');       
+               if (context.status === 'ok') {
+                  var color = 'green';
+               } else {
+                  var color = 'red';
+               }
+               n.innerHTML = '<div style="border: 1px '+color+' solid; margin: 10px 0 0 0;"><div>Test: <span data-field="id">'+context.id+'</span></div>\
+                        <div>Input: <span data-field="status">'+context.input+'</span></div>\
+                        <div>Status: <span data-field="status">'+context.status+'</span></div>\
+                        <div>Expecting: <span data-field="expected">'+context.expected+'</span></div>\
+                         <div>Result: <span data-field="result">'+context.actual+'</span></div></div>\
+               ';
+               this.container.appendChild(n);
+            }
+         },
+         showFinal: {
+            value: function (context) {
+               var n = document.createElement('div');
+               n.innerHTML = '<div>Successes: ' + context.succeed + '</div>\
+                             <div>Fails: ' + context.fail + '</div>\
+                             <div>Errors: ' + context.error + '</div>';
+               this.container.appendChild(n);
+            }
+         },
+         runTests: {
+            value: function () {
+               var succeed = 0;
+               var fail = 0;
+               var error = 0;
+               this.tests.forEach(function(test) {
+                  try {
+                     var result = this.object[this.method].apply(this.object, test.in);
+                     if (result === test.out) {
+                        var status = 'ok';
+                        succeed++;
+                     } else {
+                        var status = 'fail';
+                        fail++;
+                     }
+                     if (status === 'fail') {
+                        this.showResult({
+                           id: this.id, 
+                           status: status, 
+                           input: JSON.stringify(test.in),
+                           expected: test.out,
+                           actual: result
+                        });
+                     }
+                  } catch (ex) {
+                     error++;
+                     this.showResult({
+                        id: this.id,
+                        status: 'exception',
+                        input: test.in,
+                        expected: test.out, 
+                        actual:  ex
+                     });
+                  }
+               }.bind(this));
+               this.showFinal({
+                  succeed: succeed, fail: fail, error: error
+               });
+            }
+         }
+      });
+   });
+   </script>
+
+</head>
+
+<body>
+
+   <h1>Testing for KBase JS Utils</h1>
+   <h2>Presence of the Module</h2>
+   <div data-test="presence">
+      <div>Result:</div>
+      <div data-field="result"></div>
+   </div>
+   <script>
+      require(['kb.utils'], function (O) {
+         if (O) {
+            document.querySelector('[data-test="presence"] [data-field="result"]').innerHTML = 'success';
+         } else {
+            document.querySelector('[data-test="presence"] [data-field="result"]').innerHTML = 'failure';
+         }
+      });
+   </script>
+
+   <h2>Version - static</h2>
+   <div data-test="version-static"></div>
+   <script>
+      require(['kb.utils', 'tester'], function (O, Tester) {
+         var T = Object.create(Tester).init({
+            id: 'version-static',
+            expected: '0.0.1',
+            getResult: function() {
+               return O.version;
+            },
+            testResult: function () {
+               return (this.expected === this.result);
+            }
+         }).run();
+      });
+   </script>
+   
+   <h2>Version - new object</h2>
+   <div data-test="version"></div>
+   <script>
+      require(['kb.utils', 'tester'], function (O, Tester) {
+         var T = Object.create(Tester).init({
+            id: 'version',
+            expected: '0.0.1',
+            getResult: function () {
+               var o = Object.create(O);
+               var version = o.version; 
+               return version;
+            },
+            testResult: function () {
+               return (this.expected === this.result);
+            }
+         }).run();
+      });
+   </script>
+   
+   <h2>Object Equality - simple types</h2>
+   <div data-test="isEqual"></div>
+   <script>
+      require(['kb.utils', 'tester'], function (O, Tester) {
+         // boolean
+         var tests = [
+               {in: [true, true], out: true},
+               {in: [true, false], out: false},
+               {in: [false, true], out: false},
+               {in: [false, false], out: true},
+               
+            ];
+         // integer
+         for (var i=0; i<10; i++) {
+            for (var j=1; j<10; j++) {
+               tests.push({in: [i,j], out: (i===j)})
+            }
+         }
+         // string
+         var s1 = ['cat', 'dog', 'snake'];
+         var s2 = ['cat', 'dog', 'snake'];
+         for (var i=0; i<s1.length; i++) {
+            for (var j=1; j<s2.length; j++) {
+               tests.push({in: [s1[i], s2[j]], out: (s1[i] === s2[j])})
+            }
+         }
+         
+         // object
+         var x;
+         var strings = ['cat', 'dog', 'snake', x];
+         var ints = [];
+         for (var i=0; i<10; i++) {
+            ints.push(i);
+         }
+         ints.push(x);
+         var bools = [true, false, x];
+         
+         var objs = [];
+         for (var i=0; i<strings.length; i++) {
+            for (var j=0; j<ints.length; j++) {
+               for (var k=0; k<bools.length; k++) {
+                  objs.push([{i:i, val:strings[i]}, {i: j, val:ints[j]}, {i: k, val: bools[k]}]);
+               }
+            }
+         }
+         for (var i=0; i<objs.length; i++) {
+            for (var j=0; j<objs.length; j++) {
+               var o1 = objs[i];
+               var ov1 = {prop1: o1[0].val, prop2: o1[1].val, prop3: o1[2].val};
+               var o2 = objs[j];
+               var ov2 = {prop1: o2[0].val, prop2: o2[1].val, prop3: o2[2].val};
+               tests.push({in: [ov1, ov2], out: (o1[0].i === o2[0].i && o1[1].i === o2[1].i && o1[2].i === o2[2].i)});
+            }
+         }
+         
+
+         // array
+         
+         tests.push({in: [['cat', 1, false], ['cat', 1, false]], out: true});
+         tests.push({in: [['cat', 1, false], ['dog', 1, false]], out: false});
+         
+         // complex mixed
+         var T = Object.create(Tester).init({
+            id: 'isEqual',
+            tests: tests,
+            object: O,
+            method: 'isEqual'
+         }).runTests();
+      });
+   </script>
+   
+   
+
+</body>
+
+</html>

@@ -31,29 +31,6 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                return this.getState(['methodsMap', name, 'name'], name);
             }
          },
-         go: {
-            value: function () {
-               this.start();
-
-               /*Postal.channel('dashboard.metrics')
-               .subscribe('query.sharedNarratives', function (data) {
-                  if (this.hasState('narratives')) {
-                     var count = n.length;
-                  } else {
-                     var count = null;
-                  }
-                  Postal.channel('dashboard.metrics')
-                  .publish('update.sharedNarratives', {
-                     narratives: {
-                        count: count
-                     }
-                  });
-               }.bind(this));
-               */
-               return this;
-            }
-         },
-
          setup: {
             value: function () {
                this.kbservice = Object.create(KBService).init();
@@ -108,12 +85,9 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                      onkeyup: function (e) {
                         // little hack to make sure the public narratives is opened up.
                         var collapse = this.places.title;
-                        // console.log(collapse.hasClass('collapsed'));
                         if (collapse.hasClass('collapsed')) {
                            var id = collapse.attr('data-target');
                            $(id).collapse('show');
-                           //console.log('opening...');
-                           //collapse.collapse('show');
                         }
 
                         this.filterState({
@@ -209,7 +183,10 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                return Q.promise(function (resolve, reject, notify) {
                   // Get all workspaces, filter out those owned by the user,
                   // and those that are public
-
+                  if (!Session.isLoggedIn()) {
+                     resolve();
+                     return;
+                  }
                   Q.all([this.kbservice.getNarratives({
                            params: {
                               showDeleted: 0,
@@ -269,8 +246,6 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                               resolve();
                            }.bind(this))
                            .catch(function (err) {
-                              console.log('ERROR');
-                              console.log(err);
                               reject(err);
                            })
                      }.bind(this))
