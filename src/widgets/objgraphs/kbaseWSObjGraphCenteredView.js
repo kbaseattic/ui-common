@@ -705,7 +705,7 @@
 					    }
 					    // add the link info
 					    var links = self.tempRefData['links'];
-						console.log(links);
+					    //console.log(links);
 					    for(var i=0; i<links.length; i++) {
 						if (self.objRefToNodeIdx[links[i]['source']]!=null && self.objRefToNodeIdx[links[i]['target']]!=null) {
 						    self.graph['links'].push({
