@@ -1,5 +1,5 @@
-define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.session', 'kb.client.narrative_method_store', 'kb.client.workspace', 'kb.client.methods', 'kb.utils.api', 'kb.logger', 'q'],
-   function (DashboardWidget, UserProfileService, Utils, Session, NarrativeMethodStore, WorkspaceService, KBService, APIUtils, Logger, Q) {
+define(['kb.widget.dashboard.base', 'kb.utils', 'kb.session', 'kb.client.narrative_method_store', 'kb.client.workspace', 'kb.client.methods', 'kb.logger', 'q'],
+   function (DashboardWidget, Utils, Session, NarrativeMethodStore, WorkspaceService, KBService, Logger, Q) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
@@ -7,14 +7,12 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                cfg.name = 'AppsWidget';
                cfg.title = 'KBase Apps';
                this.DashboardWidget_init(cfg);
-
                return this;
             }
          },
 
          setup: {
             value: function () {
-               // NB This is set up here rather than in init, because it may be called 
                this.kbService = Object.create(KBService).init();
                if (Session.isLoggedIn()) {
                   if (this.hasConfig('narrative_method_store_url')) {
@@ -33,18 +31,6 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                      throw 'The Workspace client url is not defined';
                   }
                }
-            }
-         },
-
-         renderLayout: {
-            value: function () {
-               this.container.html(this.renderTemplate('layout'));
-               this.places = {
-                  title: this.container.find('[data-placeholder="title"]'),
-                  alert: this.container.find('[data-placeholder="alert"]'),
-                  content: this.container.find('[data-placeholder="content"]')
-               };
-
             }
          },
 
@@ -151,7 +137,6 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                            reject(err);
                         })
                         .done();
-
                   }
                }.bind(this));
             }
