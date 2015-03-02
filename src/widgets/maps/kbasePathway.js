@@ -118,9 +118,9 @@ $.KBWidget({
             if (self.image)
                 container.html('<img class="pathway-png" src="data/map/'+self.map_name+'.png">');
 
-            container.append('<div id="'+self.map_name+'_pathway" class="pathway">');
+            container.append('<div id="'+self.map_name+'-pathway" class="pathway">');
 
-            svg = d3.select('#'+self.map_name+'_pathway')
+            svg = d3.select('#'+self.map_name+'-pathway')
                                     .append("svg")
                                     .attr("width", 800)
                                     .attr("height", 1000);
@@ -213,6 +213,7 @@ $.KBWidget({
                 var color = '#fff',
                     lightLabel = undefined;
 
+                // reaction object listed in map
                 var rxn = rxns[i];
 
                 // adjust boxes
@@ -220,7 +221,6 @@ $.KBWidget({
                     y = rxn.y - rxn.h/2 - 1.5,
                     w = rxn.w + 2,
                     h = rxn.h + 2;
-
 
                 // adjust canvas size
                 if (x > max_x) max_x = x+w+c_pad;
@@ -256,17 +256,16 @@ $.KBWidget({
                                         if (j == count) return w;
                                         return w + 1
                                     })
-                                    .attr('height', h-1.5)
+                                    .attr('height', h-1.5);
 
 
                         if (found_rxn.length > 0) {
                             rect.attr('fill', '#bbe8f9');
                             rect.attr('stroke', strokeColorDark);
-                            //outer_rect.remove()
                         } else {
                             rect.attr('fill', '#fff')
                             rect.attr('stroke', strokeColorDark);
-                        }
+                        };
 
                         var title = '<h5>'+self.models[j].name+'<br>'+
                                     '<small>'+self.models[j].source_id+'</small></h5>';
@@ -274,11 +273,18 @@ $.KBWidget({
                     }
                 }
 
-                // color flux depending on rxns found for each fba
+                // determine if fba results should be added for the map reaction
+
                 if (self.fbas) {
                     var fba_rxns = getFbaRxns(rxn.rxns);
+                    if ([].concat.apply([], fba_rxns).length == 0 )
+                        var addFBAResults = false;
+                    else
+                        var addFBAResults = true;
+                }
 
-                    if ([].concat.apply([], fba_rxns).length == 0 ) continue;
+                // color flux depending on rxns found for each fba
+                if (addFBAResults) {
 
                     var w = rxn.w / self.fbas.length;
 
@@ -328,9 +334,9 @@ $.KBWidget({
                                     '<small>'+self.models[j].source_id+'</small></h5>';
                         tooltip(rect.node(), title, rxn, flux, self.fbas[j]);
                     }
-                }
+                }  // end fbas rects
 
-
+                console.log('adding at ', x, y, rxn.id, rxn )
                 var text = group.append('text')
                                 .attr('x', x+2)
                                 .attr('y', y+h/2+6)
@@ -343,32 +349,25 @@ $.KBWidget({
                     $(this).find('text').show();
                 })
             } // end loop
-
         }
+
+
 
 
         function tooltip(container, title, rxn, flux, obj) {
             // get substrates and products
-            var subs = []
+            var subs = [];
             for (var i in rxn.substrate_refs) {
                 subs.push(rxn.substrate_refs[i].compound_ref);
             }
-            var prods = []
+            var prods = [];
             for (var i in rxn.product_refs) {
                 prods.push(rxn.product_refs[i].compound_ref);
             }
 
-
-            // add reaction label
-            //var text = group.append('text').text(rxn.name)
-            //                  .attr('x', x+2)
-            //                  .attr('y', y+h/2 + 2)
-            //                  .attr('class', 'rxn-label');
-
-
             //content for tooltip
             var content = '<table class="table table-condensed">'+
-                              '<tr><td><b>ID</b></td><td>'+rxn.id+'</td></tr>'+
+                              '<tr><td><b>Map RXN ID</b></td><td>'+rxn.id+'</td></tr>'+
                               '<tr><td><b>Rxns</b></td><td>'+ rxn.rxns.join(', ')+'</td></tr>'+
                               '<tr><td><b>Substrates</b></td><td>'+subs.join(', ')+'</td></tr>'+
                               '<tr><td><b>Products</b></td><td>'+prods.join(', ')+'</td></tr>'+
