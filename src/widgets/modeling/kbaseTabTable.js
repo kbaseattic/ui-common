@@ -18,6 +18,8 @@ $.KBWidget({
 
         var type = input.type;
 
+        this.options = input.options;
+
         // tab widget
         var tabs;
 
@@ -164,8 +166,9 @@ $.KBWidget({
         }
 
         function buildContent() {
-
-            //5) Iterates over the entries in the spec and instantiate things
+            //
+            // 5) Iterates over the entries in the spec and instantiate things
+            //
             for (var i = 0; i < tabList.length; i++) {
                 var tabSpec = tabList[i];
                 var tabPane = tabs.tabContent(tabSpec.name);
@@ -175,6 +178,7 @@ $.KBWidget({
 
                 // if widget, invoke widget with arguments
                 else if (tabSpec.widget) {
+                    console.log('building widget', tabSpec.widget)
                     var keys = tabSpec.keys.split(/\,\s+/g);
                     var params = {};
                     tabSpec.arguments.split(/\,\s+/g).forEach(function(arg, i) {
@@ -193,8 +197,6 @@ $.KBWidget({
                     })
                 else
                     createDataTable(tabSpec, tabPane);
-
-
             }
         }
 
