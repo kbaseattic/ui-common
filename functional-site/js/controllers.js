@@ -559,10 +559,15 @@ app
     
     // callback for ng-click 'loginUser':
     $scope.loginUser = function (user, nextPath) {
+				// TODO: this should not be an ID!!
         $("#loading-indicator").show();
+				// Angular does not populate the user property if nothing
+				// was filled in.
+				var username = user?user.username:null;
+				var password = user?user.password:null;
         kbaseLogin.login(
-            user.username,
-            user.password
+            username,
+            password
         );
     };
 
