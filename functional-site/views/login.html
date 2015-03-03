@@ -12,7 +12,7 @@
          <p>Want to learn more? We have an extensive and growing <a href="http://kbase.us/tutorials">library of tutorials</a> that show you how to use KBase’s new apps to analyze your data. To become familiar with the user interface, try the <a href="http://kbase.us/narrative-guide">Narrative Interface User Guide</a>.
       </div>
       <div class="col-sm-3">
-         <div class="well">
+         <div class="well well-kbase">
             <form autofill-fix id="xlogin-form" class="form login-form" ng-hide="loggedIn()" ng-submit="loginUser(user, nextPath)">
                <input type="hidden" ng-model="nextPath">
                <div class="row">
@@ -21,21 +21,21 @@
 
                      <div class="form-group">
                         <!--<label for="kbase_username">Username:</label>-->
-                        <input name="kbase_username" type="text" placeholder="username" id="kbase_username" class=" form-control" tabindex="1" ng-model="user.username" required>
+                        <input name="kbase_username" type="text" placeholder="username" id="kbase_username" class="form-control form-control-kbase" tabindex="1" ng-model="user.username" required>
                      </div>
                      <div class="form-group">
                         <!--<label for="kbase_password" class="full-width">Password:</label>-->
-                        <input type="password" placeholder="password" id="kbase_password" class="form-control" tabindex="2" ng-model="user.password" required>
+                        <input type="password" placeholder="password" id="kbase_password" class="form-control form-control-kbase" tabindex="2" ng-model="user.password" required>
                      </div>
                      <div class="form-group">
                         <button id="signinbtn" type="submit" class="btn btn-primary btn-block btn-kbase" tabindex="3">Sign In<span id="loading-indicator" style="display: none;"> <i class="fa fa-spinner fa-spin"></i></span>
                         </button>
-                        <div id="login_error" class="alert alert-danger" style="display:none; margin-top: 1em;"></div>
+                        <div id="login_error" class="alert alert-danger alert-kbase" style="display:none; margin-top: 1em;"></div>
                      </div>
                      <div class="form-group" style="margin-top: 3em; margin-bottom: 0">
-                           <a target="_blank" href="http://gologin.kbase.us/Signup" class="btn btn-block btn-link">New to KBase? Sign Up</a>
-                           <a target="_blank" href="http://gologin.kbase.us/ResetPassword" class="btn btn-block btn-link">Forgot your password?</a>
-                           <a target="_blank" href="http://kbase.us/login-help" class="btn btn-block btn-link">Help</a>
+                        <a target="_blank" href="http://gologin.kbase.us/Signup" class="btn btn-block btn-link">New to KBase? Sign Up</a>
+                        <a target="_blank" href="http://gologin.kbase.us/ResetPassword" class="btn btn-block btn-link">Forgot your password?</a>
+                        <a target="_blank" href="http://kbase.us/login-help" class="btn btn-block btn-link">Help</a>
                      </div>
                   </div>
                </div>

@@ -50,3 +50,12 @@
    font-size: 18px;
 }
 
+.form-control-kbase {
+   border-radius: 1px;
+}
+.well-kbase {
+   border-radius: 1px;
+}
+.alert-kbase {
+   border-radius: 1px;
+}
