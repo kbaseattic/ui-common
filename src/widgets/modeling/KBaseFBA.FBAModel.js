@@ -229,13 +229,14 @@ function KBaseFBA_FBAModel(modeltabs) {
             "type": "wstype",
             "wstype": "KBaseFBA.Media"
         }]
-    },
-        /*{
+    }];
+
+    /*{
         "name": "Pathways",
         "widget": "kbasePathways",
         "keys": "workspace, objName",
         "arguments": "model_ws, model_name"
-    }*/];
+    }*/
 
     // optional views
     if (modeltabs.options.showETC) {

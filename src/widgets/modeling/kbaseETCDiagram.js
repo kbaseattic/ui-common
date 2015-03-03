@@ -6,15 +6,6 @@ $.KBWidget({
     options: {
     },
 
-    getData: function() {
-        return {
-            id: this.options.id,
-            type: "Model",
-            workspace: this.options.ws,
-            title: this.options.title
-        };
-    },
-
     init: function(options) {
         this._super(options);
         var self = this;
@@ -51,7 +42,6 @@ $.KBWidget({
             var etc = d[0].data,
                 model = d[1].data;
 
-            console.log('etc', etc);
             draw(etc, model);
         })
 
@@ -164,11 +154,10 @@ $.KBWidget({
                         if (rxn_id in model_rxns) found_rxns.push(model_rxns[rxn_id]);
                     }
 
-                    var x = start_x + w*(3);
-                    var y = start_y + h*i;
-                    var color = (found_rxns.length > 0 ? gene_color : 'white')
+                    var x = start_x + w*(3),
+                        y = start_y + h*i,
+                        color = (found_rxns.length > 0 ? gene_color : 'white');
 
-                    console.log(entity)
                     var reactions = entity.reactions;
                     var substrates = entity.substrates;
                     var products = entity.products;

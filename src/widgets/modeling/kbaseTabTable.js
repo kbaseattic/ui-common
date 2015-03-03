@@ -187,6 +187,7 @@ $.KBWidget({
                     })
 
                     tabPane[tabSpec.widget](params);
+                    continue;
                 }
 
                 // preprocess data to get workspace info on any references in class
