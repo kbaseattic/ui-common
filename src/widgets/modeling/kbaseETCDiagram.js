@@ -10,6 +10,11 @@ $.KBWidget({
         this._super(options);
         var self = this;
 
+        var gene_color = '#87CEEB',
+            negFluxColors = ['#910000', '#e52222', '#ff4444', '#fc8888', '#fcabab'],
+            fluxColors = ['#0d8200', '#1cd104','#93e572','#99db9d', '#c7e8cd'],
+            bounds = [1000, 500, 200, 25, 0, -25, -200, -500, -1000];
+
         var ele = this.$elem,
             ws = options.ws,
             name = options.name;
