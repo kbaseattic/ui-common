@@ -9,7 +9,7 @@ foreach $line (<STDIN>) {
     $line =~ s/\'/\\'/g;
     # all newlines become \n
     $line =~ s/\n/\\n/g;
-    # wrap all  lines in 
+
     print "\    s += '" . $line . "';\n";
 }
 print "    return s;\n";
