@@ -18,6 +18,8 @@ $.KBWidget({
 
         var type = input.type;
 
+        this.options = input.options;
+
         // tab widget
         var tabs;
 
@@ -125,15 +127,15 @@ $.KBWidget({
               // see if setData method returns promise or not
               if (setMethod && 'done' in setMethod) {
                   setMethod.done(function() {
-                    buildContent()
+                    buildTabContent()
                 })
               } else {
-                  buildContent();
+                  buildTabContent();
               }
         })
 
         var refLookup = {};
-        function preProcessDataTable(tabSpec) {
+        function preProcessDataTable(tabSpec, tabPane) {
             // get refs
             var refs = [],
                 cols = tabSpec.columns;
@@ -144,6 +146,7 @@ $.KBWidget({
                     })
                 }
             })
+
 
             if (!refs.length)
                 return;
@@ -160,12 +163,14 @@ $.KBWidget({
                                                       //link: data[i][2].split('-')[0]+'/'+data[i][7]+'/'+data[i][1]
                                                       link: data[i][7]+'/'+data[i][1]};
                             })
+                            return [tabSpec, tabPane]
                        })
         }
 
-        function buildContent() {
-
-            //5) Iterates over the entries in the spec and instantiate things
+        function buildTabContent() {
+            //
+            // 5) Iterates over the entries in the spec and instantiate things
+            //
             for (var i = 0; i < tabList.length; i++) {
                 var tabSpec = tabList[i];
                 var tabPane = tabs.tabContent(tabSpec.name);
@@ -174,7 +179,7 @@ $.KBWidget({
                 if (tabSpec.type == 'verticaltbl') continue;
 
                 // if widget, invoke widget with arguments
-                else if (tabSpec.widget) {
+                else if ('widget' in tabSpec) {
                     var keys = tabSpec.keys.split(/\,\s+/g);
                     var params = {};
                     tabSpec.arguments.split(/\,\s+/g).forEach(function(arg, i) {
@@ -186,15 +191,13 @@ $.KBWidget({
                 }
 
                 // preprocess data to get workspace info on any references in class
-                var prom = preProcessDataTable(tabSpec);
+                var prom = preProcessDataTable(tabSpec, tabPane);
                 if (prom)
-                    prom.done(function() {
-                        createDataTable(tabSpec, tabPane)
+                    prom.done(function(args) {
+                        createDataTable(args[0], args[1])
                     })
                 else
                     createDataTable(tabSpec, tabPane);
-
-
             }
         }
 
@@ -276,9 +279,6 @@ $.KBWidget({
                     tabs.showTab(info.id);
                     newTabEvents(info.id);
                 }
-
-
-
             });
         }
 

@@ -229,12 +229,24 @@ function KBaseFBA_FBAModel(modeltabs) {
             "type": "wstype",
             "wstype": "KBaseFBA.Media"
         }]
-    }, /*{
+    }];
+
+    /*{
         "name": "Pathways",
         "widget": "kbasePathways",
         "keys": "workspace, objName",
         "arguments": "model_ws, model_name"
-    }*/];
+    }*/
+
+    // optional views
+    if (modeltabs.options.showETC) {
+        this.tabList.push({
+            "name": "ETC",
+            "widget": "kbaseETCDiagram",
+            "keys": "workspace, objName",
+            "arguments": "ws, name"
+        })
+    }
 
 
     this.ReactionTab = function (info) {
@@ -303,8 +315,8 @@ function KBaseFBA_FBAModel(modeltabs) {
 		}
 		return output;
     }
-    
-    
+
+
 
     this.GeneTab = function (info) {
         // var gene = this.genehash[id];
@@ -489,7 +501,7 @@ function KBaseFBA_FBAModel(modeltabs) {
 			 		}
 			 	}
 			 }
-			 	
+
 			gf.output.push({
 			 	"label": "Solution "+i,
 				"data": rxns
@@ -499,8 +511,8 @@ function KBaseFBA_FBAModel(modeltabs) {
 		});
         return p;
     }
-	
-	this.parse_gf_solutions = function(solutions) {		
+
+	this.parse_gf_solutions = function(solutions) {
 		var rxnshash = {};
 		var biochemws = "kbase";
 		var biochem = "default";
@@ -537,7 +549,7 @@ function KBaseFBA_FBAModel(modeltabs) {
 		}
 		return solutions;
 	};
-	
+
     this.setData = function (indata) {
         this.data = indata;
         this.modelreactions = this.data.modelreactions;
