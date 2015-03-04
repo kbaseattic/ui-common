@@ -298,7 +298,7 @@ define(['underscore', 'q'], function (_, Q) {
                 //        });
                 //    };
                 //}
-                var whenResult = test.expects.whenResult || this.whenResult;
+                var whenResult = test.whenResult || this.whenResult;
                 return Q.Promise(function (resolve) {
                     var start = new Date();
                     whenResult(test.object, test.input)

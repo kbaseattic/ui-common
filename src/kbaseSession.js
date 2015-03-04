@@ -9,7 +9,9 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config'],
             
             /**
             * The standard name of the KBase session cookie.
-            * type: string
+            * 
+            * @const {string}
+            * @private
             */
             cookieName: {
                 value: 'kbase_session'
@@ -17,7 +19,9 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config'],
             
             /**
             * The standard name of the KBase session cookie used in the Narrative.
-            * type: string
+            * 
+            * @const {string}
+            * @private
             */
             narrCookieName: {
                 value: 'kbase_narr_session'
@@ -28,8 +32,11 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config'],
             /**
             * The span, from the instant a session cookie is created, after which the cookie will 
             * be deleted from the browser. Corresponds to the max-age attribute of a cookie. 
-            * type: integer
             * nb: this is set in @init from the configuration object.
+            * 
+            * @member {integer}
+            * @private
+            * 
             */
             cookieMaxAge: {
                 value: null,
@@ -42,12 +49,14 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config'],
             * Initialize the object to a well defined starting state.
             * This includes creating instance properties, initializing data, setting 
             * default values.
-            * @param {object} A simple object with each property being a configuration setting
+            * 
+            * @function init
+            * 
             * @returns {Session} A reference to this object.                  
             *                   
             */
             init: {
-                value: function (cfg) {
+                value: function () {
                     this.sessionObject = undefined;
                     this.setSession(this.importSessionFromCookie());
                     // 1 hour is the default cookie max age.
@@ -62,8 +71,40 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config'],
 
 
            // Implementation Methods
-            
-            
+           
+           /**
+            * The canonical kbase session object, based on the kbase session
+            * cookie, but removing a duplicated field and adding the parsed
+            * token.
+            * 
+            * @typedef {Object} SessionObject
+            * @property {string} user_id
+            * @property {string} realname
+            * @property {string} token
+            * @property {string} sessionId
+            * @property {TokenObject} tokenObject
+            */
+           
+           /**
+            * The token object as supplied by the Globus auth service. 
+            * @todo: document the remainder of the fields
+            * 
+            * @typedef {Object} TokenObject
+            * @property {string} un
+            * @property {string} expiry
+            * 
+            */
+           
+            /**
+             * Attempt to set the internal session object from the given 
+             * session object.
+             * 
+             * @function setSession
+             * @private
+             * 
+             * @param {SessionObject} obj - a session object
+             * @returns {undefined}
+             */
             setSession: {
                 value: function (obj) {
                     if (this.validateSession(obj)) {
@@ -76,6 +117,17 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config'],
                 }
             },
 
+            /**
+             * Extract the cookie from the browser environment, parse it, and 
+             * validate it. This is the canonical interface betweek KBase ui
+             * code and browser authentication.
+             * 
+             * @function importSessionFromCookie
+             * @private
+             * 
+             * @returns {SessionObject|null} a kbase session object or null
+             * if there is no valid session cookie.
+             */
             importSessionFromCookie: {
                 value: function () {
                     var sessionCookie = Cookie.getItem(this.cookieName);
@@ -92,8 +144,7 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config'],
                     }
                     session.token = session.token.replace(/PIPESIGN/g, '|').replace(/EQUALSSIGN/g, '=');
                     
-                    // Ensure that we localStorage.
-                   
+                    // Ensure that we have localStorage.
                     var storageSessionString = localStorage.getItem(this.cookieName);
                     if (!storageSessionString) {
                       console.log('WARNING: Local Storage Cookie missing -- resetting session');
@@ -109,10 +160,8 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config'],
                       this.removeAuth();
                       return null;          
                     }
-                           
 
                     // now we have a session object equivalent to the one returned by the auth service.
-
                     var newSession = {
                         username: session.user_id,
                         token: session.token,
@@ -128,6 +177,18 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config'],
                 }
             },
 
+            /**
+             * Creates a valid standard Session Object from a raw session object
+             * provided by Globus.
+             * 
+             * @function importSessionFromAuthObject
+             * @private
+             * 
+             * @param {KBaseSessionObject} kbaseSession - the session object
+             * returned from the KBase auth server
+             * @returns {SessionObject|null} a validated Session Object, or null
+             * if no session or an invalid session was provided.
+             */
             importSessionFromAuthObject: {
                 value: function (kbaseSession) {
                     // Auth object has fields un, user_id, kbase_sessionid, token. If any are missing, we void the session (if any)
@@ -154,14 +215,36 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config'],
                 }
             },
 
-            // This may need to be called during auth state changes, e.g. 
-            // a login widget.
+            /**
+             * Forces the session object to be re-imported from the browser
+             * cookie. Designed to be used by clients which want to ensure that
+             * they have the very latest session. Similar to getSession(), 
+             * except that getSession() will only refresh the session if it is
+             * missing.
+             * 
+             * @function refreshSession
+             * @public
+             * 
+             * @returns {SessionObject} the current session object.
+             */
             refreshSession: {
                 value: function () {
                     this.setSession(this.importSessionFromCookie());
+                    return this.sessionObject;
                 }
             },
 
+            /**
+             * Gets the current session object, fetching it from the environment
+             * (cookie) if it has never been set. Note that in order to retrieve
+             * the current session as rpoerted by the environment, use refreshSession.
+             * 
+             * @function getSession
+             * @public
+             * 
+             * @returns {SessionObject|null} the session object, or null if there
+             * is no valid session available.
+             */
             getSession: {
                 value: function () {
                     if (this.sessionObject === undefined) {
@@ -170,15 +253,40 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config'],
                     return this;
                 }
             },
+            
+            /**
+             * 
+             * The traditional KBase session layout, reflecting the fields set
+             * in the browser cookie.
+             * 
+             * 
+             * @typedef {Object} KBaseSessionObject
+             * @property {string} token - The Globus auth token
+             * @property {string} un - username as extracted from the Globus auth token
+             * @property {string} user_id - same as un
+             * @property {string} name - The user "full name" (globus) or
+             * "user name" (kbase). Deprecated - user name should be taken from
+             * the user profile. (See xxx)
+             * @property {string} kbase_sessionid - Issued by the auth server,
+             * used to uniquely identify this session amongst all other extant
+             * sessions. ???
+             * @todo Where is kbase_sessionid used??? Not in ui-common ...
+             * 
+             */
 
-            getSessionObject: {
-                value: function () {
-                    return this.sessionObject;
-                }
-            },
-
+            /**
+             * Returns the "KBase Session", for legacy usage. The legacy method
+             * of accessing the session is to work directly with a session object,
+             * rather than the api.
+             * 
+             * @function getKBaseSesssion
+             * @public
+             * 
+             * @returns {KBaseSessionObject}
+             */
             getKBaseSession: {
                 value: function () {
+                    this.refreshSession();
                     if (!this.sessionObject) {
                         return null;
                     }
@@ -191,7 +299,26 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config'],
                     }
                 }
             },
+            
+            /**
+             * An object representation of the Globus authentication token.
+             * 
+             * @typedef {Object} GlobusAuthToken
+             * 
+             */
 
+            /**
+             * Decodes a Globus authentication token, transforming the token
+             * plain string into a map of field names to values.
+             * 
+             * @function decodeToken
+             * @private
+             * 
+             * @param {string} - A globus auth token
+             * 
+             * @returns {GlobusAuthToken} an object representing the decoded
+             * token.
+             */
             decodeToken: {
                 value: function (token) {
                     var parts = token.split('|');
