@@ -117,9 +117,7 @@
         this.userProfile = profile.getProfile();
         // NB: KB widgets "rewire" ids -- tranform ids into data- attributes.
         this.$elem.find('[data-element="user-label"]').html(this.get_user_label());
-				console.log('URL');
         var url = profile.getAvatarURL({size: 40, rating: 'pg'});
-				 console.log(url);
         this.$elem.find('[data-element="avatar"]').attr('src', url);
       }.bind(this));
        
