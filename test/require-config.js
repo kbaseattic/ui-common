@@ -55,8 +55,10 @@ require.config({
       'kb.test': '/src/kbaseTest',
       'kb.utils.api': '/src/kbaseAPIUtils',
       'kb.alert': '/src/widgets/kbaseAlert',
+      'kb.asyncqueue': '/src/kbaseAsyncQueue',
       'kb.statemachine': '/src/kbaseStateMachine',  
       'kb.logger': '/src/kbaseLogger',
+      'kb.test': '/src/kbaseTest',
       
       // kbase app
       'kb.appstate': '/src/kbaseAppState',

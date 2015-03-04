@@ -1,422 +1,495 @@
-define(['jquery', 'q', 'kb.user_profile', 'kb.cookie', 'kb.config'], 
-function ($, Q, UserProfile, Cookie, Config) {
-  'use strict';
-  var Session = Object.create({}, {
-    init: {
-      value: function (cfg) {
-        this.sessionObject = undefined;
-        //try {
-          this.setSession(this.importSessionFromCookie());
-          //} catch (ex) {
-        //  console.log('EX importing session');
-        //  console.log(ex);
-        //}
-        //console.log('in session init');
-        return this;
-      }
-    },
-    
-    cookieName: {
-      value: 'kbase_session'
-    },
-    narrCookieName: {
-      value: 'kbase_narr_session'
-    },
-    
-    setSession: {
-      value: function (obj) {
-        if (this.validateSession(obj)) {
-          this.sessionObject = obj;
-          this.isAuthenticated = true;
-        } else {
-          this.sessionObject = null;
-          this.isAuthenticated = false;
-        }
-      }
-    },
-    
-    importSessionFromCookie: {
-      value: function () {
-        var sessionCookie = Cookie.getItem(this.cookieName);
-        // var sessionCookie = $.cookie(sessionName);
-        if (!sessionCookie) {
-          return null;
-        }
-        // first pass just break out the string into fields.
-        var session = this.decodeToken(sessionCookie);
-        
-        if (! (session.kbase_sessionid && session.un && session.user_id && session.token) ) {
-          this.removeAuth();
-          return null;
-        }
-        
-        session.token = session.token.replace(/PIPESIGN/g, '|').replace(/EQUALSSIGN/g, '=');
+/*jslint browser: true,  todo: true, vars: true, nomen: true */
+/*global define */
+/**
+ * A primitive testing framework for javascript objects.
+ * 
+ * @module Test
+ * 
+ * @todo document
+ * @todo test the test!
+ */
 
-        // now we have a session object equivalent to the one returned by the auth service.
-        
-        var newSession = {
-          username: session.user_id,
-          token: session.token,
-          tokenObject: this.decodeToken(session.token),
-          sessionId: session.kbase_sessionid
-        };
-        
-        if (this.validateSession(newSession)) {
-          return newSession;
-        } else {
-          return null;
-        }
-      }
-    },
-    
-    importSessionFromAuthObject: {
-      value: function (kbaseSession) {
-        // Auth object has fields un, user_id, kbase_sessionid, token. If any are missing, we void the session (if any)
-        // cookies and pretend we have nothing.
-        // NB: the objec returned from the auth service does NOT have the un field.
-        if (! (kbaseSession.kbase_sessionid && kbaseSession.user_id && kbaseSession.token) ) {
-          // throw new Error('Invalid Kbase Session Cookie');
-          this.removeAuth();
-          return null;
-        }
-        var newSession = {
-          username: kbaseSession.user_id,
-          token: kbaseSession.token,
-          tokenObject: this.decodeToken(kbaseSession.token),
-          sessionId: kbaseSession.kbase_sessionid
-        };
-        
-        if (this.validateSession(newSession)) {
-          return newSession;
-        } else {
-          return null;
-        }
-      }
-    },
-    
-    // This may need to be called during auth state changes, e.g. 
-    // a login widget.
-    refreshSession: {
-      value: function () {
-        this.setSession(this.importSessionFromCookie());
-      }
-    },
-    
-    getSession: {
-      value: function () {
-        if (this.sessionObject === undefined) {
-          this.setSession(this.importSessionFromCookie());
-        }
-        return this;
-      }
-    },
-    
-    getKBaseSession: {
-      value: function () {
-        var session = this.getSession();
-        if (!session) {
-          return null;
-        }
-        return {
-          un: session.username,
-          user_id: session.username,
-          token: session.token,
-          kbase_sessionid: session.sessionId
-        }
-      }
-    },
-        
-    decodeToken: {
-      value: function (token) {
-        var parts = token.split('|');
-        var map = {};
-        for (var i=0; i<parts.length; i++) {
-          var fieldParts = parts[i].split('=');
-          var key = fieldParts[0];
-          var value = fieldParts[1];
-          map[key] = value;
-        }
-        return map;
-      }
-    },
-    
-    validateSession: {
-      value: function (sessionObject) {
-        if (sessionObject === undefined) {
-          sessionObject = this.sessionObject;
-        }
-        if (!sessionObject) {
-          return false;
-        }
-        
-        if (! (sessionObject.sessionId && sessionObject.username && sessionObject.token && sessionObject.tokenObject) ) {
-          return false;
-        }
-      
-        if (this.hasExpired(sessionObject)) {
-          return false;
-        }
-        return true;
-      }
-    },
-    
-    hasExpired: {
-      value: function (sessionObject) {          
-          var expirySec = sessionObject.tokenObject.expiry;
-          if (!expirySec) {
-            return false;
-          }
-          expirySec = parseInt(expirySec);
-          if (isNaN(expirySec)) {
-            return false;
-          }
-          var expiryDate = new Date(expirySec*1000);
-          var diff = expiryDate - new Date();
-          if (diff <= 0) {
-            return true;
-          } else {
-            return false;
-          }
-        }
-    },
-    
-    makeAuthCookie: {
-      value: function () {
-        if (this.sessionObject) {
-          return 'un=' + this.sessionObject.username + 
-                 '|kbase_sessionid=' + this.sessionObject.sessionId +
-                 '|user_id=' + this.sessionObject.username +
-                 '|token=' + this.sessionObject.token.replace(/=/g, 'EQUALSSIGN').replace(/\|/g, 'PIPESIGN');
-        } else {
-          return null;
-        }
-      }
-    },
-    
-    setAuthCookie: {
-      value: function () {
-        var cookieString = this.makeAuthCookie();
-        Cookie.setItem(this.cookieName, cookieString, 3600, '/');
-        Cookie.setItem(this.cookieName, cookieString, 3600, '/', 'kbase.us');
-        Cookie.setItem(this.narrCookieName, cookieString, 3600, '/', 'kbase.us');
-        
-        //$.cookie(this.cookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });
-        //$.cookie(this.cookieName, cookieString, { path: '/', expires: 60 });
-        //$.cookie(this.narrCookieName, cookieString, { path: '/', domain: 'kbase.us', expires: 60 });  
-      }
-    },
-    
-    fetchProfile: {
-      value: function () {
-        return Q.Promise(function (resolve, reject, update) {
-          Session.refreshSession();
-          var userProfile = Object.create(UserProfile).init({username: this.getUsername()});
-          userProfile.loadProfile()
-          .then(function(profile) {
-            switch (profile.getProfileStatus()) {
-              case 'stub':
-              case 'profile':                
-                resolve(profile.getProfile());
-                break;
-              case 'none':
-                profile.createStubProfile({createdBy: 'session'})
-                .then(function(profile) {
-                  resolve(profile);
-                })
-                .catch (function(err) {
-                  reject('Error creating new stub profile');
-                })
-                .done();
-                break;
+
+/**
+ * 
+ * @typedef {TestConfig} 
+ * @property {string} expected - The expected result status for the test
+ * @property {HTMLElement} container - The DOM node to which the results will 
+ * be shown.
+ * @property {object} object - the object on which the methods is to be tested.
+ * @property {string} method - The name of the method to be tested.
+ * @
+ * 
+ */
+
+define(['underscore', 'q'], function (_, Q) {
+    'use strict';
+    return Object.create({}, {
+        /**
+         * Initialize the object to a sane state. Serves like a constructor
+         * for classic prototype-based composition.
+         * 
+         * @function init
+         * 
+         * @param {object} cfg - a configuration object
+         * 
+         * @returns {object} a reference to the object itself, for chaining.
+         */
+        init: {
+            value: function (cfg) {
+                this.id = cfg.id;
+                this.type = cfg.type || 'method';
+                this.description = cfg.description;
+                this.expected = cfg.expected;
+                this.whenResult = cfg.whenResult;
+
+                // this isn't, or should be, used any more.
+                this.getResult = cfg.getResult;
+
+                this.testResult = cfg.testResult;
+                this.container = document.querySelector('[data-test="' + this.id + '"]');
+
+                this.tests = cfg.tests;
+
+                // @todo this should be wrapped in an object that is passed to the test method associated with type
+                this.propertyName = cfg.propertyName;
+                this.makeObject = cfg.makeObject;
+                this.object = cfg.object;
+                this.method = cfg.method;
+
+                return this;
             }
-          })
-          .catch (function(err) {
-            var errMsg = 'Error getting user profile';
-            // KBase Event Interface
-            $(document).trigger('loggedInFailure', errMsg);
-            reject(errMsg);
-          })
-          .done();
-          });
-        }
-    },
-    
-    login: {
-      value: function (options) {
-        // Uses the options args style, with success and error callbacks.
-        // The top layer of kbase widgets do not have Q available.
-        
-        // Validate params.
-        if (!options.username || options.username.length === 0) {  
-          options.error('Cannot log in without username');
-          return;
-        } else if (!options.password || options.password.length === 0) {
-          options.error('Cannot log in without password');
-          return;
-        } 
-        
-        // NB: the cookie param determines whether the auth service will
-        // set a cookie or not. The cookie set only includes un and kbase_sessionid.
-        // It does not include the auth token, amazingly, which is required for all 
-        // service calls.
-        var loginParams = { 
-          user_id : options.username, 
-          password: options.password,
-          cookie: 0,
-          fields: 'un,token,user_id,kbase_sessionid',
-          status : 1
-        };
-        
-        $.support.cors = true;
-        $.ajax({
-          type: 'POST',
-          url: Config.getConfig('login_url'),
-          data: loginParams,
-          dataType: 'json',
-          crossDomain: true,
-          xhrFields: { withCredentials: true },
-          beforeSend : function(xhr){
-             // make cross-site requests
-             xhr.withCredentials = true;
-          },
-          success: function (data,res,jqXHR) {
-            if (data.kbase_sessionid) {
-              this.setSession(this.importSessionFromAuthObject(data));
-              this.setAuthCookie();
-              
-              // Awaiting clients can get the session object directly, from the cookie, or query the 
-              // global singleton session object.
-              $(document).trigger('loggedIn', this.getKBaseSession());
-              
-              // And as if that is not enough there is even a calback.
-              // Call it in a promise so that it is done after we finish up here.
-              Q.Promise(function (resolve, reject, notify) {
-                options.success(this.getKBaseSession());
-                resolve();
-              }.bind(this)).done();
-              
-              // And ... semi independently we will fetch the profile for this user.
-              this.fetchProfile()
-              .then(function (profile) {
-                $(document).trigger('profileLoaded.session', this.userProfile);
-              }).catch(function (err) {
-                $(document).trigger('loggedInFailure', {status : 0, message : err});     
-              })
-              .done();
-            } else {
-              callback.call(this, {status : 0, message : data.error_msg});
-              $(document).trigger('loggedInFailure', {status : 0, message : data.error_msg});
+        },
+        /**
+         * Displays the results of an individual test in the container node.
+         * It is typically used to display failed tests, but may be used to
+         * display any test result.
+         * 
+         * @function showResult
+         * 
+         * @param {object} context - a plain object containing properties to be
+         * displyed.
+         * 
+         * @returns {undefined}
+         * 
+         */
+        showResult: {
+            value: function (context) {
+                var n = document.createElement('div'), color;
+                if (context.status === 'ok') {
+                    color = 'green';
+                } else {
+                    color = 'red';
+                }
+                n.innerHTML = '<div style="border: 1px ' + color + ' solid; marginput: 10px 0 0 0;">' +
+                              '<div>Type: <span data-field="type">' + context.type + '</span></div>' +
+                              '<div>Test: <span data-field="id">' + context.id + '</span></div>' +
+                              '<div>Description: <span data-field="id">' + context.description + '</span></div>' +
+                              '<div>Subtest: <span data-field="subtest">' + context.subtest + '</span></div>' +
+                              '<div>Input: <span data-field="status">' + context.input + '</span></div>' +
+                              '<div>Status: <span data-field="status">' + context.status + '</span></div>' +
+                              '<div>Elapsed: <span data-field="status">' + context.elapsed + '</span></div>' +
+                              '<div>Expecting: <span data-field="expected">' + context.expected + '</span></div>' +
+                              '<div>Actual: <span data-field="result">' + context.actual + '</span></div>' +
+                              '<div>Message <span data-field="result">' + context.message + '</span></div></div>';
+                this.container.appendChild(n);
             }
-          }.bind(this),
-          error: function (jqXHR, textStatus, errorThrown) {
-           /* Some error cases
-           * status == 401 - show "uid/pw = wrong!" message
-           * status is not 401, 
-           *     and we have a responseJSON - if that's the "LoginFailure: Auth fail" error, show the same uid/pw wrong msg.
-           *     and we do not have a responseJSON (or it's something else): show a generic message
-           */
-           var errmsg = textStatus;
-           var wrongPwMsg = "Login Failed: your username/password is incorrect.";
-           if (jqXHR.status && jqXHR.status === 401) {
-              errmsg = wrongPwMsg;
-           }  else if (jqXHR.responseJSON) {
-              // if it has an error_msg field, use it
-              if (jqXHR.responseJSON.error_msg) {
-                  errmsg = jqXHR.responseJSON.error_msg;
-              }
-              // if that's the unclear auth fail message, update it
-              if (errmsg === "LoginFailure: Authentication failed.") {
-                  errmsg = wrongPwMg;
-              }
-           }
-           // if we get through here and still have a useless error message, update that, too.
-           if (errmsg == "error") {
-              errmsg = "Error connecting to KBase login server";
-          }
-           this.sessionObject = null;
-           this.error = {
-            message: errmsg
-          }
-           options.error(errmsg);
-          }.bind(this)
-      });
-     }
-   },
-    
-    isSessionProcessed: {
-      value: false,
-      writable: true, 
-    },
-    
-    isAuthenticated: {
-      value: false,
-      writable: true
-    },
-    
-    sessionObject: {
-      value: null,
-      writable: true,
-      enumberable: true,
-      configurable: true
-    },
-    
-    isReady: {
-      value: function () {
-        return this.isSessionProcessed;
-      }
-    },
-    
-    isLoggedIn: {
-      value: function () {
-        return this.isAuthenticated;
-      }
-    },
-    
-    getProp: {
-      value: function (propName, defaultValue) {
-        return Util.getProp(this.sessionObject, propName, defaultValue);
-      }
-    },
-     
-    getUsername: {
-      value: function () {
-        if (this.isAuthenticated) {
-          return this.sessionObject.username;
+        },
+        /**
+         * Displays the summary statistics for the test run, appended to the 
+         * container node.
+         * 
+         * @function showFinal
+         * 
+         * @param {object} context - a simple object containing properties to display.
+         * 
+         * @returns {undefined}
+         */
+        showSummary: {
+            value: function (context) {
+                var n = document.createElement('div');
+                n.innerHTML = '<div>Successes: ' + context.succeed + '</div>' +
+                              '<div>Fails: ' + context.fail + '</div>' +
+                              '<div>Errors: ' + context.error + '</div>';
+                this.container.appendChild(n);
+            }
+        },
+        /**
+         * @typedef {object} MethodTestResult
+         * @property {object} output - the result of the output comparison, if any
+         * @property {object} mutation - the result of the mutation comparison, if any
+         * @property {object} exception - the result of the exception comparison, if any
+         * @property {object} error - 
+         */
+
+        /**
+         * Runs a method test on the output.
+         * 
+         * @todo convert to setting a success flag, or perhaps we have it right...
+         */
+        runMethodOutputTest: {
+            value: function (test, output) {
+                var result = {
+                    type: 'output',
+                    actual: output
+                };
+                if (typeof test.expects.output === 'function') {
+                    // NB the output function call is invoked with the test 
+                    // as the context, so it has access to the object itself,
+                    // useful for "this" tests.
+                    result.expected = test.expects.output.call(this, test);
+                } else {
+                    result.expected = test.expects.output;
+                }
+                if (_.isEqual(output, result.expected)) {
+                    result.status = 'success';
+                    result.message = 'output matches expected';
+                } else {
+                    result.status = 'failure';
+                    result.message = 'output does not match expected';
+                }
+                return result;
+            }
+        },
+        runMethodMutationTest: {
+            value: function (test) {
+                
+                var result = {
+                    type: 'mutation',
+                    expected: test.expects.mutation,
+                    // NB freeze the input to protect from further change.
+                    actual: test.input
+                };
+                
+                var i;
+                var mutated = [];
+                var mismatches = [];
+                // First see if we have any mutations of input.
+                for (i = 0; i < test.input; i += 1) {
+                    if (!_.isEqual(test.input[i], test.originalInput[i])) {
+                        mutated.push(i);
+                    }
+                }
+                // And if we have any expectation mismatches.
+                if (test.expects.mutation) {
+                    for (i = 0; i < test.input; i += 1) {
+                        if (!_.isEqual(test.input[i], test.expects.mutation[i])) {
+                            mismatches.push(i);
+                        }
+                    }
+                }
+                // Now the test
+                if (mutated.length > 0) {
+                    if (test.expects.mutation) {
+                        if (mismatches.length === 0) {
+                            result.status = 'success';
+                            result.message = 'Muatations were found, and matched the expected mutations';
+                        } else {
+                            result.status = 'failure';
+                            result.message = 'Mutations were found, but the expectation did not match';
+                        }
+                    } else {
+                        result.status = 'failure';
+                        result.message = 'Mutations were made to the input, but were not expected';
+                    }
+                } else {
+                    if (test.expects.mutation) {
+                        if (mismatches.length === 0) {
+                            result.status = 'success';
+                            result.message = 'No mutations, and the expectation was for no change';
+                        } else {
+                            result.status = 'failure';
+                            result.message = 'No mutations found, but were expected';
+                        }
+                    } else {
+                        result.status = 'success';
+                        result.message = 'No mutations found, none expected'
+                    }
+                }
+                return result;
+            }
+        },
+        exceptionMatch: {
+            value: function (ex, test) {
+                if (typeof ex === 'string') {
+                    if  (ex === test) {
+                        return true;
+                    }
+                }
+                var type = eval(test.type);
+                if (ex instanceof type) {
+                    if (ex.message === test.message) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        },
+        runMethodExceptionTest: {
+            value: function (test, ex) {
+                var result = {
+                    type: 'exception',
+                    expected: test.expects.exception,
+                    actual: ex
+                };
+                if (ex !== undefined) {
+                    if (test.expects.exception) {
+                        if (this.exceptionMatch(ex, test.expects.exception)) {
+                            result.status = 'success';
+                            result.message = 'exception encountered, and it matches the expectation';
+                        } else {
+                            result.status = 'failure';
+                            result.message = 'exception encountered, and it fails the expectation';
+                        }
+                    } else {
+                        result.status = 'failure';
+                        console.log('EX');
+                        console.log(ex);
+                        result.message = 'test not supplied, but exception encountered';
+                    }
+                } else {
+                    if (test.expects.exception) {
+                        result.status = 'failure';
+                        result.message = 'test supplied, but no exception encountered';
+                    } else {
+                        result.status = 'success';
+                        result.message = 'no exception encountered, and non expected';
+                    }
+                }
+                return result;
+            }
+        },
+        
+        /**
+         * Runs a single test for a method test run.
+         * 
+         * It compares the result of executing the method with the supplied
+         * input arguments to an expected output value.
+         * 
+         * The method test can look at three different attributes, depending
+         * on what the test is after.
+         * An output comparison will inspect the output of executing the method
+         * with the supplied inputs.
+         * A mutation comparison will inspect the state of input arguments after
+         * method execution, comparing to mutation values provided.
+         * An exception comparison will inspect an exception generated by 
+         * executing the method with the provided inputs, comparing it to the
+         * provided exception expected value.
+         * 
+         * Each of these three states is inspected, and the results compared
+         * to the supplied expected values.
+         * 
+         * @function runMethodTest
+         * 
+         * @param {object} test - a method test specification
+         * 
+         * @returns {MethodTestResult} the result of the test.
+         *
+         */
+        runMethodTest: {
+            value: function (test) {
+                // var result = [];
+                // TODO: this should be test.input, not test.expects.input
+                // test.originalInput = JSON.parse(JSON.stringify(test.expects.input));
+                //if (!this.testPromise) {
+                //    this.testPromise = function (obj, input) {
+                //        return Q.Promise(function (resolve) {
+                //            resolve(obj[this.method].apply(obj, input));
+                //        });
+                //    };
+                //}
+                var whenResult = test.expects.whenResult || this.whenResult;
+                return Q.Promise(function (resolve) {
+                    var start = new Date();
+                    whenResult(test.object, test.input)
+                        .then(function (output) {
+                            var results = [];
+                            results.push(this.runMethodOutputTest(test, output));
+                            if (!test.ignoreMutation) {
+                                // console.log('ignoring mutation test');
+                                results.push(this.runMethodMutationTest(test));
+                            }
+                            test.result.results = results;
+                            //console.log('in method test');
+                            //console.log(test);
+                            var elapsed = (new Date()).getTime() - start.getTime();
+                            test.elapsed = elapsed;
+                            resolve(test);
+                        }.bind(this))
+                        .catch(function (err) {
+                            // console.log('in method test EX');
+                            // console.log(err);
+                            test.result.results = [this.runMethodExceptionTest(test, err)];
+                            var elapsed = (new Date()).getTime() - start.getTime();
+                            test.elapsed = elapsed;
+                            resolve(test);
+                        }.bind(this))
+                        .done();
+                }.bind(this));
+            }
+        },
+        /**
+         * Returns the object being tested. Used by test methods to avoid 
+         * direct references to the test object.
+         * 
+         * @function getObject
+         * 
+         * @returns {object} an arbitrary object, the object being tested.
+         */
+        getObject: {
+            value: function () {
+                var obj;
+                if (this.makeObject) {
+                    obj = this.makeObject();
+                } else {
+                    obj = this.object;
+                }
+                return obj;
+            }
+        },
+        /**
+         * @typedef {object} PropertyTestResult
+         * @property {object} comparison - the result of a comparing the given 
+         * property to the provided expected property value.
+         * @property {object} error - the result of an exception encountered during
+         * the execution of the test. Note that this is NOT the same as an 
+         * exception anaylsis
+         */
+        /**
+         * Executes a test of the value of a property. This is a simple test,
+         * only inspecting the property on an object
+         * 
+         * @function runPropertyTest
+         * 
+         * @todo provide a properties test that allows executing of arbitrary code
+         * 
+         * @params {object} test - a test specification
+         * 
+         * @returns {PropertyTestResult} the result of the test
+         */
+        runPropertyComparisonTest: {
+            value: function (test, value) {
+                var status;
+                if (_.isEqual(test.expects.propertyValue, value)) {
+                    status = 'success';
+                } else {
+                    status = 'failure';
+                }
+                return {
+                    expected: test.expectedValue,
+                    actual: value,
+                    status: status
+                };
+            }
+        },
+        runPropertyTest: {
+            value: function (test) {
+                var actual = this.getObject()[this.propertyName];
+                return [this.runPropertyComparisonTest(test, actual)];
+            }
+        },
+        runTest: {
+            value: function (test) {
+                switch (this.type) {
+                case 'property':
+                    return this.runPropertyTest(test);
+                case 'method':
+                    var r = this.runMethodTest(test)
+                    return r;
+                default:
+                    return this.runMethodTest(test);
+                }
+            }
+        },
+        runTests: {
+            value: function () {
+                var testId = 0,
+                    testPromises = this.tests.map(function (test) {
+                        testId += 1;
+                        test.result = {
+                            id: testId,
+                            start: (new Date()),
+                            status: 'pending'
+                        };
+                        test.object = this.getObject();
+                        // TODO: exception should be caught here.
+                        
+                        return this.runTest(test);                          
+                    }.bind(this)),
+                    summary = {
+                        succeed: 0,
+                        fail: 0,
+                        error: 0,
+                        unknown: 0
+                    };
+                Q.allSettled(testPromises)
+                    .then(function (results) {
+                        results.forEach(function (qResult) {
+                            var test = qResult.value;
+                            // this is a Q thing ... a bit funky if you ask me... eap
+                            if (qResult.state === 'fulfilled') {
+                                var subtestFail = false;
+                                test.result.results.forEach(function (result) {
+                                    var expectedStatus = test.expects.status || 'success';
+                                    if (expectedStatus !== result.status) {
+                                        subtestFail = true;
+                                        this.showResult({
+                                            id: this.id,
+                                            type: this.type,
+                                            tester: this.description,
+                                            description: test.description,
+                                            status: result.status,
+                                            elapsed: test.elapsed,
+                                            input: JSON.stringify(test.input),
+                                            expected: JSON.stringify(result.expected),
+                                            actual: JSON.stringify(result.actual),
+                                            subtest: result.type,
+                                            message: 'Expected test result of ' + expectedStatus + ', but got ' + result.status + '.' + result.message
+                                        });
+                                    }
+                                }.bind(this));
+                                if (subtestFail) {
+                                    test.status = 'fail';
+                                    // test.fail += 1;
+                                } else {
+                                    test.status = 'success';
+                                    // succeed += 1;
+                                }
+                            } else {
+                                test.status = 'error';
+                                this.showResult({
+                                    id: this.id,
+                                    type: this.type,
+                                    description: this.description,
+                                    status: 'error',
+                                    //input: JSON.stringify(test.expects.input),
+                                    //expected: JSON.stringify(subtest.expected),
+                                    //actual: JSON.stringify(subtest.actual),
+                                    // subtest: subtest.type,
+                                    message: 'Error thrown running the test: ' + err.message
+                                });
+                            }
+                        }.bind(this));
+                        results.forEach(function (result) {
+                            if (result.value.status === 'success') {
+                                summary.succeed += 1;
+                            } else if (result.value.status === 'fail') {
+                                summary.fail += 1;
+                            } else if (result.value.status === 'error') {
+                                summary.error += 1;
+                            } else {
+                                summary.unknown += 1;
+                            }
+                        });
+                        this.showSummary(summary);
+                    }.bind(this))
+                    .catch(function (err) {
+                       console.log('ERROR'); 
+                       console.log(err);
+                    })
+                    .done();
+            }
         }
-      }
-    },
-    
-    getUserRealName: {
-      value: function () {
-        if (this.isAuthenticated) {
-          return "Not Yet";
-        }
-      }
-    },
-    
-    getAuthToken: {
-      value: function () {
-        if (this.isAuthenticated) {
-          return this.sessionObject.token;
-        }
-      }
-    },     
-     removeAuth: {
-       value: function() {
-         Cookie.removeItem(this.cookieName, '/');
-         Cookie.removeItem(this.cookieName, '/', 'kbase.us');
-         Cookie.removeItem(this.narrCookieName, '/', 'kbase.us');
-       }
-     },
-  });
-  
-  var SessionManager = Object.create({}, {
-    init: {
-      value: function () {
-          
-      }
-    }
-  })
-  
-  return Session.init();
+    });
 });
+
