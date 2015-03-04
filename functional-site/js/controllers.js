@@ -541,6 +541,14 @@ app
         $location.path('/dashboard');
         return;
     }
+
+   require(['kb.widget.navbar'], function (NAVBAR) {
+      NAVBAR.clearMenu()
+      .addDefaultMenu({
+        search: false, narrative: false, dashboard: false
+      })
+      .setTitle("Sign In to KBase");
+   });
     
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives
     
@@ -559,10 +567,16 @@ app
     
     // callback for ng-click 'loginUser':
     $scope.loginUser = function (user, nextPath) {
+       // TODO: this should not be an ID!!
         $("#loading-indicator").show();
+       // Angular does not populate the user property if nothing
+       // was filled in.
+       var username = user?user.username:null;
+       var password = user?user.password:null;
+        $("#login_error").hide();
         kbaseLogin.login(
-            user.username,
-            user.password
+            username,
+            password
         );
     };
 

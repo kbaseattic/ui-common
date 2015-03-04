@@ -1,3 +1,5 @@
+/*global define: true */
+/*jslint browser:true  vars: true */
 define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
    function ($, nunjucks, Session, Config) {
       "use strict";
@@ -103,21 +105,23 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                //   iconStyle += 'color: ' + cfg.color + ';';
                //}
 
+               var button;
                if (cfg.url) {
                   // a link style button
                   if (cfg.external) {
                      cfg.target = '_blank';
                   }
+                  var target;
                   if (cfg.target) {
-                     var target = 'target="' + cfg.target + '"';
+                     target = 'target="' + cfg.target + '"';
                   } else {
-                     var target = '';
+                     target = '';
                   }
-                  var button = $('<a data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn" role="button" href="' + cfg.url + '" ' + target + '>' +
-                     '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</a>')
+                  button = $('<a data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn" role="button" href="' + cfg.url + '" ' + target + '>' +
+                     '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</a>');
 
                } else {
-                  var button = $('<button data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn">' +
+                  button = $('<button data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn">' +
                         '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</button>')
                      .on('click', function (e) {
                         e.preventDefault();
@@ -155,39 +159,39 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                      '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</button>');
                if (cfg.disabled) {
                   button.prop('disabled', true);
-               } 
+               }
 
                var menu = $('<ul class="dropdown-menu" role="menu"></ul>');
                if (cfg.items) {
-               for (var i = 0; i < cfg.items.length; i++) {
-                  var item = cfg.items[i];
-                  if (item.type === 'divider') {
-                     menu.append('<li class="divider"></li>');
-                  } else {
-                     var menuItem = $('<li></li>');
+                  for (var i = 0; i < cfg.items.length; i++) {
+                     var item = cfg.items[i];
+                     if (item.type === 'divider') {
+                        menu.append('<li class="divider"></li>');
+                     } else {
+                        var menuItem = $('<li></li>');
 
-                     if (item.url) {
-                        var link = $('<a></a>')
-                           .attr('href', item.url)
-                           .attr('data-menu-item', item.name);
-                     } else if (item.callback) {
-                        var link = $('<a></a>')
-                           .attr('href', '#')
-                           .attr('data-menu-item', item.name)
-                           .on('click', item.callback);
-                     }
-                     if (item.external) {
-                        link.attr('target', '_blank');
-                     }
+                        if (item.url) {
+                           var link = $('<a></a>')
+                              .attr('href', item.url)
+                              .attr('data-menu-item', item.name);
+                        } else if (item.callback) {
+                           var link = $('<a></a>')
+                              .attr('href', '#')
+                              .attr('data-menu-item', item.name)
+                              .on('click', item.callback);
+                        }
+                        if (item.external) {
+                           link.attr('target', '_blank');
+                        }
 
-                     var icon = $('<div class="navbar-icon" style=""></div>');
-                     if (item.icon) {
-                        icon.append($('<span class="fa fa-' + item.icon + '"  class="navbar-icon"></span>'));
-                     }
+                        var icon = $('<div class="navbar-icon" style=""></div>');
+                        if (item.icon) {
+                           icon.append($('<span class="fa fa-' + item.icon + '"  class="navbar-icon"></span>'));
+                        }
 
-                     menu.append(menuItem.append(link.append(icon).append(item.label)));
+                        menu.append(menuItem.append(link.append(icon).append(item.label)));
+                     }
                   }
-               }
                }
                var dropdown = $('<div class="dropdown" style="display: inline-block;"></div>').append(button).append(menu);
                if (cfg.place === 'end') {
@@ -209,6 +213,7 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
          addDefaultMenu: {
             value: function (cfg) {
                cfg = cfg || {};
+               var hasRegularMenuItems = false;
                if (cfg.search !== false) {
                   this.addMenuItem({
                      name: 'search',
@@ -217,6 +222,7 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                      url: '#/search/?q=*',
                      place: 'end'
                   });
+                  hasRegularMenuItems = true;
                }
                if (cfg.narrative !== false) {
                   this.addMenuItem({
@@ -227,6 +233,8 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                      external: true,
                      place: 'end'
                   });
+                  hasRegularMenuItems = true;
+
                }
                if (cfg.dashboard !== false) {
                   this.addMenuItem({
@@ -236,12 +244,16 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                      url: '#/dashboard',
                      place: 'end'
                   });
+                  hasRegularMenuItems = true;
+
                }
-               this.addMenuItem({
-                  type: 'divider',
-                  name: 'help',
-                  place: 'end'
-               });
+               if (hasRegularMenuItems) {
+                  this.addMenuItem({
+                     type: 'divider',
+                     name: 'help',
+                     place: 'end'
+                  });
+               }
 
                this.addHelpMenuItem({
                   name: 'contactus',
@@ -320,15 +332,17 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
             value: function (cfg) {
                var item = this.makeMenuItem(cfg);
                if (item) {
-                  if (cfg.place === 'end') {
-                     var menu = this.container.find('.navbar-menu .dropdown-menu');
-                     if (menu) {
+                  var menu = this.container.find('.navbar-menu .dropdown-menu');
+                  if (menu) {
+                     if (cfg.place === 'end') {
                         menu.append(item);
-                     }
-                  } else {
-                     var helpDivider = this.container.find('.navbar-menu .dropdown-menu [data-menu-item="help"]');
-                     if (helpDivider) {
-                        helpDivider.after(item);
+                     } else {
+                        var helpDivider = menu.find('[data-menu-item="help"]');
+                        if (helpDivider.length === 1) {
+                           helpDivider.after(item);
+                        } else {
+                           menu.prepend(item);
+                        }
                      }
                   }
                }
