@@ -160,30 +160,35 @@
                          * ['not found' header, if applicable, with link to Wikipedia]
                          * Image
                          */
-
-                        var $descDiv = $('<div style="text-align:justify; max-height: ' + this.options.maxTextHeight + 'px; overflow-y:auto; padding-right:5px">')
-                                       .append(desc.description);
-
-                        var $descHeader = $('<div>');
-                        var descHtml;
-                        if (strainName === desc.redirectFrom) {
-                            $descHeader = $(this.redirectHeader(strainName, desc.redirectFrom, desc.searchTerm));
-                        }
-                        else {
+                        if (desc.searchTerm) {
+                            var $descDiv = $('<div style="text-align:justify; max-height: ' + this.options.maxTextHeight + 'px; overflow-y:auto; padding-right:5px">')
+                                           .append(desc.description);
+    
+                            var $descHeader = $('<div>');
+                            var descHtml;
+                            if (strainName === desc.redirectFrom) {
+                                $descHeader = $(this.redirectHeader(strainName, desc.redirectFrom, desc.searchTerm));
+                            }
+                            else if (strainName !== desc.searchTerm) {
+                                $descHeader = $(this.notFoundHeader(strainName, desc.searchTerm, desc.redirectFrom));
+                            }
+    
+                            var $descFooter = $('<p>[<a href="' + desc.wikiUri + '" target="_new">more at Wikipedia</a>]</p>');
+    
+                            var imageHtml = 'Unable to find an image. If you have one, you might consider <a href="' + desc.wikiUri + '" target="_new">adding it to Wikipedia</a>.';
+                            if (desc.imageUri != null) {
+                                imageHtml = '<img src="' + desc.imageUri + '"';
+                                if (this.options.width)
+                                    imageHtml += 'style="width:' + this.options.width + 'px;"';
+                                imageHtml += "/>";
+                            }
+                            $taxonDescription.append($descHeader).append($descDiv).append($descFooter);
+                            $taxonImage.append(imageHtml);
+                        } else {
                             $descHeader = $(this.notFoundHeader(strainName, desc.searchTerm, desc.redirectFrom));
+                            $taxonDescription.append($descHeader);
+                            $taxonImage.append('Unable to find an image.');
                         }
-
-                        var $descFooter = $('<p>[<a href="' + desc.wikiUri + '" target="_new">more at Wikipedia</a>]</p>');
-
-                        var imageHtml = 'Unable to find an image. If you have one, you might consider <a href="' + desc.wikiUri + '" target="_new">adding it to Wikipedia</a>.';
-                        if (desc.imageUri != null) {
-                            imageHtml = '<img src="' + desc.imageUri + '"';
-                            if (this.options.width)
-                                imageHtml += 'style="width:' + this.options.width + 'px;"';
-                            imageHtml += "/>";
-                        }
-                        $taxonDescription.append($descHeader).append($descDiv).append($descFooter);
-                        $taxonImage.append(imageHtml);
                     }
                     else {
                         descHtml = this.notFoundHeader(strainName);
@@ -252,6 +257,7 @@
          */
         renderWorkspace: function() {
             var self = this;
+            this.searchedOnce = false;
             this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading...</center>");
             var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
             
@@ -361,7 +367,7 @@
             var underscoredName = strainName.replace(/\s+/g, "_");
             var str = "<p><b>\"<i>" +
                       strainName + 
-                      "</i>\" not found. Add a description on <a href='http://en.wikipedia.org/wiki/" + 
+                      "</i>\" not found in Wikipedia. Add a description on <a href='http://en.wikipedia.org/wiki/" + 
                       underscoredName + 
                       "' target='_new'>Wikipedia</a>.</b></p>";
             if (term) {
@@ -460,6 +466,8 @@
             this.$elem.append($errorDiv);
         },
 
+        searchedOnce: false,
+        
         /**
          * @function wikipediaLookup
          * Uses Wikipedia to look up information about the genome, then passes 
@@ -491,11 +499,11 @@
          */
         wikipediaLookup: function(termList, successCallback, errorCallback) {
             if (!termList || Object.prototype.toString.call(termList) !== '[object Array]' || termList.length === 0) {
-                if (errorCallback) {
+                if (errorCallback && !this.searchedOnce) {
                     errorCallback("No search term given");
                 }
             }
-
+            this.searchedOnce = true;
             // take the first term off the list, so we can pass the rest of it if we need to re-call this functionk
             var searchTerm = termList.shift();
 
