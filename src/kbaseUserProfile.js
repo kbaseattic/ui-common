@@ -130,82 +130,6 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
           return profileStatus
         }
       },
-
-   
-
-      /*
-      fixProfile: {
-        value: function(options) {
-          if (!this.isOwner()) {
-            options.error('Not profile owner, cannot fix it up.');
-            return;
-          }
-          var def = Q.defer();
-
-          var widget = this;
-          console.log(this.userRecord);
-          if (this.userRecord) {
-            if (this.userRecord.profile && this.userRecord.profile.account) {
-              // We are all good here... nothing to do.                      
-              def.resolve();
-            } else {
-              // No account property on user record
-              // This is not a normal state and can be removed, inciting an error
-              // condition, after testing.
-              this.promise(this.userProfileClient, 'lookup_globus_user', [this.params.userId])
-                .then(function(data) {
-                  if (!widget.userRecord.profile) {
-                    widget.userRecord.profile = {
-                      account: data[widget.params.userId]
-                    }
-                  }
-                  // widget.userRecord.profile.account = data[this.params.userId];
-                  widget.promise(widget.userProfileClient, 'set_user_profile', {
-                    profile: widget.userRecord
-                  })
-                    .then(function() {
-                      def.resolve();
-                    })
-                    .
-                  catch (function(err) {
-                    def.reject(err);
-                  });
-                })
-                .
-              catch (function(err) {
-                def.reject(err);
-              });
-            }
-          } else {
-            // No user record for user ... so we create a stub profile.
-            this.promise(this.userProfileClient, 'lookup_globus_user', [this.params.userId])
-              .then(function(data) {
-                widget.userRecord = widget.createStubProfile({
-                  username: data.userName,
-                  realname: data.fullName,
-                  account: data,
-                  createdBy: 'user'
-                });
-
-                this.promise(this.userProfileClient, 'set_user_profile', {
-                  profile: this.userRecord
-                })
-                  .then(function() {
-                    def.resolve();
-                  })
-                  .catch (function(err) {
-                  def.reject(err);
-                });
-              })
-              .catch (function(err) {
-              def.reject(err);
-            });
-          }
-
-          return def.promise;
-        }
-      },
-      */
       
       createProfile: {
         value: function() {
@@ -477,7 +401,6 @@ function(Q, Utils, md5,  UserProfileService, Config, Session) {
       getProp: {
         value: function (propName, defaultValue) {
           if (this.userRecord) {
-						console.log('getting prop ' + propName);
             return Utils.getProp(this.userRecord, propName, defaultValue);
           } else {
             return defaultValue;
