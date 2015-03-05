@@ -5,6 +5,11 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
             'use strict';
             var Session = Object.create({}, {
                 // Property Constants
+                
+                version: {
+                    value: '0.1.0',
+                    writable: false
+                },
 
                 /**
                  * The standard name of the KBase session cookie.
@@ -13,7 +18,8 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                  * @private
                  */
                 cookieName: {
-                    value: 'kbase_session'
+                    value: 'kbase_session',
+                    writable: false
                 },
                 /**
                  * The standard name of the KBase session cookie used in the Narrative.
@@ -22,7 +28,8 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                  * @private
                  */
                 narrCookieName: {
-                    value: 'kbase_narr_session'
+                    value: 'kbase_narr_session',
+                    writable: false
                 },
                 // Property Variables
 
@@ -39,6 +46,7 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                     value: null,
                     writable: true
                 },
+                
                 // Initializer
 
                 /**
@@ -53,11 +61,11 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                  */
                 init: {
                     value: function () {
-                        this.sessionObject = undefined;
+                        // The sessionObject is created in this method.
                         this.setSession(this.importSessionFromCookie());
                         // 1 hour is the default cookie max age.
                         this.cookieMaxAge = Config.getConfig('session.cookie.max-age', 60 * 60);
-
+                        
                         return this;
                     }
                 },
@@ -103,10 +111,8 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                     value: function (obj) {
                         if (this.validateSession(obj)) {
                             this.sessionObject = obj;
-                            this.isAuthenticated = true;
                         } else {
                             this.sessionObject = null;
-                            this.isAuthenticated = false;
                         }
                     }
                 },
@@ -208,9 +214,7 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                 /**
                  * Forces the session object to be re-imported from the browser
                  * cookie. Designed to be used by clients which want to ensure that
-                 * they have the very latest session. Similar to getSession(), 
-                 * except that getSession() will only refresh the session if it is
-                 * missing.
+                 * they have the very latest session. 
                  * 
                  * @function refreshSession
                  * @public
@@ -223,25 +227,7 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                         return this.sessionObject;
                     }
                 },
-                /**
-                 * Gets the current session object, fetching it from the environment
-                 * (cookie) if it has never been set. Note that in order to retrieve
-                 * the current session as rpoerted by the environment, use refreshSession.
-                 * 
-                 * @function getSession
-                 * @public
-                 * 
-                 * @returns {SessionObject|null} the session object, or null if there
-                 * is no valid session available.
-                 */
-                getSession: {
-                    value: function () {
-                        if (this.sessionObject === undefined) {
-                            this.setSession(this.importSessionFromCookie());
-                        }
-                        return this;
-                    }
-                },
+                
                 /**
                  * 
                  * The traditional KBase session layout, reflecting the fields set
@@ -565,19 +551,12 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                         });
                     }
                 },
-                isAuthenticated: {
-                    value: false,
-                    writable: true
-                },
-                sessionObject: {
-                    value: null,
-                    writable: true,
-                    enumberable: true,
-                    configurable: true
-                },
+                
                 isLoggedIn: {
                     value: function () {
-                        return this.isAuthenticated;
+                        if (this.sessionObject && this.sessionObject.token) {
+                            return true;
+                        }
                     }
                 },
                 getProp: {
@@ -587,21 +566,21 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                 },
                 getUsername: {
                     value: function () {
-                        if (this.isAuthenticated) {
+                        if (this.sessionObject) {
                             return this.sessionObject.username;
                         }
                     }
                 },
                 getRealname: {
                     value: function () {
-                        if (this.isAuthenticated) {
+                        if (this.sessionObject) {
                             return this.sessionObject.realname;
                         }
                     }
                 },
                 getAuthToken: {
                     value: function () {
-                        if (this.isAuthenticated) {
+                        if (this.sessionObject) {
                             return this.sessionObject.token;
                         }
                     }
