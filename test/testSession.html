@@ -1,0 +1,172 @@
+<html>
+
+<head>
+   <!-- load just the basic support -->
+   <script src="/ext/jquery/jquery-1.10.2.min.js"></script>
+   <script src="/ext/q/q.min.js"></script>
+   <script src="/ext/underscore/1.7.0/underscore-min.js"></script>
+   <script src="/ext/postal/postal-0.12.4.min.js"></script>
+   <script src="/ext/postal/postal.request-response-0.3.1.min.js"></script>
+   <script src="/ext/postal/postal-deluxe.js"></script>
+   <script src="/ext/requirejs/2.1.15/require.js"></script>
+   <script src="/functional-site/js/require-config.js"></script>
+   <script src="/ext/kbase-clients/kbase-client-api.min.js"></script>
+</head>
+
+<body>
+
+   <h1>Testing for Session</h1>
+   <p>Here is what we are going to test.</p>
+   <ul>
+       <li>version</li>
+       <li>No Session<br>
+           Test all public calls:
+           <ul>
+               <li>Get Session</li>
+               <li>Get KBase Session</li>
+               <li>Get username</li>
+                   
+               <li>Get real name</li>
+               <li>Get session id</li>
+               <li>Get auth token</li>
+               <li>Refresh session</li>
+           </ul>
+       </li>
+   </ul>
+   <h2>Presence of the Module</h2>
+   <div data-test="presence">
+      <div>Result:</div>
+      <div data-field="result"></div>
+   </div>
+   <script>
+      require(['kb.statemachine','kb.test'], function (StateMachine, Tester) {
+        if (StateMachine) {
+            document.querySelector('[data-test="presence"] [data-field="result"]').innerHTML = 'success';
+        } else {
+            document.querySelector('[data-test="presence"] [data-field="result"]').innerHTML = 'failure';
+        }
+      });
+   </script>
+
+   <h2>Version - static</h2>
+   <div data-test="version"></div>
+   <script>
+       /*
+     require(['kb.statemachine','kb.test'], function (StateMachine, Tester) {
+            var tests = [
+                {
+                    expects: {
+                        propertyValue: '0.0.2',
+                        status: 'success'
+                    }
+                }
+            ];
+
+             var T = Object.create(Tester).init({
+                type: 'property',
+                propertyName: 'version',
+                id: 'version',
+                tests: tests,
+                makeObject: function () {
+                    return Object.create(StateMachine).init();
+                },
+            }).runTests();
+      });
+    */
+   </script>
+   
+   <h2>Version - new object</h2>
+   <div data-test="version2"></div>
+   <script>
+       /*
+      require(['kb.statemachine', 'kb.test'], function (StateMachine, Tester) {
+        var tests = [
+           {
+               expects: {
+                   propertyValue: '0.0.2',
+                   status: 'success'
+               }
+           }
+       ];
+
+        var T = Object.create(Tester).init({
+           type: 'property',
+           propertyName: 'version',
+           id: 'version2',
+           tests: tests,
+           makeObject: function () {
+                return Object.create(StateMachine).init();
+            },
+       }).runTests();
+   });
+    */
+   </script>
+   
+   <div data-test="unauthenticatedGetProperties"></div>
+   <script>
+     require(['kb.session', 'kb.test'], function (Session, Tester) {
+            var tests = [
+                {
+                    method: 'getUsername',
+                    description: 'get user name',
+                    input: [],
+                    expects: {
+                        output: undefined
+                    }
+                },
+                {
+                    method: 'getRealname',
+                    description: 'get real name',
+                    input: [],
+                    expects: {
+                        output: undefined
+                    }
+                },
+                {
+                    method: 'getSessionId',
+                    description: 'get session id',
+                    input: [],
+                    expects: {
+                        output: undefined
+                    }
+                },
+                 {
+                    method: 'getAuthToken',
+                    description: 'get auth token',
+                    input: [],
+                    expects: {
+                        output: undefined
+                    }
+                },
+                {
+                    method: 'isLoggedIn',
+                    description: 'is session authenticated?',
+                    input: [],
+                    expects: {
+                        output: false
+                    }
+                }
+            ];
+            
+            var T = Object.create(Tester).init({
+                id: 'unauthenticatedGetProperties',
+                name: 'Get Properties of Unauthenticated Session',
+                description: 'Most everything will be undefined, because there are no unauthenticated sessions!',
+                tests: tests,
+                makeObject: function () {
+                    return Session;
+                },
+                whenResult: function (test) {
+                    return Q.Promise(function (resolve) {
+                        resolve(test.object[test.method].apply({}, test.input));
+                    });
+                }
+            }).runTests();
+        });
+   </script>
+       
+   <iframe src="testSession_2.html" style="width:800px; height: 500px;"></iframe>
+   
+</body>
+
+</html>

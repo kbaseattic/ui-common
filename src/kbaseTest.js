@@ -37,29 +37,45 @@ define(['underscore', 'q'], function (_, Q) {
          */
         init: {
             value: function (cfg) {
+                /*var k;
+                for (k in cfg) {
+                    this[k] = cfg[k];
+                }
+                if (cfg.type === undefined) {
+                    cfg.type = 'method';
+                }
+                */
+                
                 this.id = cfg.id;
                 this.type = cfg.type || 'method';
+                this.name = cfg.name;
                 this.description = cfg.description;
                 this.expected = cfg.expected;
                 this.whenResult = cfg.whenResult;
+                
 
                 // this isn't, or should be, used any more.
                 this.getResult = cfg.getResult;
 
                 this.testResult = cfg.testResult;
+                
                 this.container = document.querySelector('[data-test="' + this.id + '"]');
+                this.setupDisplay();
 
                 this.tests = cfg.tests;
 
                 // @todo this should be wrapped in an object that is passed to the test method associated with type
+                
                 this.propertyName = cfg.propertyName;
                 this.makeObject = cfg.makeObject;
                 this.object = cfg.object;
                 this.method = cfg.method;
+                
 
                 return this;
             }
         },
+        
         /**
          * Displays the results of an individual test in the container node.
          * It is typically used to display failed tests, but may be used to
@@ -93,6 +109,55 @@ define(['underscore', 'q'], function (_, Q) {
                               '<div>Actual: <span data-field="result">' + context.actual + '</span></div>' +
                               '<div>Message <span data-field="result">' + context.message + '</span></div></div>';
                 this.container.appendChild(n);
+            }
+        },
+       
+        setupDisplay: {
+            value: function () {
+                this.header = document.createElement('div');
+                this.body = document.createElement('div');
+                this.footer = document.createElement('div');
+                this.layout = document.createElement('div');
+                this.layout.appendChild(this.header);
+                this.layout.appendChild(this.body);
+                this.layout.appendChild(this.footer);
+                this.container.appendChild(this.layout);
+            }
+        },
+        showHeader: {
+            value: function () {
+                var c = '';
+                c += '<span class="title" style="font-weight: bold; font-size: 150%;">' + (this.name || '** no name **') + '</span>';
+                c += '<p style="font-style: italic;">' + this.description + '</p>';
+                this.header.innerHTML = c;
+            }
+        },
+        showTestLine: {
+            value: function (test) {
+                var line = document.createElement('div');
+                line.setAttribute('data-test-id', test.id+'');
+
+                var title = document.createElement('div');
+                var c = '';
+                c += '<span class="test-id" style="font-weight: bold;">Test ' + test.id + ': </span>';
+                c += '<span>' + test.description || '** no desc **' + '</span>';
+                c += '<span data-item="result" style="margin-left: 2em;"></span>';
+                title.innerHTML = c;
+                line.appendChild(title);
+                this.body.appendChild(line);
+            }
+        },
+        showTestResult: {
+            value: function (test, result) {
+                var resultNode = this.body.querySelector('[data-test-id="' + test.id + '"] [data-item="result"]');
+                if (resultNode) {
+                    resultNode.innerHTML = result;
+                }
+                if (result === 'PASS') {
+                    resultNode.style.color = 'green';
+                } else {
+                    resultNode.style.color = 'red';
+                }
             }
         },
         /**
@@ -138,16 +203,32 @@ define(['underscore', 'q'], function (_, Q) {
                     // as the context, so it has access to the object itself,
                     // useful for "this" tests.
                     result.expected = test.expects.output.call(this, test);
+                    if (_.isEqual(output, result.expected)) {
+                        result.status = 'success';
+                        result.message = 'output matches expected';
+                    } else {
+                        result.status = 'failure';
+                        result.message = 'output does not match expected';
+                    }                
+                } else if (typeof test.expects.output === 'object') {
+                    result.message = test.expects.output.name;
+                    if (test.expects.output.test.call({}, output)) {
+                        result.status = 'success';
+                    } else {
+                        result.status = 'failure';
+                    }                    
                 } else {
+                    // simple equality test.
                     result.expected = test.expects.output;
+                    if (_.isEqual(output, result.expected)) {
+                        result.status = 'success';
+                        result.message = 'output matches expected';
+                    } else {
+                        result.status = 'failure';
+                        result.message = 'output does not match expected';
+                    }
                 }
-                if (_.isEqual(output, result.expected)) {
-                    result.status = 'success';
-                    result.message = 'output matches expected';
-                } else {
-                    result.status = 'failure';
-                    result.message = 'output does not match expected';
-                }
+                
                 return result;
             }
         },
@@ -301,7 +382,7 @@ define(['underscore', 'q'], function (_, Q) {
                 var whenResult = test.whenResult || this.whenResult;
                 return Q.Promise(function (resolve) {
                     var start = new Date();
-                    whenResult(test.object, test.input)
+                    whenResult(test)
                         .then(function (output) {
                             var results = [];
                             results.push(this.runMethodOutputTest(test, output));
@@ -394,7 +475,7 @@ define(['underscore', 'q'], function (_, Q) {
                 case 'property':
                     return this.runPropertyTest(test);
                 case 'method':
-                    var r = this.runMethodTest(test)
+                    var r = this.runMethodTest(test);
                     return r;
                 default:
                     return this.runMethodTest(test);
@@ -404,25 +485,35 @@ define(['underscore', 'q'], function (_, Q) {
         runTests: {
             value: function () {
                 var testId = 0,
-                    testPromises = this.tests.map(function (test) {
-                        testId += 1;
-                        test.result = {
-                            id: testId,
-                            start: (new Date()),
-                            status: 'pending'
-                        };
-                        test.object = this.getObject();
-                        // TODO: exception should be caught here.
-                        
-                        return this.runTest(test);                          
-                    }.bind(this)),
                     summary = {
                         succeed: 0,
                         fail: 0,
                         error: 0,
                         unknown: 0
                     };
-                Q.allSettled(testPromises)
+                    
+                // Show the test header.
+                this.showHeader(this.name);
+                
+                // Set up tests.
+                this.tests.forEach(function (test) {
+                    testId += 1;
+                    test.id = testId;
+                    test.result = {
+                        id: testId,
+                        start: (new Date()),
+                        status: 'pending'
+                    };
+                    test.object = this.getObject();
+                    // TODO: exception should be caught here.
+
+                    test.whenTest= this.runTest(test);
+                    
+                    this.showTestLine(test);
+                }.bind(this));
+                
+                // now run the tests, updating the display for each line.
+                Q.allSettled(this.tests.map(function (test) {return test.whenTest;}))
                     .then(function (results) {
                         results.forEach(function (qResult) {
                             var test = qResult.value;
@@ -446,13 +537,15 @@ define(['underscore', 'q'], function (_, Q) {
                                             subtest: result.type,
                                             message: 'Expected test result of ' + expectedStatus + ', but got ' + result.status + '.' + result.message
                                         });
-                                    }
+                                    } 
                                 }.bind(this));
                                 if (subtestFail) {
                                     test.status = 'fail';
+                                    this.showTestResult(test, 'fail');
                                     // test.fail += 1;
                                 } else {
                                     test.status = 'success';
+                                    this.showTestResult(test, 'PASS');
                                     // succeed += 1;
                                 }
                             } else {
