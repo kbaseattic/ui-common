@@ -692,7 +692,7 @@
 
     logout: function(rePrompt) {
       require(['kb.session'], function (Session) {
-        Session.removeAuth();
+        Session.removeSession();
 
         // the rest of this is just housekeeping.
         if (this.specificLogout) {
