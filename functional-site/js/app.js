@@ -711,16 +711,21 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
             // USER_TOKEN = $("#signin-button").kbaseLogin('session').token;
             // $location.path('/narratives/featured');
            
+        } else {
+            $location.path($location.path());
         }
         $rootScope.$apply();
-        window.location.reload();
+        
+        // This reload is required for now because not all widgets necessarily
+        // handle change in session state on their own.
+        // window.location.reload();
     };
 
     var finish_logout = function() {
+        // disabled preservation of the current path in nextPath.
         // $location.url('/login/?nextPath='+$location.path());
         $location.path('/login/');
         $rootScope.$apply();
-        window.location.reload();
     };
 
     $('#signin-button').kbaseLogin();

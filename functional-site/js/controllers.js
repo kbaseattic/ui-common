@@ -533,28 +533,31 @@ app
 })
 
 
-.controller('Login', function($scope, $stateParams, $location, kbaseLogin, $modal) {
+.controller('Login', function($scope, $stateParams, $location, kbaseLogin) {
     
     // If we are logged in and landing here we redirect to the dashboard.
-    // I guess we can use the supplied kbaseLogin...
     if ($.KBaseSessionSync.isLoggedIn()) {
         $location.path('/dashboard');
         return;
     }
 
+    // Add a stripped down nav bar for the login page.
    require(['kb.widget.navbar'], function (NAVBAR) {
       NAVBAR.clearMenu()
       .addDefaultMenu({
         search: false, narrative: false, dashboard: false
       })
       .setTitle("Sign In to KBase");
-   });
+    });
     
-    $scope.nar_url = configJSON.narrative_url; // used for links to narratives
-    
+    // Set up some scope properties.
+    $scope.nar_url = configJSON.narrative_url; // used for links to narratives    
     $scope.nextPath = $stateParams.nextPath;
     
-    postal.channel('session').subscribe('login.failure', function (data) {
+    // Keep track of postal subscriptions so we can remove them when the 
+    // view is switched out.
+    var subs = [];
+    subs.push(postal.channel('session').subscribe('login.failure', function (data) {
       // TODO: wow, these jquery calls need to be scoped!
       $("#loading-indicator").hide();
       var errormsg = data.error.message;
@@ -563,17 +566,19 @@ app
       }
       $("#login_error").html(errormsg);
       $("#login_error").show();
-    });
+    }));
     
     // callback for ng-click 'loginUser':
     $scope.loginUser = function (user, nextPath) {
-       // TODO: this should not be an ID!!
+        // TODO: this should not be an ID!!
         $("#loading-indicator").show();
-       // Angular does not populate the user property if nothing
-       // was filled in.
-       var username = user?user.username:null;
-       var password = user?user.password:null;
+        // Angular does not populate the user property if nothing
+        // was filled in.
+        var username = user?user.username:null;
+        var password = user?user.password:null;
         $("#login_error").hide();
+        // Note that the login page does not handle login success -- the 
+        // app does that. 
         kbaseLogin.login(
             username,
             password
@@ -584,31 +589,13 @@ app
         kbaseLogin.logout(false);
     };
 
-    $scope.loggedIn = function() {
-        var userId = kbaseLogin.get_session_prop('user_id');
-        return (userId !== undefined && userId !== null);
-    };
-  
-    postal.channel('session').request({
-      topic: 'profile.get',
-      timeout: 10000
-    })
-    .then(function(profile) {
-      $scope.username = profile.getProp('user.realname');
-    })
-    .done();
-
-    postal.channel('session').subscribe('profile.loaded', function (data) {
-      $scope.$apply(function () {
-        $scope.username = data.profile.getProp('user.realname');
-      });
+    $scope.$on('$destroy', function () {
+        // remove the postal subscriptions.
+        subs.forEach(function (sub) {
+            sub.unsubscribe();
+        })
     });
-
 })
-
-
-
-
 
 .controller('WBLanding', function($scope, $stateParams) {
     
