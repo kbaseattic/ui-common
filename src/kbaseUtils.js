@@ -882,6 +882,8 @@ define(['q'], function (Q) {
                                 if (v2 !== null) {
                                     return false;
                                 }
+                            } else if (v2 === null) {
+                                return false;
                             } else {
                                 var k1 = Object.keys(v1);
                                 var k2 = Object.keys(v2);
