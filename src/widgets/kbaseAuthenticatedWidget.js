@@ -49,7 +49,7 @@
                 }
               }.bind(this));
 
-            postal.channel('session').subscribe('logout.success', function (session) {
+            postal.channel('session').subscribe('logout.success', function () {
                 this.setAuth(undefined);
                 if (this.loggedOutCallback) {
                     this.loggedOutCallback();
