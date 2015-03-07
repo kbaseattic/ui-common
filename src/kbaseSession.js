@@ -444,6 +444,8 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                     Cookie.removeItem(this.narrCookieName, '/', 'kbase.us');
                     // Remove the localStorage session for compatability.
                     localStorage.removeItem(this.cookieName);
+
+                    this.sessionObject = null;
                 }
             },
             /**
@@ -467,90 +469,106 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
              */
             login: {
                 value: function (options) {
-                    // Uses the options args style, with success and error callbacks.
-                    // The top layer of kbase widgets do not have Q available.
+                    return Q.Promise(function (resolve, reject) {
+                        // Uses the options args style, with success and error callbacks.
+                        // The top layer of kbase widgets do not have Q available.
 
-                    // Validate params.
-                    if (!options.username || options.username.length === 0) {
-                        options.error('Username is empty: It is required for login');
-                        return;
-                    }
-                    if (!options.password || options.password.length === 0) {
-                        options.error('Password is empty: It is required for login');
-                        return;
-                    }
+                        // Validate params.
+                        if (!options.username || options.username.length === 0) {
+                            reject('Username is empty: It is required for login');
+                            //  options.error('Username is empty: It is required for login');
+                            return;
+                        }
+                        if (!options.password || options.password.length === 0) {
+                            reject('Password is empty: It is required for login');
+                            //options.error('Password is empty: It is required for login');
+                            return;
+                        }
 
-                    // NB: the cookie param determines whether the auth service will
-                    // set a cookie or not. The cookie set only includes un and kbase_sessionid.
-                    // It does not include the auth token, amazingly, which is required for all 
-                    // service calls.
-                    var loginParams = {
-                        user_id: options.username,
-                        password: options.password,
-                        fields: 'un,token,user_id,kbase_sessionid,name',
-                        status: 1
-                    };
+                        // NB: the cookie param determines whether the auth service will
+                        // set a cookie or not. The cookie set only includes un and kbase_sessionid.
+                        // It does not include the auth token, amazingly, which is required for all 
+                        // service calls.
+                        var loginParams = {
+                            user_id: options.username,
+                            password: options.password,
+                            fields: 'un,token,user_id,kbase_sessionid,name',
+                            status: 1
+                        };
 
-                    $.support.cors = true;
-                    $.ajax({
-                        type: 'POST',
-                        url: Config.getConfig('login_url'),
-                        data: loginParams,
-                        dataType: 'json',
-                        crossDomain: true,
-                        xhrFields: {
-                            withCredentials: true
-                        },
-                        beforeSend: function (xhr) {
-                            // make cross-site requests
-                            xhr.withCredentials = true;
-                        },
-                        success: function (data, res, jqXHR) {
-                            if (data.kbase_sessionid) {
-                                this.setSession(this.importSessionFromAuthObject(data));
-                                if (!options.disableCookie) {
-                                    this.setSessionCookie();
+                        $.support.cors = true;
+                        $.ajax({
+                            type: 'POST',
+                            url: Config.getConfig('login_url'),
+                            data: loginParams,
+                            dataType: 'json',
+                            crossDomain: true,
+                            xhrFields: {
+                                withCredentials: true
+                            },
+                            beforeSend: function (xhr) {
+                                // make cross-site requests
+                                xhr.withCredentials = true;
+                            },
+                            success: function (data, res, jqXHR) {
+                                if (data.kbase_sessionid) {
+                                    this.setSession(this.importSessionFromAuthObject(data));
+                                    if (!options.disableCookie) {
+                                        this.setSessionCookie();
+                                    }
+                                    // options.success(this.makeKBaseSession());
+                                    resolve(this.makeKBaseSession());
+                                } else {
+                                    reject(data.error_msg);
+                                    //options.error({
+                                    //    status: 0,
+                                    //    message: data.error_msg
+                                    //});
                                 }
-                                options.success(this.makeKBaseSession());
-                            } else {
-                                options.error({
-                                    status: 0,
-                                    message: data.error_msg
-                                });
-                            }
-                        }.bind(this),
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            /* Some error cases
-                             * status == 401 - show "uid/pw = wrong!" message
-                             * status is not 401,
-                             *     and we have a responseJSON - if that's the "LoginFailure: Auth fail" error, show the same uid/pw wrong msg.
-                             *     and we do not have a responseJSON (or it's something else): show a generic message
-                             */
-                            var errmsg = textStatus;
-                            var wrongPwMsg = "The login attempt failed: Username &amp; Password combination are incorrect";
-                            if (jqXHR.status && jqXHR.status === 401) {
-                                errmsg = wrongPwMsg;
-                            } else if (jqXHR.responseJSON) {
-                                // if it has an error_msg field, use it
-                                if (jqXHR.responseJSON.error_msg) {
-                                    errmsg = jqXHR.responseJSON.error_msg;
+                            }.bind(this),
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                /* Some error cases
+                                 * status == 401 - show "uid/pw = wrong!" message
+                                 * status is not 401,
+                                 *     and we have a responseJSON - if that's the "LoginFailure: Auth fail" error, show the same uid/pw wrong msg.
+                                 *     and we do not have a responseJSON (or it's something else): show a generic message
+                                 */
+                                var errmsg = textStatus;
+                                var wrongPwMsg = "The login attempt failed: Username &amp; Password combination are incorrect";
+                                if (jqXHR.status && jqXHR.status === 401) {
+                                    errmsg = wrongPwMsg;
+                                } else if (jqXHR.responseJSON) {
+                                    // if it has an error_msg field, use it
+                                    if (jqXHR.responseJSON.error_msg) {
+                                        errmsg = jqXHR.responseJSON.error_msg;
+                                    }
+                                    // if that's the unclear auth fail message, update it
+                                    if (errmsg === "LoginFailure: Authentication failed.") {
+                                        errmsg = wrongPwMg;
+                                    }
                                 }
-                                // if that's the unclear auth fail message, update it
-                                if (errmsg === "LoginFailure: Authentication failed.") {
-                                    errmsg = wrongPwMg;
+                                // if we get through here and still have a useless error message, update that, too.
+                                if (errmsg == "error") {
+                                    errmsg = "Internal Error: Error connecting to the login server";
                                 }
-                            }
-                            // if we get through here and still have a useless error message, update that, too.
-                            if (errmsg == "error") {
-                                errmsg = "Internal Error: Error connecting to the login server";
-                            }
-                            this.sessionObject = null;
-                            this.error = {
-                                message: errmsg
-                            }
-                            options.error(errmsg);
-                        }.bind(this)
-                    });
+                                this.sessionObject = null;
+                                this.error = {
+                                    message: errmsg
+                                }
+                                // options.error(errmsg);
+                                reject(errmsg);
+                            }.bind(this)
+                        });
+                    }.bind(this));
+                }
+            },
+            
+            logout: {
+                value: function () {
+                    return Q.Promise(function (resolve) {
+                        this.removeSession();
+                        resolve();
+                    }.bind(this));
                 }
             },
 

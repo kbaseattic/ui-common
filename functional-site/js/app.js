@@ -690,7 +690,17 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     });
 
 
-    var finish_login = function(session) {
+    $('#signin-button').kbaseLogin();
+    
+    // This is an important part of the app lifecycle!
+    // Login and out events trigger a refresh of the entire page. 
+    // In addition, logout will redirect to the login page.
+    // Although views and widgets should be prepared to render in an unauthenticated state
+    // (and a view would need to redirect to /login if it doesn't want to be seen)
+    // in practice they may never be seen thus.
+    /*
+    postal.channel('session').subscribe('login.success', function (data) {
+        // data.session has the session if you need it
         // If we're changing state from the login page, and we have a valid 
         // session (i.e.: we're logging IN and not OUT), then forward us to
         // the /narrative/ state.
@@ -699,8 +709,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         // We need to reload to make sure the USER_ID and USER_TOKEN get set properly.
         if ($location.path() === '/login/') {
            // Are these used anywhere?
-          USER_ID = session.user_id;
-          USER_TOKEN = session.token;
+          USER_ID = data.session.user_id;
+          USER_TOKEN = data.session.token;
           if ($location.search().nextPath) {
             $location.path($location.search().nextPath);
           } else {
@@ -715,33 +725,16 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
             $location.path($location.path());
         }
         $rootScope.$apply();
-        
-        // This reload is required for now because not all widgets necessarily
-        // handle change in session state on their own.
-        // window.location.reload();
-    };
-
-    var finish_logout = function() {
+    });
+    */
+    /*
+    postal.channel('session').subscribe('logout.success', function (data) {
         // disabled preservation of the current path in nextPath.
         // $location.url('/login/?nextPath='+$location.path());
         $location.path('/login/');
         $rootScope.$apply();
-    };
-
-    $('#signin-button').kbaseLogin();
-    
-    // This is an important part of the app lifecycle!
-    // Login and out events trigger a refresh of the entire page. 
-    // In addition, logout will redirect to the login page.
-    // Although views and widgets should be prepared to render in an unauthenticated state
-    // (and a view would need to redirect to /login if it doesn't want to be seen)
-    // in practice they may never be seen thus.
-    postal.channel('session').subscribe('login.success', function (data) {
-      finish_login(data.session);
     });
-    postal.channel('session').subscribe('logout.success', function (data) {
-      finish_logout();
-    });
+    */
     
     USER_ID = $("#signin-button").kbaseLogin('get_session_prop', 'user_id');
     USER_TOKEN = $("#signin-button").kbaseLogin('get_session_prop', 'token');

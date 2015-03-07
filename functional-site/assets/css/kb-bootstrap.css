@@ -59,3 +59,10 @@
 .alert-kbase {
    border-radius: 1px;
 }
+
+.modal-kbase {
+    width: 263px;
+}
+.modal-kbase .modal-content {
+    border-radius: 1px;
+}

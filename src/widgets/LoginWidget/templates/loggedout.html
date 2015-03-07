@@ -1,13 +1,52 @@
 <div class="dropdown" style="display: inline-block;">
-	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-		Sign In
-		<span class="caret" style="margin-left: 5px;"></span>
-	</button>
-	<ul class="dropdown-menu" role="menu">
-		<li><a href="#" data-menu-item="signin"><div style="display:inline-block; width: 34px;"><span class="fa fa-sign-in" style="font-size: 150%; "></span></div>Sign in to KBase</a></li>
-		<li class="divider"></li>
-		<li><a href="http://staging.kbase.us/new-to-kbase" data-menu-item="signup"><div style="display:inline-block; width: 34px;"><span class="fa fa-pencil" style="font-size: 150%; "></span></div> Signup</a></ll>
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+        Sign In
+        <span class="caret" style="margin-left: 5px;"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+        <li>
+            <a href="#" data-menu-item="signin"><div style="display:inline-block; width: 34px;"><span class="fa fa-sign-in" style="font-size: 150%; "></span></div>Sign in to KBase</a></li>
+        <li class="divider"></li>
+        <li><a href="http://staging.kbase.us/new-to-kbase" data-menu-item="signup"><div style="display:inline-block; width: 34px;"><span class="fa fa-pencil" style="font-size: 150%; "></span></div> Signup</a></ll>
 
-		<li><a href="#" data-menu-item="logout"><div style="display:inline-block; width: 34px;"><span class="fa fa-question" style="font-size: 150%; margin-right: 10px;"></span></div> Lost Password?</a></ll>
-	</ul>
+        <li><a href="#" data-menu-item="logout"><div style="display:inline-block; width: 34px;"><span class="fa fa-question" style="font-size: 150%; margin-right: 10px;"></span></div> Lost Password?</a></ll>
+    </ul>
+</div>
+
+<div class="modal fade" data-dialog="login-dialog" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-kbase">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form autofill-fix class="form login-form">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="position: absolute; top: 0; right: 10px;"><span aria-hidden="true">&times;</span></button>
+
+                            <legend style="text-align: center;">KBase Sign In</legend>
+
+                            <div class="form-group">
+                                <!--<label for="kbase_username">Username:</label>-->
+                                <input name="kbase_username" type="text" placeholder="username" name="username" class="form-control form-control-kbase" tabindex="1" required>
+                            </div>
+                            <div class="form-group">
+                                <!--<label for="kbase_password" class="full-width">Password:</label>-->
+                                <input type="password" placeholder="password" name="password" class="form-control form-control-kbase" tabindex="2"  required>
+                            </div>
+                            <div class="form-group">
+                                <button data-button="sign-in" type="submit" class="btn btn-primary btn-block btn-kbase" tabindex="3">Sign In<span data-element="loading-indicator" style="display: none;"> <i class="fa fa-spinner fa-spin"></i></span>
+                                </button>
+                                <div data-alert="login-error" class="alert alert-danger alert-kbase hidden" style="margin-top: 1em;"></div>
+                            </div>
+                            <div class="form-group" style="margin-top: 3em; margin-bottom: 0">
+                                <a target="_blank" href="http://gologin.kbase.us/Signup" class="btn btn-block btn-link">New to KBase? Sign Up</a>
+                                <a target="_blank" href="http://gologin.kbase.us/ResetPassword" class="btn btn-block btn-link">Forgot your password?</a>
+                                <a target="_blank" href="http://kbase.us/login-help" class="btn btn-block btn-link">Help</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
 </div>

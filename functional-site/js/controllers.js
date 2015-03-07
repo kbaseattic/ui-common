@@ -339,7 +339,9 @@ app
     // time. On angular path changes, it will not have been updated. So, e.g., after a user logs 
     // out and goes backing over their history...
     if (!$.KBaseSessionSync.isLoggedIn()) {
-       window.location.href = "#/login/";
+        // Hmm, best way to preserve path ... trap original request, or what we think it should be?
+        
+       window.location.href = '#/login/?nextPath=/people/'+$stateParams.userid;
        return;
     }
     
@@ -552,48 +554,73 @@ app
     
     // Set up some scope properties.
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives    
-    $scope.nextPath = $stateParams.nextPath;
     
-    // Keep track of postal subscriptions so we can remove them when the 
-    // view is switched out.
-    var subs = [];
-    subs.push(postal.channel('session').subscribe('login.failure', function (data) {
-      // TODO: wow, these jquery calls need to be scoped!
-      $("#loading-indicator").hide();
-      var errormsg = data.error.message;
-      if (errormsg == "LoginFailure: Authentication failed.") {
-          errormsg = "Login Failed: your username/password is incorrect.";
-      }
-      $("#login_error").html(errormsg);
-      $("#login_error").show();
-    }));
+    // ignore nextPath which is ... the login page.
+    if ($stateParams.nextPath == '/login') {
+        $scope.nextPath = null;
+    } else {
+        $scope.nextPath = $stateParams.nextPath;
+    }
     
     // callback for ng-click 'loginUser':
-    $scope.loginUser = function (user, nextPath) {
-        // TODO: this should not be an ID!!
-        $("#loading-indicator").show();
-        // Angular does not populate the user property if nothing
-        // was filled in.
-        var username = user?user.username:null;
-        var password = user?user.password:null;
-        $("#login_error").hide();
-        // Note that the login page does not handle login success -- the 
-        // app does that. 
-        kbaseLogin.login(
-            username,
-            password
-        );
+    $scope.loginUser = function (user, nextPath, nextURL) {
+        require(['kb.session', 'postal', 'jquery'], function (Session, Postal, $) {
+            // TODO: this should not be an ID!!
+            $("#loading-indicator").show();
+            // Angular does not populate the user property if nothing
+            // was filled in.
+            var username = user?user.username:null;
+            var password = user?user.password:null;
+            $("#login_error").hide();
+            // Note that the login page does not handle login success -- the 
+            // app does that. 
+            //kbaseLogin.login(
+             //   username,
+            //    password
+            //);
+            Session.login({
+                username: username,
+                password: password
+            })
+                .then(function (session) {
+                    Postal.channel('session').publish('login.success', {session: session});
+                    if (nextPath && nextPath !== '/login/') {
+                        window.location.href= '#' + nextPath;
+                    } else if (nextURL) {
+                        window.location.href = nextURL;
+                    } else {
+                        window.location.href = '#/dashboard';
+                    }
+                })
+                .catch(function (errorMsg) {
+                    // All error handling is handled locally.
+                    $("#loading-indicator").hide();
+                    if (errorMsg === "LoginFailure: Authentication failed.") {
+                        errorMsg = "Login Failed: your username/password is incorrect.";
+                    }
+                    $("#login_error").html(errorMsg);
+                    $("#login_error").show();
+                })
+                .done();
+        });
     };
 
     $scope.logoutUser = function() {
-        kbaseLogin.logout(false);
+        require(['kb.session', 'postal', 'jquery'], function (Session, Postal, $) {
+            Session.logout()
+                .finally(function () {
+                    Postal.channel('session').publish('logout.success');
+                    window.location.href = '#/login/';
+                })
+                .done();
+        });
     };
 
     $scope.$on('$destroy', function () {
         // remove the postal subscriptions.
-        subs.forEach(function (sub) {
-            sub.unsubscribe();
-        })
+        //subs.forEach(function (sub) {
+        //    sub.unsubscribe();
+        //})
     });
 })
 
