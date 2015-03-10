@@ -1,4 +1,5 @@
-define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q'], function (BaseWidget, Session, $, Postal, Q) {
+define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q', 'kb.appstate', 'kb.utils', 'kb.user_profile'], 
+function (BaseWidget, Session, $, Postal, Q, AppState, Utils, UserProfile) {
     'use strict';
     // make a widget ... on the fly?
     var W = Object.create(BaseWidget, {
@@ -7,12 +8,6 @@ define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q'], function (Base
                 cfg.name = 'LoginWidget';
                 cfg.title = 'Login Widget';
                 this.BaseWidget_init(cfg);
-                
-                
-                Postal.channel('session').subscribe('login.success', function () {
-                    // close the dialog if open
-                    this.closeLoginDialog();
-                }.bind(this));
                 
                 Postal.channel('app').subscribe('location.change', function () {
                     this.render();
@@ -26,8 +21,19 @@ define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q'], function (Base
                         var password = widget.container.find('form [name="password"]').val();
                         widget.login(username, password);
                     });
-                    
+                
                 return this;
+            }
+        },
+        getUserLabel: {
+            value: function (profile) {
+                if (profile) {
+                    return Utils.getProp(profile, 'user.realname') + '<br><i style="font-size=90%;">' + Utils.getProp(profile, 'user.username') + '</i>';
+                } else if (this.sessionObject) {
+                    return Utils.getProp('user_id');
+                } else {
+                    return '';
+                }
             }
         },
         showErrorMessage: {
@@ -52,10 +58,24 @@ define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q'], function (Base
                 };
             }
         },
+        renderAvatar: {
+            value: function (profile) {
+                var userProfile = profile.getProfile();
+                this.container.find('[data-element="user-label"]').html(this.getUserLabel(userProfile));
+                var url = profile.getAvatarURL({size: 40, rating: 'pg'});
+                this.container.find('[data-element="avatar"]').attr('src', url);
+            }
+        },
         render: {
             value: function () {
                 if (Session.isLoggedIn()) {
                     this.container.html(this.renderTemplate('loggedin'));
+                    // a bit crood:
+                    AppState.whenItem('userprofile')
+                        .then(function (profile) {
+                            this.renderAvatar(profile);
+                        }.bind(this))
+                        .done();
                     this.container.find('[data-menu-item="logout"]').on('click', function (e) {
                         e.preventDefault();
                         Postal.channel('session').publish('logout.request');
