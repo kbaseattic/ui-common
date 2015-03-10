@@ -729,14 +729,14 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     */
    
    postal.channel('loginwidget').subscribe('login.prompt', function () {
-      var nextPath = $location.url();
-      // console.log(encodeURIComponent(nextPath));
-      var url = '/login/';
-      if (nextPath) {
-          url += '?nextPath=' + encodeURIComponent(nextPath);
-      }
-      $location.url(url);
-   });
+        var nextPath = $location.url();
+        var url = '/login/';
+        if (nextPath) {
+            url += '?nextPath=' + encodeURIComponent(nextPath);
+        }
+        $location.url(url);
+        $rootScope.$apply();
+    });
                    
     postal.channel('session').subscribe('logout.request', function (data) {
         require(['kb.session', 'postal'], function (Session, Postal) {
@@ -744,16 +744,6 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
                 .then(function () {
                     // Simply issues the logout
                     Postal.channel('session').publish('logout.success');
-                    /*
-                    var hash = window.location.hash;
-                    var nextPath;
-                    if (hash) {
-                        nextPath = hash.substr(1);
-                    } else {
-                        nextPath = '';
-                    }
-                    window.location.href = '#/login/';
-                    */
                 })
                 .catch(function (err) {
                     console.error('Error');
@@ -764,23 +754,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     }.bind(this));
     
     postal.channel('session').subscribe('logout.success', function (data) {
-        // disabled preservation of the current path in nextPath.
-        // $location.url('/login/?nextPath='+$location.path());
         $location.url('/login/');
         $rootScope.$apply();
-        
-        
-        /*var hash = window.location.hash;
-        var nextPath;
-        if (hash) {
-            nextPath = hash.substr(1);
-        } else {
-            nextPath = '';
-        }
-        window.location.href = '#/login/';
-        */
-        
-        
     });
     
     
@@ -817,6 +792,13 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
           });
           $(document).find('head title').text('Narrative Interface | KBase'); 
         }
+        
+        // A little hack here. The loginWidget may behave on differnt
+        // pages. At present this is just the login page, on which the login widget
+        // should not appear. This event ensures that the loginwidget rerenders itself
+        // when the view changes.
+        
+        postal.channel('app').publish('location.change');
       });
       $rootScope.$apply();
     }); 
