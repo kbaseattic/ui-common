@@ -727,6 +727,16 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         $rootScope.$apply();
     });
     */
+   
+   postal.channel('loginwidget').subscribe('login.prompt', function () {
+      var nextPath = $location.url();
+      // console.log(encodeURIComponent(nextPath));
+      var url = '/login/';
+      if (nextPath) {
+          url += '?nextPath=' + encodeURIComponent(nextPath);
+      }
+      $location.url(url);
+   });
                    
     postal.channel('session').subscribe('logout.request', function (data) {
         require(['kb.session', 'postal'], function (Session, Postal) {
@@ -756,7 +766,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     postal.channel('session').subscribe('logout.success', function (data) {
         // disabled preservation of the current path in nextPath.
         // $location.url('/login/?nextPath='+$location.path());
-        $location.path('/login/');
+        $location.url('/login/');
         $rootScope.$apply();
         
         
