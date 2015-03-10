@@ -12,7 +12,7 @@ You do not yet have any collaborators. To gain collaborators, you need to create
 
 {% else  %}
 
-<table class="table" id="collaborator_table_{{generatedId}}">
+<table class="table" id="collaborator_table_{{instanceId}}">
 	<thead>
 	<tr>
 		<th>Name</th>
@@ -35,7 +35,7 @@ You do not yet have any collaborators. To gain collaborators, you need to create
 
 <script>
 require(['jquery'], function ($) {
-	$('#collaborator_table_{{generatedId}}').DataTable({
+	$('#collaborator_table_{{instanceId}}').DataTable({
         initComplete: function (settings) {
             var api = this.api();
             var rowCount = api.data().length;
