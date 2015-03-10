@@ -9,11 +9,14 @@ define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q'], function (Base
                 this.BaseWidget_init(cfg);
                 
                 
-                Postal.channel('session').subscribe('login.success', function (data) {
+                Postal.channel('session').subscribe('login.success', function () {
                     // close the dialog if open
                     this.closeLoginDialog();
                 }.bind(this));
-
+                
+                Postal.channel('app').subscribe('location.change', function () {
+                    this.render();
+                }.bind(this));
                 
                 var widget = this;
                 this.container
@@ -23,7 +26,6 @@ define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q'], function (Base
                         var password = widget.container.find('form [name="password"]').val();
                         widget.login(username, password);
                     });
-                    
                     
                 return this;
             }
@@ -65,10 +67,9 @@ define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q'], function (Base
                         this.container.empty();
                     } else {
                         this.container.html(this.renderTemplate('loggedout'));
-                        this.container.find('[data-button="signin"]').on('click', function (e) {
-                            e.preventDefault();
+                        this.container.find('[data-button="signin"]').on('click', function () {
                             Postal.channel('loginwidget').publish('login.prompt');
-                        }.bind(this));
+                        });
                     }
                 }
                 return this;
