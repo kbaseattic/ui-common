@@ -400,7 +400,7 @@ app
     $scope.params = { 'kbCache' : kb }
     
     if (!$.KBaseSessionSync.isLoggedIn()) {
-        $location.path('/login/');
+        $location.url('/login/');
        return;
     }
     

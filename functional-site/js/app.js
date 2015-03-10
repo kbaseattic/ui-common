@@ -745,10 +745,13 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
    postal.channel('loginwidget').subscribe('login.prompt', function () {
         var nextPath = $location.url();
         var url = '/login/';
+        var params = {};
         if (nextPath) {
+            params.nextPath = nextPath;
             url += '?nextPath=' + encodeURIComponent(nextPath);
         }
-        $location.url(url);
+        $state.go('login', params);
+        // $location.url(url);
         $rootScope.$apply();
     });
     
@@ -779,8 +782,8 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         var kb = new KBCacheClient(null);
         $rootScope.kb = kb;
         window.kb = kb;
-        
-        $location.url('/login/');
+        $state.go('login');
+        //$location.url('/login/');
         $rootScope.$apply();
 
     });
