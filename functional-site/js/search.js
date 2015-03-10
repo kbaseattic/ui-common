@@ -380,6 +380,9 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
         }
     });
 
+    /*
+     * disable -- logout now always goes to /login.
+    
     $scope.$bus.subscribe({
         channel: 'session',
         topic: 'logout.success',
@@ -396,6 +399,7 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $state.go('search');
         }
     });
+     */
 
 
     $scope.login = function() {
