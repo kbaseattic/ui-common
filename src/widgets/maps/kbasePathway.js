@@ -64,9 +64,21 @@ $.KBWidget({
 
         var fba_objs
 
+
+        // get map data if needed
+        //if (options.useWorkspaceMaps) {
+
+        var p1 = kb.ws.get_objects([{workspace: self.map_ws, name: self.map_name}])
+
+        //} else {
+        //    var url = './data/map-specs/'+self.map_name.replace('map','ec')+'_graph.json';
+        //    var p1 = $.get(url);
+        //}
+
+        console.log('option', options.useWorkspaceMaps)
+
         // if data was sent to widget, don't fetch.  I know, it's crazy
         if (!self.models) {
-            var p1 = kb.ws.get_objects([{workspace: self.map_ws, name: self.map_name}])
             if (self.model_ws && self.model_name)
                 var p2 = kb.get_model(self.model_ws, self.model_name);
 
@@ -74,19 +86,22 @@ $.KBWidget({
                 var p3 = kb.get_fba(self.fba_ws, self.fba_name);
 
             $.when(p1, p2, p3).done(function(map_data, models, fbas) {
-                self.map_data = map_data;
+                self.map_data = options.useWorkspaceMaps ?
+                                map_data.map_data[0].data : map_data[0]
                 self.models = (models ? [models[0].data] : undefined);
                 self.fbas = (fbas ? [fbas[0].data] : undefined);
                 initialize();
             })
         } else {
-            kb.ws.get_objects([{workspace: self.map_ws, name: self.map_name}])
-                .done(function(map_data) {
-                    self.map_data = map_data;
-                    initialize()
-                })
-
+            p1.done(function(map_data) {
+                console.log('MAP DATA!!!', map_data)
+                self.map_data = options.useWorkspaceMaps ?
+                                    map_data[0].data : map_data[0].data;
+                initialize();
+            })
         }
+
+
 
         this.redraw = function(models, fbas) {
             self.models = models;
@@ -97,7 +112,7 @@ $.KBWidget({
             var models = [];
             var fbas = [];
 
-            self.map_data = self.map_data[0].data;
+            console.log('map data', self.map_data)
 
             rxns = self.map_data.reactions,
             cpds = self.map_data.compounds,
@@ -219,7 +234,7 @@ $.KBWidget({
                 // adjust boxes
                 var x = rxn.x - rxn.w/2 - 1,
                     y = rxn.y - rxn.h/2 - 1.5,
-                    w = rxn.w + 2,
+                    w = rxn.w + 3,
                     h = rxn.h + 2;
 
                 // adjust canvas size
@@ -254,7 +269,7 @@ $.KBWidget({
                                     .attr('y', y+1)
                                     .attr('width', function() {
                                         if (j == count) return w;
-                                        return w + 1
+                                        return w + 2
                                     })
                                     .attr('height', h-1.5);
 
