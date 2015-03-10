@@ -591,7 +591,6 @@ app
                 password: password
             })
                 .then(function (session) {
-                    console.log('um, here we are');
                     Postal.channel('session').publish('login.success', {session: session});
                     if (nextPath && nextPath !== '/login/') {
                         window.location.href= '#' + nextPath;
@@ -609,7 +608,6 @@ app
                     }
                     $("#login_error").html(errorMsg);
                     $("#login_error").show();
-                    console.log('HERE WITH ' + errorMsg);
                 })
                 .done();
         });
