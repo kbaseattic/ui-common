@@ -34,17 +34,27 @@ http://narrtest3.kbase.us/functional-site/#/narrativemanager/new?method=view_abu
 
 ### User Profile
 
+https://narrative.kbase.us/functional-site/#/people/USERNAME
+
+http://narrtest3.kbase.us/functional-site/#/people/eapearson
+
 
 #### Access User Profile
 
 
-### Dataview for Non-Shared Workspace
+### Dataview - non-public narrative, shared with user
+
+http://narrtest3.kbase.us/functional-site/#/dataview/4585/rhodobacterouput
+
+try username: eapearson
 
 
-#### Access Dataview for a data object in a non-shared workspace
+#### Dataview for a Shared Workspace
 
 
 http://narrtest3.kbase.us/functional-site/#/dataview/4585/rhodobacterouput
+
+try username: eaptest22
 
 
 
