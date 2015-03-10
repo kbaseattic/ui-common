@@ -57,29 +57,6 @@ define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q'], function (Base
                     this.container.find('[data-menu-item="logout"]').on('click', function (e) {
                         e.preventDefault();
                         Postal.channel('session').publish('logout.request');
-                        //Session.logout()
-                        //    .then(function () {
-                                // Simply issues the logout
-                        //        Postal.channel('session').publish('logout.success');
-                                /*
-                                var hash = window.location.hash;
-                                var nextPath;
-                                if (hash) {
-                                    nextPath = hash.substr(1);
-                                } else {
-                                    nextPath = '';
-                                }
-                                window.location.href = '#/login/';
-                                */
-                        //    })
-                        //    .catch(function (err) {
-                        //        console.error('Error');
-                        //        console.error(err);
-                        //    })
-                        //    .done();
-                           
-                        //Postal.channel('session').publish('logout.request');
-                        // $(this).trigger('logout.kbase');
                     });
                 } else {
                     // just a quick hack until the login widget is incorporated
@@ -90,7 +67,7 @@ define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q'], function (Base
                         this.container.html(this.renderTemplate('loggedout'));
                         this.container.find('[data-button="signin"]').on('click', function (e) {
                             e.preventDefault();
-                            window.location.href ='#/login/';
+                            Postal.channel('loginwidget').publish('login.prompt');
                         }.bind(this));
                     }
                 }
