@@ -121,8 +121,6 @@
             }
             this.setValueForKey('auth', newAuth);
            
-            console.log(this.name);
-            console.log(this);
             this.sessionId(newAuth.kbase_sessionid);
             this.authToken(newAuth.token);
             this.user_id(newAuth.user_id);

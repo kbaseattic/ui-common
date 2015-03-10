@@ -78,7 +78,7 @@
                 }.bind(this));
 
                 Postal.channel('session').subscribe('login.success', function (data) {
-                    var session = data.session;
+                    var session = data.session.getKBaseSession();
                     // $(document).on('loggedIn.kbase', function(e, session) {
                     this.sessionObject = session;
                     this.$elem.find('[data-element="user-label"]').html(this.get_user_label());

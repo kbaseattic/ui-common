@@ -591,14 +591,12 @@ app
                 password: password
             })
                 .then(function (session) {
-                    Postal.channel('session').publish('login.success', {session: session});
-                    if (nextPath && nextPath !== '/login/') {
-                        window.location.href= '#' + nextPath;
-                    } else if (nextURL) {
-                        window.location.href = nextURL;
-                    } else {
-                        window.location.href = '#/dashboard';
-                    }
+                    Postal.channel('session').publish('login.success', {
+                        session: Session,
+                        nextPath: nextPath,
+                        nextURL: nextURL
+                    });
+                   
                 })
                 .catch(function (errorMsg) {
                     // All error handling is handled locally.

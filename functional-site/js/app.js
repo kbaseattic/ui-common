@@ -728,6 +728,20 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     });
     */
    
+    postal.channel('session').subscribe('login.success', function (data) {
+        var kb = new KBCacheClient(data.session.getAuthToken());
+        $rootScope.kb = kb;
+        window.kb = kb;
+        if (data.nextPath && data.nextPath !== '/login/') {
+            $location.url(data.nextPath);
+        } else if (data.nextURL) {
+            window.location.href = data.nextURL;
+        } else {
+            $location.url('/dashboard');
+        }
+        $rootScope.$apply();
+    });
+   
    postal.channel('loginwidget').subscribe('login.prompt', function () {
         var nextPath = $location.url();
         var url = '/login/';
@@ -737,12 +751,19 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         $location.url(url);
         $rootScope.$apply();
     });
-                   
+    
     postal.channel('session').subscribe('logout.request', function (data) {
         require(['kb.session', 'postal'], function (Session, Postal) {
             Session.logout()
                 .then(function () {
-                    // Simply issues the logout
+                    // jigger the kbcacheclient.
+                    // NB the token argument needs to be an empty base object,
+                    // because it is directly set as a property, and accssed
+                    // directly to look for things like .token, which will fail
+                    // if we set it to null like it "should" be.
+                   
+                    
+                    // Simply issues the logout                    
                     Postal.channel('session').publish('logout.success');
                 })
                 .catch(function (err) {
@@ -754,8 +775,14 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     }.bind(this));
     
     postal.channel('session').subscribe('logout.success', function (data) {
+        // $rootScope.kb = new KBCacheClient(data.session.getKBaseSession());
+        var kb = new KBCacheClient(null);
+        $rootScope.kb = kb;
+        window.kb = kb;
+        
         $location.url('/login/');
         $rootScope.$apply();
+
     });
     
     

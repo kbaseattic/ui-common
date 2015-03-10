@@ -373,7 +373,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     $scope.$bus.subscribe({
         channel: 'session',
         topic: 'login.success',
-        callback: function(session) {
+        callback: function(sessionObject) {
+            var session = sessionObject.getKBaseSession();
             $scope.options.userState.session.token = session.token;
             $scope.options.userState.session.user_id = session.token;
             $scope.options.userState.session.name = session.token;

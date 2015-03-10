@@ -26,7 +26,6 @@ app.controller('Dataview', function ($scope, $stateParams) {
     .attr('href', 'views/dataview/style.css');
 
    // Set up the nabar
-   console.log('WHAT here again??');
    require(['kb.widget.navbar'], function (NAVBAR) {
       NAVBAR.clearMenu()
          .clear()
