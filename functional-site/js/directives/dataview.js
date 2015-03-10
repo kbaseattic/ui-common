@@ -21,7 +21,17 @@ angular.module('dataview')
                     objectVersion: scope.params.ver,
                     sub: scope.params.sub
                 }).go();
+                scope.$on('$destroy', function () {
+                    if (widget) {
+                        try {
+                            widget.stop();
+                        } finally {
+                            // What do do here?
+                        }
+                    }
+                });
             });
+           
         }
     };
 })
@@ -62,12 +72,26 @@ angular.module('dataview')
 .directive('dataviewvisualizer', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            $(ele).KBaseDataViewGenericViz({
+            var w = $(ele).KBaseDataViewGenericViz({
                     objid: scope.params.objid,
                     wsid: scope.params.wsid,
                     ver: scope.params.ver,
                     sub: scope.params.sub
                 });
+            /* disabled, but this type of thing is necessary
+             * in order to remove suscriptions, etc. from widgets.
+            scope.$on('$destroy', function () {
+                if (w) {
+                    try {
+                        if (w.destroy) {
+                            w.destroy();
+                        }
+                    } finally {
+                        // What do do here?
+                    }
+                }
+            });
+             */
         }
     }; 
 });

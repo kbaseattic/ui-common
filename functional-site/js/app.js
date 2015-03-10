@@ -727,14 +727,52 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         $rootScope.$apply();
     });
     */
-    /*
+                   
+    postal.channel('session').subscribe('logout.request', function (data) {
+        require(['kb.session', 'postal'], function (Session, Postal) {
+            Session.logout()
+                .then(function () {
+                    // Simply issues the logout
+                    Postal.channel('session').publish('logout.success');
+                    /*
+                    var hash = window.location.hash;
+                    var nextPath;
+                    if (hash) {
+                        nextPath = hash.substr(1);
+                    } else {
+                        nextPath = '';
+                    }
+                    window.location.href = '#/login/';
+                    */
+                })
+                .catch(function (err) {
+                    console.error('Error');
+                    console.error(err);
+                })
+                .done(); 
+        });
+    }.bind(this));
+    
     postal.channel('session').subscribe('logout.success', function (data) {
         // disabled preservation of the current path in nextPath.
         // $location.url('/login/?nextPath='+$location.path());
         $location.path('/login/');
         $rootScope.$apply();
+        
+        
+        /*var hash = window.location.hash;
+        var nextPath;
+        if (hash) {
+            nextPath = hash.substr(1);
+        } else {
+            nextPath = '';
+        }
+        window.location.href = '#/login/';
+        */
+        
+        
     });
-    */
+    
     
     USER_ID = $("#signin-button").kbaseLogin('get_session_prop', 'user_id');
     USER_TOKEN = $("#signin-button").kbaseLogin('get_session_prop', 'token');

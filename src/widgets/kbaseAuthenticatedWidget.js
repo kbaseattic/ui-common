@@ -7,7 +7,7 @@
   'use strict';
     $.KBWidget({
 
-		  name: "kbaseAuthenticatedWidget",
+        name: "kbaseAuthenticatedWidget",
 
         version: "1.0.0",
         _accessors : [
@@ -42,19 +42,37 @@
               }.bind(this));
             }
            
-            postal.channel('session').subscribe('login.success', function (session) {
+           /*
+           just disable login and logout listening for now. It is not enough 
+            to just change the cached auth info (which is a mistake as well)
+            the widget needs to re-render as well, and there are no apparent hooks
+            for this. it is unknown now any widget might implement this, since
+            the practice has been to wipe the page and refresh 
+           this.subscriptions = [];
+          
+            
+            this.subscriptions.push(postal.channel('session').subscribe('login.success', function (session) {
                 this.setAuth(session);
                 if (this.loggedInCallback) {
                     this.loggedInCallback(undefined, this.auth());
                 }
-              }.bind(this));
+            }.bind(this)));
 
-            postal.channel('session').subscribe('logout.success', function () {
-                this.setAuth(undefined);
-                if (this.loggedOutCallback) {
-                    this.loggedOutCallback();
+            this.subscriptions.push(postal.channel('session').subscribe('logout.success', function () {
+                if (!this.destroying) {
+                    try {
+                        this.setAuth(null);
+                    } catch (ex) {
+                        console.error('Error calling setAuth in widget ' + this.name);
+                        console.error(ex);
+                    }
+                    if (this.loggedOutCallback) {
+                        this.loggedOutCallback();
+                    }
                 }
-              }.bind(this)); 
+            }.bind(this))); 
+            */
+            
 
             /*
             TODO:used anywhere?
@@ -85,19 +103,29 @@
             return this;
 
         },
+        
+        /*
+         
+         destroy: function () {
+            this.destroying = true;
+            this.subscriptions.forEach(function (sub) {
+                sub.unsubscribe();
+            });
+            this.subscriptions = [];
+        },
+        */
 
         setAuth : function (newAuth) {
-            if (!newAuth) {
+            if (newAuth === undefined || newAuth === null) {
               newAuth = {};
             }
             this.setValueForKey('auth', newAuth);
            
-           
+            console.log(this.name);
+            console.log(this);
             this.sessionId(newAuth.kbase_sessionid);
             this.authToken(newAuth.token);
             this.user_id(newAuth.user_id);
-            //console.log("SETS AUTH TO "); console.log(newAuth);
-            //console.log(this);
         },
 
         loggedInQueryCallback : function(args) {

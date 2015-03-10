@@ -111,6 +111,13 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb
         render: {
             value: function () {
                // The state.status property is used to switch to the appropriate view.
+               
+               console.log('rendering with status: '+ this.status);
+               if (this.status === 'stopped') {
+                   return this;
+               };
+               
+               
                switch (this.getState('status')) {
                case 'found':
                   var name = this.getState('object.name');

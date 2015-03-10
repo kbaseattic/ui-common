@@ -383,10 +383,16 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
     $scope.$bus.subscribe({
         channel: 'session',
         topic: 'logout.success',
-        callback: function(session) {
-            $scope.options.userState.session.token = session.token;
-            $scope.options.userState.session.user_id = session.user_id;
-            $scope.options.userState.session.name = session.name;
+        callback: function() {
+            // by definition, there is no session available after logout.
+            $scope.options.userState.session.token = null;
+            $scope.options.userState.session.user_id = null;
+            $scope.options.userState.session.name = null;
+            // It was my mistake (eap) to pass an empty session object
+            // in the logout.success message. 
+            //$scope.options.userState.session.token = session.token;
+            //$scope.options.userState.session.user_id = session.user_id;
+            //$scope.options.userState.session.name = session.name;
             $state.go('search');
         }
     });

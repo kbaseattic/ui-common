@@ -13,11 +13,7 @@ define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q'], function (Base
                     // close the dialog if open
                     this.closeLoginDialog();
                 }.bind(this));
-                
-                Postal.channel('session').subscribe('logout.request', function (data) {
-                    Session.removeSession();
-                    postal.channel('session').publish('logout.success');
-                }.bind(this));
+
                 
                 var widget = this;
                 this.container
@@ -60,10 +56,12 @@ define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q'], function (Base
                     this.container.html(this.renderTemplate('loggedin'));
                     this.container.find('[data-menu-item="logout"]').on('click', function (e) {
                         e.preventDefault();
-                        Session.logout()
-                            .finally(function () {
-                                Postal.channel('session').publish('logout.success');
-                        
+                        Postal.channel('session').publish('logout.request');
+                        //Session.logout()
+                        //    .then(function () {
+                                // Simply issues the logout
+                        //        Postal.channel('session').publish('logout.success');
+                                /*
                                 var hash = window.location.hash;
                                 var nextPath;
                                 if (hash) {
@@ -71,22 +69,30 @@ define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q'], function (Base
                                 } else {
                                     nextPath = '';
                                 }
-                                console.log('nextPath'); console.log(nextPath);
-                        
                                 window.location.href = '#/login/';
-                            });
+                                */
+                        //    })
+                        //    .catch(function (err) {
+                        //        console.error('Error');
+                        //        console.error(err);
+                        //    })
+                        //    .done();
+                           
                         //Postal.channel('session').publish('logout.request');
                         // $(this).trigger('logout.kbase');
                     });
                 } else {
-                    this.container.empty();
-                    /*
-                    this.container.html(this.renderTemplate('loggedout'));
-                    this.container.find('[data-menu-item="signin"]').on('click', function (e) {
-                        e.preventDefault();
-                        window.location.href = '#/login/';
-                    }.bind(this));
-                    */
+                    // just a quick hack until the login widget is incorporated
+                    // into the navbar, etc.
+                    if (/^#\/login\//.test(window.location.hash)) {
+                        this.container.empty();
+                    } else {
+                        this.container.html(this.renderTemplate('loggedout'));
+                        this.container.find('[data-button="signin"]').on('click', function (e) {
+                            e.preventDefault();
+                            window.location.href ='#/login/';
+                        }.bind(this));
+                    }
                 }
                 return this;
             }

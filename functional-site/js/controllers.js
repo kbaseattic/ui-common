@@ -332,18 +332,22 @@ app
     $scope.params = { 'ws':$stateParams.ws, 'id': $stateParams.id, 'kbCache' : kb }
 })
 
-.controller('People', function($scope, $stateParams) {
+.controller('People', function($scope, $stateParams, $location) {
     $scope.params = { 'userid':$stateParams.userid, 'kbCache' : kb }
    
     // NB need to use KBaseSessionSync here and not kb -- because kb is only valid at page load
     // time. On angular path changes, it will not have been updated. So, e.g., after a user logs 
     // out and goes backing over their history...
     if (!$.KBaseSessionSync.isLoggedIn()) {
-        // Hmm, best way to preserve path ... trap original request, or what we think it should be?
-        
-       window.location.href = '#/login/?nextPath=/people/'+$stateParams.userid;
-       return;
+        var hash = window.location.hash;
+        var path = '/login/';
+        if (hash && hash.length > 0) {
+            path += '?nextPath=' + encodeURIComponent(hash.substr(1));
+        } 
+        $location.url(path);
+        return;
     }
+    
     
     // Set the styles for the user page
     $('<link>')
@@ -396,7 +400,7 @@ app
     $scope.params = { 'kbCache' : kb }
     
     if (!$.KBaseSessionSync.isLoggedIn()) {
-			$location.path('/login/');
+        $location.path('/login/');
        return;
     }
     
@@ -445,21 +449,21 @@ app
        // Set up the main State machine for this view.
        $scope.viewState = Object.create(StateMachine).init();
 			 
-			 // a cheap hartbeat for now... and just for the dashboard.
-			 var heartbeat = 0;
-			 $scope.heartbeatTimer = window.setInterval(function () {
-				 heartbeat++;
-				 postal.channel('app').publish('heartbeat', {heartbeat: heartbeat});
-			 }, 100);
-			 
-			 // Now remove them.
-			 $scope.$on('$destroy', function () {
-			 		// tear down the state machine
-				 	// Umm, this happen naturally when the object goes out of scope.
-				 
-				 // But the heartbeat timer will need to be stopped manually.
-				 window.clearInterval($scope.heartbeatTimer);
-			 });
+        // a cheap hartbeat for now... and just for the dashboard.
+        var heartbeat = 0;
+        $scope.heartbeatTimer = window.setInterval(function () {
+                heartbeat++;
+                postal.channel('app').publish('heartbeat', {heartbeat: heartbeat});
+        }, 100);
+
+        // Now remove them.
+        $scope.$on('$destroy', function () {
+                       // tear down the state machine
+                       // Umm, this happen naturally when the object goes out of scope.
+
+                // But the heartbeat timer will need to be stopped manually.
+                window.clearInterval($scope.heartbeatTimer);
+        });
       
     });
      
@@ -539,19 +543,23 @@ app
     
     // If we are logged in and landing here we redirect to the dashboard.
     if ($.KBaseSessionSync.isLoggedIn()) {
-        $location.path('/dashboard');
+        if ($stateParams.nextPath) {
+            $location.url($stateParams.nextPath);
+        } else {
+            $location.path('/dashboard');
+        }
         return;
     }
-
-    // Add a stripped down nav bar for the login page.
-   require(['kb.widget.navbar'], function (NAVBAR) {
-      NAVBAR.clearMenu()
-      .addDefaultMenu({
-        search: false, narrative: false, dashboard: false
-      })
-      .setTitle("Sign In to KBase");
-    });
     
+    // Add a stripped down nav bar for the login page.
+    require(['kb.widget.navbar'], function (NAVBAR) {
+        NAVBAR.clear()
+        .addDefaultMenu({
+            search: false, narrative: false, dashboard: false
+        })
+        .setTitle("Sign In to KBase");
+    });
+
     // Set up some scope properties.
     $scope.nar_url = configJSON.narrative_url; // used for links to narratives    
     
@@ -583,6 +591,7 @@ app
                 password: password
             })
                 .then(function (session) {
+                    console.log('um, here we are');
                     Postal.channel('session').publish('login.success', {session: session});
                     if (nextPath && nextPath !== '/login/') {
                         window.location.href= '#' + nextPath;
@@ -600,17 +609,7 @@ app
                     }
                     $("#login_error").html(errorMsg);
                     $("#login_error").show();
-                })
-                .done();
-        });
-    };
-
-    $scope.logoutUser = function() {
-        require(['kb.session', 'postal', 'jquery'], function (Session, Postal, $) {
-            Session.logout()
-                .finally(function () {
-                    Postal.channel('session').publish('logout.success');
-                    window.location.href = '#/login/';
+                    console.log('HERE WITH ' + errorMsg);
                 })
                 .done();
         });
@@ -978,14 +977,23 @@ app
 
 
 
-.controller('narrativemanager', function($scope, $stateParams) {
-    $scope.params = $stateParams;
-    require(['kb.widget.navbar'], function (NAVBAR) {
-      NAVBAR.clearMenu()
-      .addDefaultMenu({
-        search: true, narrative: true
-      });
-    });
+.controller('narrativemanager', function($scope, $stateParams, $location) {
+    if (!$.KBaseSessionSync.isLoggedIn()) {
+        var hash = window.location.hash;
+        var path = '/login/';
+        if (hash && hash.length > 0) {
+            path += '?nextPath=' + encodeURIComponent(hash.substr(1));
+        } 
+        $location.url(path);
+    } else {
+        $scope.params = $stateParams;
+        require(['kb.widget.navbar'], function (NAVBAR) {
+          NAVBAR.clearMenu()
+          .addDefaultMenu({
+            search: true, narrative: true
+          });
+        });
+    }
 })
 
 .controller('NarrativeStore', function($scope, $stateParams) {
