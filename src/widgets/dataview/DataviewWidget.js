@@ -112,20 +112,37 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                // Set up listeners for any kbase events we are interested in:
                // NB: following tradition, the auth listeners are namespaced for kbase; the events
                // are not actually emitted in the kbase namespace.
-               Postal.channel('session').subscribe('login.success', function (data) {
+               /*
+               this.subscriptions = [];
+               this.subscriptions.push(Postal.channel('session').subscribe('login.success', function (data) {
                   this.onLoggedIn(data.session);
-               }.bind(this));
+               }.bind(this)));
 
-               Postal.channel('session').subscribe('logout.success', function () {
-                  this.onLoggedout();
-               }.bind(this));
+               this.subscriptions.push(Postal.channel('session').subscribe('logout.success', function () {
+                    console.log('running logout.success postal event')
+                    if (this.onLoggedOut) {
+                        try {
+                            console.log('about to do onLoggedOut');
+                            this.onLoggedOut();
+                            console.log('about to do done...');
+                        } catch (ex) {
+                            console.error('Error in onLoggedOut');
+                            console.log(ex);
+                        }
+                    }
+               }.bind(this)));
+                */
                
                this.alert = Object.create(Alert).init();
+               
+               // The status of the widget.
+               this.status = 'ready';
 
                return this;
             }
          },
-
+         
+        
          setupConfig: {
             value: function () {
 
@@ -219,9 +236,17 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
 
          stop: {
             value: function () {
-               // ???
-            }
+                this.status = 'stopped';
+                /*
+                 this.subscriptions.forEach(function(subscription) {
+                     subscription.unsubscribe();
+                 });
+                 this.subscriptions = [];
+                 console.log('usubscribed!');
+                */
+             }
          },
+
 
          destroy: {
             value: function () {
@@ -404,7 +429,8 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                this.setup();
                this.setInitialState({
                   force: true
-               }).then(function () {
+               })
+               .then(function () {
                   this.refresh();
                }.bind(this));
             }

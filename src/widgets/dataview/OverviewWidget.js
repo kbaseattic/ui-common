@@ -7,9 +7,6 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb
                cfg.name = 'OverviewWidget';
                cfg.title = 'Data Object Summary';
                this.DataviewWidget_init(cfg);
-
-               
-               
                
                var monthLookup = ["Jan", "Feb", "Mar","Apr", "May", "Jun", "Jul", "Aug", "Sep","Oct", "Nov", "Dec"];
                this.templates.env.addFilter('dateFormat', function (dateString) {
@@ -111,6 +108,10 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb
         render: {
             value: function () {
                // The state.status property is used to switch to the appropriate view.
+               if (this.status === 'stopped') {
+                   return this;
+               };
+               
                switch (this.getState('status')) {
                case 'found':
                   var name = this.getState('object.name');
@@ -555,9 +556,6 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb
                         }
                      }.bind(this))
                      .catch(function (err) {
-                        //console.log('ERROR');
-                        //console.log(err);
-
                         if (err.status && err.status === 500) {
                            // User probably doesn't have access -- but in any case we can just tell them
                            // that they don't have access.

@@ -44,8 +44,14 @@
 
             // must be logged in!
             if (!this.authToken()) {
-                window.location.replace("#/login/");
-                return;
+                var hash = window.location.hash;
+                var path;
+                if (hash && hash.length > 0) {
+                    path = hash.substr(1);
+                }
+                console.log(encodeURIComponent(path));
+                window.location.replace("#/login/?nextPath="+encodeURIComponent(path));
+                return this;
             }
 
             this.$errorPanel = $('<div>');

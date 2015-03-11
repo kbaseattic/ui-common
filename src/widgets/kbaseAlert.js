@@ -19,7 +19,6 @@ define(['jquery'], function ($) {
 
       setContainer: {
          value: function (container) {
-            console.log('ALERT set container'); console.log(container);
              if (typeof container === 'string') {
                this.container = $(container);
             } else {
@@ -31,7 +30,6 @@ define(['jquery'], function ($) {
 
       renderMessages: {
          value: function () {
-            console.log('ALERT'); console.log(this.container);
             if (this.container) {
                this.container.empty();
                for (var i = 0; i < this.messages.length; i++) {
