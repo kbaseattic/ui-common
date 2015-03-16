@@ -1,3 +1,5 @@
+(function() {
+
 function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
     var self = this;
     this.tabwidget = tabwidget;
@@ -23,8 +25,8 @@ function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
 	this.setData = function (indata) {
         self.data = indata;
         var p = self.tabwidget.kbapi('ws', 'get_objects', [{ref: indata.phenotypeset_ref}]).then(function(data){
-			var kbObjects = new KBObjects();
-			self.phenoset = new kbObjects["KBasePhenotypes_PhenotypeSet"](self.tabwidget);
+			var kbModeling = new KBModeling();
+			self.phenoset = new kbModeling["KBasePhenotypes_PhenotypeSet"](self.tabwidget);
 			self.phenoset.setMetadata(data[0].info);
 			return self.phenoset.setData(data[0].data);
  		}).then (function() {
@@ -107,4 +109,6 @@ function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
 
 
 // make method of base class
-KBObjects.prototype.KBasePhenotypes_PhenotypeSimulationSet = KBasePhenotypes_PhenotypeSimulationSet;
+KBModeling.prototype.KBasePhenotypes_PhenotypeSimulationSet = KBasePhenotypes_PhenotypeSimulationSet;
+
+}());

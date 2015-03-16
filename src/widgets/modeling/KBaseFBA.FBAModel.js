@@ -1,3 +1,5 @@
+(function() {
+
 function KBaseFBA_FBAModel(modeltabs) {
     var self = this;
     this.modeltabs = modeltabs;
@@ -742,4 +744,6 @@ function KBaseFBA_FBAModel(modeltabs) {
 }
 
 // make method of base class
-KBObjects.prototype.KBaseFBA_FBAModel = KBaseFBA_FBAModel;
+KBModeling.prototype.KBaseFBA_FBAModel = KBaseFBA_FBAModel;
+
+}());

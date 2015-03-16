@@ -1,3 +1,5 @@
+(function() {
+
 function KBasePhenotypes_PhenotypeSet(modeltabs) {
     var self = this;
     this.modeltabs = modeltabs;
@@ -36,7 +38,7 @@ function KBasePhenotypes_PhenotypeSet(modeltabs) {
         for (var key in cpd_refs_hash) {
             cpd_refs.push(key);
         }
-        
+
         var promise = this.modeltabs.getBiochemCompounds(cpd_refs)
                           .then(function(cpds){
                              var addcpd_names_hash = {};
@@ -114,4 +116,6 @@ function KBasePhenotypes_PhenotypeSet(modeltabs) {
 }
 
 // make method of base class
-KBObjects.prototype. KBasePhenotypes_PhenotypeSet = KBasePhenotypes_PhenotypeSet;
+KBModeling.prototype.KBasePhenotypes_PhenotypeSet = KBasePhenotypes_PhenotypeSet;
+
+}());

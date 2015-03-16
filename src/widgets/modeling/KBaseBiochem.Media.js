@@ -1,3 +1,5 @@
+(function() {
+
 function KBaseBiochem_Media(tabwidget) {
     var self = this;
     this.tabwidget = tabwidget;
@@ -157,4 +159,6 @@ function KBaseBiochem_Media(tabwidget) {
 }
 
 // make method of base class
-KBObjects.prototype.KBaseBiochem_Media = KBaseBiochem_Media;
+KBModeling.prototype.KBaseBiochem_Media = KBaseBiochem_Media;
+
+}());

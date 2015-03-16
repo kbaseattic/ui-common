@@ -2,6 +2,7 @@
 
 $.KBWidget({
     name: "kbaseETCDiagram",
+    parent: "kbaseAuthenticatedWidget",
     version: "1.0.0",
     options: {
     },
@@ -37,10 +38,11 @@ $.KBWidget({
                     .attr("width", width)
                     .attr("height", height)
 
+        var kbapi = new KBModeling(self.authToken()).kbapi;
+        var p = kbapi('ws', 'get_objects', [{workspace: 'nconrad:core', name: 'ETC_data'},
+                                           {workspace: ws, name: name }
+                                          ]);
 
-        var p = kb.ws.get_objects([{workspace: 'nconrad:core', name: 'ETC_data'},
-                                   {workspace: ws, name: name }
-                                  ]);
         $.when(p).done(function(d) {
             ele.rmLoading();
 
@@ -255,6 +257,17 @@ $.KBWidget({
                                  placement: 'bottom',
                                  container: 'body'});
         }
+
+
+        function rxnDict(model) {
+            var rxns = {};
+            for (var i in model.modelreactions) {
+                rxns[model.modelreactions[i].reaction_ref.split('/')[5]] = model.modelreactions[i];
+            }
+
+            return rxns;
+        }
+
 
         return this;
     }  //end init
