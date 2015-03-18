@@ -104,7 +104,7 @@
             				"sPaginationType": "full_numbers",
             				"iDisplayLength": 10,
             				"aaSorting" : [[1,'asc'],[2,'asc']],  // [[0,'asc']],
-            				"sDom": 't<fip>',
+                            "sDom": "<lf>t<ip>",
             				"aoColumns": [
 			                              {sTitle: "Gene ID", mData: "id"}, 
             				              {sTitle: "Contig", mData: "contig"},
