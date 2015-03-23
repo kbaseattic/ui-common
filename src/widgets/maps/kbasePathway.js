@@ -26,12 +26,7 @@ $.KBWidget({
         self.models = options.models;
         self.fbas = options.fbas;
 
-        console.log('model_ws:', self.model_ws,
-                    'model_name:', self.model_name,
-                    'fba_ws:', self.fba_ws,
-                    'fba_name:', self.fba_name,
-                    'map_ws:', self.map_ws,
-                    'map_name:', self.map_name);
+        console.log('models/fbas', self.models, self.fbas )
 
         self.map_id = options.mapID;
 
@@ -68,14 +63,16 @@ $.KBWidget({
         // get map data if needed
         //if (options.useWorkspaceMaps) {
 
-        var p1 = kb.ws.get_objects([{workspace: self.map_ws, name: self.map_name}])
+        var kbapi = new KBModeling().kbapi;
+
+
+        var p1 = kbapi('ws', 'get_objects', [{workspace: self.map_ws, name: self.map_name}])
 
         //} else {
         //    var url = './data/map-specs/'+self.map_name.replace('map','ec')+'_graph.json';
         //    var p1 = $.get(url);
         //}
 
-        console.log('option', options.useWorkspaceMaps)
 
         // if data was sent to widget, don't fetch.  I know, it's crazy
         if (!self.models) {
@@ -94,7 +91,6 @@ $.KBWidget({
             })
         } else {
             p1.done(function(map_data) {
-                console.log('MAP DATA!!!', map_data)
                 self.map_data = options.useWorkspaceMaps ?
                                     map_data[0].data : map_data[0].data;
                 initialize();
@@ -109,10 +105,10 @@ $.KBWidget({
         }
 
         function initialize() {
+            if (options.cb) options.cb();
+
             var models = [];
             var fbas = [];
-
-            console.log('map data', self.map_data)
 
             rxns = self.map_data.reactions,
             cpds = self.map_data.compounds,
@@ -351,7 +347,6 @@ $.KBWidget({
                     }
                 }  // end fbas rects
 
-                console.log('adding at ', x, y, rxn.id, rxn )
                 var text = group.append('text')
                                 .attr('x', x+2)
                                 .attr('y', y+h/2+6)
@@ -733,7 +728,7 @@ $.KBWidget({
             for (var j=0; j<self.fbas.length; j++) {
                 var fba = self.fbas[j];
                 //if (!fba) continue;
-                fba_objs = fba.data.FBAReactionVariables;
+                fba_objs = fba.FBAReactionVariables;
 
                 // see if we can find the rxn in that fbas's list of reactions
                 var found_rxn = [];
