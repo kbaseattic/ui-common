@@ -1,3 +1,14 @@
+
+/*
+ *  kbasePathway.js
+ *
+ *  Dependencies:
+ *      kbwidget.js
+ *      modelSeedVizConfig  - Used for colors and utility functions,
+ *                            allowing for heatmap scaling, etc
+ *
+*/
+
 (function( $, undefined ) {
 
 'use strict';
@@ -26,21 +37,12 @@ $.KBWidget({
         self.models = options.models;
         self.fbas = options.fbas;
 
-        console.log('models/fbas', self.models, self.fbas )
+        console.log('models/fbas', self.models, self.fbas)
 
         self.map_id = options.mapID;
 
-        var stroke_color = '#888',
-            strokeColorDark = '#000',
-            highlight = 'steelblue';
-
-        var flux_threshold = 0.001,
-            negFluxColors = ['#910000', '#e52222', '#ff4444', '#fc8888', '#fcabab'],
-            fluxColors = ['#0d8200', '#1cd104','#93e572','#99db9d', '#c7e8cd'],
-            bounds = [1000, 500, 200, 25, 0, -25, -200, -500, -1000],
-            gapfill_color = '#f000ff',
-            gene_stroke = '#777',
-            g_present_color = '#8bc7e5';
+        var config = new ModelSeedVizConfig();
+        var kbapi = new KBModeling().kbapi;
 
         // globals
         var groups,    // groups of reactions
@@ -48,31 +50,16 @@ $.KBWidget({
             cpds,      // compounds
             maplinks;  // lines from reactions to maps and visa versa
 
-
         var oset = 12,       // off set for arrows
-            threshold = 2,   // threshold for deciding if connection is linear
             r = 12,          // radial offset from circle.  Hooray for math degrees.
-            max_x = 0,       // used for canvas size
-            max_y = 0,       // used for canvas size
+            max_x = 0,       // used to compute canvas size (width) based on data
+            max_y = 0,       // used to compute canvas size (height) based on data
             c_pad = 200,     // padding around max_x/max_y
             svg = undefined; // svg element for map
 
-        var fba_objs
-
-
-        // get map data if needed
-        //if (options.useWorkspaceMaps) {
-
-        var kbapi = new KBModeling().kbapi;
-
+        var fba_objs;
 
         var p1 = kbapi('ws', 'get_objects', [{workspace: self.map_ws, name: self.map_name}])
-
-        //} else {
-        //    var url = './data/map-specs/'+self.map_name.replace('map','ec')+'_graph.json';
-        //    var p1 = $.get(url);
-        //}
-
 
         // if data was sent to widget, don't fetch.  I know, it's crazy
         if (!self.models) {
@@ -82,22 +69,20 @@ $.KBWidget({
             if (self.fba_ws && self.fba_name)
                 var p3 = kb.get_fba(self.fba_ws, self.fba_name);
 
-            $.when(p1, p2, p3).done(function(map_data, models, fbas) {
-                self.map_data = options.useWorkspaceMaps ?
-                                map_data.map_data[0].data : map_data[0]
+            $.when(p1, p2, p3).done(function(mapData, models, fbas) {
+                self.mapData = options.useWorkspaceMaps ?
+                                mapData.mapData[0].data : mapData[0]
                 self.models = (models ? [models[0].data] : undefined);
                 self.fbas = (fbas ? [fbas[0].data] : undefined);
                 initialize();
             })
         } else {
-            p1.done(function(map_data) {
-                self.map_data = options.useWorkspaceMaps ?
-                                    map_data[0].data : map_data[0].data;
+            p1.done(function(mapData) {
+                self.mapData = options.useWorkspaceMaps ?
+                                    mapData[0].data : mapData[0].data;
                 initialize();
             })
         }
-
-
 
         this.redraw = function(models, fbas) {
             self.models = models;
@@ -110,10 +95,10 @@ $.KBWidget({
             var models = [];
             var fbas = [];
 
-            rxns = self.map_data.reactions,
-            cpds = self.map_data.compounds,
-            maplinks = self.map_data.linkedmaps;
-            groups = self.map_data.groups;
+            rxns = self.mapData.reactions,
+            cpds = self.mapData.compounds,
+            maplinks = self.mapData.linkedmaps;
+            groups = self.mapData.groups;
 
             /*var data = []
             for (var i in rxns) {
@@ -250,6 +235,7 @@ $.KBWidget({
                 var found_rxns = getModelRxns(rxn.rxns);
 
                 // divide box for number of models being displayed
+                console.log('models', self.models)
                 if (self.models) {
                     var w = rxn.w / count;
 
@@ -272,10 +258,10 @@ $.KBWidget({
 
                         if (found_rxn.length > 0) {
                             rect.attr('fill', '#bbe8f9');
-                            rect.attr('stroke', strokeColorDark);
+                            rect.attr('stroke', config.strokeDark);
                         } else {
                             rect.attr('fill', '#fff')
-                            rect.attr('stroke', strokeColorDark);
+                            rect.attr('stroke', config.strokeDark);
                         };
 
                         var title = '<h5>'+self.models[j].name+'<br>'+
@@ -333,7 +319,7 @@ $.KBWidget({
                         }
 
                         if (typeof flux != 'undefined') {
-                            var color = getColor(flux);
+                            var color = config.getColor(flux);
                             if (color)
                                 rect.attr('fill', color);
                             else
@@ -362,26 +348,27 @@ $.KBWidget({
         }
 
 
+        function tooltip(container, title, mapRxn, flux, obj) {
+            console.log('tooltip', mapRxn, flux, obj)
 
-
-        function tooltip(container, title, rxn, flux, obj) {
             // get substrates and products
             var subs = [];
-            for (var i in rxn.substrate_refs) {
-                subs.push(rxn.substrate_refs[i].compound_ref);
+            for (var i in mapRxn.substrate_refs) {
+                subs.push(mapRxn.substrate_refs[i].compound_ref);
             }
             var prods = [];
-            for (var i in rxn.product_refs) {
-                prods.push(rxn.product_refs[i].compound_ref);
+            for (var i in mapRxn.product_refs) {
+                prods.push(mapRxn.product_refs[i].compound_ref);
             }
 
             //content for tooltip
             var content = '<table class="table table-condensed">'+
-                              '<tr><td><b>Map RXN ID</b></td><td>'+rxn.id+'</td></tr>'+
-                              '<tr><td><b>Rxns</b></td><td>'+ rxn.rxns.join(', ')+'</td></tr>'+
+                              (typeof flux != 'undefined' ?
+                              '<tr><td><b>Flux</b></td><td>'+flux+'</td></tr>' : '')+
+                              '<tr><td><b>Map RXN ID</b></td><td>'+mapRxn.id+'</td></tr>'+
+                              '<tr><td><b>Rxns</b></td><td>'+ mapRxn.rxns.join(', ')+'</td></tr>'+
                               '<tr><td><b>Substrates</b></td><td>'+subs.join(', ')+'</td></tr>'+
                               '<tr><td><b>Products</b></td><td>'+prods.join(', ')+'</td></tr>'+
-                              (typeof flux != 'undefined' ? '<tr><td>Flux</td><td>'+flux+'</td></tr>' : '')+
                            '</table>'
 
             $(container).popover({html: true, content: content, animation: false, title: title,
@@ -744,37 +731,6 @@ $.KBWidget({
             return found_rxns;
         }
 
-        function getColor(v) {
-            // ignore values 'close' to 0
-            if (Math.abs(v) <= .0001)
-                return undefined;
-
-            if (v >= bounds[0])
-                return fluxColors[0];
-            else if (v >= bounds[1])
-                return fluxColors[1];
-            else if (v >= bounds[2])
-                return fluxColors[2];
-            else if (v >= bounds[3])
-                return fluxColors[3];
-            else if (v > bounds[4])
-                return fluxColors[4];
-            else if (v == bounds[4])
-                return gene_color;
-            else if (v <= bounds[5])
-                return negFluxColors[0];
-            else if (v <= bounds[6])
-                return negFluxColors[1];
-            else if (v <= bounds[7])
-                return negFluxColors[2];
-            else if (v <= bounds[8])
-                return negFluxColors[3];
-            else if (v < 0)
-                return negFluxColors[4];
-
-            return undefined;
-        }
-
 
         function zoom() {
             var margin = {top: -5, right: -5, bottom: -5, left: -5},
@@ -971,7 +927,7 @@ $.KBWidget({
             function editLabel(label) {
                 var label = d3.select(label)
                             .call(drag)
-                label.attr('fill', highlight)
+                label.attr('fill', config.highlight)
                      .attr('class', 'edited-label')
             }
 
@@ -979,15 +935,15 @@ $.KBWidget({
                 var line = d3.select(line)
 
                 // highlight line
-                line.attr('stroke', highlight)
-                    .attr('fill', highlight)
+                line.attr('stroke', config.highlight)
+                    .attr('fill', config.highlight)
                     .attr('stroke-width', 2);
 
                 // getting start and end of line
-                var x1 = line.attr('x1')
-                var y1 = line.attr('y1')
-                var x2 = line.attr('x2')
-                var y2 = line.attr('y2')
+                var x1 = line.attr('x1'),
+                    y1 = line.attr('y1'),
+                    x2 = line.attr('x2'),
+                    y2 = line.attr('y2');
                 var g = line.node().parentNode
 
                 // start, draggalbe circle
