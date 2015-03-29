@@ -10,13 +10,13 @@ $.KBWidget({
     init: function(input) {
         this._super(input);
         var self = this;
+        this.options = input.options;
 
-        // root url path for landing pages
+        // Root url path for landing pages.
+        // Can be overridden with this.options.urlRouter(type, ws, name)
         var DATAVIEW_URL = '/functional-site/#/dataview/';
 
         var type = input.type;
-
-        this.options = input.options;
 
         // tab widget
         var tabs;
@@ -26,7 +26,6 @@ $.KBWidget({
 
         // kbase api helper
         this.kbapi = kbModeling.kbapi;
-
 
         //
         // 1) Use type (periods replaced with underscores) to instantiate object
@@ -297,8 +296,9 @@ $.KBWidget({
                                 name = refLookup[ d[key] ].name,
                                 wstype = refLookup[ d[key] ].type,
                                 link = refLookup[ d[key] ].link;
-                            return '<a href="'+DATAVIEW_URL+link+
-                                     '" target="_blank" '+
+
+                            return '<a href="'+DATAVIEW_URL+link+'"'+
+                                    (self.options.urlRouter ? '' : ' target="_blank" ')
                                      '" class="id-click"'+
                                      '" data-ws="'+ws+
                                      '" data-id="'+name+
@@ -314,7 +314,7 @@ $.KBWidget({
 
                         if ($.isArray(value)) {
                             if (type == 'tabLinkArray')
-                                return tabLinkArray(value, method)
+                                return tabLinkArray(value, method);
                             return d[key].join(', ');
                         }
 
@@ -373,10 +373,15 @@ $.KBWidget({
                         r.append(cell);
 
                         getLink(ref).done(function(info) {
-                            var name = info.url.split('/')[1];
-                            var ref = info.ref;
+                            var name = info.name,
+                                ref = info.ref,
+                                url = info.url,
+                                newWindow = info.newWindow; // can this get any worse?
+
                             table.find("[data-ref='"+ref+"']")
-                                 .html('<a href="'+DATAVIEW_URL+info.url+'" target="_blank">'+name+'</a>');
+                                 .html('<a href="'+url+'"'+
+                                        (newWindow ? ' target="_blank"' : '')
+                                       + '>'+name+'</a>');
                         })
 
                     } else {
@@ -487,7 +492,27 @@ $.KBWidget({
                         {objects: [{ref: ref}]})
                         .then(function(data){
                             var a = data[0];
-                            return {url: a[7]+'/'+a[1], ref: a[6]+'/'+a[0]+'/'+a[4]};
+
+                            var ws = a[7],
+                                name = a[1],
+                                type = a[2].split('-')[0],
+                                ref = a[6]+'/'+a[0]+'/'+a[4];
+
+                            // if custom url router is supplyed, use it
+                            if (self.options.urlRouter) {
+                                var router = self.options.urlRouter;
+
+                                var url = router(type, ws, name);
+                                if (url) return {url: url, ref: ref, name: name, ws: ws, type: a[2]};
+                            }
+
+                            // if url router is supplied, but doesn't an url, link to narrative
+                            if (self.options.urlRouter)
+                                var url = 'https://narrative.kbase.us/functional-site/#/'+type+'/'+a[7]+'/'+a[1];
+                            else
+                                var url = DATAVIEW_URL+'/'+a[7]+'/'+a[1];
+
+                            return {url: url, ref: ref, name: name, ws: ws, type: a[2], newWindow: true};
                         })
         }
 
