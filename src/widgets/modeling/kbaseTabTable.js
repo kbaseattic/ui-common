@@ -160,7 +160,7 @@ $.KBWidget({
                 var prom = preProcessDataTable(tabSpec, tabPane);
                 if (prom)
                     prom.done(function(args) {
-                        createDataTable(args[0], args[1])
+                        createDataTable(args[0], args[1]);
                     })
                 else
                     createDataTable(tabSpec, tabPane);

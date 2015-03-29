@@ -323,7 +323,7 @@ $.KBWidget({
                             if (color)
                                 rect.attr('fill', color);
                             else
-                                rect.attr('fill', '#fff');
+                                rect.attr('fill', config.geneColor);
                         }
 
                         //var title = self.fbas[i].info[1];
