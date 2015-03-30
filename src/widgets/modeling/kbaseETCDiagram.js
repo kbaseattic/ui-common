@@ -28,7 +28,8 @@ $.KBWidget({
         var start_x = 25,
             start_y = 75;
 
-        var font_size = '12px';
+        var headerFontSize = '11px',
+            fontSize = '10px';
 
         ele.append('<div id="canvas">');
         var svg = d3.select("#canvas").append("svg")
@@ -74,18 +75,18 @@ $.KBWidget({
                      .attr("y", start_y - h/3)
                      .attr("x", start_x + w*j)
                      .text(name)
-                     .attr('font-size', font_size)
+                     .attr('font-size', headerFontSize)
                 } else {
                   svg.append("text")
                      .attr("y", start_y - h/1.2)
                      .attr("x", start_x + w*j)
                      .text(name.split('/')[0]+' & ')
-                     .attr('font-size', font_size);
+                     .attr('font-size', headerFontSize);
                   svg.append("text")
                      .attr("y", start_y - h/3)
                      .attr("x", start_x + w*j)
                      .text(name.split('/')[1])
-                     .attr('font-size', font_size);
+                     .attr('font-size', headerFontSize);
                 }
 
                 // FIXME: rename steps -> entities on backend
@@ -138,7 +139,7 @@ $.KBWidget({
                  .attr("y", start_y - h/3)
                  .attr("x", start_x + w*(3))
                  .text('Electron Acceptors')
-                 .attr('font-size', font_size);
+                 .attr('font-size', headerFontSize);
 
             for (var i in electron_acceptors) {
                 var steps = electron_acceptors[i].steps;
@@ -182,7 +183,7 @@ $.KBWidget({
              .attr("x", x+ 4)
              .attr("y", y + h/2)
              .text(name)
-             .attr("font-size", '10px');
+             .attr("font-size", fontSize);
 
              var content = $('<div>');
              for (var i=0; i<info.length; i++) {
@@ -224,7 +225,7 @@ $.KBWidget({
              .attr("x", x+ 4)
              .attr("y", y + h/2)
              .text(entity.name)
-             .attr("font-size", '10px');
+             .attr("font-size", fontSize);
 
              var content = $('<div>');
              for (var i=0; i<entity.steps.length; i++) {
