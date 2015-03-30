@@ -11,10 +11,7 @@ $.KBWidget({
         this._super(options);
         var self = this;
 
-        var gene_color = '#87CEEB',
-            negFluxColors = ['#910000', '#e52222', '#ff4444', '#fc8888', '#fcabab'],
-            fluxColors = ['#0d8200', '#1cd104','#93e572','#99db9d', '#c7e8cd'],
-            bounds = [1000, 500, 200, 25, 0, -25, -200, -500, -1000];
+        var config = new ModelSeedVizConfig();
 
         var ele = this.$elem,
             ws = options.ws,
@@ -53,7 +50,6 @@ $.KBWidget({
         })
 
         function draw(etc, model) {
-
             //.append("g")
                 //.call(d3.behavior.zoom().scaleExtent([1, 8]).on("zoom", zoom))
             //.append("g");
@@ -107,39 +103,37 @@ $.KBWidget({
             }
 
 
-
             // next, plot first x columns
             for (var i=0; i < unique_columns.length; i++) {
                 var entities = unique_columns[i];
 
                 var z = 0;
-                for (var entity in entities) {
-                    var name = entity
-
+                for (var name in entities) {
                     var info = entities[name];
-                    var found_rxns = [];
+
+                    var foundRXNs = {};
                     for (var j=0; j<info.length; j++) {
                         var obj = info[j]
 
-                        var found_rxns = [];  //may need to know which rxn was found
                         for (var k=0; k<obj.reactions.length; k++) {
                             var rxn_id = obj.reactions[k];
 
                             if (rxn_id in model_rxns)
-                                found_rxns.push(model_rxns[rxn_id]);
+                                foundRXNs[rxn_id] = model_rxns[rxn_id];
                         }
                     }
 
                     var x = start_x + w*i;
                     var y = start_y + h*z;
-                    var color = (found_rxns.length > 0 ? gene_color : 'white')
+                    var color = (Object.keys(foundRXNs).length > 0 ? config.geneColor : 'white')
 
-                    drawBox(name, x, y, color, info);
+                    drawBox(name, x, y, color, info, foundRXNs);
                     z++;
                 }
             }
 
 
+            // plot electron acceptors
             svg.append("text")
                  .attr("y", start_y - h/3)
                  .attr("x", start_x + w*(3))
@@ -147,40 +141,31 @@ $.KBWidget({
                  .attr('font-size', font_size);
 
             for (var i in electron_acceptors) {
-                var col_entities = electron_acceptors[i].steps;
+                var steps = electron_acceptors[i].steps;
 
-                for (var j in col_entities) {
-                    var entity = col_entities[j];
+                var foundRXNs = {};  //may need to know which rxn was found
+                for (var j in steps) {
+                    var entity = steps[j];
 
-
-
-                    var found_rxns = [];  //may need to know which rxn was found
                     for (var k in entity.reactions) {
                         var rxn_id = entity.reactions[k];
 
-                        if (rxn_id in model_rxns) found_rxns.push(model_rxns[rxn_id]);
+                        if (rxn_id in model_rxns)
+                            foundRXNs[rxn_id] = model_rxns[rxn_id];
                     }
-
-                    var x = start_x + w*(3),
-                        y = start_y + h*i,
-                        color = (found_rxns.length > 0 ? gene_color : 'white');
-
-                    var reactions = entity.reactions;
-                    var substrates = entity.substrates;
-                    var products = entity.products;
-
-                    var content = reactions[0]+' - '+
-                              substrates.name+ ' - '+
-                              products.name+'<br>'
-
-                    drawBox(electron_acceptors[i].name, x, y, color, [entity]);
                 }
+
+                var x = start_x + w*(3),
+                    y = start_y + h*i;
+                var color = (Object.keys(foundRXNs).length > 0 ? config.geneColor : 'white')
+
+                drawEA(electron_acceptors[i], x, y, color, foundRXNs);
             }
         } // end draw
 
 
 
-        function drawBox(name, x, y, color, info) {
+        function drawBox(name, x, y, color, info, foundRXNs) {
             var g = svg.append('g');
             var rect = g.append('rect')
                         .attr('class', 'rxn')
@@ -206,12 +191,12 @@ $.KBWidget({
 
                 var products = info[i].products;
 
-                content.append('('+i+') '+reactions[0]+' - '+
+                var rxn = reactions[0];
+                content.append('('+i+') '+(rxn in foundRXNs ? '<b style="color:'+config.geneColor+';">'
+                                            +rxn+'</b>' : rxn)+' - '+
                                           substrates.name+ ' - '+
                                           products.name+'<br>')
              }
-
-            //var content = JSON.stringify(info);
 
 
             $(g.node()).popover({content: content,
@@ -222,9 +207,7 @@ $.KBWidget({
         }
 
 
-        function drawEA(entity, x, y, color) {
-            //var rxns = entity.reactions;
-
+        function drawEA(entity, x, y, color, foundRXNs) {
             var g = svg.append('g');
             var rect = g.append('rect')
                         .attr('class', 'rxn')
@@ -243,13 +226,22 @@ $.KBWidget({
              .text(entity.name)
              .attr("font-size", '10px');
 
-            //var content = '<b>'+entity.substrates.name+' Substrates</b><br>'+
-            //               entity.substrates.compound_refs.join(', ')+'<br><br>'+
-            //            '<b>'+entity.products.name+' Products</b><br>'+
-            //                entity.products.compound_refs.join(', ');
+             var content = $('<div>');
+             for (var i=0; i<entity.steps.length; i++) {
+                var reactions = entity.steps[i].reactions,
+                    substrates = entity.steps[i].substrates,
+                    products = entity.steps[i].products;
+
+                var rxn = reactions[0];
+                content.append('('+i+') '+(rxn in foundRXNs ? '<b style="color:'+config.geneColor+';">'
+                                            +rxn+'</b>' : rxn)+' - '+
+                                          substrates.name+ ' - '+
+                                          products.name+'<br>')
+             }
 
 
-            $(g.node()).popover({content: '',
+
+            $(g.node()).popover({content: content,
                                  title: entity.name,
                                  //title: '<b>'+rxns.join(', ')+'</b>',
                                  trigger: 'hover',
