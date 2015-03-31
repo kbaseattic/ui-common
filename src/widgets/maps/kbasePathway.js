@@ -33,11 +33,12 @@ $.KBWidget({
         self.map_name = options.map_name;
         self.image = options.image;
 
+        // new options for viz settings
+        self.options = options.options;
+
         // optional params
         self.models = options.models;
         self.fbas = options.fbas;
-
-        console.log('models/fbas', self.models, self.fbas)
 
         self.map_id = options.mapID;
 
@@ -235,7 +236,6 @@ $.KBWidget({
                 var found_rxns = getModelRxns(rxn.rxns);
 
                 // divide box for number of models being displayed
-                console.log('models', self.models)
                 if (self.models) {
                     var w = rxn.w / count;
 
@@ -319,7 +319,7 @@ $.KBWidget({
                         }
 
                         if (typeof flux != 'undefined') {
-                            var color = config.getColor(flux);
+                            var color = config.getColor(flux, self.options.absFlux);
                             if (color)
                                 rect.attr('fill', color);
                             else
@@ -349,8 +349,6 @@ $.KBWidget({
 
 
         function tooltip(container, title, mapRxn, flux, obj) {
-            console.log('tooltip', mapRxn, flux, obj)
-
             // get substrates and products
             var subs = [];
             for (var i in mapRxn.substrate_refs) {
