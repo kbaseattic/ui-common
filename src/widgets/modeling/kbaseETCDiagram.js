@@ -42,7 +42,7 @@ $.KBWidget({
         //                                  ]);
 
 
-        var p1 = $.get('../data/app/etc.json');
+        var p1 = $.getJSON('../data/app/etc.json');
         var p2 = kbapi('ws', 'get_objects', [{workspace: ws, name: name }
                                           ]);
         $.when(p1, p2).done(function(d1, d2) {
