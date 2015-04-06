@@ -48,7 +48,7 @@ $.KBWidget({
         $.when(p1, p2).done(function(d1, d2) {
             ele.rmLoading();
 
-            var etc = d1[0].data,
+            var etc = d1[0],
                 model = d2[0].data;
 
             draw(etc, model);
