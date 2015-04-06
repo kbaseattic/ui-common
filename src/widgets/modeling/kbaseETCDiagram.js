@@ -37,15 +37,19 @@ $.KBWidget({
                     .attr("height", height)
 
         var kbapi = new KBModeling(self.authToken()).kbapi;
-        var p = kbapi('ws', 'get_objects', [{workspace: 'nconrad:core', name: 'ETC_data'},
-                                           {workspace: ws, name: name }
-                                          ]);
+        //var p = kbapi('ws', 'get_objects', [{workspace: 'nconrad:core', name: 'ETC_data'},
+        //                                   {workspace: ws, name: name }
+        //                                  ]);
 
-        $.when(p).done(function(d) {
+
+        var p1 = $.get('../data/app/etc.json');
+        var p2 = kbapi('ws', 'get_objects', [{workspace: ws, name: name }
+                                          ]);
+        $.when(p1, p2).done(function(d1, d2) {
             ele.rmLoading();
 
-            var etc = d[0].data,
-                model = d[1].data;
+            var etc = d1[0].data,
+                model = d2[0].data;
 
             draw(etc, model);
         })
