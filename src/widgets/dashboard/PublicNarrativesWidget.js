@@ -222,16 +222,15 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                            return;
                         }
 
-                        // TODO: move this into getNarratives (the hook is there, just not implemented)
-                        // filter out those owned by the user, and those which also have some sharing
-                        // permission ('n' in this case means "no sharing permission" not "no permission"
-                        // because clearly globally shared narratives carrry that permission to everyone!)
+                        // New: we want ALL public narratives now. Previously this widget produced "all other
+                        // narratives the user can access which are not owned by or shared with them".
+                        // The user-visible title for it was changed to Public Narratives, but that is
+                        // not exactly it represented. The content is now made to fit the name!
                         narratives = narratives.filter(function (x) {
-                           if (x.workspace.owner === Session.getUsername() ||
-                              x.workspace.user_permission !== 'n') {
-                              return false;
-                           } else {
+                           if (x.workspace.globalread === 'r') {
                               return true;
+                           } else {
+                              return false;
                            }
                         });
 
