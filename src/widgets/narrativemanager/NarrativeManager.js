@@ -666,7 +666,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
     }());
 
     // Do we really need a guard here? If there is no kb.urls, the deploy is pretty broken...
-    var docBaseUrl = kb.urls ? kb.urls.docsite.baseUrl : "http://staging.kbase.us";
+    var docBaseUrl = kb.urls ? kb.urls.docsite.baseUrl : "http://kbase.us";
     this.introText = _.template(introTemplate)({docBaseUrl: docBaseUrl});
 
 };
