@@ -77,8 +77,7 @@ kb_define('kbaseTreechart',
 
         updateTree : function(source) {
             var chart = this.data('D3svg').select('.chart');
-            var diameter = 800;
-chart.attr("transform", "translate(" + 400 + "," + 400 + ")");
+
             var $tree = this;
 
             var duration = 500;
@@ -86,7 +85,7 @@ chart.attr("transform", "translate(" + 400 + "," + 400 + ")");
             var rootOffset = 0;
 
             var bounds = this.chartBounds();
-/*
+
             //okay. This is going to suck. Figure out the appropriate depth of the root element. Create a fake SVG element, toss the root node into there, and yank out its width.
             var fakeDiv = document.createElement('div');
 
@@ -106,14 +105,13 @@ var newHeight = 15 * this.countVisibleNodes(this.dataset());
             this.height(this.$elem.height());
             bounds.size.height = newHeight;
             this.treeLayout = d3.layout.tree()
-                      .size([400, 400])
-.separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
+                .size([bounds.size.height, bounds.size.width]);
 
 
             this.nodes = this.treeLayout.nodes(this.dataset()).reverse();
 
 var chartOffset = 0;
-rootOffset = 0;
+
             function depth(d) {
 
                 var distance = $tree.options.distance;
@@ -184,22 +182,21 @@ rootOffset = 0;
                 newWidth = $tree.options.originalWidth;
             }
 
-/*            this.$elem.animate(
+            this.$elem.animate(
                 {
                     'width' : newWidth,
                     'height' : newHeight + this.options.yGutter + this.options.yPadding
                 },
                 duration
-            );* /
-*/
+            );
+
             var node = chart.selectAll("g.node")
                   .data(this.nodes, this.uniqueID );
 
             // Enter any new nodes at the parent's previous position.
             var nodeEnter = node.enter().append("g")
                 .attr("class", "node")
-//                .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-      .attr("transform", function(d) { return "rotate(" + (source.x0 - 90) + ")translate(" + source.y0 + ")"; })
+                .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
             ;
 
             nodeEnter.append("circle")
@@ -218,8 +215,7 @@ rootOffset = 0;
                 .attr('style', 'font-size : 11px;cursor : pointer;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;')
                 .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
                 .attr("dy", ".35em")
-.attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-.attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"})
+                .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
                 .text(function(d) { return d.name; })
                 .style("fill-opacity", 1e-6)
                 .attr('fill', function(d) { return d.fill || 'black'})
@@ -279,8 +275,7 @@ rootOffset = 0;
             // Transition nodes to their new position.
             var nodeUpdate = node.transition()
                 .duration(duration)
-//                .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
-      .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+                .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
             ;
 
             nodeUpdate.select("circle")
@@ -293,8 +288,7 @@ rootOffset = 0;
             // Transition exiting nodes to the parent's new position.
             var nodeExit = node.exit().transition()
                 .duration(duration)
-//                .attr("transform", function(d) { return "translate(" + source.y  + "," + source.x + ")"; })
-      .attr("transform", function(d) { return "rotate(" + (source.x - 90) + ")translate(" + source.y + ")"; })
+                .attr("transform", function(d) { return "translate(" + source.y  + "," + source.x + ")"; })
                 .remove()
                 ;
 
@@ -345,16 +339,14 @@ rootOffset = 0;
 
         },
 
-        diagonal : d3.svg.diagonal().projection(function(d) { console.log('b');return [d.y, d.x]; }),
-
         renderChart : function() {
 
             if (this.dataset() == undefined) {
                   return;
             }
 
-//            this.$elem.height(30 * this.countVisibleNodes(this.dataset()));
-//            this.height(this.$elem.height());
+            this.$elem.height(30 * this.countVisibleNodes(this.dataset()));
+            this.height(this.$elem.height());
 
             this.options.originalWidth = this.$elem.width();
 
@@ -363,11 +355,13 @@ rootOffset = 0;
 
             if (this.treeLayout == undefined) {
                   this.treeLayout = d3.layout.tree()
-                      .size([600,300])
-.separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
+                      .size([bounds.size.height, bounds.size.width]);
             }
 
             var $tree = this;
+
+            this.diagonal = d3.svg.diagonal()
+                .projection(function(d) { return [d.y, d.x]; });
 
             // Compute the new tree layout.
             this.nodes = this.treeLayout.nodes(this.dataset()).reverse();
