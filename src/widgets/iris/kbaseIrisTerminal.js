@@ -646,7 +646,7 @@ kb_define('kbaseIrisTerminal',
                     .append(' (' + this.whatsnew().currentReleaseString() + ')' )
                     .append('<br><br>')
                     .append($.jqElem('span').css('color', 'red')
-                        .append('IRIS is a legacy system and is no longer officially supported. Some of the commands in the IRIS tutorials may not work correctly. We recommend that you use the next-generation KBase user interface, the <a href = "https://narrative.kbase.us/">Narrative interface</a>.')
+                        .append('            IRIS is a legacy system and is no longer officially supported.<br>IRIS will be decommissioned on May 18, 2015. Please see <a href = "http://kbase.us/iris/" target = "_blank">http://kbase.us/iris/</a> for more information.')
                     ),
                     'html'
             );
