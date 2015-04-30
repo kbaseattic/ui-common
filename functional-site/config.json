@@ -29,8 +29,8 @@
          }
       },
       "docsite": {
-         "baseUrl": "http://staging.kbase.us",
-         "host": "staging.kbase.us",
+         "baseUrl": "http://kbase.us",
+         "host": "kbase.us",
          "paths": {
             "about": "/what-is-kbase",
             "contact": "/contact-us",
