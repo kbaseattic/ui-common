@@ -1,0 +1,24 @@
+{
+  "name": "ui-common.summer2015cleanup",
+  "version": "0.0.1",
+  "homepage": "https://kbase.us",
+  "authors": [
+    "Erik Pearson <eapearson@lbl.gov>"
+  ],
+  "moduleType": [
+    "amd"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "3.3.5",
+    "jquery": "1.11.3",
+    "d3": "3.5.5"
+  }
+}
