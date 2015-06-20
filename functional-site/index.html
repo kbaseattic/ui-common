@@ -109,9 +109,11 @@
         };
    </script>
 
+   <script src="/bower_components/requirejs/require.js"></script>
    <script src="/bower_components/jquery/dist/jquery.min.js"></script>
    <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
    <script src="/bower_components/d3/d3.min.js"></script>
+   
 
    <!-- <script src="/ext/jquery/jquery-1.10.2.min.js"></script> -->
    <!-- <script src="../ext/jquery-migrate/jquery-migrate-1.2.1.js"></script> -->
@@ -128,24 +130,44 @@
         <script src="assets/js/dataTables.bootstrap.js"></script>
 
         -->
+        <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
+        <script src="/bower_components/datatables-colreorder/js/dataTables.colReorder.js" type="text/javascript"></script>
+        <script src="/bower_components/datatables-bootstrap3-plugin/media/js/datatables-bootstrap3.min.js" type="text/javascript"></script>
+        <script src="/bower_components/datatables-colvis/js/dataTables.colVis.js" type="text/javascript"></script>
+        
    <!-- DataTables 1.10.4 -->
-   <script src="/ext/dataTables/1.10.4/js/jquery.dataTables.min.js"></script>
+   
+   <!-- <script src="/ext/dataTables/1.10.4/js/jquery.dataTables.min.js"></script>
    <script src="/ext/dataTables/1.10.4/extensions/ColReorder/js/dataTables.colReorder.min.js"></script>
    <script src="/ext/dataTables/1.10.4/extensions/ColVis/js/dataTables.colVis.min.js"></script>
    <script src="/ext/dataTables/1.10.4/plugins/integration/bootstrap/dataTables.bootstrap.min.js"></script>
+   -->
 
    <!--<script src="assets/js/FixedHeader.min.js"></script>-->
 
-
-   <script src="assets/js/jquery.jsonview.js"></script>
-   <script src="assets/js/nc-tour.js"></script>
+   <script src="/bower_components/jquery-jsonview/dist/jquery.jsonview.js" type="text/javascript"></script>
+   <!-- <script src="assets/js/jquery.jsonview.js"></script> -->
+   
+   <!-- EAP: this is Neils tour thing. It needs to be redone to play well, but really we should
+        use an existing library 
+   <script src="assets/js/nc-tour.js"></script> -->
+   
+    
    <script src="assets/js/jquery.cookie.min.js"></script>
-   <script src="assets/js/viz/raphael-min.js"></script>
+   
+   <!-- 
+   EAP: does not seem to be used, also has bad requirejs integration.
+   <script src="assets/js/viz/raphael-min.js"></script> -->
 
-   <script src="/ext/q/q.min.js"></script>
+   <!-- TODO: minimize these -->
+   <script src="/bower_components/q/q.js"></script>
+   <script src="/bower_components/lodash/lodash.min.js" type="text/javascript"></script>
+   <script src="/bower_components/postal.js/lib/postal.min.js"></script>
+
+   <!-- <script src="/ext/q/q.min.js"></script>
    <script src="/ext/postal/1.0.0/postal.min.js"></script>
-   <script src="/ext/postal/postal.request-response-0.3.1.min.js"></script> 
-   <script src="/ext/postal/postal-config.js"></script>
+   <script src="/ext/postal/postal.request-response-0.3.1.min.js"></script>  -->
+  <!-- don't need without request response? <script src="/ext/postal/postal-config.js"></script> -->
 
 
    <!-- angular itself -->
@@ -164,19 +186,34 @@
    -->
 
 
+   <script src="/bower_components/angular/angular.min.js" type="text/javascript"></script>
+   <script src="/bower_components/angular-resource/angular-resource.min.js" type="text/javascript"></script>
+   <script src="/bower_components/angular-animate/angular-animate.min.js" type="text/javascript"></script>
+   <script src="/bower_components/angular-ui-router/release/angular-ui-router.min.js" type="text/javascript"></script>
+   <script src="/bower_components/ng-file-upload/ng-file-upload-all.min.js" type="text/javascript"></script>
+
+   
+   <!--
    <script src="js/angular-1.2.14/angular.js"></script>
    <script src="js/angular-1.2.14/angular-resource.min.js"></script>
    <script src="js/angular-1.2.14/angular-animate.min.js"></script>
+   -->
    <!-- angular extensions -->
+   <!--
    <script src="assets/js/file-upload-1.6.12/angular-file-upload-shim.min.js"></script>
    <script src="assets/js/file-upload-1.6.12/angular-file-upload.min.js"></script>
    <script src="js/ui-router-0.2.10/angular-ui-router.min.js"></script>
    <script src="js/ui-bootstrap-0.12.0/ui-bootstrap-tpls-0.12.0.min.js"></script>
+   -->
 
 
 
    <!-- KBase client library javascript -->
    <script src="assets/js/kbclient/wikiScraper.js"></script>
+   
+   
+
+   
    <script src="/ext/kbase-clients/kbase-client-api.min.js"></script>
    <!-- The following are supserseded by /ext/js/kbase-clients/kbase-client-api[.min].js -->
    <!-- <script src="assets/js/kbclient/kbase.js"></script>-->
@@ -188,6 +225,7 @@
    <!--<script src="assets/js/kbclient/user_profile_Client.js"></script>-->
 
    <script src="assets/js/widgetMaxWidthCorrection.js"></script>
+
 
    <!-- KBase support libs -->
    <script src="../src/kbaseSessionSync.js"></script>
@@ -278,15 +316,22 @@
    <script src="../src/widgets/genomes/kbaseSimulationSet.js"></script>
    <script src="../src/widgets/kbaseCardLayoutManager.js"></script>
 
+
    <script src="../src/widgets/genomes/kbaseLitWidget.js"></script>
    <script src="../src/widgets/genomes/kbaseObjectMeta.js"></script>
+
    <script src="../src/widgets/genomes/kbaseGenomeLineage.js"></script>
    <script src="../src/widgets/kbaseCardLayoutManager.js"></script>
+                   <script>console.log('HERE3');</script>
+   
+
+   
    <script src="../src/widgets/genomes/kbaseGenomeCompleteness.js"></script>
    <script src="../src/widgets/genomes/kbaseSEEDFunctions.js"></script>
    <script src="../src/widgets/genomes/kbaseGenomeGeneTable.js"></script>
    <script src="../src/widgets/genomes/kbaseGeneExprLinePlot.js"></script>
    <!-- End Genome widgets -->
+
 
    <!-- Taxonomy widgets -->
    <script src="../src/widgets/taxa/kbaseTaxonOverview.js"></script>
@@ -436,7 +481,7 @@
     
    <!-- END Assembly widgets -->
     
-    
+
     
     
    <!-- Communities Widgets and dependencies -->
@@ -491,8 +536,8 @@
    <script src="js/kbapi.js"></script>
    <script src="assets/js/header.js"></script>
 
-   <!-- RequireJS should go after all other javascript imports -->
-   <script src="/ext/requirejs/2.1.15/require.js"></script>
+   <!-- RequireJS should go after all other javascript imports
+   <script src="/ext/requirejs/2.1.15/require.js"></script> -->
    <script src="js/require-config.js"></script>
 
    <!-- end application -->
