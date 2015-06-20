@@ -1,4 +1,4 @@
-(function (kbapp) {
+(function () {
     'use strict';
     var module = angular.module('about', []);
     module.config(function ($stateProvider) {
@@ -25,4 +25,4 @@
             }
         };
     });
-}(app));
+}());

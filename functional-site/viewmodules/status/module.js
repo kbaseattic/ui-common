@@ -1,6 +1,10 @@
 (function () {
     'use strict';
     var module = angular.module('status', []);
+    
+    /*
+     * This config function is run when the module is loaded.
+     */
     module.config(function ($stateProvider) {
         $stateProvider.state('status', {
             url: '/status',
@@ -10,8 +14,10 @@
             }
         });
     });
-    console.log('status state loaded...');
 
+    /*
+     * The directives are essentially nodes in the view template.
+     */
     module.directive('statuscurrent', function($rootScope) {
         return {
             link: function(scope, ele, attrs) {
