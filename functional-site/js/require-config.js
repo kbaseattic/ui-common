@@ -8,9 +8,6 @@ define('kb_clients', [], function () {
 //NB underscore, as of 1.6, inclues AMD compatible loading. However, other parts of the kbase
 // codebase may rely on underscore being loaded globally, so se just use the global version, which 
 // must already be loaded.
-define('underscore', [], function () {
-    return _;
-});
 var kbClients = [
     ['narrative_method_store', 'NarrativeMethodStore'],
     ['user_profile', 'UserProfile'],
@@ -46,6 +43,8 @@ require.config({
         domReady: '/bower_components/requirejs-domready/domReady',
         text: '/bower_components/requirejs-text/text',
         json: '/bower_components/requirejs-json/json',
+        underscore: '/bower_components/underscore/underscore.min',
+        
         // kbase utils
         'kb.app': '/src/kbaseApp',
         'kb.router': '/src/kbaseRouter',
@@ -100,7 +99,8 @@ require.config({
         'kb.panel.navbar': '/src/panels/navbar',
         'kb.panel.narrativemanager': '/src/panels/narrativemanager',
         
-        'kb.service.profile': '/src/services/profile'
+        'kb.service.profile': '/src/services/profile',
+        'kb.service.narrativemanager': '/src/services/narrativemanager'
     }
 
 

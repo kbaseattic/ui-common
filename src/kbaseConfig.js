@@ -32,6 +32,29 @@ function(Utils, config) {
           return false;
         }
       }
+    },
+    
+    // CONFIG
+    getItem: {
+      value: function(key, defaultValue) {
+        return Utils.getProp(this.config, key, defaultValue);
+      }
+    },
+  
+    setItem: {
+      value: function (key, value) {
+        Utils.setProp(this.config, key,  value);
+      }
+    },
+
+    hasItem: {
+      value: function(key) {
+        if (Utils.getProp(this.config, key) !== undefined) {
+          return true;
+        } else {
+          return false;
+        }
+      }
     }
   });
   return Config.init(); 

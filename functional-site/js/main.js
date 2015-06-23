@@ -24,6 +24,29 @@ require(['kb.panel.about', 'kb.panel.contact', 'kb.panel.login', 'kb.panel.navba
     
     App.createMountPoint('navbar', '#kbase-navbar');
     
+    // TODO: remove any previously mounted panel.    
+    // TODO: convert all to promises or callback, but make it easy!
+    function handleRoute(handler) {
+        if (handler.route.render) {
+            try {
+                var rendered =  handler.route.render(handler.params);
+                App.mount('app', rendered);
+            } catch (ex) {
+                App.mount('app', 'Error mounting this panel.');
+            }
+        } else if (handler.route.promise) {
+            var promise = handler.route.promise;
+            promise(handler.params)
+                .then(function (rendered) {
+                    App.mount('app', rendered);
+                })
+                .catch(function (err) {
+                    App.mount('app', 'Error mounting this panel.' + err);
+                })
+                .done();       
+        }
+    }
+    
     // SETUP LISTENERS
     
     // DOM listeners
@@ -34,11 +57,7 @@ require(['kb.panel.about', 'kb.panel.contact', 'kb.panel.login', 'kb.panel.navba
         if (!handler) {
             return;
         }
-        var rendered =  handler.route.render(handler.params);
-        //if (typeof rendered === 'object') {
-        //    rendered = App.html(rendered);
-        //}
-        App.mount('app', rendered);        
+        handleRoute(handler);
     });
     
     // App Listeners
@@ -49,9 +68,9 @@ require(['kb.panel.about', 'kb.panel.contact', 'kb.panel.login', 'kb.panel.navba
         App.mount('navbar', Navbar.render());
         ProfileService.loadProfile();
     });
-    // This will work ... but we need to tune this!
     
-    AppState.whenItem('userprofile')
+    // This will work ... but we need to tune this!
+        AppState.whenItem('userprofile')
         .then(function (profile) {
             App.mount('navbar', Navbar.render());
         })
@@ -63,6 +82,7 @@ require(['kb.panel.about', 'kb.panel.contact', 'kb.panel.login', 'kb.panel.navba
     
     
     // RUN
+   
     
     // Not sure about this approach ... but works for now.
     if (Session.isLoggedIn) {
@@ -71,24 +91,16 @@ require(['kb.panel.about', 'kb.panel.contact', 'kb.panel.login', 'kb.panel.navba
         App.pub('loggedout');
     }
     
-    
+    // Navbar will be mounted upon the login/out message.
     // App.mount('navbar', Navbar.render());
     
+    // Handle the initial route.
     // Find a handler for the current route
     var handler = App.findCurrentRoute();
     if (!handler) {
         return;
     }
-    
-    // TODO: remove any previously mounted panel.
-    
-    // Mount this panel.
-    var rendered =  handler.route.render(handler.params);
-
-    //if (typeof rendered === 'object') {
-    //    rendered = App.html(rendered);
-    //}
-    App.mount('app', rendered);
+    handleRoute(handler);
     
 });
 
