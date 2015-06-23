@@ -16,11 +16,8 @@
     "test",
     "tests"
   ],
-        "dependencies": {"angular-ui-bootstrap-bower":"0.13.0",
-    "angular-resource": "1.2.11",
-    "angular-animate": "1.2.11",
-    "ng-file-upload": "5.0.9",
-    "angular-file-upload": "1.1.5",
+  "dependencies": {
+    "spark-md5": "0.0.5",
     "bootstrap": "3.3.5",
     "jquery": "1.11.3",
     "d3": "3.5.5",
@@ -35,9 +32,6 @@
     "raphael": "2.1.4",
     "lodash": "3.9.3",
     "jquery-jsonview": "1.2.2",
-    "angular": "1.2.11",
-    "angular-ui-router": "0.2.15",
-    "ng-file-upload-shim": "5.0.9",
     "blockUI": "*",
     "d3-plugins-sankey": "1.1.0",
     "jquery-cookie": "1.4.1",

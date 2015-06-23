@@ -6,10 +6,17 @@
 
         <!-- external css -->
         <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" />
-        <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap-theme.min.css" />
-
+       
+        <link rel="stylesheet" href="/ext/font-awesome/4.2.0/css/font-awesome.min.css" type="text/css" />
+        
         <!-- kbase enhancments or orverrides for bootstrap -->
         <link rel="stylesheet" type="text/css" href="assets/css/kb-bootstrap.css" />
+        
+        <!-- need to rethink these styles... fold into main -->
+        <link rel="stylesheet" type="text/css" href="assets/navbar/css/navbar.css" />
+        <link rel="stylesheet" type="text/css" href="/src/widgets/Navbar/style.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/kb-ui.css" />
+
 
         <!-- Navbar - in order to avoid unstyled flash for core components, load the css
                    here or in the primary kbase stylesheet (which is...) -->
@@ -22,11 +29,13 @@
         <script src="/bower_components/requirejs/require.js"></script>
         <script src="/bower_components/jquery/dist/jquery.min.js"></script>
         <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!--
         <script src="/bower_components/angular/angular.js" type="text/javascript"></script>
         <script src="/bower_components/angular-resource/angular-resource.min.js" type="text/javascript"></script>
         <script src="/bower_components/angular-animate/angular-animate.min.js" type="text/javascript"></script>
         <script src="/bower_components/angular-ui-router/release/angular-ui-router.min.js" type="text/javascript"></script>
         <script src="/bower_components/ng-file-upload/ng-file-upload-all.min.js" type="text/javascript"></script>
+        -->
 
         <!-- KBase client library javascript -->
         <!-- KBase support libs -->
@@ -36,66 +45,26 @@
         <!-- should be able to get rid of this now 
         <script src="../src/kbaseSessionSync.js"></script>-->
 
-        <!-- kbase angular -->
+        <!-- kbase angular 
         
         <script src="viewmodules/status/module.js"></script>
         <script src="viewmodules/about/module.js"></script>
+        -->
         
-        <!-- then the app can be created referencing the modules -->
+        <!-- then the app can be created referencing the modules 
         <script src="js/app.js"></script>
-        
-        
-        
+        -->
 
         <script src="js/require-config.js"></script>
+        
+        <script src="js/main.js"></script>
         <!-- end application -->
     </head>
     <body>
         <div id="wrap">
             <div id="content">
                 <!-- SB only one on page, so we can use the id here -->
-                <div class="navbar-kbase navbar-fixed-top" id="kbase-navbar">
-                    <div class="container-fluid">
-                        <!-- main menu -->
-                        <div class="navbar-header navbar-menu">
-                            <div style="display:inline-block">
-                                <button id="kb-nav-menu" class="btn btn-default navbar-btn kb-nav-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="fa fa-navicon"></span>
-                                </button>
-                                <ul class="dropdown-menu" role="menu" aria-labelledby="kb-nav-menu">
-                                    <li><a href="/functional-site/#/search/?q=*">Search Data</a>
-                                    </li>
-                                    <li><a href="/functional-site/#/narrativemanager/start">Narrative</a>
-                                    </li>
-                                    <li role="presentation" class="divider"></li>
-                                    <li><a target="_blank" href="https://kbase.us/about">About</a>
-                                    </li>
-                                    <li><a target="_blank" href="https://kbase.us/narrative-guide">Narrative Tutorial</a>
-                                    </li>
-                                    <li><a target="_blank" href="https://kbase.us/contact-us">Contact Us</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <a href="http://kbase.us">
-                                <img id="logo" src="assets/navbar/images/kbase_logo.png" width="46">
-                            </a>
-                        </div>
-
-                        <!-- title area -->
-                        <div class="navbar-text navbar-title">
-                            <!-- views and widgets can add title content here -->
-                            <span class="title"></span>
-                        </div>
-
-                        <!-- button area -->
-                        <div class="navbar-right">
-
-                            <!-- views and widets can place buttons here, see kbaseNavbar.js -->
-                            <span class="navbar-buttons">
-                            </span>
-                            <span id="signin-button"></span>
-                        </div>
-                    </div>
+                <div class="navbar-kbase navbar-fixed-top" id="kbase-navbar">                    
                 </div>
                 <div class="container-fluid">
                     <div id="app" ui-view></div>

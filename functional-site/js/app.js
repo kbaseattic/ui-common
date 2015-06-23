@@ -48,6 +48,6 @@ var app = angular.module('kbase-app', modules)
         });
 
     });
-
+    
 // app.run();
 

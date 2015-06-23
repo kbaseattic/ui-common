@@ -37,7 +37,8 @@ require.config({
         jquery: '/bower_components/jquery/',
         q: '/bower_components/q/q',
         nunjucks: '/bower_components/nunjucks/browser/nunjucks.min',
-        md5: '/bower_components//md5/src/md5',
+        // md5: '/bower_components/md5/build/md5.min',
+        md5: '/bower_components/spark-md5/spark-md5.min',
         lodash: '/bower_components/lodash/lodash.min',
         postal: '/bower_components/postal.js/lib/postal.min',
         // 'postal.request-response': '/ext/postal/postal.request-response.min',
@@ -46,6 +47,8 @@ require.config({
         text: '/bower_components/requirejs-text/text',
         json: '/bower_components/requirejs-json/json',
         // kbase utils
+        'kb.app': '/src/kbaseApp',
+        'kb.router': '/src/kbaseRouter',
         'kb.utils': '/src/kbaseUtils',
         'kb.cookie': '/src/kbaseCookie',
         'kb.test': '/src/kbaseTest',
@@ -56,6 +59,7 @@ require.config({
         'kb.logger': '/src/kbaseLogger',
         // kbase app
         'kb.appstate': '/src/kbaseAppState',
+        
         // widgets
         // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
         'kb.widget.buttonbar': '/src/widgets/kbaseButtonbar',
@@ -88,7 +92,15 @@ require.config({
         'kb.widget.dataview.overview': '/src/widgets/dataview/OverviewWidget',
         // KBase clients. Wrappers around the service clients to provide packaged operations with promises.
         'kb.client.workspace': '/src/clients/kbaseWorkspaceClient',
-        'kb.client.methods': '/src/clients/kbaseClientMethods'
+        'kb.client.methods': '/src/clients/kbaseClientMethods',
+        
+        'kb.panel.about': '/src/panels/about',
+        'kb.panel.contact': '/src/panels/contact',
+        'kb.panel.login': '/src/panels/login',
+        'kb.panel.navbar': '/src/panels/navbar',
+        'kb.panel.narrativemanager': '/src/panels/narrativemanager',
+        
+        'kb.service.profile': '/src/services/profile'
     }
 
 
