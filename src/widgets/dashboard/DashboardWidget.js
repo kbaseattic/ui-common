@@ -321,7 +321,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
             },
             // LIFECYCLE
 
-            start: {
+            go: {
                 value: function () {
                     // This creates the initial UI -- loads the css, inserts layout html.
                     // For simple widgets this is all the setup needed.

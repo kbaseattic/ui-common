@@ -1,4 +1,4 @@
-define(['kb.app'], function (App) {
+define(['kb.app', 'q'], function (App, Q) {
     'use strict';
     
     function renderContactForm () {
@@ -45,14 +45,16 @@ define(['kb.app'], function (App) {
     }
     
     function setup() {
-        // Set up routes
-        // var tag = App.makeTag;
-        var p = App.tag('p'),
-            div = App.tag('div');
         App.addRoute({
             path: ['contact'],
-            render: function (params) {
-                return renderContactForm();
+            promise: function (params) {
+                return Q.promise(function (resolve) {
+                    var content = renderContactForm();
+                    resolve({
+                        content: content,
+                        title: 'Contact Us'
+                    });
+                });
             }
         });
     };

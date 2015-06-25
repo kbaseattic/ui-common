@@ -1,7 +1,6 @@
-define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router', 'postal', 'jquery'], function (AppState, StateMachine, Config, Session, Router, Postal, $) {
+define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router', 'postal', 'jquery', 'q'], function (AppState, StateMachine, Config, Session, Router, Postal, $, Q) {
     'use strict';
     return (function () {
-
         /*
          * Mounts are named locations in the persistent html page where 
          * we can display content.
@@ -11,49 +10,131 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
             mounts[name] = {
                 selector: selector,
                 element: $(selector).get(),
-                rawContent: null
+                rawContent: null,
+                mounted: null
             };
         }
+        
+        function showPanel(mountName, handler) {
+            if (handler.route.promise) {
+                handler.route.promise(handler.params)
+                    .then(function (result) {
+                        if (result.content) {
+                            mount(mountName, result.content, handler.route)
+                            .then(function () {
+                                if (result.title) {
+                                    pub('title', {title: result.title});
+                                } else {
+                                    pub('title', ' ');
+                                }
+                                //if (result.style) {
+                                //    loadStyle(result.id, resylt.style);
+                                //}
+                                if (result.widgets) {
+                                    Object.keys(result.widgets).forEach(function (widgetName) {
+                                        var widget = result.widgets[widgetName];
+                                        widget.attach($('#' + widget.id));
+                                    });
+                                }
+                            })
+                            .catch(function (err) {
+                                console.log('ERROR');
+                                console.log(err);
+                            })
+                            .done();
+                        } else if (result.redirect) {
+                            replacePath(result.redirect);
+                        }
 
-        function mount(mountName, content) {
-            var mountPoint = mounts[mountName];
-            if (!mountPoint) {
-                return;
+                    })
+                    .catch(function (err) {
+                        mount('app', 'Error mounting this panel.' + err);
+                    })
+                    .done();       
             }
+        }
+        function show(mountName, handler) {
+            if (handler.route.promise) {
+                handler.route.promise(handler.params)
+                    .then(function (result) {
+                        if (result.content) {
+                            mount(mountName, result.content, handler.route)
+                            .then(function () {
+                                if (result.widgets) {
+                                    Object.keys(result.widgets).forEach(function (widgetName) {
+                                        var widget = result.widgets[widgetName];
+                                        widget.attach($('#' + widget.id));
+                                    });
+                                }
+                            })
+                            .catch(function (err) {
+                                console.log('ERROR');
+                                console.log(err);
+                            })
+                            .done();
+                        }
+                    })
+                    .catch(function (err) {
+                        mount('app', 'Error mounting this panel.' + err);
+                    })
+                    .done();       
+            }
+        }
 
-            if (typeof content === 'string') {
-                content = {
-                    content: [content],
-                    events: []
-                };
-            } else if (typeof content === 'object' && content.push) {
-                content = {
-                    content: content,
-                    events: []
-                };
-            } else {
-                if (typeof content.content === 'string') {
-                    content.content = [content.content];
+        // TODO: do the content rendering here...
+        function mount(mountName, content, mounted) {
+            return Q.Promise(function (resolve, reject) {
+                var mountPoint = mounts[mountName];
+                if (!mountPoint) {
+                    resolve();
                 }
-            }
+                if (mountPoint.mounted && mountPoint.mounted.stop) {
+                    mountPoint.mounted.stop();
+                }
 
-            mountPoint.rawContent = content.content;
-            mountPoint.events = content.events;
+                // This just gives us flexibility to make simple routes which
+                // just produce a string.
+                if (typeof content === 'string') {
+                    content = {
+                        content: [content],
+                        events: []
+                    };
+                } else if (typeof content === 'object' && content.push) {
+                    content = {
+                        content: content,
+                        events: []
+                    };
+                } else {
+                    if (typeof content.content === 'string') {
+                        content.content = [content.content];
+                    }
+                }
 
-            // We make a node to hold both the content and the events.
-            // This makes it easy to throw away the node later, and lose 
-            // the events without having to manage it all.
+                mountPoint.rawContent = content.content;
+                mountPoint.events = content.events;
+                mountPoint.mounted = mounted;
 
-            var container = $('<div/>');
-            content.content.forEach(function (el) {
-                container.append(el);
-            });
-            if (content.events) {
-                content.events.forEach(function (event) {
-                    container.on(event.type, event.selector, event.handler);
+                // We make a node to hold both the content and the events.
+                // This makes it easy to throw away the node later, and lose 
+                // the events without having to manage it all.
+
+                var container = $('<div/>');
+                content.content.forEach(function (el) {
+                    container.append(el);
                 });
-            }
-            $(mountPoint.element).empty().append(container);
+                if (content.events) {
+                    content.events.forEach(function (event) {
+                        container.on(event.type, event.selector, event.handler);
+                    });
+                }
+                $(mountPoint.element).empty().append(container);
+                
+                if (mounted && mounted.start) {
+                    mounted.start();
+                }
+                
+                resolve();
+            });
         }
 
         function jsonToHTML(node) {
@@ -132,7 +213,12 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
         }
 
         function navigateTo(location) {
-            window.location.href = '#' + location;
+            //if (window.history.pushState) {
+            //    window.history.pushState(null, '', '#' + location);
+            //} else {
+                console.log('new location ' + location);
+                window.location.hash = '#' + location;
+            //}
         }
 
         // Very simple message system.
@@ -163,12 +249,26 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
             return AppState.getItem(name);
         }
 
+        var loadedStyles = {};
+        function loadStyle(id, href) {
+            if (loadedStyles[id]) {
+                return;
+            }
+            loadedStyles[id] = true;
+            $('<link>')
+            .appendTo('head')
+            .attr({type: 'text/css', rel: 'stylesheet'})
+            .attr('href', href);
+        }
+
         return {
             addRoute: Router.addRoute,
             findCurrentRoute: Router.findCurrentRoute,
             setDefaultRoute: Router.setDefaultRoute,
 
             createMountPoint: createMountPoint,
+            show: show,
+            showPanel: showPanel,
             mount: mount,
             html: jsonToHTML,
             tag: makeTag,
@@ -179,7 +279,9 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
             pub: pub,
             
             setItem: setItem,
-            getItem: getItem
+            getItem: getItem,
+            
+            loadStyle: loadStyle
         };
     }());
 });

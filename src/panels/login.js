@@ -1,4 +1,4 @@
-define(['kb.app', 'kb.session', 'postal', 'jquery'], function (App, Session, Postal, $) {
+define(['kb.app', 'kb.session', 'jquery', 'q'], function (App, Session, $, Q) {
     'use strict';
 
     var panelId = App.genId();
@@ -17,7 +17,7 @@ define(['kb.app', 'kb.session', 'postal', 'jquery'], function (App, Session, Pos
     function element(name) {
         return node('[data-element="' + name + '"]');
     }
-    
+
     function handleLogin(e) {
         e.preventDefault();
 
@@ -48,7 +48,7 @@ define(['kb.app', 'kb.session', 'postal', 'jquery'], function (App, Session, Pos
         })
             .then(function (session) {
                 App.pub('loggedin');
-                App.navigateTo('dashboard');
+                App.navigateTo('about');
             })
             .catch(function (errorMsg) {
                 element('running').hide();
@@ -85,7 +85,6 @@ define(['kb.app', 'kb.session', 'postal', 'jquery'], function (App, Session, Pos
             h1 = App.tag('h1'),
             legend = App.tag('legend'),
             i = App.tag('i'),
-            span = App.tag('span'),
             a = App.tag('a');
 
         // Variables for form.
@@ -144,14 +143,18 @@ define(['kb.app', 'kb.session', 'postal', 'jquery'], function (App, Session, Pos
             events: events
         };
     }
-    
 
     function setup() {
         // Set up routes
         App.addRoute({
             path: ['login'],
-            render: function () {
-                return renderForm();
+            promise: function (params) {
+                return Q.Promise(function (resolve) {
+                    resolve({
+                        content: renderForm(),
+                        title: 'Sign In'
+                    });
+                });
             }
         });
     }

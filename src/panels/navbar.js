@@ -1,4 +1,4 @@
-define(['kb.app', 'kb.session'], function (App, Session) {
+define(['kb.app', 'kb.session', 'q'], function (App, Session, Q) {
     'use strict';
     // ACTUALLY: a widget
     function setup() {
@@ -16,50 +16,85 @@ define(['kb.app', 'kb.session'], function (App, Session) {
         //
         return false;
     }
+
+    var menuItems = {
+        search: {
+            uri: '/functional-site/#/search/?q=*',
+            label: 'Search Data',
+            icon: 'search'
+        },
+        narrative: {
+            uri: '/functional-site/#/narrativemanager/start',
+            label: 'Narrative',
+            icon: 'file'
+        },
+        divider: {
+            type: 'divider'
+        },
+        about: {
+            uri: '#about',
+            label: 'About',
+            icon: 'info-circle'
+        },
+        narrativeTutorial: {
+            uri: 'https://kbase.us/narrative-guide',
+            label: 'Narrative Tutorial',
+            icon: 'info-circle'
+        },
+        contact: {
+            uri: '/functional-site/#/contact',
+            label: 'Contact Us',
+            icon: 'envelope-o'
+        }, 
+        about_kbase: {
+            uri: 'https://kbase.us/about',
+            label: 'About KBase',
+            icon: 'info-circle'
+        },
+        contact_us: {
+            uri: 'https://kbase.us/contact-us',
+            label: 'Contact Us',
+            icon: 'envelope-o'
+        },
+        dashboard: {
+            uri: '#dashboard',
+            label: 'Dashboard',
+            icon: 'dashboard'
+        }
+    };
+    function defMenuItem(id, menuDef) {
+        menuItems[id] = menuDef;
+    }
+    
+    var menu = ['search', 'narrative', 'divider', 'about', 'narrativeTutorial', 'contactUs'];
+    function clearMenu() {
+        menu = [];
+    }
+    function addMenuItem(id, afterItem) {
+        menu.push(id);
+    }
+    function deleteMenuItem(id) {
+        delete menu[id];
+    }
+    function insertMenuItem(id, beforeItem) {
+    }
+    function setMenu(ids) {
+        clearMenu();
+        menu = ids.map(function (id) {
+            return id;
+        });
+    }
+
+    
+    //
     var title = '** title here **';
     function setTitle(newTitle) {
         title = newTitle;
     }
 
-    var menu = [
-        {
-            uri: '/functional-site/#/search/?q=*',
-            label: 'Search Data',
-            icon: 'search'
-        },
-        {
-            uri: '/functional-site/#/narrativemanager/start',
-            label: 'Narrative',
-            icon: 'file'
-        },
-        {
-            type: 'divider'
-        },
-        {
-            uri: '#about',
-            label: 'About',
-            icon: 'info-circle'
-        },
-        {
-            uri: 'https://kbase.us/narrative-guide',
-            label: 'Narrative Tutorial',
-            icon: 'info-circle'
-        },
-        {
-            uri: '/functional-site/#/contact',
-            label: 'Contact Us',
-            icon: 'envelope-o'
-        }
-    ];
-
-    
-
     // EVENTS
     // TODO; Move to separate module.
     var events = [];
-    function resetEvents() {
-        events = [];
-    }
     function addEvent(type, handler) {
         var id = App.genId();
         events.push({
@@ -73,21 +108,15 @@ define(['kb.app', 'kb.session'], function (App, Session) {
         Session.logout()
             .then(function () {
                 App.pub('loggedout');
-                App.navigateTo('about');
+                App.navigateTo('welcome');
             })
             .done();
     }
-    
-    // SUBS
-    var subs = [];
-    function addSub(id, handler) {
-        App.sub(id, handler);
-    }
-    
+
     // RENDERERS
     function renderMenuItem(item) {
         var li = App.tag('li'),
-            a =  App.tag('a'),
+            a = App.tag('a'),
             div = App.tag('div'),
             span = App.tag('span');
         var icon = null;
@@ -98,42 +127,55 @@ define(['kb.app', 'kb.session'], function (App, Session) {
         }
         var type = item.type || 'button';
         switch (type) {
-        case 'button':
-            return li({}, a({href: item.uri}, [
-                icon,
-                item.label
-            ]));
-        case 'divider':
-            return li({role: 'presentation', class: 'divider'});
+            case 'button':
+                return li({}, a({href: item.uri}, [
+                    icon,
+                    item.label
+                ]));
+            case 'divider':
+                return li({role: 'presentation', class: 'divider'});
         }
     }
     function renderMenu() {
         var ul = App.tag('ul');
-        return ul({class: 'dropdown-menu', role: 'menu', 'aria-labeledby': 'kb-nav-menu'}, menu.map(function (item) {
-            return renderMenuItem(item);
+        if (Session.isLoggedIn()) {
+            setMenu(['search', 'narrative', 'dashboard', 'divider', 'about', 'contact', 'divider', 'about_kbase', 'contact_us'])
+        } else {
+            setMenu(['about', 'contact', 'divider', 'about_kbase', 'contact_us']);
+        }
+        return ul({class: 'dropdown-menu', role: 'menu', 'aria-labeledby': 'kb-nav-menu'}, menu.map(function (id) {
+            var item = menuItems[id];
+            if (!item) {
+                console.log('item ' + id + ' not defined');
+            } else {
+                return renderMenuItem(item);
+            }
         }));
     }
     function renderAvatar() {
         var img = App.tag('img', {close: false});
         var profile = App.getItem('userprofile');
-        console.log(profile);
         if (profile) {
             return img({src: profile.getAvatarURL(), style: 'width: 40px;', class: 'login-button-avatar', 'data-element': 'avatar'});
-        } else {
-            return img({src: 'assets/images/nouserpic.png', style: 'width: 40px;', class: 'login-button-avatar', 'data-element': 'avatar'});
         }
+        return img({src: 'assets/images/nouserpic.png', style: 'width: 40px;', class: 'login-button-avatar', 'data-element': 'avatar'});
     }
     function renderLogin() {
         var button = App.tag('button'),
             div = App.tag('div'),
             a = App.tag('a'),
-            img = App.tag('img', {close: false}),
             span = App.tag('span'),
             ul = App.tag('ul'),
             li = App.tag('li'),
             br = App.tag('br', {close: false}),
             i = App.tag('i');
+
+
         if (Session.isLoggedIn()) {
+            // TODO: fix dependencies like this -- realname is not available until, and unless, the 
+            // profile is loaded, which happens asynchronously.            
+            var profile = App.getItem('userprofile');
+            var realname = profile ? profile.getProp('user.realname') : '?';
             return div({class: 'dropdown', style: 'display:inline-block'}, [
                 button({type: 'button', class: 'btn-btn-default dropdown-toggle', 'data-toggle': 'dropdown', 'aria-expanded': 'false'}, [
                     renderAvatar(),
@@ -146,7 +188,7 @@ define(['kb.app', 'kb.session'], function (App, Session) {
                                 span({class: 'fa fa-user', style: 'font-size: 150%; margin-right: 10px;'})
                             ]),
                             div({style: 'display: inline-block', 'data-element': 'user-label'}, [
-                                Session.getRealname(),
+                                realname,
                                 br(),
                                 i({}, Session.getUsername())
                             ])
@@ -180,9 +222,9 @@ define(['kb.app', 'kb.session'], function (App, Session) {
             div({class: 'navbar-header navbar-menu'}, [
                 div({style: 'display: inline-block;', 'data-element': 'menu'}, [
                     button({id: 'kb-nav-menu',
-                            class: 'btn btn-default navbar-btn kb-nav-btn',
-                            'data-toggle': 'dropdown',
-                            'aria-haspopup': true}, [
+                        class: 'btn btn-default navbar-btn kb-nav-btn',
+                        'data-toggle': 'dropdown',
+                        'aria-haspopup': true}, [
                         span({class: 'fa fa-navicon'})
                     ]),
                     renderMenu()
@@ -208,12 +250,19 @@ define(['kb.app', 'kb.session'], function (App, Session) {
             events: events
         };
     }
+    
+    function promise() {
+        return Q.Promise(function (resolve, reject) {
+            resolve(render());
+        });
+    }
 
-    return {
+    return {        
         setup: setup,
         teardown: teardown,
+        promise: promise,
         start: start,
         stop: stop,
-        render: render
+        setTitle: setTitle
     };
 });

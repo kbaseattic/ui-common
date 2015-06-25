@@ -1,8 +1,10 @@
 require(['kb.panel.about', 'kb.panel.contact', 'kb.panel.login', 'kb.panel.navbar', 
-         'kb.panel.narrativemanager',
+         'kb.panel.narrativemanager', 'kb.panel.userprofile', 'kb.panel.welcome',
+         'kb.panel.dashboard', 'kb.panel.narrativestore',
          'kb.service.profile', 'kb.session', 'kb.app', 'kb.appstate', 'jquery'], 
         function (About, Contact, Login,  Navbar, 
-                  NarrativeManager,
+                  NarrativeManagerPanel, UserProfile, Welcome,
+                  Dashboard, NarrativeStore,
                   ProfileService, Session, App, AppState, $) {
     // SETUP
     // 
@@ -10,7 +12,13 @@ require(['kb.panel.about', 'kb.panel.contact', 'kb.panel.login', 'kb.panel.navba
     About.setup();
     Contact.setup();
     Login.setup();
+    var NarrativeManager = NarrativeManagerPanel();
     NarrativeManager.setup();
+    UserProfile.setup();
+    Welcome.setup();
+    Dashboard.setup();
+    NarrativeStore.setup();
+    
     
     App.setDefaultRoute({
         path: ['about'],
@@ -27,24 +35,17 @@ require(['kb.panel.about', 'kb.panel.contact', 'kb.panel.login', 'kb.panel.navba
     // TODO: remove any previously mounted panel.    
     // TODO: convert all to promises or callback, but make it easy!
     function handleRoute(handler) {
-        if (handler.route.render) {
-            try {
-                var rendered =  handler.route.render(handler.params);
-                App.mount('app', rendered);
-            } catch (ex) {
-                App.mount('app', 'Error mounting this panel.');
-            }
-        } else if (handler.route.promise) {
-            var promise = handler.route.promise;
-            promise(handler.params)
-                .then(function (rendered) {
-                    App.mount('app', rendered);
-                })
-                .catch(function (err) {
-                    App.mount('app', 'Error mounting this panel.' + err);
-                })
-                .done();       
-        }
+        App.showPanel('app', handler);
+       
+    }
+    
+    function replacePath(path) {
+        // maybe render message ...
+        //
+        //        'redirecting to <a href="/narrative/ws.' + workspaceId +
+        //        '.obj.' + objId + '">/narrative/ws.' + workspaceId +
+        //        '.obj.' + objId + '</a>');
+        window.location.replace(path);
     }
     
     // SETUP LISTENERS
@@ -62,24 +63,40 @@ require(['kb.panel.about', 'kb.panel.contact', 'kb.panel.login', 'kb.panel.navba
     
     // App Listeners
     App.sub('loggedout', function () {
-        App.mount('navbar', Navbar.render());
+        App.show('navbar', {
+            route: Navbar,
+            params: null
+        });
     });
     App.sub('loggedin', function () {
-        App.mount('navbar', Navbar.render());
+        App.show('navbar', {
+            route: Navbar,
+            params: null
+        });
         ProfileService.loadProfile();
     });
+    App.sub('title', function (data) {
+        Navbar.setTitle(data.title);
+        App.show('navbar', {
+            route: Navbar,
+            params: null
+        });
+    })
     
     // This will work ... but we need to tune this!
-        AppState.whenItem('userprofile')
-        .then(function (profile) {
-            App.mount('navbar', Navbar.render());
-        })
-        .done();
+    AppState.whenItem('userprofile')
+    .then(function (profile) {
+        App.show('navbar', {
+            route: Navbar,
+            params: null
+        });
+    })
+    .done();
+
     
     //App.sub('profile.loaded', function () {
     //    App.mount('navbar', Navbar.render());
     //});
-    
     
     // RUN
    
@@ -90,7 +107,7 @@ require(['kb.panel.about', 'kb.panel.contact', 'kb.panel.login', 'kb.panel.navba
     } else {
         App.pub('loggedout');
     }
-    
+
     // Navbar will be mounted upon the login/out message.
     // App.mount('navbar', Navbar.render());
     

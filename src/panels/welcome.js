@@ -1,33 +1,26 @@
 define(['kb.app', 'kb.session', 'q'], function (App, Session, Q) {
     'use strict';
     function setup() {
-        var p = App.tag('p'),
+        var h1 = App.tag('h1'),
+            p = App.tag('p'),
             div = App.tag('div');
         App.addRoute({
-            path: ['about'],
+            path: ['welcome'],
             render: null,
             promise: function (params) {
                 return Q.promise(function (resolve) {
                     var content = [
-                        p([], 'This is all about KBase and ' + params.name),
-                        div([], [
-                            p([], 'Hi'),
-                            p([], ['Hello, ', Session.getUsername()])
-                        ])
+                        h1({}, 'Welcome to KBase'),
+                        p({}, 'This is KBase')
                     ];
                     resolve({
                         content: content,
-                        title: 'About the Functional Site'
+                        title: 'Welcome to KBase'
                     });
                 });
             }
         });
-        App.addRoute({
-            path: ['about', {type: 'param', name: 'name'}],
-            render: function (params) {
-                return 'This is all about ' + params.name;
-            }
-        });
+       
     }
     function teardown() {
         // TODO: remove routes
@@ -45,6 +38,6 @@ define(['kb.app', 'kb.session', 'q'], function (App, Session, Q) {
         setup: setup,
         teardown: teardown,
         start: start,
-        stop: stop       
+        stop: stop
     };
 });

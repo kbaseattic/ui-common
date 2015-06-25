@@ -39,6 +39,8 @@
     "md5": "0.3.0",
     "requirejs-domready": "2.0.1",
     "requirejs-json": "0.0.3",
-    "requirejs-text": "2.0.14"
+    "requirejs-text": "2.0.14",
+    "underscore": "1.8.3",
+    "require-css": "0.1.8"
   }
 }
