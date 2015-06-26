@@ -1,7 +1,11 @@
 
-/* this is a work in progress */
+/* this is a work in progress */kb_define('kbaseTableEditor',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
 
-(function( $, undefined ) {
 
     $.KBWidget({
         name: "kbaseTableEditor",
@@ -78,4 +82,4 @@
 
     });
 
-}( jQuery ) );
+});

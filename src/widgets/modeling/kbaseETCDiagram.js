@@ -1,4 +1,11 @@
-(function( $, undefined ) {
+kb_define('kbaseETCDiagram',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseAuthenticatedWidget'
+    ],
+    function ($) {
+
 
 $.KBWidget({
     name: "kbaseETCDiagram",
@@ -271,4 +278,4 @@ $.KBWidget({
 
 
 })
-}( jQuery ) );
+});

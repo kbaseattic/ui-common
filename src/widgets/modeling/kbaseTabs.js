@@ -35,9 +35,13 @@
     // This is a programmatic way of showing a tab.
 
         tabs.showTab('tab_name');
-*/
+*/kb_define('kbTabs',
+    [
+        'jquery',
+	'kbwidget'
+    ],
+    function ($) {
 
-(function( $, undefined ) {
 
     $.KBWidget({
         name: "kbTabs",
@@ -159,4 +163,4 @@
             return this;
         },
     });
-}( jQuery ) );
+});

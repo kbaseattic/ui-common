@@ -1,4 +1,11 @@
-(function( $, undefined ) {
+kb_define('kbaseTabTable',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseAuthenticatedWidget'
+    ],
+    function ($) {
+
 
 'use strict';
 
@@ -519,6 +526,6 @@ $.KBWidget({
         return this;
     }
 })
-}( jQuery ) );
+});
 
 

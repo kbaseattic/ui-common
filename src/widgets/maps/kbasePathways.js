@@ -1,4 +1,11 @@
-(function( $, undefined ) {
+kb_define('kbasePathways',
+    [
+        'jquery',
+	'kbwidget',
+	'kbasePathway'
+    ],
+    function ($) {
+
 
 'use strict';
 
@@ -128,7 +135,7 @@ $.KBWidget({
     }  //end init
 
 })
-}( jQuery ) );
+});
 
 
 
