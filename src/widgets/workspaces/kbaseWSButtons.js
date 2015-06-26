@@ -1,4 +1,4 @@
-kb_define('KBaseWSButtons',
+define('KBaseWSButtons',
     [
         'jquery',
 	'kbwidget',

@@ -1,4 +1,4 @@
-kb_define('kbaseCpd',
+define('kbaseCpd',
     [
         'jquery',
 	'kbwidget'

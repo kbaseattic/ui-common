@@ -1,4 +1,4 @@
-kb_define('KBaseGenomeCompleteness',
+define('KBaseGenomeCompleteness',
     [
         'jquery',
 	'kbwidget',

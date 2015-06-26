@@ -1,7 +1,7 @@
 /**
  * Just a simple example widget to display promconstraints
  * 
- */kb_define('kbasePromConstraint',
+ */define('kbasePromConstraint',
     [
         'jquery',
 	'kbwidget'

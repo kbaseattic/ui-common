@@ -1,4 +1,4 @@
-kb_define('KBaseMAKBiclusterCard',
+define('KBaseMAKBiclusterCard',
     [
         'jquery',
 	'kbwidget'

@@ -28,7 +28,7 @@
     );
 */
 
-kb_define('kbaseSearchControls', ['jquery', 'bootstrap', 'kbwidget'], function( $ ) {
+define('kbaseSearchControls', ['jquery', 'bootstrap', 'kbwidget'], function( $ ) {
 
     $.KBWidget({
 

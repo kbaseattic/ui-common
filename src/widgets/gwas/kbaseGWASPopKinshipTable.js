@@ -1,4 +1,4 @@
-kb_define('KBaseGWASPopKinshipTable',
+define('KBaseGWASPopKinshipTable',
     [
         'jquery',
 	'kbwidget',

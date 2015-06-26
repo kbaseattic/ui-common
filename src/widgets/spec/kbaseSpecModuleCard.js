@@ -1,4 +1,4 @@
-kb_define('KBaseSpecModuleCard',
+define('KBaseSpecModuleCard',
     [
         'jquery',
 	'kbwidget'

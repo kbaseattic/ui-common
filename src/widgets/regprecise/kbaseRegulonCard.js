@@ -1,4 +1,4 @@
-kb_define('KBaseRegulonCard',
+define('KBaseRegulonCard',
     [
         'jquery',
 	'kbwidget'

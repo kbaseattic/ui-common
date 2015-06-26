@@ -1,4 +1,4 @@
-kb_define('KBaseGeneExprLinePlot',
+define('KBaseGeneExprLinePlot',
     [
         'jquery',
 	'kbwidget',

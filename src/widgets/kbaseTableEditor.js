@@ -1,5 +1,5 @@
 
-/* this is a work in progress */kb_define('kbaseTableEditor',
+/* this is a work in progress */define('kbaseTableEditor',
     [
         'jquery',
 	'kbwidget'

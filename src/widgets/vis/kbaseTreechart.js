@@ -2,7 +2,7 @@
 
 */
 
-kb_define('kbaseTreechart',
+define('kbaseTreechart',
     [
         'jquery',
         'd3',

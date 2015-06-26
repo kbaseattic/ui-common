@@ -10,7 +10,7 @@
         }
     );
 */
-kb_define('kbaseJSONReflector',
+define('kbaseJSONReflector',
     [
         'jquery',
     	'kbwidget'

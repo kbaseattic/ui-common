@@ -1,4 +1,4 @@
-kb_define('kbaseETCDiagram',
+define('kbaseETCDiagram',
     [
         'jquery',
 	'kbwidget'

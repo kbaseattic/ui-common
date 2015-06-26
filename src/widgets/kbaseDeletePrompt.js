@@ -28,7 +28,7 @@
     Sure, you could just set it up through kbasePrompt. But why bother?
 */
 
-kb_define('kbaseDeletePrompt',
+define('kbaseDeletePrompt',
     [
         'jquery',
         'kbasePrompt',

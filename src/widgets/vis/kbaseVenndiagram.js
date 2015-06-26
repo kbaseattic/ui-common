@@ -2,7 +2,7 @@
 
 */
 
-kb_define('kbaseVenndiagram',
+define('kbaseVenndiagram',
     [
         'jquery',
         'd3',

@@ -1,4 +1,4 @@
-kb_define('kbaseWSSelector',
+define('kbaseWSSelector',
     [
         'jquery',
 	'kbwidget'

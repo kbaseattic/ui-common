@@ -26,7 +26,7 @@
  *
  * @param {String|Number} options.minHeight
  * A minimum height for the widget
- */kb_define('ForceDirectedNetwork',
+ */define('ForceDirectedNetwork',
     [
         'jquery',
 	'kbwidget'

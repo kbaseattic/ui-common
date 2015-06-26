@@ -27,7 +27,7 @@
         ... etc ...
     ]
 }
-*/kb_define('kbaseGeneTable',
+*/define('kbaseGeneTable',
     [
         'jquery',
         'kbaseTable',

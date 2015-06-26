@@ -3,7 +3,7 @@
 
 */
 
-kb_define('kbaseDataBrowser',
+define('kbaseDataBrowser',
     [
         'jquery',
         'kbaseAuthenticatedWidget',

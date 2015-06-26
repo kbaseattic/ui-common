@@ -48,7 +48,7 @@
 
 */
 
-kb_define('kbaseLogin',
+define('kbaseLogin',
     [
         'jquery',
         'kbwidget',

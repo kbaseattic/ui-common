@@ -1,4 +1,4 @@
-kb_define('kbaseAppDescription',
+define('kbaseAppDescription',
     [
         'jquery',
     	'kbwidget',

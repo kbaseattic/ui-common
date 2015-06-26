@@ -2,7 +2,7 @@
  * Output widget for visualization of Multiple Sequence Alignment.
  * @author Roman Sutormin <rsutormin@lbl.gov>
  * @public
- */kb_define('kbaseMSA',
+ */define('kbaseMSA',
     [
         'jquery',
 	'kbwidget',

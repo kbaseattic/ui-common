@@ -1,6 +1,6 @@
 /**
  * @author Roman Sutormin <rsutormin@lbl.gov>
- */kb_define('kbaseKidlWebEditor',
+ */define('kbaseKidlWebEditor',
     [
         'jquery',
 	'kbwidget',

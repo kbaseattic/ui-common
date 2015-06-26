@@ -1,4 +1,4 @@
-kb_define('kbaseSimulationSet',
+define('kbaseSimulationSet',
     [
         'jquery',
 	'kbwidget'

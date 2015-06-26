@@ -3,7 +3,7 @@
 
 */
 
-kb_define('kbaseIrisFileBrowser',
+define('kbaseIrisFileBrowser',
     [
         'jquery',
         'kbaseDataBrowser',

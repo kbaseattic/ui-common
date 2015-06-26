@@ -1,4 +1,4 @@
-kb_define('KBaseWSObjGraphCenteredView',
+define('KBaseWSObjGraphCenteredView',
     [
         'jquery',
 	'kbwidget'

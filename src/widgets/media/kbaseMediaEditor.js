@@ -1,4 +1,4 @@
-kb_define('kbaseMediaEditor',
+define('kbaseMediaEditor',
     [
         'jquery',
 	'kbwidget',

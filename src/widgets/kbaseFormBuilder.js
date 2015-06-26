@@ -117,7 +117,7 @@
 
 */
 
-kb_define('kbaseFormBuilder',
+define('kbaseFormBuilder',
     [
         'jquery',
         'kbwidget',

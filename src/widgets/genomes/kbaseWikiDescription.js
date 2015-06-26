@@ -20,7 +20,7 @@
  * @author Mike Sneddon [mwsneddon@lbl.gov]
  * @author Dylan Chivian [dcchivian@lbl.gov]
  */
- */kb_define('KBaseWikiDescription',
+ */define('KBaseWikiDescription',
     [
         'jquery',
 	'kbwidget'

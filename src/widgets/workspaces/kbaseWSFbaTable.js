@@ -1,4 +1,4 @@
-kb_define('kbaseWSFbaTable',
+define('kbaseWSFbaTable',
     [
         'jquery',
 	'kbwidget'

@@ -1,4 +1,4 @@
-kb_define('vis',
+define('vis',
     [
         'kbaseBarchart',
         'kbaseHistogram',

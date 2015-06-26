@@ -1,4 +1,4 @@
-kb_define('KBaseBambiRawOutputCard',
+define('KBaseBambiRawOutputCard',
     [
         'jquery',
 	'kbwidget'

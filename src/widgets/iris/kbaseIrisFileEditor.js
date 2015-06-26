@@ -3,7 +3,7 @@
 
 */
 
-kb_define('kbaseIrisFileEditor',
+define('kbaseIrisFileEditor',
     [
         'jquery',
         'kbaseAuthenticatedWidget',

@@ -1,4 +1,4 @@
-kb_define('kbaseBioCpdTable',
+define('kbaseBioCpdTable',
     [
         'jquery',
 	'kbwidget'

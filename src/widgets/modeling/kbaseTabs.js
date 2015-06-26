@@ -35,7 +35,7 @@
     // This is a programmatic way of showing a tab.
 
         tabs.showTab('tab_name');
-*/kb_define('kbTabs',
+*/define('kbTabs',
     [
         'jquery',
 	'kbwidget'

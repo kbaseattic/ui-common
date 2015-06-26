@@ -3,7 +3,7 @@
 
 */
 
-kb_define('kbaseIrisConfig', [],
+define('kbaseIrisConfig', [],
     function() {
         if (window.kbaseIrisConfig == undefined) {
             window.kbaseIrisConfig = {

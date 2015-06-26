@@ -5,7 +5,7 @@
  * https://gist.github.com/mbostock/1093025
  * 
  * will adapt this to work with the KBase SEED annotations
- */kb_define('KBaseSEEDFunctions',
+ */define('KBaseSEEDFunctions',
     [
         'jquery',
 	'kbwidget'

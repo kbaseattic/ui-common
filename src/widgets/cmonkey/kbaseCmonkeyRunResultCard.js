@@ -1,4 +1,4 @@
-kb_define('KBaseCmonkeyRunResultCard',
+define('KBaseCmonkeyRunResultCard',
     [
         'jquery',
 	'kbwidget'

@@ -1,4 +1,4 @@
-kb_define('kbaseMethodGallery',
+define('kbaseMethodGallery',
     [
         'jquery',
 	    'kbwidget',

@@ -1,4 +1,4 @@
-kb_define('KBaseCmonkeyMotifCard',
+define('KBaseCmonkeyMotifCard',
     [
         'jquery',
 	'kbwidget'
