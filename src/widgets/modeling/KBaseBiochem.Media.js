@@ -1,4 +1,6 @@
-function KBaseFBA_Media(tabwidget) {
+(function() {
+
+function KBaseBiochem_Media(tabwidget) {
     var self = this;
     this.tabwidget = tabwidget;
 
@@ -16,7 +18,6 @@ function KBaseFBA_Media(tabwidget) {
     };
 
     this.setData = function (data) {
-        console.log('data', data)
         this.data = data;
         this.mediacompounds = this.data.mediacompounds;
         this.reagents = this.data.reagents;
@@ -33,7 +34,7 @@ function KBaseFBA_Media(tabwidget) {
 
         var p = this.tabwidget.getBiochemCompounds(cpdarray)
                     .done(function(cpds) {
-                        console.log('cpds', cpds)
+
                         for (var i=0; i< self.mediacompounds.length; i++) {
                             var cpd = self.mediacompounds[i];
                             cpd.name = cpds[i].name;
@@ -48,32 +49,34 @@ function KBaseFBA_Media(tabwidget) {
         return p;
     };
 
-    this.CompoundTab = function (id) {
-        var cpd = this.cpdhash[id];
+    this.CompoundTab = function (info) {
+        var cpd = this.cpdhash[info.id];
+        console.log('info', cpd)
+
         return [{
             "label": "Compound",
             "data": cpd.id,
         }, {
             "label": "Name",
-            "key": "name"
+            "data": cpd.name
         }, {
             "label": "Formula",
-            "key": "formula"
+            "data": cpd.formula
         }, {
             "label": "Charge",
-            "key": "charge"
+            "data": cpd.charge
         }, {
             "label": "deltaG",
-            "key": "deltaG"
+            "data": cpd.deltaG
         }, {
             "label": "Max flux",
-            "key": "maxFlux"
+            "data": cpd.maxFlux
         }, {
             "label": "Min flux",
-            "key": "minFlux"
+            "data": cpd.minFlux
         }, {
             "label": "Concentration",
-            "key": "concentration"
+            "data": cpd.concentration
         }];
     }
 
@@ -121,6 +124,7 @@ function KBaseFBA_Media(tabwidget) {
             "label": "Compound",
             "key": "id",
             "type": "tabLink",
+            "linkformat": "dispID",
             "method": "CompoundTab",
         }, {
             "label": "Name",
@@ -131,12 +135,12 @@ function KBaseFBA_Media(tabwidget) {
         }, {
             "label": "Charge",
             "key": "charge"
-        }, {
+        },/* {
             "label": "Compartment",
             "key": "compartment",
             "type": "tabLink",
             "method": "CompartmentTab"
-        }]
+        }*/]
     }, {
         "key": "reagents",
         "name": "Reagents",
@@ -155,4 +159,6 @@ function KBaseFBA_Media(tabwidget) {
 }
 
 // make method of base class
-KBObjects.prototype.KBaseFBA_Media = KBaseFBA_Media;
+KBModeling.prototype.KBaseBiochem_Media = KBaseBiochem_Media;
+
+}());

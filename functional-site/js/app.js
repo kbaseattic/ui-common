@@ -19,12 +19,18 @@
 var cardManager = undefined;
 
 var app = angular.module('landing-pages',
-    ['lp-directives', 'card-directives',
+    ['lp-directives',
+     'card-directives',
      'trees-directives',
-     'ws-directives', 'modeling-directives', 'angular-json-rpc',
-     'communities-directives', 'narrative-directives',
-     'ui.router', 'ngResource', 'kbaseLogin',
-      'ui.bootstrap', 'search'])
+     'ws-directives',
+     'modeling-directives',
+     'communities-directives',
+     'narrative-directives',
+     'ui.router',
+     'ngResource',
+     'kbaseLogin',
+     'ui.bootstrap',
+     'search'])
     .config(['$locationProvider', '$stateProvider', '$httpProvider', '$urlRouterProvider',
     function($locationProvider, $stateProvider, $httpProvider, $urlRouterProvider) {
 
@@ -95,6 +101,10 @@ var app = angular.module('landing-pages',
     // revised output widget test page
     $stateProvider
         .state('test', {
+          url: "/test/",
+          templateUrl: 'views/test-landing.html',
+          controller: 'KBaseExamples'
+        }).state('landing', {
           url: "/test/:type/:ws/:name",
           templateUrl: 'views/test.html',
           controller: 'KBaseTables'
@@ -464,12 +474,6 @@ OLD STYLE GENE LANDING PAGE WITH CARDS ARE NO LONGER USED...
 	   {url: '/ppid/:ws/:id',
 	    templateUrl: 'views/objects/ppid.html',
 	    controller: 'PPIDetail'});
-
-    $stateProvider
-        .state('landing-pages-help',
-            {url: '/landing-pages-help',
-             templateUrl: 'views/landing-pages-help.html',
-             controller: LPHelp});
 
     $stateProvider
     	.state('tree',

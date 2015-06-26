@@ -1,97 +1,126 @@
-kb_define('kbasePathway',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
 
+/*
+ *  kbasePathway.js
+ *
+ *  Dependencies:
+ *      kbwidget.js
+ *      modelSeedVizConfig  - Used for colors and utility functions,
+ *                            allowing for heatmap scaling, etc
+ *
+*/
+
+(function( $, undefined ) {
+
+'use strict';
 
 $.KBWidget({
-    name: "kbasePathway",     
+    name: "kbasePathway",
     version: "1.0.0",
     options: {
     },
-    
+
     init: function(options) {
         var self = this;
         this._super(options);
+        var container = this.$elem;
 
-
+        // params
         self.model_ws = options.model_ws;
-        self.model_name = options.model_name;        
+        self.model_name = options.model_name;
         self.fba_ws = options.fba_ws;
         self.fba_name = options.fba_name;
         self.map_ws = options.map_ws;
         self.map_name = options.map_name;
+        self.image = options.image;
 
-        console.log('model_ws:', self.model_ws,
-                    'model_name:', self.model_name,
-                    'fba_ws:', self.fba_ws,
-                    'fba_name:', self.fba_name,
-                    'map_ws:', self.map_ws,
-                    'map_name:', self.map_name)
+        // new options for viz settings
+        self.options = options.options;
+
+        // optional params
+        self.models = options.models;
+        self.fbas = options.fbas;
 
         self.map_id = options.mapID;
 
-        var container = this.$elem;
+        var config = new ModelSeedVizConfig();
+        var kbapi = new KBModeling().kbapi;
 
-        var stroke_color = '#666';
-        var stroke_color2 = '#000';
-        var stroke_width = '1.5px';
-        var highlight = 'steelblue';
+        // globals
+        var groups,    // groups of reactions
+            rxns,      // reactions
+            cpds,      // compounds
+            maplinks;  // lines from reactions to maps and visa versa
 
-        var flux_threshold = 0.001;
-        var heat_colors = ['#8A0000','#AD3333', '#C26666', '#E0B2B2', '#f28e8e'];
-        var neg_heat_colors = ['#007A00','#19A319', '#80CC80', '#B2E0B2', '#dded00'];
-        var gapfill_color = '#f000ff';
-        var gene_stroke = '#777';
-        var g_present_color = '#8bc7e5';
+        var oset = 12,       // off set for arrows
+            r = 12,          // radial offset from circle.  Hooray for math degrees.
+            max_x = 0,       // used to compute canvas size (width) based on data
+            max_y = 0,       // used to compute canvas size (height) based on data
+            c_pad = 200,     // padding around max_x/max_y
+            svg = undefined; // svg element for map
 
+        var fba_objs;
 
+        var p1 = kbapi('ws', 'get_objects', [{workspace: self.map_ws, name: self.map_name}])
 
-        var p1 = kb.ws.get_objects([{workspace: self.map_ws, name: self.map_name}])            
-        if (self.model_ws && self.model_name) {
-            var p2 = kb.get_model(self.model_ws, self.model_name);
+        // if data was sent to widget, don't fetch.  I know, it's crazy
+        if (!self.models) {
+            if (self.model_ws && self.model_name)
+                var p2 = kb.get_model(self.model_ws, self.model_name);
+
+            if (self.fba_ws && self.fba_name)
+                var p3 = kb.get_fba(self.fba_ws, self.fba_name);
+
+            $.when(p1, p2, p3).done(function(mapData, models, fbas) {
+                self.mapData = options.useWorkspaceMaps ?
+                                mapData.mapData[0].data : mapData[0]
+                self.models = (models ? [models[0].data] : undefined);
+                self.fbas = (fbas ? [fbas[0].data] : undefined);
+                initialize();
+            })
+        } else {
+            p1.done(function(mapData) {
+                self.mapData = options.useWorkspaceMaps ?
+                                    mapData[0].data : mapData[0].data;
+                initialize();
+            })
         }
-        if (self.fba_ws && self.fba_name) {
-            var p3 = kb.get_fba(self.fba_ws, self.fba_name);
-        }        
-        $.when(p1, p2, p3).done(function(map_data, models, fbas) {
-            self.models = (models ? [models[0].data] : undefined);
-            self.fbas = (fbas ? [fbas[0].data] : undefined);
 
-            self.map_data = map_data[0].data;
-            rxns = self.map_data.reactions;
-            cpds = self.map_data.compounds;
-            maplinks = self.map_data.linkedmaps;
-            groups = self.map_data.groups;
+        this.redraw = function(models, fbas) {
+            self.models = models;
+            self.fbas = fbas;
+        }
 
-            oset = 12, // off set for arrows
-                threshold = 2, // threshold for deciding if connection is linear
-                r = 12, // radial offset from circle.  Hooray for math degrees.
-                max_x = 0,  // used for canvas size
-                max_y = 0,  // used for canvas size
-                c_pad = 200,  // padding around max_x/max_y
-                svg = undefined;
+        function initialize() {
+            if (options.cb) options.cb();
 
-            data = []
+            var models = [];
+            var fbas = [];
+
+            rxns = self.mapData.reactions,
+            cpds = self.mapData.compounds,
+            maplinks = self.mapData.linkedmaps;
+            groups = self.mapData.groups;
+
+            /*var data = []
             for (var i in rxns) {
                 data.push({'products': rxns[i].product_refs, 'substrates': rxns[i].substrate_refs});
-            }
+            }*/
 
             self.drawMap()
-        })
-
-
-            
+        }
 
         self.drawMap = function() {
+            container.html('')
 
-            container.html('<div id="'+self.map_name+'_pathway" class="pathway"></div>');
+            if (self.image)
+                container.html('<img class="pathway-png" src="data/map/'+self.map_name+'.png">');
 
-            svg = d3.select('#'+self.map_name+'_pathway').append("svg")
-                                        .attr("width", 800)
-                                       .attr("height", 1000);
+            container.append('<div id="'+self.map_name+'-pathway" class="pathway">');
+
+            svg = d3.select('#'+self.map_name+'-pathway')
+                                    .append("svg")
+                                    .attr("width", 800)
+                                    .attr("height", 1000);
 
             // add arrow markers for use
             svg.append("svg:defs").selectAll("marker")
@@ -101,8 +130,8 @@ $.KBWidget({
                 .attr("viewBox", "0 -5 10 10")
                 .attr("refX", 16)
                 .attr("refY", 0)
-                .attr("markerWidth", 7)
-                .attr("markerHeight", 7)
+                .attr("markerWidth", 10)
+                .attr("markerHeight", 10)
                 .attr("orient", "auto")
                 .attr('fill', '#666')
               .append("svg:path")
@@ -119,21 +148,20 @@ $.KBWidget({
                 .attr('d', 'M10,-5L0,0L10,5')
                 .attr('fill', '#000');
 
-            drawConnections();
+            if (!self.image) drawConnections();
             drawReactions();
-            drawMapLinks();
+            if (!self.image) drawMapLinks();
 
 
             // addjust canvas size for map size //fixme: this could be precomputed
             svg.attr("width", max_x)
                .attr("height", max_y);
 
-            if (options.editable) {
+            if (options.editable)
                 editable()
-            }
         }
 
-       
+
         // deprecated
         function getGroups() {
             var groups = [];
@@ -157,10 +185,10 @@ $.KBWidget({
                     if (rxn2.id == rxn.id) continue;
 
                     // skip any reaction that has already been grouped
-                    if (grouped_ids.indexOf(rxn2.id) > 0) continue;                    
+                    if (grouped_ids.indexOf(rxn2.id) > 0) continue;
 
                     // if reactions share same substrates and products, add to group
-                    if (angular.equals(rxn.product_refs, rxn2.product_refs) && 
+                    if (angular.equals(rxn.product_refs, rxn2.product_refs) &&
                         angular.equals(rxn.substrate_refs, rxn2.substrate_refs)) {
                         group.push(rxn2);
                         grouped_ids.push(rxn2.id);
@@ -175,140 +203,175 @@ $.KBWidget({
 
         // draw reactions
         function drawReactions() {
+            var count = self.models.length;
 
             // for each rxn on the map
-            for (var i in rxns) {
-                var color = '#fff'
+            for (var i=0; i<rxns.length; i++) {
+                var color = '#fff',
+                    lightLabel = undefined;
 
+                // reaction object listed in map
                 var rxn = rxns[i];
 
-                var x = rxn.x - rxn.w/2,
-                    y = rxn.y - rxn.h/2,
-                    w = rxn.w+2,
-                    h = rxn.h+2;
+                // adjust boxes
+                var x = rxn.x - rxn.w/2 - 1,
+                    y = rxn.y - rxn.h/2 - 1.5,
+                    w = rxn.w + 3,
+                    h = rxn.h + 2;
+
+                // adjust canvas size
                 if (x > max_x) max_x = x+w+c_pad;
-                if (y > max_y) max_y = y+h+c_pad;                    
+                if (y > max_y) max_y = y+h+c_pad;
 
                 var group = svg.append('g').attr('class', 'rect');
 
-                // draw reactions (rectangles)
+                // draw enzymes (rectangles)
                 var outer_rect = group.append('rect')
                                   .attr('class', 'rxn')
-                                  .attr('x', x-1)
-                                  .attr('y', y-2)
+                                  .attr('x', x)
+                                  .attr('y', y)
                                   .attr('width', w)
-                                  .attr('height', h)
+                                  .attr('height', h);
 
-                found_rxns = getModelRxns(rxn.rxns);
+                var found_rxns = getModelRxns(rxn.rxns);
 
                 // divide box for number of models being displayed
                 if (self.models) {
-                    var w = rxn.w / self.models.length;
+                    var w = rxn.w / count;
 
-                    for (var i in found_rxns) {
-                        var found_rxn = found_rxns[i];
-                            var rect = group.append('rect')
-                                        .attr('x', x+(w*i))
-                                        .attr('y', y-2)
-                                        .attr('width', w)
-                                        .attr('height', h)
+                    for (var j=0; j<found_rxns.length; j++) {
+                        var found_rxn = found_rxns[j];
+
+                        var rect = group.append('rect')
+                                    .attr('class', 'rxn-divider-stroke')
+                                    .attr('x', function() {
+                                        if (j == 0) return x + (w*j) + 1;
+                                        return x + (w*j)
+                                    })
+                                    .attr('y', y+1)
+                                    .attr('width', function() {
+                                        if (j == count) return w;
+                                        return w + 2
+                                    })
+                                    .attr('height', h-1.5);
+
 
                         if (found_rxn.length > 0) {
                             rect.attr('fill', '#bbe8f9');
-                            rect.attr('stroke', stroke_color2);
-                            outer_rect.remove()
+                            rect.attr('stroke', config.strokeDark);
                         } else {
                             rect.attr('fill', '#fff')
-                        }
+                            rect.attr('stroke', config.strokeDark);
+                        };
+
+                        var title = '<h5>'+self.models[j].name+'<br>'+
+                                    '<small>'+self.models[j].source_id+'</small></h5>';
+                        tooltip(rect.node(), title, rxn);
                     }
                 }
 
-                fba_rxns = getFbaRxns(rxn.rxns);
+                // determine if fba results should be added for the map reaction
 
-
-                // color flux depending on rxns found for each modle
                 if (self.fbas) {
+                    var fba_rxns = getFbaRxns(rxn.rxns);
+                    if ([].concat.apply([], fba_rxns).length == 0 )
+                        var addFBAResults = false;
+                    else
+                        var addFBAResults = true;
+                }
+
+                // color flux depending on rxns found for each fba
+                if (addFBAResults) {
+
                     var w = rxn.w / self.fbas.length;
 
-                    for (var i in fba_rxns) {
-                        var flux;
-                        var found_rxns = fba_rxns[i];
-                        var rect = group.append('rect').attr('x', x+(w*i))
-                                        .attr('y', y-2)
-                                        .attr('width', w)
-                                        .attr('height', h)
+                    // for each fba result
+                    for (var j=0; j<fba_rxns.length; j++) {
+                        var found_rxn = fba_rxns[j];
+                        var rect = group.append('rect')
+                                    .attr('class', 'rxn-divider-stroke')
+                                    .attr('x', function() {
+                                        if (j == 0) return x + (w*j) + 1;
+                                        return x + (w*j)
+                                    })
+                                    .attr('y', y+1)
+                                    .attr('width', function() {
+                                        if (j == count) return w;
+                                        return w + 1
+                                    })
+                                    .attr('height', h-1.5)
 
-                        if (found_rxns.length) {
-                            //find largest magnitude flux
-                            flux = 0
-                            for (var j in found_rxns) {
-                                if (Math.abs(found_rxns[j].value) > Math.abs(flux) ) {
-                                    flux = found_rxns[j].value
+
+                        var flux;
+
+                        // there may be more than one fba result on a box,
+                        // so find the largest magnitude flux
+                        if (found_rxn.length > 0) {
+                            var flux = found_rxn[0].value;
+                            for (var k=1; k<found_rxn.length; k++) {
+                                if (Math.abs(found_rxn[k].value) > Math.abs(flux) ) {
+                                    flux = found_rxn[k].value;
                                 }
                             }
-        
-                        }
-    
-                        if (flux) {
-                            var color = get_heat_color(flux)
+
+                            if (Math.abs(flux) > 499)
+                                lightLabel = true;
                         }
 
-                        
-                        //$('.col-md-9').append('flux: '+ flux + ' color: '+color + '  '+JSON.stringify(found_rxns)+'<br>')
-                        //$('.col-md-9').append('rxn '+ JSON.stringify(rxn.rxns)+' color: '+ color+'<br>')
-                        rect.attr('fill', color);
-                        if (color != '#fff') {
-                            rect.attr('stroke', stroke_color2)
-                            outer_rect.remove()
+                        if (typeof flux != 'undefined') {
+                            var color = config.getColor(flux, self.options.absFlux);
+                            if (color)
+                                rect.attr('fill', color);
+                            else
+                                rect.attr('fill', config.geneColor);
                         }
+
+                        //var title = self.fbas[i].info[1];
+                        var title = '<h5>'+self.models[j].name+'<br>'+
+                                    '<small>'+self.models[j].source_id+'</small></h5>';
+                        tooltip(rect.node(), title, rxn, flux, self.fbas[j]);
                     }
-                }                
+                }  // end fbas rects
 
-                // get substrates and products
-                var subs = []
-                for (var i in rxn.substrate_refs) {
-                    subs.push(rxn.substrate_refs[i].compound_ref);
-                }
-                var prods = []
-                for (var i in rxn.product_refs) {
-                    prods.push(rxn.product_refs[i].compound_ref);
-                }
+                var text = group.append('text')
+                                .attr('x', x+2)
+                                .attr('y', y+h/2+6)
+                                .text(rxn.name)
+                                .attr('class', (lightLabel ? 'rxn-label-light' : 'rxn-label') );
 
-                // add reaction label
-                var text = group.append('text').text(rxn.name)
-                                  .attr('x', x+2)
-                                  .attr('y', y+h/2 + 2)
-                                  .attr('class', 'rxn-label')
-
-
-                //content for tooltip //fixme: need to do tooltips for each model
-                var content = 'ID: ' + rxn.id+'<br>'+
-                              'Rxns: ' + rxn.rxns.join(', ')+'<br>'+
-                              'Substrates: ' + subs.join(', ')+'<br>'+
-                              'Products: ' + prods.join(', ')+'<br><br>'+
-                              'Flux: '+ (flux ? flux : 'None');
-
-
-                $(group.node()).popover({html: true, content: content, animation: false,
-                                        container: 'body', trigger: 'hover'});
-
-                // hide and show text on hoverover
                 $(group.node()).hover(function() {
-                    if ($('[data-type=rxn-label]').attr('checked')) {
-                        $(this).find('text').hide();
-                    }
+                    $(this).find('text').hide();
                 }, function() {
-                    if ($('[data-type=rxn-label]').attr('checked')) {
-                        $(this).find('text').show();
-                    }
+                    $(this).find('text').show();
                 })
+            } // end loop
+        }
+
+
+        function tooltip(container, title, mapRxn, flux, obj) {
+            // get substrates and products
+            var subs = [];
+            for (var i in mapRxn.substrate_refs) {
+                subs.push(mapRxn.substrate_refs[i].compound_ref);
+            }
+            var prods = [];
+            for (var i in mapRxn.product_refs) {
+                prods.push(mapRxn.product_refs[i].compound_ref);
             }
 
-            // bad attempt at adding data for use later
-            //var rects = svg.selectAll("rect");
-            //rects.data(data);
+            //content for tooltip
+            var content = '<table class="table table-condensed">'+
+                              (typeof flux != 'undefined' ?
+                              '<tr><td><b>Flux</b></td><td>'+flux+'</td></tr>' : '')+
+                              '<tr><td><b>Map RXN ID</b></td><td>'+mapRxn.id+'</td></tr>'+
+                              '<tr><td><b>Rxns</b></td><td>'+ mapRxn.rxns.join(', ')+'</td></tr>'+
+                              '<tr><td><b>Substrates</b></td><td>'+subs.join(', ')+'</td></tr>'+
+                              '<tr><td><b>Products</b></td><td>'+prods.join(', ')+'</td></tr>'+
+                           '</table>'
+
+            $(container).popover({html: true, content: content, animation: false, title: title,
+                                  container: 'body', trigger: 'hover'});
         }
-       
 
         function drawCompounds() {
             for (var i in cpds) {
@@ -323,8 +386,8 @@ $.KBWidget({
 
                 var content = 'ID: ' + cpd.id+'<br>'+
                               'kegg id: ' + cpd.name;
-                $(circle.node()).popover({html: true, content: content, animation: false,
-                                        container: 'body', trigger: 'hover'});
+                //$(circle.node()).popover({html: true, content: content, animation: false,
+                //                        container: 'body', trigger: 'hover'});
             }
         }
 
@@ -354,7 +417,7 @@ $.KBWidget({
                 var prods = rxn.product_refs;
                 var subs = rxn.substrate_refs;
 
-                // draw substrate lines
+                // create substrate line (links)
                 for (var i in subs) {
                     var sub_id = subs[i].id
 
@@ -365,25 +428,25 @@ $.KBWidget({
                         if (cpd.id != sub_id ) continue;
 
                         var id = cpd.id
-                        
-                        // if node has already been created, 
+
+                        // if node has already been created,
                         // create link from that node.  Otherwise, create new node and link.
                         if (node_ids.indexOf(id) != -1) {
 
                             // create link from existing node to next node
-                            links.push({source: node_ids.indexOf(id), target: nodes.length, 
+                            links.push({source: node_ids.indexOf(id), target: nodes.length,
                                         value: 1, cpd_id: id, group_index: j, rxns:model_rxns,
-                                        line_type: 'substrate'}); 
+                                        line_type: 'substrate'});
 
                             // if there is a special path to draw the line on,
                             // draw nodes and links along path.
-                            if (group.substrate_path) { 
+                            if (group.substrate_path) {
                                 var path = group.substrate_path;
-                                links.push({source: nodes.length, target: nodes.length+1, 
+                                links.push({source: nodes.length, target: nodes.length+1,
                                             value: 1, cpd_id: id, group_index: j, rxns: model_rxns,
-                                            line_type: 'substrate'}); 
+                                            line_type: 'substrate'});
                                 for (var k=1; k < path.length; k++) {
-                                    nodes.push({x:path[k][0], y: path[k][1], fixed: true, 
+                                    nodes.push({x:path[k][0], y: path[k][1], fixed: true,
                                                 style: 'point'});
                                     node_ids.push('null');
                                 }
@@ -394,8 +457,8 @@ $.KBWidget({
 
                         }  else {
                             links.push({source: nodes.length, target: nodes.length+1, value: 1,
-                                        cpd_id: id, group_index: j, line_type: 'substrate', rxns:model_rxns}); 
-                            nodes.push({x: cpd.x, y:cpd.y, fixed: true, type: 'compound', 
+                                        cpd_id: id, group_index: j, line_type: 'substrate', rxns:model_rxns});
+                            nodes.push({x: cpd.x, y:cpd.y, fixed: true, type: 'compound',
                                         name: cpd.label, cpd_index: k, rxns: model_rxns,
                                         label_x: cpd.label_x, label_y: cpd.label_y});
                             nodes.push({x:x, y:y, fixed: true, style: 'reaction'});
@@ -405,7 +468,7 @@ $.KBWidget({
                     }
                 }
 
-                // draw product lines
+                // create product lines (links)
                 for (var i in prods) {
                     var prod_id = prods[i].id
 
@@ -419,17 +482,17 @@ $.KBWidget({
                         // if there is a special path to draw the line on,
                         // draw nodes and links along path.
                         if (node_ids.indexOf(id) != -1 ) {
-                            links.push({source: nodes.length, target: node_ids.indexOf(id), 
+                            links.push({source: nodes.length, target: node_ids.indexOf(id),
                                         value: 1, type: 'arrow', cpd_id: id, group_index: j,
                                         line_type: 'product', rxns:model_rxns})
 
-                            if (group.product_path) { 
+                            if (group.product_path) {
                                 var path = group.product_path;
-                                links.push({source: nodes.length-1, target: nodes.length, 
+                                links.push({source: nodes.length-1, target: nodes.length,
                                        value: 1, cpd_id: id, group_index: j,
-                                       line_type: 'product', rxns:model_rxns});                                 
+                                       line_type: 'product', rxns:model_rxns});
                                 for (var k=1; k < path.length; k++) {
-                                    nodes.push({ x:path[k][0], y: path[k][1], fixed: true, 
+                                    nodes.push({ x:path[k][0], y: path[k][1], fixed: true,
                                                 style: 'point'});
                                     node_ids.push('null');
                                 }
@@ -439,40 +502,40 @@ $.KBWidget({
                             }
 
                         } else {
-                            links.push({source: nodes.length, target: nodes.length+1, 
+                            links.push({source: nodes.length, target: nodes.length+1,
                                         value: 1, type: 'arrow', cpd_id: id, group_index: j,
                                         line_type: 'product', rxns:model_rxns})
                             nodes.push({ x: x, y:y, fixed:true, style:'reaction'})
-                            nodes.push({ x:cpd.x, y:cpd.y, fixed: true, style: 'compound', 
+                            nodes.push({ x:cpd.x, y:cpd.y, fixed: true, style: 'compound',
                                          name: cpd.label, cpd_index: k,
                                          label_x: cpd.label_x, label_y: cpd.label_y})
                             node_ids.push('null');
                             node_ids.push(id);
                         }
                     }
-                }          
-            } 
-
+                }
+            }
 
             // the following does all the drawing
-            force = d3.layout.force()
-                            .nodes(nodes)
-                            .links(links)
-                            .charge(-400)
-                            .linkDistance(40)
-                            .on('tick', tick)
-                            .start()
+            var force = d3.layout.force()
+                          .nodes(nodes)
+                          .links(links)
+                          .charge(-400)
+                          .linkDistance(40)
+                          .on('tick', tick)
+                          .start()
 
             // define connections between compounds and reactions (nodes)
             var link = svg.selectAll(".link")
                   .data(links)
                 .enter().append("g").append('line')
                   .attr("class", "link")
-                  .style("stroke-width", stroke_width)
-                  .style('stroke', function(d) {
+
+                  /*.style('stroke', function(d) {
                         c = '#666';
-    
+
                         // if there is fba data, color lines
+
                         if (self.fbas) {
                             // fixme: this only works for one model
                             var found_rxns = getFbaRxns(d.rxns)[0]
@@ -491,13 +554,13 @@ $.KBWidget({
                                     var c = '#FF3333';
                                 } else if (-1*flux > flux_threshold) {
                                     var c = '#33AD33';
-                                } 
+                                }
                                 return c;
                             }
                         } else {
                             return c;
                         }
-                  })
+                  })*/
 
             var node = svg.selectAll(".node")
                   .data(nodes)
@@ -506,16 +569,18 @@ $.KBWidget({
                   .call(force.drag)
 
             node.append("circle")
-                  .attr('fill', '#fff')
-                  .style('stroke-width', stroke_width)
-                  .attr('stroke', stroke_color)
+                .attr('class', 'cpd')
 
+            //fix me!  tranform dep?
             node.append("text")
                 .attr("class", "cpd-label")
                 .attr("x", 10)
                 .attr("dy", ".35em")
                 .style('font-size', '8pt')
-                .attr("transform", function(d) { return "translate(" + d.label_x + "," + d.label_y + ")"; })
+                .attr("transform", function(d) {
+                    if (d.label_x || d.label_y)
+                        return "translate(" + d.label_x + "," + d.label_y + ")";
+                })
                 .text(function(d) { return d.name; });
 
 
@@ -524,40 +589,40 @@ $.KBWidget({
                     .attr("y1", function(d) { return d.source.y; })
                     .attr("x2", function(d) { return d.target.x; })
                     .attr("y2", function(d) { return d.target.y; })
-                    .attr('marker-end', function(d) { 
+                    .attr('marker-end', function(d) {
                           if (d.type == 'arrow') {
                               return 'url(#end-arrow)'
                           } else {
                               return ''
                           }
-                    });  
+                    });
 
                 node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-            
+
                 // size the circles depending on kind of point
-                node.select('circle').attr("r", function(d) { 
-                        if (d.style == "point") {
+                node.select('circle').attr("r", function(d) {
+                        if (d.style == "point")
                             return 0;
-                        } else if (d.style == "reaction") {
+                        else if (d.style == "reaction")
                             return 1;
-                        } else {
+                        else
                             return 7;
-                        }
                     })
-            };                  
+            };
 
         } // end draw connections
 
         function drawMapLinks() {
-            for (var i in maplinks) {
+            for (var i=0; i<maplinks.length; i++) {
                 var map = maplinks[i];
 
                 var x = map.x - map.w/2,
                     y = map.y - map.h/2,
                     w = parseInt(map.w)+2,
                     h = parseInt(map.h)+2;
+
                 if (x > max_x) max_x = x+w+c_pad;
-                if (y > max_y) max_y = y+h+c_pad;                          
+                if (y > max_y) max_y = y+h+c_pad;
 
                 var group = svg.append('g');
 
@@ -576,11 +641,10 @@ $.KBWidget({
                                   .attr('x', x+2)
                                   .attr('y', y+10)
                                   .call(wrap, w+2);
-
             }
-        
+
         }
-        
+
 
 
         function wrap(text, width) {
@@ -611,26 +675,24 @@ $.KBWidget({
             });
         }
 
-       
-
 
         function getModelRxns(rxn_ids) {
-            // get a list of rxn objects (or undefined) 
-            // for each model supplied          
+            // get a list of rxn objects (or undefined)
+            // for each model supplied
 
-            // this is a list of lists, where is list are rxnobjs 
+            // this is a list of lists, where is list are rxnobjs
             // for each model for a given set of rxn_ids.  phew.
             var found_rxns = [];
 
             // for each model, look for model data
             for (var j in self.models) {
                 var model = self.models[j];
-                rxn_objs = model.modelreactions;
+                var rxn_objs = model.modelreactions;
 
                 // see if we can find the rxn in that model's list of reactions
                 var found_rxn = [];
                 for (var i in rxn_objs) {
-                    rxn_obj = rxn_objs[i];
+                    var rxn_obj = rxn_objs[i];
                     if (rxn_ids.indexOf(rxn_obj.id.split('_')[0]) != -1) {
                         found_rxn.push(rxn_obj);
                     }
@@ -638,59 +700,33 @@ $.KBWidget({
 
                 found_rxns.push(found_rxn); // either an raction object or undefined
             }
-        
+
             return found_rxns;
         }
 
         function getFbaRxns(rxn_ids) {
-            // get a list of fba arrays (or undefined) 
-            // for each model supplied          
+            // get a list of fba arrays (or undefined)
+            // for each model supplied
             var found_rxns = [];
 
-            // for each model, look for model data
-
-            for (var j in self.fbas) {
+            // for each fba, look for model data
+            for (var j=0; j<self.fbas.length; j++) {
                 var fba = self.fbas[j];
-                console.log(fba)
+                //if (!fba) continue;
                 fba_objs = fba.FBAReactionVariables;
 
                 // see if we can find the rxn in that fbas's list of reactions
                 var found_rxn = [];
 
                 for (var i in fba_objs) {
-                    fba_obj = fba_objs[i];
-                    if (rxn_ids.indexOf(fba_obj.modelreaction_ref.split('/')[5].split('_')[0]) != -1) {
+                    var fba_obj = fba_objs[i];
+                    if (rxn_ids.indexOf(fba_obj.modelreaction_ref.split('/')[5].split('_')[0]) != -1)
                         found_rxn.push(fba_obj);
-                    }
                 }
 
                 found_rxns.push(found_rxn); // either an reaction object or undefined
             }
             return found_rxns;
-        }
-
-        function get_heat_color(flux) {
-            if (flux >= 100){
-                var color = heat_colors[0];
-            } else if (flux >= 50) {
-                var color = heat_colors[1];
-            } else if (flux >= 10) {
-                var color = heat_colors[2];
-            } else if (flux >= 5) {
-                var color = heat_colors[3];
-            } else if (flux <= -5) {
-                var color = neg_heat_colors[0]
-            } else if (flux <= -10) {
-                var color = neg_heat_colors[1]
-            } else if (flux <= -50) {
-                var color = neg_heat_colors[2]
-            } else if (flux <= -100) {
-                var color = neg_heat_colors[3]
-            } else {
-                var color = '#fff';
-            }
-
-            return color;
         }
 
 
@@ -821,7 +857,7 @@ $.KBWidget({
                 var x = c[0];
                 var y = c[1];
                 $('#x-pos').html(x);
-                $('#y-pos').html(y); 
+                $('#y-pos').html(y);
             });
             container.prepend(edit_opts)
 
@@ -839,7 +875,7 @@ $.KBWidget({
                         $(this).attr('checked', false)
                     } else {
                         svg.selectAll('.'+type).style('display', 'block')
-                        $(this).attr('checked', true)        
+                        $(this).attr('checked', true)
                     }
                 })
             })
@@ -863,11 +899,11 @@ $.KBWidget({
                 dragmove(this)
               });
 
-            
+
             svg.selectAll('.link').on('click', function(){
                 $('.first, .last, .middle').remove()
                 editLine(this);
-                edit_opts.find('.btn-map-save').addClass('btn-primary')                
+                edit_opts.find('.btn-map-save').addClass('btn-primary')
             })
 
             svg.selectAll('.cpd-label').on('click', function(){
@@ -889,7 +925,7 @@ $.KBWidget({
             function editLabel(label) {
                 var label = d3.select(label)
                             .call(drag)
-                label.attr('fill', highlight)
+                label.attr('fill', config.highlight)
                      .attr('class', 'edited-label')
             }
 
@@ -897,15 +933,15 @@ $.KBWidget({
                 var line = d3.select(line)
 
                 // highlight line
-                line.attr('stroke', highlight)
-                    .attr('fill', highlight)
+                line.attr('stroke', config.highlight)
+                    .attr('fill', config.highlight)
                     .attr('stroke-width', 2);
-                
-                // getting start and end of line    
-                var x1 = line.attr('x1')
-                var y1 = line.attr('y1')
-                var x2 = line.attr('x2') 
-                var y2 = line.attr('y2')
+
+                // getting start and end of line
+                var x1 = line.attr('x1'),
+                    y1 = line.attr('y1'),
+                    x2 = line.attr('x2'),
+                    y2 = line.attr('y2');
                 var g = line.node().parentNode
 
                 // start, draggalbe circle
@@ -919,7 +955,7 @@ $.KBWidget({
                  .transition()
                       .duration(750)
                       .ease("elastic")
-                      .attr("r", 8)  
+                      .attr("r", 8)
 
 
                 // end, dragable circle
@@ -933,15 +969,15 @@ $.KBWidget({
                  .transition()
                       .duration(750)
                       .ease("elastic")
-                      .attr("r", 8)   
-             
+                      .attr("r", 8)
+
 
                 // when clicking on selected line, divide into two lines.
                 line.on('click', function() {
                     // add class to denoted edited lines
                     d3.select(g).attr('class', 'edited-line')
 
-                    d3.event.stopPropagation(); 
+                    d3.event.stopPropagation();
                     // get position of new circle
                     var x = d3.mouse(this)[0];
                     var y = d3.mouse(this)[1];
@@ -949,7 +985,7 @@ $.KBWidget({
                     var type = d3.select(this).data()[0].type
 
                     // remove old line
-                    d3.select(this).remove() 
+                    d3.select(this).remove()
 
                     // add new lines
                     var line1 = d3.select(g).append("line")
@@ -984,7 +1020,7 @@ $.KBWidget({
                          .transition()
                               .duration(750)
                               .ease("elastic")
-                              .attr("r", 8)              
+                              .attr("r", 8)
                 })
             }
         }
@@ -993,7 +1029,7 @@ $.KBWidget({
         function saveMap() {
             var new_map = $.extend({}, self.map_data)
 
-            // get data on edited lines 
+            // get data on edited lines
             var g = svg.selectAll('.edited-line');
             g.each(function(d, i){
                 var l1 = d3.select(this).select('.line1');
@@ -1021,7 +1057,7 @@ $.KBWidget({
 
             })
 
-            // get data on edited compound labels 
+            // get data on edited compound labels
             var labels = svg.selectAll('.edited-label');
             labels.each(function(d, i){
                 var l = d3.select(this)
@@ -1041,14 +1077,14 @@ $.KBWidget({
                 cpds[cpd_index].label_y = y
             })
 
-            // have to get meta data to resave object 
-            var prom = kb.ws.get_object_info([{workspace: self.workspace, 
+            // have to get meta data to resave object
+            var prom = kb.ws.get_object_info([{workspace: self.workspace,
                                                name: self.map_name}], 1)
             $.when(prom).done(function(data) {
                 var metadata = data[0][10];
                 // saving object to workspace
-                var p = kb.ws.save_object({'workspace': self.workspace, 
-                        'data': new_map, 
+                var p = kb.ws.save_object({'workspace': self.workspace,
+                        'data': new_map,
                         'id': self.map_name,
                         'type': 'KBaseBiochem.MetabolicMap',
                         'metadata': metadata
@@ -1084,11 +1120,11 @@ $.KBWidget({
             if (d3.select(d).attr("class") == "first") {
                 d3.select(d.parentNode).select('line').attr("x1", x);
                 d3.select(d.parentNode).select('line').attr("y1", y);
-            } else if ( (d3.select(d).attr("class") == "middle")) {               
+            } else if ( (d3.select(d).attr("class") == "middle")) {
                 d3.select(d.parentNode).select('.line1').attr("x2", x);
                 d3.select(d.parentNode).select('.line1').attr("y2", y);
                 d3.select(d.parentNode).select('.line2').attr("x1", x);
-                d3.select(d.parentNode).select('.line2').attr("y1", y);                 
+                d3.select(d.parentNode).select('.line2').attr("y1", y);
             } else {
                 d3.select(d.parentNode).select('line').attr("x2", x);
                 d3.select(d.parentNode).select('line').attr("y2", y);
@@ -1099,8 +1135,8 @@ $.KBWidget({
         function splines() {
 
             var width = 960,
-                height = 500;            
-                
+                height = 500;
+
             var points = d3.select('line').each(function() {
                 var x1 = d3.select(this).attr('x1')
                 var y1 = d3.select(this).attr('y1')
@@ -1241,86 +1277,5 @@ $.KBWidget({
     }  //end init
 
 })
-});
-
-
-
-
-
-
-    // for when centers are "on" the same x axis, don't offset the y, etc
-    /*var g = svg.append('g').attr('class', 'line')
-    var line = g.append("line")
-             .attr("x1", x)
-             .attr("y1", y)
-             .attr("stroke-width", stroke_width)
-             .attr("stroke", stroke_color)
-             .attr("fill", stroke_color)
-             .attr('marker-end', "url(#end-arrow)");                                     
-    if (Math.abs(cpd.x-x) < threshold) {
-        var line = line.attr("x2", cpd.x)
-                       .attr("y2", (cpd.y  > y ? cpd.y-oset : cpd.y+oset));
-    } else if (Math.abs(cpd.y-y) < threshold) {
-        var line = line.attr("x2", (cpd.x  > x ? cpd.x-oset : cpd.x+oset))
-                       .attr("y2", cpd.y);
-    } else { 
-        var d = Math.abs( Math.sqrt( Math.pow(cpd.y - y,2)+Math.pow(cpd.x - x,2) ) )
-        var line = line.attr("x2", cpd.x - (r/d)*(cpd.x - x) )
-                       .attr("y2", cpd.y - (r/d)*(cpd.y - y) )
-    } */
-
-
-
-
-                        // for when centers are "on" the same x axis, don't off setthe y, etc
-                        /*
-                        var g = svg.append('g').attr('class','line')                      
-                        var line = g.append("line").attr("x2", x)
-                                 .attr("y2", y)
-                                 .attr("stroke-width", stroke_width)
-                                 .attr("stroke", stroke_color)
-                                 .attr("fill", stroke_color);
-
-                        if (Math.abs(cpd.x-x) < threshold) {
-                            var line = line.attr("x1", cpd.x)
-                                           .attr("y1", (cpd.y  > y ? cpd.y-oset : cpd.y+oset) )
-                        } else if (Math.abs(cpd.y-y) < threshold) {
-                            var line = line.attr("x1", (cpd.x  > x ? cpd.x-oset : cpd.x+oset))
-                                          .attr("y1", cpd.y );
-                        } else { 
-                            var d = Math.abs( Math.sqrt( Math.pow(cpd.y - y,2)+Math.pow(cpd.x - x,2) ) ); 
-                            var line = line.attr("x1", cpd.x - (r/d)*(cpd.x - x) )
-                                           .attr("y1", cpd.y - (r/d)*(cpd.y - y) )
-                        }
-                        */
-   /*
-                svg.on('click', function() {
-                    var x = d3.mouse(this)[0];
-                    var y = d3.mouse(this)[1];
-                    console.log(d3.mouse(this))
-                    svg.append("circle")
-                      .attr("r", 1e-6)
-                      .attr("cx", x)
-                      .attr("cy", y)
-                      .style("fill", "#F00")
-                      .attr('fill-opacity', .3)
-                      .attr('stroke', '#000')
-                      .attr('stroke-width', 1)                                           
-                    .transition()
-                      .duration(750)
-                      .ease("elastic")
-                      .attr("r", 6.5)
-
-
-                    var g = svg.append('g').attr('class', 'line');
-                    var line = g.append("line")
-                                 .attr("x1", x2)
-                                 .attr("y1", y2)
-                                 .attr("x2", x)
-                                 .attr("y2", y)
-                                 .attr("stroke-width", stroke_width)
-                                 .attr("stroke", stroke_color)
-                                 .attr("fill", stroke_color)
-                                 .attr('marker-end', "url(#end-arrow)")
-                })*/
+}( jQuery ) );
 

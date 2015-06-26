@@ -3,11 +3,8 @@
  *  Directives
  *
  *  These can be thought of as the 'widgets' on a page.
- *  Scope comes from the controllers.
  *
 */
-
-
 angular.module('lp-directives', []);
 angular.module('lp-directives')
 .directive('kbTables', function($rootScope) {

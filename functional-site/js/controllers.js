@@ -16,135 +16,48 @@ app.controller('KBaseTables', function($scope, $stateParams) {
                    kind: $stateParams.type.split('.')[1]};
 
 })
+.controller('KBaseExamples', function($scope, $stateParams) {
+    $scope.tab = "Narrative Examples";
+
+    // order in which examples are dsiplayed
+    $scope.typeOrder = ['KBaseSearch.GenomeSet',
+                        'KBaseBiochem.Media',
+                        'KBaseFBA.FBAModel',
+                        'KBaseFBA.FBA',
+                        'KBasePhenotypes.PhenotypeSet',
+                        'KBasePhenotypes.PhenotypeSimulationSet']
+
+    // example objects from KBaseExampleData
+    kb.ws.list_objects({workspaces: ['KBaseExampleData']})
+        .done(function(data){
+            var examples = {}; // by type
+            data.forEach(function(obj) {
+                var type = obj[2].split('-')[0],
+                    name = obj[1],
+                    ws = obj[7];
 
 
-.controller('Analysis', function($scope, $state, $stateParams, $location, narrative, $http) {
-    // service for narrative (builder) state
-    $scope.narrative = narrative;
+                if (type in examples)
+                    examples[type].push({obj: name, ws: ws});
+                else
+                    examples[type] = [{obj: name, ws: ws}];
+            })
 
-    // selected workpsace
-    $scope.ddSelected = narrative.current_ws;
-    $scope.ws = $scope.ddSelected; // scope.ws variable for workspace browser
-
-    // let's make this happen:
-    // http://ngmodules.org/modules/angularjs-json-rpc
-    if (!narrative.ws_objects) {
-        var p = kb.ws.list_objects({workspaces: [$scope.ddSelected]});
-        $.when(p).done(function(data){
             $scope.$apply(function() {
-                narrative.ws_objects = data;
-
-                var types = {};
-                for (var i in data) {
-                    var type = data[i][2].split('-')[0];
-                    var obj = {name: data[i][1], id: data[i][0]};
-
-                    if (type in types) {
-                        types[type].push(obj);
-                    } else {
-                        types[type] = [obj];
-                    }
-                }
-
-                narrative.wsObjsByType = types
+                $scope.examples = examples;
             })
         })
-    }
 
-    var prom = kb.ws.list_workspace_info({perm: 'w'});
-    $.when(prom).then(function(workspaces){
-        var workspaces = workspaces.sort(compare)
-
-        function compare(a,b) {
-            var t1 = kb.ui.getTimestamp(b[3])
-            var t2 = kb.ui.getTimestamp(a[3])
-            if (t1 < t2) return -1;
-            if (t1 > t2) return 1;
-            return 0;
-        }
-
-        var ws_list = [];
-        for (var i in workspaces) {
-            ws_list.push({name: workspaces[i][1], id: workspaces[i][0]})
-        }
-
-        $scope.$apply(function() {
-            narrative.ws_list = ws_list
-        })
-    });
-
-    // update workspace objects if dropdown changes
-    $scope.$watch('ddSelected', function(new_ws) {
-        var p = kb.ws.list_objects({workspaces: [new_ws]});
-        $.when(p).done(function(data){
-            $scope.$apply(function() {
-                narrative.ws_objects = data;
-
-                // if newly selected workspace is not the same
-                // as current, go to workspace browser view
-                if (narrative.current_ws != new_ws) {
-                    narrative.current_ws = new_ws;
-                    $state.go('analysis.objects', null, {reload: true});
-                }
-            })
-        })
-    })
-
-})
-
-.controller('Upload', function($scope, $state, $stateParams, $http) {
-    $scope.shockURL = "http://140.221.67.190:7078"
-
-    // improve by using angular http
-    $scope.uploadFile = function(files) {
-        $scope.$apply( function() {
-            $scope.uploadComplete = false;
-        })
-
-        //SHOCK.init({ token: USER_TOKEN, url: $scope.shockURL })
-        //SHOCK.upload('uploader')
-
-        var form = new FormData($('form')[0]);
-        $.ajax({
-            url: $scope.shockURL+'/node',  //Server script to process data
-            type: 'POST',
-            xhr: function() {
-                var myXhr = $.ajaxSettings.xhr();
-                if(myXhr.upload){
-                    myXhr.upload.addEventListener('progress', updateProgress, false);
-                }
-                return myXhr;
-            },
-            beforeSend: function (request) {
-                request.setRequestHeader("Authorization", SHOCK.auth_header.Authorization);
-            },
-            success: function(data) {
-                $scope.$apply(function() {
-                    $scope.uploadProgress = 0;
-                    $scope.uploadComplete = true;
-                })
-
-            },
-            error: function(e){
-                console.log('fail', e)
-            },
-            data: form,
-            cache: false,
-            contentType: false,
-            processData: false
-        });
-
-        function updateProgress (oEvent) {
-            if (oEvent.lengthComputable) {
-                var percent = oEvent.loaded / files[0].size;
-                $scope.$apply(function() {
-                    $scope.uploadProgress = Math.floor(percent*100);
-                })
-            }
-        }
-
-    }
-
+    $scope.otherExamples =
+        {'KBaseSearch.GenomeSet': [{ws: 'chenry:SingleGenomeNarrative', obj: 'Rhodobacter_Pangenome_Set'}],
+         'KBaseBiochem.Media': [{ws: 'chenry:SingleGenomeNarrative', obj: 'QuantOptMedia-Acetoin'},
+                                {ws: 'chenrydemo', obj: 'mediaexample'},
+                                {ws: 'KBaseMedia', obj: 'PlantHeterotrophicMedia'}],
+          'KBaseFBA.FBAModel': [{ws: 'nconrad:testObjects', obj: 'iBsu1103'},
+                                {ws: 'PublishedFBAModels', obj: 'iJO1366'}],
+          'KBasePhenotypes.PhenotypeSet': [{ws: 'chenrydemo', obj: 'testpheno'}],
+          'KBasePhenotypes.PhenotypeSimulationSet': [{ ws: 'dejongh:COBRA2014', obj: 'Rsp-biolog.simulation'}]
+        };
 })
 
 
@@ -157,18 +70,6 @@ app.controller('KBaseTables', function($scope, $stateParams) {
     $scope.ids = $stateParams.ids.split('&');
 })
 
-.controller('MVHelp', function($scope, $stateParams, $location) {
-    // Fixme: move out of controller
-    $('.api-url-submit').click(function() {
-        var form = $(this).parents('form');
-        var url = '/'+form.attr('type')+'/'+form.find('#input1').val();
-        if (form.find('#input2').val()) {
-            url = url+'/'+form.find('#input2').val();
-        }
-
-        $scope.$apply( $location.path( url ) );
-    });
-})
 
 .controller('GenomeDetail', function($scope, $stateParams) {
     $scope.params = {'genomeID' : $stateParams.id,
@@ -521,55 +422,6 @@ app.controller('KBaseTables', function($scope, $stateParams) {
 
 })
 
-.controller('MV', function($scope, $rootScope, $stateParams, $location, MVService) {
-    var type = $location.path().split('/')[2];
-
-    //if ($stateParams.tab == 'FBA') {
-    //    $scope.tabs[1].active = true;
-    //} else if ($stateParams.tab == "Model") {
-    //    $scope.tabs[0].active = true;
-    //}
-
-    $scope.type = type;
-    $scope.ws = $stateParams.ws;
-    $scope.id = $stateParams.id;
-
-    //$scope.name = 'loading';
-    $rootScope.org_name = 'loading';
-
-    $scope.selected = [{workspace: $scope.ws, name: $scope.id}]
-
-    $scope.fba_refs = [];
-
-    $scope.ref_obj_prom = kb.ws.list_referencing_objects($scope.selected)
-    $.when($scope.ref_obj_prom).done(function(data) {
-        // only care about first object
-        var data = data[0]
-
-        for (var i in data) {
-            var meta = data[i];
-            var type = meta[2].split('-')[0]
-
-            if (type == "KBaseFBA.FBA") {
-                $scope.fba_refs.push({ws: meta[7],
-                               name: meta[1],
-                               date: kb.ui.formateDate(meta[3]),
-                               timestamp: kb.ui.getTimestamp(meta[3])
-                              });
-            }
-        }
-
-        $scope.fba_refs.sort(compare)
-    })
-
-    //$scope.defaultMap = $stateParams.map;
-    function compare(a,b) {
-        if (a.timestamp < b.timestamp) return -1;
-        if (a.timestamp > b.timestamp) return 1;
-        return 0;
-    }
-
-})
 
 .controller('WBJSON', function($scope, $stateParams) {
     $scope.ws = $stateParams.ws;
@@ -642,41 +494,3 @@ app.controller('KBaseTables', function($scope, $stateParams) {
     $scope.params = {'type': $stateParams.type,
                      'mod': $stateParams.mod};
 })
-
-
-
-function LPHelp($scope, $stateParams, $location) {
-    // Fixme: move out of controller
-    $('.api-url-submit').click(function() {
-        var form = $(this).parents('form');
-        var url = '/'+form.attr('type')+'/'+form.find('#input1').val();
-        if (form.find('#input2').val()) {
-            url = url+'/'+form.find('#input2').val();
-        }
-        if (form.find('#input3').val()) {
-            url = url+'/'+form.find('#input3').val();
-        }
-
-        $scope.$apply( $location.path( url ) );
-    });
-}
-
-
-function ScrollCtrl($scope, $location, $anchorScroll) {
-  $scope.gotoAnchor = function (id){
-    $location.hash(id);
-    $anchorScroll();
-  }
-}
-
-
-angular.module('angular-json-rpc', []).config([ "$provide", function($provide) {
-
-    return $provide.decorator('$http', ['$delegate', function($delegate){
-            $delegate.jsonrpc = function(url, method, parameters, config){
-                var data = {"jsonrpc": "2.0", "method": method, "params": parameters, "id" : 1};
-                return $delegate.post(url, data, angular.extend({'headers':{'Content-Type': 'application/json'}}, config) );
-            };
-            return $delegate;
-        }]);
-}]);
