@@ -2,7 +2,7 @@
 
 */
 
-kb_define('kbaseChordchart',
+define('kbaseChordchart',
     [
         'jquery',
         'd3',

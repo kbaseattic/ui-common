@@ -2,7 +2,7 @@
 
 */
 
-kb_define('kbaseBarchart',
+define('kbaseBarchart',
     [
         'jquery',
         'd3',

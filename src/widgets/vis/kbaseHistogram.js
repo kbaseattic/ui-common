@@ -2,7 +2,7 @@
 
 */
 
-kb_define('kbaseHistogram',
+define('kbaseHistogram',
     [
         'jquery',
         'd3',

@@ -1,4 +1,4 @@
-kb_define('vis',
+define('vis',
     [
         'kbaseBarchart',
         'kbaseHistogram',
@@ -14,6 +14,7 @@ kb_define('vis',
         'kbaseChordchart',
         'kbaseVenndiagram',
         'kbaseJSONReflector',
+'GeneDistribution',
     ],
     function() {
 

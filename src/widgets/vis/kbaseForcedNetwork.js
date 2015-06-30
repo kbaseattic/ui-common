@@ -2,7 +2,7 @@
 
 */
 
-kb_define('kbaseForcedNetwork',
+define('kbaseForcedNetwork',
     [
         'jquery',
         'kbaseSearchControls',

@@ -2,7 +2,7 @@
 
 */
 
-kb_define('kbaseVisWidget',
+define('kbaseVisWidget',
     [
         'jquery',
         'd3',
@@ -48,6 +48,8 @@ kb_define('kbaseVisWidget',
 
             width  : '100%',
             height : '100%',
+
+            customRegions : {}
         },
 
         shouldScaleAxis : function (axis) {
@@ -660,7 +662,7 @@ kb_define('kbaseVisWidget',
             var $vis = this;
 
             var regionG = D3svg.selectAll('g')
-                .data(regions)
+                .data(regions, function (d) { return d})
                 .enter()
                     .append('g')
                         .attr('class', function(region) { return region } )
@@ -733,6 +735,10 @@ kb_define('kbaseVisWidget',
 
             if (! asName) {
                 dot = '.';
+            }
+
+            if (this.options.customRegions[region] != undefined) {
+                return dot + this.options.customRegions[region];
             }
 
             return dot + region + '-' + this.options.chartID;
