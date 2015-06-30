@@ -8,7 +8,7 @@
         <link rel="stylesheet" type="text/css" href="../ext/bootstrap/3.0.0/css/bootstrap.css" />
         <!-- jquery-ui-1.10.0.custom.css is needed for the landing page card layout, some old landing pages still use this style -->
         <link rel="stylesheet" type="text/css" href="../ext/jquery-ui/1.10.3/css/custom-theme/jquery-ui-1.10.0.custom.css">
-        
+
         <link rel="stylesheet" type="text/css" href="assets/css/dataTables.bootstrap.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/ws-browser.css" />
         <!--<link rel="stylesheet" type="text/css" href="assets/js/acute-select/acute/acute.select/acute.select.css" />-->
@@ -19,14 +19,14 @@
         <link rel="stylesheet" type="text/css" href="assets/css/sankeystyle.css" />
         <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/font-awesome-4.0.3/css/font-awesome.css" />
         <link rel="stylesheet" href="../ext/cytoscape.js/2.0.4-jmc/jquery.cytoscape.js-panzoom.css" />
-        <link rel="stylesheet" href="../ext/animate/animate.css" />                 
+        <link rel="stylesheet" href="../ext/animate/animate.css" />
         <!-- End external css -->
 
 
         <!-- kbase css -->
         <link rel="stylesheet" type="text/css" href="assets/css/kb-ui.css" />
-        <link rel="stylesheet" type="text/css" href="assets/css/kb-visualizations.css" />        
-        <link rel="stylesheet" type="text/css" href="assets/css/analysis.css" />        
+        <link rel="stylesheet" type="text/css" href="assets/css/kb-visualizations.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/analysis.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/search.css" />
         <link rel="stylesheet" type="text/css" href="assets/js/ws-widgets/style.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/nc-tour.css" />
@@ -51,7 +51,7 @@
 
             ga('create', 'UA-48256002-1', 'kbase.us');
             ga('send', 'pageview');
-          
+
 
             /**
              * A snippet of code to check the browser's version and alert the user if they're using IE <= 9.0.
@@ -82,13 +82,13 @@
 
         <!-- datatables -->
         <script src="../ext/dataTables/1.10.1/js/jquery.dataTables.min.js"></script>
-        <script src="../ext/dataTables/1.10.1/js/dataTables.colReorder.min.js"></script>                
-        <script src="../ext/dataTables/1.10.1/js/dataTables.colVis.min.js"></script>                        
+        <script src="../ext/dataTables/1.10.1/js/dataTables.colReorder.min.js"></script>
+        <script src="../ext/dataTables/1.10.1/js/dataTables.colVis.min.js"></script>
         <script src="assets/js/dataTables.bootstrap.js"></script>
         <!--<script src="assets/js/FixedHeader.min.js"></script>-->
 
 
-        <script src="assets/js/jquery.jsonview.js"></script>         
+        <script src="assets/js/jquery.jsonview.js"></script>
         <script src="assets/js/nc-tour.js"></script>
         <script src="assets/js/jquery.cookie.min.js"></script>
         <script src="assets/js/viz/raphael-min.js"></script>
@@ -96,12 +96,12 @@
         <!-- KBase client library javascript -->
         <script src="assets/js/kbclient/kbase.js"></script>
         <script src="assets/js/kbclient/workspaceDeluxe-0.2.1.js"></script>
-        <script src="assets/js/kbclient/userandjobstate.js"></script>        
+        <script src="assets/js/kbclient/userandjobstate.js"></script>
         <script src="assets/js/kbclient/wikiScraper.js"></script>
-        <script src="assets/js/kbclient/kbaseTrees.js"></script>        
+        <script src="assets/js/kbclient/kbaseTrees.js"></script>
         <script src="assets/js/kbclient/KBaseExpressionClient.js"></script>
-        <script src="assets/js/kbclient/shock.js"></script>        
-        <script src="assets/js/widgetMaxWidthCorrection.js"></script>        
+        <script src="assets/js/kbclient/shock.js"></script>
+        <script src="assets/js/widgetMaxWidthCorrection.js"></script>
 
         <!-- widgets -->
         <script src="../src/kbwidget.js"></script>
@@ -110,19 +110,23 @@
         <script src="../src/widgets/kbaseModal.js"></script>
 
         <script src="assets/js/kbasePromptNew.js"></script>
-        <script src="assets/js/ws-widgets/tabs.js"></script>
+        <script src="../src/widgets/modeling/kbaseTabs.js"></script>
         <script src="../src/widgets/kbaseLoginFuncSite.js"></script>
+
+        <!-- revised widgets -->
+        <script src="../src/widgets/modeling/KBObjects.js"></script>
+        <script src="../src/widgets/modeling/kbaseTabTable.js"></script>
+        <script src="../src/widgets/modeling/KBaseFBA.FBA.js"></script>
+        <script src="../src/widgets/modeling/KBaseFBA.FBAModel.js"></script>
+        <script src="../src/widgets/modeling/KBaseBiochem.Media.js"></script>
+        <script src="../src/widgets/modeling/KBasePhenotypes.PhenotypeSet.js"></script>
+        <script src="../src/widgets/modeling/KBasePhenotypes.PhenotypeSimulationSet.js"></script>
+        <script src="../src/widgets/modeling/KBaseSearch.GenomeSet.js"></script>
+        <script src="../src/widgets/modeling/KBaseFBA.FBAModelSet.js"></script>
+        <!-- end revised widgets -->
 
         <script src="../src/widgets/maps/kbasePathways.js"></script>
         <script src="../src/widgets/maps/kbasePathway.js"></script>
-        <script src="../src/widgets/models/kbaseModelMeta.js"></script>
-        <script src="../src/widgets/models/kbaseModelTabs.js"></script>
-        <script src="../src/widgets/models/kbaseModelCore.js"></script>     
-
-        <script src="../src/widgets/fbas/kbaseFbaTabs.js"></script>
-        <script src="../src/widgets/fbas/kbaseFbaMeta.js"></script>        
-        <script src="../src/widgets/fbas/kbaseFormulationForm.js"></script>
-        <script src="../src/widgets/fbas/kbaseRunFba.js"></script>
 
         <script src="../src/widgets/biochemistry/kbaseBioRxnTable.js"></script>
         <script src="../src/widgets/biochemistry/kbaseBioCpdTable.js"></script>
@@ -131,7 +135,9 @@
 
         <script src="../src/widgets/workspaces/kbaseWSFbaTable.js"></script>
         <script src="../src/widgets/workspaces/kbaseWSMediaTable.js"></script>
-    
+        <script src="../src/widgets/biochemistry/kbaseRxn.js"></script>
+        <script src="../src/widgets/biochemistry/kbaseCpd.js"></script>
+
         <!-- ws obj reference related widgets -->
         <script src="../ext/d3/sankey.js"></script> <!-- this is a d3 plugin -->
 
@@ -158,7 +164,7 @@
         <script  src="../src/widgets/genomes/kbaseGeneBiochemistry.js"></script>
         <script  src="../src/widgets/genomes/kbasePanGenome.js"></script>
         <script  src="../src/widgets/genomes/kbasePhenotypeSet.js"></script>
-        <script  src="../src/widgets/genomes/kbaseFunctSeqGenomeComparison.js"></script>   
+        <script  src="../src/widgets/genomes/kbaseFunctSeqGenomeComparison.js"></script>
 
 
         <!-- protein structure KB widget and associated needs here -->
@@ -168,7 +174,7 @@
         <script src="assets/js/kbclient/KBaseProteinStructureClient.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneStructureMatches.js"></script>
 
-    
+
         <script  src="../src/widgets/genomes/kbaseSimulationSet.js"></script>
         <script  src="../src/widgets/kbaseCardLayoutManager.js"></script>
 
@@ -181,11 +187,11 @@
         <script  src="../src/widgets/genomes/kbaseGenomeGeneTable.js"></script>
         <script  src="../src/widgets/genomes/kbaseGeneExprLinePlot.js"></script>
         <!-- End Genome widgets -->
-    
+
         <!-- Taxonomy widgets -->
         <script  src="../src/widgets/taxa/kbaseTaxonOverview.js"></script>
         <!-- end taxonomy widgets -->
-        
+
         <!-- Regulation widgets -->
         <script  src="../src/widgets/regulation/kbasePromConstraint.js"></script>
         <script  src="../src/widgets/regulation/kbaseRegulome.js"></script>
@@ -229,7 +235,7 @@
         <!-- MAK widgets -->
         <script  src="../src/widgets/mak/kbaseMAKResultCard.js"></script>
         <script  src="../src/widgets/mak/kbaseBarChartCard.js"></script>
-        <script  src="../src/widgets/mak/kbaseMAKTilingCard.js"></script>       
+        <script  src="../src/widgets/mak/kbaseMAKTilingCard.js"></script>
         <script  src="../src/widgets/mak/kbaseMAKBiclusterCard.js"></script>
         <script  src="../src/widgets/mak/kbaseHeatmapCard.js"></script>
         <script  src="../src/widgets/mak/kbaseLineChartCard.js"></script>
@@ -249,8 +255,8 @@
         <script src='../ext/gmaps/gmap3.js'></script>
         <script src="../src/widgets/gwas/kbaseGWASPop.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASPopTable.js"></script>
-        <script src="../src/widgets/gwas/kbaseGWASPopMaps.js"></script>        
-        <script src="../src/widgets/gwas/kbaseGWASTraitMaps.js"></script>        
+        <script src="../src/widgets/gwas/kbaseGWASPopMaps.js"></script>
+        <script src="../src/widgets/gwas/kbaseGWASTraitMaps.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASTraitTable.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASVarTable.js"></script>
         <script src="../src/widgets/gwas/kbaseGWASPopKinshipTable.js"></script>
@@ -276,7 +282,7 @@
         <script src="../src/widgets/trees/kbaseMSA.js"></script>
         <script src="lib/trees/canvastext.js"></script>
         <script src="lib/trees/excanvas.js"></script>
-        <script src="lib/trees/menu.js"></script>            
+        <script src="lib/trees/menu.js"></script>
         <script src="lib/trees/knhx.js"></script>
         <script src="lib/trees/easytree.js"></script>
 
@@ -290,36 +296,32 @@
         <!-- End Network widgets -->
 
         <!-- app -->
-        <script src="assets/js/file-upload-1.6.12/angular-file-upload-shim.min.js"></script>
         <script src="js/angular-1.2.14/angular.min.js"></script>
 
-        <script src="js/angular-1.2.14/angular-resource.min.js"></script> 
-        <script src="js/angular-1.2.14/angular-animate.min.js"></script> 
+        <script src="js/angular-1.2.14/angular-resource.min.js"></script>
+        <script src="js/angular-1.2.14/angular-animate.min.js"></script>
         <script src="js/ui-router-0.2.10/angular-ui-router.min.js"></script>
         <script src="js/ui-bootstrap-0.11.0/ui-bootstrap-tpls-0.11.0.min.js"></script>
         <script src="assets/js/file-upload-1.6.12/angular-file-upload.min.js"></script>
 
-        <script src="js/app.js"></script>        
+        <script src="js/app.js"></script>
         <script src="js/search.js"></script>
 
         <script src="js/directives/landingpages.js"></script>
         <script src="js/directives/cards.js"></script>
-        <!--<script src="js/directives/fav.js"></script>-->
-        <script src="js/directives/ws.js"></script>           
-        <script src="js/directives/trees.js"></script>        
+        <script src="js/directives/ws.js"></script>
+        <script src="js/directives/trees.js"></script>
         <script src="js/directives/narrative.js"></script>
         <script src="js/directives/autofillFix.js"></script>
         <script src="js/directives/modeling.js"></script>
-        <script src="js/directives/communities.js"></script>        
+        <script src="js/directives/communities.js"></script>
         <script src="js/controllers.js"></script>
-        <!--<script src="js/services/favorites.js"></script>-->
         <script src="js/services/workspaceUI.js"></script>
 
-        <!--<script src="assets/js/acute-select/acute/acute.select/acute.select.js"></script>         -->
-        <script src="js/services/narrativeUI.js"></script> 
+        <script src="js/services/narrativeUI.js"></script>
         <script src="js/kbapi.js"></script>
         <script src="assets/js/header.js"></script>
-        
+
         <!-- RequireJS should go after all other javascript imports -->
         <script src="../ext/requirejs/2.1.9/require.js"></script>
         <!-- end application -->
@@ -334,11 +336,11 @@
                     </a>
 
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <ul class="nav navbar-nav"> 
+                        <ul class="nav navbar-nav">
                             <!--<li class="dropdown" ng-class="{ active: $state.includes('narrative')}">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Narrative <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="#/narrative/">Newsfeed</a></li>                
+                                    <li><a href="#/narrative/">Newsfeed</a></li>
                                     <li><a href="#/narrative/projects/">Projects</a></li>
                                 </ul>
                             </li>-->
@@ -359,12 +361,12 @@
                         </ul>
 
                         <!--
-                        <ul class="nav navbar-nav"> 
+                        <ul class="nav navbar-nav">
                             <li ng-class="{ active: $state.includes('favorites')}"><a href="#/favorites/all/">Favorites <span class="badge  favorite-count"></span></a></li>
                             <li class="fav-loading"></li>
                         </ul>
                         -->
-                 
+
                         <div id="signin-button" class="pull-right"></div>
                         <ul class="nav navbar-nav pull-right">
                             <li class="dropdown help-dropdown">
@@ -374,16 +376,16 @@
                                     <!--<li><a href="#/landing-pages-help">Landing Page Documentation</a></li>-->
                                     <li><a href="http://kbase.us/get-started/data-search-quick-start/">Search Quick Start Guide</a></li>
                                     <li><a href="mailto:help@kbase.us">Email help@kbase.us</a></li>
-                                </ul>                        
+                                </ul>
                             </li>
                         </ul>
-                    </div> 
+                    </div>
                 </div>
 
                 <div id="app" ui-view></div>
 
-            </div> 
-            
+            </div>
+
             <div id="footer" class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main">
                 <ul>
                     <li><a href="//kbase.us/science/what-is-kbase/" target="_blank">About KBase</a></li>
@@ -392,10 +394,10 @@
                     <li><a href="//kbase.us/contact-us/" target="_blank">Contact Us</a></li>
                     <li><a href="http://science.energy.gov/" target="_blank"><img class="center-block" src="./assets/images/doe_sc_logo.png" /></a></li>
                 </ul>
-                
+
             </div>
         </div>
-        
+
 
     </body>
 

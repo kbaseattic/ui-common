@@ -1,4 +1,11 @@
-(function( $, undefined ) {
+define('KBaseGWASPopKinshipTable',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseAuthenticatedWidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: "KBaseGWASPopKinshipTable",
         parent: "kbaseAuthenticatedWidget",
@@ -52,4 +59,4 @@
             };
         }
     });
-})( jQuery )
+});

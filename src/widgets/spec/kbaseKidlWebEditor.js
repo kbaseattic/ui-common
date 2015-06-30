@@ -1,7 +1,13 @@
 /**
  * @author Roman Sutormin <rsutormin@lbl.gov>
- */
-(function($, undefined) {
+ */define('kbaseKidlWebEditor',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseAuthenticatedWidget'
+    ],
+    function ($) {
+
     $.KBWidget({
         name: 'kbaseKidlWebEditor',
         parent: 'kbaseAuthenticatedWidget',
@@ -117,4 +123,4 @@
                 });
         }
     });
-})( jQuery );
+});
