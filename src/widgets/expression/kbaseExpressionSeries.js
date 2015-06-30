@@ -1,7 +1,7 @@
 /**
  * Just a simple example widget to display an expression series
  * 
- */kb_define('kbaseExpressionSeries',
+ */define('kbaseExpressionSeries',
     [
         'jquery',
 	'kbwidget'

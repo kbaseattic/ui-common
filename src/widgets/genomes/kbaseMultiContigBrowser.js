@@ -34,7 +34,7 @@
  *        $("#contigStepNext").click(function()  { genomeWidget.moveRightStep(); });
  *        $("#contigZoomIn").click(function()    { genomeWidget.zoomIn(); });
  *        $("#contigZoomOut").click(function()   { genomeWidget.zoomOut(); });
- */kb_define('KBaseMultiContigBrowser',
+ */define('KBaseMultiContigBrowser',
     [
         'jquery',
 	'kbwidget'

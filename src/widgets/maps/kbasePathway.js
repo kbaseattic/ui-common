@@ -1,4 +1,4 @@
-kb_define('kbasePathway',
+define('kbasePathway',
     [
         'jquery',
 	'kbwidget'

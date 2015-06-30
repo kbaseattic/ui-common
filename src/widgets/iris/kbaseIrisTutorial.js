@@ -2,7 +2,7 @@
 
 */
 
-kb_define('kbaseIrisTutorial',
+define('kbaseIrisTutorial',
     [
         'jquery',
         'kbwidget',

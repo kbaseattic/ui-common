@@ -1,4 +1,4 @@
-kb_define('KBaseInferelatorHitsCard',
+define('KBaseInferelatorHitsCard',
     [
         'jquery',
 	'kbwidget'

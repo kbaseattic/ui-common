@@ -19,7 +19,7 @@
  *     });
  */
 
-kb_define('kbwidget', ['jquery', 'handlebars'], function ($) {
+define('kbwidget', ['jquery', 'handlebars'], function ($) {
 
     $(document).on(
         'libsLoaded.kbase',

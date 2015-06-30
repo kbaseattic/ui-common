@@ -1,4 +1,4 @@
-kb_define('kbaseDownload',
+define('kbaseDownload',
     [
         'jquery',
     	'kbwidget'

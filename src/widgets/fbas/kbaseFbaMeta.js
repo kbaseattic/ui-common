@@ -1,4 +1,4 @@
-kb_define('kbaseFbaMeta',
+define('kbaseFbaMeta',
     [
         'jquery',
 	'kbwidget'

@@ -1,4 +1,4 @@
-kb_define('KBaseInferelatorRunResultCard',
+define('KBaseInferelatorRunResultCard',
     [
         'jquery',
 	'kbwidget'

@@ -1,7 +1,7 @@
 /**
  * Shows a species description taken from Wikipedia.
  * Also includes a picture, but that'll be under a tab or something.
- */kb_define('KBaseTaxonOverview',
+ */define('KBaseTaxonOverview',
     [
         'jquery',
 	'kbwidget'

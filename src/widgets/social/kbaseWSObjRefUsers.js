@@ -1,4 +1,4 @@
-kb_define('KBaseWSObjRefUsers',
+define('KBaseWSObjRefUsers',
     [
         'jquery',
 	'kbwidget'

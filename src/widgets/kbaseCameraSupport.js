@@ -1,4 +1,4 @@
-kb_define('kbaseCameraSupport',
+define('kbaseCameraSupport',
     [
         'jquery',
     	'kbwidget'

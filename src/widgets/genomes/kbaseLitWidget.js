@@ -1,4 +1,4 @@
-kb_define('KBaseLitWidget',
+define('KBaseLitWidget',
     [
         'jquery',
 	'kbwidget'

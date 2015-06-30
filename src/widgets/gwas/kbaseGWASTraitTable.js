@@ -1,4 +1,4 @@
-kb_define('KBaseGWASTraitTable',
+define('KBaseGWASTraitTable',
     [
         'jquery',
 	'kbwidget'

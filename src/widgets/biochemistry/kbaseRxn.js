@@ -1,4 +1,4 @@
-kb_define('kbaseRxn',
+define('kbaseRxn',
     [
         'jquery',
 	'kbwidget'

@@ -3,7 +3,7 @@
 
 */
 
-kb_define('kbasePlantsNTO',
+define('kbasePlantsNTO',
     [
         'jquery',
         'kbaseIrisWidget',

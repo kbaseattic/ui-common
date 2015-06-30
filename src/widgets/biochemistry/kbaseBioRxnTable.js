@@ -1,4 +1,4 @@
-kb_define('kbaseBioRxnTable',
+define('kbaseBioRxnTable',
     [
         'jquery',
 	'kbwidget'

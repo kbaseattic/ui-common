@@ -4,7 +4,7 @@
  *
  * Gene "instance" info (e.g. coordinates on a particular strain's genome)
  * is in a different widget.
- */kb_define('KBaseGeneStructureMatches',
+ */define('KBaseGeneStructureMatches',
     [
         'jquery',
 	'kbwidget',

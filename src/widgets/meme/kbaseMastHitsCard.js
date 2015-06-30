@@ -1,4 +1,4 @@
-kb_define('KBaseMastHitsCard',
+define('KBaseMastHitsCard',
     [
         'jquery',
 	'kbwidget'

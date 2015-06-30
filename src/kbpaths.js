@@ -1,4 +1,4 @@
-    kb_define('kbpaths', [], function(paths) {
+    define('kbpaths', [], function(paths) {
         requirejs.config({
             baseUrl : 'src/widgets',
             urlArgs: "bust=" + (new Date()).getTime(),
@@ -189,6 +189,7 @@
 				'kbaseMSA'                          : 'trees/kbaseMSA',
 				'kbaseTree'                         : 'trees/kbaseTree',
 				'kbaseBarchart'                     : 'vis/kbaseBarchart',
+				'GeneDistribution'                 : 'vis/GeneDistribution',
 				'kbaseChordchart'                   : 'vis/kbaseChordchart',
 				'kbaseCircularHeatmap'              : 'vis/kbaseCircularHeatmap',
 				'kbaseForcedNetwork'                : 'vis/kbaseForcedNetwork',

@@ -3,7 +3,7 @@
 
 */
 
-kb_define('CDMI_API',
+define('CDMI_API',
     [
         'jquery',
     ],

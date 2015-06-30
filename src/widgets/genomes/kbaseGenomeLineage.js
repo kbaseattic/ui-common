@@ -1,7 +1,7 @@
 /**
  * Shows taxonomic lineage.
  *
- */kb_define('KBaseGenomeLineage',
+ */define('KBaseGenomeLineage',
     [
         'jquery',
 	'kbwidget'

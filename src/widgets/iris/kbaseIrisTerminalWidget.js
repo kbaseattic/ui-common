@@ -3,7 +3,7 @@
 
 */
 
-kb_define('kbaseIrisTerminalWidget',
+define('kbaseIrisTerminalWidget',
     [
         'jquery',
         'kbaseIrisWidget',

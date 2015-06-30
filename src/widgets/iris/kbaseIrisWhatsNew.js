@@ -3,7 +3,7 @@
 
 */
 
-kb_define('kbaseIrisWhatsNew',
+define('kbaseIrisWhatsNew',
     [
         'jquery',
         'kbwidget',

@@ -1,4 +1,4 @@
-kb_define('all',
+define('all',
     [
 	'CDMI_API',
 	'Client',

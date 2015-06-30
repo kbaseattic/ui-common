@@ -1,7 +1,7 @@
 /**
  * Just a simple example widget to display regulomes
  * 
- */kb_define('kbaseRegulome',
+ */define('kbaseRegulome',
     [
         'jquery',
 	'kbwidget'

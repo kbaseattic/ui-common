@@ -1,4 +1,4 @@
-kb_define('KBaseWSReferenceList',
+define('KBaseWSReferenceList',
     [
         'jquery',
 	'kbwidget'

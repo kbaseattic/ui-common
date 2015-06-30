@@ -1,4 +1,4 @@
-kb_define('KBaseMAKTilingCard',
+define('KBaseMAKTilingCard',
     [
         'jquery',
 	'kbwidget'

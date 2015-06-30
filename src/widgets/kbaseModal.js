@@ -7,7 +7,7 @@
         var modal = $('<div>').kbaseModal({title: 'Model Details', 
                                            rightLabel: 'Super Workspace,
                                            subText: 'kb|g.super.genome '});
-*/kb_define('kbaseModal',
+*/define('kbaseModal',
     [
         'jquery',
 	'kbwidget'

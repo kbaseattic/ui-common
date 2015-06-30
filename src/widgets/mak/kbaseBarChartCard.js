@@ -1,4 +1,4 @@
-kb_define('KBaseBarChartCard',
+define('KBaseBarChartCard',
     [
         'jquery',
 	'kbwidget'

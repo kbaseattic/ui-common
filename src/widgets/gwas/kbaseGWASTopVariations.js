@@ -1,4 +1,4 @@
-kb_define('KBaseGWASTopVariations',
+define('KBaseGWASTopVariations',
     [
         'jquery',
 	'kbwidget'

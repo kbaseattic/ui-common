@@ -1,4 +1,4 @@
-kb_define('KBaseGenomeOverview',
+define('KBaseGenomeOverview',
     [
         'jquery',
 	'kbwidget'

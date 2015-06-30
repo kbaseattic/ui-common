@@ -1,7 +1,7 @@
 /**
  * Just a simple example widget - makes a div with "Hello world!"
  * in a user-defined color (must be a css color - 'red' or 'yellow' or '#FF0000')
- */kb_define('kbaseCarousel',
+ */define('kbaseCarousel',
     [
         'jquery',
     	'kbwidget'

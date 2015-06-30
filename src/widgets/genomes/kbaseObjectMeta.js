@@ -1,7 +1,7 @@
 /**
  * Shows info for a workspace object.
  *
- */kb_define('KBaseObjectMeta',
+ */define('KBaseObjectMeta',
     [
         'jquery',
 	'kbwidget'

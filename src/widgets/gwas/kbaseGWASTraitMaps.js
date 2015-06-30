@@ -1,4 +1,4 @@
-kb_define('KBaseGWASTraitMaps',
+define('KBaseGWASTraitMaps',
     [
         'jquery',
 	'kbwidget'

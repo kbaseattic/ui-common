@@ -3,7 +3,7 @@
 
 */
 
-kb_define('kbasePlantsNetworkNarrative',
+define('kbasePlantsNetworkNarrative',
     [
         'jquery',
         'kbasePlantsNetworkTable',

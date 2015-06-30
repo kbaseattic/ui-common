@@ -67,9 +67,34 @@
                 }
 
                 require(['kbpaths'], function() {
-                    require(['jquery', 'vis',
+                    require(['jquery', 'vis', 'kbaseAccordion',
                         ], function($) {
                         $(function() {
+
+
+    var $accordion = $('#accordion').kbaseAccordion(
+        {
+            elements :
+                [
+                    {
+                        title : 'Accordion element 1',
+                        body : 'body 1'
+                    },
+                    {
+                        title : 'Accordion element 2',
+                        body : 'body 2'
+                    },
+                    {
+                        title : 'Accordion element 3',
+                        body : 'body 3'
+                    },
+                    {
+                        title : 'Accordion element 4',
+                        body : 'body 4'
+                    },
+                ]
+        }
+    );
 
 
                             var pos = getParameterByName('pos') || 'final';
@@ -231,7 +256,7 @@
                                     gradient : true,
                                     startingPosition : pos,
 
-                                    xLabel      : 'Some useful experiment',
+                                    xLabel      : 'Some useful pie chart',
                                     innerRadius : -100,
                                     //outerRadius : -105,
                                     outsideLabels : true,
@@ -606,7 +631,9 @@ transitionTime : 250,
         <!--</div>-->
         <div id = 'treeCompare'></div>
 
-        <div>
+<div id = 'accordion'></div>
+
+        <div style = 'display : block'>
             <div id = 'linechartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
             <div id = 'barchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
             <div id = 'scatterplotWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>

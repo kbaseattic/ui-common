@@ -1,4 +1,4 @@
-kb_define('kbaseRunFba',
+define('kbaseRunFba',
     [
         'jquery',
 	'kbwidget',

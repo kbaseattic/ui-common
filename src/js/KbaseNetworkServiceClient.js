@@ -3,7 +3,7 @@
 
 */
 
-kb_define('KbaseNetworkServiceClient',
+define('KbaseNetworkServiceClient',
     [
         'jquery',
     ],

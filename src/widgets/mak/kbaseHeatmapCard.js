@@ -1,4 +1,4 @@
-kb_define('KBaseHeatMapCard',
+define('KBaseHeatMapCard',
     [
         'jquery',
 	'kbwidget'

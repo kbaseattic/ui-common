@@ -1,4 +1,4 @@
-kb_define('KBaseNarrativesUsingData',
+define('KBaseNarrativesUsingData',
     [
         'jquery',
 	'kbwidget'

@@ -1,7 +1,7 @@
 /**
  * Just a simple example widget to display phenotypedata
  * 
- */kb_define('kbaseFunctGenomeComparison',
+ */define('kbaseFunctGenomeComparison',
     [
         'jquery',
 	'kbwidget',

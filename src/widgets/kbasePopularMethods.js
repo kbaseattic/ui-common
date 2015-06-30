@@ -1,4 +1,4 @@
-kb_define('kbasePopularMethods',
+define('kbasePopularMethods',
     [
         'jquery',
 	'kbwidget',

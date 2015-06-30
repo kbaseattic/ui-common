@@ -1,7 +1,7 @@
 /**
  * @author Bill Riehl <wjriehl@lbl.gov>, Roman Sutormin <rsutormin@lbl.gov>
  * @public
- */kb_define('kbaseTree',
+ */define('kbaseTree',
     [
         'jquery',
 	'kbwidget',

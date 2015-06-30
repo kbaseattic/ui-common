@@ -1,4 +1,4 @@
-kb_define('kbaseMethodDescription',
+define('kbaseMethodDescription',
     [
         'jquery',
     	'kbwidget',

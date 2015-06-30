@@ -1,4 +1,4 @@
-kb_define('iris',
+define('iris',
     [
         'kbaseIrisConfig',
         'kbaseLogin',

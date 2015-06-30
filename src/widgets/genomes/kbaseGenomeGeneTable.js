@@ -1,4 +1,4 @@
-kb_define('KBaseGenomeGeneTable',
+define('KBaseGenomeGeneTable',
     [
         'jquery',
 	'kbwidget',
