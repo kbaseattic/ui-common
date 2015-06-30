@@ -34,7 +34,7 @@ You do not yet have any collaborators. To gain collaborators, you need to create
 {% endif %}
 
 <script>
-require(['jquery', 'datatables'], function ($) {
+require(['jquery', 'datatables', 'datatables_bootstrap'], function ($) {
     $('#collaborator_table_{{env.instanceId}}').dataTable({
         initComplete: function (settings) {
             var api = this.api();

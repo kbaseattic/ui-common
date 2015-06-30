@@ -1,4 +1,4 @@
-define(['jquery', 'nunjucks', 'kb.widget.social.base', 'kb.client.methods', 'kb.client.user_profile', 'kb.session', 'kb.utils', 'q', 'underscore'],
+define(['jquery', 'nunjucks', 'kb.widget.social.base', 'kb.client.methods', 'kb.service.user_profile', 'kb.session', 'kb.utils', 'q', 'underscore'],
    function ($, nunjucks, SocialWidget, ClientMethods, UserProfileService, Session, Utils, Q, _) {
       "use strict";
       var Widget = Object.create(SocialWidget, {

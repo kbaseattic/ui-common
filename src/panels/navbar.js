@@ -105,10 +105,16 @@ define(['kb.app', 'kb.session', 'q'], function (App, Session, Q) {
         return id;
     }
     function handleSignout(e) {
+        console.log('handling sign out...');
         Session.logout()
             .then(function () {
                 App.pub('loggedout');
                 App.navigateTo('welcome');
+            })
+            .catch(function (err) {
+                console.log('ERROR');
+                console.log(err);
+                alert('Error signing out (check console for details)');
             })
             .done();
     }
@@ -224,7 +230,7 @@ define(['kb.app', 'kb.session', 'q'], function (App, Session, Q) {
                     button({id: 'kb-nav-menu',
                         class: 'btn btn-default navbar-btn kb-nav-btn',
                         'data-toggle': 'dropdown',
-                        'aria-haspopup': true}, [
+                        'aria-haspopup': 'true'}, [
                         span({class: 'fa fa-navicon'})
                     ]),
                     renderMenu()

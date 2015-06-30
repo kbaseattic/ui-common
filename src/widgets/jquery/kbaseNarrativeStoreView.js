@@ -1,3 +1,10 @@
+/*global
+    define
+ */
+/*jslint
+    browser: true,
+    white: true
+*/
 define(['jquery', 'kb.jquery.authenticatedwidget'], function ($) {
     $.KBWidget({
         name: "KBaseNarrativeStoreView",

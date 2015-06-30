@@ -5,14 +5,13 @@ define(['kb.app', 'kb.session', 'q'], function (App, Session, Q) {
             div = App.tag('div');
         App.addRoute({
             path: ['about'],
-            render: null,
             promise: function (params) {
                 return Q.promise(function (resolve) {
                     var content = [
-                        p([], 'This is all about KBase and ' + params.name),
-                        div([], [
-                            p([], 'Hi'),
-                            p([], ['Hello, ', Session.getUsername()])
+                        p('This is all about KBase.'),
+                        div([
+                            p('Hi'),
+                            p(['Hello, ', Session.getUsername()])
                         ])
                     ];
                     resolve({

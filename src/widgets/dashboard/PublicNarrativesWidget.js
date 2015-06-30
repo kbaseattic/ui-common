@@ -1,4 +1,4 @@
-define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.base', 'kb.client.methods', 'kb.session', 'kb.widget.buttonbar', 'q'],
+define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.base', 'kb.client.methods', 'kb.session', 'kb.widget.buttonbar', 'q', 'bootstrap'],
    function ($, Postal, Utils, APIUtils, DashboardWidget, KBService, Session, Buttonbar, Q) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
@@ -113,8 +113,11 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                   this.places.title.html(this.widgetTitle);
                   this.places.content.html(this.renderTemplate('unauthorized'));
                }
-               this.container.find('[data-toggle="popover"]').popover();
-               this.container.find('[data-toggle="tooltip"]').tooltip();
+               var that = this;
+                    that.container.find('[data-toggle="popover"]').popover();
+                    that.container.find('[data-toggle="tooltip"]').tooltip();
+               //this.container.find('[data-toggle="popover"]').popover();
+               //this.container.find('[data-toggle="tooltip"]').tooltip();
                return this;
             }
          },

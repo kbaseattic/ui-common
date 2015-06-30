@@ -1,4 +1,4 @@
-define(['kb.session', 'kb.config', 'kb.client.workspace', 'kb.client.narrative_method_store', 'jquery', 'lodash'], function (Session, Config, Workspace, NarrativeMethodStore, $, _) {
+define(['kb.session', 'kb.config', 'kb.service.workspace', 'kb.service.narrative_method_store', 'jquery', 'lodash'], function (Session, Config, Workspace, NarrativeMethodStore, $, _) {
     'use strict';
     // var NarrativeManager = function(options, auth, auth_cb) {
      // !! copied from kbaseNarrativeWorkspace !!

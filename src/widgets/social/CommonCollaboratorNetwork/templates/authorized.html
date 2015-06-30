@@ -32,7 +32,20 @@
 </table>
 
 <script>
-require(['jquery', 'datatables'], function ($) {
-    $('#collaborator_table_{{generatedId}}').dataTable();
+require(['jquery', 'datatables','datatables_bootstrap'], function ($) {
+    $('#collaborator_table_{{generatedId}}').dataTable({
+        initComplete: function (settings) {
+            var api = this.api();
+            var rowCount = api.data().length;
+            var pageSize = api.page.len();
+            var wrapper = api.settings()[0].nTableWrapper;
+            if (rowCount <= pageSize) {
+                $(wrapper).find('.dataTables_length').hide();
+                $(wrapper).find('.dataTables_filter').hide();
+                $(wrapper).find('.dataTables_paginate').hide();
+                $(wrapper).find('.dataTables_info').hide();
+            }
+        }
+    });
 });
 </script>

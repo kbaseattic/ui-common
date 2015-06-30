@@ -98,7 +98,7 @@
                                     workspace: obj_info[7],
                                     chsum: obj_info[8],
                                     size: obj_info[9],
-                                    meta: obj_info[10],
+                                    meta: obj_info[10]
                             };
                             self.$mainPanel.empty();
                             self.$mainPanel.append(self.getVizWidgetDiv(obj_info,self.options.sub,self.type2widget));

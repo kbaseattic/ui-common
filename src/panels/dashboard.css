@@ -183,6 +183,9 @@ and open the template in the editor.
    margin: 0;
 }
 
+/* Disable these. Widgets use a different 
+   arrow than other collapsibles
+   
 .kbase-dashboard-view [data-toggle="collapse"]::after {
   margin-left: 6px;
   font-family: "FontAwesome";
@@ -197,4 +200,14 @@ and open the template in the editor.
 }
 .kbase-dashboard-view [data-toggle="collapse"].collapsed::after {
   content: "\f054 ";
+}
+*/
+
+.kbase-dashboard-view [data-toggle="collapse"]::before {
+    display: inline-block;
+    width: 1.2em;
+}
+.kbase-dashboard-view [data-toggle="collapse"].collapsed::before {
+    display: inline-block;
+    width: 1.2em;
 }

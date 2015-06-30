@@ -1,7 +1,6 @@
-define(['jquery'], function ($) {
+define([], function () {
     'use strict';
-    return (function() {
-        
+    return (function () {
         // Routing
         var routes = [];
         function addRoute(pathSpec) {
@@ -11,17 +10,15 @@ define(['jquery'], function ($) {
              * regular expression, which case it is matched on a path component,
              * object with type:param
              */
-            
+
             routes.push(pathSpec);
-        };
-        function findRoute(path) {            
-        };
-        
+        }
+
         var defaultRoute = null;
         function setDefaultRoute(routeSpec) {
             defaultRoute = routeSpec;
         }
-        
+
         function parseQueryString(s) {
             var fields = s.split(/[\?\&]/),
                 params = {};
@@ -34,29 +31,34 @@ define(['jquery'], function ($) {
                 }
             });
             return params;
-        };
+        }
+
         function getCurrentRequest() {
-            // var path = window.location.pathname;
-            var hash = window.location.hash,
-                query = parseQueryString(window.location.search),
-                path;
-            
+            var path = [],
+                query = {};
+
             // The path is (for now) from the hash component.
-            if (hash && hash.length > 1) {
-                hash = hash.substr(1);
+            if (window.location.hash && window.location.hash.length > 1) {
+                var hash = window.location.hash.substr(1),
+                    pathQuery = hash.split('?', 2);
+
+                if (pathQuery.length === 2) {
+                    query = parseQueryString(pathQuery[1]);
+                }
+                path = pathQuery[0].split('/').filter(function (x) {
+                    return (x.length > 0);
+                });
             }
-            path = hash.split('/');
-            if (path[0].length === 0) {
-                path.shift();
-            }
+
             return {
                 path: path,
                 query: query
-            }            
-        };
+            };
+        }
+
         function findCurrentRoute() {
             var req = getCurrentRequest();
-            
+
             // Match on the path
             var foundRoute;
             for (var i = 0; i < routes.length; i += 1) {
@@ -97,13 +99,11 @@ define(['jquery'], function ($) {
                 return {
                     params: {},
                     route: defaultRoute                    
-                }
+                };
             }
             return foundRoute;
-        };
-        function removeRoute(routeSpec) {
-            
-        };
+        }
+        
         function listRoutes() {
             return routes.map(function(route) {
                 return route.path;

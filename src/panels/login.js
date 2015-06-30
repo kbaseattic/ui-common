@@ -150,10 +150,7 @@ define(['kb.app', 'kb.session', 'jquery', 'q'], function (App, Session, $, Q) {
             path: ['login'],
             promise: function (params) {
                 return Q.Promise(function (resolve) {
-                    resolve({
-                        content: renderForm(),
-                        title: 'Sign In'
-                    });
+                    resolve(renderForm());
                 });
             }
         });

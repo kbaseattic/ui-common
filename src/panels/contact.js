@@ -1,4 +1,4 @@
-define(['kb.app', 'q'], function (App, Q) {
+define(['kb.app', 'q', 'knockout'], function (App, Q, ko) {
     'use strict';
     
     function renderContactForm () {
@@ -7,41 +7,105 @@ define(['kb.app', 'q'], function (App, Q) {
             td = App.tag('td'),
             form = App.tag('form'),
             input = App.tag('input'),
-            button = App.tag('button');
+            textarea = App.tag('textarea'),
+            button = App.tag('button'),
+            span = App.tag('span'),
+            div = App.tag('div'),
+            p = App.tag('p');
         return form({}, [
-            table({border:'1'},[
-                tr({}, [
-                    td({}, [
-                        'Name'
-                    ]),
-                    td({}, [
-                        input({name:'name'})
-                    ])
+            div({class: 'panel panel-default'}, [
+                div({class: 'panel-heading'}, [
+                    span({class: 'panel-title'}, 'Contact Us')
                 ]),
-                tr({}, [
-                    td({}, [
-                        'E-Mail'
+                div({class: 'panel-body'}, [
+                    table({class: 'table', border:'1'},[
+                        tr({}, [
+                            td({}, [
+                                'Name'
+                            ]),
+                            td({}, [
+                                input({'data-bind': 'value: name'})
+                            ])
+                        ]),
+                        tr({}, [
+                            td({}, [
+                                'E-Mail'
+                            ]),
+                            td({}, [
+                                input({'data-bind': 'value: email'})
+                            ])
+                        ]),
+                        tr({}, [
+                            td({}, [
+                                'What?'
+                            ]),
+                            td({}, [
+                                textarea({'data-bind': 'value: what', style: 'width: 400px; height: 100px;'})
+                            ])
+                        ]),
+                        tr({}, [
+                            td({}),
+                            td({}, [
+                                button({type: 'submit', 'data-bind': 'click: submitForm'}, 'Submit')
+                            ])
+                        ])
                     ]),
-                    td({}, [
-                        input({name:'email'})
-                    ])
-                ]),
-                tr({}, [
-                    td({}, [
-                        'What?'
+                    table({class: 'table', border: '1'}, [
+                        tr({}, [
+                            td({}, [
+                                'Name'
+                            ]),
+                            td({}, [
+                                span({'data-bind': 'text: name'})
+                            ])
+                        ]),
+                        tr({}, [
+                            td({}, [
+                                'E-Mail'
+                            ]),
+                            td({}, [
+                                span({'data-bind': 'text: email'})
+                            ])
+                        ]),
+                        tr({}, [
+                            td({}, [
+                                'What?'
+                            ]),
+                            td({}, [
+                                 span({'data-bind': 'text: what'})
+                            ])
+                        ])
                     ]),
-                    td({}, [
-                        input({name:'what'})
-                    ])
-                ]),
-                tr({}, [
-                    td({}),
-                    td({}, [
-                        button({type:'submit'}, 'Submit')
+                    div({style: 'border: 1px red solid;'}, [
+                        p({}, [
+                           'Name: ', span({'data-bind': 'text: name', style: 'font-weight: bold; font-size: 150%;'})
+                        ]),
+                        p({}, [
+                           'E-Mail: ', span({'data-bind': 'text: email', style: 'font-weight: bold; font-size: 150%;'}) 
+                        ]),
+                        p({}, [
+                           'What?: ', span({'data-bind': 'text: what', style: 'font-weight: bold; font-size: 150%;'})
+                        ])
                     ])
                 ])
             ])
         ]);
+    }
+    
+    function ContactViewModel() {
+        // NB by using the event handler first argument, we can avoid usage of
+        // the 'this', which would also work (being bound to the object the 
+        // event handler is accessed.)
+        function submitIt(contact) {
+            var name = contact.name();
+            alert('submitting form for ' + name);
+        }
+        return {
+            name: ko.observable(''),
+            email: ko.observable(''),
+            what: ko.observable(''),
+            submitForm: submitIt
+        }
     }
     
     function setup() {
@@ -55,6 +119,13 @@ define(['kb.app', 'q'], function (App, Q) {
                         title: 'Contact Us'
                     });
                 });
+            },
+            start: function (node) {
+                var contact = ContactViewModel();
+                ko.applyBindings(contact, node);
+            },
+            stop: function (node) {
+                //
             }
         });
     };
@@ -63,6 +134,8 @@ define(['kb.app', 'q'], function (App, Q) {
     };
     function start () {
         //
+        console.log('starting');
+        ko.applyBindings(ContactViewModel());
     };
     function stop () {
         //

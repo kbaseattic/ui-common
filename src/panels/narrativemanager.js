@@ -1,4 +1,4 @@
-define(['kb.app', 'kb.service.narrativemanager', 'q'], function (App, NarrativeManagerService, Q) {
+define(['kb.app', 'kb.client.narrativemanager', 'q'], function (App, NarrativeManagerService, Q) {
     'use strict';
 
     return function () {

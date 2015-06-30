@@ -1,4 +1,13 @@
-define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router', 'postal', 'jquery', 'q'], function (AppState, StateMachine, Config, Session, Router, Postal, $, Q) {
+/**
+ * A singleton object module used for global state, and providing the primary api
+ * for panels and widgets.
+ * It is the clearinghouse for users used across the kbase app.
+ * Design principles:
+ * - expose minimal api
+ * - dependencies on services, but don't expose them
+ * 
+ */
+define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'underscore'], function (AppState, Session, Config, Router, $, Q, _) {
     'use strict';
     return (function () {
         /*
@@ -20,7 +29,7 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
                 handler.route.promise(handler.params)
                     .then(function (result) {
                         if (result.content) {
-                            mount(mountName, result.content, handler.route)
+                            mount(mountName, result, handler.route)
                             .then(function () {
                                 if (result.title) {
                                     pub('title', {title: result.title});
@@ -45,9 +54,10 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
                         } else if (result.redirect) {
                             replacePath(result.redirect);
                         }
-
                     })
                     .catch(function (err) {
+                        console.log('ERROR');
+                        console.log(err);
                         mount('app', 'Error mounting this panel.' + err);
                     })
                     .done();       
@@ -58,7 +68,7 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
                 handler.route.promise(handler.params)
                     .then(function (result) {
                         if (result.content) {
-                            mount(mountName, result.content, handler.route)
+                            mount(mountName, result, handler.route)
                             .then(function () {
                                 if (result.widgets) {
                                     Object.keys(result.widgets).forEach(function (widgetName) {
@@ -75,6 +85,8 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
                         }
                     })
                     .catch(function (err) {
+                        console.log('ERROR');
+                        console.log(err);
                         mount('app', 'Error mounting this panel.' + err);
                     })
                     .done();       
@@ -89,36 +101,51 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
                     resolve();
                 }
                 if (mountPoint.mounted && mountPoint.mounted.stop) {
-                    mountPoint.mounted.stop();
+                    mountPoint.mounted.stop($(mountPoint.mounted.id));
                 }
-
-                // This just gives us flexibility to make simple routes which
-                // just produce a string.
-                if (typeof content === 'string') {
+                
+                // Coerce the content into the content object format.
+                // This gives api users the convenience of supplying content as
+                // either a string, an array of content, or a content object.
+                if (_.isString(content)) {
                     content = {
                         content: [content],
                         events: []
                     };
-                } else if (typeof content === 'object' && content.push) {
+                } else if (_.isArray(content)) {
                     content = {
                         content: content,
                         events: []
                     };
-                } else {
-                    if (typeof content.content === 'string') {
-                        content.content = [content.content];
-                    }
+                } else if (!_.isObject(content)) {
+                    console.log('Invalid content container object');
+                    console.log(content);
+                    throw 'Invalid content container object (see console for details)';
+                }
+                
+                // Now massage just the content property
+                if (_.isString(content.content)) {
+                    content.content = [content.content];
+                } else if (content.content === null && content.content === undefined) {
+                    content.content = [];
+                } else if (!_.isArray(content.content)) {
+                    console.log('Invalid content object');
+                    console.log(content.content);
+                    throw 'Invalid content object (see console for details)';                    
                 }
 
                 mountPoint.rawContent = content.content;
                 mountPoint.events = content.events;
                 mountPoint.mounted = mounted;
+                if (!mounted.id) {
+                    mounted.id = genId();
+                }
 
                 // We make a node to hold both the content and the events.
                 // This makes it easy to throw away the node later, and lose 
                 // the events without having to manage it all.
 
-                var container = $('<div/>');
+                var container = $('<div id="'+mounted.id+'"/>');
                 content.content.forEach(function (el) {
                     container.append(el);
                 });
@@ -130,7 +157,7 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
                 $(mountPoint.element).empty().append(container);
                 
                 if (mounted && mounted.start) {
-                    mounted.start();
+                    mounted.start($('#'+mounted.id).get(0));
                 }
                 
                 resolve();
@@ -177,23 +204,143 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
         }
 
         var tags = {};
+        /**
+         * Given a simple object of keys and values, create a string which 
+         * encodes them into a form suitable for the value of a style attribute.
+         * Style attribute values are themselves attributes, but due to the limitation
+         * of html attributes, they are embedded in a string:
+         * The format is
+         * key: value;
+         * Note that values are not quoted, and the separator between fields is
+         * a semicolon
+         * Note that we expect the value to be embedded withing an html attribute
+         * which is quoted with double-qoutes; but we don't do any escaping here.
+         * @param {type} attribs
+         * @returns {String}
+         */
+        function makeStyleAttribs(attribs) {
+            if (attribs) {
+                var fields = Object.keys(attribs).map(function (key) {
+                    var value = attribs[key];
+                    if (typeof value === 'string') {
+                        return key + ':' + value;
+                    } else {
+                        // just ignore invalid attributes for now
+                        // TODO: what is the proper thing to do?
+                        return '';
+                    }
+                    return false;
+                });
+                return fields.filter(function(field) {return field?true:false;}).join(';');
+            } else {
+                return '';
+            }
+        }
+        
+        /**
+         * The attributes for knockout's data-bind is slightly different than
+         * for style. The syntax is that of a simple javascript object.
+         * property: value, property: "value", property: 123
+         * So, we simply escape double-quotes on the value, so that unquoted values
+         * will remain as raw names/symbols/numbers, and quoted strings will retain
+         * the quotes.
+         * TODO: it would be smarter to detect if it was a quoted string
+         * 
+         * @param {type} attribs
+         * @returns {String}
+         */
+        function makeDataBindAttribs(attribs) {
+            if (attribs) {
+                var fields = Object.keys(attribs).map(function (key) {
+                    var value = attribs[key];
+                    if (typeof value === 'string') {
+                        //var escapedValue = value.replace(/\"/g, '\\"');
+                        return key + ':' + value;
+                    } else if (typeof value === 'object') {
+                        return key + ': {' + makeDataBindAttribs(value) + '}';
+                    } else {
+                        // just ignore invalid attributes for now
+                        // TODO: what is the proper thing to do?
+                        return '';
+                    }
+                    return false;
+                });
+                return fields.filter(function(field) {return field?true:false;}).join(',');
+            } else {
+                return '';
+            }
+        }
+        
+        /**
+         * Given a simple object of keys and values, create a string which 
+         * encodes a set of html tag attributes.
+         * String values escape the "
+         * Boolean values either insert the attribute name or not
+         * Object values are interpreted as "embedded attributes" (see above)
+         * @param {type} attribs
+         * @returns {String}
+         */
+        function makeTagAttribs(attribs) {
+            var quoteChar = '"';
+            if (attribs) {
+                var fields = Object.keys(attribs).map(function (key) {
+                    var value = attribs[key]
+                    if (typeof value === 'object') {
+                        switch (key) {
+                            case 'style':
+                                value = makeStyleAttribs(value);
+                                break;
+                            case 'dataBind':
+                                key = 'data-bind';
+                            case 'data-bind':
+                                // reverse the quote char, since data-bind attributes 
+                                // can contain double-quote, which can't itself
+                                // be quoted.
+                                quoteChar = "'";
+                                value = makeDataBindAttribs(value);
+                                break;
+                        }                        
+                    }
+                    if (typeof value === 'string') {
+                        var escapedValue = value.replace(new RegExp('\\'+quoteChar, 'g'), '\\'+quoteChar);
+                        return key + '=' + quoteChar + escapedValue + quoteChar;
+                    } else if (typeof value === 'boolean') {                        
+                        if (value) {
+                            return key;
+                        }
+                    }
+                    return false;
+                });
+                return fields.filter(function(field) {return field?true:false;}).join(' ');
+            } else {
+                return '';
+            }
+        }
         function makeTag(tagName, options) {
             options = options || {};
             if (!tags[tagName]) {
                 tags[tagName] = function (attribs, children) {
                     var node = '<' + tagName;
-                    if (attribs && Object.keys(attribs).length > 0) {
-                        node += ' ';
-                        Object.keys(attribs).forEach(function (key) {
-                            node += key + '="' + attribs[key] + '"';
-                        });
+                    if (_.isArray(attribs)) {
+                        // skip attribs, just go to children.
+                        children = attribs;
+                    } else if (_.isString(attribs)) {
+                        // skip attribs, just go to children.
+                        children = attribs;
+                    } else if (_.isObject(attribs)) {
+                        node += ' ' + makeTagAttribs(attribs);
+                    } else if (!attribs) {
+                        // Do nothing.
+                    } else {
+                        throw 'Cannot make tag ' + tagName + ' from a ' + (typeof attribs);                        
                     }
+                    
                     node += '>';
                     if (options.close !== false) {
                         children = children || [];
                         if (typeof children === 'string') {
                             node += children;
-                        } else {
+                        } else if (typeof children === 'object') {
                             children.forEach(function (item) {
                                 node += item;
                             });
@@ -216,9 +363,11 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
             //if (window.history.pushState) {
             //    window.history.pushState(null, '', '#' + location);
             //} else {
-                console.log('new location ' + location);
                 window.location.hash = '#' + location;
             //}
+        }
+        function replacePath(location) {
+            window.location.replace(location);
         }
 
         // Very simple message system.
@@ -281,7 +430,12 @@ define(['kb.appstate', 'kb.statemachine', 'kb.config', 'kb.session', 'kb.router'
             setItem: setItem,
             getItem: getItem,
             
-            loadStyle: loadStyle
+            loadStyle: loadStyle,
+            
+            getAuthToken: Session.getAuthToken.bind(Session),
+            getUserId: Session.getUsername.bind(Session),
+            getUserRealname: Session.getRealname.bind(Session),
+            getConfig: Config.getItem.bind(Config)
         };
     }());
 });

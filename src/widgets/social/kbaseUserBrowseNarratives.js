@@ -1,4 +1,4 @@
-define(['jquery', 'kb.utils', 'kb.widget.social.base', 'kb.client.workspace', 'kb.session', 'q'],
+define(['jquery', 'kb.utils', 'kb.widget.social.base', 'kb.service.workspace', 'kb.session', 'q'],
         function ($, Utils, SocialWidget, WorkspaceService, Session, Q) {
             "use strict";
             var Widget = Object.create(SocialWidget, {
