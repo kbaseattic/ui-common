@@ -175,20 +175,13 @@ var colorScale = d3.scale.category20();
                                         var lgvID = 'lgv-' + $tree.uuid();
                                         var nodeHeight = node.getBBox().height;
 
-                                        if (d.yScale == undefined) {
-                                            d.yScale = nodeHeight / d.treeHeight
-                                        }
-                                        if (d.xScale == undefined) {
-                                            d.xScale = width / bounds.size.width;
-                                        }
-
                                         lgvSelection
                                             .enter()
                                                 .append('g')
                                                     .attr('class', lgvID)
                                                     .attr('transform',
                                                         'translate(' + ($tree.options.labelWidth + 10) + ',' + (0 - nodeHeight / 2) + ') , ' +
-                                                        'scale(' + width / bounds.size.width + ',' + nodeHeight / d.treeHeight + ')'
+                                                        'scale(' + width / bounds.size.width + ',' + nodeHeight / $tree.$elem.height() + ')'
                                                     )
                                         ;
 
