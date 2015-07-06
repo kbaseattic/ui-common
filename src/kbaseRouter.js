@@ -1,3 +1,10 @@
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true
+ */
 define([], function () {
     'use strict';
     return (function () {

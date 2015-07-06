@@ -1,7 +1,14 @@
-define(['kb.app', 'kb.session', 'jquery', 'q'], function (App, Session, $, Q) {
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true
+ */
+define(['kb.app', 'kb.html', 'kb.session', 'jquery', 'q'], function (APP, html, Session, $, Q) {
     'use strict';
 
-    var panelId = App.genId();
+    var panelId = html.genId();
 
     // This should be somewhere else, and handle all types of fields
     // I'm sure we've done this already.
@@ -47,8 +54,10 @@ define(['kb.app', 'kb.session', 'jquery', 'q'], function (App, Session, $, Q) {
             password: password
         })
             .then(function (session) {
-                App.pub('loggedin');
-                App.navigateTo('about');
+                APP.pub('loggedin');
+                /* TODO should be configurable default login location */
+                APP.pub('navigate', 'about');
+                // App.navigateTo('about');
             })
             .catch(function (errorMsg) {
                 element('running').hide();
@@ -67,7 +76,7 @@ define(['kb.app', 'kb.session', 'jquery', 'q'], function (App, Session, $, Q) {
         events = [];
     }
     function addEvent(type, handler) {
-        var id = App.genId();
+        var id = html.genId();
         events.push({
             type: type,
             selector: '#' + id,
@@ -77,15 +86,15 @@ define(['kb.app', 'kb.session', 'jquery', 'q'], function (App, Session, $, Q) {
     }
 
     function renderForm() {
-        var form = App.tag('form'),
-            input = App.tag('input'),
-            button = App.tag('button'),
-            div = App.tag('div'),
-            p = App.tag('p'),
-            h1 = App.tag('h1'),
-            legend = App.tag('legend'),
-            i = App.tag('i'),
-            a = App.tag('a');
+        var form = html.tag('form'),
+            input = html.tag('input'),
+            button = html.tag('button'),
+            div = html.tag('div'),
+            p = html.tag('p'),
+            h1 = html.tag('h1'),
+            legend = html.tag('legend'),
+            i = html.tag('i'),
+            a = html.tag('a');
 
         // Variables for form.
         var nextPath = 'next path',
@@ -144,9 +153,9 @@ define(['kb.app', 'kb.session', 'jquery', 'q'], function (App, Session, $, Q) {
         };
     }
 
-    function setup() {
+    function setup(app) {
         // Set up routes
-        App.addRoute({
+        app.addRoute({
             path: ['login'],
             promise: function (params) {
                 return Q.Promise(function (resolve) {

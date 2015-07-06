@@ -8,12 +8,15 @@ define('kb_clients', [], function () {
 var kbClients = [
     ['narrative_method_store', 'NarrativeMethodStore'],
     ['user_profile', 'UserProfile'],
-    ['workspace', 'Workspace']
+    ['workspace', 'Workspace'],
+    ['cdmi', 'CDMI_API'],
+    ['cdmi-entity', 'CDMI_EntityAPI'],
+    ['trees', 'KBaseTrees']
 ];
 // NB need the immediate function exec below in order to avoid
 // variable capture problem with anon funcs.
 kbClients.forEach(function(client) {
-    define('kb.service.' + client[0], [], function () {
+    define('kb.service.' + client[0], ['kb.api'], function () {
         return function (c) {
             return c;
         }(window[client[1]]);
@@ -69,6 +72,13 @@ require.config({
         'd3': 'bower_components/d3/d3.min',
         'd3-sankey': 'bower_components/d3-plugins-sankey/sankey',
         'd3-sankey-css': 'bower_components/d3-plugins-sankey/sankey',
+        'jquery-svg': 'bower_components/jquery.svg/jquery.svg.min',
+        'jquery-svg-anim': 'bower_components/jquery.svg/jquery.svganim.min',
+        'jquery-svg-dom': 'bower_components/jquery.svg/jquery.svgdom.min',
+        'jquery-svg-filter': 'bower_components/jquery.svg/jquery.svgfilter.min',
+        'jquery-svg-graph': 'bower_components/jquery.svg/jquery.svggraph.min',
+        'jquery-svg-plot': 'bower_components/jquery.svg/jquery.svgplot.min',
+        'jquery-svg-graph-deviation': 'src/etc/jquery-svg-deviation',
         
         // Just style, man.
         'font-awesome': 'bower_components/font-awesome/css/font-awesome.min',
@@ -77,6 +87,11 @@ require.config({
         // ----------------
         'kb.style.bootstrap': 'css/kb-bootstrap',
         'kb.style.sankey': 'css/sankeystyle',
+        
+        // KBase Client API
+        // -------------------
+        'kb.api': 'ext/kbase-clients/kbase-client-api.min',
+        'kb.narrative': 'src/kbaseNarrative',
         
         // KBase Utils
         // ----------------------
@@ -92,6 +107,7 @@ require.config({
         'kb.logger': 'src/kbaseLogger',
         // kbase app
         'kb.appstate': 'src/kbaseAppState',
+        'kb.html': 'src/kbaseHTML',
         
         // KBase Widgets
         // -------------
@@ -132,6 +148,10 @@ require.config({
         'kb.client.workspace': 'src/clients/kbaseWorkspaceClient',
         'kb.client.methods': 'src/clients/kbaseClientMethods',
         
+        // Standalone Widgets
+        'kb.widget': 'src/widgets/Widget',
+        'kb.widget.databrowser': 'src/widgets/DataBrowser/DataBrowser',
+        
         // KBase Panels
         // ------------
         'kb.panel.about': 'src/panels/about',
@@ -147,19 +167,61 @@ require.config({
         'kb.panel.datasearch': 'src/panels/datasearch',
         'kb.panel.dataview': 'src/panels/dataview',
         'kb.panel.dataview.style': 'src/panels/dataview',
+        'kb.panel.databrowser': 'src/panels/databrowser',
         
         // KBase JQuery Plugin Widgets
         // ---------------------------
         'kb.jquery.widget': 'src/widgets/jquery/kbaseWidget',
         'kb.jquery.authenticatedwidget': 'src/widgets/jquery/kbaseAuthenticatedWidget',
+        'kb.jquery.tabs': 'src/widgets/jquery/kbaseTabs',
+        
+        
         'kb.jquery.narrativestore': 'src/widgets/jquery/kbaseNarrativeStoreView',
         // TODO: why this name for this widget?
         'kb.jquery.provenance': 'src/widgets/jquery/KBaseWSObjGraphCenteredView',
         
+        // genomes
+        'kb.jquery.genome': 'src/widgets/jquery/genomes/KBaseGenomePage',
+        'kb.jquery.genome.wideoverview': 'src/widgets/jquery/genomes/kbaseGenomeWideOverview',
+        'kb.jquery.genome.overview': 'src/widgets/jquery/genomes/kbaseGenomeOverview',
+        'kb.jquery.genome.overview.styles': 'src/widgets/jquery/genomes/kbaseGenomeOverview',
+        'kb.jquery.genome.wiki-description': 'src/widgets/jquery/genomes/kbaseWikiDescription',
+        'kb.jquery.genome.literature': 'src/widgets/jquery/genomes/kbaseLitWidget',
+        'kb.jquery.genome.genepage': 'src/widgets/jquery/genomes/kbaseGenePage',
+        'kb.jquery.genome.lineage': 'src/widgets/jquery/genomes/kbaseGenomeLineage',
+        'kb.jquery.genome.wide-taxonomy': 'src/widgets/jquery/genomes/kbaseGenomeWideTaxonomy',
+        'kb.jquery.genome.wide-assembly-annotation': 'src/widgets/jquery/genomes/kbaseGenomeWideAssemAnnot',
+        'kb.jquery.genome.multi-contig-browser': 'src/widgets/jquery/genomes/kbaseMultiContigBrowser',
+        'kb.jquery.genome.multi-contig-browser.styles': 'src/widgets/jquery/genomes/kbaseMultiContigBrowser',
+        'kb.jquery.genome.seed-functions': 'src/widgets/jquery/genomes/kbaseSEEDFunctions',
+        'kb.jquery.genome.seed-functions.styles': 'functional-site/assets/css/kbaseSEEDFunctions',
+        'kb.jquery.genome.gene-table': 'src/widgets/jquery/genomes/kbaseGenomeGeneTable',
+        'kb.jquery.genome.contig-browser-buttons': 'src/widgets/jquery/genomes/kbaseContigBrowserButtons',
+        'kb.jquery.from_narrative.annotation-set-table': 'src/widgets/jquery/from_narrative/kbaseAnnotationSetTable',
+        
+        // assembly
+        'kb.jquery.assembly.single-object-basic': 'src/widgets/jquery/assembly/kbaseSingleObjectBasicWidget',
+        'kb.jquery.assembly.assembly-input': 'src/widgets/jquery/assembly/kbaseAssemblyInput',
+        'kb.jquery.assembly.view': 'src/widgets/jquery/from_narrative/kbaseAssemblyView',
+        'kb.jquery.assembly.paired-end-library': 'src/widgets/jquery/assembly/kbasePairedEndLibrary',
+        'kb.jquery.assembly.file-paired-end-library': 'src/widgets/jquery/assembly/kbaseFilePairedEndLibrary',
+        
+        // communities
+        'kb.jquery.communities.collection': 'src/widgets/jquery/communities/kbaseCollectionView',
+        'kb.jquery.communities.functional-matrix': 'src/widgets/jquery/communities/kbaseAbundanceDataView',
+        'kb.jquery.communities.functional-profile': 'src/widgets/jquery/communities/kbaseAbundanceDataView',
+        'kb.jquery.communities.graph': 'src/widgets/jquery/communities/kbStandaloneGraph',
+        
+        // proteome comparison
+        'kb.jquery.proteome-comparison.genome-comparison': 'src/widgets/jquery/protcmp/kbaseGenomeComparison', 
+        'kb.jquery.proteome-comparison.genome-comparison-viewer': 'src/widgets/jquery/protcmp/kbaseGenomeComparisonViewer', 
+            
+
+        
         // KBase Data Visualization Widget
         // ----------------------------
-        'kb.visualizer.contigset': 'src/widgets/jquery/visualizers/contigset/kbaseContigSetView',
-        
+        'kb.jquery.contigset': 'src/widgets/jquery/contigset/kbaseContigSetView',
+
         // KBase Services
         // non-visual dependencies of plugins
         // --------------
@@ -203,7 +265,24 @@ require.config({
         
         'd3-sankey': {
             deps: ['d3', 'css!d3-sankey-css', 'css!kb.style.sankey']
+        },
+        'kb.jquery.genome.seed-functions': {
+            deps: ['css!kb.jquery.genome.seed-functions.styles']
+        },
+        'kb.jquery.genome.multi-contig-browser': {
+            deps: ['css!kb.jquery.genome.multi-contig-browser.styles']
+        },
+        'kb.jquery.genome.overview': {
+            deps: ['css!kb.jquery.genome.overview.styles']
+        },
+        'jquery-svg-graph': {
+            deps: ['jquery', 'jquery-svg']
+        },
+        'jquery-svg-graph-deviation': {
+            deps: ['jquery', 'jquery-svg-graph']
         }
+        
+
     },
     map: {
         '*': {

@@ -554,7 +554,8 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb
                                 if (err.status && err.status === 500) {
                                     // User probably doesn't have access -- but in any case we can just tell them
                                     // that they don't have access.
-                                    if (err.error.error.match(/^us.kbase.workspace.database.exceptions.NoSuchObjectException:/)) {
+                                    console.log(err);
+                                    if (err.error.match(/^us.kbase.workspace.database.exceptions.NoSuchObjectException:/)) {
                                         this.setState('status', 'notfound');
                                         this.setState('error', {
                                             type: 'client',
@@ -562,7 +563,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb
                                             shortMessage: 'This object does not exist',
                                             originalMessage: err.error.message
                                         });
-                                    } else if (err.error.error.match(/^us.kbase.workspace.database.exceptions.InaccessibleObjectException:/)) {
+                                    } else if (err.error.match(/^us.kbase.workspace.database.exceptions.InaccessibleObjectException:/)) {
                                         this.setState('status', 'denied');
                                         this.setState('error', {
                                             type: 'client',

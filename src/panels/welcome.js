@@ -1,10 +1,17 @@
-define(['kb.app', 'kb.session', 'q'], function (App, Session, Q) {
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true
+ */
+define(['kb.html', 'kb.session', 'q'], function (html, Session, Q) {
     'use strict';
-    function setup() {
-        var h1 = App.tag('h1'),
-            p = App.tag('p'),
-            div = App.tag('div');
-        App.addRoute({
+    function setup(app) {
+        var h1 = html.tag('h1'),
+            p = html.tag('p'),
+            div = html.tag('div');
+        app.addRoute({
             path: ['welcome'],
             render: null,
             promise: function (params) {

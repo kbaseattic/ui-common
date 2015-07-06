@@ -49,6 +49,7 @@
     "angular-ui-bootstrap-bower": "0.13.0",
     "font-awesome": "4.3.0",
     "angular-ui-router": "0.2.15",
-    "d3-sankey": "*"
+    "d3-sankey": "*",
+    "jquery.svg": "*"
   }
 }

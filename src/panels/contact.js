@@ -1,17 +1,23 @@
-define(['kb.app', 'q', 'knockout'], function (App, Q, ko) {
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true
+ */
+define(['kb.html', 'q', 'knockout'], function (html, Q, ko) {
     'use strict';
-    
     function renderContactForm () {
-        var table = App.tag('table'),
-            tr = App.tag('tr'),
-            td = App.tag('td'),
-            form = App.tag('form'),
-            input = App.tag('input'),
-            textarea = App.tag('textarea'),
-            button = App.tag('button'),
-            span = App.tag('span'),
-            div = App.tag('div'),
-            p = App.tag('p');
+        var table = html.tag('table'),
+            tr = html.tag('tr'),
+            td = html.tag('td'),
+            form = html.tag('form'),
+            input = html.tag('input'),
+            textarea = html.tag('textarea'),
+            button = html.tag('button'),
+            span = html.tag('span'),
+            div = html.tag('div'),
+            p = html.tag('p');
         return form({}, [
             div({class: 'panel panel-default'}, [
                 div({class: 'panel-heading'}, [
@@ -105,11 +111,11 @@ define(['kb.app', 'q', 'knockout'], function (App, Q, ko) {
             email: ko.observable(''),
             what: ko.observable(''),
             submitForm: submitIt
-        }
+        };
     }
     
-    function setup() {
-        App.addRoute({
+    function setup(app) {
+        app.addRoute({
             path: ['contact'],
             promise: function (params) {
                 return Q.promise(function (resolve) {

@@ -1,4 +1,11 @@
-define(['kb.app', 'kb.session', 'kb.widget.social.user_profile', 'kb.widget.social.user_search', 'kb.widget.social.browse_narratives', 'kb.widget.social.collaborators', 'q', 'jquery'], function (App, Session, UserProfileWidget, UserSearchWidget, NarrativeWidget, CollaboratorsWidget, Q, $) {
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true
+ */
+define(['kb.html', 'kb.session', 'kb.widget.social.user_profile', 'kb.widget.social.user_search', 'kb.widget.social.browse_narratives', 'kb.widget.social.collaborators', 'q', 'jquery'], function (html, Session, UserProfileWidget, UserSearchWidget, NarrativeWidget, CollaboratorsWidget, Q, $) {
     'use strict';
 
     function renderUserProfilePanel(params) {
@@ -8,7 +15,7 @@ define(['kb.app', 'kb.session', 'kb.widget.social.user_profile', 'kb.widget.soci
             // invoked later...
             var widgets = {};
             function addWidget(name, widget) {
-                var id = App.genId();
+                var id = html.genId();
                 var W = Object.create(widget);
                 widgets[name] = {
                     widget: W,
@@ -24,7 +31,7 @@ define(['kb.app', 'kb.session', 'kb.widget.social.user_profile', 'kb.widget.soci
             }
 
             // Render panel
-            var div = App.tag('div');
+            var div = html.tag('div');
             var panel = div({class: 'kbase-view kbase-user-page-view container-flud', 'data-kbase-view': 'social'}, [
                 div({class: 'row'}, [
                     div({class: 'col-sm-9'}, [
@@ -51,15 +58,15 @@ define(['kb.app', 'kb.session', 'kb.widget.social.user_profile', 'kb.widget.soci
         });
     }
 
-    function setup() {
-        App.addRoute({
+    function setup(app) {
+        app.addRoute({
             path: ['people', {type: 'param', name: 'username'}],
             render: null,
             promise: function (params) {
                 return renderUserProfilePanel(params);
             }
         });
-        App.addRoute({
+        app.addRoute({
             path: ['people'],
             render: function (params) {
                 return 'NOT YET';

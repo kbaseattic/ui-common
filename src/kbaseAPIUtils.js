@@ -73,7 +73,23 @@ define(['kb.utils'],
             },
             makeWorkspaceObjectRef: {
                 value: function (workspaceId, objectId, objectVersion) {
-                    return workspaceId + '/' + objectId + (objectVersion ? ('/' + objectVersion) : "");
+                    return workspaceId + '/' + objectId + (objectVersion ? ('/' + objectVersion) : '');
+                }
+            },
+            buildObjectIdentity: {
+                value: function (workspaceID, objectId) {
+                    var obj = {};
+                    if (/^\d+$/.exec(workspaceID))
+                        obj['wsid'] = workspaceID;
+                    else
+                        obj['workspace'] = workspaceID;
+
+                    // same for the id
+                    if (/^\d+$/.exec(objectId))
+                        obj['objid'] = objectId;
+                    else
+                        obj['name'] = objectId;
+                    return obj;
                 }
             }
         });

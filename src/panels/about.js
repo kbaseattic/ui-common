@@ -1,9 +1,16 @@
-define(['kb.app', 'kb.session', 'q'], function (App, Session, Q) {
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true
+ */
+define(['kb.html', 'kb.session', 'q'], function (html, Session, Q) {
     'use strict';
-    function setup() {
-        var p = App.tag('p'),
-            div = App.tag('div');
-        App.addRoute({
+    function setup(app) {
+        var p = html.tag('p'),
+            div = html.tag('div');
+        app.addRoute({
             path: ['about'],
             promise: function (params) {
                 return Q.promise(function (resolve) {
@@ -21,7 +28,7 @@ define(['kb.app', 'kb.session', 'q'], function (App, Session, Q) {
                 });
             }
         });
-        App.addRoute({
+        app.addRoute({
             path: ['about', {type: 'param', name: 'name'}],
             render: function (params) {
                 return 'This is all about ' + params.name;
@@ -44,6 +51,6 @@ define(['kb.app', 'kb.session', 'q'], function (App, Session, Q) {
         setup: setup,
         teardown: teardown,
         start: start,
-        stop: stop       
+        stop: stop
     };
 });
