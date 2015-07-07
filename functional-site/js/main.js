@@ -1,5 +1,5 @@
 require(['kb.panel.narrativemanager', 'kb.panel.navbar',
-    'kb.client.profile', 'kb.session', 'kb.app', 'kb.appstate', 'jquery', 'q', 'bootstrap', 'css!font-awesome'],
+    'kb.client.profile', 'kb.session', 'kb.app', 'kb.appstate', 'jquery', 'q', 'bootstrap', 'css!font-awesome', 'domReady!'],
     function (NarrativeManagerPanel, Navbar, ProfileService, Session, App, AppState, $, Q) {
 
         function handleRoute(handler) {

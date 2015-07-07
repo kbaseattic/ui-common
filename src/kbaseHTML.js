@@ -8,7 +8,7 @@
 define(['underscore'], function (_) {
     'use strict';
     return (function () {
-  
+
         function jsonToHTML(node) {
             var nodeType = typeof node;
             if (nodeType === 'string') {
@@ -76,12 +76,14 @@ define(['underscore'], function (_) {
                     }
                     return false;
                 });
-                return fields.filter(function(field) {return field?true:false;}).join(';');
+                return fields.filter(function (field) {
+                    return field ? true : false;
+                }).join(';');
             } else {
                 return '';
             }
         }
-        
+
         /**
          * The attributes for knockout's data-bind is slightly different than
          * for style. The syntax is that of a simple javascript object.
@@ -110,12 +112,14 @@ define(['underscore'], function (_) {
                     }
                     return false;
                 });
-                return fields.filter(function(field) {return field?true:false;}).join(',');
+                return fields.filter(function (field) {
+                    return field ? true : false;
+                }).join(',');
             } else {
                 return '';
             }
         }
-        
+
         /**
          * Given a simple object of keys and values, create a string which 
          * encodes a set of html tag attributes.
@@ -144,19 +148,21 @@ define(['underscore'], function (_) {
                                 quoteChar = "'";
                                 value = makeDataBindAttribs(value);
                                 break;
-                        }                        
+                        }
                     }
                     if (typeof value === 'string') {
-                        var escapedValue = value.replace(new RegExp('\\'+quoteChar, 'g'), '\\'+quoteChar);
+                        var escapedValue = value.replace(new RegExp('\\' + quoteChar, 'g'), '\\' + quoteChar);
                         return key + '=' + quoteChar + escapedValue + quoteChar;
-                    } else if (typeof value === 'boolean') {                        
+                    } else if (typeof value === 'boolean') {
                         if (value) {
                             return key;
                         }
                     }
                     return false;
                 });
-                return fields.filter(function(field) {return field?true:false;}).join(' ');
+                return fields.filter(function (field) {
+                    return field ? true : false;
+                }).join(' ');
             } else {
                 return '';
             }
@@ -167,7 +173,7 @@ define(['underscore'], function (_) {
                     return children;
                 } else if (_.isArray(children)) {
                     var content = '';
-                    children.forEach(function (item) {                        
+                    children.forEach(function (item) {
                         content += renderContent(item);
                     });
                     return content;
@@ -202,9 +208,9 @@ define(['underscore'], function (_) {
                     } else if (_.isNull(attribs) || _.isUndefined(attribs)) {
                         children = '';
                     } else {
-                        throw 'Cannot make tag ' + tagName + ' from a ' + (typeof attribs);                        
+                        throw 'Cannot make tag ' + tagName + ' from a ' + (typeof attribs);
                     }
-                    
+
                     node += '>';
                     if (options.close !== false) {
                         node += renderContent(children);
@@ -241,7 +247,7 @@ define(['underscore'], function (_) {
                 }))
             ]);
         }
-        
+
         function bsPanel(title, content) {
             var div = tag('div'),
                 span = tag('span');
@@ -255,15 +261,78 @@ define(['underscore'], function (_) {
                 ])
             ]);
         }
-        
-        function loading() {
-            return '<img src="assets/img/ajax-loader.gif">';
+
+        function loading(msg) {
+            var span = tag('span'),
+                img = tag('img'),
+                prompt;
+            if (msg) {
+                prompt = msg + '... &nbsp &nbsp';
+            }
+            return span([
+                prompt,
+                img({src: 'assets/img/ajax-loader.gif'})
+            ]);
+        }
+
+        /*
+         * 
+         */
+        function makeRotatedTable(data, columns) {
+            function keyToLabel(key) {
+                if (key.label) {
+                    return key.label;
+                }
+                return key.key
+                    .replace(/(id|Id)/g, 'ID')
+                    .split(/_/g).map(function (word) {
+                        return word.charAt(0).toUpperCase() + word.slice(1);
+                    })
+                    .join(' ');
+            }
+            function columnValue(row, column) {
+                var rawValue = row[column.key];
+                if (column.format) {
+                    return column.format(rawValue);
+                }
+                if (column.type) {
+                    switch (column.type) {
+                        case 'bool': 
+                            // yuck, use truthiness
+                            if (rawValue) {
+                                return 'True';
+                            }
+                            return 'False';
+                        default:
+                            return rawValue;
+                    }
+                }
+                return rawValue;
+            }
+
+            var table = tag('table'), 
+                tr = tag('tr'),
+                th = tag('th'),
+                td = tag('td');
+           
+            var result = table({class: 'table table-stiped table-bordered'},[
+                columns.forEach(function(column) {
+                    return tr([
+                       th(keyToLabel(column)),
+                       data.map(function (row) {
+                           return td(columnValue(row, column));
+                       })
+                    ]);
+                })
+            ]);
+            return result;
         }
 
         return {
             html: jsonToHTML,
             tag: tag,
             makeTable: makeTable,
+            makeRotatedTable: makeRotatedTable,
             genId: genId,
             bsPanel: bsPanel,
             panel: bsPanel,

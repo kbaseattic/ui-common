@@ -50,6 +50,7 @@
     "font-awesome": "4.3.0",
     "angular-ui-router": "0.2.15",
     "d3-sankey": "*",
-    "jquery.svg": "*"
+    "jquery.svg": "*",
+    "node-uuid": "1.4.3"
   }
 }

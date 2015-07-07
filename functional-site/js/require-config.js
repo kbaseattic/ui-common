@@ -11,7 +11,9 @@ var kbClients = [
     ['workspace', 'Workspace'],
     ['cdmi', 'CDMI_API'],
     ['cdmi-entity', 'CDMI_EntityAPI'],
-    ['trees', 'KBaseTrees']
+    ['trees', 'KBaseTrees'],
+    ['fba', 'fbaModelServices'],
+    ['ujs', 'UserAndJobState']
 ];
 // NB need the immediate function exec below in order to avoid
 // variable capture problem with anon funcs.
@@ -42,7 +44,7 @@ require.config({
     paths: {
         // External Dependencies
         // ----------------------
-        jquery: 'bower_components/jquery/dist/jquery.min',
+        jquery: 'bower_components/jquery/dist/jquery',
         bootstrap: 'bower_components/bootstrap/dist/js/bootstrap.min',
         bootstrap_css: 'bower_components/bootstrap/dist/css/bootstrap.min',
         q: 'bower_components/q/q',
@@ -79,6 +81,10 @@ require.config({
         'jquery-svg-graph': 'bower_components/jquery.svg/jquery.svggraph.min',
         'jquery-svg-plot': 'bower_components/jquery.svg/jquery.svgplot.min',
         'jquery-svg-graph-deviation': 'src/etc/jquery-svg-deviation',
+        'uuid': 'bower_components/node-uuid/uuid',
+        'canvastext': 'lib/canvastext',
+        'popit': 'lib/popit',
+        'knhx': 'lib/knhx',
         
         // Just style, man.
         'font-awesome': 'bower_components/font-awesome/css/font-awesome.min',
@@ -108,6 +114,8 @@ require.config({
         // kbase app
         'kb.appstate': 'src/kbaseAppState',
         'kb.html': 'src/kbaseHTML',
+        'kb.easytree': 'src/trees/easytree',
+
         
         // KBase Widgets
         // -------------
@@ -174,6 +182,10 @@ require.config({
         'kb.jquery.widget': 'src/widgets/jquery/kbaseWidget',
         'kb.jquery.authenticatedwidget': 'src/widgets/jquery/kbaseAuthenticatedWidget',
         'kb.jquery.tabs': 'src/widgets/jquery/kbaseTabs',
+        'kb.jquery.kb-tabs': '/src/widgets/jquery/kbTabs',
+        'kb.jquery.media-editor': 'src/widgets/jquery/kbaseMediaEditor',
+        'kb.jquery.helper-plugins': 'src/widgets/jquery/kbaseHelperPlugins',
+
         
         
         'kb.jquery.narrativestore': 'src/widgets/jquery/kbaseNarrativeStoreView',
@@ -198,6 +210,8 @@ require.config({
         'kb.jquery.genome.gene-table': 'src/widgets/jquery/genomes/kbaseGenomeGeneTable',
         'kb.jquery.genome.contig-browser-buttons': 'src/widgets/jquery/genomes/kbaseContigBrowserButtons',
         'kb.jquery.from_narrative.annotation-set-table': 'src/widgets/jquery/from_narrative/kbaseAnnotationSetTable',
+        'kb.jquery.genome.pangenome': 'src/widgets/jquery/genomes/kbasePanGenome',
+        'kb.jquery.genomes.phenotype-set': 'src/widgets/jquery/genomes/kbasePhenotypeSet',
         
         // assembly
         'kb.jquery.assembly.single-object-basic': 'src/widgets/jquery/assembly/kbaseSingleObjectBasicWidget',
@@ -215,6 +229,21 @@ require.config({
         // proteome comparison
         'kb.jquery.proteome-comparison.genome-comparison': 'src/widgets/jquery/protcmp/kbaseGenomeComparison', 
         'kb.jquery.proteome-comparison.genome-comparison-viewer': 'src/widgets/jquery/protcmp/kbaseGenomeComparisonViewer', 
+        
+        // modeling
+        'kb.jquery.modeling.objects': 'src/widgets/jquery/modeling/KBObjects',
+        'kb.jquery.modeling.biochem-media': 'src/widgets/jquery/modeling/KBaseBiochem.Media',
+        'kb.jquery.modeling.fba': 'src/widgets/jquery/modeling/KBaseFBA.FBA',
+        'kb.jquery.modeling.fba-model': 'src/widgets/jquery/modeling/KBaseFBA.FBAModel',
+        'kb.jquery.modeling.fba-model-set': 'src/widgets/jquery/modeling/KBaseFBA.FBAModelSet',
+        'kb.jquery.modeling.phenotype-set': 'src/widgets/jquery/modeling/KBasePhenotypes.PhenotypeSet',
+        'kb.jquery.modeling.phenotype-simulation-set': 'src/widgets/jquery/modeling/KBasePhenotypes.PhenotypeSimulationSet',
+        'kb.jquery.modeling.genome-set': 'src/widgets/jquery/modeling/KBaseSearch.GenomeSet',
+        'kb.jquery.modeling.tab-table': 'src/widgets/jquery/modeling/kbaseTabTable',
+        
+        // trees
+        'kb.jquery.trees.tree': 'src/widgets/jquery/trees/kbaseTree',
+
             
 
         

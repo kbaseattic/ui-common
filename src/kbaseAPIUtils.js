@@ -92,5 +92,6 @@ define(['kb.utils'],
                     return obj;
                 }
             }
+            
         });
     });

@@ -544,6 +544,7 @@ define(['jquery', 'q', 'nunjucks', 'kb.session', 'kb.utils', 'postal', 'json!fun
                     this.error = errorValue;
                     return;
 
+                    /* TODO: fix this
                     var errorText;
                     if (typeof errorValue === 'string') {
                         errorText = errorValue;
@@ -566,6 +567,7 @@ define(['jquery', 'q', 'nunjucks', 'kb.session', 'kb.utils', 'postal', 'json!fun
                     this.status = 'error';
                     this.render();
                     // this.refresh().done();
+                    */
                 }
             },
             checkState: {

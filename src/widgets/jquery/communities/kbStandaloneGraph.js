@@ -543,8 +543,6 @@ define(['jquery', 'jquery-svg-graph-deviation'],
                 }
                 var chartOptions = {barWidth: this.settings.barWidth || 25};
                 
-                console.log('HERE');
-
                 svg.graph.status(this.hover);
 
                 svg.graph.noDraw().

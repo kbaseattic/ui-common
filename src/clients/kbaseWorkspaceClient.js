@@ -1,9 +1,9 @@
 /*global
-    define, console
+ define, console
  */
 /*jslint
-    browser: true,
-    white: true
+ browser: true,
+ white: true
  */
 define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', 'kb.config'],
     function (Q, Session, Utils, APIUtils, Workspace, Config) {
@@ -121,7 +121,7 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', '
                                                 x.username === '*' ||
                                                 x.username === narrative.workspace.owner) {
                                                 return false;
-                                            } 
+                                            }
                                             return true;
                                         })
                                         .sort(function (a, b) {
@@ -161,7 +161,7 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', '
                                     reject('Too many (' + data.length + ') objects found.');
                                     return;
                                 }
-                                
+
                                 var object = APIUtils.object_info_to_object(data[0]);
                                 resolve(object);
                             }.bind(this))
@@ -170,6 +170,63 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', '
                             })
                             .done();
                     }.bind(this));
+                }
+            },
+            // this takes a list of refs and creates <workspace_name>/<object_name>
+            // if links is true, hrefs are returned as well
+            // from kbapi.js, along with possible bugs.
+            translateRefs: {
+                value: function (reflist, links) {
+                    return Q.Promise(function (resolve) {
+                        var obj_refs = [];
+                        reflist.forEach(function (ref) {
+                            obj_refs.push({ref: ref});
+                        });
+
+                        Utils.promise(this.workspaceClient, 'get_object_info', {
+                            objects: obj_refs,
+                            ignoreErrors: 1,
+                            includeMetadata: 1
+                        }).
+                            then(function (data) {
+                                var refhash = {},
+                                    i;
+                                for (i = 0; i < data.length; i += 1) {
+                                    var item = data[i],
+                                        full_type = item[2],
+                                        module = full_type.split('.')[0],
+                                        type = full_type.slice(full_type.indexOf('.') + 1),
+                                        kind = type.split('-')[0],
+                                        label = item[7] + "/" + item[1],
+                                        route;
+                                    switch (kind) {
+                                        case 'FBA':
+                                            sub = 'fbas/';
+                                            break;
+                                        case 'FBAModel':
+                                            sub = 'models/';
+                                            break;
+                                        case 'Media':
+                                            route = 'media/';
+                                            break;
+                                        case 'Genome':
+                                            route = 'genomes/';
+                                            break;
+                                        case 'MetabolicMap':
+                                            route = 'maps/';
+                                            break;
+                                        case 'PhenotypeSet':
+                                            route = 'phenotype/';
+                                            break;
+                                    }
+
+                                    var link = '<a href="#/' + route + label + '">' + label + '</a>';
+                                    refhash[reflist[i]] = {link: link, label: label};
+                                }
+                                resolve(refhash);
+                            }).
+                            done();
+                    });
                 }
             }
         });

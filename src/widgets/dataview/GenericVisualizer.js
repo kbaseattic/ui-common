@@ -167,7 +167,17 @@ define(['jquery', 'q', 'kb.client.workspace', 'kb.app', 'kb.html'],
                     {from: 'authToken', to: 'token'}
                 ]
             },
-            
+            'KBaseGenomes.Pangenome': {
+                title: 'Data View',
+                module: 'kb.jquery.genome.pangenome',
+                widget: 'kbasePanGenome',
+                panel: true,
+                options: [
+                    {from: 'workspaceName', to: 'ws'},
+                    {from: 'objectName', to: 'name'},
+                    {from: 'authToken', to: 'token'}
+                ]
+            },
             /* COMPLEX LANDING PAGE */
             'KBaseGenomes.Genome': {
                 title: 'Data View',
@@ -194,14 +204,61 @@ define(['jquery', 'q', 'kb.client.workspace', 'kb.app', 'kb.html'],
                             // options: '{"genomeID":???objname,"workspaceID":???wsname,"featureID":???subid,"loadingImage":"'+this.options.loadingImage+'"}'
                     }
                 }
-            }
+            },
+            // MODELING
+            'KBasePhenotypes.PhenotypeSet': {
+                title: 'Data View',
+                module: 'kb.jquery.modeling.tab-table',
+                widget: 'kbaseTabTable',
+                panel: true,
+                options: [
+                    {from: 'workspaceName', to: 'ws'},
+                    {from: 'objectName', to: 'obj'},
+                    {from: 'objectType', to: 'type'},
+                    {from: 'authToken', to: 'token'}
+                ]
+            },
+            'KBasePhenotypes.PhenotypeSimulationSet': {
+                title: 'Data View',
+                module: 'kb.jquery.modeling.tab-table',
+                widget: 'kbaseTabTable',
+                panel: true,
+                options: [
+                    {from: 'workspaceName', to: 'ws'},
+                    {from: 'objectName', to: 'obj'},
+                    {from: 'objectType', to: 'type'},
+                    {from: 'authToken', to: 'token'}
+                ]
+            },
+            'KBaseSearch.GenomeSet': {
+                title: 'Data View',
+                module: 'kb.jquery.modeling.tab-table',
+                widget: 'kbaseTabTable',
+                panel: true,
+                options: [
+                    {from: 'workspaceName', to: 'ws'},
+                    {from: 'objectName', to: 'obj'},
+                    {from: 'objectType', to: 'type'},
+                    {from: 'authToken', to: 'token'}
+                ]
+            },
+            'KBaseTrees.Tree': {
+                title: 'Data View',
+                module: 'kb.jquery.trees.tree',
+                widget: 'kbaseTree',
+                panel: true,
+                options: [
+                    {from: 'workspaceId', to: 'workspaceID'},
+                    {from: 'objectId', to: 'treeID'},
+                    {from: 'objectVersion', to: 'treeObjVer'}
+                ]
+            },
         };
         // This style returns a factory function.
         // The only usage of 'this' is to return it as a convenience for 
         // method chaining.
         return function (params) {
             // This should give us an unfakable "this".
-            var greeting = params.greeting;
             var containerNode = null;
             var workspaceClient = Object.create(WorkspaceClient).init({url: params.ws_url});
             function render() {
@@ -227,7 +284,8 @@ define(['jquery', 'q', 'kb.client.workspace', 'kb.app', 'kb.html'],
             }
 
             function findMapping(objectType) {
-                var mapping = typeMap[objectType];
+                var mapping = typeMap[objectType],
+                    config;
                 if (mapping) {
                     if (params.sub && params.subid) {
                         if (mapping.sub) {
@@ -261,6 +319,12 @@ define(['jquery', 'q', 'kb.client.workspace', 'kb.app', 'kb.html'],
                             $(node).html(html.panel('Not Found', 'Sorry, cannot find widget for ' + objectType));
                             return;
                         }
+
+                        // Stuff other values into the params.
+                        params.objectName = wsobject.name;
+                        params.workspaceName = wsobject.ws;
+                        params.objectVersion = wsobject.version;
+                        params.objectType = wsobject.type;
 
                         // Create params.
                         var widgetParams = {};
