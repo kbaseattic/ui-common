@@ -12,6 +12,9 @@ define(['jquery', 'q', 'kb.client.workspace', 'kb.app', 'kb.html'],
             /*
              widget doesn't work. The underlying collection object looks broken.
              The collection object itself does not seem to return 
+            Does not work in production either 
+            Fixed!
+            It is just that some collection objects are broken.
              */
             'Communities.Collection': {
                 title: 'Data View',
