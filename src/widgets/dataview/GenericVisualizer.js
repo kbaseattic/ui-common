@@ -58,22 +58,18 @@ define(['jquery', 'q', 'kb.client.workspace', 'kb.app', 'kb.html'],
             // 'Communities.Heatmap'
 
             /* NEEDS A COMPLEX LANDING PAGE */
-            /* NOTE: skipping the rest of communities for now due to the 
-             * work to port over the modified svg plugin.
-             * TODO: finish
-             'Communities.Metagenome': {
-             //  Plugged in MetagenomeView (required a different kbaseTabs than for Neal's modeling) 
-             title: 'Data View',
-             module: 'kb.jquery.communities.metagenome',
-             widget: 'MetagenomeView',
-             panel: true,
-             options: [
-             {from: 'workspaceId', to: 'ws'},
-             {from: 'objectId', to: 'id'},
-             {from: 'authToken', to: 'token'}
-             ]
-             },
-             */
+            'Communities.Metagenome': {
+                //  Plugged in MetagenomeView (required a different kbaseTabs than for Neal's modeling) 
+                title: 'Data View',
+                module: 'kb.jquery.communities.metagenome',
+                widget: 'MetagenomeView',
+                panel: true,
+                options: [
+                    {from: 'workspaceId', to: 'ws'},
+                    {from: 'objectId', to: 'id'},
+                    {from: 'authToken', to: 'token'}
+                ]
+            },
             'GenomeComparison.ProteomeComparison': {
                 title: 'Data View',
                 module: 'kb.jquery.proteome-comparison.genome-comparison',

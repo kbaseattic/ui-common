@@ -1,4 +1,11 @@
 // This is main.js
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true
+ */
 define('kb_clients', [], function () {
     return 'KBCLIENTS DUMMY OBJECT';
 });
@@ -74,17 +81,20 @@ require.config({
         'd3': 'bower_components/d3/d3.min',
         'd3-sankey': 'bower_components/d3-plugins-sankey/sankey',
         'd3-sankey-css': 'bower_components/d3-plugins-sankey/sankey',
-        'jquery-svg': 'bower_components/jquery.svg/jquery.svg.min',
-        'jquery-svg-anim': 'bower_components/jquery.svg/jquery.svganim.min',
-        'jquery-svg-dom': 'bower_components/jquery.svg/jquery.svgdom.min',
-        'jquery-svg-filter': 'bower_components/jquery.svg/jquery.svgfilter.min',
-        'jquery-svg-graph': 'bower_components/jquery.svg/jquery.svggraph.min',
-        'jquery-svg-plot': 'bower_components/jquery.svg/jquery.svgplot.min',
-        'jquery-svg-graph-deviation': 'src/etc/jquery-svg-deviation',
+        //'jquery-svg': 'bower_components/jquery.svg/jquery.svg',
+        //'jquery-svg-anim': 'bower_components/jquery.svg/jquery.svganim.min',
+        //'jquery-svg-dom': 'bower_components/jquery.svg/jquery.svgdom.min',
+        //'jquery-svg-filter': 'bower_components/jquery.svg/jquery.svgfilter.min',
+        //'jquery-svg-graph': 'bower_components/jquery.svg/jquery.svggraph.min',
+        // 'jquery-svg-plot': 'bower_components/jquery.svg/jquery.svgplot.min',
+        //'jquery-svg-plot': 'src/widgets/jquery/communities/jquery.svg.plot',
+        //'jquery-svg-graph-deviation': 'src/etc/jquery-svg-graph-deviation',
+        'jquery-svg-graph-stacked-area': 'src/etc/jquery-svg-graph-stacked-area',
         'uuid': 'bower_components/node-uuid/uuid',
         'canvastext': 'lib/canvastext',
         'popit': 'lib/popit',
         'knhx': 'lib/knhx',
+        'googlepalette': 'lib/googlepalette',
         
         // Just style, man.
         'font-awesome': 'bower_components/font-awesome/css/font-awesome.min',
@@ -225,6 +235,9 @@ require.config({
         'kb.jquery.communities.functional-matrix': 'src/widgets/jquery/communities/kbaseAbundanceDataView',
         'kb.jquery.communities.functional-profile': 'src/widgets/jquery/communities/kbaseAbundanceDataView',
         'kb.jquery.communities.graph': 'src/widgets/jquery/communities/kbStandaloneGraph',
+        'kb.jquery.communities.plot': 'src/widgets/jquery/communities/kbStandalonePlot',
+        'kb.jquery.communities.metagenome': 'src/widgets/jquery/communities/kbaseMetagenomeView',
+        'kb.jquery.communities.jquery-svg': 'src/widgets/jquery/communities/jquery.svg',
         
         // proteome comparison
         'kb.jquery.proteome-comparison.genome-comparison': 'src/widgets/jquery/protcmp/kbaseGenomeComparison', 
@@ -304,12 +317,20 @@ require.config({
         'kb.jquery.genome.overview': {
             deps: ['css!kb.jquery.genome.overview.styles']
         },
+        /*
         'jquery-svg-graph': {
             deps: ['jquery', 'jquery-svg']
+        },
+        'jquery-svg-plot': {
+            deps: ['jquery', 'jquery-svg', 'jquery-svg-graph']
         },
         'jquery-svg-graph-deviation': {
             deps: ['jquery', 'jquery-svg-graph']
         }
+        */
+       'kb.jquery.communities.jquery-svg': {
+           deps: ['jquery']
+       }
         
 
     },

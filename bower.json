@@ -51,6 +51,7 @@
     "angular-ui-router": "0.2.15",
     "d3-sankey": "*",
     "jquery.svg": "*",
-    "node-uuid": "1.4.3"
+    "node-uuid": "1.4.3",
+    "rgb-color": "*"
   }
 }

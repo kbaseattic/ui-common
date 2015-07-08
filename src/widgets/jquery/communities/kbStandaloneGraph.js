@@ -109,7 +109,7 @@
  If set to false the stacked area chart will not normalize the values
  */
 
-define(['jquery', 'jquery-svg-graph-deviation'],
+define(['jquery', 'kb.jquery.communities.jquery-svg'], // 'jquery-svg-graph-deviation', 'jquery-svg-graph-stacked-area'],
     function ($) {
         'use strict';
         var standaloneGraph = {

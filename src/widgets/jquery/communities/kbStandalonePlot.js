@@ -98,8 +98,8 @@
  function to be called for drag select. This function will get passed an array of the selected points.
  
  */
-define(['jquery', 'jquery-svg-graph-deviation'],
-    function ($) {
+define(['jquery', 'uuid', 'kb.jquery.communities.jquery-svg'], // 'jquery-svg-graph', 'jquery-svg-plot'],
+    function ($, uuid) {
         'use strict';
         var plot = {
             about: {
@@ -132,8 +132,7 @@ define(['jquery', 'jquery-svg-graph-deviation'],
                 'y_titleOffset': 45,
                 'titleOffset': 0,
                 'drag_select': null,
-                'data': undefined
-            },
+                'data': undefined},
             options: [
                 {general:
                         [
@@ -144,7 +143,7 @@ define(['jquery', 'jquery-svg-graph-deviation'],
                             {name: 'connected', type: 'bool', description: "sets whether the data points are connected or not",
                                 title: "connected", defaultTrue: true},
                             {name: 'show_dots', type: 'bool', description: "sets whether the data points are displayed or not",
-                                title: "show dots", defaultTrue: true},
+                                title: "show dots", defaultTrue: true}
                         ]
                 },
                 {text:
@@ -155,7 +154,7 @@ define(['jquery', 'jquery-svg-graph-deviation'],
                             {name: 'y_title', type: 'text', description: "title of the y-axis of the plot", title: "y title"},
                             {name: 'x_titleOffset', type: 'int', description: "title offset from the x-axis", title: "x title offset"},
                             {name: 'y_titleOffset', type: 'int', description: "title offset from the y-axis", title: "y title offset"},
-                            {name: 'titleOffset', type: 'int', description: "title offset from the top", title: "title offset"},
+                            {name: 'titleOffset', type: 'int', description: "title offset from the top", title: "title offset"}
                         ]
                 },
                 {layout:
@@ -191,8 +190,7 @@ define(['jquery', 'jquery-svg-graph-deviation'],
                 }
             ],
             exampleData: function () {
-                return {
-                        series: [{name: "cool", color: 'blue', shape: 'circle'},
+                return {series: [{name: "cool", color: 'blue', shape: 'circle'},
                         {name: "uncool", color: 'red', shape: 'square'},
                         {name: "semi-cool", color: 'orange', shape: 'triangle'}],
                     points: [[{x: 0.5, y: 7},
@@ -216,27 +214,37 @@ define(['jquery', 'jquery-svg-graph-deviation'],
 
                 // Mix in the defaults and whatever the user provided in params.
                 $.extend(true, instance.settings, this.defaults, params);
-                
+
                 // disable caching these, the user can do that themselves.
                 // window.rendererGraph.push(instance);
 
+                instance.settings.id = uuid.v4();
+
                 return instance;
             },
-            render: function (index) {
+            render: function () {
                 // get the target div
                 var target = this.settings.target;
-                target.innerHTML = "<div id='plot_div" + index + "'></div>";
+                target.innerHTML = "<div class='plot_div'></div>";
                 target.firstChild.setAttribute('style', "width: " + this.settings.width + "px; height: " + this.settings.height + "px;");
-                $('#plot_div' + index).svg().bind('dragstart', function (event) {
-                    event.preventDefault();
-                });
-                this.svg = $('#plot_div' + index).svg('get');
-                this.drawImage(this.svg,);
+                /* TODO: re-enable
+                 $('#plot_div' + this.settings.id).svg().bind('dragstart', function (event) {
+                 event.preventDefault();
+                 });
+                 */
+                $(target).find('.plot_div').svg();
+                //this.svg = $('#plot_div_' + this.settings.id).svg('get');
+                //console.log(this.svg);
+                //this.drawImage(this.svg);
 
-                if (this.settings.drag_select && typeof this.settings.drag_select === 'function') {
-                    var svg = document.getElementById('plot_div' + index).firstChild;
-                    trackMarquee(svg, this.settings.drag_select);
-                }
+                this.drawImage($(target).find('.plot_div').svg('get'));
+
+                /* TODO: track down the marquee thing and re-enable
+                 if (this.settings.drag_select && typeof (this.settings.drag_select) == 'function') {
+                 var svg = document.getElementById('plot_div' + index).firstChild;
+                 trackMarquee(svg, this.settings.drag_select);
+                 }
+                 */
 
                 return this;
             },
@@ -274,17 +282,15 @@ define(['jquery', 'jquery-svg-graph-deviation'],
                 var minPoint = params.min;
                 var maxPoint = params.max;
                 var maxTicks = params.ticks || 10;
-                var range = rendererPlot[0].niceNum(maxPoint - minPoint, false);
-                var tickSpacing = rendererPlot[0].niceNum(range / (maxTicks - 1), true);
+                var range = this.niceNum(maxPoint - minPoint, false);
+                var tickSpacing = this.niceNum(range / (maxTicks - 1), true);
                 var niceMin = Math.floor(minPoint / tickSpacing) * tickSpacing;
-                ;
+
                 var niceMax = Math.ceil(maxPoint / tickSpacing) * tickSpacing;
 
                 return {min: niceMin, max: niceMax, space: tickSpacing};
             },
-            drawImage: function (svg, index) {
-                var renderer = rendererPlot[index];
-
+            drawImage: function (svg) {
                 var chartAreas = [[0.1, 0.1, 0.95, 0.9],
                     [0.2, 0.1, 0.95, 0.9],
                     [0.1, 0.1, 0.8, 0.9],
@@ -304,49 +310,72 @@ define(['jquery', 'jquery-svg-graph-deviation'],
                     '#bd2fa6'  // purple 
                 ];
 
-                if (renderer.settings.x_min === undefined) {
+                if (this.settings.x_min === undefined) {
                     var x_min = undefined;
                     var x_max = undefined;
                     var y_min = undefined;
                     var y_max = undefined;
-                    for (var i = 0; i < renderer.settings.data.points.length; i++) {
-                        for (var h = 0; h < renderer.settings.data.points[i].length; h++) {
-                            if (x_min === undefined || renderer.settings.data.points[i][h].x < x_min)
-                                x_min = renderer.settings.data.points[i][h].x;
-                            if (x_max === undefined || renderer.settings.data.points[i][h].x > x_max)
-                                x_max = renderer.settings.data.points[i][h].x;
-                            if (y_min === undefined || renderer.settings.data.points[i][h].y < y_min)
-                                y_min = renderer.settings.data.points[i][h].y;
-                            if (y_max === undefined || renderer.settings.data.points[i][h].y > y_max)
-                                y_max = renderer.settings.data.points[i][h].y;
+                    var i, h;
+                    for (i = 0; i < this.settings.data.points.length; i++) {
+                        for (h = 0; h < this.settings.data.points[i].length; h++) {
+                            if (x_min === undefined || this.settings.data.points[i][h].x < x_min) {
+                                x_min = this.settings.data.points[i][h].x;
+                            }
+                            if (x_max === undefined || this.settings.data.points[i][h].x > x_max) {
+                                x_max = this.settings.data.points[i][h].x;
+                            }
+                            if (y_min === undefined || this.settings.data.points[i][h].y < y_min) {
+                                y_min = this.settings.data.points[i][h].y;
+                            }
+                            if (y_max === undefined || this.settings.data.points[i][h].y > y_max) {
+                                y_max = this.settings.data.points[i][h].y;
+                            }
                         }
                     }
-                    var sx = rendererPlot[0].niceScale({min: x_min, max: x_max});
-                    renderer.settings.x_min = sx.min;
-                    renderer.settings.x_max = sx.max;
-                    var sy = rendererPlot[0].niceScale({min: y_min, max: y_max});
-                    renderer.settings.y_min = sy.min;
-                    renderer.settings.y_max = sy.max;
+                    var sx = this.niceScale({min: x_min, max: x_max});
+                    this.settings.x_min = sx.min;
+                    this.settings.x_max = sx.max;
+                    var sy = this.niceScale({min: y_min, max: y_max});
+                    this.settings.y_min = sy.min;
+                    this.settings.y_max = sy.max;
                 }
 
-                svg.plot.noDraw().title(renderer.settings.title, renderer.settings.titleOffset, renderer.settings.title_color, renderer.settings.title_settings);
-                for (i = 0; i < renderer.settings.data.length; i++) {
-                    var d = renderer.settings.data[i];
+                svg.plot.noDraw().title(this.settings.title, this.settings.titleOffset, this.settings.title_color, this.settings.title_settings);
+                for (i = 0; i < this.settings.data.length; i++) {
+                    var d = this.settings.data[i];
                 }
 
-                svg.plot.plotPoints = renderer.settings.data.points;
-                svg.plot.connected = renderer.settings.connected;
-                svg.plot.showDots = renderer.settings.show_dots;
-                svg.plot.series = renderer.settings.data.series;
+                svg.plot.plotPoints = this.settings.data.points;
+                svg.plot.connected = this.settings.connected;
+                svg.plot.showDots = this.settings.show_dots;
+                svg.plot.series = this.settings.data.series;
 
                 svg.plot.noDraw().format('white', 'gray').gridlines({stroke: 'gray', strokeDashArray: '2,2'}, 'gray');
-                svg.plot.xAxis.scale(renderer.settings.x_min, renderer.settings.x_max, renderer.settings.x_scale).ticks(parseFloat((renderer.settings.x_max - renderer.settings.x_min) / 10), parseFloat((renderer.settings.x_max - renderer.settings.x_min) / 5), 8, 'sw', renderer.settings.x_scale).title(renderer.settings.x_title, renderer.settings.x_titleOffset);
-                svg.plot.yAxis.scale(renderer.settings.y_min, renderer.settings.y_max, renderer.settings.y_scale).ticks(parseFloat((renderer.settings.y_max - renderer.settings.y_min) / 10), parseFloat((renderer.settings.y_max - renderer.settings.y_min) / 5), 8, 'sw', renderer.settings.y_scale).title(renderer.settings.y_title, renderer.settings.y_titleOffset);
+
+                console.log('SeTTINGs');
+                console.log(this.settings);
+
+                svg.plot.xAxis
+                    .scale(this.settings.x_min, this.settings.x_max, this.settings.x_scale)
+                    .ticks(
+                        parseFloat((this.settings.x_max - this.settings.x_min) / 10),
+                        parseFloat((this.settings.x_max - this.settings.x_min) / 5),
+                        8, 'sw',
+                        this.settings.x_scale)
+                    .title(this.settings.x_title, this.settings.x_titleOffset);
+                svg.plot.yAxis
+                    .scale(this.settings.y_min, this.settings.y_max, this.settings.y_scale)
+                    .ticks(
+                        parseFloat((this.settings.y_max - this.settings.y_min) / 10),
+                        parseFloat((this.settings.y_max - this.settings.y_min) / 5),
+                        8, 'sw',
+                        this.settings.y_scale)
+                    .title(this.settings.y_title, this.settings.y_titleOffset);
                 svg.plot.legend.settings({fill: 'white', stroke: 'gray'});
 
                 var plotLegend = 0;
-                if (renderer.settings.show_legend) {
-                    switch (renderer.settings.legend_position) {
+                if (this.settings.show_legend) {
+                    switch (this.settings.legend_position) {
                         case 'left':
                             plotLegend = 1;
                             break;
@@ -364,9 +393,13 @@ define(['jquery', 'jquery-svg-graph-deviation'],
                             break;
                     }
                 }
-                svg.plot.noDraw().
-                    legend.show(plotLegend).area(renderer.settings.legendArea ? renderer.settings.legendArea : legendAreas[plotLegend]).end().
-                    area(renderer.settings.chartArea ? renderer.settings.chartArea : chartAreas[plotLegend]).redraw();
+                svg.plot.noDraw().legend
+                    .show(plotLegend)
+                    .area(this.settings.legendArea ? this.settings.legendArea : legendAreas[plotLegend])
+                    .end()
+                    .area(this.settings.chartArea ? this.settings.chartArea : chartAreas[plotLegend])
+                    .redraw();
             }
-        }
+        };
+        return plot;
     });
