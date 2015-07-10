@@ -6,10 +6,16 @@ require(['kb.panel.narrativemanager', 'kb.panel.navbar',
             App.showPanel('app', handler);
 
         }
+
+        var navbar = null;
         function setupApp() {
             var NarrativeManager = NarrativeManagerPanel();
             NarrativeManager.setup();
-            Navbar.setup();
+            
+            // Call factory object.
+            navbar = Navbar();
+            navbar.setup();
+            // Navbar.setup();
 
             App.setDefaultRoute({
                 promise: function (params) {
@@ -67,21 +73,21 @@ require(['kb.panel.narrativemanager', 'kb.panel.navbar',
             // App Listeners
             App.sub('loggedout', function () {
                 App.show('navbar', {
-                    route: Navbar,
+                    route: navbar,
                     params: null
                 });
             });
             App.sub('loggedin', function () {
                 App.show('navbar', {
-                    route: Navbar,
+                    route: navbar,
                     params: null
                 });
                 ProfileService.loadProfile();
             });
             App.sub('title', function (data) {
-                Navbar.setTitle(data.title);
+                navbar.setTitle(data.title);
                 App.show('navbar', {
-                    route: Navbar,
+                    route: navbar,
                     params: null
                 });
             });
@@ -93,7 +99,7 @@ require(['kb.panel.narrativemanager', 'kb.panel.navbar',
             AppState.whenItem('userprofile')
                 .then(function (profile) {
                     App.show('navbar', {
-                        route: Navbar,
+                        route: navbar,
                         params: null
                     });
                 })
