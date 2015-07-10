@@ -12,7 +12,7 @@
  * Gene "instance" info (e.g. coordinates on a particular strain's genome)
  * is in a different widget.
  */
-define(['jquery', 'kb.app', 'kb.service.workspace', 'kb.jquery.widget', 'kb.jquery.genome.wideoverview', 'kb.jquery.genome.literature', 'kb.jquery.genome.wide-taxonomy', 'kb.jquery.genome.wide-assembly-annotation'], function ($, App, Workspace) {
+define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.widget', 'kb.jquery.genome.wideoverview', 'kb.jquery.genome.literature', 'kb.jquery.genome.wide-taxonomy', 'kb.jquery.genome.wide-assembly-annotation'], function ($, R, Workspace) {
     'use strict';
     $.KBWidget({ 
         name: "KBaseGenomePage", 
@@ -38,8 +38,8 @@ define(['jquery', 'kb.app', 'kb.service.workspace', 'kb.jquery.widget', 'kb.jque
             var self = this;
             var scope = {ws: this.options.workspaceID, id: this.options.genomeID, ver: this.options.ver};
             
-            var workspace = new Workspace(App.getConfig('workspace_url'), {
-                token: App.getAuthToken()
+            var workspace = new Workspace(R.getConfig('workspace_url'), {
+                token: R.getAuthToken()
             });
 
             var cell1 = $('<div panel panel-default">');
@@ -187,7 +187,7 @@ define(['jquery', 'kb.app', 'kb.service.workspace', 'kb.jquery.widget', 'kb.jque
                 function(error) {
                     console.error("Error loading genome subdata");
                     console.error(error);
-                    console.log(App.getAuthToken());
+                    console.log(R.getAuthToken());
                     panel1.empty();
                     self.showError(panel1, error);
                     cell2.empty();

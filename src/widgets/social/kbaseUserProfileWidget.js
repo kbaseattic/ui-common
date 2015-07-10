@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base', 'kb.user_profile', 'kb.session', 'kb.widget.navbar', 'kb.app'],
-    function (nunjucks, $, Q, Postal, Utils, SocialWidget, UserProfile, Session, NAVBAR, App) {
+define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base', 'kb.user_profile', 'kb.session', 'kb.widget.navbar', 'kb.runtime'],
+    function (nunjucks, $, Q, Postal, Utils, SocialWidget, UserProfile, Session, NAVBAR, R) {
         "use strict";
         // var NAVBAR = Object.create(Navbar).init({container: '#kbase-navbar'});
         var UserProfileWidget = Object.create(SocialWidget, {
@@ -1059,7 +1059,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                         var title = this.userProfile.getProp('user.realname') + ' (' + this.userProfile.getProp('user.username') + ')';
                         this.places.title.html(title);
                         // NAVBAR.setTitle('Viewing profile for ' + title);
-                        App.pub('title', {title: 'Viewing profile for ' + title});
+                        R.pub('title', {title: 'Viewing profile for ' + title});
                     }
                     this.renderPicture();
                     this.places.content.html(this.renderTemplate('view'));

@@ -1,5 +1,5 @@
-define(['kb.app', 'kb.session', 'postal', 'angular', 'kb.client.narrativemanager', 'angular-ui-router', 'angular-ui-bootstrap', 'angular-ui-bootstrap-templates', 'jquery.blockUI'],
-    function (App, Session, postal, angular, NarrativeManager, ui_router, ui_bootstrap) {
+define(['kb.runtime', 'kb.session', 'postal', 'angular', 'kb.client.narrativemanager', 'angular-ui-router', 'angular-ui-bootstrap', 'angular-ui-bootstrap-templates', 'jquery.blockUI'],
+    function (R, Session, postal, angular, NarrativeManager, ui_router, ui_bootstrap) {
         'use strict';
 
         /* Directives */
@@ -107,8 +107,8 @@ define(['kb.app', 'kb.session', 'postal', 'angular', 'kb.client.narrativemanager
                 getCategoryInfo: function () {
                     var deferred = $q.defer();
                     console.log('here?? ');
-                    console.log(App.getConfig('search_url'));
-                    $http.get(App.getConfig('search_url') + "categories").then(function fetchCategories(results) {
+                    console.log(R.getConfig('search_url'));
+                    $http.get(R.getConfig('search_url') + "categories").then(function fetchCategories(results) {
                         // this.categoriesJSON = results.data;
                         deferred.resolve(results);
                     });
@@ -122,12 +122,12 @@ define(['kb.app', 'kb.session', 'postal', 'angular', 'kb.client.narrativemanager
         searchApp.service('searchKBaseClientsService', function ($q, $http, $rootScope) {
             return {
                 getWorkspaceClient: function () {
-                    return new Workspace(App.getConfig('workspace_url'), {token: App.getAuthToken()});
+                    return new Workspace(R.getConfig('workspace_url'), {token: App.getAuthToken()});
                 },
                 getNarrativeManager: function () {
-                    return new NarrativeManager({ws_url: App.getConfig('workspace_url'),
-                        nms_url: App.getConfig('narrative_method_store_url')},
-                        App.getAuthToken());
+                    return new NarrativeManager({ws_url: R.getConfig('workspace_url'),
+                        nms_url: R.getConfig('narrative_method_store_url')},
+                        R.getAuthToken());
                 }
             };
         });
@@ -144,9 +144,9 @@ define(['kb.app', 'kb.session', 'postal', 'angular', 'kb.client.narrativemanager
 
             // Model data that is specific to each search instance
             var _sessionUserData = {
-                "token": App.getAuthToken(),
-                "user_id": App.getUserId(),
-                "name": App.getUserRealname(),
+                "token": R.getAuthToken(),
+                "user_id": R.getUserId(),
+                "name": R.getUserRealname(),
                 "selectAll": {},
                 "selectedWorkspace": null,
                 "viewType": "compact",
@@ -377,9 +377,9 @@ define(['kb.app', 'kb.session', 'postal', 'angular', 'kb.client.narrativemanager
                 topic: 'login.success',
                 callback: function (sessionObject) {
 
-                    $scope.options.userState.session.token = App.getAuthToken();
-                    $scope.options.userState.session.user_id = App.getUserId();
-                    $scope.options.userState.session.name = App.getUserRealname();
+                    $scope.options.userState.session.token = R.getAuthToken();
+                    $scope.options.userState.session.user_id = R.getUserId();
+                    $scope.options.userState.session.name = R.getUserRealname();
 
                     //var session = sessionObject.getKBaseSession();
                     //$scope.options.userState.session.token = session.token;
@@ -598,7 +598,7 @@ define(['kb.app', 'kb.session', 'postal', 'angular', 'kb.client.narrativemanager
 
                 $scope.options.userState.session.ajax_requests.push(
                     $http({method: 'GET',
-                        url: App.getConfig('search_url') + "getResults",
+                        url: R.getConfig('search_url') + "getResults",
                         params: queryOptions,
                         responseType: 'json'
                     }).then(function (jsonResult) {
@@ -703,7 +703,7 @@ define(['kb.app', 'kb.session', 'postal', 'angular', 'kb.client.narrativemanager
                 //console.log("getResults : " + JSON.stringify(queryOptions));
 
                 $http({method: 'GET',
-                    url: App.getConfig('search_url') + "getResults",
+                    url: R.getConfig('search_url') + "getResults",
                     params: queryOptions,
                     responseType: 'json'
                 }).then(function (jsonResult) {

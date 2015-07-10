@@ -10,8 +10,8 @@
  * @author Roman Sutormin <rsutormin@lbl.gov>
  * @public
  */
-define(['jquery', 'kb.app', 'kb.service.workspace', 'kb.jquery.authenticatedwidget', 'kb.jquery.tabs', 'datatables_bootstrap'],
-    function ($, App, Workspace) {
+define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticatedwidget', 'kb.jquery.tabs', 'datatables_bootstrap'],
+    function ($, R, Workspace) {
         'use strict';
         $.KBWidget({
             name: "kbaseGenomeComparisonViewer",
@@ -25,7 +25,7 @@ define(['jquery', 'kb.app', 'kb.service.workspace', 'kb.jquery.authenticatedwidg
                 id: null,
                 ws: null
             },
-            wsUrl: App.getConfig('workspace_url'),
+            wsUrl: R.getConfig('workspace_url'),
             // wsUrl: "https://kbase.us/services/ws", // we need to stop doing this!
             loadingImage: "assets/img/ajax-loader.gif",
             init: function (options) {

@@ -1,23 +1,54 @@
-require(['kb.panel.narrativemanager', 'kb.panel.navbar',
-    'kb.client.profile', 'kb.session', 'kb.app', 'kb.appstate', 'jquery', 'q', 'bootstrap', 'css!font-awesome', 'domReady!'],
-    function (NarrativeManagerPanel, Navbar, ProfileService, Session, App, AppState, $, Q) {
-
-        function handleRoute(handler) {
-            App.showPanel('app', handler);
-
-        }
+/**
+ * 
+ * Main entry point for the KBase single page app (SPA).
+ * 
+ * @param {type} App
+ * @param {type} AppState
+ * @param {type} $
+ * @param {type} Q
+ * @param {type} NarrativeManagerPanel
+ * @param {type} Navbar
+ * @param {type} ProfileService
+ * @param {type} Session
+ * @returns {undefined}
+ */
+/*global
+ define, console, window, require
+ */
+/*jslint
+ browser: true,
+ white: true
+ */
+require([
+    'kb.app',
+    'kb.runtime',
+    'kb.appstate',
+    'q',
+    'kb.panel.narrativemanager',
+    'kb.panel.navbar',
+    'kb.client.profile',
+    'kb.session',
+    'bootstrap',
+    'css!font-awesome',
+    'domReady!'],
+    function (App, Runtime, AppState, Q, NarrativeManagerPanel, Navbar, ProfileService, Session) {
+        'use strict';
+        
+        var app = App.create();
+        Runtime.setApp(app);
 
         var navbar = null;
         function setupApp() {
-            var NarrativeManager = NarrativeManagerPanel();
+            var NarrativeManager = NarrativeManagerPanel.create();
             NarrativeManager.setup();
-            
-            // Call factory object.
-            navbar = Navbar();
-            navbar.setup();
-            // Navbar.setup();
 
-            App.setDefaultRoute({
+            // Call factory object to create our global navbar.
+            navbar = Navbar.create();
+            navbar.setup();
+
+            // The default route is invoked if there is no route set up to handle
+            // the path.
+            app.setDefaultRoute({
                 promise: function (params) {
                     return Q.Promise(function (resolve) {
                         resolve({
@@ -27,7 +58,20 @@ require(['kb.panel.narrativemanager', 'kb.panel.navbar',
                     });
                 }
             });
-            App.addRoute({
+            
+            /* 
+             * Handle the "empty path", which is also the root of the site.
+             * This can look like the following:
+             * /functional-site
+             * /functional-site#
+             * /functional-site#/
+             * /functional-site/#
+             * /functional-site/#/
+             * /functional-site/#/////
+             * TODO: have this redirect to some sensible location ... like the dashboard
+             * TODO: rename the "promise" method of a route to something that makes more semantic sense
+            */
+            app.addRoute({
                 path: [],
                 promise: function (params) {
                     return Q.Promise(function (resolve) {
@@ -39,99 +83,80 @@ require(['kb.panel.narrativemanager', 'kb.panel.navbar',
                 }
             });
 
-            // Set up the page mount points.
-            App.createMountPoint('app', '#app');
+            /*
+             * The app is responsible for the primary display layout, which 
+             * a far as the panels are concerned, is composed of a set of 
+             * "mount points". A mount point is simply a DOM node. The id of the
+             * node is the link between the layout html and the app, and a
+             * similar string key is the link between the app and the collection
+             * of mount points in javascript. We keep a mirror of the mount points
+             * in this collection (object) in order to keep a handle on the currently
+             * mounted panel, for life cycle management.
+             */
+            app.createMountPoint('app', '#app');
+            app.createMountPoint('navbar', '#kbase-navbar');
 
-            App.createMountPoint('navbar', '#kbase-navbar');
-
-            // TODO: remove any previously mounted panel.    
-            // TODO: convert all to promises or callback, but make it easy!
-
-
-            function replacePath(path) {
-                // maybe render message ...
-                //
-                //        'redirecting to <a href="/narrative/ws.' + workspaceId +
-                //        '.obj.' + objId + '">/narrative/ws.' + workspaceId +
-                //        '.obj.' + objId + '</a>');
-                window.location.replace(path);
-            }
 
             // SETUP LISTENERS
 
             // DOM listeners
-            $(window).bind('hashchange', function (e) {
-                // NB this is called AFTER it has changed. The browser will do nothing by
-                // default.
-                var handler = App.findCurrentRoute();
-                if (!handler) {
-                    return;
-                }
-                handleRoute(handler);
-            });
+            
 
             // App Listeners
-            App.sub('loggedout', function () {
-                App.show('navbar', {
+            app.sub('loggedout', function () {
+                app.show('navbar', {
                     route: navbar,
                     params: null
                 });
             });
-            App.sub('loggedin', function () {
-                App.show('navbar', {
+            app.sub('loggedin', function () {
+                app.show('navbar', {
                     route: navbar,
                     params: null
                 });
                 ProfileService.loadProfile();
             });
-            App.sub('title', function (data) {
+            app.sub('title', function (data) {
                 navbar.setTitle(data.title);
-                App.show('navbar', {
+                app.show('navbar', {
                     route: navbar,
                     params: null
                 });
             });
-            App.sub('navigate', function (data) {
-                App.navigateTo(data);
+            app.sub('navigate', function (data) {
+                app.navigateTo(data);
             });
 
             // This will work ... but we need to tune this!
             AppState.whenItem('userprofile')
                 .then(function (profile) {
-                    App.show('navbar', {
+                    app.show('navbar', {
                         route: navbar,
                         params: null
                     });
                 })
                 .done();
+            
+
+            app.sub('new-route', function (data) {
+                app.showPanel('app', data.routeHandler);
+            });
+
         }
 
         function runApp() {
+            app.start();
+            
             //App.sub('profile.loaded', function () {
             //    App.mount('navbar', Navbar.render());
             //});
-
-            // RUN
-            App.startHeartbeat();
-
-
-            // Not sure about this approach ... but works for now.
-            if (Session.isLoggedIn) {
-                App.pub('loggedin');
-            } else {
-                App.pub('loggedout');
-            }
 
             // Navbar will be mounted upon the login/out message.
             // App.mount('navbar', Navbar.render());
 
             // Handle the initial route.
             // Find a handler for the current route
-            var handler = App.findCurrentRoute();
-            if (!handler) {
-                return;
-            }
-            handleRoute(handler);
+          
         }
 
         // 
@@ -160,7 +185,7 @@ require(['kb.panel.narrativemanager', 'kb.panel.navbar',
             {module: 'kb.panel.databrowser'}
         ].map(function (panel) {
             return requirePromise([panel.module], function (Panel) {
-                Panel.setup(App);
+                Panel.setup(app);
             });
         });
         Q.all(promises)

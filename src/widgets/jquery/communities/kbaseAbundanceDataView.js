@@ -8,8 +8,8 @@
 /**
  * KBase widget to display table and boxplot of BIOM data
  */
-define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.service.workspace', 'kb.app', 'kb.html', 'kb.utils.api', 'kb.jquery.communities.graph', 'datatables_bootstrap'],
-    function ($, _AuthenticatedWidget, Workspace, App, html, APIUtils, Graph) {
+define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.service.workspace', 'kb.runtime', 'kb.html', 'kb.utils.api', 'kb.jquery.communities.graph', 'datatables_bootstrap'],
+    function ($, _AuthenticatedWidget, Workspace, R, html, APIUtils, Graph) {
         'use strict';
         $.KBWidget({
             name: 'AbundanceDataView',
@@ -21,7 +21,7 @@ define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.service.workspace', 'kb.a
                 ws: null,
                 name: 0
             },
-            ws_url: App.getConfig('workspace_url'),
+            ws_url: R.getConfig('workspace_url'),
             loading_image: "assets/img/ajax-loader.gif",
             init: function (options) {
                 this._super(options);
@@ -116,8 +116,8 @@ define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.service.workspace', 'kb.a
                         // Made tabs created through Javascript so they don't navigate
                         // you off of an Angular page
                         // ...but the button function needs to be set up manually as below.
-                        var graphId = App.genId();
-                        var tableId = App.genId();
+                        var graphId = R.genId();
+                        var tableId = R.genId();
                         var $graphTab = $('<a href="#outputGraph' + graphId + '">BoxPlots</a>')
                             .click(function (e) {
                                 e.preventDefault();

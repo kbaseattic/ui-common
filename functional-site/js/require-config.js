@@ -112,6 +112,7 @@ require.config({
         // KBase Utils
         // ----------------------
         'kb.app': 'src/kbaseApp',
+        'kb.runtime': 'src/kbaseRuntime',
         'kb.router': 'src/kbaseRouter',
         'kb.utils': 'src/kbaseUtils',
         'kb.cookie': 'src/kbaseCookie',

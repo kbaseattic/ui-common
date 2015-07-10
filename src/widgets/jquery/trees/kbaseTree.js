@@ -10,7 +10,7 @@
  white: true
  */
 define([
-    'kb.app',
+    'kb.runtime',
     'kb.html',
     'jquery',
     'q',
@@ -20,7 +20,7 @@ define([
     'kb.easytree',
     'kb.jquery.authenticatedwidget'
 ],
-    function (App, html, $, Q, uuid, Workspace, UserAndJobState, EasyTree) {
+    function (R, html, $, Q, uuid, Workspace, UserAndJobState, EasyTree) {
         'use strict';
         $.KBWidget({
             name: 'kbaseTree',
@@ -33,8 +33,8 @@ define([
                 jobID: null,
                 token: null,
                 kbCache: null,
-                workspaceURL: App.getConfig('workspace_url'),
-                ujsServiceURL: App.getConfig('user_job_state_url'),
+                workspaceURL: R.getConfig('workspace_url'),
+                ujsServiceURL: R.getConfig('user_job_state_url'),
                 width: 1045,
                 height: 600
             },

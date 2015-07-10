@@ -5,7 +5,7 @@
  browser: true,
  white: true
  */
-define(['kb.app', 'kb.html', 'kb.session', 'jquery', 'q'], function (APP, html, Session, $, Q) {
+define(['kb.runtime', 'kb.html', 'kb.session', 'jquery', 'q'], function (R, html, Session, $, Q) {
     'use strict';
 
     var panelId = html.genId();
@@ -54,9 +54,9 @@ define(['kb.app', 'kb.html', 'kb.session', 'jquery', 'q'], function (APP, html, 
             password: password
         })
             .then(function (session) {
-                APP.pub('loggedin');
+                R.pub('loggedin');
                 /* TODO should be configurable default login location */
-                APP.pub('navigate', 'about');
+                R.pub('navigate', 'about');
                 // App.navigateTo('about');
             })
             .catch(function (errorMsg) {

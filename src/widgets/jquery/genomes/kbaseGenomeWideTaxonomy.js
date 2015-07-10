@@ -5,7 +5,7 @@
  browser: true,
  white: true
  */
-define(['jquery', 'kb.app', 'kb.service.workspace', 'kb.jquery.widget', 'kb.jquery.genome.lineage'], function ($, App, Workspace) {
+define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.widget', 'kb.jquery.genome.lineage'], function ($, R, Workspace) {
     'use strict';
     $.KBWidget({
         name: "KBaseGenomeWideTaxonomy",
@@ -40,8 +40,8 @@ define(['jquery', 'kb.app', 'kb.service.workspace', 'kb.jquery.widget', 'kb.jque
         },
         prepareTree: function (scope, $div) {
             var objectIdentity = {ref: scope.ws + "/" + scope.id};
-            var workspace = new Workspace(App.getConfig('workspace_url'), {
-                token: App.getAuthToken() 
+            var workspace = new Workspace(R.getConfig('workspace_url'), {
+                token: R.getAuthToken() 
             });
             workspace.list_referencing_objects([objectIdentity], function (data) {
                 var treeName = null,

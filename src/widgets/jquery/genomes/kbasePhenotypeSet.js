@@ -9,8 +9,8 @@
  browser: true,
  white: true
  */
-define(['jquery', 'kb.app', 'kb.utils', 'kb.html', 'kb.service.workspace', 'kb.client.workspace', 'kb.jquery.widget', 'kb.jquery.kb-tabs', 'kb.jquery.media-editor', 'datatables_bootstrap', 'kb.jquery.kb-tabs'],
-    function ($, App, Utils, html, Workspace, WorkspaceClient) {
+define(['jquery', 'kb.runtime', 'kb.utils', 'kb.html', 'kb.service.workspace', 'kb.client.workspace', 'kb.jquery.widget', 'kb.jquery.kb-tabs', 'kb.jquery.media-editor', 'datatables_bootstrap', 'kb.jquery.kb-tabs'],
+    function ($, R, Utils, html, Workspace, WorkspaceClient) {
         'use strict';
         $.KBWidget({
             name: "kbasePhenotypeSet",
@@ -27,7 +27,7 @@ define(['jquery', 'kb.app', 'kb.utils', 'kb.html', 'kb.service.workspace', 'kb.c
                 var container = this.$elem;
 
                 container.loading();
-                var workspace = new Workspace(App.getConfig('workspace_url'), {
+                var workspace = new Workspace(R.getConfig('workspace_url'), {
                     token: options.token
                 });
                 Utils.promise(workspace, 'get_objects', {
@@ -136,7 +136,7 @@ define(['jquery', 'kb.app', 'kb.utils', 'kb.html', 'kb.service.workspace', 'kb.c
                     // this will be replaced with an consolidated media widget once 
                     // ui-common is a submodule
                     function mediaTab(ele, ws, id) {
-                        var fba = new FBA(App.getConfig('fba_url'));
+                        var fba = new FBA(R.getConfig('fba_url'));
                         Utils.promise(fba, 'get_media', {
                             medias: [id], workspaces: [ws]
                         })

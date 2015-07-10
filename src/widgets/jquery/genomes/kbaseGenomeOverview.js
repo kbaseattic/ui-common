@@ -12,7 +12,7 @@
  * Gene "instance" info (e.g. coordinates on a particular strain's genome)
  * is in a different widget.
  */
-define(['jquery', 'kb.app', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.service.cdmi-entity', 'kb.service.workspace' ], function ($, App, _Widget, CDMI, CDMI_Entity, Workspace) {
+define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.service.cdmi-entity', 'kb.service.workspace' ], function ($, R, _Widget, CDMI, CDMI_Entity, Workspace) {
     'use strict';
     $.KBWidget({
         name: "KBaseGenomeOverview",
@@ -28,7 +28,7 @@ define(['jquery', 'kb.app', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.service.c
         },
         token: null,
         // cdmiURL: "https://kbase.us/services/cdmi_api",
-        cdmiURL: App.getConfig('cdmi_url'),
+        cdmiURL: R.getConfig('cdmi_url'),
         $infoTable: null,
         noContigs: "No Contigs",
         init: function (options) {

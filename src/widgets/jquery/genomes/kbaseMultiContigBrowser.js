@@ -43,7 +43,7 @@
  *        $("#contigZoomOut").click(function()   { genomeWidget.zoomOut(); });
  */
 
-define(['jquery', 'kb.jquery.widget', 'd3', 'kb.app', 'kb.service.cdmi', 'kb.jquery.genome.contig-browser-buttons'], function ($, _W, d3, App, CDMI) {
+define(['jquery', 'kb.jquery.widget', 'd3', 'kb.runtime', 'kb.service.cdmi', 'kb.jquery.genome.contig-browser-buttons'], function ($, _W, d3, R, CDMI) {
     'use strict';
     $.KBWidget({
         name: "KBaseMultiContigBrowser",
@@ -101,7 +101,7 @@ define(['jquery', 'kb.jquery.widget', 'd3', 'kb.app', 'kb.service.cdmi', 'kb.jqu
         seedOntology: [],
         seedTermsUniq: [],
         seedColors: [],
-        cdmiURL: App.getConfig('cdmi_url'),
+        cdmiURL: R.getConfig('cdmi_url'),
         // proteinInfoURL: App.getConfig('protein_info_url'),
         // cdmiURL: "http://kbase.us/services/cdmi_api",
         // proteinInfoURL: "http://kbase.us/services/protein_info_service",

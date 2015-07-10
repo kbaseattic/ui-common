@@ -10,8 +10,8 @@
  browser: true,
  white: true
  */
-define(['jquery', 'kb.app', 'kb.service.workspace', 'kb.jquery.authenticatedwidget', 'kb.jquery.kb-tabs'],
-    function ($, App, Workspace) {
+define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticatedwidget', 'kb.jquery.kb-tabs'],
+    function ($, R, Workspace) {
         'use strict';
         $.KBWidget({
             name: "kbasePanGenome",
@@ -34,7 +34,7 @@ define(['jquery', 'kb.app', 'kb.service.workspace', 'kb.jquery.authenticatedwidg
             init: function (options) {
                 this._super(options);
 
-                this.wsUrl = App.getConfig('workspace_url');
+                this.wsUrl = R.getConfig('workspace_url');
                 this.pref = this.genUUID();
                 this.token = this.authToken();
                 this.geneIndex = {};

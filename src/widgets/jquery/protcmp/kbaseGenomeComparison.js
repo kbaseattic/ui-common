@@ -10,8 +10,8 @@
  * @author Roman Sutormin <rsutormin@lbl.gov>
  * @public
  */
-define(['jquery', 'kb.app', 'kb.service.workspace', 'd3', 'kb.jquery.authenticatedwidget'],
-    function ($, App, Workspace, d3) {
+define(['jquery', 'kb.runtime', 'kb.service.workspace', 'd3', 'kb.jquery.authenticatedwidget'],
+    function ($, R, Workspace, d3) {
         'use strict';
         $.KBWidget({
             name: "GenomeComparisonWidget",
@@ -48,7 +48,7 @@ define(['jquery', 'kb.app', 'kb.service.workspace', 'd3', 'kb.jquery.authenticat
             tooltip: null,
             init: function (options) {
                 this._super(options);
-                this.cmpImgUrl = App.getConfig('genomeCmp').replace('jsonrpc', 'image');
+                this.cmpImgUrl = R.getConfig('genomeCmp').replace('jsonrpc', 'image');
                 this.ws_name = options.ws_name;
                 this.ws_id = options.ws_id;
                 this.pref = this.uuid();
@@ -67,8 +67,8 @@ define(['jquery', 'kb.app', 'kb.service.workspace', 'd3', 'kb.jquery.authenticat
                     return;
                 }
 
-                var kbws = new Workspace(App.getConfig('workspace_url'), {
-                    token: App.getAuthToken()
+                var kbws = new Workspace(R.getConfig('workspace_url'), {
+                    token: R.getAuthToken()
                 });
 
                 var dataIsReady = function () {

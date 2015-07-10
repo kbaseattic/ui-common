@@ -1,10 +1,3 @@
-/*global
- define, console, window
- */
-/*jslint
- browser: true,
- white: true
- */
 /**
  * A singleton object module used for global state, and providing the primary api
  * for panels and widgets.
@@ -14,10 +7,17 @@
  * - dependencies on services, but don't expose them
  * 
  */
+/*global
+ define, console, window
+ */
+/*jslint
+ browser: true,
+ white: true
+ */
 define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'underscore', 'postal'],
     function (AppState, Session, Config, Router, $, Q, _, Postal) {
         'use strict';
-        return (function () {
+        var factory = function () {
             function navigateTo(location) {
                 //if (window.history.pushState) {
                 //    window.history.pushState(null, '', '#' + location);
@@ -445,6 +445,46 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                     window.clearInterval(heartbeatTimer);
                 }
             }
+            
+            // LIFECYCLE
+            
+            function setup() {
+                
+            }
+            
+            function doRoute() {
+                var handler = Router.findCurrentRoute();
+                if (!handler) {
+                    pub('route-not-found');
+                }
+                pub('new-route', {
+                    routeHandler: handler
+                });
+            }
+            
+            function start() {
+                $(window).bind('hashchange', function (e) {
+                    // NB this is called AFTER it has changed. The browser will do nothing by
+                    // default.
+                    doRoute();
+                });
+                
+                startHeartbeat();
+                
+                if (Session.isLoggedIn) {
+                    pub('loggedin');
+                } else {
+                    pub('loggedout');
+                }
+                
+                // Handle the initial route upon app load
+                doRoute();
+            }
+            
+            function stop() {
+                stopHeartbeat();
+                
+            }
 
             return {
                 addRoute: Router.addRoute,
@@ -469,7 +509,15 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                 isLoggedIn: Session.isLoggedIn.bind(Session),
                 getConfig: Config.getItem.bind(Config),
                 startHeartbeat: startHeartbeat,
-                stopHeartbeat: stopHeartbeat
+                stopHeartbeat: stopHeartbeat,
+                
+                start: start,
+                stop: stop
             };
-        }());
+        };
+        
+        
+        return {
+            create: factory
+        };
     });

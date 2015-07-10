@@ -12,14 +12,14 @@ define([
     'jquery',
     'q',
     'kb.service.workspace',
-    'kb.app',
+    'kb.runtime',
     'kb.html',
     'kb.utils.api',
     // no parameters
     'datatables_bootstrap',
     'kb.jquery.authenticatedwidget'
 ],
-    function ($, Q, Workspace, App, html, APIUtils) {
+    function ($, Q, Workspace, R, html, APIUtils) {
         'use strict';
         $.KBWidget({
             name: 'CollectionView',
@@ -30,7 +30,7 @@ define([
                 id: null,
                 ws: null
             },
-            ws_url: App.getConfig('workspace_url'),
+            ws_url: R.getConfig('workspace_url'),
             loading_image: 'assets/img/ajax-loader.gif',
             init: function (options) {
                 this._super(options);

@@ -10,7 +10,7 @@
  * @author Roman Sutormin <rsutormin@lbl.gov>
  * @public
  */
-define(['jquery', 'kb.jquery.widget', 'kb.app', 'kb.service.workspace', 'kb.utils'], function ($, _Widget, App, WorkspaceService, Utils) {
+define(['jquery', 'kb.jquery.widget', 'kb.runtime', 'kb.service.workspace', 'kb.utils'], function ($, _Widget, R, WorkspaceService, Utils) {
     'use strict';
     $.KBWidget({
         name: "kbaseDownloadPanel",
@@ -122,12 +122,12 @@ define(['jquery', 'kb.jquery.widget', 'kb.app', 'kb.service.workspace', 'kb.util
         },
         init: function (options) {
             this._super(options);
-            this.wsUrl = App.getConfig('workspace_url');
-            this.transformURL = App.getConfig('transform');
-            this.ujsURL = App.getConfig('user_job_state_url');
-            this.shockURL = App.getConfig('shock');
-            this.exportURL = App.getConfig('data_import_export');
-            this.token = App.getAuthToken();
+            this.wsUrl = R.getConfig('workspace_url');
+            this.transformURL = R.getConfig('transform');
+            this.ujsURL = R.getConfig('user_job_state_url');
+            this.shockURL = R.getConfig('shock');
+            this.exportURL = R.getConfig('data_import_export');
+            this.token = R.getAuthToken();
             this.type = null; //this.options.type;
             this.wsId = this.options.params.ws;
             this.objId = this.options.params.obj;

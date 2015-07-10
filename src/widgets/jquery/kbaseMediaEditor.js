@@ -5,8 +5,8 @@
  browser: true,
  white: true
  */
-define(['jquery', 'kb.app', 'kb.utils', 'kb.service.fba', 'kb.jquery.widget'],
-    function ($, App, Utils, FBA) {
+define(['jquery', 'kb.runtime', 'kb.utils', 'kb.service.fba', 'kb.jquery.widget'],
+    function ($, R, Utils, FBA) {
         'use strict';
         $.KBWidget({
             name: "kbaseMediaEditor",
@@ -19,7 +19,7 @@ define(['jquery', 'kb.app', 'kb.utils', 'kb.service.fba', 'kb.jquery.widget'],
                     media = options.name,
                     ws = options.ws,
                     container = this.$elem,
-                    fba = new FBA(App.getConfig('fba_url'));
+                    fba = new FBA(R.getConfig('fba_url'));
 
                 container.loading();
                

@@ -25,8 +25,8 @@
  * @author Mike Sneddon [mwsneddon@lbl.gov]
  * @author Dylan Chivian [dcchivian@lbl.gov]
  */
-define(['jquery', 'kb.app', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.service.cdmi-entity'],
-    function ($, App, _Widget, CDMI, CDMI_Entity) {
+define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.service.cdmi-entity'],
+    function ($, R, _Widget, CDMI, CDMI_Entity) {
         'use strict';
         $.KBWidget({
             name: "KBaseWikiDescription",
@@ -58,7 +58,7 @@ define(['jquery', 'kb.app', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.service.c
              * @type {string} cdmiURL - the default endpoint for the CDMI service
              */
             // cdmiURL: "https://kbase.us/services/cdmi_api",
-            cdmiURL: App.getConfig('cdmi_url'),
+            cdmiURL: R.getConfig('cdmi_url'),
             /**
              * @function init
              * Initialize the widget. This initializes the CDMI client code.

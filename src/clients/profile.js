@@ -1,5 +1,5 @@
-define(['kb.user_profile', 'kb.session', 'kb.appstate', 'kb.app'],
-function (UserProfile, Session, AppState, App) {
+define(['kb.user_profile', 'kb.session', 'kb.appstate', 'kb.runtime'],
+function (UserProfile, Session, AppState, R) {
     
     function loadProfile() {
         var userProfile = Object.create(UserProfile).init({username: Session.getUsername()});
@@ -9,7 +9,7 @@ function (UserProfile, Session, AppState, App) {
                         case 'stub':
                         case 'profile':
                             AppState.setItem('userprofile', profile);
-                            App.pub('profile.loaded', {
+                            R.pub('profile.loaded', {
                                 profile: profile
                             });
                             // Postal.channel('session').publish('profile.loaded', {profile: profile});
@@ -18,13 +18,13 @@ function (UserProfile, Session, AppState, App) {
                             profile.createStubProfile({createdBy: 'session'})
                                     .then(function (profile) {
                                         AppState.setItem('userprofile', profile);
-                                        App.pub('profile.loaded', {
+                                        R.pub('profile.loaded', {
                                             profile: profile
                                         });
                                         // Postal.channel('session').publish('profile.loaded', {profile: profile});
                                     })
                                     .catch(function (err) {
-                                        App.pub('profile.loadfailure', {
+                                        R.pub('profile.loadfailure', {
                                             error: err
                                         });
                                         // Postal.channel('session').publish('profile.loadfailure', {error: err});
@@ -35,7 +35,7 @@ function (UserProfile, Session, AppState, App) {
                 })
                 .catch(function (err) {
                     var errMsg = 'Error getting user profile';
-                    App.pub('profile.loadfailure', {
+                    R.pub('profile.loadfailure', {
                         error: err, 
                         message: errMsg
                     });

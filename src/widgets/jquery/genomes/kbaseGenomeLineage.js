@@ -10,7 +10,7 @@
  * Shows taxonomic lineage.
  *
  */
-define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.app', 'kb.service.cdmi', 'kb.service.cdmi-entity', 'kb.service.workspace', 'kb.service.trees'], function ($, _W, App, CDMI, CDMI_Entity, Workspace, KBaseTrees) {
+define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.runtime', 'kb.service.cdmi', 'kb.service.cdmi-entity', 'kb.service.workspace', 'kb.service.trees'], function ($, _W, R, CDMI, CDMI_Entity, Workspace, KBaseTrees) {
     'use strict';
     $.KBWidget({
         name: "KBaseGenomeLineage",
@@ -29,8 +29,8 @@ define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.app', 'kb.service.cdmi', 
         token: null,
         // cdmiURL: "https://kbase.us/services/cdmi_api",
         // treesURL: "https://kbase.us/services/trees",
-        cdmiURL: App.getConfig('cdmi_url'),
-        treesURL: App.getConfig('trees'),
+        cdmiURL: R.getConfig('cdmi_url'),
+        treesURL: R.getConfig('trees'),
         $infoTable: null,
         pref: null,
         init: function (options) {

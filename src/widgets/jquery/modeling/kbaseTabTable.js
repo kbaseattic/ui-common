@@ -6,8 +6,7 @@
  white: true
  */
 define([
-    'kb.app',
-    'kb.utils',
+    'kb.runtime',
     'jquery',
     'q',
     'kb.service.workspace',
@@ -25,7 +24,7 @@ define([
     'kb.jquery.helper-plugins',
     'datatables_bootstrap'
 ],
-    function (App, Utils, $, Q, Workspace, FBA, KBObjects) {
+    function (R, $, Q, Workspace, FBA, KBObjects) {
         'use strict';
         $.KBWidget({
             name: "kbaseTabTable",
@@ -119,7 +118,7 @@ define([
                     var param = {ref: input.ws + '/' + input.obj};
 
                 var workspace = new Workspace(App.getConfig('workspace_url'), {
-                    token: App.getAuthToken()
+                    token: R.getAuthToken()
                 });
 
                 Q(workspace.get_object_info_new({objects: [param], includeMetadata: 1}))

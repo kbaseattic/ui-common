@@ -14,13 +14,13 @@
  * will adapt this to work with the KBase SEED annotations
  */
 
-define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.app', 'd3', 'kb.service.workspace'], function ($, _W, App, d3, Workspace) {
+define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.runtime', 'd3', 'kb.service.workspace'], function ($, _W, R, d3, Workspace) {
     'use strict';
     $.KBWidget({
         name: "KBaseSEEDFunctions",
         parent: "kbaseAuthenticatedWidget",
         version: "1.0.0",
-        wsUrl: App.getConfig('workspace_url'),
+        wsUrl: R.getConfig('workspace_url'),
         // wsUrl: "https://kbase.us/services/ws",
         options: {
             objNameOrId: null,
@@ -64,7 +64,7 @@ define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.app', 'd3', 'kb.service.w
             this.subsysToGeneMap = [];
             this.maxCount = 0;
 
-            if (App.isLoggedIn()) {
+            if (R.isLoggedIn()) {
                 // if we are logged in, then somehow render gets called later...
             } else {
                 // if we are not logged in, then render

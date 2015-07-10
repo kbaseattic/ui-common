@@ -13,8 +13,8 @@
  * 
  * will adapt this to work with the KBase SEED annotations
  */
-define(['jquery', 'kb.jquery.widget', 'd3', 'kb.service.workspace', 'kb.app'],
-    function ($, _W, d3, Workspace, App) {
+define(['jquery', 'kb.jquery.widget', 'd3', 'kb.service.workspace', 'kb.runtime'],
+    function ($, _W, d3, Workspace, R) {
         'use strict';
         $.KBWidget({
             name: "KBaseSEEDFunctions",
@@ -62,7 +62,7 @@ define(['jquery', 'kb.jquery.widget', 'd3', 'kb.service.workspace', 'kb.app'],
                 this.subsysToGeneMap = [];
                 this.maxCount = 0;
 
-                if (App.isLoggedIn()) {
+                if (R.isLoggedIn()) {
                     // if we are logged in, then somehow render gets called later...
                 } else {
                     // if we are not logged in, then render
@@ -419,7 +419,7 @@ define(['jquery', 'kb.jquery.widget', 'd3', 'kb.service.workspace', 'kb.app'],
             loggedInCallback: function (event, auth) {
                 this.authToken = auth;
                 this.wsClient = new Workspace(App.getConfig('workspace_url'), {
-                    token: App.getAuthToken()
+                    token: R.getAuthToken()
                 });
                 this.render();
                 return this;

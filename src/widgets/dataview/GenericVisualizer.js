@@ -5,8 +5,8 @@
  browser: true,
  white: true
  */
-define(['jquery', 'q', 'kb.client.workspace', 'kb.app', 'kb.html'],
-    function ($, Q, WorkspaceClient, App, html) {
+define(['jquery', 'kb.client.workspace', 'kb.html'],
+    function ($, WorkspaceClient, html) {
         "use strict";
         var typeMap = {
             /*
@@ -268,7 +268,7 @@ define(['jquery', 'q', 'kb.client.workspace', 'kb.app', 'kb.html'],
 
             // Returns id for the 
             function createBSPanel(node, title) {
-                var id = App.genId(),
+                var id = html.genId(),
                     div = html.tag('div'),
                     span = html.tag('span');
                 $(node).html(div({class: 'panel panel-default '}, [

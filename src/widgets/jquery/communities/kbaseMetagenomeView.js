@@ -12,7 +12,7 @@
 define([
     'jquery',
     'kb.service.workspace',
-    'kb.app',
+    'kb.runtime',
     'kb.html',
     'kb.jquery.communities.graph',
     'kb.jquery.communities.plot',
@@ -22,7 +22,7 @@ define([
     'kb.jquery.authenticatedwidget',
     'kb.jquery.tabs',
     'datatables_bootstrap'
-], function ($, Workspace, App, H, Graph, Plot, GooglePalette) {
+], function ($, Workspace, R, H, Graph, Plot, GooglePalette) {
     'use strict';
     $.KBWidget({
         name: 'MetagenomeView',
@@ -33,7 +33,7 @@ define([
             id: null,
             ws: null
         },
-        ws_url: App.getConfig('workspace_url'),
+        ws_url: R.getConfig('workspace_url'),
         loading_image: "assets/img/ajax-loader.gif",
         init: function (options) {
             this._super(options);

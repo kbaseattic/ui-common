@@ -8,8 +8,8 @@
  browser: true,
  white: true
  */
-define(['jquery', 'kb.app', 'kb.html', 'kb.service.workspace', 'kb.jquery.authenticatedwidget', 'datatables_bootstrap'],
-    function ($, App, html, Workspace) {
+define(['jquery', 'kb.runtime', 'kb.html', 'kb.service.workspace', 'kb.jquery.authenticatedwidget', 'datatables_bootstrap'],
+    function ($, R, html, Workspace) {
         'use strict';
         $.KBWidget({
             name: 'AnnotationSetTable',
@@ -23,7 +23,7 @@ define(['jquery', 'kb.app', 'kb.html', 'kb.service.workspace', 'kb.jquery.authen
             loading_image: "assets/img/ajax-loader.gif",
             init: function (options) {
                 this._super(options);
-                this.ws_url = App.getConfig('workspace_url');
+                this.ws_url = R.getConfig('workspace_url');
                 return this;
             },
             render: function () {

@@ -10,7 +10,7 @@
  * @author Chris Bun <chrisbun@gmail.com>
  * @public
  */
-define(['jquery', 'kb.app', 'kb.jquery.authenticatedwidget'], function ($, App) {
+define(['jquery', 'kb.runtime', 'kb.jquery.authenticatedwidget'], function ($, R) {
     'use strict';
     $.KBWidget({
         name: "kbaseAssemblyView",
@@ -30,7 +30,7 @@ define(['jquery', 'kb.app', 'kb.jquery.authenticatedwidget'], function ($, App) 
         timer: null,
         init: function (options) {
             this._super(options);
-            this.wsUrl = App.getConfig('workspace_url');
+            this.wsUrl = R.getConfig('workspace_url');
             this.ws_name = options.ws_name;
             this.ws_id = options.ws_id;
             if (options.job_id)

@@ -5,8 +5,8 @@
  browser: true,
  white: true
  */
-define(['kb.html', 'kb.session', 'kb.app', 'q', 'jquery', 'knockout'],
-    function (html, Session, App, Q, $, ko) {
+define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
+    function (html, Session, R, Q, $, ko) {
 //define(['kb.app', 'kb.session', 'q'], function (App, Session, Q) {
         'use strict';
 
@@ -72,7 +72,7 @@ define(['kb.html', 'kb.session', 'kb.app', 'q', 'jquery', 'knockout'],
                 return categories;
             }
 
-            var searchService = SearchService(App.getConfig('search_url'));
+            var searchService = SearchService(R.getConfig('search_url'));
             function setupSearch(params) {
                 return Q.Promise(function (resolve, reject) {
                     searchService.getCategories()
