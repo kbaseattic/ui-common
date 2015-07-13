@@ -126,6 +126,7 @@ require.config({
         'kb.appstate': 'src/kbaseAppState',
         'kb.html': 'src/kbaseHTML',
         'kb.easytree': 'src/trees/easytree',
+        'kb.messaging': 'src/kbaseMessaging',
 
         
         // KBase Widgets

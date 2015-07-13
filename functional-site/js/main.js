@@ -171,7 +171,7 @@ require([
                 });
             });
         }
-        console.log('About to load panels...');
+        Runtime.logDebug({source: 'main', message: 'About to load panels...'});
         var promises = [
             {module: 'kb.panel.about'},
             {module: 'kb.panel.contact'},
@@ -190,7 +190,7 @@ require([
         });
         Q.all(promises)
             .then(function () {
-                console.log('setting up app');
+                Runtime.logDebug({source: 'main', message: 'setting up app'});
                 setupApp();
                 runApp();
             })
@@ -199,7 +199,7 @@ require([
                 console.log(err);
             })
             .done();
-        console.log('done');
+        Runtime.logDebug({source: 'main', message: 'done'});
 
 
     });

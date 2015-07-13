@@ -154,8 +154,6 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                     var storageSession = JSON.parse(storageSessionString);
                     if (session.token !== storageSession.token) {
                         Logger.logWarning('Local Storage Cookie token different than cookie token -- resetting session');
-                        // console.log(session.token);
-                        // console.log(storageSession)
                         this.removeSession();
                         return null;
                     }

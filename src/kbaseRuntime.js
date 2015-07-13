@@ -1,14 +1,9 @@
-/* global define */
-/* jslint white: true */
-define([],
-    function () {
+/*global define */
+/*jslint browser: true, white: true */
+define(['kb.logger', 'kb.session'],
+    function (Logger, Session) {
         'use strict';
         
-        function appMethod(method, args) {
-            var obj = getApp();
-            obj[method].apply(method, args);
-        }
-
         function setApp(app) {
             if (window._kbase_app !== undefined) {
                 throw new Error('App is already set');
@@ -22,49 +17,82 @@ define([],
             return window._kbase_app;
         }
 
+        function appMethod(method, args) {
+            var obj = getApp();
+            return obj[method].apply(obj, args);
+        }
+
         function getConfig() {
-            appMethod('getConfig', arguments);
+            return appMethod('getConfig', arguments);
         }
 
         function hasConfig() {
-            appMethod('hasConfig', arguments);
+            return appMethod('hasConfig', arguments);
         }
 
-        function getUserId() {
-            appMethod('getUserId', arguments);
-        }
-
-        function getUsername() {
-            appMethod('getUsername', arguments);
-        }
-        
-        function getUserRealname() {
-            appMethod('getUserRealname', arguments);
-        }
-       
-        function getAuthToken() {
-            appMethod('getAuthToken', arguments);
-        }
-        
-        function isLoggedIn() {
-            appMethod('isLoggedIn', arguments);
-        }
-        
         function pub() {
-            appMethod('pub', arguments);
+            return appMethod('pub', arguments);
         }
         
         function sub() {
-            appMethod('sub', arguments);
+            return appMethod('sub', arguments);
         }
         
         function genId() {
-            appMethod('genId', arguments);
+            return appMethod('genId', arguments);
         }
         
         function getItem() {
-            appMethod('getItem', arguments);
+            return appMethod('getItem', arguments);
         }
+        
+        // Logging
+        
+
+        
+        function proxyMethod(obj, method, args) {
+            return obj[method].apply(obj, args);
+        }
+        
+        function getUserId() {
+            return proxyMethod(Session, 'getUserId', arguments);
+        }
+
+        function getUserRealname() {
+            return proxyMethod(Session, 'getUserRealname', arguments);
+        }
+       
+        function getAuthToken() {
+            return proxyMethod(Session, 'getAuthToken', arguments);
+        }
+        
+        function getUsername() {
+            return proxyMethod(Session, 'getUsername', arguments);
+        }
+        
+        function isLoggedIn() {
+            return proxyMethod(Session, 'isLoggedIn', arguments);
+        }
+        
+        function logError() {
+            return proxyMethod(Logger, 'logError', arguments);
+        }
+        
+        function logWarning() {
+            return proxyMethod(Logger, 'logWarning', arguments);
+        }
+        
+        function logInfo() {
+            return proxyMethod(Logger, 'logInfo', arguments);
+        }
+        
+        function logDebug() {
+            return proxyMethod(Logger, 'logDebug', arguments);
+        }
+        
+        
+        
+        
 
         return {
             setApp: setApp,
@@ -79,7 +107,12 @@ define([],
             pub: pub,
             sub: sub,
             genId: genId,
-            getItem: getItem
+            getItem: getItem,
+            
+            logError: logError,
+            logWarning: logWarning,
+            logInfo: logInfo,
+            logDebug: logDebug
         };
     });
 

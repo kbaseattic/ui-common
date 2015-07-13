@@ -8,9 +8,8 @@
 define([
     'kb.runtime',    
     'kb.html',
-    'kb.session',
     'q'],
-    function (R, html, Session, Q) {
+    function (R, html, Q) {
         'use strict';
         // ACTUALLY: a widget
         /*
@@ -175,7 +174,7 @@ define([
             }
             function renderMenu() {
                 var ul = html.tag('ul');
-                if (Session.isLoggedIn()) {
+                if (R.isLoggedIn()) {
                     setMenu(['search', 'narrative', 'dashboard', 'databrowser', 'divider', 'about', 'contact', 'divider', 'about_kbase', 'contact_us']);
                 } else {
                     setMenu(['about', 'contact', 'divider', 'about_kbase', 'contact_us']);
@@ -208,11 +207,10 @@ define([
                     i = html.tag('i');
 
 
-                if (Session.isLoggedIn()) {
+                if (R.isLoggedIn()) {
                     // TODO: fix dependencies like this -- realname is not available until, and unless, the 
                     // profile is loaded, which happens asynchronously.            
                     var profile = R.getItem('userprofile');
-                    console.log(profile);
                     var realname = profile ? profile.getProp('user.realname') : '?';
                     return div({class: 'dropdown', style: 'display:inline-block'}, [
                         button({type: 'button', class: 'btn-btn-default dropdown-toggle', 'data-toggle': 'dropdown', 'aria-expanded': 'false'}, [
@@ -221,14 +219,14 @@ define([
                         ]),
                         ul({class: 'dropdown-menu', role: 'menu'}, [
                             li({}, [
-                                a({href: '/functional-site/#/people/' + Session.getUsername(), 'data-menu-item': 'userlabel'}, [
+                                a({href: '/functional-site/#/people/' + R.getUsername(), 'data-menu-item': 'userlabel'}, [
                                     div({style: 'display:inline-block; width: 34px; vertical-align: top;'}, [
                                         span({class: 'fa fa-user', style: 'font-size: 150%; margin-right: 10px;'})
                                     ]),
                                     div({style: 'display: inline-block', 'data-element': 'user-label'}, [
                                         realname,
                                         br(),
-                                        i({}, Session.getUsername())
+                                        i({}, R.getUsername())
                                     ])
                                 ])
                             ]),

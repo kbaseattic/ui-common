@@ -133,8 +133,10 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                         });
                     }
                     $(mountPoint.element).empty().append(container);
-
+                    console.log('starting? ');
+                    console.log(mounted);
                     if (mounted && mounted.start) {
+                        console.log('starting');
                         mounted.start($('#' + mounted.id).get(0), mounted);
                     }
 
@@ -185,20 +187,17 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                     handler.route.promise(handler.params)
                         .then(function (result) {
                             if (result.content) {
-                                mount(mountName, result, handler.route)
-                                    .then(function () {
-                                        if (result.widgets) {
-                                            Object.keys(result.widgets).forEach(function (widgetName) {
-                                                var widget = result.widgets[widgetName];
-                                                widget.attach($('#' + widget.id));
-                                            });
-                                        }
-                                    })
-                                    .catch(function (err) {
-                                        console.log('ERROR');
-                                        console.log(err);
-                                    })
-                                    .done();
+                                return [result, mount(mountName, result, handler.route)];
+                            } else {
+                                throw new Error('Nothing to mount.');
+                            }
+                        })
+                        .spread(function (result, mounted) {
+                            if (result.widgets) {
+                                Object.keys(result.widgets).forEach(function (widgetName) {
+                                    var widget = result.widgets[widgetName];
+                                    widget.attach($('#' + widget.id));
+                                });
                             }
                         })
                         .catch(function (err) {
@@ -432,7 +431,6 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                 heartbeatTimer;
 
             function startHeartbeat() {
-                console.log('Starting the heartbeat...');
                 heartbeat = 0;
                 heartbeatTimer = window.setInterval(function () {
                     heartbeat += 1;

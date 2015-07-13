@@ -1,33 +1,68 @@
 /*global
- define
+ define,console
  */
 /*jslint
  browser: true,
  white: true
  */
-define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
+define([
+    'kb.html',
+    'kb.session',
+    'kb.runtime',
+    'q',
+    'jquery',
+    'knockout'],
     function (html, Session, R, Q, $, ko) {
-//define(['kb.app', 'kb.session', 'q'], function (App, Session, Q) {
         'use strict';
+
+        // Panel wide communication bus...
+
+        var messageBus = new ko.subscribable();
 
         function SearchService(serviceURL) {
             // Populate the categories from the search service.
             function getCategories() {
+                return Q($.get(serviceURL + 'categories'));
+            }
+
+            function getCategoryCount(query, category) {
+                var queryOptions = {
+                    page: 1,
+                    itemsPerPage: 0,
+                    category: category,
+                    q: query
+                };
+                // we wrap the ajax promise because we need to trap the category
                 return Q.Promise(function (resolve, reject) {
-                    $.ajax({
-                        url: serviceURL + 'categories',
-                        type: 'GET',
-                        success: function (data) {
+                    Q($.ajax({
+                        method: 'GET',
+                        url: serviceURL + 'getResults',
+                        data: queryOptions,
+                        responseType: 'json',
+                        crossDomain: true
+                    }))
+                        .then(function (data) {
+                            // we need to add the category on to the result object
+                            // to be able to treat this independent of the query.
+                            // It would be nice if the search service did this
+                            // for us...
+                            
+                            console.log('about to notify...');
+                            console.log(category);
+                            console.log(data);
+                            messageBus.notifySubscribers({
+                                name: category,
+                                count: data.totalResults
+                            }, 'categoryCount');
+                            
+                            data.category = category;
                             resolve(data);
-                        },
-                        error: function (jqxhr, status, err) {
-                            reject({
-                                jqhxr: jqxhr,
-                                status: status,
-                                error: err
-                            });
-                        }
-                    });
+                        })
+                        .catch(function (err) {
+                            reject(err);
+                        })
+                        .done();
+
                 });
             }
 
@@ -42,7 +77,7 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
                         page: 1,
                         itemsPerPage: 0,
                         category: category
-                    }
+                    };
                     $.ajax({
                         url: serviceURL + 'getResults',
                         type: 'GET',
@@ -62,31 +97,141 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
 
             return {
                 getCategories: getCategories,
+                getCategoryCount: getCategoryCount,
                 getFacets: getFacetSearch
             };
         }
 
         function Search() {
-            var categories = null;
+            var categoryResults = null;
+            var categoryList = [];
+            var categoryMap = {};
+
             function getCategories() {
-                return categories;
+                return categoryList;
             }
 
             var searchService = SearchService(R.getConfig('search_url'));
             function setupSearch(params) {
                 return Q.Promise(function (resolve, reject) {
+                    resolve();
+                    //searchService.getCategories()
+                    //    .then(function (data) {
+                    //        categories = data;
+                    //        resolve();
+                    //    })
+                    //    .done();
+                });
+            }
+
+
+            function fetchCategories(params) {
+                return Q.Promise(function (resolve, reject) {
                     searchService.getCategories()
                         .then(function (data) {
-                            categories = data;
-                            resolve();
+                            categoryList = Object.keys(data.categories).map(function (key) {
+                                // var cat = categoryResults.categories[key];
+                                /* TODO: add facets here too -- so that this becomes a complete map of all categories, facets, and their counts */
+                                var catObj = {
+                                    name: key,
+                                    totalCount: null,
+                                    currentCount: null
+                                };
+                                return catObj;
+                            });
+                            resolve(categoryList);
+                        })
+                        .catch(function (err) {
+                            reject(err);
                         })
                         .done();
                 });
             }
 
+            function fetchCategoriesCounts(categories) {
+                return Q.Promise(function (resolve, reject) {
+                    // Create an array of promises for fetching the counts
+                    // per category.
+                    var counts = categories.map(function (category) {
+                            return searchService.getCategoryCount('*', category);
+                        });
+
+                    Q.all(counts)
+                        .then(function (results) {
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            console.log('ERROR1');
+                            console.log(err);
+                            reject(err);
+                        })
+                        .done();
+
+                });
+            }
+            
+            function xfetchCategoriesCounts(categories) {
+                return Q.Promise(function (resolve, reject) {
+                    // Create an array of promises for fetching the counts
+                    // per category.
+                    var categoryMap = {},
+                        counts = categories.map(function (category) {
+                            categoryMap[category] = category;
+                            return searchService.getCategoryCount('*', category);
+                        });
+                                                    console.log('STARTING...');
+
+                    Q.all(counts)
+                        .then(function (results) {
+                            console.log('STARTING...');
+                            results.forEach(function (result) {
+                                var category = result.category,
+                                    categoryObj = categoryMap[category];
+                                if (categoryObj.totalCount === null) {
+                                    categoryObj.totalCount = result.totalResults;
+                                }
+                                categoryObj.currentCount = result.totalResults;
+
+                                // now just messages...
+                                console.log('here');
+                                console.log(category);
+                                messageBus.notifySubscribers({
+                                    name: category,
+                                    count: result.totalResults
+                                }, 'categoryCount');
+                            });
+                            resolve(categoryList);
+                        })
+                        .catch(function (err) {
+                            console.log('ERROR1');
+                            console.log(err);
+                            reject(err);
+                        })
+                        .done();
+
+                });
+            }
+
+            function fetchCategoryCounts(category) {
+                return Q.Promise(function (resolve) {
+                    searchService.getCategoryCount('*', category)
+                        .then(function (results) {
+                            resolve(results);
+                        })
+                        .catch(function (err) {
+                            console.log('ERROR');
+                            console.log(err);
+                        })
+                        .done();
+                });
+            }
+
+
             return {
                 setup: setupSearch,
-                getCategories: getCategories
+                getCategories: getCategories,
+                fetchCategories: fetchCategories,
+                fetchCategoriesCounts: fetchCategoriesCounts
             };
         }
 
@@ -95,6 +240,7 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
         function categoryComponent() {
             function ViewModel(params) {
                 var selectedCategoryId = params.selectedCategoryId;
+                var selectedCategory = params.selectedCategory;
 
                 function removeCategory() {
                     selectedCategoryId(null);
@@ -102,13 +248,18 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
 
                 return {
                     selectedCategoryId: selectedCategoryId,
+                    selectedCategory: selectedCategory,
                     removeCategory: removeCategory
                 };
             }
 
-            var div = html.tag('div');
+            var div = html.tag('div'),
+                span = html.tag('span');
             var template = div({}, [
-                div({dataBind: {text: 'selectedCategoryId', click: 'removeCategory'}, style: {cursor: 'pointer'}})
+                div(['Category Id: ', span({dataBind: {text: 'selectedCategoryId'}})]),
+                div({dataBind: {with : 'selectedCategory'}}, [
+                    div({dataBind: {text: 'name', click: '$parent.removeCategory'}, style: {cursor: 'pointer'}})
+                ])
             ]);
 
             return {
@@ -123,7 +274,8 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
                 //var facets = ko.observableArray(params.currentCategory);
                 // var facets = params.facets;
 
-                var facets = ko.computed
+                // var facets = ko.computed
+                var facets = null;
 
                 return {
                     facets: facets
@@ -142,8 +294,8 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
                 template: template
             };
         }
-        
-         function selectNarrativeComponent() {
+
+        function selectNarrativeComponent() {
             // This will actually render results based on what type of results 
             // are pending.
             // TODO: switch view based on type of results
@@ -197,14 +349,39 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
                     selectedCategoryId: params.selectedCategoryId
                 };
             }
-            
+
             var div = html.tag('div');
             var template = div({}, [
-                div({dataBind: {component: {
-                            name: 'resultsComponentName',
-                            params: {selectedCategoryId: 'selectedCategoryId',
-                                categories: 'categories'}
-                        }}})
+                'this will be the search results area...'
+            ]);
+
+
+            /*
+             * 
+             * this is an attempt to swap components in the search area
+             var template = div({}, [
+             div({dataBind: {component: {
+             name: 'resultsComponentName',
+             params: {selectedCategoryId: 'selectedCategoryId',
+             categories: 'categories'}
+             }}})
+             ]);
+             */
+            return {
+                template: template,
+                viewModel: {createViewModel: ViewModel}
+            };
+        }
+
+        function resultsCategoryDefaultComponent() {
+            function ViewModel(params) {
+                return {
+                };
+            }
+
+            var div = html.tag('div');
+            var template = div({}, [
+                'This is the defulat search component...'
             ]);
 
             return {
@@ -212,26 +389,8 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
                 viewModel: {createViewModel: ViewModel}
             };
         }
-        
-        function resultsCategoryDefaultComponent() {
-            function ViewModel(params) {
-                return {
-                    
-                }
-            }
-            
-            var div = html.tag('div');
-            var template = div({}, [
-                'This is the defulat search component...'
-            ]);
-            
-            return {
-                template: template,
-                viewModel: {createViewModel: ViewModel}
-            }
-        }
 
-       
+
         /**
          * A component for showing search categories, with the ability to select
          * a category and set the currently selected category.
@@ -246,27 +405,79 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
             // At the moment we assume results are just categories.
 
             var div = html.tag('div'),
-                header = html.tag('h2');
+                header = html.tag('h2'),
+                table = html.tag('table'),
+                tr = html.tag('tr'),
+                td = html.tag('td'),
+                th = html.tag('th'),
+                thead = html.tag('thead'),
+                tbody = html.tag('tbody');
+            
             var template = div({}, [
                 header({}, 'Categories'),
-                div({style: 'border: 1px red solid'}, [
-                    div({dataBind: {foreach: 'categories'}}, [
-                        div({dataBind: {text: '$data', click: '$parent.selectCategory'}, style: {cursor: 'pointer'}})
+                table({class: 'table table-striped'}, [
+                    thead([
+                        tr([
+                            th('Category'),
+                            th('Total'),
+                            th('Current')
+                        ])
+                    ]),
+                    tbody({dataBind: {foreach: 'categories'}}, [
+                        tr({dataBind: {click: '$parent.selectCategory', 
+                                       style: '{backgroundColor: name() === $parent.selectedCategoryId() ? "silver" : "transparent"}'}, 
+                            style: {cursor: 'pointer'}}, [
+                            td({dataBind: {text: 'name'}}),
+                            td([
+                                div({dataBind: {visible: 'totalCount() === null'}}, html.loading()),
+                                div({dataBind: {text: 'totalCount'}})
+                            ]),
+                            td([
+                                div({dataBind: {visible: 'currentCount() === null'}}, html.loading()),
+                                div({dataBind: {text: 'currentCount'}})
+                            ])
+                        ])
                     ])
                 ])
             ]);
 
             function ViewModel(params) {
-                var categoryInfo = params.categories;
-                var categoryKeys = Object.keys(categoryInfo.categories);
-                var categories = ko.observableArray(categoryKeys);
+
+                /*
+                 * Okay, first thing we do is turn the categories into an
+                 * observable structure, for binding to the view.
+                 * 
+                 * Our categories are a list of categories, and the total and
+                 * current search count for each one. 
+                 * 
+                 * We also have a non-observable map of these, for more efficient
+                 * lookup of categories which might be updated.
+                 * 
+                 * Note: perhaps we can just skip that for now...
+                 * 
+                 * Hmm, maybe the categories should already be observable when
+                 * they are provided in the params?
+                 * 
+                 * Then we create a function for being able to update this
+                 * from outside, when search conditions change...
+                 * 
+                 */
+
+                var categories = params.categories;
+
+
+
                 var selectedCategoryId = params.selectedCategoryId;
 
                 function selectCategory(value) {
-                    selectedCategoryId(value);
-                    var fac = categoryInfo.categories[value];
-                    console.log(fac);
-                }
+                    if (selectedCategoryId() === value.name()) {
+                        selectedCategoryId(null);
+                    } else {
+                        selectedCategoryId(value.name());
+                    }
+                    //var fac = categoryInfo.categories[value];
+                    //console.log(fac);
+               }
                 function selectFacet(value) {
                     alert("selecte facet " + value);
                     // addSelectedFacet(value);
@@ -274,7 +485,8 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
                 return {
                     categories: categories,
                     selectCategory: selectCategory,
-                    selectFacet: selectFacet
+                    selectFacet: selectFacet,
+                    selectedCategoryId: selectedCategoryId
                 };
             }
 
@@ -326,7 +538,6 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
                     submitSearch: submitSearch
                 };
             }
-            ;
 
             return {
                 viewModel: {createViewModel: ViewModel},
@@ -337,16 +548,86 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
         function searchAppComponent() {
             var div = html.tag('div');
 
+            function category(name, total, current) {
+                return {
+                    name: ko.observable(name),
+                    totalCount: ko.observable(total),
+                    currentCount: ko.observable(current)
+                };
+            }
+
             function ViewModel() {
-                var categories = search.getCategories();
+                /*
+                 * Categories are fetched initially, and updated as the search evolves.
+                 * They are fixed, but the counts associated with them change.
+                 * We turn the category map into an array (for sorting).
+                 */
+                // NB the categories are already fetched for the first time by this
+                // point.
+                var tempCat = search.getCategories();
+                var categoryMap = {};
+                var categories = ko.observableArray(tempCat.map(function (category) {
+                    var observedObject = {};
+                    Object.keys(category).forEach(function (key) {
+                        observedObject[key] = ko.observable(category[key]);
+                    });
+                    categoryMap[category.name] = observedObject;
+                    return observedObject;
+                }));
+
+                // Spin off something to fetch and populate categories?
+
+                /*
+                 search.fetchCategories()
+                 .then(function (cats) {
+                 cats.forEach(function (cat) {
+                 var observedObject = {};
+                 Object.keys(cat).forEach(function (key) {
+                 observedObject[key] = ko.observable(cat[key]);
+                 });
+                 categoryMap[cat.name] = observedObject;
+                 categories.push(observedObject);
+                 });
+                 })
+                 .catch(function (err) {
+                 console.log('ERROR');
+                 console.log(err);
+                 })
+                 .done();
+                 */
+
+                /* Now do it with a subscription */
+                messageBus.subscribe(function (cats) {
+                    cats.forEach(function (cat) {
+                        var c = category(cat.name, null, null);
+                        categoryMap[cat.name] = c;
+                        categories.push(c);
+                    });
+                }, null, 'categoriesAdded');
+                
+                messageBus.subscribe(function (category) {
+                    var c = categoryMap[category.name];
+                    if (c.totalCount() === null) {
+                        c.totalCount(category.count);
+                    }
+                    c.currentCount(category.count);
+                    
+                }, null, 'categoryCount');
+
+                /*
+                 * A category may be selected, in which case we provide a computed
+                 * observable which contains the currently selected category.
+                 */
                 var selectedCategoryId = ko.observable(null);
                 var selectedCategory = ko.computed(function (thing) {
                     if (selectedCategoryId()) {
-                        return categories.categories[selectedCategoryId()];
+                        return categoryMap[selectedCategoryId()];
                     } else {
                         return null;
                     }
                 });
+
+
                 var resultsComponentName = ko.computed(function (thing) {
                     if (selectedCategory() === null) {
                         return 'search-results-categories';
@@ -372,11 +653,14 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
                 div({class: 'col-md-3'}, [
                     html.panel('Select Narrative', div({dataBind: {component: {name: '"select-narrative"', params: {isLoggedIn: 'isLoggedIn'}}}})),
                     html.panel('Shopping Cart', 'your shopping cart'),
-                    html.panel('Category', div({dataBind: {component: {name: '"search-category"', params: {selectedCategoryId: 'selectedCategoryId'}}}})),
+                    html.panel('Category', div({dataBind: {component: {name: '"search-category"', params: {selectedCategoryId: 'selectedCategoryId', selectedCategory: 'selectedCategory'}}}})),
                     html.panel('Refine', div({dataBind: {component: {name: '"search-category-facets"', params: {selectedCategory: 'selectedCategory', selectedFacets: 'selectedFacets'}}}}))
                 ]),
                 div({class: 'col-md-9'}, [
                     html.panel('Search', div({dataBind: {component: '"search-bar"'}})),
+                    html.panel('Categories', div({dataBind: {component: {name: '"search-results-categories"',
+                                params: {selectedCategoryId: 'selectedCategoryId',
+                                    categories: 'categories'}}}})),
                     html.panel('Results', div({dataBind: {component: {name: '"search-results"',
                                 params: {selectedCategoryId: 'selectedCategoryId',
                                     categories: 'categories',
@@ -394,10 +678,10 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
             $(node).find('*').each(function () {
                 $(this).unbind();
             });
-            
+
             // Remove KO subscriptions.
             if (remove) {
-                ko.removeNode(node);                
+                ko.removeNode(node);
             } else {
                 ko.cleanNode(node);
             }
@@ -440,13 +724,26 @@ define(['kb.html', 'kb.session', 'kb.runtime', 'q', 'jquery', 'knockout'],
                 },
                 isBound: false,
                 start: function (node, self) {
-                    ///if (!self.isBound) {
-                        ko.applyBindings(null, node);
-                    //    self.isBound = true;
-                    //}
-                    //console.log(node);
-                    //Search.start(node);
-                    //Search.search(node, 'search', {q: '*'} ); 
+                    // Kick off knockout
+                    ko.applyBindings(null, node);
+                    
+                    // Get initial data -- categories and their counts with the current search
+                    search.fetchCategories()
+                        .then(function (categories) {
+                            messageBus.notifySubscribers(categories, 'categoriesAdded');
+                            search.fetchCategoriesCounts(categories.map(function (cat) {return cat.name;}))
+                                .then(function (results) {
+                                })
+                                .catch(function (err) {
+                                })
+                                .done();
+                        })
+                        .catch(function (err) {
+                            console.log('ERROR');
+                            console.log(err);
+                        })
+                        .done();
+
                 },
                 stop: function (node, state) {
                     unapplyBindings(node, true);

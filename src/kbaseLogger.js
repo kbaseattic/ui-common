@@ -69,6 +69,11 @@ define([], function () {
         },
         logError: {
             value: function (msg) {
+                if (typeof msg === 'string') {
+                    msg = {
+                        message: msg
+                    };
+                }
                 msg.type = 'ERROR';
                 this.log(msg);
                 return this;
@@ -76,6 +81,11 @@ define([], function () {
         },
         logWarning: {
             value: function (msg) {
+                if (typeof msg === 'string') {
+                    msg = {
+                        message: msg
+                    };
+                }
                 msg.type = 'WARNING';
                 this.log(msg);
                 return this;
@@ -83,6 +93,11 @@ define([], function () {
         },
         logInfo: {
             value: function (msg) {
+                if (typeof msg === 'string') {
+                    msg = {
+                        message: msg
+                    };
+                }
                 msg.type = 'INFO';
                 this.log(msg);
                 return this;
@@ -90,6 +105,11 @@ define([], function () {
         },
         logDebug: {
             value: function (msg) {
+                if (typeof msg === 'string') {
+                    msg = {
+                        message: msg
+                    };
+                }
                 msg.type = 'DEBUG';
                 this.log(msg);
                 return this;
