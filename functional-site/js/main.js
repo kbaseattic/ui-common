@@ -182,7 +182,8 @@ require([
             {module: 'kb.panel.narrativestore'},
             {module: 'kb.panel.datasearch'},
             {module: 'kb.panel.dataview'},
-            {module: 'kb.panel.databrowser'}
+            {module: 'kb.panel.databrowser'},
+            {module: 'kb.panel.spec'}
         ].map(function (panel) {
             return requirePromise([panel.module], function (Panel) {
                 Panel.setup(app);

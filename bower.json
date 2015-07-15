@@ -52,6 +52,8 @@
     "d3-sankey": "*",
     "jquery.svg": "*",
     "node-uuid": "1.4.3",
-    "rgb-color": "*"
+    "rgb-color": "*",
+    "jquery-ui": "1.11.4",
+    "google-code-prettify": "1.0.4"
   }
 }

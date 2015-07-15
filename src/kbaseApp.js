@@ -78,6 +78,23 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                     if (!mountPoint) {
                         resolve();
                     }
+                    
+                    // Stop and unmount widgets.
+                    if (mountPoint.widgets) {
+                        Object.keys(mountPoint.widgets).forEach(function (widgetKey) {
+                            var widget = mountPoint.widgets[widgetKey];
+                            if (widget.stop) {
+                                widget.stop(widget);
+                            }
+                            console.log('detaching widget...');
+                            if (widget.detach) {
+                                widget.detach(widget);
+                            }
+                        });
+                    }
+                    
+                    
+                    // Stop and unmount current panel.
                     if (mountPoint.mounted && mountPoint.mounted.stop) {
                         mountPoint.mounted.stop($(mountPoint.mounted.id), mountPoint.mounted);
                     }
@@ -114,6 +131,7 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
 
                     mountPoint.rawContent = content.content;
                     mountPoint.events = content.events;
+                    mountPoint.widgets = content.widgets;
                     mountPoint.mounted = mounted;
                     if (!mounted.id) {
                         mounted.id = genId();
@@ -133,10 +151,7 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                         });
                     }
                     $(mountPoint.element).empty().append(container);
-                    console.log('starting? ');
-                    console.log(mounted);
                     if (mounted && mounted.start) {
-                        console.log('starting');
                         mounted.start($('#' + mounted.id).get(0), mounted);
                     }
 
@@ -160,8 +175,14 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                                         //}
                                         if (result.widgets) {
                                             Object.keys(result.widgets).forEach(function (widgetName) {
-                                                var widget = result.widgets[widgetName];
-                                                widget.attach($('#' + widget.id));
+                                                var widgetConnector = result.widgets[widgetName];
+                                                widgetConnector.attach($('#' + widgetConnector.id));
+                                            });
+                                            Object.keys(result.widgets).forEach(function (widgetName) {
+                                                var widgetConnector = result.widgets[widgetName];
+                                                if (widgetConnector.start) {
+                                                    widgetConnector.start();
+                                                }
                                             });
                                         }
                                     })

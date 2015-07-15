@@ -5,7 +5,16 @@
  browser: true,
  white: true
  */
-define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb.service.workspace', 'kb.widget.navbar', 'q', 'underscore'],
+define([
+    'kb.widget.dataview.base',
+    'kb.utils.api',
+    'kb.utils',
+    'kb.session',
+    'kb.service.workspace',
+    'kb.widget.navbar',
+    'q',
+    'underscore'
+],
     function (DataviewWidget, APIUtils, Utils, Session, WorkspaceService, Navbar, Q, _) {
         'use strict';
         var widget = Object.create(DataviewWidget, {
@@ -32,22 +41,22 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb
                         // for the offset. Javascript (ecmascript) specifies 8601 as an input format, but goes on to specify the specific subset 
                         // including the offset with the colon separator.
                         /*
-                        var date = new Date(dateString);
-                        var seconds = Math.floor((new Date() - date) / 1000);
-
-                        // f-ing safari, need to add extra ':' delimiter to parse the timestamp
-                        if (isNaN(seconds)) {
-                            var tokens = dateString.split('+'),  // this is just the date without the GMT offset
-                                newTimestamp = tokens[0] + '+' + tokens[0].substr(0, 2) + ':' + tokens[1].substr(2, 2);
-                            date = new Date(dateString);
-                            seconds = Math.floor((new Date() - date) / 1000);
-                            if (isNaN(seconds)) {
-                                // just in case that didn't work either, then parse without the timezone offset, but
-                                // then just show the day and forget the fancy stuff...
-                                date = new Date(tokens[0]);
-                                return monthLookup[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
-                            }
-                        }*/
+                         var date = new Date(dateString);
+                         var seconds = Math.floor((new Date() - date) / 1000);
+                         
+                         // f-ing safari, need to add extra ':' delimiter to parse the timestamp
+                         if (isNaN(seconds)) {
+                         var tokens = dateString.split('+'),  // this is just the date without the GMT offset
+                         newTimestamp = tokens[0] + '+' + tokens[0].substr(0, 2) + ':' + tokens[1].substr(2, 2);
+                         date = new Date(dateString);
+                         seconds = Math.floor((new Date() - date) / 1000);
+                         if (isNaN(seconds)) {
+                         // just in case that didn't work either, then parse without the timezone offset, but
+                         // then just show the day and forget the fancy stuff...
+                         date = new Date(tokens[0]);
+                         return monthLookup[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+                         }
+                         }*/
 
                         // keep it simple, just give a date without time: look in narrative data list if we want to switch to 'time ago' format.
                         return monthLookup[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
@@ -216,7 +225,7 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb
                                 type: 'internal',
                                 code: 'invalidstatus',
                                 shortMessage: 'The internal status "' + this.getState('status') + '" is not suppored'
-                                // originalMessage: err.message
+                                    // originalMessage: err.message
                             });
                             this.places.content.html(this.renderTemplate('error'));
                             break;
@@ -594,9 +603,6 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb
                     }.bind(this));
                 }
             }
-
-
         });
-
         return widget;
     });

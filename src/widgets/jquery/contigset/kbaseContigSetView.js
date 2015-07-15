@@ -10,7 +10,13 @@
  * @author Roman Sutormin <rsutormin@lbl.gov>
  * @public
  */
-define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.service.workspace', 'kb.utils', 'datatables_bootstrap'], function ($, _ignore, Workspace, Utils, DataTables) {
+define([
+    'jquery',
+    'kb.jquery.authenticatedwidget',
+    'kb.service.workspace',
+    'kb.utils',
+    'datatables_bootstrap'
+], function ($, _ignore, Workspace, Utils, DataTables) {
     'use strict';
     $.KBWidget({
         name: "kbaseContigSetView",
@@ -102,27 +108,28 @@ define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.service.workspace', 'kb.u
                         ////////////////////////////// Contigs Tab //////////////////////////////
                         $('#' + pref + 'contigs').append('<table cellpadding="0" cellspacing="0" border="0" id="' + pref + 'contigs-table" ' +
                             'class="table table-bordered table-striped" style="width: 100%; margin-left: 0px; margin-right: 0px;"/>');
-                        var contigsData = [];
 
-                        for (var pos in cs.contigs) {
-                            var contig = cs.contigs[pos];
-                            contigsData.push({name: contig.id, length: contig.length});
-                        }
+                        
+                        var contigsData = cs.contigs.map(function (contig) {
+                            return {
+                                name: contig.id, 
+                                length: contig.length
+                            };
+                        });
                         var contigsSettings = {
-                            "sPaginationType": "full_numbers",
-                            "iDisplayLength": 10,
-                            "aoColumns": [
+                            sPaginationType: "full_numbers",
+                            iDisplayLength: 10,
+                            aoColumns: [
                                 {sTitle: "Contig name", mData: "name"},
                                 {sTitle: "Length", mData: "length"}
                             ],
-                            "aaData": [],
-                            "oLanguage": {
-                                "sSearch": "Search contig:",
-                                "sEmptyTable": "No contigs found."
+                            aaData: contigsData,
+                            oLanguage: {
+                                sSearch: "Search contig:",
+                                sEmptyTable: "No contigs found."
                             }
                         };
                         var contigsTable = $('#' + pref + 'contigs-table').dataTable(contigsSettings);
-                        contigsTable.fnAddData(contigsData);
 
                     })
                     .catch(function (data) {

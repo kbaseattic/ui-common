@@ -171,6 +171,8 @@ define(['underscore'], function (_) {
             if (children) {
                 if (_.isString(children)) {
                     return children;
+                } else if (_.isNumber(children)) {
+                    return '' + children;
                 } else if (_.isArray(children)) {
                     var content = '';
                     children.forEach(function (item) {

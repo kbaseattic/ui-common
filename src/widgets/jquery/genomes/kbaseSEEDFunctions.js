@@ -13,7 +13,13 @@
  * 
  * will adapt this to work with the KBase SEED annotations
  */
-define(['jquery', 'kb.jquery.widget', 'd3', 'kb.service.workspace', 'kb.runtime'],
+define([
+    'jquery',
+    'kb.jquery.widget',
+    'd3',
+    'kb.service.workspace',
+    'kb.runtime'
+],
     function ($, _W, d3, Workspace, R) {
         'use strict';
         $.KBWidget({
@@ -418,7 +424,7 @@ define(['jquery', 'kb.jquery.widget', 'd3', 'kb.service.workspace', 'kb.runtime'
             },
             loggedInCallback: function (event, auth) {
                 this.authToken = auth;
-                this.wsClient = new Workspace(App.getConfig('workspace_url'), {
+                this.wsClient = new Workspace(R.getConfig('workspace_url'), {
                     token: R.getAuthToken()
                 });
                 this.render();

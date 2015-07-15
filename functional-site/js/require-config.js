@@ -52,6 +52,8 @@ require.config({
         // External Dependencies
         // ----------------------
         jquery: 'bower_components/jquery/dist/jquery',
+        'jquery-ui': 'bower_components/jquery-ui/jquery-ui.min',
+        'jquery-ui-css': 'bower_components/jquery-ui/themes/ui-lightness/jquery-ui.min',
         bootstrap: 'bower_components/bootstrap/dist/js/bootstrap.min',
         bootstrap_css: 'bower_components/bootstrap/dist/css/bootstrap.min',
         q: 'bower_components/q/q',
@@ -95,6 +97,8 @@ require.config({
         'popit': 'lib/popit',
         'knhx': 'lib/knhx',
         'googlepalette': 'lib/googlepalette',
+        'google-code-prettify': 'bower_components/google-code-prettify/bin/prettify.min',
+        'google-code-prettify-style': 'bower_components/google-code-prettify/bin/prettify.min',
         
         // Just style, man.
         'font-awesome': 'bower_components/font-awesome/css/font-awesome.min',
@@ -127,6 +131,7 @@ require.config({
         'kb.html': 'src/kbaseHTML',
         'kb.easytree': 'src/trees/easytree',
         'kb.messaging': 'src/kbaseMessaging',
+        'kb.format': 'src/kbaseFormat',
 
         
         // KBase Widgets
@@ -188,6 +193,7 @@ require.config({
         'kb.panel.dataview': 'src/panels/dataview',
         'kb.panel.dataview.style': 'src/panels/dataview',
         'kb.panel.databrowser': 'src/panels/databrowser',
+        'kb.panel.spec': 'src/panels/spec',
         
         // KBase JQuery Plugin Widgets
         // ---------------------------
@@ -259,6 +265,16 @@ require.config({
         // trees
         'kb.jquery.trees.tree': 'src/widgets/jquery/trees/kbaseTree',
 
+
+        // type spec
+        'kb.spec.common': 'src/widgets/jquery/spec/kbaseSpecCommon',
+        'kb.jquery.spec.type-card': 'src/widgets/jquery/spec/kbaseSpecTypeCard',
+        'kb.jquery.card-layout-manager': 'src/widgets/jquery/kbaseCardLayoutManager',
+        'kb.jquery.landing-page-card': 'src/widgets/jquery/kbaseLandingPageCard',
+        
+        'kb.widget.spec.data-type-specification': 'src/widgets/dataspec/DataTypeSpecification',
+        'kb.widget.spec.module-specification': 'src/widgets/dataspec/ModuleSpecification',
+        'kb.widget.error': 'src/widgets/kbaseError',
             
 
         
@@ -332,7 +348,13 @@ require.config({
         */
        'kb.jquery.communities.jquery-svg': {
            deps: ['jquery']
-       }
+       },
+        'jquery-ui': {
+            deps: ['jquery', 'css!jquery-ui-css']
+        },
+        'google-code-prettify': {
+            deps: ['css!google-code-prettify-style']
+        }
         
 
     },

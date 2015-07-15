@@ -431,7 +431,7 @@ define(['jquery', 'kb.jquery.widget', 'd3', 'kb.runtime', 'kb.service.cdmi', 'kb
                 return [firstBase, lastBase];
             };
 
-            var range = calcLocRange(loc[0]);
+            var range = calcLocRange(loc[0]), nextRange;
             for (var i = 1; i < loc.length; i++) {
                 nextRange = calcLocRange(loc[i]);
                 if (nextRange[0] < range[0])
