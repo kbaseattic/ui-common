@@ -8,7 +8,16 @@
 /**
  * KBase widget to display table and boxplot of BIOM data
  */
-define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.service.workspace', 'kb.runtime', 'kb.html', 'kb.utils.api', 'kb.jquery.communities.graph', 'datatables_bootstrap'],
+define([
+    'jquery', 
+    'kb.jquery.authenticatedwidget', 
+    'kb.service.workspace', 
+    'kb.runtime', 
+    'kb.html', 
+    'kb.utils.api', 
+    'kb.jquery.communities.graph', 
+    'datatables_bootstrap'
+],
     function ($, _AuthenticatedWidget, Workspace, R, html, APIUtils, Graph) {
         'use strict';
         $.KBWidget({

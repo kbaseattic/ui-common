@@ -5,7 +5,13 @@
  browser: true,
  white: true
  */
-define(['kb.jquery.modeling.objects'], function (KBObjects) {
+define([
+    'q',
+    'kb.runtime',
+    'kb.service.fba',
+    'kb.service.workspace',
+    'kb.jquery.modeling.objects'
+], function (Q, R, FBA, Workspace, KBObjects) {
     'use strict';
     function KBaseFBA_FBAModel(modeltabs) {
         var self = this;
@@ -283,41 +289,42 @@ define(['kb.jquery.modeling.objects'], function (KBObjects) {
                 "data": rxn.gpr
             });
             if (rxn.rxnkbid !== "rxn00000") {
-                var p = self.modeltabs.kbapi('fba', 'get_reactions', {
+                var fba = new FBA(R.getConfig('fba_url'), {
+                    token: R.getAuthToken()
+                });
+                return Q(fba.get_reactions({
                     reactions: [rxn.rxnkbid],
                     biochemistry: self.biochem,
                     biochemistry_workspace: self.biochemws
-                }).then(function (data) {
-                    if ("deltaG" in data[0]) {
-                        output.push({
-                            "label": "Delta G",
-                            "data": data[0].deltaG + " (" + data[0].deltaGErr + ") kcal/mol"
-                        });
-                    }
-                    output.push({
-                        "label": "Enzymes",
-                        "data": data[0].enzymes.join(", ")
-                    });
-                    var aliashash = {};
-                    var finalaliases = [];
-                    for (var i = 0; i < data[0].aliases.length; i++) {
-                        if (!(data[0].aliases[i] in aliashash)) {
-                            finalaliases.push(data[0].aliases[i]);
-                            aliashash[data[0].aliases[i]] = 1;
+                }))
+                    .then(function (data) {
+                        if ("deltaG" in data[0]) {
+                            output.push({
+                                "label": "Delta G",
+                                "data": data[0].deltaG + " (" + data[0].deltaGErr + ") kcal/mol"
+                            });
                         }
-                    }
-                    output.push({
-                        "label": "Aliases",
-                        "data": finalaliases.join(", ")
+                        output.push({
+                            "label": "Enzymes",
+                            "data": data[0].enzymes.join(", ")
+                        });
+                        var aliashash = {};
+                        var finalaliases = [];
+                        for (var i = 0; i < data[0].aliases.length; i++) {
+                            if (!(data[0].aliases[i] in aliashash)) {
+                                finalaliases.push(data[0].aliases[i]);
+                                aliashash[data[0].aliases[i]] = 1;
+                            }
+                        }
+                        output.push({
+                            "label": "Aliases",
+                            "data": finalaliases.join(", ")
+                        });
+                        return output;
                     });
-                    return output;
-                });
-                return p;
             }
             return output;
         };
-
-
 
         this.GeneTab = function (info) {
             // var gene = this.genehash[id];
@@ -360,32 +367,35 @@ define(['kb.jquery.modeling.objects'], function (KBObjects) {
                     "function": "CompartmentTab"
                 }];
             if (cpd.cpdkbid !== "cpd00000") {
-                var p = self.modeltabs.kbapi('fba', 'get_compounds', {
+                var fba = new FBA(R.getConfig('fba_url'), {
+                    token: R.getAuthToken()
+                });
+                return Q(fba.get_compounds({
                     compounds: [cpd.cpdkbid],
                     biochemistry: self.biochem,
                     biochemistry_workspace: self.biochemws
-                }).then(function (data) {
-                    if ("deltaG" in data[0]) {
-                        output.push({
-                            "label": "Delta G",
-                            "data": data[0].deltaG + " (" + data[0].deltaGErr + ") kcal/mol"
-                        });
-                    }
-                    var aliashash = {};
-                    var finalaliases = [];
-                    for (var i = 0; i < data[0].aliases.length; i++) {
-                        if (!(data[0].aliases[i] in aliashash)) {
-                            finalaliases.push(data[0].aliases[i]);
-                            aliashash[data[0].aliases[i]] = 1;
+                }))
+                    .then(function (data) {
+                        if ("deltaG" in data[0]) {
+                            output.push({
+                                "label": "Delta G",
+                                "data": data[0].deltaG + " (" + data[0].deltaGErr + ") kcal/mol"
+                            });
                         }
-                    }
-                    output.push({
-                        "label": "Aliases",
-                        "data": finalaliases.join(", ")
+                        var aliashash = {};
+                        var finalaliases = [];
+                        for (var i = 0; i < data[0].aliases.length; i++) {
+                            if (!(data[0].aliases[i] in aliashash)) {
+                                finalaliases.push(data[0].aliases[i]);
+                                aliashash[data[0].aliases[i]] = 1;
+                            }
+                        }
+                        output.push({
+                            "label": "Aliases",
+                            "data": finalaliases.join(", ")
+                        });
+                        return output;
                     });
-                    return output;
-                });
-                return p;
             }
             return output;
         };
@@ -449,7 +459,6 @@ define(['kb.jquery.modeling.objects'], function (KBObjects) {
 
         this.GapfillTab = function (info) {
             var gfid = info.id;
-            console.log(gfid);
             var gf = self.gfhash[gfid];
             var ref;
             if ("gapfill_ref" in gf) {
@@ -460,56 +469,59 @@ define(['kb.jquery.modeling.objects'], function (KBObjects) {
             if ("output" in gf) {
                 return gf.output;
             }
-            var p = self.modeltabs.kbapi('ws', 'get_objects', [{ref: ref}]).then(function (data) {
-                var solutions = data[0].data.gapfillingSolutions;
-                return self.parse_gf_solutions(solutions);
-            }).then(function (solutions) {
-                if (gf.integrated === "1") {
-                    gf.integrated = "yes";
-                } else if (gf.integrated === "0") {
-                    gf.integrated = "no";
-                }
-                gf.output = [{
-                        "label": "Gapfill ID",
-                        "data": gf.simpid
-                    }, {
-                        "label": "Media",
-                        "linkformat": "dispWSRef",
-                        "type": "wstype",
-                        "wstype": "KBaseFBA.Media",
-                        "data": gf.media_ref
-                    }, {
-                        "label": "Integrated",
-                        "data": gf.integrated
-                    }];
-                if (gf.integrated === "yes") {
-                    gf.output.push({
-                        "label": "Integrated solution",
-                        "data": gf.integrated_solution
-                    });
-                }
-                var rxns = "";
-                for (var i = 0; i < solutions.length; i++) {
-                    var solrxns = solutions[i].gapfillingSolutionReactions;
-                    for (var j = 0; j < solrxns.length; j++) {
-                        if (j > 0) {
-                            rxns += "<br>";
-                        }
-                        rxns += solrxns[j].id;
-                        if ("equation" in solrxns[j]) {
-                            rxns += ":" + solrxns[j].equation;
+            var workspace = new Workspace(R.getConfig('workspace_url'), {
+                token: R.getAuthToken()
+            });
+            return Q(workspace.get_objects([{ref: ref}]))
+                .then(function (data) {
+                    var solutions = data[0].data.gapfillingSolutions;
+                    return self.parse_gf_solutions(solutions);
+                })
+                .then(function (solutions) {
+                    if (gf.integrated === "1") {
+                        gf.integrated = "yes";
+                    } else if (gf.integrated === "0") {
+                        gf.integrated = "no";
+                    }
+                    gf.output = [{
+                            "label": "Gapfill ID",
+                            "data": gf.simpid
+                        }, {
+                            "label": "Media",
+                            "linkformat": "dispWSRef",
+                            "type": "wstype",
+                            "wstype": "KBaseFBA.Media",
+                            "data": gf.media_ref
+                        }, {
+                            "label": "Integrated",
+                            "data": gf.integrated
+                        }];
+                    if (gf.integrated === "yes") {
+                        gf.output.push({
+                            "label": "Integrated solution",
+                            "data": gf.integrated_solution
+                        });
+                    }
+                    var rxns = "";
+                    for (var i = 0; i < solutions.length; i++) {
+                        var solrxns = solutions[i].gapfillingSolutionReactions;
+                        for (var j = 0; j < solrxns.length; j++) {
+                            if (j > 0) {
+                                rxns += "<br>";
+                            }
+                            rxns += solrxns[j].id;
+                            if ("equation" in solrxns[j]) {
+                                rxns += ":" + solrxns[j].equation;
+                            }
                         }
                     }
-                }
 
-                gf.output.push({
-                    "label": "Solution " + i,
-                    "data": rxns
+                    gf.output.push({
+                        "label": "Solution " + i,
+                        "data": rxns
+                    });
+                    return gf.output;
                 });
-                console.log(gf.output);
-                return gf.output;
-            });
-            return p;
         };
 
         this.parse_gf_solutions = function (solutions) {
@@ -533,19 +545,22 @@ define(['kb.jquery.modeling.objects'], function (KBObjects) {
                 ids.push(key);
             }
             if (ids.length > 0) {
-                var p = self.modeltabs.kbapi('fba', 'get_reactions', {
+                var fba = new FBA(R.getConfig('fba_url'), {
+                    token: R.getAuthToken()
+                });
+                return Q(fba.get_reactions({
                     reactions: ids,
                     biochemistry: biochem,
                     biochemistry_workspace: biochemws
-                }).then(function (data) {
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i]) {
-                            rxnshash[data[i].id].equation = data[i].definition;
+                }))
+                    .then(function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i]) {
+                                rxnshash[data[i].id].equation = data[i].definition;
+                            }
                         }
-                    }
-                    return solutions;
-                });
-                return p;
+                        return solutions;
+                    });
             }
             return solutions;
         };

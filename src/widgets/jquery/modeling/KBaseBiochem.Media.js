@@ -21,7 +21,7 @@ define(['kb.jquery.modeling.objects'], function (KBObjects) {
                 source: data[10]["Source ID"],
                 minimal: data[10]["Is Minimal"],
                 defined: data[10]["Is Defined"],
-                numcompounds: data[10]["Number compounds"]}
+                numcompounds: data[10]["Number compounds"]};
         };
         this.setData = function (data) {
             this.data = data;
@@ -53,8 +53,6 @@ define(['kb.jquery.modeling.objects'], function (KBObjects) {
         };
         this.CompoundTab = function (info) {
             var cpd = this.cpdhash[info.id];
-            console.log('info', cpd);
-
             return [
                 {
                     "label": "Compound",

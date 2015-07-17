@@ -1,10 +1,3 @@
-/*global
- define
- */
-/*jslint
- browser: true,
- white: true
- */
 /*
  Graph Renderer
  
@@ -108,8 +101,17 @@
  normalize_stacked_area (boolean)
  If set to false the stacked area chart will not normalize the values
  */
-
-define(['jquery', 'kb.jquery.communities.jquery-svg'], // 'jquery-svg-graph-deviation', 'jquery-svg-graph-stacked-area'],
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true
+ */
+define([
+    'jquery',
+    'kb.jquery.communities.jquery-svg'
+], // 'jquery-svg-graph-deviation', 'jquery-svg-graph-stacked-area'],
     function ($) {
         'use strict';
         var standaloneGraph = {
@@ -342,7 +344,7 @@ define(['jquery', 'kb.jquery.communities.jquery-svg'], // 'jquery-svg-graph-devi
 
                 // Mix in the defaults and whatever the user provided in params.
                 $.extend(true, instance.settings, this.defaults, params);
-                
+
                 // disable caching these, the user can do that themselves.
                 // window.rendererGraph.push(instance);
 
@@ -353,7 +355,7 @@ define(['jquery', 'kb.jquery.communities.jquery-svg'], // 'jquery-svg-graph-devi
                 var target = this.settings.target;
                 target.innerHTML = "<div class='graph_div'></div>";
                 target.firstChild.setAttribute('style', "width: " + this.settings.width + "px; height: " + this.settings.height + "px;");
-                
+
                 $(target).find('.graph_div').svg();
 
                 var cmax = 0;
@@ -426,7 +428,7 @@ define(['jquery', 'kb.jquery.communities.jquery-svg'], // 'jquery-svg-graph-devi
                         for (i = 0; i < this.parentElement.children.length; i += 1) {
                             if (this.parentElement.children[i] === this) {
                                 if (this.getAttribute('r')) {
-                                    i -= 1 ;
+                                    i -= 1;
                                 }
                                 label = svg.graph.xAxis.labels().labels[i];
                                 break;
@@ -542,7 +544,7 @@ define(['jquery', 'kb.jquery.communities.jquery-svg'], // 'jquery-svg-graph-devi
                     }
                 }
                 var chartOptions = {barWidth: this.settings.barWidth || 25};
-                
+
                 svg.graph.status(this.hover);
 
                 svg.graph.noDraw().

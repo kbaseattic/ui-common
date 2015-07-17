@@ -1,82 +1,82 @@
-define('ace/mode/kidl', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/sql_highlight_rules', 'ace/range'], function(require, exports, module) {
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true,
+ todo: true
+ */
+define(
+    'ace/mode/kidl',
+    [
+        'ace/lib/oop',
+        'ace/mode/text',
+        'ace/mode/sql_highlight_rules'
+    ],
+    function (oop, Text, SQL) {
+        'use strict';
 
+        var Mode = function () {
+            this.HighlightRules = SQL.SqlHighlightRules;
+        };
+        oop.inherits(Mode, Text.TextMode);
 
-var oop = require("../lib/oop");
-var TextMode = require("./text").Mode;
-var Tokenizer = require("../tokenizer").Tokenizer;
-var SqlHighlightRules = require("./sql_highlight_rules").SqlHighlightRules;
-var Range = require("../range").Range;
+        (function () {
+            this.$id = 'ace/mode/kidl';
+        }).call(Mode.prototype);
 
-var Mode = function() {
-    this.HighlightRules = SqlHighlightRules;
-};
-oop.inherits(Mode, TextMode);
+        exports.Mode = Mode;
+    });
 
-(function() {
+define(
+    'ace/mode/sql_highlight_rules',
+    [
+        'ace/lib/oop',
+        'ace/mode/text_highlight_rules'
+    ],
+    function (oop, Text) {
 
-    //this.lineCommentStart = "//";
+        var SqlHighlightRules = function () {
 
-    this.$id = "ace/mode/kidl";
-}).call(Mode.prototype);
+            var keywords = (
+                'module|typedef|funcdef|authentication|required|optional|none|include|' +
+                'returns|string|int|float|UnspecifiedObject|list|mapping|structure|tuple'
+                );
 
-exports.Mode = Mode;
+            var builtinConstants = ('');
 
-});
+            var builtinFunctions = ('');
 
-define('ace/mode/sql_highlight_rules', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text_highlight_rules'], function(require, exports, module) {
+            var keywordMapper = this.createKeywordMapper({
+                'support.function': builtinFunctions,
+                'keyword': keywords,
+                'constant.language': builtinConstants
+            }, 'identifier', true);
 
+            this.$rules = {
+                'start': [
+                    {
+                        token: 'comment',
+                        start: '/\\*',
+                        end: '\\*/'
+                    }, {
+                        token: keywordMapper,
+                        regex: '[a-zA-Z_$][a-zA-Z0-9_$]*\\b'
+                    }, {
+                        token: 'paren.lparen',
+                        regex: '[\\{\\<]'
+                    }, {
+                        token: 'paren.rparen',
+                        regex: '[\\}\\>]'
+                    }, {
+                        token: 'text',
+                        regex: '\\s+'
+                    }]
+            };
+            this.normalizeRules();
+        };
 
-var oop = require("../lib/oop");
-var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+        oop.inherits(SqlHighlightRules, Text.TextHighlightRules);
 
-var SqlHighlightRules = function() {
-
-    var keywords = (
-        "module|typedef|funcdef|authentication|required|optional|none|include|"+
-        "returns|string|int|float|UnspecifiedObject|list|mapping|structure|tuple"
-    );
-
-    var builtinConstants = (
-        ""
-    );
-
-    var builtinFunctions = (
-        ""
-    );
-
-    var keywordMapper = this.createKeywordMapper({
-        "support.function": builtinFunctions,
-        "keyword": keywords,
-        "constant.language": builtinConstants
-    }, "identifier", true);
-
-    this.$rules = {
-        "start" : [ /* {
-            token : "comment",
-            regex : "//.*$"
-        },*/  {
-            token : "comment",
-            start : "/\\*",
-            end : "\\*/"
-        }, {
-            token : keywordMapper,
-            regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
-        }, {
-            token : "paren.lparen",
-            regex : "[\\{\\<]"
-        }, {
-            token : "paren.rparen",
-            regex : "[\\}\\>]"
-        }, {
-            token : "text",
-            regex : "\\s+"
-        } ]
-    };
-    this.normalizeRules();
-};
-
-oop.inherits(SqlHighlightRules, TextHighlightRules);
-
-exports.SqlHighlightRules = SqlHighlightRules;
-});
-
+        exports.SqlHighlightRules = SqlHighlightRules;
+    });

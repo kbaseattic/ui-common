@@ -37,47 +37,12 @@ define([
                 var self = this;
 
                 // root url path for landing pages
-                var DATAVIEW_URL = '/functional-site/#/dataview/';
+                var DATAVIEW_URL = '/functional-site/#dataview/';
 
                 var type = input.type;
 
                 // tab widget
                 var tabs;
-
-                // 0) No more clients.  Make this global.  please.
-                this.kbapi = function (service, method, params) {
-                    var url, fullMethod;
-                    if (service === 'ws') {
-                        url = "https://kbase.us/services/ws/";
-                        fullMethod = 'Workspace.' + method;
-                    } else if (service === 'fba') {
-                        url = "https://kbase.us/services/KBaseFBAModeling/";
-                        fullMethod = 'fbaModelServices.' + method;
-                    }
-
-                    var rpc = {
-                        params: [params],
-                        method: fullMethod,
-                        version: "1.1",
-                        id: String(Math.random()).slice(2)
-                    };
-
-                    var prom = $.ajax({
-                        url: url,
-                        type: 'POST',
-                        processData: false,
-                        data: JSON.stringify(rpc),
-                        beforeSend: function (xhr) {
-                            if (self.authToken()) {
-                                xhr.setRequestHeader("Authorization", self.authToken());
-                            }
-                        }
-                    }).then(function (data) {
-                        return data.result[0];
-                    });
-
-                    return prom;
-                };
 
                 // base class for workspace object classes
                 var kbObjects = new KBObjects();
@@ -117,11 +82,14 @@ define([
                 else if (!isNaN(input.ws) && !isNaN(input.obj))
                     var param = {ref: input.ws + '/' + input.obj};
 
-                var workspace = new Workspace(App.getConfig('workspace_url'), {
+                this.workspace = new Workspace(R.getConfig('workspace_url'), {
+                    token: R.getAuthToken()
+                });
+                this.fba = new FBA(R.getConfig('fba_url'), {
                     token: R.getAuthToken()
                 });
 
-                Q(workspace.get_object_info_new({objects: [param], includeMetadata: 1}))
+                Q(this.workspace.get_object_info_new({objects: [param], includeMetadata: 1}))
                     .then(function (res) {
                         self.obj.setMetadata(res[0]);
 
@@ -148,12 +116,13 @@ define([
                 //
                 // 4) get object data, create tabs
                 //
-                if (isNaN(input.ws) && isNaN(input.obj))
+                if (isNaN(input.ws) && isNaN(input.obj)) {
                     var param = {workspace: input.ws, name: input.obj};
-                else if (!isNaN(input.ws) && !isNaN(input.obj))
+                } else if (!isNaN(input.ws) && !isNaN(input.obj)) {
                     var param = {ref: input.ws + '/' + input.obj};
+                }
 
-                Q(workspace.get_objects([param]))
+                Q(this.workspace.get_objects([param]))
                     .then(function (data) {
                         var setMethod = self.obj.setData(data[0].data);
 
@@ -190,16 +159,17 @@ define([
                     }
 
                     // get human readable info from workspaces
-                    return self.kbapi('ws', 'get_object_info_new', {objects: refs})
+                    return Q(self.workspace.get_object_info_new({objects: refs}))
                         .then(function (data) {
                             refs.forEach(function (ref, i) {
-
                                 // if (ref in referenceLookup) return
-                                refLookup[ref.ref] = {name: data[i][1],
+                                refLookup[ref.ref] = {
+                                    name: data[i][1],
                                     ws: data[i][7],
                                     type: data[i][2].split('-')[0],
                                     //link: data[i][2].split('-')[0]+'/'+data[i][7]+'/'+data[i][1]
-                                    link: data[i][7] + '/' + data[i][1]};
+                                    link: data[i][7] + '/' + data[i][1]
+                                };
                             });
                         });
                 }
@@ -329,7 +299,6 @@ define([
                     });
                 }
 
-
                 // takes table spec, returns datatables column settings
                 function getColSettings(tab) {
 
@@ -355,10 +324,8 @@ define([
                         settings.push(config);
                     }
 
-
                     return settings;
                 }
-
 
                 function ref(key, type, format, method, action) {
                     return function (d) {
@@ -425,19 +392,20 @@ define([
                             type = row.type;
 
                         // don't display undefined things in vertical table
-                        if ('data' in row && typeof row.data == 'undefined' ||
-                            'key' in row && typeof data[row.key] == 'undefined')
-                            continue
+                        if ('data' in row && typeof row.data === 'undefined' ||
+                            'key' in row && typeof data[row.key] === 'undefined') {
+                            continue;
+                        }
 
                         var r = $('<tr>');
-                        r.append('<td><b>' + row.label + '</b></td>')
+                        r.append('<td><b>' + row.label + '</b></td>');
 
                         // if the data is in the row definition, use it
                         if ('data' in row) {
                             var value;
-                            if (type == 'tabLinkArray') {
+                            if (type === 'tabLinkArray') {
                                 value = tabLinkArray(row.data, row.method);
-                            } else if (type == 'tabLink') {
+                            } else if (type === 'tabLink') {
                                 value = '<a class="id-click" data-id="' + row.data + '" data-method="' + row.method + '">' +
                                     row.dispid + '</a>';
                             } else {
@@ -445,7 +413,7 @@ define([
                             }
                             r.append('<td>' + value + '</td>');
                         } else if ('key' in row) {
-                            if (row.type == 'wstype') {
+                            if (row.type === 'wstype') {
                                 var ref = data[row.key];
 
                                 var cell = $('<td data-ref="' + ref + '">loading...</td>');
@@ -456,43 +424,43 @@ define([
                                     var ref = info.ref;
                                     table.find("[data-ref='" + ref + "']")
                                         .html('<a href="' + DATAVIEW_URL + info.url + '" target="_blank">' + name + '</a>');
-                                })
+                                });
 
                             } else {
                                 r.append('<td>' + data[row.key] + '</td>');
                             }
-                        } else if (row.type == 'pictureEquation')
+                        } else if (row.type === 'pictureEquation') {
                             r.append('<td>' + pictureEquation(row.data) + '</td>');
+                        }
 
                         table.append(r);
                     }
 
                     return table;
-                }
-
+                };
 
                 this.getBiochemReaction = function (id) {
-                    var input = {reactions: [id]};
-                    return self.kbapi('fba', 'get_reactions', {reactions: [id]})
+                    return Q(this.fba.get_reactions({reactions: [id]}))
                         .then(function (data) {
                             return data[0];
-                        })
-                }
+                        });
+                };
 
                 this.getBiochemCompound = function (id) {
-                    return self.kbapi('fba', 'get_compounds', {compounds: [id]})
+                    return Q(this.fba.get_compounds({compounds: [id]}))
                         .then(function (data) {
                             return data[0];
-                        })
-                }
+                        });
+                };
 
                 this.getBiochemCompounds = function (ids) {
-                    return self.kbapi('fba', 'get_compounds', {compounds: ids})
-                }
+                    return Q(this.fba.get_compounds({compounds: ids}));
+                };
 
+                /* TODO: replace these remote calls with locally installed images. */
                 this.compoundImage = function (id) {
                     return 'http://bioseed.mcs.anl.gov/~chenry/jpeg/' + id + '.jpeg';
-                }
+                };
 
                 var imageURL = "http://bioseed.mcs.anl.gov/~chenry/jpeg/";
                 this.pictureEquation = function (eq) {
@@ -501,6 +469,7 @@ define([
                     for (var i = 0; i < cpds.left.length; i++) {
                         var cpd = cpds.left[i];
                         var img_url = imageURL + cpd + '.jpeg';
+                        /* TODO: this is going to fail ... there is no panel node around unless it is set globally in some dependency ... */
                         panel.append('<div class="pull-left text-center">\
                                     <img src="' + img_url + '" width=150 ><br>\
                                     <div class="cpd-id" data-cpd="' + cpd + '">' + cpd + '</div>\
@@ -534,23 +503,21 @@ define([
                         }
                     }
 
-
                     var cpd_ids = cpds.left.concat(cpds.right);
-                    var prom = self.kbapi('fba', 'get_compounds', {compounds: cpd_ids})
-                    $.when(prom).done(function (d) {
+                    Q(this.fba.get_compounds({compounds: cpd_ids}))
+                    .then(function (d) {
                         var map = {};
                         for (var i in d) {
                             map [d[i].id ] = d[i].name;
                         }
 
                         $('.cpd-id').each(function () {
-                            $(this).html(map[$(this).data('cpd')])
-                        })
+                            $(this).html(map[$(this).data('cpd')]);
+                        });
                     });
 
-
                     return panel;
-                }
+                };
 
                 function get_cpds(equation) {
                     var cpds = {};
@@ -562,18 +529,14 @@ define([
                 }
 
                 function getLink(ref) {
-                    return self.kbapi('ws', 'get_object_info_new',
-                        {objects: [{ref: ref}]})
+                    return Q(self.workspace.get_object_info_new({objects: [{ref: ref}]}))
                         .then(function (data) {
                             var a = data[0];
                             return {url: a[7] + '/' + a[1], ref: a[6] + '/' + a[0] + '/' + a[4]};
                         });
                 }
 
-
                 return this;
             }
         });
     });
-
-

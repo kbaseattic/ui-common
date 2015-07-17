@@ -12,9 +12,9 @@ define(['jquery', 'kb.client.workspace', 'kb.html'],
             /*
              widget doesn't work. The underlying collection object looks broken.
              The collection object itself does not seem to return 
-            Does not work in production either 
-            Fixed!
-            It is just that some collection objects are broken.
+             Does not work in production either 
+             Fixed!
+             It is just that some collection objects are broken.
              */
             'Communities.Collection': {
                 title: 'Data View',
@@ -59,7 +59,15 @@ define(['jquery', 'kb.client.workspace', 'kb.html'],
             },
             // DO later ,need to port heatmap or use another heatmap widget.
             // 'Communities.Heatmap'
-
+            'Communities.Heatmap': {
+                name: 'Data View',
+                module: 'kb.jquery.communities.abundance-data-heatmap',
+                widget: 'AbundanceDataHeatmap',
+                options: [
+                    {from: 'workspaceId', to: 'ws'},
+                    {from: 'objectId', to: 'id'}
+                ]
+            },
             /* NEEDS A COMPLEX LANDING PAGE */
             'Communities.Metagenome': {
                 //  Plugged in MetagenomeView (required a different kbaseTabs than for Neal's modeling) 
@@ -252,6 +260,60 @@ define(['jquery', 'kb.client.workspace', 'kb.html'],
                     {from: 'objectVersion', to: 'treeObjVer'}
                 ]
             },
+            /*
+             * The modeling widgets are all based on the "tab table" which  
+             * expects the widgets to be made through an internal object
+             * system. All widgets are loaded within the tab-table module, 
+             * and looked up and loaded there.
+             */
+            'KBaseBiochem.Media': {
+                title: 'Data View',
+                module: 'kb.jquery.modeling.tab-table',
+                widget: 'kbaseTabTable',
+                panel: true,
+                options: [
+                    {from: 'workspaceName', to: 'ws'},
+                    {from: 'objectName', to: 'obj'},
+                    {from: 'objectType', to: 'type'},
+                    {from: 'authToken', to: 'token'}
+                ]
+            },
+            'KBaseFBA.FBA': {
+                title: 'Data View',
+                module: 'kb.jquery.modeling.tab-table',
+                widget: 'kbaseTabTable',
+                panel: true,
+                options: [
+                    {from: 'workspaceName', to: 'ws'},
+                    {from: 'objectName', to: 'obj'},
+                    {from: 'objectType', to: 'type'},
+                    {from: 'authToken', to: 'token'}
+                ]
+            },
+            'KBaseFBA.FBAModel': {
+                title: 'Data View',
+                module: 'kb.jquery.modeling.tab-table',
+                widget: 'kbaseTabTable',
+                panel: true,
+                options: [
+                    {from: 'workspaceName', to: 'ws'},
+                    {from: 'objectName', to: 'obj'},
+                    {from: 'objectType', to: 'type'},
+                    {from: 'authToken', to: 'token'}
+                ]
+            },
+            'KBaseFBA.FBAModelSet': {
+                title: 'Data View',
+                module: 'kb.jquery.modeling.tab-table',
+                widget: 'kbaseTabTable',
+                panel: true,
+                options: [
+                    {from: 'workspaceName', to: 'ws'},
+                    {from: 'objectName', to: 'obj'},
+                    {from: 'objectType', to: 'type'},
+                    {from: 'authToken', to: 'token'}
+                ]
+            }
         };
         // This style returns a factory function.
         // The only usage of 'this' is to return it as a convenience for 

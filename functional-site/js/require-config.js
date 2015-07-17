@@ -99,6 +99,7 @@ require.config({
         'googlepalette': 'lib/googlepalette',
         'google-code-prettify': 'bower_components/google-code-prettify/bin/prettify.min',
         'google-code-prettify-style': 'bower_components/google-code-prettify/bin/prettify.min',
+        'ace': 'bower_components/ace-builds/src-min/ace',
         
         // Just style, man.
         'font-awesome': 'bower_components/font-awesome/css/font-awesome.min',
@@ -244,6 +245,8 @@ require.config({
         'kb.jquery.communities.functional-profile': 'src/widgets/jquery/communities/kbaseAbundanceDataView',
         'kb.jquery.communities.graph': 'src/widgets/jquery/communities/kbStandaloneGraph',
         'kb.jquery.communities.plot': 'src/widgets/jquery/communities/kbStandalonePlot',
+        'kb.jquery.communities.heatmap': 'src/widgets/jquery/communities/kbStandaloneHeatmap',
+        'kb.jquery.communities.abundance-data-heatmap': 'src/widgets/jquery/communities/kbaseAbundanceDataHeatmap',
         'kb.jquery.communities.metagenome': 'src/widgets/jquery/communities/kbaseMetagenomeView',
         'kb.jquery.communities.jquery-svg': 'src/widgets/jquery/communities/jquery.svg',
         

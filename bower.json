@@ -54,6 +54,7 @@
     "node-uuid": "1.4.3",
     "rgb-color": "*",
     "jquery-ui": "1.11.4",
-    "google-code-prettify": "1.0.4"
+    "google-code-prettify": "1.0.4",
+    "ace-builds": "1.2.0"
   }
 }

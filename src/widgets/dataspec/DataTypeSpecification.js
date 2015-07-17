@@ -73,6 +73,7 @@ define([
                             }).join(', '))]),
                     tr([th('Description'), td(pre({style: {'white-space': 'pre-wrap', 'word-wrap': 'break-word'}}, data.description))])
                 ]);
+                /* TODO: Add back in the kidl editor -- need to talk to Roman */
             }
 
             // SPEC FILE Tab
@@ -94,13 +95,14 @@ define([
             // FUNCTIONS Tab
             function functionsTab(data) {
                 // Build The table more functionally, using datatables.
+                console.log(data.using_func_defs);
                 var tableData = data.using_func_defs.map(function (funcId) {
                     var parsed = funcId.match(/^(.+?)-(.+?)$/),
                         funcName = parsed[1],
                         funcVer = parsed[2];
 
                     return {
-                        name: a({href: '#', 'data-action': 'spec-functions', 'data-funcid': funcId}, funcName),
+                        name: a({href: '#spec/functions/'+funcId}, funcName),
                         ver: funcVer
                     };
                 });
@@ -136,10 +138,7 @@ define([
                         typeVer = parsed[2];
 
                     return {
-                        name: a({
-                            href: '#',
-                            'data-action': 'spec-types',
-                            'data-typeid': typeId}, typeName),
+                        name: a({href: '#spec/type/' + typeId}, typeName),
                         ver: typeVer
                     };
                 });
@@ -175,7 +174,7 @@ define([
                         typeVer = parsed[2];
 
                     return {
-                        name: a({href: '#', 'data-action': 'spec-types', 'data-typeid': typeId}, typeName),
+                        name: a({href: '#spec/type/'+typeId}, typeName),
                         ver: typeVer
                     };
                 });

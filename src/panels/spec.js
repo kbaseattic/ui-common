@@ -19,41 +19,7 @@ define([
 
     var Widgets = function () {
         var widgets = {};
-        function addJQWidget(name, widget) {
-            var id = html.genId();
-            widgets[name] = {
-                widget: null,
-                id: id,
-                attach: function (node) {
-                    var jqueryWidget = $(node)[widget];
-                    if (!jqueryWidget) {
-                        $(node).html(html.panel('Not Found', 'Sorry, cannot find widget ' + widget));
-                    } else {
-                        $(node)[widget]({
-                            template: 'spec',
-                            data: params,
-                            auth: R.getAuthToken()
-                        });
-                    }
-                },
-                detach: function (self) {
-                    var jqWidget = $(self.id)[widget];
-                    console.log(jqWidget);
-                    if (jqWidget) {
-                        jqWidget('destroy');
-                    }
-
-                },
-                start: function () {
-
-                },
-                stop: function () {
-
-                }
-            };
-
-            return id;
-        }
+        
         function addFactoryWidget(name, widget, params) {
             // Create a container node. We need to be able to render
             // default content in case the widget can't render for 

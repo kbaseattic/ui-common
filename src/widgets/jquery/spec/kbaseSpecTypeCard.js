@@ -12,6 +12,7 @@ define([
     'kb.service.workspace',
     'kb.spec.common',
     'google-code-prettify',
+    
     'jquery-ui',
     'kb.jquery.authenticatedwidget'
 ],
@@ -196,7 +197,8 @@ define([
                         var aTypeId = data.using_type_defs[i];
                         var aTypeName = aTypeId.substring(0, aTypeId.indexOf('-'));
                         var aTypeVer = aTypeId.substring(aTypeId.indexOf('-') + 1);
-                        typesData.push({name: '<a onclick="specClicks[\'' + pref + 'types-click\'](this,event); return false;" data-typeid="' + aTypeId + '">' + aTypeName + '</a>', ver: aTypeVer});
+                        console.log('HERE');
+                        typesData.push({name: '<a href="#spec/type/' + aTypeId +'">' + aTypeName + '</a>', ver: aTypeVer});
                     }
                     var typesSettings = {
                         "sPaginationType": "full_numbers",
