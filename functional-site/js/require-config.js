@@ -111,7 +111,7 @@ require.config({
         
         // KBase Client API
         // -------------------
-        'kb.api': 'ext/kbase-clients/kbase-client-api.min',
+        'kb.api': 'lib/kbase-clients/kbase-client-api.min',
         'kb.narrative': 'src/kbaseNarrative',
         
         // KBase Utils
