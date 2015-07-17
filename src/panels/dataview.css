@@ -1,3 +1,4 @@
+@charset "UTF-8";
 @import url("//fonts.googleapis.com/css?family=Roboto");
 
 /* --- KBase method list styles --*/
@@ -422,7 +423,7 @@
    line-height: 14px;
    color: #A63232;
    text-align: left;
-   pading-left:30px;
+   padding-left:30px;
    margin:10px;
 }
 .kb-app-step-error-heading {
@@ -516,7 +517,7 @@ button.kb-app-run {
     font-size: 13px;
     box-shadow: 1px 1px 1px #ccc;
     -webkit-box-shadow: 1px 1px 1px #ccc;
-    moz-box-shadow: 1px 1px 1px #ccc;
+    -moz-box-shadow: 1px 1px 1px #ccc;
 }
 button.kb-app-run:hover {
     background-color: #1E88E5;
@@ -538,7 +539,7 @@ button.kb-method-run {
     font-size: 13px;
     box-shadow: 1px 1px 1px #ccc;
     -webkit-box-shadow: 1px 1px 1px #ccc;
-    moz-box-shadow: 1px 1px 1px #ccc;
+    -moz-box-shadow: 1px 1px 1px #ccc;
 }
 button.kb-method-run:hover {
     background-color: #1E88E5;
@@ -616,7 +617,7 @@ button.kb-method-run:hover {
 
     box-shadow: 1px 1px 1px 1px #fff;
     -webkit-box-shadow: 1px 1px 1px 1px #fff;
-    moz-box-shadow: 1px 1px 1px 1px #fff;
+    -moz-box-shadow: 1px 1px 1px 1px #fff;
 }
 
 .kb-data-list-obj-row:hover {
@@ -626,7 +627,7 @@ button.kb-method-run:hover {
 
     box-shadow: 1px 1px 1px 1px #aaa;
     -webkit-box-shadow: 1px 1px 1px 1px #aaa;
-    moz-box-shadow: 1px 1px 1px 1px #aaa;
+    -moz-box-shadow: 1px 1px 1px 1px #aaa;
 }
 
 .kb-data-list-obj-row-selected {
@@ -635,7 +636,7 @@ button.kb-method-run:hover {
     border-left-color: #4BB856;
     box-shadow: 1px 1px 1px 1px #aaa;
     -webkit-box-shadow: 1px 1px 1px 1px #aaa;
-    moz-box-shadow: 1px 1px 1px 1px #aaa;
+    -moz-box-shadow: 1px 1px 1px 1px #aaa;
 }
 
 
@@ -653,7 +654,7 @@ button.kb-method-run:hover {
     text-shadow: none !important;
     box-shadow: none;
     -webkit-box-shadow: none;
-    moz-box-shadow: none;
+    -moz-box-shadow: none;
     margin: 0;
 }
 
@@ -665,7 +666,7 @@ button.kb-method-run:hover {
     border: none;
     box-shadow: 1px 1px 3px #aaa;
     -webkit-box-shadow: 1px 1px 3px #aaa;
-    moz-box-shadow: 1px 1px 3px #aaa;
+    -moz-box-shadow: 1px 1px 3px #aaa;
     text-align: center;
     
     width:  30pt;
@@ -701,7 +702,7 @@ button.kb-method-run:hover {
     font-weight: 400;
     box-shadow: 1px 1px 3px #aaa;
     -webkit-box-shadow: 1px 1px 3px #aaa;
-    moz-box-shadow: 1px 1px 3px #aaa;
+    -moz-box-shadow: 1px 1px 3px #aaa;
 }
 .kb-data-list-add-data-text-button:hover {
     background-color: #DC3C31;
@@ -718,7 +719,7 @@ button.kb-method-run:hover {
     font-size: 13px;
     box-shadow: 1px 1px 3px #aaa;
     -webkit-box-shadow: 1px 1px 3px #aaa;
-    moz-box-shadow: 1px 1px 3px #aaa;
+    -moz-box-shadow: 1px 1px 3px #aaa;
     margin: 5px;
 }
 .kb-data-list-btn:hover {
@@ -739,7 +740,7 @@ button.kb-method-run:hover {
     font-size: 13px;
     box-shadow: 1px 1px 3px #aaa;
     -webkit-box-shadow: 1px 1px 3px #aaa;
-    moz-box-shadow: 1px 1px 3px #aaa;
+    -moz-box-shadow: 1px 1px 3px #aaa;
     margin: 5px;
 }
 .kb-data-list-cancel-btn:hover {
@@ -874,7 +875,7 @@ button.kb-method-run:hover {
     text-shadow: none !important;
     box-shadow: none;
     -webkit-box-shadow: none;
-    moz-box-shadow: none;
+    -moz-box-shadow: none;
     margin: 0;
 }
 .kb-data-list-more-div {
@@ -920,7 +921,7 @@ button.kb-method-run:hover {
     text-shadow: none !important;
     box-shadow: none;
     -webkit-box-shadow: none;
-    moz-box-shadow: none;
+    -moz-box-shadow: none;
     padding:2px;
     width:auto;
     height:auto;
@@ -1039,7 +1040,6 @@ button.kb-method-run:hover {
 
 /* ICONS FROM NARRATIVE kbaseIcons.css */
 
-@charset "UTF-8";
 
 @font-face {
   font-family: "kbase-icons";
