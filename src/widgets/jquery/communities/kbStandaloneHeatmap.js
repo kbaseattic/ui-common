@@ -145,27 +145,27 @@ define([
                 
                 // not pretty, but add event handlers here.
                 var that = this;
-                $(target).find('.heatmap-container').on('click', '[data-type="label"]', function (e) {
-                    var row = parseInt($(this).attr('data-row'));
-                    var dir = parseInt($(this).attr('data-dir'));
+                $(target).find('.heatmap-container').on('click', '[data-type="label"]', function () {
+                    var row = parseInt($(this).attr('data-row'), 10);
+                    var dir = parseInt($(this).attr('data-dir'), 10);
                     that.toggleSelected(row, dir);
                 });
                 
-                 $(target).find('.heatmap-container').on('click', '[data-type="cell"]', function (e) {
-                    var row = parseInt($(this).attr('data-row'));
-                    var col = parseInt($(this).attr('data-col'));
+                 $(target).find('.heatmap-container').on('click', '[data-type="cell"]', function () {
+                    var row = parseInt($(this).attr('data-row'), 10);
+                    var col = parseInt($(this).attr('data-col'), 10);
                     var value = parseFloat($(this).attr('data-value'));
                     that.cellClick(row, col, value, this);
                 });
-                $(target).find('.heatmap-container').on('mouseover', '[data-type="cell"]', function (e) {
-                    var row = parseInt($(this).attr('data-row'));
-                    var col = parseInt($(this).attr('data-col'));
+                $(target).find('.heatmap-container').on('mouseover', '[data-type="cell"]', function () {
+                    var row = parseInt($(this).attr('data-row'), 10);
+                    var col = parseInt($(this).attr('data-col'), 10);
                     var value = parseFloat($(this).attr('data-value'));
                     that.cellHover(1, row, col, value, this);
                 });
-                $(target).find('.heatmap-container').on('mouseout', '[data-type="cell"]', function (e) {
-                    var row = parseInt($(this).attr('data-row'));
-                    var col = parseInt($(this).attr('data-col'));
+                $(target).find('.heatmap-container').on('mouseout', '[data-type="cell"]', function () {
+                    var row = parseInt($(this).attr('data-row'), 10);
+                    var col = parseInt($(this).attr('data-col'), 10);
                     var value = parseFloat($(this).attr('data-value'));
                     that.cellHover(0, row, col, value, this);
                 });
@@ -179,12 +179,12 @@ define([
                 // initialize shortcut variables
                 var numrows = this.settings.data.rows.length;
                 var numcols = this.settings.data.columns.length;
-                var boxwidth = parseInt((this.settings.width - this.settings.legend_width - this.settings.tree_width - 5) / numcols);
+                var boxwidth = parseInt((this.settings.width - this.settings.legend_width - this.settings.tree_width - 5) / numcols, 10);
                 this.settings.boxwidth = boxwidth;
-                var boxheight = parseInt((this.settings.height - this.settings.legend_height - this.settings.tree_height - 5) / numrows);
+                var boxheight = parseInt((this.settings.height - this.settings.legend_height - this.settings.tree_height - 5) / numrows, 10);
                 this.settings.boxheight = boxheight;
-                var displaywidth = parseInt(this.settings.width - this.settings.legend_width - this.settings.tree_width - 5);
-                var displayheight = parseInt(this.settings.height - this.settings.legend_height - this.settings.tree_height - 5);
+                var displaywidth = parseInt(this.settings.width - this.settings.legend_width - this.settings.tree_width - 5, 10);
+                var displayheight = parseInt(this.settings.height - this.settings.legend_height - this.settings.tree_height - 5, 10);
 
                 var x = 0;
                 var y = 0;
@@ -235,7 +235,6 @@ define([
                         'data-type': 'label',
                         'data-row': String(i),
                         'data-dir': '0',
-                        // onclick: "rendererHeatmap[" + index + "].toggleSelected(" + i + ", " + index + ", 0);", 
                         cursor: "pointer"});
                     this.settings.cells.push([]);
 
@@ -257,7 +256,6 @@ define([
                                 'data-type': 'label',
                                 'data-row': String(h),
                                 'data-dir': '1',
-                                // onclick: "rendererHeatmap[" + index + "].toggleSelected(" + h + ", " + index + ", 1);", 
                                 cursor: "pointer"});
 
                         }
@@ -284,16 +282,6 @@ define([
                         settings['data-col'] = String(h);
                         settings['data-value'] = String(adjusted_value);
                         
-                        if (typeof this.settings.cellClicked === "function") {
-                            // TODO
-                            //settings.onclick = "rendererHeatmap[" + index + "].cellClick(" + i + ", " + h + ", " + adjusted_value + ", this, " + index + ");";
-                        }
-                        if (typeof this.settings.cellHovered === "function") {
-                            // TODO
-                            // settings.onmouseover = "rendererHeatmap[" + index + "].cellHover(1, " + i + ", " + h + ", " + adjusted_value + ", this, " + index + ");";
-                            // settings.onmouseout = "rendererHeatmap[" + index + "].cellHover(0, " + i + ", " + h + ", " + adjusted_value + ", this, " + index + ");";
-                        }
-
                         // draw the box
                         this.settings.cells[i][h] = svg.rect(null, x, y, width, height, rx, ry, settings);
                     }
