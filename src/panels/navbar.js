@@ -6,10 +6,11 @@
  white: true
  */
 define([
-    'kb.runtime',    
+    'kb.runtime',
     'kb.html',
-    'q'],
-    function (R, html, Q) {
+    'q',
+    'kb.session'],
+    function (R, html, Q, Session) {
         'use strict';
         // ACTUALLY: a widget
         /*
@@ -213,7 +214,7 @@ define([
                     var profile = R.getItem('userprofile');
                     var realname = profile ? profile.getProp('user.realname') : '?';
                     return div({class: 'dropdown', style: 'display:inline-block'}, [
-                        button({type: 'button', class: 'btn-btn-default dropdown-toggle', 'data-toggle': 'dropdown', 'aria-expanded': 'false'}, [
+                        button({type: 'button', class: 'btn btn-default dropdown-toggle', 'data-toggle': 'dropdown', 'aria-expanded': 'false'}, [
                             renderAvatar(),
                             span({class: 'caret', style: 'margin-left: 5px;'})
                         ]),
