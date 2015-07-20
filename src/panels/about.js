@@ -5,22 +5,28 @@
  browser: true,
  white: true
  */
-define(['kb.html', 'kb.session', 'q', 'kb.messaging', 'knockout', 'jquery'], function (html, Session, Q, Messaging, ko, $) {
+define([
+    'jquery',
+    'q',
+    'knockout',     
+    'kb.html', 
+    'kb.runtime', 
+    'kb.messaging'
+], 
+    function ($, Q, ko, html, R, Messaging) {
     'use strict';
-    
+
     var msgMan = Object.create(Messaging.MessageManager).init();
-    
-    
 
     var Widget = function () {
         var viewModel = function () {
             var messageSent = ko.observable(),
                 messageReceived = ko.observable();
-            
+
             msgMan.on('clickme', function (msg) {
                 messageReceived(msg.data);
             });
-            
+
             return {
                 messageSent: messageSent,
                 messageReceived: messageReceived,
@@ -31,8 +37,6 @@ define(['kb.html', 'kb.session', 'q', 'kb.messaging', 'knockout', 'jquery'], fun
                 }
             };
         };
-
-
 
 
         var div = html.tag('div'),
@@ -54,7 +58,7 @@ define(['kb.html', 'kb.session', 'q', 'kb.messaging', 'knockout', 'jquery'], fun
             template: view
         };
     };
-    function unapplyBindings(node, remove) {
+    function unApplyBindings(node, remove) {
         // Unbind DOM events 
         $(node).find('*').each(function () {
             $(this).unbind();
@@ -67,49 +71,94 @@ define(['kb.html', 'kb.session', 'q', 'kb.messaging', 'knockout', 'jquery'], fun
             ko.cleanNode(node);
         }
     }
-    function setup(app) {
-        var p = html.tag('p'),
-            div = html.tag('div');
+    
+    
+    function aboutPanelFactory()  {
+        function widget(config) {
+            var mount, container;
+            function render() {
+                var p = html.tag('p'),
+                    div = html.tag('div'),
+                    a = html.tag('a');
+                return [
+                    p('This is all about KBase.'),
+                    div([
+                        p('Hi'),
+                        p(['Hello, ', R.getUsername()]),
+                        p(['Try this', a({href: '#contact'}, 'Contact')])
+                    ]),
+                    div({dataBind: {component: {name: '"test"'}}, style: {border: '1px red dotted'}})
+                ];
+            }
+            // Widget API
+            function attach(node) {
+                return Q.Promise(function (resolve) {
+                    mount = node;
+                    container = document.createElement('div');
+                    mount.appendChild(container);
+                    container.innerHTML = html.flatten(render());
+                    resolve();
+                });
+            }
+            function detach() {
+                return Q.Promise(function (resolve) {
+                    mount.removeChild(container);
+                    container = null;
+                    resolve();
+                });
+            }
+            function start(params) {
+                return Q.Promise(function (resolve) {
+                    ko.applyBindings(null, container);
+                    resolve();
+                });
+            }
+            function stop() {
+                return Q.Promise(function (resolve) {
+                    ko.cleanNode(container);
+                    resolve();
+                });
+            }
 
+            return {
+                attach: attach,
+                detach: detach,
+                start: start,
+                stop: stop
+            };
+        };
+
+        return {
+            create: function (config) {
+                return widget(config);
+            }
+        };
+    }
+    
+    function setup(app, config) {
+       
+
+        // create our little ko test widget.
         ko.components.register('test', Widget());
 
         app.addRoute({
             path: ['about'],
-            promise: function (params) {
-                return Q.promise(function (resolve) {
-                    var content = [
-                        p('This is all about KBase.'),
-                        div([
-                            p('Hi'),
-                            p(['Hello, ', Session.getUsername()])
-                        ]),
-                        div({dataBind: {component: {name: '"test"'}}, style: {border: '1px red dotted'}})
-                    ];
-                    resolve({
-                        content: content,
-                        title: 'About the Functional Site',
-                    });
-                });
-            },
-            start: function (node, self) {
-                ko.applyBindings(node);
-            },
-            stop: function (node, self) {
-                unapplyBindings(node);
-            }
-
+            widget: aboutPanelFactory()
         });
-        app.addRoute({
-            path: ['about', {type: 'param', name: 'name'}],
-            render: function (params) {
-                return 'This is all about ' + params.name;
-            }
-        });
+        // app.addRoute({
+        //     path: ['about', {type: 'param', name: 'name'}],
+        //     render: function (params) {
+        //         return 'This is all about ' + params.name;
+        //     }
+        // });
     }
     function teardown() {
         // TODO: remove routes
         return false;
     }
+
+
+
     function start() {
         //
         return false;

@@ -14,8 +14,18 @@
  browser: true,
  white: true
  */
-define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'underscore', 'postal'],
-    function (AppState, Session, Config, Router, $, Q, _, Postal) {
+define([
+    'jquery',
+    'q',
+    'underscore',
+    'postal',
+    'kb.html',
+    'kb.appstate',
+    'kb.session',
+    'kb.config',
+    'kb.router'
+],
+    function ($, Q, _, Postal, html, AppState, Session, Config, Router) {
         'use strict';
         var factory = function () {
             function navigateTo(location) {
@@ -37,20 +47,32 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
 
 
             // Very simple message system.
-            var messages = {};
-            function sub(id, fun) {
-                if (messages[id] === undefined) {
-                    messages[id] = [];
-                }
-                messages[id].push(fun);
+            var listeners = {};
+            var subId = 0;
+            function nextSubId() {
+                subId += 1;
+                return 'sub_' + subId;
             }
-            function pub(id, data) {
-                if (messages[id]) {
-                    messages[id].forEach(function (fun) {
+            function sub(msgId, fun) {
+                if (listeners[msgId] === undefined) {
+                    listeners[msgId] = {};
+                }
+                var subId = nextSubId();
+                listeners[msgId][subId] = {
+                    fun: fun
+                };
+                return [msgId, subId];
+            }
+            function unsub(sub) {
+                delete listeners[sub[0]][sub[1]];
+            }
+            function pub(msgId, data) {
+                if (listeners[msgId]) {
+                    Object.keys(listeners[msgId]).forEach(function (subId) {
                         try {
-                            fun(data);
+                            listeners[msgId][subId].fun(data);
                         } catch (ex) {
-                            console.log('Execption runnning sub ' + id);
+                            console.log('Execption runnning msg ' + id + ', sub ' + subId);
                             console.log(ex);
                         }
                     });
@@ -63,9 +85,11 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
              */
             var mounts = {};
             function createMountPoint(name, selector) {
+                var $container = $(selector);
                 mounts[name] = {
                     selector: selector,
-                    element: $(selector).get(),
+                    container: $container,
+                    element: $container.get(0),
                     rawContent: null,
                     state: {},
                     mounted: null
@@ -78,7 +102,7 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                     if (!mountPoint) {
                         resolve();
                     }
-                    
+
                     // Stop and unmount widgets.
                     if (mountPoint.widgets) {
                         Object.keys(mountPoint.widgets).forEach(function (widgetKey) {
@@ -86,14 +110,13 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                             if (widget.stop) {
                                 widget.stop(widget);
                             }
-                            console.log('detaching widget...');
                             if (widget.detach) {
                                 widget.detach(widget);
                             }
                         });
                     }
-                    
-                    
+
+
                     // Stop and unmount current panel.
                     if (mountPoint.mounted && mountPoint.mounted.stop) {
                         mountPoint.mounted.stop($(mountPoint.mounted.id), mountPoint.mounted);
@@ -166,9 +189,9 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                                 mount(mountName, result, handler.route)
                                     .then(function () {
                                         if (result.title) {
-                                            pub('title', {title: result.title});
+                                            publish('app', 'title', {title: result.title});
                                         } else {
-                                            pub('title', ' ');
+                                            publish('app', 'title', ' ');
                                         }
                                         //if (result.style) {
                                         //    loadStyle(result.id, resylt.style);
@@ -203,9 +226,122 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                         .done();
                 }
             }
+
+
+            function showPanel2(mountPointName, routed) {
+                // stop the old one
+                return Q.Promise(function (resolve, reject) {
+                    var mountPoint = mounts[mountPointName];
+                    if (!mountPoint) {
+                        reject('Sorry, no mount point named ' + mountPointName);
+                    }
+
+                    // Stop and unmount current panel.
+                    Q.Promise(function (resolve, reject) {
+                        if (mountPoint.mounted) {
+                            var widget = mountPoint.mounted.widget;
+                            widget.stop()
+                                .then(function () {
+                                    widget.detach()
+                                        .then(function () {
+                                            console.log('stopped');
+                                            resolve();
+                                        })
+                                        .catch(function (err) {
+                                            reject(err);
+                                        })
+                                        .done();
+                                })
+                                .catch(function (err) {
+                                    reject(err);
+                                })
+                                .done();
+                        } else {
+                            resolve();
+                        }
+                    })
+                        .then(function () {
+                            // Create new mount.
+                            var newMount = {
+                                id: html.genId(),
+                                widget: routed.route.widget.create()
+                            };
+                            newMount.container = $('<div id="' + newMount.id + '"/>');
+                            mountPoint.container.empty().append(newMount.container);
+                            mountPoint.mounted = newMount;
+
+                            newMount.widget.attach(newMount.container.get(0))
+                                .then(function () {
+                                    newMount.widget.start()
+                                        .then(function () {
+                                            resolve();
+                                        })
+                                        .catch(function (err) {
+                                            reject(err);
+                                        })
+                                        .done();
+                                })
+                                .catch(function (err) {
+                                    reject(err);
+                                })
+                                .done();
+                        })
+                        .catch(function (err) {
+                            console.log('ERROR');
+                            console.log(err);
+                            reject(err);
+                        })
+                        .done();
+                });
+            }
+
+            function show2(mountPointName, toMount) {
+                // stop the old one
+                return Q.Promise(function (resolve, reject) {
+                    var mountPoint = mounts[mountPointName];
+                    if (!mountPoint) {
+                        reject('Sorry, no mount point named ' + mountPointName);
+                    }
+
+                    // Stop and unmount current panel.
+                    if (mountPoint.mounted) {
+                        mountPoint.mounted.widget.stop()
+                            .then(function () {
+                                return mountPoint.mounted.widget.detach();
+                            })
+                            .done();
+                    }
+
+
+                    // Create new mount.
+                    var newMount = {
+                        id: html.genId(),
+                        widget: toMount.widget
+                    };
+                    newMount.container = $('<div id="' + newMount.id + '"/>');
+                    mountPoint.container.empty().append(newMount.container);
+
+                    newMount.widget.attach(newMount.container.get(0))
+                        .then(function () {
+                            newMount.widget.start()
+                                .then(function () {
+                                    resolve();
+                                })
+                                .catch(function (err) {
+                                    reject(err);
+                                })
+                                .done();
+                        })
+                        .catch(function (err) {
+                            reject(err);
+                        })
+                        .done();
+                });
+            }
+
             function show(mountName, handler) {
-                if (handler.route.promise) {
-                    handler.route.promise(handler.params)
+                if (handler.route.attach) {
+                    handler.route.attach(handler.params)
                         .then(function (result) {
                             if (result.content) {
                                 return [result, mount(mountName, result, handler.route)];
@@ -464,45 +600,63 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                     window.clearInterval(heartbeatTimer);
                 }
             }
-            
+
             // LIFECYCLE
-            
+
             function setup() {
-                
+
             }
-            
+
             function doRoute() {
                 var handler = Router.findCurrentRoute();
                 if (!handler) {
-                    pub('route-not-found');
+                    publish('app', 'route-not-found');
                 }
-                pub('new-route', {
+                publish('app', 'new-route', {
                     routeHandler: handler
                 });
             }
-            
+
             function start() {
-                $(window).bind('hashchange', function (e) {
+                // window.addEventListener('hashchange', function () {
+                $(window).on('hashchange', function () {
+                    console.log('what?');
                     // NB this is called AFTER it has changed. The browser will do nothing by
                     // default.
                     doRoute();
                 });
-                
+                console.log(window);
+                console.log('added haschange handler, i think...');
+
                 startHeartbeat();
-                
-                if (Session.isLoggedIn) {
-                    pub('loggedin');
+
+                if (Session.isLoggedIn()) {
+                    publish('app', 'loggedin');
                 } else {
-                    pub('loggedout');
+                    publish('app', 'loggedout');
                 }
-                
+
                 // Handle the initial route upon app load
                 doRoute();
             }
-            
+
             function stop() {
                 stopHeartbeat();
-                
+
+            }
+
+
+            function publish(channel, message, data) {
+                if (data === undefined) {
+                    data = {};
+                }
+                return Postal.channel(channel).publish(message, data);
+            }
+            function subscribe(channel, message, fun) {
+                return Postal.channel(channel).subscribe(message, fun);
+            }
+            function unsubscribe(subscription) {
+                return subscription.unsubscribe();
             }
 
             return {
@@ -511,14 +665,20 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                 setDefaultRoute: Router.setDefaultRoute,
                 createMountPoint: createMountPoint,
                 show: show,
+                show2: show2,
                 showPanel: showPanel,
+                showPanel2: showPanel2,
                 mount: mount,
                 html: jsonToHTML,
                 tag: makeTag,
                 genId: genId,
                 navigateTo: navigateTo,
                 sub: sub,
+                unsub: unsub,
                 pub: pub,
+                subscribe: subscribe,
+                unsubscribe: unsubscribe,
+                publish: publish,
                 setItem: setItem,
                 getItem: getItem,
                 loadStyle: loadStyle,
@@ -526,16 +686,16 @@ define(['kb.appstate', 'kb.session', 'kb.config', 'kb.router', 'jquery', 'q', 'u
                 getUserId: Session.getUsername.bind(Session),
                 getUserRealname: Session.getRealname.bind(Session),
                 isLoggedIn: Session.isLoggedIn.bind(Session),
+                hasConfig: Config.hasItem.bind(Config),
                 getConfig: Config.getItem.bind(Config),
                 startHeartbeat: startHeartbeat,
                 stopHeartbeat: stopHeartbeat,
-                
                 start: start,
                 stop: stop
             };
         };
-        
-        
+
+
         return {
             create: factory
         };

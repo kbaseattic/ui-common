@@ -1,7 +1,11 @@
 /*global define */
 /*jslint browser: true, white: true */
-define(['kb.logger', 'kb.session'],
-    function (Logger, Session) {
+define([
+    'kb.logger', 
+    'kb.session',
+    'kb.props'
+],
+    function (Logger, Session, Props) {
         'use strict';
         
         function setApp(app) {
@@ -33,9 +37,21 @@ define(['kb.logger', 'kb.session'],
         function pub() {
             return appMethod('pub', arguments);
         }
-        
         function sub() {
             return appMethod('sub', arguments);
+        }
+        function unsub() {
+            return appMethod('unsub', arguments);
+        }
+        
+         function publish() {
+            return appMethod('publish', arguments);
+        }
+        function subscribe() {
+            return appMethod('subscribe', arguments);
+        }
+        function unsubscribe() {
+            return appMethod('unsubscribe', arguments);
         }
         
         function genId() {
@@ -90,10 +106,11 @@ define(['kb.logger', 'kb.session'],
             return proxyMethod(Logger, 'logDebug', arguments);
         }
         
+        /* Wrap postal messaging */
+       
         
+        var props = Props.create();
         
-        
-
         return {
             setApp: setApp,
             getApp: getApp,
@@ -106,13 +123,27 @@ define(['kb.logger', 'kb.session'],
             isLoggedIn: isLoggedIn,
             pub: pub,
             sub: sub,
+            unsub: unsub,
             genId: genId,
             getItem: getItem,
             
             logError: logError,
             logWarning: logWarning,
             logInfo: logInfo,
-            logDebug: logDebug
+            logDebug: logDebug,
+            
+            publish: publish,
+            subscribe: subscribe,
+            unsubscribe: unsubscribe,
+            
+            send: publish,
+            recv: subscribe,
+            drop: unsubscribe,
+            
+            props: props,
+            debug: function () {
+                return props.debug();
+            }
         };
     });
 

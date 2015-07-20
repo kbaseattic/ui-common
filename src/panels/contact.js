@@ -114,25 +114,61 @@ define(['kb.html', 'q', 'knockout'], function (html, Q, ko) {
         };
     }
     
+     
+    function contactPanelFactory() {
+        function widget() {
+            var mount, container;
+            var contact = ContactViewModel();
+            
+            // API
+            function attach(node) {
+                return Q.Promise(function (resolve) {
+                    mount = node;
+                    container = document.createElement('div');
+                    mount.appendChild(container);
+                    container.innerHTML = renderContactForm();
+                    resolve();
+                });
+            }
+            function detach(node) {
+                return Q.Promise(function (resolve) {
+                    mount.removeChild(container);
+                    resolve();
+                });
+            }
+            function start(node) {
+                return Q.Promise(function (resolve) {
+                    contact = ContactViewModel();
+                    ko.applyBindings(contact, container);
+                    resolve();
+                });
+            }
+            function stop(node) {
+                return Q.Promise(function (resolve) {
+                    ko.cleanNode(container);
+                    contact = null;
+                    resolve();
+                });
+            }
+            return {
+                attach: attach,
+                detach: detach,
+                start: start,
+                stop: stop
+            }
+        }
+        return {
+            create: function (config) {
+                return widget(config);
+            }
+        }
+        
+    }
+    
     function setup(app) {
         app.addRoute({
             path: ['contact'],
-            promise: function (params) {
-                return Q.promise(function (resolve) {
-                    var content = renderContactForm();
-                    resolve({
-                        content: content,
-                        title: 'Contact Us'
-                    });
-                });
-            },
-            start: function (node) {
-                var contact = ContactViewModel();
-                ko.applyBindings(contact, node);
-            },
-            stop: function (node) {
-                //
-            }
+            widget: contactPanelFactory()
         });
     };
     function teardown() {

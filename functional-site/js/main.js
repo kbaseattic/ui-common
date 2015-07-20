@@ -33,7 +33,7 @@ require([
     'domReady!'],
     function (App, Runtime, AppState, Q, NarrativeManagerPanel, Navbar, ProfileService, Session) {
         'use strict';
-        
+
         var app = App.create();
         Runtime.setApp(app);
 
@@ -42,13 +42,22 @@ require([
             var NarrativeManager = NarrativeManagerPanel.create();
             NarrativeManager.setup();
 
-            // Call factory object to create our global navbar.
+            // Call factory to create our global navbar.
             navbar = Navbar.create();
             navbar.setup();
+
+            Runtime.props.setItem('navbar', navbar);
 
             // The default route is invoked if there is no route set up to handle
             // the path.
             app.setDefaultRoute({
+                redirect: 'welcome'
+                
+            });
+            
+            /*
+             * 
+                
                 promise: function (params) {
                     return Q.Promise(function (resolve) {
                         resolve({
@@ -57,8 +66,8 @@ require([
                         });
                     });
                 }
-            });
-            
+             */
+
             /* 
              * Handle the "empty path", which is also the root of the site.
              * This can look like the following:
@@ -70,10 +79,11 @@ require([
              * /functional-site/#/////
              * TODO: have this redirect to some sensible location ... like the dashboard
              * TODO: rename the "promise" method of a route to something that makes more semantic sense
-            */
+             */
             app.addRoute({
                 path: [],
-                promise: function (params) {
+                redirect: 'welcome',
+                x: function (params) {
                     return Q.Promise(function (resolve) {
                         resolve({
                             content: 'Functional Site',
@@ -100,53 +110,58 @@ require([
             // SETUP LISTENERS
 
             // DOM listeners
-            
+
 
             // App Listeners
-            app.sub('loggedout', function () {
-                app.show('navbar', {
-                    route: navbar,
-                    params: null
-                });
-            });
-            app.sub('loggedin', function () {
-                app.show('navbar', {
-                    route: navbar,
-                    params: null
-                });
-                ProfileService.loadProfile();
-            });
-            app.sub('title', function (data) {
-                navbar.setTitle(data.title);
-                app.show('navbar', {
-                    route: navbar,
-                    params: null
-                });
-            });
-            app.sub('navigate', function (data) {
+
+            app.show2('navbar', {widget: navbar})
+                .then(function () {
+                    // anything to do?
+                })
+                .catch(function (err) {
+                    console.error('ERROR');
+                    console.error(err);
+                })
+                .done();
+
+
+
+
+
+            Runtime.recv('app', 'navigate', function (data) {
+                console.log('navigating to ... ');
+                console.log(data);
                 app.navigateTo(data);
             });
 
             // This will work ... but we need to tune this!
-            AppState.whenItem('userprofile')
-                .then(function (profile) {
-                    app.show('navbar', {
-                        route: navbar,
-                        params: null
-                    });
-                })
-                .done();
-            
+            Runtime.recv('app', 'loggedin', function () {
+                console.log('is this the problem?');
+                ProfileService.loadProfile();
+            });
 
-            app.sub('new-route', function (data) {
-                app.showPanel('app', data.routeHandler);
+
+            Runtime.recv('app', 'new-route', function (data) {
+                console.log('new-route');
+                console.log(data);
+                if (data.routeHandler.route.redirect) {
+                    Runtime.send('app', 'navigate', data.routeHandler.route.redirect);
+                } else {
+                    app.showPanel2('app', data.routeHandler)
+                        .catch(function (err) {
+                            console.error('ERROR');
+                            console.error(err);
+                        })
+                        .done();
+                }
             });
 
         }
 
         function runApp() {
+            console.log('running app...');
             app.start();
-            
+
             //App.sub('profile.loaded', function () {
             //    App.mount('navbar', Navbar.render());
             //});
@@ -156,7 +171,7 @@ require([
 
             // Handle the initial route.
             // Find a handler for the current route
-          
+
         }
 
         // 
@@ -173,20 +188,21 @@ require([
         }
         Runtime.logDebug({source: 'main', message: 'About to load panels...'});
         var promises = [
-            {module: 'kb.panel.about'},
-            {module: 'kb.panel.contact'},
-            {module: 'kb.panel.login'},
-            {module: 'kb.panel.userprofile'},
-            {module: 'kb.panel.welcome'},
-            {module: 'kb.panel.dashboard'},
-            {module: 'kb.panel.narrativestore'},
-            {module: 'kb.panel.datasearch'},
-            {module: 'kb.panel.dataview'},
-            {module: 'kb.panel.databrowser'},
-            {module: 'kb.panel.spec'}
+            {module: 'kb.panel.about', config: {}},
+            {module: 'kb.panel.contact', config: {}},
+            {module: 'kb.panel.login', config: {}},
+            //{module: 'kb.panel.userprofile'},
+            {module: 'kb.panel.welcome'}
+            //{module: 'kb.panel.dashboard'},
+            //{module: 'kb.panel.narrativestore'},
+            //{module: 'kb.panel.datasearch'},
+            //{module: 'kb.panel.dataview'},
+            //{module: 'kb.panel.databrowser'},
+            //{module: 'kb.panel.spec'}
         ].map(function (panel) {
-            return requirePromise([panel.module], function (Panel) {
-                Panel.setup(app);
+            return requirePromise([panel.module], function (PanelModule) {
+                // this registers routes
+                PanelModule.setup(app, panel.config);
             });
         });
         Q.all(promises)

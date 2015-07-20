@@ -172,13 +172,11 @@ define(['underscore'], function (_) {
                 if (_.isString(children)) {
                     return children;
                 } else if (_.isNumber(children)) {
-                    return '' + children;
+                    return String(children);
                 } else if (_.isArray(children)) {
-                    var content = '';
-                    children.forEach(function (item) {
-                        content += renderContent(item);
-                    });
-                    return content;
+                    return children.map(function (item) {
+                        return renderContent(item);
+                    }).join('');
                 }
             } else {
                 return '';
@@ -195,6 +193,8 @@ define(['underscore'], function (_) {
                     } else if (_.isString(attribs)) {
                         // skip attribs, just go to children.
                         children = attribs;
+                    } else if (_.isNull(attribs) || _.isUndefined(attribs)) {
+                        children = '';
                     } else if (_.isObject(attribs)) {
                         node += ' ' + makeTagAttribs(attribs);
                     } else if (!attribs) {
@@ -207,8 +207,6 @@ define(['underscore'], function (_) {
                         } else {
                             children = 'false';
                         }
-                    } else if (_.isNull(attribs) || _.isUndefined(attribs)) {
-                        children = '';
                     } else {
                         throw 'Cannot make tag ' + tagName + ' from a ' + (typeof attribs);
                     }
@@ -329,6 +327,18 @@ define(['underscore'], function (_) {
             ]);
             return result;
         }
+        
+        function flatten(html) {
+            if (_.isString(html)) {
+                return html;
+            } else if (_.isArray(html)) {
+                return html.map(function (h) {
+                    return flatten(h);
+                }).join('');
+            } else {
+                throw new Error('Not a valid html representation -- must be string or list');
+            }
+        }
 
         return {
             html: jsonToHTML,
@@ -338,7 +348,8 @@ define(['underscore'], function (_) {
             genId: genId,
             bsPanel: bsPanel,
             panel: bsPanel,
-            loading: loading
+            loading: loading,
+            flatten: flatten
         };
     }());
 });

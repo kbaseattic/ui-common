@@ -1,7 +1,14 @@
-define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base', 'kb.user_profile', 'kb.session', 'kb.widget.navbar', 'kb.runtime'],
-    function (nunjucks, $, Q, Postal, Utils, SocialWidget, UserProfile, Session, NAVBAR, R) {
+define([
+    'nunjucks',
+    'jquery',
+    'q',
+    'kb.utils',
+    'kb.widget.social.base',
+    'kb.user_profile',
+    'kb.runtime'
+],
+    function (nunjucks, $, Q, Utils, SocialWidget, UserProfile, R) {
         "use strict";
-        // var NAVBAR = Object.create(Navbar).init({container: '#kbase-navbar'});
         var UserProfileWidget = Object.create(SocialWidget, {
             init: {
                 value: function (cfg) {
@@ -68,8 +75,6 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
             },
             go: {
                 value: function () {
-
-
                     // Show the user we are doing something, since we are about to launch a 
                     // query for profile data.
                     this.setupUI();
@@ -77,35 +82,18 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                     this.setInitialState()
                         .then(function () {
                             this.refresh().done();
-                            // Disable for now...
-                            /*
-                             if (widget.isOwner()) {
-                             // Repair the profile if need be.
-                             widget.fixProfile()
-                             .then(function() {
-                             widget.refresh().done();
-                             })
-                             .catch (function(err) {
-                             widget.renderErrorView(err);
-                             })
-                             .done();
-                             } else {
-                             widget.refresh().done();
-                             }
-                             */
                         }.bind(this))
                         .catch(function (err) {
                             this.renderErrorView(err);
                         }.bind(this))
                         .done();
-                    
+
                     return this;
                 }
             },
             resetState: {
                 value: function () {
                     this.userProfile = null;
-                    // this.accountRecord = null;
                 }
             },
             /*
@@ -114,8 +102,9 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
             setInitialState: {
                 value: function (options) {
                     return Q.Promise(function (resolve, reject, notify) {
-                        // this.resetState();
-                        if (!Session.isLoggedIn()) {
+                        console.log('logged in?');
+                        console.log(R.isLoggedIn());
+                        if (!R.isLoggedIn()) {
                             // We don't even try to get the profile if the user isn't 
                             // logged in.
                             this.userProfile = null;
@@ -123,93 +112,20 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                         } else {
                             this.userProfile = Object.create(UserProfile).init({username: this.params.userId});
                             this.userProfile.loadProfile()
-                                .then(function (found) {
+                                .then(function () {
                                     resolve();
                                 })
                                 .catch(function (err) {
-                                    console.log('[UserProfile.sync] Error getting user profile.');
-                                    console.log(err);
+                                    R.logError({
+                                        message:'[UserProfile.sync] Error getting user profile.',
+                                        data: err
+                                    });
                                     reject(err);
                                 });
                         }
                     }.bind(this));
                 }
             },
-            /*
-             fixProfile: {
-             value: function(options) {
-             if (!this.isOwner()) {
-             options.error('Not profile owner, cannot fix it up.');
-             return;
-             }
-             var def = Q.defer();
-             
-             var widget = this;
-             console.log(this.userRecord);
-             if (this.userRecord) {
-             if (this.userRecord.profile && this.userRecord.profile.account) {
-             // We are all good here... nothing to do.                      
-             def.resolve();
-             } else {
-             // No account property on user record
-             // This is not a normal state and can be removed, inciting an error
-             // condition, after testing.
-             this.promise(this.userProfileClient, 'lookup_globus_user', [this.params.userId])
-             .then(function(data) {
-             if (!widget.userRecord.profile) {
-             widget.userRecord.profile = {
-             account: data[widget.params.userId]
-             }
-             }
-             // widget.userRecord.profile.account = data[this.params.userId];
-             widget.promise(widget.userProfileClient, 'set_user_profile', {
-             profile: widget.userRecord
-             })
-             .then(function() {
-             def.resolve();
-             })
-             .
-             catch (function(err) {
-             def.reject(err);
-             });
-             })
-             .
-             catch (function(err) {
-             def.reject(err);
-             });
-             }
-             } else {
-             // No user record for user ... so we create a stub profile.
-             this.promise(this.userProfileClient, 'lookup_globus_user', [this.params.userId])
-             .then(function(data) {
-             widget.userRecord = widget.createStubProfile({
-             username: data.userName,
-             realname: data.fullName,
-             account: data,
-             createdBy: 'user'
-             });
-             
-             this.promise(this.userProfileClient, 'set_user_profile', {
-             profile: this.userRecord
-             })
-             .then(function() {
-             def.resolve();
-             })
-             .catch (function(err) {
-             def.reject(err);
-             });
-             })
-             .catch (function(err) {
-             def.reject(err);
-             });
-             }
-             
-             return def.promise;
-             }
-             },
-             */
-
-
             createTemplateContext: {
                 value: function () {
                     // NB: the guard for userProfile presence below is only necessary
@@ -218,7 +134,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                     // not have been populated yet because it is async too, and slower.
                     // So we need to have some better control over widget state,
                     // e.g. to avoid rendering when in an invalid state.
-                    if (Session.isLoggedIn() && this.userProfile) {
+                    if (R.isLoggedIn() && this.userProfile) {
                         return Utils.merge(Utils.merge({}, this.context), {
                             env: {
                                 lists: this.lists,
@@ -239,7 +155,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
             },
             calcProfileCompletion: {
                 value: function () {
-                    if (Session.isLoggedIn()) {
+                    if (R.isLoggedIn()) {
                         var completion = this.userProfile.calcProfileCompletion();
                         var lastSave = this.userProfile.nthHistory(1);
                         if (completion.status === 'complete' && (!lastSave || (lastSave && lastSave.completionStatus === completion.status))) {
@@ -251,34 +167,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                         return 'notloggedin';
                     }
                 }
-       },
-            // MODEL UPDATE
-
-            /*
-             updateField: {
-             value: function (fieldName, controlType, dataPath, validationFun) {
-             var field = this.places.content.find('[data-field="'+fieldName+'"]');
-             if (!field) {
-             throw 'Field "' + fieldName + '" was not found on the form.';
-             }
-             var control = field.find(controlType);
-             if (!control) {
-             throw 'Field "' + fieldName + '" does not have an input control of type "' + controlType + '"';
-             }
-             
-             try {
-             var result = validationFun.call(this, control.val());
-             if (result === undefined) {
-             this.deleteProfileField(dataPath, fieldName, result);
-             } else {
-             this.setProfileField(dataPath, fieldName, result);
-             }
-             } catch (err) {
-             this.setFieldError(field, err);
-             }
-             }
-             },
-             */
+            },
 
             formToObject: {
                 value: function (schema) {
@@ -933,7 +822,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
             },
             getProfileStatus: {
                 value: function () {
-                    if (Session.isLoggedIn()) {
+                    if (R.isLoggedIn()) {
                         return this.userProfile.getProfileStatus();
                     } else {
                         return 'notloggedin';
@@ -1012,10 +901,12 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                     if (this.isOwner()) {
                         // For now the user profile is available through the login widget, not the session.
                         this.places.title.html('You - ' + this.userProfile.getProp('user.realname') + ' (' + this.userProfile.getProp('user.username') + ')');
-
-                        NAVBAR.setTitle('Viewing your profile');
-                        NAVBAR.clearButtons();
-                        NAVBAR.addButton({
+                        
+                        R.send('app', 'title', {
+                            title: 'Viewing your profile'
+                        });
+                        R.send('navbar', 'clearButtons');
+                        R.send('navbar', 'addButton', {
                             name: 'edit',
                             label: 'Edit',
                             style: 'primary',
@@ -1024,6 +915,46 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                                 widget.clearMessages();
                                 widget.renderEditView();
                             }.bind(this)
+                        });
+                        R.send('navbar', 'addButton', {
+                            name: 'poo',
+                            label: 'Poop',
+                            style: 'primary',
+                            icon: 'comment', 
+                            callback: function () {
+                                alert('clicked me');
+                            }
+                        });
+                        
+                        /*navbar.clearButtons();
+                        navbar.addButton({
+                            name: 'edit',
+                            label: 'Edit',
+                            style: 'primary',
+                            icon: 'edit',
+                            callback: function () {
+                                widget.clearMessages();
+                                widget.renderEditView();
+                            }.bind(this)
+                        });
+                        navbar.addButton({
+                            name: 'poo',
+                            label: 'Poop',
+                            style: 'primary',
+                            icon: 'comment', 
+                            callback: function () {
+                                alert('clicked me');
+                            }
+                        });*/
+                        
+
+                        //navbar.render();
+                        // alert('rendered?');
+
+                        // NAVBAR.setTitle('Viewing your profile');
+                       /*NAVBAR.clearButtons();
+                        NAVBAR.addButton({
+                           
                         });
                         NAVBAR.addDropdown({
                             place: 'end',
@@ -1055,11 +986,11 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                                     }}
                             ]
                         });
+                        */
                     } else {
                         var title = this.userProfile.getProp('user.realname') + ' (' + this.userProfile.getProp('user.username') + ')';
                         this.places.title.html(title);
-                        // NAVBAR.setTitle('Viewing profile for ' + title);
-                        R.pub('title', {title: 'Viewing profile for ' + title});
+                        R.send('app', 'title', {title: 'Viewing profile for ' + title});
                     }
                     this.renderPicture();
                     this.places.content.html(this.renderTemplate('view'));
@@ -1129,7 +1060,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                 value: function () {
                     this.userProfile.deleteUserdata()
                         .then(function () {
-                            Postal.channel('session').publish('profile.saved');
+                            R.send('session', 'profile.saved');
                             this.addSuccessMessage('Your profile has been successfully removed.');
                             this.render();
                         }.bind(this))
@@ -1150,13 +1081,73 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                     }
                     this.formHasError = true;
                 }
-      },
+            },
             renderEditView: {
                 value: function () {
                     var W = this;
-                    NAVBAR.setTitle('Editing your profile');
-                    NAVBAR.clearButtons();
-                    NAVBAR.addButton({
+                    R.send('app', 'title', {title: 'Editing your profile'});
+                    R.send('navbar', 'clearButtons');
+                    R.send('navbar', 'addButton', {
+                        name: 'save',
+                        label: 'Save',
+                        style: 'primary',
+                        icon: 'save',
+                        disabled: true,
+                        callback: function () {
+                            console.log('but not here?');
+                            if (W.updateUserProfileFromForm()) {
+                                W.userProfile.saveProfile()
+                                    .then(function () {
+                                        W.changed = false;
+                                        W.renderViewEditLayout();
+                                        W.addSuccessMessage('Success!', 'Your user profile has been updated.');
+                                        W.renderInfoView();
+                                        R.send('session', 'profile.saved');
+                                    })
+                                    .catch(function (err) {
+                                        W.renderErrorView(err);
+                                    })
+                                    .done();
+                            }
+                        }
+                    });
+                    R.send('navbar', 'addButton', {
+                        name: 'cancel',
+                        label: 'Cancel',
+                        style: 'default',
+                        icon: 'ban',
+                        callback: function () {
+                            // Do we have pending changes?
+                            // 
+                            // var changed = !NAVBAR.findButton('save').prop('disabled');
+                            
+                            var changed = W.changed
+
+                            if (changed) {
+                                var modal = $('.UserProfileWidget [data-widget-modal="confirm-cancel"]')
+                                    .modal('show');
+
+                                modal.find('[data-widget-modal-control="confirm-cancel"]').on('click', function (e) {
+                                    modal
+                                        .modal('hide')
+                                        .on('hidden.bs.modal', function (e) {
+                                            W.changed = false;
+                                            W.clearMessages();
+                                            W.renderInfoView();
+                                        });
+                                });
+                            } else {
+                                W.clearMessages();
+                                W.renderInfoView();
+                            }
+                        }
+                    });
+                    
+                    
+                    
+                    /*navbar.setTitle('Editing your profile');
+                    navbar.clearButtons();
+                    navbar.addButton({
                         name: 'save',
                         label: 'Save',
                         style: 'primary',
@@ -1169,7 +1160,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                                         W.renderViewEditLayout();
                                         W.addSuccessMessage('Success!', 'Your user profile has been updated.');
                                         W.renderInfoView();
-                                        postal.channel('session').publish('profile.saved');
+                                        R.publish('session', 'profile.saved');
                                     })
                                     .catch(function (err) {
                                         W.renderErrorView(err);
@@ -1178,14 +1169,15 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                             }
                         }
                     });
-                    NAVBAR.addButton({
+                    navbar.addButton({
                         name: 'cancel',
                         label: 'Cancel',
                         style: 'default',
                         icon: 'ban',
                         callback: function () {
                             // Do we have pending changes?
-                            var changed = !NAVBAR.findButton('save').prop('disabled');
+                            // var changed = !NAVBAR.findButton('save').prop('disabled');
+                            var changed = false;
 
                             if (changed) {
                                 var modal = $('.UserProfileWidget [data-widget-modal="confirm-cancel"]')
@@ -1205,6 +1197,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                             }
                         }
                     });
+                    */
 
                     this.places.content.html(this.renderTemplate('edit'));
 
@@ -1222,14 +1215,26 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
 
                         // append to the container
                         affiliations.append(newAffiliation);
-                        NAVBAR.findButton('save').prop('disabled', false);
+                        
+                        widget.changed = true;
+                        R.send('navbar', 'enableButton', {
+                            id: 'save'
+                        });
+                        
+                        // navbar.findButton('save').prop('disabled', false);
+                        
                     }.bind(this));
 
                     // Wire up remove button for any affiliation.
                     this.places.content.find('[data-field="profile.userdata.affiliations"]').on('click', '[data-button="remove"]', function (e) {
                         // remove the containing affiliation group.
                         $(this).closest('[data-field-group="affiliation"]').remove();
-                        NAVBAR.findButton('save').prop('disabled', false);
+                        widget.changed = true;
+                        R.send('navbar', 'enableButton', {
+                            id: 'save'
+                        });
+                        // NAVBAR.findButton('save').prop('disabled', false);
+                        
                     });
                     // on any field change events, we update the relevant affiliation panel title
                     this.places.content.find('[data-field="profile.userdata.affiliations"]').on('keyup', 'input', function (e) {
@@ -1252,7 +1257,13 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                         //widget.places.content
                         //.find('[data-button="save"]')
                         //.removeAttr('disabled');
-                        NAVBAR.findButton('save').prop('disabled', false);
+                        
+                        widget.changed = true;
+                        R.send('navbar', 'enableButton', {
+                            id: 'save'
+                        });
+                        
+                        // NAVBAR.findButton('save').prop('disabled', false);
                     });
 
                 }
@@ -1295,7 +1306,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                         $('[data-button="create-profile"]').on('click', function (e) {
                             widget.userProfile.createProfile()
                                 .then(function () {
-                                    Postal.channel('session').publish('profile.saved');
+                                    R.send('session', 'profile.saved');
                                     widget.clearMessages();
                                     widget.addSuccessMessage('Success!', 'Your user profile has been created.');
                                     widget.render();

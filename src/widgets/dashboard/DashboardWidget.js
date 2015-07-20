@@ -370,6 +370,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
                         this.subscriptions.forEach(function (sub) {
                             sub.unsubscribe();
                         });
+                        this.subscriptions = [];
                     }
                 }
             },

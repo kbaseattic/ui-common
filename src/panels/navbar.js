@@ -6,11 +6,12 @@
  white: true
  */
 define([
+    'jquery',
     'kb.runtime',
     'kb.html',
     'q',
     'kb.session'],
-    function (R, html, Q, Session) {
+    function ($, R, html, Q, Session) {
         'use strict';
         // ACTUALLY: a widget
         /*
@@ -29,13 +30,146 @@ define([
                 // TODO: remove routes
                 return false;
             }
+
+            var isDirty = undefined;
+            function dirty() {
+                isDirty = true;
+            }
+            function clean() {
+                isDirty = false;
+            }
+
+            var $mount = null;
+            var $container = null;
+            function attach(node) {
+                return Q.Promise(function (resolve) {
+                    if ($mount) {
+                        throw new Error('Already attached');
+                    }
+                    $mount = $(node);
+                    $container = $('<div></div>');
+                    $mount.html($container);
+                    var content = render();
+                    $container.html(content);
+                    attachEvents();
+                    clean();
+                    resolve();
+                });
+            }
+            function reattach() {
+                return Q.Promise(function (resolve) {
+                    detach()
+                        .then(function () {
+                            return stop();
+                        })
+                        .then(function () {
+                            $container = $('<div></div>');
+                            $mount.empty().append($container);
+                            var content = render();
+                            $container.html(content);
+                            attachEvents();
+                            clean();
+                        })
+                        .then(function () {
+                            return start();
+                        })
+                        .done();
+                });
+            }
+            function detach() {
+                return Q.Promise(function (resolve) {
+                    detachEvents();
+                    // $mount.empty();
+                    $container.remove();
+                    $container = null;
+                    resolve();
+                });
+            }
+
+
+            var subscriptions = [];
+            var subscriptions2 = [];
             function start() {
-                //
-                return false;
+                return Q.Promise(function (resolve) {
+                    subscribeAll();
+                    resolve();
+                });
+                /*
+                 
+                 R.whenItem('userprofile')
+                 .then(function (profile) {
+                 attach($container).done();
+                 })
+                 .done();
+                 */
+            }
+            function subscribeAll() {
+                unsubscribeAll();
+                subscriptions2.push(R.recv('app', 'loggedout', function () {
+                    // all we care about is the avatar menu
+                    // this will be automatically re-rendered if we set the dirty
+                    // flag.
+                    dirty();                        
+                }));
+                subscriptions2.push(R.recv('app', 'loggedin', function () {
+                    // all we care about is the avatar menu
+                    dirty();
+                }));
+                subscriptions2.push(R.recv('app', 'title', function (data) {
+                    setTitle(data.title);
+                }));
+                subscriptions2.push(R.recv('navbar', 'clearButtons', function () {
+                    clearButtons();
+                }));
+                subscriptions2.push(R.recv('navbar', 'addButton', function (data) {
+                    addButton(data);
+                }));
+                subscriptions2.push(R.recv('navbar', 'enableButton', function (data) {
+                    var button = buttonMap[data.id];
+                    if (button) {
+                        button.disabled = false;
+                    }
+                    dirty();
+                }));
+                /*
+                subscriptions.push(R.sub('refresh', function () {
+                    if (isDirty) {
+                        console.log('yo, dirty, trying to reattach....');
+                        console.log($container);
+                        reattach()
+                            .catch(function (err) {
+                                console.log('ERROR');
+                                console.log(err);
+                            })
+                            .done();
+                    }
+                }));
+                */
+
+                subscriptions2.push(R.recv('app', 'heartbeat', function (data) {
+                    if (isDirty) {
+                        reattach()
+                            .catch(function (err) {
+                                console.log('ERROR');
+                                console.log(err);
+                            })
+                            .done();
+                    }
+                }));
+            }
+            function unsubscribeAll() {
+                subscriptions.forEach(function (sub) {
+                    R.unsub(sub);
+                });
+                subscriptions2.forEach(function (sub) {
+                    R.drop(sub);
+                });
             }
             function stop() {
-                //
-                return false;
+                return Q.Promise(function (resolve) {
+                    unsubscribeAll();
+                    resolve();
+                });
             }
 
             /*
@@ -119,28 +253,67 @@ define([
 
 
             //
-            var title = '** title here **';
+            var title = '';
             function setTitle(newTitle) {
                 title = newTitle;
+                dirty();
             }
 
             // EVENTS
             // TODO; Move to separate module.
             var events = [];
-            function addEvent(type, handler) {
-                var id = html.genId();
+            function addEvent(type, handler, id, data) {
+                if (!id) {
+                    id = html.genId();
+                }
                 events.push({
                     type: type,
                     selector: '#' + id,
                     handler: handler
                 });
+                dirty();
                 return id;
             }
+            function matches (element, selector) {
+                var matches = ['matches', 'webkitMatchesSelector', 'msMatchesSelector', 'mozMatchesSelector', 'oMatchesSelector'],
+                    matcher = _.find(matches, function (m) {return (m in element);});
+                if (matcher) {
+                    return element[matcher](selector);
+                } else {
+                    throw new Error('No mathches method found!');
+                }
+            }
+            function attachEvents() {
+                events.forEach(function (event) {
+                    $container.on(event.type, event.selector, event.data, event.handler);
+                    /*var fun = function (e) {
+                        console.log('trying...');
+                        console.log(e.target);
+                        console.log(event.selector);
+                        console.log(matches(e.target, event.selector));
+                        if (matches(e.target, event.selector)) {
+                            event.handler();
+                        }
+                    };
+                    event.actualHandler = fun;
+                    $container.get(0).addEventListener(event.type, fun);
+                    */
+                });
+            }
+            function detachEvents() {
+                events.forEach(function (event) {
+                    if (event.listener) {
+                        $container.off(event.type, event.selector);
+                        // $container.get(0).removeEventListener(event.type, event.actualHandler);
+                    }
+                });
+            }
+
             function handleSignout(e) {
                 Session.logout()
                     .then(function () {
-                        R.pub('loggedout');
-                        R.pub('navigate', 'welcome');
+                        R.send('app', 'loggedout');
+                        R.send('app', 'navigate', 'welcome');
                     })
                     .catch(function (err) {
                         console.log('ERROR');
@@ -276,23 +449,108 @@ define([
                         ])
                     ]),
                     div({class: 'navbar-right'}, [
-                        span({class: 'navbar-buttons', 'data-element': 'buttons'}),
+                        span({class: 'navbar-buttons', 'data-element': 'buttons'}, [
+                            renderButtons()
+                        ]),
                         span({id: 'signin-button', 'data-element': 'signin-button'}, [
                             renderLogin()
                         ])
                     ])
                 ]);
-                return {
-                    content: content,
-                    events: events
-                };
+                return content;
             }
 
-            function promise() {
-                return Q.Promise(function (resolve) {
-                    resolve(render());
+
+
+
+            /* BUTTONS */
+            var buttons = [];
+            var buttonMap = {};
+            function clearButtons() {
+                if (!$container) {
+                    return false
+                }
+                // $container.find('.navbar-buttons').empty();
+                buttons = [];
+                buttonMap = {};
+                return true;
+            }
+
+            function addButton(cfg) {
+                if (cfg.place === 'end') {
+                    buttons.push(cfg);
+                } else {
+                    buttons.unshift(cfg);
+                }
+                buttonMap[cfg.name] = cfg;
+                dirty();
+                return true;
+            }
+
+            function renderButton(cfg) {
+                var iconStyle = '';
+                var label = '';
+
+                var div = html.tag('div'),
+                    a = html.tag('a'),
+                    button = html.tag('button');
+
+                if (cfg.label) {
+                    label = div({class: 'kb-nav-btn-txt'}, cfg.label);
+                } else {
+                    iconStyle += 'font-size: 150%;';
+                }
+
+                var btn;
+                var id = html.genId();
+                var attribs = {
+                    'data-button': cfg.name,
+                    id: id,
+                    class: 'btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn',
+                    disabled: cfg.disabled ? true : false
+                };
+                var icon = div({
+                    class: 'fa fa-' + cfg.icon,
+                    style: iconStyle
+                });
+                if (cfg.url) {
+                    // a link style button
+                    attribs.role = 'button';
+                    attribs.href = cfg.url;
+                    if (cfg.target) {
+                        attribs.target = cfg.target;
+                    } else if (cfg.external) {
+                        attribs.target = '_blank';
+                    }
+                    btn = a(attribs, [icon, label]);
+                } else {
+                    btn = button(attribs, [icon, label]);
+                    addEvent('click', function (e) {
+                        console.log('yes, here!');
+                        //e.preventDefault();
+                        console.log('yes, here2!');
+                        cfg.callback();
+                        return false;
+                    }, id);
+                }
+                return btn;
+            }
+
+
+            function renderButtons() {
+                return buttons.map(function (buttonDef) {
+                    return renderButton(buttonDef);
                 });
             }
+
+
+            function findButton(name) {
+                return $container.find('.navbar-buttons [data-button="' + name + '"]');
+            }
+
+            // All set up, set flags.
+            dirty();
+
 
             /*
              * And this, dear friends, is the Navbar api.
@@ -301,12 +559,19 @@ define([
                 // Standard panel/widget stuff
                 setup: setup,
                 teardown: teardown,
-                promise: promise,
+                attach: attach,
+                detach: detach,
                 start: start,
                 stop: stop,
+                // probably should remove after play time is over...
+                render: render,
                 // navbar api
                 setTitle: setTitle,
-                defMenuItem: defMenuItem
+                defMenuItem: defMenuItem,
+                clearButtons: clearButtons,
+                addButton: addButton
+
+
 
                     //addAppMenuItem: addAppMenuItem,
                     //removeAppMenuItem: removeAppMenuItem,
