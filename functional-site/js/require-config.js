@@ -130,6 +130,8 @@ require.config({
         'kb.messaging': 'src/kbaseMessaging',
         'kb.format': 'src/kbaseFormat',
         'kb.props': 'src/kbaseProps',
+        'kb.widgetconnector': 'src/kbaseWidgetConnector',
+        'kb.simplepanel': 'src/kbaseSimplePanel',
         
         // KBase Widgets
         // -------------
@@ -187,6 +189,9 @@ require.config({
         'kb.panel.dataview.style': 'src/panels/dataview',
         'kb.panel.databrowser': 'src/panels/databrowser',
         'kb.panel.spec': 'src/panels/spec',
+        'kb.panel.message': 'src/panels/message',
+        
+        
         // KBase JQuery Plugin Widgets
         // ---------------------------
         'kb.jquery.widget': 'src/widgets/jquery/kbaseWidget',

@@ -5,34 +5,33 @@
  browser: true,
  white: true
  */
-define(['kb.html', 'kb.statemachine', 'q'],
-    function (html, StateMachine, Q) {
+define([
+    'q',
+    'kb.html',
+    'kb.runtime',
+    'kb.statemachine', 
+    'kb.widgetconnector',
+    'kb.simplepanel'
+],
+    function (q, html, R, StateMachine, widgetConnector, simplePanel) {
         'use strict';
 
-        function renderPanel(app, params) {
-            return Q.Promise(function (resolve) {
+        function renderPanel() {
+            return q.Promise(function (resolve) {
                 // View stat is a local state machine for this view.
                 var viewState = Object.create(StateMachine).init();
 
                 // Widgets
                 // Widgets are an array of functions or promises which are 
                 // invoked later...
-                var widgets = {};
+                var widgets = [];
                 function addWidget(config) {
                     var id = html.genId();
-                    widgets[config.name] = {
+                    widgets.push({
                         id: id,
-                        attach: function (node) {
-                            require([config.module], function (Widget) {
-                                var W = Object.create(Widget);
-                                W.init({
-                                    container: node,
-                                    userId: params.username,
-                                    viewState: viewState
-                                }).go();
-                            });
-                        }
-                    };
+                        config: config,
+                        widget: widgetConnector.create()
+                    });
                     return id;
                 }
 
@@ -48,6 +47,9 @@ define(['kb.html', 'kb.statemachine', 'q'],
                             panel('Data Browser',
                                 div({id: addWidget({
                                         name: 'databrowser',
+                                        config: {
+                                            viewState: viewState
+                                        },
                                         module: 'kb.widget.databrowser'
                                     })})
                                 )
@@ -55,7 +57,7 @@ define(['kb.html', 'kb.statemachine', 'q'],
                     ])
                 ]);
                 resolve({
-                    title: 'Data Browser for ' + app.getUserId(),
+                    title: 'Data Browser for ' + R.getUsername(),
                     content: panel,
                     widgets: widgets
                 });
@@ -65,11 +67,9 @@ define(['kb.html', 'kb.statemachine', 'q'],
         function setup(app) {
             app.addRoute({
                 path: ['databrowser'],
-                promise: function (params) {
-                    return Q.promise(function (resolve) {
-                        resolve(renderPanel(app, params));
-                    });
-                }
+                widget: simplePanel({
+                    renderer: renderPanel
+                })
             });
         }
         function teardown() {

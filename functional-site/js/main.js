@@ -51,8 +51,9 @@ require([
             // The default route is invoked if there is no route set up to handle
             // the path.
             app.setDefaultRoute({
-                redirect: 'welcome'
-                
+                redirect: {
+                    path: 'message/notfound'
+                }
             });
             
             /*
@@ -82,7 +83,9 @@ require([
              */
             app.addRoute({
                 path: [],
-                redirect: 'welcome',
+                redirect: {
+                    path: 'welcome'
+                },
                 x: function (params) {
                     return Q.Promise(function (resolve) {
                         resolve({
@@ -145,7 +148,11 @@ require([
                 console.log('new-route');
                 console.log(data);
                 if (data.routeHandler.route.redirect) {
-                    Runtime.send('app', 'navigate', data.routeHandler.route.redirect);
+                    console.log('redirecting'); console.log(data.routeHandler);
+                    Runtime.send('app', 'navigate', {
+                        path: data.routeHandler.route.redirect.path,
+                        params: data.routeHandler.route.redirect.params
+                    });
                 } else {
                     app.showPanel2('app', data.routeHandler)
                         .catch(function (err) {
@@ -188,16 +195,17 @@ require([
         }
         Runtime.logDebug({source: 'main', message: 'About to load panels...'});
         var promises = [
+            {module: 'kb.panel.message', config: {}},
             {module: 'kb.panel.about', config: {}},
             {module: 'kb.panel.contact', config: {}},
             {module: 'kb.panel.login', config: {}},
-            //{module: 'kb.panel.userprofile'},
-            {module: 'kb.panel.welcome'}
-            //{module: 'kb.panel.dashboard'},
+            {module: 'kb.panel.userprofile', config: {}},
+            {module: 'kb.panel.welcome', config: {}},
+            {module: 'kb.panel.dashboard', config: {}},
             //{module: 'kb.panel.narrativestore'},
             //{module: 'kb.panel.datasearch'},
             //{module: 'kb.panel.dataview'},
-            //{module: 'kb.panel.databrowser'},
+            {module: 'kb.panel.databrowser', config: {}}
             //{module: 'kb.panel.spec'}
         ].map(function (panel) {
             return requirePromise([panel.module], function (PanelModule) {

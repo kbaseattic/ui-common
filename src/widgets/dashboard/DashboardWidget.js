@@ -379,6 +379,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
                     if (this.heartbeatSubscription) {
                         this.heartbeatSubscription.unsubscribe();
                     }
+                    this.stopSubscriptions();
                     if (this.onStop) {
                         this.onStop();
                     }

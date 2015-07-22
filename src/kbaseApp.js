@@ -28,11 +28,23 @@ define([
     function ($, Q, _, Postal, html, AppState, Session, Config, Router) {
         'use strict';
         var factory = function () {
+            
+            function paramsToQuery (params) {
+                return Object.keys(params).map(function(key) {
+                    return key + '=' + encodeURIComponent(params[key])
+                }).join('&');
+            }
+            
             function navigateTo(location) {
                 //if (window.history.pushState) {
                 //    window.history.pushState(null, '', '#' + location);
                 //} else {
-                window.location.hash = '#' + location;
+                var loc = location.path;
+                if (location.params) {
+                    loc += '?' + paramsToQuery(location.params);
+                    
+                }
+                window.location.hash = '#' + loc;
                 //}
             }
             function replacePath(location) {
@@ -272,7 +284,7 @@ define([
 
                             newMount.widget.attach(newMount.container.get(0))
                                 .then(function () {
-                                    newMount.widget.start()
+                                    newMount.widget.start(routed.params)
                                         .then(function () {
                                             resolve();
                                         })

@@ -97,6 +97,7 @@ define([
                     container = document.createElement('div');
                     mount.appendChild(container);
                     container.innerHTML = html.flatten(render());
+                    R.send('app', 'title', 'About then FUNctional Site');
                     resolve();
                 });
             }

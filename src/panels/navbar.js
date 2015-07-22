@@ -115,8 +115,8 @@ define([
                     // all we care about is the avatar menu
                     dirty();
                 }));
-                subscriptions2.push(R.recv('app', 'title', function (data) {
-                    setTitle(data.title);
+                subscriptions2.push(R.recv('app', 'title', function (title) {
+                    setTitle(title);
                 }));
                 subscriptions2.push(R.recv('navbar', 'clearButtons', function () {
                     clearButtons();

@@ -14,12 +14,13 @@ define([
     'kb.session',
     'kb.config',
     'kb.widget.dataview.overview',
-    'kb.jquery.provenance',
     'kb.widget.genericvisualizer',
+    
+    'kb.jquery.provenance',    
     'kb.widget.dataview.download',
     'css!kb.panel.dataview.style'
 ],
-    function (_, $, Q, html, StateMachine, Session, Config, OverviewWidget, ProvenanceWidget, GenericVisualizer, DownloadWidget) {
+    function (_, $, Q, html, StateMachine, Session, Config, OverviewWidget, GenericVisualizer) {
         'use strict';
 
         // handle subobjects, only allowed types!!  This needs to be refactored because it can depend on the base type!!!

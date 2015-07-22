@@ -1,39 +1,40 @@
 /*global
- define
+ define, require
  */
 /*jslint
  browser: true,
  white: true
  */
-define(['kb.html', 'kb.statemachine', 'kb.session', 'q', 'postal', 'css!kb.panel.dashboard.style'],
-    function (html, StateMachine, Session, Q, Postal) {
+define([
+    'kb.html',
+    'kb.runtime',
+    'kb.statemachine',
+    'q',
+    'jquery',
+    'kb.widgetconnector',
+    'kb.simplepanel',
+    'css!kb.panel.dashboard.style'
+],
+    function (html, R, StateMachine, q, $, widgetConnector, simplePanel) {
         'use strict';
 
-        function renderPanel(params) {
-            return Q.Promise(function (resolve) {
+        function renderPanel() {
+            return q.Promise(function (resolve) {
                 // View stat is a local state machine for this view.
-                var viewState = Object.create(StateMachine).init();
+                var panelState = Object.create(StateMachine).init();
 
                 // Widgets
                 // Widgets are an array of functions or promises which are 
                 // invoked later...
-                var widgets = {};
+                var widgets = [];
 
                 function addWidget(config) {
                     var id = html.genId();
-                    widgets[config.name] = {
+                    widgets.push({
                         id: id,
-                        attach: function (node) {
-                            require([config.module], function (Widget) {
-                                var W = Object.create(Widget);
-                                W.init({
-                                    container: node,
-                                    userId: params.username,
-                                    viewState: viewState
-                                }).go();
-                            });
-                        }
-                    };
+                        config: config,
+                        widget: widgetConnector.create()
+                    });
                     return id;
                 }
 
@@ -44,39 +45,53 @@ define(['kb.html', 'kb.statemachine', 'kb.session', 'q', 'postal', 'css!kb.panel
                         div({class: 'col-sm-8'}, [
                             div({id: addWidget({
                                     name: 'narratives',
+                                    config: {
+                                        viewState: panelState
+                                    },
                                     module: 'kb.widget.dashboard.narratives'
                                 })}),
                             div({id: addWidget({
                                     name: 'sharednarratives',
+                                    config: {
+                                        viewState: panelState
+                                    },
                                     module: 'kb.widget.dashboard.sharedNarratives'
                                 })}),
                             div({id: addWidget({
                                     name: 'publicnarratives',
+                                     config: {
+                                        viewState: panelState
+                                    },
                                     module: 'kb.widget.dashboard.publicNarratives'
                                 })}),
                             div({id: addWidget({
                                     name: 'apps',
+                                     config: {
+                                        viewState: panelState
+                                    },
                                     module: 'kb.widget.dashboard.apps'
                                 })})
                         ]),
                         div({class: 'col-sm-4'}, [
                             div({id: addWidget({
                                     name: 'profile',
+                                    config: {
+                                        viewState: panelState
+                                    },
                                     module: 'kb.widget.dashboard.profile'
                                 })}),
                             div({id: addWidget({
                                     name: 'metrics',
+                                     config: {
+                                        viewState: panelState
+                                    },
                                     module: 'kb.widget.dashboard.metrics'
-                                })}),
-                            div({id: addWidget({
-                                    name: 'usersearch',
-                                    module: 'kb.widget.dashboard.usersearch'
                                 })})
                         ])
                     ])
                 ]);
                 resolve({
-                    title: 'Dashboard for ' + Session.getUsername(),
+                    title: 'Dashboard for ' + R.getUsername(),
                     content: panel,
                     widgets: widgets
                 });
@@ -87,13 +102,9 @@ define(['kb.html', 'kb.statemachine', 'kb.session', 'q', 'postal', 'css!kb.panel
             app.addRoute({
                 id: 'dashboard',
                 path: ['dashboard'],
-                promise: function (params) {
-                    return Q.promise(function (resolve) {
-                        resolve(renderPanel(params));
-                    });
-                },
-                start: start,
-                stop: stop
+                widget: simplePanel({
+                    renderer: renderPanel
+                })
             });
         }
         function teardown() {

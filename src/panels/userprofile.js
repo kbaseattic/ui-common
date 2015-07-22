@@ -6,37 +6,29 @@
  white: true
  */
 define([
+    'kb.runtime',
     'kb.html',
-    'kb.session',
-    'kb.widget.social.user_profile',
-    'kb.widget.social.user_search',
-    'kb.widget.social.browse_narratives',
-    'kb.widget.social.collaborators',
+    'kb.widgetconnector',
+    'kb.simplepanel',
     'q',
     'jquery'
 ],
-    function (html, Session, UserProfileWidget, UserSearchWidget, NarrativeWidget, CollaboratorsWidget, Q, $) {
+    function (R, html, widgetConnector, simplePanel, q, $) {
         'use strict';
 
-        function renderUserProfilePanel(params) {
-            return Q.Promise(function (resolve) {
+        function renderPanel() {
+            return q.Promise(function (resolve) {
                 // Widgets
                 // Widgets are an array of functions or promises which are 
                 // invoked later...
-                var widgets = {};
-                function addWidget(name, widget) {
+                var widgets = [];
+                function addWidget(config) {
                     var id = html.genId();
-                    var W = Object.create(widget);
-                    widgets[name] = {
-                        widget: W,
+                    widgets.push({
                         id: id,
-                        attach: function (node) {
-                            W.init({
-                                container: $(node),
-                                userId: params.username
-                            }).go();
-                        }
-                    };
+                        config: config,
+                        widget: widgetConnector.create()
+                    });
                     return id;
                 }
 
@@ -45,42 +37,69 @@ define([
                 var panel = div({class: 'kbase-view kbase-user-page-view container-flud', 'data-kbase-view': 'social'}, [
                     div({class: 'row'}, [
                         div({class: 'col-sm-9'}, [
-                            div({id: addWidget('profile', UserProfileWidget)})
+                            div({id: addWidget({
+                                    name: 'profile',
+                                    module: 'kb.widget.social.user_profile'
+                                })})                            
                         ]),
                         div({class: 'col-sm-3'}, [
-                            div({id: addWidget('usersearch', UserSearchWidget)})
+                            div({id: addWidget({
+                                    name: 'usersearch', 
+                                    module: 'kb.widget.social.user_search'
+                                })})
                         ])
                     ]),
                     div({class: 'row'}, [
                         div({class: 'col-sm-6'}, [
-                            div({id: addWidget('narratives', NarrativeWidget)})
+                            div({id: addWidget({
+                                    name: 'narratives',
+                                    module: 'kb.widget.social.browse_narratives'
+                                })})
                         ]),
                         div({class: 'col-sm-6'}, [
-                            div({id: addWidget('collaborators', CollaboratorsWidget)})
+                            div({id: addWidget({
+                                    name: 'collaborators',
+                                    module: 'kb.widget.social.collaborators'
+                                })})
                         ])
                     ])
                 ]);
+                var title;
+                if (R.getUsername === params.username) {
+                    title = 'Viewing your Profile';
+                } else {
+                    title = 'Viewing profile for ' + params.username;
+                }
                 resolve({
-                    title: Session.getUsername(),
+                    title: title,
                     content: panel,
                     widgets: widgets
                 });
+            });
+        }
+        function runner() {
+            return q.Promise(function (resolve) {
+               +++ LEFT OFF HERE +++
+               need to figure out how to give the panel state, communiciate with its env (e.g. title),
+               and also feed params to the children widgets.
+               this particular solution is TRYING to be generic. Of course, bringing the full
+               implementation of the panel in here would solve the problem ...
             });
         }
 
         function setup(app) {
             app.addRoute({
                 path: ['people', {type: 'param', name: 'username'}],
-                render: null,
-                promise: function (params) {
-                    return renderUserProfilePanel(params);
-                }
+                widget: simplePanel({
+                    renderer: renderPanel,
+                    runner: runner
+                })
             });
             app.addRoute({
                 path: ['people'],
-                render: function (params) {
-                    return 'NOT YET';
-                }
+                widget: simplePanel({
+                    renderer: renderPanel
+                })
             });
         }
         function teardown() {

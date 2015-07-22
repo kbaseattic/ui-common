@@ -73,7 +73,7 @@ define([
                                                 return 0;
                                             }
                                         });
-
+                                        console.log(users);
                                         widget.setState('searchResults', users);
                                     })
                                     .catch(function (err) {
