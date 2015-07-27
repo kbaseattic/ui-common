@@ -291,7 +291,7 @@ define([
                                 })
                                     )
                             ]);
-                            container.html(content);
+                            $container.html(content);
                             widgets.forEach(function (widget) {
                                 widget.widget.attach($('#' + widget.id));
                             });
@@ -309,6 +309,13 @@ define([
             }
 
             // API
+            
+            function create() {
+                return q.Promise(function (resolve) {
+                    resolve();
+                });
+            }
+            
             function attach(node) {
                 return q.Promise(function (resolve) {
                     mount = node;
@@ -327,7 +334,7 @@ define([
 
             function start(params) {
                 return q.Promise(function (resolve, reject) {
-                    container.html(html.loading());
+                    $container.html(html.loading());
 
                     // Parse the data type, throwing exceptions if malformed.
                     var moduleId = params.moduleid;
@@ -361,6 +368,7 @@ define([
             }
 
             return {
+                create: create,
                 attach: attach,
                 detach: detach,
                 start: start,

@@ -86,9 +86,7 @@ define([
                 div({class: 'row'}, [
                     div({class: 'col-sm-12'}, [
                         //div({id: addJQWidget('cardlayoutmanager', 'KBaseCardLayoutManager')}),
-                        div({id: widgets.addFactoryWidget('datatypespec', DataTypeSpecWidget, {
-                                datatype: params.datatype
-                            })})
+                        div({id: widgets.addFactoryWidget('datatypespec', DataTypeSpecWidget)})
                     ])
                 ])
             ]);
@@ -101,98 +99,98 @@ define([
     }
     
     function typeViewPanelFactory() {
-            function widget(config) {
-                var mount, container, $container, children = [];
+        function widget(config) {
+            var mount, container, $container, children = [];
 
-                function attach(node) {
-                    return q.Promise(function (resolve) {
-                        mount = node;
-                        container = document.createElement('div');
-                        mount.appendChild(container);
-                        $container = $(container);
-                        resolve();
-                    });
-                }
-                function start(params) {
-                    return q.Promise(function (resolve, reject) {
-                        renderTypePanel(params)
-                            .then(function (rendered) {
-                                container.innerHTML = rendered.content;
-                                R.send('app', 'title', rendered.title);
-                                // create widgets.
-                                children = rendered.widgets;
-                                q.all(children.map(function (w) {
-                                            console.log('creating...');
-                                            console.log(w);
-                                    return w.widget.create(w.config);
-                                }))
-                                    .then(function () {
-                                        q.all(children.map(function (w) {
-                                            return w.widget.attach($('#' + w.id).get(0));
-                                        }))
-                                            .then(function (results) {
-                                                q.all(children.map(function (w) {
-                                                    return w.widget.start(params);
-                                                }))
-                                                    .then(function (results) {
-                                                        resolve();
-                                                    })
-                                                    .catch(function (err) {
-                                                        console.log('ERROR starting');
-                                                        console.log(err);
-                                                    })
-                                                    .done();
-                                            })
-                                            .catch(function (err) {
-                                                console.log('ERROR attaching');
-                                                console.log(err);
-                                            })
-                                            .done();
-                                    })
-                                    .catch(function (err) {
-                                        console.log('ERROR creating');
-                                        console.log(err);
-                                    })
-                                    .done();
-                            })
-                            .catch(function (err) {
-                                console.log('ERROR rendering console');
-                                console.log(err);
-                                reject(err);
-                            })
-                            .done();
-                    });
-                }
-                function stop() {
-                    return q.Promise(function (resolve) {
-                        resolve();
-
-                    });
-                }
-                function detach() {
-                    return q.Promise(function (resolve) {
-                        resolve();
-                    });
-                }
-
-                return {
-                    attach: attach,
-                    start: start,
-                    stop: stop,
-                    detach: detach
-                };
+            function attach(node) {
+                return q.Promise(function (resolve) {
+                    mount = node;
+                    container = document.createElement('div');
+                    mount.appendChild(container);
+                    $container = $(container);
+                    resolve();
+                });
             }
-            ;
+            function start(params) {
+                return q.Promise(function (resolve, reject) {
+                    renderTypePanel(params)
+                        .then(function (rendered) {
+                            container.innerHTML = rendered.content;
+                            R.send('app', 'title', rendered.title);
+                            // create widgets.
+                            children = rendered.widgets;
+                            q.all(children.map(function (w) {
+                                        console.log('creating...');
+                                        console.log(w);
+                                return w.widget.create(w.config);
+                            }))
+                                .then(function () {
+                                    q.all(children.map(function (w) {
+                                        return w.widget.attach($('#' + w.id).get(0));
+                                    }))
+                                        .then(function (results) {
+                                            q.all(children.map(function (w) {
+                                                return w.widget.start(params);
+                                            }))
+                                                .then(function (results) {
+                                                    resolve();
+                                                })
+                                                .catch(function (err) {
+                                                    console.log('ERROR starting');
+                                                    console.log(err);
+                                                })
+                                                .done();
+                                        })
+                                        .catch(function (err) {
+                                            console.log('ERROR attaching');
+                                            console.log(err);
+                                        })
+                                        .done();
+                                })
+                                .catch(function (err) {
+                                    console.log('ERROR creating');
+                                    console.log(err);
+                                })
+                                .done();
+                        })
+                        .catch(function (err) {
+                            console.log('ERROR rendering console');
+                            console.log(err);
+                            reject(err);
+                        })
+                        .done();
+                });
+            }
+            function stop() {
+                return q.Promise(function (resolve) {
+                    resolve();
+
+                });
+            }
+            function detach() {
+                return q.Promise(function (resolve) {
+                    resolve();
+                });
+            }
 
             return {
-                create: function (config) {
-                    return widget(config);
-                }
+                attach: attach,
+                start: start,
+                stop: stop,
+                detach: detach
             };
         }
+        ;
+
+        return {
+            create: function (config) {
+                return widget(config);
+            }
+        };
+    }
 
     function renderModulePanel(params) {
-        return Q.Promise(function (resolve) {
+        return q.Promise(function (resolve) {
 
             // Widgets
             // Widgets are an array of functions or promises which are 
@@ -220,29 +218,106 @@ define([
         });
     }
     
+    function moduleViewPanelFactory() {
+        function widget(config) {
+            var mount, container, $container, children = [];
+
+            function attach(node) {
+                return q.Promise(function (resolve) {
+                    mount = node;
+                    container = document.createElement('div');
+                    mount.appendChild(container);
+                    $container = $(container);
+                    resolve();
+                });
+            }
+            function start(params) {
+                return q.Promise(function (resolve, reject) {
+                    renderModulePanel(params)
+                        .then(function (rendered) {
+                            container.innerHTML = rendered.content;
+                            R.send('app', 'title', rendered.title);
+                            // create widgets.
+                            children = rendered.widgets;
+                            q.all(children.map(function (w) {
+                                        console.log('creating...');
+                                        console.log(w);
+                                return w.widget.create(w.config);
+                            }))
+                                .then(function () {
+                                    q.all(children.map(function (w) {
+                                        return w.widget.attach($('#' + w.id).get(0));
+                                    }))
+                                        .then(function (results) {
+                                            q.all(children.map(function (w) {
+                                                return w.widget.start(params);
+                                            }))
+                                                .then(function (results) {
+                                                    resolve();
+                                                })
+                                                .catch(function (err) {
+                                                    console.log('ERROR starting');
+                                                    console.log(err);
+                                                })
+                                                .done();
+                                        })
+                                        .catch(function (err) {
+                                            console.log('ERROR attaching');
+                                            console.log(err);
+                                        })
+                                        .done();
+                                })
+                                .catch(function (err) {
+                                    console.log('ERROR creating');
+                                    console.log(err);
+                                })
+                                .done();
+                        })
+                        .catch(function (err) {
+                            console.log('ERROR rendering module view');
+                            console.log(err);
+                            reject(err);
+                        })
+                        .done();
+                });
+            }
+            function stop() {
+                return q.Promise(function (resolve) {
+                    resolve();
+
+                });
+            }
+            function detach() {
+                return q.Promise(function (resolve) {
+                    resolve();
+                });
+            }
+
+            return {
+                attach: attach,
+                start: start,
+                stop: stop,
+                detach: detach
+            };
+        }
+        ;
+
+        return {
+            create: function (config) {
+                return widget(config);
+            }
+        };
+    }
+    
     function setup(app) {
         app.addRoute({
             path: ['spec', 'type', {type: 'param', name: 'datatype'}],
-            render: null,
-            data: null,
             widget: typeViewPanelFactory()
-
         });
          
         app.addRoute({
             path: ['spec', 'module', {type: 'param', name: 'moduleid'}],
-            render: null,
-            data: null,
-            promise: function (params) {
-                return renderModulePanel(params);
-            },
-            start: function (node, self) {
-                return true;
-            },
-            stop: function (node, self) {
-                return true;
-            }
-
+            widget: moduleViewPanelFactory()
         });
     }
     function teardown() {
