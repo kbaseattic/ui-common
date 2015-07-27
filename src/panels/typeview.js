@@ -69,7 +69,7 @@ define([
             addFactoryWidget: addFactoryWidget,
             getWidgets: getWidgets
         };
-    }
+    };
 
 
     function renderTypePanel(params) {
@@ -236,12 +236,10 @@ define([
                     renderModulePanel(params)
                         .then(function (rendered) {
                             container.innerHTML = rendered.content;
-                            R.send('app', 'title', rendered.title);
+                            R.send('app', 'title', 'Loading: ' + rendered.title);
                             // create widgets.
                             children = rendered.widgets;
-                            q.all(children.map(function (w) {
-                                        console.log('creating...');
-                                        console.log(w);
+                            q.all(children.map(function (w) {                                
                                 return w.widget.create(w.config);
                             }))
                                 .then(function () {
@@ -253,29 +251,41 @@ define([
                                                 return w.widget.start(params);
                                             }))
                                                 .then(function (results) {
+                                                    R.send('app', 'title', rendered.title);
                                                     resolve();
                                                 })
                                                 .catch(function (err) {
-                                                    console.log('ERROR starting');
-                                                    console.log(err);
+                                                    R.logError({
+                                                        message: 'Starting widget',
+                                                        exception: err
+                                                    });
+                                                    reject(err);
                                                 })
                                                 .done();
                                         })
                                         .catch(function (err) {
-                                            console.log('ERROR attaching');
-                                            console.log(err);
+                                            R.logError({
+                                                message: 'Attaching widget',
+                                                exception: err
+                                            });
+                                            reject(err);
                                         })
                                         .done();
                                 })
                                 .catch(function (err) {
-                                    console.log('ERROR creating');
-                                    console.log(err);
+                                    R.logError({
+                                        message: 'Creating widget',
+                                        exception: err
+                                    });
+                                    reject(err);
                                 })
                                 .done();
                         })
                         .catch(function (err) {
-                            console.log('ERROR rendering module view');
-                            console.log(err);
+                            R.logError({
+                                message: 'ERROR rendering module view',
+                                exception: err
+                            });
                             reject(err);
                         })
                         .done();

@@ -166,8 +166,6 @@ define([
                                 // create widgets.
                                 children = rendered.widgets;
                                 q.all(children.map(function (w) {
-                                            console.log('creating...');
-                                            console.log(w);
                                     return w.widget.create(w.config);
                                 }))
                                     .then(function () {

@@ -55,6 +55,7 @@
     "rgb-color": "*",
     "jquery-ui": "1.11.4",
     "google-code-prettify": "1.0.4",
-    "ace-builds": "1.2.0"
+    "ace-builds": "1.2.0",
+    "stacktrace-js": "0.6.4"
   }
 }

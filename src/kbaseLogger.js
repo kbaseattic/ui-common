@@ -5,7 +5,7 @@
  browser: true,
  white: true
  */
-define([], function () {
+define(['stacktrace'], function (Stacktrace) {
     "use strict";
     /**
      A simple logger for the KBase javscript front end.
@@ -63,6 +63,9 @@ define([], function () {
                 if (msg.data) {
                     console[outputter](prefix + 'Data follows');
                     console[outputter](msg.data);
+                }
+                if (msg.exception) {
+                    console[outputter](msg.exception);
                 }
                 return this;
             }

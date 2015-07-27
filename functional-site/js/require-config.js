@@ -102,6 +102,8 @@ require.config({
         'ace': 'bower_components/ace-builds/src-min/ace',
         // Just style, man.
         'font-awesome': 'bower_components/font-awesome/css/font-awesome.min',
+        'stacktrace': 'bower_components/stacktrace-js/dist/stacktrace.min',
+        
         // KBase Styles
         // ----------------
         'kb.style.bootstrap': 'css/kb-bootstrap',
