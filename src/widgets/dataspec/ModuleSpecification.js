@@ -21,32 +21,16 @@ define([
         // Just take params for now
         /* TODO: use specific arguments */
         var factory = function (params) {
-            var container = null;
+
+            var mount, container, $container, children = [];
 
             var workspace = new Workspace(R.getConfig('workspace_url', {
                 token: R.getAuthToken()
             }));
 
+            var moduleName, moduleVersion;
 
-            // Parse the data type, throwing exceptions if malformed.
-            var moduleId = params.moduleid;
-            var matched = moduleId.match(/^(.+?)-(.+)$/);
-            if (!matched) {
-                throw new Error('Invalid module id ' + moduleId);
-            }
-            if (matched.length !== 3) {
-                throw new Error('Invalid module id ' + moduleId);
-            }
 
-            var moduleName = matched[1];
-            var moduleVersion = matched[2];
-
-            function attach(node) {
-                container = $(node);
-            }
-            function detach() {
-                container.empty();
-            }
 
             // tags used in this module.
             var table = html.tag('table'),
@@ -234,14 +218,15 @@ define([
                                         iDisplayLength: 10,
                                         aoColumns: [
                                             {sTitle: 'Module version', mData: 'name'},
-                                            {sTitle: 'Upload date',  mData: function (row, type) {
+                                            {sTitle: 'Upload date', mData: function (row, type) {
                                                     switch (type) {
                                                         case 'display':
                                                             return Format.niceTime(row.date);
                                                             break;
                                                         default:
                                                             return row.date;
-                                                    }}}
+                                                        }
+                                                }}
                                         ],
                                         aaData: tableData,
                                         oLanguage: {
@@ -264,68 +249,115 @@ define([
             }
 
             function render() {
-                q(workspace.get_module_info({mod: moduleName, ver: moduleVersion}))
-                    .then(function (data) {
-                        var tabs = [
-                            {title: 'Overview', id: 'overview', content: overviewTab},
-                            {title: 'Spec-file', id: 'spec', content: specFileTab},
-                            {title: 'Types', id: 'types', content: typesTab},
-                            {title: 'Functions', id: 'funcs', content: functionsTab},
-                            {title: 'Included modules', id: 'inc', content: includedModulesTab},
-                            {title: 'Versions', id: 'vers', content: versionsTab}
-                        ],
-                            id = '_' + html.genId(),
-                            widgets = [];
+                return q.Promise(function (resolve, reject) {
+                    q(workspace.get_module_info({mod: moduleName, ver: moduleVersion}))
+                        .then(function (data) {
+                            var tabs = [
+                                {title: 'Overview', id: 'overview', content: overviewTab},
+                                {title: 'Spec-file', id: 'spec', content: specFileTab},
+                                {title: 'Types', id: 'types', content: typesTab},
+                                {title: 'Functions', id: 'funcs', content: functionsTab},
+                                {title: 'Included modules', id: 'inc', content: includedModulesTab},
+                                {title: 'Versions', id: 'vers', content: versionsTab}
+                            ],
+                                id = '_' + html.genId(),
+                                widgets = [];
 
-                        var content = div([
-                            ul({id: id, class: 'nav nav-tabs'},
-                                tabs.map(function (tab) {
-                                    var active = (tab.id === 'overview') ? 'active' : '';
-                                    return li({class: active}, a({href: '#' + tab.id + id, 'data-toggle': 'tab'}, tab.title));
-                                })),
-                            div({class: 'tab-content'}, tabs.map(function (tab) {
-                                var active = (tab.id === 'overview') ? ' active' : '',
-                                    result = tab.content(data);
-                                if (typeof result === 'string') {
-                                    return div({class: 'tab-pane in' + active, id: tab.id + id}, tab.content(data));
-                                }
-                                // This is the emerging widget pattern: Save a list of widgets 
-                                // and invoke them after the content is added to the dom,
-                                // because they need a real node to render upon.
-                                var widgetId = html.genId();
-                                widgets.push({
-                                    id: widgetId,
-                                    widget: result.widget
-                                });
-                                return div({class: 'tab-pane in' + active, id: tab.id + id}, [
-                                    div({id: widgetId}, [
-                                        result.content
-                                    ])
-                                ]);
-                            })
-                                )
-                        ]);
-                        container.html(content);
-                        widgets.forEach(function (widget) {
-                            widget.widget.attach($('#' + widget.id));
-                        });
-                        PR.prettyPrint();
-                    })
-                    .catch(function (err) {
-                        var error = 'Error rendering widget';
-                        console.log(err);
-                        container.html(error);
-                    })
-                    .done();
+                            var content = div([
+                                ul({id: id, class: 'nav nav-tabs'},
+                                    tabs.map(function (tab) {
+                                        var active = (tab.id === 'overview') ? 'active' : '';
+                                        return li({class: active}, a({href: '#' + tab.id + id, 'data-toggle': 'tab'}, tab.title));
+                                    })),
+                                div({class: 'tab-content'}, tabs.map(function (tab) {
+                                    var active = (tab.id === 'overview') ? ' active' : '',
+                                        result = tab.content(data);
+                                    if (typeof result === 'string') {
+                                        return div({class: 'tab-pane in' + active, id: tab.id + id}, tab.content(data));
+                                    }
+                                    // This is the emerging widget pattern: Save a list of widgets 
+                                    // and invoke them after the content is added to the dom,
+                                    // because they need a real node to render upon.
+                                    var widgetId = html.genId();
+                                    widgets.push({
+                                        id: widgetId,
+                                        widget: result.widget
+                                    });
+                                    return div({class: 'tab-pane in' + active, id: tab.id + id}, [
+                                        div({id: widgetId}, [
+                                            result.content
+                                        ])
+                                    ]);
+                                })
+                                    )
+                            ]);
+                            container.html(content);
+                            widgets.forEach(function (widget) {
+                                widget.widget.attach($('#' + widget.id));
+                            });
+                            PR.prettyPrint();
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            reject(err);
+                            //var error = 'Error rendering widget';
+                            //console.log(err);
+                            //container.html(error);
+                        })
+                        .done();
+                });
             }
 
+            // API
+            function attach(node) {
+                return q.Promise(function (resolve) {
+                    mount = node;
+                    container = document.createElement('div');
+                    mount.appendChild(container);
+                    $container = $(container);
+                    resolve();
+                });
+            }
+            function detach() {
+                return q.Promise(function (resolve) {
+                    container.empty();
+                    resolve();
+                });
+            }
 
-            function start() {
-                container.html(html.loading());
-                render();
+            function start(params) {
+                return q.Promise(function (resolve, reject) {
+                    container.html(html.loading());
+
+                    // Parse the data type, throwing exceptions if malformed.
+                    var moduleId = params.moduleid;
+                    var matched = moduleId.match(/^(.+?)-(.+)$/);
+                    if (!matched) {
+                        throw new Error('Invalid module id ' + moduleId);
+                    }
+                    if (matched.length !== 3) {
+                        throw new Error('Invalid module id ' + moduleId);
+                    }
+
+                    moduleName = matched[1];
+                    moduleVersion = matched[2];
+
+                    render()
+                        .then(function () {
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            reject(err);
+                        })
+                        .done();
+
+                });
             }
 
             function stop() {
+                return q.Promise(function (resolve) {
+                    resolve();
+                });
             }
 
             return {

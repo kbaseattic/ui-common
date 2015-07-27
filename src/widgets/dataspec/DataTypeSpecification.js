@@ -18,29 +18,9 @@ define([
 
         // Just take params for now
         /* TODO: use specific arguments */
-        var factory = function (params) {
-            var container = null;
-
-            // Parse the data type, throwing exceptions if malformed.
-            var dataType = params.datatype;
-            var matched = dataType.match(/^(.+?)\.(.+?)-(.+)$/);
-            if (!matched) {
-                throw new Error('Invalid data type ' + dataType);
-            }
-            if (matched.length !== 4) {
-                throw new Error('Invalid data type ' + dataType);
-            }
-
-            var moduleName = matched[1];
-            var typeName = matched[1] + '.' + matched[2];
-            var typeVersion = matched[3];
-
-            function attach(node) {
-                container = $(node);
-            }
-            function detach() {
-                container.empty();
-            }
+        var factory = function () {
+            var mount, container, $container, children = [];
+            var moduleName, typeName, typeVersion;
 
             // tags used in this module.
             var table = html.tag('table'),
@@ -286,7 +266,6 @@ define([
                         widgets.forEach(function (widget) {
                             widget.widget.attach($('#' + widget.id));
                         });
-                        console.log(PR.prettyPrint);
                         PR.prettyPrint();
                     })
                     .catch(function (err) {
@@ -296,14 +275,58 @@ define([
                     })
                     .done();
             }
+            
+            // API
+            
+            var mount, container, $container, children = [];
 
+            function attach(node) {
+                return q.Promise(function (resolve) {
+                    mount = node;
+                    container = document.createElement('div');
+                    mount.appendChild(container);
+                    $container = $(container);
+                    resolve();
+                });
+            }
+            
+            function detach() {
+                return q.Promise(function (resolve) {
+                    container.empty();
+                    resolve();
+                });
+            }
 
-            function start() {
-                container.html(html.loading());
-                render();
+            function start(params) {
+                return q.Promise(function (resolve) {
+                    container.html(html.loading());
+                
+                    // Parse the data type, throwing exceptions if malformed.
+                    var dataType = params.datatype;
+                    var matched = dataType.match(/^(.+?)\.(.+?)-(.+)$/);
+                    if (!matched) {
+                        throw new Error('Invalid data type ' + dataType);
+                    }
+                    if (matched.length !== 4) {
+                        throw new Error('Invalid data type ' + dataType);
+                    }
+
+                    moduleName = matched[1];
+                    typeName = matched[1] + '.' + matched[2];
+                    typeVersion = matched[3];
+
+                    /* TODO: reign this puppy in... */
+                    // This is a promise that isn't returned ... so it just goes off by itself.
+                    render();
+                    
+                    resolve();
+                });
             }
 
             function stop() {
+                return q.Promise(function (resolve) {
+                    resolve();
+                });
             }
 
             return {
@@ -315,8 +338,8 @@ define([
         };
 
         return {
-            create: function (params) {
-                return factory(params);
+            create: function () {
+                return factory();
             }
         };
     });

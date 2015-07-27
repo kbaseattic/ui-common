@@ -189,7 +189,7 @@ require.config({
         'kb.panel.dataview': 'src/panels/dataview',
         'kb.panel.dataview.style': 'src/panels/dataview',
         'kb.panel.databrowser': 'src/panels/databrowser',
-        'kb.panel.spec': 'src/panels/spec',
+        'kb.panel.typeview': 'src/panels/typeview',
         'kb.panel.message': 'src/panels/message',
         
         
