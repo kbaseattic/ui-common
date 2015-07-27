@@ -917,8 +917,8 @@ define([
                             }.bind(this)
                         });
                         R.send('navbar', 'addButton', {
-                            name: 'poo',
-                            label: 'Poop',
+                            name: 'test',
+                            label: 'Test Button',
                             style: 'primary',
                             icon: 'comment', 
                             callback: function () {
@@ -938,8 +938,8 @@ define([
                             }.bind(this)
                         });
                         navbar.addButton({
-                            name: 'poo',
-                            label: 'Poop',
+                            name: 'test',
+                            label: 'Test Button',
                             style: 'primary',
                             icon: 'comment', 
                             callback: function () {
