@@ -20,7 +20,7 @@ define([
         /* TODO: use specific arguments */
         var factory = function () {
             var mount, container, $container, children = [];
-            var moduleName, typeName, typeVersion;
+            var dataType, moduleName, typeName, typeVersion;
 
             // tags used in this module.
             var table = html.tag('table'),
@@ -262,7 +262,7 @@ define([
                                 })
                                     )
                             ]);
-                        container.html(content);
+                        $container.html(content);
                         widgets.forEach(function (widget) {
                             widget.widget.attach($('#' + widget.id));
                         });
@@ -271,7 +271,7 @@ define([
                     .catch(function (err) {
                         var error = 'Error rendering widget';
                         console.log(err);
-                        container.html(error);
+                        $container.html(error);
                     })
                     .done();
             }
@@ -279,6 +279,12 @@ define([
             // API
             
             var mount, container, $container, children = [];
+            
+            function create() {
+                return q.Promise(function (resolve) {
+                    resolve();
+                });
+            }
 
             function attach(node) {
                 return q.Promise(function (resolve) {
@@ -292,17 +298,17 @@ define([
             
             function detach() {
                 return q.Promise(function (resolve) {
-                    container.empty();
+                    $container.empty();
                     resolve();
                 });
             }
 
             function start(params) {
                 return q.Promise(function (resolve) {
-                    container.html(html.loading());
+                    $container.html(html.loading());
                 
                     // Parse the data type, throwing exceptions if malformed.
-                    var dataType = params.datatype;
+                    dataType = params.datatype;
                     var matched = dataType.match(/^(.+?)\.(.+?)-(.+)$/);
                     if (!matched) {
                         throw new Error('Invalid data type ' + dataType);
@@ -330,6 +336,7 @@ define([
             }
 
             return {
+                create: create,
                 attach: attach,
                 detach: detach,
                 start: start,
