@@ -11,16 +11,16 @@ define([
     'q',
     'kb.html',
     'kb.statemachine',
-    'kb.session',
-    'kb.config',
-    'kb.widget.dataview.overview',
+    'kb.runtime',
+    'kb.widgetconnector',
     'kb.widget.genericvisualizer',
+    'kb.jquerywidgetconnector',
     
-    'kb.jquery.provenance',    
+    'kb.jquery.provenance',
     'kb.widget.dataview.download',
     'css!kb.panel.dataview.style'
 ],
-    function (_, $, Q, html, StateMachine, Session, Config, OverviewWidget, GenericVisualizer) {
+    function (_, $, q, html, StateMachine, R, widgetConnectorFactory, GenericVisualizer, jqueryWidgetConnectorFactory) {
         'use strict';
 
         // handle subobjects, only allowed types!!  This needs to be refactored because it can depend on the base type!!!
@@ -76,96 +76,163 @@ define([
         }
 
         function renderPanel(params) {
-            return Q.Promise(function (resolve) {
+            return q.Promise(function (resolve) {
                 // View stat is a local state machine for this view.
                 var viewState = Object.create(StateMachine).init();
 
                 // Widgets
-                // Widgets are an array of functions or promises which are 
-                // invoked later...
-                var widgets = {};
-                function addWidget(name, widget) {
+                var widgets = [];
+                
+                // These are "classic Erik" widgets, for which the widgetConnector
+                // calls them according to the new widget api.
+                function addWidget(config) {
                     var id = html.genId();
-                    var W = Object.create(widget);
-                    widgets[name] = {
-                        widget: W,
+                    widgets.push({
                         id: id,
-                        attach: function (node) {
-                            W.init({
-                                container: node,
-                                workspaceId: params.workspaceId,
-                                objectId: params.objectId,
-                                objectVersion: params.ver,
-                                sub: params.sub,
-                                viewState: viewState
-                            }).go();
-                        }
-                    };
-                    return id;
-                }
-
-                function addFactoryWidget(name, widget, params) {
-                    var id = html.genId();
-                    var W = widget({
-                        workspaceId: params.workspaceId,
-                        objectId: params.objectId,
-                        objectVersion: params.ver,
-                        workspaceURL: Config.getItem('workspace_url'),
-                        authToken: Session.getAuthToken(),
-                        sub: params.sub,
-                        subid: params.subid,
-                        viewState: viewState
+                        config: config,
+                        widget: widgetConnectorFactory.create()
                     });
-                    widgets[name] = {
-                        widget: W,
-                        id: id,
-                        attach: function (node) {
-                            W.attach(node);
-                        }
-                    };
                     return id;
                 }
 
-                function addJQWidget(name, widget) {
+                // These are new (only one maybe) widgets based on the factory
+                // pattern which do implement the new widget pattern.
+                function addFactoryWidget(name, widget) {
                     var id = html.genId();
-                    widgets[name] = {
-                        widget: null,
-                        id: id,
-                        attach: function (node) {
-                            var jqueryWidget = $(node)[widget];
-                            if (!jqueryWidget) {
-                                $(node).html(html.panel('Not Found', 'Sorry, cannot find widget ' + widget));
-                            } else {
-                                $(node)[widget]({
-                                    wsNameOrId: params.workspaceId,
-                                    objNameOrId: params.objectId,
-                                    ws_url: Config.getItem('workspace_url'),
-                                    token: Session.getAuthToken()
-                                });
-                            }
-                        }
-                    };
+                    widgets.push({
+                        name: name,
+                        widget: widget.create(),
+                        id: id
+                    });
+                    return id;
+                }
+
+                function addJQWidget(config) {
+                    var id = html.genId();
+                    widgets.push({
+                        config: config,
+                        widget: jqueryWidgetConnectorFactory.create(),
+                        id: id
+                    });
 
                     return id;
                 }
 
                 // Render panel
                 var div = html.tag('div');
-                var panel = div({class: 'kbase-view kbase-dashboard-view container-fluid', 'data-kbase-view': 'social'}, [
+                var panel = div({class: 'kbase-view kbase-dataview-view container-fluid', 'data-kbase-view': 'dataview'}, [
                     div({class: 'row'}, [
                         div({class: 'col-sm-12'}, [
-                            div({id: addWidget('overview', OverviewWidget)}),
-                            renderBSCollapsiblePanel('Data Provenance and Reference Network', div({id: addJQWidget('provenance', 'KBaseWSObjGraphCenteredView')})),
-                            div({id: addFactoryWidget('visualizer1', GenericVisualizer, _.extend(_.clone(params), {greeting: 'Hey'}))})
+                            div({id: addWidget({
+                                    name: 'overview',
+                                    module: 'kb.widget.dataview.overview'
+                                })}),
+                            renderBSCollapsiblePanel('Data Provenance and Reference Network', div({id: addJQWidget({
+                                    name: 'provenance',
+                                    module: 'kb.jquery.provenance',
+                                    jqueryobject: 'KBaseWSObjGraphCenteredView'
+                                })})),
+                            div({id: addFactoryWidget('visualizer1', GenericVisualizer)})
                         ])
                     ])
                 ]);
                 resolve({
-                    title: 'Dashboard for ' + Session.getUsername(),
+                    title: 'Dataview',
                     content: panel,
                     widgets: widgets
                 });
             });
+        }
+
+        function dataViewWidgetFactory() {
+            function widget(config) {
+                var mount, container, $container, children = [];
+
+                function attach(node) {
+                    return q.Promise(function (resolve) {
+                        mount = node;
+                        container = document.createElement('div');
+                        mount.appendChild(container);
+                        $container = $(container);
+                        resolve();
+                    });
+                }
+                function start(params) {
+                    return q.Promise(function (resolve, reject) {
+                        renderPanel(params)
+                            .then(function (rendered) {
+                                container.innerHTML = rendered.content;
+                                R.send('app', 'title', rendered.title);
+                                // create widgets.
+                                children = rendered.widgets;
+                                q.all(children.map(function (w) {
+                                            console.log('creating...');
+                                            console.log(w);
+                                    return w.widget.create(w.config);
+                                }))
+                                    .then(function () {
+                                        q.all(children.map(function (w) {
+                                            return w.widget.attach($('#' + w.id).get(0));
+                                        }))
+                                            .then(function (results) {
+                                                q.all(children.map(function (w) {
+                                                    return w.widget.start(params);
+                                                }))
+                                                    .then(function (results) {
+                                                        resolve();
+                                                    })
+                                                    .catch(function (err) {
+                                                        console.log('ERROR starting');
+                                                        console.log(err);
+                                                    })
+                                                    .done();
+                                            })
+                                            .catch(function (err) {
+                                                console.log('ERROR attaching');
+                                                console.log(err);
+                                            })
+                                            .done();
+                                    })
+                                    .catch(function (err) {
+                                        console.log('ERROR creating');
+                                        console.log(err);
+                                    })
+                                    .done();
+                            })
+                            .catch(function (err) {
+                                console.log('ERROR rendering console');
+                                console.log(err);
+                                reject(err);
+                            })
+                            .done();
+                    });
+                }
+                function stop() {
+                    return q.Promise(function (resolve) {
+                        resolve();
+
+                    });
+                }
+                function detach() {
+                    return q.Promise(function (resolve) {
+                        resolve();
+                    });
+                }
+
+                return {
+                    attach: attach,
+                    start: start,
+                    stop: stop,
+                    detach: detach
+                };
+            }
+            ;
+
+            return {
+                create: function (config) {
+                    return widget(config);
+                }
+            };
         }
 
         function setup(app) {
@@ -179,13 +246,7 @@ define([
                     sub: {},
                     subid: {}
                 },
-                promise: function (params) {
-                    return Q.promise(function (resolve) {
-                        resolve(renderPanel(params));
-                    });
-                },
-                start: start,
-                stop: stop
+                widget: dataViewWidgetFactory()
             });
             app.addRoute({
                 id: 'dataview',
@@ -198,13 +259,7 @@ define([
                     sub: {},
                     subid: {}
                 },
-                promise: function (params) {
-                    return Q.promise(function (resolve) {
-                        resolve(renderPanel(params));
-                    });
-                },
-                start: start,
-                stop: stop
+                widget: dataViewWidgetFactory()
             });
         }
         function teardown() {

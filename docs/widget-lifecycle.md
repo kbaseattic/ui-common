@@ -80,7 +80,7 @@ In the case of widgets, the run method may be called multiple times -- whenever 
 For example, a widget which serves as the main panel will have parameters derived from the url path and query parameters. The first time a path is invoked, these parameters are fed to the run method and the widget builds itself for the first time. If the path is invoked after this, for instance a link is clicked, or an option is changed in the interface, the widget is not reloaded (construct, create, attach, run), but rather the run method is called again with new parameters. It is up to the widget to handle this case. A simple widget may just re-render. A more sophisticated widget, or one that is large and requires noticable time to generate, may just alter elements that are affected by the parameter chages.
 
 
-### widget.halt() [optional]
+### widget.stop()
 
 The stop method tells the widget to stop all activity. If the widget has timers registered, they should be unregistered; subscriptions should be unsubscribed; and so forth. 
 

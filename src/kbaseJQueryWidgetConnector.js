@@ -7,8 +7,10 @@
  */
 define([
     'jquery',
-    'q'
-], function ($, q) {
+    'q',
+    'kb.runtime',
+    'kb.html'
+], function ($, q, R, html) {
     'use strict';
     
         function widgetConnector() {
@@ -17,8 +19,9 @@ define([
             function create(cfg) {
                 return q.Promise(function (resolve) {
                     config = cfg;                    
-                    require([config.module], function (Widget) {
-                        widget = Object.create(Widget);
+                    require([config.module], function () {
+                        // these are jquery widgets, so they are just added to the
+                        // jquery namespace.
                         resolve();
                     });
                 });
@@ -41,18 +44,22 @@ define([
                     // not need a connector!
                     // not the best .. perhaps merge the params into the config
                     // better yet, rewrite the widgets in the new model...
-                    var widgetConfig = config.config || params || {};
-                    widgetConfig.container = $container;
-                    widgetConfig.userId = params.username;
-                    widget.init(widgetConfig);
-                    widget.go();
-                    
+                    var jqueryWidget = $(container)[config.jqueryobject];
+                    if (!jqueryWidget) {
+                        $(container).html(html.panel('Not Found', 'Sorry, cannot find widget ' + widget));
+                    } else {                    
+                        $(container)[config.jqueryobject]({
+                            wsNameOrId: params.workspaceId,
+                            objNameOrId: params.objectId,
+                            ws_url: R.getConfig('workspace_url'),
+                            token: R.getAuthToken()
+                        });
+                    }
                     resolve();
                 });
             }
             function stop() {
                 return q.Promise(function (resolve) {
-                    widget.stop();
                     resolve();
                 });
             }

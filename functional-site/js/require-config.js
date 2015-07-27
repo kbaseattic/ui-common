@@ -131,6 +131,7 @@ require.config({
         'kb.format': 'src/kbaseFormat',
         'kb.props': 'src/kbaseProps',
         'kb.widgetconnector': 'src/kbaseWidgetConnector',
+        'kb.jquerywidgetconnector': 'src/kbaseJQueryWidgetConnector',
         'kb.simplepanel': 'src/kbaseSimplePanel',
         
         // KBase Widgets

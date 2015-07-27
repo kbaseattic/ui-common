@@ -8,15 +8,15 @@
 define([
     'kb.runtime',
     'kb.html',
+    'kb.session',
     'kb.widgetconnector',
-    'kb.simplepanel',
     'q',
     'jquery'
 ],
-    function (R, html, widgetConnector, simplePanel, q, $) {
+    function (R, html, Session, widgetConnector, q, $) {
         'use strict';
 
-        function renderPanel() {
+        function renderPanel(params) {
             return q.Promise(function (resolve) {
                 // Widgets
                 // Widgets are an array of functions or promises which are 
@@ -64,42 +64,144 @@ define([
                         ])
                     ])
                 ]);
-                var title;
-                if (R.getUsername === params.username) {
-                    title = 'Viewing your Profile';
-                } else {
-                    title = 'Viewing profile for ' + params.username;
-                }
                 resolve({
-                    title: title,
+                    title: Session.getUsername(),
                     content: panel,
                     widgets: widgets
                 });
             });
         }
-        function runner() {
-            return q.Promise(function (resolve) {
-               +++ LEFT OFF HERE +++
-               need to figure out how to give the panel state, communiciate with its env (e.g. title),
-               and also feed params to the children widgets.
-               this particular solution is TRYING to be generic. Of course, bringing the full
-               implementation of the panel in here would solve the problem ...
-            });
+
+        function userprofileWidgetFactory() {
+
+            function widget() {
+                var mount, container;
+
+                var children = [];
+
+                // API 
+                function attach(node) {
+                    return q.Promise(function (resolve, reject) {
+                        mount = node;
+                        container = document.createElement('div');
+                        mount.appendChild(container);
+                        renderPanel()
+                            .then(function (rendered) {
+                                container.innerHTML = rendered.content;
+                                R.send('app', 'title', rendered.title);
+                                // create widgets.
+                                children = rendered.widgets;
+                                q.all(children.map(function (w) {
+                                    return w.widget.create(w.config);
+                                }))
+                                    .then(function () {
+                                        q.all(children.map(function (w) {
+                                            return w.widget.attach($('#' + w.id).get(0));
+                                        }))
+                                            .then(function (results) {
+                                                resolve();
+                                            })
+                                            .catch(function (err) {
+                                                console.log('ERROR attaching');
+                                                console.log(err);
+                                            })
+                                            .done();
+                                    })
+                                    .catch(function (err) {
+                                        console.log('ERROR creating');
+                                        console.log(err);
+                                    })
+                                    .done();
+                            })
+                            .catch(function (err) {
+                                console.log('ERROR rendering console');
+                                console.log(err);
+                                reject(err);
+                            })
+                            .done();
+                    });
+                }
+
+                function start(params) {
+                    return q.Promise(function (resolve, reject) {
+                        // for now these are fire and forget.
+                        // this has implications for lifecycle --
+                        // for instance, if stop is called immediately after start
+                        // can it really stop the widgets? they may be in the middle
+                        // of loading dependencies or fetching data!
+                        // Better for lifecycle control might be a to have the 
+                        // widgets return attachment promises, as we now do for
+                        // panels...
+                        // 
+                        // NB: the widget connector, for now, needs the params
+                        // for attachment.
+                        console.log('PARAMS');
+                        console.log(params);
+                        q.all(children.map(function (wc) {
+                            return wc.widget.start(params);
+                        }))
+                            .then(function (results) {
+                                resolve();
+                            })
+                            .catch(function (err) {
+                                reject(err);
+                            })
+                            .done();
+                    });
+                }
+                function stop() {
+                    return q.Promise(function (resolve, reject) {
+                        q.all(children.map(function (wc) {
+                            return wc.widget.stop();
+                        }))
+                            .then(function (results) {
+                                resolve();
+                            })
+                            .catch(function (err) {
+                                reject(err);
+                            })
+                            .done();
+                    });
+                }
+                function detach() {
+                    return q.Promise(function (resolve, reject) {
+                        q.all(children.map(function (wc) {
+                            return wc.widget.detach();
+                        }))
+                            .then(function (results) {
+                                resolve();
+                            })
+                            .catch(function (err) {
+                                reject(err);
+                            })
+                            .done();
+                    });
+                }
+                return {
+                    attach: attach,
+                    start: start,
+                    stop: stop,
+                    detach: detach
+                };
+            }
+
+            return {
+                create: function (config) {
+                    return widget(config);
+                }
+            };
         }
 
         function setup(app) {
             app.addRoute({
                 path: ['people', {type: 'param', name: 'username'}],
-                widget: simplePanel({
-                    renderer: renderPanel,
-                    runner: runner
-                })
+                widget: userprofileWidgetFactory()
             });
             app.addRoute({
                 path: ['people'],
-                widget: simplePanel({
-                    renderer: renderPanel
-                })
+                render: function (params) {
+                    return 'NOT YET';
+                }
             });
         }
         function teardown() {

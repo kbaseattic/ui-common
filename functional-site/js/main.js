@@ -194,7 +194,7 @@ require([
             });
         }
         Runtime.logDebug({source: 'main', message: 'About to load panels...'});
-        var promises = [
+        var panels = [
             {module: 'kb.panel.message', config: {}},
             {module: 'kb.panel.about', config: {}},
             {module: 'kb.panel.contact', config: {}},
@@ -203,8 +203,8 @@ require([
             {module: 'kb.panel.welcome', config: {}},
             {module: 'kb.panel.dashboard', config: {}},
             //{module: 'kb.panel.narrativestore'},
-            //{module: 'kb.panel.datasearch'},
-            //{module: 'kb.panel.dataview'},
+            // {module: 'kb.panel.datasearch'},
+            {module: 'kb.panel.dataview', config: {}},
             {module: 'kb.panel.databrowser', config: {}}
             //{module: 'kb.panel.spec'}
         ].map(function (panel) {
@@ -213,7 +213,7 @@ require([
                 PanelModule.setup(app, panel.config);
             });
         });
-        Q.all(promises)
+        Q.all(panels)
             .then(function () {
                 Runtime.logDebug({source: 'main', message: 'setting up app'});
                 setupApp();

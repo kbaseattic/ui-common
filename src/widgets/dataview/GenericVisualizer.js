@@ -1,12 +1,18 @@
 /*global
- define, console, document
+ define, require, console, document
  */
 /*jslint
  browser: true,
  white: true
  */
-define(['jquery', 'kb.client.workspace', 'kb.html'],
-    function ($, WorkspaceClient, html) {
+define([
+    'jquery',
+    'q',
+    'kb.client.workspace',
+    'kb.html',
+    'kb.runtime'
+],
+    function ($, q, WorkspaceClient, html, R) {
         "use strict";
         var typeMap = {
             /*
@@ -315,123 +321,166 @@ define(['jquery', 'kb.client.workspace', 'kb.html'],
                 ]
             }
         };
-        // This style returns a factory function.
-        // The only usage of 'this' is to return it as a convenience for 
-        // method chaining.
-        return function (params) {
-            // This should give us an unfakable "this".
-            var containerNode = null;
-            var workspaceClient = Object.create(WorkspaceClient).init({url: params.ws_url});
-            function render() {
-                var node = $(document.createElement('div'));
-                attachWidget(node);
-                $(containerNode).append(node);
-            }
 
-            // Returns id for the 
-            function createBSPanel(node, title) {
-                var id = html.genId(),
-                    div = html.tag('div'),
-                    span = html.tag('span');
-                $(node).html(div({class: 'panel panel-default '}, [
-                    div({class: 'panel-heading'}, [
-                        span({class: 'panel-title'}, title)
-                    ]),
-                    div({class: 'panel-body'}, [
-                        div({id: id})
-                    ])
-                ]));
-                return $('#' + id);
-            }
-
-            function findMapping(objectType) {
-                var mapping = typeMap[objectType],
-                    config;
-                if (mapping) {
-                    if (params.sub && params.subid) {
-                        if (mapping.sub) {
-                            if (mapping.sub.hasOwnProperty(params.sub)) {
-                                mapping = mapping.sub[params.sub]; // ha, crazy line, i know.
-                            } else {
-                                console.error('Sub was specified, but config has no correct sub handler, sub:', params.sub, "config:", config);
-                                return $('<div>');
-                            }
+        function findMapping(objectType, params) {
+            var mapping = typeMap[objectType];
+            if (mapping) {
+                if (params.sub && params.subid) {
+                    if (mapping.sub) {
+                        if (mapping.sub.hasOwnProperty(params.sub)) {
+                            mapping = mapping.sub[params.sub]; // ha, crazy line, i know.
                         } else {
-                            console.error('Sub was specified, but config has no sub handler, sub:', params.sub);
-                            return $('<div>');
+                            throw new Error('Sub was specified, but config has no correct sub handler, sub:' + params.sub + "config:");
                         }
-                        //} else {
-                        //    console.error('Something was in sub, but no sub.sub or sub.subid found', params.sub);
-                        //    return $('<div>');
+                    } else {
+                        throw new Error('Sub was specified, but config has no sub handler, sub:' + params.sub);
                     }
+                    //} else {
+                    //    console.error('Something was in sub, but no sub.sub or sub.subid found', params.sub);
+                    //    return $('<div>');
                 }
-                return mapping;
             }
+            return mapping;
+        }
+
+        // Returns id for the 
+        function createBSPanel($node, title) {
+            var id = html.genId(),
+                div = html.tag('div'),
+                span = html.tag('span');
+            $node.html(div({class: 'panel panel-default '}, [
+                div({class: 'panel-heading'}, [
+                    span({class: 'panel-title'}, title)
+                ]),
+                div({class: 'panel-body'}, [
+                    div({id: id})
+                ])
+            ]));
+            return $('#' + id);
+        }
 
 
-            function attachWidget(node) {
+        function genericVisualizerWidgetFactory() {
+            var mount, container, $container, config;
+            var workspaceClient;
+
+            function attachWidget(params) {
                 // Get the workspace object
+                var $widgetContainer = $container;
+                
+                // Translate and normalize params.
+                params.objectVersion = params.ver;
+                
+                // Get other params from the runtime.
+                params.workspaceURL = R.getConfig('workspace_url');
+                params.authToken = R.getAuthToken();
 
-                workspaceClient.getObject(params.workspaceId, params.objectId)
-                    .then(function (wsobject) {
-                        var objectType = wsobject.type.split(/-/)[0];
-                        var mapping = findMapping(objectType);
-                        if (!mapping) {
-                            $(node).html(html.panel('Not Found', 'Sorry, cannot find widget for ' + objectType));
-                            return;
-                        }
-
-                        // Stuff other values into the params.
-                        params.objectName = wsobject.name;
-                        params.workspaceName = wsobject.ws;
-                        params.objectVersion = wsobject.version;
-                        params.objectType = wsobject.type;
-
-                        // Create params.
-                        var widgetParams = {};
-                        mapping.options.forEach(function (item) {
-                            var from = params[item.from];
-                            if (!from && item.optional !== true) {
-                                // console.log(params);
-                                throw 'Missing param, from ' + item.from + ', to ' + item.to;
+                return q.Promise(function (resolve) {
+                    workspaceClient.getObject(params.workspaceId, params.objectId)
+                        .then(function (wsobject) {
+                            var objectType = wsobject.type.split(/-/)[0];
+                            var mapping = findMapping(objectType, params);
+                            if (!mapping) {
+                                $widgetContainer.html(html.panel('Not Found', 'Sorry, cannot find widget for ' + objectType));
+                                resolve();
                             }
-                            widgetParams[item.to] = from;
-                        });
-                        require(['jquery', mapping.module], function ($, Widget) {
-                            // jquery chicanery
-                            var jqueryWidget = $(node)[mapping.widget];
-                            if (!jqueryWidget) {
-                                $(node).html('Sorry, cannot find jquery widget ' + mapping.widget);
-                            } else {
-                                if (mapping.panel) {
-                                    node = createBSPanel(node, mapping.title);
+                            
+                            // These params are from the found object.
+                            params.objectName = wsobject.name;
+                            params.workspaceName = wsobject.ws;
+                            params.objectVersion = wsobject.version;
+                            params.objectType = wsobject.type;
+
+                            // Create params.
+                            var widgetParams = {};
+                            mapping.options.forEach(function (item) {
+                                var from = params[item.from];
+                                if (!from && item.optional !== true) {
+                                    // console.log(params);
+                                    throw 'Missing param, from ' + item.from + ', to ' + item.to;
                                 }
-                                $(node)[mapping.widget](widgetParams);
-                            }
-                        });
-                        //console.log('Got workspace object');
-                        //console.log(wsobject);
-                    })
-                    .catch(function (err) {
-                        console.log('ERROR');
-                        console.log(err);
-                    })
-                    .done();
-                // Create the type symbol from the object.
+                                widgetParams[item.to] = from;
+                            });
+                            require(['jquery', mapping.module], function ($, Widget) {
+                                // jquery chicanery
+                                if ($widgetContainer[mapping.widget] === undefined) {
+                                    $widgetContainer.html('Sorry, cannot find jquery widget ' + mapping.widget);
+                                } else {
+                                    if (mapping.panel) {
+                                        $widgetContainer = createBSPanel($widgetContainer, mapping.title);
+                                    }
+                                    $widgetContainer[mapping.widget](widgetParams);
+                                }
+                                resolve();
+                            });
+                        })
+                        .catch(function (err) {
+                            console.log('ERROR');
+                            console.log(err);
+                        })
+                        .done();
+                });
             }
 
+            function create(cfg) {
+                return q.Promise(function (resolve) {
+                    config = cfg;
+                    workspaceClient = Object.create(WorkspaceClient).init({url: R.getConfig('workspace_url')});
+                    resolve();
+                });
+            }
             function attach(node) {
-                containerNode = node;
-                render();
+                return q.Promise(function (resolve) {
+                    mount = node;
+                    container = document.createElement('div');
+                    $container = $(container);
+                    mount.appendChild(container);
+                    resolve();
+                });
+            }
+            function start(params) {
+                return q.Promise(function (resolve) {
+                    attachWidget(params)
+                        .then(function () {
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            console.error('ERROR');
+                            console.error(err);
+                        })
+                        .done();
+                });
+            }
+            function stop() {
+                return q.Promise(function (resolve) {
+                    resolve();
+                });
+            }
+            function detach() {
+                return q.Promise(function (resolve) {
+                    resolve();
+                });
+            }
+            function destroy() {
+                return q.Promise(function (resolve) {
+                    resolve();
+                });
             }
 
-
-            // 
-            var self = {
+            return {
+                create: create,
                 attach: attach,
-                attachWidget: attachWidget
+                start: start,
+                stop: stop,
+                detach: detach,
+                destroy: destroy
             };
-            return self;
+        }
+
+        return {
+            create: function () {
+                return genericVisualizerWidgetFactory();
+            }
         };
     });
 
