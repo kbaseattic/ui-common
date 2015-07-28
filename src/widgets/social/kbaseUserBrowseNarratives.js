@@ -1,7 +1,7 @@
-define(['jquery', 'nunjucks', 'kb.utils', 'kb.widget.social.base', 'kb.client.workspace', 'kb.session', 'q'],
-        function ($, nunjucks, Utils, SocialWidget, WorkspaceService, Session, Q) {
+define(['jquery', 'kb.utils', 'kb.widget.social.base', 'kb.service.workspace', 'kb.session', 'q'],
+        function ($, Utils, SocialWidget, WorkspaceService, Session, Q) {
             "use strict";
-            var RecentActivityWidget = Object.create(SocialWidget, {
+            var Widget = Object.create(SocialWidget, {
                 init: {
                     value: function (cfg) {
                         cfg.name = 'BrowseNarratives';
@@ -79,8 +79,6 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.widget.social.base', 'kb.client.wo
                             return def.promise;
                         }
 
-                        var recentActivity = [];
-
                         // Note that Narratives are now associated 1-1 with a workspace. 
                         // Some new narrative attributes, such as name and (maybe) description, are actually
                         // stored as attributes of the workspace itself.
@@ -130,5 +128,5 @@ define(['jquery', 'nunjucks', 'kb.utils', 'kb.widget.social.base', 'kb.client.wo
                 }
             });
 
-            return RecentActivityWidget;
+            return Widget;
         });

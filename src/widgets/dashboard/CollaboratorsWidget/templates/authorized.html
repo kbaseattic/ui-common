@@ -12,7 +12,7 @@ You do not yet have any collaborators. To gain collaborators, you need to create
 
 {% else  %}
 
-<table class="table" id="collaborator_table_{{instanceId}}">
+<table class="table" id="collaborator_table_{{env.instanceId}}">
 	<thead>
 	<tr>
 		<th>Name</th>
@@ -34,16 +34,18 @@ You do not yet have any collaborators. To gain collaborators, you need to create
 {% endif %}
 
 <script>
-require(['jquery'], function ($) {
-	$('#collaborator_table_{{instanceId}}').DataTable({
+require(['jquery', 'datatables', 'datatables_bootstrap'], function ($) {
+    $('#collaborator_table_{{env.instanceId}}').dataTable({
         initComplete: function (settings) {
             var api = this.api();
             var rowCount = api.data().length;
             var pageSize = api.page.len();
             var wrapper = api.settings()[0].nTableWrapper;
             if (rowCount <= pageSize) {
-                $(wrapper).find('.dataTables_paginate').closest('.row').hide();
-                $(wrapper).find('.dataTables_filter').closest('.row').hide();
+                $(wrapper).find('.dataTables_length').hide();
+                $(wrapper).find('.dataTables_filter').hide();
+                $(wrapper).find('.dataTables_paginate').hide();
+                $(wrapper).find('.dataTables_info').hide();
             }
         }
     });

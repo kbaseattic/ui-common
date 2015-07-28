@@ -1,4 +1,11 @@
-define(['kb.widget.dashboard.base', 'kb.utils', 'kb.utils.api', 'kb.session', 'kb.client.workspace', 'q'],
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true
+ */
+define(['kb.widget.dashboard.base', 'kb.utils', 'kb.utils.api', 'kb.session', 'kb.service.workspace', 'q'],
     function (DashboardWidget, Utils, APIUtils, Session, WorkspaceService, Q) {
         "use strict";
         var widget = Object.create(DashboardWidget, {
@@ -16,7 +23,6 @@ define(['kb.widget.dashboard.base', 'kb.utils', 'kb.utils.api', 'kb.session', 'k
                     return this;
                 }
             },
-
             setup: {
                 value: function () {
                     // User profile service
@@ -33,28 +39,16 @@ define(['kb.widget.dashboard.base', 'kb.utils', 'kb.utils.api', 'kb.session', 'k
                     }
                 }
             },
-
-
-            renderLayout: {
-                value: function () {
-                    this.container.html(this.renderTemplate('layout'));
-                    this.places = {
-                        title: this.container.find('[data-placeholder="title"]'),
-                        alert: this.container.find('[data-placeholder="alert"]'),
-                        content: this.container.find('[data-placeholder="content"]')
-                    };
-
-                }
-            },
-
+            
             setInitialState: {
                 value: function (options) {
-                    return Q.promise(function (resolve, reject, notify) {
+                    return Q.Promise(function (resolve, reject, notify) {
                         // We only run any queries if the session is authenticated.
                         if (!Session.isLoggedIn()) {
                             resolve();
                             return;
                         }
+                        console.log('starting...');
 
                         // Note that Narratives are now associated 1-1 with a workspace. 
                         // Some new narrative attributes, such as name and (maybe) description, are actually
@@ -62,12 +56,13 @@ define(['kb.widget.dashboard.base', 'kb.utils', 'kb.utils.api', 'kb.session', 'k
                         // At present we can just use the presence of "narrative_nice_name" metadata attribute 
                         // to flag a compatible workspace.
                         //
-                        this.promise(this.workspaceClient, 'list_workspace_info', {
-                                showDeleted: 0,
-                                excludeGlobal: 1,
-                                owners: [Session.getUsername()]
-                            })
+                        Utils.promise(this.workspaceClient, 'list_workspace_info', {
+                            showDeleted: 0,
+                            excludeGlobal: 1,
+                            owners: [Session.getUsername()]
+                        })
                             .then(function (data) {
+                                console.log('Hmm .. did this work yet?');
                                 var dataObjects = [];
                                 // First we both transform each ws info object into a nicer js object,
                                 // and filter for modern narrative workspaces.
@@ -88,11 +83,13 @@ define(['kb.widget.dashboard.base', 'kb.utils', 'kb.utils.api', 'kb.session', 'k
                                 // Now get the workspace details.
 
                                 var workspaceObjects = [];
-                                this.promise(this.workspaceClient, 'list_objects', {
-                                        ids: workspaceList,
-                                        includeMetadata: 1
-                                    })
+                                Utils.promise(this.workspaceClient, 'list_objects', {
+                                    ids: workspaceList,
+                                    includeMetadata: 1
+                                })
                                     .then(function (data) {
+                                                                        console.log('Well .. did this work yet?');
+
                                         for (var i = 0; i < data.length; i++) {
                                             workspaceObjects.push(APIUtils.object_info_to_object(data[i]));
                                         }
@@ -113,6 +110,9 @@ define(['kb.widget.dashboard.base', 'kb.utils', 'kb.utils.api', 'kb.session', 'k
 
                             }.bind(this))
                             .catch(function (err) {
+                                console.log('ERROR');
+                                console.log(err);
+
                                 reject(err);
                             })
                             .done();

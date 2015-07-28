@@ -595,7 +595,8 @@ searchApp.controller('searchController', function searchCtrl($rootScope, $scope,
             $http({method: 'GET', 
                    url: $rootScope.kb.search_url + "getResults",
                    params: queryOptions,      
-                   responseType: 'json'
+                   responseType: 'json',
+                   crossDomain: true
                   }).then(function (jsonResult) {
                       if (jsonResult.data.totalResults === undefined) {
                           $scope.options.categoryCounts[category] = 0;
