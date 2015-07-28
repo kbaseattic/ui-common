@@ -127,10 +127,6 @@ require([
                 })
                 .done();
 
-
-
-
-
             Runtime.recv('app', 'navigate', function (data) {
                 app.navigateTo(data);
             });
@@ -139,7 +135,6 @@ require([
             Runtime.recv('app', 'loggedin', function () {
                 ProfileService.loadProfile();
             });
-
 
             Runtime.recv('app', 'new-route', function (data) {
                 if (data.routeHandler.route.redirect) {

@@ -8,6 +8,7 @@ function (UserProfile, AppState, R) {
                     switch (profile.getProfileStatus()) {
                         case 'stub':
                         case 'profile':
+                            /* TODO: do not need two ways of doing this... */
                             AppState.setItem('userprofile', profile);
                             R.send('app', 'profile.loaded', {
                                 profile: profile
