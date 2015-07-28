@@ -321,7 +321,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
             },
             // LIFECYCLE
 
-            start: {
+            go: {
                 value: function () {
                     // This creates the initial UI -- loads the css, inserts layout html.
                     // For simple widgets this is all the setup needed.
@@ -370,6 +370,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
                         this.subscriptions.forEach(function (sub) {
                             sub.unsubscribe();
                         });
+                        this.subscriptions = [];
                     }
                 }
             },
@@ -378,6 +379,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
                     if (this.heartbeatSubscription) {
                         this.heartbeatSubscription.unsubscribe();
                     }
+                    this.stopSubscriptions();
                     if (this.onStop) {
                         this.onStop();
                     }
@@ -558,8 +560,9 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
             },
             setError: {
                 value: function (errorValue) {
-
-
+                    console.log(this);
+                    console.error('ERROR');
+                    console.error(errorValue);
                     this.status = 'error';
                     this.error = errorValue;
                     return;

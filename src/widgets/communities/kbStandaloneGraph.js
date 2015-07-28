@@ -398,7 +398,7 @@
 		svg.graph.xAxis.labelRotation = renderer.settings.x_labels_rotation;
 		svg.graph.xAxis.labels(renderer.settings.x_labels);
 	    }
-	    var sy = rendererGraph[0].niceScale({min: 0, max: max, ticks: renderer.settings.y_labeled_tick_interval });
+	    var sy =this.niceScale({min: 0, max: max, ticks: renderer.settings.y_labeled_tick_interval });
 	    svg.graph.yAxis.
 		title(renderer.settings.y_title, renderer.settings.y_title_color).
 		ticks(sy.max / renderer.settings.y_labeled_tick_interval, sy.max / renderer.settings.y_tick_interval, null, null, renderer.settings.y_scale).

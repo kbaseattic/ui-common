@@ -71,8 +71,8 @@ define(['q'], function (Q) {
                 var i;
                 for (i = 0; i < props.length; i += 1) {
                     if ((obj === undefined) ||
-                            (typeof obj !== 'object') ||
-                            (obj === null)) {
+                        (typeof obj !== 'object') ||
+                        (obj === null)) {
                         return defaultValue;
                     }
                     obj = obj[props[i]];
@@ -112,8 +112,8 @@ define(['q'], function (Q) {
                 var i;
                 for (i = 0; i < propPath.length; i += 1) {
                     if ((obj === undefined) ||
-                            (typeof obj !== 'object') ||
-                            (obj === null)) {
+                        (typeof obj !== 'object') ||
+                        (obj === null)) {
                         return false;
                     }
                     obj = obj[propPath[i]];
@@ -253,7 +253,7 @@ define(['q'], function (Q) {
                     return;
                 }
                 var propKey = path.pop(),
-                        key;
+                    key;
                 while (path.length > 0) {
                     key = path.shift();
                     if (obj[key] === undefined) {
@@ -301,12 +301,12 @@ define(['q'], function (Q) {
                         throw new TypeError('Invalid KBase Client call; method "' + method + '" not found in client "' + client.constructor + '"');
                     }
                     client[method](arg1,
-                            function (result) {
-                                resolve(result);
-                            },
-                            function (err) {
-                                reject(err);
-                            });
+                        function (result) {
+                            resolve(result);
+                        },
+                        function (err) {
+                            reject(err);
+                        });
                 });
             }
         },
@@ -328,7 +328,7 @@ define(['q'], function (Q) {
         getSchemaNode: {
             value: function (schema, propPath) {
                 var props = propPath.split('.'),
-                        i;
+                    i;
                 // doesn't handle arrays now.
                 for (i = 0; i < props.length; (i += 1)) {
                     var prop = props[i];
