@@ -132,23 +132,17 @@ require([
 
 
             Runtime.recv('app', 'navigate', function (data) {
-                console.log('navigating to ... ');
-                console.log(data);
                 app.navigateTo(data);
             });
 
             // This will work ... but we need to tune this!
             Runtime.recv('app', 'loggedin', function () {
-                console.log('is this the problem?');
                 ProfileService.loadProfile();
             });
 
 
             Runtime.recv('app', 'new-route', function (data) {
-                console.log('new-route');
-                console.log(data);
                 if (data.routeHandler.route.redirect) {
-                    console.log('redirecting'); console.log(data.routeHandler);
                     Runtime.send('app', 'navigate', {
                         path: data.routeHandler.route.redirect.path,
                         params: data.routeHandler.route.redirect.params
@@ -166,7 +160,7 @@ require([
         }
 
         function runApp() {
-            console.log('running app...');
+            Runtime.logDebug({source: 'main', message: 'running app'});
             app.start();
 
             //App.sub('profile.loaded', function () {

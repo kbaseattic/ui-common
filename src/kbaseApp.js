@@ -632,13 +632,10 @@ define([
             function start() {
                 // window.addEventListener('hashchange', function () {
                 $(window).on('hashchange', function () {
-                    console.log('what?');
                     // NB this is called AFTER it has changed. The browser will do nothing by
                     // default.
                     doRoute();
                 });
-                console.log(window);
-                console.log('added haschange handler, i think...');
 
                 startHeartbeat();
 
