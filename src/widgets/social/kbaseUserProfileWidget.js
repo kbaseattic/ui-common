@@ -102,8 +102,6 @@ define([
             setInitialState: {
                 value: function (options) {
                     return Q.Promise(function (resolve, reject, notify) {
-                        console.log('logged in?');
-                        console.log(R.isLoggedIn());
                         if (!R.isLoggedIn()) {
                             // We don't even try to get the profile if the user isn't 
                             // logged in.

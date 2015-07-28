@@ -115,6 +115,11 @@ define([
                     // all we care about is the avatar menu
                     dirty();
                 }));
+                subscriptions2.push(R.recv('app', 'profile.loaded', function () {
+                    // all we care about is the avatar menu
+                    dirty();
+                }));
+
                 subscriptions2.push(R.recv('app', 'title', function (title) {
                     setTitle(title);
                 }));
