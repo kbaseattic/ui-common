@@ -75,7 +75,6 @@ define([
             // FUNCTIONS Tab
             function functionsTab(data) {
                 // Build The table more functionally, using datatables.
-                console.log(data.using_func_defs);
                 var tableData = data.using_func_defs.map(function (funcId) {
                     var parsed = funcId.match(/^(.+?)-(.+?)$/),
                         funcName = parsed[1],
