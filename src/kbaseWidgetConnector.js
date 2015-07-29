@@ -14,7 +14,7 @@ define([
         function widgetConnector() {
             var widget, mount, container, $container, config;
 
-            function create(cfg) {
+            function init(cfg) {
                 return q.Promise(function (resolve) {
                     config = cfg;                    
                     require([config.module], function (Widget) {
@@ -68,7 +68,7 @@ define([
             }
 
             return {
-                create: create,
+                init: init,
                 attach: attach,
                 start: start,
                 stop: stop,

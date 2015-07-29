@@ -195,6 +195,7 @@ require([
             // {module: 'kb.panel.datasearch'},
             {module: 'kb.panel.dataview', config: {}},
             {module: 'kb.panel.databrowser', config: {}},
+            {module: 'kb.panel.typebrowser', config: {}},
             {module: 'kb.panel.typeview'}
         ].map(function (panel) {
             return requirePromise([panel.module], function (PanelModule) {
