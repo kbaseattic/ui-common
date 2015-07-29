@@ -264,8 +264,9 @@ require.config({
         'kb.jquery.spec.type-card': 'src/widgets/jquery/spec/kbaseSpecTypeCard',
         'kb.jquery.card-layout-manager': 'src/widgets/jquery/kbaseCardLayoutManager',
         'kb.jquery.landing-page-card': 'src/widgets/jquery/kbaseLandingPageCard',
-        'kb.widget.spec.data-type-specification': 'src/widgets/dataspec/DataTypeSpecification',
-        'kb.widget.spec.module-specification': 'src/widgets/dataspec/ModuleSpecification',
+        'kb.widget.spec.data-type-specification': 'src/widgets/specview/DataTypeSpecification',
+        'kb.widget.spec.module-specification': 'src/widgets/specview/ModuleSpecification',
+        'kb.widget.spec.function-specification': 'src/widgets/specview/FunctionSpecification',
         'kb.widget.error': 'src/widgets/kbaseError',
         // KBase Data Visualization Widget
         // ----------------------------

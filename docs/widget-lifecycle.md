@@ -53,6 +53,10 @@ After a widget factory or constructor has been created, the widget itself is cre
 
 For a factory object, this is through a ```create``` method which takes a configuration object argument. The configuration object represents startup information required for the creation of the object. It does not represent the actual invocation parameters. For instance, it may contain urls required to make service calls. In fact, the factory may actually return different widgets based on the input configuration.
 
+### widget.init(config)
+
+The widget ```init``` method is used to initialize a widget to a known state with a given configuration object. It is called after the widget is created, and the widget is attached.
+
 ### widget.attach(node)
 
 A widget's ```attach``` method will be called in order to provide a chance for the widget to attach any DOM elements to the given node. The node provided should be considered stable for the entire life of the widget. The widget should not use it for attaching events or attributes. The widget should only use it for attaching its own top level container node. 

@@ -21,7 +21,7 @@ define([
         var tableId;
 
         function renderer() {
-            return q.Promise(function (resolve) {
+            return q.Promise(function (resolve, reject) {
                 var workspace = new Workspace(R.getConfig('workspace_url'), {
                     token: R.getAuthToken()
                 });
@@ -62,10 +62,13 @@ define([
                                     return [
                                         type.module, type.type, 
                                         a({href: '#spec/type/' + type.id}, type.version),
-                                        type.info.used_type_defs.join('<br>')
+                                        type.info.using_type_defs.join('<br>'),
+                                        type.info.used_type_defs.join('<br>'),
+                                        type.info.using_func_defs.join('<br>')
+                                        
                                     ];
-                                })
-                                var cols = ['Module', 'Type', 'Version', 'Used by'];
+                                });
+                                var cols = ['Module', 'Type', 'Version', 'Using types', 'Used by types', 'Used by functions'];
                                 tableId = html.genId();
                                 var result = html.makeTable(cols, rows, {id: tableId, class: 'table table-striped'});
                                 resolve({
@@ -77,18 +80,18 @@ define([
                             .catch(function (err) {
                                 console.log('ERROR getting type info');
                                 console.log(err);
+                                reject( {
+                                   title: 'Error',
+                                   content: 'Error getting type info'
+                                });
                             })
                             .done();
-
-
                     })
                     .catch(function (err) {
                         console.log('ERROR');
                         console.log(err);
                     })
                     .done();
-
-
             });
         }
 
@@ -137,6 +140,10 @@ define([
                         resolve();
                     })
                     .catch(function (err) {
+                        if (err.title) {
+                            container.innerHTML = err.content;
+                            R.send('app', 'title', err.title);
+                        } 
                         console.log('ERROR rendering widget');
                         console.log(err);
                         reject(err);

@@ -36,10 +36,7 @@ define([
                     panel = html.panel;
                 var panel = div({class: 'kbase-view kbase-typebrowser-view container-fluid', 'data-kbase-view': 'typebrowser'}, [
                     div({class: 'row'}, [
-                        div({class: 'col-sm-3'}, [
-                            panel('Search', 'Search for types here...')
-                        ]),
-                        div({class: 'col-sm-9'}, [
+                        div({class: 'col-sm-12'}, [
                             panel('Type Browser',
                                 div({id: addWidget({
                                         name: 'typebrowser',
