@@ -3,7 +3,15 @@
 
 */
 
-(function( $, undefined ) {
+define('kbaseDataBrowser',
+    [
+        'jquery',
+        'kbaseAuthenticatedWidget',
+        'kbaseButtonControls',
+        'kbaseBox',
+    ],
+    function ($) {
+
 
 
     $.KBWidget({
@@ -21,9 +29,9 @@
             'shouldToggleNavHeight' : true,
             'controlButtons' : ['deleteButton', 'viewButton', 'addDirectoryButton', 'uploadButton', 'addButton'],
             'name' : 'File Browser',
-            'openFolderIcon' : 'icon-folder-open-alt',
-            'closedFolderIcon' : 'icon-folder-close-alt',
-            'fileIcon' : 'icon-file',
+            'openFolderIcon' : 'fa fa-folder-open-o',
+            'closedFolderIcon' : 'fa fa-folder-o',
+            'fileIcon' : 'fa fa-file',
         },*/
         options : {
             'title' : 'Data Browser',
@@ -31,11 +39,11 @@
             'height' : '200px',
             'types' : {
                 'file' : {
-                    'icon' : 'icon-file-alt',
+                    'icon' : 'fa fa-file-o',
                 },
                 'folder' : {
-                    'icon' : 'icon-folder-close-alt',
-                    'icon-open' : 'icon-folder-open-alt',
+                    'icon' : 'fa fa-folder-o',
+                    'icon-alt' : 'fa fa-folder-open-o',
                     'expandable' : true,
                 }
             },
@@ -69,11 +77,11 @@
                 $.proxy( function (idx, val) {
 
                     var icon = val.icon;
-                    var iconOpen = val['icon-open'];
+                    var iconOpen = val['fa fa-open'];
 
                     if (icon == undefined && val.type != undefined) {
                         icon = this.options.types[val.type].icon;
-                        iconOpen = this.options.types[val.type]['icon-open'];
+                        iconOpen = this.options.types[val.type]['fa fa-open'];
                     }
 
                     if (val.expandable == undefined && val.type != undefined) {
@@ -88,6 +96,7 @@
 
                     var $li = $('<li></li>')
                         .attr('id', val.id)
+                        .css('cursor', 'pointer')
                         .append(
                             $('<a></a>')
                                 .css('padding', '3px 5px 3px 5px')
@@ -167,6 +176,17 @@
 
                     }
 
+                    var leafCallback = this.options.types[val.type].leafCallback;
+
+                    if (!val.expandable && leafCallback != undefined) {
+                        $li.bind('click',
+                            $.proxy(function(e) {
+                                e.preventDefault(); e.stopPropagation();
+                                leafCallback.call(this, val, $li);
+                            }, this)
+                        );
+                    }
+
                     var controls = val.controls;
                     if (controls == undefined && val.type != undefined) {
                         controls = this.options.types[val.type].controls;
@@ -225,4 +245,4 @@
 
     });
 
-}( jQuery ) );
+});

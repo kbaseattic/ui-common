@@ -12,14 +12,14 @@
             //and a callback function.
             controls : [
                 {
-                    icon : 'icon-search',
+                    icon : 'fa fa-search',
                     callback : function(e) {
                         console.log("clicked on search");
                     },
                     id : 'search' //optional. Keys the button to be available via $box.controls('search')
                 },
                 {
-                    icon : 'icon-minus',
+                    icon : 'fa fa-minus',
                     callback : function(e) {
                         console.log("clicked on delete");
                     }
@@ -36,7 +36,7 @@
 
 */
 
-(function( $, undefined ) {
+define('kbaseBox', ['jquery', 'kbwidget', 'kbaseButtonControls'], function( $ ) {
 
     $.KBWidget({
 
@@ -49,6 +49,7 @@
             controls : [],
             bannerColor : 'lightgray',
             boxColor : 'lightgray',
+            displayTitle : true,
         },
 
         init: function(options) {
@@ -58,8 +59,8 @@
             if (this.options.canCollapse) {
                 this.options.controls.push(
                     {
-                        icon : 'icon-caret-up',
-                        'icon-alt' : 'icon-caret-down',
+                        icon : 'fa fa-caret-up',
+                        'icon-alt' : 'fa fa-caret-down',
                         'tooltip' : {title : 'collapse / expand', placement : 'bottom'},
                         callback : $.proxy(function(e) {
                             this.data('content').slideToggle();
@@ -80,11 +81,11 @@
         },
 
         startThinking : function() {
-            this.data('banner').addClass('progress progress-striped active')
+            this.data('thinking').css('display', 'inline');
         },
 
         stopThinking : function() {
-            this.data('banner').removeClass('progress progress-striped active')
+            this.data('thinking').css('display', 'none');
         },
 
         appendUI : function ($elem) {
@@ -100,6 +101,7 @@
                 .append(
                     $('<div></div>')
                         .css('border', '1px solid ' + this.options.boxColor)
+//                        .addClass('col-sm-12')
                         .css('padding', '2px')
                         .append(
                             $('<div></div>')
@@ -137,11 +139,22 @@
                                         $('<span></span>')
                                             .attr('id', 'title')
                                     )
+                                    .append(
+                                        $('<span></span>')
+                                            .attr('id', 'thinking')
+                                            .css('display', 'none')
+                                            .append('&nbsp;&nbsp;')
+                                            .append(
+                                                $.jqElem('i')
+                                                    .addClass('fa fa-spinner fa fa-spin')
+                                            )
+                                    )
                             )
                         )
                         .append(
                             $('<div></div>')
                                 .attr('id', 'content')
+//                                .addClass('col-sm-12')
                         )
                 )
                 .append(
@@ -163,6 +176,10 @@
                         controls : this.options.controls
                     }
                 )
+            }
+
+            if (! this.options.displayTitle) {
+                this.data('banner').css("display", 'none');
             }
 
             //this.setControls(this.options.controls);
@@ -196,4 +213,4 @@
 
     });
 
-}( jQuery ) );
+} );

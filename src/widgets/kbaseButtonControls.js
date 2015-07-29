@@ -10,25 +10,33 @@
             id: some_id, //arbitrary value to associate with these controls. Each button gets a copy in .data('id')
             controls : [
                 {
-                    icon : 'icon-search',
-                    'icon-alt' : 'icon-search-alt', //optional. Toggle icon between icon and icon-alt when clicked.
+                    icon : 'fa fa-search',
+                    'icon-alt' : 'fa fa-search-o', //optional. Toggle icon between icon and icon-alt when clicked.
                     callback : function(e) {
-                        console.log("clicked on search");
+                        this.dbg("clicked on search");
                     },
                     id : 'search' //optional. Keys the button to be available via $('#some_div').controls('search')
                 },
                 {
-                    icon : 'icon-minus',
+                    icon : 'fa fa-minus',
                     callback : function(e) {
-                        console.log("clicked on delete");
+                        this.dbg("clicked on delete");
                     }
                 },
             ],
         }
     );
-*/
+*/define('kbaseButtonControls',
+    [
+        'jquery',
+        'bootstrap',
+        'kbwidget',
+        'geometry_rectangle',
+        'geometry_point',
+        'geometry_size',
+    ],
+    function ($) {
 
-(function( $, undefined ) {
 
     $.KBWidget({
 
@@ -38,6 +46,9 @@
         options: {
             controls : [],
             onMouseover : true,
+            position : 'top',
+            type : 'floating',
+            posOffset : '0px',
         },
 
         init: function(options) {
@@ -49,6 +60,41 @@
             this.appendUI( $( this.$elem ) );
 
             return this;
+
+        },
+
+        bounds : function($e) {
+            var offset = $e.offset();
+
+            return new Rectangle(
+                new Point(offset.left, offset.top),
+                new Size($e.width(), $e.height())
+            );
+        },
+
+        visibleBounds : function($e) {
+
+            var rect = this.bounds($e);
+
+            var throttle = 0;
+
+            while ($e = $e.parent()) {
+
+                var parentRect = this.bounds($e);
+                rect = rect.intersectRect(parentRect);
+
+                //just being paranoid
+                if (throttle++ > 1000) {
+                    break;
+                }
+
+                if ($e.prop('tagName').toLowerCase() == 'body') {
+                    break;
+                }
+
+            }
+
+            return rect;
 
         },
 
@@ -168,4 +214,4 @@
 
     });
 
-}( jQuery ) );
+});
