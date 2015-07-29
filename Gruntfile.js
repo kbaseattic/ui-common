@@ -1,10 +1,6 @@
 'use strict';
 var path = require('path');
 
-// the actual "static" directory path, relative to this Gruntfile.
-// should be updated as necessary, if this moves
-var staticDir = 'static';
-
 module.exports = function(grunt) {
     // Project configuration
     grunt.loadNpmTasks('grunt-contrib-requirejs');
