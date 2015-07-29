@@ -62,9 +62,15 @@ define([
                                     return [
                                         type.module, type.type, 
                                         a({href: '#spec/type/' + type.id}, type.version),
-                                        type.info.using_type_defs.join('<br>'),
-                                        type.info.used_type_defs.join('<br>'),
-                                        type.info.using_func_defs.join('<br>')
+                                        type.info.using_type_defs.map(function(typeId) {
+                                            return a({href: '#spec/type/' + typeId}, typeId);
+                                        }).join('<br>'),
+                                        type.info.used_type_defs.map(function(typeId) {
+                                            return a({href: '#spec/type/' + typeId}, typeId);
+                                        }).join('<br>'),
+                                        type.info.using_func_defs.map(function(functionId) {
+                                            return a({href: '#spec/functions/' + functionId}, functionId);
+                                        }).join('<br>')
                                         
                                     ];
                                 });

@@ -10,10 +10,11 @@ define([
     'q',
     'kb.runtime',
     'kb.html',
+    'kb.utils',
     'kb.service.workspace',
     'kb.spec.common',
     'google-code-prettify'],
-    function ($, q, R, html, Workspace, specCommon, PR) {
+    function ($, q, R, html, Utils, Workspace, specCommon, PR) {
         'use strict';
 
         // Just take params for now
@@ -31,7 +32,10 @@ define([
                 div = html.tag('div'),
                 pre = html.tag('pre'),
                 ul = html.tag('ul'),
-                li = html.tag('li');
+                li = html.tag('li'),
+                bstable = function (cols, rows) {
+                    return html.makeTable(cols, rows, {class: 'table'});
+                }
             
             function tabTableContent() {
                 return table({
@@ -47,10 +51,11 @@ define([
                     tr([th('Name'), td(typeName)]),
                     tr([th('Version'), td(typeVersion)]),
                     tr([th('Module version(s)'), td(
-                            data.module_vers.map(function (moduleVer) {
+                            bstable(['Version id', 'Created at'], data.module_vers.map(function (moduleVer) {
                                 var moduleId = moduleName + '-' + moduleVer;
-                                return a({href: '#spec/module/'+moduleId}, moduleVer);
-                            }).join(', '))]),
+                                return [a({href: '#spec/module/'+moduleId}, moduleVer), 
+                                        Utils.niceTimestamp(parseInt(moduleVer, 10))];
+                            })))]),
                     tr([th('Description'), td(pre({style: {'white-space': 'pre-wrap', 'word-wrap': 'break-word'}}, data.description))])
                 ]);
                 /* TODO: Add back in the kidl editor -- need to talk to Roman */

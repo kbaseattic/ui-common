@@ -96,7 +96,6 @@ define([
                                     .then(function (data) {
                                         var workspaceObjects = data.map(function (info) {
                                             var wsObjectInfo = APIUtils.object_info_to_object(info);
-                                            console.log(wsObjectInfo.type);
                                             return {
                                                 info: wsObjectInfo,
                                                 narrative: {
