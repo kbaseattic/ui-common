@@ -13,4 +13,4 @@ before_install:
   - bower install
   - npm install
   - npm install -g grunt-cli
-script: make && make test
+script: grunt test
