@@ -30,9 +30,14 @@
     $('#tabs').kbaseTabs('showTab', 'T1');
     $('#tabs').kbaseTabs('addTab', tabObject);  //the tabObject defined up above
 
-*/
+*/define('kbaseTabs',
+    [
+        'jquery',
+	'kbwidget',
+	'kbaseDeletePrompt'
+    ],
+    function ($) {
 
-(function( $, undefined ) {
 
 
     $.KBWidget({
@@ -69,16 +74,16 @@
             }
 
             var $block =
-                $('<div></div>')
+                $.jqElem('div')
                     .addClass('tabbable')
             ;
 
-            var $tabs = $('<div></div>')
+            var $tabs = $.jqElem('div')
                 .addClass('tab-content')
                 .attr('id', 'tabs-content')
                 .css('height', this.tabsHeight())
             ;
-            var $nav = $('<ul></ul>')
+            var $nav = $.jqElem('ul')
                 .addClass('nav nav-tabs')
                 .attr('id', 'tabs-nav')
             ;
@@ -122,7 +127,7 @@
             }
 
             var $tab = $('<div></div>')
-                .addClass('tab-pane')
+                .addClass('tab-pane fade')
                 .append(tab.content);
 
             if (this.options.border) {
@@ -216,7 +221,7 @@
             }
         },
 
-        closeIcon : function () { return 'fa fa-close'; },
+        closeIcon : function () { return 'fa fa-times'; },
 
         deleteTabToolTip : function (tabName) {
             return 'Remove ' + tabName;
@@ -255,15 +260,14 @@
         shouldShowTab : function (tab) { return 1; },
 
         deletePrompt : function(tabName) {
-	    this.removeTab(tabName);
-            /*var $deleteModal = $('<div></div>').kbaseDeletePrompt(
+            var $deleteModal = $('<div></div>').kbaseDeletePrompt(
                 {
                     name     : tabName,
                     callback : this.deleteTabCallback(tabName),
                 }
             );
 
-            $deleteModal.openPrompt();*/
+            $deleteModal.openPrompt();
         },
 
         deleteTabCallback : function (tabName) {
@@ -287,4 +291,4 @@
 
     });
 
-}( jQuery ) );
+});

@@ -1,0 +1,16 @@
+language: node_js
+node_js:
+  - "0.12"
+  - "iojs"
+branches:
+  only:
+    - develop
+    - staging
+    - master
+    - ease-dev-campaign
+before_install:
+  - npm install -g bower
+  - bower install
+  - npm install
+  - npm install -g grunt-cli
+script: make && make test

@@ -46,9 +46,14 @@
     		console.log("Tried to log in and got back: "); console.log(args);
     	});
 
-*/
+*/define('kbaseLogin',
+    [
+        'jquery',
+	'kbwidget',
+	'kbasePrompt'
+    ],
+    function ($) {
 
-(function( $, undefined ) {
 
     $.KBWidget({
 
@@ -397,7 +402,7 @@
                                         .append(
                                             $('<i></i>')
                                                 .attr('id', 'loginicon')
-                                                .addClass('icon-lock')
+                                                .addClass('fa fa-lock')
                                         )
                                 )
                             )
@@ -426,7 +431,7 @@
                                 .append(
                                     $('<i></i>')
                                         .attr('id', 'logouticon')
-                                        .addClass('icon-signout')
+                                        .addClass('fa fa-signout')
                                 )
                         )
                 );
@@ -449,7 +454,7 @@
             this.registerLogin =
                 function(args) {
 
-                    this.data('loginicon').removeClass().addClass('icon-lock');
+                    this.data('loginicon').removeClass().addClass('fa fa-lock');
 
                     if ( args.success ) {
                         this.data("entrance").hide();
@@ -472,7 +477,7 @@
                                                     .addClass('pull-left')
                                                     .append(
                                                         $('<i></i>')
-                                                            .addClass('icon-warning-sign')
+                                                            .addClass('fa fa-warning-sign')
                                                             .attr('style', 'float: left; margin-right: .3em;')
                                                     )
                                             )
@@ -502,7 +507,7 @@
                 $.proxy(
                     function(evt) {
 
-                        this.data('loginicon').removeClass().addClass('icon-refresh');
+                        this.data('loginicon').removeClass().addClass('fa fa-refresh');
 
                         this.login(
 
@@ -546,7 +551,7 @@
                         .append(
                             $('<i></i>')
                                 .attr('id', 'loginicon')
-                                .addClass('icon-lock')
+                                .addClass('fa fa-lock')
                         )
                 );
 
@@ -578,7 +583,7 @@
                             }
                         );
 
-                        this.data('loginicon').removeClass().addClass('icon-user');
+                        this.data('loginicon').removeClass().addClass('fa fa-user');
 
                         this.data('loginbutton').bind(
                             'click',
@@ -598,7 +603,7 @@
             this.specificLogout =
                 function() {
                     this.data('loginbutton').tooltip('destroy');
-                    this.data('loginicon').removeClass().addClass('icon-lock');
+                    this.data('loginicon').removeClass().addClass('fa fa-lock');
                 };
 
             return $prompt;
@@ -695,9 +700,16 @@
 
             var $ld = $('<div></div').kbasePrompt(
                 {
+                    keyboard : false,
                     title : 'Login to KBase',
                     controls : [
-                        'cancelButton',
+                        {
+                            name: 'Cancel',
+                            callback : $.proxy(function (e, $prompt) {
+                                $prompt.closePrompt();
+                                this.trigger('logInCanceled', {status : 0, message : "Log in canceled"});
+                            }, this)
+                        },
                         {
                             name     : 'Login',
                             type     : 'primary',
@@ -743,7 +755,7 @@
                                                                     .addClass('pull-left')
                                                                     .append(
                                                                         $('<i></i>')
-                                                                            .addClass('icon-warning-sign')
+                                                                            .addClass('fa fa-warning-sign')
                                                                             .attr('style', 'float: left; margin-right: .3em;')
                                                                     )
                                                             )
@@ -772,7 +784,7 @@
                                                                     .addClass('pull-left')
                                                                     .append(
                                                                         $('<i></i>')
-                                                                            .addClass('icon-info-sign')
+                                                                            .addClass('fa fa-info-sign')
                                                                             .attr('style', 'float: left; margin-right: .3em;')
                                                                     )
                                                             )*/
@@ -795,14 +807,14 @@
                                                     .append(
                                                         $('<label></label>')
                                                             .addClass('control-label')
-                                                            .addClass('col-lg-2')
+                                                            .addClass('col-md-2')
                                                             .attr('for', 'user_id')
                                                             .css('margin-right', '10px')
                                                             .append('Username:\n')
                                                     )
                                                     .append(
                                                         $.jqElem('div')
-                                                        .addClass('col-lg-9')
+                                                        .addClass('col-md-9')
                                                         .append(
                                                             $('<input>')
                                                                 .addClass('form-control')
@@ -819,14 +831,14 @@
                                                     .append(
                                                         $('<label></label>')
                                                             .addClass('control-label')
-                                                            .addClass('col-lg-2')
+                                                            .addClass('col-md-2')
                                                             .attr('for', 'password')
                                                             .css('margin-right', '10px')
                                                             .append('Password:\n')
                                                     )
                                                     .append(
                                                         $.jqElem('div')
-                                                        .addClass('col-lg-9')
+                                                        .addClass('col-md-9')
                                                         .append(
                                                             $('<input>')
                                                                 .addClass('form-control')
@@ -896,6 +908,18 @@
                     }
                 }
             );
+
+            //the login prompt CANNOT let bootstrap handle the escape to close the prompt
+            //because we want to trigger the logInCanceled event.
+            $ld.dialogModal().unbind('keyup');
+            $ld.dialogModal().keyup($.proxy(function(e) {
+                if (e.keyCode == 27) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    $ld.closePrompt();
+                    this.trigger('logInCanceled', {status : 0, message : "Log in canceled"});
+                }
+            }, this));
 
             return $ld;
 
@@ -982,11 +1006,16 @@
                                 // If we have a useless error message, replace with
                                 // friendly, but useless error message
 
-                                if (textStatus == "error") {
-                                    textStatus = "Error connecting to KBase login server";
+                                var errmsg = textStatus;
+                                if (jqXHR.responseJSON) {
+                                    errmsg = jqXHR.responseJSON.error_msg;
+                                }
+
+                                if (errmsg == "error") {
+                                    errmsg = "Error connecting to KBase login server";
                                 }
                                 this.populateLoginInfo({});
-                                callback.call(this,{ status : 0, message : textStatus })
+                                callback.call(this,{ status : 0, message : errmsg })
                              },
                              this
                             ),
@@ -1038,4 +1067,4 @@
 
     });
 
-}( jQuery ) );
+});

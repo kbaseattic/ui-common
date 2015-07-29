@@ -3,29 +3,32 @@
 Widget to create an accordion control. Easy to use!
 
     var $accordion = $('#accordion').kbaseAccordion(
-        [
-            {
-                title : 'Accordion element 1',
-                body : 'body 1'
-            },
-            {
-                title : 'Accordion element 2',
-                body : 'body 2'
-            },
-            {
-                title : 'Accordion element 3',
-                body : 'body 3'
-            },
-            {
-                title : 'Accordion element 4',
-                body : 'body 4'
-            },
-        ]
+        {
+            elements :
+                [
+                    {
+                        title : 'Accordion element 1',
+                        body : 'body 1'
+                    },
+                    {
+                        title : 'Accordion element 2',
+                        body : 'body 2'
+                    },
+                    {
+                        title : 'Accordion element 3',
+                        body : 'body 3'
+                    },
+                    {
+                        title : 'Accordion element 4',
+                        body : 'body 4'
+                    },
+                ]
+        }
     );
 
 */
 
-(function( $, undefined ) {
+define('kbaseAccordion', ['jquery', 'kbwidget'], function( $ ) {
 
 
     $.KBWidget({
@@ -69,6 +72,10 @@ Widget to create an accordion control. Easy to use!
                 $.proxy(
                     function (idx, val) {
 
+                        if (val.fontMultiplier == undefined) {
+                            val.fontMultiplier = this.options.fontMultiplier;
+                        }
+
                         $block.append(
                             $('<div></div>')
                                 .addClass('panel panel-default')
@@ -81,10 +88,11 @@ Widget to create an accordion control. Easy to use!
                                             $('<i></i>')
                                                 .css('margin-right', '5px')
                                                 .css('margin-left', '3px')
-                                                .addClass('icon-chevron-right')
+                                                .addClass('fa')
+                                                .addClass(val.open ? 'fa-chevron-down' : 'fa-chevron-right')
                                                 .addClass('pull-left')
-                                                .css('height', '22px')
-                                                .css('line-height', '22px')
+                                                .css('height', (22 * val.fontMultiplier) + 'px')
+                                                .css('line-height', (22 * val.fontMultiplier) + 'px')
                                                 .css('color', 'gray')
                                         )
                                         .append(
@@ -92,8 +100,9 @@ Widget to create an accordion control. Easy to use!
                                                 .css('padding', '0px')
                                                 .attr('href', '#')
                                                 .attr('title', val.title)
-                                                .css('height', '22px')
-                                                .css('line-height', '22px')
+                                                .css('height', (22 * val.fontMultiplier) + 'px')
+                                                .css('line-height', (22 * val.fontMultiplier) + 'px')
+                                                .css('font-size', (100 * val.fontMultiplier) + '%')
 
                                                 .append(val.title)
                                                 //.text(val.title)
@@ -108,15 +117,15 @@ Widget to create an accordion control. Easy to use!
                                                     if ($opened != undefined) {
                                                         $opened.collapse('hide');
                                                         var $i = $opened.parent().first().find('i');
-                                                        $i.removeClass('icon-chevron-down');
-                                                        $i.addClass('icon-chevron-right');
+                                                        $i.removeClass('fa fa-chevron-down');
+                                                        $i.addClass('fa fa-chevron-right');
                                                     }
 
                                                     if ($target.get(0) != $opened.get(0)) {
                                                         $target.collapse('show');
                                                         var $i = $(this).parent().find('i');
-                                                        $i.removeClass('icon-chevron-right');
-                                                        $i.addClass('icon-chevron-down');
+                                                        $i.removeClass('fa fa-chevron-right');
+                                                        $i.addClass('fa fa-chevron-down');
                                                     }
 
                                                 }
@@ -125,6 +134,7 @@ Widget to create an accordion control. Easy to use!
                                 .append(
                                     $('<div></div>')
                                         .addClass('panel-body collapse')
+                                        .addClass(val.open ? 'in' : '')
                                         .css('padding-top', '9px')
                                         .css('padding-bottom', '9px')
                                         .append(val.body)
@@ -145,4 +155,4 @@ Widget to create an accordion control. Easy to use!
 
     });
 
-}( jQuery ) );
+});

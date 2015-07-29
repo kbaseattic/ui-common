@@ -28,7 +28,13 @@
     Sure, you could just set it up through kbasePrompt. But why bother?
 */
 
-(function( $, undefined ) {
+define('kbaseDeletePrompt',
+    [
+        'jquery',
+        'kbasePrompt',
+    ],
+    function ($) {
+
     $.KBWidget({
 
 		  name: "kbaseDeletePrompt",
@@ -63,4 +69,4 @@
 
     });
 
-}( jQuery ) );
+});
