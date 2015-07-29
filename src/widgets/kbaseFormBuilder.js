@@ -58,6 +58,8 @@
             select
             multiselect
             radio
+            file
+            hidden
 
             string  (which is a text field)
             secure  (which is a password field)
@@ -65,6 +67,7 @@
             boolean (which is a checkbox)
 
             They all correspond to the same HTML form element
+        placeholder : a placeholder value on a text field. Useful to populate a default.
         value: the value of the input element. NOTE - only applicable to elements with a single value
         values: the possible values of a element which could have multiple values.
                 This can either be a string, in which case it is both the value AND the visible string.
@@ -114,7 +117,14 @@
 
 */
 
-(function( $, undefined ) {
+define('kbaseFormBuilder',
+    [
+        'jquery',
+        'kbwidget',
+        'kbasePrompt',
+    ],
+    function ($) {
+
 
 
     $.KBWidget({
@@ -123,7 +133,8 @@
 
         version: "1.0.0",
         options: {
-            elements : [],
+            elements    : [],
+            values      : {},
 
             //don't mess with the dispatch.
             dispatch : {
@@ -134,6 +145,8 @@
                 select      : 'buildSelectbox',
                 multiselect : 'buildSelectbox',
                 radio       : 'buildRadioButton',
+                hidden      : 'buildHiddenField',
+                //file        : 'buildFileField',   //this one doesn't actually work...
 
                 string      : 'buildTextField',
                 secure      : 'buildSecureTextField',
@@ -142,16 +155,22 @@
             },
 
             canSubmit : false,
+            resetButton : 'Reset',
+            submitButton : 'Submit',
 
         },
 
         init: function(options) {
             this._super(options);
+            this.$elem.empty();
             this.$elem.append(this._buildForm(this.options.elements));
             return this;
         },
 
         getFormValuesAsObject : function() {
+
+            var formValues = this.data('formValues');
+
             var values = this.getFormValuesAsArray();
 
             var ret = {};
@@ -163,6 +182,14 @@
                     if (val.length == 1) {
                         ret[val[0]] = true;
                     }
+
+                    var type = formValues[val[0]].type;
+                    var multi = formValues[val[0]].multi;
+
+                    if (val.length == 2 && ! multi && type != 'multiselect') {
+                        ret[val[0]] = ret[val[0]][0];
+                    }
+
                 }
             );
 
@@ -191,7 +218,7 @@
                     fields = [ form[field] ];
                 }
 
-                if (type == 'checkbox') {
+                if (type == 'checkbox' || type == 'boolean') {
                     if (form[field].checked) {
                         ret.push([key]);
                     }
@@ -229,13 +256,46 @@
                         ret.push(selectedValues);
                     }
                 }
+                else if (type == 'file') {
+                    var files = form[field].files || form[field].dataTransfer.files;
+
+                    $.each(
+                        files,
+                        $.proxy(
+                            function (idx, file) {
+
+                                ret.jobs++;
+                                var response = [key];
+                                ret.push(response);
+
+                                var reader = new FileReader();
+
+                                reader.onload = $.proxy(
+                                    function(e) {
+                                        ret.jobs--;
+                                        response.push(e.target.result);
+                                    },
+                                    this
+                                );
+
+                                reader.readAsBinaryString(file);
+
+                            },
+                            this
+                        )
+                    );
+
+                }
                 else {
 
                     var res = [];
                     for (var i = 0; i < fields.length; i++) {
 
                         if (val.json) {
-                            var json = JSON.parse(fields[i].value);
+                            var json = '';
+                            if (typeof fields[i].value == 'string' && fields[i].value.length) {
+                                json = JSON.parse(fields[i].value);
+                            }
                             if (val.asArray) {
                                 json = [ json ];
                             }
@@ -369,15 +429,19 @@
             var $form = $.jqElem('form')
                 .addClass('form-horizontal')
 
-            if (data.action) {
-                form.attr('action', data.action);
+            if (this.options.action) {
+                $form.attr('action', this.options.action);
             }
-            if (data.method) {
-                form.attr('method', data.method);
+            if (this.options.method) {
+                $form.attr('method', this.options.method);
             }
 
-            if (! data.canSubmit) {
-                $form.bind('submit', function (evt) {return false});
+            if (! this.options.canSubmit) {
+                $form.on('submit', function (evt) {return false});
+            }
+
+            if (this.options.submitCallback) {
+                $form.on('submit', $.proxy(function (e) { return this.options.submitCallback(e, $form, this) }, this) );
             }
 
             this.data('form', $form);
@@ -390,8 +454,12 @@
                 $.proxy(
                     function(idx, formInput) {
 
-                        if (formInput.key == undefined) {
-                            formInput.key = formInput.name;
+                        if (typeof formInput == 'string') {
+                            formInput = {key : formInput};
+                        }
+
+                        if (formInput.name == undefined) {
+                            formInput.name = formInput.key;
                         }
 
                         if (formValues[formInput.key] != undefined) {
@@ -422,14 +490,18 @@
 
                         var labelText = formInput.label != undefined
                             ? formInput.label
-                            : formInput.name;
+                            : formInput.name.charAt(0).toUpperCase() + formInput.name.slice(1);
+
+                        if (this.options.rawLabels) {
+                            labelText = formInput.name;
+                        }
 
                         var $label = $.jqElem('label')
-                            .addClass('control-label col-lg-2')
+                            .addClass('control-label col-sm-4')
                             .append(
                                 $.jqElem('span')
                                     .attr('title', labelText)
-                                    .append(labelText)
+                                    .append(labelText + ' : ')
                             )
                             //a smarter set of CSS would allow me to embed the inputbox INSIDE the label element so that the browser
                             //could just pick up the targetting for me. But this is bootstrap and if I did that it'd break the layout
@@ -450,14 +522,43 @@
                         }
 
                         if (this.options.dispatch[formInput.type]) {
+                            if (formInput.json && formInput.value) {
+                                formInput.value_as_string = JSON.stringify(formInput.value, undefined, 2);
+                            }
+                            else {
+                                formInput.value_as_string = formInput.value;
+                            }
                             $field = this[this.options.dispatch[formInput.type]](formInput);
                         }
                         else {
                             $field = this.buildTextField(formInput);
                         }
 
-                        var $container = $('<div></div>')
-                            .addClass('col-lg-10');
+                        if (formInput.kb_bind) {
+                            $field.kb_bind(formInput.kb_bind[0], formInput.kb_bind[1]);
+                        }
+
+                        if (formInput.validate) {
+
+                            if (typeof(formInput.validate) != 'function') {
+                                formInput.validate = this.buildValidationRegexFunction(
+                                    formInput.key,
+                                    formInput.validate.regex,
+                                    formInput.validate.msg
+                                );
+                            }
+
+                            $field.on(
+                                'change',
+                                $.proxy(function (e) {
+                                    e.stopPropagation(); e.preventDefault();
+                                    formInput.validate(formInput.key, this)
+                                }, this)
+                            )
+                        };
+
+                        var $container = $.jqElem('div')
+                            .addClass('col-sm-8');
                             ;//.addClass('input-group-addon');
 
                         var $description;
@@ -467,34 +568,59 @@
                                 .append(formInput.description)
                         };
 
+                        var $error = $.jqElem('span')
+                            .addClass('help-block')
+
                         if (formInput.multi) {
+                            var $fb = this;
                             $container.append(
-                                $.jqElem('div')
+                                $.jqElem('span')
                                     .addClass('input-group')
                                     .append($field)
                                     .append(
-                                        $.jqElem('span')
+                                        $.jqElem('div')
                                             .addClass('input-group-btn')
                                             .append(
                                                 $('<button></button>')
                                                     .addClass('btn btn-default')
                                                     .attr('title', 'Add more')
-                                                    .append($('<i></i>').addClass('icon-plus'))
+                                                    .append($('<i></i>').addClass('fa fa-plus'))
                                                     .bind(
                                                         'click',
                                                         function (evt) {
-                                                            $container.append($field.clone());
-                                                            evt.stopPropagation();
+                                                            evt.stopPropagation(); evt.preventDefault();
+                                                            var $newgroup = $container.children().first().clone();
+                                                            var $newerror = $error.clone();
+                                                            $newgroup.find('i').toggleClass('fa fa-plus fa fa-minus');
+                                                            $newgroup.find('button').unbind('click');
+                                                            $newgroup.find('button').bind('click', function (e) {
+                                                                e.stopPropagation(); e.preventDefault();
+                                                                $newgroup.remove();
+                                                                $newerror.remove();
+                                                                $container.find(':input:not(button)').trigger('change')
+                                                            });
+                                                            $newgroup.find(':input:not(button)').val(undefined);
+                                                            $newgroup.find(':input:not(button)').off('change');
+                                                            $newgroup.find(':input:not(button)').on(
+                                                                'change',
+                                                                $.proxy(function (e) {
+                                                                    e.stopPropagation(); e.preventDefault();
+                                                                    formInput.validate(formInput.key, $fb)
+                                                                }, $fb)
+                                                            );
+                                                            $container.append($newgroup, $newerror);
                                                         }
                                                     )
                                             )
                                     )
                             )
+                            .append($error)
                             .append($description);
                         }
                         else {
                             $container
                                 .append($field)
+                                .append($error)
                                 .append($description);
                         }
 
@@ -502,26 +628,179 @@
                             $field.prop('disabled', true);
                         }
 
-                        $form.append(
-                            $('<div></div>')
-                                .addClass('form-group')
-                                .append($label)
-                                .append($container)
-                        );
+
+                        var $block = $.jqElem('div')
+                            .addClass('form-group')
+                            .attr('id', formInput.key + '-group')
+                            .append($label)
+                            .append($container);
+
+                        if (formInput.type == 'hidden') {
+                            $block.css('display', 'none');
+                        }
+
+                        $form.append($block);
 
                     },
                     this
                 )
             );
 
+            if (this.options.canSubmit || this.options.canReset) {
+                var $div =
+                    $.jqElem('div')
+                        .addClass('pull-right')
+                ;
+
+                if (this.options.canReset) {
+                    $div.append(
+                        $.jqElem('input')
+                            .addClass('btn btn-default btn-warning')
+                            .attr('type', 'button')
+                            .val(this.options.resetButton)
+                            .on(
+                                'click',
+                                function(e) {
+                                    var $resetModal = $.jqElem('div').kbasePrompt(
+                                        {
+                                            title : 'Begin again',
+                                            body : 'Really start over?',
+                                            controls : [
+                                                'cancelButton',
+                                                {
+                                                    name : 'Reset',
+                                                    type : 'primary',
+                                                    callback : function (e, $prompt) {
+                                                        e.stopPropagation(); e.preventDefault();
+                                                        $form.get(0).reset();
+                                                        $prompt.closePrompt();
+                                                    }
+                                                }
+                                            ],
+                                        }
+                                    );
+
+                                    $resetModal.openPrompt();
+                                }
+                            )
+                    )
+                }
+
+                if (this.options.canReset && this.options.canSubmit) {
+                    $div.append(' ');
+                };
+
+                if (this.options.canSubmit) {
+                    $div.append(
+                        $.jqElem('input')
+                            .addClass('btn btn-primary')
+                            .attr('type', 'submit')
+                            .val(this.options.submitButton)
+                    )
+                }
+
+                $form.append($div);
+            }
+
+            this._rewireIds($form, this);
+
             return $form;
 
+        },
+
+        validateForm : function() {
+            var ret = true;
+            var $fb = this;
+            $.each(
+                this.options.elements,
+                function (idx, formInput) {
+                    if (formInput.validate) {
+                        var retA = formInput.validate(formInput.key, $fb);
+                        ret = ret && retA;
+                    }
+                }
+            );
+
+            return ret;
+        },
+
+        formGroup : function (key) {
+            return this.data(key + '-group');
+        },
+
+        errmsg : function ($field, msg) {
+
+            var errmsg = $field.next('span');
+
+            if (errmsg.length == 0) {
+                errmsg = $field.parent().next();
+            }
+            var $errmsg = $(errmsg);
+            $errmsg.text(msg);
+        },
+
+        buildValidationRegexFunction : function(key, regex, msg) {
+            var $fb = this;
+
+            if (typeof regex == 'string') {
+                regex = new RegExp(regex);
+
+            }
+
+            return function (key, $fb) {
+
+                var ret = true;
+
+                var $group = $fb.formGroup(key);
+                $group.removeClass('has-error');
+
+                $.each(
+                    $fb.fieldsForKey(key),
+                    function (idx, field) {
+                        var $field = $(field);
+
+                        $fb.errmsg($field, '');
+
+                        if (!$field.val().match(regex)) {
+                            ret = false;
+                            $group.addClass('has-error');
+                            $fb.errmsg($field, msg);
+                        }
+                    }
+                )
+
+                return ret;
+            }
+        },
+
+
+        fieldsForKey : function(key) {
+            var $group = this.formGroup(key);
+            return $group.find(':input:not(button)');
+        },
+
+        buildHiddenField : function(data) {
+            return $.jqElem('input')
+                    .attr('type', 'hidden')
+                    .attr('value', data.value_as_string)
+                    .attr('name', data.name)
+            ;
         },
 
         buildTextField : function(data) {
             return $.jqElem('input')
                     .attr('type', 'text')
-                    .attr('value', data.value)
+                    .attr('value', data.value_as_string)
+                    .attr('placeholder', data.placeholder)
+                    .attr('name', data.name)
+                    .addClass('form-control')
+            ;
+        },
+
+        buildFileField : function(data) {
+            return $.jqElem('input')
+                    .attr('type', 'file')
+                    .attr('value', data.value_as_string)
                     .attr('name', data.name)
                     .addClass('form-control')
             ;
@@ -531,7 +810,7 @@
             var $textArea = $.jqElem('textarea')
                     .attr('name', data.name)
                     .addClass('form-control')
-                    .append(data.value)
+                    .append(data.value_as_string)
             ;
 
             if (data.rows) {
@@ -544,7 +823,7 @@
         buildSecureTextField : function(data) {
             return $.jqElem('input')
                     .attr('type', 'password')
-                    .attr('value', data.value)
+                    .attr('value', data.value_as_string)
                     .attr('name', data.name)
                     .addClass('form-control')
             ;
@@ -556,10 +835,10 @@
                     .attr('type', 'checkbox')
                     .addClass('form-control')
                     .attr('name', data.name)
-                    .attr('value', data.value);
+                    .attr('value', data.value_as_string);
             ;
 
-            if (data.checked) {
+            if (data.checked == true || data.value == true) {
                 $checkbox.prop('checked', true);
             }
 
@@ -675,4 +954,4 @@
 
     });
 
-}( jQuery ) );
+});
