@@ -233,9 +233,14 @@ define(['underscore'], function (_) {
                 tr = tag('tr'),
                 th = tag('th'),
                 td = tag('td');
-            var id = genId();
+            var id;
             options = options || {};
-            options.generated = {id: id};
+            if (options.id) {
+                id = options.id;
+            } else {
+                id = genId();
+                options.generated = {id: id};
+            }
             return table({id: id, class: options.class}, [
                 thead(tr(columns.map(function (x) {
                     return th(x);

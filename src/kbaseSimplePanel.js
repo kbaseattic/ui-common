@@ -35,7 +35,7 @@ define([
                             // create widgets.
                             children = rendered.widgets;
                             q.all(children.map(function (w) {
-                                return w.widget.create(w.config);
+                                return w.widget.init(w.config);
                             }))
                                 .then(function () {
                                     q.all(children.map(function (w) {

@@ -175,6 +175,7 @@ require.config({
         // Standalone Widgets
         'kb.widget': 'src/widgets/Widget',
         'kb.widget.databrowser': 'src/widgets/DataBrowser/DataBrowser',
+        'kb.widget.typebrowser': 'src/widgets/TypeBrowser',
         // KBase Panels
         // ------------
         'kb.panel.about': 'src/panels/about',
@@ -191,6 +192,7 @@ require.config({
         'kb.panel.dataview': 'src/panels/dataview',
         'kb.panel.dataview.style': 'src/panels/dataview',
         'kb.panel.databrowser': 'src/panels/databrowser',
+        'kb.panel.typebrowser': 'src/panels/typebrowser',
         'kb.panel.typeview': 'src/panels/typeview',
         'kb.panel.message': 'src/panels/message',
         
@@ -262,8 +264,9 @@ require.config({
         'kb.jquery.spec.type-card': 'src/widgets/jquery/spec/kbaseSpecTypeCard',
         'kb.jquery.card-layout-manager': 'src/widgets/jquery/kbaseCardLayoutManager',
         'kb.jquery.landing-page-card': 'src/widgets/jquery/kbaseLandingPageCard',
-        'kb.widget.spec.data-type-specification': 'src/widgets/dataspec/DataTypeSpecification',
-        'kb.widget.spec.module-specification': 'src/widgets/dataspec/ModuleSpecification',
+        'kb.widget.spec.data-type-specification': 'src/widgets/specview/DataTypeSpecification',
+        'kb.widget.spec.module-specification': 'src/widgets/specview/ModuleSpecification',
+        'kb.widget.spec.function-specification': 'src/widgets/specview/FunctionSpecification',
         'kb.widget.error': 'src/widgets/kbaseError',
         // KBase Data Visualization Widget
         // ----------------------------
