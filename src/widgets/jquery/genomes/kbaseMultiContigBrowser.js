@@ -101,7 +101,7 @@ define(['jquery', 'kb.jquery.widget', 'd3', 'kb.runtime', 'kb.service.cdmi', 'kb
         seedOntology: [],
         seedTermsUniq: [],
         seedColors: [],
-        cdmiURL: R.getConfig('cdmi_url'),
+        cdmiURL: R.getConfig('service.cdmi.url'),
         // proteinInfoURL: App.getConfig('protein_info_url'),
         // cdmiURL: "http://kbase.us/services/cdmi_api",
         // proteinInfoURL: "http://kbase.us/services/protein_info_service",

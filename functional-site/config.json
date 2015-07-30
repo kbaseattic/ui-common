@@ -108,10 +108,9 @@
         "xtransform": "https://kbase.us/services/transform",
         "xtrees": "https://kbase.us/services/trees",
         "xuser_profile": "https://kbase.us/services/user_profile/rpc",
-        "dashboard_metrics_url": "/userMetrics",
-        "cdmi_url": "https://kbase.us/services/cdmi_api",
-        "protein_info_url": "https://kbase.us/services/protein_info_service",
-        "networks": "https://kbase.us/services/networks/rpc",
+        "xdashboard_metrics_url": "/userMetrics",
+        "xcdmi_url": "https://kbase.us/services/cdmi_api",
+        "xprotein_info_url": "https://kbase.us/services/protein_info_service",
         "ui": {
             "images": {
                 "spinner": "/ui-common/assets/img/ajax-loader.gif"

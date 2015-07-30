@@ -64,7 +64,7 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                     // The sessionObject is created in this method.
                     this.setSession(this.importSessionFromCookie());
                     // 1 hour is the default cookie max age.
-                    this.cookieMaxAge = Config.getConfig('session.cookie.max-age', 60 * 60);
+                    this.cookieMaxAge = Config.getConfig('ui.constants.session_max_age', 60 * 60);
 
                     return this;
                 }
