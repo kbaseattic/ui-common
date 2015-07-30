@@ -124,7 +124,7 @@ define(['jquery', 'kb.jquery.widget', 'kb.runtime', 'kb.service.workspace', 'kb.
             this._super(options);
             this.wsUrl = R.getConfig('service.workspace.url');
             this.transformURL = R.getConfig('transform');
-            this.ujsURL = R.getConfig('user_job_state_url');
+            this.ujsURL = R.getConfig('service.user_job_state.url');
             this.shockURL = R.getConfig('shock');
             this.exportURL = R.getConfig('data_import_export');
             this.token = R.getAuthToken();
