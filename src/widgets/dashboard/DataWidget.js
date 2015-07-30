@@ -27,7 +27,7 @@ define(['kb.widget.dashboard.base', 'kb.utils', 'kb.utils.api', 'kb.session', 'k
                 value: function () {
                     // User profile service
                     if (Session.isLoggedIn()) {
-                        if (this.hasConfig('workspace_url')) {
+                        if (this.hasConfig('service.workspace.url')) {
                             this.workspaceClient = new WorkspaceService(this.getConfig('service.workspace.url'), {
                                 token: Session.getAuthToken()
                             });

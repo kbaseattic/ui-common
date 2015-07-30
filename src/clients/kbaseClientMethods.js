@@ -4,7 +4,7 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', '
       return Object.create({}, {
          init: {
             value: function (cfg) {
-               if (Config.hasConfig('workspace_url')) {
+               if (Config.hasConfig('service.workspace.url')) {
                   this.workspaceClient = new Workspace(Config.getConfig('service.workspace.url'), {
                      token: Session.getAuthToken()
                   });
