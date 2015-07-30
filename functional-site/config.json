@@ -105,7 +105,7 @@
         "xgene_families": "https://kbase.us/services/gene_families",
         "xgenomeCmp": "https://kbase.us/services/genome_comparison/jsonrpc",
         "xshock": "https://kbase.us/services/shock-api",
-        "transform": "https://kbase.us/services/transform",
+        "xtransform": "https://kbase.us/services/transform",
         "trees": "https://kbase.us/services/trees",
         "user_profile": "https://kbase.us/services/user_profile/rpc",
         "dashboard_metrics_url": "/userMetrics",

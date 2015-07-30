@@ -30,7 +30,7 @@ define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.runtime', 'kb.service.cdm
         // cdmiURL: "https://kbase.us/services/cdmi_api",
         // treesURL: "https://kbase.us/services/trees",
         cdmiURL: R.getConfig('cdmi_url'),
-        treesURL: R.getConfig('trees'),
+        treesURL: R.getConfig('service.trees.url'),
         $infoTable: null,
         pref: null,
         init: function (options) {
