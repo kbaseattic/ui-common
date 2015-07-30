@@ -49,7 +49,7 @@ define([
             cards: {},
             cdmWorkspace: "CDS",
             defaultWidth: 300,
-            fbaURL: R.getConfig('fba_url'),
+            fbaURL: R.getConfig('service.fba.url'),
             workspaceURL: R.getConfig('service.workspace.url'),
             workspaceClient: null,
             fbaClient: null, // used to export CDS genomes to workspace.

@@ -85,7 +85,7 @@ define([
                 this.workspace = new Workspace(R.getConfig('service.workspace.url'), {
                     token: R.getAuthToken()
                 });
-                this.fba = new FBA(R.getConfig('fba_url'), {
+                this.fba = new FBA(R.getConfig('service.fba.url'), {
                     token: R.getAuthToken()
                 });
 

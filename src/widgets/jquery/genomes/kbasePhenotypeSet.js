@@ -136,7 +136,7 @@ define(['jquery', 'kb.runtime', 'kb.utils', 'kb.html', 'kb.service.workspace', '
                     // this will be replaced with an consolidated media widget once 
                     // ui-common is a submodule
                     function mediaTab(ele, ws, id) {
-                        var fba = new FBA(R.getConfig('fba_url'));
+                        var fba = new FBA(R.getConfig('service.fba.url'));
                         Utils.promise(fba, 'get_media', {
                             medias: [id], workspaces: [ws]
                         })
