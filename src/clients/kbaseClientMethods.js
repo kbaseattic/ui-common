@@ -19,7 +19,7 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', '
                   throw 'The user profile client url is not defined';
                }
                if (Config.hasConfig('narrative_method_store_url')) {
-                  this.narrativeMethodStoreClient = new NarrativeMethodStore(Config.getConfig('narrative_method_store_url'), {
+                  this.narrativeMethodStoreClient = new NarrativeMethodStore(Config.getConfig('service.narrative_method_store.url'), {
                      token: Session.getAuthToken()
                   });
                } else {

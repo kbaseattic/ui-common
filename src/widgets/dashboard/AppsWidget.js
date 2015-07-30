@@ -16,7 +16,7 @@ define(['kb.widget.dashboard.base', 'kb.utils', 'kb.session', 'kb.service.narrat
                this.kbService = Object.create(KBService).init();
                if (Session.isLoggedIn()) {
                   if (this.hasConfig('narrative_method_store_url')) {
-                     this.methodStore = new NarrativeMethodStore(this.getConfig('narrative_method_store_url'), {
+                     this.methodStore = new NarrativeMethodStore(this.getConfig('service.narrative_method_store.url'), {
                         token: Session.getAuthToken()
                      });
                   } else {

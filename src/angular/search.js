@@ -126,7 +126,7 @@ define(['kb.runtime', 'kb.session', 'postal', 'angular', 'kb.client.narrativeman
                 },
                 getNarrativeManager: function () {
                     return new NarrativeManager({ws_url: R.getConfig('service.workspace.url'),
-                        nms_url: R.getConfig('narrative_method_store_url')},
+                        nms_url: R.getConfig('service.narrative_method_store.url')},
                         R.getAuthToken());
                 }
             };
