@@ -126,7 +126,7 @@ define(['jquery', 'kb.jquery.widget', 'kb.runtime', 'kb.service.workspace', 'kb.
             this.transformURL = R.getConfig('transform');
             this.ujsURL = R.getConfig('service.user_job_state.url');
             this.shockURL = R.getConfig('shock');
-            this.exportURL = R.getConfig('data_import_export');
+            this.exportURL = R.getConfig('service.data_import_export.url');
             this.token = R.getAuthToken();
             this.type = null; //this.options.type;
             this.wsId = this.options.params.ws;
