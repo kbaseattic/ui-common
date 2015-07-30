@@ -26,8 +26,8 @@ module.exports = function(grunt) {
                     optimize: "uglify2",
                     generateSourceMaps: true,
                     preserveLicenseComments: false,
-                    name: "kbase-ui",
-                    out: "dist/kbase-min.js"
+                    name: "functional-site/js/require-config",
+                    out: "functional-site/js/dist/kbase-min.js"
                 }
             }
         },
@@ -42,9 +42,9 @@ module.exports = function(grunt) {
             source: {
                 files: [{
                     src: [
-                        'dist/kbase-min.js',
+                        'functional-site/js/dist/kbase-min.js',
                     ],
-                    dest: 'dist/'
+                    dest: 'functional-site/js/dist/'
                 }]
             }
         },
@@ -57,19 +57,20 @@ module.exports = function(grunt) {
                 actions: [
                     {
                         name: 'requirejs-onefile',
-                        search: 'require-config.js',
+                        search: 'js/require-config.js',
                         replace: function(match) {
                             // do a little sneakiness here. we just did the filerev thing, so get that mapping
                             // and return that (minus the .js on the end)
-                            var revvedFile = grunt.filerev.summary['dist/kbase-min.js'];
-                            // starts with 'static/' and ends with '.js' so return all but the first 7 and last 3 characters
-                            return revvedFile.substr(7, revvedFile.length - 10);
+                            var revvedFile = grunt.filerev.summary['functional-site/js/dist/kbase-min.js'];
+                            // starts with 'functional-site/' so return all but the first 16 characters
+                            return revvedFile.substr(16);
                         },
                         flags: ''
                     }
                 ]
             }
-        }
+        },
+
     });
 
 
