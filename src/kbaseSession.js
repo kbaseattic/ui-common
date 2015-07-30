@@ -497,7 +497,7 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                         $.support.cors = true;
                         $.ajax({
                             type: 'POST',
-                            url: Config.getConfig('login_url'),
+                            url: Config.getConfig('service.login.url'),
                             data: loginParams,
                             dataType: 'json',
                             crossDomain: true,
