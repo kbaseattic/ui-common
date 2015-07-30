@@ -11,14 +11,14 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', '
                } else {
                   throw 'The workspace client url is not defined';
                }
-               if (Config.hasConfig('user_profile_url')) {
+               if (Config.hasConfig('service.user_profile.url')) {
                   this.userProfileClient = new UserProfile(Config.getConfig('user_profile_url'), {
                      token: Session.getAuthToken()
                   });
                } else {
                   throw 'The user profile client url is not defined';
                }
-               if (Config.hasConfig('narrative_method_store_url')) {
+               if (Config.hasConfig('service.narrative_method_store.url')) {
                   this.narrativeMethodStoreClient = new NarrativeMethodStore(Config.getConfig('service.narrative_method_store.url'), {
                      token: Session.getAuthToken()
                   });

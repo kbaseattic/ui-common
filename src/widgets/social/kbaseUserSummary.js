@@ -22,7 +22,7 @@ function (SocialWidget, UserProfileService, Session) {
         value: function () {
           // User profile service
           if (Session.isLoggedIn()) { 
-            if (this.hasConfig('user_profile_url')) {
+            if (this.hasConfig('service.user_profile.url')) {
               this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
                   token: Session.getAuthToken()
               });

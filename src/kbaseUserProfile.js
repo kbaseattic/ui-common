@@ -10,7 +10,7 @@ define(['q', 'kb.utils', 'md5', 'kb.service.user_profile', 'kb.config', 'kb.sess
                     }
                     this.username = cfg.username;
                     if (Session.isLoggedIn()) {
-                        if (Config.hasConfig('user_profile_url')) {
+                        if (Config.hasConfig('service.user_profile.url')) {
 
                             this.userProfileClient = new UserProfileService(Config.getConfig('user_profile_url'), {
                                 token: Session.getAuthToken()
