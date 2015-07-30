@@ -50,6 +50,13 @@ define([
             function replacePath(location) {
                 window.location.replace(location);
             }
+            function redirectTo(location, newWindow) {
+                if (newWindow) {
+                    window.open(location);
+                } else {
+                    window.location.replace(location);
+                }
+            }
 
             var generatedId = 0;
             function genId() {
@@ -682,6 +689,7 @@ define([
                 tag: makeTag,
                 genId: genId,
                 navigateTo: navigateTo,
+                redirectTo: redirectTo,
                 sub: sub,
                 unsub: unsub,
                 pub: pub,

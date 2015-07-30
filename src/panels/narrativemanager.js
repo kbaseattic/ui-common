@@ -9,7 +9,8 @@ define([
     'kb.runtime',
     'kb.html',
     'kb.client.narrativemanager',
-    'q'],
+    'q'
+],
     function (R, html, NarrativeManagerService, Q) {
         'use strict';
 
@@ -50,7 +51,10 @@ define([
                                     objId = result.last_narrative.nar_info[0],
                                     path = makeNarrativePath(wsId, objId);
                                 resolve({
-                                    redirect: path
+                                    redirect: {
+                                        url: path,
+                                        new_window: true
+                                    }
                                 });
                             } else {
                                 //we need to construct a new narrative- we have a first timer
@@ -61,7 +65,10 @@ define([
                                             objId = info.nar_info[0],
                                             path = makeNarrativePath(wsId, objId);
                                         resolve({
-                                            redirect: path
+                                            redirect: {
+                                                url: path,
+                                                new_window: true
+                                            }
                                         });
                                     },
                                     function (error) {
@@ -79,6 +86,7 @@ define([
 
             function createNewNarrative(params) {
                 return Q.promise(function (resolve, fail) {
+                    params = params || {};
                     if (params.app && params.method) {
                         fail("Must provide no more than one of the app or method params");
                         return;
@@ -119,7 +127,10 @@ define([
                                 objId = info.nar_info[0],
                                 path = makeNarrativePath(wsId, objId);
                             resolve({
-                                redirect: path
+                                redirect: {
+                                    url: path,
+                                    new_window: true
+                                }
                             });
                         },
                         function (error) {
@@ -149,8 +160,7 @@ define([
                         copydata: {},
                         appparam: {}
                     },
-                    render: null,
-                    promise: function () {
+                    handler: function () {
                         return startOrCreateEmptyNarrative();
                     }
                 });
@@ -162,8 +172,7 @@ define([
                         copydata: {},
                         appparam: {}
                     },
-                    render: null,
-                    promise: function (params) {
+                    handler: function (params) {
                         return createNewNarrative(params);
                     }
                 });

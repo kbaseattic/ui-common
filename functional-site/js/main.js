@@ -28,7 +28,6 @@ define([
     'kb.panel.navbar',
     'kb.client.profile',
     'kb.session',
-    
     'bootstrap',
     'css!font-awesome',
     'domReady!'],
@@ -131,6 +130,10 @@ define([
             Runtime.recv('app', 'navigate', function (data) {
                 app.navigateTo(data);
             });
+            
+            Runtime.recv('app', 'redirect', function (data) {
+                app.redirectTo(data.url, data.new_window);
+            })
 
             // This will work ... but we need to tune this!
             Runtime.recv('app', 'loggedin', function () {
@@ -138,11 +141,26 @@ define([
             });
 
             Runtime.recv('app', 'new-route', function (data) {
+                console.log(data);
                 if (data.routeHandler.route.redirect) {
                     Runtime.send('app', 'navigate', {
                         path: data.routeHandler.route.redirect.path,
                         params: data.routeHandler.route.redirect.params
                     });
+                } else if (data.routeHandler.route.handler) {
+                    // This pattern handles the narrativemanager -- represents another way
+                    // to handle routes...
+                    data.routeHandler.route.handler(data.params)
+                        .then(function (result) {
+                            if (result.redirect) {
+                                Runtime.send('app', 'redirect', result.redirect);
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log('ERROR');
+                            console.log(err);
+                        })
+                        .done();
                 } else {
                     app.showPanel2('app', data.routeHandler)
                         .catch(function (err) {
