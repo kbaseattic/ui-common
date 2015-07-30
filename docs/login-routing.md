@@ -1,5 +1,7 @@
 # Login Routing
 
+THIS IS AN OLD DOC 
+
 ## Goal
 
 Given a link into a protected resource, the login page is triggered, and after successful login, the browser is routed to the originally requested resource.
