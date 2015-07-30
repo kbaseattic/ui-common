@@ -178,6 +178,7 @@ require.config({
         'kb.widget': 'src/widgets/Widget',
         'kb.widget.databrowser': 'src/widgets/DataBrowser/DataBrowser',
         'kb.widget.typebrowser': 'src/widgets/TypeBrowser',
+        
         // KBase Panels
         // ------------
         'kb.panel.about': 'src/panels/about',
@@ -198,6 +199,7 @@ require.config({
         'kb.panel.typeview': 'src/panels/typeview',
         'kb.panel.message': 'src/panels/message',
         'kb.panel.test': 'src/panels/test',
+        'kb.panel.sample': 'src/panels/sample',
         
         
         // KBase JQuery Plugin Widgets
@@ -274,6 +276,11 @@ require.config({
         // KBase Data Visualization Widget
         // ----------------------------
         'kb.jquery.contigset': 'src/widgets/jquery/contigset/kbaseContigSetView',
+        // Sample Widgets
+        'kb.widget.sample.factory': 'src/widgets/sample/factory',
+        
+        
+        
         // KBase Services
         // non-visual dependencies of plugins
         // --------------
