@@ -53,7 +53,7 @@ define([
                                 resolve({
                                     redirect: {
                                         url: path,
-                                        new_window: true
+                                        new_window: false
                                     }
                                 });
                             } else {
@@ -67,7 +67,7 @@ define([
                                         resolve({
                                             redirect: {
                                                 url: path,
-                                                new_window: true
+                                                new_window: false
                                             }
                                         });
                                     },
@@ -129,7 +129,7 @@ define([
                             resolve({
                                 redirect: {
                                     url: path,
-                                    new_window: true
+                                    new_window: false
                                 }
                             });
                         },
