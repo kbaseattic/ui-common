@@ -9,88 +9,70 @@ define([
     'kb.html',
     'kb.runtime',
     'q',
-    'kb.service.networks',
+    'underscore',
     'kb.rgbcolor'],
-    function (html, R, q, NetworksClient, RGBColor) {
+    function (html, R, q, _, RGBColor) {
         'use strict';
 
         function testWidget() {
 
             function widget(config) {
-                var mount, container, $container;
+                var mount, container;
 
-                var networksClient;
+                function renderLighten() {
+                    var div = html.tag('div');
 
-                function render() {
-                    var h1 = html.tag('h1'),
-                        p = html.tag('p'),
+                    var rgbc = new RGBColor(0, 0, 0);
+
+                    return _.range(0, 255, 5).map(function (i) {
+                        return div({style: {
+                                display: 'inline-block',
+                                width: '40px',
+                                height: '40px',
+                                border: '1px silver solid',
+                                'background-color': rgbc.lightenBy(i).asString()
+                            }}, String(i));
+                    });
+                }
+
+
+                function renderDarken() {
+                    var
                         div = html.tag('div');
-                    return div([
-                        h1('Teseting at KBase'),
-                        p('This is a test panel. It is used for testing things...')
-                    ]);
+
+                    var rgbc = new RGBColor(255, 255, 255);
+
+                    return _.range(0, 255, 5).map(function (i) {
+                        return div({style: {
+                                display: 'inline-block',
+                                width: '40px',
+                                height: '40px',
+                                border: '1px silver solid',
+                                'background-color': rgbc.lightenBy(i).asString()
+                            }}, String(i));
+                    });
                 }
                 
-                function testRGBColor() {
+                function render() {
                     var h1 = html.tag('h1'),
-                        p = html.tag('p'),
                         div = html.tag('div');
-                    
-                    var rgbc = new RGBColor(0,0,0);
-                    
-                    var testBlocks = [];
-                    for (var i = 0; i <= 255; i += 5) {
-                        testBlocks.push(div({style: {
-                                width: '40px', 
-                                height: '40px', 
-                                border: '1px silver solid', 
-                                'background-color': rgbc.lightenBy(i).asString()
-                            }}, String(i)));
-                    }
-                    rgbc = new RGBColor(255,255,255);
-                    for (var i = 0; i <= 255; i += 5) {
-                        testBlocks.push(div({style: {
-                                width: '40px', 
-                                height: '40px', 
-                                border: '1px silver solid', 
-                                'background-color': rgbc.darkenBy(i).asString()
-                            }}, String(i)));
-                    }
-                    
                     return div([
-                        h1('Teseting at KBase'),
-                        p('This is a test panel. It is used for testing things...'),
-                       testBlocks
+                        h1('Testing at KBase'),
+                        div({class: 'row'}, [
+                            div({class: 'col-md-6'}, [
+                                html.bsPanel('Lighten', renderLighten()),
+                                html.bsPanel('Darken', renderDarken())
+                            ])
+                        ])
                     ]);
-                }
-
-                function init(config) {
-                    networksClient = new NetworksClient(R.getConfig('networks_url'));
                 }
 
                 function attach(node) {
-                    return q.Promise(function (resolve, reject) {
-networksClient = new NetworksClient(R.getConfig('networks_url'));
+                    return q.Promise(function (resolve) {
                         mount = node;
                         container = document.createElement('div');
-                        $container = $(container);
                         mount.appendChild(container);
-                        container.innerHTML = testRGBColor();
-
-                        /*q(networksClient.all_datasets())
-                            .then(function (data) {
-                                console.log('GOT');
-                                console.log(data);
-                                resolve();
-                            })
-                            .catch(function (err) {
-                                console.log('ERR');
-                                console.log(err);
-                                reject(err);
-                            })
-                            .done();
-                            */
-
+                        container.innerHTML = render();
 
                         resolve();
                     });
@@ -114,7 +96,6 @@ networksClient = new NetworksClient(R.getConfig('networks_url'));
                 }
 
                 return {
-                    init: init,
                     attach: attach,
                     start: start,
                     stop: stop,
@@ -127,7 +108,7 @@ networksClient = new NetworksClient(R.getConfig('networks_url'));
                 create: function (config) {
                     return widget(config);
                 }
-            }
+            };
         }
 
 

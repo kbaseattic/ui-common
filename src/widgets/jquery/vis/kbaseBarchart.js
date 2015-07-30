@@ -1,7 +1,13 @@
 /*
  kbaseBarchart
  */
-
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true
+ */
 define([
     'jquery',
     'd3',
