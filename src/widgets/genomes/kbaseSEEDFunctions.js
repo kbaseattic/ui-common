@@ -20,7 +20,7 @@ define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.runtime', 'd3', 'kb.servi
         name: "KBaseSEEDFunctions",
         parent: "kbaseAuthenticatedWidget",
         version: "1.0.0",
-        wsUrl: R.getConfig('workspace_url'),
+        wsUrl: R.getConfig('service.workspace.url'),
         // wsUrl: "https://kbase.us/services/ws",
         options: {
             objNameOrId: null,

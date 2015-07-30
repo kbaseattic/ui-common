@@ -122,10 +122,10 @@ define(['kb.runtime', 'kb.session', 'postal', 'angular', 'kb.client.narrativeman
         searchApp.service('searchKBaseClientsService', function ($q, $http, $rootScope) {
             return {
                 getWorkspaceClient: function () {
-                    return new Workspace(R.getConfig('workspace_url'), {token: App.getAuthToken()});
+                    return new Workspace(R.getConfig('service.workspace.url'), {token: App.getAuthToken()});
                 },
                 getNarrativeManager: function () {
-                    return new NarrativeManager({ws_url: R.getConfig('workspace_url'),
+                    return new NarrativeManager({ws_url: R.getConfig('service.workspace.url'),
                         nms_url: R.getConfig('narrative_method_store_url')},
                         R.getAuthToken());
                 }

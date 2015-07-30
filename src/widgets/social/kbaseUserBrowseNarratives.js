@@ -25,7 +25,7 @@ define(['jquery', 'kb.utils', 'kb.widget.social.base', 'kb.service.workspace', '
                     value: function () {
                         if (Session.isLoggedIn()) {
                             if (this.hasConfig('workspace_url')) {
-                                this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'), {
+                                this.workspaceClient = new WorkspaceService(this.getConfig('service.workspace.url'), {
                                     token: Session.getAuthToken()
                                 });
                             } else {

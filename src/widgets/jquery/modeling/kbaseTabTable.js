@@ -82,7 +82,7 @@ define([
                 else if (!isNaN(input.ws) && !isNaN(input.obj))
                     var param = {ref: input.ws + '/' + input.obj};
 
-                this.workspace = new Workspace(R.getConfig('workspace_url'), {
+                this.workspace = new Workspace(R.getConfig('service.workspace.url'), {
                     token: R.getAuthToken()
                 });
                 this.fba = new FBA(R.getConfig('fba_url'), {

@@ -113,7 +113,7 @@ define([
             setup: {
                 value: function () {
                     if (this.hasConfig('workspace_url')) {
-                        this.workspaceClient = new WorkspaceService(this.getConfig('workspace_url'), {
+                        this.workspaceClient = new WorkspaceService(this.getConfig('service.workspace.url'), {
                             token: Session.getAuthToken()
                         });
                     } else {

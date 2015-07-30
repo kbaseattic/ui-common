@@ -45,7 +45,7 @@ define([
                 var self = this;
                 var scope = {ws: this.options.workspaceID, id: this.options.genomeID, ver: this.options.ver};
 
-                var workspace = new Workspace(R.getConfig('workspace_url'), {
+                var workspace = new Workspace(R.getConfig('service.workspace.url'), {
                     token: R.getAuthToken()
                 });
 

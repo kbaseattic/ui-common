@@ -67,7 +67,7 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'd3', 'kb.jquery.authent
                     return;
                 }
 
-                var kbws = new Workspace(R.getConfig('workspace_url'), {
+                var kbws = new Workspace(R.getConfig('service.workspace.url'), {
                     token: R.getAuthToken()
                 });
 

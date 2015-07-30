@@ -469,7 +469,7 @@ define([
             if ("output" in gf) {
                 return gf.output;
             }
-            var workspace = new Workspace(R.getConfig('workspace_url'), {
+            var workspace = new Workspace(R.getConfig('service.workspace.url'), {
                 token: R.getAuthToken()
             });
             return Q(workspace.get_objects([{ref: ref}]))

@@ -27,7 +27,7 @@ define(['jquery', 'kb.runtime', 'kb.utils', 'kb.html', 'kb.service.workspace', '
                 var container = this.$elem;
 
                 container.loading();
-                var workspace = new Workspace(R.getConfig('workspace_url'), {
+                var workspace = new Workspace(R.getConfig('service.workspace.url'), {
                     token: options.token
                 });
                 Utils.promise(workspace, 'get_objects', {

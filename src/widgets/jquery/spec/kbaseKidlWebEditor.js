@@ -50,7 +50,7 @@ define([
                         token: this.token, 
                         moduleName: self.options.mod,
                         typeName: self.options.type, 
-                        wsUrl: R.getConfig('workspace_url')
+                        wsUrl: R.getConfig('service.workspace.url')
                     };
                     $(function () {
                         var card = self.$elem.parent();
