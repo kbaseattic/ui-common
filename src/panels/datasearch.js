@@ -111,7 +111,7 @@ define([
                 return categoryList;
             }
 
-            var searchService = SearchService(R.getConfig('search_url'));
+            var searchService = SearchService(R.getConfig('service.search.url'));
             function setupSearch(params) {
                 return Q.Promise(function (resolve, reject) {
                     resolve();
