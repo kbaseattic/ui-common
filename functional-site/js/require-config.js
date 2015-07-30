@@ -20,7 +20,8 @@ var kbClients = [
     ['cdmi-entity', 'CDMI_EntityAPI'],
     ['trees', 'KBaseTrees'],
     ['fba', 'fbaModelServices'],
-    ['ujs', 'UserAndJobState']
+    ['ujs', 'UserAndJobState'],
+    ['networks', 'KBaseNetworks']
 ];
 // NB need the immediate function exec below in order to avoid
 // variable capture problem with anon funcs.
@@ -135,6 +136,7 @@ require.config({
         'kb.widgetconnector': 'src/kbaseWidgetConnector',
         'kb.jquerywidgetconnector': 'src/kbaseJQueryWidgetConnector',
         'kb.simplepanel': 'src/kbaseSimplePanel',
+        'kb.rgbcolor': 'src/js/RGBColor',
         
         // KBase Widgets
         // -------------
@@ -195,6 +197,7 @@ require.config({
         'kb.panel.typebrowser': 'src/panels/typebrowser',
         'kb.panel.typeview': 'src/panels/typeview',
         'kb.panel.message': 'src/panels/message',
+        'kb.panel.test': 'src/panels/test',
         
         
         // KBase JQuery Plugin Widgets
