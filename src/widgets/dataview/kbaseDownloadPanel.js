@@ -123,7 +123,7 @@ define(['jquery', 'kb.jquery.widget', 'kb.runtime', 'kb.service.workspace', 'kb.
         init: function (options) {
             this._super(options);
             this.wsUrl = R.getConfig('service.workspace.url');
-            this.transformURL = R.getConfig('transform');
+            this.transformURL = R.getConfig('service.transform.url');
             this.ujsURL = R.getConfig('service.user_job_state.url');
             this.shockURL = R.getConfig('service.shock.url');
             this.exportURL = R.getConfig('service.data_import_export.url');
