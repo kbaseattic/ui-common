@@ -422,7 +422,7 @@ define([
                 });
             }
 
-            function create(cfg) {
+            function init(cfg) {
                 return q.Promise(function (resolve) {
                     config = cfg;
                     workspaceClient = Object.create(WorkspaceClient).init({url: R.getConfig('workspace_url')});
@@ -468,7 +468,7 @@ define([
             }
 
             return {
-                create: create,
+                init: init,
                 attach: attach,
                 start: start,
                 stop: stop,

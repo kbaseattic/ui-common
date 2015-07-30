@@ -5,8 +5,17 @@
  browser: true,
  white: true
  */
-define(['kb.widget', 'kb.utils', 'kb.narrative', 'kb.utils.api', 'kb.session', 'kb.service.workspace', 'q', 'datatables_bootstrap'],
-    function (Widget, Utils, Narrative, APIUtils, Session, WorkspaceService, Q) {
+define([
+    'kb.widget',
+    'kb.utils',
+    'kb.narrative',
+    'kb.utils.api',
+    'kb.session',
+    'kb.service.workspace',
+    'q',
+    'datatables_bootstrap'
+],
+    function (Widget, Utils, Narrative, APIUtils, Session, WorkspaceService, q) {
         "use strict";
         var widget = Object.create(Widget, {
             init: {
@@ -41,7 +50,7 @@ define(['kb.widget', 'kb.utils', 'kb.narrative', 'kb.utils.api', 'kb.session', '
             },
             setInitialState: {
                 value: function (options) {
-                    return Q.Promise(function (resolve, reject, notify) {
+                    return q.Promise(function (resolve, reject, notify) {
                         // We only run any queries if the session is authenticated.
                         if (!Session.isLoggedIn()) {
                             resolve();
@@ -54,11 +63,11 @@ define(['kb.widget', 'kb.utils', 'kb.narrative', 'kb.utils.api', 'kb.session', '
                         // At present we can just use the presence of "narrative_nice_name" metadata attribute 
                         // to flag a compatible workspace.
                         //
-                        Utils.promise(this.workspaceClient, 'list_workspace_info', {
+                        q(this.workspaceClient.list_workspace_info({
                             showDeleted: 0,
                             excludeGlobal: 1,
                             owners: [Session.getUsername()]
-                        })
+                        }))
                             .then(function (data) {
                                 // First we both transform each ws info object into a nicer js object,
                                 // and filter for modern narrative workspaces.
@@ -67,7 +76,7 @@ define(['kb.widget', 'kb.utils', 'kb.narrative', 'kb.utils.api', 'kb.session', '
                                     i, wsInfo;
                                 for (i = 0; i < data.length; i += 1) {
                                     wsInfo = APIUtils.workspace_metadata_to_object(data[i]);
-                                    
+
                                     // make sure a modern narrative.
                                     if (Narrative.isValid(wsInfo)) {
                                         // if (wsInfo.metadata.narrative && wsInfo.metadata.is_temporary !== 'true') {
@@ -80,23 +89,23 @@ define(['kb.widget', 'kb.utils', 'kb.narrative', 'kb.utils.api', 'kb.session', '
 
                                 // Now get the workspace details.
 
-                                var workspaceObjects = [];
-                                Utils.promise(this.workspaceClient, 'list_objects', {
+                                q(this.workspaceClient.list_objects({
                                     ids: workspaceList,
                                     includeMetadata: 1
-                                })
+                                }))
                                     .then(function (data) {
-                                        var i;
-                                        for (i = 0; i < data.length; i++) {
-                                            var objectInfo = APIUtils.object_info_to_object(data[i]);
-                                            workspaceObjects.push({
-                                                info: objectInfo,
+                                        var workspaceObjects = data.map(function (info) {
+                                            var wsObjectInfo = APIUtils.object_info_to_object(info);
+                                            return {
+                                                info: wsObjectInfo,
                                                 narrative: {
-                                                    workspaceId: objectInfo.wsid,
-                                                    name: workspaceDb[objectInfo.wsid].metadata.narrative_nice_name
+                                                    workspaceId: wsObjectInfo.wsid,
+                                                    name: workspaceDb[wsObjectInfo.wsid].metadata.narrative_nice_name
                                                 }
-                                            });
-                                        }
+                                            };
+                                        });
+                                        
+                                        
                                         //workspaceObjects = workspaceObjects.sort(function (a, b) {
                                         //    var x = (Utils.iso8601ToDate(a.save_date)).getTime(),
                                         //        y = (Utils.iso8601ToDate(b.save_date)).getTime();
