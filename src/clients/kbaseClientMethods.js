@@ -4,22 +4,22 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', '
       return Object.create({}, {
          init: {
             value: function (cfg) {
-               if (Config.hasConfig('service.workspace.url')) {
-                  this.workspaceClient = new Workspace(Config.getConfig('service.workspace.url'), {
+               if (Config.hasItem('service.workspace.url')) {
+                  this.workspaceClient = new Workspace(Config.getItem('service.workspace.url'), {
                      token: Session.getAuthToken()
                   });
                } else {
                   throw 'The workspace client url is not defined';
                }
-               if (Config.hasConfig('service.user_profile.url')) {
-                  this.userProfileClient = new UserProfile(Config.getConfig('user_profile_url'), {
+               if (Config.hasItem('service.user_profile.url')) {
+                  this.userProfileClient = new UserProfile(Config.getItem('user_profile_url'), {
                      token: Session.getAuthToken()
                   });
                } else {
                   throw 'The user profile client url is not defined';
                }
-               if (Config.hasConfig('service.narrative_method_store.url')) {
-                  this.narrativeMethodStoreClient = new NarrativeMethodStore(Config.getConfig('service.narrative_method_store.url'), {
+               if (Config.hasItem('service.narrative_method_store.url')) {
+                  this.narrativeMethodStoreClient = new NarrativeMethodStore(Config.getItem('service.narrative_method_store.url'), {
                      token: Session.getAuthToken()
                   });
                } else {

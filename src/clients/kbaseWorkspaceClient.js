@@ -12,9 +12,9 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', '
             init: {
                 value: function (cfg) {
                     if (Session.isLoggedIn()) {
-                        if (Config.hasConfig('service.workspace.url')) {
+                        if (Config.hasItem('service.workspace.url')) {
                             // console.log(Workspace);
-                            this.workspaceClient = new Workspace(Config.getConfig('service.workspace.url'), {
+                            this.workspaceClient = new Workspace(Config.getItem('service.workspace.url'), {
                                 token: Session.getAuthToken()
                             });
                         } else {

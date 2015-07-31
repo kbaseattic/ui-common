@@ -258,14 +258,14 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                         name: 'contactus',
                         label: 'Contact Us',
                         icon: 'envelope-o',
-                        url: Config.getConfig('docsite.baseUrl') + Config.getConfig('docsite.paths.contact'),
+                        url: Config.getItem('docsite.baseUrl') + Config.getItem('docsite.paths.contact'),
                         place: 'end'
                     });
                     this.addHelpMenuItem({
                         name: 'about',
                         label: 'About KBase',
                         icon: 'info-circle',
-                        url: Config.getConfig('docsite.baseUrl') + Config.getConfig('docsite.paths.about')
+                        url: Config.getItem('docsite.baseUrl') + Config.getItem('docsite.paths.about')
                     });
                     return this;
                 }
