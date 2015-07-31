@@ -161,6 +161,15 @@ define([
                             console.log(err);
                         })
                         .done();
+                } else if (data.routeHandler.route.panelFactory) {
+                    // And ... we have another panel factory pattern here. We will
+                    // converge as soon as we can...
+                     app.showPanel3('app', data.routeHandler)
+                        .catch(function (err) {
+                            console.error('ERROR');
+                            console.error(err);
+                        })
+                        .done();
                 } else {
                     app.showPanel2('app', data.routeHandler)
                         .catch(function (err) {

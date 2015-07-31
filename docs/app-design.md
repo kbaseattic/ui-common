@@ -70,4 +70,41 @@ I prefer the mental model of an object being isolated from its prototype. Creati
 The constructor technique is very popular, especially with the "crossover" crowd. It uses the "new" operator to create new objects using the constructor object. In principle it is very similar to the factor technique, but it uses the hidden constructor method to create the object, rather than an explicit factory method or function.
 
 
-Factory
+### Factory
+
+## App Components
+
+- index page
+- main.js
+- Runtime
+- App
+- Panels
+    - displayable
+    - redidirects
+- Widgets
+    - standalone widgets
+    - complex widgets with subwidgets
+    - utility widgets (e.g. charting)
+    - app-level widgets (e.g. dialogs)
+- Top Level 
+    - navbar
+        - menu
+        - title
+        - buttons
+            - dropdown buttons
+        - notifications
+            - notifications list dopdown
+        - login menu
+    - content area
+    - modal dialog
+    - pop-up
+- Major Modules
+    - App
+    - Runtime
+    - Session
+    - Config
+    - HTML
+    
+## What is a Widget?
+
+An widget is an implementation of the widget interface.
