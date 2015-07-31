@@ -1,6 +1,8 @@
 ## KBase UI Configuration
 ## production environment
 ---
+# TODO: ensure that this list includes all supported services
+# TODO: ensure that all services represented are also defined as amd modules
 service:
     workspace:
         url: https://ci.kbase.us/services/ws/
@@ -45,9 +47,6 @@ service:
     trees:
         url: https://ci.kbase.us/services/trees
         name: Trees
-    dashboard_metrics:
-        url: /userMetrics
-        name: Dashboard Metrics
     cdmi:
         url: https://kbase.us/services/cdmi_api
         name: CDMI
@@ -71,7 +70,8 @@ ui:
     internal_links:
         landing_pages: /functional-site/#/dataview/
         ws_browser: /functional-site/#/ws
-        version_check: /narrative_version
+        version_check: /narrative_version        
+        dashboard_metrics: /userMetrics
     outbound_links:
         reset_password: https://gologin.kbase.us/ResetPassword
         status_page: http://kbase.us/internal/status

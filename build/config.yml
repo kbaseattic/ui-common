@@ -1,7 +1,10 @@
 ## KBase UI Configuration
 ## production environment
 ---
-service:
+# TODO: ensure that this list includes all supported services
+# TODO: ensure that all services represented are also defined as amd modules
+# TODO: alpha sort of services
+services:
     workspace:
         url: https://kbase.us/services/ws/
         name: Workspace
@@ -44,15 +47,14 @@ service:
     trees:
         url: https://kbase.us/services/trees
         name: Trees
-    dashboard_metrics:
-        url: /userMetrics
-        name: Dashboard Metrics
     cdmi:
         url: https://kbase.us/services/cdmi_api
         name: CDMI
     protein_info:
         url: https://kbase.us/services/protein_info_service
         name: Protein Info
+
+# Settings in support of the user interface
 ui:
     images:
         spinner:
@@ -60,6 +62,19 @@ ui:
     constants:
         client_timeout: 900000,
         session_max_age: 5184000
+    internal_paths:
+        landing_pages: /functional-site/#/dataview/
+        ws_browser: /functional-site/#/ws
+        version_check: /narrative_version
+        dashboard_metrics: /userMetrics
+    outbound_urls:
+        reset_password: https://gologin.kbase.us/ResetPassword
+        status_page: http://kbase.us/internal/status
+        submit_jira_ticket: https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&description=#Narrative%20version
+        update_profile: https://gologin.kbase.us/account/UpdateProfile
+        
+# Primarily for output links for the docsite. 
+# TODO: merge with ui.outbound_links?        
 docsite:
     base_url: http://kbase.us
     host: kbase.us
