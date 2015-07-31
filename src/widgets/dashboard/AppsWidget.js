@@ -15,7 +15,7 @@ define(['kb.widget.dashboard.base', 'kb.utils', 'kb.session', 'kb.service.narrat
             value: function () {
                this.kbService = Object.create(KBService).init();
                if (Session.isLoggedIn()) {
-                  if (this.hasConfig('service.narrative_method_store.url')) {
+                  if (this.hasConfig('services.narrative_method_store.url')) {
                      this.methodStore = new NarrativeMethodStore(this.getConfig('services.narrative_method_store.url'), {
                         token: Session.getAuthToken()
                      });
@@ -23,7 +23,7 @@ define(['kb.widget.dashboard.base', 'kb.utils', 'kb.session', 'kb.service.narrat
                      throw 'The Narrative Method Store client url is not defined';
                   }
 
-                  if (this.hasConfig('service.workspace.url')) {
+                  if (this.hasConfig('services.workspace.url')) {
                      this.workspaceClient = new WorkspaceService(this.getConfig('services.workspace.url'), {
                         token: Session.getAuthToken()
                      });

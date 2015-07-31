@@ -1,19 +1,18 @@
-define(['q', 'kb.utils', 'md5', 'kb.service.user_profile', 'kb.config', 'kb.session'],
-    function (Q, Utils, md5, UserProfileService, Config, Session) {
+define(['q', 'kb.utils', 'md5', 'kb.service.user_profile', 'kb.runtime'],
+    function (Q, Utils, md5, UserProfileService, R) {
         "use strict";
         var UserProfile = Object.create({}, {
             init: {
                 value: function (cfg) {
-                    this.config = Config[Config.setup];
                     if (!cfg.username) {
                         throw 'Cannot create a profile object without a username';
                     }
                     this.username = cfg.username;
-                    if (Session.isLoggedIn()) {
-                        if (Config.hasItem('service.user_profile.url')) {
+                    if (R.isLoggedIn()) {
+                        if (R.hasConfig('services.user_profile.url')) {
 
-                            this.userProfileClient = new UserProfileService(Config.getItem('user_profile_url'), {
-                                token: Session.getAuthToken()
+                            this.userProfileClient = new UserProfileService(R.getConfig('services.user_profile.url'), {
+                                token: R.getAuthToken()
                             });
                         } else {
                             throw 'The user profile client url is not defined';

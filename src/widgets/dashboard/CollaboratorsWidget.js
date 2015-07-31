@@ -17,7 +17,7 @@ define(['kb.widget.dashboard.base', 'kb.client.methods', 'kb.service.user_profil
                     if (AppState.getItem('session').isLoggedIn()) {
                         this.clientMethods = Object.create(ClientMethods).init();
 
-                        if (this.hasConfig('service.user_profile.url')) {
+                        if (this.hasConfig('services.user_profile.url')) {
                             this.userProfileClient = new UserProfileService(this.getConfig('user_profile_url'), {
                                 token: AppState.getItem('session').getAuthToken()
                             });

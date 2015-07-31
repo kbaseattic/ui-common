@@ -26,7 +26,7 @@ define([
                 value: function () {
                     // User profile service
                     if (R.isLoggedIn()) {
-                        if (R.hasConfig('service.user_profile.url')) {
+                        if (R.hasConfig('services.user_profile.url')) {
                             this.userProfileClient = new UserProfileService(R.getConfig('user_profile_url'), {
                                 token: R.getAuthToken()
                             });

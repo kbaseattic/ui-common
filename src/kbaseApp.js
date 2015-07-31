@@ -31,7 +31,7 @@ define([
             
             function paramsToQuery (params) {
                 return Object.keys(params).map(function(key) {
-                    return key + '=' + encodeURIComponent(params[key])
+                    return key + '=' + encodeURIComponent(params[key]);
                 }).join('&');
             }
             
@@ -91,7 +91,7 @@ define([
                         try {
                             listeners[msgId][subId].fun(data);
                         } catch (ex) {
-                            console.log('Execption runnning msg ' + id + ', sub ' + subId);
+                            console.log('Execption runnning msg ' + msgId + ', sub ' + subId);
                             console.log(ex);
                         }
                     });
@@ -711,7 +711,6 @@ define([
                 stop: stop
             };
         };
-
 
         return {
             create: factory

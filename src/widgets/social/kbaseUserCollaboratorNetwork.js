@@ -32,7 +32,7 @@ define([
                     if (R.isLoggedIn()) {
                         this.clientMethods = Object.create(ClientMethods).init();
 
-                        if (R.hasConfig('service.user_profile.url')) {
+                        if (R.hasConfig('services.user_profile.url')) {
                             this.userProfileClient = new UserProfileService(R.getConfig('user_profile_url'), {
                                 token: R.getAuthToken()
                             });

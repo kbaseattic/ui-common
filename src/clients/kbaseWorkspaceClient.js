@@ -5,17 +5,23 @@
  browser: true,
  white: true
  */
-define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', 'kb.config'],
-    function (Q, Session, Utils, APIUtils, Workspace, Config) {
+define([
+    'q',
+    'kb.runtime',
+    'kb.utils',
+    'kb.utils.api',
+    'kb.service.workspace'
+],
+    function (Q, R, Utils, APIUtils, Workspace) {
         'use strict';
         return Object.create({}, {
             init: {
                 value: function (cfg) {
-                    if (Session.isLoggedIn()) {
-                        if (Config.hasItem('service.workspace.url')) {
+                    if (R.isLoggedIn()) {
+                        if (R.hasConfig('services.workspace.url')) {
                             // console.log(Workspace);
-                            this.workspaceClient = new Workspace(Config.getItem('service.workspace.url'), {
-                                token: Session.getAuthToken()
+                            this.workspaceClient = new Workspace(R.getConfig('services.workspace.url'), {
+                                token: R.getAuthToken()
                             });
                         } else {
                             throw 'The workspace client url is not defined';
@@ -109,7 +115,7 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', '
                                 id: narrative.workspace.id
                             });
                         }.bind(this));
-                        var username = Session.getUsername();
+                        var username = R.getUsername();
                         Q.all(promises)
                             .then(function (permissions) {
                                 var i, narrative;

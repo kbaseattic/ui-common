@@ -36,7 +36,7 @@ define([
                 value: function () {
                     // User profile service
                     if (Session.isLoggedIn()) {
-                        if (this.hasConfig('service.workspace.url')) {
+                        if (this.hasConfig('services.workspace.url')) {
                             this.workspaceClient = new WorkspaceService(this.getConfig('services.workspace.url'), {
                                 token: Session.getAuthToken()
                             });
