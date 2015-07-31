@@ -116,7 +116,7 @@
     "narrative_url": "//narrative.kbase.us/narrative",
     "ui": {
         "footer": ""
-    }
+    },
 
    "next": {
       "awe": "https://next.kbase.us/services/awe-api", 
@@ -177,5 +177,5 @@
       "version_check": "/narrative_version", 
       "workspace": "https://ci.kbase.us/services/ws", 
       "ws_browser": "https://narrative.kbase.us/functional-site/#/ws"
-   }, 
+   }
 }

@@ -1,0 +1,69 @@
+## KBase UI Configuration
+## production environment
+---
+service:
+    workspace:
+        url: https://kbase.us/services/ws/
+        name: Workspace
+    fba:
+        url: https://kbase.us/services/KBaseFBAModeling/
+        name: FBA
+    user_job_state:
+        url: https://kbase.us/services/userandjobstate
+        name: User and Job State
+    search:
+        url: https://kbase.us/services/search/
+        name: Data Search
+    user_profile:
+        url: https://kbase.us/services/user_profile/rpc
+        name: User Profile
+    login:
+        url: https://kbase.us/services/authorization/Sessions/Login
+        name: Login
+    narrative_method_store:
+        url: https://kbase.us/services/narrative_method_store/rpc
+        name: Narrative Method Store
+    awe:
+        url: https://kbase.us/services/awe-api
+        name: AWE
+    data_import_export:
+        url: https://kbase.us/services/data_import_export
+        name: Data Import Export
+    gene_families:
+        url: https://kbase.us/services/gene_families
+        name: Gene Families
+    genome_comparison:
+        url: https://kbase.us/services/genome_comparison/jsonrpc
+        name: Genome Comparison
+    shock: 
+        url: https://kbase.us/services/shock-api
+        name: Shock
+    transform:
+        url: https://kbase.us/services/transform
+        name: Transform
+    trees:
+        url: https://kbase.us/services/trees
+        name: Trees
+    dashboard_metrics:
+        url: /userMetrics
+        name: Dashboard Metrics
+    cdmi:
+        url: https://kbase.us/services/cdmi_api
+        name: CDMI
+    protein_info:
+        url: https://kbase.us/services/protein_info_service
+        name: Protein Info
+ui:
+    images:
+        spinner:
+            url: /ui-common/assets/img/ajax-loader.gif
+    constants:
+        client_timeout: 900000,
+        session_max_age: 5184000
+docsite:
+    base_url: http://kbase.us
+    host: kbase.us
+    paths:
+        about: /what-is-kbase
+        contact: /contact-us
+        browser_support: /supported-browsers

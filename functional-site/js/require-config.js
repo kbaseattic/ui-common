@@ -67,6 +67,7 @@
             domReady: 'bower_components/requirejs-domready/domReady',
             text: 'bower_components/requirejs-text/text',
             json: 'bower_components/requirejs-json/json',
+            yaml: 'bower_components/require-yaml/yaml',
             underscore: 'bower_components/underscore/underscore-min',
             datatables: 'bower_components/datatables/media/js/jquery.dataTables.min',
             datatables_css: 'bower_components/datatables/media/css/jquery.dataTables.min',
@@ -103,6 +104,8 @@
             // Just style, man.
             'font-awesome': 'bower_components/font-awesome/css/font-awesome.min',
             'stacktrace': 'bower_components/stacktrace-js/dist/stacktrace.min',
+            'js-yaml': 'bower_components/js-yaml/dist/js-yaml.min',
+            
             // KBase Styles
             // ----------------
             'kb.style.bootstrap': 'css/kb-bootstrap',
