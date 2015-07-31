@@ -20,7 +20,8 @@ var kbClients = [
     ['cdmi-entity', 'CDMI_EntityAPI'],
     ['trees', 'KBaseTrees'],
     ['fba', 'fbaModelServices'],
-    ['ujs', 'UserAndJobState']
+    ['ujs', 'UserAndJobState'],
+    ['networks', 'KBaseNetworks']
 ];
 // NB need the immediate function exec below in order to avoid
 // variable capture problem with anon funcs.
@@ -135,6 +136,7 @@ require.config({
         'kb.widgetconnector': 'src/kbaseWidgetConnector',
         'kb.jquerywidgetconnector': 'src/kbaseJQueryWidgetConnector',
         'kb.simplepanel': 'src/kbaseSimplePanel',
+        'kb.rgbcolor': 'src/js/RGBColor',
         
         // KBase Widgets
         // -------------
@@ -176,6 +178,7 @@ require.config({
         'kb.widget': 'src/widgets/Widget',
         'kb.widget.databrowser': 'src/widgets/DataBrowser/DataBrowser',
         'kb.widget.typebrowser': 'src/widgets/TypeBrowser',
+        
         // KBase Panels
         // ------------
         'kb.panel.about': 'src/panels/about',
@@ -195,6 +198,8 @@ require.config({
         'kb.panel.typebrowser': 'src/panels/typebrowser',
         'kb.panel.typeview': 'src/panels/typeview',
         'kb.panel.message': 'src/panels/message',
+        'kb.panel.test': 'src/panels/test',
+        'kb.panel.sample': 'src/panels/sample',
         
         
         // KBase JQuery Plugin Widgets
@@ -271,6 +276,11 @@ require.config({
         // KBase Data Visualization Widget
         // ----------------------------
         'kb.jquery.contigset': 'src/widgets/jquery/contigset/kbaseContigSetView',
+        // Sample Widgets
+        'kb.widget.sample.factory': 'src/widgets/sample/factory',
+        
+        
+        
         // KBase Services
         // non-visual dependencies of plugins
         // --------------

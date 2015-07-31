@@ -19,7 +19,8 @@
       "user_profile": "https://kbase.us/services/user_profile/rpc", 
       "dashboard_metrics_url": "/userMetrics",
       "cdmi_url": "https://kbase.us/services/cdmi_api",
-      "protein_info_url": "http://kbase.us/services/protein_info_service",
+      "protein_info_url": "https://kbase.us/services/protein_info_service",
+      "networks": "https://kbase.us/services/networks/rpc",
       "session": {
          "cookie": {
             "max-age": 5184000
@@ -59,6 +60,7 @@
       "dashboard_metrics_url": "/userMetrics",
       "cdmi_url": "https://kbase.us/services/cdmi_api",
       "protein_info_url": "http://kbase.us/services/protein_info_service",
+      "networks": "https://kbase.us/services/networks",
       "kbase_clients": {
          "defaults": {
             "timeout": 900000
@@ -98,6 +100,7 @@
       "dashboard_metrics_url": "/userMetrics",
       "cdmi_url": "https://kbase.us/services/cdmi_api",
       "protein_info_url": "http://kbase.us/services/protein_info_service",
+      "networks": "https://kbase.us/services/networks",
       "kbase_clients": {
          "defaults": {
             "timeout": 900000

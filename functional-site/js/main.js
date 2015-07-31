@@ -196,7 +196,9 @@ require([
             {module: 'kb.panel.dataview', config: {}},
             {module: 'kb.panel.databrowser', config: {}},
             {module: 'kb.panel.typebrowser', config: {}},
-            {module: 'kb.panel.typeview'}
+            {module: 'kb.panel.typeview'},
+            {module: 'kb.panel.test'},
+            {module: 'kb.panel.sample'}
         ].map(function (panel) {
             return requirePromise([panel.module], function (PanelModule) {
                 // this registers routes
