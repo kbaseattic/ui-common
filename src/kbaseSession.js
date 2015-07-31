@@ -1,5 +1,10 @@
 /*global define: true */
 /*jslint browser:true  vars: true */
+/* NB: kb.config is used here rather than runtime because the session is loaded
+ * as a singleton.
+ * TODO: just create as a normal object, and the runtime will take care of creating
+ * a singleton...
+ */
 define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
     function ($, Q, Cookie, Config, Logger) {
         'use strict';
@@ -64,7 +69,7 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                     // The sessionObject is created in this method.
                     this.setSession(this.importSessionFromCookie());
                     // 1 hour is the default cookie max age.
-                    this.cookieMaxAge = Config.getConfig('session.cookie.max-age', 60 * 60);
+                    this.cookieMaxAge = Config.getItem('ui.constants.session_max_age', 60 * 60);
 
                     return this;
                 }
@@ -497,7 +502,7 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
                         $.support.cors = true;
                         $.ajax({
                             type: 'POST',
-                            url: Config.getConfig('login_url'),
+                            url: Config.getItem('services.login.url'),
                             data: loginParams,
                             dataType: 'json',
                             crossDomain: true,

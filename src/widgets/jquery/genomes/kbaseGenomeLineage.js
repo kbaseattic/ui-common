@@ -30,7 +30,7 @@ define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.runtime', 'kb.service.cdm
         // cdmiURL: "https://kbase.us/services/cdmi_api",
         // treesURL: "https://kbase.us/services/trees",
         cdmiURL: R.getConfig('cdmi_url'),
-        treesURL: R.getConfig('trees'),
+        treesURL: R.getConfig('services.trees.url'),
         $infoTable: null,
         pref: null,
         init: function (options) {
@@ -103,7 +103,7 @@ define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.runtime', 'kb.service.cdm
                 var obj = this.getObjectIdentity(this.options.workspaceID, this.options.genomeID);
                 obj.included = ["/taxonomy", "/scientific_name"];
                 
-                var workspace = new Workspace(App.getConfig('workspace_url'), {
+                var workspace = new Workspace(App.getConfig('services.workspace.url'), {
                     token: App.getAuthToken()
                 });
                 

@@ -17,7 +17,9 @@ define([], function () {
              * regular expression, which case it is matched on a path component,
              * object with type:param
              */
-
+            /* TODO: do something on overlapping routes */
+            /* TODO: better mapping method for routes. */
+            /* still, with a relatively short list of routes, this is far from a performance issue. */
             routes.push(pathSpec);
         }
 

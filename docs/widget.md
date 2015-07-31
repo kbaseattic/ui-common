@@ -1,23 +1,42 @@
-# Widget Lifecycle
+# Widgets
+
+## What is a Widget?
+
+A widget is an implementation of the widget interface, which hopefully exploits that interface to do something interesting and useful.
+
+The widget interface represents "lifeceycle hooks", which allow a controlling environment, such as a Panel, Widget or testing environment, to create, activate, deactivate, and destroy a widget. Within this framework, which are hopefully clear from the Widget Lifecycle Interface section below, the widget may exploit the KBase runtime API, any available libraries, and the DOM node provided to the widget to implement its functionality. A widget must also operate within certain constraints. Some of these constraints are imposed by a the design and structural requirements of a widget, which are enforced by the development environment, build process, and runtime environment. Other constraints are imposed by convention, and may be enforced by code review.
+
+## Widget Lifecycle 
 
 In order to automate and animate the KBase UI, widgets and widget-like things need to follow a set of patterns. These patterns are expressed on one hand as an API, or set of methods, implemented by a widget (or widget wrapper), and on the other as a set of lifecycle procedures which manage the widgets.
 
 The basic lifecycle is:
 
 - construction: not a method, but the act of creating a widget constructor object
-- create(confg): a widget is created with a set of configuration data from a factory object.
-- attach(node): a widget is attached to a dom node, and creates any dom structure it needs
-- start(params): a widget is run for the first time with a set of runtime parameters, also starting any runtime services
+- init(config): a widget is initialized with configuration data from a factory object.
+- attach(node): a widget is attached to a DOM node, upon which it may create its own DOM structure.
+- start(params): a widget is run for the first time with a set of parameters, also starting any runtime services
 - run(params): a widget is run with a set of runtime parameters, perhaps passed from a url or another widget.
 - halt: a widget must cease any activity, such as responding to events
 - detach: a widget should detach any nodes it has installed in the original mount node, which should be empty before the detach method returns
 - destroy: a widget must remove any artifacts outside of its own self
 
-All methods are asynchronous, returning a promise object. This allows the widget to perform asynchronous calls in any lifecycle state.
+All methods are asynchronous, returning a promise object. This allows the widget to perform asynchronous calls in any lifecycle stage.
 
-## Widget Manager
+These methods represent the Widget Lifecycle Interface.
+
+## A Widget Manager
+
+The lifecycle events above are called by some sort of Widget Manager. The primary use case is that of a top level Panel. A Panel is invoked when a route is visited, and may occupy the main content area  of the window. A Panel is just a specialized widget, but that is a different topic. The Panel will utilize some procedure for identifying widgets and associating them with some DOM structure that it creates. For instance, a Panel may set up a grid for displaying multiple widgets.
+
+The Widget Manager is responsible for creating widgets and running them through their lifecycle stages, in coordination with its own lifecycle. The lifecycle interface is designed to allow recursive widgets, so that it is easy to create a hierarchy of widgets.
+
+A Widget Manager such as a Panel will probably have most of its code devoted to managing widgets and interfacing with the user interface runtime system.
+
 
 ## Widget
+
+A widget, in contrast with a Widget Manager, 
 
 ## Overview
 
@@ -55,7 +74,7 @@ For a factory object, this is through a ```create``` method which takes a config
 
 ### widget.init(config)
 
-The widget ```init``` method is used to initialize a widget to a known state with a given configuration object. It is called after the widget is created, and the widget is attached.
+The widget ```init``` method is used to initialize a widget to a known state with a given configuration object. It is called after the widget is created, and the widget is attached. 
 
 ### widget.attach(node)
 

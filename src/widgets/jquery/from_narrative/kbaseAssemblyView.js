@@ -30,7 +30,7 @@ define(['jquery', 'kb.runtime', 'kb.jquery.authenticatedwidget'], function ($, R
         timer: null,
         init: function (options) {
             this._super(options);
-            this.wsUrl = R.getConfig('workspace_url');
+            this.wsUrl = R.getConfig('services.workspace.url');
             this.ws_name = options.ws_name;
             this.ws_id = options.ws_id;
             if (options.job_id)

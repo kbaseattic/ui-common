@@ -23,7 +23,7 @@ define(['jquery', 'kb.runtime', 'kb.html', 'kb.service.workspace', 'kb.jquery.au
             loading_image: "assets/img/ajax-loader.gif",
             init: function (options) {
                 this._super(options);
-                this.ws_url = R.getConfig('workspace_url');
+                this.ws_url = R.getConfig('services.workspace.url');
                 return this;
             },
             render: function () {

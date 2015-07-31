@@ -25,7 +25,7 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticated
                 id: null,
                 ws: null
             },
-            wsUrl: R.getConfig('workspace_url'),
+            wsUrl: R.getConfig('services.workspace.url'),
             // wsUrl: "https://kbase.us/services/ws", // we need to stop doing this!
             loadingImage: "assets/img/ajax-loader.gif",
             init: function (options) {

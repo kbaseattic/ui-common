@@ -44,7 +44,7 @@ define(['jquery', 'kb.jquery.widget'], function ($) {
             // from the CDS
             this.cdmiClient = new CDMI_API(this.cdmiURL);
             this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
-            this.workspaceClient = new Workspace(App.getConfig('workspace_url'));
+            this.workspaceClient = new Workspace(App.getConfig('services.workspace.url'));
 
             this.render();
             if (this.options.workspaceID)

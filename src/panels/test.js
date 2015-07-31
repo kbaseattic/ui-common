@@ -9,9 +9,8 @@ define([
     'kb.html',
     'kb.runtime',
     'q',
-    'underscore',
-    'kb.rgbcolor'],
-    function (html, R, q, _, RGBColor) {
+    'underscore'],
+    function (html, R, q, _) {
         'use strict';
 
         function testWidget() {
@@ -19,52 +18,22 @@ define([
             function widget(config) {
                 var mount, container;
 
-                function renderLighten() {
-                    var div = html.tag('div');
-
-                    var rgbc = new RGBColor(0, 0, 0);
-
-                    return _.range(0, 255, 5).map(function (i) {
-                        return div({style: {
-                                display: 'inline-block',
-                                width: '40px',
-                                height: '40px',
-                                border: '1px silver solid',
-                                'background-color': rgbc.lightenBy(i).asString()
-                            }}, String(i));
-                    });
-                }
-
-
-                function renderDarken() {
-                    var
-                        div = html.tag('div');
-
-                    var rgbc = new RGBColor(255, 255, 255);
-
-                    return _.range(0, 255, 5).map(function (i) {
-                        return div({style: {
-                                display: 'inline-block',
-                                width: '40px',
-                                height: '40px',
-                                border: '1px silver solid',
-                                'background-color': rgbc.lightenBy(i).asString()
-                            }}, String(i));
-                    });
-                }
                 
                 function render() {
                     var h1 = html.tag('h1'),
                         div = html.tag('div');
-                    return div([
+                    var content = div([
                         h1('Testing at KBase'),
                         div({class: 'row'}, [
                             div({class: 'col-md-6'}, [
-                                html.bsPanel('Lighten', renderLighten()),
-                                html.bsPanel('Darken', renderDarken())
+                                'You can use this page to test widgets. Nothing special, just edit it to suite your needs.'
                             ])
                         ])
                     ]);
+                    return {
+                        title: 'Widget Testing Panel',
+                        content: content
+                    }
                 }
 
                 function attach(node) {
@@ -72,7 +41,9 @@ define([
                         mount = node;
                         container = document.createElement('div');
                         mount.appendChild(container);
-                        container.innerHTML = render();
+                        var rendered = render();
+                        R.send('app', 'title', rendered.title);
+                        container.innerHTML = rendered.content;
 
                         resolve();
                     });

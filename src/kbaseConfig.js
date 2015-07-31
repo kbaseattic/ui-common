@@ -1,4 +1,4 @@
-define(['kb.utils', 'json!functional-site/config.json'],
+define(['kb.utils', 'yaml!build/config.yml'],
     function (Utils, config) {
         'use strict';
         var Config = Object.create({}, {
@@ -8,29 +8,11 @@ define(['kb.utils', 'json!functional-site/config.json'],
             },
             init: {
                 value: function (cfg) {
-                    this.config = config[config.setup];
+                    this.config = config;
                     return this;
                 }
             },
-            // CONFIG
-            getConfig: {
-                value: function (key, defaultValue) {
-                    return Utils.getProp(this.config, key, defaultValue);
-                }
-            },
-            setConfig: {
-                value: function (key, value) {
-                    Utils.setProp(this.config, key, value);
-                }
-            },
-            hasConfig: {
-                value: function (key) {
-                    if (Utils.getProp(this.config, key) !== undefined) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
+           
             // CONFIG
             getItem: {
                 value: function (key, defaultValue) {

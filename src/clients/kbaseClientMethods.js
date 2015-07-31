@@ -1,26 +1,34 @@
-define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', 'kb.service.user_profile', 'kb.service.narrative_method_store', 'kb.config'],
-   function (Q, Session, Utils, APIUtils, Workspace, UserProfile, NarrativeMethodStore, Config) {
+define([
+    'q', 
+    'kb.runtime',
+    'kb.utils', 
+    'kb.utils.api', 
+    'kb.service.workspace', 
+    'kb.service.user_profile', 
+    'kb.service.narrative_method_store'
+],
+   function (Q, R, Utils, APIUtils, Workspace, UserProfile, NarrativeMethodStore) {
 
       return Object.create({}, {
          init: {
             value: function (cfg) {
-               if (Config.hasConfig('workspace_url')) {
-                  this.workspaceClient = new Workspace(Config.getConfig('workspace_url'), {
-                     token: Session.getAuthToken()
+               if (R.hasConfig('services.workspace.url')) {
+                  this.workspaceClient = new Workspace(R.getConfig('services.workspace.url'), {
+                     token: R.getAuthToken()
                   });
                } else {
                   throw 'The workspace client url is not defined';
                }
-               if (Config.hasConfig('user_profile_url')) {
-                  this.userProfileClient = new UserProfile(Config.getConfig('user_profile_url'), {
-                     token: Session.getAuthToken()
+               if (R.hasConfig('services.user_profile.url')) {
+                  this.userProfileClient = new UserProfile(R.getConfig('services.user_profile.url'), {
+                     token: R.getAuthToken()
                   });
                } else {
                   throw 'The user profile client url is not defined';
                }
-               if (Config.hasConfig('narrative_method_store_url')) {
-                  this.narrativeMethodStoreClient = new NarrativeMethodStore(Config.getConfig('narrative_method_store_url'), {
-                     token: Session.getAuthToken()
+               if (R.hasConfig('services.narrative_method_store.url')) {
+                  this.narrativeMethodStoreClient = new NarrativeMethodStore(R.getConfig('services.narrative_method_store.url'), {
+                     token: R.getAuthToken()
                   });
                } else {
                   throw 'The narrative method store client url is not defined';
@@ -139,7 +147,7 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', '
                         id: narrative.workspace.id
                      })
                   }.bind(this));
-                  var username = Session.getUsername();
+                  var username = R.getUsername();
                   Q.all(promises)
                      .then(function (permissions) {
                         for (var i = 0; i < permissions.length; i++) {
@@ -189,7 +197,7 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', '
          getCollaborators: {
             value: function (options) {
                var users = (options && options.users)?options.users:[];
-               users.push(Session.getUsername());
+               users.push(R.getUsername());
                return Q.promise(function (resolve, reject, notify) {
                   this.getNarratives({
                         params: {
@@ -200,7 +208,7 @@ define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.service.workspace', '
                         this.getPermissions(narratives)
                            .then(function (narratives) {
                               var collaborators = {};
-                              // var currentUser = Session.getUsername();
+                              // var currentUser = R.getUsername();
                               
                               for (var i = 0; i < narratives.length; i++) {
                                  // make sure logged in user is here

@@ -23,8 +23,7 @@ define([
     function (R, html, $, Q, uuid, Workspace, UserAndJobState, EasyTree) {
         'use strict';
         $.KBWidget({
-            name: 'kbaseTree',
-            parent: 'kbaseAuthenticatedWidget',
+            d
             version: '0.0.1',
             options: {
                 treeID: null,
@@ -33,8 +32,8 @@ define([
                 jobID: null,
                 token: null,
                 kbCache: null,
-                workspaceURL: R.getConfig('workspace_url'),
-                ujsServiceURL: R.getConfig('user_job_state_url'),
+                workspaceURL: R.getConfig('services.workspace.url'),
+                ujsServiceURL: R.getConfig('services.user_job_state.url'),
                 width: 1045,
                 height: 600
             },

@@ -33,7 +33,7 @@ define([
             id: null,
             ws: null
         },
-        ws_url: R.getConfig('workspace_url'),
+        ws_url: R.getConfig('services.workspace.url'),
         loading_image: "assets/img/ajax-loader.gif",
         init: function (options) {
             this._super(options);

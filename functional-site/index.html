@@ -6,11 +6,11 @@
 
         <!-- external css -->
         <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" />
-        
+
         <!-- TODO: all into require! -->
         <!-- kbase enhancements or overrides for bootstrap -->
         <link rel="stylesheet" type="text/css" href="/css/kb-bootstrap.css" />
-        
+
         <!-- need to rethink these styles... fold into main -->
         <!-- <link rel="stylesheet" type="text/css" href="assets/navbar/css/navbar.css" /> -->
         <link rel="stylesheet" type="text/css" href="assets/css/kb-ui.css" />
@@ -26,7 +26,18 @@
         <!-- External javascript packages -->
         <script src="/bower_components/requirejs/require.js"></script>
         <script src="js/require-config.js"></script>       
-       
+        <script>
+            require(['kb.main'], function (main) {
+                main.start()
+                    .then(function (resolve) {
+                        console.log('app has started!');
+                    })
+                    .catch(function (err) {
+                        console.log('app is unhappy :(');
+                    })
+                    .done();
+            });
+        </script>
         <!-- end application -->
     </head>
     <body>
@@ -41,5 +52,5 @@
             </div>
         </div>
     </body>
-     <script src="js/main.js"></script>
+
 </html>

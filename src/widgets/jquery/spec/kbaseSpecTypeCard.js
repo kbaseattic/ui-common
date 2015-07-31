@@ -40,7 +40,7 @@ define([
                 var container = self.$elem;
                 container.append('<p class="muted loader-table"><img src="assets/img/ajax-loader.gif"> loading...</p>');
 
-                var kbws = new Workspace(R.getConfig('workspace_url'), {token: self.options.token});
+                var kbws = new Workspace(R.getConfig('services.workspace.url'), {token: self.options.token});
                 var typeName = this.options.id;
                 var typeVer = null;
                 if (typeName.indexOf('-') >= 0) {
