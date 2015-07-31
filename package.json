@@ -20,5 +20,14 @@
     "grunt-contrib-requirejs": "^0.4.4",
     "grunt-filerev": "^2.3.1",
     "grunt-regex-replace": "^0.2.6"
+  },
+  "devDependencies": {
+    "karma": "^0.13.3",
+    "phantomjs": "^1.9.17",
+    "karma-phantomjs-launcher": "^0.2.0",
+    "jasmine-core": "^2.3.4",
+    "karma-jasmine": "^0.3.6",
+    "karma-requirejs": "^0.2.2",
+    "grunt-karma": "^0.12.0"
   }
 }
