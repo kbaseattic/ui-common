@@ -135,8 +135,6 @@ define([
                         // 
                         // NB: the widget connector, for now, needs the params
                         // for attachment.
-                        console.log('PARAMS');
-                        console.log(params);
                         q.all(children.map(function (wc) {
                             return wc.widget.start(params);
                         }))
