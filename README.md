@@ -41,6 +41,9 @@ This will get ui-common and set it up into a working state:
     - ```bower install```
 - For testing (and soon, building)
     - ```npm install```
+- Copy the correct config file into the build dir
+    - ```mkdir build && cp -r source/config/prod.yml build/config.yml```
+    - this will be part of the build process when we have one.
 
 
 ##The Widget API
