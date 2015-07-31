@@ -71,7 +71,7 @@ module.exports = function(grunt) {
         // Testing with Karma!
         'karma': {
             unit: {
-                configFile: 'test/karma.conf.js'
+                configFile: 'karma.conf.js'
             },
             dev: {
                 reporters: 'dots'
