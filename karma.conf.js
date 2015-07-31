@@ -64,7 +64,7 @@ module.exports = function(config) {
 
       {pattern: 'bower_components/requirejs-text/text.js', included: false},
       {pattern: 'bower_components/requirejs-json/json.js', included: false},
-      {pattern: 'functional-site/config.json', included: false},
+      {pattern: 'functional-site/config.json', served: true, included: false},
 
       {pattern: 'src/**/*.js', included: false},
       {pattern: 'test/spec/*.js', included: false},
