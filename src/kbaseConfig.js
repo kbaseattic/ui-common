@@ -8,7 +8,7 @@ define(['kb.utils', 'json!functional-site/config.json'],
             },
             init: {
                 value: function (cfg) {
-                    this.config = config[config.setup];
+                    this.config = config[config.current_config];
                     return this;
                 }
             },
