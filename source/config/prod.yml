@@ -62,11 +62,13 @@ ui:
     constants:
         client_timeout: 900000,
         session_max_age: 5184000
+     # TODO: simply paths?    
     internal_paths:
         landing_pages: /functional-site/#/dataview/
         ws_browser: /functional-site/#/ws
         version_check: /narrative_version
         dashboard_metrics: /userMetrics
+    # TODO: simply urls?
     outbound_urls:
         reset_password: https://gologin.kbase.us/ResetPassword
         status_page: http://kbase.us/internal/status
