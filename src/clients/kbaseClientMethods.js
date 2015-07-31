@@ -1,7 +1,6 @@
 define([
     'q', 
     'kb.runtime',
-    'kb.session', 
     'kb.utils', 
     'kb.utils.api', 
     'kb.service.workspace', 
@@ -21,7 +20,7 @@ define([
                   throw 'The workspace client url is not defined';
                }
                if (R.hasConfig('services.user_profile.url')) {
-                  this.userProfileClient = new UserProfile(R.getConfig('services.user_profile_url'), {
+                  this.userProfileClient = new UserProfile(R.getConfig('services.user_profile.url'), {
                      token: R.getAuthToken()
                   });
                } else {
@@ -148,7 +147,7 @@ define([
                         id: narrative.workspace.id
                      })
                   }.bind(this));
-                  var username = Session.getUsername();
+                  var username = R.getUsername();
                   Q.all(promises)
                      .then(function (permissions) {
                         for (var i = 0; i < permissions.length; i++) {
@@ -198,7 +197,7 @@ define([
          getCollaborators: {
             value: function (options) {
                var users = (options && options.users)?options.users:[];
-               users.push(Session.getUsername());
+               users.push(R.getUsername());
                return Q.promise(function (resolve, reject, notify) {
                   this.getNarratives({
                         params: {
@@ -209,7 +208,7 @@ define([
                         this.getPermissions(narratives)
                            .then(function (narratives) {
                               var collaborators = {};
-                              // var currentUser = Session.getUsername();
+                              // var currentUser = R.getUsername();
                               
                               for (var i = 0; i < narratives.length; i++) {
                                  // make sure logged in user is here
