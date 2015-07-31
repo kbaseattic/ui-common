@@ -107,8 +107,8 @@ define(['kb.runtime', 'kb.session', 'postal', 'angular', 'kb.client.narrativeman
                 getCategoryInfo: function () {
                     var deferred = $q.defer();
                     console.log('here?? ');
-                    console.log(R.getConfig('service.search.url'));
-                    $http.get(R.getConfig('service.search.url') + "categories").then(function fetchCategories(results) {
+                    console.log(R.getConfig('services.search.url'));
+                    $http.get(R.getConfig('services.search.url') + "categories").then(function fetchCategories(results) {
                         // this.categoriesJSON = results.data;
                         deferred.resolve(results);
                     });
@@ -122,11 +122,11 @@ define(['kb.runtime', 'kb.session', 'postal', 'angular', 'kb.client.narrativeman
         searchApp.service('searchKBaseClientsService', function ($q, $http, $rootScope) {
             return {
                 getWorkspaceClient: function () {
-                    return new Workspace(R.getConfig('service.workspace.url'), {token: App.getAuthToken()});
+                    return new Workspace(R.getConfig('services.workspace.url'), {token: App.getAuthToken()});
                 },
                 getNarrativeManager: function () {
-                    return new NarrativeManager({ws_url: R.getConfig('service.workspace.url'),
-                        nms_url: R.getConfig('service.narrative_method_store.url')},
+                    return new NarrativeManager({ws_url: R.getConfig('services.workspace.url'),
+                        nms_url: R.getConfig('services.narrative_method_store.url')},
                         R.getAuthToken());
                 }
             };
@@ -598,7 +598,7 @@ define(['kb.runtime', 'kb.session', 'postal', 'angular', 'kb.client.narrativeman
 
                 $scope.options.userState.session.ajax_requests.push(
                     $http({method: 'GET',
-                        url: R.getConfig('service.search.url') + "getResults",
+                        url: R.getConfig('services.search.url') + "getResults",
                         params: queryOptions,
                         responseType: 'json'
                     }).then(function (jsonResult) {
@@ -703,7 +703,7 @@ define(['kb.runtime', 'kb.session', 'postal', 'angular', 'kb.client.narrativeman
                 //console.log("getResults : " + JSON.stringify(queryOptions));
 
                 $http({method: 'GET',
-                    url: R.getConfig('service.search.url') + "getResults",
+                    url: R.getConfig('services.search.url') + "getResults",
                     params: queryOptions,
                     responseType: 'json'
                 }).then(function (jsonResult) {

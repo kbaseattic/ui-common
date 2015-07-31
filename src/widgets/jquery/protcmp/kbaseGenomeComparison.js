@@ -48,7 +48,7 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'd3', 'kb.jquery.authent
             tooltip: null,
             init: function (options) {
                 this._super(options);
-                this.cmpImgUrl = R.getConfig('service.genome_comparison.url').replace('jsonrpc', 'image');
+                this.cmpImgUrl = R.getConfig('services.genome_comparison.url').replace('jsonrpc', 'image');
                 this.ws_name = options.ws_name;
                 this.ws_id = options.ws_id;
                 this.pref = this.uuid();
@@ -67,7 +67,7 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'd3', 'kb.jquery.authent
                     return;
                 }
 
-                var kbws = new Workspace(R.getConfig('service.workspace.url'), {
+                var kbws = new Workspace(R.getConfig('services.workspace.url'), {
                     token: R.getAuthToken()
                 });
 

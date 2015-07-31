@@ -122,11 +122,11 @@ define(['jquery', 'kb.jquery.widget', 'kb.runtime', 'kb.service.workspace', 'kb.
         },
         init: function (options) {
             this._super(options);
-            this.wsUrl = R.getConfig('service.workspace.url');
-            this.transformURL = R.getConfig('service.transform.url');
-            this.ujsURL = R.getConfig('service.user_job_state.url');
-            this.shockURL = R.getConfig('service.shock.url');
-            this.exportURL = R.getConfig('service.data_import_export.url');
+            this.wsUrl = R.getConfig('services.workspace.url');
+            this.transformURL = R.getConfig('services.transform.url');
+            this.ujsURL = R.getConfig('services.user_job_state.url');
+            this.shockURL = R.getConfig('services.shock.url');
+            this.exportURL = R.getConfig('services.data_import_export.url');
             this.token = R.getAuthToken();
             this.type = null; //this.options.type;
             this.wsId = this.options.params.ws;

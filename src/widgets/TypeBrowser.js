@@ -22,7 +22,7 @@ define([
 
         function renderer() {
             return q.Promise(function (resolve, reject) {
-                var workspace = new Workspace(R.getConfig('service.workspace.url'), {
+                var workspace = new Workspace(R.getConfig('services.workspace.url'), {
                     token: R.getAuthToken()
                 });
                 var a = html.tag('a');

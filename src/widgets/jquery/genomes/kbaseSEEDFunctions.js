@@ -424,7 +424,7 @@ define([
             },
             loggedInCallback: function (event, auth) {
                 this.authToken = auth;
-                this.wsClient = new Workspace(R.getConfig('service.workspace.url'), {
+                this.wsClient = new Workspace(R.getConfig('services.workspace.url'), {
                     token: R.getAuthToken()
                 });
                 this.render();

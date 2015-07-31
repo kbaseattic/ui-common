@@ -20,10 +20,10 @@ define([
             KB_STATE = 'widget_state';
 
         return function () {
-            var workspace = new Workspace(R.getConfig('service.workspace.url'), {
+            var workspace = new Workspace(R.getConfig('services.workspace.url'), {
                 token: R.getAuthToken()
             }),
-                narrativeMethodStore = new NarrativeMethodStore(R.getConfig('service.narrative_method_store.url'), {
+                narrativeMethodStore = new NarrativeMethodStore(R.getConfig('services.narrative_method_store.url'), {
                     token: R.getAuthToken()
                 });
 

@@ -30,7 +30,7 @@ define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.service.workspace', 'kb.r
                 this._super(options);
 
                 this.options.landingPageURL = "#/dataview/";
-                this.workspaceURL = R.getConfig('service.workspace.url');
+                this.workspaceURL = R.getConfig('services.workspace.url');
 
                 this.$errorPane = $('<div>').addClass('alert alert-danger').hide();
                 this.$elem.append(this.$errorPane);

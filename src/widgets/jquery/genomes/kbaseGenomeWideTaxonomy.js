@@ -40,7 +40,7 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.widget', 'kb.
         },
         prepareTree: function (scope, $div) {
             var objectIdentity = {ref: scope.ws + "/" + scope.id};
-            var workspace = new Workspace(R.getConfig('service.workspace.url'), {
+            var workspace = new Workspace(R.getConfig('services.workspace.url'), {
                 token: R.getAuthToken() 
             });
             workspace.list_referencing_objects([objectIdentity], function (data) {

@@ -19,7 +19,7 @@ define(['jquery', 'kb.runtime', 'kb.utils', 'kb.service.fba', 'kb.jquery.widget'
                     media = options.name,
                     ws = options.ws,
                     container = this.$elem,
-                    fba = new FBA(R.getConfig('service.fba.url'));
+                    fba = new FBA(R.getConfig('services.fba.url'));
 
                 container.loading();
                

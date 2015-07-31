@@ -33,8 +33,8 @@ define([
                 jobID: null,
                 token: null,
                 kbCache: null,
-                workspaceURL: R.getConfig('service.workspace.url'),
-                ujsServiceURL: R.getConfig('service.user_job_state.url'),
+                workspaceURL: R.getConfig('services.workspace.url'),
+                ujsServiceURL: R.getConfig('services.user_job_state.url'),
                 width: 1045,
                 height: 600
             },

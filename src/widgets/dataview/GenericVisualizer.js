@@ -372,7 +372,7 @@ define([
                 params.objectVersion = params.ver;
                 
                 // Get other params from the runtime.
-                params.workspaceURL = R.getConfig('service.workspace.url');
+                params.workspaceURL = R.getConfig('services.workspace.url');
                 params.authToken = R.getAuthToken();
 
                 return q.Promise(function (resolve) {
@@ -425,7 +425,7 @@ define([
             function init(cfg) {
                 return q.Promise(function (resolve) {
                     config = cfg;
-                    workspaceClient = Object.create(WorkspaceClient).init({url: R.getConfig('service.workspace.url')});
+                    workspaceClient = Object.create(WorkspaceClient).init({url: R.getConfig('services.workspace.url')});
                     resolve();
                 });
             }

@@ -16,7 +16,7 @@ define(['kb.widget.dashboard.base', 'kb.utils', 'kb.session', 'kb.service.narrat
                this.kbService = Object.create(KBService).init();
                if (Session.isLoggedIn()) {
                   if (this.hasConfig('service.narrative_method_store.url')) {
-                     this.methodStore = new NarrativeMethodStore(this.getConfig('service.narrative_method_store.url'), {
+                     this.methodStore = new NarrativeMethodStore(this.getConfig('services.narrative_method_store.url'), {
                         token: Session.getAuthToken()
                      });
                   } else {
@@ -24,7 +24,7 @@ define(['kb.widget.dashboard.base', 'kb.utils', 'kb.session', 'kb.service.narrat
                   }
 
                   if (this.hasConfig('service.workspace.url')) {
-                     this.workspaceClient = new WorkspaceService(this.getConfig('service.workspace.url'), {
+                     this.workspaceClient = new WorkspaceService(this.getConfig('services.workspace.url'), {
                         token: Session.getAuthToken()
                      });
                   } else {
