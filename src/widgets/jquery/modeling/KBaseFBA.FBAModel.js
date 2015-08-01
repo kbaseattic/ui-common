@@ -289,7 +289,7 @@ define([
                 "data": rxn.gpr
             });
             if (rxn.rxnkbid !== "rxn00000") {
-                var fba = new FBA(R.getConfig('fba_url'), {
+                var fba = new FBA(R.getConfig('services.fba.url'), {
                     token: R.getAuthToken()
                 });
                 return Q(fba.get_reactions({
@@ -367,7 +367,7 @@ define([
                     "function": "CompartmentTab"
                 }];
             if (cpd.cpdkbid !== "cpd00000") {
-                var fba = new FBA(R.getConfig('fba_url'), {
+                var fba = new FBA(R.getConfig('services.fba.url'), {
                     token: R.getAuthToken()
                 });
                 return Q(fba.get_compounds({
@@ -469,7 +469,7 @@ define([
             if ("output" in gf) {
                 return gf.output;
             }
-            var workspace = new Workspace(R.getConfig('workspace_url'), {
+            var workspace = new Workspace(R.getConfig('services.workspace.url'), {
                 token: R.getAuthToken()
             });
             return Q(workspace.get_objects([{ref: ref}]))
@@ -545,7 +545,7 @@ define([
                 ids.push(key);
             }
             if (ids.length > 0) {
-                var fba = new FBA(R.getConfig('fba_url'), {
+                var fba = new FBA(R.getConfig('services.fba.url'), {
                     token: R.getAuthToken()
                 });
                 return Q(fba.get_reactions({

@@ -7,7 +7,15 @@ define([
     function (Q, SocialWidget, UserProfileService, R) {
         "use strict";
         var widget = Object.create(SocialWidget, {
-            init: {
+           
+            
+            // LIFECYCLE
+            
+            
+            // API
+            // Called by the owner / parent / manager
+            
+             init: {
                 value: function (cfg) {
                     cfg.name = 'UserSearch';
                     cfg.title = 'Find Other Users';
@@ -16,6 +24,8 @@ define([
                     return this;
                 }
             },
+            
+            
             go: {
                 value: function () {
                     this.start();

@@ -51,7 +51,7 @@ define([
                         $(container)[config.jqueryobject]({
                             wsNameOrId: params.workspaceId,
                             objNameOrId: params.objectId,
-                            ws_url: R.getConfig('workspace_url'),
+                            ws_url: R.getConfig('services.workspace.url'),
                             token: R.getAuthToken()
                         });
                     }

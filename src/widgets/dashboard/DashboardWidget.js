@@ -560,9 +560,9 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
             },
             setError: {
                 value: function (errorValue) {
-                    console.log(this);
                     console.error('ERROR');
                     console.error(errorValue);
+                    console.log(this);
                     this.status = 'error';
                     this.error = errorValue;
                     return;

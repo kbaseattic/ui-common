@@ -28,13 +28,13 @@ define([
     function ($, Q, _, Postal, html, AppState, Session, Config, Router) {
         'use strict';
         var factory = function () {
-            
-            function paramsToQuery (params) {
-                return Object.keys(params).map(function(key) {
-                    return key + '=' + encodeURIComponent(params[key])
+
+            function paramsToQuery(params) {
+                return Object.keys(params).map(function (key) {
+                    return key + '=' + encodeURIComponent(params[key]);
                 }).join('&');
             }
-            
+
             function navigateTo(location) {
                 //if (window.history.pushState) {
                 //    window.history.pushState(null, '', '#' + location);
@@ -42,13 +42,20 @@ define([
                 var loc = location.path;
                 if (location.params) {
                     loc += '?' + paramsToQuery(location.params);
-                    
+
                 }
                 window.location.hash = '#' + loc;
                 //}
             }
             function replacePath(location) {
                 window.location.replace(location);
+            }
+            function redirectTo(location, newWindow) {
+                if (newWindow) {
+                    window.open(location);
+                } else {
+                    window.location.replace(location);
+                }
             }
 
             var generatedId = 0;
@@ -84,7 +91,7 @@ define([
                         try {
                             listeners[msgId][subId].fun(data);
                         } catch (ex) {
-                            console.log('Execption runnning msg ' + id + ', sub ' + subId);
+                            console.log('Execption runnning msg ' + msgId + ', sub ' + subId);
                             console.log(ex);
                         }
                     });
@@ -297,6 +304,85 @@ define([
                                     reject(err);
                                 })
                                 .done();
+                        })
+                        .catch(function (err) {
+                            console.log('ERROR');
+                            console.log(err);
+                            reject(err);
+                        })
+                        .done();
+                });
+            }
+
+            function showPanel3(mountPointName, routed) {
+                // stop the old one
+                return Q.Promise(function (resolve, reject) {
+                    var mountPoint = mounts[mountPointName];
+                    if (!mountPoint) {
+                        reject('Sorry, no mount point named ' + mountPointName);
+                    }
+
+                    // Stop and unmount current panel.
+                    Q.Promise(function (resolve, reject) {
+                        if (mountPoint.mounted) {
+                            var widget = mountPoint.mounted.widget;
+                            widget.stop()
+                                .then(function () {
+                                    widget.detach()
+                                        .then(function () {
+                                            console.log('stopped');
+                                            resolve();
+                                        })
+                                        .catch(function (err) {
+                                            reject(err);
+                                        })
+                                        .done();
+                                })
+                                .catch(function (err) {
+                                    reject(err);
+                                })
+                                .done();
+                        } else {
+                            resolve();
+                        }
+                    })
+                        .then(function () {
+                            // Create new mount.
+                            var newMount = {
+                                id: html.genId(),
+                                widget: routed.route.panelFactory.create()
+                            };
+
+                            /* TODO: config threaded here? */
+                            newMount.widget.init()
+                                .then(function () {
+                                    newMount.container = $('<div id="' + newMount.id + '"/>');
+                                    mountPoint.container.empty().append(newMount.container);
+                                    mountPoint.mounted = newMount;
+
+                                    newMount.widget.attach(newMount.container.get(0))
+                                        .then(function () {
+                                            newMount.widget.start(routed.params)
+                                                .then(function () {
+                                                    resolve();
+                                                })
+                                                .catch(function (err) {
+                                                    reject(err);
+                                                })
+                                                .done();
+                                        })
+                                        .catch(function (err) {
+                                            reject(err);
+                                        })
+                                        .done();
+                                })
+                                .catch(function (err) {
+                                    console.log('ERROR initializing panel');
+                                    console.log(err);
+                                    reject(err);
+                                })
+                                .done();
+
                         })
                         .catch(function (err) {
                             console.log('ERROR');
@@ -677,11 +763,13 @@ define([
                 show2: show2,
                 showPanel: showPanel,
                 showPanel2: showPanel2,
+                showPanel3: showPanel3,
                 mount: mount,
                 html: jsonToHTML,
                 tag: makeTag,
                 genId: genId,
                 navigateTo: navigateTo,
+                redirectTo: redirectTo,
                 sub: sub,
                 unsub: unsub,
                 pub: pub,
@@ -703,7 +791,6 @@ define([
                 stop: stop
             };
         };
-
 
         return {
             create: factory

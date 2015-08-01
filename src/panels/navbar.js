@@ -241,6 +241,11 @@ define([
                     uri: '#sample',
                     label: 'Sample Panel',
                     icon: 'bicycle'
+                },
+                test: {
+                    uri: '#test',
+                    label: 'Testing Panel',
+                    icon: 'flask'
                 }
             };
             function defMenuItem(id, menuDef) {
@@ -364,7 +369,7 @@ define([
             function renderMenu() {
                 var ul = html.tag('ul');
                 if (R.isLoggedIn()) {
-                    setMenu(['search', 'narrative', 'dashboard', 'databrowser', 'typebrowser', 'sample', 'divider', 'about', 'contact', 'divider', 'about_kbase', 'contact_us']);
+                    setMenu(['search', 'narrative', 'dashboard', 'databrowser', 'typebrowser', 'test', 'sample', 'divider', 'about', 'contact', 'divider', 'about_kbase', 'contact_us']);
                 } else {
                     setMenu(['about', 'contact', 'divider', 'about_kbase', 'contact_us']);
                 }

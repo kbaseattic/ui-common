@@ -19,7 +19,7 @@
  browser: true,
  white: true
  */
-require([
+define([
     'kb.app',
     'kb.runtime',
     'kb.appstate',
@@ -55,18 +55,18 @@ require([
                     path: 'message/notfound'
                 }
             });
-            
+
             /*
              * 
-                
-                promise: function (params) {
-                    return Q.Promise(function (resolve) {
-                        resolve({
-                            content: 'Route Not Found',
-                            title: 'Not Found'
-                        });
-                    });
-                }
+             
+             promise: function (params) {
+             return Q.Promise(function (resolve) {
+             resolve({
+             content: 'Route Not Found',
+             title: 'Not Found'
+             });
+             });
+             }
              */
 
             /* 
@@ -130,6 +130,10 @@ require([
             Runtime.recv('app', 'navigate', function (data) {
                 app.navigateTo(data);
             });
+            
+            Runtime.recv('app', 'redirect', function (data) {
+                app.redirectTo(data.url, data.new_window);
+            })
 
             // This will work ... but we need to tune this!
             Runtime.recv('app', 'loggedin', function () {
@@ -137,11 +141,35 @@ require([
             });
 
             Runtime.recv('app', 'new-route', function (data) {
+                console.log(data);
                 if (data.routeHandler.route.redirect) {
                     Runtime.send('app', 'navigate', {
                         path: data.routeHandler.route.redirect.path,
                         params: data.routeHandler.route.redirect.params
                     });
+                } else if (data.routeHandler.route.handler) {
+                    // This pattern handles the narrativemanager -- represents another way
+                    // to handle routes...
+                    data.routeHandler.route.handler(data.params)
+                        .then(function (result) {
+                            if (result.redirect) {
+                                Runtime.send('app', 'redirect', result.redirect);
+                            }
+                        })
+                        .catch(function (err) {
+                            console.log('ERROR');
+                            console.log(err);
+                        })
+                        .done();
+                } else if (data.routeHandler.route.panelFactory) {
+                    // And ... we have another panel factory pattern here. We will
+                    // converge as soon as we can...
+                     app.showPanel3('app', data.routeHandler)
+                        .catch(function (err) {
+                            console.error('ERROR');
+                            console.error(err);
+                        })
+                        .done();
                 } else {
                     app.showPanel2('app', data.routeHandler)
                         .catch(function (err) {
@@ -170,53 +198,64 @@ require([
 
         }
 
-        // 
-        // SETUP
-        // 
-        // Set up the panel routes
-        function requirePromise(modules, fun) {
-            return Q.Promise(function (resolve) {
-                require(modules, function () {
-                    fun.apply(null, arguments);
-                    resolve();
+        function start() {
+
+            return Q.Promise(function (resolve, reject) {
+                // 
+                // SETUP
+                // 
+                // Set up the panel routes
+                function requirePromise(modules, fun) {
+                    return Q.Promise(function (resolve) {
+                        require(modules, function () {
+                            fun.apply(null, arguments);
+                            resolve();
+                        });
+                    });
+                }
+                Runtime.logDebug({source: 'main', message: 'About to load panels...'});
+                var panels = [
+                    {module: 'kb.panel.message', config: {}},
+                    {module: 'kb.panel.about', config: {}},
+                    {module: 'kb.panel.contact', config: {}},
+                    {module: 'kb.panel.login', config: {}},
+                    {module: 'kb.panel.userprofile', config: {}},
+                    {module: 'kb.panel.welcome', config: {}},
+                    {module: 'kb.panel.dashboard', config: {}},
+                    //{module: 'kb.panel.narrativestore'},
+                    // {module: 'kb.panel.datasearch'},
+                    {module: 'kb.panel.dataview', config: {}},
+                    {module: 'kb.panel.databrowser', config: {}},
+                    {module: 'kb.panel.typebrowser', config: {}},
+                    {module: 'kb.panel.typeview'},
+                    {module: 'kb.panel.test'},
+                    {module: 'kb.panel.sample'}
+                ].map(function (panel) {
+                    return requirePromise([panel.module], function (PanelModule) {
+                        // this registers routes
+                        PanelModule.setup(app, panel.config);
+                    });
                 });
+                Q.all(panels)
+                    .then(function () {
+                        Runtime.logDebug({source: 'main', message: 'setting up app'});
+                        setupApp();
+                        runApp();
+                        Runtime.logDebug({source: 'main', message: 'done'});
+                        resolve();
+                    })
+                    .catch(function (err) {
+                        console.log('ERROR loading panels');
+                        console.log(err);
+                        reject(err);
+                    })
+                    .done();
             });
         }
-        Runtime.logDebug({source: 'main', message: 'About to load panels...'});
-        var panels = [
-            {module: 'kb.panel.message', config: {}},
-            {module: 'kb.panel.about', config: {}},
-            {module: 'kb.panel.contact', config: {}},
-            {module: 'kb.panel.login', config: {}},
-            {module: 'kb.panel.userprofile', config: {}},
-            {module: 'kb.panel.welcome', config: {}},
-            {module: 'kb.panel.dashboard', config: {}},
-            //{module: 'kb.panel.narrativestore'},
-            // {module: 'kb.panel.datasearch'},
-            {module: 'kb.panel.dataview', config: {}},
-            {module: 'kb.panel.databrowser', config: {}},
-            {module: 'kb.panel.typebrowser', config: {}},
-            {module: 'kb.panel.typeview'},
-            {module: 'kb.panel.test'},
-            {module: 'kb.panel.sample'}
-        ].map(function (panel) {
-            return requirePromise([panel.module], function (PanelModule) {
-                // this registers routes
-                PanelModule.setup(app, panel.config);
-            });
-        });
-        Q.all(panels)
-            .then(function () {
-                Runtime.logDebug({source: 'main', message: 'setting up app'});
-                setupApp();
-                runApp();
-            })
-            .catch(function (err) {
-                console.log('ERROR loading panels');
-                console.log(err);
-            })
-            .done();
-        Runtime.logDebug({source: 'main', message: 'done'});
+
+        return {
+            start: start
+        };
 
 
     });

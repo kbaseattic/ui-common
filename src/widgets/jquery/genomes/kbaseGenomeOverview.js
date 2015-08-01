@@ -171,7 +171,7 @@ define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.servi
             } else {
                 var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
                 
-                var prom = new Workspace(App.getConfig('workspace_url'), {
+                var prom = new Workspace(App.getConfig('services.workspace.url'), {
                     auth: App.getAuthToken()
                 }).get_objects([obj]);
                 

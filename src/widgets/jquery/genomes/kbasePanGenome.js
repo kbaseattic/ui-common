@@ -34,7 +34,7 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticated
             init: function (options) {
                 this._super(options);
 
-                this.wsUrl = R.getConfig('workspace_url');
+                this.wsUrl = R.getConfig('services.workspace.url');
                 this.pref = this.genUUID();
                 this.token = this.authToken();
                 this.geneIndex = {};
