@@ -31,9 +31,11 @@ define([
     'jquery',
     'kb.html',
     'kb.runtime',
-    'kb.widget.sample.factory'
+    'kb.widget.sample.factory',
+    'kb.jquerywidgetconnector',
+    'kb.widgetconnector'
 ],
-    function (q, $, html, R, SampleFactoryWidget) {
+    function (q, $, html, R, SampleFactoryWidget, jqueryWidgetConnectorFactory, objectWidgetConnectorFactory) {
         /* DOC: strict mode
          * We always set strict mode with the following magic javascript
          * incantation.
@@ -91,7 +93,7 @@ define([
                       */
                     var widgets = [];
 
-                    function addWidget(def) {
+                    function addFactoryWidget(def) {
                         var id = html.genId();
                         widgets.push({
                             id: id,
@@ -99,6 +101,26 @@ define([
                             widget: def.widget
                         });
                         return div({id: id});
+                    }
+                    
+                    function addJqueryWidget(config) {
+                        var id = html.genId();
+                        widgets.push({
+                            config: config,
+                            widget: jqueryWidgetConnectorFactory.create(),
+                            id: id
+                        });
+                        return id;
+                    }
+                    
+                    function addObjectWidget(config) {
+                        var id = html.genId();
+                        widgets.push({
+                            id: id,
+                            config: config,
+                            widget: objectWidgetConnectorFactory.create()
+                        });
+                        return id;
                     }
 
                     /* DOC: return some structure
@@ -114,10 +136,19 @@ define([
                             div({class: 'row'}, [
                                 div({class: 'col-md-6'}, [
                                    'Will be here...',
-                                   addWidget({
+                                   html.bsPanel('Sample Factory Widget', addFactoryWidget({
                                        config: {},
                                        widget: SampleFactoryWidget.create()
-                                   })
+                                   })),
+                                   html.bsPanel('Sample jquery Widget', div({id: addJqueryWidget({
+                                        name: 'samplejquerywidget',
+                                        module: 'kb.widget.sample.jquery',
+                                        jqueryobject: 'SampleWidget'
+                                    })})),
+                                    html.bsPanel('Sample Object Widget', div({id: addObjectWidget({
+                                        name: 'sampleobjectwidget',
+                                        module: 'kb.widget.sample.object'
+                                    })})),
                                 ])
                             ])
                         ]),
@@ -237,7 +268,7 @@ define([
                             .done();
                     });
                 }
-                function stop(node) {
+                function stop() {
                     return q.Promise(function (resolve) {
                         q.all(rendered.widgets.map(function (w) {
                             return w.widget.stop();
@@ -251,7 +282,7 @@ define([
                             .done();
                     });
                 }
-                function detach(node) {
+                function detach() {
                     return q.Promise(function (resolve) {
                         q.all(rendered.widgets.map(function (w) {
                             return w.widget.detach();

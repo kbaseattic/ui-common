@@ -18,6 +18,9 @@ define([
                 return q.Promise(function (resolve) {
                     config = cfg;                    
                     require([config.module], function (Widget) {
+                        if (!Widget) {
+                            throw new Error('Widget module did not load properly (undefined) for ' + config.module);
+                        }
                         widget = Object.create(Widget);
                         resolve();
                     });
