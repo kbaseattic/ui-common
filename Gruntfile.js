@@ -1,15 +1,12 @@
 'use strict';
 var path = require('path');
 
-// the actual "static" directory path, relative to this Gruntfile.
-// should be updated as necessary, if this moves
-var staticDir = 'static';
-
 module.exports = function(grunt) {
     // Project configuration
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-filerev');
     grunt.loadNpmTasks('grunt-regex-replace');
+    grunt.loadNpmTasks('grunt-karma');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -71,6 +68,16 @@ module.exports = function(grunt) {
             }
         },
 
+        // Testing with Karma!
+        'karma': {
+            unit: {
+                configFile: 'karma.conf.js'
+            },
+            dev: {
+                reporters: 'dots'
+            }
+        }
+
     });
 
 
@@ -81,5 +88,6 @@ module.exports = function(grunt) {
     ]);
 
     grunt.registerTask('test', [
+        'karma:unit'
     ]);
 };

@@ -1,5 +1,6 @@
 language: node_js
 node_js:
+  - "0.10"
   - "0.12"
   - "iojs"
 branches:
@@ -10,7 +11,8 @@ branches:
     - ease-dev-campaign
 before_install:
   - npm install -g bower
+  - npm install -g grunt-cli
+install:
   - bower install
   - npm install
-  - npm install -g grunt-cli
-script: make && make test
+script: grunt test
