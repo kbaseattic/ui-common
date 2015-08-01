@@ -149,7 +149,6 @@
             //kbaseuserpopularnarratives: '/src/widgets/social/kbaseUserPopularNarratives',
             'kb.widget.social.user_search': 'src/widgets/social/kbaseUserSearch',
             'kb.widget.social.browse_narratives': 'src/widgets/social/kbaseUserBrowseNarratives',
-            //kbaseusersummary: '/src/widgets/social/kbaseUserSummary',
             'kb.widget.social.collaborators': 'src/widgets/social/kbaseUserCollaboratorNetwork',
             'kb.session': 'src/kbaseSession',
             'kb.config': 'src/kbaseConfig',
