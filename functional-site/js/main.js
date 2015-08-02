@@ -85,14 +85,6 @@ define([
                 path: [],
                 redirect: {
                     path: 'welcome'
-                },
-                x: function (params) {
-                    return Q.Promise(function (resolve) {
-                        resolve({
-                            content: 'Functional Site',
-                            title: 'Home'
-                        });
-                    });
                 }
             });
 

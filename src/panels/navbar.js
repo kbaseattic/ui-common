@@ -185,12 +185,12 @@ define([
              */
             var menuItems = {
                 search: {
-                    uri: '/functional-site/#/search/?q=*',
+                    uri: R.getConfig('ui.paths.spa_root')+'search/?q=*',
                     label: 'Search Data',
                     icon: 'search'
                 },
                 narrative: {
-                    uri: '/functional-site/#/narrativemanager/start',
+                    uri: R.getConfig('ui.paths.spa_root')+'narrativemanager/start',
                     label: 'Narrative',
                     icon: 'file'
                 },
@@ -208,7 +208,7 @@ define([
                     icon: 'info-circle'
                 },
                 contact: {
-                    uri: '/functional-site/#/contact',
+                    uri: R.getConfig('ui.paths.spa_root')+'contact',
                     label: 'Contact Us',
                     icon: 'envelope-o'
                 },
@@ -402,8 +402,9 @@ define([
 
 
                 if (R.isLoggedIn()) {
-                    // TODO: fix dependencies like this -- realname is not available until, and unless, the 
-                    // profile is loaded, which happens asynchronously.            
+                    /* TODO: fix dependencies like this -- realname is not available until, and unless, the                     
+                      profile is loaded, which happens asynchronously.            
+                    */
                     var profile = R.getItem('userprofile');
                     var realname = profile ? profile.getProp('user.realname') : '?';
                     return div({class: 'dropdown', style: 'display:inline-block'}, [
@@ -413,7 +414,7 @@ define([
                         ]),
                         ul({class: 'dropdown-menu', role: 'menu'}, [
                             li({}, [
-                                a({href: '/functional-site/#/people/' + R.getUsername(), 'data-menu-item': 'userlabel'}, [
+                                a({href: R.getConfig('ui.paths.spa_root') + 'people/' + R.getUsername(), 'data-menu-item': 'userlabel'}, [
                                     div({style: 'display:inline-block; width: 34px; vertical-align: top;'}, [
                                         span({class: 'fa fa-user', style: 'font-size: 150%; margin-right: 10px;'})
                                     ]),

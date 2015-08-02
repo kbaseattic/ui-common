@@ -39,11 +39,15 @@ define([
                 //if (window.history.pushState) {
                 //    window.history.pushState(null, '', '#' + location);
                 //} else {
+                if (typeof location === 'string')  {
+                    location = {path: location};
+                }
                 var loc = location.path;
                 if (location.params) {
                     loc += '?' + paramsToQuery(location.params);
 
                 }
+                
                 window.location.hash = '#' + loc;
                 //}
             }
