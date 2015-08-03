@@ -6,8 +6,8 @@ node_js:
   - "iojs"
 cache:
   directories:
-  - $HOME/bower_components
-  - $HOME/node_modules
+  - bower_components
+  - node_modules
 branches:
   only:
     - develop
