@@ -32,11 +32,11 @@ define([
     'kb.html',
     'kb.runtime',
     'kb.widget.sample.factory',
-    'kb.jquerywidgetconnector',
-    'kb.widgetconnector',
+    'kb.widget.kbwidgetadapter',
+    'kb.widget.widgetadapter',
     'kb.widget.sample.object-interface'
 ],
-    function (q, $, html, R, sampleWidgetFactory, kbWidgetAdapter, objectWidgetConnectorFactory, sampleObjectInterfaceWidget) {
+    function (q, $, html, R, sampleWidgetFactory, kbWidgetAdapterFactory, widgetAdapterFactory, sampleObjectInterfaceWidget) {
         /* DOC: strict mode
          * We always set strict mode with the following magic javascript
          * incantation.
@@ -131,7 +131,7 @@ define([
                     function addJqueryWidget(config) {
                         var id = html.genId();
                         widgets.push({
-                            widget: kbWidgetAdapter.makeOne(config),
+                            widget: kbWidgetAdapterFactory.make(config),
                             id: id
                         });
                         return id;
@@ -141,7 +141,7 @@ define([
                         var id = html.genId();
                         widgets.push({
                             id: id,
-                            widget: objectWidgetConnectorFactory.create(config)
+                            widget: widgetAdapterFactory.make(config)
                         });
                         return id;
                     }
@@ -170,7 +170,7 @@ define([
                                     'Will be here...',
                                     html.bsPanel('Sample Factory Widget', addFactoryWidget({
                                         config: {},
-                                        widget: sampleWidgetFactory.makeWidget()
+                                        widget: sampleWidgetFactory.make()
                                     })),
                                     html.bsPanel('Sample jquery Widget', div({id: addJqueryWidget({
                                             name: 'samplejquerywidget',

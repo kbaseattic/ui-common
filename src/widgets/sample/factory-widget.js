@@ -253,7 +253,7 @@ define([
         };
         
         return {
-            makeWidget: function (config) {
+            make: function (config) {
                 return widget(config);
             }
         };

@@ -11,11 +11,11 @@ define([
     'kb.statemachine',
     'q',
     'jquery',
-    'kb.widgetconnector',
+    'kb.widget.widgetadapter',
     'kb.simplepanel',
     'css!kb.panel.dashboard.style'
 ],
-    function (html, R, StateMachine, q, $, widgetConnector, simplePanel) {
+    function (html, R, StateMachine, q, $, widgetAdapter, simplePanel) {
         'use strict';
 
         function renderPanel() {
@@ -33,7 +33,7 @@ define([
                     widgets.push({
                         id: id,
                         config: config,
-                        widget: widgetConnector.create()
+                        widget: widgetAdapter.make()
                     });
                     return id;
                 }

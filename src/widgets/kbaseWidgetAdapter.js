@@ -82,10 +82,7 @@ define([
         }
         
         return {
-            create: function (config) {
-                return adapter(config);
-            },
-            makeOne: function (config) {
+            make: function (config) {
                 return adapter(config);
             }
         };

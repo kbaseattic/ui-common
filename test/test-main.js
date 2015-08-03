@@ -103,8 +103,8 @@ require.config({
       'kb.messaging': 'src/kbaseMessaging',
       'kb.format': 'src/kbaseFormat',
       'kb.props': 'src/kbaseProps',
-      'kb.widgetconnector': 'src/kbaseWidgetConnector',
-      'kb.jquerywidgetconnector': 'src/kbaseJQueryWidgetConnector',
+      'kb.widget.widgetadapter': 'src/widget/kbaseWidgetAdapter',
+      'kb.widget.kbwidgetadapter': 'src/widget/kbaseKBWidgetAdapter',
       'kb.simplepanel': 'src/kbaseSimplePanel',
       'kb.rgbcolor': 'src/js/RGBColor',
       

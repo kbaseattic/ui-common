@@ -135,8 +135,8 @@
             'kb.messaging': 'src/kbaseMessaging',
             'kb.format': 'src/kbaseFormat',
             'kb.props': 'src/kbaseProps',
-            'kb.widgetconnector': 'src/kbaseWidgetConnector',
-            'kb.jquerywidgetconnector': 'src/kbaseJQueryWidgetConnector',
+            'kb.widget.widgetadapter': 'src/widgets/kbaseWidgetAdapter',
+            'kb.widget.kbwidgetadapter': 'src/widgets/kbaseKBWidgetAdapter',
             'kb.simplepanel': 'src/kbaseSimplePanel',
             'kb.dom': 'src/kbaseDOM',
             

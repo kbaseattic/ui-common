@@ -10,10 +10,10 @@ define([
     'kb.html',
     'kb.runtime',
     'kb.statemachine', 
-    'kb.widgetconnector',
+    'kb.widget.widgetadapter',
     'kb.simplepanel'
 ],
-    function (q, html, R, StateMachine, widgetConnector, simplePanel) {
+    function (q, html, R, StateMachine, widgetAdapter, simplePanel) {
         'use strict';
 
         function renderPanel() {
@@ -30,7 +30,7 @@ define([
                     widgets.push({
                         id: id,
                         config: config,
-                        widget: widgetConnector.create()
+                        widget: widgetAdapter.make()
                     });
                     return id;
                 }

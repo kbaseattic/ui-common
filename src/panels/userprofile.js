@@ -9,11 +9,11 @@ define([
     'kb.runtime',
     'kb.html',
     'kb.session',
-    'kb.widgetconnector',
+    'kb.widget.widgetadapter',
     'q',
     'jquery'
 ],
-    function (R, html, Session, widgetConnector, q, $) {
+    function (R, html, Session, widgetAdapterFactory, q, $) {
         'use strict';
 
         function renderPanel(params) {
@@ -27,7 +27,7 @@ define([
                     widgets.push({
                         id: id,
                         config: config,
-                        widget: widgetConnector.create()
+                        widget: widgetAdapterFactory.make()
                     });
                     return id;
                 }
