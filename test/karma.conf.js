@@ -98,7 +98,7 @@ module.exports = function(config) {
       'src/**/!(datavis|Tiling_widget|postal.request-response.q).js': ['coverage']
     },
 
-    coverateReporter: {
+    coverageReporter: {
       type: 'lcov',
       dir: 'coverage/',
     },

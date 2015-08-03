@@ -30,6 +30,7 @@
     "grunt-contrib-requirejs": "^0.4.4",
     "grunt-filerev": "^2.3.1",
     "grunt-regex-replace": "^0.2.6",
-    "karma-coverage": "^0.4.2"
+    "karma-coverage": "^0.4.2",
+    "grunt-coveralls": "^1.0.0"
   }
 }

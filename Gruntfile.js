@@ -8,6 +8,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-regex-replace');
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-coveralls');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -84,7 +85,17 @@ module.exports = function(grunt) {
             dev: {
                 reporters: 'dots'
             }
-        }
+        },
+
+        // Run coveralls and send the info.
+        'coveralls': {
+            options: {
+                force: true,
+            },
+            repoMaticApp: {
+                src: 'coverage/**/*.info',
+            },
+        },
 
     });
 
@@ -100,6 +111,7 @@ module.exports = function(grunt) {
     ]);
 
     grunt.registerTask('test', [
-        'karma:unit'
+        'karma:unit',
+        'coveralls'
     ]);
 };
