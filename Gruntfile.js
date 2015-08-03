@@ -7,9 +7,18 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-filerev');
     grunt.loadNpmTasks('grunt-regex-replace');
     grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-coveralls');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+
+        'copy': {
+            'build-config': {
+                src: 'source/config/prod.yml',
+                dest: 'build/config.yml',
+            },
+        },
 
         // Compile the requirejs stuff into a single, uglified file.
         // the options below are taken verbatim from a standard build.js file
@@ -71,12 +80,22 @@ module.exports = function(grunt) {
         // Testing with Karma!
         'karma': {
             unit: {
-                configFile: 'karma.conf.js'
+                configFile: 'test/karma.conf.js'
             },
             dev: {
                 reporters: 'dots'
             }
-        }
+        },
+
+        // Run coveralls and send the info.
+        'coveralls': {
+            options: {
+                force: true,
+            },
+            'ui-common': {
+                src: 'coverage/**/*.info',
+            },
+        },
 
     });
 
@@ -87,7 +106,12 @@ module.exports = function(grunt) {
         'regex-replace'
     ]);
 
+    grunt.registerTask('build-config', [
+        'copy'
+    ]);
+
     grunt.registerTask('test', [
-        'karma:unit'
+        'karma:unit',
+        'coveralls'
     ]);
 };

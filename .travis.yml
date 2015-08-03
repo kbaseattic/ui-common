@@ -1,8 +1,13 @@
+sudo: false
 language: node_js
 node_js:
   - "0.10"
   - "0.12"
   - "iojs"
+cache:
+  directories:
+  - bower_components
+  - node_modules
 branches:
   only:
     - develop
@@ -15,4 +20,4 @@ before_install:
 install:
   - bower install
   - npm install
-script: grunt test
+script: grunt build-config && grunt test
