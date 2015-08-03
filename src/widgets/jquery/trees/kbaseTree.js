@@ -23,7 +23,8 @@ define([
     function (R, html, $, Q, uuid, Workspace, UserAndJobState, EasyTree) {
         'use strict';
         $.KBWidget({
-            d
+            name: 'kbaseTree',
+            parent: 'kbaseAuthenticatedWidget',
             version: '0.0.1',
             options: {
                 treeID: null,
