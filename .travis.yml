@@ -7,6 +7,7 @@ node_js:
 cache:
   directories:
   - $HOME/bower_components
+  - $HOME/node_modules
 branches:
   only:
     - develop
