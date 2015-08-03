@@ -92,7 +92,7 @@ module.exports = function(grunt) {
             options: {
                 force: true,
             },
-            repoMaticApp: {
+            'ui-common': {
                 src: 'coverage/**/*.info',
             },
         },
