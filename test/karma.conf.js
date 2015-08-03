@@ -5,12 +5,22 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '.',
+    basePath: '../',
 
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine', 'requirejs'],
+
+    // list of Karma plugins to use
+    // This is someone redundant with what's in package.json,
+    // but I like it to be explicit here.
+    plugins: [
+      'karma-jasmine',
+      'karma-phantomjs-launcher',
+      'karma-coverage',
+      'karma-requirejs',
+    ],
 
 
     // list of files / patterns to load in the browser
@@ -85,9 +95,13 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        'src/**/!(datavis|Tiling_widget|postal.request-response.q).js': ['coverage']
+      'src/**/!(datavis|Tiling_widget|postal.request-response.q).js': ['coverage']
     },
 
+    coverateReporter: {
+      type: 'lcov',
+      dir: 'coverage/',
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
