@@ -26,6 +26,21 @@
  *  enhances readability.
  * 
  */
+
+/* 
+ * Sample panel module
+ * @module panel/sample
+ * 
+ * @param {type} q
+ * @param {type} $
+ * @param {type} html
+ * @param {type} R
+ * @param {type} sampleWidgetFactory
+ * @param {type} kbWidgetAdapterFactory
+ * @param {type} widgetAdapterFactory
+ * @param {type} sampleObjectInterfaceWidget
+ * @returns {sample_L43.sampleAnonym$22}
+ */
 define([
     'q',
     'jquery',
@@ -175,7 +190,7 @@ define([
                                     html.bsPanel('Sample jquery Widget', div({id: addJqueryWidget({
                                             name: 'samplejquerywidget',
                                             module: 'kb.widget.sample.jquery',
-                                            jqueryObject: 'SampleWidget'
+                                            jquery_object: 'SampleWidget'
                                         })})),
                                     html.bsPanel('Sample Object Widget', div({id: addObjectWidget({
                                             name: 'sampleobjectwidget',

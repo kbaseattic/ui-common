@@ -89,8 +89,7 @@ define([
                     var id = html.genId();
                     widgets.push({
                         id: id,
-                        config: config,
-                        widget: widgetAdapter.make()
+                        widget: widgetAdapter.make(config)
                     });
                     return id;
                 }
@@ -107,11 +106,10 @@ define([
                     return id;
                 }
 
-                function addJQWidget(config) {
+                function addKBWidget(config) {
                     var id = html.genId();
                     widgets.push({
-                        config: config,
-                        widget: kbWidgetAdapter.makeOne(),
+                        widget: kbWidgetAdapter.make(config),
                         id: id
                     });
 
@@ -127,10 +125,10 @@ define([
                                     name: 'overview',
                                     module: 'kb.widget.dataview.overview'
                                 })}),
-                            renderBSCollapsiblePanel('Data Provenance and Reference Network', div({id: addJQWidget({
+                            renderBSCollapsiblePanel('Data Provenance and Reference Network', div({id: addKBWidget({
                                     name: 'provenance',
                                     module: 'kb.jquery.provenance',
-                                    jqueryobject: 'KBaseWSObjGraphCenteredView'
+                                    jquery_object: 'KBaseWSObjGraphCenteredView'
                                 })})),
                             div({id: addFactoryWidget('visualizer1', GenericVisualizer)})
                         ])

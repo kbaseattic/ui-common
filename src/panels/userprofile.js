@@ -26,8 +26,7 @@ define([
                     var id = html.genId();
                     widgets.push({
                         id: id,
-                        config: config,
-                        widget: widgetAdapterFactory.make()
+                        widget: widgetAdapterFactory.make(config)
                     });
                     return id;
                 }

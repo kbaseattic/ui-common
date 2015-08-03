@@ -9,13 +9,13 @@ define([
     'kb.widget.dataview.base',
     'kb.utils.api',
     'kb.utils',
-    'kb.session',
+    'kb.runtime',
     'kb.service.workspace',
     'kb.widget.navbar',
     'q',
     'underscore'
 ],
-    function (DataviewWidget, APIUtils, Utils, Session, WorkspaceService, Navbar, Q, _) {
+    function (DataviewWidget, APIUtils, Utils, R, WorkspaceService, Navbar, Q, _) {
         'use strict';
         var widget = Object.create(DataviewWidget, {
             init: {
@@ -112,9 +112,9 @@ define([
             },
             setup: {
                 value: function () {
-                    if (this.hasConfig('services.workspace.url')) {
-                        this.workspaceClient = new WorkspaceService(this.getConfig('services.workspace.url'), {
-                            token: Session.getAuthToken()
+                    if (R.hasConfig('services.workspace.url')) {
+                        this.workspaceClient = new WorkspaceService(R.getConfig('services.workspace.url'), {
+                            token: R.getAuthToken()
                         });
                     } else {
                         throw 'The workspace client url is not defined';

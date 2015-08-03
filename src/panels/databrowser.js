@@ -29,8 +29,7 @@ define([
                     var id = html.genId();
                     widgets.push({
                         id: id,
-                        config: config,
-                        widget: widgetAdapter.make()
+                        widget: widgetAdapter.make(config)
                     });
                     return id;
                 }

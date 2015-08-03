@@ -17,7 +17,7 @@ define([
             var mount, container, $container;
             
             var module = config.module;
-            var jqueryObject = config.jqueryObject;
+            var jqueryObject = config.jquery_object;
 
             function init() {
                 return q.Promise(function (resolve) {
