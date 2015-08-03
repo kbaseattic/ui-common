@@ -4,10 +4,10 @@ Common user interface components and libraries for the KBase Project.
 
 | Branch | Status |
 | :--- | :--- |
-| master | [![Build Status](https://travis-ci.org/kbase/narrative.svg?branch=master)](https://travis-ci.org/kbase/narrative) [![Coverage Status](https://coveralls.io/repos/kbase/narrative/badge.svg?branch=master)](https://coveralls.io/r/kbase/narrative?branch=master) |
-| staging | [![Build Status](https://travis-ci.org/kbase/narrative.svg?branch=staging)](https://travis-ci.org/kbase/narrative) [![Coverage Status](https://coveralls.io/repos/kbase/narrative/badge.svg?branch=staging)](https://coveralls.io/r/kbase/narrative?branch=staging) |
-| develop | [![Build Status](https://travis-ci.org/kbase/narrative.svg?branch=develop)](https://travis-ci.org/kbase/narrative) [![Coverage Status](https://coveralls.io/repos/kbase/narrative/badge.svg?branch=develop)](https://coveralls.io/r/kbase/narrative?branch=develop)|
-| ease-dev-campaign | [![Build Status](https://travis-ci.org/kbase/narrative.svg?branch=ease-dev-campaign)](https://travis-ci.org/kbase/narrative) [![Coverage Status](https://coveralls.io/repos/kbase/narrative/badge.svg?branch=ease-dev-campaign)](https://coveralls.io/r/kbase/narrative?branch=ease-dev-campaign)|
+| master | [![Build Status](https://travis-ci.org/kbase/ui-common.svg?branch=master)](https://travis-ci.org/kbase/ui-common) [![Coverage Status](https://coveralls.io/repos/kbase/ui-common/badge.svg?branch=master)](https://coveralls.io/r/kbase/ui-common?branch=master) |
+| staging | [![Build Status](https://travis-ci.org/kbase/ui-common.svg?branch=staging)](https://travis-ci.org/kbase/ui-common) [![Coverage Status](https://coveralls.io/repos/kbase/ui-common/badge.svg?branch=staging)](https://coveralls.io/r/kbase/ui-common?branch=staging) |
+| develop | [![Build Status](https://travis-ci.org/kbase/ui-common.svg?branch=develop)](https://travis-ci.org/kbase/ui-common) [![Coverage Status](https://coveralls.io/repos/kbase/ui-common/badge.svg?branch=develop)](https://coveralls.io/r/kbase/ui-common?branch=develop)|
+| ease-dev-campaign | [![Build Status](https://travis-ci.org/kbase/ui-common.svg?branch=ease-dev-campaign)](https://travis-ci.org/kbase/ui-common) [![Coverage Status](https://coveralls.io/repos/kbase/ui-common/badge.svg?branch=ease-dev-campaign)](https://coveralls.io/r/kbase/ui-common?branch=ease-dev-campaign)|
 
 
 ##Contents
