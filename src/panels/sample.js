@@ -10,6 +10,7 @@
  browser: true,
  white: true
  */
+
 /* DOC: requirejs define
  * Note that this is an anonymous define. The module name for this panel is 
  * provided in require-config.js, which associates a string key with this module file.
@@ -27,8 +28,17 @@
  * 
  */
 
+/* @typedef Panel
+ * @type {object}
+ * @property {Widget} widget
+ * @property {undefined} installRoutes
+ * @property {undefined} uninstallRoutes
+ * 
+ */
+
 /* 
- * Sample panel module
+ * Sample panel module.
+ * 
  * @module panel/sample
  * 
  * @param {type} q
@@ -318,6 +328,11 @@ define([
                             .done();
                     });
                 }
+                function run(params) {
+                     return q.Promise(function (resolve) {
+                        resolve();
+                    });
+                }
                 function stop() {
                     return q.Promise(function (resolve) {
                         q.all(rendered.widgets.map(function (w) {
@@ -344,6 +359,11 @@ define([
                                 reject(err);
                             })
                             .done();
+                    });
+                }
+                function destroy() {
+                    return q.Promise(function (resolve) {
+                        resolve();
                     });
                 }
 
@@ -374,18 +394,9 @@ define([
             // TODO: remove routes
             return false;
         }
-        function start() {
-            //
-            return false;
-        }
-        function stop() {
-            //
-            return false;
-        }
+        
         return {
             setup: setup,
-            teardown: teardown,
-            start: start,
-            stop: stop
+            teardown: teardown
         };
     });

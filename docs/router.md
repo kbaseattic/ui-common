@@ -31,4 +31,3 @@ A path is specified as an array of path segments. Each segment can correspond to
 
 
 
-## 
