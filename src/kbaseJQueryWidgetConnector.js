@@ -13,13 +13,15 @@ define([
 ], function ($, q, R, html) {
     'use strict';
     
-        function widgetConnector() {
+        function widgetConnector(config) {
             var widget, mount, container, $container, config;
+            
+            var module = config.module;
+            var jqueryObject = config.jqueryObject;
 
-            function init(cfg) {
+            function init() {
                 return q.Promise(function (resolve) {
-                    config = cfg;                    
-                    require([config.module], function () {
+                    require([module], function () {
                         // these are jquery widgets, so they are just added to the
                         // jquery namespace.
                         resolve();
@@ -44,11 +46,11 @@ define([
                     // not need a connector!
                     // not the best .. perhaps merge the params into the config
                     // better yet, rewrite the widgets in the new model...
-                    var jqueryWidget = $(container)[config.jqueryobject];
+                    var jqueryWidget = $(container)[jqueryObject];
                     if (!jqueryWidget) {
-                        $(container).html(html.panel('Not Found', 'Sorry, cannot find widget ' + widget));
+                        $(container).html(html.panel('Not Found', 'Sorry, cannot find widget ' + jqueryObject));
                     } else {                    
-                        $(container)[config.jqueryobject]({
+                        $(container)[jqueryObject]({
                             wsNameOrId: params.workspaceId,
                             objNameOrId: params.objectId,
                             ws_url: R.getConfig('services.workspace.url'),
@@ -85,8 +87,8 @@ define([
         }
         
         return {
-            create: function () {
-                return widgetConnector();
+            create: function (config) {
+                return widgetConnector(config);
             }
         };
     });

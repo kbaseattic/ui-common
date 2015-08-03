@@ -35,7 +35,7 @@ define([
     'kb.jquerywidgetconnector',
     'kb.widgetconnector'
 ],
-    function (q, $, html, R, SampleFactoryWidget, jqueryWidgetConnectorFactory, objectWidgetConnectorFactory) {
+    function (q, $, html, R, sampleWidgetFactory, jqueryWidgetConnectorFactory, objectWidgetConnectorFactory) {
         /* DOC: strict mode
          * We always set strict mode with the following magic javascript
          * incantation.
@@ -88,26 +88,49 @@ define([
                       * (from html module) with both the widget and the dom node
                       * it will be rendered in (at some future time.)
                       * This is a very common pattern for creating widgets
-                      * ahead of their use, since the html is not yet 
+                      * ahead of their use, when the html is not yet 
                       * instantiated in the DOM.
                       */
                     var widgets = [];
 
+                    /* DOC: factory widgets
+                     * The "factory widget" is a widget that is created 
+                     * by the factory pattern, and implements the widget lifecycle
+                     * interface. 
+                     * Note that we use the widget directly here, since it implements
+                     * the widget lifecycle api completely.
+                     * 
+                     * See the sample widget file for details.
+                     * 
+                     * Also note our little pattern for our widget definition.
+                     * We have an id, which stores a unique string id for associating
+                     * the widget the a dome node.
+                     * A config object which is simply a way of passing information to a
+                     * widget from the panel code. Note that this is not the same as 
+                     * parameters, which are more oriented towards dynamic informatin such
+                     * as route parameters
+                     * A widget object is some object which implements the widget lifecycle
+                     * api.
+                     */
                     function addFactoryWidget(def) {
                         var id = html.genId();
                         widgets.push({
                             id: id,
-                            config: def.config,
                             widget: def.widget
                         });
                         return div({id: id});
                     }
                     
+                    /* DOC: jquery widget
+                     * 
+                     * This is a method for working with traditional kbase jquery 
+                     * widgets. These widgets do not implement the widget lifecycle, 
+                     * so instead of 
+                     */
                     function addJqueryWidget(config) {
                         var id = html.genId();
                         widgets.push({
-                            config: config,
-                            widget: jqueryWidgetConnectorFactory.create(),
+                            widget: jqueryWidgetConnectorFactory.create(config),
                             id: id
                         });
                         return id;
@@ -117,8 +140,7 @@ define([
                         var id = html.genId();
                         widgets.push({
                             id: id,
-                            config: config,
-                            widget: objectWidgetConnectorFactory.create()
+                            widget: objectWidgetConnectorFactory.create(config)
                         });
                         return id;
                     }
@@ -138,12 +160,12 @@ define([
                                    'Will be here...',
                                    html.bsPanel('Sample Factory Widget', addFactoryWidget({
                                        config: {},
-                                       widget: SampleFactoryWidget.create()
+                                       widget: sampleWidgetFactory.makeWidget()
                                    })),
                                    html.bsPanel('Sample jquery Widget', div({id: addJqueryWidget({
                                         name: 'samplejquerywidget',
                                         module: 'kb.widget.sample.jquery',
-                                        jqueryobject: 'SampleWidget'
+                                        jqueryObject: 'SampleWidget'
                                     })})),
                                     html.bsPanel('Sample Object Widget', div({id: addObjectWidget({
                                         name: 'sampleobjectwidget',

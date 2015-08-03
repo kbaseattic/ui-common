@@ -11,13 +11,14 @@ define([
 ], function ($, q) {
     'use strict';
     
-        function widgetConnector() {
-            var widget, mount, container, $container, config;
+        function widgetConnector(config) {
+            var widget, mount, container, $container;
+            
+            var module = config.module;
 
-            function init(cfg) {
+            function init() {
                 return q.Promise(function (resolve) {
-                    config = cfg;                    
-                    require([config.module], function (Widget) {
+                    require([module], function (Widget) {
                         if (!Widget) {
                             throw new Error('Widget module did not load properly (undefined) for ' + config.module);
                         }
@@ -81,8 +82,8 @@ define([
         }
         
         return {
-            create: function () {
-                return widgetConnector();
+            create: function (config) {
+                return widgetConnector(config);
             }
         };
     });

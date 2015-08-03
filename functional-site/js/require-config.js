@@ -274,9 +274,9 @@
             'kb.jquery.contigset': 'src/widgets/jquery/contigset/kbaseContigSetView',
             
             // Sample Widgets
-            'kb.widget.sample.factory': 'src/widgets/sample/factory',
-            'kb.widget.sample.jquery': 'src/widgets/sample/kbase-jquery',
-            'kb.widget.sample.object': 'src/widgets/sample/object-es5',
+            'kb.widget.sample.factory': 'src/widgets/sample/factory-widget',
+            'kb.widget.sample.jquery': 'src/widgets/sample/kbase-jquery-widget',
+            'kb.widget.sample.object': 'src/widgets/sample/object-es5-widget',
             
             // KBase Services
             // non-visual dependencies of plugins
