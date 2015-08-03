@@ -10,6 +10,7 @@
  browser: true,
  white: true
  */
+
 /* DOC: requirejs define
  * Note that this is an anonymous define. The module name for this panel is 
  * provided in require-config.js, which associates a string key with this module file.
@@ -26,14 +27,41 @@
  *  enhances readability.
  * 
  */
+
+/* @typedef Panel
+ * @type {object}
+ * @property {Widget} widget
+ * @property {undefined} installRoutes
+ * @property {undefined} uninstallRoutes
+ * 
+ */
+
+/* 
+ * Sample panel module.
+ * 
+ * @module panel/sample
+ * 
+ * @param {type} q
+ * @param {type} $
+ * @param {type} html
+ * @param {type} R
+ * @param {type} sampleWidgetFactory
+ * @param {type} kbWidgetAdapterFactory
+ * @param {type} widgetAdapterFactory
+ * @param {type} sampleObjectInterfaceWidget
+ * @returns {sample_L43.sampleAnonym$22}
+ */
 define([
     'q',
     'jquery',
     'kb.html',
     'kb.runtime',
-    'kb.widget.sample.factory'
+    'kb.widget.sample.factory',
+    'kb.widget.kbwidgetadapter',
+    'kb.widget.widgetadapter',
+    'kb.widget.sample.object-interface'
 ],
-    function (q, $, html, R, SampleFactoryWidget) {
+    function (q, $, html, R, sampleWidgetFactory, kbWidgetAdapterFactory, widgetAdapterFactory, sampleObjectInterfaceWidget) {
         /* DOC: strict mode
          * We always set strict mode with the following magic javascript
          * incantation.
@@ -54,7 +82,7 @@ define([
                  * and an array of subwidgets (children).
                  */
                 var mount, container;
-                
+
                 /* DOC helper functions
                  * Although not part of the Panel Interface, a common pattern is
                  * to have a sert of helper functions. This assists in meeting 
@@ -77,25 +105,76 @@ define([
                     var h1 = html.tag('h1'),
                         div = html.tag('div');
 
-                     /* DOC: avoiding extra dependencies
-                      * Sometimes it is easier to implement a management interface
-                      * directly in code like this. In this case we both add a
-                      * widget to a list of child widgets, and build a 
-                      * widget container structure which populates the widgets
-                      * by associating a dynamically created unique id 
-                      * (from html module) with both the widget and the dom node
-                      * it will be rendered in (at some future time.)
-                      * This is a very common pattern for creating widgets
-                      * ahead of their use, since the html is not yet 
-                      * instantiated in the DOM.
-                      */
+                    /* DOC: avoiding extra dependencies
+                     * Sometimes it is easier to implement a management interface
+                     * directly in code like this. In this case we both add a
+                     * widget to a list of child widgets, and build a 
+                     * widget container structure which populates the widgets
+                     * by associating a dynamically created unique id 
+                     * (from html module) with both the widget and the dom node
+                     * it will be rendered in (at some future time.)
+                     * This is a very common pattern for creating widgets
+                     * ahead of their use, when the html is not yet 
+                     * instantiated in the DOM.
+                     */
                     var widgets = [];
 
-                    function addWidget(def) {
+                    /* DOC: factory widgets
+                     * The "factory widget" is a widget that is created 
+                     * by the factory pattern, and implements the widget lifecycle
+                     * interface. 
+                     * Note that we use the widget directly here, since it implements
+                     * the widget lifecycle api completely.
+                     * 
+                     * See the sample widget file for details.
+                     * 
+                     * Also note our little pattern for our widget definition.
+                     * We have an id, which stores a unique string id for associating
+                     * the widget the a dome node.
+                     * A config object which is simply a way of passing information to a
+                     * widget from the panel code. Note that this is not the same as 
+                     * parameters, which are more oriented towards dynamic informatin such
+                     * as route parameters
+                     * A widget object is some object which implements the widget lifecycle
+                     * api.
+                     */
+                    function addFactoryWidget(def) {
                         var id = html.genId();
                         widgets.push({
                             id: id,
-                            config: def.config,
+                            widget: def.widget
+                        });
+                        return div({id: id});
+                    }
+
+                    /* DOC: jquery widget
+                     * 
+                     * This is a method for working with traditional kbase jquery 
+                     * widgets. These widgets do not implement the widget lifecycle, 
+                     * so instead of 
+                     */
+                    function addJqueryWidget(config) {
+                        var id = html.genId();
+                        widgets.push({
+                            widget: kbWidgetAdapterFactory.make(config),
+                            id: id
+                        });
+                        return id;
+                    }
+
+                    function addObjectWidget(config) {
+                        var id = html.genId();
+                        widgets.push({
+                            id: id,
+                            widget: widgetAdapterFactory.make(config)
+                        });
+                        return id;
+                    }
+
+                    function addObjectInterfaceWidget(def) {
+                        var id = html.genId();
+                        widgets.push({
+                            id: id,
                             widget: def.widget
                         });
                         return div({id: id});
@@ -113,18 +192,30 @@ define([
                             h1('Sample Panel and Widgets'),
                             div({class: 'row'}, [
                                 div({class: 'col-md-6'}, [
-                                   'Will be here...',
-                                   addWidget({
-                                       config: {},
-                                       widget: SampleFactoryWidget.create()
-                                   })
+                                    'Will be here...',
+                                    html.bsPanel('Sample Factory Widget', addFactoryWidget({
+                                        config: {},
+                                        widget: sampleWidgetFactory.make()
+                                    })),
+                                    html.bsPanel('Sample jquery Widget', div({id: addJqueryWidget({
+                                            name: 'samplejquerywidget',
+                                            module: 'kb.widget.sample.jquery',
+                                            jquery_object: 'SampleWidget'
+                                        })})),
+                                    html.bsPanel('Sample Object Widget', div({id: addObjectWidget({
+                                            name: 'sampleobjectwidget',
+                                            module: 'kb.widget.sample.object'
+                                        })})),
+                                    html.bsPanel('Sample Object Widget with Interface', addObjectInterfaceWidget({
+                                        widget: Object.create(sampleObjectInterfaceWidget)
+                                    }))
                                 ])
                             ])
                         ]),
                         widgets: widgets
                     };
                 }
-                
+
                 /* DOC: create lifecycle event
                  * The create lifecycle event is the only synchronous one. 
                  * This is because object creation, in its many forms, may
@@ -136,7 +227,7 @@ define([
                  * correspond to the parent widget's events.
                  */
                 var rendered = render();
-                
+
                 /* DOC: init event
                  * Since a panel implements the widget interface, it starts 
                  * with an init event handler. The init event gives the panel
@@ -147,7 +238,7 @@ define([
                  */
                 function init(config) {
                     return q.Promise(function (resolve, reject) {
-                         q.all(rendered.widgets.map(function (w) {
+                        q.all(rendered.widgets.map(function (w) {
                             return w.widget.init(w.config);
                         }))
                             .then(function () {
@@ -189,14 +280,14 @@ define([
                         mount = node;
                         container = document.createElement('div');
                         mount.appendChild(container);
-                        
+
                         /* DOC: dom access
                          * In this case we are keeping things simple by using 
                          * the plain DOM API. We could also use jquery 
                          * here if we wish to.
                          */
                         container.innerHTML = rendered.content;
-                        
+
                         /* DOC: runtime interface
                          * Since a panel title is also, logically, the title of
                          * the "page" we use the runtimes event bus to emit the
@@ -237,7 +328,12 @@ define([
                             .done();
                     });
                 }
-                function stop(node) {
+                function run(params) {
+                     return q.Promise(function (resolve) {
+                        resolve();
+                    });
+                }
+                function stop() {
                     return q.Promise(function (resolve) {
                         q.all(rendered.widgets.map(function (w) {
                             return w.widget.stop();
@@ -251,7 +347,7 @@ define([
                             .done();
                     });
                 }
-                function detach(node) {
+                function detach() {
                     return q.Promise(function (resolve) {
                         q.all(rendered.widgets.map(function (w) {
                             return w.widget.detach();
@@ -263,6 +359,11 @@ define([
                                 reject(err);
                             })
                             .done();
+                    });
+                }
+                function destroy() {
+                    return q.Promise(function (resolve) {
+                        resolve();
                     });
                 }
 
@@ -293,18 +394,9 @@ define([
             // TODO: remove routes
             return false;
         }
-        function start() {
-            //
-            return false;
-        }
-        function stop() {
-            //
-            return false;
-        }
+        
         return {
             setup: setup,
-            teardown: teardown,
-            start: start,
-            stop: stop
+            teardown: teardown
         };
     });

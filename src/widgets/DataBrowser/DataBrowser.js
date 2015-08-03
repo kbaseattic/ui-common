@@ -10,12 +10,12 @@ define([
     'kb.utils',
     'kb.narrative',
     'kb.utils.api',
-    'kb.session',
+    'kb.runtime',
     'kb.service.workspace',
     'q',
     'datatables_bootstrap'
 ],
-    function (Widget, Utils, Narrative, APIUtils, Session, WorkspaceService, q) {
+    function (Widget, Utils, Narrative, APIUtils, R, WorkspaceService, q) {
         "use strict";
         var widget = Object.create(Widget, {
             init: {
@@ -35,10 +35,10 @@ define([
             setup: {
                 value: function () {
                     // User profile service
-                    if (Session.isLoggedIn()) {
-                        if (this.hasConfig('services.workspace.url')) {
-                            this.workspaceClient = new WorkspaceService(this.getConfig('services.workspace.url'), {
-                                token: Session.getAuthToken()
+                    if (R.isLoggedIn()) {
+                        if (R.hasConfig('services.workspace.url')) {
+                            this.workspaceClient = new WorkspaceService(R.getConfig('services.workspace.url'), {
+                                token: R.getAuthToken()
                             });
                         } else {
                             throw 'The workspace client url is not defined';
@@ -52,7 +52,7 @@ define([
                 value: function (options) {
                     return q.Promise(function (resolve, reject, notify) {
                         // We only run any queries if the session is authenticated.
-                        if (!Session.isLoggedIn()) {
+                        if (!R.isLoggedIn()) {
                             resolve();
                             return;
                         }
@@ -66,7 +66,7 @@ define([
                         q(this.workspaceClient.list_workspace_info({
                             showDeleted: 0,
                             excludeGlobal: 1,
-                            owners: [Session.getUsername()]
+                            owners: [R.getUsername()]
                         }))
                             .then(function (data) {
                                 // First we both transform each ws info object into a nicer js object,

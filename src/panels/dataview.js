@@ -12,15 +12,15 @@ define([
     'kb.html',
     'kb.statemachine',
     'kb.runtime',
-    'kb.widgetconnector',
+    'kb.widget.widgetadapter',
     'kb.widget.genericvisualizer',
-    'kb.jquerywidgetconnector',
+    'kb.widget.kbwidgetadapter',
     
     'kb.jquery.provenance',
     'kb.widget.dataview.download',
     'css!kb.panel.dataview.style'
 ],
-    function (_, $, q, html, StateMachine, R, widgetConnectorFactory, GenericVisualizer, jqueryWidgetConnectorFactory) {
+    function (_, $, q, html, StateMachine, R, widgetAdapter, GenericVisualizer, kbWidgetAdapter) {
         'use strict';
 
         // handle subobjects, only allowed types!!  This needs to be refactored because it can depend on the base type!!!
@@ -83,14 +83,13 @@ define([
                 // Widgets
                 var widgets = [];
                 
-                // These are "classic Erik" widgets, for which the widgetConnector
+                // These are "classic Erik" widgets, for which the widgetAdapter
                 // calls them according to the new widget api.
                 function addWidget(config) {
                     var id = html.genId();
                     widgets.push({
                         id: id,
-                        config: config,
-                        widget: widgetConnectorFactory.create()
+                        widget: widgetAdapter.make(config)
                     });
                     return id;
                 }
@@ -107,11 +106,10 @@ define([
                     return id;
                 }
 
-                function addJQWidget(config) {
+                function addKBWidget(config) {
                     var id = html.genId();
                     widgets.push({
-                        config: config,
-                        widget: jqueryWidgetConnectorFactory.create(),
+                        widget: kbWidgetAdapter.make(config),
                         id: id
                     });
 
@@ -127,10 +125,10 @@ define([
                                     name: 'overview',
                                     module: 'kb.widget.dataview.overview'
                                 })}),
-                            renderBSCollapsiblePanel('Data Provenance and Reference Network', div({id: addJQWidget({
+                            renderBSCollapsiblePanel('Data Provenance and Reference Network', div({id: addKBWidget({
                                     name: 'provenance',
                                     module: 'kb.jquery.provenance',
-                                    jqueryobject: 'KBaseWSObjGraphCenteredView'
+                                    jquery_object: 'KBaseWSObjGraphCenteredView'
                                 })})),
                             div({id: addFactoryWidget('visualizer1', GenericVisualizer)})
                         ])

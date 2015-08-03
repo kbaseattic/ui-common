@@ -13,13 +13,15 @@ define([
 ], function ($, q, R, html) {
     'use strict';
     
-        function widgetConnector() {
-            var widget, mount, container, $container, config;
+        function adapter(config) {
+            var mount, container, $container;
+            
+            var module = config.module;
+            var jqueryObject = config.jquery_object;
 
-            function init(cfg) {
+            function init() {
                 return q.Promise(function (resolve) {
-                    config = cfg;                    
-                    require([config.module], function () {
+                    require([module], function () {
                         // these are jquery widgets, so they are just added to the
                         // jquery namespace.
                         resolve();
@@ -44,11 +46,11 @@ define([
                     // not need a connector!
                     // not the best .. perhaps merge the params into the config
                     // better yet, rewrite the widgets in the new model...
-                    var jqueryWidget = $(container)[config.jqueryobject];
+                    var jqueryWidget = $(container)[jqueryObject];
                     if (!jqueryWidget) {
-                        $(container).html(html.panel('Not Found', 'Sorry, cannot find widget ' + widget));
+                        $(container).html(html.panel('Not Found', 'Sorry, cannot find widget ' + jqueryObject));
                     } else {                    
-                        $(container)[config.jqueryobject]({
+                        $(container)[jqueryObject]({
                             wsNameOrId: params.workspaceId,
                             objNameOrId: params.objectId,
                             ws_url: R.getConfig('services.workspace.url'),
@@ -58,11 +60,17 @@ define([
                     resolve();
                 });
             }
+            function run(params) {
+                return q.Promise(function (resolve) {
+                    resolve();
+                });
+            }
             function stop() {
                 return q.Promise(function (resolve) {
                     resolve();
                 });
             }
+           
             function detach() {
                 return q.Promise(function (resolve) {
                     resolve();
@@ -78,6 +86,7 @@ define([
                 init: init,
                 attach: attach,
                 start: start,
+                run: run,
                 stop: stop,
                 detach: detach,
                 destroy: destroy
@@ -85,8 +94,8 @@ define([
         }
         
         return {
-            create: function () {
-                return widgetConnector();
+            make: function (config) {
+                return adapter(config);
             }
         };
     });

@@ -39,11 +39,15 @@ define([
                 //if (window.history.pushState) {
                 //    window.history.pushState(null, '', '#' + location);
                 //} else {
+                if (typeof location === 'string')  {
+                    location = {path: location};
+                }
                 var loc = location.path;
                 if (location.params) {
                     loc += '?' + paramsToQuery(location.params);
 
                 }
+                
                 window.location.hash = '#' + loc;
                 //}
             }
@@ -217,13 +221,13 @@ define([
                                         //}
                                         if (result.widgets) {
                                             Object.keys(result.widgets).forEach(function (widgetName) {
-                                                var widgetConnector = result.widgets[widgetName];
-                                                widgetConnector.attach($('#' + widgetConnector.id));
+                                                var widgetAdapter = result.widgets[widgetName];
+                                                widgetAdapter.attach($('#' + widgetAdapter.id));
                                             });
                                             Object.keys(result.widgets).forEach(function (widgetName) {
-                                                var widgetConnector = result.widgets[widgetName];
-                                                if (widgetConnector.start) {
-                                                    widgetConnector.start();
+                                                var widgetAdapter = result.widgets[widgetName];
+                                                if (widgetAdapter.start) {
+                                                    widgetAdapter.start();
                                                 }
                                             });
                                         }

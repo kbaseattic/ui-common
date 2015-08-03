@@ -295,9 +295,9 @@ define([
             setInitialState: {
                 value: function () {
                     return Q.promise(function (resolve, reject) {
-                        Q.all([Q($.get(R.getConfig('ui.internal_paths.dashboard_metrics') + '/narrative_histogram.json')),
+                        Q.all([Q($.get(R.getConfig('ui.paths.dashboard_metrics') + '/narrative_histogram.json')),
                             // Q($.get(Config.getItem('service.dashboard_metrics.url') + '/narrative_shared_histogram.json')),
-                            Q($.get(R.getConfig('ui.internal_paths.dashboard_metrics') + '/narrative_sharing_histogram.json')),
+                            Q($.get(R.getConfig('ui.paths.dashboard_metrics') + '/narrative_sharing_histogram.json')),
                             this.viewState.whenItem('narratives', 10000)
                         ])
                             .then(function (data) {

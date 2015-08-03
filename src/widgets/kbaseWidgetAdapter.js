@@ -11,13 +11,17 @@ define([
 ], function ($, q) {
     'use strict';
     
-        function widgetConnector() {
-            var widget, mount, container, $container, config;
+        function adapter(config) {
+            var widget, mount, $container;
+            
+            var module = config.module;
 
-            function init(cfg) {
+            function init() {
                 return q.Promise(function (resolve) {
-                    config = cfg;                    
-                    require([config.module], function (Widget) {
+                    require([module], function (Widget) {
+                        if (!Widget) {
+                            throw new Error('Widget module did not load properly (undefined) for ' + config.module);
+                        }
                         widget = Object.create(Widget);
                         resolve();
                     });
@@ -26,9 +30,8 @@ define([
             function attach(node) {
                 return q.Promise(function (resolve) {
                     mount = node;
-                    container = document.createElement('div');
-                    $container = $(container);
-                    mount.appendChild(container);
+                    $container = $('<div></div>');
+                    mount.appendChild($container.get(0));
                     resolve();
                 });
             }
@@ -58,6 +61,7 @@ define([
             }
             function detach() {
                 return q.Promise(function (resolve) {
+                    mount.removeChild($container.get(0));
                     resolve();
                 });
             }
@@ -78,8 +82,8 @@ define([
         }
         
         return {
-            create: function () {
-                return widgetConnector();
+            make: function (config) {
+                return adapter(config);
             }
         };
     });

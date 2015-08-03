@@ -135,9 +135,12 @@
             'kb.messaging': 'src/kbaseMessaging',
             'kb.format': 'src/kbaseFormat',
             'kb.props': 'src/kbaseProps',
-            'kb.widgetconnector': 'src/kbaseWidgetConnector',
-            'kb.jquerywidgetconnector': 'src/kbaseJQueryWidgetConnector',
+            'kb.widget.widgetadapter': 'src/widgets/kbaseWidgetAdapter',
+            'kb.widget.kbwidgetadapter': 'src/widgets/kbaseKBWidgetAdapter',
             'kb.simplepanel': 'src/kbaseSimplePanel',
+            'kb.dom': 'src/kbaseDOM',
+            
+            
             // KBase Widgets
             // -------------
             // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
@@ -149,7 +152,6 @@
             //kbaseuserpopularnarratives: '/src/widgets/social/kbaseUserPopularNarratives',
             'kb.widget.social.user_search': 'src/widgets/social/kbaseUserSearch',
             'kb.widget.social.browse_narratives': 'src/widgets/social/kbaseUserBrowseNarratives',
-            //kbaseusersummary: '/src/widgets/social/kbaseUserSummary',
             'kb.widget.social.collaborators': 'src/widgets/social/kbaseUserCollaboratorNetwork',
             'kb.session': 'src/kbaseSession',
             'kb.config': 'src/kbaseConfig',
@@ -273,8 +275,13 @@
             // KBase Data Visualization Widget
             // ----------------------------
             'kb.jquery.contigset': 'src/widgets/jquery/contigset/kbaseContigSetView',
+            
             // Sample Widgets
-            'kb.widget.sample.factory': 'src/widgets/sample/factory',
+            'kb.widget.sample.factory': 'src/widgets/sample/factory-widget',
+            'kb.widget.sample.jquery': 'src/widgets/sample/kbase-jquery-widget',
+            'kb.widget.sample.object': 'src/widgets/sample/object-es5-widget',
+            'kb.widget.sample.object-interface': 'src/widgets/sample/object-widget-interface',
+            
             // KBase Services
             // non-visual dependencies of plugins
             // --------------
