@@ -13,8 +13,8 @@ define([
 ], function ($, q, R, html) {
     'use strict';
     
-        function widgetConnector(config) {
-            var widget, mount, container, $container, config;
+        function adapter(config) {
+            var mount, container, $container;
             
             var module = config.module;
             var jqueryObject = config.jqueryObject;
@@ -60,11 +60,17 @@ define([
                     resolve();
                 });
             }
+            function run(params) {
+                return q.Promise(function (resolve) {
+                    resolve();
+                });
+            }
             function stop() {
                 return q.Promise(function (resolve) {
                     resolve();
                 });
             }
+           
             function detach() {
                 return q.Promise(function (resolve) {
                     resolve();
@@ -80,6 +86,7 @@ define([
                 init: init,
                 attach: attach,
                 start: start,
+                run: run,
                 stop: stop,
                 detach: detach,
                 destroy: destroy
@@ -88,7 +95,10 @@ define([
         
         return {
             create: function (config) {
-                return widgetConnector(config);
+                return adapter(config);
+            },
+            makeOne: function (config) {
+                return adapter(config);
             }
         };
     });

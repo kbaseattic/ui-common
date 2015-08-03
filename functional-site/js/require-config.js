@@ -138,6 +138,9 @@
             'kb.widgetconnector': 'src/kbaseWidgetConnector',
             'kb.jquerywidgetconnector': 'src/kbaseJQueryWidgetConnector',
             'kb.simplepanel': 'src/kbaseSimplePanel',
+            'kb.dom': 'src/kbaseDOM',
+            
+            
             // KBase Widgets
             // -------------
             // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
@@ -277,6 +280,7 @@
             'kb.widget.sample.factory': 'src/widgets/sample/factory-widget',
             'kb.widget.sample.jquery': 'src/widgets/sample/kbase-jquery-widget',
             'kb.widget.sample.object': 'src/widgets/sample/object-es5-widget',
+            'kb.widget.sample.object-interface': 'src/widgets/sample/object-widget-interface',
             
             // KBase Services
             // non-visual dependencies of plugins

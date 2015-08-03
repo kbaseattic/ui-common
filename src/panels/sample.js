@@ -33,9 +33,10 @@ define([
     'kb.runtime',
     'kb.widget.sample.factory',
     'kb.jquerywidgetconnector',
-    'kb.widgetconnector'
+    'kb.widgetconnector',
+    'kb.widget.sample.object-interface'
 ],
-    function (q, $, html, R, sampleWidgetFactory, jqueryWidgetConnectorFactory, objectWidgetConnectorFactory) {
+    function (q, $, html, R, sampleWidgetFactory, kbWidgetAdapter, objectWidgetConnectorFactory, sampleObjectInterfaceWidget) {
         /* DOC: strict mode
          * We always set strict mode with the following magic javascript
          * incantation.
@@ -56,7 +57,7 @@ define([
                  * and an array of subwidgets (children).
                  */
                 var mount, container;
-                
+
                 /* DOC helper functions
                  * Although not part of the Panel Interface, a common pattern is
                  * to have a sert of helper functions. This assists in meeting 
@@ -79,18 +80,18 @@ define([
                     var h1 = html.tag('h1'),
                         div = html.tag('div');
 
-                     /* DOC: avoiding extra dependencies
-                      * Sometimes it is easier to implement a management interface
-                      * directly in code like this. In this case we both add a
-                      * widget to a list of child widgets, and build a 
-                      * widget container structure which populates the widgets
-                      * by associating a dynamically created unique id 
-                      * (from html module) with both the widget and the dom node
-                      * it will be rendered in (at some future time.)
-                      * This is a very common pattern for creating widgets
-                      * ahead of their use, when the html is not yet 
-                      * instantiated in the DOM.
-                      */
+                    /* DOC: avoiding extra dependencies
+                     * Sometimes it is easier to implement a management interface
+                     * directly in code like this. In this case we both add a
+                     * widget to a list of child widgets, and build a 
+                     * widget container structure which populates the widgets
+                     * by associating a dynamically created unique id 
+                     * (from html module) with both the widget and the dom node
+                     * it will be rendered in (at some future time.)
+                     * This is a very common pattern for creating widgets
+                     * ahead of their use, when the html is not yet 
+                     * instantiated in the DOM.
+                     */
                     var widgets = [];
 
                     /* DOC: factory widgets
@@ -120,7 +121,7 @@ define([
                         });
                         return div({id: id});
                     }
-                    
+
                     /* DOC: jquery widget
                      * 
                      * This is a method for working with traditional kbase jquery 
@@ -130,12 +131,12 @@ define([
                     function addJqueryWidget(config) {
                         var id = html.genId();
                         widgets.push({
-                            widget: jqueryWidgetConnectorFactory.create(config),
+                            widget: kbWidgetAdapter.makeOne(config),
                             id: id
                         });
                         return id;
                     }
-                    
+
                     function addObjectWidget(config) {
                         var id = html.genId();
                         widgets.push({
@@ -143,6 +144,15 @@ define([
                             widget: objectWidgetConnectorFactory.create(config)
                         });
                         return id;
+                    }
+
+                    function addObjectInterfaceWidget(def) {
+                        var id = html.genId();
+                        widgets.push({
+                            id: id,
+                            widget: def.widget
+                        });
+                        return div({id: id});
                     }
 
                     /* DOC: return some structure
@@ -157,27 +167,30 @@ define([
                             h1('Sample Panel and Widgets'),
                             div({class: 'row'}, [
                                 div({class: 'col-md-6'}, [
-                                   'Will be here...',
-                                   html.bsPanel('Sample Factory Widget', addFactoryWidget({
-                                       config: {},
-                                       widget: sampleWidgetFactory.makeWidget()
-                                   })),
-                                   html.bsPanel('Sample jquery Widget', div({id: addJqueryWidget({
-                                        name: 'samplejquerywidget',
-                                        module: 'kb.widget.sample.jquery',
-                                        jqueryObject: 'SampleWidget'
-                                    })})),
+                                    'Will be here...',
+                                    html.bsPanel('Sample Factory Widget', addFactoryWidget({
+                                        config: {},
+                                        widget: sampleWidgetFactory.makeWidget()
+                                    })),
+                                    html.bsPanel('Sample jquery Widget', div({id: addJqueryWidget({
+                                            name: 'samplejquerywidget',
+                                            module: 'kb.widget.sample.jquery',
+                                            jqueryObject: 'SampleWidget'
+                                        })})),
                                     html.bsPanel('Sample Object Widget', div({id: addObjectWidget({
-                                        name: 'sampleobjectwidget',
-                                        module: 'kb.widget.sample.object'
-                                    })})),
+                                            name: 'sampleobjectwidget',
+                                            module: 'kb.widget.sample.object'
+                                        })})),
+                                    html.bsPanel('Sample Object Widget with Interface', addObjectInterfaceWidget({
+                                        widget: Object.create(sampleObjectInterfaceWidget)
+                                    }))
                                 ])
                             ])
                         ]),
                         widgets: widgets
                     };
                 }
-                
+
                 /* DOC: create lifecycle event
                  * The create lifecycle event is the only synchronous one. 
                  * This is because object creation, in its many forms, may
@@ -189,7 +202,7 @@ define([
                  * correspond to the parent widget's events.
                  */
                 var rendered = render();
-                
+
                 /* DOC: init event
                  * Since a panel implements the widget interface, it starts 
                  * with an init event handler. The init event gives the panel
@@ -200,7 +213,7 @@ define([
                  */
                 function init(config) {
                     return q.Promise(function (resolve, reject) {
-                         q.all(rendered.widgets.map(function (w) {
+                        q.all(rendered.widgets.map(function (w) {
                             return w.widget.init(w.config);
                         }))
                             .then(function () {
@@ -242,14 +255,14 @@ define([
                         mount = node;
                         container = document.createElement('div');
                         mount.appendChild(container);
-                        
+
                         /* DOC: dom access
                          * In this case we are keeping things simple by using 
                          * the plain DOM API. We could also use jquery 
                          * here if we wish to.
                          */
                         container.innerHTML = rendered.content;
-                        
+
                         /* DOC: runtime interface
                          * Since a panel title is also, logically, the title of
                          * the "page" we use the runtimes event bus to emit the

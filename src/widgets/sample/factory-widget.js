@@ -3,7 +3,7 @@
  * 
  */
 /*
- * JS LINT CONFIG
+ * DOC: js lint config
  * 
  */
 /*global
@@ -14,7 +14,7 @@
  white: true
  */
 /*
- * Sample Factory Pattern Widget
+ * DOC: Sample Factory Pattern Widget
  * 
  * Follows a factory pattern for generation of widgets.
  * The module returns factory-maker - a function which returns a factory for making 
@@ -24,18 +24,42 @@
  * init
  * attach
  * start
+ * run
  * stop
  * detach
  * destroy
  */
 
 /* DOC: dependencies
+ * This sample widget has only a single explicit dependency - the q promises library.
+ * At this stage of the widget lifecycle each method must be implemented as a
+ * promise. This allows the widget to incorporate asynchronous processes into 
+ * any method.
+ * 
+ * We use the well-established "Q" promises library. Since promises is really
+ * an interface, it would be possible to use another promises library, or 
+ * even to roll your own.
+ * 
+ * We also use our own lightweight DOM wrapper, kb.dom. This allows us to prevent
+ * access to the global DOM objects.
+ * 
+ * Of course, one may wish to use jquery to do the same thing.
+ * 
+ * TODO: I think we need one more dependency -- a kbase dom helper, so that
+ * TODO: widget authors don't need to deal with "document", "window" or other
+ * TODO: global dom objects. This is also more consistent with the spirit of AMD - 
+ * TODO: ban all globals. It also gives us a hook on to a more secure widget env,
+ * TODO: as well as widget testing (via mocks for the DOM).
  * 
  */
 define([   
-    'q'
+    'q', 'kb.dom'
 ],
-    function (q) {
+    function (q, DOM) {
+        /* DOC: strict mode please 
+         * To facility robust and clean code, we use strict mode. It should be 
+         * placed at the top of the module function.
+         */
         'use strict';
 
         /* DOC: widget creation with factory pattern
@@ -103,8 +127,8 @@ define([
                      * node and later when we remove it they will be automatically
                      * cleaned up by the DOM -- we don't have to track them ourselves.
                      */
-                    container = document.createElement('div');
-                    mount.appendChild(container);
+                    container = DOM.createElement('div');
+                    DOM.append(mount, container);
                     
                     resolve();
                 });
@@ -136,7 +160,7 @@ define([
                     /* DOC: rendering
                      * Here we have a simple rendering implementation!
                      */
-                    container.innerHTML = 'Hi, I am a very simple minded widget.';
+                    DOM.setHTML(container, 'Hi, I am a very simple minded widget.');
                     resolve();
                 });
             }
@@ -156,7 +180,7 @@ define([
              */
             function run(params) {
                 return q.Promise(function (resolve) {
-                    container.innerHTML = 'Hi, it is now ' + (new Date());
+                    DOM.setHTML(container, 'Hi, it is now ' + (new Date()));
                     resolve();
                 });
             }
@@ -192,7 +216,7 @@ define([
              */
             function detach() {
                 return q.Promise(function (resolve) {
-                    mount.removeChild(container);
+                    DOM.remove(mount, container);
                     resolve();
                 });
             }
