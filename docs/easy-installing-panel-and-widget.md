@@ -15,25 +15,28 @@
 
 ## create widget
 
-Widgets live in src/widgets. Note that this location will change.
+Widgets live in ```src/widgets```. Note that this location will change. (For one, the location for all source will change!)
 
-Groups of related widgets should live in src/widgets/group
+Groups of related widgets should live in ```src/widgets/group```
 
 The widget file name needs to be unique within the directory, of course.
 
-Traditionally they are prefixed with kbase, so kbaseMyWidget, but I'm not sure this is really necessary.
-I've been placing jquery widgets that have been wrapped in AMD calls into src/widgets/jquery. That is not a permanent solution, just a way to set them aside from the original non-AMD ones.
+Traditionally they are prefixed with ```kbase```, so ```kbaseMyWidget```, but I'm not sure this is really necessary. The directory (and module name) should provide enough namespacing that file names can be simpler.
 
-### Factory widgets
+(But then again, thinking about usage, when developers are editing, it can be very handy for a file name to be more fully descriptive.)
+
+I've been placing jquery widgets that have been wrapped in AMD calls into ```src/widgets/jquery```. That is not a permanent solution, just a way to set them aside from the original non-AMD ones.
+
+There are many ways to create widgets. A widget, after all, is merely an implementation of the widget interface.
+
+TODO: reference to api docs
 
 
-### 
-
-### jquery widgets
+### kbwidget jquery widgets
 
 Jquery widgets work within the new framework by following specific conventions.
 
-#### wrap in amd define
+#### wrap in AMD define
 
 First the classic kbase jquery widget needs to be wrapped in an AMD define, like so
 
@@ -62,6 +65,14 @@ Explanation of dependencies:
 - ```kb.runtime``` is the new runtime api. It provides configuration, auth token, and other services (no explained here yet... hold on for the example widget...)
 - ```kb.service.workspace``` represents how a kbase service client api is brought into the module, and is not required for a module of course. There is a sprinkling of them available 
 - ```kb.jquery.authenticatedwidget``` is the classic kbase authenticated widget base object, provided as an AMD module. For now, jquery widgets are provided with the kb.jquery prefix. This is not permanent, and there will be surely be a refactor, but it is handy for recognizing them. Note that we don't have a parameter matching the auth widget module. jquery widget modules do not return anything, they are loaded purely for side effect (which is to say, they make some mutation to the global jquery object.)
+
+### Factory widgets
+
+TO BE DONE
+
+### Object widgets
+
+TO BE DONE
 
 ## Add Widget to require-config.js
 
@@ -103,31 +114,47 @@ the module name might be
 
 ## create panel
 
-Panels are specialized widgets. They implement the widget lifecycle interface but are wrapped in a factory which knows how to both emit a panel and also inform the runtime about requested routes, and internally implements a widget manager in order to create and manage a set of widgets.
+Panels implement the Panel interface and operate through the router mechanism. The panel interface is really just a means for an application to setup and teardown a Panel. Realistically, an application only sets up a panel. When an application would be ready to tear down a panel, the window is probably being destroyed, and there is no reason to manage the panel. Regardless, this API will eventually be fully implemented.
+
+The setup method for a panel currently does just one thing -- it registers a route that is associated with a widget. The app installs a function on the route which knows how to do things that the panel sets up. For instance, it knows how to mount a panel, and redirect. (And that is about it!)
+
+WORK IN PROGRESS
 
 A panel can also do more interesting things to wire together its widgets, providing interwidget communication, refreshing services, shared state, and so forth. All of that is purely up to the panel implementation, with the help of external and internal libraries (modules) made available in the user interface environment.
 
-( provide a list of the external deps and versions, and the internal utilities.)
+TODO: provide a list of the external deps and versions, and the internal utilities.
 
-Panels live in ```src/panels```. They typically consist of a single file, but may also have an accompanying css file (how is that loaded? I think it is through require)
+Panels live in ```src/panels```. They typically consist of a single file, but may also have an accompanying css file 
 
-The good news is that there is a working sample panel in /src/panels/sample.js
+TODO: how is that loaded? I think it is through require
+TODO: remember, this is a brief how-to!
 
-It implements the latest widget interface, which adds the mandatory init method.
+The good news is that there is a working sample panel in ```/src/panels/sample.js```
 
-As of this writing (which will change very soon, within hours I hope) this sample panel incorporates only a widgetFactory not a kbase jquery widget.
+This sample panel includes simple "hello world" examples of all major types of widgets.
+
+TODO: See the advanced samples for examples which exemplify common use cases.
 
 ## Add Panel to require-config.js
 
 There is a separate section for panels. The module naming convention is ```kb.panel.myawesomepanel```.
 
+E.g.
+
+    'kb.panel.myawesomepanel': 'src/panels/myawesomepanel'
+
 ## Update main.js
 
-```main.js``` is the main driver for the web app, invoked from the index page. It contains a short section which contains a list of panel "factory" objects. The factory objects have a setup method which both adds routes to the runtime. Part of adding a route is adding a handler, which in this case is a factoryPanel.
+```main.js``` is the main driver for the web app, invoked from the index page. 
+
+It lives, for now, in ```/functional-site/js/main.js```.
+
+It contains a short section which contains a list of panel "factory" objects. The factory objects have a setup method which adds routes to the runtime. Part of adding a route is adding a handler, which in this case is a factoryPanel.
+
+FUTURE: this will soon be driven by a modular plugin system which is driven by configuration.
 
 Adding a panel to this list is all that is required to add the panel route and panel to the system.
 
-(this part is under revision now ... the patterns of usage are becoming clearer ...)
 
 
 ## Add to the system menu for testing
@@ -136,7 +163,7 @@ If your panel is standalone -- is not invoked from some other context with speci
 
 (this process will be under revision soon.)
 
-The changes are made to src/panels/navbar.js
+The changes are made to ```src/panels/navbar.js```.
 
 The navbar itself is a panel which is installed on the navbar area at the top of the window. It contains a section which defines system menus which may be installed in the navbar. The menu items are set up as a simple map directly in the navbar.js factory:
 
@@ -149,9 +176,13 @@ The navbar itself is a panel which is installed on the navbar area at the top of
 
 each menu item has a uri, a text label, and an icon, which is a font awesome icon.
 
-Any url prefixed with /functional-site/# will route directly through the page's router. Consult the file, for now, to see the different forms that menu items can take.
+FUTURE: this will also be driven by configuration so that the core code does not need to change.
 
-The renderMenu function assembles the menu items into the hamburger menu. To add your item to the system menu, simply insert the map key for the menu item into the appropriate location within the list.
+Any url prefixed with ```/functional-site/#``` will route directly through the page's router. Consult the file, for now, to see the different forms that menu items can take.
+
+The renderMenu function assembles the menu items into the hamburger menu. To add your item to the system menu, simply insert the map key for the menu item into the appropriate location within the list. There are two menus defined here, the authenticated menu and the unauthentcated.
+
+FUTURE: there menu will be driven by configuration soon.
 
 NOTE: this will likely change, it is a first pass without getting stuck on configuration, etc.
 
@@ -159,3 +190,33 @@ NOTE: this will likely change, it is a first pass without getting stuck on confi
 
 That should be it. The panel url should appear on the system menu, clicking it should load the panel and the panel should load the widgets.
 
+
+
+<style type="text/css">
+    body {
+        font-family: sans-serif;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        xcolor: #FFF;
+        color: blue;
+    }
+    h3 {
+        padding: 4px;
+        background-color: gray;
+        color: #FFF;
+    }
+     code {
+        xmargin: 1em;
+        xdisplay: block;
+        xpadding: 1em;
+        xcolor: lime;
+        background-color: #CCC;
+    }
+    pre > code {
+        margin: 1em;
+        display: block;
+        padding: 1em;
+        color: lime;
+        background-color: black;
+    }
+</style>
