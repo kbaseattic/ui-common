@@ -21,12 +21,15 @@ Groups of related widgets should live in ```src/widgets/group```
 
 The widget file name needs to be unique within the directory, of course.
 
-Traditionally they are prefixed with kbase, so kbaseMyWidget, but I'm not sure this is really necessary.
-I've been placing jquery widgets that have been wrapped in AMD calls into src/widgets/jquery. That is not a permanent solution, just a way to set them aside from the original non-AMD ones.
+Traditionally they are prefixed with ```kbase```, so ```kbaseMyWidget```, but I'm not sure this is really necessary. The directory (and module name) should provide enough namespacing that file names can be simpler.
+
+(But then again, thinking about usage, when developers are editing, it can be very handy for a file name to be more fully descriptive.)
+
+I've been placing jquery widgets that have been wrapped in AMD calls into ```src/widgets/jquery```. That is not a permanent solution, just a way to set them aside from the original non-AMD ones.
 
 There are many ways to create widgets. A widget, after all, is merely an implementation of the widget interface.
 
-TODO: doc reference
+TODO: reference to api docs
 
 
 ### kbwidget jquery widgets
