@@ -30,26 +30,15 @@
 
 /* @typedef Panel
  * @type {object}
- * @property {Widget} widget
- * @property {undefined} installRoutes
- * @property {undefined} uninstallRoutes
+ * @method {undefined} setup
+ * @method {undefined} teardown
  * 
  */
 
 /* 
  * Sample panel module.
+ * @module {Panel} panel/sample
  * 
- * @module panel/sample
- * 
- * @param {type} q
- * @param {type} $
- * @param {type} html
- * @param {type} R
- * @param {type} sampleWidgetFactory
- * @param {type} kbWidgetAdapterFactory
- * @param {type} widgetAdapterFactory
- * @param {type} sampleObjectInterfaceWidget
- * @returns {sample_L43.sampleAnonym$22}
  */
 define([
     'q',
