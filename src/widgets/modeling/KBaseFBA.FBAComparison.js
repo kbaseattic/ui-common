@@ -11,18 +11,12 @@ function KBaseFBA_FBAComparison(modeltabs) {
                          objecttype: data[2],
                          owner: data[5],
                          instance: data[4],
-                         moddate: data[3]}
-
-        // if there is user metadata, add it
-        if ('Name' in data[10]) {
-            this.usermeta = {name: data[10]["Name"],
-                             commonreactions: data[10]["Common reactions"],
-                             commoncompounds: data[10]["Common compounds"],
-                             numfbas: data[10]["Number FBAs"],
-                             numreactions: data[10]["Number reactions"],
-                             numcompounds: data[10]["Number compounds"]}
-            $.extend(this.overview, this.usermeta)
-        }
+                         moddate: data[3],
+                         commonreactions: data[10]["Common reactions"],
+                         commoncompounds: data[10]["Common compounds"],
+                         numfbas: data[10]["Number FBAs"],
+                         numreactions: data[10]["Number reactions"],
+                         numcompounds: data[10]["Number compounds"]};
     };
 
 	this.cmpnamehash = {
@@ -91,11 +85,13 @@ function KBaseFBA_FBAComparison(modeltabs) {
         }, {
         	"label": "Model",
             "key": "model",
-            "type": "wstype"
+            "type": "wstype",
+            "wstype": "KBaseFBA.FBAModel"
         }, {
         	"label": "Media",
-            "key": "media",
-            "type": "wstype"
+             "key": "media",
+            "type": "wstype",
+            "wstype": "KBaseFBA.Media"
         }, {
             "label": "Objective",
             "key": "objective",
@@ -319,13 +315,14 @@ function KBaseFBA_FBAComparison(modeltabs) {
                 }
             }
         	this.modelreactions[i].equation = reactants+" "+sign+" "+products;
-        	this.modelreactions[i].numfba = this.modelreactions[i].reaction_fluxes.length;
+        	this.modelreactions[i].numfba = 0;
         	var percent = Math.floor(100*this.modelreactions[i].state_conservation[this.modelreactions[i].most_common_state][1]);
         	this.modelreactions[i].mostcommonstate = this.modelreactions[i].most_common_state+" ("+percent+"%)";
         	this.modelreactions[i].inactivestates = "None";
         	this.modelreactions[i].forwardstates = "None";
         	this.modelreactions[i].reversestates = "None";
         	for (var key in this.modelreactions[i].reaction_fluxes) {
+        		this.modelreactions[i].numfba++;
         		if (this.modelreactions[i].reaction_fluxes[key][0] == "IA") {
         			if (this.modelreactions[i].inactivestates == "None") {
         				this.modelreactions[i].inactivestates = "Count: "+this.modelreactions[i].state_conservation["IA"][0]+"<br>"+key;
@@ -356,7 +353,7 @@ function KBaseFBA_FBAComparison(modeltabs) {
         	this.modelcompounds[i]["name"] = namearray[0];
             this.modelcompounds[i].dispid = idarray[0]+"["+idarray[1]+"]";
         	this.modelcompounds[i].exchange = " => "+this.modelcompounds[i].name+"["+namearray[1]+"]";
-        	this.modelcompounds[i].numfba = this.modelcompounds[i].exchanges.length;
+        	this.modelcompounds[i].numfba = 0;
         	var percent = Math.floor(100*this.modelcompounds[i].state_conservation[this.modelcompounds[i].most_common_state][1]);
         	this.modelcompounds[i].mostcommonstate = this.modelcompounds[i].most_common_state+" ("+percent+"%)";
         	if (this.modelcompounds[i].state_conservation["UP"]) {
@@ -375,6 +372,7 @@ function KBaseFBA_FBAComparison(modeltabs) {
         		this.modelcompounds[i].inactivestates = "None";
         	}
         	for (var key in this.modelcompounds[i].exchanges) {
+        		this.modelcompounds[i].numfba++;
         		if (this.modelcompounds[i].exchanges[key][0] == "UP") {
         			this.modelcompounds[i].uptakestates += "<br>"+key+": "+this.modelcompounds[i].exchanges[key][5];
         		} else if (this.modelcompounds[i].exchanges[key][0] == "EX") {
