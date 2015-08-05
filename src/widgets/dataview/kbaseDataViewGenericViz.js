@@ -221,7 +221,9 @@
 		/* STILL NEEDS A COMPLEX LANDING PAGE */
 		'KBaseFBA.FBAModel': modelingConfig,
             
-		'KBaseFBA.FBAModelSet': modelingConfig,		            
+		'KBaseFBA.FBAModelSet': modelingConfig,
+		
+		'KBaseFBA.FBAComparison': modelingConfig,		            
             
 		'KBaseGeneFamilies.DomainAnnotation': {
 		    widget:'kbaseDomainAnnotation',
