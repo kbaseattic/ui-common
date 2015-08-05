@@ -66,6 +66,7 @@ define([
              * 
              */
             options: {
+                param1: 'default param1 value'
             },
             
             /* DOC: init function 
@@ -112,7 +113,7 @@ define([
                  * is the $elem property, which is the jquery-wrapped node provded
                  * to this widget for its usage.
                  */
-                this.$elem.html('Hello, I am a simple KBase Jquery Widget');
+                this.$elem.html('Hello, I am a simple KBase Jquery Widget. Param 1 is ' + this.options.param1);
             }
         });
     });

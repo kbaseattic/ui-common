@@ -123,12 +123,12 @@ define([], function () {
                     break;
                 }
             }
-            
             // The total params is the path params and query params
             if (foundRoute) {
                 var allowableParams = foundRoute.route.queryParams || {};
                 Object.keys(req.query).forEach(function(key) {
                     var paramDef = allowableParams[key];
+                    /* TODO: implement the param def for conversion, validation, etc. */
                     if (paramDef) {
                         foundRoute.params[key] = req.query[key];
                     }

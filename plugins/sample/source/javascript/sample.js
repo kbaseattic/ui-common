@@ -140,7 +140,7 @@ define([
                      * widgets. These widgets do not implement the widget lifecycle, 
                      * so instead of 
                      */
-                    function addJqueryWidget(config) {
+                    function addKBWidgetWidget(config) {
                         var id = html.genId();
                         widgets.push({
                             widget: kbWidgetAdapterFactory.make(config),
@@ -184,7 +184,7 @@ define([
                                         config: {},
                                         widget: sampleWidgetFactory.make()
                                     })),
-                                    html.bsPanel('Sample jquery Widget', div({id: addJqueryWidget({
+                                    html.bsPanel('Sample jquery Widget', div({id: addKBWidgetWidget({
                                             name: 'samplejquerywidget',
                                             module: 'kb.widget.sample.jquery',
                                             jquery_object: 'SampleWidget'

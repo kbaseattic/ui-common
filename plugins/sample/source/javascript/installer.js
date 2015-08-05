@@ -14,6 +14,9 @@ define([
         function setup() {
             R.addRoute({
                 path: ['sample'],
+                queryParams: {
+                    param1: {}
+                },
                 panelFactory: samplePanelFactory
             });
             
