@@ -175,7 +175,7 @@ define([
                      */
                     return {
                         title: 'Sample Panel',
-                        content: div([
+                        content: div({class: 'kb-panel-sample'}, [
                             h1('Sample Panel and Widgets'),
                             div({class: 'row'}, [
                                 div({class: 'col-md-6'}, [
@@ -350,7 +350,18 @@ define([
                 }
                 function destroy() {
                     return q.Promise(function (resolve) {
-                        resolve();
+                        q.all(rendered.widgets.map(function (w) {
+                            if (w.widget.destroy) {
+                                return w.widget.destroy();
+                            }
+                        }))
+                            .then(function (results) {
+                                resolve();
+                            })
+                            .catch(function (err) {
+                                reject(err);
+                            })
+                            .done();
                     });
                 }
 
@@ -359,7 +370,8 @@ define([
                     attach: attach,
                     start: start,
                     stop: stop,
-                    detach: detach
+                    detach: detach,
+                    destroy: destroy
                 };
             }
             

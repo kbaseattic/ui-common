@@ -1,6 +1,6 @@
 ## YAML Template.
 ---
-plugins: [sample, eg_plugin]
+plugins: [sample, eg_plugin, about, databrowser]
 navbar:
     menu:
         available_items:
@@ -12,10 +12,6 @@ navbar:
                 uri: funtional_site#narrativemanager/start
                 label: Narrative
                 icon: file
-            about:
-                path: about
-                label: About
-                icon: info-circle
             narrativeTutorial: 
                 uri: https://kbase.us/narrative-guide
                 label: Narrative Tutorial
@@ -36,10 +32,6 @@ navbar:
                 path: dashboard
                 label: Dashboard
                 icon: dashboard
-            databrowser:
-                path: databrowser
-                label: Data Browser
-                icon: database
             typebrowser:
                 path: typebrowser
                 label: Type Browser
@@ -49,6 +41,6 @@ navbar:
                 label: Testing Panel
                 icon: flask
         menus:
-            authenticated: [search, narrative, dashboard, databrowser, typebrowser, test, divider, about, contact, divider]                
+            authenticated: [search, narrative, dashboard, typebrowser, test, divider, about, contact, divider]                
             unauthenticated: [about, contact, divider, about_kbase, contact_us]
         

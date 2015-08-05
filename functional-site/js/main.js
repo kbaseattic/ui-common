@@ -213,14 +213,27 @@ define([
                     require(['yaml!plugins/' + plugin + '/config.yml'], function (config) {
                         // build up a list of modules and add them to the require config.
                         var paths = {},
-                            sourcePath = 'plugins/' + plugin + '/source/javascript/';
+                            sourcePath = 'plugins/' + plugin + '/source';
+                            
+                        // load any styles.
+                        var dependencies = [
+                            config.setup.installer.module
+                        ];
+                        if (config.source.styles) {
+                            config.source.styles.forEach(function (style) {
+                                dependencies.push('css!'+sourcePath + '/css/' + style.file);
+                            });
+                        }
 
-                        config.sources.forEach(function (source) {
-                            paths[source.module] = sourcePath + source.file;
+                        config.source.modules.forEach(function (source) {
+                            paths[source.module] = sourcePath + '/javascript/' + source.file;
                         });
                         require.config({paths: paths});
                         // enter a require closure with the installer as the module.
-                        require([config.setup.installer.module], function (installer) {
+                        
+                        // NB - installer is the first module in the dependency
+                        // list so we receive it as the first argument.
+                        require(dependencies, function (installer) {
                             installer.setup();
                             resolve();
                         });
@@ -249,7 +262,6 @@ define([
                 Runtime.logDebug({source: 'main', message: 'About to load panels...'});
                 var panels = [
                     {module: 'kb.panel.message', config: {}},
-                    {module: 'kb.panel.about', config: {}},
                     {module: 'kb.panel.contact', config: {}},
                     {module: 'kb.panel.login', config: {}},
                     {module: 'kb.panel.userprofile', config: {}},
@@ -258,7 +270,6 @@ define([
                     //{module: 'kb.panel.narrativestore'},
                     // {module: 'kb.panel.datasearch'},
                     {module: 'kb.panel.dataview', config: {}},
-                    {module: 'kb.panel.databrowser', config: {}},
                     {module: 'kb.panel.typebrowser', config: {}},
                     {module: 'kb.panel.typeview'},
                     {module: 'kb.panel.test'},

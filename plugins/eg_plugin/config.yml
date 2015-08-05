@@ -6,15 +6,15 @@ package:
     description: A package containing an example plugin
     date: August 4, 2015
     version: 0.0.1
-sources:
-    ## sources are relative to build/plugins/PACKAGE/source/javascript
-    -
-        module: kb.panel.eg_plugin
-        file: panel    
-    -
-        module: kb.panel.eg_plugin.installer
-        file: installer
-        
+source:
+    modules:
+        ## sources are relative to build/plugins/PACKAGE/source/javascript
+        -
+            module: kb.panel.eg_plugin
+            file: panel    
+        -
+            module: kb.panel.eg_plugin.installer
+            file: installer
 setup:
     installer: 
         module: kb.panel.eg_plugin.installer

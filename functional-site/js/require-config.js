@@ -178,11 +178,10 @@
             'kb.client.methods': 'src/clients/kbaseClientMethods',
             // Standalone Widgets
             'kb.widget': 'src/widgets/Widget',
-            'kb.widget.databrowser': 'src/widgets/DataBrowser/DataBrowser',
+            // 'kb.widget.databrowser': 'src/widgets/DataBrowser/DataBrowser',
             'kb.widget.typebrowser': 'src/widgets/TypeBrowser',
             // KBase Panels
             // ------------
-            'kb.panel.about': 'src/panels/about',
             'kb.panel.contact': 'src/panels/contact',
             'kb.panel.login': 'src/panels/login',
             'kb.panel.navbar': 'src/panels/navbar',
@@ -195,7 +194,6 @@
             'kb.panel.datasearch': 'src/panels/datasearch',
             'kb.panel.dataview': 'src/panels/dataview',
             'kb.panel.dataview.style': 'src/panels/dataview',
-            'kb.panel.databrowser': 'src/panels/databrowser',
             'kb.panel.typebrowser': 'src/panels/typebrowser',
             'kb.panel.typeview': 'src/panels/typeview',
             'kb.panel.message': 'src/panels/message',
