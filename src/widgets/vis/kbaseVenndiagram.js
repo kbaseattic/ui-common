@@ -6,7 +6,7 @@ define(
     [
         'jquery',
         'd3',
-        'kb.vis.widget',
+        'kb.widget.vis.widget',
         'kb.RGBColor',
         'kb.geometry.rectangle',
         'kb.geometry.point',

@@ -6,7 +6,7 @@ define(
     [
         'jquery',
         'd3',
-        'kb.vis.widget',
+        'kb.widget.vis.widget',
         'kb.RGBColor',
         'kb.geometry.rectangle',
         'kb.geometry.point',
@@ -14,10 +14,8 @@ define(
     ], function( $ ) {
 
     'use strict';
-
+console.log("KBLC!");
     $.KBWidget({
-
-    'use strict';
 
 	    name: "kbaseLinechart",
 	  parent: "kbaseVisWidget",

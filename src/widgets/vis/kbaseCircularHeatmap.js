@@ -6,12 +6,12 @@ define(
     [
         'jquery',
         'd3',
-        'kb.vis.piechart',
+        'kb.widget.vis.piechart',
     ], function( $ ) {
 
-    $.KBWidget({
-
     'use strict';
+
+    $.KBWidget({
 
 	    name: "kbaseCircularHeatmap",
 	  parent: "kbasePiechart",

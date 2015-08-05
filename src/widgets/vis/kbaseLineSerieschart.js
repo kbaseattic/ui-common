@@ -6,16 +6,17 @@ define(
     [
         'jquery',
         'd3',
-        'kb.vis.linechart',
+        'kb.widget.vis.linechart',
         'kb.RGBColor',
         'kb.geometry.rectangle',
         'kb.geometry.point',
         'kb.geometry.size',
     ], function( $ ) {
 
-    $.KBWidget({
 
     'use strict';
+
+    $.KBWidget({
 
 	    name: "kbaseLineSerieschart",
 	  parent: "kbaseLinechart",

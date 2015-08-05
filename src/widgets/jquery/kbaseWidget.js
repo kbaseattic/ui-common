@@ -140,7 +140,7 @@ $('someElement').kb_unbind($target, attribute, callback, transformers, accessors
 
 define(['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
 
-    'use strict';
+    //'use strict';
 
     $(document).on(
         'libsLoaded.kbase',
@@ -687,7 +687,7 @@ define(['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
                 } else if ( typeof method === 'object' || ! method ) {
                     //return this.data(name).init( arguments );
                     var args = arguments;
-                    $w = this.data(name);
+                    var $w = this.data(name);
                     if ($w._init === undefined) {
                         $w = Widget.prototype.init.apply($w, arguments);
                     }
@@ -823,12 +823,14 @@ define(['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
                 var opts = $.extend(true, {}, this.options);
                 this.options = $.extend(true, {}, opts, args);
 
+                var arg;
                 for (arg in args) {
                     if (args[arg] === undefined && this.options[arg] !== undefined) {
                         delete this.options[arg];
                     }
                 }
 
+                var attribute;
                 for (attribute in this.__attributes) {
                     if (this.options[attribute] !== undefined) {
                         var setter = this.__attributes[attribute].setter;

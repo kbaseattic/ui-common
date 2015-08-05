@@ -221,7 +221,8 @@ define([
                     {module: 'kb.panel.typebrowser', config: {}},
                     {module: 'kb.panel.typeview'},
                     {module: 'kb.panel.test'},
-                    {module: 'kb.panel.sample'}
+                    {module: 'kb.panel.sample'},
+                    {module: 'kb.panel.linechart'}
                 ].map(function (panel) {
                     return requirePromise([panel.module], function (PanelModule) {
                         // this registers routes

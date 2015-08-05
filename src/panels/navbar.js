@@ -240,7 +240,7 @@ define([
                 sample: {
                     uri: '#sample',
                     label: 'Sample Panel',
-                    icon: 'flask'
+                    icon: 'bicycle'
                 },
                 linechart: {
                     uri: '#linechart',

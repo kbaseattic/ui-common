@@ -6,12 +6,12 @@ define(
     [
         'jquery',
         'd3',
-        'kb.vis.barchart',
+        'kb.widget.vis.barchart',
     ], function( $ ) {
 
-    $.KBWidget({
-
     'use strict';
+
+    $.KBWidget({
 
 	    name: "kbaseHistogram",
 	  parent: "kbaseBarchart",

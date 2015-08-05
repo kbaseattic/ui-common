@@ -145,19 +145,19 @@
             'kb.geometry.rectangle' : 'src/js/geometry/rectangle',
             'kb.RGBColor'           : 'src/js/RGBColor',
 
-            'kb.vis.barchart'       : 'src/vis/kbaseBarchart',
-            //'kb.vis.chordchart'     : 'src/vis/kbaseChordchart',
-            //'kb.vis.circularHeatmap': 'src/vis/kbaseCircularHeatmap',
-            //'kb.vis.forcedNetwork'  : 'src/vis/kbaseForcedNetwork',
-            'kb.vis.heatmap'        : 'src/vis/kbaseHeatmap',
-            //'kb.vis.histogram'      : 'src/vis/kbaseHistogram',
-            'kb.vis.linechart'      : 'src/vis/kbaseLinechart',
-            //'kb.vis.lineSerieschart': 'src/vis/kbaseLineSerieschart',
-            //'kb.vis.piechart'       : 'src/vis/kbasePiechart',
-            //'kb.vis.scatterplot'    : 'src/vis/kbaseScatterplot',
-            //'kb.vis.treechart'      : 'src/vis/kbaseTreechart',
-            //'kb.vis.venndiagram'    : 'src/vis/kbaseVenndiagram',
-            'kb.vis.widget'         : 'src/vis/kbaseVisWidget',
+            'kb.widget.vis.barchart'       : 'src/widgets/vis/kbaseBarchart',
+            //'kb.widget.vis.chordchart'     : 'src/widgets/vis/kbaseChordchart',
+            //'kb.widget.vis.circularHeatmap': 'src/widgets/vis/kbaseCircularHeatmap',
+            //'kb.widget.vis.forcedNetwork'  : 'src/widgets/vis/kbaseForcedNetwork',
+            'kb.widget.vis.heatmap'        : 'src/widgets/vis/kbaseHeatmap',
+            //'kb.widget.vis.histogram'      : 'src/widgets/vis/kbaseHistogram',
+            'kb.widget.vis.linechart'      : 'src/widgets/vis/kbaseLinechart',
+            //'kb.widget.vis.lineSerieschart': 'src/widgets/vis/kbaseLineSerieschart',
+            //'kb.widget.vis.piechart'       : 'src/widgets/vis/kbasePiechart',
+            //'kb.widget.vis.scatterplot'    : 'src/widgets/vis/kbaseScatterplot',
+            //'kb.widget.vis.treechart'      : 'src/widgets/vis/kbaseTreechart',
+            //'kb.widget.vis.venndiagram'    : 'src/widgets/vis/kbaseVenndiagram',
+            'kb.widget.vis.widget'         : 'src/widgets/vis/kbaseVisWidget',
 
 
             // KBase Widgets
@@ -220,6 +220,7 @@
             'kb.panel.message': 'src/panels/message',
             'kb.panel.test': 'src/panels/test',
             'kb.panel.sample': 'src/panels/sample',
+            'kb.panel.linechart': 'src/panels/linechart',
             // KBase JQuery Plugin Widgets
             // ---------------------------
             'kb.jquery.widget': 'src/widgets/jquery/kbaseWidget',

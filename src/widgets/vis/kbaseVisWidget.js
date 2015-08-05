@@ -12,7 +12,7 @@ define(
         'kb.geometry.point',
         'kb.geometry.size'
     ],
-    function ($) {
+    function ($, d3, kbw, RGBColor, Rectangle, Point, Size) {
 
         'use strict';
 
@@ -180,7 +180,7 @@ define(
                 return yScale;
             },
             init: function (options) {
-
+console.log("VIS INIT!");
                 this._super(options);
 
                 if (this.children() == undefined) {
@@ -580,7 +580,6 @@ define(
                                 'font-family': 'sans-serif',
                                 'font-size': '12px',
                                 'line-height': '20px',
-                                'display'               : 'none',
                             }
                         )
                         ;
@@ -771,19 +770,32 @@ define(
                     new Size(this.chartBounds().size.width, this.yPadding())
                     );
             },
+
             chartBounds: function () {
 
                 var widgetWidth = this.width();
                 var widgetHeight = this.height();
 
-                return new Rectangle(
+                var chart = new Rectangle(
                     new Point(this.xPadding(), this.yGutter()),
                     new Size(
                         widgetWidth - this.xPadding() - this.xGutter(),
                         widgetHeight - this.yGutter() - this.yPadding()
-                        )
-                    );
+                    )
+                );
+
+                if (chart.size.width < 0) {
+                    chart.size.width = 0;
+                }
+
+                if (chart.size.height < 0) {
+                    chart.size.height = 0;
+                }
+
+                return chart;
+
             },
+
             showToolTip: function (args) {
 
                 if (args.event == undefined) {

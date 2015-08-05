@@ -143,14 +143,14 @@ define([
                      * out, however, to be a useful pattern.
                      */
                     return {
-                        title: 'Sample Panel',
+                        title: 'Linechart Panel',
                         content: div([
                             h1('Some visualizations'),
                             div({class: 'row'}, [
                                 div({class: 'col-md-6'}, [
                                     html.bsPanel('Line Chart', div({id: addJqueryWidget({
                                             name: 'linechartwidget',
-                                            module: 'kb.vis.linechart',
+                                            module: 'kb.widget.vis.linechart',
                                             jquery_object: 'kbaseLinechart'
                                         })})),
                                 ])
@@ -267,6 +267,7 @@ define([
                                 resolve();
                             })
                             .catch(function (err) {
+console.log("1FAILED WITH ", err);
                                 reject(err);
                             })
                             .done();
@@ -286,6 +287,7 @@ define([
                                 resolve();
                             })
                             .catch(function (err) {
+console.log("2FAILED WITH ", err);
                                 reject(err);
                             })
                             .done();
@@ -300,6 +302,7 @@ define([
                                 resolve();
                             })
                             .catch(function (err) {
+console.log("3FAILED WITH ", err);
                                 reject(err);
                             })
                             .done();

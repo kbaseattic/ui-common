@@ -6,17 +6,17 @@ define(
     [
         'jquery',
         'd3',
-        'kb.vis.widget',
+        'kb.widget.vis.widget',
         'kb.RGBColor',
         'kb.geometry.rectangle',
         'kb.geometry.point',
         'kb.geometry.size',
-        'kb.vis.piechart',
+        'kb.widget.vis.piechart',
     ], function( $ ) {
 
-    $.KBWidget({
-
     'use strict';
+
+    $.KBWidget({
 
 	    name: "kbaseChordchart",
 	  parent: "kbasePiechart",
