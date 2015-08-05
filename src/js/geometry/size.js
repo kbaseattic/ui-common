@@ -7,6 +7,7 @@
  */
 define([],
     function () {
+
         'use strict';
 
         function Size (width, height) {

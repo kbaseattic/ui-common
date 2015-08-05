@@ -105,6 +105,7 @@
             'font-awesome': 'bower_components/font-awesome/css/font-awesome.min',
             'stacktrace': 'bower_components/stacktrace-js/dist/stacktrace.min',
             'js-yaml': 'bower_components/js-yaml/dist/js-yaml.min',
+            'handlebars' : 'bower_components/handlebars/handlebars.amd.min',
 
             // KBase Styles
             // ----------------
@@ -143,6 +144,20 @@
             'kb.geometry.point'     : 'src/js/geometry/point',
             'kb.geometry.rectangle' : 'src/js/geometry/rectangle',
             'kb.RGBColor'           : 'src/js/RGBColor',
+
+            'kb.vis.barchart'       : 'src/vis/kbaseBarchart',
+            //'kb.vis.chordchart'     : 'src/vis/kbaseChordchart',
+            //'kb.vis.circularHeatmap': 'src/vis/kbaseCircularHeatmap',
+            //'kb.vis.forcedNetwork'  : 'src/vis/kbaseForcedNetwork',
+            'kb.vis.heatmap'        : 'src/vis/kbaseHeatmap',
+            //'kb.vis.histogram'      : 'src/vis/kbaseHistogram',
+            'kb.vis.linechart'      : 'src/vis/kbaseLinechart',
+            //'kb.vis.lineSerieschart': 'src/vis/kbaseLineSerieschart',
+            //'kb.vis.piechart'       : 'src/vis/kbasePiechart',
+            //'kb.vis.scatterplot'    : 'src/vis/kbaseScatterplot',
+            //'kb.vis.treechart'      : 'src/vis/kbaseTreechart',
+            //'kb.vis.venndiagram'    : 'src/vis/kbaseVenndiagram',
+            'kb.vis.widget'         : 'src/vis/kbaseVisWidget',
 
 
             // KBase Widgets

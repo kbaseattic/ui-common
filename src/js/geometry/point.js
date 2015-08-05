@@ -7,6 +7,7 @@
  */
 define(['kb.geometry.rectangle', ],
     function (Rectangle) {
+
         'use strict';
 
         function Point(x,y) {

@@ -6,13 +6,15 @@ define(
     [
         'jquery',
         'd3',
-        'kbwidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size'
+        'kb.jquery.widget',
+        'kb.RGBColor',
+        'kb.geometry.rectangle',
+        'kb.geometry.point',
+        'kb.geometry.size'
     ],
     function ($) {
+
+        'use strict';
 
         $.KBWidget({
             name: "kbaseVisWidget",
@@ -696,7 +698,7 @@ define(
                  .enter()
                  .append('g')
                  .attr('class', function(region) { return region } );
-                 
+
                  ;*/
 
             },

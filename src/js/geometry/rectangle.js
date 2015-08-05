@@ -7,6 +7,7 @@
  */
 define(['kb.geometry.point', 'kb.geometry.size'],
     function (Point, Size) {
+
         'use strict';
 
         function Rectangle(origin,size) {

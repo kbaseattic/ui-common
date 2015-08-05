@@ -2,14 +2,16 @@
 
 */
 
-define('kbaseHistogram',
+define(
     [
         'jquery',
         'd3',
-        'kbaseBarchart',
+        'kb.vis.barchart',
     ], function( $ ) {
 
     $.KBWidget({
+
+    'use strict';
 
 	    name: "kbaseHistogram",
 	  parent: "kbaseBarchart",

@@ -1,17 +1,19 @@
 /*
- 
+
  */
 
-define('kbaseVenndiagram',
+define(
     [
         'jquery',
         'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
+        'kb.vis.widget',
+        'kb.RGBColor',
+        'kb.geometry.rectangle',
+        'kb.geometry.point',
+        'kb.geometry.size',
     ], function ($) {
+
+    'use strict';
 
     $.KBWidget({
         name: "kbaseVenndiagram",

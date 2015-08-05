@@ -15,11 +15,11 @@ define([
         'use strict';
         // ACTUALLY: a widget
         /*
-         * Use the factory pattern. 
-         * This lets us create objects which don't use "this" and which use 
+         * Use the factory pattern.
+         * This lets us create objects which don't use "this" and which use
          * natural closures for modularization rather than object construction
          * by way of Object.create()
-         * 
+         *
          */
         var factory = function () {
             var self = this;
@@ -95,7 +95,7 @@ define([
                     resolve();
                 });
                 /*
-                 
+
                  R.whenItem('userprofile')
                  .then(function (profile) {
                  attach($container).done();
@@ -109,7 +109,7 @@ define([
                     // all we care about is the avatar menu
                     // this will be automatically re-rendered if we set the dirty
                     // flag.
-                    dirty();                        
+                    dirty();
                 }));
                 subscriptions2.push(R.recv('app', 'loggedin', function () {
                     // all we care about is the avatar menu
@@ -179,9 +179,9 @@ define([
 
             /*
              * These are the registered menu items. Any menu item must be registered
-             * here. 
-             * Menu items may also be added using the defMenuItem method. 
-             * A menu item might be defined by a panel or widget when it is first loaded. In this case, 
+             * here.
+             * Menu items may also be added using the defMenuItem method.
+             * A menu item might be defined by a panel or widget when it is first loaded. In this case,
              */
             var menuItems = {
                 search: {
@@ -236,11 +236,16 @@ define([
                     uri: '#typebrowser',
                     label: 'Type Browser',
                     icon: 'beer'
-                }, 
+                },
                 sample: {
                     uri: '#sample',
                     label: 'Sample Panel',
-                    icon: 'bicycle'
+                    icon: 'flask'
+                },
+                linechart: {
+                    uri: '#linechart',
+                    label: 'Line chart',
+                    icon: 'line-chart'
                 },
                 test: {
                     uri: '#test',
@@ -369,7 +374,7 @@ define([
             function renderMenu() {
                 var ul = html.tag('ul');
                 if (R.isLoggedIn()) {
-                    setMenu(['search', 'narrative', 'dashboard', 'databrowser', 'typebrowser', 'test', 'sample', 'divider', 'about', 'contact', 'divider', 'about_kbase', 'contact_us']);
+                    setMenu(['search', 'narrative', 'dashboard', 'databrowser', 'typebrowser', 'test', 'sample', 'linechart', 'divider', 'about', 'contact', 'divider', 'about_kbase', 'contact_us']);
                 } else {
                     setMenu(['about', 'contact', 'divider', 'about_kbase', 'contact_us']);
                 }
@@ -402,8 +407,8 @@ define([
 
 
                 if (R.isLoggedIn()) {
-                    /* TODO: fix dependencies like this -- realname is not available until, and unless, the                     
-                      profile is loaded, which happens asynchronously.            
+                    /* TODO: fix dependencies like this -- realname is not available until, and unless, the
+                      profile is loaded, which happens asynchronously.
                     */
                     var profile = R.getItem('userprofile');
                     var realname = profile ? profile.getProp('user.realname') : '?';
@@ -598,7 +603,7 @@ define([
                     //removeAppMenuItem: removeAppMenuItem,
                     //addPanelMenuItem: addPanelMenuItem,
                     //removePanelMenuItem: removePanelMenuItem,
-                    //clearMenu: 
+                    //clearMenu:
                     // On the other hand, panels and widgets don't need to muck with the menu,
                     // they can use buttons.
                     //clearButtons: clearButtons,

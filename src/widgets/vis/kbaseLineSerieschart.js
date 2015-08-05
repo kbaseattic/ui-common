@@ -2,18 +2,20 @@
 
 */
 
-define('kbaseLineSerieschart',
+define(
     [
         'jquery',
         'd3',
-        'kbaseLinechart',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
+        'kb.vis.linechart',
+        'kb.RGBColor',
+        'kb.geometry.rectangle',
+        'kb.geometry.point',
+        'kb.geometry.size',
     ], function( $ ) {
 
     $.KBWidget({
+
+    'use strict';
 
 	    name: "kbaseLineSerieschart",
 	  parent: "kbaseLinechart",
