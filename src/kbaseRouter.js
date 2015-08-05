@@ -5,9 +5,36 @@
  browser: true,
  white: true
  */
+
+/**
+ * A route path ParamComponent
+ * 
+ * @typedef {Object} RoutePathComponent
+ * @property {string} type - the type of the component, either 'param' or 'path'
+ * @property {string} name - type name of the component. For param, it is the name of the query variable and of the resulting property in the param object; for path it is literal text of the path component.
+ * 
+ */
+
+/**
+ * A definition of path and parameters which may match a route, and a payload.
+ * 
+ * @typedef {Object} RouteSpecification
+ * @property {Array.<String|RoutePathComponent>} path - an array of path elements, either literal strings or path component objects
+ * @property {Object} params - an object whose properties are parameters may be present in a query string
+ * @property {Object} payload - an arbitrary object which represents the state associated with the route path.
+ */
+
+/** 
+ * A simple hash-path router service.
+ * 
+ * @module router
+ * 
+ * 
+ * @returns {unresolved}
+ */
 define([], function () {
     'use strict';
-    return (function () {
+    var factory = function () {
         // Routing
         var routes = [];
         function addRoute(pathSpec) {
@@ -64,11 +91,13 @@ define([], function () {
                 query: query
             };
         }
-
+        
         function findCurrentRoute() {
             var req = getCurrentRequest();
+            return findRoute(req);
+        }
 
-            // Match on the path
+        function findRoute(req) {
             var foundRoute;
             for (var i = 0; i < routes.length; i += 1) {
                 var route = routes[i];
@@ -123,7 +152,15 @@ define([], function () {
             addRoute: addRoute,
             listRoutes: listRoutes,
             findCurrentRoute: findCurrentRoute,
+            getCurrentRequest: getCurrentRequest,
+            findRoute: findRoute,
             setDefaultRoute: setDefaultRoute
+        };
+    };
+    
+    return {
+        make: function() {
+            return factory();
         }
-    }());
+    };
 });

@@ -27,14 +27,14 @@ define([
     'kb.panel.narrativemanager',
     'kb.panel.navbar',
     'kb.client.profile',
-    'kb.session',
+    'yaml!build/ui.yml',
     'bootstrap',
     'css!font-awesome',
     'domReady!'],
-    function (App, Runtime, AppState, Q, NarrativeManagerPanel, Navbar, ProfileService, Session) {
+    function (App, Runtime, AppState, Q, NarrativeManagerPanel, Navbar, ProfileService, UIConfig) {
         'use strict';
 
-        var app = App.create();
+        var app = App.make();
         Runtime.setApp(app);
 
         var navbar = null;
@@ -46,6 +46,20 @@ define([
             navbar = Navbar.create();
             navbar.setup();
 
+            // Set up the navbar.
+            Object.keys(UIConfig.navbar.menu.available_items).forEach(function (menuId) {
+                navbar.addMenuItem(menuId, UIConfig.navbar.menu.available_items[menuId]);
+            });
+            Object.keys(UIConfig.navbar.menu.menus).forEach(function (menuId) {
+                navbar.addMenu(menuId, UIConfig.navbar.menu.menus[menuId]);
+            });
+
+            Runtime.recv('navbar', 'add-menu-item', function (data) {
+                navbar.addMenuItem(data.name, data.definition);
+                navbar.addToMenu('authenticated', data.name);
+            });
+
+            // ?? (EAP)
             Runtime.props.setItem('navbar', navbar);
 
             // The default route is invoked if there is no route set up to handle
@@ -122,10 +136,10 @@ define([
             Runtime.recv('app', 'navigate', function (data) {
                 app.navigateTo(data);
             });
-            
+
             Runtime.recv('app', 'redirect', function (data) {
                 app.redirectTo(data.url, data.new_window);
-            })
+            });
 
             // This will work ... but we need to tune this!
             Runtime.recv('app', 'loggedin', function () {
@@ -133,7 +147,6 @@ define([
             });
 
             Runtime.recv('app', 'new-route', function (data) {
-                console.log(data);
                 if (data.routeHandler.route.redirect) {
                     Runtime.send('app', 'navigate', {
                         path: data.routeHandler.route.redirect.path,
@@ -156,7 +169,7 @@ define([
                 } else if (data.routeHandler.route.panelFactory) {
                     // And ... we have another panel factory pattern here. We will
                     // converge as soon as we can...
-                     app.showPanel3('app', data.routeHandler)
+                    app.showPanel3('app', data.routeHandler)
                         .catch(function (err) {
                             console.error('ERROR');
                             console.error(err);
@@ -187,6 +200,34 @@ define([
 
             // Handle the initial route.
             // Find a handler for the current route
+
+        }
+
+        function installPlugins() {
+            var plugins = UIConfig.plugins;
+
+            // for each plugin
+            var loaders = plugins.map(function (plugin) {
+                // read the config file
+                return Q.Promise(function (resolve) {
+                    require(['yaml!plugins/' + plugin + '/config.yml'], function (config) {
+                        // build up a list of modules and add them to the require config.
+                        var paths = {},
+                            sourcePath = 'plugins/' + plugin + '/source/javascript/';
+
+                        config.sources.forEach(function (source) {
+                            paths[source.module] = sourcePath + source.file;
+                        });
+                        require.config({paths: paths});
+                        // enter a require closure with the installer as the module.
+                        require([config.setup.installer.module], function (installer) {
+                            installer.setup();
+                            resolve();
+                        });
+                    });
+                });
+            });
+            return Q.all(loaders);
 
         }
 
@@ -221,20 +262,27 @@ define([
                     {module: 'kb.panel.typebrowser', config: {}},
                     {module: 'kb.panel.typeview'},
                     {module: 'kb.panel.test'},
-                    {module: 'kb.panel.sample'}
+                    // {module: 'kb.panel.sample'},
+                    // {module: 'kb.panel.sample.router'}
                 ].map(function (panel) {
                     return requirePromise([panel.module], function (PanelModule) {
                         // this registers routes
                         PanelModule.setup(app, panel.config);
                     });
                 });
+
                 Q.all(panels)
                     .then(function () {
-                        Runtime.logDebug({source: 'main', message: 'setting up app'});
                         setupApp();
+                        resolve();
+                    })
+                    .then(function () {
+                        Runtime.logDebug({source: 'main', message: 'setting up app'});
+                        return installPlugins();
+                    })
+                    .then(function () {
                         runApp();
                         Runtime.logDebug({source: 'main', message: 'done'});
-                        resolve();
                     })
                     .catch(function (err) {
                         console.log('ERROR loading panels');

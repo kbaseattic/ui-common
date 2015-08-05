@@ -200,7 +200,9 @@
             'kb.panel.typeview': 'src/panels/typeview',
             'kb.panel.message': 'src/panels/message',
             'kb.panel.test': 'src/panels/test',
-            'kb.panel.sample': 'src/panels/sample',
+            // 'kb.panel.sample': 'src/panels/sample',
+            'kb.panel.sample.router': 'src/panels/sample-router',
+            
             // KBase JQuery Plugin Widgets
             // ---------------------------
             'kb.jquery.widget': 'src/widgets/jquery/kbaseWidget',
@@ -277,10 +279,10 @@
             'kb.jquery.contigset': 'src/widgets/jquery/contigset/kbaseContigSetView',
             
             // Sample Widgets
-            'kb.widget.sample.factory': 'src/widgets/sample/factory-widget',
-            'kb.widget.sample.jquery': 'src/widgets/sample/kbase-jquery-widget',
-            'kb.widget.sample.object': 'src/widgets/sample/object-es5-widget',
-            'kb.widget.sample.object-interface': 'src/widgets/sample/object-widget-interface',
+            //'kb.widget.sample.factory': 'src/widgets/sample/factory-widget',
+            //'kb.widget.sample.jquery': 'src/widgets/sample/kbase-jquery-widget',
+            //'kb.widget.sample.object': 'src/widgets/sample/object-es5-widget',
+            //'kb.widget.sample.object-interface': 'src/widgets/sample/object-widget-interface',
             
             // KBase Services
             // non-visual dependencies of plugins

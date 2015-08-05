@@ -19,7 +19,10 @@ Common user interface components and libraries for the KBase Project.
 
 ##Installation
 
+
+
 ###Developer
+
 
 
 ####Works for Erik
@@ -64,6 +67,8 @@ TODO: Add documentation
 ##Landing Pages
 
 ##KBase Labs Template
+
+what??
 
 ##Contributors
 

@@ -184,86 +184,27 @@ define([
              * A menu item might be defined by a panel or widget when it is first loaded. In this case, 
              */
             var menuItems = {
-                search: {
-                    uri: R.getConfig('ui.paths.spa_root')+'search/?q=*',
-                    label: 'Search Data',
-                    icon: 'search'
-                },
-                narrative: {
-                    uri: R.getConfig('ui.paths.spa_root')+'narrativemanager/start',
-                    label: 'Narrative',
-                    icon: 'file'
-                },
                 divider: {
                     type: 'divider'
-                },
-                about: {
-                    uri: '#about',
-                    label: 'About',
-                    icon: 'info-circle'
-                },
-                narrativeTutorial: {
-                    uri: 'https://kbase.us/narrative-guide',
-                    label: 'Narrative Tutorial',
-                    icon: 'info-circle'
-                },
-                contact: {
-                    uri: R.getConfig('ui.paths.spa_root')+'contact',
-                    label: 'Contact Us',
-                    icon: 'envelope-o'
-                },
-                about_kbase: {
-                    uri: 'https://kbase.us/about',
-                    label: 'About KBase',
-                    icon: 'info-circle'
-                },
-                contact_us: {
-                    uri: 'https://kbase.us/contact-us',
-                    label: 'Contact Us',
-                    icon: 'envelope-o'
-                },
-                dashboard: {
-                    uri: '#dashboard',
-                    label: 'Dashboard',
-                    icon: 'dashboard'
-                },
-                databrowser: {
-                    uri: '#databrowser',
-                    label: 'Data Browser',
-                    icon: 'database'
-                },
-                typebrowser: {
-                    uri: '#typebrowser',
-                    label: 'Type Browser',
-                    icon: 'beer'
-                }, 
-                sample: {
-                    uri: '#sample',
-                    label: 'Sample Panel',
-                    icon: 'bicycle'
-                },
-                test: {
-                    uri: '#test',
-                    label: 'Testing Panel',
-                    icon: 'flask'
                 }
             };
-            function defMenuItem(id, menuDef) {
+            function addMenuItem(id, menuDef) {
                 menuItems[id] = menuDef;
             }
 
+            
             var menu = [];
             function clearMenu() {
                 menu = [];
             }
-            function addMenuItem(id, afterItem) {
-                menu.push(id);
-            }
+            
+            /*
             function deleteMenuItem(id) {
                 delete menu[id];
             }
             function insertMenuItem(id, beforeItem) {
             }
+            */
             function setMenu(ids) {
                 clearMenu();
                 menu = ids.map(function (id) {
@@ -358,20 +299,37 @@ define([
                 var type = item.type || 'button';
                 switch (type) {
                     case 'button':
-                        return li({}, a({href: item.uri}, [
-                            icon,
-                            item.label
-                        ]));
+                        if (item.uri) {
+                            return li({}, a({href: item.uri}, [
+                                icon,
+                                item.label
+                            ]));
+                        } else if (item.path) {
+                            return li({}, a({href: '#'+item.path}, [
+                                icon,
+                                item.label
+                            ]));
+                        }
                     case 'divider':
                         return li({role: 'presentation', class: 'divider'});
                 }
             }
+            
+            var menus = {};
+            function addMenu(id, items) {
+                menus[id] = items;
+            }
+            function addToMenu(id, item) {
+                menus[id].push(item);
+                dirty();
+            }
+
             function renderMenu() {
                 var ul = html.tag('ul');
                 if (R.isLoggedIn()) {
-                    setMenu(['search', 'narrative', 'dashboard', 'databrowser', 'typebrowser', 'test', 'sample', 'divider', 'about', 'contact', 'divider', 'about_kbase', 'contact_us']);
+                    setMenu(menus['authenticated']);
                 } else {
-                    setMenu(['about', 'contact', 'divider', 'about_kbase', 'contact_us']);
+                    setMenu(menus['unauthenticated']);
                 }
                 return ul({class: 'dropdown-menu', role: 'menu', 'aria-labeledby': 'kb-nav-menu'}, menu.map(function (id) {
                     var item = menuItems[id];
@@ -588,9 +546,14 @@ define([
                 render: render,
                 // navbar api
                 setTitle: setTitle,
-                defMenuItem: defMenuItem,
+                // addMenuItem: addMenuItem,
                 clearButtons: clearButtons,
-                addButton: addButton
+                addButton: addButton,
+                
+                addMenu: addMenu,
+                addMenuItem: addMenuItem,
+                
+                addToMenu: addToMenu,
 
 
 
