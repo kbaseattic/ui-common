@@ -1,0 +1,17 @@
+
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc"]
+    },
+    "source": {
+        "include": ["../../src"],
+        "exclude": ["../../src/datavis.js", "../../src/kbwidget.js"]
+    },
+    "opts": {
+        "encoding": "utf8",
+        "destination": "../../build/jsdocs/",
+        "recurse": false        
+    },
+    "plugins": ["plugins/markdown"]
+}

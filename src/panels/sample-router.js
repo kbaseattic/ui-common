@@ -57,7 +57,7 @@ define([
          */
         'use strict';
 
-        function samplePanelFactory() {
+        function panelFactory() {
 
             function widget(config) {
                 /* DOC: widget variables and factory pattern
@@ -84,49 +84,11 @@ define([
                  * 
                  */
                 function render() {
-                    /*
-                     * DOC: html helper module
-                     * The kb.html helper module is quite useful for building 
-                     * html in a functional style. It has a generic tag function
-                     * builder, as well as methods to build more complex html
-                     * structures.
-                     */
                     var h1 = html.tag('h1'),
                         div = html.tag('div');
 
-                    /* DOC: avoiding extra dependencies
-                     * Sometimes it is easier to implement a management interface
-                     * directly in code like this. In this case we both add a
-                     * widget to a list of child widgets, and build a 
-                     * widget container structure which populates the widgets
-                     * by associating a dynamically created unique id 
-                     * (from html module) with both the widget and the dom node
-                     * it will be rendered in (at some future time.)
-                     * This is a very common pattern for creating widgets
-                     * ahead of their use, when the html is not yet 
-                     * instantiated in the DOM.
-                     */
                     var widgets = [];
 
-                    /* DOC: factory widgets
-                     * The "factory widget" is a widget that is created 
-                     * by the factory pattern, and implements the widget lifecycle
-                     * interface. 
-                     * Note that we use the widget directly here, since it implements
-                     * the widget lifecycle api completely.
-                     * 
-                     * See the sample widget file for details.
-                     * 
-                     * Also note our little pattern for our widget definition.
-                     * We have an id, which stores a unique string id for associating
-                     * the widget the a dome node.
-                     * A config object which is simply a way of passing information to a
-                     * widget from the panel code. Note that this is not the same as 
-                     * parameters, which are more oriented towards dynamic informatin such
-                     * as route parameters
-                     * A widget object is some object which implements the widget lifecycle
-                     * api.
-                     */
                     function addFactoryWidget(def) {
                         var id = html.genId();
                         widgets.push({
@@ -136,12 +98,6 @@ define([
                         return div({id: id});
                     }
 
-                    /* DOC: jquery widget
-                     * 
-                     * This is a method for working with traditional kbase jquery 
-                     * widgets. These widgets do not implement the widget lifecycle, 
-                     * so instead of 
-                     */
                     function addJqueryWidget(config) {
                         var id = html.genId();
                         widgets.push({
@@ -169,12 +125,6 @@ define([
                         return div({id: id});
                     }
 
-                    /* DOC: return some structure
-                     * The render function returns enough structure to represent
-                     * what needs to be rendered. This is not hard-coded at all, 
-                     * and is just a convention within this panel. It has turned
-                     * out, however, to be a useful pattern.
-                     */
                     return {
                         title: 'Sample Panel',
                         content: div([
@@ -205,26 +155,8 @@ define([
                     };
                 }
 
-                /* DOC: create lifecycle event
-                 * The create lifecycle event is the only synchronous one. 
-                 * This is because object creation, in its many forms, may
-                 * not always be naturally implementable as a promise.
-                 * In this case, we are trying to exemplify how a Panel can
-                 * strictly follow the widget lifecycle interface, and mangage
-                 * its sub-widgets along exactly the same trajectory. In reality,
-                 * sometimes a sub-widgets lifecyle events won't necessarily 
-                 * correspond to the parent widget's events.
-                 */
                 var rendered = render();
 
-                /* DOC: init event
-                 * Since a panel implements the widget interface, it starts 
-                 * with an init event handler. The init event gives the panel
-                 * a chance to set up whetever it needs, and to fail early if
-                 * the proper conditions are not met.
-                 * In this case, we really just need to initialize the sub-widgets.
-                 * 
-                 */
                 function init(config) {
                     return q.Promise(function (resolve, reject) {
                         q.all(rendered.widgets.map(function (w) {
@@ -242,54 +174,17 @@ define([
                     });
                 }
 
-                /* DOC: attach event
-                 * This attach() function implements the attach lifecycle event
-                 * in the Panel Widget lifecycle interface.
-                 * It is invoked at  point at which the parent environment has
-                 * obtained a concerete DOM node at which to attach this Panel,
-                 * and is ready to allow the Panel to attach itself to it.
-                 * The Panel should not do anything with the provided node
-                 * other than attach its own container node. This is because 
-                 * in some environments, it may be that the provided node is
-                 * long lived. A panel should not, for example, attach DOM listeners
-                 * to it.
-                 * 
-                 */
+
                 function attach(node) {
                     return q.Promise(function (resolve, reject) {
-                        /* DOC: creating our attachment point
-                         *  Here we save the provided node in the mount variable,
-                         *  and attach our own container node to it. This pattern
-                         *  allows us to attach event listeners as we wish to 
-                         *  our own container, so that we have more control
-                         *  over it. E.g. we can destroy and recreate it if we
-                         *  want another set of event listeners and don't want
-                         *  to bother with managing them all individually.
-                         */
                         mount = node;
                         container = document.createElement('div');
                         mount.appendChild(container);
 
-                        /* DOC: dom access
-                         * In this case we are keeping things simple by using 
-                         * the plain DOM API. We could also use jquery 
-                         * here if we wish to.
-                         */
                         container.innerHTML = rendered.content;
 
-                        /* DOC: runtime interface
-                         * Since a panel title is also, logically, the title of
-                         * the "page" we use the runtimes event bus to emit the
-                         * 'title' event to the application. The application 
-                         * takes care of modifying the window panel to accomodate
-                         * it.
-                         */
                         R.send('app', 'title', rendered.title);
 
-                        /* DOC: implement widget manager attach lifecycle event
-                         * Okay, here we run all of the widgets through the 
-                         * 
-                         */
                         q.all(rendered.widgets.map(function (w) {
                             return w.widget.attach($('#' + w.id).get(0));
                         }))
@@ -374,10 +269,28 @@ define([
 
         function setup(app) {
             app.addRoute({
-                path: ['sample'],
-                panelFactory: samplePanelFactory()
+                path: ['sample', 'router', {type: 'param', name: 'param1'}],
+                queryParams: {
+                    param2: {
+                        required: true
+                    },
+                    param3: {
+                        required: false
+                    },
+                    param4: {
+                        required: true
+                    }
+                },
+                panelFactory: panelFactory()
             });
-
+            R.send('navbar', 'add-menu-item', {
+                name: 'samplerouter', 
+                definition: {
+                    path: 'sample/router/test', 
+                    label: 'Sample Panel with Interesting Routing', 
+                    icon: 'plane'
+                }
+            });
         }
         function teardown() {
             // TODO: remove routes

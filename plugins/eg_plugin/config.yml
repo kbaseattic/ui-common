@@ -1,0 +1,21 @@
+## YAML Template.
+---
+package:
+    author: Erik Pearson
+    name: example plugin
+    description: A package containing an example plugin
+    date: August 4, 2015
+    version: 0.0.1
+source:
+    modules:
+        ## sources are relative to build/plugins/PACKAGE/source/javascript
+        -
+            module: kb.panel.eg_plugin
+            file: panel    
+        -
+            module: kb.panel.eg_plugin.installer
+            file: installer
+setup:
+    installer: 
+        module: kb.panel.eg_plugin.installer
+        

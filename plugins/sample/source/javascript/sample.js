@@ -57,9 +57,7 @@ define([
          */
         'use strict';
 
-        function samplePanelFactory() {
-
-            function widget(config) {
+        function widget(config) {
                 /* DOC: widget variables and factory pattern
                  * In the factory pattery for object creation, we can just
                  * declare variables within the factory function, and they 
@@ -142,7 +140,7 @@ define([
                      * widgets. These widgets do not implement the widget lifecycle, 
                      * so instead of 
                      */
-                    function addJqueryWidget(config) {
+                    function addKBWidgetWidget(config) {
                         var id = html.genId();
                         widgets.push({
                             widget: kbWidgetAdapterFactory.make(config),
@@ -177,7 +175,7 @@ define([
                      */
                     return {
                         title: 'Sample Panel',
-                        content: div([
+                        content: div({class: 'kb-panel-sample'}, [
                             h1('Sample Panel and Widgets'),
                             div({class: 'row'}, [
                                 div({class: 'col-md-6'}, [
@@ -186,7 +184,7 @@ define([
                                         config: {},
                                         widget: sampleWidgetFactory.make()
                                     })),
-                                    html.bsPanel('Sample jquery Widget', div({id: addJqueryWidget({
+                                    html.bsPanel('Sample jquery Widget', div({id: addKBWidgetWidget({
                                             name: 'samplejquerywidget',
                                             module: 'kb.widget.sample.jquery',
                                             jquery_object: 'SampleWidget'
@@ -352,7 +350,18 @@ define([
                 }
                 function destroy() {
                     return q.Promise(function (resolve) {
-                        resolve();
+                        q.all(rendered.widgets.map(function (w) {
+                            if (w.widget.destroy) {
+                                return w.widget.destroy();
+                            }
+                        }))
+                            .then(function (results) {
+                                resolve();
+                            })
+                            .catch(function (err) {
+                                reject(err);
+                            })
+                            .done();
                     });
                 }
 
@@ -361,31 +370,14 @@ define([
                     attach: attach,
                     start: start,
                     stop: stop,
-                    detach: detach
+                    detach: detach,
+                    destroy: destroy
                 };
             }
-
-            return {
-                create: function (config) {
-                    return widget(config);
-                }
-            };
-        }
-
-        function setup(app) {
-            app.addRoute({
-                path: ['sample'],
-                panelFactory: samplePanelFactory()
-            });
-
-        }
-        function teardown() {
-            // TODO: remove routes
-            return false;
-        }
-        
+            
         return {
-            setup: setup,
-            teardown: teardown
+            create: function (config) {
+                return widget(config);
+            }
         };
     });

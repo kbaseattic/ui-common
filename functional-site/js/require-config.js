@@ -197,11 +197,10 @@
             'kb.client.methods': 'src/clients/kbaseClientMethods',
             // Standalone Widgets
             'kb.widget': 'src/widgets/Widget',
-            'kb.widget.databrowser': 'src/widgets/DataBrowser/DataBrowser',
+            // 'kb.widget.databrowser': 'src/widgets/DataBrowser/DataBrowser',
             'kb.widget.typebrowser': 'src/widgets/TypeBrowser',
             // KBase Panels
             // ------------
-            'kb.panel.about': 'src/panels/about',
             'kb.panel.contact': 'src/panels/contact',
             'kb.panel.login': 'src/panels/login',
             'kb.panel.navbar': 'src/panels/navbar',
@@ -214,13 +213,13 @@
             'kb.panel.datasearch': 'src/panels/datasearch',
             'kb.panel.dataview': 'src/panels/dataview',
             'kb.panel.dataview.style': 'src/panels/dataview',
-            'kb.panel.databrowser': 'src/panels/databrowser',
             'kb.panel.typebrowser': 'src/panels/typebrowser',
             'kb.panel.typeview': 'src/panels/typeview',
             'kb.panel.message': 'src/panels/message',
             'kb.panel.test': 'src/panels/test',
-            'kb.panel.sample': 'src/panels/sample',
             'kb.panel.linechart': 'src/panels/linechart',
+            'kb.panel.sample.router': 'src/panels/sample-router',
+            
             // KBase JQuery Plugin Widgets
             // ---------------------------
             'kb.jquery.widget': 'src/widgets/jquery/kbaseWidget',
@@ -297,11 +296,11 @@
             'kb.jquery.contigset': 'src/widgets/jquery/contigset/kbaseContigSetView',
 
             // Sample Widgets
-            'kb.widget.sample.factory': 'src/widgets/sample/factory-widget',
-            'kb.widget.sample.jquery': 'src/widgets/sample/kbase-jquery-widget',
-            'kb.widget.sample.object': 'src/widgets/sample/object-es5-widget',
-            'kb.widget.sample.object-interface': 'src/widgets/sample/object-widget-interface',
-
+            //'kb.widget.sample.factory': 'src/widgets/sample/factory-widget',
+            //'kb.widget.sample.jquery': 'src/widgets/sample/kbase-jquery-widget',
+            //'kb.widget.sample.object': 'src/widgets/sample/object-es5-widget',
+            //'kb.widget.sample.object-interface': 'src/widgets/sample/object-widget-interface',
+            
             // KBase Services
             // non-visual dependencies of plugins
             // --------------
