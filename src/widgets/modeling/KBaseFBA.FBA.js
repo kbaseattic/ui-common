@@ -49,6 +49,9 @@ function KBaseFBA_FBA(modeltabs) {
             "key": "expression",
             "type": "wstype"
         },{
+            "label": "Expression condition",
+            "key": "expressioncolumn",
+        },{
             "label": "Single KO",
             "key": "singleko"
         },{
@@ -251,8 +254,7 @@ function KBaseFBA_FBA(modeltabs) {
                          moddate: indata[3]}
 
         this.usermeta = {};
-
-        // if there is user metadata, add it
+		// if there is user metadata, add it
         if ('Model' in indata[10]) {
             this.usermeta = {objective: indata[10]["Objective"],
                              model: indata[10]["Model"],
@@ -265,7 +267,15 @@ function KBaseFBA_FBA(modeltabs) {
                              numcpdbounds: indata[10]["Number compound bounds"],
                              numconstraints: indata[10]["Number constraints"],
                              numaddnlcpds: indata[10]["Number additional compounds"]}
-
+			if ('ExpressionMatrix' in indata[10]) {
+				this.usermeta["expression"] = indata[10]["ExpressionMatrix"];
+			}
+			if ('PromConstraint' in indata[10]) {
+				this.usermeta["promconstraint"] = indata[10]["PromConstraint"];
+			}
+			if ('ExpressionMatrixColumn' in indata[10]) {
+				this.usermeta["expressioncolumn"] = indata[10]["ExpressionMatrixColumn"];
+			}
             $.extend(this.overview, this.usermeta)
         }
     };
@@ -387,6 +397,8 @@ function KBaseFBA_FBA(modeltabs) {
                 mdlgene.growthFraction = this.delhash[mdlgene.id].growthFraction;
             }
         }
+        var exp_state = 0;
+        var exp_value = 0;
         for (var i=0; i< this.modelreactions.length; i++) {
             var mdlrxn = this.modelreactions[i];
             if (this.rxnhash[mdlrxn.id]) {
@@ -403,6 +415,25 @@ function KBaseFBA_FBA(modeltabs) {
                 mdlrxn.customUpperBound = this.rxnboundhash[mdlrxn.id].upperBound;
                 mdlrxn.customLowerBound = this.rxnboundhash[mdlrxn.id].lowerBound;
             }
+            if (mdlrxn.exp_state) {
+            	exp_state = 1;
+            }
+            if (mdlrxn.expression) {
+            	exp_value = 1;
+            	mdlrxn.exp_value = mdlrxn.scaled_exp + " (" + mdlrxn.expression + ")";
+            }
+        }
+        if (exp_state == 1) {
+        	this.tabList.push({
+        		"label": "Expression state",
+            	"key": "exp_state",
+        	});
+        }
+        if (exp_value == 1) {
+        	this.tabList.push({
+        		"label": "Scaled expression (unscaled value)",
+            	"key": "exp_value",
+        	});
         }
         this.compoundFluxes = [];
         this.cpdfluxhash = {};
