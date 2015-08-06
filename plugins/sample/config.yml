@@ -31,9 +31,18 @@ source:
     styles:
         -
             file: styles.css
-           
-        
 setup:
-    installer: 
-        module: kb.panel.sample.installer
+    routes:
+        -
+            path: ['sample']
+            queryParams: 
+                param1: {}
+            panelFactory: kb.panel.sample
+    menu:
+        -
+            name: sample
+            definition:
+                path: sample
+                label: Sample Panel
+                icon: bicycle
         

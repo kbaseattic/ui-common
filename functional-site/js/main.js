@@ -59,6 +59,10 @@ define([
                 navbar.addToMenu('authenticated', data.name);
             });
 
+            Runtime.recv('navbar', 'clear-buttons', function () {
+                navbar.clearButtons();
+            })
+
             // ?? (EAP)
             Runtime.props.setItem('navbar', navbar);
 
@@ -214,14 +218,15 @@ define([
                         // build up a list of modules and add them to the require config.
                         var paths = {},
                             sourcePath = 'plugins/' + plugin + '/source';
-                            
+
                         // load any styles.
-                        var dependencies = [
-                            config.setup.installer.module
-                        ];
+                        var dependencies = [];
+                        if (config.setup.installer) {
+                            dependencies.push(config.setup.installer.module);
+                        }
                         if (config.source.styles) {
                             config.source.styles.forEach(function (style) {
-                                dependencies.push('css!'+sourcePath + '/css/' + style.file);
+                                dependencies.push('css!' + sourcePath + '/css/' + style.file);
                             });
                         }
 
@@ -230,13 +235,45 @@ define([
                         });
                         require.config({paths: paths});
                         // enter a require closure with the installer as the module.
-                        
+
                         // NB - installer is the first module in the dependency
                         // list so we receive it as the first argument.
-                        require(dependencies, function (installer) {
-                            installer.setup();
-                            resolve();
-                        });
+                        if (config.setup.installer) {
+                            require(dependencies, function (installer) {
+                                installer.setup();
+                                resolve();
+                            });
+                        } else {
+                            if (config.setup.routes) {
+                                require(dependencies, function () {
+                                    var routes = config.setup.routes.map(function (route) {
+                                        return Q.Promise(function (resolve) {
+                                            require([route.panelFactory], function (factory) {
+                                                Runtime.addRoute({
+                                                    path: route.path,
+                                                    panelFactory: factory
+                                                });
+                                                resolve();
+                                            });
+                                        });
+                                    });
+                                    Q.all(routes)
+                                        .then(function () {
+                                            if (config.setup.menu) {
+                                                config.setup.menu.forEach(function (item) {
+                                                    Runtime.send('navbar', 'add-menu-item', item);
+                                                });
+                                            }
+                                            resolve();
+                                        })
+                                        .catch(function (err) {
+                                            console.log('ERROR');
+                                            console.log(err);
+                                        })
+                                        .done();
+                                });
+                            }
+                        }
                     });
                 });
             });
@@ -264,7 +301,7 @@ define([
                     {module: 'kb.panel.message', config: {}},
                     {module: 'kb.panel.contact', config: {}},
                     {module: 'kb.panel.login', config: {}},
-                    {module: 'kb.panel.userprofile', config: {}},
+                    // {module: 'kb.panel.userprofile', config: {}},
                     {module: 'kb.panel.welcome', config: {}},
                     {module: 'kb.panel.dashboard', config: {}},
                     //{module: 'kb.panel.narrativestore'},

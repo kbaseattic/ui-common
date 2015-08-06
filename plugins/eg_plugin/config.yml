@@ -16,6 +16,20 @@ source:
             module: kb.panel.eg_plugin.installer
             file: installer
 setup:
-    installer: 
-        module: kb.panel.eg_plugin.installer
+    #installer: 
+    #    module: kb.panel.eg_plugin.installer
+    routes:
+        -
+            path: ['eg_plugin']
+            # this is one of the modules defined above.
+            panelFactory: kb.panel.eg_plugin
+    menu:
+        -
+            name: ev_plugin
+            definition:
+                path: "eg_plugin"
+                label: Example Plugin Panel
+                icon: bolt
+            
+    
         

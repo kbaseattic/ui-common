@@ -1,6 +1,6 @@
 ## YAML Template.
 ---
-plugins: [sample, eg_plugin, about, databrowser]
+plugins: [sample, eg_plugin, about, databrowser, userprofile]
 navbar:
     menu:
         available_items:
@@ -41,6 +41,6 @@ navbar:
                 label: Testing Panel
                 icon: flask
         menus:
-            authenticated: [search, narrative, dashboard, typebrowser, test, divider, about, contact, divider]                
+            authenticated: [search, narrative, dashboard, typebrowser, test, divider, contact, divider]                
             unauthenticated: [about, contact, divider, about_kbase, contact_us]
         

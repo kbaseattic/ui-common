@@ -20,6 +20,15 @@ source:
             module: kb.plugin.databrowser.installer
             file: installer
 setup:
-    installer: 
-        module: kb.plugin.databrowser.installer
+    routes:
+        -
+            path: ['databrowser']
+            panelFactory: kb.panel.databrowser
+    menu:
+        -
+            name: databrowser
+            definition:
+                path: databrowser
+                label: Data Browser
+                icon: database
         
