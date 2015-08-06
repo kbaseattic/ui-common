@@ -81,17 +81,18 @@ function KBaseFBA_FBAComparison(modeltabs) {
     	"columns": [{
             "label": "FBA",
             "key": "fba",
-            "type": "wstype"
+            "type": "wstype",
+            "linkformat": "dispWSRef"
         }, {
         	"label": "Model",
             "key": "model",
             "type": "wstype",
-            "wstype": "KBaseFBA.FBAModel"
+            "linkformat": "dispWSRef"
         }, {
         	"label": "Media",
              "key": "media",
             "type": "wstype",
-            "wstype": "KBaseFBA.Media"
+            "linkformat": "dispWSRef"
         }, {
             "label": "Objective",
             "key": "objective",
@@ -107,11 +108,13 @@ function KBaseFBA_FBAComparison(modeltabs) {
     	"name": "FBA Comparisons",
         "type": "dataTable",
     	"columns": [{
+            "label": "Index",
+            "key": "index",
+        }, {    
             "label": "FBA",
-            "type": "tabLink",
-            "linkformat": "dispID",
-            "key": "id",
-            "method": "FBATab",
+            "key": "fba",
+            "type": "wstype",
+            "linkformat": "dispWSRef"
         }]
     }, {
         "key": "modelreactions",
@@ -239,6 +242,37 @@ function KBaseFBA_FBAComparison(modeltabs) {
 		
 		return output;
     }
+    
+    this.CompareTab = function (info) {
+        var cpd = self.cpdhash[info.id];
+		var output = [{
+			"label": "Compound",
+			"data": cpd.dispid,
+		}, {
+			"label": "Name",
+			"data": cpd.name
+		 }, {
+			"label": "Formula",
+			"data": cpd.formula
+		}, {
+			"label": "Charge",
+			"data": cpd.charge
+		}, {
+            "label": "Most common state",
+            "data": cpd.mostcommonstate
+		}, {
+            "label": "Inactive states",
+            "data": cpd.inactivestates
+        }, {
+            "label": "Uptake states",
+            "data": cpd.uptakestates
+        }, {
+            "label": "Excretion states",
+            "data": cpd.excretionstates
+		}];
+		
+		return output;
+    }
 	
     this.setData = function (indata) {
         this.data = indata;
@@ -247,30 +281,36 @@ function KBaseFBA_FBAComparison(modeltabs) {
         this.rxnhash = {};
         this.fbahash = {};
         this.fbacomparisons = [];
-        
         for (var i=0; i< this.fbas.length; i++) {
         	this.fbacomparisons[i] = {};
         	this.fbahash[this.fbas[i].id] = this.fbas[i];
         	var item = "F"+(i+1);
         	this.tabList[2]["columns"].push({
     			"label": item,
-            	"data": item
+            	"key": item
     		});
+    		this.fbas[i]["dispid"] = this.fbas[i].id.split("/")[1];
     		this.fbas[i]["fba"] = this.fbas[i]["fba_ref"];
     		this.fbas[i]["model"] = this.fbas[i]["fbamodel_ref"];
     		this.fbas[i]["media"] = this.fbas[i]["media_ref"];
     		this.fbas[i]["rxndata"] = "Inactive: "+(this.fbas[i]["reactions"]-this.fbas[i]["active_reactions"])+"<br>Active: "+this.fbas[i]["active_reactions"];
     		this.fbas[i]["exchangedata"] = "Available: "+(this.fbas[i]["compounds"]-this.fbas[i]["uptake_compounds"]-this.fbas[i]["excretion_compounds"])+"<br>Uptake: "+this.fbas[i]["uptake_compounds"]+"<br>Excretion: "+this.fbas[i]["excretion_compounds"];
-    		this.fbacomparisons[i]["id"] = this.fbas[i]["id"];
-    		for (var j=0; j< this.data.fbas.length; j++) {
-    			var fbaabbrev = "F"+(i+1);
-    			if (this.fbas[i]["fba_similarity"][this.fbas[j]["id"]]) {
-					this.fbacomparisons[i][fbaabbrev] = "R: "+this.fbas[i]["fba_similarity"][this.fbas[j]["id"]][0]+" / "+
-						this.fbas[i]["fba_similarity"][this.data.fbas[j]["id"]][1]+" / "+
-						this.fbas[i]["fba_similarity"][this.data.fbas[j]["id"]][2]+"<br>"+
-						"C: "+this.fbas[i]["fba_similarity"][this.data.fbas[j]["id"]][4]+" / "
-						this.fbas[i]["fba_similarity"][this.data.fbas[j]["id"]][5]+" / "+
-						this.fbas[i]["fba_similarity"][this.data.fbas[j]["id"]][6];
+    		var fbaabbrev = "F"+(i+1);
+    		this.fbacomparisons[i]["fba"] = this.fbas[i]["fba"];
+    		this.fbacomparisons[i]["index"] = fbaabbrev;
+    		for (var j=0; j< this.fbas.length; j++) {
+    			fbaabbrev = "F"+(j+1);
+    			if (j != i) {
+    				if (this.fbas[j].id in this.fbas[i]["fba_similarity"]) {
+						var simdata = this.fbas[i]["fba_similarity"][this.fbas[j]["id"]];
+						rfraction = Math.round(100*(simdata[1]+simdata[2]+simdata[3])/simdata[0])/100;
+						cfraction = Math.round(100*(simdata[5]+simdata[6]+simdata[7])/simdata[4])/100;
+						var text = "R: "+rfraction+"<br>C: "+cfraction;
+						var tooltip = "Common reactions: "+simdata[0]+"&#013;Common forward: "+simdata[1]+"&#013;Common reverse: "+simdata[2]+"&#013;Common inactive: "+simdata[3]+"&#013;Common compounds: "+simdata[4]+"&#013;Common uptake: "+simdata[5]+"&#013;Common excretion: "+simdata[6]+"&#013;Common inactive: "+simdata[7];
+						this.fbacomparisons[i][fbaabbrev] = "<p title=\""+tooltip+"\">"+text+"</p>";
+					}
+    			} else {
+					this.fbacomparisons[i][fbaabbrev] = "<p title=\"Reactions: "+this.fbas[i].reactions+"&#013;Compounds: "+this.fbas[i].compounds+"\">R: 1<br>C: 1</p>";
     			}
     		}
     	}
@@ -356,17 +396,17 @@ function KBaseFBA_FBAComparison(modeltabs) {
         	this.modelcompounds[i].numfba = 0;
         	var percent = Math.floor(100*this.modelcompounds[i].state_conservation[this.modelcompounds[i].most_common_state][1]);
         	this.modelcompounds[i].mostcommonstate = this.modelcompounds[i].most_common_state+" ("+percent+"%)";
-        	if (this.modelcompounds[i].state_conservation["UP"]) {
+        	if ("UP" in this.modelcompounds[i].state_conservation) {
         		this.modelcompounds[i].uptakestates = "Average: "+this.modelcompounds[i].state_conservation["UP"][2]+" +/- "+this.modelcompounds[i].state_conservation["UP"][3];
         	} else {
         		this.modelcompounds[i].uptakestates = "None";
         	}
-        	if (this.modelcompounds[i].state_conservation["EX"]) {
+        	if ("EX" in this.modelcompounds[i].state_conservation) {
         		this.modelcompounds[i].excretionstates = "Average: "+this.modelcompounds[i].state_conservation["EX"][2]+" +/- "+this.modelcompounds[i].state_conservation["EX"][3];
         	} else {
         		this.modelcompounds[i].excretionstates = "None";	
         	}
-        	if (this.modelcompounds[i].state_conservation["IA"]) {
+        	if ("IA" in this.modelcompounds[i].state_conservation) {
         		this.modelcompounds[i].inactivestates = "Count: "+this.modelcompounds[i].state_conservation["IA"][0];
         	} else {
         		this.modelcompounds[i].inactivestates = "None";
