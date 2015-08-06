@@ -310,7 +310,9 @@ define([
                     {module: 'kb.panel.typebrowser', config: {}},
                     {module: 'kb.panel.typeview'},
                     {module: 'kb.panel.test'},
-                    {module: 'kb.panel.linechart'}
+                    {module: 'kb.panel.vis.linechart'},
+                    {module: 'kb.panel.vis.barchart'},
+                    {module: 'kb.panel.vis.heatmap'}
                 ].map(function (panel) {
                     return requirePromise([panel.module], function (PanelModule) {
                         // this registers routes

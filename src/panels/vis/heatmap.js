@@ -10,46 +10,53 @@ define([
     'kb.runtime',
     'q',
     'underscore',
-    'kb.widget.kbwidgetadapter'],
-    function (html, R, q, _, kbWidgetAdapterFactory) {
+    'kb.widget.vis.heatmap'],
+    function (html, R, q, _) {
         'use strict';
 
-        function linechartWidget() {
+        function heatmapWidget() {
 
             function widget(config) {
+
                 var mount, container;
 
 
                 function render() {
-                    var h1 = html.tag('h1'),
-                        div = html.tag('div');
-                    var content = div([
-                        h1('Testing at KBase'),
-                        div({class: 'row'}, [
-                            div({class: 'col-md-6'}, [
-                                'You can use this page to test widgets. Nothing special, just edit it to suite your needs.'
-                            ])
-                        ])
-                    ]);
-                    var $div = $('<div></div>').append("This would be a line chart").on('click', function(e) { alert ("FOO") });
 
-var $lc = kbWidgetAdapterFactory.make(
-    {
-        name: 'linechart',
-        module : 'kb.widget.vis.linechart',
-        jquery_object : 'kbaseLinechart',
-        widgetConfig : {
-            debug : true
-        }
-    }
-);
+                    var heatmap =
+                        {
+                            row_ids : [],
+                            row_labels : [],
+                            column_ids : [],
+                            column_labels : [],
+                            data : [],
+                        };
+                    var numCells = 20;
+                    var colors = ['red', 'green', 'blue', 'purple', 'cyan'];
+                    for (var idx = 0; idx < numCells; idx++) {
+                        var row = [];
+                        heatmap.data.push(row);
+                        for (var jdx = 0; jdx < numCells; jdx++) {
+                            row.push(Math.random());
+                        }
+                        heatmap.row_ids.push('Wingding' + idx);
+                        heatmap.row_labels.push('Wingding' + idx);
+                        heatmap.column_ids.push('Frobnoz' + idx);
+                        heatmap.column_labels.push('Frobnoz' + idx);
+                    }
 
-console.log("LC IS ", $lc);
+                    var $hm = $.jqElem('div').css({width : '500px', height : '500px'}).kbaseHeatmap(
+                        {
+                            dataset : heatmap,
+                            ulIcon : '/functional-site/assets/navbar/images/kbase_logo.png',
+                        }
+                    );
 
                     return {
-                        title: 'Sample line chart',
-                        content: $div[0],
+                        title: 'Sample Heat map',
+                        content: $hm.$elem,
                     }
+
                 }
 
                 function attach(node) {
@@ -58,8 +65,9 @@ console.log("LC IS ", $lc);
                         container = document.createElement('div');
                         mount.appendChild(container);
                         var rendered = render();
+
                         R.send('app', 'title', rendered.title);
-                        container.innerHTML = rendered.content;
+                        $(container).append(rendered.content);
 
                         resolve();
                     });
@@ -101,8 +109,8 @@ console.log("LC IS ", $lc);
 
         function setup(app) {
             app.addRoute({
-                path: ['linechart'],
-                widget: linechartWidget()
+                path: ['heatmap'],
+                widget: heatmapWidget()
             });
 
         }

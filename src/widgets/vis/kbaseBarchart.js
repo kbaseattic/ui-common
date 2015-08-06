@@ -112,7 +112,7 @@ define(
                             xId = $bar.xIDMap()[xId];
                         }
 
-                        return $bar.xScale()(xId) + barScale(j);
+                        return $bar.xScale()(xId) + barScale(d.stacked ? 0 : j);
                     } )
                     .attr('y', function (b, bi) {
 
@@ -213,14 +213,30 @@ define(
                         d.label = [d.label];
                     }
 
-                    var barDomain = d.value;
-                    if (d.stacked && $.isArray(d.value)) {
-                        barDomain = [d3.sum(d.value)];
+                    //var barDomain = d.value;
+                    //if (d.stacked && $.isArray(d.value)) {
+                    //    barDomain = [d3.sum(d.value)];
+                    //}
+
+                    var barDomain = [0];
+                    if (! d.stacked) {
+                        var idx = 0;
+
+                        for (idx = 0; idx < d.value.length; idx++) {
+                            barDomain.push(idx);
+                        }
                     }
 
                     var barScale = d3.scale.ordinal()
                         .domain(barDomain)
+                        //.range([0,$bar.xScale().rangeBand()])
                         .rangeBands([0,$bar.xScale().rangeBand()], 0.05)
+                    ;
+
+                    var barScale2 = d3.scale.ordinal()
+                        .domain(barDomain)
+                        //.range([85])
+                        .rangeBands([0,85], 0.05)
                     ;
 
                     d3.select(this).selectAll('.bar')

@@ -217,9 +217,12 @@
             'kb.panel.typeview': 'src/panels/typeview',
             'kb.panel.message': 'src/panels/message',
             'kb.panel.test': 'src/panels/test',
-            'kb.panel.linechart': 'src/panels/linechart',
             'kb.panel.sample.router': 'src/panels/sample-router',
-            
+
+            'kb.panel.vis.linechart': 'src/panels/vis/linechart',
+            'kb.panel.vis.heatmap': 'src/panels/vis/heatmap',
+            'kb.panel.vis.barchart': 'src/panels/vis/barchart',
+
             // KBase JQuery Plugin Widgets
             // ---------------------------
             'kb.jquery.widget': 'src/widgets/jquery/kbaseWidget',
@@ -300,7 +303,7 @@
             //'kb.widget.sample.jquery': 'src/widgets/sample/kbase-jquery-widget',
             //'kb.widget.sample.object': 'src/widgets/sample/object-es5-widget',
             //'kb.widget.sample.object-interface': 'src/widgets/sample/object-widget-interface',
-            
+
             // KBase Services
             // non-visual dependencies of plugins
             // --------------
