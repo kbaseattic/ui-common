@@ -27,6 +27,7 @@ test: init
 
 clean:
 	@ rm -rf $(DISTLIB)
+	@ rm -rf coverage/
 
 dist-clean: clean
 	@ rm -rf node_modules/

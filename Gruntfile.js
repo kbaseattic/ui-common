@@ -93,7 +93,7 @@ module.exports = function(grunt) {
                 force: true,
             },
             'ui-common': {
-                src: 'coverage/**/*.info',
+                src: 'build/reports/coverage/report-lcov/**/*.info',
             },
         },
 
