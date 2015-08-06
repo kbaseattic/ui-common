@@ -51,7 +51,7 @@
         paths: {
             // External Dependencies
             // ----------------------
-            jquery: 'bower_components/jquery/dist/jquery',
+            jquery: 'bower_components/jquery/dist/jquery.min',
             'jquery-ui': 'bower_components/jquery-ui/jquery-ui.min',
             'jquery-ui-css': 'bower_components/jquery-ui/themes/ui-lightness/jquery-ui.min',
             bootstrap: 'bower_components/bootstrap/dist/js/bootstrap.min',
@@ -203,7 +203,7 @@
             'kb.panel.sample': 'src/panels/sample',
             // KBase JQuery Plugin Widgets
             // ---------------------------
-            'kb.jquery.widget': 'src/widgets/jquery/kbwidget',
+            'kb.jquery.widget': 'src/widgets/jquery/kbaseWidget',
             'kb.jquery.authenticatedwidget': 'src/widgets/jquery/kbaseAuthenticatedWidget',
             'kb.jquery.tabs': 'src/widgets/jquery/kbaseTabs',
             'kb.jquery.kb-tabs': '/src/widgets/jquery/kbTabs',
