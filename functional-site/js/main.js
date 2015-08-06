@@ -213,11 +213,17 @@ define([
             // for each plugin
             var loaders = plugins.map(function (plugin) {
                 // read the config file
+                if (typeof plugin === 'string') {
+                    plugin = {
+                        name: plugin,
+                        directory: 'plugins/' + plugin
+                    }
+                }
                 return Q.Promise(function (resolve) {
-                    require(['yaml!plugins/' + plugin + '/config.yml'], function (config) {
+                    require(['yaml!' + plugin.directory + '/config.yml'], function (config) {
                         // build up a list of modules and add them to the require config.
                         var paths = {},
-                            sourcePath = 'plugins/' + plugin + '/source';
+                            sourcePath = plugin.directory + '/source';
 
                         // load any styles.
                         var dependencies = [];

@@ -1,6 +1,19 @@
 ## YAML Template.
 ---
-plugins: [sample, eg_plugin, about, databrowser, userprofile, narrativestore]
+plugins:
+    -
+        name: sample
+        directory: bower_components/kbase-ui-plugin-sample/src/plugin
+    -
+        eg_plugin
+    -
+        about
+    -
+        databrowser
+    -
+        userprofile
+    -
+        narrativestore
 navbar:
     menu:
         available_items:

@@ -1,5 +1,5 @@
 {
-  "name": "ui-common.summer2015cleanup",
+  "name": "ui-common.ease-dev-campaign",
   "version": "0.0.1",
   "homepage": "https://kbase.us",
   "authors": [
@@ -58,6 +58,8 @@
     "ace-builds": "1.2.0",
     "stacktrace-js": "0.6.4",
     "js-yaml": "3.3.1",
-    "require-yaml": "0.1.2"
+    "require-yaml": "0.1.2",
+    
+    "kbase-ui-plugin-sample": "eapearson/kbase-ui-plugin-sample"
   }
 }

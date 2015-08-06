@@ -16,8 +16,6 @@ define([
         var mount, container;
 
         // Mini widget manager
-
-
         function render() {
             var div = html.tag('div');
             var widgets = [];
@@ -35,34 +33,30 @@ define([
                         jquery_object: 'KBaseNarrativeStoreView'
                     })})
             ]);
-
             return {
                 content: content,
                 widgets: widgets
             };
-
         }
 
         var rendered = render();
 
         // Widget Interface Implementation
 
-
-
         function init(config) {
             return q.Promise(function (resolve) {
                 q.all(rendered.widgets.map(function (w) {
                     return w.widget.init(w.config);
                 }))
-                    .then(function () {
-                        resolve();
-                    })
-                    .catch(function (err) {
-                        /* TODO: work out best pattern for error flow */
-                        console.log('ERROR creating');
-                        console.log(err);
-                    })
-                    .done();
+                        .then(function () {
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            /* TODO: work out best pattern for error flow */
+                            console.log('ERROR creating');
+                            console.log(err);
+                        })
+                        .done();
             });
         }
         function attach(node) {
@@ -73,15 +67,15 @@ define([
                 q.all(rendered.widgets.map(function (w) {
                     return w.widget.attach(node);
                 }))
-                    .then(function () {
-                        resolve();
-                    })
-                    .catch(function (err) {
-                        /* TODO: work out best pattern for error flow */
-                        console.log('ERROR creating');
-                        console.log(err);
-                    })
-                    .done();
+                        .then(function () {
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            /* TODO: work out best pattern for error flow */
+                            console.log('ERROR creating');
+                            console.log(err);
+                        })
+                        .done();
             });
         }
         function start(params) {
@@ -90,15 +84,15 @@ define([
                 q.all(rendered.widgets.map(function (w) {
                     return w.widget.start(params);
                 }))
-                    .then(function () {
-                        resolve();
-                    })
-                    .catch(function (err) {
-                        /* TODO: work out best pattern for error flow */
-                        console.log('ERROR creating');
-                        console.log(err);
-                    })
-                    .done();
+                        .then(function () {
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            /* TODO: work out best pattern for error flow */
+                            console.log('ERROR creating');
+                            console.log(err);
+                        })
+                        .done();
                 resolve();
             });
         }
@@ -108,15 +102,15 @@ define([
                 q.all(rendered.widgets.map(function (w) {
                     return w.widget.start(params);
                 }))
-                    .then(function () {
-                        resolve();
-                    })
-                    .catch(function (err) {
-                        /* TODO: work out best pattern for error flow */
-                        console.log('ERROR creating');
-                        console.log(err);
-                    })
-                    .done();
+                        .then(function () {
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            /* TODO: work out best pattern for error flow */
+                            console.log('ERROR creating');
+                            console.log(err);
+                        })
+                        .done();
             });
         }
         function stop() {
@@ -124,15 +118,15 @@ define([
                 q.all(rendered.widgets.map(function (w) {
                     return w.widget.stop();
                 }))
-                    .then(function () {
-                        resolve();
-                    })
-                    .catch(function (err) {
-                        /* TODO: work out best pattern for error flow */
-                        console.log('ERROR creating');
-                        console.log(err);
-                    })
-                    .done();
+                        .then(function () {
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            /* TODO: work out best pattern for error flow */
+                            console.log('ERROR creating');
+                            console.log(err);
+                        })
+                        .done();
             });
         }
         function detach() {
@@ -140,32 +134,32 @@ define([
                 q.all(rendered.widgets.map(function (w) {
                     return w.widget.detach();
                 }))
-                    .then(function () {
-                        mount.removeChild(container);
-                        resolve();
-                    })
-                    .catch(function (err) {
-                        /* TODO: work out best pattern for error flow */
-                        console.log('ERROR creating');
-                        console.log(err);
-                    })
-                    .done();
+                        .then(function () {
+                            mount.removeChild(container);
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            /* TODO: work out best pattern for error flow */
+                            console.log('ERROR creating');
+                            console.log(err);
+                        })
+                        .done();
             });
         }
         function destroy() {
             return q.Promise(function (resolve) {
-                 q.all(rendered.widgets.map(function (w) {
+                q.all(rendered.widgets.map(function (w) {
                     return w.widget.destroy();
                 }))
-                    .then(function () {
-                        resolve();
-                    })
-                    .catch(function (err) {
-                        /* TODO: work out best pattern for error flow */
-                        console.log('ERROR creating');
-                        console.log(err);
-                    })
-                    .done();
+                        .then(function () {
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            /* TODO: work out best pattern for error flow */
+                            console.log('ERROR creating');
+                            console.log(err);
+                        })
+                        .done();
             });
         }
 
