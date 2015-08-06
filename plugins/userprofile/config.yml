@@ -34,7 +34,7 @@ source:
     xstyles:
         -
             file: styles.css
-setup:
+install:
     routes:
         -
             path: ['people', {type: param, name: username}]

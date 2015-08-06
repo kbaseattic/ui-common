@@ -31,7 +31,7 @@ source:
     styles:
         -
             file: styles.css
-setup:
+install:
     routes:
         -
             path: ['sample']

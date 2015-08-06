@@ -15,7 +15,7 @@ source:
         -
             module: kb.panel.eg_plugin.installer
             file: installer
-setup:
+install:
     #installer: 
     #    module: kb.panel.eg_plugin.installer
     routes:
