@@ -143,6 +143,10 @@
             
             // KBase Widgets
             // -------------
+            
+            'kb.widget.base.simple': 'src/widgets/base/simple',
+            
+            
             // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
             'kb.widget.buttonbar': 'src/widgets/kbaseButtonbar',
             'kb.widget.social.base': 'src/widgets/social/kbaseSocialWidget',

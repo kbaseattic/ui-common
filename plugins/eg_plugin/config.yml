@@ -11,10 +11,10 @@ source:
         ## sources are relative to build/plugins/PACKAGE/source/javascript
         -
             module: kb.panel.eg_plugin
-            file: panel    
+            file: panel
         -
-            module: kb.panel.eg_plugin.installer
-            file: installer
+            module: kb.widget.eg_plugin.test_widget
+            file: "widgets/TestWidget"
 install:
     #installer: 
     #    module: kb.panel.eg_plugin.installer

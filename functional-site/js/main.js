@@ -293,16 +293,15 @@ define([
                         });
                     });
                 }
+                
+                // Here we load the internal panels.
                 Runtime.logDebug({source: 'main', message: 'About to load panels...'});
                 var panels = [
                     {module: 'kb.panel.message', config: {}},
                     {module: 'kb.panel.contact', config: {}},
                     {module: 'kb.panel.login', config: {}},
-                    // {module: 'kb.panel.userprofile', config: {}},
                     {module: 'kb.panel.welcome', config: {}},
                     {module: 'kb.panel.dashboard', config: {}},
-                    //{module: 'kb.panel.narrativestore'},
-                    // {module: 'kb.panel.datasearch'},
                     {module: 'kb.panel.dataview', config: {}},
                     {module: 'kb.panel.typebrowser', config: {}},
                     {module: 'kb.panel.typeview'},
