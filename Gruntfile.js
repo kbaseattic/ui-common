@@ -83,7 +83,19 @@ module.exports = function(grunt) {
                 configFile: 'test/karma.conf.js'
             },
             dev: {
-                reporters: 'dots'
+                // to do - add watch here
+                configFile: 'test/karma.conf.js',
+                reporters: ['progress', 'coverage'],
+                coverageReporter: {
+                    dir: 'build/test-coverage/',
+                    reporters: [
+                        { type: 'html', subdir: 'html' },
+                    ],
+                },
+
+                autoWatch: true,
+                singleRun: false,
+
             }
         },
 
@@ -99,23 +111,37 @@ module.exports = function(grunt) {
 
     });
 
+    // Does the task of building the main config file.
+    // **Might get moved to an external shell script if this gets
+    // more complex.
+    grunt.registerTask('build-config', [
+        'copy'
+    ]);
 
+    // Does the whole building task
     grunt.registerTask('build', [
+        'build-config',
         'requirejs',
         'filerev',
         'regex-replace'
     ]);
 
-    grunt.registerTask('build-config', [
-        'copy'
-    ]);
-
+    // Does a single, local, unit test run.
     grunt.registerTask('test', [
         'karma:unit',
     ]);
 
+    // Does a single unit test run, then sends 
+    // the lcov results to coveralls. Intended for running
+    // from travis-ci.
     grunt.registerTask('test-travis', [
         'karma:unit',
         'coveralls'
+    ]);
+
+    // Does an ongoing test run in a watching development
+    // mode.
+    grunt.registerTask('develop', [
+        'karma:dev',
     ]);
 };

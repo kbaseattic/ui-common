@@ -203,7 +203,7 @@
             'kb.panel.sample': 'src/panels/sample',
             // KBase JQuery Plugin Widgets
             // ---------------------------
-            'kb.jquery.widget': 'src/widgets/jquery/kbaseWidget',
+            'kb.jquery.widget': 'src/widgets/jquery/kbwidget',
             'kb.jquery.authenticatedwidget': 'src/widgets/jquery/kbaseAuthenticatedWidget',
             'kb.jquery.tabs': 'src/widgets/jquery/kbaseTabs',
             'kb.jquery.kb-tabs': '/src/widgets/jquery/kbTabs',

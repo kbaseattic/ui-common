@@ -1,5 +1,5 @@
 'use strict';
-define(['jquery', 'kb.jquery.widget'], function($) {
+define(['jquery', 'kb.jquery.widget'], function($, widget) {
 
     describe('make a widget', function() {
         it('got a widget', function() {
