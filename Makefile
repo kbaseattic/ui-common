@@ -1,64 +1,38 @@
 PACKAGE  = ui-common
 TOPDIR   = $(PWD)
-MOCHA    = $(TOPDIR)/node_modules/.bin/mocha
+DISTLIB  = $(TOPDIR)/build
+DOCSLIB  = $(TOPDIR)/docs
+TARGET   = prod
+CONFIG   = source/config/$(TARGET).yml
 
-UGLIFY   = $(TOPDIR)/node_modules/.bin/uglifyjs
-JSDUCK   := $(shell which jsduck)
-
-DISTDIR      ?= ./dist
-DISTLIB      ?= $(DISTDIR)/kbase.js
-DOCSDIR      ?= $(DISTDIR)/docs
-MINDISTLIB   ?= $(DISTDIR)/kbase.min.js
-
-FILEORDER     = ./src/file-order.txt
-SOURCES       = $(shell find ./src -name "*.js")
-SOURCES      += $(FILEORDER)
-
-default:
-	git submodule init
-	git submodule update
-	
 all:
-	@echo This Makefile is deprecated, please see README.deploy.
-
-#all: test dist docs
+	test deploy docs
 
 init:
-	@ npm install
-	@ git submodule update --init
-	@ mkdir -p $(DISTDIR)
+	@bower install
+	@npm install
+	@mkdir -p $(DISTLIB)
+	@cp -r $(CONFIG) $(DISTLIB)/config.yml
 
-ext/kbase-datavis/dist/datavis.js:
-	@ cd ./ext/kbase-datavis && make dist MINIFY=0
-
-dist-datavis: ext/kbase-datavis/dist/datavis.js
-
-$(DOCSDIR)/index.html: $(SOURCES)
-ifndef JSDUCK
-	$(error JSDuck not found (install with `gem install jsduck`).)
-endif
-	@ $(JSDUCK) --builtin-classes --output $(DOCSDIR) \
-		--exclude ./src/datavis.js -- ./src
-
-docs: init $(DOCSDIR)/index.html
-
-$(DISTLIB): $(SOURCES) ext/kbase-datavis/dist/datavis.js
-	@ $(UGLIFY) `cat $(FILEORDER) | sed -e "s/\#.*//g" -e "s|^\.|./src|g"` \
-		--beautify --output $(DISTLIB)
-
-$(MINDISTLIB): $(DISTLIB)
-	@ $(UGLIFY) $(DISTLIB) --comments --compress --mangle --output $(MINDISTLIB)
-
-dist: init dist-datavis $(DISTLIB) $(MINDISTLIB) 
+default: init
+	@ git submodule init
+	@ git submodule update
+	@ grunt build
+	
+deploy:
+	@ echo "This Makefile is deprecated for deployment, please see README.deploy."
 
 test: init
-	@ $(MOCHA)
+	@ grunt test
 
 clean:
-	@ rm -rf $(DISTLIB) $(MINDISTLIB)
+	@ rm -rf $(DISTLIB)
 
 dist-clean: clean
 	@ rm -rf node_modules/
-	@ rm -rf $(DOCSDIR)
+	@ rm -rf bower_components/
+
+docs: init
+	@echo docs!
 
 .PHONY: all

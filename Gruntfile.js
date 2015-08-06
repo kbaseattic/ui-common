@@ -112,6 +112,10 @@ module.exports = function(grunt) {
 
     grunt.registerTask('test', [
         'karma:unit',
+    ]);
+
+    grunt.registerTask('test-travis', [
+        'karma:unit',
         'coveralls'
     ]);
 };
