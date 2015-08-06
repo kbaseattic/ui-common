@@ -376,7 +376,7 @@ define([
             }
             
         return {
-            create: function (config) {
+            make: function (config) {
                 return widget(config);
             }
         };

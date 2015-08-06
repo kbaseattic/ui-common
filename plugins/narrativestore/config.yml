@@ -1,0 +1,22 @@
+## YAML Template.
+---
+package:
+    author: Erik Pearson
+    name: narrative_store
+    description: The narrative store
+    date: August 5, 2015
+    version: 0.0.2
+source:
+    modules:
+        -
+            module: kb.panel.narrativestore
+            file: panel
+        -
+            module: kb.widget.narrativestore
+            file: "widgets/narrativeStoreView"
+install:
+    routes:
+            -
+                path: ['narrativestore', {type: param, name: type}, {type: param, name: id}]
+                panelFactory: kb.panel.narrativestore
+    

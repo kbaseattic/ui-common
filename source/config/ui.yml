@@ -1,6 +1,6 @@
 ## YAML Template.
 ---
-plugins: [sample, eg_plugin, about, databrowser, userprofile]
+plugins: [sample, eg_plugin, about, databrowser, userprofile, narrativestore]
 navbar:
     menu:
         available_items:

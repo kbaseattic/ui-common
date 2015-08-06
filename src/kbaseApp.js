@@ -356,7 +356,7 @@ define([
                             // Create new mount.
                             var newMount = {
                                 id: html.genId(),
-                                widget: routed.route.panelFactory.create()
+                                widget: routed.route.panelFactory.make()
                             };
 
                             /* TODO: config threaded here? */

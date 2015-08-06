@@ -2,80 +2,29 @@
  define, require
  */
 /*jslint
- browser: true,
  white: true
  */
 define([
     'q',
     'kb.html',
+    'kb.dom',
     'kb.runtime',
     'kb.widget.databrowser'
 ],
-    function (q, html, R, databrowserWidgetFactory) {
+    function (q, html, DOM, R, databrowserWidgetFactory) {
         'use strict';
-
-        /*
-        function renderPanel() {
-            return q.Promise(function (resolve) {
-                // View stat is a local state machine for this view.
-                var viewState = Object.create(StateMachine).init();
-
-                // Widgets
-                // Widgets are an array of functions or promises which are 
-                // invoked later...
-                var widgets = [];
-                function addWidget(config) {
-                    var id = html.genId();
-                    widgets.push({
-                        id: id,
-                        widget: widgetAdapter.make(config)
-                    });
-                    return id;
-                }
-
-                // Render panel
-                var div = html.tag('div'),
-                    panel = html.panel;
-                var panel = div({class: 'kbase-view kbase-databrowser-view container-fluid', 'data-kbase-view': 'databrowser'}, [
-                    div({class: 'row'}, [
-                        div({class: 'col-sm-3'}, [
-                            panel('Search', 'Search will go here...')
-                        ]),
-                        div({class: 'col-sm-9'}, [
-                            panel('Data Browser',
-                                div({id: addWidget({
-                                        name: 'databrowser',
-                                        config: {
-                                            viewState: viewState
-                                        },
-                                        module: 'kb.widget.databrowser'
-                                    })})
-                                )
-                        ])
-                    ])
-                ]);
-                resolve({
-                    title: 'Data Browser for ' + R.getUsername(),
-                    content: panel,
-                    widgets: widgets
-                });
-            });
-        }
-        */
-       
-                
 
         function widget(config) {
             var mount, container;
-            
-            
+
+
             function render() {
                 var h1 = html.tag('h1'),
                     div = html.tag('div');
 
                 var widgets = [];
 
-                function addFactoryWidget(def) {
+                function addWidget(def) {
                     var id = html.genId();
                     widgets.push({
                         id: id,
@@ -90,7 +39,7 @@ define([
                         h1('Data Browser'),
                         div({class: 'row'}, [
                             div({class: 'col-md-12'}, [
-                                html.bsPanel('Data Browser Widget', addFactoryWidget({
+                                html.bsPanel('Data Browser Widget', addWidget({
                                     config: {},
                                     widget: databrowserWidgetFactory.make()
                                 }))
@@ -101,51 +50,40 @@ define([
                 };
             }
 
-            /* DOC: create lifecycle event
-             * The create lifecycle event is the only synchronous one. 
-             * This is because object creation, in its many forms, may
-             * not always be naturally implementable as a promise.
-             * In this case, we are trying to exemplify how a Panel can
-             * strictly follow the widget lifecycle interface, and mangage
-             * its sub-widgets along exactly the same trajectory. In reality,
-             * sometimes a sub-widgets lifecyle events won't necessarily 
-             * correspond to the parent widget's events.
-             */
             var rendered = render();
-            
-            
+
+
+            // Widget API
             function init() {
                 return q.Promise(function (resolve) {
                     resolve();
                 });
             }
-
-            // Widget API
             function attach(node) {
                 return q.Promise(function (resolve, reject) {
                     mount = node;
-                    container = document.createElement('div');
+                    container = DOM.createElement('div');
                     mount.appendChild(container);
                     container.innerHTML = html.flatten(rendered.content);
                     R.send('app', 'title', rendered.title);
                     q.all(rendered.widgets.map(function (w) {
-                            return w.widget.attach($('#' + w.id).get(0));
-                        }))
-                            .then(function (results) {
-                                resolve();
-                            })
-                            .catch(function (err) {
-                                reject(err);
-                            })
-                            .done();
+                        return w.widget.attach(DOM.findById(w.id));
+                    }))
+                        .then(function () {
+                            resolve();
+                        })
+                        .catch(function (err) {
+                            reject(err);
+                        })
+                        .done();
                 });
             }
             function detach() {
-                return q.Promise(function (resolve) {
+                return q.Promise(function (resolve, reject) {
                     q.all(rendered.widgets.map(function (w) {
                         return w.widget.detach();
                     }))
-                        .then(function (results) {
+                        .then(function () {
                             mount.removeChild(container);
                             container = null;
                             resolve();
@@ -157,11 +95,11 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve) {
+                return q.Promise(function (resolve, reject) {
                     q.all(rendered.widgets.map(function (w) {
                         return w.widget.start(params);
                     }))
-                        .then(function (results) {
+                        .then(function () {
                             resolve();
                         })
                         .catch(function (err) {
@@ -171,11 +109,11 @@ define([
                 });
             }
             function run(params) {
-                return q.Promise(function (resolve) {
+                return q.Promise(function (resolve, reject) {
                     q.all(rendered.widgets.map(function (w) {
                         return w.widget.run(params);
                     }))
-                        .then(function (results) {
+                        .then(function () {
                             resolve();
                         })
                         .catch(function (err) {
@@ -185,11 +123,11 @@ define([
                 });
             }
             function stop() {
-                return q.Promise(function (resolve) {
+                return q.Promise(function (resolve, reject) {
                     q.all(rendered.widgets.map(function (w) {
                         return w.widget.stop();
                     }))
-                        .then(function (results) {
+                        .then(function () {
                             resolve();
                         })
                         .catch(function (err) {
@@ -199,13 +137,13 @@ define([
                 });
             }
             function destroy() {
-                return q.Promise(function (resolve) {
+                return q.Promise(function (resolve, reject) {
                     q.all(rendered.widgets.map(function (w) {
                         if (w.widget.destroy) {
                             return w.widget.destroy();
                         }
                     }))
-                        .then(function (results) {
+                        .then(function () {
                             resolve();
                         })
                         .catch(function (err) {
@@ -227,7 +165,7 @@ define([
         }
 
         return {
-            create: function (config) {
+            make: function (config) {
                 return widget(config);
             }
         };
