@@ -17,6 +17,15 @@ source:
             module: kb.plugin.about.installer
             file: installer
 setup:
-    installer: 
-        module: kb.plugin.about.installer
-        
+    routes:
+        -
+            path: ['about']
+            panelFactory: kb.panel.about
+    menu:
+        -
+            name: about
+            definition:
+                path: about
+                label: About the Functional Site
+                icon: "info-circle"
+            

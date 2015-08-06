@@ -365,6 +365,8 @@ define([
                                     newMount.container = $('<div id="' + newMount.id + '"/>');
                                     mountPoint.container.empty().append(newMount.container);
                                     mountPoint.mounted = newMount;
+                                    
+                                    publish('navbar', 'clear-buttons');
 
                                     newMount.widget.attach(newMount.container.get(0))
                                         .then(function () {

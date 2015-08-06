@@ -8,9 +8,18 @@
  */
 
 define([
-    'jquery', 'q', 'kb.runtime', 'kb.dom', 'kb.html', 'kb.service.workspace', 'kb.utils.api', 'kb.narrative', 'datatables_bootstrap'
+    'jquery',
+    'q',
+    'kb.runtime',
+    'kb.dom',
+    'kb.html',
+    'kb.service.workspace',
+    'kb.utils.api',
+    'kb.utils',
+    'kb.narrative',
+    'datatables_bootstrap'
 ],
-    function ($, q, R, DOM, html, WorkspaceClient, APIUtils, Narrative) {
+    function ($, q, R, DOM, html, WorkspaceClient, APIUtils, Utils, Narrative) {
         'use strict';
 
         var widget = function (config) {
@@ -26,17 +35,17 @@ define([
                 var a = html.tag('a'),
                     tableId = html.genId(),
                     columns = ['Object Name', 'Type', 'Version', 'Narrative', 'Version', 'Last Modified'],
-                    rows = data.map(function(object) {
+                    rows = data.map(function (object) {
                         return [
                             a({href: '/functional-site/#dataview/' + object.info.wsid + '/' + object.info.id}, object.info.name),
                             object.info.typeName,
                             object.info.typeMajorVersion + '.' + object.info.typeMinorVersion,
                             a({href: '/narrative/' + object.narrative.workspaceId + '/' + object.info.id}, object.narrative.name),
                             object.info.version,
-                            object.info.save_date
+                            Utils.niceElapsedTime(object.info.save_date)
                         ]
                     });
-                
+
                 return {
                     content: html.makeTable(columns, rows, {class: 'table table-striped', id: tableId}),
                     afterAttach: function () {
@@ -129,7 +138,7 @@ define([
 
                     getData()
                         .then(function (data) {
-                            var rendered= render(data);
+                            var rendered = render(data);
                             DOM.setHTML(container, rendered.content);
                             if (rendered.afterAttach) {
                                 rendered.afterAttach();
