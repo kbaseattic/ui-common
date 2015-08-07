@@ -11,16 +11,13 @@ source:
     ## NB: need to quote file names, otherwise 
     modules:
         -
-            module: kb.panel.about
+            module: kb$panel$about
             file: panel
-        -
-            module: kb.plugin.about.installer
-            file: installer
 install:
     routes:
         -
             path: ['about']
-            panelFactory: kb.panel.about
+            panelFactory: kb$panel$about
     menu:
         -
             name: about
