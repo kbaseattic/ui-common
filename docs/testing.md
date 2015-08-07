@@ -15,7 +15,7 @@ Each suite works in a couple components.
 
 We use RequireJS to load modules. The set of paths and namespaces is available in functional-site/js/require-config.js (and possibly could be published elsewhere). As an example, to load the kbaseConfig module for testing, this syntax is used to wrap a test suite:
 
-```
+```JavaScript
 'use strict';
 define(['kb.config'], function(Config) {
     ... specs go here ...
@@ -26,7 +26,7 @@ define(['kb.config'], function(Config) {
 
 Next, we use Jasmine's ```describe``` function to start the suite.
 
-```
+```JavaScript
 'use strict';
 define(['kb.config'], function(Config) {
     describe('The KBase Config object', function() {
@@ -41,7 +41,7 @@ You can have multiple ```describe``` statements in a single file. Just note that
 
 Finally, individual test specs are just calls to the Jasmine's ```it``` function. Like ```describe```, these take a descriptive string, and a function that runs the test.
 
-```
+```JavaScript
 'use strict';
 define(['kb.config'], function(Config) {
     describe('The KBase Config object', function() {
@@ -59,7 +59,7 @@ There are a large number of Matcher functions available for most cases, and they
 
 Any variables or constants you might need across tests can be defined outside the tests (i.e., before any 'describe's). The scoping rules mean that each spec has access to the global variables that are defined in the same file but outside the tests.
 
-```
+```JavaScript
 'use strict';
 define(['kb.config'], function(Config) {
     var wsUrlConfig = 'services.workspace.url';
@@ -83,9 +83,11 @@ Karma is a test running framework - that means it handles starting up a web serv
 
 Karma uses a common conf.js file (commonly `karma.conf.js`). For us, that lives inside the test directory. This configuration file tells Karma what files need to be included in the web server, whether they need to be automatically loaded as part of the test page, and where the test files are. Fortunately, most of this is templateable. However, since most of our external components are installed by Bower, and that can lead to some inconsistencies in what gets installed, we had to include most of those manually. If you need to include a new external dependency, you'll likely have to do the same. Otherwise, all .js files in the src directory are included, and .js files under test/spec are treated as tests.
 
-The configuration is currently set to just test against PhantomJS - a headless, WebKit scriptable browser. Version of Chrome and Firefox will eventually be added to the testers, especially for automation on Travis-CI.
+The configuration is currently set to just test against PhantomJS - a headless, WebKit scriptable browser. Versions of Chrome and Firefox will eventually be added to the testers, especially for automation. For automation, this repo uses [Travis-CI](https://travis-ci.org/kbase/ui-common) to automatically run tests during a Github pull request. This then emits test coverage reports to [Coveralls](https://coveralls.io/github/kbase/ui-common) to see how much of your code is covered by tests.
 
-Finally, Karma is configured to automatically report test coverage. When running locally using the commands below, an HTML directory with test results and coverage will be automatically generated for you to browse. When run on Travis-CI, a different file is made that gets passed along to Coveralls.
+Internet Explorer and Safari are, unfortunately, unavailable on Travis-CI as of this writing. There are plugins available for Karma that allow those to be used locally (look up [karma-ie-launcher](https://www.npmjs.com/package/karma-ie-launcher) and [karma-safari-launcher](https://www.npmjs.com/package/karma-safari-launcher)), but will not be included in KBase anytime soon.
+
+Finally, Karma is configured to automatically report test coverage. When running locally using the commands below, an HTML directory with test results and coverage will be automatically generated for you to browse at build/test-coverage/html (see below for instructions on viewing). When run on Travis-CI, a different file is made that gets passed along to Coveralls.
 
 # Running tests with Grunt or Make
 
