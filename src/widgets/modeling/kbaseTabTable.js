@@ -133,14 +133,20 @@ $.KBWidget({
         })
 
         var refLookup = {};
-        function preProcessDataTable(tabSpec) {
+        function preProcessDataTable(tabSpec,tabPane) {
             // get refs
-            var refs = [],
-                cols = tabSpec.columns;
+            var refs = [];
+            var refhash = {};
+            var cols = tabSpec.columns;
             cols.forEach(function(col){
-                if ((col.type == 'tabLink' || col.type == 'wstype') && col.linkformat == 'dispWSRef') {
+                if ((col.type == 'tabLink' || col.type == 'wstype') && col.linkformat == 'dispWSRef') { 
                     self.obj[tabSpec.key].forEach(function(item) {
-                        refs.push( {ref: item[col.key]} );
+                        if (item[col.key] in refhash) {
+                        
+                    	} else {
+                        	refhash[item[col.key]] = 1;
+                        	refs.push( {ref: item[col.key]} );
+                        }
                     })
                 }
             })
@@ -152,7 +158,6 @@ $.KBWidget({
             return self.kbapi('ws', 'get_object_info_new', {objects: refs})
                        .then(function(data) {
                             refs.forEach(function(ref, i){
-
                                 // if (ref in referenceLookup) return
                                 refLookup[ref.ref] = {name: data[i][1],
                                                       ws: data[i][7],
@@ -160,6 +165,7 @@ $.KBWidget({
                                                       //link: data[i][2].split('-')[0]+'/'+data[i][7]+'/'+data[i][1]
                                                       link: data[i][7]+'/'+data[i][1]};
                             })
+                            createDataTable(tabSpec, tabPane);
                        })
         }
 
@@ -171,10 +177,12 @@ $.KBWidget({
                 var tabPane = tabs.tabContent(tabSpec.name);
 
                 // skip any vertical tables for now
-                if (tabSpec.type == 'verticaltbl') continue;
+                if (tabSpec.type == 'verticaltbl') {
+                	continue;
+                }
 
                 // if widget, invoke widget with arguments
-                else if (tabSpec.widget) {
+                if (tabSpec.widget) {
                     var keys = tabSpec.keys.split(/\,\s+/g);
                     var params = {};
                     tabSpec.arguments.split(/\,\s+/g).forEach(function(arg, i) {
@@ -186,13 +194,10 @@ $.KBWidget({
                 }
 
                 // preprocess data to get workspace info on any references in class
-                var prom = preProcessDataTable(tabSpec);
-                if (prom)
-                    prom.done(function() {
-                        createDataTable(tabSpec, tabPane)
-                    })
-                else
+                var prom = preProcessDataTable(tabSpec,tabPane);
+                if (!prom) {
                     createDataTable(tabSpec, tabPane);
+                }
 
 
             }
