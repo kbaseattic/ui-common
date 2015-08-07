@@ -4,11 +4,11 @@ Tests are good for you! A unit testing framework is now available. Integration t
 
 # Jasmine for writing tests
 
-Our unit testing framework is built around the Jasmine package. You can read the docs and tutorials [here](http://jasmine.github.io/2.3/introduction.html), but some introductory details follow. You can also check out tests in the test/specs directory from the root of this repo.
+Our unit testing framework is built around the Jasmine package. You can read the docs and tutorials [here](http://jasmine.github.io/2.3/introduction.html), but some introductory details follow. You can also check out tests in the test/spec directory from the root of this repo.
 
 Jasmine is a behavior-driven tool for JavaScript testing. It has built-in support for various different packages and common libraries, as well as features that allow function mocking and AJAX call simulation. In the end, though, you're still writing JavaScript code in your tests.
 
-Your test suites will be composed of test "specs" - individual tests that should examine one functional piece of the module you're testing. We have it designed so that a single suite should correspond with a single module. These can all be found under test/specs in the root of this repo, and should roughly follow the same directory structure as the original source code location for clarity and consistency.
+Your test suites will be composed of test "specs" - individual tests that should examine one functional piece of the module you're testing. We have it designed so that a single suite should correspond with a single module. These can all be found under test/spec in the root of this repo, and should roughly follow the same directory structure as the original source code location for clarity and consistency.
 
 Each suite works in a couple components.  
 **1. Load the module(s) you're testing using RequireJS.**
@@ -57,7 +57,7 @@ There are a few things going on inside of the spec. The main testing portion is 
 
 There are a large number of Matcher functions available for most cases, and they can be prepended with a ```.not.``` (e.g. ```expect(false).not.toBe(true)```) You can see these (with examples!) in the Jasmine Documentation [here](http://jasmine.github.io/2.3/introduction.html#section-Included_Matchers)
 
-Any variables or constants you might need across tests can be defined outside. The scoping rules mean that each spec has access to variables outside of them.
+Any variables or constants you might need across tests can be defined outside the tests (i.e., before any 'describe's). The scoping rules mean that each spec has access to the global variables that are defined in the same file but outside the tests.
 
 ```
 'use strict';
@@ -73,7 +73,7 @@ define(['kb.config'], function(Config) {
 });
 ```
 
-That's pretty much it. You can certainly do more complex things, like simulate click events and DOM modification, but this is intended for an introduction. There are a few test suites available in test/specs, and more will come.
+That's pretty much it. You can certainly do more complex things, like simulate click events and DOM modification, but this is intended for an introduction. There are a few test suites available in test/spec, and more will come.
 
 # Karma for running tests
 
@@ -81,7 +81,7 @@ Now that you have a number of tests written, they need to be run! The tool we us
 
 Karma is a test running framework - that means it handles starting up a web server, web browser, and populates the test page with all necessary files, then runs the test. **This is already configured for you.** There's nothing you should need to do here, but this part of the document describes the process used.
 
-Karma uses a common conf.js file (commonly `karma.conf.js`). For us, that lives inside the test directory. This configuration file tells Karma what files need to be included in the web server, whether they need to be automatically loaded as part of the test page, and where the test files are. Fortunately, most of this is templateable. However, since most of our external components are installed by Bower, and that can lead to some inconsistencies in what gets installed, we had to include most of those manually. If you need to include a new external dependency, you'll likely have to do the same. Otherwise, all .js files in the src directory are included, and .js files under test/specs are treated as tests.
+Karma uses a common conf.js file (commonly `karma.conf.js`). For us, that lives inside the test directory. This configuration file tells Karma what files need to be included in the web server, whether they need to be automatically loaded as part of the test page, and where the test files are. Fortunately, most of this is templateable. However, since most of our external components are installed by Bower, and that can lead to some inconsistencies in what gets installed, we had to include most of those manually. If you need to include a new external dependency, you'll likely have to do the same. Otherwise, all .js files in the src directory are included, and .js files under test/spec are treated as tests.
 
 The configuration is currently set to just test against PhantomJS - a headless, WebKit scriptable browser. Version of Chrome and Firefox will eventually be added to the testers, especially for automation on Travis-CI.
 
