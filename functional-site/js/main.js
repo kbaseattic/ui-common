@@ -213,7 +213,7 @@ define([
             // for each plugin
             var loaders = plugins.map(function (plugin) {
                 // read the config file
-                if (typeof plugin === 'string') {
+                if (typeof plugin === 'string') { 
                     plugin = {
                         name: plugin,
                         directory: 'plugins/' + plugin
@@ -222,10 +222,13 @@ define([
                 return Q.Promise(function (resolve) {
                     require(['yaml!' + plugin.directory + '/config.yml'], function (config) {
                         // build up a list of modules and add them to the require config.
-                        var paths = {},
+                        var paths = {}, shims = {}, 
                             sourcePath = plugin.directory + '/source';
 
                         // load any styles.
+                        // NB these are styles for the plugin as a whole.
+                        // TODO: do away with this. the styles should be dependencies
+                        // of the panel and widgets. widget css code is below...
                         var dependencies = [];
                         if (config.source.styles) {
                             config.source.styles.forEach(function (style) {
@@ -233,14 +236,24 @@ define([
                             });
                         }
 
+                        // Add each module defined to the require config paths.
                         config.source.modules.forEach(function (source) {
-                            paths[source.module] = sourcePath + '/javascript/' + source.file;
+                            var sourceFile = sourcePath + '/javascript/' + source.file
+                            paths[source.module] = sourceFile;
+                            if (source.css) {
+                                var styleModule = source.module + '-css';
+                                paths[styleModule] = sourceFile;
+                                shims[source.module] = {deps: ['css!' + styleModule]};
+                            }
                         });
-                        require.config({paths: paths});
-                        // enter a require closure with the installer as the module.
-
-                        // NB - installer is the first module in the dependency
-                        // list so we receive it as the first argument.
+                        
+                        console.log(paths);
+                        // shims = {};
+                        
+                        // This usage of require.config will merge with the existing
+                        // require configuration.
+                        require.config({paths: paths, shim: shims});
+                        
                         if (config.install.routes) {
                             require(dependencies, function () {
                                 var routes = config.install.routes.map(function (route) {
@@ -248,6 +261,7 @@ define([
                                         require([route.panelFactory], function (factory) {
                                             Runtime.addRoute({
                                                 path: route.path,
+                                                queryParams: route.queryParams,
                                                 panelFactory: factory
                                             });
                                             resolve();
@@ -301,8 +315,6 @@ define([
                     {module: 'kb.panel.contact', config: {}},
                     {module: 'kb.panel.login', config: {}},
                     {module: 'kb.panel.welcome', config: {}},
-                    {module: 'kb.panel.dashboard', config: {}},
-                    {module: 'kb.panel.dataview', config: {}},
                     {module: 'kb.panel.typebrowser', config: {}},
                     {module: 'kb.panel.typeview'},
                     {module: 'kb.panel.test'},

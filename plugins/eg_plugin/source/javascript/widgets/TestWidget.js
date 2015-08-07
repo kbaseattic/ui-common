@@ -11,18 +11,28 @@
 /* DOC: sample pure object widget with interface
  */
 define([
-    'kb.dom',
-    'kb.widget.base.simple'
+    'kb.widget.base.simpleDOM',
+    'kb.html'
 ],
-    function (DOM, SimpleWidget) {
-        "use strict";
-        return Object.create(SimpleWidget, {
-            
-           onStart: {
-               value: function (params) {
-                   DOM.setHTML(this.container, 'Hello, I am a simple widget.');
-               }
-           }
-            
+    function (SimpleDOM, html) {
+        'use strict';
+        var moduleRunCount = 0;
+        return Object.create(SimpleDOM, {
+            onInit: {
+                value: function (config) {
+                }
+            },
+            onStart: {
+                value: function (params) {
+                    var div = html.tag('div');
+                    moduleRunCount += 1;
+                    var content = div([
+                        (params.name===undefined ? '' : 'Hi, ' + params.name + ', how are you?'),
+                        'I am a simple widget. I have been run ' + moduleRunCount + ' times.'
+                    ])
+                    this.setHTML(content);
+                }
+            }
+
+        });
     });
-});

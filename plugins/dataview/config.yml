@@ -1,0 +1,210 @@
+## YAML Template.
+---
+package:
+    author: Erik Pearson
+    name: dataview_panel
+    description: Viewers for data object (aka Landing Pages)
+    date: August 6, 2015
+    version: 0.0.1
+source:
+    ## sources are relative to build/plugins/PACKAGE/source/javascript
+    ## NB: need to quote file names, otherwise 
+    modules:
+        -
+            module: kb.panel.dataview
+            file: panel
+        -
+            module: kb.widget.dataview.provenance
+            file: widgets/kbaseWSObjGraphCenteredView
+        -
+            module: kb.widget.dataview.download
+            file: widgets/kbaseDownloadPanel
+        -
+            module: kb.widget.dataview.base
+            file: widgets/DataviewWidget
+        -
+            module: kb.widget.dataview.overview
+            file: widgets/OverviewWidget
+        -
+            module: kb.widget.dataview.genericvisualizer
+            file: widgets/GenericVisualizer
+        
+        # GENOME
+        -
+            module: kb.widget.dataview.genome
+            file: widgets/genomes/kbaseGenomePage
+        -
+            module: kb.widget.dataview.genome.wide_overview
+            file: widgets/genomes/kbaseGenomeWideOverview
+        -
+            module: kb.widget.dataview.genome.overview
+            file: widgets/genomes/kbaseGenomeOverview
+            css: true
+        -
+            module: kb.widget.dataview.genome.wiki_description
+            file: widgets/genomes/kbaseWikiDescription
+        -
+            module: kb.widget.dataview.genome.literature
+            file: widgets/genomes/kbaseLitWidget
+        -
+            module: kb.widget.dataview.genome.genepage
+            file: widgets/genomes/kbaseGenePage
+        -
+            module: kb.widget.dataview.genome.lineage
+            file: widgets/genomes/kbaseGenomeLineage
+        -
+            module: kb.widget.dataview.genome.wide_taxonomy
+            file: widgets/genomes/kbaseGenomeWideTaxonomy
+        -
+            module: kb.widget.dataview.genome.wide_assembly_annotation
+            file: widgets/genomes/kbaseGenomeWideAssemAnnot
+        -
+            module: kb.widget.dataview.genome.multi_contig_browser
+            file: widgets/genomes/kbaseMultiContigBrowser
+            css: true
+        -
+            module: kb.widget.dataview.genome.seed_functions
+            file: widgets/genomes/kbaseSEEDFunctions
+            css: true
+        -
+            module: kb.widget.dataview.contigset.contigset_view
+            file: widgets/contigset/kbaseContigSetView
+            
+        # EXPRESSION
+        
+        -
+            module: kb.widget.dataview.expression.expression_series
+            file: widgets/expression/kbaseExpressionSeries
+            
+        # SEED FUNCTION STYLES TOO?
+        -
+            module: kb.widget.dataview.genome.gene_table
+            file: widgets/genomes/kbaseGenomeGeneTable
+        -
+            module: kb.widget.dataview.genome.contig_browser_buttons
+            file: widgets/genomes/kbaseContigBrowserButtons
+        -
+            module: kb.widget.dataview.genome.annotation_set_table
+            file: widgets/from_narrative/kbaseAnnotationSetTable
+        -
+            module: kb.widget.dataview.genome.pangenome
+            file: widgets/genomes/kbasePhenotypeSet
+        -
+            module: kb.widget.dataview.genome.phenotype-set
+            file: widgets/genomes/kbasePhenotypeSet            
+            
+        # ASSEMBLY
+        
+        -
+            module: kb.widget.dataview.assembly.single-object-basic
+            file: widgets/assembly/kbaseSingleObjectBasicWidget
+        -
+            module: kb.widget.dataview.assembly.assembly-input
+            file: widgets/assembly/kbaseAssemblyInput
+        -
+            module: kb.widget.dataview.assembly.view
+            file: widgets/assembly/kbaseAssemblyView
+        -
+            module: kb.widget.dataview.assembly.paired-end-library
+            file: widgets/assembly/kbaseFilePairedEndLibrary
+        -
+            module: kb.widget.dataview.assembly.file-paired-end-library
+            file: widgets/assembly/kbaseCollectionView
+        
+        # COMMUNITIES
+        -
+            module: kb.widget.dataview.communities.collection
+            file: widgets/communities/kbaseCollectionView
+        -
+            module: kb.widget.dataview.communities.functional-matrix
+            file: widgets/communities/kbaseAbundanceDataView
+        -
+            module: kb.widget.dataview.communities.functional-profile
+            file: widgets/communities/kbaseAbundanceDataView
+        -
+            module: kb.widget.dataview.communities.graph
+            file: widgets/communities/kbStandaloneGraph
+        -
+            module: kb.widget.dataview.communities.plot
+            file: widgets/communities/kbStandalonePlot
+        -
+            module: kb.widget.dataview.communities.heatmap
+            file: widgets/communities/kbStandaloneHeatmap
+        -
+            module: kb.widget.dataview.communities.abundance-data-heatmap
+            file: widgets/communities/kbaseAbundanceDataHeatmap
+        -
+            module: kb.widget.dataview.communities.metagenome
+            file: widgets/communities/kbaseMetagenomeView
+        -
+            module: kb.widget.dataview.communities.jquery-svg
+            file: widgets/communities/jquery.svg
+            
+        # PROTEOME COMPARISON
+        
+        -
+            module: kb.widget.dataview.preteome-comparison.genome-comparison
+            file: widgets/protcmp/kbaseGenomeComparison
+        -
+            module: kb.widget.dataview.preteome-comparison.genome-comparison-viewer
+            file: widgets/protcmp/kbaseGenomeComparisonViewer
+            
+        # MODELING
+        -
+            module: kb.widget.dataview.modeling.objects
+            file: widgets/modeling/KBObjects
+        -
+            module: kb.widget.dataview.modeling.biochem_media
+            file: widgets/modeling/KBaseBiochem.Media
+        -
+            module: kb.widget.dataview.modeling.fba
+            file: widgets/modeling/KBaseFBA.FBA
+        -
+            module: kb.widget.dataview.modeling.fba_model
+            file: widgets/modeling/KBaseFBA.FBAModel
+        -
+            module: kb.widget.dataview.modeling.fba_model_set
+            file: widgets/modeling/KBaseFBA.FBAModelSet
+        -
+            module: kb.widget.dataview.modeling.phenotype_set
+            file: widgets/modeling/KBasePhenotypes.PhenotypeSet
+        -
+            module: kb.widget.dataview.modeling.phenotype_simulation_set
+            file: widgets/modeling/KBasePhenotypes.PhenotypeSimulationSet
+        -
+            module: kb.widget.dataview.modeling.genome_set
+            file: widgets/modeling/KBaseSearch.GenomeSet
+        -
+            module: kb.widget.dataview.modeling.tab_table
+            file: widgets/modeling/kbaseTabTable
+            
+        # TREES
+        
+        -
+            module: kb.widget.dataview.modeling.tree
+            file: kbaseTree  
+        
+install:
+    routes:
+        -
+            path: 
+                - 
+                    dataview
+                -
+                    type: param
+                    name: workspaceId
+                -
+                    type: param
+                    name: objectId
+            queryParams:
+                sub: {}
+                subid: {}            
+            panelFactory: kb.panel.dataview
+        -
+            path: ['dataview', {type: param, name: workspaceId}, {type: param, name: objectId}, {type: param, name: objectVersion}]
+            queryParams:
+                sub: {}
+                subid: {}            
+            panelFactory: kb.panel.dataview
+# no menu
+        

@@ -21,8 +21,10 @@ install:
     routes:
         -
             path: ['eg_plugin']
+            queryParams: 
+                name: {}                    
             # this is one of the modules defined above.
-            panelFactory: kb.panel.eg_plugin
+            panelFactory: kb.panel.eg_plugin            
     menu:
         -
             name: ev_plugin

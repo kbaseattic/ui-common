@@ -14,9 +14,6 @@ source:
             module: kb.panel.userprofile
             file: panel
         -
-            module: kb.plugin.userprofile.installer
-            file: installer
-        -
             module: kb.widget.userprofile.base
             file: "widgets/userProfileBase"
         -

@@ -14,6 +14,10 @@ plugins:
         userprofile
     -
         narrativestore
+    -
+        dashboard
+    -
+        dataview
 navbar:
     menu:
         available_items:
@@ -41,10 +45,6 @@ navbar:
                 uri: https://kbase.us/contact-us
                 label: Contact Us
                 icon: envelope-o
-            dashboard:
-                path: dashboard
-                label: Dashboard
-                icon: dashboard
             typebrowser:
                 path: typebrowser
                 label: Type Browser
@@ -54,6 +54,6 @@ navbar:
                 label: Testing Panel
                 icon: flask
         menus:
-            authenticated: [search, narrative, dashboard, typebrowser, test, divider, contact, divider]                
+            authenticated: [search, narrative, typebrowser, test, divider, contact, divider]                
             unauthenticated: [about, contact, divider, about_kbase, contact_us]
         

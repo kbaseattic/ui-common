@@ -13,8 +13,7 @@ define([
     'kb.widget.spec.data-type-specification',
     'kb.widget.spec.module-specification',
     'kb.widget.spec.function-specification',
-    'kb.widget.error',
-    'kb.jquery.card-layout-manager'
+    'kb.widget.error'
 ], function ($, html, R, q, DataTypeSpecWidget, ModuleSpecWidget, FunctionSpecWidget, ErrorWidget) {
     'use strict';
 

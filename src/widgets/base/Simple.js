@@ -15,7 +15,7 @@ define([
     'kb.dom'
 ],
     function (q, DOM) {
-        "use strict";
+        'use strict';
         return Object.create({}, {
            
             init: {
@@ -49,8 +49,7 @@ define([
             
             start: {
                 value: function (params) {
-                    return q.Promise(function (resolve) {
-                        
+                    return q.Promise(function (resolve) {                        
                         if (this.onStart) {
                             this.onStart(params);
                         }

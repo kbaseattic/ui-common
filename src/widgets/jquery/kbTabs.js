@@ -137,10 +137,17 @@ define(['jquery', 'kb.widget'], function ($) {
 
             // adds content to existing tab pane; useful for ajax
             this.addContent = function (p) {
-                var c = tab_contents.children('[data-id="' + p.name + '"]')
-                c.append((p.content ? p.content : ''));
-
-                return c;
+                var tab = tab_contents.children('[data-id="' + p.name + '"]')
+                tab.append((p.content ? p.content : ''));
+                return tab;
+            };
+            
+            this.setContent = function (p) {
+                var tab = tab_contents.children('[data-id="' + p.name + '"]')
+                tab.empty();
+                tab.append((p.content ? p.content : ''));
+                /* TODO: probably better to return this to support chaining... */
+                return tab;
             };
 
             // highlights tab and shows content

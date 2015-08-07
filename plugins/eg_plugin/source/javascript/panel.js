@@ -114,7 +114,7 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve) {
+                return q.Promise(function (resolve, reject) {
                     q.all(rendered.widgets.map(function (w) {
                         return w.widget.start(params);
                     }))

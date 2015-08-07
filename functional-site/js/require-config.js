@@ -75,11 +75,11 @@
             datatables_bootstrap_css: 'bower_components/datatables-bootstrap3-plugin/media/css/datatables-bootstrap3.min',
             knockout: 'bower_components/knockout/dist/knockout.debug',
             'knockout-mapping': 'bower_components/knockout-mapping/knockout-mapping',
-            angular: 'bower_components/angular/angular',
-            'angular-ui': 'bower_components/angular-ui/build/angular-ui.min',
-            'angular-ui-router': 'bower_components/angular-ui-router/release/angular-ui-router.min',
-            'angular-ui-bootstrap': 'bower_components/angular-ui-bootstrap-bower/ui-bootstrap.min',
-            'angular-ui-bootstrap-templates': 'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min',
+            //angular: 'bower_components/angular/angular',
+            //'angular-ui': 'bower_components/angular-ui/build/angular-ui.min',
+            //'angular-ui-router': 'bower_components/angular-ui-router/release/angular-ui-router.min',
+            //'angular-ui-bootstrap': 'bower_components/angular-ui-bootstrap-bower/ui-bootstrap.min',
+            //'angular-ui-bootstrap-templates': 'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min',
             'jquery.blockUI': 'bower_components/blockUI/jquery.blockUI',
             'd3': 'bower_components/d3/d3.min',
             'd3-sankey': 'bower_components/d3-plugins-sankey/sankey',
@@ -100,7 +100,7 @@
             'googlepalette': 'lib/googlepalette',
             'google-code-prettify': 'bower_components/google-code-prettify/bin/prettify.min',
             'google-code-prettify-style': 'bower_components/google-code-prettify/bin/prettify.min',
-            'ace': 'bower_components/ace-builds/src-min/ace',
+            // 'ace': 'bower_components/ace-builds/src-min/ace',
             // Just style, man.
             'font-awesome': 'bower_components/font-awesome/css/font-awesome.min',
             'stacktrace': 'bower_components/stacktrace-js/dist/stacktrace.min',
@@ -109,7 +109,7 @@
             // KBase Styles
             // ----------------
             'kb.style.bootstrap': 'css/kb-bootstrap',
-            'kb.style.sankey': 'css/sankeystyle',
+            'kb/style/sankey': 'css/sankeystyle',
             // KBase Client API
             // -------------------
             'kb.api': 'lib/kbase-clients/kbase-client-api.min',
@@ -145,44 +145,23 @@
             // -------------
             
             'kb.widget.base.simple': 'src/widgets/base/simple',
+            'kb.widget.base.simpleDOM': 'src/widgets/base/simpleDOM',
             
-            
-            // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
             'kb.widget.buttonbar': 'src/widgets/kbaseButtonbar',
             'kb.widget.social.base': 'src/widgets/social/kbaseSocialWidget',
             'kb.user_profile': 'src/kbaseUserProfile',
-            //'kb.widget.social.user_profile': 'src/widgets/social/kbaseUserProfileWidget',
-            //kbaseuserrecentactivity: '/src/widgets/social/kbaseUserRecentActivity',
-            //kbaseuserpopularnarratives: '/src/widgets/social/kbaseUserPopularNarratives',
-            //'kb.widget.social.user_search': 'src/widgets/social/kbaseUserSearch',
-            //'kb.widget.social.browse_narratives': 'src/widgets/social/kbaseUserBrowseNarratives',
-            //'kb.widget.social.collaborators': 'src/widgets/social/kbaseUserCollaboratorNetwork',
             'kb.session': 'src/kbaseSession',
             'kb.config': 'src/kbaseConfig',
             'kb.widget.navbar': 'src/widgets/kbaseNavbar',
             'kb.widget.base': 'src/widgets/kbaseBaseWidget',
             'kb.widget.login': 'src/widgets/kbaseLoginWidget',
-            // Dashboard widgets
-            'kb.widget.dashboard.base': 'src/widgets/dashboard/DashboardWidget',
-            'kb.widget.dashboard.profile': 'src/widgets/dashboard/ProfileWidget',
-            'kb.widget.dashboard.sharedNarratives': 'src/widgets/dashboard/SharedNarrativesWidget',
-            'kb.widget.dashboard.narratives': 'src/widgets/dashboard/NarrativesWidget',
-            'kb.widget.dashboard.publicNarratives': '/src/widgets/dashboard/PublicNarrativesWidget',
-            'kb.widget.dashboard.apps': 'src/widgets/dashboard/AppsWidget',
-            'kb.widget.dashboard.data': 'src/widgets/dashboard/DataWidget',
-            'kb.widget.dashboard.collaborators': '/src/widgets/dashboard/CollaboratorsWidget',
-            'kb.widget.dashboard.metrics': 'src/widgets/dashboard/MetricsWidget',
+            
             // Dataview widgets
-            'kb.widget.dataview.base': 'src/widgets/dataview/DataviewWidget',
-            'kb.widget.dataview.overview': 'src/widgets/dataview/OverviewWidget',
-            'kb.widget.genericvisualizer': 'src/widgets/dataview/genericvisualizer',
-            'kb.widget.dataview.download': 'src/widgets/dataview/kbaseDownloadPanel',
             // KBase clients. Wrappers around the service clients to provide packaged operations with promises.
             'kb.client.workspace': 'src/clients/kbaseWorkspaceClient',
             'kb.client.methods': 'src/clients/kbaseClientMethods',
             // Standalone Widgets
             'kb.widget': 'src/widgets/Widget',
-            // 'kb.widget.databrowser': 'src/widgets/DataBrowser/DataBrowser',
             'kb.widget.typebrowser': 'src/widgets/TypeBrowser',
             // KBase Panels
             // ------------
@@ -190,19 +169,13 @@
             'kb.panel.login': 'src/panels/login',
             'kb.panel.navbar': 'src/panels/navbar',
             'kb.panel.narrativemanager': 'src/panels/narrativemanager',
-            // 'kb.panel.userprofile': 'src/panels/userprofile',
             'kb.panel.welcome': 'src/panels/welcome',
-            'kb.panel.dashboard': 'src/panels/dashboard',
-            'kb.panel.dashboard.style': 'src/panels/dashboard',
             'kb.panel.narrativestore': 'src/panels/narrativestore',
             'kb.panel.datasearch': 'src/panels/datasearch',
-            'kb.panel.dataview': 'src/panels/dataview',
-            'kb.panel.dataview.style': 'src/panels/dataview',
             'kb.panel.typebrowser': 'src/panels/typebrowser',
             'kb.panel.typeview': 'src/panels/typeview',
             'kb.panel.message': 'src/panels/message',
             'kb.panel.test': 'src/panels/test',
-            // 'kb.panel.sample': 'src/panels/sample',
             'kb.panel.sample.router': 'src/panels/sample-router',
             
             // KBase JQuery Plugin Widgets
@@ -214,63 +187,11 @@
             'kb.jquery.media-editor': 'src/widgets/jquery/kbaseMediaEditor',
             'kb.jquery.helper-plugins': 'src/widgets/jquery/kbaseHelperPlugins',
             'kb.jquery.narrativestore': 'src/widgets/jquery/kbaseNarrativeStoreView',
-            // TODO: why this name for this widget?
-            'kb.jquery.provenance': 'src/widgets/jquery/KBaseWSObjGraphCenteredView',
-            // genomes
-            'kb.jquery.genome': 'src/widgets/jquery/genomes/KBaseGenomePage',
-            'kb.jquery.genome.wideoverview': 'src/widgets/jquery/genomes/kbaseGenomeWideOverview',
-            'kb.jquery.genome.overview': 'src/widgets/jquery/genomes/kbaseGenomeOverview',
-            'kb.jquery.genome.overview.styles': 'src/widgets/jquery/genomes/kbaseGenomeOverview',
-            'kb.jquery.genome.wiki-description': 'src/widgets/jquery/genomes/kbaseWikiDescription',
-            'kb.jquery.genome.literature': 'src/widgets/jquery/genomes/kbaseLitWidget',
-            'kb.jquery.genome.genepage': 'src/widgets/jquery/genomes/kbaseGenePage',
-            'kb.jquery.genome.lineage': 'src/widgets/jquery/genomes/kbaseGenomeLineage',
-            'kb.jquery.genome.wide-taxonomy': 'src/widgets/jquery/genomes/kbaseGenomeWideTaxonomy',
-            'kb.jquery.genome.wide-assembly-annotation': 'src/widgets/jquery/genomes/kbaseGenomeWideAssemAnnot',
-            'kb.jquery.genome.multi-contig-browser': 'src/widgets/jquery/genomes/kbaseMultiContigBrowser',
-            'kb.jquery.genome.multi-contig-browser.styles': 'src/widgets/jquery/genomes/kbaseMultiContigBrowser',
-            'kb.jquery.genome.seed-functions': 'src/widgets/jquery/genomes/kbaseSEEDFunctions',
-            'kb.jquery.genome.seed-functions.styles': 'functional-site/assets/css/kbaseSEEDFunctions',
-            'kb.jquery.genome.gene-table': 'src/widgets/jquery/genomes/kbaseGenomeGeneTable',
-            'kb.jquery.genome.contig-browser-buttons': 'src/widgets/jquery/genomes/kbaseContigBrowserButtons',
-            'kb.jquery.from_narrative.annotation-set-table': 'src/widgets/jquery/from_narrative/kbaseAnnotationSetTable',
-            'kb.jquery.genome.pangenome': 'src/widgets/jquery/genomes/kbasePanGenome',
-            'kb.jquery.genomes.phenotype-set': 'src/widgets/jquery/genomes/kbasePhenotypeSet',
-            // assembly
-            'kb.jquery.assembly.single-object-basic': 'src/widgets/jquery/assembly/kbaseSingleObjectBasicWidget',
-            'kb.jquery.assembly.assembly-input': 'src/widgets/jquery/assembly/kbaseAssemblyInput',
-            'kb.jquery.assembly.view': 'src/widgets/jquery/from_narrative/kbaseAssemblyView',
-            'kb.jquery.assembly.paired-end-library': 'src/widgets/jquery/assembly/kbasePairedEndLibrary',
-            'kb.jquery.assembly.file-paired-end-library': 'src/widgets/jquery/assembly/kbaseFilePairedEndLibrary',
-            // communities
-            'kb.jquery.communities.collection': 'src/widgets/jquery/communities/kbaseCollectionView',
-            'kb.jquery.communities.functional-matrix': 'src/widgets/jquery/communities/kbaseAbundanceDataView',
-            'kb.jquery.communities.functional-profile': 'src/widgets/jquery/communities/kbaseAbundanceDataView',
-            'kb.jquery.communities.graph': 'src/widgets/jquery/communities/kbStandaloneGraph',
-            'kb.jquery.communities.plot': 'src/widgets/jquery/communities/kbStandalonePlot',
-            'kb.jquery.communities.heatmap': 'src/widgets/jquery/communities/kbStandaloneHeatmap',
-            'kb.jquery.communities.abundance-data-heatmap': 'src/widgets/jquery/communities/kbaseAbundanceDataHeatmap',
-            'kb.jquery.communities.metagenome': 'src/widgets/jquery/communities/kbaseMetagenomeView',
-            'kb.jquery.communities.jquery-svg': 'src/widgets/jquery/communities/jquery.svg',
-            // proteome comparison
-            'kb.jquery.proteome-comparison.genome-comparison': 'src/widgets/jquery/protcmp/kbaseGenomeComparison',
-            'kb.jquery.proteome-comparison.genome-comparison-viewer': 'src/widgets/jquery/protcmp/kbaseGenomeComparisonViewer',
-            // modeling
-            'kb.jquery.modeling.objects': 'src/widgets/jquery/modeling/KBObjects',
-            'kb.jquery.modeling.biochem-media': 'src/widgets/jquery/modeling/KBaseBiochem.Media',
-            'kb.jquery.modeling.fba': 'src/widgets/jquery/modeling/KBaseFBA.FBA',
-            'kb.jquery.modeling.fba-model': 'src/widgets/jquery/modeling/KBaseFBA.FBAModel',
-            'kb.jquery.modeling.fba-model-set': 'src/widgets/jquery/modeling/KBaseFBA.FBAModelSet',
-            'kb.jquery.modeling.phenotype-set': 'src/widgets/jquery/modeling/KBasePhenotypes.PhenotypeSet',
-            'kb.jquery.modeling.phenotype-simulation-set': 'src/widgets/jquery/modeling/KBasePhenotypes.PhenotypeSimulationSet',
-            'kb.jquery.modeling.genome-set': 'src/widgets/jquery/modeling/KBaseSearch.GenomeSet',
-            'kb.jquery.modeling.tab-table': 'src/widgets/jquery/modeling/kbaseTabTable',
-            // trees
-            'kb.jquery.trees.tree': 'src/widgets/jquery/trees/kbaseTree',
+
             // type spec
             'kb.spec.common': 'src/widgets/jquery/spec/kbaseSpecCommon',
             'kb.jquery.spec.type-card': 'src/widgets/jquery/spec/kbaseSpecTypeCard',
-            'kb.jquery.card-layout-manager': 'src/widgets/jquery/kbaseCardLayoutManager',
+            // 'kb.jquery.card-layout-manager': 'src/widgets/jquery/kbaseCardLayoutManager',
             'kb.jquery.landing-page-card': 'src/widgets/jquery/kbaseLandingPageCard',
             'kb.widget.spec.data-type-specification': 'src/widgets/specview/DataTypeSpecification',
             'kb.widget.spec.module-specification': 'src/widgets/specview/ModuleSpecification',
@@ -278,13 +199,8 @@
             'kb.widget.error': 'src/widgets/kbaseError',
             // KBase Data Visualization Widget
             // ----------------------------
-            'kb.jquery.contigset': 'src/widgets/jquery/contigset/kbaseContigSetView',
+            // 'kb.jquery.contigset': 'src/widgets/jquery/contigset/kbaseContigSetView',
             
-            // Sample Widgets
-            //'kb.widget.sample.factory': 'src/widgets/sample/factory-widget',
-            //'kb.widget.sample.jquery': 'src/widgets/sample/kbase-jquery-widget',
-            //'kb.widget.sample.object': 'src/widgets/sample/object-es5-widget',
-            //'kb.widget.sample.object-interface': 'src/widgets/sample/object-widget-interface',
             
             // KBase Services
             // non-visual dependencies of plugins
@@ -293,7 +209,7 @@
             'kb.client.narrativemanager': 'src/clients/narrativemanager',
             // KBase Angular Apps
             // ------------------
-            'kb.angular.search': 'src/angular/search'
+            //'kb.angular.search': 'src/angular/search'
 
 
         },
@@ -313,6 +229,7 @@
             bootstrap: {
                 deps: ['jquery']
             },
+            /*
             angular: {
                 deps: ['jquery'], exports: 'angular'
             },
@@ -325,9 +242,11 @@
             'angular-ui-router': {
                 deps: ['angular']
             },
+            */
             'd3-sankey': {
-                deps: ['d3', 'css!d3-sankey-css', 'css!kb.style.sankey']
+                deps: ['d3', 'css!d3-sankey-css', 'css!kb/style/sankey']
             },
+            /*
             'kb.jquery.genome.seed-functions': {
                 deps: ['css!kb.jquery.genome.seed-functions.styles']
             },
@@ -337,6 +256,7 @@
             'kb.jquery.genome.overview': {
                 deps: ['css!kb.jquery.genome.overview.styles']
             },
+            */
             /*
              'jquery-svg-graph': {
              deps: ['jquery', 'jquery-svg']
@@ -362,7 +282,7 @@
         },
         map: {
             '*': {
-                'css': 'bower_components/require-css/css.min'
+                'css': 'bower_components/require-css/css'
             }
         }
 

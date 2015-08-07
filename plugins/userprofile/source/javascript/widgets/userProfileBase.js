@@ -1,3 +1,11 @@
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true,
+ todo: true
+ */
 define([
     'nunjucks',
     'jquery',
@@ -14,7 +22,7 @@ define([
             // constants and constant state.
             SocialWidget_init: {
                 value: function (cfg) {
-                    this._generatedId = 0;
+                    this.generatedId = 0;
 
                     // First we get the global config.
 
@@ -75,7 +83,7 @@ define([
                     this.stateMeta = {
                         status: 'none',
                         timestamp: new Date()
-                    }
+                    };
 
                     // Creates maps out of lists.
                     this.createListMaps();
@@ -94,7 +102,8 @@ define([
                         }
                         return s;
                     });
-                    // This is the cache of templates.
+                    // this is the cache of templates.
+                    
                     this.templates.cache = {};
 
                     // The context object is what is given to templates.
@@ -188,7 +197,7 @@ define([
 
                     this.setInitialState()
                         .then(function () {
-                            return this.refresh()
+                            return this.refresh();
                         }.bind(this))
                         .catch(function (err) {
                             this.setError(err);
@@ -225,7 +234,7 @@ define([
             // CONFIG
             getConfig: {
                 value: function (key, defaultValue) {
-                    for (var i = 0; i < this.configs.length; i++) {
+                    for (var i = 0; i < this.configs.length; i += 1) {
                         if (Utils.getProp(this.configs[i], key) !== undefined) {
                             return Utils.getProp(this.configs[i], key);
                         }
@@ -425,7 +434,7 @@ define([
             // Generates a unique id for usage on synthesized dom elements.
             genId: {
                 value: function () {
-                    return 'gen_' + this.widgetName + '_' + this._generatedId++;
+                    return 'gen_' + this.widgetName + '_' + this.generatedId++;
                 }
             },
             renderError: {

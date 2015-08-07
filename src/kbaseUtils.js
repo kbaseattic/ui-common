@@ -30,7 +30,7 @@
  * @typedef {(string|string[])} PropertyPath
  */
 
-define(['q'], function (Q) {
+define(['q', 'jquery'], function (Q, $) {
     "use strict";
     var Utils = Object.create({}, {
         version: {
@@ -902,6 +902,71 @@ define(['q'], function (Q) {
                     return true;
                 }.bind(this);
                 return iseq(v1, v2);
+            }
+        },
+        
+        // from kbapi.js
+        // dang, this is so very specific
+        objTable: {
+            value: function(p) {
+                var obj = p.obj,
+                    keys = p.keys;
+
+                // option to use nicely formated keys as labels
+                if (p.keysAsLabels ) {
+                    var labels = [];      
+                    for (var i in keys) {
+                        var str = keys[i].key.replace(/(id|Id)/g, 'ID');
+                        var words = str.split(/_/g);
+                        for (var j in words) {
+                            words[j] = words[j].charAt(0).toUpperCase() + words[j].slice(1);
+                        }
+                        var name = words.join(' ');
+                        labels.push(name);
+                    }
+                } else if ('labels' in p) {
+                    var labels = p.labels;
+                } else {
+                    // if labels are specified in key objects, use them
+                    for (var i in keys) {
+                        var key_obj = keys[i];
+                        if ('label' in key_obj) {
+                            labels.push(key_obj.label);                    
+                        } else {
+                            labels.push(key_obj.key)
+                        }   
+
+                    }
+                }
+
+                var table = $('<table class="table table-striped table-bordered">');
+
+                for (var i in keys) {
+                    var key = keys[i];
+                    var row = $('<tr>');
+
+                    if (p.bold) {
+                        var label = $('<td><b>'+labels[i]+'</b></td>');
+                    } else {
+                        var label = $('<td>'+labels[i]+'</td>');
+                    }
+
+                    var value = $('<td>');
+
+                    if ('format' in key) {
+                        var val = key.format(obj);
+                        value.append(val);
+                    } else if (key.type === 'bool') {
+                        value.append((obj[key.key] === 1 ? 'True' : 'False'));
+                    } else {
+                        value.append(obj[key.key]);
+                    }
+                    row.append(label, value);
+
+                    table.append(row);
+                }
+
+                return table;
             }
         }
     });

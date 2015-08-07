@@ -183,18 +183,19 @@ define([
             // from kbapi.js, along with possible bugs.
             translateRefs: {
                 value: function (reflist, links) {
-                    return Q.Promise(function (resolve) {
-                        var obj_refs = [];
-                        reflist.forEach(function (ref) {
-                            obj_refs.push({ref: ref});
+                    return Q.Promise(function (resolve, reject) {
+                        var obj_refs = reflist.map(function (ref) {
+                           return {ref: ref};
                         });
-
-                        Utils.promise(this.workspaceClient, 'get_object_info', {
+                        console.log(obj_refs);
+                        Q(this.workspaceClient.get_object_info_new({
                             objects: obj_refs,
                             ignoreErrors: 1,
                             includeMetadata: 1
-                        }).
+                        })).
                             then(function (data) {
+                                console.log('there?');
+
                                 var refhash = {},
                                     i;
                                 for (i = 0; i < data.length; i += 1) {
@@ -204,7 +205,7 @@ define([
                                         type = full_type.slice(full_type.indexOf('.') + 1),
                                         kind = type.split('-')[0],
                                         label = item[7] + "/" + item[1],
-                                        route;
+                                        route, sub;
                                     switch (kind) {
                                         case 'FBA':
                                             sub = 'fbas/';
@@ -229,10 +230,16 @@ define([
                                     var link = '<a href="#/' + route + label + '">' + label + '</a>';
                                     refhash[reflist[i]] = {link: link, label: label};
                                 }
+
                                 resolve(refhash);
-                            }).
-                            done();
-                    });
+                            })
+                            .catch(function (err) {
+                                console.log('ERROR');
+                                console.log(err);
+                                reject(err);
+                            })
+                            .done();
+                    }.bind(this));
                 }
             }
         });
