@@ -1,0 +1,59 @@
+## YAML Template.
+---
+plugins:
+    -
+        name: sample
+        directory: bower_components/kbase-ui-plugin-sample/src/plugin
+    -
+        eg_plugin
+    -
+        about
+    -
+        databrowser
+    -
+        userprofile
+    -
+        narrativestore
+navbar:
+    menu:
+        available_items:
+            search: 
+                path: search/?q=*
+                label: Search Data
+                icon: search
+            narrative: 
+                uri: funtional_site#narrativemanager/start
+                label: Narrative
+                icon: file
+            narrativeTutorial: 
+                uri: https://kbase.us/narrative-guide
+                label: Narrative Tutorial
+                icon: info-circle
+            contact: 
+                path: contact
+                label: Contact Us
+                icon: envelope-o
+            about_kbase: 
+                uri: https://kbase.us/about
+                label: About KBase
+                icon: info-circle
+            contact_us:
+                uri: https://kbase.us/contact-us
+                label: Contact Us
+                icon: envelope-o
+            dashboard:
+                path: dashboard
+                label: Dashboard
+                icon: dashboard
+            typebrowser:
+                path: typebrowser
+                label: Type Browser
+                icon: beer
+            test: 
+                path: test
+                label: Testing Panel
+                icon: flask
+        menus:
+            authenticated: [search, narrative, dashboard, typebrowser, test, divider, contact, divider]                
+            unauthenticated: [about, contact, divider, about_kbase, contact_us]
+        

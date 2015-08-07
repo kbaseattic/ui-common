@@ -62,6 +62,10 @@ define([
             return appMethod('getItem', arguments);
         }
         
+        function addRoute() {
+            return appMethod('addRoute', arguments);
+        }
+        
         // Logging
         
 
@@ -135,6 +139,8 @@ define([
             publish: publish,
             subscribe: subscribe,
             unsubscribe: unsubscribe,
+            
+            addRoute: addRoute,
             
             send: publish,
             recv: subscribe,

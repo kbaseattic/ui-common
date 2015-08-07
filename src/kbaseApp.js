@@ -28,6 +28,8 @@ define([
     function ($, Q, _, Postal, html, AppState, Session, Config, Router) {
         'use strict';
         var factory = function () {
+            
+            var router = Router.make();
 
             function paramsToQuery(params) {
                 return Object.keys(params).map(function (key) {
@@ -354,7 +356,7 @@ define([
                             // Create new mount.
                             var newMount = {
                                 id: html.genId(),
-                                widget: routed.route.panelFactory.create()
+                                widget: routed.route.panelFactory.make()
                             };
 
                             /* TODO: config threaded here? */
@@ -363,6 +365,8 @@ define([
                                     newMount.container = $('<div id="' + newMount.id + '"/>');
                                     mountPoint.container.empty().append(newMount.container);
                                     mountPoint.mounted = newMount;
+                                    
+                                    publish('navbar', 'clear-buttons');
 
                                     newMount.widget.attach(newMount.container.get(0))
                                         .then(function () {
@@ -706,11 +710,10 @@ define([
             // LIFECYCLE
 
             function setup() {
-
             }
 
             function doRoute() {
-                var handler = Router.findCurrentRoute();
+                var handler = router.findCurrentRoute();
                 if (!handler) {
                     publish('app', 'route-not-found');
                 }
@@ -759,9 +762,9 @@ define([
             }
 
             return {
-                addRoute: Router.addRoute,
-                findCurrentRoute: Router.findCurrentRoute,
-                setDefaultRoute: Router.setDefaultRoute,
+                addRoute: router.addRoute,
+                findCurrentRoute: router.findCurrentRoute,
+                setDefaultRoute: router.setDefaultRoute,
                 createMountPoint: createMountPoint,
                 show: show,
                 show2: show2,
@@ -791,12 +794,15 @@ define([
                 getConfig: Config.getItem.bind(Config),
                 startHeartbeat: startHeartbeat,
                 stopHeartbeat: stopHeartbeat,
+                
+                
+                // The app needs its own freaking lifecycle as well!
                 start: start,
                 stop: stop
             };
         };
 
         return {
-            create: factory
+            make: factory
         };
     });

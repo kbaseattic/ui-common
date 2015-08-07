@@ -6,8 +6,8 @@
  white: true
  */
 define([
-    'kb.runtime', '\
-kb.html',
+    'kb.runtime', 
+    'kb.html',
     'kb.session',
     'jquery',
     'q'

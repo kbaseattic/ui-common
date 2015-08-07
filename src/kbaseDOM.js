@@ -19,11 +19,14 @@ define([], function () {
     function setHTML(parent, content) {
         return parent.innerHTML = content;
     }
-    
+    function findById(id) {
+        return document.getElementById(id);
+    }
     return {
         createElement: createElement,
         append: append,
         remove: remove,
-        setHTML: setHTML
+        setHTML: setHTML,
+        findById: findById
     };
 });

@@ -7,10 +7,11 @@
  */
 define([
     'jquery',
+    'underscore',
     'q',
     'kb.runtime',
     'kb.html'
-], function ($, q, R, html) {
+], function ($, _, q, R, html) {
     'use strict';
     
         function adapter(config) {
@@ -47,15 +48,19 @@ define([
                     // not the best .. perhaps merge the params into the config
                     // better yet, rewrite the widgets in the new model...
                     var jqueryWidget = $(container)[jqueryObject];
+                    var widgetConfig = _.extendOwn({}, params, {
+                        // Why this?
+                        wsNameOrId: params.workspaceId,
+                        objNameOrId: params.objectId,
+                        // commonly used, but really should remove this.
+                        /* TODO: remove default params like this */
+                        ws_url: R.getConfig('services.workspace.url'),
+                        token: R.getAuthToken()
+                    });
                     if (!jqueryWidget) {
                         $(container).html(html.panel('Not Found', 'Sorry, cannot find widget ' + jqueryObject));
                     } else {                    
-                        $(container)[jqueryObject]({
-                            wsNameOrId: params.workspaceId,
-                            objNameOrId: params.objectId,
-                            ws_url: R.getConfig('services.workspace.url'),
-                            token: R.getAuthToken()
-                        });
+                        $(container)[jqueryObject](widgetConfig);
                     }
                     resolve();
                 });
