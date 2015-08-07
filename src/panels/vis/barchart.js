@@ -23,47 +23,29 @@ define([
 
                 function render() {
 
+                    var bars = [];
+
+                    for (var i = 0; i < 20; i++) {
+                        bars.push(
+                            {
+                                bar   : i,
+                                color : ['#00BBBB', '#0000FF','#00BBBB', '#0000FF'],
+                                value : [Math.random() * 10, Math.random() * 20,Math.random() * 10, Math.random() * 30]
+                            }
+                        );
+                    }
+                    console.log(bars);
 
                     var $bar = $.jqElem('div').css({width : '500px', height : '500px'}).kbaseBarchart(
 
                         {
                             scaleAxes   : true,
 
-                            xLabel      : 'Some useful experiment',
-                            yLabel      : 'Meaningful data',
+                            xLabel      : 'Survey Data',
+                            //yLabel      : 'Meaningful data',
+                            hGrid       : true,
 
-                            dataset : [
-                                {
-                                    bar : 'Bar 1',
-                                    value : 20,
-                                    color : 'red',
-                                },
-                                {
-                                    bar : 'Bar 2',
-                                    value : 50,
-                                    color : 'green'
-                                },
-                                {
-                                    bar : 'Bar 3',
-                                    value : 10,
-                                    color : 'blue',
-                                    label : 'Some meaningful mouseover value'
-                                },
-
-                                {
-                                    bar : 'Bar 4',
-                                    value : [10,20,30,40,50],
-                                    color : 'purple',
-                                },
-                                {
-                                    bar : 'Bar 5',
-                                    value : [10,20,30,40,50],
-                                    color : ['red', 'green', 'blue', 'cyan', 'magenta'],
-                                    label : ['6.67% effort', '13.34% talent', '20% failure', '26.67% determination', '33.33% mustard'],
-                                    stacked : true,
-                                },
-
-                            ],
+                            dataset : bars,
 
                         }
 

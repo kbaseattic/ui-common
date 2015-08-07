@@ -37,7 +37,7 @@ define([
                         var row = [];
                         heatmap.data.push(row);
                         for (var jdx = 0; jdx < numCells; jdx++) {
-                            row.push(Math.random());
+                            row.push(Math.random() * 2 - 1);
                         }
                         heatmap.row_ids.push('Wingding' + idx);
                         heatmap.row_labels.push('Wingding' + idx);
@@ -45,10 +45,11 @@ define([
                         heatmap.column_labels.push('Frobnoz' + idx);
                     }
 
-                    var $hm = $.jqElem('div').css({width : '500px', height : '500px'}).kbaseHeatmap(
+                    var $hm = $.jqElem('div').css({width : '1000px', height : '500px'}).kbaseHeatmap(
                         {
                             dataset : heatmap,
-                            ulIcon : '/functional-site/assets/navbar/images/kbase_logo.png',
+                            colors : ['#0000AA', '#FFFFFF', '#AA0000'],
+                            //ulIcon : '/functional-site/assets/navbar/images/kbase_logo.png',
                         }
                     );
 

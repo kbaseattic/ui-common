@@ -257,6 +257,28 @@ define(
                 return this;
             }
 
+            if (this.options.hGrid && this.yScale) {
+                var yAxis =
+                    d3.svg.axis()
+                    .scale(this.yScale())
+                    .orient('left')
+                    .tickSize(0 - bounds.size.width)
+                    .outerTickSize(0)
+                    .tickFormat('');
+
+                var gyAxis = this.D3svg().select(this.region('chart')).select('.yAxis');
+
+                if (gyAxis[0][0] == undefined) {
+                    gyAxis = this.D3svg().select(this.region('chart'))
+                        .append('g')
+                        .attr('class', 'yAxis axis')
+                        .attr("transform", "translate(" + 0 + ",0)")
+                }
+
+                gyAxis.transition().call(yAxis);
+                gyAxis.selectAll('line').style('stroke', 'lightgray');
+            }
+
             var chart = this.D3svg().select( this.region('chart') ).selectAll('.barGroup');
 
             chart

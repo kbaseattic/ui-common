@@ -24,6 +24,10 @@ define(
                 xPadding: 30,
                 yGutter: 20,
                 yPadding: 30,
+
+                yLabels : true,
+                xLabels : true,
+
                 xScaleType: 'linear',
                 yScaleType: 'linear',
                 useIDMapping: false,
@@ -33,8 +37,6 @@ define(
                 scaleAxes: false,
                 useUniqueID: false,
                 transitionTime: 1750,
-                //ulIcon         : '/root/img/labs_icon.png',
-                ulIcon: '/narrative/static/kbase/js/ui-common/root/img/labs_icon.png',
                 ticker: 0,
                 radialGradientStopColor: 'black',
                 linearGradientStopColor: 'black',
@@ -180,7 +182,7 @@ define(
                 return yScale;
             },
             init: function (options) {
-console.log("VIS INIT!");
+
                 this._super(options);
 
                 if (this.children() == undefined) {
@@ -473,6 +475,10 @@ console.log("VIS INIT!");
                         ;
                 }
 
+                if (! this.options.xLabels) {
+                    xAxis.tickFormat('');
+                }
+
                 var gxAxis = this.D3svg().select(this.region('yPadding')).select('.xAxis');
 
                 if (gxAxis[0][0] == undefined) {
@@ -500,6 +506,10 @@ console.log("VIS INIT!");
                     d3.svg.axis()
                     .scale(this.yScale())
                     .orient('left');
+
+                if (! this.options.yLabels) {
+                    yAxis.tickFormat('');
+                }
 
                 var gyAxis = this.D3svg().select(this.region('xPadding')).select('.yAxis');
 

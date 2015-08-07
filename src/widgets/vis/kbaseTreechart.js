@@ -296,8 +296,8 @@ var throttle = 0
                 if (d.parent != undefined) {
                     name = uniqueness(d.parent) + '/' + name;
                 }
-console.log("UNIQUE NAME IS " + name);
-return name;
+
+                return name;
             }
 
             var node = chart.selectAll("g.node")

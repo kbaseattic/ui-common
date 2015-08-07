@@ -14,7 +14,7 @@ define(
     ], function( $ ) {
 
     'use strict';
-console.log("KBLC!");
+
     $.KBWidget({
 
 	    name: "kbaseLinechart",
@@ -25,13 +25,64 @@ console.log("KBLC!");
             overColor : 'yellow',
             lineWidth : 3,
             lineCap : 'round',
-            color : 'black',
+            strokeColor : 'black',
+            fillColor : 'none',
+            strokeOpacity : 1.0,
+            fillOpacity : 0.3,
+            xIncrementor : function(xIdx) {
+                return xIdx != undefined ? xIdx + 1 : 0;
+            },
 
         },
 
         _accessors : [
 
         ],
+
+        setDataset : function(dataset) {
+
+            var $line = this;
+
+            dataset.forEach(
+                function(line, idx) {
+                    if (line.values) {
+
+                        var revLine = [];
+
+                        var numPoints = line.values.length;
+
+                        var xInc = $line.options.xIncrementor;
+
+                        var xIdx = xInc();
+
+                        for (var i = 0; i < numPoints; i++) {
+                            var point = line.values[i];
+
+                            if (! $.isPlainObject(point)) {
+                                line.values[i] = {x : xIdx, y : point}
+                                xIdx = xInc(xIdx);
+                            }
+                            else {
+                                xIdx = xInc(point.x);
+                                if (point.y2) {
+                                    revLine.push( { x : point.x, y : point.y2} )
+                                }
+                            }
+                        }
+
+                        if (revLine.length) {
+                            for (var i = revLine.length - 1; i >= 0 ; i--) {
+                                line.values.push(revLine[i]);
+                            }
+                            line.values.push(line.values[0]);
+                        }
+
+                    }
+                }
+            );
+
+            this._super(dataset);
+        },
 
         defaultXDomain : function() {
 
@@ -95,9 +146,11 @@ console.log("KBLC!");
 
                 this
                     .attr('d',              function(d) {return lineMaker(d.values) })
-                    .attr('stroke',         function (d) { return d.color || $line.options.color } )
-                    .attr('fill',           'none')
-                    .attr('stroke-width',   function (d) {return d.width || $line.options.lineWidth} )
+                    .attr('stroke',         function (d) { return d.strokeColor || $line.options.strokeColor } )
+                    .attr('fill',           function(d) { return d.fillColor || $line.options.fillColor} )
+                    .attr('fill-opacity',        function (d) { return d.fillOpacity || $line.options.fillOpacity} )
+                    .attr('stroke-opacity',        function (d) { return d.strokeOpacity || $line.options.strokeOpacity} )
+                    .attr('stroke-width',   function (d) {return d.width != undefined ? d.width : $line.options.lineWidth} )
                     .attr('stroke-linecap',   function (d) {return d.linecap || $line.options.lineCap} )
                     .attr('stroke-dasharray',   function (d) {return d.dasharray } )
                 ;
@@ -127,8 +180,8 @@ console.log("KBLC!");
                 .on('mouseout', function(d) {
                     if ($line.options.overColor) {
                         d3.select(this)
-                            .attr('stroke',         function (d) { return d.color || $line.options.color } )
-                            .attr('stroke-width',   d.width || $line.options.lineWidth );
+                            .attr('stroke',         function (d) { return d.strokeColor || $line.options.strokeColor } )
+                            .attr('stroke-width',   function (d) {return d.width != undefined ? d.width : $line.options.lineWidth} );
 
                         $line.hideToolTip();
 
@@ -137,10 +190,31 @@ console.log("KBLC!");
                 return this;
             };
 
-            var chart = this.data('D3svg').select('.chart').selectAll('.line');
+            if (this.options.hGrid && this.yScale) {
+                var yAxis =
+                    d3.svg.axis()
+                    .scale(this.yScale())
+                    .orient('left')
+                    .tickSize(0 - bounds.size.width)
+                    .outerTickSize(0)
+                    .tickFormat('');
+
+                var gyAxis = this.D3svg().select(this.region('chart')).select('.yAxis');
+
+                if (gyAxis[0][0] == undefined) {
+                    gyAxis = this.D3svg().select(this.region('chart'))
+                        .append('g')
+                        .attr('class', 'yAxis axis')
+                        .attr("transform", "translate(" + 0 + ",0)")
+                }
+
+                gyAxis.transition().call(yAxis);
+                gyAxis.selectAll('line').style('stroke', 'lightgray');
+            }
+
+            var chart = this.data('D3svg').select(this.region('chart')).selectAll('.line').data(this.dataset());
 
             chart
-                .data(this.dataset())
                 .enter()
                     .append('path')
                         .attr('class', 'line')
@@ -149,15 +223,13 @@ console.log("KBLC!");
                 ;
 
                 chart
-                    .data(this.dataset())
-                        .call(mouseAction)
-                        .transition()
-                        .duration(this.options.transitionTime)
-                        .call(funkyTown)
+                    .call(mouseAction)
+                    .transition()
+                    .duration(this.options.transitionTime)
+                    .call(funkyTown)
                 ;
 
                 chart
-                    .data(this.dataset())
                     .exit()
                         .remove();
 

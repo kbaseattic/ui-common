@@ -47,7 +47,7 @@
     "angular": "1.4.1",
     "angular-ui": "0.4.0",
     "angular-ui-bootstrap-bower": "0.13.0",
-    "font-awesome": "4.3.0",
+    "font-awesome": "4.4.0",
     "angular-ui-router": "0.2.15",
     "d3-sankey": "*",
     "jquery.svg": "*",
@@ -59,6 +59,9 @@
     "stacktrace-js": "0.6.4",
     "js-yaml": "3.3.1",
     "require-yaml": "0.1.2",
-    "handlebars":"3.0.3"
+    "handlebars": "3.0.3"
+  },
+  "resolutions": {
+    "font-awesome": "4.4.0"
   }
 }
