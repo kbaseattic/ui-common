@@ -5,7 +5,7 @@
  browser: true,
  white: true
  */
-define(['kb.widget.dashboard.base', 'kb.utils', 'kb.utils.api', 'kb.session', 'kb.service.workspace', 'q'],
+define(['kb$widget$dashboard$base', 'kb.utils', 'kb.utils.api', 'kb.session', 'kb.service.workspace', 'q'],
     function (DashboardWidget, Utils, APIUtils, Session, WorkspaceService, Q) {
         "use strict";
         var widget = Object.create(DashboardWidget, {
