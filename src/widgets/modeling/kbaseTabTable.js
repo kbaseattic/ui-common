@@ -136,15 +136,11 @@ $.KBWidget({
         function preProcessDataTable(tabSpec,tabPane) {
             // get refs
             var refs = [];
-            var refhash = {};
             var cols = tabSpec.columns;
             cols.forEach(function(col){
-                if ((col.type == 'tabLink' || col.type == 'wstype') && col.linkformat == 'dispWSRef') { 
+                if ((col.type === 'tabLink' || col.type === 'wstype') && col.linkformat === 'dispWSRef') {
                     self.obj[tabSpec.key].forEach(function(item) {
-                        if (item[col.key] in refhash) {
-                        
-                    	} else {
-                        	refhash[item[col.key]] = 1;
+                        if (refs.indexOf(item[col.key]) === -1) {
                         	refs.push( {ref: item[col.key]} );
                         }
                     })
@@ -198,7 +194,6 @@ $.KBWidget({
                 if (!prom) {
                     createDataTable(tabSpec, tabPane);
                 }
-
 
             }
         }
