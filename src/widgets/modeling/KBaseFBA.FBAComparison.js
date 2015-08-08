@@ -110,7 +110,7 @@ function KBaseFBA_FBAComparison(modeltabs) {
     	"columns": [{
             "label": "Index",
             "key": "index",
-        }, {    
+        }, {
             "label": "FBA",
             "key": "fba",
             "type": "wstype",
@@ -211,7 +211,7 @@ function KBaseFBA_FBAComparison(modeltabs) {
 		}];
 		return output;
     }
-    
+
     this.CompoundTab = function (info) {
         var cpd = self.cpdhash[info.id];
 		var output = [{
@@ -239,10 +239,10 @@ function KBaseFBA_FBAComparison(modeltabs) {
             "label": "Excretion states",
             "data": cpd.excretionstates
 		}];
-		
+
 		return output;
     }
-    
+
     this.CompareTab = function (info) {
         var cpd = self.cpdhash[info.id];
 		var output = [{
@@ -270,10 +270,10 @@ function KBaseFBA_FBAComparison(modeltabs) {
             "label": "Excretion states",
             "data": cpd.excretionstates
 		}];
-		
+
 		return output;
     }
-	
+
     this.setData = function (indata) {
         this.data = indata;
         this.fbas = this.data.fbas;
@@ -316,7 +316,7 @@ function KBaseFBA_FBAComparison(modeltabs) {
     	}
 
         this.modelreactions = this.data.reactions;
-        for (var i=0; i< this.modelreactions.length; i++) { 
+        for (var i=0; i< this.modelreactions.length; i++) {
         	var idarray = this.modelreactions[i]["id"].split('_');
         	var namearray = this.modelreactions[i]["name"].split('_');
         	this.modelreactions[i]["name"] = namearray[0];
@@ -384,9 +384,9 @@ function KBaseFBA_FBAComparison(modeltabs) {
         		}
         	}
     	}
-    	
+
     	this.modelcompounds = this.data.compounds;
-        for (var i=0; i< this.modelcompounds.length; i++) { 
+        for (var i=0; i< this.modelcompounds.length; i++) {
         	this.cpdhash[this.modelcompounds[i].id] = this.modelcompounds[i];
         	var idarray = this.modelcompounds[i]["id"].split('_');
         	var namearray = this.modelcompounds[i]["name"].split('_');
@@ -404,7 +404,7 @@ function KBaseFBA_FBAComparison(modeltabs) {
         	if ("EX" in this.modelcompounds[i].state_conservation) {
         		this.modelcompounds[i].excretionstates = "Average: "+this.modelcompounds[i].state_conservation["EX"][2]+" +/- "+this.modelcompounds[i].state_conservation["EX"][3];
         	} else {
-        		this.modelcompounds[i].excretionstates = "None";	
+        		this.modelcompounds[i].excretionstates = "None";
         	}
         	if ("IA" in this.modelcompounds[i].state_conservation) {
         		this.modelcompounds[i].inactivestates = "Count: "+this.modelcompounds[i].state_conservation["IA"][0];
@@ -422,10 +422,10 @@ function KBaseFBA_FBAComparison(modeltabs) {
         		}
         	}
         }
-        
+
     };
 
 }
 
 // make method of base class
-KBObjects.prototype.KBaseFBA_FBAComparison = KBaseFBA_FBAComparison;
+KBModeling.prototype.KBaseFBA_FBAComparison = KBaseFBA_FBAComparison;

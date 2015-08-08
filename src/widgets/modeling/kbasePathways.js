@@ -1,35 +1,33 @@
 (function( $, undefined ) {
 
 $.KBWidget({
-    name: "kbasePathways",     
+    name: "kbasePathways",
     version: "1.0.0",
-    options: {
-    },
-    
     init: function(options) {
-        var map_ws = 'nconrad:paths';;
-        var container = this.$elem;
+        var self = this;
 
-        var model_ws = options.model_ws;
-        var model_name = options.model_name;
-        var fba_ws = options.fba_ws;
-        var fba_name = options.fba_name;
+        var imageWorkspace = 'nconrad:kegg',
+            mapWorkspace = 'nconrad:pathwaysjson',
+            container = this.$elem;
+
+        var kbapi = new KBModeling().kbapi;
+
+        var models = options.models,
+            fbas = options.fbas;
 
         // add tabs
         var selectionTable = $('<table cellpadding="0" cellspacing="0" border="0" \
             class="table table-bordered table-striped">');
         var tabs = container.kbTabs({tabs: [
-                                        {name: 'Selection', content: selectionTable, active: true} 
+                                        {name: 'Selection', content: selectionTable, active: true}
                                     ]});
-
 
         this.load_map_list = function() {
             // load table for maps
             container.loading();
-            var p = kb.ws.list_objects({workspaces: [map_ws], includeMetadata: 1})
-            $.when(p).done(function(d){
+            kbapi('ws', 'list_objects', {workspaces: [mapWorkspace], includeMetadata: 1})
+            .done(function(d){
                 container.rmLoading();
-
 
                 var tableSettings = {
                     "aaData": d,
@@ -38,7 +36,7 @@ $.KBWidget({
                     "aoColumns": [
                         { sTitle: 'Name', mData: function(d) {
                             return '<a class="pathway-link" data-map_id="'+d[1]+'">'+d[10].name+'</a>';
-                        }}, 
+                        }},
                         { sTitle: 'Map ID', mData: 1},
                         { sTitle: 'Rxn Count', sWidth: '10%', mData: function(d){
                             if ('reaction_ids' in d[10]){
@@ -53,19 +51,18 @@ $.KBWidget({
                             } else {
                                 return 'N/A';
                             }
-                        }} , 
+                        }} ,
                         { sTitle: "Source","sWidth": "10%", mData: function(d) {
                             return "KEGG";
                         }},
-                    ],                         
+                    ],
                     "oLanguage": {
                         "sEmptyTable": "No objects in workspace",
                         "sSearch": "Search:"
                     }
                 }
 
-
-                var table = selectionTable.dataTable(tableSettings);  
+                var table = selectionTable.dataTable(tableSettings);
 
             }).fail(function(e){
                 container.prepend('<div class="alert alert-danger">'+
@@ -83,30 +80,43 @@ $.KBWidget({
             container.find('.pathway-link').click(function() {
                 var map_id = $(this).data('map_id');
                 var name = $(this).text();
-                var exists;
 
-                var container = $('<div id="path-'+map_id+'">');
+                var elemID = map_id+'-'+self.uuid();
+                var container = $('<div id="path-container-'+elemID+'" style="position:relative;">');
                 container.loading();
                 tabs.addTab({name: name, removable: true, content: container});
-                load_map(map_id, container);
+
+                load_map(map_id, container, elemID);
                 tabs.showTab(name);
             });
 
             // tooltip for hover on pathway name
             container.find('.pathway-link')
-                     .tooltip({title: 'Open path tab', 
-                               placement: 'right', delay: {show: 1000}});
+                     .tooltip({title: 'Open path tab',
+                               placement: 'right',
+                               delay: {show: 1000}});
         } // end events
 
-        function load_map(map, container) {                       
-            container.kbasePathway({model_ws: model_ws,
-                                    model_name: model_name,
-                                    fba_ws: fba_ws,
-                                    fba_name: fba_name,                                    
-                                    map_ws: map_ws,
-                                    map_name: map,
-                                    editable: (options.editable ? true : false),
-                                })
+
+        function load_map(map, container, elemID) {
+            var p1 = kbapi('ws', 'get_objects', [{workspace: imageWorkspace, name: map+'.png'}]),
+                p2 = kbapi('ws', 'get_objects', [{workspace: mapWorkspace, name: map}])
+            $.when(p1, p2)
+                .then(function(imgRes, mapRes) {
+                    var image = imgRes[0].data.id,
+                        mapData = mapRes[0].data;
+
+                    // no need to decode...
+                    container.append('<img src="data:image/png;base64,'+image+'" >');
+                    container.append('<div id="pathway-'+elemID+'" style="position:absolute; top:0;">');
+
+                    container.rmLoading();
+                    new ModelSeedPathway({elem: 'pathway-'+elemID,
+                                          usingImage: true,
+                                          mapData: mapData,
+                                          models: models,
+                                          fbas: fbas})
+                })
         }
 
         return this;
