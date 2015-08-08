@@ -1,9 +1,10 @@
-PACKAGE  = ui-common
-TOPDIR   = $(PWD)
-DISTLIB  = $(TOPDIR)/build
-DOCSLIB  = $(TOPDIR)/docs
-TARGET   = prod
-CONFIG   = source/config/$(TARGET).yml
+PACKAGE  	   = ui-common
+TOPDIR   	   = $(PWD)
+DISTLIB  	   = $(TOPDIR)/build
+DOCSLIB  	   = $(TOPDIR)/docs
+TARGET   	   = prod
+KBASE_CONFIG   = source/config/$(TARGET).yml
+UI_CONFIG	   = source/config/ui.yml
 
 all:
 	test deploy docs
@@ -12,7 +13,8 @@ init:
 	@bower install
 	@npm install
 	@mkdir -p $(DISTLIB)
-	@cp -r $(CONFIG) $(DISTLIB)/config.yml
+	@cp $(KBASE_CONFIG) $(DISTLIB)/config.yml
+	@cp $(UI_CONFIG) $(DISTLIB)/ui.yml
 
 default: init
 	@ git submodule init
