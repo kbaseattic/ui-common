@@ -1,5 +1,5 @@
 define([
-    'kb$widget$dashboard$base',
+    'kb_widget_dashboard_base',
     'kb.utils',
     'kb.service.narrative_method_store',
     'kb.service.workspace',

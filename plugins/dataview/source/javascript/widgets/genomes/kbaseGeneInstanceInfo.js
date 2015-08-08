@@ -12,7 +12,11 @@
  * Gene "instance" info (e.g. coordinates on a particular strain's genome)
  * is in a different widget.
  */
-define(['jquery', 'kb.jquery.widget'], function ($) {
+define([
+    'jquery', 
+    'kb.runtime', 
+    'kb.jquery.widget'
+], function ($) {
     'use strict';
     $.KBWidget({
         name: "KBaseGeneInstanceInfo",

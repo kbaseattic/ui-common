@@ -12,10 +12,10 @@ define([
     'kb.runtime',
     'kb.widget.widgetadapter',
     'kb.widget.kbwidgetadapter',
-    'kb.widget.dataview.genericvisualizer',
+    'kb_widget_dataview_genericVisualizer',
     
-    'kb.widget.dataview.provenance',
-    'kb.widget.dataview.download'
+    'kb_widget_dataview_provenance',
+    'kb_widget_dataview_download'
 ],
     function ($, q, html, R, widgetAdapter, kbWidgetAdapter, GenericVisualizer) {
         'use strict';
@@ -103,11 +103,11 @@ define([
                         div({class: 'col-sm-12'}, [
                             div({id: addWidget({
                                     name: 'overview',
-                                    module: 'kb.widget.dataview.overview'
+                                    module: 'kb_widget_dataview_overview'
                                 })}),
                             renderBSCollapsiblePanel('Data Provenance and Reference Network', div({id: addKBWidget({
                                     name: 'provenance',
-                                    module: 'kb.widget.dataview.provenance',
+                                    module: 'kb_widget_dataview_provenance',
                                     jquery_object: 'KBaseWSObjGraphCenteredView'
                                 })})),
                             div({id: addFactoryWidget('visualizer1', GenericVisualizer)})

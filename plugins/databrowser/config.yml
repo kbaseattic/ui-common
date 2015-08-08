@@ -11,16 +11,16 @@ source:
     ## NB: need to quote file names, otherwise 
     modules:
         -
-            module: kb$panel$databrowser
+            module: kb_panel_databrowser
             file: panel
         -
-            module: kb$widget$databrowser
+            module: kb_widget_databrowser
             file: "databrowser-widget"
 install:
     routes:
         -
             path: ['databrowser']
-            panelFactory: kb$panel$databrowser
+            panelFactory: kb_panel_databrowser
     menu:
         -
             name: databrowser

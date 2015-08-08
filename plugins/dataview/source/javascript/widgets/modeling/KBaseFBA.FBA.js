@@ -8,7 +8,7 @@
 define([
     'q',
     'kb.runtime',
-    'kb.widget.dataview.modeling.objects',
+    'kb_widget_dataview_modeling_objects',
     'kb.service.workspace'
 ],
     function (Q, R, KBObjects, Workspace) {

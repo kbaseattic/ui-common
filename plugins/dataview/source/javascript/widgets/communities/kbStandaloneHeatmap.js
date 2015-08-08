@@ -60,7 +60,7 @@
  */
 define([
     'jquery',
-    'kb.widget.dataview.communities.jquery-svg'
+    'kb_widget_dataview_communities_jquerySvg'
 ], // 'jquery-svg-graph-deviation', 'jquery-svg-graph-stacked-area'],
     function ($) {
         'use strict';

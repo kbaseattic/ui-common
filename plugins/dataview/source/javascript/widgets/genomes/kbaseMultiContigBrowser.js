@@ -49,7 +49,7 @@ define([
     'd3',
     'kb.runtime',
     'kb.service.cdmi',
-    'kb.widget.dataview.genome.contig_browser_buttons'
+    'kb_widget_dataview_genome_contigBrowserButtons'
 ], function ($, _W, d3, R, CDMI) {
     'use strict';
     $.KBWidget({

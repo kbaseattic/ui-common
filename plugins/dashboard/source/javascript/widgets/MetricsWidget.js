@@ -1,7 +1,7 @@
 define([
     'jquery',
     'q',
-    'kb$widget$dashboard$base',
+    'kb_widget_dashboard_base',
     'kb.runtime'
 ],
     function ($, Q, DashboardWidget, R) {

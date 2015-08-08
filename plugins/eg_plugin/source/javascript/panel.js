@@ -10,7 +10,7 @@ define([
     'jquery',
     'kb.html',
     'kb.runtime',
-    'kb.widget.eg_plugin.test_widget'
+    'kb_widget_egPlugin_testWidget'
 ],
     function (q, $, html, R, testWidget) {
         /* DOC: strict mode

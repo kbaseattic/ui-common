@@ -10,21 +10,21 @@ source:
     modules:
         ## sources are relative to build/plugins/PACKAGE/source/javascript
         -
-            module: kb.panel.eg_plugin
+            module: kb_panel_egPlugin
             file: panel
         -
-            module: kb.widget.eg_plugin.test_widget
+            module: kb_widget_egPlugin_testWidget
             file: "widgets/TestWidget"
 install:
     #installer: 
-    #    module: kb.panel.eg_plugin.installer
+    #    module: kb_panel_egPlugin.installer
     routes:
         -
             path: ['eg_plugin']
             queryParams: 
                 name: {}                    
             # this is one of the modules defined above.
-            panelFactory: kb.panel.eg_plugin            
+            panelFactory: kb_panel_egPlugin            
     menu:
         -
             name: ev_plugin

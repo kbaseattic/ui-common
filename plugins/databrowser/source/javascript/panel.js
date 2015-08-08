@@ -9,7 +9,7 @@ define([
     'kb.html',
     'kb.dom',
     'kb.runtime',
-    'kb$widget$databrowser'
+    'kb_widget_databrowser'
 ],
     function (q, html, DOM, R, databrowserWidgetFactory) {
         'use strict';

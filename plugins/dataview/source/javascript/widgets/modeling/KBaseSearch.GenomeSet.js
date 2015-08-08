@@ -5,7 +5,7 @@
  browser: true,
  white: true
  */
-define(['kb.widget.dataview.modeling.objects'], function (KBObjects) {
+define(['kb_widget_dataview_modeling_objects'], function (KBObjects) {
     'use strict';
     function KBaseSearch_GenomeSet(modeltabs) {
         var self = this;

@@ -17,10 +17,10 @@ define([
     'kb.runtime',
     'kb.service.workspace',
     'kb.jquery.widget',
-    'kb.widget.dataview.genome.wide_overview',
-    'kb.widget.dataview.genome.literature',
-    'kb.widget.dataview.genome.wide_taxonomy',
-    'kb.widget.dataview.genome.wide_assembly_annotation'
+    'kb_widget_dataview_genome_wideOverview',
+    'kb_widget_dataview_genomeLiterature',
+    'kb_widget_dataview_genome_wideTaxonomy',
+    'kb_widget_dataview_genome_wideAssemblyAnnotation'
 ],
     function ($, R, Workspace) {
         'use strict';

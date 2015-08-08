@@ -11,7 +11,7 @@
  * Pavel Novichkov <psnovichkov@lbl.gov>
  * @public
  */
-define(['jquery', 'kb.widget.dataview.assembly.single-object-basic'],
+define(['jquery', 'kb_widget_dataview_assembly_singleObjectBasic'],
     function ($) {
         'use strict';
         $.KBWidget({

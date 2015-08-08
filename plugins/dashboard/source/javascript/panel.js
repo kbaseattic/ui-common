@@ -45,28 +45,28 @@ define([
                                     config: {
                                         viewState: panelState
                                     },
-                                    module: 'kb$widget$dashboard$narratives'
+                                    module: 'kb_widget_dashboard_narratives'
                                 })}),
                             div({id: addWidget({
                                     name: 'sharednarratives',
                                     config: {
                                         viewState: panelState
                                     },
-                                    module: 'kb$widget$dashboard$sharedNarratives'
+                                    module: 'kb_widget_dashboard_sharedNarratives'
                                 })}),
                             div({id: addWidget({
                                     name: 'publicnarratives',
                                     config: {
                                         viewState: panelState
                                     },
-                                    module: 'kb$widget$dashboard$publicNarratives'
+                                    module: 'kb_widget_dashboard_publicNarratives'
                                 })}),
                             div({id: addWidget({
                                     name: 'apps',
                                     config: {
                                         viewState: panelState
                                     },
-                                    module: 'kb$widget$dashboard$apps'
+                                    module: 'kb_widget_dashboard_apps'
                                 })})
                         ]),
                         div({class: 'col-sm-4'}, [
@@ -75,14 +75,14 @@ define([
                                     config: {
                                         viewState: panelState
                                     },
-                                    module: 'kb$widget$dashboard$profile'
+                                    module: 'kb_widget_dashboard_profile'
                                 })}),
                             div({id: addWidget({
                                     name: 'metrics',
                                     config: {
                                         viewState: panelState
                                     },
-                                    module: 'kb$widget$dashboard$metrics'
+                                    module: 'kb_widget_dashboard_metrics'
                                 })})
                         ])
                     ])

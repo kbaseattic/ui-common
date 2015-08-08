@@ -14,7 +14,7 @@ define([
     'kb.service.workspace',
     'kb.runtime',
     'kb.html',
-    'kb.widget.dataview.communities.heatmap',
+    'kb_widget_dataview_communities_heatmap',
     // no parameters
     'datatables_bootstrap',
     'kb.jquery.authenticatedwidget'

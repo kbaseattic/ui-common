@@ -11,34 +11,34 @@ source:
     ## NB: need to quote file names, otherwise 
     modules:
         -
-            module: kb$panel$dashboard
+            module: kb_panel_dashboard
             file: panel
         -
-            module: kb$widget$dashboard$base
+            module: kb_widget_dashboard_base
             file: "widgets/DashboardWidget"
         -
-            module: kb$widget$dashboard$apps
+            module: kb_widget_dashboard_apps
             file: "widgets/AppsWidget"
         -
-            module: kb$widget$dashboard$collaborators
+            module: kb_widget_dashboard_collaborators
             file: "widgets/CollaboratorsWidget"
         -
-            module: kb$widget$dashboard$data
+            module: kb_widget_dashboard_data
             file: "widgets/DataWidget"
         -
-            module: kb$widget$dashboard$metrics
+            module: kb_widget_dashboard_metrics
             file: "widgets/MetricsWidget"
         -
-            module: kb$widget$dashboard$narratives
+            module: kb_widget_dashboard_narratives
             file: "widgets/NarrativesWidget"
         -
-            module: kb$widget$dashboard$publicNarratives
+            module: kb_widget_dashboard_publicNarratives
             file: "widgets/PublicNarrativesWidget"
         -
-            module: kb$widget$dashboard$sharedNarratives
+            module: kb_widget_dashboard_sharedNarratives
             file: "widgets/SharedNarrativesWidget"
         -
-            module: kb$widget$dashboard$profile
+            module: kb_widget_dashboard_profile
             file: "widgets/ProfileWidget"
        
     styles:
@@ -48,7 +48,7 @@ install:
     routes:
         -
             path: ['dashboard']
-            panelFactory: kb$panel$dashboard
+            panelFactory: kb_panel_dashboard
     menu:
         -
             name: dashboard

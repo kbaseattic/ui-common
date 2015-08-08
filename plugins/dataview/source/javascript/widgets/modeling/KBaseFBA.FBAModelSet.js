@@ -5,7 +5,7 @@
  browser: true,
  white: true
  */
-define(['kb.widget.dataview.modeling.objects'], function (KBObjects) {
+define(['kb_widget_dataview_modeling_objects'], function (KBObjects) {
     'use strict';
     function KBaseFBA_FBAModelSet(modeltabs) {
         var self = this;

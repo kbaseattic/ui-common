@@ -10,7 +10,7 @@ define([
     'kb.runtime',
     'kb.service.fba',
     'kb.service.workspace',
-    'kb.widget.dataview.modeling.objects'
+    'kb_widget_dataview_modeling_objects'
 ], function (Q, R, FBA, Workspace, KBObjects) {
     'use strict';
     function KBaseFBA_FBAModel(modeltabs) {

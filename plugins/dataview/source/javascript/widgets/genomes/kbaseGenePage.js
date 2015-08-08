@@ -10,7 +10,7 @@
  * @author Roman Sutormin <rsutormin@lbl.gov>
  * @public
  */
-define(['jquery', 'kb.jquery.widget', 'kb.widget.dataview.genome.geneinstanceinfo', 'kb.widget.dataview.genome.genebiochemistry', 'kb.widget.dataview.genome.genesequence'], function ($) {
+define(['jquery', 'kb.jquery.widget', 'kb_widget_dataview_genome_geneInstanceInfo', 'kb_widget_dataview_genome_geneBiochemistry', 'kb_widget_dataview_genome_geneSequence'], function ($) {
     'use strict';
     $.KBWidget({
         name: "KBaseGenePage",

@@ -9,14 +9,14 @@ package:
 source:
     modules:
         -
-            module: kb.panel.narrativestore
+            module: kb_panel_narrativeStore
             file: panel
         -
-            module: kb.widget.narrativestore
+            module: kb_widget_narrativeStore
             file: "widgets/narrativeStoreView"
 install:
     routes:
             -
                 path: ['narrativestore', {type: param, name: type}, {type: param, name: id}]
-                panelFactory: kb.panel.narrativestore
+                panelFactory: kb_panel_narrativeStore
     

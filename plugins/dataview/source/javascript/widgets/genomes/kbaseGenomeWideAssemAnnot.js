@@ -8,9 +8,9 @@
 define([
     'jquery',
     'kb.jquery.widget',
-    'kb.widget.dataview.genome.multi_contig_browser',
-    'kb.widget.dataview.genome.seed_functions',
-    'kb.widget.dataview.genome.gene_table'
+    'kb_widget_dataview_genome_multiContigBrowser',
+    'kb_widget_dataview_genome_seedFunctions',
+    'kb_widget_dataview_genome_geneTable'
 ], function ($, _W) {
     'use strict';
     $.KBWidget({

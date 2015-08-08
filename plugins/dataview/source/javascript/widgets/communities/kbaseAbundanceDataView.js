@@ -15,7 +15,7 @@ define([
     'kb.runtime', 
     'kb.html', 
     'kb.utils.api', 
-    'kb.widget.dataview.communities.graph', 
+    'kb_widget_dataview_communities_graph', 
     'datatables_bootstrap'
 ],
     function ($, _AuthenticatedWidget, Workspace, R, html, APIUtils, Graph) {

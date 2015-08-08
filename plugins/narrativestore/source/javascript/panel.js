@@ -29,7 +29,7 @@ define([
             }
             var content = div([
                 div({id: addKBWidget({
-                        module: 'kb.widget.narrativestore',
+                        module: 'kb_widget_narrativeStore',
                         jquery_object: 'KBaseNarrativeStoreView'
                     })})
             ]);

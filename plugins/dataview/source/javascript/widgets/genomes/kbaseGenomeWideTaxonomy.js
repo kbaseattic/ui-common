@@ -5,7 +5,7 @@
  browser: true,
  white: true
  */
-define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.widget', 'kb.widget.dataview.genome.lineage'], function ($, R, Workspace) {
+define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.widget', 'kb_widget_dataview_genomeLineage'], function ($, R, Workspace) {
     'use strict';
     $.KBWidget({
         name: "KBaseGenomeWideTaxonomy",

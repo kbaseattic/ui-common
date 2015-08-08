@@ -6,7 +6,7 @@
  white: true
  */
 define([
-    'kb.widget.dataview.base',
+    'kb_widget_dataview_base',
     'kb.utils.api',
     'kb.utils',
     'kb.runtime',

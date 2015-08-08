@@ -24,7 +24,7 @@ define([
              */
             'Communities.Collection': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.communities.collection',
+                module: 'kb_widget_dataview_communities_collection',
                 widget: 'CollectionView',
                 panel: true,
                 options: [
@@ -40,7 +40,7 @@ define([
                 //RankAbundancePlot - id, name [0,1], top ["10"-text], order [average, max, sum], ws, auth
                 //AbundanceDataTable - id, name, ws, auth
                 title: 'Data View',
-                module: 'kb.widget.dataview.communities.functional-matrix',
+                module: 'kb_widget_dataview_communities_functionalMatrix',
                 widget: 'AbundanceDataView',
                 panel: true,
                 options: [
@@ -54,7 +54,7 @@ define([
             'Communities.FunctionalProfile': {
                 /* Done! Narrative uses AbundanceDataView */
                 title: 'Data View',
-                module: 'kb.widget.dataview.communities.functional-profile',
+                module: 'kb_widget_dataview_communities_functionalProfile',
                 widget: 'AbundanceDataView',
                 panel: true,
                 options: [
@@ -67,7 +67,7 @@ define([
             // 'Communities.Heatmap'
             'Communities.Heatmap': {
                 name: 'Data View',
-                module: 'kb.widget.dataview.communities.abundance-data-heatmap',
+                module: 'kb_widget_dataview_communities_abundanceDataHeatmap',
                 widget: 'AbundanceDataHeatmap',
                 options: [
                     {from: 'workspaceId', to: 'ws'},
@@ -78,7 +78,7 @@ define([
             'Communities.Metagenome': {
                 //  Plugged in MetagenomeView (required a different kbaseTabs than for Neal's modeling) 
                 title: 'Data View',
-                module: 'kb.widget.dataview.communities.metagenome',
+                module: 'kb_widget_dataview_communities_metagenome',
                 widget: 'MetagenomeView',
                 panel: true,
                 options: [
@@ -100,7 +100,7 @@ define([
             },
             'KBaseAssembly.AssemblyInput': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.assembly.assembly-input',
+                module: 'kb_widget_dataview_assembly_assemblyInput',
                 widget: 'kbaseAssemblyInput',
                 panel: true,
                 options: [
@@ -112,7 +112,7 @@ define([
             },
             'KBaseAssembly.AssemblyReport': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.assembly.view',
+                module: 'kb_widget_dataview_assembly_view',
                 widget: 'kbaseAssemblyView',
                 panel: true,
                 options: [
@@ -123,7 +123,7 @@ define([
             /* TODO: find sample data - untested */
             'KBaseAssembly.PairedEndLibrary': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.assembly.paired-end-library',
+                module: 'kb_widget_dataview_assembly_pairedEndLibrary',
                 widget: 'kbasePairedEndLibrary',
                 panel: true,
                 options: [
@@ -134,7 +134,7 @@ define([
             },
             'KBaseFile.PairedEndLibrary': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.assembly.file-paired-end-library',
+                module: 'kb_widget_dataview_assembly_filePairedEndLibrary',
                 widget: 'kbaseFilePairedEndLibrary',
                 panel: true,
                 options: [
@@ -156,7 +156,7 @@ define([
             },
             'KBaseGenomes.ContigSet': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.contigset.contigset_view',
+                module: 'kb_widget_dataview_contigset_contigSetView',
                 widget: 'kbaseContigSetView',
                 panel: true,
                 options: [
@@ -171,7 +171,7 @@ define([
             },
             'KBaseGenomes.MetagenomeAnnotation': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.genome.annotation_set_table',
+                module: 'kb_widget_dataview_genome_annotationSetTable',
                 widget: 'AnnotationSetTable',
                 panel: true,
                 options: [
@@ -182,7 +182,7 @@ define([
             },
             'KBaseGenomes.Pangenome': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.genome.pangenome',
+                module: 'kb_widget_dataview_genome_pangenome',
                 widget: 'kbasePanGenome',
                 panel: true,
                 options: [
@@ -194,7 +194,7 @@ define([
             /* COMPLEX LANDING PAGE */
             'KBaseGenomes.Genome': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.genome',
+                module: 'kb_widget_dataview_genome',
                 widget: 'KBaseGenomePage',
                 noPanel: true,
                 // Options object to build. Maps
@@ -206,7 +206,7 @@ define([
                 // options: '{"genomeID":???objname,"workspaceID":???wsname,"loadingImage":"'+this.options.loadingImage+'"}',
                 sub: {
                     Feature: {
-                        module: 'kb.widget.dataview.genome.genepage',
+                        module: ' kb_widget_dataview_genome_genePage',
                         widget: 'KBaseGenePage',
                         noPanel: true,
                         options: [
@@ -221,7 +221,7 @@ define([
             // MODELING
             'KBasePhenotypes.PhenotypeSet': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.modeling.tab_table',
+                module: 'kb_widget_dataview_modeling_tabTable',
                 widget: 'kbaseTabTable',
                 panel: true,
                 options: [
@@ -233,7 +233,7 @@ define([
             },
             'KBasePhenotypes.PhenotypeSimulationSet': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.modeling.tab_table',
+                module: 'kb_widget_dataview_modeling_tabTable',
                 widget: 'kbaseTabTable',
                 panel: true,
                 options: [
@@ -245,7 +245,7 @@ define([
             },
             'KBaseSearch.GenomeSet': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.modeling.tab_table',
+                module: 'kb_widget_dataview_modeling_tabTable',
                 widget: 'kbaseTabTable',
                 panel: true,
                 options: [
@@ -274,7 +274,7 @@ define([
              */
             'KBaseBiochem.Media': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.modeling.tab_table',
+                module: 'kb_widget_dataview_modeling_tabTable',
                 widget: 'kbaseTabTable',
                 panel: true,
                 options: [
@@ -286,7 +286,7 @@ define([
             },
             'KBaseFBA.FBA': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.modeling.tab_table',
+                module: 'kb_widget_dataview_modeling_tabTable',
                 widget: 'kbaseTabTable',
                 panel: true,
                 options: [
@@ -298,7 +298,7 @@ define([
             },
             'KBaseFBA.FBAModel': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.modeling.tab_table',
+                module: 'kb_widget_dataview_modeling_tabTable',
                 widget: 'kbaseTabTable',
                 panel: true,
                 options: [
@@ -310,7 +310,7 @@ define([
             },
             'KBaseFBA.FBAModelSet': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.modeling.tab_table',
+                module: 'kb_widget_dataview_modeling_tabTable',
                 widget: 'kbaseTabTable',
                 panel: true,
                 options: [
@@ -322,7 +322,7 @@ define([
             },
             'KBaseExpression.ExpressionSeries': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.expression.expression_series',
+                module: 'kb_widget_dataview_expression_expressionSeries',
                 widget: 'kbaseExpressionSeries',
                 panel: true,
                 options: [

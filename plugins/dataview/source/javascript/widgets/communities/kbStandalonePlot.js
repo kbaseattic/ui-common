@@ -98,7 +98,7 @@
  function to be called for drag select. This function will get passed an array of the selected points.
  
  */
-define(['jquery', 'uuid', 'kb.widget.dataview.communities.jquery-svg'], // 'jquery-svg-graph', 'jquery-svg-plot'],
+define(['jquery', 'uuid', 'kb_widget_dataview_communities_jquerySvg'], // 'jquery-svg-graph', 'jquery-svg-plot'],
     function ($, uuid) {
         'use strict';
         var plot = {

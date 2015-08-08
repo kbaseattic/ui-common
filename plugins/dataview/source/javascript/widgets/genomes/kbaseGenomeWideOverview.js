@@ -15,8 +15,8 @@
 define([
     'jquery',
     'kb.jquery.widget',
-    'kb.widget.dataview.genome.overview',
-    'kb.widget.dataview.genome.wiki_description'
+    'kb_widget_dataview_genome_overview',
+    'kb_widget_dataview_genome_wikiDescription'
 ], function ($) {
     'use strict';
     $.KBWidget({

@@ -14,8 +14,8 @@ define([
     'kb.service.workspace',
     'kb.runtime',
     'kb.html',
-    'kb.widget.dataview.communities.graph',
-    'kb.widget.dataview.communities.plot',
+    'kb_widget_dataview_communities_graph',
+    'kb_widget_dataview_communities_plot',
     'googlepalette',
     
     // these don't need a parameter
