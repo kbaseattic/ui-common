@@ -409,6 +409,15 @@ function KBaseFBA_FBA(modeltabs) {
         for (var i=0; i< this.modelreactions.length; i++) {
             var mdlrxn = this.modelreactions[i];
             if (this.rxnhash[mdlrxn.id]) {
+                if ("exp_state" in this.rxnhash[mdlrxn.id]) {
+                	mdlrxn.exp_state = this.rxnhash[mdlrxn.id].exp_state;
+                }
+                if ("expression" in this.rxnhash[mdlrxn.id]) {
+                	mdlrxn.expression = this.rxnhash[mdlrxn.id].expression;
+                }
+                if ("scaled_exp" in this.rxnhash[mdlrxn.id]) {
+                	mdlrxn.scaled_exp = this.rxnhash[mdlrxn.id].scaled_exp;
+                }
                 mdlrxn.upperFluxBound = this.rxnhash[mdlrxn.id].upperBound;
                 mdlrxn.lowerFluxBound = this.rxnhash[mdlrxn.id].lowerBound;
                 mdlrxn.fluxMin = this.rxnhash[mdlrxn.id].min;
@@ -422,24 +431,26 @@ function KBaseFBA_FBA(modeltabs) {
                 mdlrxn.customUpperBound = this.rxnboundhash[mdlrxn.id].upperBound;
                 mdlrxn.customLowerBound = this.rxnboundhash[mdlrxn.id].lowerBound;
             }
-            if (mdlrxn.exp_state) {
+            if ("exp_state" in mdlrxn) {
             	exp_state = 1;
             }
-            if (mdlrxn.expression) {
+            if ("expression" in mdlrxn) {
             	exp_value = 1;
-            	mdlrxn.exp_value = mdlrxn.scaled_exp + " (" + mdlrxn.expression + ")";
+            	mdlrxn.scaled_exp = Math.round(100*mdlrxn.scaled_exp)/100;
+            	mdlrxn.expression = Math.round(100*mdlrxn.expression)/100;
+            	mdlrxn.exp_value = mdlrxn.scaled_exp + "<br>(" + mdlrxn.expression + ")";
             }
         }
-        if (exp_state == 1) {
-        	this.tabList.push({
-        		"label": "Expression state",
-            	"key": "exp_state",
-        	});
-        }
         if (exp_value == 1) {
-        	this.tabList.push({
+        	this.tabList[1].columns.splice(3, 0,{
         		"label": "Scaled expression (unscaled value)",
             	"key": "exp_value",
+        	});
+        }
+        if (exp_state == 1) {
+        	this.tabList[1].columns.splice(3, 0,{
+        		"label": "Expression state",
+            	"key": "exp_state",
         	});
         }
         this.compoundFluxes = [];
