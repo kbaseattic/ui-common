@@ -27,14 +27,14 @@ define([
     'kb.panel.narrativemanager',
     'kb.panel.navbar',
     'kb.client.profile',
-    'kb.session',
+    'yaml!build/ui.yml',
     'bootstrap',
     'css!font-awesome',
     'domReady!'],
-    function (App, Runtime, AppState, Q, NarrativeManagerPanel, Navbar, ProfileService, Session) {
+    function (App, Runtime, AppState, Q, NarrativeManagerPanel, Navbar, ProfileService, UIConfig) {
         'use strict';
 
-        var app = App.create();
+        var app = App.make();
         Runtime.setApp(app);
 
         var navbar = null;
@@ -46,6 +46,24 @@ define([
             navbar = Navbar.create();
             navbar.setup();
 
+            // Set up the navbar.
+            Object.keys(UIConfig.navbar.menu.available_items).forEach(function (menuId) {
+                navbar.addMenuItem(menuId, UIConfig.navbar.menu.available_items[menuId]);
+            });
+            Object.keys(UIConfig.navbar.menu.menus).forEach(function (menuId) {
+                navbar.addMenu(menuId, UIConfig.navbar.menu.menus[menuId]);
+            });
+
+            Runtime.recv('navbar', 'add-menu-item', function (data) {
+                navbar.addMenuItem(data.name, data.definition);
+                navbar.addToMenu('authenticated', data.name);
+            });
+
+            Runtime.recv('navbar', 'clear-buttons', function () {
+                navbar.clearButtons();
+            })
+
+            // ?? (EAP)
             Runtime.props.setItem('navbar', navbar);
 
             // The default route is invoked if there is no route set up to handle
@@ -122,10 +140,10 @@ define([
             Runtime.recv('app', 'navigate', function (data) {
                 app.navigateTo(data);
             });
-            
+
             Runtime.recv('app', 'redirect', function (data) {
                 app.redirectTo(data.url, data.new_window);
-            })
+            });
 
             // This will work ... but we need to tune this!
             Runtime.recv('app', 'loggedin', function () {
@@ -133,7 +151,6 @@ define([
             });
 
             Runtime.recv('app', 'new-route', function (data) {
-                console.log(data);
                 if (data.routeHandler.route.redirect) {
                     Runtime.send('app', 'navigate', {
                         path: data.routeHandler.route.redirect.path,
@@ -156,7 +173,7 @@ define([
                 } else if (data.routeHandler.route.panelFactory) {
                     // And ... we have another panel factory pattern here. We will
                     // converge as soon as we can...
-                     app.showPanel3('app', data.routeHandler)
+                    app.showPanel3('app', data.routeHandler)
                         .catch(function (err) {
                             console.error('ERROR');
                             console.error(err);
@@ -190,6 +207,77 @@ define([
 
         }
 
+        function installPlugins() {
+            var plugins = UIConfig.plugins;
+
+            // for each plugin
+            var loaders = plugins.map(function (plugin) {
+                // read the config file
+                if (typeof plugin === 'string') {
+                    plugin = {
+                        name: plugin,
+                        directory: 'plugins/' + plugin
+                    }
+                }
+                return Q.Promise(function (resolve) {
+                    require(['yaml!' + plugin.directory + '/config.yml'], function (config) {
+                        // build up a list of modules and add them to the require config.
+                        var paths = {},
+                            sourcePath = plugin.directory + '/source';
+
+                        // load any styles.
+                        var dependencies = [];
+                        if (config.source.styles) {
+                            config.source.styles.forEach(function (style) {
+                                dependencies.push('css!' + sourcePath + '/css/' + style.file);
+                            });
+                        }
+
+                        config.source.modules.forEach(function (source) {
+                            paths[source.module] = sourcePath + '/javascript/' + source.file;
+                        });
+                        require.config({paths: paths});
+                        // enter a require closure with the installer as the module.
+
+                        // NB - installer is the first module in the dependency
+                        // list so we receive it as the first argument.
+                        if (config.install.routes) {
+                            require(dependencies, function () {
+                                var routes = config.install.routes.map(function (route) {
+                                    return Q.Promise(function (resolve) {
+                                        require([route.panelFactory], function (factory) {
+                                            Runtime.addRoute({
+                                                path: route.path,
+                                                panelFactory: factory
+                                            });
+                                            resolve();
+                                        });
+                                    });
+                                });
+                                Q.all(routes)
+                                    .then(function () {
+                                        if (config.install.menu) {
+                                            config.install.menu.forEach(function (item) {
+                                                Runtime.send('navbar', 'add-menu-item', item);
+                                            });
+                                        }
+                                        resolve();
+                                    })
+                                    .catch(function (err) {
+                                        console.log('ERROR');
+                                        console.log(err);
+                                    })
+                                    .done();
+                            });
+                        }
+                        
+                    });
+                });
+            });
+            return Q.all(loaders);
+
+        }
+
         function start() {
 
             return Q.Promise(function (resolve, reject) {
@@ -205,36 +293,40 @@ define([
                         });
                     });
                 }
+                
+                // Here we load the internal panels.
                 Runtime.logDebug({source: 'main', message: 'About to load panels...'});
                 var panels = [
                     {module: 'kb.panel.message', config: {}},
-                    {module: 'kb.panel.about', config: {}},
                     {module: 'kb.panel.contact', config: {}},
                     {module: 'kb.panel.login', config: {}},
-                    {module: 'kb.panel.userprofile', config: {}},
                     {module: 'kb.panel.welcome', config: {}},
                     {module: 'kb.panel.dashboard', config: {}},
-                    //{module: 'kb.panel.narrativestore'},
-                    // {module: 'kb.panel.datasearch'},
                     {module: 'kb.panel.dataview', config: {}},
-                    {module: 'kb.panel.databrowser', config: {}},
                     {module: 'kb.panel.typebrowser', config: {}},
                     {module: 'kb.panel.typeview'},
                     {module: 'kb.panel.test'},
-                    {module: 'kb.panel.sample'}
+                    // {module: 'kb.panel.sample'},
+                    // {module: 'kb.panel.sample.router'}
                 ].map(function (panel) {
                     return requirePromise([panel.module], function (PanelModule) {
                         // this registers routes
                         PanelModule.setup(app, panel.config);
                     });
                 });
+
                 Q.all(panels)
                     .then(function () {
-                        Runtime.logDebug({source: 'main', message: 'setting up app'});
                         setupApp();
+                        resolve();
+                    })
+                    .then(function () {
+                        Runtime.logDebug({source: 'main', message: 'setting up app'});
+                        return installPlugins();
+                    })
+                    .then(function () {
                         runApp();
                         Runtime.logDebug({source: 'main', message: 'done'});
-                        resolve();
                     })
                     .catch(function (err) {
                         console.log('ERROR loading panels');

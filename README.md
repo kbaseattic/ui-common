@@ -19,7 +19,10 @@ Common user interface components and libraries for the KBase Project.
 
 ##Installation
 
+
+
 ###Developer
+
 
 
 ####Works for Erik
@@ -52,6 +55,8 @@ This will get ui-common and set it up into a working state:
 - Copy the correct config file into the build dir
     - ```mkdir build && cp -r source/config/prod.yml build/config.yml```
     - this will be part of the build process when we have one.
+- Copy the ui config file into the build dir
+    - ```cp -r source/config/ui.yml build/ui.yml```
 
 
 ##The Widget API
@@ -64,6 +69,8 @@ TODO: Add documentation
 ##Landing Pages
 
 ##KBase Labs Template
+
+what??
 
 ##Contributors
 

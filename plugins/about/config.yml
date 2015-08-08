@@ -1,0 +1,31 @@
+## YAML Template.
+---
+package:
+    author: Erik Pearson
+    name: about panel
+    description: A package containing the about panel
+    date: August 5, 2015
+    version: 0.0.1
+source:
+    ## sources are relative to build/plugins/PACKAGE/source/javascript
+    ## NB: need to quote file names, otherwise 
+    modules:
+        -
+            module: kb.panel.about
+            file: panel
+        -
+            module: kb.plugin.about.installer
+            file: installer
+install:
+    routes:
+        -
+            path: ['about']
+            panelFactory: kb.panel.about
+    menu:
+        -
+            name: about
+            definition:
+                path: about
+                label: About the Functional Site
+                icon: "info-circle"
+            

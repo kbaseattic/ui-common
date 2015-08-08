@@ -1,0 +1,35 @@
+## YAML Template.
+---
+package:
+    author: Erik Pearson
+    name: example plugin
+    description: A package containing an example plugin
+    date: August 4, 2015
+    version: 0.0.1
+source:
+    modules:
+        ## sources are relative to build/plugins/PACKAGE/source/javascript
+        -
+            module: kb.panel.eg_plugin
+            file: panel
+        -
+            module: kb.widget.eg_plugin.test_widget
+            file: "widgets/TestWidget"
+install:
+    #installer: 
+    #    module: kb.panel.eg_plugin.installer
+    routes:
+        -
+            path: ['eg_plugin']
+            # this is one of the modules defined above.
+            panelFactory: kb.panel.eg_plugin
+    menu:
+        -
+            name: ev_plugin
+            definition:
+                path: "eg_plugin"
+                label: Example Plugin Panel
+                icon: bolt
+            
+    
+        
