@@ -14,9 +14,13 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
 
         'copy': {
-            'build-config': {
+            'kbase-config': {
                 src: 'source/config/prod.yml',
-                dest: 'build/config.yml',
+                dest: 'build/config.yml'
+            },
+            'ui-config': {
+                src: 'source/config/ui.yml',
+                dest: 'build/ui.yml'
             },
         },
 
