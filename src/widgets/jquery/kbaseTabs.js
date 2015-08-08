@@ -39,7 +39,7 @@
  
  */
 
-define(['jquery', 'kb.widget'], function ($) {
+define(['jquery', 'kb.jquery.widget', 'bootstrap'], function ($) {
     'use strict';
     $.KBWidget({
         name: "kbaseTabs",
