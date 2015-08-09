@@ -23,7 +23,7 @@ install:
                 method: {}
                 copydata: {}
                 appparam: {}
-            handlerModule:
+            redirectHandler:
                 module: kb_panel_narrativeManager
                 method: startOrCreateEmptyNarrative
         -
@@ -33,7 +33,7 @@ install:
                 method: {}
                 copydata: {}
                 appparam: {}            
-            handlerModule:
+            redirectHandler:
                 module: kb_panel_narrativeManager
                 method: createNewNarrative         
         

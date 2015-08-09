@@ -162,7 +162,6 @@
             'kb.client.methods': 'src/clients/kbaseClientMethods',
             // Standalone Widgets
             'kb.widget': 'src/widgets/Widget',
-            'kb.widget.typebrowser': 'src/widgets/TypeBrowser',
             // KBase Panels
             // ------------
             'kb.panel.login': 'src/panels/login',
@@ -171,7 +170,6 @@
             'kb.panel.datasearch': 'src/panels/datasearch',
             'kb.panel.typeview': 'src/panels/typeview',
             'kb.panel.message': 'src/panels/message',
-            'kb.panel.test': 'src/panels/test',
             'kb.panel.sample.router': 'src/panels/sample-router',
             
             // KBase JQuery Plugin Widgets

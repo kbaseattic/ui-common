@@ -17,7 +17,7 @@ define([
 
     function widget() {
         var mount, container, $container;
-        
+
         var tableId;
 
         function renderer() {
@@ -57,26 +57,26 @@ define([
                                     var typeId = result.type_def;
                                     typeRecords[typeId].info = result;
                                 });
-                                var rows = Object.keys(typeRecords).map(function(typeId) {
+                                tableId = html.genId()
+                                var rows = Object.keys(typeRecords).map(function (typeId) {
                                     var type = typeRecords[typeId];
                                     return [
-                                        type.module, type.type, 
+                                        type.module, type.type,
                                         a({href: '#spec/type/' + type.id}, type.version),
-                                        type.info.using_type_defs.map(function(typeId) {
+                                        type.info.using_type_defs.map(function (typeId) {
                                             return a({href: '#spec/type/' + typeId}, typeId);
                                         }).join('<br>'),
-                                        type.info.used_type_defs.map(function(typeId) {
+                                        type.info.used_type_defs.map(function (typeId) {
                                             return a({href: '#spec/type/' + typeId}, typeId);
                                         }).join('<br>'),
-                                        type.info.using_func_defs.map(function(functionId) {
+                                        type.info.using_func_defs.map(function (functionId) {
                                             return a({href: '#spec/functions/' + functionId}, functionId);
                                         }).join('<br>')
-                                        
+
                                     ];
-                                });
-                                var cols = ['Module', 'Type', 'Version', 'Using types', 'Used by types', 'Used by functions'];
-                                tableId = html.genId();
-                                var result = html.makeTable(cols, rows, {id: tableId, class: 'table table-striped'});
+                                }),
+                                    cols = ['Module', 'Type', 'Version', 'Using types', 'Used by types', 'Used by functions'],
+                                    result = html.makeTable(cols, rows, {id: tableId, class: 'table table-striped'});
                                 resolve({
                                     title: 'Type Browser',
                                     content: result,
@@ -86,9 +86,9 @@ define([
                             .catch(function (err) {
                                 console.log('ERROR getting type info');
                                 console.log(err);
-                                reject( {
-                                   title: 'Error',
-                                   content: 'Error getting type info'
+                                reject({
+                                    title: 'Error',
+                                    content: 'Error getting type info'
                                 });
                             })
                             .done();
@@ -104,12 +104,12 @@ define([
         function attachDatatable() {
             console.log('attaching datatable ...');
             console.log(tableId);
-            $('#'+tableId).dataTable({
+            $('#' + tableId).dataTable({
                 initComplete: function (settings) {
-                    var api = this.api();
-                    var rowCount = api.data().length;
-                    var pageSize = api.page.len();
-                    var wrapper = api.settings()[0].nTableWrapper;
+                    var api = this.api(),
+                        rowCount = api.data().length,
+                        pageSize = api.page.len(),
+                        wrapper = api.settings()[0].nTableWrapper;
                     if (rowCount <= pageSize) {
                         $(wrapper).find('.dataTables_paginate').closest('.row').hide();
                         $(wrapper).find('.dataTables_filter').closest('.row').hide();
@@ -132,14 +132,14 @@ define([
                 container = document.createElement('div');
                 $container = $(container);
                 mount.appendChild(container);
-                
+
                 container.innerHTML = 'Loading...' + html.loading();
 
                 renderer()
                     .then(function (rendered) {
                         container.innerHTML = rendered.content;
                         R.send('app', 'title', rendered.title);
-                        
+
                         attachDatatable();
                         // create widgets.
                         // no children for now (see kbaseSimplePanel for how to do this)
@@ -149,7 +149,7 @@ define([
                         if (err.title) {
                             container.innerHTML = err.content;
                             R.send('app', 'title', err.title);
-                        } 
+                        }
                         console.log('ERROR rendering widget');
                         console.log(err);
                         reject(err);
@@ -183,7 +183,7 @@ define([
     }
 
     return {
-        create: function () {
+        make: function () {
             return widget();
         }
     };

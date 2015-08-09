@@ -175,6 +175,15 @@ define([
                             console.error(err);
                         })
                         .done();
+                // TODO: merge the following with the first redirect handler... 
+                // i.e. make them all return a promise.
+                } else if (data.routeHandler.route.redirectHandler) {                    
+                    app.doRedirectHandler(data.routeHandler)
+                        .catch(function (err) {
+                            console.error('ERROR');
+                            console.error(err);
+                        })
+                        .done();
                 } else {
                     app.showPanel2('app', data.routeHandler)
                         .catch(function (err) {
@@ -310,8 +319,7 @@ define([
                     {module: 'kb.panel.message', config: {}},
                     {module: 'kb.panel.login', config: {}},
                     {module: 'kb.panel.welcome'},
-                    {module: 'kb.panel.typeview'},
-                    {module: 'kb.panel.test'}
+                    {module: 'kb.panel.typeview'}
                     // {module: 'kb.panel.sample'},
                     // {module: 'kb.panel.sample.router'}
                 ].map(function (panel) {
