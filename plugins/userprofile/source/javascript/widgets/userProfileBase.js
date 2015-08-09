@@ -12,10 +12,9 @@ define([
     'q',
     'kb.runtime',
     'kb.utils',
-    'postal',
-    'json!functional-site/config.json'
+    'postal'
 ],
-    function (nunjucks, $, Q, R, Utils, Postal, config) {
+    function (nunjucks, $, Q, R, Utils, Postal) {
         "use strict";
         var SocialWidget = Object.create({}, {
             // The init function interfaces this object with the caller, and sets up any 
@@ -29,7 +28,7 @@ define([
                     // The global config is derived from the module definition, which gets it from the 
                     // functional site main config file directly. The setup property of the config defines
                     // the current set of settings (production, development, etc.)
-                    this.globalConfig = config[config.setup];
+                    // this.globalConfig = R;
 
                     // TODO: implement local config and config merging.
                     this.localConfig = {};
@@ -140,7 +139,7 @@ define([
             setupConfig: {
                 value: function () {
 
-                    this.configs = [{}, this.initConfig, this.localConfig, this.globalConfig];
+                    this.configs = [{}, this.initConfig, this.localConfig];
 
                     // Check for required and apply defaults.
                     if (!this.hasConfig('container')) {

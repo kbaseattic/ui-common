@@ -165,14 +165,10 @@
             'kb.widget.typebrowser': 'src/widgets/TypeBrowser',
             // KBase Panels
             // ------------
-            'kb.panel.contact': 'src/panels/contact',
             'kb.panel.login': 'src/panels/login',
             'kb.panel.navbar': 'src/panels/navbar',
-            'kb.panel.narrativemanager': 'src/panels/narrativemanager',
             'kb.panel.welcome': 'src/panels/welcome',
-            'kb.panel.narrativestore': 'src/panels/narrativestore',
             'kb.panel.datasearch': 'src/panels/datasearch',
-            'kb.panel.typebrowser': 'src/panels/typebrowser',
             'kb.panel.typeview': 'src/panels/typeview',
             'kb.panel.message': 'src/panels/message',
             'kb.panel.test': 'src/panels/test',

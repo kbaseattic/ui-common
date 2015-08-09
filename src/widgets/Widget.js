@@ -5,8 +5,8 @@
  browser: true,
  white: true
  */
-define(['jquery', 'q', 'nunjucks', 'kb.session', 'kb.utils', 'postal', 'json!functional-site/config.json'],
-    function ($, Q, nunjucks, Session, Utils, Postal, config) {
+define(['jquery', 'q', 'nunjucks', 'kb.runtime', 'kb.session', 'kb.utils', 'postal'],
+    function ($, Q, nunjucks, R, Session, Utils, Postal) {
         "use strict";
         var Widget = Object.create({}, {
             // The init function interfaces this object with the caller, and sets up any 
@@ -20,7 +20,7 @@ define(['jquery', 'q', 'nunjucks', 'kb.session', 'kb.utils', 'postal', 'json!fun
                     // The global config is derived from the module definition, which gets it from the 
                     // functional site main config file directly. The setup property of the config defines
                     // the current set of settings (production, development, etc.)
-                    this.globalConfig = config[config.setup];
+                    // this.globalConfig = config[config.setup];
 
                     // TODO: implement local config and config merging.
                     this.localConfig = {};
@@ -210,7 +210,7 @@ define(['jquery', 'q', 'nunjucks', 'kb.session', 'kb.utils', 'postal', 'json!fun
                     this.context.env = {
                         widgetTitle: this.widgetTitle,
                         widgetName: this.widgetName,
-                        docsite: this.getConfig('docsite')
+                        docsite: R.getConfig('docsite')
                     };
                     // NB this means that when clearing state or params, the object
                     // should not be blown away.
@@ -246,7 +246,7 @@ define(['jquery', 'q', 'nunjucks', 'kb.session', 'kb.utils', 'postal', 'json!fun
             setupConfig: {
                 value: function () {
 
-                    this.configs = [{}, this.initConfig, this.localConfig, this.globalConfig];
+                    this.configs = [{}, this.initConfig, this.localConfig];
 
                     // Check for required and apply defaults.
                     if (!this.hasConfig('container')) {
@@ -651,9 +651,9 @@ define(['jquery', 'q', 'nunjucks', 'kb.session', 'kb.utils', 'postal', 'json!fun
 
                     // We need to ensure that the context reflects the current auth state.
                     this.context.env.generatedId = this.genId();
-                    this.context.env.loggedIn = Session.isLoggedIn();
-                    if (Session.isLoggedIn()) {
-                        this.context.env.loggedInUser = Session.getUsername();
+                    this.context.env.loggedIn = R.isLoggedIn();
+                    if (R.isLoggedIn()) {
+                        this.context.env.loggedInUser = R.getUsername();
                         //this.context.env.loggedInUserRealName = Session.getUserRealName();
                     } else {
                         delete this.context.env.loggedInUser;
@@ -746,7 +746,7 @@ define(['jquery', 'q', 'nunjucks', 'kb.session', 'kb.utils', 'postal', 'json!fun
                     try {
                         if (this.status === 'error' || this.error) {
                             this.renderError();
-                        } else if (Session.isLoggedIn()) {
+                        } else if (R.isLoggedIn()) {
                             //if (this.initialStateSet) {
                             this.setTitle(this.widgetTitle);
                             this.places.content.html(this.renderTemplate('authorized'));

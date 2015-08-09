@@ -24,14 +24,13 @@ define([
     'kb.runtime',
     'kb.appstate',
     'q',
-    'kb.panel.narrativemanager',
     'kb.panel.navbar',
     'kb.client.profile',
     'yaml!build/ui.yml',
     'bootstrap',
     'css!font-awesome',
     'domReady!'],
-    function (App, Runtime, AppState, Q, NarrativeManagerPanel, Navbar, ProfileService, UIConfig) {
+    function (App, Runtime, AppState, Q, Navbar, ProfileService, UIConfig) {
         'use strict';
 
         var app = App.make();
@@ -39,9 +38,6 @@ define([
 
         var navbar = null;
         function setupApp() {
-            var NarrativeManager = NarrativeManagerPanel.create();
-            NarrativeManager.setup();
-
             // Call factory to create our global navbar.
             navbar = Navbar.create();
             navbar.setup();
@@ -312,12 +308,10 @@ define([
                 Runtime.logDebug({source: 'main', message: 'About to load panels...'});
                 var panels = [
                     {module: 'kb.panel.message', config: {}},
-                    {module: 'kb.panel.contact', config: {}},
                     {module: 'kb.panel.login', config: {}},
-                    {module: 'kb.panel.welcome', config: {}},
-                    {module: 'kb.panel.typebrowser', config: {}},
+                    {module: 'kb.panel.welcome'},
                     {module: 'kb.panel.typeview'},
-                    {module: 'kb.panel.test'},
+                    {module: 'kb.panel.test'}
                     // {module: 'kb.panel.sample'},
                     // {module: 'kb.panel.sample.router'}
                 ].map(function (panel) {

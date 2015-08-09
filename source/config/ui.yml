@@ -18,6 +18,10 @@ plugins:
         dashboard
     -
         dataview
+    -
+        contact
+    -
+        typebrowser
 navbar:
     menu:
         available_items:
@@ -33,27 +37,16 @@ navbar:
                 uri: https://kbase.us/narrative-guide
                 label: Narrative Tutorial
                 icon: info-circle
-            contact: 
-                path: contact
-                label: Contact Us
-                icon: envelope-o
+
             about_kbase: 
                 uri: https://kbase.us/about
                 label: About KBase
                 icon: info-circle
-            contact_us:
-                uri: https://kbase.us/contact-us
-                label: Contact Us
-                icon: envelope-o
-            typebrowser:
-                path: typebrowser
-                label: Type Browser
-                icon: beer
             test: 
                 path: test
                 label: Testing Panel
                 icon: flask
         menus:
-            authenticated: [search, narrative, typebrowser, test, divider, contact, divider]                
-            unauthenticated: [about, contact, divider, about_kbase, contact_us]
+            authenticated: [search, narrative, test, divider, divider]                
+            unauthenticated: [about, divider, about_kbase, contact_us]
         

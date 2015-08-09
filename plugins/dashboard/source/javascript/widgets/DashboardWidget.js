@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 'postal', 'json!functional-site/config.json'],
-    function (nunjucks, $, Q, Session, Utils, UserProfile, Postal, config) {
+define(['nunjucks', 'jquery', 'q', 'kb.runtime', 'kb.session', 'kb.utils', 'kb.user_profile', 'postal'],
+    function (nunjucks, $, Q, R, Session, Utils, UserProfile, Postal) {
         "use strict";
         var DashboardWidget = Object.create({}, {
             // The init function interfaces this object with the caller, and sets up any 
@@ -13,7 +13,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
                     // The global config is derived from the module definition, which gets it from the 
                     // functional site main config file directly. The setup property of the config defines
                     // the current set of settings (production, development, etc.)
-                    this.globalConfig = config[config.setup];
+                    // this.globalConfig = config[config.setup];
 
                     // TODO: implement local config and config merging.
                     this.localConfig = {};
@@ -31,8 +31,8 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
                     // This allows creating links to social widgets in some contexts in which the username can't be
                     // placed onto the url.
                     if (Utils.isBlank(cfg.userId)) {
-                        if (Session.isLoggedIn()) {
-                            this.params.userId = Session.getUsername();
+                        if (R.isLoggedIn()) {
+                            this.params.userId = R.getUsername();
                         }
                     } else {
                         this.params.userId = cfg.userId;
@@ -233,7 +233,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
                     this.context.env = {
                         widgetTitle: this.widgetTitle,
                         widgetName: this.widgetName,
-                        docsite: this.getConfig('docsite')
+                        docsite: R.getConfig('docsite')
                     };
                     // NB this means that when clearing state or params, the object
                     // should not be blown away.
@@ -269,7 +269,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
             setupConfig: {
                 value: function () {
 
-                    this.configs = [{}, this.initConfig, this.localConfig, this.globalConfig];
+                    this.configs = [{}, this.initConfig, this.localConfig];
 
                     // Check for required and apply defaults.
                     if (!this.hasConfig('container')) {
@@ -673,9 +673,9 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
 
                     // We need to ensure that the context reflects the current auth state.
                     this.context.env.generatedId = this.genId();
-                    this.context.env.loggedIn = Session.isLoggedIn();
-                    if (Session.isLoggedIn()) {
-                        this.context.env.loggedInUser = Session.getUsername();
+                    this.context.env.loggedIn = R.isLoggedIn();
+                    if (R.isLoggedIn()) {
+                        this.context.env.loggedInUser = R.getUsername();
                         //this.context.env.loggedInUserRealName = Session.getUserRealName();
                     } else {
                         delete this.context.env.loggedInUser;
@@ -768,7 +768,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
                     try {
                         if (this.status === 'error' || this.error) {
                             this.renderError();
-                        } else if (Session.isLoggedIn()) {
+                        } else if (R.isLoggedIn()) {
                             //if (this.initialStateSet) {
                             this.setTitle(this.widgetTitle);
                             this.places.content.html(this.renderTemplate('authorized'));

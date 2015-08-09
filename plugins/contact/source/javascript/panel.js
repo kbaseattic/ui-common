@@ -120,84 +120,57 @@ define([
             };
         }
 
+        function widget() {
+            var mount, container;
+            var contact = ContactViewModel();
 
-        function contactPanelFactory() {
-            function widget() {
-                var mount, container;
-                var contact = ContactViewModel();
-
-                // API
-                function attach(node) {
-                    return Q.Promise(function (resolve) {
-                        mount = node;
-                        container = document.createElement('div');
-                        mount.appendChild(container);
-                        container.innerHTML = renderContactForm();
-                        R.send('app', 'title', 'Contact KBase');
-                        resolve();
-                    });
-                }
-                function detach(node) {
-                    return Q.Promise(function (resolve) {
-                        mount.removeChild(container);
-                        resolve();
-                    });
-                }
-                function start(node) {
-                    return Q.Promise(function (resolve) {
-                        contact = ContactViewModel();
-                        ko.applyBindings(contact, container);
-                        resolve();
-                    });
-                }
-                function stop(node) {
-                    return Q.Promise(function (resolve) {
-                        ko.cleanNode(container);
-                        contact = null;
-                        resolve();
-                    });
-                }
-                return {
-                    attach: attach,
-                    detach: detach,
-                    start: start,
-                    stop: stop
-                }
+            // API
+            function init(config) {
+                return Q.Promise(function (resolve) {
+                    resolve();
+                });
+            }
+            function attach(node) {
+                return Q.Promise(function (resolve) {
+                    mount = node;
+                    container = document.createElement('div');
+                    mount.appendChild(container);
+                    container.innerHTML = renderContactForm();
+                    R.send('app', 'title', 'Contact KBase');
+                    resolve();
+                });
+            }
+            function detach(node) {
+                return Q.Promise(function (resolve) {
+                    mount.removeChild(container);
+                    resolve();
+                });
+            }
+            function start(node) {
+                return Q.Promise(function (resolve) {
+                    contact = ContactViewModel();
+                    ko.applyBindings(contact, container);
+                    resolve();
+                });
+            }
+            function stop(node) {
+                return Q.Promise(function (resolve) {
+                    ko.cleanNode(container);
+                    contact = null;
+                    resolve();
+                });
             }
             return {
-                create: function (config) {
-                    return widget(config);
-                }
-            }
-
+                init: init,
+                attach: attach,
+                detach: detach,
+                start: start,
+                stop: stop
+            };
         }
-
-        function setup(app) {
-            app.addRoute({
-                path: ['contact'],
-                widget: contactPanelFactory()
-            });
-        }
-        ;
-        function teardown() {
-            // TODO: remove routes
-        }
-        ;
-        function start() {
-            //
-            console.log('starting');
-            ko.applyBindings(ContactViewModel());
-        }
-        ;
-        function stop() {
-            //
-        }
-        ;
         return {
-            setup: setup,
-            teardown: teardown,
-            start: start,
-            stop: stop
+            make: function (config) {
+                return widget(config);
+            }
         };
-
     });
