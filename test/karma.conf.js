@@ -16,10 +16,10 @@ module.exports = function(config) {
     // This is someone redundant with what's in package.json,
     // but I like it to be explicit here.
     plugins: [
-      'karma-jasmine',
-      'karma-phantomjs-launcher',
-      'karma-coverage',
-      'karma-requirejs',
+        'karma-jasmine',
+        'karma-phantomjs-launcher',
+        'karma-coverage',
+        'karma-requirejs',
     ],
 
 
