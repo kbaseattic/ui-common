@@ -78,9 +78,11 @@ module.exports = function(config) {
       {pattern: 'bower_components/js-yaml/dist/js-yaml.min.js', included: false},
       {pattern: 'build/*.yml', included: false},
       {pattern: 'functional-site/config.json', served: true, included: false},
+      {pattern: 'functional-site/js/require-config.js', served: true, included: true},
+
 
       {pattern: 'src/**/*.js', included: false},
-      {pattern: 'test/spec/*.js', included: false},
+      {pattern: 'test/spec/**/*.js', included: false},
 
       'test/test-main.js',
     ],
@@ -99,8 +101,11 @@ module.exports = function(config) {
     },
 
     coverageReporter: {
-      type: 'lcov',
-      dir: 'coverage/',
+      dir: 'build/test-coverage/',
+      reporters: [
+        { type: 'html', subdir: 'html' },
+        { type: 'lcov', subdir: 'lcov' }
+      ]
     },
 
     // test results reporter to use

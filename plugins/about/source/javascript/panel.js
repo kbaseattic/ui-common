@@ -73,13 +73,11 @@ define([
         }
     }
     
+    /*
+     * The widget factory function implements the widget interface.
+     */
     function widget(config) {
         var mount, container;
-        function init() {
-            return Q.Promise(function (resolve) {
-               resolve();
-            });
-        }
         function render() {
             var p = html.tag('p'),
                 div = html.tag('div'),
@@ -95,6 +93,11 @@ define([
             ];
         }
         // Widget API
+        function init() {
+            return Q.Promise(function (resolve) {
+               resolve();
+            });
+        }
         function attach(node) {
             return Q.Promise(function (resolve) {
                 mount = node;
@@ -135,7 +138,7 @@ define([
     };
     
     return {
-        create: function (config) {
+        make: function (config) {
             return widget(config);
         }
     };

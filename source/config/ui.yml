@@ -1,6 +1,19 @@
 ## YAML Template.
 ---
-plugins: [sample, eg_plugin, about, databrowser]
+plugins:
+    -
+        name: sample
+        directory: bower_components/kbase-ui-plugin-sample/src/plugin
+    -
+        eg_plugin
+    -
+        about
+    -
+        databrowser
+    -
+        userprofile
+    -
+        narrativestore
 navbar:
     menu:
         available_items:
@@ -57,6 +70,6 @@ navbar:
                 label: Scatter Plot
                 icon: ellipsis-h
         menus:
-            authenticated: [search, narrative, dashboard, typebrowser, test, divider, linechart, barchart, heatmap, scatterplot, divider, about, contact, divider]                
+            authenticated: [search, narrative, dashboard, typebrowser, test, linechart, barchart, heatmap, scatterplot, divider, contact, divider]                
             unauthenticated: [about, contact, divider, about_kbase, contact_us]
         

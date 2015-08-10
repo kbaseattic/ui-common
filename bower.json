@@ -1,5 +1,5 @@
 {
-  "name": "ui-common.summer2015cleanup",
+  "name": "ui-common.ease-dev-campaign",
   "version": "0.0.1",
   "homepage": "https://kbase.us",
   "authors": [
@@ -20,7 +20,7 @@
     "spark-md5": "0.0.5",
     "bootstrap": "3.3.5",
     "jquery": "1.11.3",
-    "d3": "3.5.6",
+    "d3": "3.5.5",
     "postal.js": "1.0.6",
     "q": "1.4.1",
     "requirejs": "2.1.18",
@@ -47,7 +47,7 @@
     "angular": "1.4.1",
     "angular-ui": "0.4.0",
     "angular-ui-bootstrap-bower": "0.13.0",
-    "font-awesome": "4.4.0",
+    "font-awesome": "4.3.0",
     "angular-ui-router": "0.2.15",
     "d3-sankey": "*",
     "jquery.svg": "*",
@@ -59,9 +59,8 @@
     "stacktrace-js": "0.6.4",
     "js-yaml": "3.3.1",
     "require-yaml": "0.1.2",
-    "handlebars": "3.0.3"
-  },
-  "resolutions": {
-    "font-awesome": "4.4.0"
+    "handlebars": "3.0.3",
+    
+    "kbase-ui-plugin-sample": "eapearson/kbase-ui-plugin-sample#0.0.1"
   }
 }

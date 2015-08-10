@@ -213,17 +213,20 @@ define([
             // for each plugin
             var loaders = plugins.map(function (plugin) {
                 // read the config file
+                if (typeof plugin === 'string') {
+                    plugin = {
+                        name: plugin,
+                        directory: 'plugins/' + plugin
+                    }
+                }
                 return Q.Promise(function (resolve) {
-                    require(['yaml!plugins/' + plugin + '/config.yml'], function (config) {
+                    require(['yaml!' + plugin.directory + '/config.yml'], function (config) {
                         // build up a list of modules and add them to the require config.
                         var paths = {},
-                            sourcePath = 'plugins/' + plugin + '/source';
+                            sourcePath = plugin.directory + '/source';
 
                         // load any styles.
                         var dependencies = [];
-                        if (config.setup.installer) {
-                            dependencies.push(config.setup.installer.module);
-                        }
                         if (config.source.styles) {
                             config.source.styles.forEach(function (style) {
                                 dependencies.push('css!' + sourcePath + '/css/' + style.file);
@@ -238,42 +241,36 @@ define([
 
                         // NB - installer is the first module in the dependency
                         // list so we receive it as the first argument.
-                        if (config.setup.installer) {
-                            require(dependencies, function (installer) {
-                                installer.setup();
-                                resolve();
-                            });
-                        } else {
-                            if (config.setup.routes) {
-                                require(dependencies, function () {
-                                    var routes = config.setup.routes.map(function (route) {
-                                        return Q.Promise(function (resolve) {
-                                            require([route.panelFactory], function (factory) {
-                                                Runtime.addRoute({
-                                                    path: route.path,
-                                                    panelFactory: factory
-                                                });
-                                                resolve();
+                        if (config.install.routes) {
+                            require(dependencies, function () {
+                                var routes = config.install.routes.map(function (route) {
+                                    return Q.Promise(function (resolve) {
+                                        require([route.panelFactory], function (factory) {
+                                            Runtime.addRoute({
+                                                path: route.path,
+                                                panelFactory: factory
                                             });
+                                            resolve();
                                         });
                                     });
-                                    Q.all(routes)
-                                        .then(function () {
-                                            if (config.setup.menu) {
-                                                config.setup.menu.forEach(function (item) {
-                                                    Runtime.send('navbar', 'add-menu-item', item);
-                                                });
-                                            }
-                                            resolve();
-                                        })
-                                        .catch(function (err) {
-                                            console.log('ERROR');
-                                            console.log(err);
-                                        })
-                                        .done();
                                 });
-                            }
+                                Q.all(routes)
+                                    .then(function () {
+                                        if (config.install.menu) {
+                                            config.install.menu.forEach(function (item) {
+                                                Runtime.send('navbar', 'add-menu-item', item);
+                                            });
+                                        }
+                                        resolve();
+                                    })
+                                    .catch(function (err) {
+                                        console.log('ERROR');
+                                        console.log(err);
+                                    })
+                                    .done();
+                            });
                         }
+                        
                     });
                 });
             });
@@ -296,16 +293,15 @@ define([
                         });
                     });
                 }
+                
+                // Here we load the internal panels.
                 Runtime.logDebug({source: 'main', message: 'About to load panels...'});
                 var panels = [
                     {module: 'kb.panel.message', config: {}},
                     {module: 'kb.panel.contact', config: {}},
                     {module: 'kb.panel.login', config: {}},
-                    // {module: 'kb.panel.userprofile', config: {}},
                     {module: 'kb.panel.welcome', config: {}},
                     {module: 'kb.panel.dashboard', config: {}},
-                    //{module: 'kb.panel.narrativestore'},
-                    // {module: 'kb.panel.datasearch'},
                     {module: 'kb.panel.dataview', config: {}},
                     {module: 'kb.panel.typebrowser', config: {}},
                     {module: 'kb.panel.typeview'},

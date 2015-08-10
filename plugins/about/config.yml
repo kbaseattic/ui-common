@@ -16,7 +16,7 @@ source:
         -
             module: kb.plugin.about.installer
             file: installer
-setup:
+install:
     routes:
         -
             path: ['about']

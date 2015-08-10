@@ -19,7 +19,7 @@ source:
         -
             module: kb.plugin.databrowser.installer
             file: installer
-setup:
+install:
     routes:
         -
             path: ['databrowser']

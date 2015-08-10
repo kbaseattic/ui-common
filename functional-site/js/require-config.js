@@ -51,7 +51,7 @@
         paths: {
             // External Dependencies
             // ----------------------
-            jquery: 'bower_components/jquery/dist/jquery',
+            jquery: 'bower_components/jquery/dist/jquery.min',
             'jquery-ui': 'bower_components/jquery-ui/jquery-ui.min',
             'jquery-ui-css': 'bower_components/jquery-ui/themes/ui-lightness/jquery-ui.min',
             bootstrap: 'bower_components/bootstrap/dist/js/bootstrap.min',
@@ -162,6 +162,10 @@
 
             // KBase Widgets
             // -------------
+            
+            'kb.widget.base.simple': 'src/widgets/base/simple',
+            
+            
             // userProfileServiceClient: '/functional-site/assets/js/kbclient/user_profile_Client.js',
             'kb.widget.buttonbar': 'src/widgets/kbaseButtonbar',
             'kb.widget.social.base': 'src/widgets/social/kbaseSocialWidget',
