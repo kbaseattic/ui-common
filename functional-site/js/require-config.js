@@ -154,7 +154,7 @@
             'kb.widget.vis.linechart'      : 'src/widgets/vis/kbaseLinechart',
             //'kb.widget.vis.lineSerieschart': 'src/widgets/vis/kbaseLineSerieschart',
             //'kb.widget.vis.piechart'       : 'src/widgets/vis/kbasePiechart',
-            //'kb.widget.vis.scatterplot'    : 'src/widgets/vis/kbaseScatterplot',
+            'kb.widget.vis.scatterplot'    : 'src/widgets/vis/kbaseScatterplot',
             //'kb.widget.vis.treechart'      : 'src/widgets/vis/kbaseTreechart',
             //'kb.widget.vis.venndiagram'    : 'src/widgets/vis/kbaseVenndiagram',
             'kb.widget.vis.widget'         : 'src/widgets/vis/kbaseVisWidget',
@@ -222,6 +222,7 @@
             'kb.panel.vis.linechart': 'src/panels/vis/linechart',
             'kb.panel.vis.heatmap': 'src/panels/vis/heatmap',
             'kb.panel.vis.barchart': 'src/panels/vis/barchart',
+            'kb.panel.vis.scatterplot': 'src/panels/vis/scatterplot',
 
             // KBase JQuery Plugin Widgets
             // ---------------------------

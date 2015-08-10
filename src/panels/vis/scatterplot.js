@@ -10,11 +10,11 @@ define([
     'kb.runtime',
     'q',
     'underscore',
-    'kb.widget.vis.barchart'],
+    'kb.widget.vis.scatterplot'],
     function (html, R, q, _) {
         'use strict';
 
-        function barchartWidget() {
+        function scatterplotWidget() {
 
             function widget(config) {
 
@@ -23,37 +23,49 @@ define([
 
                 function render() {
 
-                    var bars = [];
+                    var dataset = [];
 
-                    for (var i = 0; i < 20; i++) {
-                        bars.push(
+                    var points = 200;
+
+                    var randomColor = function() {
+                        var colors = ['red', 'green', 'blue', 'cyan', 'magenta', 'yellow', 'orange', 'black'];
+                        return colors[Math.floor(Math.random() * colors.length)];
+                    }
+
+                    var randomShape = function() {
+                    //return 'circle';
+                        var shapes = ['circle', 'circle', 'circle', 'circle', 'circle', 'circle', 'square', 'triangle-up', 'triangle-down', 'diamond', 'cross'];
+                        return shapes[Math.floor(Math.random() * shapes.length)];
+                    }
+
+                    for (var idx = 0; idx < points; idx++) {
+                        dataset.push(
                             {
-                                bar   : i,
-                                color : ['#00BBBB', '#0000FF','#00BBBB', '#0000FF'],
-                                value : [Math.random() * 10, Math.random() * 20,Math.random() * 10, Math.random() * 30]
+                                x : Math.random() * 500,
+                                y : Math.random() * 500,
+                                weight : Math.random() * 225,
+                                color : randomColor(),
+                                label : 'Data point ' + idx,
+                                shape : randomShape(),
                             }
                         );
                     }
-                    console.log(bars);
 
-                    var $bar = $.jqElem('div').css({width : '800px', height : '500px'}).kbaseBarchart(
-
+                    var $scatter = $.jqElem('div').css({width : '800px', height : '500px'}).kbaseScatterplot(
                         {
                             scaleAxes   : true,
 
-                            xLabel      : 'Survey Data',
+                            //xLabel      : 'Some useful experiment',
                             //yLabel      : 'Meaningful data',
-                            hGrid       : true,
 
-                            dataset : bars,
+                            dataset : dataset,
 
                         }
-
                     );
 
                     return {
-                        title: 'Sample bar chart',
-                        content: $bar.$elem,
+                        title: 'Sample scatter plot',
+                        content: $scatter.$elem,
                     }
 
                 }
@@ -108,8 +120,8 @@ define([
 
         function setup(app) {
             app.addRoute({
-                path: ['barchart'],
-                widget: barchartWidget()
+                path: ['scatterplot'],
+                widget: scatterplotWidget()
             });
 
         }

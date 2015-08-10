@@ -142,8 +142,10 @@ define(
             chart
                 .data(this.dataset())
                 .enter()
-                    .append('circle')
+                    .append('path')
                     .attr('class', 'point')
+                    .attr("transform", function(d) { return "translate(" + $scatter.xScale()(d.x) + "," + $scatter.yScale()(d.y) + ")"; })
+                    .attr('d', function (d) { return d3.svg.symbol().type(d.shape).size(d.weight)() } )
                     .call(funkyTown)
                     .call(mouseAction)
             ;

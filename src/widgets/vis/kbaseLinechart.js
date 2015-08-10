@@ -33,6 +33,10 @@ define(
                 return xIdx != undefined ? xIdx + 1 : 0;
             },
 
+            highlightLineColor : 'red',
+            highlightLineWidth : 1,
+            useHighlightLine : true,
+
         },
 
         _accessors : [
@@ -232,6 +236,57 @@ define(
                 chart
                     .exit()
                         .remove();
+
+            for (var i = 0; i < this.dataset().length; i++) {
+
+                var line = this.dataset()[i];
+
+                if (line.shape == undefined) {
+                    continue;
+                }
+
+                var points = this.data('D3svg').select(this.region('chart')).selectAll('.point-' + line.label).data(line.values);
+
+                points
+                    .enter()
+                        .append('path')
+                            .attr('class', 'point')
+                            .attr("transform", function(d) { return "translate(" + $line.xScale()(d.x) + "," + $line.yScale()(d.y) + ")"; })
+                            .attr('d', function (d) { return d3.svg.symbol().type(line.shape).size(line.shapeArea)() } )
+                            .attr('fill', function(d) {return line.fillColor || line.strokeColor || $line.options.fillColor})
+                    ;
+            }
+
+            if (this.options.useHighlightLine) {
+                var highlight = this.data('D3svg').select(this.region('chart')).selectAll('.highlight').data([0]);
+
+                highlight.enter()
+                    .append('line')
+                    .attr('x1', bounds.size.width / 2)
+                    .attr('x2', bounds.size.width / 2)
+                    .attr('y1', 0)
+                    .attr('y2', bounds.size.height)
+                    .attr('opacity', 0)
+                    .attr('stroke', this.options.highlightLineColor)
+                    .attr('stroke-width', this.options.highlightLineWidth)
+                ;
+
+                this.data('D3svg').select(this.region('chart'))
+                    .on('mouseover', function(d) {
+                        highlight.attr('opacity', 1);
+                    })
+                    .on('mousemove', function(d) {
+                        var coords = d3.mouse(this);
+                        highlight
+                            .attr('x1', coords[0])
+                            .attr('x2', coords[0])
+                            .attr('opacity', 1)
+                    })
+                    .on('mouseout', function(d) {
+                        highlight.attr('opacity', 0);
+                    })
+                ;
+            }
 
         },
 

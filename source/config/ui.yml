@@ -52,7 +52,11 @@ navbar:
                 path: heatmap
                 label: Heat Map
                 icon: barcode
+            scatterplot:
+                path: scatterplot
+                label: Scatter Plot
+                icon: ellipsis-h
         menus:
-            authenticated: [search, narrative, dashboard, typebrowser, test, divider, linechart, barchart, heatmap, divider, about, contact, divider]                
+            authenticated: [search, narrative, dashboard, typebrowser, test, divider, linechart, barchart, heatmap, scatterplot, divider, about, contact, divider]                
             unauthenticated: [about, contact, divider, about_kbase, contact_us]
         
