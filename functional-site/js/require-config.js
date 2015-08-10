@@ -136,7 +136,7 @@
             'kb.format': 'src/kbaseFormat',
             'kb.props': 'src/kbaseProps',
             'kb.widget.widgetadapter': 'src/widgets/kbaseWidgetAdapter',
-            'kb.widget.kbwidgetadapter': 'src/widgets/kbaseKBWidgetAdapter',
+            'kb.widget.kbwidgetadapter': 'src/widgets/kbaseKbWidgetAdapter',
             'kb.simplepanel': 'src/kbaseSimplePanel',
             'kb.dom': 'src/kbaseDOM',
             
