@@ -2,16 +2,18 @@
 
 */
 
-define('kbaseBarchart',
+define(
     [
         'jquery',
         'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
+        'kb.widget.vis.widget',
+        'kb.RGBColor',
+        'kb.geometry.rectangle',
+        'kb.geometry.point',
+        'kb.geometry.size',
     ], function( $ ) {
+
+    'use strict';
 
     $.KBWidget({
 
@@ -110,7 +112,7 @@ define('kbaseBarchart',
                             xId = $bar.xIDMap()[xId];
                         }
 
-                        return $bar.xScale()(xId) + barScale(j);
+                        return $bar.xScale()(xId) + barScale(d.stacked ? 0 : j);
                     } )
                     .attr('y', function (b, bi) {
 
@@ -211,14 +213,30 @@ define('kbaseBarchart',
                         d.label = [d.label];
                     }
 
-                    var barDomain = d.value;
-                    if (d.stacked && $.isArray(d.value)) {
-                        barDomain = [d3.sum(d.value)];
+                    //var barDomain = d.value;
+                    //if (d.stacked && $.isArray(d.value)) {
+                    //    barDomain = [d3.sum(d.value)];
+                    //}
+
+                    var barDomain = [0];
+                    if (! d.stacked) {
+                        var idx = 0;
+
+                        for (idx = 0; idx < d.value.length; idx++) {
+                            barDomain.push(idx);
+                        }
                     }
 
                     var barScale = d3.scale.ordinal()
                         .domain(barDomain)
+                        //.range([0,$bar.xScale().rangeBand()])
                         .rangeBands([0,$bar.xScale().rangeBand()], 0.05)
+                    ;
+
+                    var barScale2 = d3.scale.ordinal()
+                        .domain(barDomain)
+                        //.range([85])
+                        .rangeBands([0,85], 0.05)
                     ;
 
                     d3.select(this).selectAll('.bar')
@@ -237,6 +255,28 @@ define('kbaseBarchart',
 
                 })
                 return this;
+            }
+
+            if (this.options.hGrid && this.yScale) {
+                var yAxis =
+                    d3.svg.axis()
+                    .scale(this.yScale())
+                    .orient('left')
+                    .tickSize(0 - bounds.size.width)
+                    .outerTickSize(0)
+                    .tickFormat('');
+
+                var gyAxis = this.D3svg().select(this.region('chart')).select('.yAxis');
+
+                if (gyAxis[0][0] == undefined) {
+                    gyAxis = this.D3svg().select(this.region('chart'))
+                        .append('g')
+                        .attr('class', 'yAxis axis')
+                        .attr("transform", "translate(" + 0 + ",0)")
+                }
+
+                gyAxis.transition().call(yAxis);
+                gyAxis.selectAll('line').style('stroke', 'lightgray');
             }
 
             var chart = this.D3svg().select( this.region('chart') ).selectAll('.barGroup');

@@ -2,12 +2,14 @@
 
 */
 
-define('kbaseCircularHeatmap',
+define(
     [
         'jquery',
         'd3',
-        'kbasePiechart',
+        'kb.widget.vis.piechart',
     ], function( $ ) {
+
+    'use strict';
 
     $.KBWidget({
 

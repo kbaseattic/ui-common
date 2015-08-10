@@ -2,16 +2,18 @@
 
 */
 
-define('kbaseScatterplot',
+define(
     [
         'jquery',
         'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
+        'kb.widget.vis.widget',
+        'kb.RGBColor',
+        'kb.geometry.rectangle',
+        'kb.geometry.point',
+        'kb.geometry.size',
     ], function( $ ) {
+
+    'use strict';
 
     $.KBWidget({
 
@@ -140,8 +142,10 @@ define('kbaseScatterplot',
             chart
                 .data(this.dataset())
                 .enter()
-                    .append('circle')
+                    .append('path')
                     .attr('class', 'point')
+                    .attr("transform", function(d) { return "translate(" + $scatter.xScale()(d.x) + "," + $scatter.yScale()(d.y) + ")"; })
+                    .attr('d', function (d) { return d3.svg.symbol().type(d.shape).size(d.weight)() } )
                     .call(funkyTown)
                     .call(mouseAction)
             ;
