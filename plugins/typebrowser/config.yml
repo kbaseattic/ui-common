@@ -12,10 +12,10 @@ source:
     modules:
         -
             module: kb_panel_typeBrowser
-            file: panel
+            file: 'panel.js'
         -
             module: kb_widget_typeBrowser
-            file: "widgets/TypeBrowser"
+            file: "widgets/TypeBrowser.js"
 install:
     routes:
         -

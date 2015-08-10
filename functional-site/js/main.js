@@ -233,13 +233,13 @@ define([
                     require(['yaml!' + plugin.directory + '/config.yml'], function (config) {
                         // build up a list of modules and add them to the require config.
                         var paths = {}, shims = {},
-                            sourcePath = plugin.directory + '/source';
+                            sourcePath = plugin.directory + '/source',
+                            dependencies = [];
 
                         // load any styles.
                         // NB these are styles for the plugin as a whole.
                         // TODO: do away with this. the styles should be dependencies
                         // of the panel and widgets. widget css code is below...
-                        var dependencies = [];
                         if (config.source.styles) {
                             config.source.styles.forEach(function (style) {
                                 dependencies.push('css!' + sourcePath + '/css/' + style.file);
@@ -248,12 +248,17 @@ define([
 
                         // Add each module defined to the require config paths.
                         config.source.modules.forEach(function (source) {
-                            var sourceFile = sourcePath + '/javascript/' + source.file;
-                            paths[source.module] = sourceFile;
-                            if (source.css) {
-                                var styleModule = source.module + '-css';
-                                paths[styleModule] = sourceFile;
-                                shims[source.module] = {deps: ['css!' + styleModule]};
+                            var jsSourceFile = source.file,
+                                matched = jsSourceFile.match(/^(.+?)(?:(?:\.js$)|(?:$))/);
+                            if (matched) {
+                                jsSourceFile = matched[1];
+                                var sourceFile = sourcePath + '/javascript/' + jsSourceFile;
+                                paths[source.module] = sourceFile;
+                                if (source.css) {
+                                    var styleModule = source.module + '_css';
+                                    paths[styleModule] = sourceFile;
+                                    shims[source.module] = {deps: ['css!' + styleModule]};
+                                }
                             }
                         });
 
@@ -304,6 +309,7 @@ define([
                                     .then(function () {
                                         if (config.install.menu) {
                                             config.install.menu.forEach(function (item) {
+                                            console.log('Adding'); console.log(item);
                                                 Runtime.send('navbar', 'add-menu-item', item);
                                             });
                                         }
@@ -319,12 +325,9 @@ define([
 
                     });
                 });
-                console.log(p);
                 return p;
             });
-            console.log(loaders);
             return Q.all(loaders);
-
         }
 
         function start() {
