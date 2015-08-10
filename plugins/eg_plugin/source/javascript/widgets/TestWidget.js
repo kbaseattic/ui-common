@@ -11,7 +11,7 @@
 /* DOC: sample pure object widget with interface
  */
 define([
-    'kb.widget.base.simpleDOM',
+    'kb_widgetBases_domWidget',
     'kb.html'
 ],
     function (SimpleDOM, html) {

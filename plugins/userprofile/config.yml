@@ -14,23 +14,20 @@ source:
             module: kb_panel_userProfile
             file: panel
         -
-            module: kb_widget_userprofile_base
+            module: kb_widget_userProfile_base
             file: "widgets/userProfileBase"
         -
-            module: kb_widget_userprofile_userProfileEditor
+            module: kb_widget_userProfile_userProfileEditor
             file: "widgets/userProfileEditor"
         -
-            module: kb_widget_userprofile_userSearch
+            module: kb_widget_userProfile_userSearch
             file: "widgets/userSearch"
         -
-            module: kb_widget_userprofile_collaboratorNetwork
+            module: kb_widget_userProfile_collaboratorNetwork
             file: "widgets/collaboratorNetwork"
         -
-            module: kb_widget_userprofile_narrativeBrowser
+            module: kb_widget_userProfile_narrativeBrowser
             file: "widgets/narrativeBrowser"
-    xstyles:
-        -
-            file: styles.css
 install:
     routes:
         -

@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.alert', 'postal', 'json!functional-site/config.json'],
-   function (nunjucks, $, Q, Session, Utils, APIUtils, Alert, Postal, config) {
+define(['nunjucks', 'jquery', 'q', 'kb.runtime', 'kb.utils', 'kb.utils.api', 'kb.alert', 'postal'],
+   function (nunjucks, $, Q, R, Utils, APIUtils, Alert, Postal) {
       "use strict";
       var widget = Object.create({}, {
 
@@ -14,7 +14,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                // The global config is derived from the module definition, which gets it from the 
                // functional site main config file directly. The setup property of the config defines
                // the current set of settings (production, development, etc.)
-               this.globalConfig = config[config.setup];
+               // this.globalConfig = config[config.setup];
 
                // TODO: implement local config and config merging.
                this.localConfig = {};
@@ -32,8 +32,8 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                // This allows creating links to social widgets in some contexts in which the username can't be
                // placed onto the url.
                if (Utils.isBlank(cfg.userId)) {
-                  if (Session.isLoggedIn()) {
-                     this.params.userId = Session.getUsername();
+                  if (R.isLoggedIn()) {
+                     this.params.userId = R.getUsername();
                   }
                } else {
                   this.params.userId = cfg.userId;
@@ -43,7 +43,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                // Auth information is derived from the auth widget.
                // Auth state can change at any time -- the syncAuth method knows how to 
                // rebuild the widget after auth state change.
-               this.setupAuth();
+               // this.setupAuth();
 
 
                // Set up widget based on the config, params, and auth.
@@ -93,7 +93,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                this.context.env = {
                   widgetTitle: this.widgetTitle,
                   widgetName: this.widgetName,
-                  docsite: this.getConfig('docsite'),
+                  docsite: R.getConfig('docsite'),
                   browser: {
                      location: {
                         scheme: window.location.protocol,
@@ -146,7 +146,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
          setupConfig: {
             value: function () {
 
-               this.configs = [{}, this.initConfig, this.localConfig, this.globalConfig];
+               this.configs = [{}, this.initConfig, this.localConfig];
 
                // Check for required and apply defaults.
                if (!this.hasConfig('container')) {
@@ -188,11 +188,11 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
             }
          },
 
-         setupAuth: {
-            value: function () {
-               Session.refreshSession();
-            }
-         },
+        // setupAuth: {
+        //    value: function () {
+        //       Session.refreshSession();
+        //    }
+        // },
 
          // LIFECYCLE
 
@@ -412,7 +412,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
 
          onLoggedIn: {
             value: function (auth) {
-               this.setupAuth();
+               //this.setupAuth();
                this.setup();
                this.setInitialState({
                      force: true
@@ -425,7 +425,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
 
          onLoggedOut: {
             value: function () {
-               this.setupAuth();
+               // this.setupAuth();
                this.setup();
                this.setInitialState({
                   force: true
@@ -461,9 +461,9 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb
                // We need to ensure that the context reflects the current auth state.
                this.context.params = this.params;
                this.context.env.generatedId = this.genId();
-               this.context.env.loggedIn = Session.isLoggedIn();
-               if (Session.isLoggedIn()) {
-                  this.context.env.loggedInUser = Session.getUsername();
+               this.context.env.loggedIn = R.isLoggedIn();
+               if (R.isLoggedIn()) {
+                  this.context.env.loggedInUser = R.getUsername();
                   //this.context.env.loggedInUserRealName = Session.getUserRealName();
                } else {
                   delete this.context.env.loggedInUser;

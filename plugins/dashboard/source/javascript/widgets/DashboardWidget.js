@@ -1,4 +1,4 @@
-define(['nunjucks', 'jquery', 'q', 'kb.runtime', 'kb.session', 'kb.utils', 'kb.user_profile', 'postal'],
+define(['nunjucks', 'jquery', 'q', 'kb.runtime', 'kb.session', 'kb.utils', 'kb_user_profile', 'postal'],
     function (nunjucks, $, Q, R, Session, Utils, UserProfile, Postal) {
         "use strict";
         var DashboardWidget = Object.create({}, {

@@ -1,5 +1,5 @@
 define([
-    'kb.widget.base.simple'
+    'kb_widgetBases_simpleWidget'
 ],
     function (Simple) {
         'use strict';

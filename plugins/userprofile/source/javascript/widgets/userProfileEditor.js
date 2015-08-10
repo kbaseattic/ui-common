@@ -3,8 +3,8 @@ define([
     'jquery',
     'q',
     'kb.utils',
-    'kb.widget.social.base',
-    'kb.user_profile',
+    'kb_widget_userProfile_base',
+    'kb_user_profile',
     'kb.runtime'
 ],
     function (nunjucks, $, Q, Utils, SocialWidget, UserProfile, R) {

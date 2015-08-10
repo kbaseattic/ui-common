@@ -26,6 +26,8 @@ plugins:
         narrativemanager
     -
         egPluginJustPanel
+    -
+        eg_ezPlugin
 navbar:
     menu:
         available_items:

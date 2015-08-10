@@ -54,6 +54,7 @@
     "stacktrace-js": "0.6.4",
     "js-yaml": "3.3.1",
     "require-yaml": "0.1.2",
-    "kbase-ui-plugin-sample": "eapearson/kbase-ui-plugin-sample#0.0.1"
+    "kbase-ui-plugin-sample": "eapearson/kbase-ui-plugin-sample#0.0.1",
+    "kb-ui-plugin-demo": "eapearson/kb-ui-plugin-demo"
   }
 }

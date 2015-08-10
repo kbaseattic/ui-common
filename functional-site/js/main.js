@@ -57,7 +57,7 @@ define([
 
             Runtime.recv('navbar', 'clear-buttons', function () {
                 navbar.clearButtons();
-            })
+            });
 
             // ?? (EAP)
             Runtime.props.setItem('navbar', navbar);
@@ -175,9 +175,18 @@ define([
                             console.error(err);
                         })
                         .done();
-                // TODO: merge the following with the first redirect handler... 
-                // i.e. make them all return a promise.
-                } else if (data.routeHandler.route.redirectHandler) {                    
+                } else if (data.routeHandler.route.panelObject) {
+                    // And ... we have another panel factory pattern here. We will
+                    // converge as soon as we can...
+                    app.showPanel3('app', data.routeHandler)
+                        .catch(function (err) {
+                            console.error('ERROR');
+                            console.error(err);
+                        })
+                        .done();
+                    // TODO: merge the following with the first redirect handler... 
+                    // i.e. make them all return a promise.
+                } else if (data.routeHandler.route.redirectHandler) {
                     app.doRedirectHandler(data.routeHandler)
                         .catch(function (err) {
                             console.error('ERROR');
@@ -213,21 +222,17 @@ define([
         }
 
         function installPlugins() {
-            var plugins = UIConfig.plugins;
-
-            // for each plugin
-            var loaders = plugins.map(function (plugin) {
-                // read the config file
-                if (typeof plugin === 'string') { 
+            var loaders = UIConfig.plugins.map(function (plugin) {
+                if (typeof plugin === 'string') {
                     plugin = {
                         name: plugin,
                         directory: 'plugins/' + plugin
-                    }
+                    };
                 }
-                return Q.Promise(function (resolve) {
+                var p = Q.Promise(function (resolve) {
                     require(['yaml!' + plugin.directory + '/config.yml'], function (config) {
                         // build up a list of modules and add them to the require config.
-                        var paths = {}, shims = {}, 
+                        var paths = {}, shims = {},
                             sourcePath = plugin.directory + '/source';
 
                         // load any styles.
@@ -243,7 +248,7 @@ define([
 
                         // Add each module defined to the require config paths.
                         config.source.modules.forEach(function (source) {
-                            var sourceFile = sourcePath + '/javascript/' + source.file
+                            var sourceFile = sourcePath + '/javascript/' + source.file;
                             paths[source.module] = sourceFile;
                             if (source.css) {
                                 var styleModule = source.module + '-css';
@@ -251,26 +256,48 @@ define([
                                 shims[source.module] = {deps: ['css!' + styleModule]};
                             }
                         });
-                        
-                        console.log(paths);
+
+                        // console.log(paths);
                         // shims = {};
-                        
+
                         // This usage of require.config will merge with the existing
                         // require configuration.
                         require.config({paths: paths, shim: shims});
-                        
+
                         if (config.install.routes) {
                             require(dependencies, function () {
                                 var routes = config.install.routes.map(function (route) {
                                     return Q.Promise(function (resolve) {
-                                        require([route.panelFactory], function (factory) {
-                                            Runtime.addRoute({
-                                                path: route.path,
-                                                queryParams: route.queryParams,
-                                                panelFactory: factory
+                                        // Runtime.addRoute(route);
+                                        if (route.panelFactory) {
+                                            require([route.panelFactory], function (factory) {
+                                                Runtime.addRoute({
+                                                    path: route.path,
+                                                    queryParams: route.queryParams,
+                                                    panelFactory: factory
+                                                });
+                                                resolve();
                                             });
+                                        } else if (route.panelObject) {
+                                            require([route.panelObject], function (obj) {
+                                                Runtime.addRoute({
+                                                    path: route.path,
+                                                    queryParams: route.queryParams,
+                                                    panelObject: obj
+                                                });
+                                                resolve();
+                                            });
+                                        } else  if (route.redirectHandler) {
+                                            Runtime.addRoute(route);
                                             resolve();
-                                        });
+                                        } else {
+                                            throw {
+                                                name: 'routeError',
+                                                message: 'invalid route',
+                                                route: route
+                                            };
+                                        }
+                                        
                                     });
                                 });
                                 Q.all(routes)
@@ -289,10 +316,13 @@ define([
                                     .done();
                             });
                         }
-                        
+
                     });
                 });
+                console.log(p);
+                return p;
             });
+            console.log(loaders);
             return Q.all(loaders);
 
         }
@@ -312,7 +342,7 @@ define([
                         });
                     });
                 }
-                
+
                 // Here we load the internal panels.
                 Runtime.logDebug({source: 'main', message: 'About to load panels...'});
                 var panels = [
@@ -339,6 +369,7 @@ define([
                         return installPlugins();
                     })
                     .then(function () {
+                        Runtime.logDebug({source: 'main', message: 'About to run app...'});
                         runApp();
                         Runtime.logDebug({source: 'main', message: 'done'});
                     })

@@ -144,12 +144,12 @@
             // KBase Widgets
             // -------------
             
-            'kb.widget.base.simple': 'src/widgets/base/simple',
-            'kb.widget.base.simpleDOM': 'src/widgets/base/simpleDOM',
+            'kb_widgetBases_simpleWidget': 'src/widgetBases/simpleWidget',
+            'kb_widgetBases_domWidget': 'src/widgetBases/domWidget',
+            'kb_widgetBases_baseWidget': 'src/widgetBases/baseWidget',
             
             'kb.widget.buttonbar': 'src/widgets/kbaseButtonbar',
-            'kb.widget.social.base': 'src/widgets/social/kbaseSocialWidget',
-            'kb.user_profile': 'src/kbaseUserProfile',
+            'kb_user_profile': 'src/kbaseUserProfile',
             'kb.session': 'src/kbaseSession',
             'kb.config': 'src/kbaseConfig',
             'kb.widget.navbar': 'src/widgets/kbaseNavbar',
@@ -164,6 +164,9 @@
             'kb.widget': 'src/widgets/Widget',
             // KBase Panels
             // ------------
+            
+            'kb_panelBases_widgetPanel': 'src/panelBases/widgetPanel',
+            
             'kb.panel.login': 'src/panels/login',
             'kb.panel.navbar': 'src/panels/navbar',
             'kb.panel.welcome': 'src/panels/welcome',

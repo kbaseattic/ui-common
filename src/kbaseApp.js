@@ -354,9 +354,18 @@ define([
                     })
                         .then(function () {
                             // Create new mount.
+                            
+                            var panelWidget;
+                            if (routed.route.panelFactory) {
+                                panelWidget = routed.route.panelFactory.make();
+                            } else if (routed.route.panelObject) {
+                                panelWidget = Object.create(routed.route.panelObject);
+                            }
+                        
+                        
                             var newMount = {
                                 id: html.genId(),
-                                widget: routed.route.panelFactory.make()
+                                widget: panelWidget
                             };
 
                             /* TODO: config threaded here? */

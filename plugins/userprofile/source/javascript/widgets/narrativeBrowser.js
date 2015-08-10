@@ -1,7 +1,7 @@
 define([
     'jquery',
     'kb.utils',
-    'kb.widget.social.base',
+    'kb_widget_userProfile_base',
     'kb.service.workspace',
     'kb.runtime',
     'q'

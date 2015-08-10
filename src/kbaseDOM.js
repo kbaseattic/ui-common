@@ -27,6 +27,7 @@ define([], function () {
         append: append,
         remove: remove,
         setHTML: setHTML,
-        findById: findById
+        findById: findById,
+        getById: findById
     };
 });
