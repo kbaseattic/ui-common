@@ -5,7 +5,7 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '../',
+    basePath: '../../',
 
 
     // frameworks to use
@@ -18,6 +18,8 @@ module.exports = function(config) {
     plugins: [
         'karma-jasmine',
         'karma-phantomjs-launcher',
+        'karma-chrome-launcher',
+        'karma-firefox-launcher',
         'karma-coverage',
         'karma-requirejs',
     ],
@@ -86,7 +88,7 @@ module.exports = function(config) {
       {pattern: 'src/**/*.js', included: false},
       {pattern: 'test/spec/**/*.js', included: false},
 
-      'test/test-main.js',
+      'test/dev/test-main.js',
     ],
 
 
@@ -135,7 +137,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+    browsers: ['PhantomJS', 'Chrome', 'Firefox'],
 
 
     // Continuous Integration mode
