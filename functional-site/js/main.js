@@ -269,7 +269,7 @@ define([
                         // require configuration.
                         require.config({paths: paths, shim: shims});
 
-                        if (config.install.routes) {
+                        if (config.install && config.install.routes) {
                             require(dependencies, function () {
                                 var routes = config.install.routes.map(function (route) {
                                     return Q.Promise(function (resolve) {
@@ -321,6 +321,8 @@ define([
                                     })
                                     .done();
                             });
+                        } else {
+                            resolve();
                         }
 
                     });

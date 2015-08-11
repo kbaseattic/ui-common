@@ -5,7 +5,7 @@
  browser: true,
  white: true
  */
-define(['kb.geometry.rectangle', ],
+define(['kb_vis_rectangle', ],
     function (Rectangle) {
 
         'use strict';

@@ -6,13 +6,12 @@ define(
     [
         'jquery',
         'd3',
-        'kb.jquery.widget',
-        'kb.RGBColor',
-        'kb.geometry.rectangle',
-        'kb.geometry.point',
-        'kb.geometry.size'
+        'kb_vis_rectangle',
+        'kb_vis_point',
+        'kb_vis_size',
+        'kb.jquery.widget'
     ],
-    function ($, d3, kbw, RGBColor, Rectangle, Point, Size) {
+    function ($, d3, Rectangle, Point, Size) {
 
         'use strict';
 
@@ -24,10 +23,8 @@ define(
                 xPadding: 30,
                 yGutter: 20,
                 yPadding: 30,
-
-                yLabels : true,
-                xLabels : true,
-
+                yLabels: true,
+                xLabels: true,
                 xScaleType: 'linear',
                 yScaleType: 'linear',
                 useIDMapping: false,
@@ -41,7 +38,7 @@ define(
                 radialGradientStopColor: 'black',
                 linearGradientStopColor: 'black',
                 defaultDataset: function () {
-                    return []
+                    return [];
                 },
                 width: '100%',
                 height: '100%',
@@ -50,9 +47,9 @@ define(
             shouldScaleAxis: function (axis) {
                 if (this.options.scaleAxes) {
                     return true;
-                } else if (axis == 'x' && this.options.scaleXAxis) {
+                } else if (axis === 'x' && this.options.scaleXAxis) {
                     return true;
-                } else if (axis == 'y' && this.options.scaleYAxis) {
+                } else if (axis === 'y' && this.options.scaleYAxis) {
                     return true;
                 } else {
                     return false;
@@ -153,8 +150,8 @@ define(
             setYScaleDomain: function (domain, scaleType) {
                 var yScale = this.yScale();
 
-                if (yScale == undefined) {
-                    if (scaleType == undefined) {
+                if (yScale === undefined) {
+                    if (scaleType === undefined) {
                         scaleType = this.yScaleType() || this.options.yScaleType;
                     }
                     yScale = d3.scale[scaleType]();
@@ -165,7 +162,7 @@ define(
 
                 yScale.domain(domain);
 
-                if (this.options.useIDMapping && this.yIDMap() == undefined) {
+                if (this.options.useIDMapping && this.yIDMap() === undefined) {
                     this.yIDMap(this.createIDMapForDomain(domain));
                 }
 
@@ -174,7 +171,7 @@ define(
                 return yScale;
             },
             setYScaleRange: function (range, yScale) {
-                if (yScale == undefined) {
+                if (yScale === undefined) {
                     yScale = this.yScale();
                 }
                 yScale.range(range);
@@ -185,23 +182,23 @@ define(
 
                 this._super(options);
 
-                if (this.children() == undefined) {
+                if (this.children() === undefined) {
                     this.children([]);
                 }
 
-                if (this.options.transformations == undefined) {
+                if (this.options.transformations === undefined) {
                     this.options.transformations = {};
                 }
 
-                if (this.radialGradients() == undefined) {
+                if (this.radialGradients() === undefined) {
                     this.radialGradients({});
                 }
 
-                if (this.linearGradients() == undefined) {
+                if (this.linearGradients() === undefined) {
                     this.linearGradients({});
                 }
 
-                if (this.options.chartID == undefined) {
+                if (this.options.chartID === undefined) {
                     this.options.chartID = this.uuid();
                 }
 
@@ -210,19 +207,19 @@ define(
                 }
 
                 this.uniqueID = $.proxy(function (d) {
-                    if (d.id == undefined) {
+                    if (d.id === undefined) {
                         d.id = this.ticker();
                     }
                     return d.id;
                 }, this);
 
-                if (this.options.width != undefined && this.options.width.match(/px/)) {
+                if (this.options.width !== undefined && this.options.width.match(/px/)) {
                     this.width(parseInt(this.options.width));
                 } else {
                     this.width(this.$elem.width());
                 }
 
-                if (this.options.height != undefined && this.options.height.match(/px/)) {
+                if (this.options.height !== undefined && this.options.height.match(/px/)) {
                     this.height(parseInt(this.options.height));
                 } else {
                     this.height(this.$elem.height());
@@ -252,27 +249,27 @@ define(
                     return;
                 }
 
-                if (field == undefined || field == 'chart') {
+                if (field === undefined || field === 'chart') {
                     this.renderChart();
                 }
 
-                if (field == undefined || field == 'xAxis') {
+                if (field === undefined || field === 'xAxis') {
                     this.renderXAxis();
                 }
 
-                if (field == undefined || field == 'yAxis') {
+                if (field === undefined || field === 'yAxis') {
                     this.renderYAxis();
                 }
 
-                if (field == undefined || field == 'xLabel') {
+                if (field === undefined || field === 'xLabel') {
                     this.renderXLabel();
                 }
 
-                if (field == undefined || field == 'yLabel') {
+                if (field === undefined || field === 'yLabel') {
                     this.renderYLabel();
                 }
 
-                if (field == undefined || field == 'ulCorner') {
+                if (field === undefined || field === 'ulCorner') {
                     this.renderULCorner();
                 }
 
@@ -340,11 +337,11 @@ define(
             },
             setDatasets: function (newDatasets) {
 
-                if (newDatasets == undefined) {
+                if (newDatasets === undefined) {
                     newDatasets = [];
                 }
 
-                if (this.children() == undefined) {
+                if (this.children() === undefined) {
                     this.children([]);
                 }
 
@@ -379,7 +376,7 @@ define(
                     }
 
                     $me.render();
-                }
+                };
 
                 this.callAfterInit(initKids);
 
@@ -454,7 +451,7 @@ define(
 
                 var $self = this;
 
-                if (this.xScale() == undefined || this.xScale().domain == undefined) {
+                if (this.xScale() === undefined || this.xScale().domain === undefined) {
                     return;
                 }
 
@@ -465,26 +462,26 @@ define(
 
                 var ticks = this.xTickValues();
 
-                if (ticks != undefined) {
+                if (ticks !== undefined) {
                     xAxis
                         .tickValues(ticks)
                         .tickSubdivide(0)
                         .tickFormat(function (d) {
-                            return $self.xTickLabel.call($self, d)
+                            return $self.xTickLabel.call($self, d);
                         })
                         ;
                 }
 
-                if (! this.options.xLabels) {
+                if (!this.options.xLabels) {
                     xAxis.tickFormat('');
                 }
 
                 var gxAxis = this.D3svg().select(this.region('yPadding')).select('.xAxis');
 
-                if (gxAxis[0][0] == undefined) {
+                if (gxAxis[0][0] === undefined) {
                     gxAxis = this.D3svg().select(this.region('yPadding'))
                         .append('g')
-                        .attr('class', 'xAxis axis')
+                        .attr('class', 'xAxis axis');
                 }
 
                 gxAxis.transition().call(xAxis);
@@ -507,13 +504,13 @@ define(
                     .scale(this.yScale())
                     .orient('left');
 
-                if (! this.options.yLabels) {
+                if (!this.options.yLabels) {
                     yAxis.tickFormat('');
                 }
 
                 var gyAxis = this.D3svg().select(this.region('xPadding')).select('.yAxis');
 
-                if (gyAxis[0][0] == undefined) {
+                if (gyAxis[0][0] === undefined) {
                     gyAxis = this.D3svg().select(this.region('xPadding'))
                         .append('g')
                         .attr('class', 'yAxis axis')
@@ -557,7 +554,7 @@ define(
 
                     D3svg = d3.select($elem.get(0))
                         .append('svg')
-                        .attr('style', 'width : ' + this.options.width + '; height : ' + this.options.height)
+                        .attr('style', 'width : ' + this.options.width + '; height : ' + this.options.height);
                     //.attr('viewBox', '0 0 1600 1600')
                     //.attr('preserveAspectRatio', 'mMidYMid mMidYMid')
                     //.attr('width', 1600)
@@ -567,7 +564,7 @@ define(
                     //.attr('style', this.options.debug ? 'border : 1px solid blue' : undefined);
                     //.attr('style', 'width : 100%; height : 100%')
 
-                    var tooltip = d3.select('body').selectAll('.visToolTip')
+                    d3.select('body').selectAll('.visToolTip')
                         .data([0])
                         .enter()
                         .append('div')
@@ -597,8 +594,8 @@ define(
                     this.data('D3svg', D3svg);
                 }
 
-                //XXX FUCK! D3svg is pointing to a reference to the parent's D3svg, but that might not yet exist. Which means that I need to rewire fucking everything
-                //to use a goddamn method instead. Fuck my life.
+                //XXX D3svg is pointing to a reference to the parent's D3svg, but that might not yet exist. Which means that I need to rewire  everything
+                //to use a goddamn method instead. 
 
                 else {
                     this.$elem = this.options.parent.$elem;
@@ -627,28 +624,28 @@ define(
 
                 var regionG = D3svg.selectAll('g')
                     .data(regions, function (d) {
-                        return d
+                        return d;
                     })
                     .enter()
                     .append('g')
                     .attr('class', function (region) {
-                        return region
+                        return region;
                     })
                     .attr('data-x', $.proxy(function (region) {
                         var bounds = this[region + 'Bounds']();
-                        return bounds.origin.x
+                        return bounds.origin.x;
                     }, this))
                     .attr('data-y', $.proxy(function (region) {
                         var bounds = this[region + 'Bounds']();
-                        return bounds.origin.y
+                        return bounds.origin.y;
                     }, this))
                     .attr('data-width', $.proxy(function (region) {
                         var bounds = this[region + 'Bounds']();
-                        return bounds.size.width
+                        return bounds.size.width;
                     }, this))
                     .attr('data-height', $.proxy(function (region) {
                         var bounds = this[region + 'Bounds']();
-                        return bounds.size.height
+                        return bounds.size.height;
                     }, this))
                     .attr('transform',
                         $.proxy(
@@ -664,14 +661,14 @@ define(
                     .attr('y', 0)
                     .attr('width', $.proxy(function (region) {
                         var bounds = this[region + 'Bounds']();
-                        return bounds.size.width
+                        return bounds.size.width;
                     }, this))
                     .attr('height', $.proxy(function (region) {
                         var bounds = this[region + 'Bounds']();
-                        return bounds.size.height
+                        return bounds.size.height;
                     }, this))
                     .attr('fill', function (d) {
-                        return $vis.options.debug ? colors.shift() : $vis.options.bgColor
+                        return $vis.options.debug ? colors.shift() : $vis.options.bgColor;
                     })
                     .attr('class', 'background');
 
@@ -680,17 +677,17 @@ define(
                     function (idx, region) {
 
                         D3svg.selectAll('.' + region).selectAll('g').data([{region: $vis.region(region, true), r: region}], function (d) {
-                            return d.region
+                            return d.region;
                         })
                             .enter()
                             .append('g')
                             .attr('class', function (d) {
-                                return d.region
+                                return d.region;
                             })
                             .attr('transform', function (d) {
 
                                 var transform = $vis.options.transformations[d.r] || $vis.options.transformations.global;//{ translate : {x : 0, y : 0}, scale : {width : .1, height : 1} };
-                                if (transform == undefined) {
+                                if (transform === undefined) {
                                     return;
                                 }
 
@@ -707,7 +704,7 @@ define(
                  .enter()
                  .append('g')
                  .attr('class', function(region) { return region } );
-
+                 
                  ;*/
 
             },
@@ -726,7 +723,7 @@ define(
                     dot = '.';
                 }
 
-                if (this.options.customRegions[region] != undefined) {
+                if (this.options.customRegions[region] !== undefined) {
                     return dot + this.options.customRegions[region];
                 }
 
@@ -780,7 +777,6 @@ define(
                     new Size(this.chartBounds().size.width, this.yPadding())
                     );
             },
-
             chartBounds: function () {
 
                 var widgetWidth = this.width();
@@ -791,8 +787,8 @@ define(
                     new Size(
                         widgetWidth - this.xPadding() - this.xGutter(),
                         widgetHeight - this.yGutter() - this.yPadding()
-                    )
-                );
+                        )
+                    );
 
                 if (chart.size.width < 0) {
                     chart.size.width = 0;
@@ -805,10 +801,9 @@ define(
                 return chart;
 
             },
-
             showToolTip: function (args) {
 
-                if (args.event == undefined) {
+                if (args.event === undefined) {
                     args.event = d3.event;
                 }
 
@@ -845,11 +840,11 @@ define(
                  }
                  );*/
 
-                if (this.radialGradients()[gradKey] != undefined && grad.id == undefined) {
+                if (this.radialGradients()[gradKey] !== undefined && grad.id === undefined) {
                     grad.id = this.radialGradients()[gradKey];
                 }
 
-                if (grad.id == undefined) {
+                if (grad.id === undefined) {
                     grad.id = this.uuid();
                 }
 
@@ -866,233 +861,237 @@ define(
                     .enter()
                     .append('radialGradient')
                     .attr('id',
-                        //as brilliant as this hack is, it's also godawful. I might as well put a goto here.
-                            //this just returns the grad's id, as usual. BUT it also invokes a side effect to set
-                                //a global flag (well, enclosing context flag) to say that this is a newly created gradient
-                                    //so down below we don't use any transition time to set the values. There's gotta be a better
-                                        //way to do this, but I couldn't figure it out.
-                                            function (d) {
-                                                newGrad = true;
-                                                return d.id
-                                            }
-                                        )
-                                            .attr('gradientUnits', 'userSpaceOnUse')
-                                            .attr('cx', function (d) {
-                                                return d.cx
-                                            })
-                                            .attr('cy', function (d) {
-                                                return d.cy
-                                            })
-                                            .attr('r', function (d) {
-                                                return 2.5 * d.r
-                                            })
-                                            .attr('spreadMethod', 'pad')
-                                            ;
+                        /*
+                         as brilliant as this hack is, it's also godawful. I might as well put a goto here.
+                         this just returns the grad's id, as usual. BUT it also invokes a side effect to set
+                         a global flag (well, enclosing context flag) to say that this is a newly created gradient
+                         so down below we don't use any transition time to set the values. There's gotta be a better
+                         way to do this, but I couldn't figure it out.
+                         */
+                            function (d) {
+                                newGrad = true;
+                                return d.id;
+                            }
+                        )
+                            .attr('gradientUnits', 'userSpaceOnUse')
+                            .attr('cx', function (d) {
+                                return d.cx;
+                            })
+                            .attr('cy', function (d) {
+                                return d.cy;
+                            })
+                            .attr('r', function (d) {
+                                return 2.5 * d.r;
+                            })
+                            .attr('spreadMethod', 'pad')
+                            ;
 
-                                        var transitionTime = newGrad
-                                            ? 0
-                                            : this.options.transitionTime;
+                        var transitionTime = newGrad
+                            ? 0
+                            : this.options.transitionTime;
 
-                                        var stop0 = gradient.selectAll('stop[offset="0%"]').data([grad]);
-                                        stop0.enter()
-                                            .append('stop')
-                                            .attr('offset', '0%');
-                                        stop0.transition().duration(transitionTime)
-                                            .attr('stop-color', function (d) {
-                                                return d.startColor
-                                            });
+                        var stop0 = gradient.selectAll('stop[offset="0%"]').data([grad]);
+                        stop0.enter()
+                            .append('stop')
+                            .attr('offset', '0%');
+                        stop0.transition().duration(transitionTime)
+                            .attr('stop-color', function (d) {
+                                return d.startColor;
+                            });
 
-                                        var stop30 = gradient.selectAll('stop[offset="30%"]').data([grad]);
-                                        stop30.enter()
-                                            .append('stop')
-                                            .attr('offset', '30%')
-                                            .attr('stop-opacity', 1)
-                                        stop30.transition().duration(transitionTime)
-                                            .attr('stop-color', function (d) {
-                                                return d.startColor
-                                            });
+                        var stop30 = gradient.selectAll('stop[offset="30%"]').data([grad]);
+                        stop30.enter()
+                            .append('stop')
+                            .attr('offset', '30%')
+                            .attr('stop-opacity', 1);
+                        stop30.transition().duration(transitionTime)
+                            .attr('stop-color', function (d) {
+                                return d.startColor;
+                            });
 
-                                        var stop70 = gradient.selectAll('stop[offset="70%"]').data([grad]);
-                                        stop70.enter()
-                                            .append('stop')
-                                            .attr('stop-opacity', 1)
-                                            .attr('offset', '70%');
-                                        stop70.transition().duration(transitionTime)
-                                            .attr('stop-color', function (d) {
-                                                return d.stopColor
-                                            });
+                        var stop70 = gradient.selectAll('stop[offset="70%"]').data([grad]);
+                        stop70.enter()
+                            .append('stop')
+                            .attr('stop-opacity', 1)
+                            .attr('offset', '70%');
+                        stop70.transition().duration(transitionTime)
+                            .attr('stop-color', function (d) {
+                                return d.stopColor;
+                            });
 
-                                        return this.radialGradients()[gradKey] = grad.id;
+                        return this.radialGradients()[gradKey] = grad.id;
 
-                                    },
-                                linearGradient: function (grad) {
+                    },
+                linearGradient: function (grad) {
 
-                                    var chartBounds = this.chartBounds();
+                    var chartBounds = this.chartBounds();
 
-                                    grad = $.extend(
-                                        true,
-                                        {
-                                            x1: 0, //chartBounds.origin.x,
-                                            x2: 0, //chartBounds.size.width,
-                                            y1: chartBounds.size.height, //chartBounds.origin.y,
-                                            y2: 0,
-                                            width: 0,
-                                            height: chartBounds.size.height,
-                                        },
-                                        grad
-                                        );
+                    grad = $.extend(
+                        true,
+                        {
+                            x1: 0, //chartBounds.origin.x,
+                            x2: 0, //chartBounds.size.width,
+                            y1: chartBounds.size.height, //chartBounds.origin.y,
+                            y2: 0,
+                            width: 0,
+                            height: chartBounds.size.height,
+                        },
+                        grad
+                        );
 
-                                    var gradKey = [grad.cx, grad.cy, grad.r, grad.startColor, grad.stopColor].join(',');
+                    var gradKey = [grad.cx, grad.cy, grad.r, grad.startColor, grad.stopColor].join(',');
 
-                                    if (this.linearGradients()[gradKey] != undefined && grad.id == undefined) {
-                                        grad.id = this.linearGradients()[gradKey];
+                    if (this.linearGradients()[gradKey] !== undefined && grad.id === undefined) {
+                        grad.id = this.linearGradients()[gradKey];
+                    }
+
+                    if (grad.id === undefined) {
+                        grad.id = this.uuid();
+                    }
+
+
+                    //I'd prefer to .select('.definitions').selectAll('linearGradient') and then just let
+                    //d3 figure out the one that appropriately maps to my given grad value...but I couldn't
+                    //get that to work for some inexplicable reason.
+                    var gradient = this.D3svg().select('.definitions').selectAll('#' + grad.id)
+                        .data([grad]);
+
+                    var newGrad = false;
+
+                    gradient
+                        .enter()
+                        .append('linearGradient')
+                        .attr('id',
+                            /*
+                             as brilliant as this hack is, it's also godawful. I might as well put a goto here.
+                             this just returns the grad's id, as usual. BUT it also invokes a side effect to set
+                             a global flag (well, enclosing context flag) to say that this is a newly created gradient
+                             so down below we don't use any transition time to set the values. There's gotta be a better
+                             way to do this, but I couldn't figure it out.
+                             */
+                                function (d) {
+                                    newGrad = true;
+                                    return d.id;
+                                }
+                            )
+                                .attr('gradientUnits', 'userSpaceOnUse')
+                                .attr('x1', function (d) {
+                                    return d.x1;
+                                })
+                                .attr('x2', function (d) {
+                                    return d.x2;
+                                })
+                                .attr('y1', function (d) {
+                                    return d.y1;
+                                })
+                                .attr('y2', function (d) {
+                                    return d.y2;
+                                })
+                                .attr('spreadMethod', 'pad')
+                                ;
+
+                            var transitionTime = newGrad
+                                ? 0
+                                : this.options.transitionTime;
+
+                            var gradStops = gradient.selectAll('stop').data(grad.colors);
+
+                            gradStops
+                                .enter()
+                                .append('stop')
+                                ;
+
+                            gradStops
+                                .transition().duration(transitionTime)
+                                .attr('offset', function (d, i) {
+                                    var num = 0;
+                                    if (i === grad.colors.length - 1) {
+                                        num = 1;
+                                    } else if (i > 0) {
+                                        num = i / (grad.colors.length - 1);
                                     }
 
-                                    if (grad.id == undefined) {
-                                        grad.id = this.uuid();
-                                    }
+                                    return (Math.round(10000 * num) / 100) + '%';
+                                })
+                                .attr('stop-color', function (d) {
+                                    return d;
+                                });
 
 
-                                    //I'd prefer to .select('.definitions').selectAll('linearGradient') and then just let
-                                    //d3 figure out the one that appropriately maps to my given grad value...but I couldn't
-                                    //get that to work for some inexplicable reason.
-                                    var gradient = this.D3svg().select('.definitions').selectAll('#' + grad.id)
-                                        .data([grad]);
+                            return this.linearGradients()[gradKey] = grad.id;
 
-                                    var newGrad = false;
+                        },
+                    wrap: function (text, width, xCoord) {
 
-                                    gradient
-                                        .enter()
-                                        .append('linearGradient')
-                                        .attr('id',
-                                            //as brilliant as this hack is, it's also godawful. I might as well put a goto here.
-                                                //this just returns the grad's id, as usual. BUT it also invokes a side effect to set
-                                                    //a global flag (well, enclosing context flag) to say that this is a newly created gradient
-                                                        //so down below we don't use any transition time to set the values. There's gotta be a better
-                                                            //way to do this, but I couldn't figure it out.
-                                                                function (d) {
-                                                                    newGrad = true;
-                                                                    return d.id
-                                                                }
-                                                            )
-                                                                .attr('gradientUnits', 'userSpaceOnUse')
-                                                                .attr('x1', function (d) {
-                                                                    return d.x1
-                                                                })
-                                                                .attr('x2', function (d) {
-                                                                    return d.x2
-                                                                })
-                                                                .attr('y1', function (d) {
-                                                                    return d.y1
-                                                                })
-                                                                .attr('y2', function (d) {
-                                                                    return d.y2
-                                                                })
-                                                                .attr('spreadMethod', 'pad')
-                                                                ;
-
-                                                            var transitionTime = newGrad
-                                                                ? 0
-                                                                : this.options.transitionTime;
-
-                                                            var gradStops = gradient.selectAll('stop').data(grad.colors);
-
-                                                            gradStops
-                                                                .enter()
-                                                                .append('stop')
-                                                                ;
-
-                                                            gradStops
-                                                                .transition().duration(transitionTime)
-                                                                .attr('offset', function (d, i) {
-                                                                    var num = 0;
-                                                                    if (i == grad.colors.length - 1) {
-                                                                        num = 1;
-                                                                    } else if (i > 0) {
-                                                                        num = i / (grad.colors.length - 1)
-                                                                    }
-
-                                                                    return (Math.round(10000 * num) / 100) + '%'
-                                                                })
-                                                                .attr('stop-color', function (d) {
-                                                                    return d
-                                                                })
+                        if (xCoord === undefined) {
+                            xCoord = function () {
+                                return 0;
+                            };
+                        }
+                        ;
 
 
-                                                            return this.linearGradients()[gradKey] = grad.id;
+                        text.each(function () {
+                            var text = d3.select(this),
+                                words = text.text().split(/\s+/).reverse(),
+                                word,
+                                line = [],
+                                lineNumber = 0,
+                                lineHeight = 1.1, // ems
+                                y = text.attr("y"),
+                                dy = parseFloat(text.attr("dy")) || 0,
+                                tspan = text
+                                .text(null)
+                                .append("tspan")
+                                .attr("x", xCoord)
+                                .attr("y", y)
+                                .attr("dy", dy + "em")
+                                ;
 
-                                                        },
-                                                    wrap: function (text, width, xCoord) {
+                            while (word = words.pop()) {
+                                line.push(word);
+                                tspan.text(line.join(" "));
+                                if (tspan.node().getComputedTextLength() > width) {
+                                    line.pop();
+                                    tspan.text(line.join(" "));
+                                    line = [word];
+                                    tspan = text.append("tspan")
+                                        .attr("x", xCoord)
+                                        .attr("y", y).
+                                        attr("dy", lineHeight + 'em')//++lineNumber * lineHeight + dy + "em")
+                                        .text(word)
+                                        ;
+                                }
+                            }
+                        });
+                    },
+                    absPos: function (obj) {
 
-                                                        if (xCoord == undefined) {
-                                                            xCoord = function () {
-                                                                return 0;
-                                                            }
-                                                        }
-                                                        ;
+                        var box = obj.getBBox();
+                        var matrix = obj.getScreenCTM();
 
+                        return {x: box.x + matrix.e, y: box.y + matrix.f};
+                    },
+                    endall: function (transition, callback) {
+                        var n = 0;
+                        transition
+                            .each(function () {
+                                ++n;
+                            })
+                            .each("end", function () {
+                                if (!--n)
+                                    callback.apply(this, arguments);
+                            });
+                    },
+                    uniqueness: function (uniqueFunc) {
+                        if (uniqueFunc === undefined) {
+                            uniqueFunc = this.uniqueID;
+                        }
 
-                                                        text.each(function () {
-                                                            var text = d3.select(this),
-                                                                words = text.text().split(/\s+/).reverse(),
-                                                                word,
-                                                                line = [],
-                                                                lineNumber = 0,
-                                                                lineHeight = 1.1, // ems
-                                                                y = text.attr("y"),
-                                                                dy = parseFloat(text.attr("dy")) || 0,
-                                                                tspan = text
-                                                                .text(null)
-                                                                .append("tspan")
-                                                                .attr("x", xCoord)
-                                                                .attr("y", y)
-                                                                .attr("dy", dy + "em")
-                                                                ;
+                        return this.options.useUniqueID
+                            ? uniqueFunc
+                            : undefined;
+                    }
+                });
 
-                                                            while (word = words.pop()) {
-                                                                line.push(word);
-                                                                tspan.text(line.join(" "));
-                                                                if (tspan.node().getComputedTextLength() > width) {
-                                                                    line.pop();
-                                                                    tspan.text(line.join(" "));
-                                                                    line = [word];
-                                                                    tspan = text.append("tspan")
-                                                                        .attr("x", xCoord)
-                                                                        .attr("y", y).
-                                                                        attr("dy", lineHeight + 'em')//++lineNumber * lineHeight + dy + "em")
-                                                                        .text(word)
-                                                                        ;
-                                                                }
-                                                            }
-                                                        });
-                                                    },
-                                                    absPos: function (obj) {
-
-                                                        var box = obj.getBBox();
-                                                        var matrix = obj.getScreenCTM();
-
-                                                        return {x: box.x + matrix.e, y: box.y + matrix.f};
-                                                    },
-                                                    endall: function (transition, callback) {
-                                                        var n = 0;
-                                                        transition
-                                                            .each(function () {
-                                                                ++n;
-                                                            })
-                                                            .each("end", function () {
-                                                                if (!--n)
-                                                                    callback.apply(this, arguments);
-                                                            });
-                                                    },
-                                                    uniqueness: function (uniqueFunc) {
-                                                        if (uniqueFunc == undefined) {
-                                                            uniqueFunc = this.uniqueID;
-                                                        }
-
-                                                        return this.options.useUniqueID
-                                                            ? uniqueFunc
-                                                            : undefined;
-                                                    },
-                                                });
-
-                                        });
+        });

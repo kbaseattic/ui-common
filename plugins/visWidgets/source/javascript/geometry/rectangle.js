@@ -5,7 +5,7 @@
  browser: true,
  white: true
  */
-define(['kb.geometry.point', 'kb.geometry.size'],
+define(['kb_vis_point', 'kb_vis_size'],
     function (Point, Size) {
 
         'use strict';

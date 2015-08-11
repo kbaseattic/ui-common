@@ -145,21 +145,6 @@
             'kb.geometry.rectangle' : 'src/js/geometry/rectangle',
             'kb.RGBColor'           : 'src/js/RGBColor',
 
-            'kb.widget.vis.barchart'       : 'src/widgets/vis/kbaseBarchart',
-            //'kb.widget.vis.chordchart'     : 'src/widgets/vis/kbaseChordchart',
-            //'kb.widget.vis.circularHeatmap': 'src/widgets/vis/kbaseCircularHeatmap',
-            //'kb.widget.vis.forcedNetwork'  : 'src/widgets/vis/kbaseForcedNetwork',
-            'kb.widget.vis.heatmap'        : 'src/widgets/vis/kbaseHeatmap',
-            //'kb.widget.vis.histogram'      : 'src/widgets/vis/kbaseHistogram',
-            'kb.widget.vis.linechart'      : 'src/widgets/vis/kbaseLinechart',
-            //'kb.widget.vis.lineSerieschart': 'src/widgets/vis/kbaseLineSerieschart',
-            //'kb.widget.vis.piechart'       : 'src/widgets/vis/kbasePiechart',
-            'kb.widget.vis.scatterplot'    : 'src/widgets/vis/kbaseScatterplot',
-            //'kb.widget.vis.treechart'      : 'src/widgets/vis/kbaseTreechart',
-            //'kb.widget.vis.venndiagram'    : 'src/widgets/vis/kbaseVenndiagram',
-            'kb.widget.vis.widget'         : 'src/widgets/vis/kbaseVisWidget',
-
-
             // KBase Widgets
             // -------------
             

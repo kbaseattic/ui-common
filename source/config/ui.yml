@@ -28,6 +28,13 @@ plugins:
         egPluginJustPanel
     -
         eg_ezPlugin
+    -
+        name: kb_ui_plugin_demo
+        directory: bower_components/kb-ui-plugin-demo/src/plugin
+    -
+        visWidgets
+    -
+        demo_visWidgets
 navbar:
     menu:
         available_items:

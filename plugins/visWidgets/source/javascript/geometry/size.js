@@ -17,7 +17,7 @@ define([],
 
         Size.prototype.asString = function () {
             return "{" + this.width + ", " + this.height + "}";
-        }
+        };
 
         return Size;
     }

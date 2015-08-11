@@ -112,7 +112,7 @@ define(
 
             else if ($tree.options.red == undefined && $tree.options.blue != undefined) {
                 colors = ['red', 'black'];
-            }
+            } 
 
             d.fill = $tree.afterInArray(d.fill, colors);
 
@@ -479,7 +479,7 @@ var throttle = 0
                 }
             });
 
-            // Update the linksÉ
+            // Update the linksï¿½
             var link = chart.selectAll("path.link")
                 .data($tree.treeLayout.links($tree.nodes), function(d) { return uniqueness(d.target) });
 

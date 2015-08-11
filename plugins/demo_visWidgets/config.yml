@@ -1,0 +1,62 @@
+## Demo Plugin for Screencast
+---
+package:
+    author: Erik Pearson
+    name: demo_visWidgets
+    description: A plugin installing menus, routes, and panels demonstrating Jim's vis widgets
+    date: August 9, 2015
+    version: 0.0.1
+source:
+    modules:
+        -
+            module: kb_demo_vis_barChart
+            file: barchart
+        -
+            module: kb_demo_vis_heatMap
+            file: heatmap
+        -
+            module: kb_demo_vis_lineChart
+            file: linechart
+        -
+            module: kb_demo_vis_scatterPlot
+            file: scatterplot
+install:
+    routes:
+        -
+            path: ['visdemo', 'barchart']
+            panelFactory: kb_demo_vis_barChart
+        -
+            path: ['visdemo', 'heatmap']
+            panelFactory: kb_demo_vis_heatMap
+        -
+            path: ['visdemo', 'linechart']
+            panelFactory: kb_demo_vis_lineChart
+        -
+            path: ['visdemo', 'scatterplot']
+            panelFactory: kb_demo_vis_scatterPlot
+    menu:
+        -
+            name: visdemoBarchart
+            definition:
+                path: visdemo/barchart
+                label: Vis Demo - Bar Chart
+                icon: paw
+        -
+            name: visdemoHeatmap
+            definition:
+                path: visdemo/heatmap
+                label: Vis Demo - heatmap
+                icon: paw
+        -
+            name: visdemoLinechart
+            definition:
+                path: visdemo/linechart
+                label: Vis Demo - linechart
+                icon: paw
+        -
+            name: visdemoScatterplot
+            definition:
+                path: visdemo/scatterplot
+                label: Vis Demo - scatterplot
+                icon: paw                
+                
