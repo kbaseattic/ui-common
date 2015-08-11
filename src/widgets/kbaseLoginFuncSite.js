@@ -212,7 +212,7 @@
             });
         },
         fetchUserProfile: function () {
-            require(['kb.user_profile', 'kb.session', 'kb.appstate', 'postal'],
+            require(['kb_user_profile', 'kb.session', 'kb.appstate', 'postal'],
                 function (UserProfile, Session, AppState, Postal) {
                     var userProfile = Object.create(UserProfile).init({username: Session.getUsername()});
                     userProfile.loadProfile()

@@ -354,9 +354,18 @@ define([
                     })
                         .then(function () {
                             // Create new mount.
+                            
+                            var panelWidget;
+                            if (routed.route.panelFactory) {
+                                panelWidget = routed.route.panelFactory.make();
+                            } else if (routed.route.panelObject) {
+                                panelWidget = Object.create(routed.route.panelObject);
+                            }
+                        
+                        
                             var newMount = {
                                 id: html.genId(),
-                                widget: routed.route.panelFactory.make()
+                                widget: panelWidget
                             };
 
                             /* TODO: config threaded here? */
@@ -398,6 +407,20 @@ define([
                             reject(err);
                         })
                         .done();
+                });
+            }
+            
+            // This is a more general purpose 
+            function doRedirectHandler(routed) {
+                // 
+                return Q.Promise(function (resolve) {
+                    var module = routed.route.module;
+                    var method = routed.route.method;
+                    
+                    require([module], function (M) {
+                        resolve(M[method](routed.params));                        
+                    });
+                    
                 });
             }
 
@@ -771,6 +794,7 @@ define([
                 showPanel: showPanel,
                 showPanel2: showPanel2,
                 showPanel3: showPanel3,
+                doRedirectHandler: doRedirectHandler,
                 mount: mount,
                 html: jsonToHTML,
                 tag: makeTag,

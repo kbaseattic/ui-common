@@ -16,10 +16,10 @@ module.exports = function(config) {
     // This is someone redundant with what's in package.json,
     // but I like it to be explicit here.
     plugins: [
-      'karma-jasmine',
-      'karma-phantomjs-launcher',
-      'karma-coverage',
-      'karma-requirejs',
+        'karma-jasmine',
+        'karma-phantomjs-launcher',
+        'karma-coverage',
+        'karma-requirejs',
     ],
 
 
@@ -51,11 +51,6 @@ module.exports = function(config) {
       {pattern: 'bower_components/datatables-bootstrap3-plugin/media/css/datatables-bootstrap3.min.css', included: false},
       {pattern: 'bower_components/knockout/dist/knockout.debug.js', included: false},
       {pattern: 'bower_components/knockout-mapping/knockout.mapping.js', included: false},
-      {pattern: 'bower_components/angular/angular.js', included: false},
-      {pattern: 'bower_components/angular-ui/build/angular-ui.min.js', included: false},
-      {pattern: 'bower_components/angular-ui-router/release/angular-ui-router.min.js', included: false},
-      {pattern: 'bower_components/angular-ui-bootstrap-bower/ui-bootstrap.min.js', included: false},
-      {pattern: 'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js', included: false},
       {pattern: 'bower_components/blockUI/jquery.blockUI.js', included: false},
       {pattern: 'bower_components/d3/d3.min.js', included: false},
       {pattern: 'bower_components/d3-plugins-sankey/sankey.js', included: false},
@@ -68,7 +63,6 @@ module.exports = function(config) {
       {pattern: 'lib/googlepalette.js', included: false},
       {pattern: 'bower_components/google-code-prettify/bin/prettify.min.js', included: false},
       {pattern: 'bower_components/google-code-prettify/bin/prettify.min.css', included: false},
-      {pattern: 'bower_components/ace-builds/src-min/ace.js', included: false},
       {pattern: 'bower_components/font-awesome/css/font-awesome.min.css', included: false},
       {pattern: 'bower_components/stacktrace-js/dist/stacktrace.min.js', included: false},
       {pattern: 'bower_components/handlebars/handlebars.amd.min.js', included: false},
@@ -79,7 +73,6 @@ module.exports = function(config) {
       {pattern: 'bower_components/require-yaml/yaml.js', included: false},
       {pattern: 'bower_components/js-yaml/dist/js-yaml.min.js', included: false},
       {pattern: 'build/*.yml', included: false},
-      {pattern: 'functional-site/config.json', served: true, included: false},
       {pattern: 'functional-site/js/require-config.js', served: true, included: true},
 
 

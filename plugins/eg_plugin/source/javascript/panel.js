@@ -10,7 +10,7 @@ define([
     'jquery',
     'kb.html',
     'kb.runtime',
-    'kb.widget.eg_plugin.test_widget'
+    'kb_widget_egPlugin_testWidget'
 ],
     function (q, $, html, R, testWidget) {
         /* DOC: strict mode
@@ -114,7 +114,7 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve) {
+                return q.Promise(function (resolve, reject) {
                     q.all(rendered.widgets.map(function (w) {
                         return w.widget.start(params);
                     }))

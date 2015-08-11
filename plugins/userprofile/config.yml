@@ -11,32 +11,26 @@ source:
     ## NB: need to quote file names, otherwise 
     modules:
         -
-            module: kb.panel.userprofile
+            module: kb_panel_userProfile
             file: panel
         -
-            module: kb.plugin.userprofile.installer
-            file: installer
-        -
-            module: kb.widget.userprofile.base
+            module: kb_widget_userProfile_base
             file: "widgets/userProfileBase"
         -
-            module: kb.widget.userprofile.user_profile_editor
+            module: kb_widget_userProfile_userProfileEditor
             file: "widgets/userProfileEditor"
         -
-            module: kb.widget.userprofile.user_search
+            module: kb_widget_userProfile_userSearch
             file: "widgets/userSearch"
         -
-            module: kb.widget.userprofile.collaborator_network
+            module: kb_widget_userProfile_collaboratorNetwork
             file: "widgets/collaboratorNetwork"
         -
-            module: "kb.widget.userprofile.narrative_browser"
+            module: kb_widget_userProfile_narrativeBrowser
             file: "widgets/narrativeBrowser"
-    xstyles:
-        -
-            file: styles.css
 install:
     routes:
         -
             path: ['people', {type: param, name: username}]
-            panelFactory: kb.panel.userprofile
+            panelFactory: kb_panel_userProfile
         

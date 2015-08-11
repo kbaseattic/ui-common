@@ -1,4 +1,4 @@
-define(['kb.user_profile', 'kb.appstate', 'kb.runtime'],
+define(['kb_user_profile', 'kb.appstate', 'kb.runtime'],
 function (UserProfile, AppState, R) {
     
     function loadProfile() {

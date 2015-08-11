@@ -1,7 +1,7 @@
 define([
     'q',
     'kb.runtime',
-    'kb.widget.social.base',
+    'kb_widget_userProfile_base',
     'kb.client.methods',
     'kb.service.user_profile'
 ],

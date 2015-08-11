@@ -14,6 +14,27 @@ plugins:
         userprofile
     -
         narrativestore
+    -
+        dashboard
+    -
+        dataview
+    -
+        contact
+    -
+        typebrowser
+    -
+        narrativemanager
+    -
+        egPluginJustPanel
+    -
+        eg_ezPlugin
+    -
+        name: kb_ui_plugin_demo
+        directory: bower_components/kb-ui-plugin-demo/src/plugin
+    -
+        visWidgets
+    -
+        demo_visWidgets
 navbar:
     menu:
         available_items:
@@ -29,26 +50,11 @@ navbar:
                 uri: https://kbase.us/narrative-guide
                 label: Narrative Tutorial
                 icon: info-circle
-            contact: 
-                path: contact
-                label: Contact Us
-                icon: envelope-o
+
             about_kbase: 
                 uri: https://kbase.us/about
                 label: About KBase
                 icon: info-circle
-            contact_us:
-                uri: https://kbase.us/contact-us
-                label: Contact Us
-                icon: envelope-o
-            dashboard:
-                path: dashboard
-                label: Dashboard
-                icon: dashboard
-            typebrowser:
-                path: typebrowser
-                label: Type Browser
-                icon: beer
             test: 
                 path: test
                 label: Testing Panel
@@ -70,6 +76,6 @@ navbar:
                 label: Scatter Plot
                 icon: ellipsis-h
         menus:
-            authenticated: [search, narrative, dashboard, typebrowser, test, linechart, barchart, heatmap, scatterplot, divider, contact, divider]                
-            unauthenticated: [about, contact, divider, about_kbase, contact_us]
+            authenticated: [search, narrative, test, divider, divider]                
+            unauthenticated: [about, divider, about_kbase, contact_us]
         

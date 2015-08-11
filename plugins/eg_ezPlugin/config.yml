@@ -1,0 +1,39 @@
+## Demo Plugin for Screencast
+---
+package:
+    author: Erik Pearson
+    name: eg_ezpanel
+    description: A plugin package with using an easy panel base object
+    date: August 9, 2015
+    version: 0.0.1
+source:
+    modules:
+        -
+            module: kb_panel_eg_ezPanel
+            file: panel
+        -
+            module: kb_widget_eg_ezPanel_dataWidget
+            file: dataWidget
+        -
+            module: kb_widget_eg_ezPanel_myDataWidget
+            file: myDataWidget
+        # -
+        #    module: kb_widget_eg_ezPanel_widget1
+        #    file: widget1.js
+    styles:
+        -
+            file: style.css
+install:
+    routes:
+        -
+            path: ['eg', 'ezpanel']
+            queryParams: 
+                param1: {}
+            panelObject: kb_panel_eg_ezPanel
+    menu:
+        -
+            name: eg_ezPanel
+            definition:
+                path: eg/ezpanel
+                label: EZ Panel Demo
+                icon: paw

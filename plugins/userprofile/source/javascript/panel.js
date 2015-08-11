@@ -38,13 +38,13 @@ define([
                         div({class: 'col-sm-9'}, [
                             div({id: addWidget({
                                     name: 'profile',
-                                    module: 'kb.widget.userprofile.user_profile_editor'
+                                    module: 'kb_widget_userProfile_userProfileEditor'
                                 })})                            
                         ]),
                         div({class: 'col-sm-3'}, [
                             div({id: addWidget({
                                     name: 'usersearch', 
-                                    module: 'kb.widget.userprofile.user_search'
+                                    module: 'kb_widget_userProfile_userSearch'
                                 })})
                         ])
                     ]),
@@ -52,13 +52,13 @@ define([
                         div({class: 'col-sm-6'}, [
                             div({id: addWidget({
                                     name: 'narratives',
-                                    module: 'kb.widget.userprofile.narrative_browser'
+                                    module: 'kb_widget_userProfile_narrativeBrowser'
                                 })})
                         ]),
                         div({class: 'col-sm-6'}, [
                             div({id: addWidget({
                                     name: 'collaborators',
-                                    module: 'kb.widget.userprofile.collaborator_network'
+                                    module: 'kb_widget_userProfile_collaboratorNetwork'
                                 })})
                         ])
                     ])

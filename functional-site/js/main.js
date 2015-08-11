@@ -24,14 +24,13 @@ define([
     'kb.runtime',
     'kb.appstate',
     'q',
-    'kb.panel.narrativemanager',
     'kb.panel.navbar',
     'kb.client.profile',
     'yaml!build/ui.yml',
     'bootstrap',
     'css!font-awesome',
     'domReady!'],
-    function (App, Runtime, AppState, Q, NarrativeManagerPanel, Navbar, ProfileService, UIConfig) {
+    function (App, Runtime, AppState, Q, Navbar, ProfileService, UIConfig) {
         'use strict';
 
         var app = App.make();
@@ -39,9 +38,6 @@ define([
 
         var navbar = null;
         function setupApp() {
-            var NarrativeManager = NarrativeManagerPanel.create();
-            NarrativeManager.setup();
-
             // Call factory to create our global navbar.
             navbar = Navbar.create();
             navbar.setup();
@@ -61,7 +57,7 @@ define([
 
             Runtime.recv('navbar', 'clear-buttons', function () {
                 navbar.clearButtons();
-            })
+            });
 
             // ?? (EAP)
             Runtime.props.setItem('navbar', navbar);
@@ -179,6 +175,24 @@ define([
                             console.error(err);
                         })
                         .done();
+                } else if (data.routeHandler.route.panelObject) {
+                    // And ... we have another panel factory pattern here. We will
+                    // converge as soon as we can...
+                    app.showPanel3('app', data.routeHandler)
+                        .catch(function (err) {
+                            console.error('ERROR');
+                            console.error(err);
+                        })
+                        .done();
+                    // TODO: merge the following with the first redirect handler... 
+                    // i.e. make them all return a promise.
+                } else if (data.routeHandler.route.redirectHandler) {
+                    app.doRedirectHandler(data.routeHandler)
+                        .catch(function (err) {
+                            console.error('ERROR');
+                            console.error(err);
+                        })
+                        .done();
                 } else {
                     app.showPanel2('app', data.routeHandler)
                         .catch(function (err) {
@@ -208,56 +222,94 @@ define([
         }
 
         function installPlugins() {
-            var plugins = UIConfig.plugins;
-
-            // for each plugin
-            var loaders = plugins.map(function (plugin) {
-                // read the config file
+            var loaders = UIConfig.plugins.map(function (plugin) {
                 if (typeof plugin === 'string') {
                     plugin = {
                         name: plugin,
                         directory: 'plugins/' + plugin
-                    }
+                    };
                 }
-                return Q.Promise(function (resolve) {
+                var p = Q.Promise(function (resolve) {
                     require(['yaml!' + plugin.directory + '/config.yml'], function (config) {
                         // build up a list of modules and add them to the require config.
-                        var paths = {},
-                            sourcePath = plugin.directory + '/source';
+                        var paths = {}, shims = {},
+                            sourcePath = plugin.directory + '/source',
+                            dependencies = [];
 
                         // load any styles.
-                        var dependencies = [];
+                        // NB these are styles for the plugin as a whole.
+                        // TODO: do away with this. the styles should be dependencies
+                        // of the panel and widgets. widget css code is below...
                         if (config.source.styles) {
                             config.source.styles.forEach(function (style) {
                                 dependencies.push('css!' + sourcePath + '/css/' + style.file);
                             });
                         }
 
+                        // Add each module defined to the require config paths.
                         config.source.modules.forEach(function (source) {
-                            paths[source.module] = sourcePath + '/javascript/' + source.file;
+                            var jsSourceFile = source.file,
+                                matched = jsSourceFile.match(/^(.+?)(?:(?:\.js$)|(?:$))/);
+                            if (matched) {
+                                jsSourceFile = matched[1];
+                                var sourceFile = sourcePath + '/javascript/' + jsSourceFile;
+                                paths[source.module] = sourceFile;
+                                if (source.css) {
+                                    var styleModule = source.module + '_css';
+                                    paths[styleModule] = sourceFile;
+                                    shims[source.module] = {deps: ['css!' + styleModule]};
+                                }
+                            }
                         });
-                        require.config({paths: paths});
-                        // enter a require closure with the installer as the module.
 
-                        // NB - installer is the first module in the dependency
-                        // list so we receive it as the first argument.
-                        if (config.install.routes) {
+                        // console.log(paths);
+                        // shims = {};
+
+                        // This usage of require.config will merge with the existing
+                        // require configuration.
+                        require.config({paths: paths, shim: shims});
+
+                        if (config.install && config.install.routes) {
                             require(dependencies, function () {
                                 var routes = config.install.routes.map(function (route) {
                                     return Q.Promise(function (resolve) {
-                                        require([route.panelFactory], function (factory) {
-                                            Runtime.addRoute({
-                                                path: route.path,
-                                                panelFactory: factory
+                                        // Runtime.addRoute(route);
+                                        if (route.panelFactory) {
+                                            require([route.panelFactory], function (factory) {
+                                                Runtime.addRoute({
+                                                    path: route.path,
+                                                    queryParams: route.queryParams,
+                                                    panelFactory: factory
+                                                });
+                                                resolve();
                                             });
+                                        } else if (route.panelObject) {
+                                            require([route.panelObject], function (obj) {
+                                                Runtime.addRoute({
+                                                    path: route.path,
+                                                    queryParams: route.queryParams,
+                                                    panelObject: obj
+                                                });
+                                                resolve();
+                                            });
+                                        } else  if (route.redirectHandler) {
+                                            Runtime.addRoute(route);
                                             resolve();
-                                        });
+                                        } else {
+                                            throw {
+                                                name: 'routeError',
+                                                message: 'invalid route',
+                                                route: route
+                                            };
+                                        }
+                                        
                                     });
                                 });
                                 Q.all(routes)
                                     .then(function () {
                                         if (config.install.menu) {
                                             config.install.menu.forEach(function (item) {
+                                            console.log('Adding'); console.log(item);
                                                 Runtime.send('navbar', 'add-menu-item', item);
                                             });
                                         }
@@ -269,13 +321,15 @@ define([
                                     })
                                     .done();
                             });
+                        } else {
+                            resolve();
                         }
-                        
+
                     });
                 });
+                return p;
             });
             return Q.all(loaders);
-
         }
 
         function start() {
@@ -293,23 +347,16 @@ define([
                         });
                     });
                 }
-                
+
                 // Here we load the internal panels.
                 Runtime.logDebug({source: 'main', message: 'About to load panels...'});
                 var panels = [
                     {module: 'kb.panel.message', config: {}},
-                    {module: 'kb.panel.contact', config: {}},
                     {module: 'kb.panel.login', config: {}},
-                    {module: 'kb.panel.welcome', config: {}},
-                    {module: 'kb.panel.dashboard', config: {}},
-                    {module: 'kb.panel.dataview', config: {}},
-                    {module: 'kb.panel.typebrowser', config: {}},
-                    {module: 'kb.panel.typeview'},
-                    {module: 'kb.panel.test'},
-                    {module: 'kb.panel.vis.linechart'},
-                    {module: 'kb.panel.vis.barchart'},
-                    {module: 'kb.panel.vis.heatmap'},
-                    {module: 'kb.panel.vis.scatterplot'}
+                    {module: 'kb.panel.welcome'},
+                    {module: 'kb.panel.typeview'}
+                    // {module: 'kb.panel.sample'},
+                    // {module: 'kb.panel.sample.router'}
                 ].map(function (panel) {
                     return requirePromise([panel.module], function (PanelModule) {
                         // this registers routes
@@ -327,6 +374,7 @@ define([
                         return installPlugins();
                     })
                     .then(function () {
+                        Runtime.logDebug({source: 'main', message: 'About to run app...'});
                         runApp();
                         Runtime.logDebug({source: 'main', message: 'done'});
                     })

@@ -1,0 +1,34 @@
+## YAML Template.
+---
+package:
+    author: Erik Pearson
+    name: test
+    description: test
+    date: August 8, 2015
+    version: 0.0.1
+source:
+    modules:
+        ## sources are relative to build/plugins/PACKAGE/source/javascript
+        -
+            module: kb_panel_egPluginJustPanel
+            file: panel
+install:
+    #installer: 
+    #    module: kb_panel_egPlugin.installer
+    routes:
+        -
+            path: ['eg_plugin_just_panel']
+            queryParams: 
+                name: {}                    
+            # this is one of the modules defined above.
+            panelFactory: kb_panel_egPluginJustPanel            
+    menu:
+        -
+            name: ev_plugin_just_panel
+            definition:
+                path: 'eg_plugin_just_panel'
+                label: Example Plugin (panel only)
+                icon: bolt
+            
+    
+        

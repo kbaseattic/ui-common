@@ -11,10 +11,12 @@ Jasmine is a behavior-driven tool for JavaScript testing. It has built-in suppor
 Your test suites will be composed of test "specs" - individual tests that should examine one functional piece of the module you're testing. We have it designed so that a single suite should correspond with a single module. These can all be found under test/spec in the root of this repo, and should roughly follow the same directory structure as the original source code location for clarity and consistency.
 
 Each suite works in a couple components.  
+
 **1. Load the module(s) you're testing using RequireJS.**
 
 We use RequireJS to load modules. The set of paths and namespaces is available in functional-site/js/require-config.js (and possibly could be published elsewhere). As an example, to load the kbaseConfig module for testing, this syntax is used to wrap a test suite:
 
+<!-- note that this is the github code markdown extension -->
 ```JavaScript
 'use strict';
 define(['kb.config'], function(Config) {
@@ -53,6 +55,7 @@ define(['kb.config'], function(Config) {
 });
 ```
 
+
 There are a few things going on inside of the spec. The main testing portion is that ```expect``` function, which takes a value called the "actual." This gets chained with a Matcher function that takes the expected value. In the example above, we ```expect``` the wsUrl (actually returned from the function) simply to be defined (in the JavaScript definition of the term).
 
 There are a large number of Matcher functions available for most cases, and they can be prepended with a ```.not.``` (e.g. ```expect(false).not.toBe(true)```) You can see these (with examples!) in the Jasmine Documentation [here](http://jasmine.github.io/2.3/introduction.html#section-Included_Matchers)
@@ -72,6 +75,7 @@ define(['kb.config'], function(Config) {
     });
 });
 ```
+
 
 That's pretty much it. You can certainly do more complex things, like simulate click events and DOM modification, but this is intended for an introduction. There are a few test suites available in test/spec, and more will come.
 
@@ -102,10 +106,42 @@ We use Grunt as a general task runner. You can check out the Gruntfile.js in the
 
 As mentioned above, test coverage is automatically generated at test completion. You can see this from a local web server using the following command in the root of this repo:  
 
-```python -m SimpleHTTPServer 8000```  
+    python -m SimpleHTTPServer 8000
+
 and pointing your web browser to  
-http://localhost:8000/build/test-coverage/html/
+
+    http://localhost:8000/build/test-coverage/html/
 
 These pages will help you find any missing holes and cases you might not have captured.
 
 # Happy testing!
+
+
+<style type="text/css">
+    body {
+        font-family: sans-serif;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        xcolor: #FFF;
+        color: blue;
+    }
+    h3 {
+        padding: 4px;
+        background-color: gray;
+        color: #FFF;
+    }
+     code {
+        xmargin: 1em;
+        xdisplay: block;
+        xpadding: 1em;
+        xcolor: lime;
+        background-color: #CCC;
+    }
+    pre > code {
+        margin: 1em;
+        display: block;
+        padding: 1em;
+        color: lime;
+        background-color: black;
+    }
+</style>

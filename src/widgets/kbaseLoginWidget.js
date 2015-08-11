@@ -1,4 +1,4 @@
-define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q', 'kb.appstate', 'kb.utils', 'kb.user_profile'], 
+define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q', 'kb.appstate', 'kb.utils', 'kb_user_profile'], 
 function (BaseWidget, Session, $, Postal, Q, AppState, Utils, UserProfile) {
     'use strict';
     // make a widget ... on the fly?

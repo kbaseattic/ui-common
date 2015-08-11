@@ -1,27 +1,34 @@
+/*global
+ define
+ */
+/*jslint
+ browser: true,
+ white: true,
+ todo: true
+ */
 define([
     'nunjucks',
     'jquery',
     'q',
     'kb.runtime',
     'kb.utils',
-    'postal',
-    'json!functional-site/config.json'
+    'postal'
 ],
-    function (nunjucks, $, Q, R, Utils, Postal, config) {
+    function (nunjucks, $, Q, R, Utils, Postal) {
         "use strict";
         var SocialWidget = Object.create({}, {
             // The init function interfaces this object with the caller, and sets up any 
             // constants and constant state.
             SocialWidget_init: {
                 value: function (cfg) {
-                    this._generatedId = 0;
+                    this.generatedId = 0;
 
                     // First we get the global config.
 
                     // The global config is derived from the module definition, which gets it from the 
                     // functional site main config file directly. The setup property of the config defines
                     // the current set of settings (production, development, etc.)
-                    this.globalConfig = config[config.setup];
+                    // this.globalConfig = R;
 
                     // TODO: implement local config and config merging.
                     this.localConfig = {};
@@ -75,7 +82,7 @@ define([
                     this.stateMeta = {
                         status: 'none',
                         timestamp: new Date()
-                    }
+                    };
 
                     // Creates maps out of lists.
                     this.createListMaps();
@@ -94,7 +101,8 @@ define([
                         }
                         return s;
                     });
-                    // This is the cache of templates.
+                    // this is the cache of templates.
+                    
                     this.templates.cache = {};
 
                     // The context object is what is given to templates.
@@ -131,7 +139,7 @@ define([
             setupConfig: {
                 value: function () {
 
-                    this.configs = [{}, this.initConfig, this.localConfig, this.globalConfig];
+                    this.configs = [{}, this.initConfig, this.localConfig];
 
                     // Check for required and apply defaults.
                     if (!this.hasConfig('container')) {
@@ -188,7 +196,7 @@ define([
 
                     this.setInitialState()
                         .then(function () {
-                            return this.refresh()
+                            return this.refresh();
                         }.bind(this))
                         .catch(function (err) {
                             this.setError(err);
@@ -225,7 +233,7 @@ define([
             // CONFIG
             getConfig: {
                 value: function (key, defaultValue) {
-                    for (var i = 0; i < this.configs.length; i++) {
+                    for (var i = 0; i < this.configs.length; i += 1) {
                         if (Utils.getProp(this.configs[i], key) !== undefined) {
                             return Utils.getProp(this.configs[i], key);
                         }
@@ -425,7 +433,7 @@ define([
             // Generates a unique id for usage on synthesized dom elements.
             genId: {
                 value: function () {
-                    return 'gen_' + this.widgetName + '_' + this._generatedId++;
+                    return 'gen_' + this.widgetName + '_' + this.generatedId++;
                 }
             },
             renderError: {

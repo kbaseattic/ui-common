@@ -1,0 +1,31 @@
+## YAML Template.
+---
+package:
+    author: Erik Pearson
+    name: type_browser
+    description: Browse all types registered in the workspace
+    date: August 7, 2015
+    version: 0.0.1
+source:
+    ## sources are relative to build/plugins/PACKAGE/source/javascript
+    ## NB: need to quote file names, otherwise 
+    modules:
+        -
+            module: kb_panel_typeBrowser
+            file: panel
+        -
+            module: kb_widget_typeBrowser
+            file: "widgets/TypeBrowser"
+install:
+    routes:
+        -
+            path: ['typebrowser']
+            panelFactory: kb_panel_typeBrowser
+    menu:
+        -
+            name: typebrowser
+            definition:
+                path: typebrowser
+                label: Type Browser
+                icon: beer
+        

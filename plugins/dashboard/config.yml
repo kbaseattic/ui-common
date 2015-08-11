@@ -1,0 +1,58 @@
+## YAML Template.
+---
+package:
+    author: Erik Pearson
+    name: dashboard_panel
+    description: The dashboard panel and associated widgets
+    date: August 6, 2015
+    version: 0.0.1
+source:
+    ## sources are relative to build/plugins/PACKAGE/source/javascript
+    ## NB: need to quote file names, otherwise 
+    modules:
+        -
+            module: kb_panel_dashboard
+            file: panel
+        -
+            module: kb_widget_dashboard_base
+            file: "widgets/DashboardWidget"
+        -
+            module: kb_widget_dashboard_apps
+            file: "widgets/AppsWidget"
+        -
+            module: kb_widget_dashboard_collaborators
+            file: "widgets/CollaboratorsWidget"
+        -
+            module: kb_widget_dashboard_data
+            file: "widgets/DataWidget"
+        -
+            module: kb_widget_dashboard_metrics
+            file: "widgets/MetricsWidget"
+        -
+            module: kb_widget_dashboard_narratives
+            file: "widgets/NarrativesWidget"
+        -
+            module: kb_widget_dashboard_publicNarratives
+            file: "widgets/PublicNarrativesWidget"
+        -
+            module: kb_widget_dashboard_sharedNarratives
+            file: "widgets/SharedNarrativesWidget"
+        -
+            module: kb_widget_dashboard_profile
+            file: "widgets/ProfileWidget"
+       
+    styles:
+        -
+            file: styles.css
+install:
+    routes:
+        -
+            path: ['dashboard']
+            panelFactory: kb_panel_dashboard
+    menu:
+        -
+            name: dashboard
+            definition:
+                path: ['dashboard']
+                label: Dashbaord
+                icon: dashboard
