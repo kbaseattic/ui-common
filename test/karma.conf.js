@@ -73,6 +73,8 @@ module.exports = function(config) {
       {pattern: 'bower_components/ace-builds/src-min/ace.js', included: false},
       {pattern: 'bower_components/font-awesome/css/font-awesome.min.css', included: false},
       {pattern: 'bower_components/stacktrace-js/dist/stacktrace.min.js', included: false},
+      {pattern: 'bower_components/handlebars/handlebars.amd.min.js', included: false},
+
 
       {pattern: 'bower_components/requirejs-text/text.js', included: false},
       {pattern: 'bower_components/requirejs-json/json.js', included: false},

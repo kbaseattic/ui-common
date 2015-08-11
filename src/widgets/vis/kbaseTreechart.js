@@ -2,16 +2,18 @@
 
 */
 
-define('kbaseTreechart',
+define(
     [
         'jquery',
         'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
+        'kb.widget.vis.widget',
+        'kb.RGBColor',
+        'kb.geometry.rectangle',
+        'kb.geometry.point',
+        'kb.geometry.size',
     ], function( $ ) {
+
+    'use strict';
 
     $.KBWidget({
 
@@ -294,8 +296,8 @@ var throttle = 0
                 if (d.parent != undefined) {
                     name = uniqueness(d.parent) + '/' + name;
                 }
-console.log("UNIQUE NAME IS " + name);
-return name;
+
+                return name;
             }
 
             var node = chart.selectAll("g.node")

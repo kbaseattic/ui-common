@@ -2,17 +2,19 @@
 
 */
 
-define('kbaseForcedNetwork',
+define(
     [
         'jquery',
         'kbaseSearchControls',
         'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
+        'kb.widget.vis.widget',
+        'kb.RGBColor',
+        'kb.geometry.rectangle',
+        'kb.geometry.point',
+        'kb.geometry.size',
     ], function( $ ) {
+
+    'use strict';
 
     $.KBWidget({
 

@@ -2,19 +2,20 @@
 
 */
 
-define('kbasePiechart',
+define(
     [
         'jquery',
         'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
+        'kb.widget.vis.widget',
+        'kb.RGBColor',
+        'kb.geometry.rectangle',
+        'kb.geometry.point',
+        'kb.geometry.size',
     ], function( $ ) {
 
-    $.KBWidget({
+    'use strict';
 
+    $.KBWidget({
 	    name: "kbasePiechart",
 	  parent: "kbaseVisWidget",
 

@@ -2,16 +2,18 @@
 
 */
 
-define('kbaseHeatmap',
+define(
     [
         'jquery',
         'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
+        'kb.widget.vis.widget',
+        'kb.RGBColor',
+        'kb.geometry.rectangle',
+        'kb.geometry.point',
+        'kb.geometry.size',
     ], function( $ ) {
+
+    'use strict';
 
     $.KBWidget({
 
@@ -271,7 +273,9 @@ define('kbaseHeatmap',
             var tempAxis =
                 d3.svg.axis()
                     .scale(tempScale)
-                    .orient('right');
+                    .orient('right')
+            ;
+
 
             var gtempAxis = this.D3svg().select( this.region('xGutter') ).select('.tempAxis');
 
@@ -284,12 +288,15 @@ define('kbaseHeatmap',
                         .attr("transform", "translate(" + (xGutterBounds.size.width / 3 + 6) + ",0)")
             }
 
-            tempAxis.tickFormat(function(d) {
-                if (d.length > 23) {
-                    return d.substring(0,20) + '...';
-                }
-                return d;
-            });
+            tempAxis.tickFormat(
+                d3.format('.2f')
+                /*function(d) {
+                    if (d.length > 23) {
+                        return d.substring(0,20) + '...';
+                    }
+                    return d;
+                }*/
+            );
 
             gtempAxis.transition().call(tempAxis);
 

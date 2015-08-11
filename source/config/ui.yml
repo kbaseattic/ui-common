@@ -52,6 +52,22 @@ navbar:
                 path: test
                 label: Testing Panel
                 icon: flask
+            linechart:
+                path: linechart
+                label: Line Chart
+                icon: line-chart
+            barchart:
+                path: barchart
+                label: Bar Chart
+                icon: bar-chart
+            heatmap:
+                path: heatmap
+                label: Heat Map
+                icon: barcode
+            scatterplot:
+                path: scatterplot
+                label: Scatter Plot
+                icon: ellipsis-h
         menus:
             authenticated: [search, narrative, test, divider, divider]                
             unauthenticated: [about, divider, about_kbase, contact_us]

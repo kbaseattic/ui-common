@@ -56,5 +56,8 @@
     "require-yaml": "0.1.2",
     "kbase-ui-plugin-sample": "eapearson/kbase-ui-plugin-sample#0.0.1",
     "kb-ui-plugin-demo": "eapearson/kb-ui-plugin-demo"
+    "handlebars": "3.0.3",
+    
+    "kbase-ui-plugin-sample": "eapearson/kbase-ui-plugin-sample#0.0.1"
   }
 }

@@ -9,7 +9,7 @@
         return 'KBCLIENTS DUMMY OBJECT';
     });
     //NB underscore, as of 1.6, inclues AMD compatible loading. However, other parts of the kbase
-    // codebase may rely on underscore being loaded globally, so se just use the global version, which 
+    // codebase may rely on underscore being loaded globally, so se just use the global version, which
     // must already be loaded.
     var kbClients = [
         ['narrative_method_store', 'NarrativeMethodStore'],
@@ -105,7 +105,8 @@
             'font-awesome': 'bower_components/font-awesome/css/font-awesome.min',
             'stacktrace': 'bower_components/stacktrace-js/dist/stacktrace.min',
             'js-yaml': 'bower_components/js-yaml/dist/js-yaml.min',
-            
+            'handlebars' : 'bower_components/handlebars/handlebars.amd.min',
+
             // KBase Styles
             // ----------------
             'kb.style.bootstrap': 'css/kb-bootstrap',
@@ -139,8 +140,26 @@
             'kb.widget.kbwidgetadapter': 'src/widgets/kbaseKbWidgetAdapter',
             'kb.simplepanel': 'src/kbaseSimplePanel',
             'kb.dom': 'src/kbaseDOM',
-            
-            
+            'kb.geometry.size'      : 'src/js/geometry/size',
+            'kb.geometry.point'     : 'src/js/geometry/point',
+            'kb.geometry.rectangle' : 'src/js/geometry/rectangle',
+            'kb.RGBColor'           : 'src/js/RGBColor',
+
+            'kb.widget.vis.barchart'       : 'src/widgets/vis/kbaseBarchart',
+            //'kb.widget.vis.chordchart'     : 'src/widgets/vis/kbaseChordchart',
+            //'kb.widget.vis.circularHeatmap': 'src/widgets/vis/kbaseCircularHeatmap',
+            //'kb.widget.vis.forcedNetwork'  : 'src/widgets/vis/kbaseForcedNetwork',
+            'kb.widget.vis.heatmap'        : 'src/widgets/vis/kbaseHeatmap',
+            //'kb.widget.vis.histogram'      : 'src/widgets/vis/kbaseHistogram',
+            'kb.widget.vis.linechart'      : 'src/widgets/vis/kbaseLinechart',
+            //'kb.widget.vis.lineSerieschart': 'src/widgets/vis/kbaseLineSerieschart',
+            //'kb.widget.vis.piechart'       : 'src/widgets/vis/kbasePiechart',
+            'kb.widget.vis.scatterplot'    : 'src/widgets/vis/kbaseScatterplot',
+            //'kb.widget.vis.treechart'      : 'src/widgets/vis/kbaseTreechart',
+            //'kb.widget.vis.venndiagram'    : 'src/widgets/vis/kbaseVenndiagram',
+            'kb.widget.vis.widget'         : 'src/widgets/vis/kbaseVisWidget',
+
+
             // KBase Widgets
             // -------------
             
@@ -174,7 +193,12 @@
             'kb.panel.typeview': 'src/panels/typeview',
             'kb.panel.message': 'src/panels/message',
             'kb.panel.sample.router': 'src/panels/sample-router',
-            
+
+            'kb.panel.vis.linechart': 'src/panels/vis/linechart',
+            'kb.panel.vis.heatmap': 'src/panels/vis/heatmap',
+            'kb.panel.vis.barchart': 'src/panels/vis/barchart',
+            'kb.panel.vis.scatterplot': 'src/panels/vis/scatterplot',
+
             // KBase JQuery Plugin Widgets
             // ---------------------------
             'kb.jquery.widget': 'src/widgets/jquery/kbaseWidget',
