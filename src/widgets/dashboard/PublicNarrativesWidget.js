@@ -10,6 +10,8 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
 
                // TODO: get this from somewhere, allow user to configure this.
                this.params.limit = 10;
+               
+               this.search = '';
 
                this.view = 'slider';
                this.templates.env.addFilter('appName', function (x) {
@@ -121,11 +123,23 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
 
          filterState: {
             value: function (options) {
-               if (!options.search || options.search.length === 0) {
+                var search;
+                if (options && options.search) {
+                    if (options.search.length === 0) {
+                        search = '';
+                    } else {
+                        search = options.search;
+                    }
+                } else {
+                    search = this.search;
+                }
+                this.search = search;
+                
+               if (search.length === 0) {
                   this.setState('narrativesFiltered', this.getState('narratives'));
                   return;
                }
-               var searchRe = new RegExp(options.search, 'i');
+               var searchRe = new RegExp(search, 'i');
                var nar = this.getState('narratives').filter(function (x) {
                   if (x.workspace.metadata.narrative_nice_name.match(searchRe) ||
                      (x.object.metadata.cellInfo &&
@@ -227,8 +241,7 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                         // permission ('n' in this case means "no sharing permission" not "no permission"
                         // because clearly globally shared narratives carrry that permission to everyone!)
                         narratives = narratives.filter(function (x) {
-                           if (x.workspace.owner === Session.getUsername() ||
-                              x.workspace.user_permission !== 'n') {
+                           if (x.workspace.globalread === 'n') {
                               return false;
                            } else {
                               return true;
@@ -241,7 +254,8 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                                  return b.object.saveDate.getTime() - a.object.saveDate.getTime();
                               });
                               this.setState('narratives', narratives);
-                              this.setState('narrativesFiltered', narratives);
+                              this.filterState();
+                              // this.setState('narrativesFiltered', narratives);
 
                               resolve();
                            }.bind(this))
