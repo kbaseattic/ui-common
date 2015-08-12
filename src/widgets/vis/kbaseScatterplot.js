@@ -1,5 +1,45 @@
 /*
 
+                    var dataset = [];
+
+                    var points = 200;
+
+                    var randomColor = function() {
+                        var colors = ['red', 'green', 'blue', 'cyan', 'magenta', 'yellow', 'orange', 'black'];
+                        return colors[Math.floor(Math.random() * colors.length)];
+                    }
+
+                    var randomShape = function() {
+                    //return 'circle';
+                        var shapes = ['circle', 'circle', 'circle', 'circle', 'circle', 'circle', 'square', 'triangle-up', 'triangle-down', 'diamond', 'cross'];
+                        return shapes[Math.floor(Math.random() * shapes.length)];
+                    }
+
+                    for (var idx = 0; idx < points; idx++) {
+                        dataset.push(
+                            {
+                                x : Math.random() * 500,
+                                y : Math.random() * 500,
+                                weight : Math.random() * 225,
+                                color : randomColor(),
+                                label : 'Data point ' + idx,
+                                shape : randomShape(),
+                            }
+                        );
+                    }
+
+                    var $scatter = $('#scatterplot').css({width : '800px', height : '500px'}).kbaseScatterplot(
+                        {
+                            scaleAxes   : true,
+
+                            //xLabel      : 'Some useful experiment',
+                            //yLabel      : 'Meaningful data',
+
+                            dataset : dataset,
+
+                        }
+                    );
+
 */
 
 define('kbaseScatterplot',
@@ -12,6 +52,8 @@ define('kbaseScatterplot',
         'geometry_point',
         'geometry_size',
     ], function( $ ) {
+
+    'use strict';
 
     $.KBWidget({
 
@@ -140,8 +182,10 @@ define('kbaseScatterplot',
             chart
                 .data(this.dataset())
                 .enter()
-                    .append('circle')
+                    .append('path')
                     .attr('class', 'point')
+                    .attr("transform", function(d) { return "translate(" + $scatter.xScale()(d.x) + "," + $scatter.yScale()(d.y) + ")"; })
+                    .attr('d', function (d) { return d3.svg.symbol().type(d.shape).size(d.weight)() } )
                     .call(funkyTown)
                     .call(mouseAction)
             ;
