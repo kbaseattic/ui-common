@@ -341,10 +341,7 @@ function KBaseFBA_FBAModel(modeltabs) {
 			"data": cpd.charge
 		}, {
 			"label": "Compartment",
-			"data": cpd.cmpkbid,
-			"dispid": self.cmphash[cpd.cmpkbid].name+" "+self.cmphash[cpd.cmpkbid].compartmentIndex,
-			"type": "tabLink",
-			"function": "CompartmentTab"
+			"data": self.cmphash[cpd.cmpkbid].name+" "+self.cmphash[cpd.cmpkbid].compartmentIndex,
 		}];
 		if (cpd.cpdkbid != "cpd00000") {
 			var p = self.modeltabs.kbapi('fba', 'get_compounds', {
