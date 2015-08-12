@@ -38,7 +38,7 @@ define([], function() {
             'KBasePhenotypes.PhenotypeSimulationSet' : {
                 'deps' : ['KBModeling']
             },
-            'KBaseSearch.GenomeSet' {
+            'KBaseSearch.GenomeSet' : {
                 'deps' : ['KBModeling']
             },
             'kbaseTabTable' : {
