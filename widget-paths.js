@@ -18,13 +18,16 @@ define([], function() {
         },
         'shim': {
             'KBaseFBA.FBAModel' : {
-                'deps' : ['KBModeling']
+                'deps' : ['KBModeling',
+                          'kbasePathways']
             },
             'KBaseFBA.FBAModelSet' : {
-                'deps' : ['KBModeling']
+                'deps' : ['KBModeling',
+                          'kbasePathways']
             },
             'KBaseFBA.FBA' : {
-                'deps' : ['KBModeling']
+                'deps' : ['KBModeling',
+                          'kbasePathways']
             },
             'KBaseFBA.FBAComparison' : {
                 'deps' : ['KBModeling']
