@@ -229,12 +229,13 @@ function KBaseFBA_FBAModel(modeltabs) {
             "type": "wstype",
             "wstype": "KBaseFBA.Media"
         }]
-    }, /*{
+    }, {
         "name": "Pathways",
         "widget": "kbasePathways",
-        "keys": "workspace, objName",
-        "arguments": "model_ws, model_name"
-    }*/];
+        "getParams": function() {
+            return {models: [self.data]};
+        }
+    }];
 
 
     this.ReactionTab = function (info) {
@@ -303,8 +304,8 @@ function KBaseFBA_FBAModel(modeltabs) {
 		}
 		return output;
     }
-    
-    
+
+
 
     this.GeneTab = function (info) {
         // var gene = this.genehash[id];
@@ -434,7 +435,7 @@ function KBaseFBA_FBAModel(modeltabs) {
 
     this.GapfillTab = function (info) {
     	var gfid = info.id;
-        console.log(gfid);
+
         var gf = self.gfhash[gfid];
         var ref;
         if ("gapfill_ref" in gf) {
@@ -486,18 +487,18 @@ function KBaseFBA_FBAModel(modeltabs) {
 			 		}
 			 	}
 			 }
-			 	
+
 			gf.output.push({
 			 	"label": "Solution "+i,
 				"data": rxns
 			});
-			console.log(gf.output);
+
 			return gf.output;
 		});
         return p;
     }
-	
-	this.parse_gf_solutions = function(solutions) {		
+
+	this.parse_gf_solutions = function(solutions) {
 		var rxnshash = {};
 		var biochemws = "kbase";
 		var biochem = "default";
@@ -534,7 +535,7 @@ function KBaseFBA_FBAModel(modeltabs) {
 		}
 		return solutions;
 	};
-	
+
     this.setData = function (indata) {
         this.data = indata;
         this.modelreactions = this.data.modelreactions;
@@ -727,4 +728,4 @@ function KBaseFBA_FBAModel(modeltabs) {
 }
 
 // make method of base class
-KBObjects.prototype.KBaseFBA_FBAModel = KBaseFBA_FBAModel;
+KBModeling.prototype.KBaseFBA_FBAModel = KBaseFBA_FBAModel;

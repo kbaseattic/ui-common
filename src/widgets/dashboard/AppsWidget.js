@@ -1,29 +1,20 @@
-define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.session', 'kb.client.narrative_method_store', 'kb.client.workspace', 'kb.client.methods', 'kb.utils.api', 'kb.logger', 'q'],
-   function (DashboardWidget, UserProfileService, Utils, Session, NarrativeMethodStore, WorkspaceService, Narratives, APIUtils, Logger, Q) {
+define(['kb.widget.dashboard.base', 'kb.utils', 'kb.session', 'kb.client.narrative_method_store', 'kb.client.workspace', 'kb.client.methods', 'kb.logger', 'q'],
+   function (DashboardWidget, Utils, Session, NarrativeMethodStore, WorkspaceService, KBService, Logger, Q) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
             value: function (cfg) {
                cfg.name = 'AppsWidget';
                cfg.title = 'KBase Apps';
-               Narratives.init();
                this.DashboardWidget_init(cfg);
-               return this;
-            }
-         },
-
-         go: {
-            value: function () {
-               this.start();
                return this;
             }
          },
 
          setup: {
             value: function () {
-               // User profile service
+               this.kbService = Object.create(KBService).init();
                if (Session.isLoggedIn()) {
-
                   if (this.hasConfig('narrative_method_store_url')) {
                      this.methodStore = new NarrativeMethodStore(this.getConfig('narrative_method_store_url'), {
                         token: Session.getAuthToken()
@@ -43,18 +34,6 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
             }
          },
 
-         renderLayout: {
-            value: function () {
-               this.container.html(this.renderTemplate('layout'));
-               this.places = {
-                  title: this.container.find('[data-placeholder="title"]'),
-                  alert: this.container.find('[data-placeholder="alert"]'),
-                  content: this.container.find('[data-placeholder="content"]')
-               };
-
-            }
-         },
-
          setInitialState: {
             value: function () {
                var widget = this;
@@ -63,7 +42,6 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                      this.setState('apps', null);
                      resolve();
                   } else {
-
                      Utils.promise(this.methodStore, 'list_apps_full_info', {})
                         .then(function (allApps) {
                            var appMap = {};
@@ -86,7 +64,7 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                            });
                            
                            
-                           Narratives.getNarratives({
+                           this.kbService.getNarratives({
                               params: {showDeleted: 0}
                            })
                               .then(function (narratives) {
@@ -151,19 +129,14 @@ define(['kb.widget.dashboard.base', 'kb.client.user_profile', 'kb.utils', 'kb.se
                                  resolve();
                               })
                               .catch(function (err) {
-                                 console.log('ERROR');
-                                 console.log(err);
                                  reject(err);
                               })
                               .done();
                         }.bind(this))
                         .catch(function (err) {
-                           console.log('ERROR');
-                           console.log(err);
                            reject(err);
                         })
                         .done();
-
                   }
                }.bind(this));
             }

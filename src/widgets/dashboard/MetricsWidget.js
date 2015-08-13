@@ -13,7 +13,7 @@ define(['kb.widget.dashboard.base', 'postal', 'kb.config'], function (DashboardW
          value: function () {
             this.start();
 
-
+           
 
             /*Postal.channel('dashboard.metrics')
             .subscribe('update.narratives', function (data) {
@@ -34,9 +34,35 @@ define(['kb.widget.dashboard.base', 'postal', 'kb.config'], function (DashboardW
             return this;
          }
       },
+      afterStart: {
+         value: function () {
+             /*
+              * Set listeners for updates to the narratives and sharedNarratives summary data.
+              * This data is set by the "your narratives" and "narratives shared with you"
+              * widgets.
+              */
+             this.viewState.listen('narratives', {
+							 onSet: function (value) {
+		               this.setState('narratives', value);
+		               this.calcNarrativeMetrics(value.count);
+		               this.calcSharingNarrativeMetrics(value.sharingCount);
+		            }.bind(this),
+								onError: function (err) {
+									this.setError(err);
+								}.bind(this)
+							});
+
+            // we dont' do this one any longer.
+            //this.viewState.listen('sharedNarratives', function (value) {
+            //   this.setState('sharedNarratives', value);
+            //    this.calcSharedNarrativeMetrics(value.count);
+            //}.bind(this)); 
+         }
+      },
       setup: {
          value: function () {}
       },
+			
       calcNarrativeMetrics: {
          value: function (userValue) {
             // Just dummy data for now.
@@ -287,65 +313,24 @@ define(['kb.widget.dashboard.base', 'postal', 'kb.config'], function (DashboardW
       setInitialState: {
          value: function () {
             return Q.promise(function (resolve, reject, notify) {
-               // We don't really have any initial state, it is all fed in from postal.
-               
-               // Get the json stuff.
                Q.all([Q($.get(Config.getConfig('dashboard_metrics_url') + '/narrative_histogram.json')),
-                      Q($.get(Config.getConfig('dashboard_metrics_url') + '/narrative_shared_histogram.json')),
-                      Q($.get(Config.getConfig('dashboard_metrics_url') + '/narrative_sharing_histogram.json'))])
+                      // Q($.get(Config.getConfig('dashboard_metrics_url') + '/narrative_shared_histogram.json')),
+                      Q($.get(Config.getConfig('dashboard_metrics_url') + '/narrative_sharing_histogram.json')),
+                      this.viewState.whenItem('narratives', 10000)
+                     ])
                .then(function(data) {
                   this.setState('narrativesStats', data[0]);
-                  this.setState('sharedNarrativesStats', data[1]);
-                  this.setState('sharingNarrativesStats', data[2]);
-                  
-                   // hey, cool, these calls may return immediately IF the state machine 
-                  // already has values for these properties.
-                  this.viewState.listen('narratives', function (value) {
-                     this.setState('narratives', value);
-                     this.calcNarrativeMetrics(value.count);
-                     this.calcSharingNarrativeMetrics(value.sharingCount);
-                  }.bind(this));
-
-                  this.viewState.listen('sharedNarratives', function (value) {
-                     this.setState('sharedNarratives', value);
-                      this.calcSharedNarrativeMetrics(value.count);
-                  }.bind(this));
-                  
-
-                  /*this.viewState.listen('publicNarratives', function (value) {
-                     this.setState('publicNarratives', value);
-                  }.bind(this));
-
-                  this.viewState.listen('collaborators', function (value) {
-                     this.setState('collaborators', value);
-                  }.bind(this));*/
-
+                  // this.setState('sharedNarrativesStats', data[1]);
+                  this.setState('sharingNarrativesStats', data[1]);
+                  this.setState('narratives', data[2]);
+                  this.calcNarrativeMetrics(data[2].count);
+                  this.calcSharingNarrativeMetrics(data[2].sharingCount);
+                  resolve();
                }.bind(this))
                .catch(function (err) {
-                  console.log('ERROR'); console.log(err);
-                  reject (err);
+                  reject(err);
                })
                .done();
-
-                  /*Postal.channel('dashboard.metrics')
-                  .publish('query.narratives', function (data) {});
-               
-                   Postal.channel('dashboard.metrics')
-                  .publish('query.sharedNarratives', function (data) {});
-               
-                   
-                   Postal.channel('dashboard.metrics')
-                  .publish('query.collaborators', function (data) {});
-                  */
-
-
-                  /*Postal.channel('dashboard')
-                  .request('metrics.get.narratives', function (data) {
-                     console.log('HERE');
-                     this.setState('narratives.count', data.narratives.count);
-                  }.bind(this));
-                  */
-                  resolve();
             }.bind(this));
          }
       }

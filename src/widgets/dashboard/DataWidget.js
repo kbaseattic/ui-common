@@ -17,13 +17,6 @@ define(['kb.widget.dashboard.base', 'kb.utils', 'kb.utils.api', 'kb.session', 'k
                 }
             },
 
-            go: {
-                value: function () {
-                    this.start();
-                    return this;
-                }
-            },
-
             setup: {
                 value: function () {
                     // User profile service

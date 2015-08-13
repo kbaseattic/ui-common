@@ -21,6 +21,11 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                return this;
             }
          },
+          setup: {
+            value: function () {
+               this.kbservice = Object.create(KBService).init();            
+            }
+         },
          getAppName: {
             value: function (name) {
                return this.getState(['appsMap', name, 'name'], name); 
@@ -31,32 +36,8 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                return this.getState(['methodsMap', name, 'name'], name); 
             }
          },
-         go: {
-            value: function () {
-               this.start();
-               return this;
-            }
-         },
 
-         setup: {
-            value: function () {
-               this.kbservice = Object.create(KBService).init();
-            }
-         },
-
-         renderLayout: {
-            value: function () {
-               this.container.html(this.renderTemplate('layout'));
-               this.places = {
-                  title: this.container.find('[data-placeholder="title"]'),
-                  alert: this.container.find('[data-placeholder="alert"]'),
-                  content: this.container.find('[data-placeholder="content"]')
-               };
-
-            }
-         },
-         
-           setupUI: {
+        setupUI: {
             value: function () {
                if (this.hasState('narratives') && this.getState('narratives').length > 0) {
                   this.buttonbar = Object.create(Buttonbar).init({
@@ -68,9 +49,7 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                         placeholder: 'Search',
                         place: 'end',
                         onkeyup: function (e) {
-                           this.filterState({
-                              search: $(e.target).val()
-                           });
+                           this.setParam('filter', $(e.target).val());
                         }.bind(this)
                      });
                }
@@ -84,16 +63,16 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                if (this.error) {
                   this.renderError();
                } else if (Session.isLoggedIn()) {
-                  if (this.initialStateSet) {
+                  //if (this.initialStateSet) {
                      this.places.title.html(this.widgetTitle);
                      this.places.content.html(this.renderTemplate(this.view));
-                  }
+                  //}
                } else {
-                  if (this.initialStateSet) {
+                  //if (this.initialStateSet) {
                      // no profile, no basic aaccount info
                      this.places.title.html(this.widgetTitle);
                      this.places.content.html(this.renderTemplate('unauthorized'));
-                  }
+                  //}
                }
                this.container.find('[data-toggle="popover"]').popover();
                this.container.find('[data-toggle="tooltip"]').tooltip();
@@ -101,14 +80,18 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
             }
          },
 
-
-           filterState: {
-            value: function (options) {
-               if (!options.search || options.search.length === 0) {
+         filterState: {
+            value: function () {
+               var search = this.getParam('filter');
+               if (!search || search.length === 0) {
                   this.setState('narrativesFiltered', this.getState('narratives')); 
                   return;
                }
-               var searchRe = new RegExp(options.search, 'i');
+               try {
+                  var searchRe = new RegExp(search, 'i');
+               } catch (ex) {
+                  // User entered invalid search expression. How to give the user feedback?
+               }
                var nar = this.getState('narratives').filter(function (x) {
                   if (x.workspace.metadata.narrative_nice_name.match(searchRe) ||
                       (x.object.metadata.cellInfo &&
@@ -209,7 +192,7 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.bas
                                  return b.object.saveDate.getTime() - a.object.saveDate.getTime();
                               });
                               this.setState('narratives', narratives);
-                              this.setState('narrativesFiltered', narratives);
+                              this.filterState();
                            
                               resolve();
                            }.bind(this))

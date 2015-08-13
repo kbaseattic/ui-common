@@ -428,4 +428,4 @@ function KBaseFBA_FBAComparison(modeltabs) {
 }
 
 // make method of base class
-KBObjects.prototype.KBaseFBA_FBAComparison = KBaseFBA_FBAComparison;
+KBModeling.prototype.KBaseFBA_FBAComparison = KBaseFBA_FBAComparison;

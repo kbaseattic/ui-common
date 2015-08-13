@@ -59,6 +59,7 @@
         "Gapgeneration" : null,
         "ModelTemplate" : null,
         "ETC" : "etc",
+        "FBAComparison" : "ws/fbacomparison",
         "PromConstraint" : "ws/promconstraint"
     },
 

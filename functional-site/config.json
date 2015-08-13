@@ -66,8 +66,8 @@
          }
       },
       "docsite": {
-         "host": "staging.kbase.us",
-         "baseUrl": "http://staging.kbase.us",
+         "host": "kbase.us",
+         "baseUrl": "http://kbase.us",
          "paths": {
             "about": "/what-is-kbase",
             "contact": "/contact-us",
@@ -103,8 +103,8 @@
          }
       },
       "docsite": {
-         "host": "staging.kbase.us",
-         "baseUrl": "http://staging.kbase.us",
+         "host": "kbase.us",
+         "baseUrl": "http://kbase.us",
          "paths": {
             "about": "/what-is-kbase",
             "contact": "/contact-us",

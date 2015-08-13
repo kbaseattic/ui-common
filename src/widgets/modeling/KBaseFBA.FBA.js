@@ -160,7 +160,7 @@ function KBaseFBA_FBA(modeltabs) {
         }, {
         	"label": "Exchange reaction",
             "key": "exchangerxn",
-            "visible": 1  
+            "visible": 1
         }, {
             "label": "Exchange flux",
             "key": "uptake",
@@ -240,6 +240,13 @@ function KBaseFBA_FBA(modeltabs) {
             "key": "maxprod",
             "visible": 0
         }]
+    }, {
+        "name": "Pathways",
+        "widget": "kbasePathways",
+        "getParams": function() {
+            return {models: [self.model],
+                    fbas: [self.data]};
+        }
     }];
 
     this.setMetadata = function (indata) {
@@ -511,11 +518,12 @@ function KBaseFBA_FBA(modeltabs) {
         }
     };
 
-	this.setData = function (indata) {
+	this.setData = function (indata) { // this is a mess
         self.data = indata;
         var p = self.modeltabs.kbapi('ws', 'get_objects', [{ref: indata.fbamodel_ref}]).then(function(data){
-			var kbObjects = new KBObjects();
-			self.model = new kbObjects["KBaseFBA_FBAModel"](self.modeltabs);
+            self.model = data[0].data;
+			var kbModeling = new KBModeling();  // this is a mess
+			self.model = new kbModeling["KBaseFBA_FBAModel"](self.modeltabs);
 			self.model.setMetadata(data[0].info);
 			self.model.setData(data[0].data);
  			self.formatObject();
@@ -540,7 +548,7 @@ function KBaseFBA_FBA(modeltabs) {
         }
         return self.ExtendReactionTab(info,output);
     };
-    
+
     this.ExtendReactionTab = function (info,data) {
     	var rxn = self.rxnhash[info.id];
     	data.push({
@@ -561,7 +569,7 @@ function KBaseFBA_FBA(modeltabs) {
     	});
     	return data;
     };
-    
+
     this.CompoundTab = function (info) {
 		var output = self.model.CompoundTab(info);
         if (output && 'done' in output) {
@@ -572,7 +580,7 @@ function KBaseFBA_FBA(modeltabs) {
         }
         return self.ExtendCompoundTab(info,output);
     };
-    
+
     this.ExtendCompoundTab = function (info,data) {
     	var cpd = self.cpdhash[info.id];
     	data.push({
@@ -597,7 +605,7 @@ function KBaseFBA_FBA(modeltabs) {
     	});
     	return data;
     };
-    
+
     this.GeneTab = function (info) {
 		var output = self.model.GeneTab(info);
         if (output && 'done' in output) {
@@ -621,7 +629,7 @@ function KBaseFBA_FBA(modeltabs) {
     	});
     	return data;
     };
-    
+
     this.BiomassTab = function (info) {
 		var output = self.model.BiomassTab(info);
         if (output && 'done' in output) {
@@ -656,11 +664,11 @@ function KBaseFBA_FBA(modeltabs) {
     	});
     	return data;
     };
-    
+
     this.CompartmentTab = function (info) {
 		return self.model.CompartmentTab(info);
     };
 }
 
 // make method of base class
-KBObjects.prototype.KBaseFBA_FBA = KBaseFBA_FBA;
+KBModeling.prototype.KBaseFBA_FBA = KBaseFBA_FBA;

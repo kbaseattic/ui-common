@@ -120,7 +120,7 @@
       <h3>Affiliations</h3>  
       {% if userRecord.profile.userdata.affiliations|length > 0 %}  
         {% for affiliation in userRecord.profile.userdata.affiliations|sort(true, true, "start_year") %}
-          <p><strong>{{affiliation.title | e}}</strong> ({{affiliation.start_year| e}}-{% if affiliation.end_year %}{{affiliation.userdata.end_year | e}}{% else %}present{% endif %}) @ {{affiliation.institution | e}}</p>
+          <p><strong>{{affiliation.title | e}}</strong> ({{affiliation.start_year| e}}-{% if affiliation.end_year %}{{affiliation.end_year | e}}{% else %}present{% endif %}) @ {{affiliation.institution | e}}</p>
         {% endfor %}
       {% elif env.isOwner %}
         <p class="text-warning">Show your colors! Please add one or more affiliations.</p>
@@ -169,19 +169,3 @@
 </div>
 
 
-<div class="modal fade" data-widget-modal="help" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-widget-modal-control="deny"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">User Profile Help</h4>
-      </div>
-      <div class="modal-body">
-        <p>Help text here...</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-widget-modal-control="deny" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
