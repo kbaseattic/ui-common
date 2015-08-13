@@ -140,7 +140,9 @@ $.KBWidget({
                 var tabPane = tabs.tabContent(tabSpec.name);
 
                 // skip any vertical tables for now
-                if (tabSpec.type == 'verticaltbl') continue;
+                if (tabSpec.type == 'verticaltbl') {
+                	continue;
+                }
 
                 // if widget, invoke widget with arguments
                 if (tabSpec.widget) {
