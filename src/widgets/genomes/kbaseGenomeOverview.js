@@ -305,8 +305,9 @@
                         if (dnaLength)
                             gcContent = (gcContent/dnaLength*100).toFixed(2) + " %";
                     }
-                    else
-                        gcContent = Number(gcContent * 100).toFixed(2) + " %";
+                    else {
+                        gcContent = gcContent.toFixed(2) + " %";
+                    }
                 }
             } else if (Number(genome.gc_content) < 1.0) {
                 gcContent = Number(genome.gc_content * 100).toFixed(2) + " %";
