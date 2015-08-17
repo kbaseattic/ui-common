@@ -133,7 +133,7 @@ define(['underscore'], function (_) {
             var quoteChar = '"';
             if (attribs) {
                 var fields = Object.keys(attribs).map(function (key) {
-                    var value = attribs[key]
+                    var value = attribs[key];
                     if (typeof value === 'object') {
                         switch (key) {
                             case 'style':
@@ -157,6 +157,8 @@ define(['underscore'], function (_) {
                         if (value) {
                             return key;
                         }
+                    } else if (typeof value === 'number') {
+                        return key + '=' + quoteChar + String(value) + quoteChar;
                     }
                     return false;
                 });
