@@ -484,12 +484,12 @@ define([
                             this.setState('sub', this.getParam('sub'));
                         }
 
-                        Utils.promise(this.workspaceClient, 'get_object_info_new', {
+                        Q(this.workspaceClient.get_object_info_new({
                             objects: [{
                                     ref: APIUtils.makeWorkspaceObjectRef(this.getParam('workspaceId'), this.getParam('objectId'), this.getParam('objectVersion'))
                                 }],
                             includeMetadata: 1
-                        })
+                        }))
                             .then(function (data) {
                                 if (!data || data.length === 0) {
                                     this.setState('status', 'notfound');
@@ -563,16 +563,15 @@ define([
                                 if (err.status && err.status === 500) {
                                     // User probably doesn't have access -- but in any case we can just tell them
                                     // that they don't have access.
-                                    console.log(err);
-                                    if (err.error.match(/^us.kbase.workspace.database.exceptions.NoSuchObjectException:/)) {
+                                    if (err.error.error.match(/^us.kbase.workspace.database.exceptions.NoSuchObjectException:/)) {
                                         this.setState('status', 'notfound');
                                         this.setState('error', {
                                             type: 'client',
                                             code: 'notfound',
                                             shortMessage: 'This object does not exist',
                                             originalMessage: err.error.message
-                                        });
-                                    } else if (err.error.match(/^us.kbase.workspace.database.exceptions.InaccessibleObjectException:/)) {
+                                        });                                                                     
+                                    } else if (err.error.error.match(/^us.kbase.workspace.database.exceptions.InaccessibleObjectException:/)) {
                                         this.setState('status', 'denied');
                                         this.setState('error', {
                                             type: 'client',

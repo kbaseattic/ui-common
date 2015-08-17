@@ -385,7 +385,7 @@ define([
                 params.workspaceURL = R.getConfig('services.workspace.url');
                 params.authToken = R.getAuthToken();
 
-                return q.Promise(function (resolve) {
+                return q.Promise(function (resolve, reject) {
                     workspaceClient.getObject(params.workspaceId, params.objectId)
                         .then(function (wsobject) {
                             var objectType = wsobject.type.split(/-/)[0];
@@ -426,8 +426,9 @@ define([
                             });
                         })
                         .catch(function (err) {
-                            console.log('ERROR');
-                            console.log(err);
+                            //console.log('ERROR');
+                            //console.log(err);
+                            reject(err);
                         })
                         .done();
                 });
@@ -449,15 +450,32 @@ define([
                     resolve();
                 });
             }
+            function showError(err) {
+                var content;
+                
+                if (typeof err === 'string') {
+                    content = err;
+                } else if (err.message) {
+                    content = err.message;
+                } else if (err.error && err.error.error) {
+                    content = err.error.error.message;
+                } else {
+                    content = 'Unknown Error';
+                }
+                container.innerHTML = html.bsPanel('Error', content);
+            }
             function start(params) {
-                return q.Promise(function (resolve) {
+                return q.Promise(function (resolve, reject) {
                     attachWidget(params)
                         .then(function () {
                             resolve();
                         })
                         .catch(function (err) {
-                            console.error('ERROR');
-                            console.error(err);
+                            // if attaching the widget failed, we attach a 
+                            // generic error widget:
+                            // TO BE DONE
+                            showError(err);
+                            reject(err);
                         })
                         .done();
                 });

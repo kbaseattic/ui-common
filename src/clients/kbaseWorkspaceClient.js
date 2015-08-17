@@ -17,17 +17,13 @@ define([
         return Object.create({}, {
             init: {
                 value: function (cfg) {
-                    if (R.isLoggedIn()) {
-                        if (R.hasConfig('services.workspace.url')) {
-                            // console.log(Workspace);
-                            this.workspaceClient = new Workspace(R.getConfig('services.workspace.url'), {
-                                token: R.getAuthToken()
-                            });
-                        } else {
-                            throw 'The workspace client url is not defined';
-                        }
+                    if (R.hasConfig('services.workspace.url')) {
+                        // console.log(Workspace);
+                        this.workspaceClient = new Workspace(R.getConfig('services.workspace.url'), {
+                            token: R.getAuthToken()
+                        });
                     } else {
-                        this.workspaceClient = null;
+                        throw 'The workspace client url is not defined';
                     }
                     return this;
                 }
@@ -153,11 +149,11 @@ define([
                 value: function (workspaceId, objectId) {
                     return Q.Promise(function (resolve, reject) {
                         var objectRefs = [{ref: workspaceId + '/' + objectId}];
-                        Utils.promise(this.workspaceClient, 'get_object_info_new', {
+                        Q(this.workspaceClient.get_object_info_new({
                             objects: objectRefs,
                             ignoreErrors: 1,
                             includeMetadata: 1
-                        })
+                        }))
                             .then(function (data) {
                                 if (data.length === 0) {
                                     reject('Object not found');
@@ -165,6 +161,11 @@ define([
                                 }
                                 if (data.length > 1) {
                                     reject('Too many (' + data.length + ') objects found.');
+                                    return;
+                                }
+                                if (data[0] === null) {
+                                    reject('Null object returned');
+                                    console.log(data);
                                     return;
                                 }
 
