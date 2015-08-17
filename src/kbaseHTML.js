@@ -68,7 +68,7 @@ define(['underscore'], function (_) {
                 var fields = Object.keys(attribs).map(function (key) {
                     var value = attribs[key];
                     if (typeof value === 'string') {
-                        return key + ':' + value;
+                        return key + ': ' + value;
                     } else {
                         // just ignore invalid attributes for now
                         // TODO: what is the proper thing to do?
@@ -78,7 +78,7 @@ define(['underscore'], function (_) {
                 });
                 return fields.filter(function (field) {
                     return field ? true : false;
-                }).join(';');
+                }).join('; ');
             } else {
                 return '';
             }
