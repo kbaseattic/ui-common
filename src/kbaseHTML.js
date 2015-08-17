@@ -196,7 +196,10 @@ define(['underscore'], function (_) {
                     } else if (_.isNull(attribs) || _.isUndefined(attribs)) {
                         children = '';
                     } else if (_.isObject(attribs)) {
-                        node += ' ' + makeTagAttribs(attribs);
+                        var tagAttribs = makeTagAttribs(attribs);
+                        if (tagAttribs && tagAttribs.length > 0) {
+                            node += ' ' + tagAttribs;
+                        }
                     } else if (!attribs) {
                         // Do nothing.
                     } else if (_.isNumber(attribs)) {
