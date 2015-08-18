@@ -22,7 +22,7 @@ $.KBWidget({
 
 			// Service URL: should be in window.kbconfig.urls.
 			// featureValueURL: 'http://localhost:8889',
-			featureValueURL: 'https://ci.kbase.us/services/feature_values/jsonrpc',
+			featureValueURL: null,
 
 			loadingImage: "static/kbase/images/ajax-loader.gif"
 		},

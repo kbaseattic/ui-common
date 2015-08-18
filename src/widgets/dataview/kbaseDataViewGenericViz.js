@@ -300,7 +300,18 @@
 		'KBaseFeatureValues.ExpressionMatrix': {
 		    widget: 'kbaseExpressionMatrix',
             options: '{"expressionMatrixID":???objname,"workspaceID":???wsname}'
-		}
+		},
+		
+        'KBaseCollections.FeatureSet': {
+            widget: 'kbaseFeatureSet',
+            options: '{"featureset_name":???objname,"workspaceName":???wsname}'
+        },
+        
+        'KBaseFeatureValues.FeatureClusters': {
+            widget: 'kbaseExpressionFeatureClusters',
+            options: '{"clusterSetID":???objname,"workspaceID":???wsname}'
+        }
+		
 	    };
 	    
 	    /*var list = ''; var list2=''
