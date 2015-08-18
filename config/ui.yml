@@ -43,7 +43,7 @@ navbar:
                 label: Search Data
                 icon: search
             narrative: 
-                uri: funtional_site#narrativemanager/start
+                uri: #narrativemanager/start
                 label: Narrative
                 icon: file
             narrativeTutorial: 

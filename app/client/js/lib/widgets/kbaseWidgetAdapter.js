@@ -7,21 +7,27 @@
  */
 define([
     'jquery',
-    'q'
-], function ($, q) {
+    'q',
+    'underscore'
+], function ($, q, _) {
     'use strict';
     
         function adapter(config) {
-            var widget, mount, $container;
+            var widget, mount, $container, initConfig;
             
             var module = config.module;
 
-            function init() {
+            function init(cfg) {
+                        console.log('init'); console.log(cfg);
                 return q.Promise(function (resolve) {
                     require([module], function (Widget) {
                         if (!Widget) {
                             throw new Error('Widget module did not load properly (undefined) for ' + config.module);
                         }
+                        // NB we save the config, because the internal widget 
+                        // unfortunately requires the container in init, and 
+                        // that is not available until attach...
+                        initConfig = cfg || {};
                         widget = Object.create(Widget);
                         resolve();
                     });
@@ -45,6 +51,8 @@ define([
                     // not the best .. perhaps merge the params into the config
                     // better yet, rewrite the widgets in the new model...
                     var widgetConfig = config.config || params || {};
+                    console.log('initConfig:'); console.log(initConfig);
+                    _.extend(widgetConfig, initConfig);
                     widgetConfig.container = $container;
                     widgetConfig.userId = params.username;
                     widget.init(widgetConfig);

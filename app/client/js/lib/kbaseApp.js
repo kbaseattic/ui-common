@@ -353,8 +353,6 @@ define([
                         }
                     })
                         .then(function () {
-                            // Create new mount.
-                            
                             var panelWidget;
                             if (routed.route.panelFactory) {
                                 panelWidget = routed.route.panelFactory.make();
@@ -362,14 +360,17 @@ define([
                                 panelWidget = Object.create(routed.route.panelObject);
                             }
                         
-                        
                             var newMount = {
                                 id: html.genId(),
                                 widget: panelWidget
                             };
 
                             /* TODO: config threaded here? */
-                            newMount.widget.init()
+                            if (routed.route.config.pluginPath) {
+                                console.log('HUH?'); console.log(routed.route.config);
+                            }
+                            
+                            newMount.widget.init(routed.route.config)
                                 .then(function () {
                                     newMount.container = $('<div id="' + newMount.id + '"/>');
                                     mountPoint.container.empty().append(newMount.container);

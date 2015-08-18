@@ -139,6 +139,8 @@ define([
             setupConfig: {
                 value: function () {
 
+console.log('CONFIG');
+console.log(this.initConfig);
                     this.configs = [{}, this.initConfig, this.localConfig];
 
                     // Check for required and apply defaults.

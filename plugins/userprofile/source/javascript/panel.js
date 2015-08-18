@@ -71,14 +71,15 @@ define([
             });
         }
 
-        function widget() {
-            var mount, container;
-
-            var children = [];
+        function widget(config) {
+            var mount, container,
+                children = [],
+                root;
 
             // API 
             function init(config) {
                 return q.Promise(function (resolve) {
+                    root = config.pluginPath;
                     resolve();
                 });
             }
@@ -94,7 +95,9 @@ define([
                             // create widgets.
                             children = rendered.widgets;
                             q.all(children.map(function (w) {
-                                return w.widget.init(w.config);
+                                var config = w.config || {};
+                                config.root = root;
+                                return w.widget.init(config);
                             }))
                                 .then(function () {
                                     q.all(children.map(function (w) {

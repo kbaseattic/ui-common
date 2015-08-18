@@ -229,8 +229,6 @@ define([
                         directory: 'plugins/' + plugin
                     };
                 }
-                console.log('PLUGIN:');
-                console.log(plugin);
                 var p = Q.Promise(function (resolve) {
                     require(['yaml!' + plugin.directory + '/config.yml'], function (config) {
                         // build up a list of modules and add them to the require config.
@@ -264,9 +262,6 @@ define([
                             }
                         });
 
-                        // console.log(paths);
-                        // shims = {};
-
                         // This usage of require.config will merge with the existing
                         // require configuration.
                         require.config({paths: paths, shim: shims});
@@ -281,6 +276,9 @@ define([
                                                 Runtime.addRoute({
                                                     path: route.path,
                                                     queryParams: route.queryParams,
+                                                    config: {
+                                                        pluginPath: sourcePath
+                                                    },
                                                     panelFactory: factory
                                                 });
                                                 resolve();
@@ -290,6 +288,9 @@ define([
                                                 Runtime.addRoute({
                                                     path: route.path,
                                                     queryParams: route.queryParams,
+                                                    config: {
+                                                        pluginPath: sourcePath
+                                                    },
                                                     panelObject: obj
                                                 });
                                                 resolve();
@@ -311,7 +312,6 @@ define([
                                     .then(function () {
                                         if (config.install.menu) {
                                             config.install.menu.forEach(function (item) {
-                                            console.log('Adding'); console.log(item);
                                                 Runtime.send('navbar', 'add-menu-item', item);
                                             });
                                         }

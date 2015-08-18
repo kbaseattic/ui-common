@@ -131,10 +131,11 @@ define([
                     // can be issued by setting a param, config, state, and the profile will
                     // not have been populated yet because it is async too, and slower.
                     // So we need to have some better control over widget state,
-                    // e.g. to avoid rendering when in an invalid state.
+                    // e.g. to avoid rendering when in an invalid state.                    
                     if (R.isLoggedIn() && this.userProfile) {
                         return Utils.merge(Utils.merge({}, this.context), {
                             env: {
+                                root: this.getConfig('root'),
                                 lists: this.lists,
                                 isOwner: this.isOwner(),
                                 profileCompletion: this.calcProfileCompletion()
