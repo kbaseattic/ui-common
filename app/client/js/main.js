@@ -277,7 +277,7 @@ define([
                                                     path: route.path,
                                                     queryParams: route.queryParams,
                                                     config: {
-                                                        pluginPath: sourcePath
+                                                        pluginPath: '/' + sourcePath
                                                     },
                                                     panelFactory: factory
                                                 });

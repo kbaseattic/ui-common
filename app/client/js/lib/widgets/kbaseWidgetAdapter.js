@@ -18,7 +18,6 @@ define([
             var module = config.module;
 
             function init(cfg) {
-                        console.log('init'); console.log(cfg);
                 return q.Promise(function (resolve) {
                     require([module], function (Widget) {
                         if (!Widget) {
@@ -51,7 +50,6 @@ define([
                     // not the best .. perhaps merge the params into the config
                     // better yet, rewrite the widgets in the new model...
                     var widgetConfig = config.config || params || {};
-                    console.log('initConfig:'); console.log(initConfig);
                     _.extend(widgetConfig, initConfig);
                     widgetConfig.container = $container;
                     widgetConfig.userId = params.username;

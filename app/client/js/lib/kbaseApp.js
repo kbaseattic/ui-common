@@ -269,7 +269,6 @@ define([
                                 .then(function () {
                                     widget.detach()
                                         .then(function () {
-                                            console.log('stopped');
                                             resolve();
                                         })
                                         .catch(function (err) {
@@ -336,7 +335,6 @@ define([
                                 .then(function () {
                                     widget.detach()
                                         .then(function () {
-                                            console.log('stopped');
                                             resolve();
                                         })
                                         .catch(function (err) {
@@ -366,10 +364,6 @@ define([
                             };
 
                             /* TODO: config threaded here? */
-                            if (routed.route.config.pluginPath) {
-                                console.log('HUH?'); console.log(routed.route.config);
-                            }
-                            
                             newMount.widget.init(routed.route.config)
                                 .then(function () {
                                     newMount.container = $('<div id="' + newMount.id + '"/>');
@@ -725,7 +719,6 @@ define([
                 }, 100);
             }
             function stopHeartbeat() {
-                console.log('Stopping the heartbeat...');
                 if (heartbeatTimer) {
                     window.clearInterval(heartbeatTimer);
                 }

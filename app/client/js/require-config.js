@@ -115,6 +115,8 @@
             // -------------------
             'kb.api': 'lib/kbase-client-api',
             'kb.narrative': 'js/lib/kbaseNarrative',
+            'kb_client_metrics': 'js/lib/clients/kbaseMetrics',
+            
             // KBase Utils
             // ----------------------
             'kb.app': 'js/lib/kbaseApp',

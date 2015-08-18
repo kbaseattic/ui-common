@@ -74,7 +74,7 @@ define(['jquery', 'q', 'kb_widget_dashboard_base', 'kb.client.methods', 'kb.sess
                                         icon: 'plus-circle',
                                         style: 'primary',
                                         class: 'btn-kbase',
-                                        url: '/functional-site/#/narrativemanager/new',
+                                        url: '#/narrativemanager/new',
                                         external: true
                                     })
                                     /*.addRadioToggle({
@@ -155,10 +155,10 @@ define(['jquery', 'q', 'kb_widget_dashboard_base', 'kb.client.methods', 'kb.sess
 
                         // Need to filter narratives?
                         var count = this.doState('narratives', function (x) {
-                            return x.length
+                            return x.length;
                         }, null);
                         var filtered = this.doState('narrativesFiltered', function (x) {
-                            return x.length
+                            return x.length;
                         }, null);
 
                         var sharingCount = this.doState('narratives', function (narratives) {
@@ -246,7 +246,7 @@ define(['jquery', 'q', 'kb_widget_dashboard_base', 'kb.client.methods', 'kb.sess
                                                     }.bind(this))
                                                     .catch(function (err) {
                                                         reject(err);
-                                                    })
+                                                    });
                                         }
                                     }.bind(this))
                                     .catch(function (err) {

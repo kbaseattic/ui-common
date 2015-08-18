@@ -46,6 +46,12 @@ module.exports = function(grunt) {
                 src: '**/*',
                 dest: 'build/client/plugins',
                 expand: true
+            },
+            data: {
+                cwd: 'data',
+                src: '**/*',
+                dest: 'build/client/data',
+                expand: true
             }
         },
         
