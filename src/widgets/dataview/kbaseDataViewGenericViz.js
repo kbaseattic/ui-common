@@ -310,6 +310,11 @@
         'KBaseFeatureValues.FeatureClusters': {
             widget: 'kbaseExpressionFeatureClusters',
             options: '{"clusterSetID":???objname,"workspaceID":???wsname}'
+        },
+        
+        'KBaseFeatureValues.EstimateKResult': {
+            widget: 'kbaseExpressionEstimateKTable',
+            options: '{"estimateKID":???objname,"workspaceID":???wsname}'
         }
 		
 	    };
