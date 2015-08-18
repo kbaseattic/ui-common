@@ -106,8 +106,7 @@ define([
                 options: [
                     {from: 'workspaceId', to: 'workspaceId'},
                     {from: 'objectId', to: 'objId'},
-                    {from: 'objectVersion', to: 'objVer', optional: true},
-                    {from: 'loadingImage', to: 'loadingImage', optional: true}
+                    {from: 'objectVersion', to: 'objVer', optional: true}
                 ]
             },
             'KBaseAssembly.AssemblyReport': {
@@ -145,7 +144,7 @@ define([
             },
             'KBaseGenomes.GenomeComparison': {
                 title: 'Data View',
-                module: 'kb.widget.dataview.proteome-comparison.genome-comparison-viewer',
+                module: 'kb_widget_dataview_proteomeComparison_genomeComparisonViewer',
                 widget: 'kbaseGenomeComparisonViewer',
                 panel: true,
                 options: [
@@ -164,10 +163,8 @@ define([
                     {from: 'objectId', to: 'ws_id'},
                     {from: 'objectVersion', to: 'ver', optional: true},
                     {from: 'workspaceURL', to: 'ws_url'},
-                    {from: 'authToken', to: 'token'},
-                    {from: 'loadingImage', to: 'loadingImage', optional: true}
+                    {from: 'authToken', to: 'token'}
                 ]
-                    // options: '{"ws_id":???objname,"ws_name":???wsname,"ver":???ver,"loadingImage":"'+this.options.loadingImage+'"}'
             },
             'KBaseGenomes.MetagenomeAnnotation': {
                 title: 'Data View',
@@ -200,10 +197,8 @@ define([
                 // Options object to build. Maps
                 options: [
                     {from: 'objectId', to: 'genomeID'},
-                    {from: 'workspaceId', to: 'workspaceID'},
-                    {from: 'loadingImage', to: 'loadingImage', optional: true}
+                    {from: 'workspaceId', to: 'workspaceID'}
                 ],
-                // options: '{"genomeID":???objname,"workspaceID":???wsname,"loadingImage":"'+this.options.loadingImage+'"}',
                 sub: {
                     Feature: {
                         module: ' kb_widget_dataview_genome_genePage',
@@ -211,10 +206,8 @@ define([
                         noPanel: true,
                         options: [
                             {from: 'objectId', to: 'genomeID'},
-                            {from: 'workspaceId', to: 'objectId'},
-                            {from: 'loadingImage', to: 'loadingImage', optional: true}
+                            {from: 'workspaceId', to: 'objectId'}
                         ]
-                            // options: '{"genomeID":???objname,"workspaceID":???wsname,"featureID":???subid,"loadingImage":"'+this.options.loadingImage+'"}'
                     }
                 }
             },

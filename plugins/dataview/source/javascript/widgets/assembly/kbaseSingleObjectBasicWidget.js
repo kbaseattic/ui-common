@@ -23,8 +23,7 @@ define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.service.workspace', 'kb.r
             options: {
                 objId: null,
                 workspaceId: null,
-                objVer: null,
-                loadingImage: null
+                objVer: null
             },
             init: function (options) {
                 this._super(options);

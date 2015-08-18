@@ -37,7 +37,7 @@ define([
                     columns = ['Object Name', 'Type', 'Version', 'Narrative', 'Version', 'Last Modified'],
                     rows = data.map(function (object) {
                         return [
-                            a({href: '/functional-site/#dataview/' + object.info.wsid + '/' + object.info.id}, object.info.name),
+                            a({href: '#dataview/' + object.info.wsid + '/' + object.info.id}, object.info.name),
                             object.info.typeName,
                             object.info.typeMajorVersion + '.' + object.info.typeMinorVersion,
                             a({href: '/narrative/' + object.narrative.workspaceId + '/' + object.info.id}, object.narrative.name),

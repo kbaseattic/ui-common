@@ -15,32 +15,56 @@ module.exports = function(grunt) {
 
         'copy': {
             'kbase-config': {
-                src: 'source/config/prod.yml',
-                dest: 'build/config.yml'
+                src: 'config/prod.yml',
+                dest: 'build/client/config.yml'
             },
             'ui-config': {
-                src: 'source/config/ui.yml',
-                dest: 'build/ui.yml'
+                src: 'config/ui.yml',
+                dest: 'build/client/ui.yml'
             },
+            client: {
+                cwd: 'app/client',
+                src: '**/*', 
+                dest: 'build/client',
+                expand: true
+            },
+            bower: {
+                cwd: 'bower_components',
+                src: '**/*',
+                dest: 'build/client/bower_components',
+                expand: true
+            },
+            lib: {
+                cwd: 'lib',
+                src: '**/*',
+                dest: 'build/client/lib',
+                expand: true
+            },
+            plugins: {
+                cwd: 'plugins',
+                src: '**/*',
+                dest: 'build/client/plugins',
+                expand: true
+            }
         },
 
         // Compile the requirejs stuff into a single, uglified file.
         // the options below are taken verbatim from a standard build.js file
         // used for r.js (if we were doing this outside of a grunt build)
-        'requirejs': {
-            compile: {
-                options: {
-                    baseUrl: ".",
-                    mainConfigFile: "functional-site/js/require-config.js",
-                    findNestedDependencies: true,
-                    optimize: "uglify2",
-                    generateSourceMaps: true,
-                    preserveLicenseComments: false,
-                    name: "functional-site/js/require-config",
-                    out: "functional-site/js/dist/kbase-min.js"
-                }
-            }
-        },
+    //    'requirejs': {
+    //        compile: {
+    //            options: {
+     //               baseUrl: ".",
+    //                mainConfigFile: "app/client/require-config.js",
+    //                findNestedDependencies: true,
+    //                optimize: "uglify2",
+    //                generateSourceMaps: true,
+    //                preserveLicenseComments: false,
+    //                name: "functional-site/js/require-config",
+    //                out: "functional-site/js/dist/kbase-min.js"
+    //            }
+    //        }
+    //    },
 
         // Put a 'revision' stamp on the output file. This attaches an 8-character 
         // md5 hash to the end of the requirejs built file.
@@ -124,10 +148,10 @@ module.exports = function(grunt) {
 
     // Does the whole building task
     grunt.registerTask('build', [
-        'build-config',
-        'requirejs',
-        'filerev',
-        'regex-replace'
+        'build-config'
+        //'requirejs',
+        //'filerev',
+        //'regex-replace'
     ]);
 
     // Does a single, local, unit test run.
