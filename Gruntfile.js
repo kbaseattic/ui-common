@@ -8,6 +8,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-regex-replace');
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-coveralls');
 
     grunt.initConfig({
@@ -46,6 +47,10 @@ module.exports = function(grunt) {
                 dest: 'build/client/plugins',
                 expand: true
             }
+        },
+        
+        clean: {
+            build: ['build']
         },
 
         // Compile the requirejs stuff into a single, uglified file.
@@ -144,6 +149,10 @@ module.exports = function(grunt) {
     // more complex.
     grunt.registerTask('build-config', [
         'copy'
+    ]);
+    
+    grunt.registerTask('clean', [
+        'clean'
     ]);
 
     // Does the whole building task
