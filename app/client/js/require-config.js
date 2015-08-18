@@ -142,10 +142,7 @@
             'kb.widget.kbwidgetadapter': 'js/lib/widgets/kbaseKbWidgetAdapter',
             'kb.simplepanel': 'js/lib/kbaseSimplePanel',
             'kb.dom': 'js/lib/kbaseDOM',
-            'kb.geometry.size'      : 'js/lib/js/geometry/size',
-            'kb.geometry.point'     : 'js/lib/js/geometry/point',
-            'kb.geometry.rectangle' : 'js/lib/js/geometry/rectangle',
-            'kb.RGBColor'           : 'js/lib/js/RGBColor',
+            'kb_data':  'js/lib/kbaseData',
 
             // KBase Widgets
             // -------------

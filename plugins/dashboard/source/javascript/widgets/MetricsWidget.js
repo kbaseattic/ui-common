@@ -1,9 +1,9 @@
 define([
     'q',
     'kb_widget_dashboard_base',
-    'kb_client_metrics'
+    'kb_data'
 ],
-    function (Q, DashboardWidget, metrics) {
+    function (Q, DashboardWidget, data) {
         'use strict';
         return Object.create(DashboardWidget, {
             init: {
@@ -294,8 +294,8 @@ define([
             setInitialState: {
                 value: function () {
                     return Q.promise(function (resolve, reject) {
-                        Q.all([metrics.get_narrative_histogram(),
-                            metrics.get_narrative_sharing_histogram(),
+                        Q.all([data.getJSON('metrics','narrative_histogram'),
+                              data.getJSON('metrics','narrative_sharing_histogram'),
                             this.viewState.whenItem('narratives', 10000)
                         ])
                             .then(function (data) {
