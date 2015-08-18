@@ -163,7 +163,12 @@ define('kbaseLinechart',
                                 xIdx = xInc(xIdx);
                             }
                             else {
-                                xIdx = xInc(point.x);
+                                if (point.x) {
+                                    xIdx = xInc(point.x);
+                                }
+                                else {
+                                    point.x = xIdx;
+                                }
                                 if (point.y2) {
                                     revLine.push( { x : point.x, y : point.y2} )
                                 }
