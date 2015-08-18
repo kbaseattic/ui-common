@@ -44,7 +44,21 @@ define('kbaseVisWidget',
                 },
                 width: '100%',
                 height: '100%',
-                customRegions: {}
+                customRegions: {},
+
+                xAxisColor : 'black',
+                yAxisColor : 'black',
+
+                xAxisRegion : 'yPadding',
+                yAxisRegion : 'xPadding',
+
+                xAxisOrientation : 'bottom',
+                yAxisOrientation : 'left',
+
+                xLabelRegion : 'yGutter',
+                yLabelRegion : 'xGutter',
+
+                aspectRatio : 'default',
             },
             shouldScaleAxis: function (axis) {
                 if (this.options.scaleAxes) {
@@ -394,50 +408,57 @@ define('kbaseVisWidget',
                 return [0, 100];
             },
             renderXLabel: function () {
-                var yGutterBounds = this.yGutterBounds();
+                var labelRegionBounds = this[this.options.xLabelRegion + 'Bounds']();
+
 
                 var xLabeldataset = [this.xLabel()];
+                var yOffset = this.options.xLabelRegion == 'yPadding' ? 5 : 0;
+                console.log("Y OFF ", yOffset, this.options.yLabelRegion);
 
-                var xLabel = this.D3svg().select(this.region('yGutter')).selectAll('.xLabel');
+                var xLabel = this.D3svg().select(this.region(this.options.xLabelRegion)).selectAll('.xLabel');
                 xLabel
                     .data(xLabeldataset)
                     .text(this.xLabel())
                     .enter()
                     .append('text')
                     .attr('class', 'xLabel')
-                    .attr('x', yGutterBounds.size.width / 2)
-                    .attr('y', yGutterBounds.size.height / 2 + 3)
+                    .attr('x', labelRegionBounds.size.width / 2)
+                    .attr('y', labelRegionBounds.size.height / 2 + 3)
                     .attr('text-anchor', 'middle')
                     .attr('font-size', '11px')
                     .attr('font-family', 'sans-serif')
                     .attr('fill', 'black')
+                    .attr('transform', 'translate(0,' + yOffset + ')')
                     .text(this.xLabel());
                 ;
 
             },
             renderYLabel: function () {
 
-                var xGutterBounds = this.xGutterBounds();
+                var labelRegionBounds = this[this.options.yLabelRegion + 'Bounds']();
 
                 var yLabeldataset = [this.yLabel()];
 
-                var xLabel = this.D3svg().select(this.region('xGutter')).selectAll('.yLabel');
-                xLabel
+                var rotation = this.options.yLabelRegion == 'xPadding' ? -90 : 90;
+                var xOffset = this.options.yLabelRegion == 'xPadding' ? 5 : 0;
+
+                var yLabel = this.D3svg().select(this.region(this.options.yLabelRegion)).selectAll('.yLabel');
+                yLabel
                     .data(yLabeldataset)
                     .text(this.yLabel())
                     .enter()
                     .append('text')
                     .attr('class', 'yLabel')
-                    .attr('x', xGutterBounds.size.width / 2)
-                    .attr('y', xGutterBounds.size.height / 2 + 3)
+                    .attr('x', labelRegionBounds.size.width / 2)
+                    .attr('y', labelRegionBounds.size.height / 2 + 3)
                     .attr('text-anchor', 'middle')
                     .attr('font-size', '11px')
                     .attr('font-family', 'sans-serif')
                     .attr('fill', 'black')
-                    .attr('transform', 'rotate(90,'
-                        + (xGutterBounds.size.width / 2 - 7)
+                    .attr('transform', 'translate(' + xOffset + ',0) rotate(' + rotation + ','
+                        + (labelRegionBounds.size.width / 2 - 7)
                         + ','
-                        + xGutterBounds.size.height / 2
+                        + labelRegionBounds.size.height / 2
                         + ')')
                     .text(this.yLabel());
                 ;
@@ -460,7 +481,7 @@ define('kbaseVisWidget',
                 var xAxis =
                     d3.svg.axis()
                     .scale(this.xScale())
-                    .orient('bottom');
+                    .orient(this.options.xAxisOrientation);
 
                 var ticks = this.xTickValues();
 
@@ -478,12 +499,17 @@ define('kbaseVisWidget',
                     xAxis.tickFormat('');
                 }
 
-                var gxAxis = this.D3svg().select(this.region('yPadding')).select('.xAxis');
+                var gxAxis = this.D3svg().select(this.region(this.options.xAxisRegion)).select('.xAxis');
+
+                var axisRegionBounds = this[this.options.xAxisRegion + 'Bounds']();
+                var axisTransform = this.options.xAxisRegion == 'yGutter' ? axisRegionBounds.size.height : 0;
 
                 if (gxAxis[0][0] == undefined) {
-                    gxAxis = this.D3svg().select(this.region('yPadding'))
+                    gxAxis = this.D3svg().select(this.region(this.options.xAxisRegion))
                         .append('g')
                         .attr('class', 'xAxis axis')
+                        .attr('stroke', this.options.xAxisColor)
+                        .attr("transform", "translate(0," + axisTransform + ")")
                 }
 
                 gxAxis.transition().call(xAxis);
@@ -504,19 +530,23 @@ define('kbaseVisWidget',
                 var yAxis =
                     d3.svg.axis()
                     .scale(this.yScale())
-                    .orient('left');
+                    .orient(this.options.yAxisOrientation);
 
                 if (! this.options.yLabels) {
                     yAxis.tickFormat('');
                 }
 
-                var gyAxis = this.D3svg().select(this.region('xPadding')).select('.yAxis');
+                var gyAxis = this.D3svg().select(this.region(this.options.yAxisRegion)).select('.yAxis');
+
+                var axisRegionBounds = this[this.options.yAxisRegion + 'Bounds']();
+                var axisTransform = this.options.yAxisRegion == 'xPadding' ? axisRegionBounds.size.width : 0;
 
                 if (gyAxis[0][0] == undefined) {
-                    gyAxis = this.D3svg().select(this.region('xPadding'))
+                    gyAxis = this.D3svg().select(this.region(this.options.yAxisRegion))
                         .append('g')
                         .attr('class', 'yAxis axis')
-                        .attr("transform", "translate(" + this.xPaddingBounds().size.width + ",0)")
+                        .attr('stroke', this.options.yAxisColor)
+                        .attr("transform", "translate(" + axisTransform + ",0)")
                 }
 
                 gyAxis.transition().call(yAxis);
@@ -544,6 +574,43 @@ define('kbaseVisWidget',
              */
 
             appendUI: function ($elem) {
+
+                var chartBounds = this.chartBounds();
+                if (chartBounds.size.width != chartBounds.size.height && this.options.aspectRatio != 'default') {
+
+                    var diff        = Math.abs(chartBounds.size.width - chartBounds.size.height);
+                    var newHeight   = $elem.height();
+                    var newWidth    = $elem.width();
+
+                    if (this.options.aspectRatio == 'minSquare') {
+
+                        if (chartBounds.size.width < chartBounds.size.height) {
+                            newHeight -= diff;
+                        }
+                        else if (chartBounds.size.height < chartBounds.size.width) {
+                            newWidth -= diff;
+                        }
+                    }
+                    else if (this.options.aspectRatio == 'maxSquare') {
+                        if (chartBounds.size.height < chartBounds.size.width) {
+                            newHeight += diff;
+                        }
+                        else if (chartBounds.size.width < chartBounds.size.height) {
+                            newWidth += diff;
+                        }
+                    }
+
+                    $elem.animate(
+                        {
+                            'width' : newWidth,
+                            'height' : newHeight
+                        },
+                        0
+                    );
+                    this.width(newWidth);
+                    this.height(newHeight);
+
+                }
 
                 var D3svg;
 
