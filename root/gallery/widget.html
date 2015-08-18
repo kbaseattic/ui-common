@@ -144,13 +144,25 @@
                             $('#linechartWidget').kbaseLinechart(
 
                                 {
+
+                                    legend : [
+                                        { label : 'foo', color : 'blue'},
+                                        { label : 'bar', color : 'red'},
+                                        { label : 'baz', color : 'green'},
+                                        { label : 'applegate farms', color : 'orange'}
+                                    ],
+
                                     scaleAxes       : true,
                                     //debug       : true,
 
                                     xLabel      : 'Expression profile',
-                                    //yLabel      : 'Meaningful data',
+                                    yLabel      : 'Meaningful data',
+                                    xLabelRegion : 'yPadding',
+                                    yLabelRegion : 'xPadding',
                                     hGrid : true,
                                     xLabels : false,
+
+                                    xPadding : 40,
 
                                     pointOver : function(d) {
                                         this.showToolTip({label : 'point over obj'});
@@ -159,8 +171,23 @@
                                         this.hideToolTip();
                                     },
 
+                                    //xAxisOrientation : 'top',
+                                    //xAxisRegion : 'yGutter',
+
+                                    //yAxisOrientation : 'right',
+                                    //yAxisRegion : 'xGutter',
+
                                     dataset : [
                                         {
+                                            strokeColor : 'red',
+                                            label : 'parabolic',
+                                            values : [0,1,4,9,16,25,{x : 60, y : 36},49,64,81,100,121,144,{y : 169, label : 'has a label!'}],
+                                            width : 1,
+                                            shape : 'circle',
+                                            shapeArea : 16,
+                                            //fillColor : 'red',
+                                        },
+                                        /*{
                                             strokeColor : 'red',
                                             fillColor : 'red',
                                             values : [
@@ -183,16 +210,6 @@
                                             label : 'area',
                                             width : 0,
                                             fillOpacity : 0.3,
-                                        },
-
-                                        {
-                                            strokeColor : 'red',
-                                            label : 'parabolic',
-                                            values : [0,1,4,9,16,25,{x : 60, y : 36},49,64,81,100,121,144,169],
-                                            width : 1,
-                                            shape : 'circle',
-                                            shapeArea : 64,
-                                            //fillColor : 'red',
                                         },
                                         {
                                             strokeColor : 'orange',
@@ -219,7 +236,7 @@
                                             fillColor : 'blue',
                                             strokeOpacity : 0.3,
                                             fillOpacity : 0.3,
-                                        },
+                                        },*/
                                         /*{
                                             strokeColor : 'black',
                                             label : 'sin',
@@ -498,6 +515,7 @@
                                     //ulIcon : '/functional-site/assets/navbar/images/kbase_logo.png',
                                     minValue : -1.0,
                                     maxValue : 1.0,
+                                    aspectRatio : 'maxSquare'
                                 }
                             );
 

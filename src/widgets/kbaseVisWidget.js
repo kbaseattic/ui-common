@@ -42,6 +42,9 @@ define('kbaseVisWidget',
                 defaultDataset: function () {
                     return []
                 },
+                defaultLegend: function () {
+                    return []
+                },
                 width: '100%',
                 height: '100%',
                 customRegions: {},
@@ -57,6 +60,10 @@ define('kbaseVisWidget',
 
                 xLabelRegion : 'yGutter',
                 yLabelRegion : 'xGutter',
+
+                legendRegion : 'chart',
+                legendAlignment : 'UR',
+                legendWidth : 50,
 
                 aspectRatio : 'default',
             },
@@ -79,6 +86,7 @@ define('kbaseVisWidget',
                 'width',
                 'height',
                 {name: 'dataset', setter: 'setDataset'},
+                {name: 'legend', setter: 'setLegend'},
                 {name: 'input', setter: 'setInput'},
                 {name: 'xLabel', setter: 'setXLabel'},
                 {name: 'yLabel', setter: 'setYLabel'},
@@ -289,7 +297,75 @@ define('kbaseVisWidget',
                     this.renderULCorner();
                 }
 
+                if (field == undefined || field == 'legend') {
+                    this.renderLegend();
+                }
+
             },
+
+            renderLegend : function() {
+return;
+console.log("I HAS A LEGEND", this.legend());
+                var legendRectSize = 18,
+                    legendSpacing  = 4;
+
+                if (this.legend() == undefined) {
+                    return;
+                }
+
+                var legend = this.D3svg().select(this.options.legendRegion).selectAll('.legend')
+                    .data([0])
+                    .enter()
+                    .append('g')
+                    .attr('class', 'legend');
+                /*
+                    .data(this.legend())
+                    .enter()
+                    .append('g')
+                    .attr('transform', function (d, i) {
+                        var height = legendRectSize + legendSpacing;
+                        var offset = -gapBetweenGroups/2;
+                        var horz = spaceForLabels + chartWidth + 40 - legendRectSize;
+                        var vert = i * height - offset;
+                        return 'translate(' + horz + ',' + vert + ')';
+                    });
+console.log(legend);
+                legend.append('rect')
+                    .attr('width', legendRectSize)
+                    .attr('height', legendRectSize)
+                    .style('fill', function (d, i) { console.log("ADDS COLOR : ", d.color);return d.color })
+                    .style('stroke', function (d, i) { return d.color });
+
+                legend.append('text')
+                    .attr('class', 'legend')
+                    .attr('x', legendRectSize + legendSpacing)
+                    .attr('y', legendRectSize - legendSpacing)
+                    .text(function (d) { console.log("ADDS LABEL : ", d.label);return d.label; });
+
+/*                console.log("I HAS A LEGEND");
+
+                var legendRegionBounds = this[this.options.legendRegion + 'Bounds']();
+
+                var xOffset = 0;
+                var yOffset = 0;
+
+                if (this.options.legendAlignment.match(/R/, 'i')) {
+                    xOffset = legendRegionBounds.size.width - this.options.legendWidth;
+                }
+
+                if (this.options.legendAlignment.match(/L/, 'i')) {
+                    xOffset = legendRegionBounds.size.width - this.options.legendWidth;
+                }
+
+                var legend = this.D3svg().select(this.options.legendRegion).selectAll('.legend');
+                legend
+                    .data([0])
+                    .enter()
+                    .append('g')
+                    .attr('transform', 'translate('+xOffset+','+yOffset+')')
+*/
+            },
+
             renderULCorner: function () {
 
                 var ulBounds = this.ULBounds();
@@ -332,6 +408,19 @@ define('kbaseVisWidget',
                         })
                 }
             },
+
+            setLegend : function(newLegend) {
+                if (newLegend == undefined) {
+                    newLegend = this.options.defaultLegend();
+                }
+
+                this.setValueForKey('legend', newLegend);
+
+                this.render();
+            },
+
+
+
             setDataset: function (newDataset) {
 
                 if (newDataset == undefined) {
@@ -413,7 +502,6 @@ define('kbaseVisWidget',
 
                 var xLabeldataset = [this.xLabel()];
                 var yOffset = this.options.xLabelRegion == 'yPadding' ? 5 : 0;
-                console.log("Y OFF ", yOffset, this.options.yLabelRegion);
 
                 var xLabel = this.D3svg().select(this.region(this.options.xLabelRegion)).selectAll('.xLabel');
                 xLabel
@@ -508,7 +596,7 @@ define('kbaseVisWidget',
                     gxAxis = this.D3svg().select(this.region(this.options.xAxisRegion))
                         .append('g')
                         .attr('class', 'xAxis axis')
-                        .attr('stroke', this.options.xAxisColor)
+                        .attr('fill', this.options.xAxisColor)
                         .attr("transform", "translate(0," + axisTransform + ")")
                 }
 
@@ -545,7 +633,7 @@ define('kbaseVisWidget',
                     gyAxis = this.D3svg().select(this.region(this.options.yAxisRegion))
                         .append('g')
                         .attr('class', 'yAxis axis')
-                        .attr('stroke', this.options.yAxisColor)
+                        .attr('fill', this.options.yAxisColor)
                         .attr("transform", "translate(" + axisTransform + ",0)")
                 }
 
