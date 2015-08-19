@@ -10,12 +10,21 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-coveralls');
+    grunt.loadNpmTasks('grunt-connect');
+    grunt.loadNpmTasks('grunt-open');
+    grunt.loadNpmTasks('grunt-http-server');
 
+    /* 
+     * This section sets up a mapping for bower packages.
+     * Believe it or not this is shorter and easier to maintain 
+     * than plain grunt-contrib-copy
+     * 
+     */
     var bowerFiles = [
         {
             name: 'require',
             dir: 'requirejs'
-        },        
+        },
         {
             name: 'jquery',
             src: ['dist/jquery.js']
@@ -26,8 +35,7 @@ module.exports = function (grunt) {
         },
         {
             name: 'bootstrap',
-            src: 'dist/**/*',
-            expand: true
+            src: 'dist/**/*'
         },
         {
             name: 'q'
@@ -232,6 +240,12 @@ module.exports = function (grunt) {
                         src: '**/*',
                         dest: 'build/client/data',
                         expand: true
+                    },
+                    {
+                        cwd: 'app/server',
+                        src: '**/*',
+                        dest: 'build/server',
+                        expand: true
                     }
                 ]
             },
@@ -242,6 +256,31 @@ module.exports = function (grunt) {
         clean: {
             build: {
                 src: ['build']
+            }
+        },
+        connect: {
+            dev: {
+                port: 8887,
+                base: 'build/client',
+                keepalive: false,
+                onCreateServer: function (server, connect, options) {
+                    console.log('created...');
+                }
+            }
+        },
+        'http-server': {
+            dev: {
+                root: 'build/client',
+                port: 8887,
+                host: '0.0.0.0',
+                autoIndex: true,
+                runInBackground: true
+            }
+        },
+        open: {
+            dev: {
+                path: 'http://localhost:8887',
+                app: 'Firefox'
             }
         },
         // Compile the requirejs stuff into a single, uglified file.
@@ -369,4 +408,8 @@ module.exports = function (grunt) {
     grunt.registerTask('develop', [
         'karma:dev',
     ]);
+    
+    grunt.registerTask('preview', [
+        'open:dev','connect:dev'
+    ])
 };
