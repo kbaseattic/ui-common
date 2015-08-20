@@ -118,6 +118,26 @@ define('kbaseBarchart',
             ];
         },
 
+        extractLegend : function (dataset) {
+
+            var legend = [];
+            dataset.forEach(
+                function(bar, idx) {
+                    if (! $.isArray(bar.color) ) {
+                        legend.push(
+                            {
+                                color : bar.color,
+                                label : bar.bar,
+                            }
+                        )
+                    }
+                }
+            )
+
+            this.setLegend(legend);
+
+        },
+
         renderChart : function() {
 
             if (this.dataset() == undefined) {

@@ -378,7 +378,7 @@ define('kbaseHeatmap',
 
                 var label = d3.select(this).text();
                 if (label.length > 23) {
-                    d3.select(this).text(label.substring(0,20) + '...');
+                    d3.select(this).text(label.substring(0,18) + '...');
                 }
 
                 var label_idx = $hm.dataset().row_labels.indexOf(label);

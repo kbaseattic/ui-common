@@ -132,12 +132,32 @@ define('kbaseLinechart',
             highlightLineColor : 'red',
             highlightLineWidth : 1,
             useHighlightLine : true,
+            shapeArea : 64,
 
         },
 
         _accessors : [
 
         ],
+
+        extractLegend : function (dataset) {
+
+            var legend = [];
+            dataset.forEach(
+                function(line, idx) {
+                    legend.push(
+                        {
+                            color : line.strokeColor,
+                            label : line.label,
+                            shape : line.shape
+                        }
+                    )
+                }
+            )
+
+            this.setLegend(legend);
+
+        },
 
         setDataset : function(dataset) {
 
@@ -171,7 +191,10 @@ define('kbaseLinechart',
                                 }
                                 if (point.y2) {
                                     revLine.push( { x : point.x, y : point.y2} )
+                                    delete point.y2;
                                 }
+                                //console.log("VALUE IS ", point);
+                                //line.values[i] = {x : point.x, y : point.y};
                             }
                         }
 
@@ -317,7 +340,7 @@ define('kbaseLinechart',
                 gyAxis.selectAll('line').style('stroke', 'lightgray');
             }
 
-            var chart = this.data('D3svg').select(this.region('chart')).selectAll('.line').data(this.dataset());
+            var chart = this.data('D3svg').select(this.region('chart')).selectAll('.line').data(this.dataset(), function (d) {return d.label});
 
             chart
                 .enter()
@@ -338,60 +361,81 @@ define('kbaseLinechart',
                     .exit()
                         .remove();
 
-            this.dataset().forEach( function (line, i) {
+            var time = $line.linesDrawn ? $line.options.transitionTime : 0;
 
-                if (line.shape == undefined) {
-                    return;
+            var pointsData = [];
+            this.dataset().forEach(function(line, i) {
+
+                if (line.shape) {
+                    line.values.forEach(function (point, i) {
+                        pointsData.push(
+                            {
+                                x : point.x,
+                                y : point.y,
+                                label : point.label,
+                                color : line.fillColor || line.strokeColor || $line.options.fillColor,
+                                shape : line.shape,
+                                shapeArea : line.shapeArea || $line.options.shapeArea,
+                                pointOver : line.pointOver || $line.options.pointOver,
+                                pointOut : line.pointOut || $line.options.pointOut,
+                                id : [point.x, point.y, line.label].join('/'),
+                            }
+                        )
+                    })
                 }
+            })
 
-                var points = $line.data('D3svg').select($line.region('chart')).selectAll('.point-' + line.label).data(line.values);
+            var points = $line.data('D3svg').select($line.region('chart')).selectAll('.point').data(pointsData, function (d) { return d.id});
 
-                points
-                    .enter()
-                        .append('path')
-                            .attr('class', 'point')
-                            .attr("transform", function(d) { return "translate(" + $line.xScale()(d.x) + "," + $line.yScale()(d.y) + ")"; })
-                            .attr('d', function (d) { return d3.svg.symbol().type(line.shape).size(line.shapeArea)() } )
-                            .attr('fill', function(d) {return line.fillColor || line.strokeColor || $line.options.fillColor})
-                            .on('mouseover', function(d) {
+            points.enter()
+                .append('path')
+                    .attr('class', 'point')
+                    .attr('opacity', 0)
+                    .attr("transform", function(d) { return "translate(" + $line.xScale()(d.x) + "," + $line.yScale()(d.y) + ")"; })
+                    .on('mouseover', function(d) {
 
-                                if ($line.options.overColor) {
-                                    d3.select(this)
-                                        .attr('fill', $line.options.overColor)
-                                }
+                        if ($line.options.overColor) {
+                            d3.select(this)
+                                .attr('fill', $line.options.overColor)
+                        }
 
-                                if (d.label) {
-                                    $line.showToolTip(
-                                        {
-                                            label : d.label,
-                                        }
-                                    );
+                        if (d.label) {
+                            $line.showToolTip(
+                                {
+                                    label : d.label,
                                 }
-                                else if (line.pointOver) {
-                                    line.pointOver.call($line, d);
-                                }
-                                else if ($line.options.pointOver) {
-                                    $line.options.pointOver.call($line, d);
-                                }
-                            })
-                            .on('mouseout', function(d) {
-                                if ($line.options.overColor) {
-                                    d3.select(this)
-                                        .attr('fill', function(d) {return line.fillColor || line.strokeColor || $line.options.fillColor})
-                                }
+                            );
+                        }
+                        else if (d.pointOver) {
+                            d.pointOver.call($line, d);
+                        }
+                    })
+                    .on('mouseout', function(d) {
+                        if ($line.options.overColor) {
+                            d3.select(this)
+                                .attr('fill', function(d) {return line.fillColor || line.strokeColor || $line.options.fillColor})
+                        }
 
-                                if (d.label) {
-                                    $line.hideToolTip();
-                                }
-                                else if (line.pointOut) {
-                                    line.pointOut.call($line, d);
-                                }
-                                else if ($line.options.pointOut) {
-                                    $line.options.pointOut.call($line, d);
-                                }
-                            })
-                    ;
-            });
+                        if (d.label) {
+                            $line.hideToolTip();
+                        }
+                        else if (d.pointOut) {
+                            d.pointOut.call($line, d);
+                        }
+                    })
+
+            points
+                .transition().duration(time)
+                .attr("transform", function(d) { return "translate(" + $line.xScale()(d.x) + "," + $line.yScale()(d.y) + ")"; })
+                .attr('d', function (d) {return d3.svg.symbol().type(d.shape).size(d.shapeArea)() } )
+                .attr('fill', function(d) {return d.color})
+                .attr('opacity', 1)
+            ;
+
+            points.exit()
+                .transition().duration(time)
+                .attr('opacity', 0)
+                .remove();
 
             if (this.options.useHighlightLine) {
                 var highlight = this.data('D3svg').select(this.region('chart')).selectAll('.highlight').data([0]);
@@ -424,6 +468,8 @@ define('kbaseLinechart',
                     })
                 ;
             }
+
+            this.linesDrawn = true;
 
         },
 

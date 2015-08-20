@@ -61,11 +61,17 @@ define('kbaseVisWidget',
                 xLabelRegion : 'yGutter',
                 yLabelRegion : 'xGutter',
 
+                xLabelOffset : 0,
+                yLabelOffset : 0,
+
                 legendRegion : 'chart',
-                legendAlignment : 'UR',
-                legendWidth : 50,
+                legendAlignment : 'TL',
+                legendOffset : [0,0],
+                //legendWidth : 50,
 
                 aspectRatio : 'default',
+
+                //autoLegend : true,
             },
             shouldScaleAxis: function (axis) {
                 if (this.options.scaleAxes) {
@@ -303,67 +309,182 @@ define('kbaseVisWidget',
 
             },
 
+            fitTextToWidth : function(text, width) {
+
+                var fakeText = this.D3svg()
+                    .append('text')
+                    .attr('opacity', 0)
+                    .attr('font-size', '7pt')
+                    .text(text);
+
+                var box = fakeText[0][0].getBBox();
+
+                var truncatedText = text;
+                var truncated = false;
+                var width = box.width;
+
+                while (box.width > width && truncatedText.length) {
+                    truncatedText = truncatedText.substring(0, truncatedText.length - 1);
+                    fakeText.text(truncatedText + '...');
+                    box = fakeText[0][0].getBBox();
+                    truncated = true;
+                }
+
+                fakeText.remove();
+
+                return {
+                    truncated : truncated,
+                    text : text,
+                    truncatedText : text == truncatedText ? text : truncatedText + '...',
+                    width : box.width
+                }
+
+            },
+
             renderLegend : function() {
-return;
-console.log("I HAS A LEGEND", this.legend());
-                var legendRectSize = 18,
-                    legendSpacing  = 4;
 
                 if (this.legend() == undefined) {
                     return;
                 }
 
-                var legend = this.D3svg().select(this.options.legendRegion).selectAll('.legend')
-                    .data([0])
-                    .enter()
-                    .append('g')
-                    .attr('class', 'legend');
-                /*
-                    .data(this.legend())
-                    .enter()
-                    .append('g')
-                    .attr('transform', function (d, i) {
-                        var height = legendRectSize + legendSpacing;
-                        var offset = -gapBetweenGroups/2;
-                        var horz = spaceForLabels + chartWidth + 40 - legendRectSize;
-                        var vert = i * height - offset;
-                        return 'translate(' + horz + ',' + vert + ')';
-                    });
-console.log(legend);
-                legend.append('rect')
-                    .attr('width', legendRectSize)
-                    .attr('height', legendRectSize)
-                    .style('fill', function (d, i) { console.log("ADDS COLOR : ", d.color);return d.color })
-                    .style('stroke', function (d, i) { return d.color });
+                var $vis = this;
 
-                legend.append('text')
-                    .attr('class', 'legend')
-                    .attr('x', legendRectSize + legendSpacing)
-                    .attr('y', legendRectSize - legendSpacing)
-                    .text(function (d) { console.log("ADDS LABEL : ", d.label);return d.label; });
+                var shapeArea = {
+                    circle : 81,
+                    square : 81,
+                    'triangle-up' : 49,
+                    'triangle-down' : 49,
+                    diamond : 36,
+                    cross : 49,
+                }
 
-/*                console.log("I HAS A LEGEND");
+                var legendRectSize = 8,
+                    legendSpacing  = 1;
 
                 var legendRegionBounds = this[this.options.legendRegion + 'Bounds']();
 
-                var xOffset = 0;
-                var yOffset = 0;
+                var legendWidth = Math.min(this.options.legendWidth || 1000000000, legendRegionBounds.size.width);
 
-                if (this.options.legendAlignment.match(/R/, 'i')) {
-                    xOffset = legendRegionBounds.size.width - this.options.legendWidth;
+                var legendX = 0;
+                var legendY = 0;
+
+                var textXOffset = 6;
+                var textYOffset = 3;
+
+                if (this.options.legendAlignment.match(/B/)) {
+                    legendY = legendRegionBounds.size.height - 11 * this.legend().length;
                 }
 
-                if (this.options.legendAlignment.match(/L/, 'i')) {
-                    xOffset = legendRegionBounds.size.width - this.options.legendWidth;
+                if (this.options.legendAlignment.match(/R/)) {
+
+                    var actualWidth = 0;
+                    this.legend().forEach(function (item, i) {
+                        var trunc = $vis.fitTextToWidth(item.label, legendWidth);
+                        actualWidth = Math.max(actualWidth, trunc.width);
+                    });
+
+
+                    legendX = legendRegionBounds.size.width - (actualWidth + textXOffset + 6);
+
                 }
 
-                var legend = this.D3svg().select(this.options.legendRegion).selectAll('.legend');
-                legend
+                var uniqueKey = function(d) { return d.label };
+
+                this.D3svg().select(this.region(this.options.legendRegion)).selectAll('.legend')
                     .data([0])
                     .enter()
                     .append('g')
-                    .attr('transform', 'translate('+xOffset+','+yOffset+')')
-*/
+                    .attr('class', 'legend')
+
+                var legend = this.D3svg().select(this.region(this.options.legendRegion)).selectAll('.legend').selectAll('g').data(this.legend(), uniqueKey);
+
+                var gTransform = function (b,j,i) {
+                    var horz = 6 + legendX + $vis.options.legendOffset[0];
+                    var vert = 6 + i * 11 + legendY + $vis.options.legendOffset[1];
+                    return 'translate(' + horz + ',' + vert + ')';
+                };
+
+                legend
+                    .enter()
+                    .append('g')
+                    .each(function (d,i) {
+
+                        var g = d3.select(this);
+
+                        g.attr('transform', function (b,j) {return gTransform(b,j,i)})
+
+                        g
+                            .append('path')
+                            .attr('opacity', 0)
+                        ;
+                        g.append('text')
+                            .attr('class', 'legend-text')
+                            .attr('opacity', 0)
+                        ;
+                    })
+                ;
+
+                var time = this.drawnLegend ? this.options.transitionTime : 0;
+
+                legend
+                    .each(function (d,i) {
+
+                        var g = d3.select(this);
+
+                        g.transition().duration(time).attr('transform', function (b,j) {return gTransform(b,j,i)})
+
+                        var truncationObj = $vis.fitTextToWidth(d.label, legendWidth);
+
+                        g.selectAll('path')
+                            .transition().duration(time)
+                                .attr('d', function (b) {return d3.svg.symbol().type(d.shape || 'square').size(shapeArea[d.shape] || 81)() } )
+                                .style('fill', function (b, j) { return d.color })
+                                .style('stroke', function (b, j) { return d.color })
+                                .attr('opacity', 1)
+                        ;
+                        g.selectAll('text')
+                            .transition().duration(time)
+                                .attr('x', textXOffset)       //magic numbers make things look pretty!
+                                .attr('y', textYOffset)
+                                .attr('font-size', '7pt')
+                                .text(function () { return truncationObj.truncatedText })
+                                .attr('opacity', 1)
+                        ;
+
+                        if (truncationObj.truncated) {
+                            g.selectAll('text')
+                                .on('mouseover', function(d) {
+                                    $vis.showToolTip({label : truncationObj.text})
+                                })
+                                .on('mouseout', function(d) {
+                                    $vis.hideToolTip();
+                                })
+                        }
+                    })
+                ;
+
+                legend
+                    .exit()
+                    .each(function (d,i) {
+
+                        var g = d3.select(this);
+
+                        g.selectAll('path')
+                            .transition().duration(time)
+                            .attr('opacity', 0)
+                            .remove();
+
+                        g.selectAll('text')
+                            .transition().duration(time)
+                            .attr('opacity', 0)
+                            .remove();
+                    })
+                ;
+
+                this.drawnLegend = true;
+
+                return;
+
             },
 
             renderULCorner: function () {
@@ -420,6 +541,7 @@ console.log(legend);
             },
 
 
+            extractLegend : function(dataset) { /* no op in the super class */ },
 
             setDataset: function (newDataset) {
 
@@ -436,6 +558,10 @@ console.log(legend);
 
                 if (this.shouldScaleAxis('y')) {
                     this.setYScaleDomain(this.defaultYDomain());
+                }
+
+                if (this.options.autoLegend) {
+                    this.extractLegend(newDataset);
                 }
 
                 this.render();
@@ -501,7 +627,7 @@ console.log(legend);
 
 
                 var xLabeldataset = [this.xLabel()];
-                var yOffset = this.options.xLabelRegion == 'yPadding' ? 5 : 0;
+                var yOffset = this.options.xLabelOffset;
 
                 var xLabel = this.D3svg().select(this.region(this.options.xLabelRegion)).selectAll('.xLabel');
                 xLabel
@@ -528,7 +654,7 @@ console.log(legend);
                 var yLabeldataset = [this.yLabel()];
 
                 var rotation = this.options.yLabelRegion == 'xPadding' ? -90 : 90;
-                var xOffset = this.options.yLabelRegion == 'xPadding' ? 5 : 0;
+                var xOffset = this.options.yLabelOffset;
 
                 var yLabel = this.D3svg().select(this.region(this.options.yLabelRegion)).selectAll('.yLabel');
                 yLabel
