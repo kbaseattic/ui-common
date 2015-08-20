@@ -55,6 +55,7 @@ define([
                         q.all(getinfo)
                             .then(function (results) {
                                 results.forEach(function (result) {
+                                    console.log(result);
                                     var typeId = result.type_def;
                                     typeRecords[typeId].info = result;
                                 });
@@ -67,7 +68,7 @@ define([
                                             module: type.module,
                                             type: type.type,
                                             size: 'medium'
-                                        }),
+                                        }).html,
                                         a({href: '#spec/type/' + type.id}, type.version),
                                         type.info.using_type_defs.map(function (typeId) {
                                             return a({href: '#spec/type/' + typeId}, typeId);

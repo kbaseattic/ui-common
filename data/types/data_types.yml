@@ -21,10 +21,17 @@ types:
                 type: fontAwesome
                 classes: ['fa-list-ul']
             viewer:
-                title: 'Data View'
+                # This the title for the widget
+                title: 'Data View'                
+                # This is the module name as specified in the plugin
+                # it should follow standard namespacing
                 module: kb_widget_dataview_communities_collection
+                # This is the internal jquery object name for this widget.
                 widget: CollectionView
+                # If a bootstrap panel is requested to wrap this widget.
                 panel: true
+                # Mapping of standard options to the widget option properties.
+                # By standard, I mean those defined in the GenericVisualizer widget.
                 options:
                     -
                         from: workspaceId
@@ -283,28 +290,4 @@ types:
         TomtomRunResult:
     ProbabilisticAnnotation:
         ProbAnno:
-        RxnProbs:
-                
-                    
-    ToFile:
-            
-        
-        
-        
-        
-
-        
-        
-        
-
-        
-
-        
-        
-        
-        
-
-        
-        
-
-        
+        RxnProbs:            

@@ -10,6 +10,7 @@ define([
     'kb_widget_dataview_base',
     'kb.utils.api',
     'kb.utils',
+    'kb.html',
     'kb.runtime',
     'kb.service.workspace',
     'kb.widget.navbar',
@@ -17,7 +18,7 @@ define([
     'underscore',
     'kb_types'
 ],
-    function ($, DataviewWidget, APIUtils, Utils, R, WorkspaceService, Navbar, Q, _, types) {
+    function ($, DataviewWidget, APIUtils, Utils, html, R, WorkspaceService, Navbar, Q, _, types) {
         'use strict';
         var widget = Object.create(DataviewWidget, {
             init: {
@@ -432,7 +433,7 @@ define([
                 value: function (object_info) {
                     try {
                         var typeId = object_info[2],
-                            matched = typeId.match(/^(.+?).(.+?)-(.+)$/),
+                            matched = typeId.match(/^(.+?)\.(.+?)-(.+)$/),
                             module = matched[1],
                             type = matched[2],
                             version = matched[3];
@@ -441,8 +442,6 @@ define([
                             module: module, 
                             type: type
                         });
-
-                        var $logo = $('<span>');
 
                         var code = 0;
                         for (var i = 0; i < type.length; code += type.charCodeAt(i++));
@@ -470,30 +469,19 @@ define([
                         ];
                         var color = colors[code % colors.length];
 
-                        // background circle
-                        $logo.addClass('fa-stack fa-2x')
-                            .append($('<i>')
-                                .addClass('fa fa-circle fa-stack-2x')
-                                .css({'color': color}));
+                        var div = html.tag('div'),
+                            span = html.tag('span'),
+                            i = html.tag('i');
+                        var logo = div([
+                            span({class: 'fa-stack fa-2x'}, [
+                                i({class: 'fa fa-circle fa-stack-2x', style: {color: color}}),
+                                i({class: 'fa-inverse fa-stack-1x ' + icon.classes.join(' ')})
+                            ])
+                        ]);
+                        
+                        console.log(logo);
 
-                        var isCustomIcon = (icon.length > 0 && icon[0].length > 4 &&
-                            icon[0].substring(0, 4) === 'icon');
-
-                        if (isCustomIcon) {
-                            // add custom icons (more than 1 will look weird, though)
-                            _.each(icon, function (cls) {
-                                $logo.append($('<i>')
-                                    .addClass('icon fa-inverse fa-stack-1x ' + cls));
-                            });
-                        } else {
-                            // add stack of font-awesome icons
-                            _.each(icon, function (cls) {
-                                $logo.append($('<i>')
-                                    .addClass('fa fa-inverse fa-stack-1x ' + cls));
-                            });
-                        }
-
-                        return $('<div>').append($logo).html(); //probably a better way to do this...
+                        return logo;
                     } catch (err) {
                         console.error('When fetching icon config: ', err);
                         return '';

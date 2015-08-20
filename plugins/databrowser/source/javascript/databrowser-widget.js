@@ -44,7 +44,7 @@ define([
                                 module: object.info.typeModule,
                                 type: object.info.typeName,
                                 size: 'medium'
-                            }),
+                            }).html,
                             object.info.typeMajorVersion + '.' + object.info.typeMinorVersion,
                             a({href: '/narrative/' + object.narrative.workspaceId + '/' + object.info.id}, object.narrative.name),
                             object.info.version,

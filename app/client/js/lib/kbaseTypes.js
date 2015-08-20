@@ -42,7 +42,11 @@ define([
                     break;
             } 
             if (classes) {
-                return '<span class="' + classes.join(' ') + '"></span>';
+                return {
+                    classes: classes,
+                    type: icon.type,
+                    html: '<span class="' + classes.join(' ') + '"></span>'
+                }
             }
         }
         function getDefault(prop) {
