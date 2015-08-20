@@ -237,7 +237,7 @@ define([
                             dependencies = [];
 
                         // load any styles.
-                        // NB these are styles for the plugin as a whole.
+                         // NB these are styles for the plugin as a whole.
                         // TODO: do away with this. the styles should be dependencies
                         // of the panel and widgets. widget css code is below...
                         if (config.source.styles) {
@@ -354,9 +354,9 @@ define([
                 Runtime.logDebug({source: 'main', message: 'About to load panels...'});
                 var panels = [
                     {module: 'kb.panel.message', config: {}},
-                    {module: 'kb.panel.login', config: {}},
+                    // {module: 'kb.panel.login', config: {}},
                     {module: 'kb.panel.welcome'},
-                    {module: 'kb.panel.typeview'}
+                    // {module: 'kb.panel.typeview'}
                     // {module: 'kb.panel.sample'},
                     // {module: 'kb.panel.sample.router'}
                 ].map(function (panel) {

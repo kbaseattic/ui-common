@@ -68,7 +68,7 @@ ui:
         client_timeout: 900000,
         session_max_age: 5184000
     internal_links:
-        landing_pages: /functional-site/#/dataview/
+        landing_pages: #dataview/
         ws_browser: /functional-site/#/ws
         version_check: /narrative_version        
         dashboard_metrics: /userMetrics

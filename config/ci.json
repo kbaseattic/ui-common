@@ -103,7 +103,7 @@
    
    "ci": {
       "invocation": "", 
-      "landing_pages": "/functional-site/#/dataview/",
+      "landing_pages": "#dataview/",
       "log_proxy_host": "172.17.42.1", 
       "log_proxy_port": 32001, 
       "narrative_job_proxy": "http://localhost:7068", 

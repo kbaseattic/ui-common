@@ -2,6 +2,8 @@
 ---
 plugins:
     -
+        login
+    -
         name: sample
         directory: bower_components/kbase-ui-plugin-sample/src/plugin
     -
@@ -18,6 +20,8 @@ plugins:
         dashboard
     -
         dataview
+    -
+        typeview
     -
         contact
     -

@@ -145,6 +145,7 @@
             'kb.simplepanel': 'js/lib/kbaseSimplePanel',
             'kb.dom': 'js/lib/kbaseDOM',
             'kb_data':  'js/lib/kbaseData',
+            'kb_types': 'js/lib/kbaseTypes',
 
             // KBase Widgets
             // -------------
@@ -171,8 +172,9 @@
             // ------------
             
             'kb_panelBases_widgetPanel': 'js/lib/panelBases/widgetPanel',
+            'kb_widgetCollection': 'js/lib/kbaseWidgetCollection',
             
-            'kb.panel.login': 'js/lib/panels/login',
+            // 'kb.panel.login': 'js/lib/panels/login',
             'kb.panel.navbar': 'js/lib/panels/navbar',
             'kb.panel.welcome': 'js/lib/panels/welcome',
             'kb.panel.datasearch': 'js/lib/panels/datasearch',
@@ -180,29 +182,22 @@
             'kb.panel.message': 'js/lib/panels/message',
             'kb.panel.sample.router': 'js/lib/panels/sample-router',
 
-            'kb.panel.vis.linechart': 'js/lib/panels/vis/linechart',
-            'kb.panel.vis.heatmap': 'js/lib/panels/vis/heatmap',
-            'kb.panel.vis.barchart': 'js/lib/panels/vis/barchart',
-            'kb.panel.vis.scatterplot': 'js/lib/panels/vis/scatterplot',
-
             // KBase JQuery Plugin Widgets
             // ---------------------------
             'kb.jquery.widget': 'js/lib/widgets/jquery/kbaseWidget',
             'kb.jquery.authenticatedwidget': 'js/lib/widgets/jquery/kbaseAuthenticatedWidget',
             'kb.jquery.tabs': 'js/lib/widgets/jquery/kbaseTabs',
-            'kb.jquery.kb-tabs': '/src/widgets/jquery/kbTabs',
-            'kb.jquery.media-editor': 'js/lib/widgets/jquery/kbaseMediaEditor',
+            'kb.jquery.kb-tabs': 'js/lib/widgets/jquery/kbTabs',
+            // 'kb.jquery.media-editor': 'js/lib/widgets/jquery/kbaseMediaEditor',
             'kb.jquery.helper-plugins': 'js/lib/widgets/jquery/kbaseHelperPlugins',
             'kb.jquery.narrativestore': 'js/lib/widgets/jquery/kbaseNarrativeStoreView',
 
             // type spec
             'kb.spec.common': 'js/lib/widgets/jquery/spec/kbaseSpecCommon',
-            'kb.jquery.spec.type-card': 'js/lib/widgets/jquery/spec/kbaseSpecTypeCard',
+            // 'kb.jquery.spec.type-card': 'js/lib/widgets/jquery/spec/kbaseSpecTypeCard',
             // 'kb.jquery.card-layout-manager': 'js/lib/widgets/jquery/kbaseCardLayoutManager',
-            'kb.jquery.landing-page-card': 'js/lib/widgets/jquery/kbaseLandingPageCard',
-            'kb.widget.spec.data-type-specification': 'js/lib/widgets/specview/DataTypeSpecification',
-            'kb.widget.spec.module-specification': 'js/lib/widgets/specview/ModuleSpecification',
-            'kb.widget.spec.function-specification': 'js/lib/widgets/specview/FunctionSpecification',
+            // 'kb.jquery.landing-page-card': 'js/lib/widgets/jquery/kbaseLandingPageCard',
+            
             'kb.widget.error': 'js/lib/widgets/kbaseError',
             // KBase Data Visualization Widget
             // ----------------------------

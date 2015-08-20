@@ -259,7 +259,7 @@ module.exports = function (grunt) {
             }
         },
         connect: {
-            dev: {
+            server: {
                 port: 8887,
                 base: 'build/client',
                 keepalive: false,
@@ -410,6 +410,6 @@ module.exports = function (grunt) {
     ]);
     
     grunt.registerTask('preview', [
-        'open:dev','connect:dev'
+        'open:dev','connect'
     ])
 };

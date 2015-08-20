@@ -174,7 +174,8 @@ define([
                         if ((!tree.ws_refs) || (!tree.ws_refs[node.id])) {
                             var node_name = tree.default_node_labels[node.id];
                             if (node_name.indexOf('/') > 0) {  // Gene label
-                                var url = "/functional-site/#/genes/" + self.options.workspaceID + "/" + node_name;
+                                /* TODO: reroute #genes to #dataview */
+                                var url = "#genes/" + self.options.workspaceID + "/" + node_name;
                                 window.open(url, '_blank');
                             }
                             return;
@@ -182,7 +183,7 @@ define([
                         var ref = tree.ws_refs[node.id]['g'][0];
                         var objInfo = refToInfoMap[ref];
                         if (objInfo) {
-                            var url = "/functional-site/#/dataview/" + objInfo[7] + "/" + objInfo[1];
+                            var url = "#dataview/" + objInfo[7] + "/" + objInfo[1];
                             window.open(url, '_blank');
                         }
                     }, function (node) {

@@ -5,7 +5,14 @@
  browser: true,
  white: true
  */
-define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.widget', 'kb_widget_dataview_genomeLineage'], function ($, R, Workspace) {
+define([
+    'jquery',
+    'kb.runtime',
+    'kb.html',
+    'kb.service.workspace',
+    'kb.jquery.widget',
+    'kb_widget_dataview_genomeLineage'
+], function ($, R, html, Workspace) {
     'use strict';
     $.KBWidget({
         name: "KBaseGenomeWideTaxonomy",
@@ -14,7 +21,6 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.widget', 'kb_
         options: {
             genomeID: null,
             workspaceID: null,
-            loadingImage: "assets/img/ajax-loader.gif",
             genomeInfo: null
         },
         init: function (options) {
@@ -33,7 +39,6 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.widget', 'kb_
             taxonomyinfo.KBaseGenomeLineage({
                 genomeID: self.options.genomeID,
                 workspaceID: self.options.workspaceID,
-                loadingImage: self.options.loadingImage,
                 genomeInfo: self.options.genomeInfo
             });
             this.prepareTree({ws: self.options.workspaceID, id: self.options.genomeID}, tree);
@@ -41,7 +46,7 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.widget', 'kb_
         prepareTree: function (scope, $div) {
             var objectIdentity = {ref: scope.ws + "/" + scope.id};
             var workspace = new Workspace(R.getConfig('services.workspace.url'), {
-                token: R.getAuthToken() 
+                token: R.getAuthToken()
             });
             workspace.list_referencing_objects([objectIdentity], function (data) {
                 var treeName = null,

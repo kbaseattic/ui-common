@@ -247,7 +247,7 @@ define(['q', 'kb.utils', 'md5', 'kb.service.user_profile', 'kb.runtime'],
                     if (gdefault && email) {
                         return this.makeGravatarURL(email, options.size || 100, options.rating || 'pg', gdefault);
                     } else {
-                        return 'assets/images/nouserpic.png';
+                        return '/modules/userprofile/nouserpic.png';
                     }
                 }
             },

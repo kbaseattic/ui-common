@@ -294,8 +294,8 @@ define([
             setInitialState: {
                 value: function () {
                     return Q.promise(function (resolve, reject) {
-                        Q.all([data.getJSON('metrics','narrative_histogram'),
-                              data.getJSON('metrics','narrative_sharing_histogram'),
+                        Q.all([data.getJSON({path: 'metrics', file: 'narrative_histogram'}),
+                              data.getJSON({path: 'metrics', file:'narrative_sharing_histogram'}),
                             this.viewState.whenItem('narratives', 10000)
                         ])
                             .then(function (data) {

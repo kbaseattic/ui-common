@@ -6,6 +6,7 @@
  white: true
  */
 define([
+    'jquery',
     'kb_widget_dataview_base',
     'kb.utils.api',
     'kb.utils',
@@ -13,9 +14,10 @@ define([
     'kb.service.workspace',
     'kb.widget.navbar',
     'q',
-    'underscore'
+    'underscore',
+    'kb_types'
 ],
-    function (DataviewWidget, APIUtils, Utils, R, WorkspaceService, Navbar, Q, _) {
+    function ($, DataviewWidget, APIUtils, Utils, R, WorkspaceService, Navbar, Q, _, types) {
         'use strict';
         var widget = Object.create(DataviewWidget, {
             init: {
@@ -429,23 +431,45 @@ define([
             createDataIcon: {
                 value: function (object_info) {
                     try {
-                        var icons = $.parseJSON(
-                            $.ajax({
-                                url: 'assets/icons/icons.json', // should not be hardcoded!! but figure that out later
-                                async: false,
-                                dataType: 'json'
-                            }).responseText
-                            );
-                        //console.log(icons);
+                        var typeId = object_info[2],
+                            matched = typeId.match(/^(.+?).(.+?)-(.+)$/),
+                            module = matched[1],
+                            type = matched[2],
+                            version = matched[3];
+                        // var type = object_info[2].split('-')[0].split('.')[1];
+                        var icon = types.getIcon({
+                            module: module, 
+                            type: type
+                        });
 
-                        var type = object_info[2].split('-')[0].split('.')[1];
                         var $logo = $('<span>');
-                        var icon = _.has(icons.data, type) ? icons.data[type] : icons.data['DEFAULT'];
 
                         var code = 0;
-                        for (var i = 0; i < type.length; code += type.charCodeAt(i++))
-                            ;
-                        var color = icons.colors[code % icons.colors.length];
+                        for (var i = 0; i < type.length; code += type.charCodeAt(i++));
+                        var colors = [
+                            "#F44336",
+                            "#E91E63",
+                            "#9C27B0",
+                            "#3F51B5",
+                            "#2196F3",
+                            "#673AB7",
+                            "#FFC107",
+                            "#0277BD",
+                            "#00BCD4",
+                            "#009688",
+                            "#4CAF50",
+                            "#33691E",
+                            "#2E7D32",
+                            "#AEEA00",
+                            "#03A9F4",
+                            "#FF9800",
+                            "#FF5722",
+                            "#795548",
+                            "#006064",
+                            "#607D8B"
+                        ];
+                        var color = colors[code % colors.length];
+
                         // background circle
                         $logo.addClass('fa-stack fa-2x')
                             .append($('<i>')
@@ -570,7 +594,7 @@ define([
                                             code: 'notfound',
                                             shortMessage: 'This object does not exist',
                                             originalMessage: err.error.message
-                                        });                                                                     
+                                        });
                                     } else if (err.error.error.match(/^us.kbase.workspace.database.exceptions.InaccessibleObjectException:/)) {
                                         this.setState('status', 'denied');
                                         this.setState('error', {

@@ -4,44 +4,45 @@ define([
     function (_) {
         'use strict';
 
-        var factory = function () {
-            var obj = {};
-
+        function item(config) {
+            
+            var obj = config ? config.data || {} : {};
+            
             function getItem(props, defaultValue) {
                 if (typeof props === 'string') {
                     props = props.split('.');
                 } else if (!_.isArray(props)) {
                     throw new TypeError('Invalid type for key: ' + (typeof props));
                 }
-                var i;
+                var i, temp = obj;
                 for (i = 0; i < props.length; i += 1) {
-                    if ((obj === undefined) ||
-                            (typeof obj !== 'object') ||
-                            (obj === null)) {
+                    if ((temp === undefined) ||
+                        (typeof temp !== 'object') ||
+                        (temp === null)) {
                         return defaultValue;
                     }
-                    obj = obj[props[i]];
+                    temp = temp[props[i]];
                 }
-                if (obj === undefined) {
+                if (temp === undefined) {
                     return defaultValue;
                 }
-                return obj;
+                return temp;
             }
 
             function hasItem(propPath) {
                 if (typeof propPath === 'string') {
                     propPath = propPath.split('.');
                 }
-                var i;
+                var i, temp = obj;
                 for (i = 0; i < propPath.length; i += 1) {
-                    if ((obj === undefined) ||
-                            (typeof obj !== 'object') ||
-                            (obj === null)) {
+                    if ((temp === undefined) ||
+                        (typeof temp !== 'object') ||
+                        (temp === null)) {
                         return false;
                     }
-                    obj = obj[propPath[i]];
+                    temp = temp[propPath[i]];
                 }
-                if (obj === undefined) {
+                if (temp === undefined) {
                     return false;
                 }
                 return true;
@@ -56,17 +57,17 @@ define([
                 }
                 // pop off the last property for setting at the end.
                 var propKey = path.pop(),
-                    key;
+                    key, temp = obj;
                 // Walk the path, creating empty objects if need be.
                 while (path.length > 0) {
                     key = path.shift();
-                    if (obj[key] === undefined) {
-                        obj[key] = {};
+                    if (temp[key] === undefined) {
+                        temp[key] = {};
                     }
-                    obj = obj[key];
+                    temp = temp[key];
                 }
                 // Finally set the property.
-                obj[propKey] = value;
+                temp[propKey] = value;
                 return value;
             }
 
@@ -79,24 +80,24 @@ define([
                 }
                 increment = (increment === undefined) ? 1 : increment;
                 var propKey = path.pop(),
-                    key;
+                    key, temp = obj;
                 while (path.length > 0) {
                     key = path.shift();
-                    if (obj[key] === undefined) {
-                        obj[key] = {};
+                    if (temp[key] === undefined) {
+                        temp[key] = {};
                     }
-                    obj = obj[key];
+                    temp = temp[key];
                 }
-                if (obj[propKey] === undefined) {
-                    obj[propKey] = increment;
+                if (temp[propKey] === undefined) {
+                    temp[propKey] = increment;
                 } else {
-                    if (_.isNumber(obj[propKey])) {
-                        obj[propKey] += increment;
+                    if (_.isNumber(temp[propKey])) {
+                        temp[propKey] += increment;
                     } else {
                         throw new Error('Can only increment a number');
                     }
                 }
-                return obj[propKey];
+                return temp[propKey];
             }
 
             function deleteItem(path) {
@@ -107,18 +108,18 @@ define([
                     return;
                 }
                 var propKey = path.pop(),
-                    key;
+                    key, temp = obj;
                 while (path.length > 0) {
                     key = path.shift();
-                    if (obj[key] === undefined) {
+                    if (temp[key] === undefined) {
                         return false;
                     }
-                    obj = obj[key];
+                    temp = temp[key];
                 }
-                delete obj[propKey];
+                delete temp[propKey];
                 return true;
             }
-
+            
             return {
                 setItem: setItem,
                 hasItem: hasItem,
@@ -133,7 +134,10 @@ define([
 
         return {
             create: function () {
-                return factory();
+                return item();
+            },
+            make: function (config) {
+                return item(config);
             }
         };
     });

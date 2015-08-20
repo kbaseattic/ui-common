@@ -7,7 +7,6 @@ dist/docs
 .externalToolBuilders/
 .settings/
 /nbproject/private/
-functional-site/assets/data/maps
 narrative_version
 userMetrics/*.json
 bower_components/

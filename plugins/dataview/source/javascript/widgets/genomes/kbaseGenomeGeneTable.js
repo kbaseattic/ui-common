@@ -7,11 +7,12 @@
  */
 define([
     'jquery',
+    'kb.html',
     'kb.service.workspace',
     'kb.utils',
     'datatables_bootstrap',
     'kb.jquery.authenticatedwidget'
-], function ($, Workspace, Utils) {
+], function ($, html, Workspace) {
     'use strict';
     $.KBWidget({
         name: "KBaseGenomeGeneTable",
@@ -26,10 +27,8 @@ define([
             ws_name: null,
             ver: null,
             kbCache: null,
-            loadingImage: "assets/img/ajax-loader.gif",
             genomeInfo: null
         },
-        wsUrl: "https://kbase.us/services/ws/",
         init: function (options) {
             this._super(options);
 
@@ -45,7 +44,7 @@ define([
 
             var container = this.$elem;
 
-            container.append("<div><img src=\"" + self.options.loadingImage + "\">&nbsp;&nbsp;loading genes data...</div>");
+            container.append(html.loading('loading genes data...'));
 
             var genomeRef = String(this.options.ws_name) + "/" + String(this.options.genome_id);
 

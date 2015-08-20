@@ -11,8 +11,9 @@ define([
     'kb.runtime',
     'kb.html',
     'kb.service.workspace',
+    'kb_types',
     'datatables_bootstrap'
-], function ($, q, R, html, Workspace) {
+], function ($, q, R, html, Workspace, Types) {
     'use strict';
 
     function widget() {
@@ -62,6 +63,11 @@ define([
                                     var type = typeRecords[typeId];
                                     return [
                                         type.module, type.type,
+                                        Types.getIcon({
+                                            module: type.module,
+                                            type: type.type,
+                                            size: 'medium'
+                                        }),
                                         a({href: '#spec/type/' + type.id}, type.version),
                                         type.info.using_type_defs.map(function (typeId) {
                                             return a({href: '#spec/type/' + typeId}, typeId);
@@ -75,7 +81,7 @@ define([
 
                                     ];
                                 }),
-                                    cols = ['Module', 'Type', 'Version', 'Using types', 'Used by types', 'Used by functions'],
+                                    cols = ['Module', 'Type', 'Icon', 'Version', 'Using types', 'Used by types', 'Used by functions'],
                                     result = html.makeTable(cols, rows, {id: tableId, class: 'table table-striped'});
                                 resolve({
                                     title: 'Type Browser',
@@ -133,7 +139,7 @@ define([
                 $container = $(container);
                 mount.appendChild(container);
 
-                container.innerHTML = 'Loading...' + html.loading();
+                container.innerHTML = 'Loading all KBase Types ...' + html.loading();
 
                 renderer()
                     .then(function (rendered) {

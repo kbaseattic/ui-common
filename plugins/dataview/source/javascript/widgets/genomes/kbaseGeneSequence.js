@@ -12,7 +12,12 @@
  * Gene "instance" info (e.g. coordinates on a particular strain's genome)
  * is in a different widget.
  */
-define(['jquery', 'kb.jquery.widget'], function ($) {
+define([
+    'jquery', 
+    'kb.runtime',
+    'kb.html',
+    'kb.jquery.widget'
+], function ($, R, html) {
     'use strict';
     $.KBWidget({
         name: "KBaseGeneSequence",
@@ -22,7 +27,6 @@ define(['jquery', 'kb.jquery.widget'], function ($) {
             featureID: null,
             embedInCard: false,
             auth: null,
-            loadingImage: "assets/img/loading.gif",
             genomeID: null,
             workspaceID: null,
             kbCache: null,
@@ -30,7 +34,6 @@ define(['jquery', 'kb.jquery.widget'], function ($) {
             seq_cell_height: 208,
             genomeInfo: null
         },
-        cdmiURL: "https://kbase.us/services/cdmi_api",
         init: function (options) {
             this._super(options);
 
@@ -39,8 +42,8 @@ define(['jquery', 'kb.jquery.widget'], function ($) {
                 return this;
             }
 
-            this.cdmiClient = new CDMI_API(this.cdmiURL);
-            this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
+            this.cdmiClient = new CDMI_API(R.getConfig('services.cdmi.url'));
+            this.entityClient = new CDMI_EntityAPI(R.getConfig('services.cdmi.url'));
 
             this.render();
             if (this.options.workspaceID) {
@@ -70,7 +73,7 @@ define(['jquery', 'kb.jquery.widget'], function ($) {
         },
         renderWorkspace: function () {
             var self = this;
-            this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            this.showMessage(html.loading());
             this.$infoPanel.hide();
 
             if (this.options.genomeInfo) {

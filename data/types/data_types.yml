@@ -1,0 +1,310 @@
+## KBase Data Ty pes
+---
+defaults:
+    icon:  
+        type: fontAwesome
+        classes: ['fa-file-o']
+types:
+    Bambi:
+        BambiRunResult:
+    Cmonkey:
+        CmonkeyRunResult:
+    Communities:
+        Biom:
+        BiomAnnotationEntry:
+        BiomMatrix:
+        BiomMatrixEntry:
+        BiomMetagenome:
+        BiomMetagenomeEntry:        
+        Collection:
+            icon: 
+                type: fontAwesome
+                classes: ['fa-list-ul']
+            viewer:
+                title: 'Data View'
+                module: kb_widget_dataview_communities_collection
+                widget: CollectionView
+                panel: true
+                options:
+                    -
+                        from: workspaceId
+                        to: ws
+                    -                
+                        from: objectId
+                        to: id
+                    -
+                        from: authToken
+                        to: token
+        Data:
+        DataHandle:
+        Drisee:
+        FunctionalMatrix: 
+                icon:   
+                    type: fontAwesome
+                    classes: ['fa-table']
+        FunctionalProfile:
+        Heatmap: 
+            icon:   
+                type: fontAwesome
+                classes: ['fa-th']
+        List:
+        Metadata:
+        Metagenome: 
+            icon:   
+                type: kbase
+                classes: ['icon-metagenome', 'kb-data-icon-dnudge']
+        MetagenomeMatrix:
+        MetagenomeProfile:
+        MetagenomeSet:
+        MetagenomeSetElement:
+        PCoA:
+        PCoAMember:
+        Profile:
+        ProfileStats:
+        ProfileTable:
+        Project:
+        SequenceFile:
+        StatList:
+        StatMatrix:
+        Statistics:
+        StatsQC:
+        TaxonomicMatrix: 
+            icon:   
+                type: fontAwesome
+                classes: ['fa-table']
+        TaxonomicProfile:
+    Empty:
+        AHandle:
+        AType:
+    GenomeComparison:
+        ProteomeComparison: 
+            icon:   
+                type: fontAwesome
+                classes: ['fa-arrows-h']
+    Inferelator:
+        InferelatorRunResult:
+    KBaseAssembly:
+        AssemblyInput:
+            icon: 
+                type: kbase
+                classes: ['icon-reads', 'kb-data-icon-dnudge']    
+        Handle:
+        PairedEndLibrary: 
+                icon:   
+                    type: kbase
+                    classes: ['icon-reads', 'kb-data-icon-dnudge']
+        ReferenceAssembly: 
+            icon:   
+                type: fontAwesome
+                classes: ['fa-book']           
+        SingleEndLibrary: 
+            icon:   
+                type: kbase
+                classes: ['icon-reads', 'kb-data-icon-dnudge']
+    KBaseBiochem:
+        Biochemistry:
+        BiochemistryStructures:
+        Media: 
+            icon:   
+                type: fontAwesome
+                classes: ['fa-flask']
+        MetabolicMap:
+    KBaseCommon:
+        Location:
+        Sourceinfo:
+        StrainInfo:
+    KBaseCommunities:
+        # is this an old version of "Communities"?
+        Metagenome:
+    KBaseExpression:
+        ExpressionPlatform:
+        ExpressionReplicateGroup:
+        ExpressionSample: 
+            icon:  
+                type: fontAwesome
+                classes: ['fa-tachometer']
+        ExpressionSeries: 
+            icon:  
+                type: fontAwesome
+                classes: ['fa-tachometer']
+        RNASeqDifferentialExpression:
+        RNASeqSample:
+        RNASeqSampleAlignment:
+    KBaseFBA:
+        BooleanGeneExpressionData:
+        BooleanGeneExpressionDataCollection:
+        Classifier:
+        ClassifierResult:
+        ClassifierTrainingSet:
+        ETC:
+        FBA:
+            icon:  
+                type: kbase
+                classes: ['icon-metabolism', 'kb-data-icon-dnudge']
+        FBAComparison:
+        FBAModel: 
+            icon:   
+                type: kbase
+                classes: ['icon-metabolism', 'kb-data-icon-dnudge']
+        FBAModelSet:
+        Gapfilling:
+        Gapgeneration:
+        ModelTemplate:
+        PromConstraint:
+        ReactionSensitivityAnalysis:
+        regulatory_network:
+    KBaseFile:
+        AnnotationFile:
+        AssemblyFile:
+        FileRef:
+        PairedEndLibrary:
+            # is this the same as KbaseAssembly.PairedEndLibrary?
+        SingleEndLibrary:
+            # is this the same as KBaseAssembly.SingleEndLibrary?
+    KBaseGeneFamilies:
+        # note that the icons mapping below was original singular, assuming this was a typo?
+        DomainAlignments: 
+            icon:  
+                type: fontAwesome
+                classes: ['fa-sliders']
+        DomainAnnotation:
+        DomainCluster:
+        DomainClusterSearchResult:
+        DomainLibrary:
+        DomainModelSet:
+    KBaseGenomes:
+        ContigSet: 
+            icon: 
+                type: fontAwesome
+                classes: ['fa-align-justify']
+        Feature:
+        Genome: 
+            icon:   
+                type: kbase
+                classes: ['icon-genome', 'kb-data-icon-dnudge']
+        GenomeComparison: 
+            icon:   
+                type: kbase
+                classes: ['icon-compare', 'kb-data-icon-dnudge2']
+        GenomeDomainData:
+        MetagenomeAnnotation:
+        Pangenome: 
+            icon:   
+                type: fontAwesome
+                classes: ['fa-bullseye']
+        ProbabilisticAnnotation:
+    KBaseGwasData:
+        GwasExperimentSummary:
+        GwasGeneList:
+        GwasPopulation:
+        GwasPopulationKinship:
+        GwasPopulationSummary:
+        GwasPopulationTrait:
+        GwasPopulationVariation:
+        GwasTopVariations:
+        VariantCall:
+        VariationSample:
+    KBaseNarrative:
+        Cell:
+        Metadata:
+        Narrative:
+        Worksheet:
+    KBaseNetworks:
+        InteractionSet:
+        Network: 
+            icon:   
+                type: fontAwesome
+                classes: ['fa-code-fork']
+    KBaseOntology:
+        GeneAnnotations:
+        GeneOntologyAnnotation:
+        Mapping:
+        Ontology:
+        OntologyAccMap:
+        gene_enrichment_annotations:
+    KBasePhenotypes:
+        PhenotypeSet: 
+            icon:   
+                type: fontAwesome
+                classes: ['fa-list-ul']
+        PhenotypeSimulationSet:
+            icon:   
+                type: fontAwesome
+                classes: ['fa-list-ul']
+    KbasePPI:
+        Interaction:
+        InteractionDataset:
+    KBaseRegulation:
+        Regulome:
+    KBaseSearch:
+        Contig:
+        ContigSet:
+            # different from KbaseGenomes.ContigSet?
+        Feature:
+        FeatureSet:
+        Genome:
+            # different from KBaseGenomes.Genome?
+        GenomeSet: 
+            icon:   
+                type: fontAwesome
+                classes: ['fa-list-ul']
+        IndividualFeature:
+        Ontology:
+        SearchFeatureSet:
+        Type2CommandConfig:
+    KBaseSequences:
+        SequenceSet:
+    KBaseTrees:
+        MSA:
+        MSASet:
+        Tree: 
+            icon:   
+                type: kbase
+                classes: ['icon-tree', 'kb-data-icon-dnudge']
+    MAK:
+        ExpressionDataPoint:
+        ExpressionDataSample:
+        ExpressionDataSeries:
+        FloatDataTable:
+        FloatDataTableContainer:
+        MAKBicluster:
+        MAKBiclusterSet:
+        MAKInputData:
+        MAKResult:
+        StringDataTable:
+        StringDataTableContainer:
+    MEME:
+        MastHit:
+        MastRunResult:
+        MemePSPM:
+        MemePSPMCollection:
+        MemeRunResult:
+        MemeSite:
+        TomtomRunResult:
+    ProbabilisticAnnotation:
+        ProbAnno:
+        RxnProbs:
+                
+                    
+    ToFile:
+            
+        
+        
+        
+        
+
+        
+        
+        
+
+        
+
+        
+        
+        
+        
+
+        
+        
+
+        

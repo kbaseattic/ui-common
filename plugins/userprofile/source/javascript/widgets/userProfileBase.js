@@ -12,9 +12,10 @@ define([
     'q',
     'kb.runtime',
     'kb.utils',
+    'kb.html', 
     'postal'
 ],
-    function (nunjucks, $, Q, R, Utils, Postal) {
+    function (nunjucks, $, Q, R, Utils, html, Postal) {
         "use strict";
         var SocialWidget = Object.create({}, {
             // The init function interfaces this object with the caller, and sets up any 
@@ -558,7 +559,7 @@ define([
             // NB depends on assets.
             renderWaitingView: {
                 value: function () {
-                    this.places.content.html('<img src="assets/img/ajax-loader.gif"></img>');
+                    this.places.content.html(html.loading());
                 }
             },
             loadCSS: {

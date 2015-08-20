@@ -131,7 +131,7 @@
                     
                      {% for versionObject in state.versions %}
                      <tr>
-                        <td><a href="/functional-site/#/dataview/{{versionObject.wsid}}/{{versionObject.id}}/{{versionObject.version}}">v{{versionObject.version}}</a></td>
+                        <td><a href="#dataview/{{versionObject.wsid}}/{{versionObject.id}}/{{versionObject.version}}">v{{versionObject.version}}</a></td>
                         <td>Saved on {{versionObject.save_date|dateFormat}} by <a href="#/people/{{versionObject.saved_by}}">{{versionObject.saved_by}}</a></td>
                      </tr>
                      {% endfor%}
@@ -167,8 +167,8 @@
                        
                         {% for ref in state.inc_references %}
                         <tr>
-                           <td><a href="/functional-site/#/dataview/{{ref.wsid}}/{{ref.id}}/{{ref.version}}">{{ref.name}}</a></td>
-                           <td><a href="#/spec/type/{{ref.type}}" target="_blank">{{ref.typeName}}</a></td>
+                           <td><a href="#dataview/{{ref.wsid}}/{{ref.id}}/{{ref.version}}">{{ref.name}}</a></td>
+                           <td><a href="#spec/type/{{ref.type}}" target="_blank">{{ref.typeName}}</a></td>
                            <td>Saved on {{ref.save_date|dateFormat}} by <a href="#/people/{{ref.saved_by}}">{{ref.saved_by}}</a></td>
                         </tr>
                         {% endfor%}
@@ -211,8 +211,8 @@
                        
                         {% for ref in state.out_references %}
                         <tr>
-                           <td><a href="/functional-site/#/dataview/{{ref.wsid}}/{{ref.id}}/{{ref.version}}">{{ref.name}}</a></td>
-                           <td><a href="#/spec/type/{{ref.type}}" target="_blank">{{ref.typeName}}</a></td>
+                           <td><a href="#dataview/{{ref.wsid}}/{{ref.id}}/{{ref.version}}">{{ref.name}}</a></td>
+                           <td><a href="#spec/type/{{ref.type}}" target="_blank">{{ref.typeName}}</a></td>
                            <td>Saved on {{ref.save_date|dateFormat}} by <a href="#/people/{{ref.saved_by}}">{{ref.saved_by}}</a></td>
                         </tr>
                         {% endfor%}

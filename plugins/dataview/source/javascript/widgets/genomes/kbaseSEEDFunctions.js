@@ -15,12 +15,14 @@
  */
 define([
     'jquery',
-    'kb.jquery.widget',
     'd3',
     'kb.service.workspace',
-    'kb.runtime'
+    'kb.runtime',
+    'kb.html', 
+    
+    'kb.jquery.widget',
 ],
-    function ($, _W, d3, Workspace, R) {
+    function ($, d3, Workspace, R, html) {
         'use strict';
         $.KBWidget({
             name: "KBaseSEEDFunctions",
@@ -30,8 +32,6 @@ define([
                 objNameOrId: null,
                 wsNameOrId: null,
                 objVer: null,
-                //loadingImage: "assets/img/loading.gif",
-                loadingImage: "assets/img/ajax-loader.gif",
                 kbCache: null,
                 width: 900,
                 genomeInfo: null
@@ -311,7 +311,7 @@ define([
 
                 // open window with gene landing page
                 if (d.children === undefined || (d._children === null && d.children === null)) {
-                    window.open("/functional-site/#/genes/" + this.options.wsNameOrId + "/" + this.options.objNameOrId + "/" + d.name);
+                    window.open("#genes/" + this.options.wsNameOrId + "/" + this.options.objNameOrId + "/" + d.name);
                 }
 
                 // expand tree

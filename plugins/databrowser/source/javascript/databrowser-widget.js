@@ -17,9 +17,10 @@ define([
     'kb.utils.api',
     'kb.utils',
     'kb.narrative',
+    'kb_types',
     'datatables_bootstrap'
 ],
-    function ($, q, R, DOM, html, WorkspaceClient, APIUtils, Utils, Narrative) {
+    function ($, q, R, DOM, html, WorkspaceClient, APIUtils, Utils, Narrative, Types) {
         'use strict';
 
         var widget = function (config) {
@@ -34,11 +35,16 @@ define([
             function render(data) {
                 var a = html.tag('a'),
                     tableId = html.genId(),
-                    columns = ['Object Name', 'Type', 'Version', 'Narrative', 'Version', 'Last Modified'],
+                    columns = ['Object Name', 'Type', 'Icon', 'Version', 'Narrative', 'Version', 'Last Modified'],
                     rows = data.map(function (object) {
                         return [
                             a({href: '#dataview/' + object.info.wsid + '/' + object.info.id}, object.info.name),
                             object.info.typeName,
+                            Types.getIcon({
+                                module: object.info.typeModule,
+                                type: object.info.typeName,
+                                size: 'medium'
+                            }),
                             object.info.typeMajorVersion + '.' + object.info.typeMinorVersion,
                             a({href: '/narrative/' + object.narrative.workspaceId + '/' + object.info.id}, object.narrative.name),
                             object.info.version,

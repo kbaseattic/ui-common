@@ -10,7 +10,12 @@
  * @author Chris Bun <chrisbun@gmail.com>
  * @public
  */
-define(['jquery', 'kb.runtime', 'kb.jquery.authenticatedwidget'], function ($, R) {
+define([
+    'jquery',
+    'kb.runtime',
+    'kb.html',
+    'kb.jquery.authenticatedwidget'
+], function ($, R, html) {
     'use strict';
     $.KBWidget({
         name: "kbaseAssemblyView",
@@ -26,7 +31,6 @@ define(['jquery', 'kb.runtime', 'kb.jquery.authenticatedwidget'], function ($, R
             ws_name: null,
             job_id: null
         },
-        loadingImage: "assets/img/ajax-loader.gif",
         timer: null,
         init: function (options) {
             this._super(options);
@@ -56,7 +60,7 @@ define(['jquery', 'kb.runtime', 'kb.jquery.authenticatedwidget'], function ($, R
 
             var ready = function () {
                 container.empty();
-                container.append("<div><img src=\"" + self.loadingImage + "\">&nbsp;&nbsp;loading genome data...</div>");
+                container.append(html.loading('loading genome data...'));
                 var objname;
                 objname = self.ws_id;
                 if (typeof self.ws_id === "string") {
