@@ -55,7 +55,7 @@ define([
                         q.all(getinfo)
                             .then(function (results) {
                                 results.forEach(function (result) {
-                                    console.log(result);
+                                    // console.log(result);
                                     var typeId = result.type_def;
                                     typeRecords[typeId].info = result;
                                 });

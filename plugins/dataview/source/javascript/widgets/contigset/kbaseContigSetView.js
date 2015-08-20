@@ -15,10 +15,11 @@ define([
     'kb.service.workspace',
     'kb.utils',
     'kb.html',
+    'kb.runtime',
     
     'datatables_bootstrap',
     'kb.jquery.authenticatedwidget',
-], function ($, Workspace, Utils, html) {
+], function ($, Workspace, Utils, html, R) {
     'use strict';
     $.KBWidget({
         name: "kbaseContigSetView",
@@ -31,8 +32,6 @@ define([
         options: {
             ws_id: null,
             ws_name: null,
-            ws_url: null,
-            token: null,
             width: 850
         },
         init: function (options) {
@@ -48,7 +47,9 @@ define([
                 this.ws_name = options.ws;
             }
 
-            this.ws_service = new Workspace(options.ws_url, {token: options.token});
+            this.ws_service = new Workspace(R.getConfig('services.workspace.url'), {
+                token: R.getAuthToken()
+            });
 
             this.render();
             return this;

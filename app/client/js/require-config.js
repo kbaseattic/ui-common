@@ -136,7 +136,7 @@
             // kbase app
             'kb.appstate': 'js/lib/kbaseAppState',
             'kb.html': 'js/lib/kbaseHTML',
-            'kb.easytree': 'js/lib/trees/easytree',
+            'kb.easytree': 'js/lib/kbaseEasyTree',
             'kb.messaging': 'js/lib/kbaseMessaging',
             'kb.format': 'js/lib/kbaseFormat',
             'kb.props': 'js/lib/kbaseProps',

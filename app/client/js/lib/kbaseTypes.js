@@ -49,12 +49,17 @@ define([
                 }
             }
         }
+        function getViewer(arg) {
+            var viewer = types.getItem(['types', arg.type.module, arg.type.name, 'viewer']);
+            return viewer;
+        }
         function getDefault(prop) {
             return types.getItem(['defaults', prop]);
         }
         
         return {
             getIcon: getIcon,
+            getViewer: getViewer,
             getDefault: getDefault
         };
     });

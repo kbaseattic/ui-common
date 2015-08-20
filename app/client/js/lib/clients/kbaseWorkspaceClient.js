@@ -188,15 +188,12 @@ define([
                         var obj_refs = reflist.map(function (ref) {
                            return {ref: ref};
                         });
-                        console.log(obj_refs);
                         Q(this.workspaceClient.get_object_info_new({
                             objects: obj_refs,
                             ignoreErrors: 1,
                             includeMetadata: 1
                         })).
                             then(function (data) {
-                                console.log('there?');
-
                                 var refhash = {},
                                     i;
                                 for (i = 0; i < data.length; i += 1) {

@@ -35,11 +35,12 @@ define([
             function render(data) {
                 var a = html.tag('a'),
                     tableId = html.genId(),
-                    columns = ['Object Name', 'Type', 'Icon', 'Version', 'Narrative', 'Version', 'Last Modified'],
+                    columns = ['Object Name', 'Module', 'Type', 'Icon', 'Version', 'Narrative', 'Version', 'Last Modified'],
                     rows = data.map(function (object) {
                         return [
                             a({href: '#dataview/' + object.info.wsid + '/' + object.info.id}, object.info.name),
-                            object.info.typeName,
+                            object.info.typeModule,
+                            a({href: '#spec/type/'+object.info.typeModule + '.' +object.info.typeName},  object.info.typeName),
                             Types.getIcon({
                                 module: object.info.typeModule,
                                 type: object.info.typeName,

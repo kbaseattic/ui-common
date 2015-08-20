@@ -92,6 +92,19 @@ define(['kb.utils'],
                         obj['name'] = objectId;
                     return obj;
                 }
+            },
+            parseTypeId: {
+                value: function (typeId) {
+                    var matched = typeId.match(/^(.+?)\.(.+?)-(.+)$/),
+                        module = matched[1],
+                        name = matched[2],
+                        version = matched[3];
+                    return {
+                        module: module,
+                        name: name,
+                        version: version
+                    };
+                }
             }
             
         });

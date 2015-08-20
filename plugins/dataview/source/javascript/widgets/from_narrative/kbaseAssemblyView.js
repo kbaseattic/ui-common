@@ -60,16 +60,17 @@ define([
 
             var ready = function () {
                 container.empty();
-                container.append(html.loading('loading genome data...'));
+                container.append(html.loading('loading data...'));
                 var objname;
                 objname = self.ws_id;
-                if (typeof self.ws_id === "string") {
-                    if (self.ws_id.indexOf(".report") === -1) { //Check if contigset or report
-                        objname = self.ws_id + ".report";
-                    }
-                }
+                // commented this out ... can't think of how this ever worked. eap.
+                //if (typeof self.ws_id === 'string') {
+               //     if (self.ws_id.indexOf('.report') === -1) { //Check if contigset or report
+                //        objname = self.ws_id + '.report';
+               //     }
+               // }
 
-                kbws.get_objects([{ref: self.ws_name + "/" + objname}], function (data) {
+                kbws.get_objects([{ref: self.ws_name + '/' + objname}], function (data) {
                     container.empty();
                     var report_div = '<div class="" style="margin-top:15px">';
                     var report = data[0].data.report;

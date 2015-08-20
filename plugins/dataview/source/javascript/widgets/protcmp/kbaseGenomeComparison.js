@@ -13,7 +13,7 @@
 define([
     'jquery', 
     'kb.runtime', 
-    'html',
+    'kb.html',
     'kb.service.workspace', 
     'd3', 
     'kb.jquery.authenticatedwidget'

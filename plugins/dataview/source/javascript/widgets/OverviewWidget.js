@@ -433,14 +433,10 @@ define([
                 value: function (object_info) {
                     try {
                         var typeId = object_info[2],
-                            matched = typeId.match(/^(.+?)\.(.+?)-(.+)$/),
-                            module = matched[1],
-                            type = matched[2],
-                            version = matched[3];
-                        // var type = object_info[2].split('-')[0].split('.')[1];
+                            type = APIUtils.parseTypeId(typeId);
                         var icon = types.getIcon({
-                            module: module, 
-                            type: type
+                            module: type.module, 
+                            type: type.name
                         });
 
                         var code = 0;
