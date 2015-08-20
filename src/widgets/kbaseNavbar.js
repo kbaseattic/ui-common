@@ -1,123 +1,127 @@
+/*global define: true */
+/*jslint browser:true  vars: true */
 define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
    function ($, nunjucks, Session, Config) {
       "use strict";
       var Navbar = Object.create({}, {
+        version: {
+            value: '0.0.2',
+            writable: false
+        },
          init: {
             value: function (cfg) {
-               if (typeof cfg.container === 'string') {
-                  this.container = $(cfg.container);
-               } else {
-                  this.container = cfg.container;
-               }
+                if (typeof cfg.container === 'string') {
+                    this.container = $(cfg.container);
+                } else {
+                    this.container = cfg.container;
+                }
 
-               // Looks like a widget ... acts like a widget ...
-               this.widgetTitle = 'Navbar Widget';
-               this.widgetName = 'Navbar';
+                // Looks like a widget ... acts like a widget ...
+                this.widgetTitle = 'Navbar Widget';
+                this.widgetName = 'Navbar';
 
-               this.templates = {};
-               this.templates.env = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/' + this.widgetName + '/templates'), {
-                  'autoescape': false
-               });
-               this.templates.env.addFilter('kbmarkup', function (s) {
-                  if (s) {
-                     s = s.replace(/\n/g, '<br>');
-                  }
-                  return s;
-               });
-               // This is the cache of templates.
-               this.templates.cache = {};
+                this.templates = {};
+                this.templates.env = new nunjucks.Environment(new nunjucks.WebLoader('/src/widgets/' + this.widgetName + '/templates'), {
+                    'autoescape': false
+                });
+                this.templates.env.addFilter('kbmarkup', function (s) {
+                    if (s) {
+                        s = s.replace(/\n/g, '<br>');
+                    }
+                    return s;
+                });
+                // This is the cache of templates.
+                this.templates.cache = {};
 
-               // The context object is what is given to templates.
-               this.context = {};
-               this.context.env = {
-                  widgetTitle: this.widgetTitle,
-                  widgetName: this.widgetName
-               };
+                // The context object is what is given to templates.
+                this.context = {};
+                this.context.env = {
+                    widgetTitle: this.widgetTitle,
+                    widgetName: this.widgetName
+                };
 
 
-               // Don't load css dynamically for now. There are parts of the functional
-               // site which don't know about this widget yet. And perhaps it will be
-               // best practice to load the css for core ui components statically so that
-               // the layout doesn't jump around as components load.
-               // this.loadCSS();
-               return this;
+                // Don't load css dynamically for now. There are parts of the functional
+                // site which don't know about this widget yet. And perhaps it will be
+                // best practice to load the css for core ui components statically so that
+                // the layout doesn't jump around as components load.
+                // this.loadCSS();
+                return this;
             }
-         },
-         version: {
-            value: "0.0.2"
-         },
-         getVersion: {
+        },
+        getVersion: {
             value: function () {
-               return this.version;
+                return this.version;
             }
-         },
-         loadCSS: {
+        },
+        loadCSS: {
             value: function () {
-               $('<link>')
-                  .appendTo('head')
-                  .attr({
-                     type: 'text/css',
-                     rel: 'stylesheet'
-                  })
-                  .attr('href', '/src/widgets/' + this.widgetName + '/style.css');
-               return this;
+                $('<link>').appendTo('head')
+                    .attr({
+                        type: 'text/css',
+                        rel: 'stylesheet'
+                    })
+                    .attr('href', '/src/widgets/' + this.widgetName + '/style.css');
+                return this;
             }
-         },
-         setTitle: {
+        },
+        setTitle: {
             value: function (title) {
-               // okay, we are punning on a class set on this element.
-               this.container.find('.navbar-title').html(title);
-               return this;
+                // okay, we are punning on a class set on this element.
+                this.container.find('.navbar-title').html(title);
+                return this;
             }
-         },
-         clear: {
+        },
+        clear: {
             value: function () {
-               this.clearMenu();
-               this.clearTitle();
-               this.clearButtons();
-               return this;
+                this.clearMenu();
+                this.clearTitle();
+                this.clearButtons();
+                return this;
             }
-         },
-         clearTitle: {
+        },
+        clearTitle: {
             value: function () {
-               this.container.find('.navbar-title').empty();
-               return this;
+                this.container.find('.navbar-title').empty();
+                return this;
             }
-         },
-         clearButtons: {
+        },
+        clearButtons: {
             value: function () {
-               this.container.find('.navbar-buttons').empty();
-               return this;
+                this.container.find('.navbar-buttons').empty();
+                return this;
             }
-         },
-         addButton: {
+        },
+        addButton: {
             value: function (cfg) {
-               var iconStyle = '';
-               var label = '';
-               if (cfg.label) {
-                  label = '<div class="kb-nav-btn-txt">' + cfg.label + '</div>';
-               } else {
-                  iconStyle += 'font-size: 150%;';
-               }
-               //if (cfg.color) {
-               //   iconStyle += 'color: ' + cfg.color + ';';
-               //}
+                var iconStyle = '';
+                var label = '';
+                if (cfg.label) {
+                    label = '<div class="kb-nav-btn-txt">' + cfg.label + '</div>';
+                } else {
+                    iconStyle += 'font-size: 150%;';
+                }
+                //if (cfg.color) {
+                //   iconStyle += 'color: ' + cfg.color + ';';
+                //}
 
+               var button;
                if (cfg.url) {
                   // a link style button
                   if (cfg.external) {
                      cfg.target = '_blank';
                   }
+                  var target;
                   if (cfg.target) {
-                     var target = 'target="' + cfg.target + '"';
+                     target = 'target="' + cfg.target + '"';
                   } else {
-                     var target = '';
+                     target = '';
                   }
-                  var button = $('<a data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn" role="button" href="' + cfg.url + '" ' + target + '>' +
-                     '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</a>')
+                  button = $('<a data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn" role="button" href="' + cfg.url + '" ' + target + '>' +
+                     '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</a>');
 
                } else {
-                  var button = $('<button data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn">' +
+                  button = $('<button data-button="' + cfg.name + '" id="kb-' + cfg.name + '-btn" class="btn btn-' + (cfg.style || 'default') + ' navbar-btn kb-nav-btn">' +
                         '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</button>')
                      .on('click', function (e) {
                         e.preventDefault();
@@ -134,13 +138,13 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                }
                return this;
             }
-         },
-         findButton: {
+        },
+        findButton: {
             value: function (name) {
-               return this.container.find('.navbar-buttons [data-button="' + name + '"]');
+                return this.container.find('.navbar-buttons [data-button="' + name + '"]');
             }
-         },
-         addDropdown: {
+        },
+        addDropdown: {
             value: function (cfg) {
                // var button = $('<button type="button" class="btn btn-' + cfg.style + ' dropdown-toggle" data-toggle="dropdown" aria-expanded="false">' + cfg.label + ' <span class="caret"></span></button>');
                var iconStyle = '';
@@ -155,39 +159,39 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                      '  <div class="fa fa-' + cfg.icon + '" style="' + iconStyle + '"></div>' + label + '</button>');
                if (cfg.disabled) {
                   button.prop('disabled', true);
-               } 
+               }
 
                var menu = $('<ul class="dropdown-menu" role="menu"></ul>');
                if (cfg.items) {
-               for (var i = 0; i < cfg.items.length; i++) {
-                  var item = cfg.items[i];
-                  if (item.type === 'divider') {
-                     menu.append('<li class="divider"></li>');
-                  } else {
-                     var menuItem = $('<li></li>');
+                  for (var i = 0; i < cfg.items.length; i++) {
+                     var item = cfg.items[i];
+                     if (item.type === 'divider') {
+                        menu.append('<li class="divider"></li>');
+                     } else {
+                        var menuItem = $('<li></li>');
 
-                     if (item.url) {
-                        var link = $('<a></a>')
-                           .attr('href', item.url)
-                           .attr('data-menu-item', item.name);
-                     } else if (item.callback) {
-                        var link = $('<a></a>')
-                           .attr('href', '#')
-                           .attr('data-menu-item', item.name)
-                           .on('click', item.callback);
-                     }
-                     if (item.external) {
-                        link.attr('target', '_blank');
-                     }
+                        if (item.url) {
+                           var link = $('<a></a>')
+                              .attr('href', item.url)
+                              .attr('data-menu-item', item.name);
+                        } else if (item.callback) {
+                           var link = $('<a></a>')
+                              .attr('href', '#')
+                              .attr('data-menu-item', item.name)
+                              .on('click', item.callback);
+                        }
+                        if (item.external) {
+                           link.attr('target', '_blank');
+                        }
 
-                     var icon = $('<div class="navbar-icon" style=""></div>');
-                     if (item.icon) {
-                        icon.append($('<span class="fa fa-' + item.icon + '"  class="navbar-icon"></span>'));
-                     }
+                        var icon = $('<div class="navbar-icon" style=""></div>');
+                        if (item.icon) {
+                           icon.append($('<span class="fa fa-' + item.icon + '"  class="navbar-icon"></span>'));
+                        }
 
-                     menu.append(menuItem.append(link.append(icon).append(item.label)));
+                        menu.append(menuItem.append(link.append(icon).append(item.label)));
+                     }
                   }
-               }
                }
                var dropdown = $('<div class="dropdown" style="display: inline-block;"></div>').append(button).append(menu);
                if (cfg.place === 'end') {
@@ -203,12 +207,12 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                }
                return this;
             }
-         },
-
-         /* TODO: This should not be here, rather in some top level module, like the app */
-         addDefaultMenu: {
+        },
+        /* TODO: This should not be here, rather in some top level module, like the app */
+        addDefaultMenu: {
             value: function (cfg) {
                cfg = cfg || {};
+               var hasRegularMenuItems = false;
                if (cfg.search !== false) {
                   this.addMenuItem({
                      name: 'search',
@@ -217,6 +221,7 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                      url: '#/search/?q=*',
                      place: 'end'
                   });
+                  hasRegularMenuItems = true;
                }
                if (cfg.narrative !== false) {
                   this.addMenuItem({
@@ -227,6 +232,8 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                      external: true,
                      place: 'end'
                   });
+                  hasRegularMenuItems = true;
+
                }
                if (cfg.dashboard !== false) {
                   this.addMenuItem({
@@ -236,166 +243,166 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                      url: '#/dashboard',
                      place: 'end'
                   });
+                  hasRegularMenuItems = true;
+
                }
-               this.addMenuItem({
-                  type: 'divider',
-                  name: 'help',
-                  place: 'end'
-               });
-
-               this.addHelpMenuItem({
-                  name: 'contactus',
-                  label: 'Contact Us',
-                  icon: 'envelope-o',
-                  url: Config.getConfig('docsite.baseUrl')  + Config.getConfig('docsite.paths.contact'),
-                  place: 'end'
-               });
-               this.addHelpMenuItem({
-                  name: 'about',
-                  label: 'About KBase',
-                  icon: 'info-circle',
-                  url: Config.getConfig('docsite.baseUrl')  + Config.getConfig('docsite.paths.about'),
-               });
-               return this;
-            }
-         },
-
-         makeMenuItem: {
-            value: function (cfg) {
-               if (cfg.type === 'divider') {
-                  var item = $('<li  role="presentation" class="divider"></li>').attr('data-menu-item', cfg.name);
-               } else {
-                  var item = $('<li></li>');
-                  if (cfg.url) {
-                     var link = $('<a></a>')
-                        .attr('href', cfg.url)
-                        .attr('data-menu-item', cfg.name);
-                  } else if (cfg.callback) {
-                     var link = $('<a></a>')
-                        .attr('href', '#')
-                        .attr('data-menu-item', cfg.name)
-                        .on('click', cfg.callback);
-                  }
-                  if (cfg.external) {
-                     link.attr('target', '_blank');
-                  }
-                  var icon = $('<div class="navbar-icon" style=""></div>');
-                  if (cfg.icon) {
-                     icon.append($('<span class="fa fa-' + cfg.icon + '"  class="navbar-icon"></span>'));
-                  }
-                  item.append(link.append(icon).append(cfg.label));
+               if (hasRegularMenuItems) {
+                  this.addMenuItem({
+                     type: 'divider',
+                     name: 'help',
+                     place: 'end'
+                  });
                }
-               return item;
-            }
-         },
 
-         addMenuItem: {
+                this.addHelpMenuItem({
+                    name: 'contactus',
+                    label: 'Contact Us',
+                    icon: 'envelope-o',
+                    url: Config.getConfig('docsite.baseUrl') + Config.getConfig('docsite.paths.contact'),
+                    place: 'end'
+                });
+                this.addHelpMenuItem({
+                    name: 'about',
+                    label: 'About KBase',
+                    icon: 'info-circle',
+                    url: Config.getConfig('docsite.baseUrl') + Config.getConfig('docsite.paths.about'),
+                });
+                return this;
+            }
+        },
+        makeMenuItem: {
             value: function (cfg) {
-               var menu = this.container.find('.navbar-menu .dropdown-menu');
-               if (menu) {
-                  var item = this.makeMenuItem(cfg);
-                  if (item) {
-                     if (cfg.place === 'end') {
-                        menu.append(item);
-                     } else {
-                        menu.prepend(item);
-                     }
-                  }
-               }
-               return this;
+                if (cfg.type === 'divider') {
+                    var item = $('<li  role="presentation" class="divider"></li>').attr('data-menu-item', cfg.name);
+                } else {
+                    var item = $('<li></li>');
+                    if (cfg.url) {
+                        var link = $('<a></a>')
+                                .attr('href', cfg.url)
+                                .attr('data-menu-item', cfg.name);
+                    } else if (cfg.callback) {
+                        var link = $('<a></a>')
+                                .attr('href', '#')
+                                .attr('data-menu-item', cfg.name)
+                                .on('click', cfg.callback);
+                    }
+                    if (cfg.external) {
+                        link.attr('target', '_blank');
+                    }
+                    var icon = $('<div class="navbar-icon" style=""></div>');
+                    if (cfg.icon) {
+                        icon.append($('<span class="fa fa-' + cfg.icon + '"  class="navbar-icon"></span>'));
+                    }
+                    item.append(link.append(icon).append(cfg.label));
+                }
+                return item;
             }
-         },
-
-         removeMenuItem: {
+        },
+        addMenuItem: {
+            value: function (cfg) {
+                var menu = this.container.find('.navbar-menu .dropdown-menu');
+                if (menu) {
+                    var item = this.makeMenuItem(cfg);
+                    if (item) {
+                        if (cfg.place === 'end') {
+                            menu.append(item);
+                        } else {
+                            menu.prepend(item);
+                        }
+                    }
+                }
+                return this;
+            }
+        },
+        removeMenuItem: {
             value: function (cfg) {
 
             }
-         },
-         setAboutURL: {
+        },
+        setAboutURL: {
             value: function (cfg) {
 
             }
-         },
-         addHelpMenuItem: {
+        },
+        addHelpMenuItem: {
             value: function (cfg) {
                var item = this.makeMenuItem(cfg);
                if (item) {
-                  if (cfg.place === 'end') {
-                     var menu = this.container.find('.navbar-menu .dropdown-menu');
-                     if (menu) {
+                  var menu = this.container.find('.navbar-menu .dropdown-menu');
+                  if (menu) {
+                     if (cfg.place === 'end') {
                         menu.append(item);
-                     }
-                  } else {
-                     var helpDivider = this.container.find('.navbar-menu .dropdown-menu [data-menu-item="help"]');
-                     if (helpDivider) {
-                        helpDivider.after(item);
+                     } else {
+                        var helpDivider = menu.find('[data-menu-item="help"]');
+                        if (helpDivider.length === 1) {
+                           helpDivider.after(item);
+                        } else {
+                           menu.prepend(item);
+                        }
                      }
                   }
                }
                return this;
             }
-         },
-         removeHelpMenuItem: {
+        },
+        removeHelpMenuItem: {
             value: function (cfg) {
 
             }
-         },
-         clearMenu: {
+        },
+        clearMenu: {
             value: function (cfg) {
-               this.container.find('.navbar-menu .dropdown-menu').empty();
-               return this;
+                this.container.find('.navbar-menu .dropdown-menu').empty();
+                return this;
             }
-         },
-
-         // TEMPLATES
-         getTemplate: {
+        },
+        // TEMPLATES
+        getTemplate: {
             value: function (name) {
-               if (this.templates.cache[name] === undefined) {
-                  this.templates.cache[name] = this.templates.env.getTemplate(name + '.html');
-               }
-               return this.templates.cache[name];
+                if (this.templates.cache[name] === undefined) {
+                    this.templates.cache[name] = this.templates.env.getTemplate(name + '.html');
+                }
+                return this.templates.cache[name];
             }
-         },
-
-         createTemplateContext: {
+        },
+        createTemplateContext: {
             value: function (additionalContext) {
-               /*
+                /*
                  var context = this.merge({}, this.context);
                  return this.merge(context, {
-                   state: this.state, 
-                   params: this.params
+                 state: this.state, 
+                 params: this.params
                  })
                  */
 
-               // We need to ensure that the context reflects the current auth state.
-               this.context.env.loggedIn = this.isLoggedIn();
-               if (this.isLoggedIn()) {
-                  this.context.env.loggedInUser = this.auth.username;
-                  this.context.env.loggedInUserRealName = this.auth.realname;
-               } else {
-                  delete this.context.env.loggedInUser;
-                  delete this.context.env.loggedInUserRealName;
-               }
+                // We need to ensure that the context reflects the current auth state.
+                this.context.env.loggedIn = this.isLoggedIn();
+                if (this.isLoggedIn()) {
+                    this.context.env.loggedInUser = this.auth.username;
+                    this.context.env.loggedInUserRealName = this.auth.realname;
+                } else {
+                    delete this.context.env.loggedInUser;
+                    delete this.context.env.loggedInUserRealName;
+                }
 
-               this.context.env.isOwner = this.isOwner();
+                this.context.env.isOwner = this.isOwner();
 
-               if (additionalContext) {
-                  var temp = this.merge({}, this.context);
-                  return this.merge(temp, additionalContext);
-               } else {
-                  return this.context;
-               }
+                if (additionalContext) {
+                    var temp = this.merge({}, this.context);
+                    return this.merge(temp, additionalContext);
+                } else {
+                    return this.context;
+                }
             }
-         },
-
-         renderTemplate: {
+        },
+        renderTemplate: {
             value: function (name, context) {
-               var template = this.getTemplate(name);
-               if (!template) {
-                  throw 'Template ' + name + ' not found';
-               }
-               var context = context ? context : this.createTemplateContext();
-               return template.render(context);
+                var template = this.getTemplate(name);
+                if (!template) {
+                    throw 'Template ' + name + ' not found';
+                }
+                var context = context ? context : this.createTemplateContext();
+                return template.render(context);
             }
          }
       });

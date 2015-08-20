@@ -332,8 +332,22 @@ app
     $scope.params = { 'ws':$stateParams.ws, 'id': $stateParams.id, 'kbCache' : kb }
 })
 
-.controller('People', function($scope, $stateParams) {
+.controller('People', function($scope, $stateParams, $location) {
     $scope.params = { 'userid':$stateParams.userid, 'kbCache' : kb }
+   
+    // NB need to use KBaseSessionSync here and not kb -- because kb is only valid at page load
+    // time. On angular path changes, it will not have been updated. So, e.g., after a user logs 
+    // out and goes backing over their history...
+    if (!$.KBaseSessionSync.isLoggedIn()) {
+        var hash = window.location.hash;
+        var path = '/login/';
+        if (hash && hash.length > 0) {
+            path += '?nextPath=' + encodeURIComponent(hash.substr(1));
+        } 
+        $location.url(path);
+        return;
+    }
+    
     
     // Set the styles for the user page
     $('<link>')
@@ -382,57 +396,24 @@ app
    
 })
 
-.controller('Dashboard', function($scope, $stateParams) {
+.controller('Dashboard', function($scope, $stateParams, $location) {
     $scope.params = { 'kbCache' : kb }
     
-    // Try this.
-    // Get the layout template.
-    // Get the layout config
-    // Render the layout template
-    // Create and attache widgets, from the layout template
-    
-    /*
-    require(['jquery', 'nunjucks', 'kb.utils'], function ($, nunjucks, Utils) {
-       var templateEnv = new nunjucks.Environment(new nunjucks.WebLoader('/functional-site/views/dashboard/templates'), {
-         'autoescape': false
-       });
-       // For now we just have a single standard layout.
-       var layout = templateEnv.getTemplate('layout.html');
-       
-       Utils.getJSON('/functional-site/views/dashboard/dashboard.json')
-       .then(function (data) {
-          var content = layout.render(data);
-          
-       }
-       
-       
-      
-       
-       this.templates.env.addFilter('kbmarkup', function(s) {
-         if (s) {
-              s = s.replace(/\n/g, '<br>');
-            }
-            return s;
-          });
-          // This is the cache of templates.
-          this.templates.cache = {};
-
-          // The context object is what is given to templates.
-          this.context = {};
-          this.context.env = {
-            widgetTitle: this.widgetTitle,
-            widgetName: this.widgetName,
-            docsite: this.getConfig('docsite')
-          };
-    });
-    */
-    
+    if (!$.KBaseSessionSync.isLoggedIn()) {
+        $location.url('/login/');
+       return;
+    }
     
     // Set the styles for the dashboard page
     $('<link>')
     .appendTo('head')
     .attr({type: 'text/css', rel: 'stylesheet'})
     .attr('href', 'views/dashboard/style.css');
+   
+    $('<link>')
+    .appendTo('head')
+    .attr({type: 'text/css', rel: 'stylesheet'})
+    .attr('href', '/src/widgets/dashboard/style.css');
     
     // Set up the navbar menu.
    // Note that the navbar is a singleton. There is only one per page/view, and it is as persistent
@@ -466,9 +447,23 @@ app
       */
        
        // Set up the main State machine for this view.
-       var stateMachine = Object.create(StateMachine).init();
+       $scope.viewState = Object.create(StateMachine).init();
+			 
+        // a cheap hartbeat for now... and just for the dashboard.
+        var heartbeat = 0;
+        $scope.heartbeatTimer = window.setInterval(function () {
+                heartbeat++;
+                postal.channel('app').publish('heartbeat', {heartbeat: heartbeat});
+        }, 100);
 
-       $scope.stateMachine = stateMachine;
+        // Now remove them.
+        $scope.$on('$destroy', function () {
+                       // tear down the state machine
+                       // Umm, this happen naturally when the object goes out of scope.
+
+                // But the heartbeat timer will need to be stopped manually.
+                window.clearInterval($scope.heartbeatTimer);
+        });
       
     });
      
@@ -544,68 +539,85 @@ app
 })
 
 
-.controller('Login', function($scope, $stateParams, $location, kbaseLogin, $modal) {
+.controller('Login', function($scope, $stateParams, $location, kbaseLogin) {
     
     // If we are logged in and landing here we redirect to the dashboard.
-    // I guess we can use the supplied kbaseLogin...
     if ($.KBaseSessionSync.isLoggedIn()) {
-        $location.path('/dashboard');
+        if ($stateParams.nextPath) {
+            $location.url($stateParams.nextPath);
+        } else {
+            $location.path('/dashboard');
+        }
         return;
     }
     
-    $scope.nar_url = configJSON.narrative_url; // used for links to narratives
-    
-    $scope.nextPath = $stateParams.nextPath;
-    
-    postal.channel('session').subscribe('login.failure', function (data) {
-      // TODO: wow, these jquery calls need to be scoped!
-      $("#loading-indicator").hide();
-      var errormsg = data.error.message;
-      if (errormsg == "LoginFailure: Authentication failed.") {
-          errormsg = "Login Failed: your username/password is incorrect.";
-      }
-      $("#login_error").html(errormsg);
-      $("#login_error").show();
+    // Add a stripped down nav bar for the login page.
+    require(['kb.widget.navbar'], function (NAVBAR) {
+        NAVBAR.clear()
+        .addDefaultMenu({
+            search: false, narrative: false, dashboard: false
+        })
+        .setTitle("Sign In to KBase");
     });
+
+    // Set up some scope properties.
+    $scope.nar_url = configJSON.narrative_url; // used for links to narratives    
+    
+    // ignore nextPath which is ... the login page.
+    if ($stateParams.nextPath == '/login') {
+        $scope.nextPath = null;
+    } else {
+        $scope.nextPath = $stateParams.nextPath;
+    }
     
     // callback for ng-click 'loginUser':
-    $scope.loginUser = function (user, nextPath) {
-        $("#loading-indicator").show();
-        kbaseLogin.login(
-            user.username,
-            user.password
-        );
+    $scope.loginUser = function (user, nextPath, nextURL) {
+        require(['kb.session', 'postal', 'jquery'], function (Session, Postal, $) {
+            // TODO: this should not be an ID!!
+            $("#loading-indicator").show();
+            // Angular does not populate the user property if nothing
+            // was filled in.
+            var username = user?user.username:null;
+            var password = user?user.password:null;
+            $("#login_error").hide();
+            // Note that the login page does not handle login success -- the 
+            // app does that. 
+            //kbaseLogin.login(
+             //   username,
+            //    password
+            //);
+            Session.login({
+                username: username,
+                password: password
+            })
+                .then(function (session) {
+                    Postal.channel('session').publish('login.success', {
+                        session: Session,
+                        nextPath: nextPath,
+                        nextURL: nextURL
+                    });
+                   
+                })
+                .catch(function (errorMsg) {
+                    // All error handling is handled locally.
+                    $("#loading-indicator").hide();
+                    if (errorMsg === "LoginFailure: Authentication failed.") {
+                        errorMsg = "Login Failed: your username/password is incorrect.";
+                    }
+                    $("#login_error").html(errorMsg);
+                    $("#login_error").show();
+                })
+                .done();
+        });
     };
 
-    $scope.logoutUser = function() {
-        kbaseLogin.logout(false);
-    };
-
-    $scope.loggedIn = function() {
-        var userId = kbaseLogin.get_session_prop('user_id');
-        return (userId !== undefined && userId !== null);
-    };
-  
-    postal.channel('session').request({
-      topic: 'profile.get',
-      timeout: 10000
-    })
-    .then(function(profile) {
-      $scope.username = profile.getProp('user.realname');
-    })
-    .done();
-
-    postal.channel('session').subscribe('profile.loaded', function (data) {
-      $scope.$apply(function () {
-        $scope.username = data.profile.getProp('user.realname');
-      });
+    $scope.$on('$destroy', function () {
+        // remove the postal subscriptions.
+        //subs.forEach(function (sub) {
+        //    sub.unsubscribe();
+        //})
     });
-
 })
-
-
-
-
 
 .controller('WBLanding', function($scope, $stateParams) {
     
@@ -961,14 +973,23 @@ app
 
 
 
-.controller('narrativemanager', function($scope, $stateParams) {
-    $scope.params = $stateParams;
-    require(['kb.widget.navbar'], function (NAVBAR) {
-      NAVBAR.clearMenu()
-      .addDefaultMenu({
-        search: true, narrative: true
-      });
-    });
+.controller('narrativemanager', function($scope, $stateParams, $location) {
+    if (!$.KBaseSessionSync.isLoggedIn()) {
+        var hash = window.location.hash;
+        var path = '/login/';
+        if (hash && hash.length > 0) {
+            path += '?nextPath=' + encodeURIComponent(hash.substr(1));
+        } 
+        $location.url(path);
+    } else {
+        $scope.params = $stateParams;
+        require(['kb.widget.navbar'], function (NAVBAR) {
+          NAVBAR.clearMenu()
+          .addDefaultMenu({
+            search: true, narrative: true
+          });
+        });
+    }
 })
 
 .controller('NarrativeStore', function($scope, $stateParams) {

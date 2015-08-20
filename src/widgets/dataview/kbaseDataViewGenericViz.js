@@ -47,23 +47,21 @@
 	    
             this.$mainPanel = $("<div>");
             this.$elem.append(this.$mainPanel);
-	    
             if (!this.auth.token) {
-                this.ws = kb.ws;  //new Workspace(this.options.ws_url);
+                this.ws = new Workspace(this.options.ws_url);
                 this.loggedIn = false;
             } else {
-                //console.log(['authenticated:', this.auth]);
                 this.ws = new Workspace(this.options.ws_url, this.auth);
                 this.loggedIn = true;
-                this.getInfoAndRender();
             }
+            this.getInfoAndRender();
 	    
             return this;
         },
 
         loggedInCallback: function(event, auth) {
             this.options.auth = auth;
-            //console.log(['authenticated:', this.options.auth]);
+            // console.log(['authenticated:', this.options.auth]);
             this.ws = new Workspace(this.options.ws_url, this.options.auth);
             this.loggedIn = true;
             this.getInfoAndRender();
@@ -221,7 +219,9 @@
 		/* STILL NEEDS A COMPLEX LANDING PAGE */
 		'KBaseFBA.FBAModel': modelingConfig,
             
-		'KBaseFBA.FBAModelSet': modelingConfig,		            
+		'KBaseFBA.FBAModelSet': modelingConfig,
+		
+		'KBaseFBA.FBAComparison': modelingConfig,		            
             
 		'KBaseGeneFamilies.DomainAnnotation': {
 		    widget:'kbaseDomainAnnotation',

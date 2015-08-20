@@ -50,3 +50,19 @@
    font-size: 18px;
 }
 
+.form-control-kbase {
+   border-radius: 1px;
+}
+.well-kbase {
+   border-radius: 1px;
+}
+.alert-kbase {
+   border-radius: 1px;
+}
+
+.modal-kbase {
+    width: 263px;
+}
+.modal-kbase .modal-content {
+    border-radius: 1px;
+}

@@ -49,6 +49,9 @@ function KBaseFBA_FBA(modeltabs) {
             "key": "expression",
             "type": "wstype"
         },{
+            "label": "Expression condition",
+            "key": "expressioncolumn",
+        },{
             "label": "Single KO",
             "key": "singleko"
         },{
@@ -157,7 +160,7 @@ function KBaseFBA_FBA(modeltabs) {
         }, {
         	"label": "Exchange reaction",
             "key": "exchangerxn",
-            "visible": 1  
+            "visible": 1
         }, {
             "label": "Exchange flux",
             "key": "uptake",
@@ -237,6 +240,13 @@ function KBaseFBA_FBA(modeltabs) {
             "key": "maxprod",
             "visible": 0
         }]
+    }, {
+        "name": "Pathways",
+        "widget": "kbasePathways",
+        "getParams": function() {
+            return {models: [self.model],
+                    fbas: [self.data]};
+        }
     }];
 
     this.setMetadata = function (indata) {
@@ -251,8 +261,7 @@ function KBaseFBA_FBA(modeltabs) {
                          moddate: indata[3]}
 
         this.usermeta = {};
-
-        // if there is user metadata, add it
+		// if there is user metadata, add it
         if ('Model' in indata[10]) {
             this.usermeta = {objective: indata[10]["Objective"],
                              model: indata[10]["Model"],
@@ -265,7 +274,15 @@ function KBaseFBA_FBA(modeltabs) {
                              numcpdbounds: indata[10]["Number compound bounds"],
                              numconstraints: indata[10]["Number constraints"],
                              numaddnlcpds: indata[10]["Number additional compounds"]}
-
+			if ('ExpressionMatrix' in indata[10]) {
+				this.usermeta["expression"] = indata[10]["ExpressionMatrix"];
+			}
+			if ('PromConstraint' in indata[10]) {
+				this.usermeta["promconstraint"] = indata[10]["PromConstraint"];
+			}
+			if ('ExpressionMatrixColumn' in indata[10]) {
+				this.usermeta["expressioncolumn"] = indata[10]["ExpressionMatrixColumn"];
+			}
             $.extend(this.overview, this.usermeta)
         }
     };
@@ -387,9 +404,20 @@ function KBaseFBA_FBA(modeltabs) {
                 mdlgene.growthFraction = this.delhash[mdlgene.id].growthFraction;
             }
         }
+        var exp_state = 0;
+        var exp_value = 0;
         for (var i=0; i< this.modelreactions.length; i++) {
             var mdlrxn = this.modelreactions[i];
             if (this.rxnhash[mdlrxn.id]) {
+                if ("exp_state" in this.rxnhash[mdlrxn.id]) {
+                	mdlrxn.exp_state = this.rxnhash[mdlrxn.id].exp_state;
+                }
+                if ("expression" in this.rxnhash[mdlrxn.id]) {
+                	mdlrxn.expression = this.rxnhash[mdlrxn.id].expression;
+                }
+                if ("scaled_exp" in this.rxnhash[mdlrxn.id]) {
+                	mdlrxn.scaled_exp = this.rxnhash[mdlrxn.id].scaled_exp;
+                }
                 mdlrxn.upperFluxBound = this.rxnhash[mdlrxn.id].upperBound;
                 mdlrxn.lowerFluxBound = this.rxnhash[mdlrxn.id].lowerBound;
                 mdlrxn.fluxMin = this.rxnhash[mdlrxn.id].min;
@@ -403,6 +431,27 @@ function KBaseFBA_FBA(modeltabs) {
                 mdlrxn.customUpperBound = this.rxnboundhash[mdlrxn.id].upperBound;
                 mdlrxn.customLowerBound = this.rxnboundhash[mdlrxn.id].lowerBound;
             }
+            if ("exp_state" in mdlrxn) {
+            	exp_state = 1;
+            }
+            if ("expression" in mdlrxn) {
+            	exp_value = 1;
+            	mdlrxn.scaled_exp = Math.round(100*mdlrxn.scaled_exp)/100;
+            	mdlrxn.expression = Math.round(100*mdlrxn.expression)/100;
+            	mdlrxn.exp_value = mdlrxn.scaled_exp + "<br>(" + mdlrxn.expression + ")";
+            }
+        }
+        if (exp_value == 1) {
+        	this.tabList[1].columns.splice(3, 0,{
+        		"label": "Scaled expression (unscaled value)",
+            	"key": "exp_value",
+        	});
+        }
+        if (exp_state == 1) {
+        	this.tabList[1].columns.splice(3, 0,{
+        		"label": "Expression state",
+            	"key": "exp_state",
+        	});
         }
         this.compoundFluxes = [];
         this.cpdfluxhash = {};
@@ -469,11 +518,12 @@ function KBaseFBA_FBA(modeltabs) {
         }
     };
 
-	this.setData = function (indata) {
+	this.setData = function (indata) { // this is a mess
         self.data = indata;
         var p = self.modeltabs.kbapi('ws', 'get_objects', [{ref: indata.fbamodel_ref}]).then(function(data){
-			var kbObjects = new KBObjects();
-			self.model = new kbObjects["KBaseFBA_FBAModel"](self.modeltabs);
+            self.model = data[0].data;
+			var kbModeling = new KBModeling();  // this is a mess
+			self.model = new kbModeling["KBaseFBA_FBAModel"](self.modeltabs);
 			self.model.setMetadata(data[0].info);
 			self.model.setData(data[0].data);
  			self.formatObject();
@@ -498,7 +548,7 @@ function KBaseFBA_FBA(modeltabs) {
         }
         return self.ExtendReactionTab(info,output);
     };
-    
+
     this.ExtendReactionTab = function (info,data) {
     	var rxn = self.rxnhash[info.id];
     	data.push({
@@ -519,7 +569,7 @@ function KBaseFBA_FBA(modeltabs) {
     	});
     	return data;
     };
-    
+
     this.CompoundTab = function (info) {
 		var output = self.model.CompoundTab(info);
         if (output && 'done' in output) {
@@ -530,7 +580,7 @@ function KBaseFBA_FBA(modeltabs) {
         }
         return self.ExtendCompoundTab(info,output);
     };
-    
+
     this.ExtendCompoundTab = function (info,data) {
     	var cpd = self.cpdhash[info.id];
     	data.push({
@@ -555,7 +605,7 @@ function KBaseFBA_FBA(modeltabs) {
     	});
     	return data;
     };
-    
+
     this.GeneTab = function (info) {
 		var output = self.model.GeneTab(info);
         if (output && 'done' in output) {
@@ -579,7 +629,7 @@ function KBaseFBA_FBA(modeltabs) {
     	});
     	return data;
     };
-    
+
     this.BiomassTab = function (info) {
 		var output = self.model.BiomassTab(info);
         if (output && 'done' in output) {
@@ -614,11 +664,11 @@ function KBaseFBA_FBA(modeltabs) {
     	});
     	return data;
     };
-    
+
     this.CompartmentTab = function (info) {
 		return self.model.CompartmentTab(info);
     };
 }
 
 // make method of base class
-KBObjects.prototype.KBaseFBA_FBA = KBaseFBA_FBA;
+KBModeling.prototype.KBaseFBA_FBA = KBaseFBA_FBA;

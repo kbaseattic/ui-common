@@ -15,10 +15,10 @@ function KBaseSearch_GenomeSet(modeltabs) {
             this.usermeta = {name: data[10]["Name"],
                              source: data[10]["Source"]+"/"+data[10]["Source ID"],
                              type: data[10]["Type"]}
-                           
+
             $.extend(this.overview, this.usermeta)}
     };
-		
+
     this.setData = function (indata) {
 	this.data = indata;
 	this.genome_refs = [];
@@ -26,7 +26,7 @@ function KBaseSearch_GenomeSet(modeltabs) {
 	    this.genome_refs.push({"ref":indata.elements[obj]["ref"]});
 	}
     }
-        
+
     this.tabList = [{
 		"key": "overview",
 		"name": "Overview",
@@ -53,7 +53,7 @@ function KBaseSearch_GenomeSet(modeltabs) {
 		},{
 			"label": "Source",
 			"key": "source"
-		}]	
+		}]
 	}, {
 		"key": "genome_refs",
 		"name": "Genomes",
@@ -69,4 +69,4 @@ function KBaseSearch_GenomeSet(modeltabs) {
 }
 
 // make method of base class
-KBObjects.prototype.KBaseSearch_GenomeSet = KBaseSearch_GenomeSet;
+KBModeling.prototype.KBaseSearch_GenomeSet = KBaseSearch_GenomeSet;

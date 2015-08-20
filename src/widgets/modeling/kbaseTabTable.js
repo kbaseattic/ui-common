@@ -21,48 +21,15 @@ $.KBWidget({
         // tab widget
         var tabs;
 
-        // 0) No more clients.  Make this global.  please.
-        this.kbapi = function(service, method, params) {
-            var url, method;
-            if (service == 'ws') {
-                url = "https://kbase.us/services/ws/";
-                method = 'Workspace.'+method;
-            } else if (service == 'fba') {
-                url = "https://kbase.us/services/KBaseFBAModeling/";
-                method = 'fbaModelServices.'+method;
-            }
+        var kbModeling = new KBModeling( self.authToken() );
 
-            var rpc = {
-                params: [params],
-                method: method,
-                version: "1.1",
-                id: String(Math.random()).slice(2),
-            };
-
-            var prom = $.ajax({
-                url: url,
-                type: 'POST',
-                processData: false,
-                data: JSON.stringify(rpc),
-                beforeSend: function (xhr) {
-                    if (self.authToken())
-                        xhr.setRequestHeader("Authorization", self.authToken());
-                }
-            }).then(function(data) {
-                return data.result[0];
-            })
-
-            return prom;
-        }
-
-        // base class for workspace object classes
-        var kbObjects = new KBObjects();
+        // kbase api helper
+        this.kbapi = kbModeling.kbapi;
 
         //
-        // 1) Use type (periods replaced with underscores) to instantiate object
+        // 1) Use type (periods replaced with underscores) to instantiate a modeling object
         //
-
-        this.obj = new kbObjects[type.replace(/\./g, '_')](self);
+        this.obj = new kbModeling[type.replace(/\./g, '_')](self);
 
         //
         // 2) add the tabs (at page load)
@@ -125,22 +92,24 @@ $.KBWidget({
               // see if setData method returns promise or not
               if (setMethod && 'done' in setMethod) {
                   setMethod.done(function() {
-                    buildContent()
-                })
+                      buildContent()
+                  })
               } else {
                   buildContent();
               }
         })
 
         var refLookup = {};
-        function preProcessDataTable(tabSpec) {
+        function preProcessDataTable(tabSpec,tabPane) {
             // get refs
-            var refs = [],
-                cols = tabSpec.columns;
+            var refs = [];
+            var cols = tabSpec.columns;
             cols.forEach(function(col){
-                if ((col.type == 'tabLink' || col.type == 'wstype') && col.linkformat == 'dispWSRef') {
+                if ((col.type === 'tabLink' || col.type === 'wstype') && col.linkformat === 'dispWSRef') {
                     self.obj[tabSpec.key].forEach(function(item) {
-                        refs.push( {ref: item[col.key]} );
+                        if (refs.indexOf(item[col.key]) === -1) {
+                        	refs.push( {ref: item[col.key]} );
+                        }
                     })
                 }
             })
@@ -152,7 +121,6 @@ $.KBWidget({
             return self.kbapi('ws', 'get_object_info_new', {objects: refs})
                        .then(function(data) {
                             refs.forEach(function(ref, i){
-
                                 // if (ref in referenceLookup) return
                                 refLookup[ref.ref] = {name: data[i][1],
                                                       ws: data[i][7],
@@ -160,10 +128,11 @@ $.KBWidget({
                                                       //link: data[i][2].split('-')[0]+'/'+data[i][7]+'/'+data[i][1]
                                                       link: data[i][7]+'/'+data[i][1]};
                             })
+                            createDataTable(tabSpec, tabPane);
                        })
         }
 
-        function buildContent() {
+        function buildContent(data) {
 
             //5) Iterates over the entries in the spec and instantiate things
             for (var i = 0; i < tabList.length; i++) {
@@ -171,29 +140,21 @@ $.KBWidget({
                 var tabPane = tabs.tabContent(tabSpec.name);
 
                 // skip any vertical tables for now
-                if (tabSpec.type == 'verticaltbl') continue;
+                if (tabSpec.type == 'verticaltbl') {
+                	continue;
+                }
 
                 // if widget, invoke widget with arguments
-                else if (tabSpec.widget) {
-                    var keys = tabSpec.keys.split(/\,\s+/g);
-                    var params = {};
-                    tabSpec.arguments.split(/\,\s+/g).forEach(function(arg, i) {
-                        params[arg] = self.obj[keys[i]];
-                    })
-
-                    tabPane[tabSpec.widget](params);
+                if (tabSpec.widget) {
+                    tabPane[tabSpec.widget]( tabSpec.getParams() );
                     continue;
                 }
 
                 // preprocess data to get workspace info on any references in class
-                var prom = preProcessDataTable(tabSpec);
-                if (prom)
-                    prom.done(function() {
-                        createDataTable(tabSpec, tabPane)
-                    })
-                else
+                var prom = preProcessDataTable(tabSpec,tabPane);
+                if (!prom) {
                     createDataTable(tabSpec, tabPane);
-
+                }
 
             }
         }
@@ -522,30 +483,6 @@ $.KBWidget({
                             var a = data[0];
                             return {url: a[7]+'/'+a[1], ref: a[6]+'/'+a[0]+'/'+a[4]};
                         })
-        }
-
-        //mmmm... let's define this twice.  Why not.
-        $.fn.loading = function(text, big) {
-            $(this).rmLoading()
-
-            if (big) {
-                if (typeof text != 'undefined') {
-                    $(this).append('<p class="text-center text-muted loader"><br>'+
-                         '<img src="assets/img/ajax-loader-big.gif"> '+text+'</p>');
-                } else {
-                    $(this).append('<p class="text-center text-muted loader"><br>'+
-                         '<img src="assets/img/ajax-loader-big.gif"> loading...</p>')
-                }
-            } else {
-                if (typeof text != 'undefined')
-                    $(this).append('<p class="text-muted loader">'+
-                         '<img src="//narrative.kbase.us/narrative/static/kbase/images/ajax-loader.gif"> '+text+'</p>');
-                else
-                    $(this).append('<p class="text-muted loader">'+
-                         '<img src="//narrative.kbase.us/narrative/static/kbase/images/ajax-loader.gif"> loading...</p>')
-            }
-
-            return this;
         }
 
         return this;

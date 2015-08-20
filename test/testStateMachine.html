@@ -5,213 +5,330 @@
    <script src="/ext/jquery/jquery-1.10.2.min.js"></script>
    <script src="/ext/q/q.min.js"></script>
    <script src="/ext/underscore/1.7.0/underscore-min.js"></script>
-
-
    <script src="/ext/postal/postal-0.12.4.min.js"></script>
    <script src="/ext/postal/postal.request-response-0.3.1.min.js"></script>
    <script src="/ext/postal/postal-deluxe.js"></script>
    <script src="/ext/requirejs/2.1.15/require.js"></script>
    <script src="/functional-site/js/require-config.js"></script>
-
    <script src="/ext/kbase-clients/kbase-client-api.min.js"></script>
-
-   <script>
-   define('tester', [], function () {
-      return Object.create({}, {
-         init: {
-            value: function (cfg) {
-               this.id = cfg.id;
-               this.expected = cfg.expected;
-               this.getResult = cfg.getResult;
-               this.testResult = cfg.testResult;
-               this.container = document.querySelector('[data-test="'+this.id+'"]');
-               this.displayLayout();
-               return this;
-            } 
-         },
-         
-         run: {
-            value: function () {
-               var result;
-               try {
-                  result = this.getResult();
-                  this.status = 'ok';
-                  this.result = result;
-               } catch(ex) {
-                  this.status = 'error';
-                  this.error = ex;
-               }
-               
-               var testResult;
-               try {
-                  testResult = this.testResult.call(this);
-                  this.status = 'ok';
-                  this.testResult = testResult;
-               } catch(ex) {
-                  this.status = 'error';
-                  this.error = ex;
-               }
-               
-               this.setText('id', this.id);
-               this.setText('status', this.status);
-               this.setText('expected', this.expected);
-               this.setText('result', this.result);
-               this.setText('testResult', this.testResult);
-            }
-         },
-         
-         
-         getText: {
-            value: function(field) {
-               return this.container.querySelector('[data-field="'+field+'"]').textContent
-            }
-         },
-         setText: {
-            value: function(field, value) {
-               this.container.querySelector('[data-field="'+field+'"]').textContent = value;
-            }
-         },
-         setComment: {
-            value: function(comment) {
-               this.setText('comments', comment);
-            }
-         },
-         displayLayout: {
-            value: function () {
-               var l = '<div>Test: <span data-field="id"></span></div>\
-                        <div>Status: <span data-field="status"></span></div>\
-                        <div>Expecting: <span data-field="expected"></span></div>\
-                         <div>Result: <span data-field="result"></span></div>\
-                         <div>Test Result:  <span data-field="testResult"></span></div>\
-                         <div>Comments: <span data-field="comments"></span></div>\
-               ';
-               this.container.innerHTML = l;
-            }
-         },
-         displayResults: {
-            value: function () {
-               
-            }
-         }
-      });
-   });
-   </script>
-
 </head>
 
 <body>
 
    <h1>Testing for statemachine</h1>
+   <p>Here is what we are going to test.</p>
+   <ul>
+       <li>version</li>
+       <li>setItem</li>
+       <li>getItem</li>
+       <li>deleteItem</li>
+       <li>listenToItem</li>
+   </ul>
    <h2>Presence of the Module</h2>
    <div data-test="presence">
       <div>Result:</div>
       <div data-field="result"></div>
    </div>
    <script>
-      require(['kb.statemachine'], function (StateMachine) {
-         if (StateMachine) {
+      require(['kb.statemachine','kb.test'], function (StateMachine, Tester) {
+        if (StateMachine) {
             document.querySelector('[data-test="presence"] [data-field="result"]').innerHTML = 'success';
-         } else {
+        } else {
             document.querySelector('[data-test="presence"] [data-field="result"]').innerHTML = 'failure';
-         }
+        }
       });
    </script>
 
    <h2>Version - static</h2>
-   <div data-test="version-static"></div>
+   <div data-test="version"></div>
    <script>
-      require(['kb.statemachine', 'tester'], function (StateMachine, Tester) {
-         var T = Object.create(Tester).init({
-            id: 'version-static',
-            expected: '0.0.1',
-            getResult: function() {
-               return StateMachine.version;
-            },
-            testResult: function () {
-               return (this.expected === this.result);
-            }
-         }).run();
+       /*
+     require(['kb.statemachine','kb.test'], function (StateMachine, Tester) {
+            var tests = [
+                {
+                    expects: {
+                        propertyValue: '0.0.2',
+                        status: 'success'
+                    }
+                }
+            ];
+
+             var T = Object.create(Tester).init({
+                type: 'property',
+                propertyName: 'version',
+                id: 'version',
+                tests: tests,
+                makeObject: function () {
+                    return Object.create(StateMachine).init();
+                },
+            }).runTests();
       });
+    */
    </script>
    
    <h2>Version - new object</h2>
-   <div data-test="version"></div>
+   <div data-test="version2"></div>
    <script>
-      require(['kb.statemachine', 'tester'], function (StateMachine, Tester) {
-         var T = Object.create(Tester).init({
-            id: 'version',
-            expected: '0.0.1',
-            getResult: function () {
-               var sm = Object.create(StateMachine).init();
-               var version = sm.version; 
-               return version;
-            },
-            testResult: function () {
-               return (this.expected === this.result);
-            }
-         }).run();
-      });
-   </script>
-   
-   <h2>Set and Get Synchronous</h2>
-   <p>This tests setting and getting a property on the StateMachine object.</p>
-   <div data-test="setget_sync"></div>
-   <script>
-      require(['kb.statemachine', 'tester'], function (StateMachine, Tester) {
-         var T = Object.create(Tester).init({
-            id: 'setget_sync',
-            expected: 'synchronous_set',
-            getResult: function () {
-               var sm = Object.create(StateMachine).init();
-               sm.setItem('test', 'synchronous_set');
-               return sm.getItem('test');
-            },
-            testResult: function () {
-               return (this.expected === this.result);
-            }
-         }).run();
-      });
-   </script>
-   
-   <h2>Get without set</h2>
-   <p>Get a property without setting it first. Should get 'undefined' or the defaultValue supplied</p>
-   <div data-test="get_without_set"></div>
-   <script>
-      require(['kb.statemachine', 'tester'], function (StateMachine, Tester) {
-         var T = Object.create(Tester).init({
-            id: 'get_without_set',
-            expected: undefined,
-            getResult: function () {
-               var sm = Object.create(StateMachine).init();
-               return sm.getItem('test');
-            },
-            testResult: function () {
-               return (this.expected === this.result);
-            }
-         }).run();
-      });
-   </script>
-   
-   
-   <h2>Get without set, using default value</h2>
-   <p>Get a property without setting it first, but supply a default value.</p>
-   <div data-test="get_without_set_with_defaultvalue"></div>
-   <script>
-      require(['kb.statemachine', 'tester'], function (StateMachine, Tester) {
-         var T = Object.create(Tester).init({
-            id: 'get_without_set_with_defaultvalue',
-            expected: 'mydefaultvalue',
-            getResult: function () {
-               var sm = Object.create(StateMachine).init();
-               return sm.getItem('test', 'mydefaultvalue');
-            },
-            testResult: function () {
-               return (this.expected === this.result);
-            }
-         }).run();
-      });
-   </script>
+       /*
+      require(['kb.statemachine', 'kb.test'], function (StateMachine, Tester) {
+        var tests = [
+           {
+               expects: {
+                   propertyValue: '0.0.2',
+                   status: 'success'
+               }
+           }
+       ];
 
+        var T = Object.create(Tester).init({
+           type: 'property',
+           propertyName: 'version',
+           id: 'version2',
+           tests: tests,
+           makeObject: function () {
+                return Object.create(StateMachine).init();
+            },
+       }).runTests();
+   });
+    */
+   </script>
+   
+   <h2>setItem</h2>
+   <p>This tests setting and getting a property on the StateMachine object.</p>
+   <div data-test="setItem"></div>
+   <script>
+     require(['kb.statemachine', 'kb.test'], function (StateMachine, Tester) {
+            var t = [
+                ['mytest', 'text'],
+                [123, 'number'],
+                [true, 'boolean'],
+                [[1,2,3,'go!'], 'array'],
+                [{ar: 'bit', 'tr': 'ary', obj: 'ect'}, 'object']];
+            var tests = [];
+            for (var i in t) {
+                tests.push({
+                    input: ['test', t[i][0]],
+                    description: 'set a ' + t[i][1] + ' property',
+                    expects: {
+                        mutation: undefined,
+                        output: function (test) {return test.object;}
+                    }
+                });
+            }
+
+            var T = Object.create(Tester).init({
+                id: 'setItem',
+                name: 'Set Item',
+                description: 'Set a state item. In the base case, without observing the state of the object, or any events flowing, there is not much to see here.',
+                tests: tests,
+                makeObject: function () {
+                    return Object.create(StateMachine).init();
+                },
+                whenResult: function (test) {
+                    return Q.Promise(function (resolve) {
+                        resolve(test.object.setItem(test.input[0], test.input[1]));
+                    });
+                }
+            }).runTests();
+        });
+   </script>
+       
+    <h2>getItem - nothing there</h2>
+    <p>This tests setting and getting a property on the StateMachine object for which
+       the property does not exist. We would expect:
+    <ul>
+       <li>A return value of undefined if no default value supplied</li>
+       <li>The default value if it was supplied</li>
+       <li>A type error if an invalid key type was provided (e.g. not a string
+           or a list of one string element.)</li>
+   </ul></p>
+   <div data-test="getItem_no_exist"></div>
+   <script>
+     require(['kb.statemachine', 'kb.test'], function (StateMachine, Tester) {
+            var tests = [
+                {
+                    input: ['test'],
+                    description: 'No default value, so should get undefined',
+                    expects: {
+                        output: undefined
+                    }
+                },
+                {
+                    input: ['test', 'some value'],
+                    description: 'Supply a default value and get it back',
+                    whenResult: function (test) {
+                        return Q.Promise(function (resolve) {
+                            resolve(test.object.getItem(test.input[0], test.input[1]));
+                        }.bind(this));
+                    },
+                    expects: {
+                        output: 'some value'
+                    }
+                },
+                {
+                    input: [123],
+                    description: 'Supply a number as a key and get an exception',
+                    expects: {
+                        exception: {
+                            type: 'TypeError',
+                            message: 'Invalid type for key: number'
+                        }
+                    }
+                }
+            ];
+
+            var T = Object.create(Tester).init({
+                id: 'getItem_no_exist',
+                name: 'Get Property, does not exist',
+                description: 'Get a property that does not exist.',
+                tests: tests,
+                makeObject: function () {
+                    return Object.create(StateMachine).init();
+                },
+                whenResult: function (test) {
+                    return Q.Promise(function (resolve) {
+                        resolve(test.object.getItem(test.input[0]));
+                    }.bind(this));
+                }
+            }).runTests();
+        });
+   </script>
+   
+   
+    <h2>setItem / getItem</h2>
+    <p>In order to test the set/get cycle, we need to now test a function, not 
+        simply a method on the object.</p>
+    <ul>
+       <li>Set a value, get it back, all types</li>
+       <li>Set a value, ask for nonexistent one.</li>
+   </ul>
+   <div data-test="setGetItem"></div>
+   <script>
+     require(['kb.statemachine', 'kb.test'], function (StateMachine, Tester) {
+             var tests = [
+                {
+                    input: ['testKey', 'testValue'],
+                    description: 'set a value, get it back',
+                    expects: {
+                        output: 'testValue'
+                    }
+                }
+            ];
+
+            var T = Object.create(Tester).init({
+                id: 'setGetItem',
+                name: 'Set and Get an Item',
+                description: 'setting and getting a property',
+                tests: tests,
+                makeObject: function () {
+                    return Object.create(StateMachine).init();
+                },
+                whenResult: function(test) {
+                    return Q.Promise(function (resolve) {
+                        test.object.setItem(test.input[0], test.input[1]);
+                        resolve(test.object.getItem(test.input[0]));
+                    });
+                }
+                /*testRunner: function (key, value) {
+                    var obj = this.getObject();
+                    obj.setItem(key, value);
+                    var value = obj.getItem(key);
+                    return value
+                },
+                */
+            }).runTests();
+        });
+   </script>
+   
+   
+   
+    <h2>whenItem</h2>
+    <p>The whenItem method will return the requested state property
+    by way of a promise. It may return quickly if the object is already in the 
+    state machine -- otherwise it will return it when it becomes available. 
+    An timeout value is used to trigger an error (promise rejection) if the
+    item does not become available within the timeout period. </p>
+    <ul>
+        <li>Set a value, fetch it with whenItem</li>
+        <li>fetch with whenItem, then set value.</li>
+        <li>fetch with whenItem, then wait for a period of time, then set value.</li>
+        <li>fetch with whenItem, never set it. Expect an error to be caught with
+            the promise catch method.</li>
+
+   </ul>
+   <div data-test="whenItem1"></div>
+   <script>
+     require(['kb.statemachine', 'kb.test'], function (StateMachine, Tester) {
+             var tests = [
+                {
+                    input: ['testKey', 'testValue'],
+                    description: 'set a value, get it back',
+                    expects: {
+                        output: 'testValue'
+                    }
+                },
+                {
+                    input: ['name', 'Erik'],
+                    description: 'set a value, get it back',
+                    expects: {
+                        output: 'Erik'
+                    }
+                },
+                {
+                    input: ['name', 1000],
+                    description: 'get a non-existent value',
+                    whenResult: function (test) {
+                        return Q.Promise(function (resolve, reject) {
+                            var key = test.input[0];
+                            var timeout = test.input[1];
+                            test.object.whenItem(key, timeout)
+                                .then(function (value) {
+                                    resolve(value);
+                                })
+                                .catch(function (err) {
+                                    reject(err);
+                                })
+                                .done();
+                        }.bind(this));
+                    },
+                    expects: {                   
+                        exception: {
+                            type: 'Error',
+                            message: 'Timed out after 1000 ms',
+                            code: {'code':'ETIMEDOUT'}
+                        }
+                    }
+                }
+            ];
+
+            var T = Object.create(Tester).init({
+                id: 'whenItem1',
+                name: 'whenItem',
+                description: 'Use whenItem to get the value of an item',
+                tests: tests,
+                makeObject: function () {
+                    return Object.create(StateMachine).init();
+                },
+                whenResult: function (test) {
+                    return Q.Promise(function (resolve, reject) {
+                        var key = test.input[0];
+                        var value = test.input[1];
+                        test.object.setItem(key, value);
+
+                        test.object.whenItem(key)
+                            .then(function (value) {
+                                resolve(value);
+                            })
+                            .catch(function (err) {
+                                reject(err);
+                            })
+                            .done();
+                    }.bind(this));
+                }
+            }).runTests();
+        });
+   </script>
+   
 </body>
 
 </html>

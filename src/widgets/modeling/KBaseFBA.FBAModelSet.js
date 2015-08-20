@@ -10,10 +10,10 @@ function KBaseFBA_FBAModelSet(modeltabs) {
 			objecttype: data[2],
 			owner: data[5],
 			instance: data[4],
-			moddate: data[3]                 
+			moddate: data[3]
         };
     };
-		
+
     this.setData = function (indata) {
 		this.data = indata;
 		this.models = [];
@@ -42,7 +42,7 @@ function KBaseFBA_FBAModelSet(modeltabs) {
 		},{
 			"label": "Mod-date",
 			"key": "moddate"
-		}]	
+		}]
 	}, {
 		"key": "models",
 		"name": "Models",
@@ -58,4 +58,4 @@ function KBaseFBA_FBAModelSet(modeltabs) {
 }
 
 // make method of base class
-KBObjects.prototype.KBaseFBA_FBAModelSet = KBaseFBA_FBAModelSet;
+KBModeling.prototype.KBaseFBA_FBAModelSet = KBaseFBA_FBAModelSet;

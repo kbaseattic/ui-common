@@ -29,6 +29,10 @@ define(['kb.statemachine', 'kb.config', 'kb.session', 'postal'], function (State
              Postal.channel('session').subscribe('profile.loaded', function(data) {
                 this.setItem('userprofile', data.profile);
              }.bind(this));
+						 
+             Postal.channel('session').subscribe('profile.loadfailure', function(data) {
+                this.setError('userprofile', data.error);
+             }.bind(this));
             
             return this;
          }

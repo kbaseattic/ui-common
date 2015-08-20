@@ -37,4 +37,12 @@ app.controller('Dataview', function ($scope, $stateParams) {
 
 
    });
+   
+   
+   $scope.$on('$destroy', function () {
+        // remove the postal subscriptions.
+        //subs.forEach(function (sub) {
+        //    sub.unsubscribe();
+        //})
+    });
 });

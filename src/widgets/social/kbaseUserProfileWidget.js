@@ -1073,13 +1073,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                        widget.deleteProfile();
                      });
                    });
-                 }.bind(this)},
-                {type: 'divider'},
-                {name: 'help', icon: 'question', color: 'orange', label: 'Help', callback: function (e) {
-                  e.preventDefault();
-                  var modal = $('.UserProfileWidget [data-widget-modal="help"]')
-                  .modal('show');
-                }}
+                 }.bind(this)}
               ]
             });
           } else {
@@ -1240,48 +1234,6 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
           
           var widget = this;
 
-/*
-          // wire up basic form crud buttons.
-          $('[data-button="save"]').on('click', function(e) {
-            if (widget.updateUserProfileFromForm()) {
-              widget.userProfile.saveProfile()
-              .then(function() {
-                  widget.renderViewEditLayout();
-                  widget.addSuccessMessage('Success!', 'Your user profile has been updated.');
-                  widget.renderInfoView();
-              })
-              .catch (function(err) {
-                widget.renderErrorView(err);
-              })
-              .done();
-            }
-          });
-          $('[data-button="cancel"]').on('click', function(e) {
-            
-            // Do we have pending changes?
-            var changed = !widget.places.content
-            .find('[data-button="save"]')
-            .prop('disabled');
-            
-            if (changed) {
-              var modal = $('.UserProfileWidget [data-widget-modal="confirm-cancel"]')
-              .modal('show');
-            
-              modal.find('[data-widget-modal-control="confirm-cancel"]').on('click', function (e) {
-                modal
-                .modal('hide')
-                .on('hidden.bs.modal', function (e) {
-                  widget.clearMessages();
-                  widget.renderInfoView();
-                });
-              });
-            } else {
-              widget.clearMessages();
-              widget.renderInfoView();
-            }
-           
-          });
-          */
           // wire up affiliation add/remove buttons.
           this.places.content.find('[data-button="add-affiliation"]').on('click', function(e) {
             // grab the container 
@@ -1294,12 +1246,14 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
 
             // append to the container
             affiliations.append(newAffiliation);
+              NAVBAR.findButton('save').prop('disabled', false);
           }.bind(this));
 
           // Wire up remove button for any affiliation.
           this.places.content.find('[data-field="profile.userdata.affiliations"]').on('click', '[data-button="remove"]', function(e) {
             // remove the containing affiliation group.
             $(this).closest('[data-field-group="affiliation"]').remove();
+              NAVBAR.findButton('save').prop('disabled', false);
           });
           // on any field change events, we update the relevant affiliation panel title
           this.places.content.find('[data-field="profile.userdata.affiliations"]').on('keyup', 'input', function(e) {
