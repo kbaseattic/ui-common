@@ -75,11 +75,6 @@
             datatables_bootstrap_css: 'bower_components/datatables-bootstrap3-plugin/media/css/datatables-bootstrap3',
             knockout: 'bower_components/knockout/dist/knockout',
             'knockout-mapping': 'bower_components/knockout-mapping/knockout-mapping',
-            //angular: 'bower_components/angular/angular',
-            //'angular-ui': 'bower_components/angular-ui/build/angular-ui.min',
-            //'angular-ui-router': 'bower_components/angular-ui-router/release/angular-ui-router.min',
-            //'angular-ui-bootstrap': 'bower_components/angular-ui-bootstrap-bower/ui-bootstrap.min',
-            //'angular-ui-bootstrap-templates': 'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min',
             'jquery.blockUI': 'bower_components/blockUI/jquery.blockUI',
             'd3': 'bower_components/d3/d3',
             'd3-sankey': 'bower_components/d3-plugins-sankey/sankey',
@@ -99,81 +94,105 @@
             'stacktrace': 'bower_components/stacktrace-js/dist/stacktrace',
             'js-yaml': 'bower_components/js-yaml/dist/js-yaml',
             'handlebars' : 'bower_components/handlebars/handlebars.amd',
-            
-            
+
+            // Manually installed external dependencies.
             'jquery-svg-graph-stacked-area': 'js/lib/etc/jquery-svg-graph-stacked-area',
             'canvastext': 'lib/canvastext',
             'popit': 'lib/popit',
             'knhx': 'lib/knhx',
             'googlepalette': 'lib/googlepalette',
-            // 'ace': 'bower_components/ace-builds/src-min/ace',
-            // Just style, man.
 
             // KBase Styles
             // ----------------
             'kb.style.bootstrap': 'css/kb-bootstrap',
             'kb/style/sankey': 'css/sankeystyle',
+            
             // KBase Client API
             // -------------------
             'kb.api': 'lib/kbase-client-api',
             'kb.narrative': 'js/lib/kbaseNarrative',
             'kb_client_metrics': 'js/lib/clients/kbaseMetrics',
+            'kb_user_profile': 'js/lib/kbaseUserProfile',
+            'kb.client.workspace': 'js/lib/clients/kbaseWorkspaceClient',
+            'kb.client.methods': 'js/lib/clients/kbaseClientMethods',
+            'kb.client.profile': 'js/lib/clients/profile',
+            'kb.client.narrativemanager': 'js/lib/clients/narrativemanager',
+            
+            
+            // KBase SPA
+            // ---------
+            'kb.main': 'js/main',
+            'kb.runtime': 'js/lib/kbaseRuntime',
+            'kb.app': 'js/lib/kbaseApp',
+            
+            'kb.router': 'js/lib/kbaseRouter',
+            'kb.appstate': 'js/lib/kbaseAppState',
+            
+            'kb_types': 'js/lib/kbaseTypes',
+            'kb_data':  'js/lib/kbaseData',
+            
             
             // KBase Utils
             // ----------------------
-            'kb.app': 'js/lib/kbaseApp',
-            'kb.main': 'js/main',
-            'kb.runtime': 'js/lib/kbaseRuntime',
-            'kb.router': 'js/lib/kbaseRouter',
-            'kb.utils': 'js/lib/kbaseUtils',
+            
+            // Core building blocks
             'kb.cookie': 'js/lib/kbaseCookie',
-            'kb.test': 'js/lib/kbaseTest',
+            'kb.props': 'js/lib/kbaseProps',
+            'kb.logger': 'js/lib/kbaseLogger',
+            'kb.session': 'js/lib/kbaseSession',
+            'kb.config': 'js/lib/kbaseConfig',
+            
+            // App widgets
+            'kb.widget.navbar': 'js/lib/widgets/kbaseNavbar',
+            'kb.widget.login': 'js/lib/widgets/kbaseLoginWidget',
+            'kb.widget.error': 'js/lib/widgets/kbaseError',
+            
+            // Commonly Used
+            'kb.html': 'js/lib/kbaseHTML',
+            'kb.dom': 'js/lib/kbaseDOM',
+            
+            // Less Commonly Used
+            'kb.utils': 'js/lib/kbaseUtils',
             'kb.utils.api': 'js/lib/kbaseAPIUtils',
             'kb.alert': 'js/lib/widgets/kbaseAlert',
             'kb.asyncqueue': 'js/lib/kbaseAsyncQueue',
             'kb.statemachine': 'js/lib/kbaseStateMachine',
-            'kb.logger': 'js/lib/kbaseLogger',
-            // kbase app
-            'kb.appstate': 'js/lib/kbaseAppState',
-            'kb.html': 'js/lib/kbaseHTML',
-            'kb.easytree': 'js/lib/kbaseEasyTree',
             'kb.messaging': 'js/lib/kbaseMessaging',
             'kb.format': 'js/lib/kbaseFormat',
-            'kb.props': 'js/lib/kbaseProps',
-            'kb.widget.widgetadapter': 'js/lib/widgets/kbaseWidgetAdapter',
-            'kb.widget.kbwidgetadapter': 'js/lib/widgets/kbaseKbWidgetAdapter',
-            'kb.simplepanel': 'js/lib/kbaseSimplePanel',
-            'kb.dom': 'js/lib/kbaseDOM',
-            'kb_data':  'js/lib/kbaseData',
-            'kb_types': 'js/lib/kbaseTypes',
+            'kb.easytree': 'js/lib/kbaseEasyTree',
+            
+            // Probably should go away
+            
 
             // KBase Widgets
             // -------------
             
+            // Adapters
+            'kb.widget.widgetadapter': 'js/lib/widgets/kbaseWidgetAdapter',
+            'kb.widget.kbwidgetadapter': 'js/lib/widgets/kbaseKbWidgetAdapter',
+            
+            
+            // Base objects
+            'kb.simplepanel': 'js/lib/kbaseSimplePanel',            
             'kb_widgetBases_simpleWidget': 'js/lib/widgetBases/simpleWidget',
             'kb_widgetBases_domWidget': 'js/lib/widgetBases/domWidget',
             'kb_widgetBases_baseWidget': 'js/lib/widgetBases/baseWidget',
-            
-            'kb.widget.buttonbar': 'js/lib/widgets/kbaseButtonbar',
-            'kb_user_profile': 'js/lib/kbaseUserProfile',
-            'kb.session': 'js/lib/kbaseSession',
-            'kb.config': 'js/lib/kbaseConfig',
-            'kb.widget.navbar': 'js/lib/widgets/kbaseNavbar',
             'kb.widget.base': 'js/lib/widgets/kbaseBaseWidget',
-            'kb.widget.login': 'js/lib/widgets/kbaseLoginWidget',
+            'kb_panelBases_widgetPanel': 'js/lib/panelBases/widgetPanel',
+            
+            // Widget capabilities
+            'kb.widget.buttonbar': 'js/lib/widgets/kbaseButtonbar',
             
             // Dataview widgets
             // KBase clients. Wrappers around the service clients to provide packaged operations with promises.
-            'kb.client.workspace': 'js/lib/clients/kbaseWorkspaceClient',
-            'kb.client.methods': 'js/lib/clients/kbaseClientMethods',
             // Standalone Widgets
-            'kb.widget': 'js/lib/widgets/Widget',
             // KBase Panels
             // ------------
-            
-            'kb_panelBases_widgetPanel': 'js/lib/panelBases/widgetPanel',
+
+            // Widget Managers
             'kb_widgetCollection': 'js/lib/kbaseWidgetCollection',
             
+            // Built in Panels
             // 'kb.panel.login': 'js/lib/panels/login',
             'kb.panel.navbar': 'js/lib/panels/navbar',
             'kb.panel.welcome': 'js/lib/panels/welcome',
@@ -194,26 +213,6 @@
 
             // type spec
             'kb.spec.common': 'js/lib/widgets/jquery/spec/kbaseSpecCommon',
-            // 'kb.jquery.spec.type-card': 'js/lib/widgets/jquery/spec/kbaseSpecTypeCard',
-            // 'kb.jquery.card-layout-manager': 'js/lib/widgets/jquery/kbaseCardLayoutManager',
-            // 'kb.jquery.landing-page-card': 'js/lib/widgets/jquery/kbaseLandingPageCard',
-            
-            'kb.widget.error': 'js/lib/widgets/kbaseError',
-            // KBase Data Visualization Widget
-            // ----------------------------
-            // 'kb.jquery.contigset': 'js/lib/widgets/jquery/contigset/kbaseContigSetView',
-            
-            
-            // KBase Services
-            // non-visual dependencies of plugins
-            // --------------
-            'kb.client.profile': 'js/lib/clients/profile',
-            'kb.client.narrativemanager': 'js/lib/clients/narrativemanager',
-            // KBase Angular Apps
-            // ------------------
-            //'kb.angular.search': 'js/lib/angular/search'
-
-
         },
         shim: {
             datatables: {
