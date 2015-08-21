@@ -12,11 +12,14 @@
  */
 define([
     'jquery',
-    'kb.jquery.authenticatedwidget',
     'kb.service.workspace',
     'kb.utils',
-    'datatables_bootstrap'
-], function ($, _ignore, Workspace, Utils, DataTables) {
+    'kb.html',
+    'kb.runtime',
+    
+    'datatables_bootstrap',
+    'kb.jquery.authenticatedwidget',
+], function ($, Workspace, Utils, html, R) {
     'use strict';
     $.KBWidget({
         name: "kbaseContigSetView",
@@ -29,11 +32,8 @@ define([
         options: {
             ws_id: null,
             ws_name: null,
-            ws_url: null,
-            token: null,
             width: 850
         },
-        loadingImage: "./assets/images/ajax-loader.gif",
         init: function (options) {
             this._super(options);
 
@@ -47,7 +47,9 @@ define([
                 this.ws_name = options.ws;
             }
 
-            this.ws_service = new Workspace(options.ws_url, {token: options.token});
+            this.ws_service = new Workspace(R.getConfig('services.workspace.url'), {
+                token: R.getAuthToken()
+            });
 
             this.render();
             return this;
@@ -60,7 +62,7 @@ define([
 
             var ready = function () {
                 container.empty();
-                container.append("<div><img src=\"" + self.loadingImage + "\">&nbsp;&nbsp;loading genome data...</div>");
+                container.append(html.loading('loading data...'));
 
                 // var p = kb.req('ws', 'get_object_subset', [{ref: self.ws_name + "/" + self.ws_id, included: ['contigs/[*]/id', 'contigs/[*]/length', 'id', 'name', 'source', 'source_id', 'type']}]);
 

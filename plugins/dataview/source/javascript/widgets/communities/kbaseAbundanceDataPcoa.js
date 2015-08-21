@@ -14,7 +14,6 @@
 	            y_axis: "2"
         },
 	    ws_url: window.kbconfig.urls.workspace,
-	    loading_image: "assets/img/ajax-loader.gif",
         
 	    init: function(options) {
             this._super(options);

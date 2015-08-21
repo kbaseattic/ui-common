@@ -17,8 +17,7 @@ define([
             parent: "kbaseAuthenticatedWidget",
             options: {
                 type: null, // either app or method
-                id: null,
-                loadingImage: "assets/img/ajax-loader.gif"
+                id: null
             },
             $mainPanel: null,
             $errorPanel: null,

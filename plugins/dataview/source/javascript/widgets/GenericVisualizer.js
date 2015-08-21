@@ -10,330 +10,17 @@ define([
     'q',
     'kb.client.workspace',
     'kb.html',
-    'kb.runtime'
+    'kb.runtime',
+    'kb.utils.api',
+    'kb_types'
 ],
-    function ($, q, WorkspaceClient, html, R) {
+    function ($, q, WorkspaceClient, html, R, APIUtils, Types) {
         "use strict";
-        var typeMap = {
-            /*
-             widget doesn't work. The underlying collection object looks broken.
-             The collection object itself does not seem to return 
-             Does not work in production either 
-             Fixed!
-             It is just that some collection objects are broken.
-             */
-            'Communities.Collection': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_communities_collection',
-                widget: 'CollectionView',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'ws'},
-                    {from: 'objectId', to: 'id'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            'Communities.FunctionalMatrix': {
-                //AbundanceDataBoxplot - id, name, ws, auth
-                // expects auth, ws passed to it.
-                //AbundanceDataView - id, name, ws
-                //RankAbundancePlot - id, name [0,1], top ["10"-text], order [average, max, sum], ws, auth
-                //AbundanceDataTable - id, name, ws, auth
-                title: 'Data View',
-                module: 'kb_widget_dataview_communities_functionalMatrix',
-                widget: 'AbundanceDataView',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'ws'},
-                    {from: 'objectId', to: 'id'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            // Need some example data to test with
-            // NB uses the same plugin as above, so it should just work.
-            'Communities.FunctionalProfile': {
-                /* Done! Narrative uses AbundanceDataView */
-                title: 'Data View',
-                module: 'kb_widget_dataview_communities_functionalProfile',
-                widget: 'AbundanceDataView',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'ws'},
-                    {from: 'objectId', to: 'id'},
-                    {from: 'authToken', to: 'token'}
-                ],
-            },
-            // DO later ,need to port heatmap or use another heatmap widget.
-            // 'Communities.Heatmap'
-            'Communities.Heatmap': {
-                name: 'Data View',
-                module: 'kb_widget_dataview_communities_abundanceDataHeatmap',
-                widget: 'AbundanceDataHeatmap',
-                options: [
-                    {from: 'workspaceId', to: 'ws'},
-                    {from: 'objectId', to: 'id'}
-                ]
-            },
-            /* NEEDS A COMPLEX LANDING PAGE */
-            'Communities.Metagenome': {
-                //  Plugged in MetagenomeView (required a different kbaseTabs than for Neal's modeling) 
-                title: 'Data View',
-                module: 'kb_widget_dataview_communities_metagenome',
-                widget: 'MetagenomeView',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'ws'},
-                    {from: 'objectId', to: 'id'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            'GenomeComparison.ProteomeComparison': {
-                title: 'Data View',
-                module: 'kb.widget.dataview.proteome-comparison.genome-comparison',
-                widget: 'GenomeComparisonWidget',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'ws_name'},
-                    {from: 'objectId', to: 'ws_id'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            'KBaseAssembly.AssemblyInput': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_assembly_assemblyInput',
-                widget: 'kbaseAssemblyInput',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'workspaceId'},
-                    {from: 'objectId', to: 'objId'},
-                    {from: 'objectVersion', to: 'objVer', optional: true},
-                    {from: 'loadingImage', to: 'loadingImage', optional: true}
-                ]
-            },
-            'KBaseAssembly.AssemblyReport': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_assembly_view',
-                widget: 'kbaseAssemblyView',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'ws_name'},
-                    {from: 'objectId', to: 'ws_id'}
-                ]
-            },
-            /* TODO: find sample data - untested */
-            'KBaseAssembly.PairedEndLibrary': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_assembly_pairedEndLibrary',
-                widget: 'kbasePairedEndLibrary',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'workspaceId'},
-                    {from: 'objectId', to: 'objId'},
-                    {from: 'objectVersion', to: 'objVer', optional: true}
-                ]
-            },
-            'KBaseFile.PairedEndLibrary': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_assembly_filePairedEndLibrary',
-                widget: 'kbaseFilePairedEndLibrary',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'workspaceId'},
-                    {from: 'objectId', to: 'objId'},
-                    {from: 'objectVersion', to: 'objVer', optional: true}
-                ]
-            },
-            'KBaseGenomes.GenomeComparison': {
-                title: 'Data View',
-                module: 'kb.widget.dataview.proteome-comparison.genome-comparison-viewer',
-                widget: 'kbaseGenomeComparisonViewer',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'ws'},
-                    {from: 'objectId', to: 'id'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            'KBaseGenomes.ContigSet': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_contigset_contigSetView',
-                widget: 'kbaseContigSetView',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'ws_name'},
-                    {from: 'objectId', to: 'ws_id'},
-                    {from: 'objectVersion', to: 'ver', optional: true},
-                    {from: 'workspaceURL', to: 'ws_url'},
-                    {from: 'authToken', to: 'token'},
-                    {from: 'loadingImage', to: 'loadingImage', optional: true}
-                ]
-                    // options: '{"ws_id":???objname,"ws_name":???wsname,"ver":???ver,"loadingImage":"'+this.options.loadingImage+'"}'
-            },
-            'KBaseGenomes.MetagenomeAnnotation': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_genome_annotationSetTable',
-                widget: 'AnnotationSetTable',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'ws'},
-                    {from: 'objectId', to: 'id'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            'KBaseGenomes.Pangenome': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_genome_pangenome',
-                widget: 'kbasePanGenome',
-                panel: true,
-                options: [
-                    {from: 'workspaceName', to: 'ws'},
-                    {from: 'objectName', to: 'name'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            /* COMPLEX LANDING PAGE */
-            'KBaseGenomes.Genome': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_genome',
-                widget: 'KBaseGenomePage',
-                noPanel: true,
-                // Options object to build. Maps
-                options: [
-                    {from: 'objectId', to: 'genomeID'},
-                    {from: 'workspaceId', to: 'workspaceID'},
-                    {from: 'loadingImage', to: 'loadingImage', optional: true}
-                ],
-                // options: '{"genomeID":???objname,"workspaceID":???wsname,"loadingImage":"'+this.options.loadingImage+'"}',
-                sub: {
-                    Feature: {
-                        module: ' kb_widget_dataview_genome_genePage',
-                        widget: 'KBaseGenePage',
-                        noPanel: true,
-                        options: [
-                            {from: 'objectId', to: 'genomeID'},
-                            {from: 'workspaceId', to: 'objectId'},
-                            {from: 'loadingImage', to: 'loadingImage', optional: true}
-                        ]
-                            // options: '{"genomeID":???objname,"workspaceID":???wsname,"featureID":???subid,"loadingImage":"'+this.options.loadingImage+'"}'
-                    }
-                }
-            },
-            // MODELING
-            'KBasePhenotypes.PhenotypeSet': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_modeling_tabTable',
-                widget: 'kbaseTabTable',
-                panel: true,
-                options: [
-                    {from: 'workspaceName', to: 'ws'},
-                    {from: 'objectName', to: 'obj'},
-                    {from: 'objectType', to: 'type'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            'KBasePhenotypes.PhenotypeSimulationSet': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_modeling_tabTable',
-                widget: 'kbaseTabTable',
-                panel: true,
-                options: [
-                    {from: 'workspaceName', to: 'ws'},
-                    {from: 'objectName', to: 'obj'},
-                    {from: 'objectType', to: 'type'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            'KBaseSearch.GenomeSet': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_modeling_tabTable',
-                widget: 'kbaseTabTable',
-                panel: true,
-                options: [
-                    {from: 'workspaceName', to: 'ws'},
-                    {from: 'objectName', to: 'obj'},
-                    {from: 'objectType', to: 'type'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            'KBaseTrees.Tree': {
-                title: 'Data View',
-                module: 'kb.widget.dataview.trees.tree',
-                widget: 'kbaseTree',
-                panel: true,
-                options: [
-                    {from: 'workspaceId', to: 'workspaceID'},
-                    {from: 'objectId', to: 'treeID'},
-                    {from: 'objectVersion', to: 'treeObjVer'}
-                ]
-            },
-            /*
-             * The modeling widgets are all based on the "tab table" which  
-             * expects the widgets to be made through an internal object
-             * system. All widgets are loaded within the tab_table module, 
-             * and looked up and loaded there.
-             */
-            'KBaseBiochem.Media': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_modeling_tabTable',
-                widget: 'kbaseTabTable',
-                panel: true,
-                options: [
-                    {from: 'workspaceName', to: 'ws'},
-                    {from: 'objectName', to: 'obj'},
-                    {from: 'objectType', to: 'type'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            'KBaseFBA.FBA': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_modeling_tabTable',
-                widget: 'kbaseTabTable',
-                panel: true,
-                options: [
-                    {from: 'workspaceName', to: 'ws'},
-                    {from: 'objectName', to: 'obj'},
-                    {from: 'objectType', to: 'type'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            'KBaseFBA.FBAModel': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_modeling_tabTable',
-                widget: 'kbaseTabTable',
-                panel: true,
-                options: [
-                    {from: 'workspaceName', to: 'ws'},
-                    {from: 'objectName', to: 'obj'},
-                    {from: 'objectType', to: 'type'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            'KBaseFBA.FBAModelSet': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_modeling_tabTable',
-                widget: 'kbaseTabTable',
-                panel: true,
-                options: [
-                    {from: 'workspaceName', to: 'ws'},
-                    {from: 'objectName', to: 'obj'},
-                    {from: 'objectType', to: 'type'},
-                    {from: 'authToken', to: 'token'}
-                ]
-            },
-            'KBaseExpression.ExpressionSeries': {
-                title: 'Data View',
-                module: 'kb_widget_dataview_expression_expressionSeries',
-                widget: 'kbaseExpressionSeries',
-                panel: true,
-                options: [
-                    {from: 'workspaceName', to: 'ws'},
-                    {from: 'objectName', to: 'name'}
-                ]
-            }
-        };
+       
 
-        function findMapping(objectType, params) {
-            var mapping = typeMap[objectType];
+        function findMapping(type, params) {
+            // var mapping = typeMap[objectType];
+            var mapping = Types.getViewer({type: type});
             if (mapping) {
                 if (params.sub && params.subid) {
                     if (mapping.sub) {
@@ -385,13 +72,14 @@ define([
                 params.workspaceURL = R.getConfig('services.workspace.url');
                 params.authToken = R.getAuthToken();
 
-                return q.Promise(function (resolve) {
+                return q.Promise(function (resolve, reject) {
                     workspaceClient.getObject(params.workspaceId, params.objectId)
                         .then(function (wsobject) {
-                            var objectType = wsobject.type.split(/-/)[0];
-                            var mapping = findMapping(objectType, params);
+                            var type = APIUtils.parseTypeId(wsobject.type);
+                            //var objectType = wsobject.type.split(/-/)[0];
+                            var mapping = findMapping(type, params);
                             if (!mapping) {
-                                $widgetContainer.html(html.panel('Not Found', 'Sorry, cannot find widget for ' + objectType));
+                                $widgetContainer.html(html.panel('Not Found', 'Sorry, cannot find widget for ' + type.module + '.' + type.name));
                                 resolve();
                                 return;
                             }
@@ -426,8 +114,9 @@ define([
                             });
                         })
                         .catch(function (err) {
-                            console.log('ERROR');
-                            console.log(err);
+                            //console.log('ERROR');
+                            //console.log(err);
+                            reject(err);
                         })
                         .done();
                 });
@@ -449,15 +138,32 @@ define([
                     resolve();
                 });
             }
+            function showError(err) {
+                var content;
+                
+                if (typeof err === 'string') {
+                    content = err;
+                } else if (err.message) {
+                    content = err.message;
+                } else if (err.error && err.error.error) {
+                    content = err.error.error.message;
+                } else {
+                    content = 'Unknown Error';
+                }
+                container.innerHTML = html.bsPanel('Error', content);
+            }
             function start(params) {
-                return q.Promise(function (resolve) {
+                return q.Promise(function (resolve, reject) {
                     attachWidget(params)
                         .then(function () {
                             resolve();
                         })
                         .catch(function (err) {
-                            console.error('ERROR');
-                            console.error(err);
+                            // if attaching the widget failed, we attach a 
+                            // generic error widget:
+                            // TO BE DONE
+                            showError(err);
+                            reject(err);
                         })
                         .done();
                 });

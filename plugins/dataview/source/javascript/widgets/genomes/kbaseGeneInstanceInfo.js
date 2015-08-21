@@ -15,8 +15,9 @@
 define([
     'jquery', 
     'kb.runtime', 
+    'kb.html',
     'kb.jquery.widget'
-], function ($) {
+], function ($, R, html) {
     'use strict';
     $.KBWidget({
         name: "KBaseGeneInstanceInfo",
@@ -30,11 +31,8 @@ define([
             auth: null,
             hideButtons:false,
             width:350,
-            loadingImage: "assets/img/loading.gif",
             genomeInfo: null
         },
-
-        cdmiURL: "https://kbase.us/services/cdmi_api",
 
         init: function(options) {
             this._super(options);
@@ -46,9 +44,9 @@ define([
             
             // always setup the cdmi clients, cause for now there is a hack to get domain/operon info if available
             // from the CDS
-            this.cdmiClient = new CDMI_API(this.cdmiURL);
-            this.entityClient = new CDMI_EntityAPI(this.cdmiURL);
-            this.workspaceClient = new Workspace(App.getConfig('services.workspace.url'));
+            this.cdmiClient = new CDMI_API(R.getConfig('services.cdmi.url'));
+            this.entityClient = new CDMI_EntityAPI(R.getConfig('services.cdmi.url'));
+            this.workspaceClient = new Workspace(R.getConfig('services.workspace.url'));
 
             this.render();
             if (this.options.workspaceID)
@@ -115,7 +113,7 @@ define([
         renderCentralStore: function() {
 
             this.$infoPanel.hide();
-            this.showMessage("<img src='" + this.options.loadingImage + "'>");
+            this.showMessage(html.loading());
 
             var self = this;
 

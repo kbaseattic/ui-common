@@ -6,16 +6,19 @@
  white: true
  */
 define([
+    'jquery',
     'kb_widget_dataview_base',
     'kb.utils.api',
     'kb.utils',
+    'kb.html',
     'kb.runtime',
     'kb.service.workspace',
     'kb.widget.navbar',
     'q',
-    'underscore'
+    'underscore',
+    'kb_types'
 ],
-    function (DataviewWidget, APIUtils, Utils, R, WorkspaceService, Navbar, Q, _) {
+    function ($, DataviewWidget, APIUtils, Utils, html, R, WorkspaceService, Navbar, Q, _, types) {
         'use strict';
         var widget = Object.create(DataviewWidget, {
             init: {
@@ -429,47 +432,52 @@ define([
             createDataIcon: {
                 value: function (object_info) {
                     try {
-                        var icons = $.parseJSON(
-                            $.ajax({
-                                url: 'assets/icons/icons.json', // should not be hardcoded!! but figure that out later
-                                async: false,
-                                dataType: 'json'
-                            }).responseText
-                            );
-                        //console.log(icons);
-
-                        var type = object_info[2].split('-')[0].split('.')[1];
-                        var $logo = $('<span>');
-                        var icon = _.has(icons.data, type) ? icons.data[type] : icons.data['DEFAULT'];
+                        var typeId = object_info[2],
+                            type = APIUtils.parseTypeId(typeId);
+                        var icon = types.getIcon({
+                            module: type.module, 
+                            type: type.name
+                        });
 
                         var code = 0;
-                        for (var i = 0; i < type.length; code += type.charCodeAt(i++))
-                            ;
-                        var color = icons.colors[code % icons.colors.length];
-                        // background circle
-                        $logo.addClass('fa-stack fa-2x')
-                            .append($('<i>')
-                                .addClass('fa fa-circle fa-stack-2x')
-                                .css({'color': color}));
+                        for (var i = 0; i < type.length; code += type.charCodeAt(i++));
+                        var colors = [
+                            "#F44336",
+                            "#E91E63",
+                            "#9C27B0",
+                            "#3F51B5",
+                            "#2196F3",
+                            "#673AB7",
+                            "#FFC107",
+                            "#0277BD",
+                            "#00BCD4",
+                            "#009688",
+                            "#4CAF50",
+                            "#33691E",
+                            "#2E7D32",
+                            "#AEEA00",
+                            "#03A9F4",
+                            "#FF9800",
+                            "#FF5722",
+                            "#795548",
+                            "#006064",
+                            "#607D8B"
+                        ];
+                        var color = colors[code % colors.length];
 
-                        var isCustomIcon = (icon.length > 0 && icon[0].length > 4 &&
-                            icon[0].substring(0, 4) === 'icon');
+                        var div = html.tag('div'),
+                            span = html.tag('span'),
+                            i = html.tag('i');
+                        var logo = div([
+                            span({class: 'fa-stack fa-2x'}, [
+                                i({class: 'fa fa-circle fa-stack-2x', style: {color: color}}),
+                                i({class: 'fa-inverse fa-stack-1x ' + icon.classes.join(' ')})
+                            ])
+                        ]);
+                        
+                        console.log(logo);
 
-                        if (isCustomIcon) {
-                            // add custom icons (more than 1 will look weird, though)
-                            _.each(icon, function (cls) {
-                                $logo.append($('<i>')
-                                    .addClass('icon fa-inverse fa-stack-1x ' + cls));
-                            });
-                        } else {
-                            // add stack of font-awesome icons
-                            _.each(icon, function (cls) {
-                                $logo.append($('<i>')
-                                    .addClass('fa fa-inverse fa-stack-1x ' + cls));
-                            });
-                        }
-
-                        return $('<div>').append($logo).html(); //probably a better way to do this...
+                        return logo;
                     } catch (err) {
                         console.error('When fetching icon config: ', err);
                         return '';
@@ -484,12 +492,12 @@ define([
                             this.setState('sub', this.getParam('sub'));
                         }
 
-                        Utils.promise(this.workspaceClient, 'get_object_info_new', {
+                        Q(this.workspaceClient.get_object_info_new({
                             objects: [{
                                     ref: APIUtils.makeWorkspaceObjectRef(this.getParam('workspaceId'), this.getParam('objectId'), this.getParam('objectVersion'))
                                 }],
                             includeMetadata: 1
-                        })
+                        }))
                             .then(function (data) {
                                 if (!data || data.length === 0) {
                                     this.setState('status', 'notfound');
@@ -563,8 +571,7 @@ define([
                                 if (err.status && err.status === 500) {
                                     // User probably doesn't have access -- but in any case we can just tell them
                                     // that they don't have access.
-                                    console.log(err);
-                                    if (err.error.match(/^us.kbase.workspace.database.exceptions.NoSuchObjectException:/)) {
+                                    if (err.error.error.match(/^us.kbase.workspace.database.exceptions.NoSuchObjectException:/)) {
                                         this.setState('status', 'notfound');
                                         this.setState('error', {
                                             type: 'client',
@@ -572,7 +579,7 @@ define([
                                             shortMessage: 'This object does not exist',
                                             originalMessage: err.error.message
                                         });
-                                    } else if (err.error.match(/^us.kbase.workspace.database.exceptions.InaccessibleObjectException:/)) {
+                                    } else if (err.error.error.match(/^us.kbase.workspace.database.exceptions.InaccessibleObjectException:/)) {
                                         this.setState('status', 'denied');
                                         this.setState('error', {
                                             type: 'client',

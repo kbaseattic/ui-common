@@ -14,11 +14,11 @@
                         {%if result.avatar.gravatar_default and result.email %} 
                         <img src="{{result.email | gravatar(64,"pg", result.avatar.gravatar_default)}}" class="avatar">
                         {% else %}
-                        <img src="assets/images/nouserpic.png" class="avatar">
+                        <img src="{{env.root}}/images/nouserpic.png" class="avatar">
                         {% endif %}
                     </td>
                     <td>
-                        <a href="/functional-site/#/people/{{result.username}}">{{result.realname}}</a><br>
+                        <a href="#people/{{result.username}}">{{result.realname}}</a><br>
                         <i>{{result.username}}</i>
                     </td>
                 </tr>

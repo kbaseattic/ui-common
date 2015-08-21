@@ -37,7 +37,7 @@ define([
                 var self = this;
 
                 // root url path for landing pages
-                var DATAVIEW_URL = '/functional-site/#dataview/';
+                var DATAVIEW_URL = '#dataview/';
 
                 var type = input.type;
 

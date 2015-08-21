@@ -10,7 +10,12 @@
  * @author Chris Bun <chrisbun@gmail.com>
  * @public
  */
-define(['jquery', 'kb.runtime', 'kb.jquery.authenticatedwidget'], function ($, R) {
+define([
+    'jquery',
+    'kb.runtime',
+    'kb.html',
+    'kb.jquery.authenticatedwidget'
+], function ($, R, html) {
     'use strict';
     $.KBWidget({
         name: "kbaseAssemblyView",
@@ -26,7 +31,6 @@ define(['jquery', 'kb.runtime', 'kb.jquery.authenticatedwidget'], function ($, R
             ws_name: null,
             job_id: null
         },
-        loadingImage: "assets/img/ajax-loader.gif",
         timer: null,
         init: function (options) {
             this._super(options);
@@ -56,16 +60,17 @@ define(['jquery', 'kb.runtime', 'kb.jquery.authenticatedwidget'], function ($, R
 
             var ready = function () {
                 container.empty();
-                container.append("<div><img src=\"" + self.loadingImage + "\">&nbsp;&nbsp;loading genome data...</div>");
+                container.append(html.loading('loading data...'));
                 var objname;
                 objname = self.ws_id;
-                if (typeof self.ws_id === "string") {
-                    if (self.ws_id.indexOf(".report") === -1) { //Check if contigset or report
-                        objname = self.ws_id + ".report";
-                    }
-                }
+                // commented this out ... can't think of how this ever worked. eap.
+                //if (typeof self.ws_id === 'string') {
+               //     if (self.ws_id.indexOf('.report') === -1) { //Check if contigset or report
+                //        objname = self.ws_id + '.report';
+               //     }
+               // }
 
-                kbws.get_objects([{ref: self.ws_name + "/" + objname}], function (data) {
+                kbws.get_objects([{ref: self.ws_name + '/' + objname}], function (data) {
                     container.empty();
                     var report_div = '<div class="" style="margin-top:15px">';
                     var report = data[0].data.report;

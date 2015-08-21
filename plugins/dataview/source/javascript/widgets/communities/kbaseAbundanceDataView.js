@@ -10,15 +10,15 @@
  */
 define([
     'jquery', 
-    'kb.jquery.authenticatedwidget', 
     'kb.service.workspace', 
     'kb.runtime', 
     'kb.html', 
-    'kb.utils.api', 
     'kb_widget_dataview_communities_graph', 
-    'datatables_bootstrap'
+    
+    'datatables_bootstrap',
+    'kb.jquery.authenticatedwidget', 
 ],
-    function ($, _AuthenticatedWidget, Workspace, R, html, APIUtils, Graph) {
+    function ($, Workspace, R, html, Graph) {
         'use strict';
         $.KBWidget({
             name: 'AbundanceDataView',
@@ -31,7 +31,6 @@ define([
                 name: 0
             },
             ws_url: R.getConfig('services.workspace.url'),
-            loading_image: "assets/img/ajax-loader.gif",
             init: function (options) {
                 this._super(options);
                 return this;
@@ -46,7 +45,7 @@ define([
                     container.append("<div>[Error] You're not logged in</div>");
                     return;
                 }
-                container.append("<div><img src=\"" + self.loading_image + "\">&nbsp;&nbsp;loading data...</div>");
+                container.append(html.loading('loading data...'));
 
                 var kbws = new Workspace(self.ws_url, {'token': self.token});
                 kbws.get_objects([{ref: self.options.ws + "/" + self.options.id}], function (data) {

@@ -12,7 +12,16 @@
  * Gene "instance" info (e.g. coordinates on a particular strain's genome)
  * is in a different widget.
  */
-define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.service.cdmi-entity', 'kb.service.workspace' ], function ($, R, _Widget, CDMI, CDMI_Entity, Workspace) {
+define([
+    'jquery',
+    'kb.runtime',
+    'kb.html',
+    'kb.service.cdmi',
+    'kb.service.cdmi-entity',
+    'kb.service.workspace',
+    
+    'kb.jquery.widget'
+], function ($, R, html, CDMI, CDMI_Entity, Workspace) {
     'use strict';
     $.KBWidget({
         name: "KBaseGenomeOverview",
@@ -21,21 +30,18 @@ define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.servi
         options: {
             genomeID: null,
             workspaceID: null,
-            loadingImage: "assets/img/ajax-loader.gif",
             kbCache: null,
             isInCard: false,
             genomeInfo: null
         },
         token: null,
-        // cdmiURL: "https://kbase.us/services/cdmi_api",
-        cdmiURL: R.getConfig('cdmi_url'),
+        cdmiURL: R.getConfig('services.cdmi.url'),
         $infoTable: null,
         noContigs: "No Contigs",
         init: function (options) {
             this._super(options);
 
-            this.$messagePane = $("<div/>")
-                .hide();
+            this.$messagePane = $("<div/>").hide();
             this.$elem.append(this.$messagePane);
 
             this.render(); // this is moved inside central store and 
@@ -51,7 +57,7 @@ define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.servi
             var self = this;
 
             this.$infoPanel = $("<div>");
-           
+
             this.$infoTable = $("<table>")
                 .addClass("table table-striped table-bordered");
             this.$infoPanel.append($("<div>").css("overflow", "auto").append(this.$infoTable));
@@ -74,7 +80,7 @@ define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.servi
             this.entityClient = new CDMI_Entity(this.cdmiURL);
 
             this.$infoPanel.hide();
-            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
+            this.showMessage(html.loading('loading...'));
             /**
              * Fields to show:
              * ID
@@ -162,19 +168,19 @@ define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.servi
         alreadyRenderedTable: false,
         renderWorkspace: function () {
             var self = this;
-            this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading ...</center>");
+            this.showMessage(html.loading('loading...'));
             this.$infoPanel.hide();
-            
+
 
             if (self.options.genomeInfo) {
                 self.showData(self.options.genomeInfo.data);
             } else {
                 var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
-                
+
                 var prom = new Workspace(App.getConfig('services.workspace.url'), {
                     auth: App.getAuthToken()
                 }).get_objects([obj]);
-                
+
                 // var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
                 $.when(prom).done($.proxy(function (genome) {
                     // console.log(genome);

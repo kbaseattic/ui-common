@@ -8,7 +8,14 @@
  browser: true,
  white: true
  */
-define(['jquery', 'kb.runtime', 'kb.html', 'kb.service.workspace', 'kb.jquery.authenticatedwidget', 'datatables_bootstrap'],
+define([
+    'jquery',
+    'kb.runtime',
+    'kb.html',
+    'kb.service.workspace',
+    'kb.jquery.authenticatedwidget',
+    'datatables_bootstrap'
+],
     function ($, R, html, Workspace) {
         'use strict';
         $.KBWidget({
@@ -20,7 +27,6 @@ define(['jquery', 'kb.runtime', 'kb.html', 'kb.service.workspace', 'kb.jquery.au
                 id: null,
                 ws: null
             },
-            loading_image: "assets/img/ajax-loader.gif",
             init: function (options) {
                 this._super(options);
                 this.ws_url = R.getConfig('services.workspace.url');
@@ -34,7 +40,7 @@ define(['jquery', 'kb.runtime', 'kb.html', 'kb.service.workspace', 'kb.jquery.au
                     container.append("<div>[Error] You're not logged in</div>");
                     return;
                 }
-                container.append("<div><img src=\"" + self.loading_image + "\">&nbsp;&nbsp;loading data...</div>");
+                container.append(html.loading('loading data...'));
 
                 var kbws = new Workspace(self.ws_url, {'token': self.token});
                 kbws.get_objects([{ref: self.options.ws + "/" + self.options.id}], function (data) {

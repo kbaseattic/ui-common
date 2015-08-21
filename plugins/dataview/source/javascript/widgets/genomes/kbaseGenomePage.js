@@ -15,6 +15,7 @@
 define([
     'jquery',
     'kb.runtime',
+    'kb.html',
     'kb.service.workspace',
     'kb.jquery.widget',
     'kb_widget_dataview_genome_wideOverview',
@@ -22,7 +23,7 @@ define([
     'kb_widget_dataview_genome_wideTaxonomy',
     'kb_widget_dataview_genome_wideAssemblyAnnotation'
 ],
-    function ($, R, Workspace) {
+    function ($, R, html, Workspace) {
         'use strict';
         $.KBWidget({
             name: "KBaseGenomePage",
@@ -32,7 +33,6 @@ define([
                 genomeID: null,
                 workspaceID: null,
                 ver: null,
-                loadingImage: "assets/img/ajax-loader.gif"
             },
             init: function (options) {
                 this._super(options);
@@ -87,7 +87,6 @@ define([
                         panel1.KBaseGenomeWideOverview({
                             genomeID: scope.id,
                             workspaceID: scope.ws,
-                            loadingImage: "assets/img/ajax-loader.gif",
                             genomeInfo: genomeInfo
                         });
                     } catch (e) {
@@ -102,7 +101,6 @@ define([
                     try {
                         panel2.KBaseLitWidget({
                             literature: searchTerm,
-                            loadingImage: "assets/img/ajax-loader.gif",
                             genomeInfo: genomeInfo
                         });
                     } catch (e) {
@@ -119,7 +117,6 @@ define([
                         panel4.KBaseGenomeWideTaxonomy({
                             genomeID: scope.id,
                             workspaceID: scope.ws,
-                            loadingImage: "assets/img/ajax-loader.gif",
                             genomeInfo: genomeInfo
                         });
                     } catch (e) {
@@ -143,7 +140,6 @@ define([
                                     panel5.KBaseGenomeWideAssemAnnot({
                                         genomeID: scope.id,
                                         workspaceID: scope.ws,
-                                        loadingImage: "assets/img/ajax-loader.gif",
                                         ver: scope.ver,
                                         genomeInfo: genomeInfo
                                     });
@@ -204,8 +200,7 @@ define([
                     });
             },
             makePleaseWaitPanel: function () {
-                return $('<div>').append('<p class="muted ajax-loader"><img src="' +
-                    this.options.loadingImage + '"> loading...</p>');
+                return $('<div>').html(html.loading('loading...'));
             },
             makeDecoration: function ($panel, title, $widgetDiv) {
                 var id = this.genUUID();

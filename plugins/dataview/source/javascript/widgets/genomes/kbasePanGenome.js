@@ -10,8 +10,15 @@
  browser: true,
  white: true
  */
-define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticatedwidget', 'kb.jquery.kb-tabs'],
-    function ($, R, Workspace) {
+define([
+    'jquery',
+    'kb.runtime',
+    'kb.html',
+    'kb.service.workspace',
+    'kb.jquery.authenticatedwidget',
+    'kb.jquery.kb-tabs'
+],
+    function ($, R, html, Workspace) {
         'use strict';
         $.KBWidget({
             name: "kbasePanGenome",
@@ -20,7 +27,6 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticated
             options: {
                 ws: null,
                 name: null,
-                loadingImage: "assets/img/ajax-loader.gif",
                 withExport: false,
                 width: 1000
             },
@@ -42,7 +48,7 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticated
                 this.genomeRefs = {};
                 var container = this.$elem;
                 container.empty();
-                container.append("<div><img src=\"" + this.options.loadingImage + "\">&nbsp;&nbsp;loading pan-genome data...</div>");
+                container.html(html.loading('loading pan-genome data...'));
                 this.render();
                 return this;
             },
@@ -324,7 +330,7 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticated
             },
             buildOrthoTable: function (orth_id, ortholog) {
                 var self = this;
-                var tab = $("<div><img src=\"" + this.options.loadingImage + "\">&nbsp;&nbsp;loading gene data...</div>");
+                var tab = $(html.loading('loading gene data...'));
                 var req = [];
                 for (var i in ortholog.orthologs) {
                     var genomeRef = ortholog.orthologs[i][2];

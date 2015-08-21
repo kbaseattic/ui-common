@@ -1,5 +1,15 @@
-define(['nunjucks', 'jquery', 'q', 'kb.runtime', 'kb.session', 'kb.utils', 'kb_user_profile', 'postal'],
-    function (nunjucks, $, Q, R, Session, Utils, UserProfile, Postal) {
+define([
+    'nunjucks', 
+    'jquery', 
+    'q', 
+    'kb.html',
+    'kb.runtime', 
+    'kb.session', 
+    'kb.utils', 
+    'kb_user_profile', 
+    'postal'
+],
+    function (nunjucks, $, Q, html, R, Session, Utils, UserProfile, Postal) {
         "use strict";
         var DashboardWidget = Object.create({}, {
             // The init function interfaces this object with the caller, and sets up any 
@@ -814,7 +824,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.runtime', 'kb.session', 'kb.utils', 'kb_u
             // NB depends on assets.
             renderWaitingView: {
                 value: function () {
-                    this.places.content.html('<img src="assets/img/ajax-loader.gif"></img>');
+                    this.places.content.html(html.loading());
                 }
             },
             setTitle: {

@@ -10,8 +10,16 @@
  * @author Roman Sutormin <rsutormin@lbl.gov>
  * @public
  */
-define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticatedwidget', 'kb.jquery.tabs', 'datatables_bootstrap'],
-    function ($, R, Workspace) {
+define([
+    'jquery',
+    'kb.runtime',
+    'kb.html',
+    'kb.service.workspace',
+    'kb.jquery.authenticatedwidget',
+    'kb.jquery.tabs',
+    'datatables_bootstrap'
+],
+    function ($, R, html, Workspace) {
         'use strict';
         $.KBWidget({
             name: "kbaseGenomeComparisonViewer",
@@ -25,9 +33,6 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticated
                 id: null,
                 ws: null
             },
-            wsUrl: R.getConfig('services.workspace.url'),
-            // wsUrl: "https://kbase.us/services/ws", // we need to stop doing this!
-            loadingImage: "assets/img/ajax-loader.gif",
             init: function (options) {
                 this._super(options);
                 this.pref = this.genUUID();
@@ -36,19 +41,17 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticated
                 return this;
             },
             render: function () {
-                var self = this;
-
-                var container = this.$elem;
+                var self = this,
+                    container = this.$elem,
+                    kbws = new Workspace(R.getConfig('services.workspace.url'), {token: self.authToken()});
+                
                 container.empty();
                 if (!self.authToken()) {
                     container.append("<div>[Error] You're not logged in</div>");
                     return;
                 }
-                container.append("<div><img src=\"" + self.loadingImage + "\">&nbsp;&nbsp;loading genome comparison data...</div>");
+                container.html(html.loading('loading genome comparison data...'));
 
-                var kbws = new Workspace(self.wsUrl, {token: self.authToken()});
-
-                //var request = {auth: self.authToken(), workspace: self.ws_name, id: self.simulation_id, type: 'KBasePhenotypes.PhenotypeSimulationSet'};
                 kbws.get_objects([{ref: self.ws + "/" + self.id}], function (data) {
                     ///////////////////////////////////// Data Preparation ////////////////////////////////////////////
                     var object = data[0].data;
@@ -56,11 +59,10 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticated
                     var genomes = object.genomes;
                     var functions = object.functions;
                     var families = object.families;
+                    
                     ///////////////////////////////////// Instantiating Tabs ////////////////////////////////////////////
-                    container.empty();
                     var tabPane = $('<div id="' + self.pref + 'tab-content">');
-                    container.append(tabPane);
-                    console.log(tabPane);
+                    container.html(tabPane);
                     tabPane.kbaseTabs({canDelete: true, tabs: []});
                     ///////////////////////////////////// Overview table ////////////////////////////////////////////    		
                     var tabOverview = $("<div/>");
@@ -411,7 +413,8 @@ define(['jquery', 'kb.runtime', 'kb.service.workspace', 'kb.jquery.authenticated
                                 var genome = genomes[i];
                                 var genes = "";
                                 var scores = "";
-                                var functions = "";
+                                // var functions = "";
+                                var fams = '';
                                 var sss = "";
                                 var primclass = "";
                                 var subclass = "";

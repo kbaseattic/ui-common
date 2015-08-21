@@ -14,12 +14,11 @@ define([
     'kb.service.workspace',
     'kb.runtime',
     'kb.html',
-    'kb.utils.api',
     // no parameters
     'datatables_bootstrap',
     'kb.jquery.authenticatedwidget'
 ],
-    function ($, Q, Workspace, R, html, APIUtils) {
+    function ($, Q, Workspace, R, html) {
         'use strict';
         $.KBWidget({
             name: 'CollectionView',
@@ -31,7 +30,6 @@ define([
                 ws: null
             },
             ws_url: R.getConfig('services.workspace.url'),
-            loading_image: 'assets/img/ajax-loader.gif',
             init: function (options) {
                 this._super(options);
                 return this;
@@ -44,7 +42,7 @@ define([
                     container.append('<div>[Error] You are not logged in</div>');
                     return;
                 }
-                container.append('<div><img src="' + self.loading_image + '">&nbsp;&nbsp;loading data...</div>');
+                container.append(html.loading('loading data...'));
 
                 var workspace = new Workspace(self.ws_url, {token: self.token}),
                     title;

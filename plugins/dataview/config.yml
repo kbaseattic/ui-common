@@ -97,7 +97,7 @@ source:
             file: widgets/from_narrative/kbaseAnnotationSetTable
         -
             module: kb_widget_dataview_genome_pangenome
-            file: widgets/genomes/kbasePhenotypeSet
+            file: widgets/genomes/kbasePanGenome
         -
             module: kb_widget_dataview_genome_phenotypeSet
             file: widgets/genomes/kbasePhenotypeSet            
@@ -111,14 +111,14 @@ source:
             module: kb_widget_dataview_assembly_assemblyInput
             file: widgets/assembly/kbaseAssemblyInput
         -
-            module: kb_widget_dataview_assembly_view
-            file: widgets/assembly/kbaseAssemblyView
+            module: kb_widget_dataview_assembly_assemblyView
+            file: widgets/from_narrative/kbaseAssemblyView
         -
             module: kb_widget_dataview_assembly_pairedEndLibrary
-            file: widgets/assembly/kbaseFilePairedEndLibrary
+            file: widgets/assembly/kbasePairedEndLibrary
         -
             module: kb_widget_dataview_assembly_filePairedEndLibrary
-            file: widgets/assembly/kbaseCollectionView
+            file: widgets/assembly/kbaseFilePairedEndLibrary
         
         # COMMUNITIES
         -
@@ -190,8 +190,11 @@ source:
         # TREES
         
         -
-            module: kb_widget_dataview_modeling_tree
-            file: kbaseTree  
+            module: kb_widget_dataview_trees_easytree
+            file: widgets/trees/easyTree
+        -
+            module: kb_widget_dataview_trees_tree
+            file: widgets/trees/kbaseTree  
         
 install:
     routes:

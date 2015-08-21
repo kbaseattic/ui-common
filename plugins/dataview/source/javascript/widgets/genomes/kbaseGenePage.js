@@ -10,7 +10,15 @@
  * @author Roman Sutormin <rsutormin@lbl.gov>
  * @public
  */
-define(['jquery', 'kb.jquery.widget', 'kb_widget_dataview_genome_geneInstanceInfo', 'kb_widget_dataview_genome_geneBiochemistry', 'kb_widget_dataview_genome_geneSequence'], function ($) {
+define([
+    'jquery',
+    'kb.html',
+    
+    'kb.jquery.widget',
+    'kb_widget_dataview_genome_geneInstanceInfo',
+    'kb_widget_dataview_genome_geneBiochemistry',
+    'kb_widget_dataview_genome_geneSequence'
+], function ($, html) {
     'use strict';
     $.KBWidget({
         name: "KBaseGenePage",
@@ -20,7 +28,6 @@ define(['jquery', 'kb.jquery.widget', 'kb_widget_dataview_genome_geneInstanceInf
             featureID: null,
             genomeID: null,
             workspaceID: null,
-            loadingImage: "assets/img/ajax-loader.gif"
         },
         init: function (options) {
             this._super(options);
@@ -63,19 +70,18 @@ define(['jquery', 'kb.jquery.widget', 'kb_widget_dataview_genome_geneInstanceInf
                 panel1.empty();
                 try {
                     panel1.KBaseGeneInstanceInfo({
-                        featureID: scope.fid, 
-                        genomeID: scope.gid, 
+                        featureID: scope.fid,
+                        genomeID: scope.gid,
                         workspaceID: scope.ws,
-                        kbCache: kb, 
-                        hideButtons: true, 
-                        loadingImage: "assets/img/ajax-loader.gif",
+                        kbCache: kb,
+                        hideButtons: true,
                         genomeInfo: genomeInfo
                     });
                 } catch (e) {
                     console.error(e);
                     self.showError(panel1, e.message);
                 }
-                
+
                 var searchTerm = "";
                 if (genomeInfo && genomeInfo.data['scientific_name']) {
                     searchTerm = genomeInfo.data['scientific_name'];
@@ -83,25 +89,23 @@ define(['jquery', 'kb.jquery.widget', 'kb_widget_dataview_genome_geneInstanceInf
                 panel2.empty();
                 try {
                     panel2.KBaseGeneBiochemistry({
-                        featureID: scope.fid, 
-                        genomeID: scope.gid, 
-                        workspaceID: scope.ws, 
+                        featureID: scope.fid,
+                        genomeID: scope.gid,
+                        workspaceID: scope.ws,
                         kbCache: kb,
-                        loadingImage: "assets/img/ajax-loader.gif", 
                         genomeInfo: genomeInfo
                     });
                 } catch (e) {
                     console.error(e);
                     self.showError(panel2, e.message);
                 }
-                
+
                 panel3.empty();
                 panel3.KBaseGeneSequence({
-                    featureID: scope.fid, 
-                    genomeID: scope.gid, 
-                    workspaceID: scope.ws, 
+                    featureID: scope.fid,
+                    genomeID: scope.gid,
+                    workspaceID: scope.ws,
                     kbCache: kb,
-                    loadingImage: "assets/img/ajax-loader.gif", 
                     genomeInfo: genomeInfo
                 });
             };
@@ -147,8 +151,7 @@ define(['jquery', 'kb.jquery.widget', 'kb_widget_dataview_genome_geneInstanceInf
                 });
         },
         makePleaseWaitPanel: function () {
-            return $('<div>').append('<p class="muted ajax-loader"><img src="' +
-                this.options.loadingImage + '"> loading...</p>');
+            return $('<div>').html(html.loading('loading...'));
         },
         makeDecoration: function ($panel, title, $widgetDiv) {
             var id = this.genUUID();

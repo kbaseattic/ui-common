@@ -1,0 +1,46 @@
+## YAML Template.
+---
+package:
+    author: Erik Pearson
+    name: type_viewer
+    description: View a type
+    date: August 19, 2015
+    version: 0.0.1
+source:
+    ## sources are relative to build/plugins/PACKAGE/source/javascript
+    ## NB: need to quote file names, otherwise 
+    modules:
+        -
+            module: kb_panel_typeView
+            file: 'typeViewPanel.js'
+        -
+            module: kb_panel_moduleView
+            file: 'moduleViewPanel.js'
+        -
+            module: kb_panel_functionView
+            file: 'functionViewPanel.js'
+        -
+            module: kb_widget_dataTypeSpecification
+            file: "widgets/DataTypeSpecification.js"
+        -
+            module: kb_widget_moduleSpecification
+            file: "widgets/ModuleSpecification.js"
+        -
+            module: kb_widget_FunctionSpecification
+            file: "widgets/FunctionSpecification.js"
+        -
+            module: kb_spec_common
+            file: 'kbaseSpecCommon.js'
+install:
+    routes:
+        -
+            path: ['spec', 'type', {type: 'param', name: 'datatype'}]
+            panelFactory: kb_panel_typeView
+        -
+            path: ['spec', 'module', {type: 'param', name: 'moduleid'}]
+            panelFactory: kb_panel_moduleView
+        -
+            path: ['spec', 'functions', {type: 'param', name: 'functionid'}]
+            panelFactory: kb_panel_functionView
+   
+        
