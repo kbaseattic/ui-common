@@ -36,17 +36,21 @@ define([
                         var typeRecords = {};
                         var getinfo = [];
                         Object.keys(data).forEach(function (moduleName) {
+                            // list_all_types above returns a map of module.typeName to the latest version.
                             var types = data[moduleName];
                             Object.keys(types).forEach(function (typeName) {
-                                var typeId = moduleName + '.' + typeName + '-' + types[typeName];
+                                var type = Types.makeType({
+                                    module: moduleName,
+                                    name: typeName,
+                                    version: types[typeName] 
+                                }),
+                                typeId = Types.makeTypeId(type);
                                 //rows.push([
                                 //    moduleName, typeName, a({href: '#spec/type/' + typeId}, types[typeName])
                                 //]);
+                                // Each type is put into a map simply to create a set.
                                 typeRecords[typeId] = {
-                                    id: typeId,
-                                    module: moduleName,
-                                    type: typeName,
-                                    version: types[typeName]
+                                    type: type
                                 };
                                 getinfo.push(q(workspace.get_type_info(typeId)));
                             });
@@ -59,24 +63,23 @@ define([
                                     var typeId = result.type_def;
                                     typeRecords[typeId].info = result;
                                 });
-                                tableId = html.genId()
+                                tableId = html.genId();
                                 var rows = Object.keys(typeRecords).map(function (typeId) {
-                                    var type = typeRecords[typeId];
+                                    var typeRecord = typeRecords[typeId];
                                     return [
-                                        type.module, type.type,
+                                        typeRecord.type.module, typeRecord.type.name,
                                         Types.getIcon({
-                                            module: type.module,
-                                            type: type.type,
+                                            type: typeRecord.type,
                                             size: 'medium'
                                         }).html,
-                                        a({href: '#spec/type/' + type.id}, type.version),
-                                        type.info.using_type_defs.map(function (typeId) {
+                                        a({href: '#spec/type/' + typeId}, Types.makeVersion(typeRecord.type)),
+                                        typeRecord.info.using_type_defs.map(function (typeId) {
                                             return a({href: '#spec/type/' + typeId}, typeId);
                                         }).join('<br>'),
-                                        type.info.used_type_defs.map(function (typeId) {
+                                        typeRecord.info.used_type_defs.map(function (typeId) {
                                             return a({href: '#spec/type/' + typeId}, typeId);
                                         }).join('<br>'),
-                                        type.info.using_func_defs.map(function (functionId) {
+                                        typeRecord.info.using_func_defs.map(function (functionId) {
                                             return a({href: '#spec/functions/' + functionId}, functionId);
                                         }).join('<br>')
 

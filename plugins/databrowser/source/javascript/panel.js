@@ -103,6 +103,9 @@ define([
                             resolve();
                         })
                         .catch(function (err) {
+                            /* TODO: render error here */
+                            console.log('ERROR starting widgets');
+                            console.log(err);
                             reject(err);
                         })
                         .done();

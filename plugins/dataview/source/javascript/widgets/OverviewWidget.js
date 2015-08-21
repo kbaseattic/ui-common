@@ -433,11 +433,8 @@ define([
                 value: function (object_info) {
                     try {
                         var typeId = object_info[2],
-                            type = APIUtils.parseTypeId(typeId);
-                        var icon = types.getIcon({
-                            module: type.module, 
-                            type: type.name
-                        });
+                            type = types.parseTypeId(typeId);
+                        var icon = types.getIcon({type: type});
 
                         var code = 0;
                         for (var i = 0; i < type.length; code += type.charCodeAt(i++));

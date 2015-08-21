@@ -172,12 +172,14 @@
             'kb.widget.kbwidgetadapter': 'js/lib/widgets/kbaseKbWidgetAdapter',
             
             
-            // Base objects
-            'kb.simplepanel': 'js/lib/kbaseSimplePanel',            
+            // Base Widgets
             'kb_widgetBases_simpleWidget': 'js/lib/widgetBases/simpleWidget',
             'kb_widgetBases_domWidget': 'js/lib/widgetBases/domWidget',
             'kb_widgetBases_baseWidget': 'js/lib/widgetBases/baseWidget',
             'kb.widget.base': 'js/lib/widgets/kbaseBaseWidget',
+
+            // Base Panels (widget managing widgets...)
+            'kb.simplepanel': 'js/lib/kbaseSimplePanel',            
             'kb_panelBases_widgetPanel': 'js/lib/panelBases/widgetPanel',
             
             // Widget capabilities

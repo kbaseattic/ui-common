@@ -33,20 +33,30 @@ define([
             var workspaceObjects;
 
             function render(data) {
+                    console.log('here');
+
                 var a = html.tag('a'),
                     tableId = html.genId(),
-                    columns = ['Object Name', 'Module', 'Type', 'Icon', 'Version', 'Narrative', 'Version', 'Last Modified'],
+                    columns = ['Object Name', 'Module', 'Type', 'Version', 'Icon', 'Narrative', 'Version', 'Last Modified'],
+                    /* TODO: the workspace client should make a type object for us, but kbaseTypes is new */
                     rows = data.map(function (object) {
+                        var type = {
+                            module: object.info.typeModule,
+                            name: object.info.typeName,
+                            version: {
+                                major : object.info.typeMajorVersion,                            
+                                minor: object.info.typeMinorVersion
+                            }
+                        };
                         return [
                             a({href: '#dataview/' + object.info.wsid + '/' + object.info.id}, object.info.name),
-                            object.info.typeModule,
-                            a({href: '#spec/type/'+object.info.typeModule + '.' +object.info.typeName},  object.info.typeName),
+                            type.module,
+                            a({href: '#spec/type/' + Types.makeTypeId(type)}, type.name),
+                            Types.makeVersion(type),
                             Types.getIcon({
-                                module: object.info.typeModule,
-                                type: object.info.typeName,
+                                type: type,
                                 size: 'medium'
                             }).html,
-                            object.info.typeMajorVersion + '.' + object.info.typeMinorVersion,
                             a({href: '/narrative/' + object.narrative.workspaceId + '/' + object.info.id}, object.narrative.name),
                             object.info.version,
                             Utils.niceElapsedTime(object.info.save_date)
@@ -156,9 +166,6 @@ define([
                             reject(err);
                         })
                         .done();
-
-
-                    resolve();
                 });
             }
 
