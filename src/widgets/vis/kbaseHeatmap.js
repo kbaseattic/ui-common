@@ -633,7 +633,7 @@ define('kbaseHeatmap',
             chart
                 .enter()
                     .append('rect')
-                    .attr('class', 'cell')
+                    .attr('class', 'davis-cell')
             ;
 
             chart
