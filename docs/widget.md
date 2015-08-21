@@ -125,32 +125,3 @@ This method tells the widget to remove any javscript resources that would not be
 This certainly includes any parent DOM nodes create -- destroying them will also remove any event handlers and all descendent nodes.
 
 
-
-<style type="text/css">
-    body {
-        font-family: sans-serif;
-    }
-    h1, h2, h3, h4, h5, h6 {
-        xcolor: #FFF;
-        color: blue;
-    }
-    h3 {
-        padding: 4px;
-        background-color: gray;
-        color: #FFF;
-    }
-     code {
-        xmargin: 1em;
-        xdisplay: block;
-        xpadding: 1em;
-        xcolor: lime;
-        background-color: #CCC;
-    }
-    pre > code {
-        margin: 1em;
-        display: block;
-        padding: 1em;
-        color: lime;
-        background-color: black;
-    }
-</style>

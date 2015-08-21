@@ -14,6 +14,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks('grunt-http-server');
     grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks('grunt-markdown');
 
     /* 
      * This section sets up a mapping for bower packages.
@@ -373,6 +374,21 @@ module.exports = function (grunt) {
                     copy: false
                 }
             }
+        },
+        markdown: {
+            build: {
+                files: [
+                    {
+                        expand: true,
+                        src: 'docs/**/*.md',
+                        dest: 'build/docs',
+                        ext: '.html'                            
+                    }
+                ],
+                options: {
+                    
+                }
+            }
         }
 
     });
@@ -392,7 +408,8 @@ module.exports = function (grunt) {
     grunt.registerTask('build', [
         'bower:install',
         'copy:build',
-        'copy:bower'
+        'copy:bower',
+        'markdown:build'
             // 'build-config'
             //'requirejs',
             //'filerev',
