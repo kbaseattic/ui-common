@@ -13,6 +13,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-connect');
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks('grunt-http-server');
+    grunt.loadNpmTasks('grunt-bower-task');
 
     /* 
      * This section sets up a mapping for bower packages.
@@ -365,6 +366,13 @@ module.exports = function (grunt) {
             'ui-common': {
                 src: 'build/test-coverage/lcov/**/*.info',
             },
+        },
+        bower: {
+            install: {
+                options: {
+                    copy: false
+                }
+            }
         }
 
     });
@@ -382,6 +390,7 @@ module.exports = function (grunt) {
 
     // Does the whole building task
     grunt.registerTask('build', [
+        'bower:install',
         'copy:build',
         'copy:bower'
             // 'build-config'
