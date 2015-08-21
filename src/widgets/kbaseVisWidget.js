@@ -64,10 +64,17 @@ define('kbaseVisWidget',
                 xLabelOffset : 0,
                 yLabelOffset : 0,
 
+                xLabelSize : '8pt',
+                yLabelSize : '8pt',
+
                 legendRegion : 'chart',
                 legendAlignment : 'TL',
                 legendOffset : [0,0],
+                legendLineHeight : 13,
                 //legendWidth : 50,
+                legendSize : '7pt',
+                legendTextXOffset : 6,
+                legendTextYOffset : 3,
 
                 aspectRatio : 'default',
 
@@ -314,16 +321,16 @@ define('kbaseVisWidget',
                 var fakeText = this.D3svg()
                     .append('text')
                     .attr('opacity', 0)
-                    .attr('font-size', '7pt')
+                    .attr('font-size', this.options.legendSize)
                     .text(text);
 
                 var box = fakeText[0][0].getBBox();
 
                 var truncatedText = text;
                 var truncated = false;
-                var width = box.width;
+                var originalWidth = box.width;
 
-                while (box.width > width && truncatedText.length) {
+                while (box.width + this.options.legendTextXOffset > width && truncatedText.length) {
                     truncatedText = truncatedText.substring(0, truncatedText.length - 1);
                     fakeText.text(truncatedText + '...');
                     box = fakeText[0][0].getBBox();
@@ -336,7 +343,7 @@ define('kbaseVisWidget',
                     truncated : truncated,
                     text : text,
                     truncatedText : text == truncatedText ? text : truncatedText + '...',
-                    width : box.width
+                    width : originalWidth
                 }
 
             },
@@ -358,8 +365,7 @@ define('kbaseVisWidget',
                     cross : 49,
                 }
 
-                var legendRectSize = 8,
-                    legendSpacing  = 1;
+                var legendRectSize = 8;
 
                 var legendRegionBounds = this[this.options.legendRegion + 'Bounds']();
 
@@ -368,11 +374,11 @@ define('kbaseVisWidget',
                 var legendX = 0;
                 var legendY = 0;
 
-                var textXOffset = 6;
-                var textYOffset = 3;
+                var textXOffset = $vis.options.legendTextXOffset;
+                var textYOffset = $vis.options.legendTextYOffset;
 
                 if (this.options.legendAlignment.match(/B/)) {
-                    legendY = legendRegionBounds.size.height - 11 * this.legend().length;
+                    legendY = legendRegionBounds.size.height - $vis.options.legendLineHeight * this.legend().length;
                 }
 
                 if (this.options.legendAlignment.match(/R/)) {
@@ -400,7 +406,7 @@ define('kbaseVisWidget',
 
                 var gTransform = function (b,j,i) {
                     var horz = 6 + legendX + $vis.options.legendOffset[0];
-                    var vert = 6 + i * 11 + legendY + $vis.options.legendOffset[1];
+                    var vert = 6 + i * $vis.options.legendLineHeight + legendY + $vis.options.legendOffset[1];
                     return 'translate(' + horz + ',' + vert + ')';
                 };
 
@@ -442,11 +448,12 @@ define('kbaseVisWidget',
                                 .style('stroke', function (b, j) { return d.color })
                                 .attr('opacity', 1)
                         ;
+
                         g.selectAll('text')
                             .transition().duration(time)
                                 .attr('x', textXOffset)       //magic numbers make things look pretty!
                                 .attr('y', textYOffset)
-                                .attr('font-size', '7pt')
+                                .attr('font-size', $vis.options.legendSize)
                                 .text(function () { return truncationObj.truncatedText })
                                 .attr('opacity', 1)
                         ;
@@ -639,7 +646,7 @@ define('kbaseVisWidget',
                     .attr('x', labelRegionBounds.size.width / 2)
                     .attr('y', labelRegionBounds.size.height / 2 + 3)
                     .attr('text-anchor', 'middle')
-                    .attr('font-size', '11px')
+                    .attr('font-size', this.options.xLabelSize)
                     .attr('font-family', 'sans-serif')
                     .attr('fill', 'black')
                     .attr('transform', 'translate(0,' + yOffset + ')')
@@ -666,7 +673,7 @@ define('kbaseVisWidget',
                     .attr('x', labelRegionBounds.size.width / 2)
                     .attr('y', labelRegionBounds.size.height / 2 + 3)
                     .attr('text-anchor', 'middle')
-                    .attr('font-size', '11px')
+                    .attr('font-size', this.options.yLabelSize)
                     .attr('font-family', 'sans-serif')
                     .attr('fill', 'black')
                     .attr('transform', 'translate(' + xOffset + ',0) rotate(' + rotation + ','

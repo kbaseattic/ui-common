@@ -119,6 +119,9 @@ define('kbaseLinechart',
         version: "1.0.0",
         options: {
             overColor : 'yellow',
+            useOverLine : true,
+            useLineLabelToolTip : true,
+
             lineWidth : 3,
             lineCap : 'round',
             strokeColor : 'black',
@@ -129,9 +132,9 @@ define('kbaseLinechart',
                 return xIdx != undefined ? xIdx + 1 : 0;
             },
 
+            useHighlightLine : true,
             highlightLineColor : 'red',
             highlightLineWidth : 1,
-            useHighlightLine : true,
             shapeArea : 64,
 
         },
@@ -193,8 +196,6 @@ define('kbaseLinechart',
                                     revLine.push( { x : point.x, y : point.y2} )
                                     delete point.y2;
                                 }
-                                //console.log("VALUE IS ", point);
-                                //line.values[i] = {x : point.x, y : point.y};
                             }
                         }
 
@@ -289,6 +290,10 @@ define('kbaseLinechart',
 
             var mouseAction = function() {
 
+                if (! $line.options.useOverLine) {
+                    return;
+                }
+
                 this.on('mouseover', function(d) {
                     if ($line.options.overColor) {
                         d3.select(this)
@@ -296,7 +301,7 @@ define('kbaseLinechart',
                             .attr('stroke-width', (d.width || $line.options.lineWidth) + 5);
                     }
 
-                    if (d.label) {
+                    if (d.label && $line.options.useLineLabelToolTip) {
                         $line.showToolTip(
                             {
                                 label : d.label,
@@ -311,7 +316,9 @@ define('kbaseLinechart',
                             .attr('stroke',         function (d) { return d.strokeColor || $line.options.strokeColor } )
                             .attr('stroke-width',   function (d) {return d.width != undefined ? d.width : $line.options.lineWidth} );
 
-                        $line.hideToolTip();
+                        if ($line.options.useLineLabelToolTip) {
+                            $line.hideToolTip();
+                        }
 
                     }
                 })
@@ -368,19 +375,20 @@ define('kbaseLinechart',
 
                 if (line.shape) {
                     line.values.forEach(function (point, i) {
-                        pointsData.push(
-                            {
-                                x : point.x,
-                                y : point.y,
-                                label : point.label,
-                                color : line.fillColor || line.strokeColor || $line.options.fillColor,
-                                shape : line.shape,
-                                shapeArea : line.shapeArea || $line.options.shapeArea,
-                                pointOver : line.pointOver || $line.options.pointOver,
-                                pointOut : line.pointOut || $line.options.pointOut,
-                                id : [point.x, point.y, line.label].join('/'),
-                            }
-                        )
+
+                        var newPoint = {};
+                        for (var key in point) {
+                            newPoint[key] = point[key];
+                        };
+
+                        newPoint.color = line.fillColor || line.strokeColor || $line.options.fillColor;
+                        newPoint.shape = line.shape;
+                        newPoint.shapeArea = line.shapeArea || $line.options.shapeArea,
+                        newPoint.pointOver = line.pointOver || $line.options.pointOver,
+                        newPoint.pointOut = line.pointOut || $line.options.pointOut,
+                        newPoint.id = [point.x, point.y, line.label].join('/'),
+
+                        pointsData.push(newPoint);
                     })
                 }
             })
@@ -413,7 +421,7 @@ define('kbaseLinechart',
                     .on('mouseout', function(d) {
                         if ($line.options.overColor) {
                             d3.select(this)
-                                .attr('fill', function(d) {return line.fillColor || line.strokeColor || $line.options.fillColor})
+                                .attr('fill', function(d) {return d.color})
                         }
 
                         if (d.label) {

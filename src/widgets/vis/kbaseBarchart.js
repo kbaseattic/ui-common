@@ -11,7 +11,6 @@
                             }
                         );
                     }
-                    console.log(bars);
 
                     var $bar = $('#barchart').css({width : '800px', height : '500px'}).kbaseBarchart(
 

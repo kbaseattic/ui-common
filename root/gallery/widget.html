@@ -149,6 +149,14 @@
                                     xGutter : 75,
                                     //legendAlignment : 'TR',
                                     autoLegend : true,
+                                    //useLineLabelToolTip : true,
+                                    //useOverLine : false,
+                                    legendLineHeight : 25,
+                                    legendSize : '18pt',
+                                    legendTextYOffset : 6,
+
+                                    xLabelSize : '12pt',
+                                    yLabelSize : '12pt',
 
                                     lZegend : [
                                         { label : 'foo', color : 'blue'},
@@ -172,6 +180,7 @@
                                     xPadding : 40,
 
                                     pointOver : function(d) {
+                                    console.log("POINT OVER", d);
                                         this.showToolTip({label : 'point over obj'});
                                     },
                                     pointOut : function(d) {
@@ -578,7 +587,14 @@
                                     //ulIcon : '/functional-site/assets/navbar/images/kbase_logo.png',
                                     minValue : -1.0,
                                     maxValue : 1.0,
-                                    aspectRatio : 'maxSquare'
+                                    aspectRatio : 'maxSquare',
+
+                                    /*labelOver : function (d) {
+                                        console.log("OVER ", d);
+                                    },
+                                    labelOut : function (d) {
+                                        console.log("OUT OF ", d);
+                                    },*/
                                 }
                             );
 

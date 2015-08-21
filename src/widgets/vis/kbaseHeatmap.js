@@ -244,7 +244,10 @@ define('kbaseHeatmap',
                         d3.select(this).attr('fill', $hm.options.overColor);
                         var d3this = d3.select(this);
 
-                        if (d3this.text() != label) {
+                        if ($hm.options.labelOver) {
+                            $hm.options.labelOver.call(this, d);
+                        }
+                        else if (d3this.text() != label) {
                             $hm.showToolTip(
                                 {
                                     label : label
@@ -254,7 +257,13 @@ define('kbaseHeatmap',
                     })
                     .on('mouseout', function(d) {
                         d3.select(this).attr('fill', 'black');
-                        $hm.hideToolTip();
+
+                        if ($hm.options.labelOut) {
+                            $hm.options.labelOut.call(this, d);
+                        }
+                        else {
+                            $hm.hideToolTip();
+                        }
                     })
             });
 
@@ -389,7 +398,10 @@ define('kbaseHeatmap',
                         d3.select(this).attr('fill', $hm.options.overColor);
                         var d3this = d3.select(this);
 
-                        if (d3this.text() != label) {
+                        if ($hm.options.labelOver) {
+                            $hm.options.labelOver.call(this, d);
+                        }
+                        else if (d3this.text() != label) {
                             $hm.showToolTip(
                                 {
                                     label : label
@@ -399,7 +411,12 @@ define('kbaseHeatmap',
                     })
                     .on('mouseout', function(d) {
                         d3.select(this).attr('fill', 'black');
-                        $hm.hideToolTip();
+                        if ($hm.options.labelOut) {
+                            $hm.options.labelOut.call(this, d);
+                        }
+                        else {
+                            $hm.hideToolTip();
+                        }
                     })
             });
 
@@ -629,7 +646,7 @@ define('kbaseHeatmap',
             }
 
 
-            var chart = this.D3svg().select( this.region('chart') ).selectAll('.cell').data(oldStyleDataset);
+            var chart = this.D3svg().select( this.region('chart') ).selectAll('.davis-cell').data(oldStyleDataset);
             chart
                 .enter()
                     .append('rect')
