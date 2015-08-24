@@ -82,6 +82,9 @@ http.createServer(function (request, response) {
         case '.jpg':
             contentType = 'image/jpg';
             break;
+        case '.gif':
+            contentType = 'image/gif';
+            break;
         case '.wav':
             contentType = 'audio/wav';
             break;
