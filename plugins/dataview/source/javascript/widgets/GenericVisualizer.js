@@ -92,14 +92,18 @@ define([
 
                             // Create params.
                             var widgetParams = {};
-                            mapping.options.forEach(function (item) {
-                                var from = params[item.from];
-                                if (!from && item.optional !== true) {
-                                    // console.log(params);
-                                    throw 'Missing param, from ' + item.from + ', to ' + item.to;
-                                }
-                                widgetParams[item.to] = from;
-                            });
+                            if (mapping.options) {
+                                mapping.options.forEach(function (item) {
+                                    var from = params[item.from];
+                                    if (!from && item.optional !== true) {
+                                        // console.log(params);
+                                        throw 'Missing param, from ' + item.from + ', to ' + item.to;
+                                    }
+                                    widgetParams[item.to] = from;
+                                });
+                            } else {
+                                widgetParams = params;
+                            }
                             require(['jquery', mapping.module], function ($, Widget) {
                                 // jquery chicanery
                                 if ($widgetContainer[mapping.widget] === undefined) {
