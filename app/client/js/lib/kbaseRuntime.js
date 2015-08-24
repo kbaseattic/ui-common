@@ -3,9 +3,10 @@
 define([
     'kb.logger', 
     'kb.session',
-    'kb.props'
+    'kb.props',
+    'kb_types'
 ],
-    function (Logger, Session, Props) {
+    function (Logger, Session, Props, Types) {
         'use strict';
         
         function setApp(app) {
@@ -108,6 +109,10 @@ define([
         
         function logDebug() {
             return proxyMethod(Logger, 'logDebug', arguments);
+        }
+        
+        function addTypeViewer() {
+            return proxyMethod(Types, add)
         }
         
         /* Wrap postal messaging */

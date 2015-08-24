@@ -27,10 +27,12 @@ define([
     'kb.panel.navbar',
     'kb.client.profile',
     'yaml!ui.yml',
+    'kb_types',
+    
     'bootstrap',
     'css!font-awesome',
     'domReady!'],
-    function (App, Runtime, AppState, Q, Navbar, ProfileService, UIConfig) {
+    function (App, Runtime, AppState, Q, Navbar, ProfileService, UIConfig, Types) {
         'use strict';
 
         var app = App.make();
@@ -218,11 +220,12 @@ define([
 
             // Handle the initial route.
             // Find a handler for the current route
-
+            
         }
 
         function installPlugins() {
             var loaders = UIConfig.plugins.map(function (plugin) {
+                console.log('loading plugin ' + plugin);
                 if (typeof plugin === 'string') {
                     plugin = {
                         name: plugin,
@@ -266,55 +269,81 @@ define([
                         // require configuration.
                         require.config({paths: paths, shim: shims});
 
-                        if (config.install && config.install.routes) {
+                        // Now install any routes.
+                        if (config.install) {
                             require(dependencies, function () {
-                                var routes = config.install.routes.map(function (route) {
-                                    return Q.Promise(function (resolve) {
-                                        // Runtime.addRoute(route);
-                                        if (route.panelFactory) {
-                                            require([route.panelFactory], function (factory) {
-                                                Runtime.addRoute({
-                                                    path: route.path,
-                                                    queryParams: route.queryParams,
-                                                    config: {
-                                                        pluginPath: '/' + sourcePath
-                                                    },
-                                                    panelFactory: factory
+                                var installSteps = [];
+                                if (config.install.routes) {
+                                    config.install.routes.forEach(function (route) {
+                                        installSteps.push(Q.Promise(function (resolve) {
+                                            // Runtime.addRoute(route);
+                                            if (route.panelFactory) {
+                                                require([route.panelFactory], function (factory) {
+                                                    Runtime.addRoute({
+                                                        path: route.path,
+                                                        queryParams: route.queryParams,
+                                                        config: {
+                                                            pluginPath: '/' + sourcePath
+                                                        },
+                                                        panelFactory: factory
+                                                    });
+                                                    resolve();
                                                 });
-                                                resolve();
-                                            });
-                                        } else if (route.panelObject) {
-                                            require([route.panelObject], function (obj) {
-                                                Runtime.addRoute({
-                                                    path: route.path,
-                                                    queryParams: route.queryParams,
-                                                    config: {
-                                                        pluginPath: sourcePath
-                                                    },
-                                                    panelObject: obj
+                                            } else if (route.panelObject) {
+                                                require([route.panelObject], function (obj) {
+                                                    Runtime.addRoute({
+                                                        path: route.path,
+                                                        queryParams: route.queryParams,
+                                                        config: {
+                                                            pluginPath: sourcePath
+                                                        },
+                                                        panelObject: obj
+                                                    });
+                                                    resolve();
                                                 });
+                                            } else  if (route.redirectHandler) {
+                                                Runtime.addRoute(route);
                                                 resolve();
-                                            });
-                                        } else  if (route.redirectHandler) {
-                                            Runtime.addRoute(route);
+                                            } else {
+                                                throw {
+                                                    name: 'routeError',
+                                                    message: 'invalid route',
+                                                    route: route
+                                                };
+                                            }
+
+                                        }));
+                                });
+                                    
+                                }
+                                
+                                if (config.install.menu) {
+                                    config.install.menu.forEach(function (item) {
+                                        installSteps.push(Q.Promise(function (resolve) {
+                                            Runtime.send('navbar', 'add-menu-item', item);
                                             resolve();
-                                        } else {
-                                            throw {
-                                                name: 'routeError',
-                                                message: 'invalid route',
-                                                route: route
-                                            };
-                                        }
+                                        }));
+                                    });
+                                }
+                                
+                                if (config.install.types) {
+                                    config.install.types.forEach(function (typeDef) {
+                                        var type = typeDef.type,
+                                            viewers = typeDef.viewers;
+                                        viewers.forEach(function (viewerDef) {
+                                            installSteps.push(Q.Promise(function (resolve) {
+                                                Types.addViewer(type, viewerDef);
+                                                resolve();
+                                            }));
+                                        });
                                         
                                     });
-                                });
-                                Q.all(routes)
+                                }
+                                
+                                console.log('Have ' + installSteps.length + ' steps');
+                                Q.all(installSteps)
                                     .then(function () {
-                                        if (config.install.menu) {
-                                            config.install.menu.forEach(function (item) {
-                                                Runtime.send('navbar', 'add-menu-item', item);
-                                            });
-                                        }
+                                        console.log('Finished install steps...');
                                         resolve();
                                     })
                                     .catch(function (err) {
@@ -324,6 +353,7 @@ define([
                                     .done();
                             });
                         } else {
+                            console.log('No installation?');
                             resolve();
                         }
 

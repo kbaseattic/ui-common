@@ -195,6 +195,8 @@ source:
         -
             module: kb_widget_dataview_trees_tree
             file: widgets/trees/kbaseTree  
+            
+
         
 install:
     routes:
@@ -218,5 +220,43 @@ install:
                 sub: {}
                 subid: {}            
             panelFactory: kb_panel_dataview
-# no menu
+    # no menu
+    types:
+        -
+            type: 
+                module: Communities
+                name:   Collection
+                version: any
+            icon: 
+                type: fontAwesome
+                classes: ['fa-list-ul']
+            viewers:
+                -
+                    # if set true, this will be set as the default vis widget for this type.
+                    default: true
+                    # This the title for the widget
+                    title: 'Data View 3'                
+                    # This is the module name as specified in the plugin
+                    # it should follow standard namespacing. It should also be 
+                    # defined above in the modules.
+                    module: kb_widget_dataview_communities_collection
+                    # This is the internal jquery object name for this widget,
+                    # if it is invoked this way.
+                    type: kbwidget
+                    widget: CollectionView
+                    # If a bootstrap panel is requested to wrap this widget.
+                    panel: true
+                    # Mapping of standard options to the widget option properties.
+                    # By standard, I mean those defined in the GenericVisualizer widget.
+                    options:
+                        -
+                            from: workspaceId
+                            to: ws
+                        -
+                            from: objectId
+                            to: id
+                        -
+                            from: authToken
+                            to: token
+                
         

@@ -54,9 +54,10 @@ define([
                         /* TODO: resolve this issue 
                          * Some objects have an "actual" URL - surprise! */
                         var collectionObject = data[0].data,
-                            idList = collectionObject.members
-                            .map(function (member) {
+                            idList = collectionObject.members.map(function (member) {
                                 if (member.URL.match(/^http/)) {
+                                    console.log('ERROR');
+                                    console.log(member);
                                     throw new Error('Invalid Collection Object');
                                 }
                                 return {ref: member.URL};
@@ -70,23 +71,23 @@ define([
                     })
                     .then(function (resData) {
                         var rows = resData.map(function (item) {
-                                return [
-                                    item.data.id,
-                                    item.data.name,
-                                    item.data.mixs.project_name,
-                                    item.data.mixs.PI_lastname,
-                                    item.data.mixs.biome,
-                                    item.data.mixs.sequence_type,
-                                    item.data.mixs.seq_method,
-                                    item.data.statistics.sequence_stats.bp_count_raw,
-                                    item.data.created
-                                ];
-                            }),
+                            return [
+                                item.data.id,
+                                item.data.name,
+                                item.data.mixs.project_name,
+                                item.data.mixs.PI_lastname,
+                                item.data.mixs.biome,
+                                item.data.mixs.sequence_type,
+                                item.data.mixs.seq_method,
+                                item.data.statistics.sequence_stats.bp_count_raw,
+                                item.data.created
+                            ];
+                        }),
                             columns = ['ID', 'Name', 'Project', 'PI', 'Biome', 'Sequence Type', 'Sequencing Method', 'bp Count', 'Created'],
                             options = {
                                 class: 'table table-striped'
                             },
-                            table = html.makeTable(columns, rows, options),
+                        table = html.makeTable(columns, rows, options),
                             div = html.tag('div'),
                             h4 = html.tag('h4'),
                             content = div([
