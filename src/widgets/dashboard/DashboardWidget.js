@@ -246,7 +246,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
                     // refreshing more expensive data.
                     // this.refreshBeat = 0;
                     //
-                    this.refreshInterval = 10000;
+                    this.refreshInterval = 60000;
                     this.refreshLastTime = null;
 
 
