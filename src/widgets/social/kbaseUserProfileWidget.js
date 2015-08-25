@@ -1073,13 +1073,7 @@ define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base'
                        widget.deleteProfile();
                      });
                    });
-                 }.bind(this)},
-                {type: 'divider'},
-                {name: 'help', icon: 'question', color: 'orange', label: 'Help', callback: function (e) {
-                  e.preventDefault();
-                  var modal = $('.UserProfileWidget [data-widget-modal="help"]')
-                  .modal('show');
-                }}
+                 }.bind(this)}
               ]
             });
           } else {

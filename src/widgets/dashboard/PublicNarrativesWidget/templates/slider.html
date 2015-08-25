@@ -97,7 +97,7 @@
          <div class="-footer">
             <div style="display:inline-block; width: 33%;text-align: center;">
                {% if narrative.workspace.user_permission == 'r' %}
-                  <span class="fa fa-minus dimmed"  style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="Sharing information not available for this Narrative" data-container="body"></span> {% else %} {% if narrative.permissions|length > 0 %} {{ narrative.permissions | length }} {% else %} 0 {% endif %} <span class="fa fa-share-alt"  data-toggle="tooltip" data-placement="auto" title="The number of other users with whom this Narrative has been shared" data-container="body"></span> {% endif %} {% if narrative.workspace.globalread == 'r' or narrative.workspace.globalread == 'w' %} P{% endif %}
+                  <span class="fa fa-minus dimmed"  style="opacity: 0.4;" data-toggle="tooltip" data-placement="auto" title="Sharing information not available for this Narrative" data-container="body"></span> {% else %} {% if narrative.permissions|length > 0 %} {{ narrative.permissions | length }} {% else %} 0 {% endif %} <span class="fa fa-share-alt"  data-toggle="tooltip" data-placement="auto" title="The number of other users with whom this Narrative has been shared" data-container="body"></span> {% endif %} {% if narrative.workspace.globalread == 'r' or narrative.workspace.globalread == 'w' %} <span class="fa fa-globe"  data-toggle="tooltip" data-placement="auto" title="This narrative is Publicly available" data-container="body"></span>{% endif %}
             </div><div style="display:inline-block; width: 33%;text-align: center;">
            
                {% set runningJobs = narrative.object.metadata.jobInfo.running %}

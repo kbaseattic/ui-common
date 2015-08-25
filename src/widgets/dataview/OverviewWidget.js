@@ -124,64 +124,66 @@ define(['kb.widget.dataview.base', 'kb.utils.api', 'kb.utils', 'kb.session', 'kb
 
                   Navbar
                   .clearButtons();
+              
+                  if (Session.isLoggedIn()) {
+                    Navbar.addDropdown({
+                            place: 'end',
+                            name: 'download',
+                            style: 'default',
+                            icon: 'download',
+                            label: 'Download',
+                            widget: 'kbaseDownloadPanel',
+                            params: {'ws': this.getState('workspace.id'), 'obj': this.getState('object.id'), 'ver': this.getState('object.version')}
+                    });
 
-                  Navbar.addDropdown({
-                	  place: 'end',
-                	  name: 'download',
-                	  style: 'default',
-                	  icon: 'download',
-                	  label: 'Download',
-                	  widget: 'kbaseDownloadPanel',
-                	  params: {'ws': this.getState('workspace.id'), 'obj': this.getState('object.id'), 'ver': this.getState('object.version')}
-                  });
+                    Navbar
+                    .addButton({
+                          name: 'copy',
+                          label: '+ New Narrative',
+                          style: 'primary',
+                          icon: 'plus-square',
+                          url: '/functional-site/#/narrativemanager/new?copydata=' + dataRef,
+                          external: true
+                       })
+                       /*.addButton({
+                          name: 'download',
+                          label: 'Download',
+                          style: 'primary',
+                          icon: 'download',
+                          callback: function () {
+                             alert('download object');
+                          }.bind(this)
+                       })*/;
 
-                  Navbar
-                  .addButton({
-                        name: 'copy',
-                        label: '+ New Narrative',
-                        style: 'primary',
-                        icon: 'plus-square',
-                        url: '/functional-site/#/narrativemanager/new?copydata=' + dataRef,
-                        external: true
-                     })
-                     /*.addButton({
-                        name: 'download',
-                        label: 'Download',
-                        style: 'primary',
-                        icon: 'download',
-                        callback: function () {
-                           alert('download object');
-                        }.bind(this)
-                     })*/;
-
-                  var narratives = this.getState('writableNarratives');
-                  if (narratives) {
-                     var items = [];
-                     for (var i = 0; i < narratives.length; i++) {
-                        var narrative = narratives[i];
-                        items.push({
-                           name: 'narrative_' + i,
-                           icon: 'file',
-                           label: narrative.metadata.narrative_nice_name,
-                           external: true,
-                           callback: (function (narrative) {
-                              var widget = this;
-                              return function (e) {
-                                 e.preventDefault();
-                                 widget.copyObjectToNarrative(narrative);
-                              }
-                           }.bind(this))(narrative)
-                        });
-                     }
-                     Navbar.addDropdown({
-                        place: 'end',
-                        name: 'options',
-                        style: 'default',
-                        icon: 'copy',
-                        label: 'Copy',
-                        items: items
-                     });
-                  }
+                    var narratives = this.getState('writableNarratives');
+                    if (narratives) {
+                       var items = [];
+                       for (var i = 0; i < narratives.length; i++) {
+                          var narrative = narratives[i];
+                          items.push({
+                             name: 'narrative_' + i,
+                             icon: 'file',
+                             label: narrative.metadata.narrative_nice_name,
+                             external: true,
+                             callback: (function (narrative) {
+                                var widget = this;
+                                return function (e) {
+                                   e.preventDefault();
+                                   widget.copyObjectToNarrative(narrative);
+                                }
+                             }.bind(this))(narrative)
+                          });
+                       }
+                       Navbar.addDropdown({
+                          place: 'end',
+                          name: 'options',
+                          style: 'default',
+                          icon: 'copy',
+                          label: 'Copy',
+                          items: items
+                       });
+                    }
+                }
                   break;
                case 'notfound':
                   Navbar

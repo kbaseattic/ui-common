@@ -31,6 +31,10 @@
         init: function(options) {
             this._super(options);
 	    
+            var cfgWsUrl = kb.urls.workspace_url;
+            if (cfgWsUrl)
+                this.options.ws_url = cfgWsUrl;
+            
 		    // first initialize the type to widget config
             this.setupType2Widget();
 	    
@@ -47,23 +51,21 @@
 	    
             this.$mainPanel = $("<div>");
             this.$elem.append(this.$mainPanel);
-	    
             if (!this.auth.token) {
-                this.ws = kb.ws;  //new Workspace(this.options.ws_url);
+                this.ws = new Workspace(this.options.ws_url);
                 this.loggedIn = false;
             } else {
-                //console.log(['authenticated:', this.auth]);
                 this.ws = new Workspace(this.options.ws_url, this.auth);
                 this.loggedIn = true;
-                this.getInfoAndRender();
             }
+            this.getInfoAndRender();
 	    
             return this;
         },
 
         loggedInCallback: function(event, auth) {
             this.options.auth = auth;
-            //console.log(['authenticated:', this.options.auth]);
+            // console.log(['authenticated:', this.options.auth]);
             this.ws = new Workspace(this.options.ws_url, this.options.auth);
             this.loggedIn = true;
             this.getInfoAndRender();
@@ -293,7 +295,28 @@
 			    options: '{"genomeID":???objname,"workspaceID":???wsname,"featureID":???subid,"loadingImage":"'+this.options.loadingImage+'"}'
 			}
 		    }
-		}
+		},
+		
+		'KBaseFeatureValues.ExpressionMatrix': {
+		    widget: 'kbaseExpressionMatrix',
+            options: '{"expressionMatrixID":???objname,"workspaceID":???wsname}'
+		},
+		
+        'KBaseCollections.FeatureSet': {
+            widget: 'kbaseFeatureSet',
+            options: '{"featureset_name":???objname,"workspaceName":???wsname}'
+        },
+        
+        'KBaseFeatureValues.FeatureClusters': {
+            widget: 'kbaseExpressionFeatureClusters',
+            options: '{"clusterSetID":???objname,"workspaceID":???wsname}'
+        },
+        
+        'KBaseFeatureValues.EstimateKResult': {
+            widget: 'kbaseExpressionEstimateKTable',
+            options: '{"estimateKID":???objname,"workspaceID":???wsname}'
+        }
+		
 	    };
 	    
 	    /*var list = ''; var list2=''
