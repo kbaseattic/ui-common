@@ -49,6 +49,30 @@ define('kbaseTreechart',
             'comparison',
         ],
 
+        calculateNodeDepths : function(nodes) {
+            //we need to know the distance of all nodes from a leaf, in order to use leaf bias. Dammit.
+            nodes.forEach(function (node) {
+                if (! node.children && ! node._children) {
+
+                    node.nodeDepth = 0;
+
+                    var parent = node.parent;
+                    var nodeDepth = 1;
+
+                    while (parent != undefined) {
+                        if (parent.nodeDepth == undefined || parent.nodeDepth < nodeDepth) {
+                            parent.nodeDepth = nodeDepth;
+                        }
+
+                        nodeDepth++;
+                        parent = parent.parent;
+                    }
+                }
+            })
+            //done calculating distances for leaf bias
+        },
+
+
         afterInArray : function (val, array) {
             var idx = array.indexOf(val) + 1;
             if (idx >= array.length) {
@@ -172,10 +196,11 @@ var newHeight = 15 * this.countVisibleNodes(this.dataset());
 
 
             this.nodes = this.treeLayout.nodes(this.dataset()).reverse();
+            this.calculateNodeDepths(this.nodes);
 
 var chartOffset = 0;
 
-            function depth(d) {
+            var depth = function(d) {
 
                 var distance = $tree.options.distance;
                 if (d.distance != undefined) {
@@ -285,8 +310,21 @@ var throttle = 0
                 duration
             );
 
+            var uniqueness = function (d) {
+                var name = d.name;
+                if (name == undefined && $tree.options.nameFunction != undefined) {
+                    name = $tree.options.nameFunction.call($tree, d);
+                }
+
+                if (d.parent != undefined) {
+                    name = uniqueness(d.parent) + '/' + name;
+                }
+
+                return name;
+            }
+
             var node = chart.selectAll("g.node")
-                  .data(this.nodes, this.uniqueID );
+                .data(this.nodes, uniqueness);
 
             // Enter any new nodes at the parent's previous position.
             var nodeEnter = node.enter().append("g")
@@ -396,6 +434,9 @@ var throttle = 0
                     var y = $tree.options.fixed && (! d.children || d.length == 0)
                         ? $tree.options.fixedDepth
                         : d.y;
+                    if ($tree.options.bias == 'leaf' && d.parent != undefined) {
+                        y = $tree.options.fixedDepth - d.nodeDepth * $tree.options.distance;
+                    }
                 return "translate(" + y + "," + d.x + ")"; })
             ;
 
@@ -466,7 +507,7 @@ var throttle = 0
 
             // Update the links…
             var link = chart.selectAll("path.link")
-                .data($tree.treeLayout.links($tree.nodes), function(d) { return d.target.id; });
+                .data($tree.treeLayout.links($tree.nodes), function(d) { return uniqueness(d.target) });
 
             // Enter any new links at the parent's previous position.
             link.enter().insert("path", "g")
@@ -535,6 +576,28 @@ var throttle = 0
 
             var $tree = this;
 
+            var getYCoords = function(d) {
+                var sourceY = d.source.y;
+                var targetY = $tree.options.fixed && (! d.target.children || d.target.length == 0)
+                    ? $tree.options.fixedDepth
+                    : d.target.y;
+
+                if ($tree.options.bias == 'leaf' && d.source.nodeDepth != undefined && d.target.nodeDepth != undefined) {
+                    //Sigh. This is gonna be a pain in the ass.
+
+                    //just blissfully assume that we should be at the end.
+                    targetY = $tree.options.fixedDepth - d.target.nodeDepth * $tree.options.distance;
+                    sourceY = $tree.options.fixedDepth - d.source.nodeDepth * $tree.options.distance;
+
+                    if (d.source.parent == undefined) {
+                        sourceY = d.source.y;
+                    }
+
+                }
+
+                return { source : sourceY, target : targetY }
+            }
+
             if (this.options.lineStyle == 'curve') {
                 this.diagonal = d3.svg.diagonal()
                     .projection(function(d) {
@@ -547,45 +610,40 @@ var throttle = 0
             else if (this.options.lineStyle == 'straight') {
                 this.diagonal = function(d) {
 
-                    var y = $tree.options.fixed && (! d.target.children || d.target.length == 0)
-                        ? $tree.options.fixedDepth
-                        : d.target.y;
+                    var yCoords = getYCoords(d);
 
-                    return "M" + d.source.y + ',' + d.source.x + 'L' + y + ',' + d.target.x;
+                    return "M" + yCoords.source + ',' + d.source.x + 'L' + yCoords.target + ',' + d.target.x;
                 }
             }
             else if (this.options.lineStyle == 'square') {
                 this.diagonal = function(d) {
 
-                    var y = $tree.options.fixed && (! d.target.children || d.target.length == 0)
-                        ? $tree.options.fixedDepth
-                        : d.target.y;
+                    var yCoords = getYCoords(d);
 
-                    return "M" + d.source.y + ',' + d.source.x +
-                           'L' + d.source.y + ',' + d.target.x +
-                           'L' + y + ',' + d.target.x
+                    return "M" + yCoords.source + ',' + d.source.x +
+                           'L' + yCoords.source + ',' + d.target.x +
+                           'L' + yCoords.target + ',' + d.target.x
                     ;
                 }
             }
             else if (this.options.lineStyle == 'step') {
                 this.diagonal = function(d) {
 
-                    var y = $tree.options.fixed && (! d.target.children || d.target.length == 0)
-                        ? $tree.options.fixedDepth
-                        : d.target.y;
+                    var yCoords = getYCoords(d);
 
-                    var halfY = (y - d.source.y ) / 2 + d.source.y;
+                    var halfY = (yCoords.target - yCoords.source ) / 2 + yCoords.source;
 
-                    return "M" + d.source.y + ',' + d.source.x +
+                    return "M" + yCoords.source + ',' + d.source.x +
                            'L' + halfY + ',' + d.source.x +
                            'L' + halfY + ',' + d.target.x +
-                           'L' + y + ',' + d.target.x
+                           'L' + yCoords.target + ',' + d.target.x
                     ;
                 }
             }
 
             // Compute the new tree layout.
             this.nodes = this.treeLayout.nodes(this.dataset()).reverse();
+            this.calculateNodeDepths(this.nodes);
 
             this.dataset().x0 = bounds.size.height / 2;
             this.dataset().y0 = 0;
