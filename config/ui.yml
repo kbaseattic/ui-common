@@ -39,6 +39,8 @@ plugins:
         visWidgets
     -
         demo_visWidgets
+    -
+        new_widget
 navbar:
     menu:
         available_items:

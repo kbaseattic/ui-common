@@ -86,7 +86,7 @@ define([
                                     ];
                                 }),
                                     cols = ['Module', 'Type', 'Icon', 'Version', 'Using types', 'Used by types', 'Used by functions'],
-                                    result = html.makeTable(cols, rows, {id: tableId, class: 'table table-striped'});
+                                    result = html.makeTable({columns: cols, rows: rows, id: tableId, class: 'table table-striped'});
                                 resolve({
                                     title: 'Type Browser',
                                     content: result,

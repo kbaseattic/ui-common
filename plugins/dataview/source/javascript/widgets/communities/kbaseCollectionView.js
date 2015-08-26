@@ -83,11 +83,12 @@ define([
                                 item.data.created
                             ];
                         }),
-                            columns = ['ID', 'Name', 'Project', 'PI', 'Biome', 'Sequence Type', 'Sequencing Method', 'bp Count', 'Created'],
                             options = {
-                                class: 'table table-striped'
+                                columns: ['ID', 'Name', 'Project', 'PI', 'Biome', 'Sequence Type', 'Sequencing Method', 'bp Count', 'Created'],
+                                rows: rows,
+                                classes: ['table', 'table-striped'],
                             },
-                        table = html.makeTable(columns, rows, options),
+                        table = html.makeTable(options),
                             div = html.tag('div'),
                             h4 = html.tag('h4'),
                             content = div([

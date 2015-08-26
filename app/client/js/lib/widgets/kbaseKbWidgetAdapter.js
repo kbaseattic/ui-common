@@ -14,28 +14,57 @@ define([
 ], function ($, _, q, R, html) {
     'use strict';
     
+        function createBSPanel($node, title) {
+            var id = html.genId(),
+                div = html.tag('div'),
+                span = html.tag('span');
+            $node.html(div({class: 'panel panel-default '}, [
+                div({class: 'panel-heading'}, [
+                    span({class: 'panel-title'}, title)
+                ]),
+                div({class: 'panel-body'}, [
+                    div({id: id})
+                ])
+            ]));
+            return $('#' + id);
+        }
+    
         function adapter(config) {
             var mount, container, $container;
             
-            var module = config.module;
-            var jqueryObject = config.jquery_object;
+            var module = config.module;            
+            var jqueryObjectName = config.jquery_object;
+            var wantPanel = config.panel;
+            var title = config.title;
 
             function init() {
                 return q.Promise(function (resolve) {
                     require([module], function () {
                         // these are jquery widgets, so they are just added to the
                         // jquery namespace.
+                        // TODO: throw error if not found...
+                        
                         resolve();
                     });
                 });
             }
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return q.Promise(function (resolve, reject) {
                     mount = node;
                     container = document.createElement('div');
-                    $container = $(container);
                     mount.appendChild(container);
-                    resolve();
+                    
+                    if (wantPanel) {
+                        $container = createBSPanel($(container), title);
+                    } else {
+                        $container = $(container);
+                    }
+                    
+                    if ($container[jqueryObjectName] === undefined) {
+                        reject('Sorry, cannot find jquery widget ' + jqueryObjectName);
+                    } else {                    
+                        resolve();
+                    }
                 });
             }
             function start(params) {
@@ -47,7 +76,6 @@ define([
                     // not need a connector!
                     // not the best .. perhaps merge the params into the config
                     // better yet, rewrite the widgets in the new model...
-                    var jqueryWidget = $(container)[jqueryObject];
                     var widgetConfig = _.extendOwn({}, params, {
                         // Why this?
                         wsNameOrId: params.workspaceId,
@@ -57,11 +85,7 @@ define([
                         ws_url: R.getConfig('services.workspace.url'),
                         token: R.getAuthToken()
                     });
-                    if (!jqueryWidget) {
-                        $(container).html(html.panel('Not Found', 'Sorry, cannot find widget ' + jqueryObject));
-                    } else {                    
-                        $(container)[jqueryObject](widgetConfig);
-                    }
+                    $container[jqueryObjectName](widgetConfig);
                     resolve();
                 });
             }

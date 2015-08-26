@@ -1,0 +1,61 @@
+## A data widget plugin
+---
+package:
+    author: M Mouse
+    name: my-widget-plugin
+    description: A package containing a sample widget plugin
+    date: August 24, 2015
+    version: 0.0.1
+source:
+    modules:
+        -
+            module: kb_widget_sample1
+            file: widget1.js            
+        -
+            module: kb_widget_sample2
+            file: widget2.js            
+        -
+            module: kb_widget_sample3
+            file: widget3.js     
+        -
+            module: kb_widget_sample4
+            file: widget4.js             
+        -
+            module: kb_widget_sample5
+            file: widget5.js
+install:
+   types:
+        -
+            type: 
+                module: Communities
+                name:   Collection
+                version: any
+            icon: 
+                type: fontAwesome
+                classes: ['fa-list-ul']
+            viewers:
+                -
+                    default: false
+                    title: 'My Collections Widget'                
+                    module: kb_widget_sample1
+                    type: widgetFactory
+                -
+                    default: false
+                    title: 'My Collections Widget'                
+                    module: kb_widget_sample2
+                    type: widgetFactory
+                -
+                    default: false
+                    title: 'My Collections Widget'                
+                    module: kb_widget_sample3
+                    type: widgetFactory    
+                -
+                    default: true
+                    title: 'My Collections Widget'                
+                    module: kb_widget_sample4
+                    type: widgetFactory                      
+                -
+                    default: true
+                    title: 'My Collections Widget'                
+                    module: kb_widget_sample5
+                    type: widgetFactory                      

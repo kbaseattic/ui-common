@@ -34,7 +34,7 @@ define([
                 ul = html.tag('ul'),
                 li = html.tag('li'),
                 bstable = function (cols, rows) {
-                    return html.makeTable(cols, rows, {class: 'table'});
+                    return html.makeTable({columns: cols, rows: rows, class: 'table'});
                 }
             
             function tabTableContent() {

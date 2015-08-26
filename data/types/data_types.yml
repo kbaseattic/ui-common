@@ -40,9 +40,6 @@ types:
                         -
                             from: objectId
                             to: id
-                        -
-                            from: authToken
-                            to: token
                 -
                     default: true
                     # This the title for the widget
@@ -63,9 +60,6 @@ types:
                         -
                             from: objectId
                             to: id
-                        -
-                            from: authToken
-                            to: token
         Data:
         DataHandle:
         Drisee:
@@ -86,9 +80,6 @@ types:
                         -
                             from: objectId
                             to: id
-                        -
-                            from: authToken
-                            to: token 
         FunctionalProfile:
             viewers:
                 -
@@ -103,9 +94,6 @@ types:
                         -
                             from: objectId
                             to: id
-                        -
-                            from: authToken
-                            to: token
         Heatmap: 
             icon:   
                 type: fontAwesome
@@ -141,9 +129,6 @@ types:
                         -
                             from: objectId
                             to: id
-                        -
-                            from: authToken
-                            to: token
         MetagenomeMatrix:
         MetagenomeProfile:
         MetagenomeSet:
@@ -185,9 +170,6 @@ types:
                         -
                             from: objectId
                             to: ws_id
-                        -
-                            from: authToken
-                            to: token
     Inferelator:
         InferelatorRunResult:
     KBaseAssembly:
@@ -279,9 +261,6 @@ types:
                         -
                             from: objectType 
                             to: type
-                        -
-                            from: authToken 
-                            to: token
         MetabolicMap:
     KBaseCommon:
         Location:
@@ -344,9 +323,6 @@ types:
                         -
                             from: objectType 
                             to: type
-                        -
-                            from: authToken 
-                            to: token
         FBAComparison:
         FBAModel: 
             icon:   
@@ -368,9 +344,6 @@ types:
                         -
                             from: objectType 
                             to: type
-                        -
-                            from: authToken 
-                            to: token
         FBAModelSet:
             # untested
             viewers:
@@ -389,9 +362,6 @@ types:
                         -
                             from: objectType 
                             to: type
-                        -
-                            from: authToken 
-                            to: token
         Gapfilling:
         Gapgeneration:
         ModelTemplate:
@@ -504,9 +474,6 @@ types:
                         -
                             from: objectId
                             to: id
-                        -
-                            from: authToken 
-                            to: token
         GenomeDomainData:
         MetagenomeAnnotation:
             viewers:
@@ -522,9 +489,6 @@ types:
                         -
                             from: objectId 
                             to: id
-                        -
-                            from: authToken 
-                            to: token
         Pangenome: 
             icon:   
                 type: fontAwesome
@@ -542,9 +506,6 @@ types:
                         -
                             from: objectName 
                             to: name
-                        -
-                            from: authToken 
-                            to: token
         ProbabilisticAnnotation:
     KBaseGwasData:
         GwasExperimentSummary:
@@ -596,9 +557,6 @@ types:
                         -
                             from: objectType 
                             to: type
-                        -
-                            from: authToken 
-                            to: token
         PhenotypeSimulationSet:
             icon:   
                 type: fontAwesome
@@ -619,9 +577,6 @@ types:
                         -
                             from: objectType 
                             to: type
-                        -
-                            from: authToken 
-                            to: token
     KbasePPI:
         Interaction:
         InteractionDataset:
@@ -655,9 +610,6 @@ types:
                         -
                             from: objectType 
                             to: type
-                        -
-                            from: authToken
-                            to: token
         IndividualFeature:
         Ontology:
         SearchFeatureSet:

@@ -56,7 +56,8 @@
             'jquery-ui-css': 'bower_components/jquery-ui/themes/ui-lightness/jquery-ui',
             bootstrap: 'bower_components/bootstrap/dist/js/bootstrap',
             bootstrap_css: 'bower_components/bootstrap/dist/css/bootstrap',
-            q: 'bower_components/q/q',
+            // q: 'bower_components/q/q',
+            bluebird: 'bower_components/bluebird/js/browser/bluebird',
             nunjucks: 'bower_components/nunjucks/browser/nunjucks',
             // md5: '/bower_components/md5/build/md5.min',
             md5: 'bower_components/spark-md5/spark-md5',
@@ -141,6 +142,7 @@
             'kb.logger': 'js/lib/kbaseLogger',
             'kb.session': 'js/lib/kbaseSession',
             'kb.config': 'js/lib/kbaseConfig',
+            'kb.qcompat': 'js/lib/qCompat',
             
             // App widgets
             'kb.widget.navbar': 'js/lib/widgets/kbaseNavbar',
@@ -177,6 +179,7 @@
             'kb_widgetBases_domWidget': 'js/lib/widgetBases/domWidget',
             'kb_widgetBases_baseWidget': 'js/lib/widgetBases/baseWidget',
             'kb.widget.base': 'js/lib/widgets/kbaseBaseWidget',
+            'kb_widgetBases_dataVisWidget': 'js/lib/widgetBases/dataVisWidget',
 
             // Base Panels (widget managing widgets...)
             'kb.simplepanel': 'js/lib/kbaseSimplePanel',            

@@ -161,7 +161,11 @@ define([
                         tableTest.settings.minwidths = mw;
                         tableTest.render(tlen);
                         */
-                        var tableTest = html.makeTable(cnames, tdata, {class: 'table table-striped'});
+                        var tableTest = html.makeTable({ 
+                            columns: cnames,
+                            rows: tdata, 
+                            classes: ['table', 'table-striped']
+                        });
                         document.getElementById('outputTable' + graphId).innerHTML = tableTest;
                          $('#' + 'outputTable' + graphId + '>table').dataTable();
                        

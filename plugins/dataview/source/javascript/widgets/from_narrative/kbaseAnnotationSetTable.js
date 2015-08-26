@@ -54,7 +54,6 @@ define([
                         container.append('<div><p>' + msg + '>/p></div>');
                     } else {
                         var otus = data[0].data.otus,
-                            columns = ['features', 'functional role', 'abundance', 'avg e-value', 'otu'],
                             rows = [],
                             o, funcs, f;
                         for (o = 0; o < otus.length; o += 1) {
@@ -72,9 +71,11 @@ define([
 
                         // container.append('<div id="annotationTable' + tableId + '" style="width: 95%;"></div>');
                         var options = {
+                            columns: ['features', 'functional role', 'abundance', 'avg e-value', 'otu'],
+                            rows: rows,
                             class: 'table table-striped'
                         };
-                        var table = html.makeTable(columns, rows, options);
+                        var table = html.makeTable(options);
                         container.html(table);
                         $('#' + options.generated.id).dataTable();
 

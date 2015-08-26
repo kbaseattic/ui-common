@@ -33,8 +33,6 @@ define([
             var workspaceObjects;
 
             function render(data) {
-                    console.log('here');
-
                 var a = html.tag('a'),
                     tableId = html.genId(),
                     columns = ['Object Name', 'Module', 'Type', 'Version', 'Icon', 'Narrative', 'Version', 'Last Modified'],
@@ -64,7 +62,12 @@ define([
                     });
 
                 return {
-                    content: html.makeTable(columns, rows, {class: 'table table-striped', id: tableId}),
+                    content: html.makeTable({
+                        columns: columns,
+                        rows: rows, 
+                        classes: ['table', 'table-striped'], 
+                        id: tableId
+                    }),
                     afterAttach: function () {
                         $('#' + tableId).dataTable();
                     }

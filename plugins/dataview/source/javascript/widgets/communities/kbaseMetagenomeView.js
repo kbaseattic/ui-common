@@ -137,7 +137,6 @@ define([
                     var mTabDiv = $('<div id="' + pref + 'metadata" style="width: 95%;">');
                     tabPane.kbaseTabs('addTab', {tab: 'Metadata', content: mTabDiv, canDelete: false, show: true});
 
-                    var columns = ['Category', 'Field', 'Value'];
                     var mdata = [];
                     var cats = ['project', 'sample', 'library', 'env_package'];
                     for (var c in cats) {
@@ -148,9 +147,11 @@ define([
                         }
                     }
                     var tableOptions = {
+                        columns:  ['Category', 'Field', 'Value'],
+                        rows: mdata,
                         class: 'table table-striped'
                     };
-                    var table = H.makeTable(columns, mdata, tableOptions);
+                    var table = H.makeTable(tableOptions);
                     $('#' + pref + 'metadata').html(table);
                     $('#' + tableOptions.generated.id).dataTable();
 

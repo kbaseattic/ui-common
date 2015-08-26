@@ -472,8 +472,6 @@ define([
                             ])
                         ]);
                         
-                        console.log(logo);
-
                         return logo;
                     } catch (err) {
                         console.error('When fetching icon config: ', err);

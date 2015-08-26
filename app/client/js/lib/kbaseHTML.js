@@ -10,7 +10,8 @@ define(['underscore'], function (_) {
     return (function () {
 
         function jsonToHTML(node) {
-            var nodeType = typeof node;
+            var nodeType = typeof node,
+                out;
             if (nodeType === 'string') {
                 return node;
             }
@@ -21,9 +22,8 @@ define(['underscore'], function (_) {
                 return 'false';
             }
             if (nodeType === 'number') {
-                return '' + node;
+                return String(node);
             }
-            var out;
             if (nodeType === 'object' && node.push) {
                 out = '';
                 node.forEach(function (item) {
@@ -69,19 +69,16 @@ define(['underscore'], function (_) {
                     var value = attribs[key];
                     if (typeof value === 'string') {
                         return key + ': ' + value;
-                    } else {
-                        // just ignore invalid attributes for now
-                        // TODO: what is the proper thing to do?
-                        return '';
                     }
-                    return false;
+                    // just ignore invalid attributes for now
+                    // TODO: what is the proper thing to do?
+                    return '';
                 });
                 return fields.filter(function (field) {
                     return field ? true : false;
                 }).join('; ');
-            } else {
-                return '';
             }
+            return '';
         }
 
         /**
@@ -103,21 +100,19 @@ define(['underscore'], function (_) {
                     if (typeof value === 'string') {
                         //var escapedValue = value.replace(/\"/g, '\\"');
                         return key + ':' + value;
-                    } else if (typeof value === 'object') {
-                        return key + ': {' + makeDataBindAttribs(value) + '}';
-                    } else {
-                        // just ignore invalid attributes for now
-                        // TODO: what is the proper thing to do?
-                        return '';
                     }
-                    return false;
+                    if (typeof value === 'object') {
+                        return key + ': {' + makeDataBindAttribs(value) + '}';
+                    }
+                    // just ignore invalid attributes for now
+                    // TODO: what is the proper thing to do?
+                    return '';
                 });
                 return fields.filter(function (field) {
                     return field ? true : false;
                 }).join(',');
-            } else {
-                return '';
             }
+            return '';
         }
 
         /**
@@ -140,7 +135,7 @@ define(['underscore'], function (_) {
                                 value = makeStyleAttribs(value);
                                 break;
                             case 'dataBind':
-                                key = 'data-bind';
+                                key = 'data-bind';                                
                             case 'data-bind':
                                 // reverse the quote char, since data-bind attributes 
                                 // can contain double-quote, which can't itself
@@ -231,7 +226,7 @@ define(['underscore'], function (_) {
             generatedId += 1;
             return 'kb_html_' + generatedId;
         }
-        function makeTable(columns, rows, options) {
+        function makeTablex(columns, rows, options) {
             var table = tag('table'),
                 thead = tag('thead'),
                 tbody = tag('tbody'),
@@ -257,6 +252,39 @@ define(['underscore'], function (_) {
                 }))
             ]);
         }
+        
+        function makeTable(arg) {
+            var table = tag('table'),
+                thead = tag('thead'),
+                tbody = tag('tbody'),
+                tr = tag('tr'),
+                th = tag('th'),
+                td = tag('td');
+            var id;
+            arg = arg || {};
+            if (arg.id) {
+                id = arg.id;
+            } else {
+                id = genId();
+                arg.generated = {id: id};
+            }
+            var attribs = {id: id};
+            if (arg.class) {
+                attribs.class = arg.class;
+            } else if (arg.classes) {
+                attribs.class = arg.classes.join(' ');
+            }
+            return table(attribs, [
+                thead(tr(arg.columns.map(function (x) {
+                    return th(x);
+                }))),
+                tbody(arg.rows.map(function (row) {
+                    return tr(row.map(function (x) {
+                        return td(x);
+                    }));
+                }))
+            ]);
+        }
 
         function bsPanel(title, content) {
             var div = tag('div'),
@@ -268,6 +296,20 @@ define(['underscore'], function (_) {
                 ]),
                 div({class: 'panel-body'}, [
                     content
+                ])
+            ]);
+        }
+        
+        function makePanel(arg) {
+            var div = tag('div'),
+                span = tag('span');
+
+            return div({class: 'panel panel-default'}, [
+                div({class: 'panel-heading'}, [
+                    span({class: 'panel-title'}, arg.title)
+                ]),
+                div({class: 'panel-body'}, [
+                    arg.content
                 ])
             ]);
         }
@@ -349,6 +391,55 @@ define(['underscore'], function (_) {
                 throw new Error('Not a valid html representation -- must be string or list');
             }
         }
+        
+        function makeList(arg) {
+            if (_.isArray(arg.items)) {
+                var ul = tag('ul'),
+                    li = tag('li');
+                return ul(arg.items.map(function (item) {
+                    return li(item);
+                }));
+            }
+            return 'Sorry, cannot make a list from that';
+        }
+        
+        function makeTabs(arg) {
+            var ul = tag('ul'),
+                li = tag('li'),
+                a = tag('a'),
+                div = tag('div');
+            
+            return div([
+                ul({class: 'nav nav-tabs', role: 'tablist'}, 
+                arg.tabs.map(function (tab, index) {
+                    var attribs = {
+                        role: 'presentation'
+                    };
+                    if (index === 0) {
+                        attribs.class = 'active';
+                    }
+                    return li(attribs, a({
+                        href: '#' + tab.id, 
+                        'aria-controls': 'home',
+                        role: 'tab',
+                        'data-toggle': 'tab'
+                    }, tab.label));
+                })),
+                div({class: 'tab-content'}, 
+                    arg.tabs.map(function (tab, index) {
+                        var attribs = {
+                            role: 'tabpanel',
+                            class: 'tab-pane',
+                            id: tab.id
+                        };
+                        if (index === 0) {
+                            attribs.class += ' active';
+                        }
+                        return div(attribs, tab.content);
+                    })
+                )
+            ]);
+        }
 
         return {
             html: jsonToHTML,
@@ -358,8 +449,11 @@ define(['underscore'], function (_) {
             genId: genId,
             bsPanel: bsPanel,
             panel: bsPanel,
+            makePanel: makePanel,
             loading: loading,
-            flatten: flatten
+            flatten: flatten,
+            makeList: makeList,
+            makeTabs: makeTabs
         };
     }());
 });

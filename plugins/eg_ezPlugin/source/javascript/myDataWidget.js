@@ -47,7 +47,7 @@ define([
                     });
 
                 return {
-                    content: html.makeTable(columns, rows, {class: 'table table-striped', id: tableId}),
+                    content: html.makeTable({columns: columns, rows: rows, class: 'table table-striped', id: tableId}),
                     afterAttach: function () {
                         $('#' + tableId).dataTable();
                     }

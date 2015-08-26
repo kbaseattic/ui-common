@@ -8,15 +8,16 @@
 define([
     'jquery',
     'q',
-    'kb.client.workspace',
+    'kb.service.workspace',
     'kb.html',
     'kb.runtime',
     'kb.utils.api',
-    'kb_types'
+    'kb_types',
+    'kb.widget.kbwidgetadapter'
 ],
-    function ($, q, WorkspaceClient, html, R, APIUtils, Types) {
+    function ($, q, Workspace, html, R, APIUtils, Types, KBWidgetAdapter) {
         "use strict";
-       
+
 
         function findMapping(type, params) {
             // var mapping = typeMap[objectType];
@@ -56,80 +57,142 @@ define([
             return $('#' + id);
         }
 
+        function makeWidget(params) {
+            // Translate and normalize params.
+            params.objectVersion = params.ver;
 
+            // Get other params from the runtime.
+            // params.workspaceURL = R.getConfig('services.workspace.url');
+            // params.authToken = R.getAuthToken();
+
+            return q.Promise(function (resolve, reject) {
+                var workspace = new Workspace(R.getConfig('services.workspace.url'), {
+                    token: R.getAuthToken()
+                }),
+                    objectRefs = [{ref: params.workspaceId + '/' + params.objectId}];
+                q(workspace.get_object_info_new({
+                    objects: objectRefs,
+                    ignoreErrors: 1,
+                    includeMetadata: 1
+                }))
+                    .then(function (data) {
+                        if (data.length === 0) {
+                            reject('Object not found');
+                            return;
+                        }
+                        if (data.length > 1) {
+                            reject('Too many (' + data.length + ') objects found.');
+                            return;
+                        }
+                        if (data[0] === null) {
+                            reject('Null object returned');
+                            return;
+                        }
+
+                        var wsobject = APIUtils.object_info_to_object(data[0]);
+                        var type = APIUtils.parseTypeId(wsobject.type),
+                            mapping = findMapping(type, params);
+                        if (!mapping) {
+                            reject('Not Found', 'Sorry, cannot find widget for ' + type.module + '.' + type.name);
+                            return;
+                        }
+
+                        // These params are from the found object.
+                        var widgetParams = {
+                            workspaceId: params.workspaceId,
+                            objectId: params.objectId,
+                            objectName: wsobject.name,
+                            workspaceName: wsobject.ws,
+                            objectVersion: wsobject.version,
+                            objectType: wsobject.type,
+                            type: wsobject.type
+                        };
+                       
+
+                        // Create params.
+                        if (mapping.options) {
+                            mapping.options.forEach(function (item) {
+                                var from = widgetParams[item.from];
+                                if (!from && item.optional !== true) {
+                                    // console.log(params);
+                                    throw 'Missing param, from ' + item.from + ', to ' + item.to;
+                                }
+                                widgetParams[item.to] = from;
+                            });
+                        }
+                        // Handle different types of widgets here.
+                        var type = mapping.type || 'kbwidget';
+                        switch (type) {
+                            case 'kbwidget':
+                                var w = KBWidgetAdapter.make({
+                                    module: mapping.module,
+                                    // TODO: don't actually know how the jquery object is specified in the mapping
+                                    jquery_object: mapping.jquery_object || mapping.widget,
+                                    panel: mapping.panel,
+                                    title: mapping.title
+                                });
+                                resolve({
+                                    widget: w,
+                                    params: widgetParams
+                                });
+                                break;
+                                // case 'widgetBase':
+                            case 'widgetBase':
+                                // The widgetBase type is based on standard prototypal
+                                // object inheritance and ES5 object building.
+                                // The object (perhaps via prototypes) is expected
+                                // to itself implement the widget api...
+                                require([mapping.module], function (W) {
+                                    resolve({
+                                        widget:  Object.create(W),
+                                        params: widgetParams
+                                    })
+                                });
+                                break;
+                            case 'widgetFactory':
+                                require([mapping.module], function (W) {
+                                    resolve({
+                                        widget: W.make(),
+                                        params: widgetParams
+                                    });
+                                });
+                                break;
+                            default:
+                                reject('Invalid type ' + type + ' in widget mapping')
+                        }
+                    })
+                    .catch(function (err) {
+                        //console.log('ERROR');
+                        //console.log(err);
+                        reject(err);
+                    })
+                    .done();
+            });
+        }
         function genericVisualizerWidgetFactory() {
             var mount, container, $container, config;
-            var workspaceClient;
+            var theWidget;
+            
+            function showError(err) {
+                var content;
 
-            function attachWidget(params) {
-                // Get the workspace object
-                var $widgetContainer = $container;
-                
-                // Translate and normalize params.
-                params.objectVersion = params.ver;
-                
-                // Get other params from the runtime.
-                params.workspaceURL = R.getConfig('services.workspace.url');
-                params.authToken = R.getAuthToken();
-
-                return q.Promise(function (resolve, reject) {
-                    workspaceClient.getObject(params.workspaceId, params.objectId)
-                        .then(function (wsobject) {
-                            var type = APIUtils.parseTypeId(wsobject.type);
-                            //var objectType = wsobject.type.split(/-/)[0];
-                            var mapping = findMapping(type, params);
-                            if (!mapping) {
-                                $widgetContainer.html(html.panel('Not Found', 'Sorry, cannot find widget for ' + type.module + '.' + type.name));
-                                resolve();
-                                return;
-                            }
-                            
-                            // These params are from the found object.
-                            params.objectName = wsobject.name;
-                            params.workspaceName = wsobject.ws;
-                            params.objectVersion = wsobject.version;
-                            params.objectType = wsobject.type;
-
-                            // Create params.
-                            var widgetParams = {};
-                            if (mapping.options) {
-                                mapping.options.forEach(function (item) {
-                                    var from = params[item.from];
-                                    if (!from && item.optional !== true) {
-                                        // console.log(params);
-                                        throw 'Missing param, from ' + item.from + ', to ' + item.to;
-                                    }
-                                    widgetParams[item.to] = from;
-                                });
-                            } else {
-                                widgetParams = params;
-                            }
-                            require(['jquery', mapping.module], function ($, Widget) {
-                                // jquery chicanery
-                                if ($widgetContainer[mapping.widget] === undefined) {
-                                    $widgetContainer.html('Sorry, cannot find jquery widget ' + mapping.widget);
-                                } else {
-                                    if (mapping.panel) {
-                                        $widgetContainer = createBSPanel($widgetContainer, mapping.title);
-                                    }
-                                    $widgetContainer[mapping.widget](widgetParams);
-                                }
-                                resolve();
-                            });
-                        })
-                        .catch(function (err) {
-                            //console.log('ERROR');
-                            //console.log(err);
-                            reject(err);
-                        })
-                        .done();
-                });
+                if (typeof err === 'string') {
+                    content = err;
+                } else if (err.message) {
+                    content = err.message;
+                } else if (err.error && err.error.error) {
+                    content = err.error.error.message;
+                } else {
+                    content = 'Unknown Error';
+                }
+                container.innerHTML = html.bsPanel('Error', content);
             }
+
+            // Widget Lifecycle Interface
 
             function init(cfg) {
                 return q.Promise(function (resolve) {
                     config = cfg;
-                    workspaceClient = Object.create(WorkspaceClient).init({url: R.getConfig('services.workspace.url')});
                     resolve();
                 });
             }
@@ -142,25 +205,28 @@ define([
                     resolve();
                 });
             }
-            function showError(err) {
-                var content;
-                
-                if (typeof err === 'string') {
-                    content = err;
-                } else if (err.message) {
-                    content = err.message;
-                } else if (err.error && err.error.error) {
-                    content = err.error.error.message;
-                } else {
-                    content = 'Unknown Error';
-                }
-                container.innerHTML = html.bsPanel('Error', content);
-            }
+
             function start(params) {
                 return q.Promise(function (resolve, reject) {
-                    attachWidget(params)
+                    var newParams;
+                    makeWidget(params)
+                        .then(function (result) {
+                            theWidget = result.widget;
+                            newParams = result.params;
+                            if (theWidget.init) {
+                                return theWidget.init(config);
+                            } else {
+                                return null;
+                            }
+                        })
                         .then(function () {
-                            resolve();
+                            return theWidget.attach(container);
+                        })
+                        .then(function () {
+                            return theWidget.start(newParams);
+                        })
+                        .then(function () {
+                            // do nothing...
                         })
                         .catch(function (err) {
                             // if attaching the widget failed, we attach a 
@@ -173,18 +239,51 @@ define([
                 });
             }
             function stop() {
-                return q.Promise(function (resolve) {
-                    resolve();
+                return q.Promise(function (resolve, reject) {
+                    if (theWidget && theWidget.stop) {
+                        theWidget.stop()
+                            .then(function () {
+                                resolve();
+                            })
+                            .catch(function (err) {
+                                reject(err);
+                            })
+                            .done();
+                    } else {
+                        resolve();
+                    }
                 });
             }
             function detach() {
-                return q.Promise(function (resolve) {
-                    resolve();
+                return q.Promise(function (resolve, reject) {
+                     if (theWidget && theWidget.detach) {
+                        theWidget.detach()
+                            .then(function () {
+                                resolve();
+                            })
+                            .catch(function (err) {
+                                reject(err);
+                            })
+                            .done();
+                    } else {
+                        resolve();
+                    }
                 });
             }
             function destroy() {
                 return q.Promise(function (resolve) {
-                    resolve();
+                     if (theWidget && theWidget.destroy) {
+                        theWidget.destroy()
+                            .then(function () {
+                                resolve();
+                            })
+                            .catch(function (err) {
+                                reject(err);
+                            })
+                            .done();
+                    } else {
+                        resolve();
+                    }
                 });
             }
 
