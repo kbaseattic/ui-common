@@ -1,0 +1,82 @@
+
+<div class="row">
+
+    <div class="col-sm-3 col-md-3 sidebar" id="ws-sidebar">
+        <!--<ul class="nav nav-tabs">
+            <li ng-class="{ active: $state.includes('narratives')}">
+                <a ui-sref="narratives()" >Narratives</a>
+            </li>
+            <li ng-class="{ active: $state.includes('ws')}">
+                <a ui-sref="ws">Workspaces</a>
+            </li>
+        </ul>-->
+        <div>
+            <div ng-show="$root.USER_ID" class="narrative-filters">
+                <div newnarrativebtn></div>
+            </div>
+
+
+            <div class="narrative-filters">
+                <a ui-sref="narratives.featured" ng-class="{ active: $state.includes('narratives.featured')}" class="select-nar">
+                    <span><b>Apps</b></span>
+                    <span class="glyphicon glyphicon-chevron-right pull-right"></span>
+                </a> 
+            </div>
+
+            <div class="narrative-filters">
+                <a ng-show="$root.USER_ID" ui-sref="narratives.mynarratives"  ng-class="{ active: $state.includes('narratives.mynarratives')}" class="select-nar">
+                    <span class="my-nar-count"></span> 
+                    <span> <b>My Narratives</b></span>
+                    <span class="glyphicon glyphicon-chevron-right pull-right"></span>
+                </a>
+                <a ng-show="$root.USER_ID" ui-sref="narratives.shared" ng-class="{ active: $state.includes('narratives.shared')}" class="select-nar">
+                    <span class="shared-nar-count"></span>                     
+                    <span> <b>Shared With Me</b></span>
+                    <span class="glyphicon glyphicon-chevron-right pull-right"></span>
+                </a>
+                <a ui-sref="narratives.public" ng-class="{ active: $state.includes('narratives.public')}" class="select-nar">
+                    <span class="public-nar-count"></span> 
+                    <span> <b>Public</b></span>  
+                    <span class="glyphicon glyphicon-chevron-right pull-right"></span>
+                </a>
+            </div>
+
+
+            <div class="narrative-feed">
+                <h3 class="sidebar-header">RECENT NARRATIVES</h3>
+                <div recentnarratives>
+                    <ul class="recent-nars" ng-repeat="nar in narratives | orderBy:'timestamp':true | limitTo:5">
+                        <li>
+                            <a href="{{nar_url}}/narrative/ws.{{nar.wsid}}.obj.{{nar.id}}" target="_blank" class="ellipsis">{{nar.name}}</a><br>
+                            <div class="recent-nar-time text-muted">
+                                <i>{{nar.owner}}</i> <span class="pull-right"><i>{{nar.nealtime}}</i></span>
+                            </div>
+                        </li>
+                        <br>
+                    </ul>
+                </div>
+                <!--<a class="pull-right" href="#/narrative/projects/">View all</a>-->
+            </div>
+
+            <!--<h3 class="sidebar-header">RECENT PROJECTS</h3>
+            <div recentprojects>
+                <ul class="recent-projects" ng-repeat="nar in projects | orderBy:'timestamp':true | limitTo:5">
+                    <li>{{nar.name}}<span class="text-mutted pull-right">{{nar.nealtime}}</span>
+                    </li>
+                </ul>
+            </div>-->
+        </div>
+    </div>
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main">
+        <div class="obj-table" ui-view>
+            <!--<div ng-show="!selected_ws">
+                <span class="text-danger">No Workspace Selected</span><br>
+                <small>Please select a workspace from the left.</small>
+            </div>-->
+
+        </div>
+    </div>
+</div>
+
+

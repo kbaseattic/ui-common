@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <!-- title and icon -->
+    <title>Metagenome Landing Page</title>
+    <link rel="icon" href="images/KBase_favicon.ico" type="image/x-icon">
+
+    <!-- default js -->
+    <script src="Retina/js/jquery.min.js"></script>
+    <script src="Retina/js/stm.js"></script>
+    <script src="Retina/js/retina.js"></script>
+    <script src="Retina/js/bootstrap.min.js"></script>
+
+    <!-- config  -->
+    <script src="js/config.js"></script>
+
+    <!-- bootstrap style -->
+    <link rel="stylesheet" type="text/css" href="Retina/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/kbase.css">
+
+    <!-- webapp initialization -->
+    <script>
+    jQuery( document ).ready(function(){
+	stm.init(RetinaConfig.mgrast_api, true, "MG-RAST");
+	Retina.init( { library_resource: "Retina/js/" } ).then( function() {
+	    Retina.add_widget({"name": "login", "resource": "widgets/",  "filename": "widget.login.js"});
+	    Retina.add_widget({"name": "metagenome_overview", "resource": "widgets/",  "filename": "widget.metagenome_overview.js"});
+	    Retina.load_widget("login").then( function() {
+	    	Retina.Widget.create("login", {"target": document.getElementById("login_space"), "callback": function(){
+	    	    if (this.hasOwnProperty('result') && this.result == 'success') {
+			if (window.hasOwnProperty('auth') && ! window.auth.hasOwnProperty('Auth')) {
+			    window.location.reload(false);
+			}
+	    		window.auth = { Auth: this.token };
+	    	    } else {
+			window.auth = {};
+			window.location.reload(false);
+	    	    }
+		    Retina.load_widget("metagenome_overview").then( function() {
+			Retina.WidgetInstances.metagenome_overview = [ Retina.WidgetInstances.metagenome_overview[0] ];
+			Retina.Widget.create('metagenome_overview', { "main": document.getElementById("content"),
+								      "sidebar": document.getElementById("sidebar") });
+		    });
+	    	}});
+		Retina.load_widget("metagenome_overview").then( function() {
+		    Retina.WidgetInstances.metagenome_overview = [ Retina.WidgetInstances.metagenome_overview[0] ];
+		    Retina.Widget.create('metagenome_overview', { "main": document.getElementById("content"),
+								  "sidebar": document.getElementById("sidebar") });
+		});
+	    });
+	});
+    });
+    </script>
+  </head>
+
+  <body>
+
+    <!-- header -->
+    <div>
+      <div class="nav navbar-fixed-top" style="border-bottom: 1px solid #e0e0e0;  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);">
+	<a class="pull-left" href="http://www.kbase.us">
+	  <img style="width: 46px;margin: 2px 10px 0;" src="images/kbase_logo.png">
+	</a>
+	<div>
+	  <ul class="kbase_nav">
+	    <li>
+	      <a href="https://narrative.kbase.us/functional-site/#/narratives/featured">Narratives</a>
+	    </li>
+	    <li>
+	      <a href="https://narrative.kbase.us/functional-site/#/ws/">Workspaces</a>
+	    </li>
+	    <li>
+	      <a href="https://narrative.kbase.us/functional-site/#/search/?q=*">Search Data</a>
+	    </li>
+	    <li>
+	      <a href="http://kbase.us/services/docs/uploader/uploader.html">Upload</a>
+	    </li>
+	  </ul>
+	  <div id="login_space" class="pull-right"></div>
+	  <div class="pull-right">
+	    <ul class="kbase_nav" style="margin-right: 10px;">
+	      <li class="dropdown help-dropdown">
+		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+		  Help
+		  <b class="caret"></b>
+		</a>
+		<ul class="dropdown-menu" style="left: -150px;">
+		  <li>
+		    <a href="http://kbase.us/for-users/narrative-quick-start/">Narrative Quick Start Guide</a>
+		  </li>
+		  <li>
+		    <a href="mailto:help@kbase.us">Email help@kbase.us</a>
+		  </li>
+		</ul>
+	      </li>
+	    </ul>
+	  </div>
+	</div>
+      </div>
+      
+      <!--border layout -->
+    <div class="borderlayout">
+      
+      <!-- main content -->
+      <div id="content"></div>
+    </div>
+    
+      <!-- sidebar content -->
+      <div id="sidebar" class="sidebar span5"></div>
+      
+  </body>
+</html>

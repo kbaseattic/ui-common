@@ -1,0 +1,48 @@
+
+<div class="ws-selector"> 
+    <div class="ws-selector-header">
+        <div class="btn-toolbar ws-toolbar">
+            <div class="dropdown pull-left">
+                <a ng-show="$root.USER_ID" data-toggle="dropdown">
+                    Filter <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu settings-dropdown perm-filters" role="menu">
+                    <!--<div class="checkbox pull-left">
+                        <label><input id="ws-filter-projects" type="checkbox" value="">Narrative Projects</label>
+                    </div>-->
+
+                    <div class="checkbox pull-left">
+                        <label><input id="ws-filter-owner" type="checkbox" value="">Owner</label>
+                    </div>
+                    <br><br><hr class="hr">
+                    Your permission:<br>
+                    <div class="checkbox">
+                        <label><input id="ws-filter-admin" type="checkbox" value="" checked>Admin</label>
+                    </div>
+                    <div class="checkbox">
+                        <label><input id="ws-filter-write" type="checkbox" value="" checked>Write</label>
+                    </div>
+                    <div class="checkbox">
+                        <label><input id="ws-filter-read" type="checkbox" value="" checked>Read</label>
+                    </div>
+                </ul>                 
+            </div>
+            <a ng-show="$root.USER_ID" class="btn-new-ws pull-left">New+</a>
+            <!--<a class="btn-analysis pull-left" ui-sref="analysis({ws: $scope.ws})">Analysis</a>-->
+
+            <div class="fav-toolbar" style="display: none;">
+                <div class="fav-toolbar-title pull-left">Objects</div>
+                <button type="button" class="btn btn-default pull-right" ng-click="clearList()">Clear</button>
+            </div>
+        </div>
+
+        <input type="text" class="form-control wb-search" placeholder="Search Workspaces">
+    </div>
+
+
+    <div id="select-box" class="select-box scroll-pane">
+        <table class="table table-bordered table-condensed table-hover"></table>
+    </div>
+
+    <div favoritesidebar style="display: none;" id="favorite-sidebar" class="scroll-pane"></div>
+</div>

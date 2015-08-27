@@ -1,0 +1,145 @@
+Universal	Alanyl-tRNA synthetase (EC 6.1.1.7)
+Universal	Arginyl-tRNA synthetase (EC 6.1.1.19)
+Universal	Chorismate synthase (EC 4.2.3.5)
+Universal	Cysteinyl-tRNA synthetase (EC 6.1.1.16)
+Universal	Signal recognition particle, subunit Ffh SRP54 (TC 3.A.5.1.1)
+Universal	Signal recognition particle receptor protein FtsY (=alpha subunit) (TC 3.A.5.1.1)
+Universal	TsaD/Kae1/Qri7 protein, required for threonylcarbamoyladenosine t(6)A37 formation in tRNA
+Universal	GMP synthase [glutamine-hydrolyzing], amidotransferase subunit (EC 6.3.5.2)
+Universal	Histidyl-tRNA synthetase (EC 6.1.1.21)
+Universal	Translation initiation factor 2
+Universal	SSU rRNA (adenine(1518)-N(6)/adenine(1519)-N(6))-dimethyltransferase (EC 2.1.1.182)
+Universal	Leucyl-tRNA synthetase (EC 6.1.1.4)
+Universal	Nucleoside diphosphate kinase (EC 2.7.4.6)
+Universal	Phosphoglycerate kinase (EC 2.7.2.3)
+Universal	Phenylalanyl-tRNA synthetase alpha chain (EC 6.1.1.20)
+Universal	Phenylalanyl-tRNA synthetase beta chain (EC 6.1.1.20)
+Universal	Phosphoribosylamine--glycine ligase (EC 6.3.4.13)
+Universal	Phosphoribosylaminoimidazole carboxylase catalytic subunit (EC 4.1.1.21)
+Universal	Phosphoribosylformylglycinamidine synthase, synthetase subunit (EC 6.3.5.3)
+Universal	Phosphoribosylformylglycinamidine cyclo-ligase (EC 6.3.3.1)
+Universal	CTP synthase (EC 6.3.4.2)
+Universal	Nucleoside 5-triphosphatase RdgB (dHAPTP, dITP, XTP-specific) (EC 3.6.1.15)
+Universal	Ribonuclease HII (EC 3.1.26.4)
+Universal	DNA-directed RNA polymerase alpha subunit (EC 2.7.7.6)
+Universal	DNA-directed RNA polymerase beta subunit (EC 2.7.7.6)
+Universal	DNA-directed RNA polymerase beta' subunit (EC 2.7.7.6)
+Universal	Preprotein translocase secY subunit (TC 3.A.5.1.1)
+Universal	Seryl-tRNA synthetase (EC 6.1.1.11)
+Universal	tRNA-guanine transglycosylase (EC 2.4.2.29)
+Universal	tRNA pseudouridine synthase B (EC 4.2.1.70)
+Bacterial	LSU ribosomal protein L10p (P0)
+Bacterial	LSU ribosomal protein L11p (L12e)
+Bacterial	LSU ribosomal protein L13p (L13Ae)
+Bacterial	LSU ribosomal protein L14p (L23e)
+Bacterial	LSU ribosomal protein L15p (L27Ae)
+Bacterial	LSU ribosomal protein L16p (L10e)
+Bacterial	LSU ribosomal protein L18p (L5e)
+Bacterial	LSU ribosomal protein L1p (L10Ae)
+Bacterial	LSU ribosomal protein L22p (L17e)
+Bacterial	LSU ribosomal protein L23p (L23Ae)
+Bacterial	LSU ribosomal protein L2p (L8e)
+Bacterial	LSU ribosomal protein L3p (L3e)
+Bacterial	LSU ribosomal protein L4p (L1e)
+Bacterial	LSU ribosomal protein L5p (L11e)
+Bacterial	LSU ribosomal protein L6p (L9e)
+Bacterial	SSU ribosomal protein S10p (S20e)
+Bacterial	SSU ribosomal protein S11p (S14e)
+Bacterial	SSU ribosomal protein S12p (S23e)
+Bacterial	SSU ribosomal protein S13p (S18e)
+Bacterial	SSU ribosomal protein S15p (S13e)
+Bacterial	SSU ribosomal protein S17p (S11e)
+Bacterial	SSU ribosomal protein S19p (S15e)
+Bacterial	SSU ribosomal protein S2p (SAe)
+Bacterial	SSU ribosomal protein S3p (S3e)
+Bacterial	SSU ribosomal protein S4p (S9e)
+Bacterial	SSU ribosomal protein S5p (S2e)
+Bacterial	SSU ribosomal protein S7p (S5e)
+Bacterial	SSU ribosomal protein S8p (S15Ae)
+Bacterial	SSU ribosomal protein S9p (S16e)
+Chloroplast	LSU ribosomal protein L10p (P0), chloroplast
+Chloroplast	LSU ribosomal protein L11p (L12e), chloroplast
+Chloroplast	LSU ribosomal protein L13p (L13Ae), chloroplast
+Chloroplast	LSU ribosomal protein L14p (L23e), chloroplast
+Chloroplast	LSU ribosomal protein L15p (L27Ae), chloroplast
+Chloroplast	LSU ribosomal protein L16p (L10e), chloroplast
+Chloroplast	LSU ribosomal protein L18p (L5e), chloroplast
+Chloroplast	LSU ribosomal protein L1p (L10Ae), chloroplast
+Chloroplast	LSU ribosomal protein L22p (L17e), chloroplast
+Chloroplast	LSU ribosomal protein L23p (L23Ae), chloroplast
+Chloroplast	LSU ribosomal protein L2p (L8e), chloroplast
+Chloroplast	LSU ribosomal protein L3p (L3e), chloroplast
+Chloroplast	LSU ribosomal protein L4p (L1e), chloroplast
+Chloroplast	LSU ribosomal protein L5p (L11e), chloroplast
+Chloroplast	LSU ribosomal protein L6p (L9e), chloroplast
+Chloroplast	SSU ribosomal protein S10p (S20e), chloroplast
+Chloroplast	SSU ribosomal protein S11p (S14e), chloroplast
+Chloroplast	SSU ribosomal protein S12p (S23e), chloroplast
+Chloroplast	SSU ribosomal protein S13p (S18e), chloroplast
+Chloroplast	SSU ribosomal protein S15p (S13e), chloroplast
+Chloroplast	SSU ribosomal protein S17p (S11e), chloroplast
+Chloroplast	SSU ribosomal protein S19p (S15e), chloroplast
+Chloroplast	SSU ribosomal protein S2p (SAe), chloroplast
+Chloroplast	SSU ribosomal protein S3p (S3e), chloroplast
+Chloroplast	SSU ribosomal protein S4p (S9e), chloroplast
+Chloroplast	SSU ribosomal protein S5p (S2e), chloroplast
+Chloroplast	SSU ribosomal protein S7p (S5e), chloroplast
+Chloroplast	SSU ribosomal protein S8p (S15Ae), chloroplast
+Chloroplast	SSU ribosomal protein S9p (S16e), chloroplast
+Euk/Archaeal	LSU ribosomal protein L10Ae (L1p)
+Euk/Archaeal	LSU ribosomal protein L10e (L16p)
+Euk/Archaeal	LSU ribosomal protein L11e (L5p)
+Euk/Archaeal	LSU ribosomal protein L12e (L11p)
+Euk/Archaeal	LSU ribosomal protein L13Ae (L13p)
+Euk/Archaeal	LSU ribosomal protein L17e (L22p)
+Euk/Archaeal	LSU ribosomal protein L1e (L4p)
+Euk/Archaeal	LSU ribosomal protein L23Ae (L23p)
+Euk/Archaeal	LSU ribosomal protein L23e (L14p)
+Euk/Archaeal	LSU ribosomal protein L27Ae (L15p)
+Euk/Archaeal	LSU ribosomal protein L3e (L3p)
+Euk/Archaeal	LSU ribosomal protein L5e (L18p)
+Euk/Archaeal	LSU ribosomal protein L8e (L2p)
+Euk/Archaeal	LSU ribosomal protein L9e (L6p)
+Euk/Archaeal	LSU ribosomal protein P0 (L10p)
+Euk/Archaeal	SSU ribosomal protein S11e (S17p)
+Euk/Archaeal	SSU ribosomal protein S13e (S15p)
+Euk/Archaeal	SSU ribosomal protein S14e (S11p)
+Euk/Archaeal	SSU ribosomal protein S15Ae (S8p)
+Euk/Archaeal	SSU ribosomal protein S15e (S19p)
+Euk/Archaeal	SSU ribosomal protein S16e (S9p)
+Euk/Archaeal	SSU ribosomal protein S20e (S10p)
+Euk/Archaeal	SSU ribosomal protein S23e (S12p)
+Euk/Archaeal	SSU ribosomal protein S2e (S5p)
+Euk/Archaeal	SSU ribosomal protein S3e (S3p)
+Euk/Archaeal	SSU ribosomal protein S5e (S7p)
+Euk/Archaeal	SSU ribosomal protein S9e (S4p)
+Euk/Archaeal	SSU ribosomal protein SAe (S2p)
+Mitochondrial	LSU ribosomal protein L10p (P0), mitochondrial
+Mitochondrial	LSU ribosomal protein L11p (L12e), mitochondrial
+Mitochondrial	LSU ribosomal protein L13p (L13Ae), mitochondrial
+Mitochondrial	LSU ribosomal protein L14p (L23e), mitochondrial
+Mitochondrial	LSU ribosomal protein L15p (L27Ae), mitochondrial
+Mitochondrial	LSU ribosomal protein L16p (L10e), mitochondrial
+Mitochondrial	LSU ribosomal protein L18p (L5e), mitochondrial
+Mitochondrial	LSU ribosomal protein L1p (L10Ae), mitochondrial
+Mitochondrial	LSU ribosomal protein L22p (L17e), mitochondrial
+Mitochondrial	LSU ribosomal protein L23p (L23Ae), mitochondrial
+Mitochondrial	LSU ribosomal protein L2p (L8e), mitochondrial
+Mitochondrial	LSU ribosomal protein L3p (L3e), mitochondrial
+Mitochondrial	LSU ribosomal protein L4p (L1e), mitochondrial
+Mitochondrial	LSU ribosomal protein L5p (L11e), mitochondrial
+Mitochondrial	LSU ribosomal protein L6p (L9e), mitochondrial
+Mitochondrial	SSU ribosomal protein S10p (S20e), mitochondrial
+Mitochondrial	SSU ribosomal protein S11p (S14e), mitochondrial
+Mitochondrial	SSU ribosomal protein S12p (S23e), mitochondrial
+Mitochondrial	SSU ribosomal protein S13p (S18e), mitochondrial
+Mitochondrial	SSU ribosomal protein S15p (S13e), mitochondrial
+Mitochondrial	SSU ribosomal protein S17p (S11e), mitochondrial
+Mitochondrial	SSU ribosomal protein S19p (S15e), mitochondrial
+Mitochondrial	SSU ribosomal protein S2p (SAe), mitochondrial
+Mitochondrial	SSU ribosomal protein S3p (S3e), mitochondrial
+Mitochondrial	SSU ribosomal protein S4p (S9e), mitochondrial
+Mitochondrial	SSU ribosomal protein S5p (S2e), mitochondrial
+Mitochondrial	SSU ribosomal protein S7p (S5e), mitochondrial
+Mitochondrial	SSU ribosomal protein S8p (S15Ae), mitochondrial
+Mitochondrial	SSU ribosomal protein S9p (S16e), mitochondrial
