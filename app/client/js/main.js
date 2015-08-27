@@ -251,10 +251,19 @@ define([
                                 }
                             }
                         });
-
+                        
                         // This usage of require.config will merge with the existing
                         // require configuration.
                         require.config({paths: paths, shim: shims});
+                        
+                        // Create a dynamic module for the plugin to use.
+                        define('kb_plugin_' + config.package.name, [], function () {
+                            return {
+                                plugin: {
+                                    path: '/' + sourcePath
+                                }
+                            }
+                        });
 
                         // Now install any routes.
                         if (config.install) {

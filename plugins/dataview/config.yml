@@ -2,7 +2,7 @@
 ---
 package:
     author: Erik Pearson
-    name: dataview_panel
+    name: dataview
     description: Viewers for data object (aka Landing Pages)
     date: August 6, 2015
     version: 0.0.1

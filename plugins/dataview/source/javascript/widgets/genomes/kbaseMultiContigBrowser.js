@@ -50,8 +50,9 @@ define([
     'kb.runtime',
     'kb.html',
     'kb.service.cdmi',
+    'kb_plugin_dataview',
     'kb_widget_dataview_genome_contigBrowserButtons'
-], function ($, _W, d3, R, html, CDMI) {
+], function ($, _W, d3, R, html, CDMI, Plugin) {
     'use strict';
     $.KBWidget({
         name: "KBaseMultiContigBrowser",
@@ -986,7 +987,7 @@ define([
             }
 
             // read subsys.txt into seedOntology and seedTermsUniq objs
-            d3.text("assets/data/subsys.txt", function (text) {
+            d3.text(Plugin.plugin.path + "/data/subsys.txt", function (text) {
                 var data = d3.tsv.parseRows(text);
 
                 var seedRole = "";
