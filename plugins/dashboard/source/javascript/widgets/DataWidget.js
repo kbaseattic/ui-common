@@ -5,8 +5,8 @@
  browser: true,
  white: true
  */
-define(['kb_widget_dashboard_base', 'kb.utils', 'kb.utils.api', 'kb.session', 'kb.service.workspace', 'q'],
-    function (DashboardWidget, Utils, APIUtils, Session, WorkspaceService, Q) {
+define(['kb_widget_dashboard_base', 'kb.utils', 'kb.utils.api', 'kb.session', 'kb.service.workspace', 'bluebird'],
+    function (DashboardWidget, Utils, APIUtils, Session, WorkspaceService, Promise) {
         "use strict";
         var widget = Object.create(DashboardWidget, {
             init: {
@@ -42,7 +42,7 @@ define(['kb_widget_dashboard_base', 'kb.utils', 'kb.utils.api', 'kb.session', 'k
             
             setInitialState: {
                 value: function (options) {
-                    return Q.Promise(function (resolve, reject, notify) {
+                    return new Promise(function (resolve, reject, notify) {
                         // We only run any queries if the session is authenticated.
                         if (!Session.isLoggedIn()) {
                             resolve();
@@ -56,11 +56,11 @@ define(['kb_widget_dashboard_base', 'kb.utils', 'kb.utils.api', 'kb.session', 'k
                         // At present we can just use the presence of "narrative_nice_name" metadata attribute 
                         // to flag a compatible workspace.
                         //
-                        Utils.promise(this.workspaceClient, 'list_workspace_info', {
+                        Promise.resolve(this.workspaceClient.list_workspace_info({
                             showDeleted: 0,
                             excludeGlobal: 1,
                             owners: [Session.getUsername()]
-                        })
+                        }))
                             .then(function (data) {
                                 console.log('Hmm .. did this work yet?');
                                 var dataObjects = [];
@@ -83,10 +83,10 @@ define(['kb_widget_dashboard_base', 'kb.utils', 'kb.utils.api', 'kb.session', 'k
                                 // Now get the workspace details.
 
                                 var workspaceObjects = [];
-                                Utils.promise(this.workspaceClient, 'list_objects', {
+                                Promise.resolve(this.workspaceClient.list_objects({
                                     ids: workspaceList,
                                     includeMetadata: 1
-                                })
+                                }))
                                     .then(function (data) {
                                                                         console.log('Well .. did this work yet?');
 

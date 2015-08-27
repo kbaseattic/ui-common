@@ -142,7 +142,6 @@
             'kb.logger': 'js/lib/kbaseLogger',
             'kb.session': 'js/lib/kbaseSession',
             'kb.config': 'js/lib/kbaseConfig',
-            'kb.qcompat': 'js/lib/qCompat',
             
             // App widgets
             'kb.widget.navbar': 'js/lib/widgets/kbaseNavbar',

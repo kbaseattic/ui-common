@@ -6,12 +6,12 @@
  white: true
  */
 define([
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb_widget_dataview_modeling_objects',
     'kb.service.workspace'
 ],
-    function (Q, R, KBObjects, Workspace) {
+    function (Promise, R, KBObjects, Workspace) {
         'use strict';
         function KBaseFBA_FBA(modeltabs) {
             var self = this;
@@ -493,7 +493,7 @@ define([
                 var workspace = new Workspace(R.getConfig('workspace_url', {
                     token: R.getAuthToken()
                 }));
-                return Q(workspace.get_objects([{ref: indata.fbamodel_ref}]))
+                return new Promise.resolve(workspace.get_objects([{ref: indata.fbamodel_ref}]))
                     .then(function (data) {
                         var kbObjects = new KBObjects();
                         self.model = new kbObjects["KBaseFBA_FBAModel"](self.modeltabs);

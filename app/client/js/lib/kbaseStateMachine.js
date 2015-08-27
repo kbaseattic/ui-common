@@ -33,7 +33,7 @@
  * @typedef {(object|string|number|boolean|undefined|function)} Any
  */
 
-define(['kb.utils', 'kb.asyncqueue', 'q'], function (Utils, AsyncQueue, Q) {
+define(['kb.utils', 'kb.asyncqueue', 'bluebird'], function (Utils, AsyncQueue, Promise) {
     "use strict";
     var StateMachine = Object.create({}, {
         /**
@@ -330,7 +330,7 @@ define(['kb.utils', 'kb.asyncqueue', 'q'], function (Utils, AsyncQueue, Q) {
          */
         whenItem: {
             value: function (key, timeout) {
-                var p = Q.Promise(function (resolve, reject) {
+                var p = new Promise(function (resolve, reject) {
                     if (Utils.hasProp(this.state, key)) {
                         var item = Utils.getProp(this.state, key);
                         if (item.status === 'error') {

@@ -11,10 +11,10 @@
  * and the html module.
  */
 define([
-    'q',
+    'bluebird',
     'kb.html'
 ],
-    function (q, html) {
+    function (Promise, html) {
         'use strict';
 
         var widget = function (config) {
@@ -42,7 +42,7 @@ define([
             // API
 
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -51,7 +51,7 @@ define([
             }
 
             function start(params) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     var improvements = [
                         'using the html module to compose html functionally',
                         'using html functions to generate complex html pieces',

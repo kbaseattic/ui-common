@@ -1,5 +1,5 @@
-define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'postal'],
-  function(nunjucks, $, Q, Session, Utils, Postal) {
+define(['nunjucks', 'jquery', 'bluebird', 'kb.session', 'kb.utils', 'postal'],
+  function(nunjucks, $, Promise, Session, Utils, Postal) {
     "use strict";
     var BaseWidget = Object.create({}, {
 
@@ -273,7 +273,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'postal'],
 
       refresh: {
         value: function() {
-          return Q.Promise(function (resolve, reject, notify) {
+          return new Promise(function (resolve, reject, notify) {
             if (!this.refreshTimer) {
               this.refreshTimer = window.setTimeout(function() {
                 this.refreshTimer = null;
@@ -337,25 +337,10 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'postal'],
         }
       },
 
-     
-      promise: {
-        value: function(client, method, arg1) {
-          var def = Q.defer();
-          client[method](arg1,
-            function(result) {
-              def.resolve(result);
-            },
-            function(err) {
-              def.reject(err);
-            });
-          return def.promise;
-        }
-      },
-
       setInitialState: {
         value: function(options) {
           // The base method just resolves immediately (well, on the next turn.) 
-          return Q.Promise(function (resolve, reject, notify) {
+          return new Promise(function (resolve, reject, notify) {
             resolve();
           });
         }

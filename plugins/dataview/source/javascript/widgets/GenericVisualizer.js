@@ -7,7 +7,7 @@
  */
 define([
     'jquery',
-    'q',
+    'bluebird',
     'kb.service.workspace',
     'kb.html',
     'kb.runtime',
@@ -15,7 +15,7 @@ define([
     'kb_types',
     'kb.widget.kbwidgetadapter'
 ],
-    function ($, q, Workspace, html, R, APIUtils, Types, KBWidgetAdapter) {
+    function ($, Promise, Workspace, html, R, APIUtils, Types, KBWidgetAdapter) {
         "use strict";
 
 
@@ -65,12 +65,12 @@ define([
             // params.workspaceURL = R.getConfig('services.workspace.url');
             // params.authToken = R.getAuthToken();
 
-            return q.Promise(function (resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 var workspace = new Workspace(R.getConfig('services.workspace.url'), {
                     token: R.getAuthToken()
                 }),
                     objectRefs = [{ref: params.workspaceId + '/' + params.objectId}];
-                q(workspace.get_object_info_new({
+                Promise.resolve(workspace.get_object_info_new({
                     objects: objectRefs,
                     ignoreErrors: 1,
                     includeMetadata: 1
@@ -191,13 +191,13 @@ define([
             // Widget Lifecycle Interface
 
             function init(cfg) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     config = cfg;
                     resolve();
                 });
             }
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     $container = $(container);
@@ -207,7 +207,7 @@ define([
             }
 
             function start(params) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     var newParams;
                     makeWidget(params)
                         .then(function (result) {
@@ -239,7 +239,7 @@ define([
                 });
             }
             function stop() {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     if (theWidget && theWidget.stop) {
                         theWidget.stop()
                             .then(function () {
@@ -255,7 +255,7 @@ define([
                 });
             }
             function detach() {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                      if (theWidget && theWidget.detach) {
                         theWidget.detach()
                             .then(function () {
@@ -271,7 +271,7 @@ define([
                 });
             }
             function destroy() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                      if (theWidget && theWidget.destroy) {
                         theWidget.destroy()
                             .then(function () {

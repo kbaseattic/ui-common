@@ -15,13 +15,13 @@
 define([
     'jquery',
     'underscore',
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb.html',
     'kb.service.workspace',
     'kb.utils.api',
     'kb_types'
-], function ($, _, q, R, html, Workspace, APIUtils, Types) {
+], function ($, _, Promise, R, html, Workspace, APIUtils, Types) {
     'use strict';
     
         function findMapping(type, params) {
@@ -53,7 +53,7 @@ define([
                 params.workspaceURL = R.getConfig('services.workspace.url');
                 params.authToken = R.getAuthToken();
 
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     var workspaceClient = new Workspace(R.getConfig('services.workspace.url'), {
                         token: R.getAuthToken()
                     });
@@ -136,7 +136,7 @@ define([
             var title = config.title;
 
             function init() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     // Init cannot be used to create the widget, because
                     // we don't even know what it is yet!
                     require([module], function () {
@@ -149,7 +149,7 @@ define([
                 });
             }
             function attach(node) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     // Attach can only be used to create the DOM structures to be
                     // later used. Our widget cannot be created yet because we
                     // don't yet have params.
@@ -171,7 +171,7 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     // Ah, so here we can create the widget!
                     
                     makeWidget(params)
@@ -198,23 +198,23 @@ define([
                 });
             }
             function run(params) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function stop() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
            
             function detach() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function destroy() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }

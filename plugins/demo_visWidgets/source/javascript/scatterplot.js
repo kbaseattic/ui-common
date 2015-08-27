@@ -7,9 +7,9 @@
  */
 define([
     'kb.runtime',
-    'q',
+    'bluebird',
     'kb_widget_vis_scatterPlot'],
-    function (R, q) {
+    function (R, Promise) {
         'use strict';
         function widget(config) {
             var mount, container;
@@ -58,12 +58,12 @@ define([
 
             }
             function init(config) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -76,18 +76,18 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function stop(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
 
                     resolve();
                 });
             }
             function detach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
 
                     resolve();
                 });

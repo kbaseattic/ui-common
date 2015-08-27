@@ -8,7 +8,7 @@
 define([
     'kb.runtime',
     'jquery',
-    'q',
+    'bluebird',
     'kb.service.workspace',
     'kb.service.fba',
     'kb_widget_dataview_modeling_objects',
@@ -24,7 +24,7 @@ define([
     'kb.jquery.helper-plugins',
     'datatables_bootstrap'
 ],
-    function (R, $, Q, Workspace, FBA, KBObjects) {
+    function (R, $, Promise, Workspace, FBA, KBObjects) {
         'use strict';
         $.KBWidget({
             name: "kbaseTabTable",
@@ -89,7 +89,7 @@ define([
                     token: R.getAuthToken()
                 });
 
-                Q(this.workspace.get_object_info_new({objects: [param], includeMetadata: 1}))
+                Promise.resolve(this.workspace.get_object_info_new({objects: [param], includeMetadata: 1}))
                     .then(function (res) {
                         self.obj.setMetadata(res[0]);
 
@@ -122,7 +122,7 @@ define([
                     var param = {ref: input.ws + '/' + input.obj};
                 }
 
-                Q(this.workspace.get_objects([param]))
+                Promise.resolve(this.workspace.get_objects([param]))
                     .then(function (data) {
                         var setMethod = self.obj.setData(data[0].data);
 
@@ -159,7 +159,7 @@ define([
                     }
 
                     // get human readable info from workspaces
-                    return Q(self.workspace.get_object_info_new({objects: refs}))
+                    return new Promise.resolve(self.workspace.get_object_info_new({objects: refs}))
                         .then(function (data) {
                             refs.forEach(function (ref, i) {
                                 // if (ref in referenceLookup) return
@@ -440,21 +440,21 @@ define([
                 };
 
                 this.getBiochemReaction = function (id) {
-                    return Q(this.fba.get_reactions({reactions: [id]}))
+                    return new Promise.resolve(this.fba.get_reactions({reactions: [id]}))
                         .then(function (data) {
                             return data[0];
                         });
                 };
 
                 this.getBiochemCompound = function (id) {
-                    return Q(this.fba.get_compounds({compounds: [id]}))
+                    return new Promise.resolve(this.fba.get_compounds({compounds: [id]}))
                         .then(function (data) {
                             return data[0];
                         });
                 };
 
                 this.getBiochemCompounds = function (ids) {
-                    return Q(this.fba.get_compounds({compounds: ids}));
+                    return new Promise.resolve(this.fba.get_compounds({compounds: ids}));
                 };
 
                 /* TODO: replace these remote calls with locally installed images. */
@@ -504,7 +504,7 @@ define([
                     }
 
                     var cpd_ids = cpds.left.concat(cpds.right);
-                    Q(this.fba.get_compounds({compounds: cpd_ids}))
+                    Promise.resolve(this.fba.get_compounds({compounds: cpd_ids}))
                     .then(function (d) {
                         var map = {};
                         for (var i in d) {
@@ -529,7 +529,7 @@ define([
                 }
 
                 function getLink(ref) {
-                    return Q(self.workspace.get_object_info_new({objects: [{ref: ref}]}))
+                    return new Promise.resolve(self.workspace.get_object_info_new({objects: [{ref: ref}]}))
                         .then(function (data) {
                             var a = data[0];
                             return {url: a[7] + '/' + a[1], ref: a[6] + '/' + a[0] + '/' + a[4]};

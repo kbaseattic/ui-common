@@ -9,9 +9,9 @@ define([
     'kb.runtime',
     'kb.html',
     'kb_narrativeManager',
-    'q'
+    'bluebird'
 ],
-    function (R, html, NarrativeManagerService, Q) {
+    function (R, html, NarrativeManagerService, Promise) {
         'use strict';
 
         var NarrativeManager = NarrativeManagerService();
@@ -41,7 +41,7 @@ define([
         }
 
         function startOrCreateEmptyNarrative() {
-            return Q.Promise(function (resolve, fail) {
+            return new Promise(function (resolve, fail) {
                 NarrativeManager.detectStartSettings(
                     function (result) {
                         if (result.last_narrative) {
@@ -84,7 +84,7 @@ define([
         }
 
         function createNewNarrative(params) {
-            return Q.promise(function (resolve, fail) {
+            return new Promise(function (resolve, fail) {
                 params = params || {};
                 if (params.app && params.method) {
                     fail("Must provide no more than one of the app or method params");

@@ -12,14 +12,14 @@
  */
 define([
     'jquery',
+    'bluebird',
     'kb.runtime',
     'kb.html',
     'kb.service.workspace',
     'kb.utils',
-    
     'kb.jquery.widget',
 ],
-    function ($, R, html, WorkspaceService, Utils) {
+    function ($, Promise, R, html, WorkspaceService, Utils) {
         'use strict';
         $.KBWidget({
             name: "kbaseDownloadPanel",
@@ -144,11 +144,11 @@ define([
                 var Workspace = new WorkspaceService(this.wsUrl, {
                     token: this.token
                 });
-                Utils.promise(Workspace, 'get_object_info_new', {
+                Promise.resolve(Workspace.get_object_info_new({
                     objects: [{
                             ref: this.wsId + '/' + this.objId
                         }]
-                })
+                }))
                     .then(function (objInfoList) {
                         self.objId = objInfoList[0][1];
                         self.type = objInfoList[0][2].split('-')[0];

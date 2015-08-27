@@ -9,7 +9,7 @@
 
 define([
     'jquery',
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb.dom',
     'kb.html',
@@ -19,7 +19,7 @@ define([
     'kb.narrative',
     'datatables_bootstrap'
 ],
-    function ($, q, R, DOM, html, WorkspaceClient, APIUtils, Utils, Narrative) {
+    function ($, Promise, R, DOM, html, WorkspaceClient, APIUtils, Utils, Narrative) {
         'use strict';
 
         var widget = function (config) {
@@ -56,8 +56,8 @@ define([
 
 
             function getData() {
-                return q.Promise(function (resolve, reject) {
-                    q(workspaceClient.list_workspace_info({
+                return new Promise(function (resolve, reject) {
+                    Promise.resolve(workspaceClient.list_workspace_info({
                         showDeleted: 0,
                         excludeGlobal: 1,
                         owners: [R.getUsername()]
@@ -77,7 +77,7 @@ define([
                             // We should now have the list of recently active narratives.
                             // Now we sort and limit the list.
                             // Now get the workspace details.
-                            q(workspaceClient.list_objects({
+                            Promise.resolve(workspaceClient.list_objects({
                                 ids: workspaceList,
                                 includeMetadata: 1
                             }))
@@ -111,13 +111,13 @@ define([
             }
 
             function init(config) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
 
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
 
                     container = DOM.createElement('div');
@@ -129,7 +129,7 @@ define([
             }
 
             function start(params) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
 
                     /* DOC: rendering
                      * Here we have a simple rendering implementation!
@@ -156,27 +156,27 @@ define([
             }
 
             function run(params) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     DOM.setHTML(container, 'Hi, it is now ' + (new Date()));
                     resolve();
                 });
             }
 
             function stop() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
 
             function detach() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     DOM.remove(mount, container);
                     resolve();
                 });
             }
 
             function destroy() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }

@@ -12,7 +12,7 @@
 
 
 
-define(['q'], function (Q) {
+define(['bluebird'], function (Promise) {
     "use strict";
 
     /**

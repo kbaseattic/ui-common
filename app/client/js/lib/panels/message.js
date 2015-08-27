@@ -5,7 +5,7 @@
  browser: true,
  white: true
  */
-define(['kb.html', 'kb.session', 'q'], function (html, Session, Q) {
+define(['kb.html', 'kb.session', 'bluebird'], function (html, Session, Promise) {
     'use strict';
 
     function messagePanel() {
@@ -35,7 +35,7 @@ define(['kb.html', 'kb.session', 'q'], function (html, Session, Q) {
             }
 
             function attach(node) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
 
                     mount = node;
                     container = document.createElement('div');
@@ -46,18 +46,18 @@ define(['kb.html', 'kb.session', 'q'], function (html, Session, Q) {
                 });
             }
             function start(params) {
-                return Q.Promise(function (resolve) {                    
+                return new Promise(function (resolve) {                    
                     container.innerHTML = render(params.id);
                     resolve();
                 });
             }
             function stop(node) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function detach(node) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }

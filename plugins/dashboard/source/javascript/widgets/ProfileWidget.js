@@ -1,5 +1,5 @@
-define(['kb_widget_dashboard_base', 'kb_user_profile', 'kb.service.user_profile', 'kb.session', 'kb.appstate', 'kb.utils', 'q'],
-        function (DashboardWidget, UserProfile, UserProfileService, Session, AppState, Utils, Q) {
+define(['kb_widget_dashboard_base', 'kb_user_profile', 'kb.service.user_profile', 'kb.session', 'kb.appstate', 'kb.utils', 'bluebird'],
+        function (DashboardWidget, UserProfile, UserProfileService, Session, AppState, Utils, Promise) {
             "use strict";
             var widget = Object.create(DashboardWidget, {
                 init: {
@@ -31,7 +31,7 @@ define(['kb_widget_dashboard_base', 'kb_user_profile', 'kb.service.user_profile'
                 },
                 setInitialState: {
                     value: function (options) {
-                        return Q.Promise(function (resolve, reject, notify) {
+                        return new Promise(function (resolve, reject, notify) {
                             if (!Session.isLoggedIn()) {
                                 resolve();
                                 return;

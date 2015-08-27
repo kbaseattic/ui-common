@@ -14,11 +14,11 @@ define([
     'kb.runtime',
     'kb.service.workspace',
     'kb.widget.navbar',
-    'q',
+    'bluebird',
     'underscore',
     'kb_types'
 ],
-    function ($, DataviewWidget, APIUtils, Utils, html, R, WorkspaceService, Navbar, Q, _, types) {
+    function ($, DataviewWidget, APIUtils, Utils, html, R, WorkspaceService, Navbar, Promise, _, types) {
         'use strict';
         var widget = Object.create(DataviewWidget, {
             init: {
@@ -258,10 +258,10 @@ define([
                     var to = narrativeWs.id + '';
                     var name = this.getState('object.name');
 
-                    Utils.promise(this.workspaceClient, 'copy_object', {
+                    Promise.resolve(this.workspaceClient.copy_object({
                         from: {ref: from},
                         to: {wsid: to, name: name}
-                    })
+                    }))
                         .then(function (data) {
                             if (data) {
 
@@ -290,10 +290,10 @@ define([
                 value: function () {
 
                     // Note: we can just get the object history in one call :) -mike
-                    Utils.promise(this.workspaceClient, 'get_object_history',
-                        {ref: APIUtils.makeWorkspaceObjectRef(
-                                this.getState('workspace.id'),
-                                this.getState('object.id'))})
+                    Promise.resolve(this.workspaceClient.get_object_history({
+                        ref: APIUtils.makeWorkspaceObjectRef(
+                            this.getState('workspace.id'),
+                            this.getState('object.id'))}))
                         .then(function (dataList) {
                             var versions = dataList.map(function (x) {
                                 return APIUtils.object_info_to_object(x);
@@ -313,8 +313,7 @@ define([
             },
             checkRefCountAndFetchOutgoingReferences: {
                 value: function () {
-                    Utils.promise(this.workspaceClient,
-                        'get_object_provenance', [{ref: this.getObjectRef()}])
+                    Promise.resolve(this.workspaceClient.get_object_provenance([{ref: this.getObjectRef()}]))
                         .then(function (provdata) {
                             var refs = provdata[0].refs;
                             var prov = provdata[0].provenance;
@@ -346,8 +345,7 @@ define([
                     for (var i = 0; i < reflist.length; i++) {
                         objids.push({ref: reflist[i]});
                     }
-                    Utils.promise(this.workspaceClient, 'get_object_info_new',
-                        {objects: objids, ignoreErrors: 1})
+                    Promise.resolve(this.workspaceClient.get_object_info_new({objects: objids, ignoreErrors: 1}))
                         .then(function (dataList) {
                             var refs = [];
                             if (dataList) {
@@ -371,9 +369,7 @@ define([
             },
             checkRefCountAndFetchReferences: {
                 value: function () {
-                    Utils.promise(this.workspaceClient,
-                        'list_referencing_object_counts',
-                        [{ref: this.getObjectRef()}])
+                    Promise.resolve(this.workspaceClient.list_referencing_object_counts([{ref: this.getObjectRef()}]))
                         .then(function (sizes) {
                             if (sizes[0] > 100) {
                                 this.setState('too_many_inc_refs', true);
@@ -409,9 +405,7 @@ define([
             },
             fetchReferences: {
                 value: function () {
-                    Utils.promise(this.workspaceClient, 'list_referencing_objects',
-                        [{ref: this.getObjectRef()}]
-                        )
+                    Promise.resolve(this.workspaceClient.list_referencing_objects([{ref: this.getObjectRef()}]))
                         .then(function (dataList) {
                             var refs = [];
                             if (dataList[0]) {
@@ -437,7 +431,8 @@ define([
                         var icon = types.getIcon({type: type});
 
                         var code = 0;
-                        for (var i = 0; i < type.length; code += type.charCodeAt(i++));
+                        for (var i = 0; i < type.length; code += type.charCodeAt(i++))
+                            ;
                         var colors = [
                             "#F44336",
                             "#E91E63",
@@ -471,7 +466,7 @@ define([
                                 i({class: 'fa-inverse fa-stack-1x ' + icon.classes.join(' ')})
                             ])
                         ]);
-                        
+
                         return logo;
                     } catch (err) {
                         console.error('When fetching icon config: ', err);
@@ -482,12 +477,12 @@ define([
             setInitialState: {
                 value: function () {
                     var widget = this;
-                    return Q.Promise(function (resolve, reject, notify) {
+                    return new Promise(function (resolve, reject, notify) {
                         if (this.getParam('sub')) {
                             this.setState('sub', this.getParam('sub'));
                         }
 
-                        Q(this.workspaceClient.get_object_info_new({
+                        Promise.resolve(this.workspaceClient.get_object_info_new({
                             objects: [{
                                     ref: APIUtils.makeWorkspaceObjectRef(this.getParam('workspaceId'), this.getParam('objectId'), this.getParam('objectVersion'))
                                 }],
@@ -510,10 +505,10 @@ define([
                                     // The narrative this lives in.
                                     var workspaceId = this.getParam('workspaceId');
                                     var isIntegerId = /^\d+$/.test(workspaceId);
-                                    Utils.promise(this.workspaceClient, 'get_workspace_info', {
+                                    Promise.resolve(this.workspaceClient.get_workspace_info({
                                         id: isIntegerId ? workspaceId : null,
                                         workspace: isIntegerId ? null : workspaceId
-                                    })
+                                    }))
                                         .then(function (data) {
                                             this.setState('workspace', APIUtils.workspace_metadata_to_object(data));
 
@@ -527,9 +522,9 @@ define([
                                             this.checkRefCountAndFetchOutgoingReferences();
 
                                             // Other narratives this user has.
-                                            Utils.promise(this.workspaceClient, 'list_workspace_info', {
+                                            Promise.resolve(this.workspaceClient.list_workspace_info({
                                                 perm: 'w'
-                                            })
+                                            }))
                                                 .then(function (data) {
                                                     var objects = data.map(function (x) {
                                                         return APIUtils.workspace_metadata_to_object(x);

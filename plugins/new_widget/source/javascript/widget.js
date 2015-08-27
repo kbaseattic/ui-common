@@ -1,11 +1,11 @@
-define(['q'], function (q) {
+define(['bluebird'], function Promise {
     'use strict';
     
     var widget = function (config) {
         var mount, container;
         
         function attach(node) {
-            return q.Promise(function (resolve) {
+            return new Promise(function (resolve) {
                 mount = node;
                 container = document.createElement('div');
                 mount.appendChild(container);
@@ -14,7 +14,7 @@ define(['q'], function (q) {
         }
         
         function start(params) {
-            return q.Promise(function (resolve) {
+            return new Promise(function (resolve) {
                 container.innerHTML = 'Hi, I am a widget';
             });
         }

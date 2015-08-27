@@ -5,7 +5,7 @@
  white: true
  browser: true
  */
-define(['jquery', 'q'], function ($, q) {
+define(['jquery', 'bluebird'], function ($, Promise) {
     'use strict';
     function getJSON(arg) {
         if (arg.sync) {
@@ -31,7 +31,7 @@ define(['jquery', 'q'], function ($, q) {
             console.log('here');
             return returnData;
         } else {
-            return q($.get('/data/' + arg.path + '/' + arg.file + '.json'));
+            return new Promise.resolve($.get('/data/' + arg.path + '/' + arg.file + '.json'));
         }
     }
 

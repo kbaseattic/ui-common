@@ -16,7 +16,7 @@
  */
 define([
     'jquery',
-    'q',
+    'bluebird',
     'underscore',
     'postal',
     'kb.html',
@@ -25,7 +25,7 @@ define([
     'kb.config',
     'kb.router'
 ],
-    function ($, Q, _, Postal, html, AppState, Session, Config, Router) {
+    function ($, Promise, _, Postal, html, AppState, Session, Config, Router) {
         'use strict';
         var factory = function () {
             
@@ -122,7 +122,7 @@ define([
             }
             // TODO: do the content rendering here...
             function mount(mountName, content, mounted) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     var mountPoint = mounts[mountName];
                     if (!mountPoint) {
                         resolve();
@@ -255,14 +255,14 @@ define([
 
             function showPanel2(mountPointName, routed) {
                 // stop the old one
-                return Q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     var mountPoint = mounts[mountPointName];
                     if (!mountPoint) {
                         reject('Sorry, no mount point named ' + mountPointName);
                     }
 
                     // Stop and unmount current panel.
-                    Q.Promise(function (resolve, reject) {
+                    (new Promise(function (resolve, reject) {
                         if (mountPoint.mounted) {
                             var widget = mountPoint.mounted.widget;
                             widget.stop()
@@ -283,7 +283,7 @@ define([
                         } else {
                             resolve();
                         }
-                    })
+                    }))
                         .then(function () {
                             // Create new mount.
                             var newMount = {
@@ -321,14 +321,14 @@ define([
 
             function showPanel3(mountPointName, routed) {
                 // stop the old one
-                return Q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     var mountPoint = mounts[mountPointName];
                     if (!mountPoint) {
                         reject('Sorry, no mount point named ' + mountPointName);
                     }
 
                     // Stop and unmount current panel.
-                    Q.Promise(function (resolve, reject) {
+                    (new Promise(function (resolve, reject) {
                         if (mountPoint.mounted) {
                             var widget = mountPoint.mounted.widget;
                             widget.stop()
@@ -349,7 +349,7 @@ define([
                         } else {
                             resolve();
                         }
-                    })
+                    }))
                         .then(function () {
                             var panelWidget;
                             if (routed.route.panelFactory) {
@@ -408,7 +408,7 @@ define([
             // This is a more general purpose 
             function doRedirectHandler(routed) {
                 // 
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     var module = routed.route.module;
                     var method = routed.route.method;
                     
@@ -421,7 +421,7 @@ define([
 
             function show2(mountPointName, toMount) {
                 // stop the old one
-                return Q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     var mountPoint = mounts[mountPointName];
                     if (!mountPoint) {
                         reject('Sorry, no mount point named ' + mountPointName);

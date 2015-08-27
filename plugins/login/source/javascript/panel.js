@@ -10,9 +10,9 @@ define([
     'kb.html',
     'kb.session',
     'jquery',
-    'q'
+    'bluebird'
 ],
-    function (R, html, Session, $, Q) {
+    function (R, html, Session, $, Promise) {
         'use strict';
 
         var panelId = html.genId();
@@ -183,13 +183,13 @@ define([
             // API
             
             function init(config) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
 
             function attach(node) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     $container = $(container);
@@ -201,19 +201,19 @@ define([
             }
 
             function start(params) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
 
             function stop() {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
 
             function detach() {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     eventMan.reset($container);
                     mount.removeChild(container);
                     resolve();

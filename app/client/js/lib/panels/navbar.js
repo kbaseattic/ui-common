@@ -9,9 +9,9 @@ define([
     'jquery',
     'kb.runtime',
     'kb.html',
-    'q',
+    'bluebird',
     'kb.session'],
-    function ($, R, html, Q, Session) {
+    function ($, R, html, Promise, Session) {
         'use strict';
         // ACTUALLY: a widget
         /*
@@ -42,7 +42,7 @@ define([
             var $mount = null;
             var $container = null;
             function attach(node) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     if ($mount) {
                         throw new Error('Already attached');
                     }
@@ -57,7 +57,7 @@ define([
                 });
             }
             function reattach() {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     detach()
                         .then(function () {
                             return stop();
@@ -77,7 +77,7 @@ define([
                 });
             }
             function detach() {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     detachEvents();
                     // $mount.empty();
                     $container.remove();
@@ -90,7 +90,7 @@ define([
             var subscriptions = [];
             var subscriptions2 = [];
             function start() {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     subscribeAll();
                     resolve();
                 });
@@ -171,7 +171,7 @@ define([
                 });
             }
             function stop() {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     unsubscribeAll();
                     resolve();
                 });

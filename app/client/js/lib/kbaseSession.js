@@ -5,8 +5,8 @@
  * TODO: just create as a normal object, and the runtime will take care of creating
  * a singleton...
  */
-define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
-    function ($, Q, Cookie, Config, Logger) {
+define(['jquery', 'bluebird', 'kb.cookie', 'kb.config', 'kb.logger'],
+    function ($, Promise, Cookie, Config, Logger) {
         'use strict';
         var Session = Object.create({}, {
             // Property Constants
@@ -472,7 +472,7 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
              */
             login: {
                 value: function (options) {
-                    return Q.Promise(function (resolve, reject) {
+                    return new Promise(function (resolve, reject) {
                         // Uses the options args style, with success and error callbacks.
                         // The top layer of kbase widgets do not have Q available.
 
@@ -568,7 +568,7 @@ define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
             
             logout: {
                 value: function () {
-                    return Q.Promise(function (resolve) {
+                    return new Promise(function (resolve) {
                         this.removeSession();
                         resolve();
                     }.bind(this));

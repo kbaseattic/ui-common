@@ -48,9 +48,10 @@ define([
     'kb.jquery.widget',
     'd3',
     'kb.runtime',
+    'kb.html',
     'kb.service.cdmi',
     'kb_widget_dataview_genome_contigBrowserButtons'
-], function ($, _W, d3, R, CDMI) {
+], function ($, _W, d3, R, html, CDMI) {
     'use strict';
     $.KBWidget({
         name: "KBaseMultiContigBrowser",
@@ -132,7 +133,7 @@ define([
 
             this.$messagePane = $("<div/>");
             this.$elem.append(this.$messagePane);
-            this.showMessage("<center><img src='" + this.options.loadingImage + "'/> loading contig details </center>");
+            this.showMessage(html.loading('loading contig details'));
 
             var $maindiv = $('<div class="row"/>');
 
@@ -1155,7 +1156,7 @@ define([
             if (doneLoading)
                 this.hideMessage();
             else
-                this.showMessage("<img src='" + this.options.loadingImage + "'/>");
+                this.showMessage(html.loading());
         },
         showMessage: function (message) {
             // kbase panel now does this for us, should probably remove this

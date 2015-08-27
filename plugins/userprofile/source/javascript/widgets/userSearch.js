@@ -1,10 +1,10 @@
 define([
-    'q',
+    'bluebird',
     'kb_widget_userProfile_base', 
     'kb.service.user_profile', 
     'kb.runtime'
 ],
-    function (Q, SocialWidget, UserProfileService, R) {
+    function (Promise, SocialWidget, UserProfileService, R) {
         "use strict";
         var widget = Object.create(SocialWidget, {
             init: {
@@ -58,7 +58,7 @@ define([
                             if (widget.params.searchText && widget.params.searchText.length < 3) {
                                 widget.refresh().done();
                             } else {
-                                Q(widget.userProfileClient.filter_users({
+                                Promise.resolve(widget.userProfileClient.filter_users({
                                     filter: widget.params.searchText
                                 }))
                                     .then(function (users) {

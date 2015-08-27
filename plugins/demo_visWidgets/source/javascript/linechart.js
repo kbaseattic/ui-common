@@ -7,9 +7,9 @@
  */
 define([
     'kb.runtime',
-    'q',
+    'bluebird',
     'kb_widget_vis_lineChart'],
-    function (R, q) {
+    function (R, Promise) {
         'use strict';
         function widget(config) {
             var mount, container;
@@ -110,12 +110,12 @@ define([
 
             }
             function init(confi) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -128,17 +128,17 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function stop() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function detach() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }

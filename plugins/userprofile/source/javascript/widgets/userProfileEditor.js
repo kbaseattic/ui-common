@@ -1,13 +1,13 @@
 define([
     'nunjucks',
     'jquery',
-    'q',
+    'bluebird',
     'kb.utils',
     'kb_widget_userProfile_base',
     'kb_user_profile',
     'kb.runtime'
 ],
-    function (nunjucks, $, Q, Utils, SocialWidget, UserProfile, R) {
+    function (nunjucks, $, Promise, Utils, SocialWidget, UserProfile, R) {
         "use strict";
         var UserProfileWidget = Object.create(SocialWidget, {
             init: {
@@ -101,7 +101,7 @@ define([
              */
             setInitialState: {
                 value: function (options) {
-                    return Q.Promise(function (resolve, reject, notify) {
+                    return new Promise(function (resolve, reject, notify) {
                         if (!R.isLoggedIn()) {
                             // We don't even try to get the profile if the user isn't 
                             // logged in.

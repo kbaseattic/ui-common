@@ -1,7 +1,7 @@
 define([
     'nunjucks', 
     'jquery', 
-    'q', 
+    'bluebird', 
     'kb.html',
     'kb.runtime', 
     'kb.session', 
@@ -9,7 +9,7 @@ define([
     'kb_user_profile', 
     'postal'
 ],
-    function (nunjucks, $, Q, html, R, Session, Utils, UserProfile, Postal) {
+    function (nunjucks, $, Promise, html, R, Session, Utils, UserProfile, Postal) {
         "use strict";
         var DashboardWidget = Object.create({}, {
             // The init function interfaces this object with the caller, and sets up any 
@@ -521,7 +521,7 @@ define([
             },
             refresh: {
                 value: function () {
-                    return Q.Promise(function (resolve, reject, notify) {
+                    return new Promise(function (resolve, reject, notify) {
                         this.render();
                         resolve();
                     }.bind(this));
@@ -614,7 +614,7 @@ define([
             setInitialState: {
                 value: function (options) {
                     // The base method just resolves immediately (well, on the next turn.) 
-                    return Q.Promise(function (resolve, reject, notify) {
+                    return new Promise(function (resolve, reject, notify) {
                         resolve();
                     });
                 }

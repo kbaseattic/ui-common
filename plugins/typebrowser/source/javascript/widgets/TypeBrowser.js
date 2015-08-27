@@ -7,13 +7,13 @@
  */
 define([
     'jquery',
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb.html',
     'kb.service.workspace',
     'kb_types',
     'datatables_bootstrap'
-], function ($, q, R, html, Workspace, Types) {
+], function ($, Promise, R, html, Workspace, Types) {
     'use strict';
 
     function widget() {
@@ -22,12 +22,12 @@ define([
         var tableId;
 
         function renderer() {
-            return q.Promise(function (resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 var workspace = new Workspace(R.getConfig('services.workspace.url'), {
                     token: R.getAuthToken()
                 });
                 var a = html.tag('a');
-                q(workspace.list_all_types({
+                Promise.resolve(workspace.list_all_types({
                     with_empty_modules: 1
                 }))
                     .then(function (data) {
@@ -52,11 +52,11 @@ define([
                                 typeRecords[typeId] = {
                                     type: type
                                 };
-                                getinfo.push(q(workspace.get_type_info(typeId)));
+                                getinfo.push(Promise.resolve(workspace.get_type_info(typeId)));
                             });
                         });
 
-                        q.all(getinfo)
+                        Promise.all(getinfo)
                             .then(function (results) {
                                 results.forEach(function (result) {
                                     // console.log(result);
@@ -131,13 +131,13 @@ define([
 
         // API
         function init(config) {
-            return q.Promise(function (resolve) {
+            return new Promise(function (resolve) {
                 resolve();
             });
         }
 
         function attach(node) {
-            return q.Promise(function (resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 mount = node;
                 container = document.createElement('div');
                 $container = $(container);
@@ -169,17 +169,17 @@ define([
         }
 
         function start(params) {
-            return q.Promise(function (resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 resolve();
             });
         }
         function stop() {
-            return q.Promise(function (resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 resolve();
             });
         }
         function detach() {
-            return q.Promise(function (resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 resolve();
             });
         }

@@ -10,7 +10,7 @@
  */
 define([
     'jquery',
-    'q',
+    'bluebird',
     'kb.service.workspace',
     'kb.runtime',
     'kb.html',
@@ -19,7 +19,7 @@ define([
     'datatables_bootstrap',
     'kb.jquery.authenticatedwidget'
 ],
-    function ($, Q, Workspace, R, html, Heatmap) {
+    function ($, Promise, Workspace, R, html, Heatmap) {
         'use strict';
         $.KBWidget({
             name: 'AbundanceDataHeatmap',

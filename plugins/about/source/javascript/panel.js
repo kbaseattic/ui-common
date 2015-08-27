@@ -7,13 +7,13 @@
  */
 define([
     'jquery',
-    'q',
+    'bluebird',
     'knockout',     
     'kb.html', 
     'kb.runtime', 
     'kb.messaging'
 ], 
-    function ($, Q, ko, html, R, Messaging) {
+    function ($, Promise, ko, html, R, Messaging) {
     'use strict';
 
     var msgMan = Object.create(Messaging.MessageManager).init();
@@ -94,12 +94,12 @@ define([
         }
         // Widget API
         function init() {
-            return Q.Promise(function (resolve) {
+            return new Promise(function (resolve) {
                resolve();
             });
         }
         function attach(node) {
-            return Q.Promise(function (resolve) {
+            return new Promise(function (resolve) {
                 mount = node;
                 container = document.createElement('div');
                 mount.appendChild(container);
@@ -109,20 +109,20 @@ define([
             });
         }
         function detach() {
-            return Q.Promise(function (resolve) {
+            return new Promise(function (resolve) {
                 mount.removeChild(container);
                 container = null;
                 resolve();
             });
         }
         function start(params) {
-            return Q.Promise(function (resolve) {
+            return new Promise(function (resolve) {
                 ko.applyBindings(null, container);
                 resolve();
             });
         }
         function stop() {
-            return Q.Promise(function (resolve) {
+            return new Promise(function (resolve) {
                 ko.cleanNode(container);
                 resolve();
             });

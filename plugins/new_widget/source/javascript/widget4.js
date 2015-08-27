@@ -11,13 +11,13 @@
  * and the html module.
  */
 define([
-    'q',
+    'bluebird',
     'kb.html',
     'kb.runtime',
     'kb.utils.api',
     'kb.service.workspace'
 ],
-    function (q, html, runtime, utils, Workspace) {
+    function (Promise, html, runtime, utils, Workspace) {
         'use strict';
 
         var widget = function (config) {
@@ -45,7 +45,7 @@ define([
             // API
 
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -89,7 +89,7 @@ define([
             }
 
             function start(params) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     var workspace = new Workspace(runtime.getConfig('services.workspace.url'), {
                         token: runtime.getAuthToken()
                     });
@@ -100,7 +100,7 @@ define([
                         name: params.objectName,
                         ver: params.objectVersion
                     };
-                    q(workspace.get_object_info_new({
+                    Promise.resolve(workspace.get_object_info_new({
                         objects: [objectIdentity],
                         includeMetadata: 1,
                         ignoreErrors: 0

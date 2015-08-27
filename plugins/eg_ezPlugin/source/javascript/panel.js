@@ -6,7 +6,7 @@
  white: true
  */
 define([
-    'q',
+    'bluebird',
     'kb_panelBases_widgetPanel',
     'kb.dom',
     'kb.html',
@@ -15,7 +15,7 @@ define([
     'kb.runtime',
     'kb_widget_eg_ezPanel_myDataWidget',
     'kb_widget_eg_ezPanel_dataWidget'
-], function (q, WidgetPanel, DOM, html, SimpleWidget, BaseWidget, R, myDataWidget, dataWidget) {
+], function (Promise, WidgetPanel, DOM, html, SimpleWidget, BaseWidget, R, myDataWidget, dataWidget) {
     'use strict';
     
     var myWidget1 = Object.create(SimpleWidget, {
@@ -61,7 +61,7 @@ define([
         },
         onAttach: {
             value: function (container) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     var self = this;
                     window.setTimeout(function () {
                         self.container.innerHTML = self.content;

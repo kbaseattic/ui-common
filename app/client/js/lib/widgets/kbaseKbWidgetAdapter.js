@@ -8,10 +8,10 @@
 define([
     'jquery',
     'underscore',
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb.html'
-], function ($, _, q, R, html) {
+], function ($, _, Promise, R, html) {
     'use strict';
     
         function createBSPanel($node, title) {
@@ -38,7 +38,7 @@ define([
             var title = config.title;
 
             function init() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     require([module], function () {
                         // these are jquery widgets, so they are just added to the
                         // jquery namespace.
@@ -49,7 +49,7 @@ define([
                 });
             }
             function attach(node) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -68,7 +68,7 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     // The config is supplied by the caller, but we add 
                     // standard properties here.
                     /* TODO: be more generic */
@@ -90,23 +90,23 @@ define([
                 });
             }
             function run(params) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function stop() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
            
             function detach() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function destroy() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }

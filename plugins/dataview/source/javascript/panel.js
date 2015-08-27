@@ -7,7 +7,7 @@
  */
 define([
     'jquery',
-    'q',
+    'bluebird',
     'kb.html',
     'kb.runtime',
     'kb.widget.widgetadapter',
@@ -17,7 +17,7 @@ define([
     'kb_widget_dataview_provenance',
     'kb_widget_dataview_download'
 ],
-    function ($, q, html, R, widgetAdapter, kbWidgetAdapter, GenericVisualizer) {
+    function ($, Promise, html, R, widgetAdapter, kbWidgetAdapter, GenericVisualizer) {
         'use strict';
 
         // handle subobjects, only allowed types!!  This needs to be refactored because it can depend on the base type!!!
@@ -59,7 +59,7 @@ define([
         }
 
         function renderPanel(params) {
-            return q.Promise(function (resolve) {
+            return new Promise(function (resolve) {
                 // Widgets
                 var widgets = [];
                 
@@ -126,13 +126,13 @@ define([
             var mount, container, $container, children = [];
             
             function init(config) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     return resolve();
                 })
             }
 
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -141,22 +141,22 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     renderPanel(params)
                         .then(function (rendered) {
                             container.innerHTML = rendered.content;
                             R.send('app', 'title', rendered.title);
                             // create widgets.
                             children = rendered.widgets;
-                            q.all(children.map(function (w) {
+                            Promise.all(children.map(function (w) {
                                 return w.widget.init(w.config);
                             }))
                                 .then(function () {
-                                    q.all(children.map(function (w) {
+                                    Promise.all(children.map(function (w) {
                                         return w.widget.attach($('#' + w.id).get(0));
                                     }))
                                         .then(function (results) {
-                                            q.all(children.map(function (w) {
+                                            Promise.all(children.map(function (w) {
                                                 return w.widget.start(params);
                                             }))
                                                 .then(function (results) {
@@ -189,13 +189,13 @@ define([
                 });
             }
             function stop() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
 
                 });
             }
             function detach() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }

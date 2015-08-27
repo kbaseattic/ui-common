@@ -6,13 +6,13 @@
  white: true
  */
 define([
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb.utils',
     'kb.utils.api',
     'kb.service.workspace'
 ],
-    function (Q, R, Utils, APIUtils, Workspace) {
+    function (Promise, R, Utils, APIUtils, Workspace) {
         'use strict';
         return Object.create({}, {
             init: {
@@ -45,8 +45,8 @@ define([
             getNarratives: {
                 value: function (cfg) {
                     // get all the narratives the user can see.
-                    return Q.promise(function (resolve, reject) {
-                        Utils.promise(this.workspaceClient, 'list_workspace_info', cfg.params)
+                    return new Promise(function (resolve, reject) {
+                        Promise.resolve(this.workspaceClient.list_workspace_info(cfg.params))
                             .then(function (data) {
                                 var workspaces = [], i, wsInfo;
                                 for (i = 0; i < data.length; i += 1) {
@@ -63,11 +63,11 @@ define([
                                 });
 
                                 // Now get the corresponding object metadata for each narrative workspace
-                                Utils.promise(this.workspaceClient, 'get_object_info_new', {
+                                Promise.resolve(this.workspaceClient.get_object_info_new({
                                     objects: objectRefs,
                                     ignoreErrors: 1,
                                     includeMetadata: 1
-                                })
+                                }))
                                     .then(function (data) {
                                         var narratives = [], i;
                                         for (i = 0; i < data.length; i += 1) {
@@ -105,14 +105,14 @@ define([
             },
             getPermissions: {
                 value: function (narratives) {
-                    return Q.promise(function (resolve, reject, notify) {
+                    return new Promise(function (resolve, reject, notify) {
                         var promises = narratives.map(function (narrative) {
-                            return Utils.promise(this.workspaceClient, 'get_permissions', {
+                            return Promise.resolve(this.workspaceClient.get_permissions({
                                 id: narrative.workspace.id
-                            });
+                            }));
                         }.bind(this));
                         var username = R.getUsername();
-                        Q.all(promises)
+                        Promise.all(promises)
                             .then(function (permissions) {
                                 var i, narrative;
                                 for (i = 0; i < permissions.length; i += 1) {
@@ -147,9 +147,9 @@ define([
             },
             getObject: {
                 value: function (workspaceId, objectId) {
-                    return Q.Promise(function (resolve, reject) {
+                    return new Promise(function (resolve, reject) {
                         var objectRefs = [{ref: workspaceId + '/' + objectId}];
-                        Q(this.workspaceClient.get_object_info_new({
+                        Promise.resolve(this.workspaceClient.get_object_info_new({
                             objects: objectRefs,
                             ignoreErrors: 1,
                             includeMetadata: 1
@@ -184,11 +184,11 @@ define([
             // from kbapi.js, along with possible bugs.
             translateRefs: {
                 value: function (reflist, links) {
-                    return Q.Promise(function (resolve, reject) {
+                    return new Promise(function (resolve, reject) {
                         var obj_refs = reflist.map(function (ref) {
                            return {ref: ref};
                         });
-                        Q(this.workspaceClient.get_object_info_new({
+                        Promise.resolve(this.workspaceClient.get_object_info_new({
                             objects: obj_refs,
                             ignoreErrors: 1,
                             includeMetadata: 1

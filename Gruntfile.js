@@ -40,7 +40,8 @@ module.exports = function (grunt) {
             src: 'dist/**/*'
         },
         {
-            name: 'q'
+            name: 'bluebird',
+            src: ['js/browser/bluebird.js']
         },
         {
             name: 'd3'

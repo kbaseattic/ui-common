@@ -9,10 +9,10 @@ define([
     'kb.html',
     'kb.session',
     'kb.runtime',
-    'q',
+    'bluebird',
     'jquery',
     'knockout'],
-    function (html, Session, R, Q, $, ko) {
+    function (html, Session, R, Promise, $, ko) {
         'use strict';
 
         // Panel wide communication bus...
@@ -22,7 +22,7 @@ define([
         function SearchService(serviceURL) {
             // Populate the categories from the search service.
             function getCategories() {
-                return Q($.get(serviceURL + 'categories'));
+                return new Promise.resolve($.get(serviceURL + 'categories'));
             }
 
             function getCategoryCount(query, category) {
@@ -33,8 +33,8 @@ define([
                     q: query
                 };
                 // we wrap the ajax promise because we need to trap the category
-                return Q.Promise(function (resolve, reject) {
-                    Q($.ajax({
+                return new Promise(function (resolve, reject) {
+                    Promoise.resolve($.ajax({
                         method: 'GET',
                         url: serviceURL + 'getResults',
                         data: queryOptions,
@@ -67,7 +67,7 @@ define([
             }
 
             function getFacetSearch(category) {
-                return Q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     // Encode facets.
                     // facet
 
@@ -113,7 +113,7 @@ define([
 
             var searchService = SearchService(R.getConfig('services.search.url'));
             function setupSearch(params) {
-                return Q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     resolve();
                     //searchService.getCategories()
                     //    .then(function (data) {
@@ -126,7 +126,7 @@ define([
 
 
             function fetchCategories(params) {
-                return Q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     searchService.getCategories()
                         .then(function (data) {
                             categoryList = Object.keys(data.categories).map(function (key) {
@@ -149,14 +149,14 @@ define([
             }
 
             function fetchCategoriesCounts(categories) {
-                return Q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     // Create an array of promises for fetching the counts
                     // per category.
                     var counts = categories.map(function (category) {
                             return searchService.getCategoryCount('*', category);
                         });
 
-                    Q.all(counts)
+                    Promise.all(counts)
                         .then(function (results) {
                             resolve();
                         })
@@ -171,7 +171,7 @@ define([
             }
             
             function xfetchCategoriesCounts(categories) {
-                return Q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     // Create an array of promises for fetching the counts
                     // per category.
                     var categoryMap = {},
@@ -181,7 +181,7 @@ define([
                         });
                                                     console.log('STARTING...');
 
-                    Q.all(counts)
+                    Promise.all(counts)
                         .then(function (results) {
                             console.log('STARTING...');
                             results.forEach(function (result) {
@@ -213,7 +213,7 @@ define([
             }
 
             function fetchCategoryCounts(category) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     searchService.getCategoryCount('*', category)
                         .then(function (results) {
                             resolve(results);
@@ -707,7 +707,7 @@ define([
                     facets: {}
                 },
                 promise: function (params) {
-                    return Q.promise(function (resolve) {
+                    return new Promise(function (resolve) {
                         //var content = [
                         //    ngInclude({src: '\'/functional-site/views/search/search.html\''})
                         //];

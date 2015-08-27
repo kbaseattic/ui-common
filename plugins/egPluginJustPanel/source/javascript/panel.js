@@ -8,9 +8,9 @@
 define([
     'kb.html',
     'kb.runtime',
-    'q',
+    'bluebird',
     'underscore'],
-    function (html, R, q, _) {
+    function (html, R, Promise, _) {
         'use strict';
 
 
@@ -18,7 +18,7 @@ define([
             var mount, container;
 
             function init() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
@@ -41,7 +41,7 @@ define([
             }
 
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -53,18 +53,18 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function stop(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
 
                     resolve();
                 });
             }
             function detach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
 
                     resolve();
                 });

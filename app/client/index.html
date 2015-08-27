@@ -38,10 +38,11 @@
         <script>
             require(['kb.main'], function (main) {
                 main.start()
-                    .then(function (resolve) {
+                    .then(function () {
                         console.log('app has started!');
                     })
                     .catch(function (err) {
+                        document.getElementById('app').innerHTML = 'My gosh, I am not a happy camper';
                         console.log('app is unhappy :(');
                     })
                     .done();

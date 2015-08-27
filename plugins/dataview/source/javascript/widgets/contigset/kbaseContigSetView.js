@@ -12,6 +12,7 @@
  */
 define([
     'jquery',
+    'bluebird',
     'kb.service.workspace',
     'kb.utils',
     'kb.html',
@@ -19,7 +20,7 @@ define([
     
     'datatables_bootstrap',
     'kb.jquery.authenticatedwidget',
-], function ($, Workspace, Utils, html, R) {
+], function ($, Promise, Workspace, Utils, html, R) {
     'use strict';
     $.KBWidget({
         name: "kbaseContigSetView",
@@ -66,10 +67,10 @@ define([
 
                 // var p = kb.req('ws', 'get_object_subset', [{ref: self.ws_name + "/" + self.ws_id, included: ['contigs/[*]/id', 'contigs/[*]/length', 'id', 'name', 'source', 'source_id', 'type']}]);
 
-                Utils.promise(self.ws_service, 'get_object_subset', [{
+                Promise.resolve(self.ws_service.get_object_subset([{
                         ref: self.ws_name + '/' + self.ws_id,
                         included: ['contigs/[*]/id', 'contigs/[*]/length', 'id', 'name', 'source', 'source_id', 'type']
-                    }])
+                    }]))
                     .then(function (data) {
                         container.empty();
                         var cs = data[0].data,

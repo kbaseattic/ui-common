@@ -7,9 +7,9 @@
  */
 define([
     'jquery',
-    'q',
+    'bluebird',
     'underscore'
-], function ($, q, _) {
+], function ($, Promise, _) {
     'use strict';
     
         function adapter(config) {
@@ -18,7 +18,7 @@ define([
             var module = config.module;
 
             function init(cfg) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     require([module], function (Widget) {
                         if (!Widget) {
                             throw new Error('Widget module did not load properly (undefined) for ' + config.module);
@@ -33,7 +33,7 @@ define([
                 });
             }
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     $container = $('<div></div>');
                     mount.appendChild($container.get(0));
@@ -41,7 +41,7 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     // The config is supplied by the caller, but we add 
                     // standard properties here.
                     /* TODO: be more generic */
@@ -60,19 +60,19 @@ define([
                 });
             }
             function stop() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     widget.stop();
                     resolve();
                 });
             }
             function detach() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount.removeChild($container.get(0));
                     resolve();
                 });
             }
             function destroy() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }

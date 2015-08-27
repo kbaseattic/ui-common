@@ -1,13 +1,13 @@
 define([
     'nunjucks',
     'jquery',
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb.utils',
     'kb.alert',
     'kb.html'
 ],
-    function (nunjucks, $, Q, R, Utils, Alert, html) {
+    function (nunjucks, $, Promise, R, Utils, Alert, html) {
         "use strict";
         var widget = Object.create({}, {
             // The init function interfaces this object with the caller, and sets up any 
@@ -307,7 +307,7 @@ define([
             },
             refresh: {
                 value: function () {
-                    return Q.Promise(function (resolve, reject, notify) {
+                    return new Promise(function (resolve, reject, notify) {
                         if (this.initialDataLoaded) {
                             if (!this.refreshTimer) {
                                 this.refreshTimer = window.setTimeout(function () {
@@ -385,7 +385,7 @@ define([
             setInitialState: {
                 value: function (options) {
                     // The base method just resolves immediately (well, on the next turn.) 
-                    return Q.Promise(function (resolve, reject, notify) {
+                    return new Promise(function (resolve, reject, notify) {
                         resolve();
                     });
                 }

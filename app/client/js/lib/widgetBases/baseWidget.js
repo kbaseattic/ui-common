@@ -11,14 +11,14 @@
 /* DOC: sample pure object widget with interface
  */
 define([
-    'q',
+    'bluebird',
     'kb.dom',
     'kb.html',
     'kb.runtime',
     'kb.widget.kbwidgetadapter',
     'kb.widget.widgetadapter'
 ],
-    function (q, DOM, html, R, kbWidgetAdapterFactory, widgetAdapterFactory) {
+    function (Promise, DOM, html, R, kbWidgetAdapterFactory, widgetAdapterFactory) {
         'use strict';
 
         var div = html.tag('div');
@@ -150,10 +150,10 @@ define([
             },
             init: {
                 value: function (cfg) {
-                    return q.Promise(function (resolve, reject) {
-                        q(this.onInitWrapper(cfg))
+                    return new Promise(function (resolve, reject) {
+                        Promise.resolve(this.onInitWrapper(cfg))
                             .then(function () {
-                                q.all(this.getWidgets().map(function (w) {
+                                Promise.all(this.getWidgets().map(function (w) {
                                     return w.widget.init(cfg);
                                 }))
                                     .then(function () {
@@ -188,14 +188,14 @@ define([
             },
             attach: {
                 value: function (node) {
-                    return q.Promise(function (resolve, reject) {
+                    return new Promise(function (resolve, reject) {
                         this.mount = node;
                         this.container = DOM.createElement('div');
                         this.mount.appendChild(this.container);
-                        q(this.onAttachWrapper(this.container))
+                        Promise.resolve(this.onAttachWrapper(this.container))
                             .then(function () {
                                 this.placeContent();
-                                q.all(this.getWidgets().map(function (w) {
+                                Promise.all(this.getWidgets().map(function (w) {
                                     return w.widget.attach(DOM.getById(w.id));
                                 }))
                                     .then(function () {
@@ -241,11 +241,11 @@ define([
             },
             start: {
                 value: function (params) {
-                   return q.Promise(function (resolve, reject) { 
-                        q(this.onStartWrapper(params))
+                   return new Promise(function (resolve, reject) { 
+                        Promise.resolve(this.onStartWrapper(params))
                             .then(function () {
                                 this.placeContent();
-                                q.all(this.getWidgets().map(function (w) {
+                                Promise.all(this.getWidgets().map(function (w) {
                                     return w.widget.start(params);
                                 }))
                                     .then(function () {
@@ -278,11 +278,11 @@ define([
             },
             run: {
                 value: function (params) {
-                   return q.Promise(function (resolve, reject) {                        
-                        q(this.onRunWrapper(params))
+                   return new Promise(function (resolve, reject) {                        
+                        Promise.resolve(this.onRunWrapper(params))
                             .then(function () {
                                 this.placeContent();
-                                q.all(this.getWidgets().map(function (w) {
+                                Promise.all(this.getWidgets().map(function (w) {
                                     return w.widget.run(params);
                                 }))
                                     .then(function () {
@@ -316,10 +316,10 @@ define([
             },
             stop: {
                 value: function () {
-                   return q.Promise(function (resolve, reject) {                        
-                        q(this.onStopWrapper())
+                   return new Promise(function (resolve, reject) {                        
+                        Promise.resolve(this.onStopWrapper())
                             .then(function () {
-                                q.all(this.getWidgets().map(function (w) {
+                                Promise.all(this.getWidgets().map(function (w) {
                                     return w.widget.stop();
                                 }))
                                     .then(function () {
@@ -352,10 +352,10 @@ define([
             },
             detach: {
                 value: function () {
-                   return q.Promise(function (resolve, reject) {
-                        q(this.onDetachWrapper())
+                   return new Promise(function (resolve, reject) {
+                        Promise.resolve(this.onDetachWrapper())
                             .then(function () {
-                                q.all(this.getWidgets().map(function (w) {
+                                Promise.all(this.getWidgets().map(function (w) {
                                     return w.widget.detach();
                                 }))
                                     .then(function () {
@@ -388,10 +388,10 @@ define([
             },
             destroy: {
                 value: function () {
-                   return q.Promise(function (resolve, reject) {
-                        q(this.onDestroyWrapper())
+                   return new Promise(function (resolve, reject) {
+                        Promise.resolve(this.onDestroyWrapper())
                             .then(function () {
-                                q.all(this.getWidgets().map(function (w) {
+                                Promise.all(this.getWidgets().map(function (w) {
                                     return w.widget.destroy();
                                 }))
                                     .then(function () {

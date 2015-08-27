@@ -8,10 +8,10 @@
 define([
     'jquery',
     'underscore',
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb.html'],
-    function ($, _, Q, R, html) {
+    function ($, _, Promise, R, html) {
         'use strict';
        
        // Just take params for now

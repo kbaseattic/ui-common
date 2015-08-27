@@ -1,1 +1,0 @@
-../../ext/angularjs/app/lib/angular/angular.js

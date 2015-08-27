@@ -1,9 +1,9 @@
 define([
-    'q',
+    'bluebird',
     'kb_widget_dashboard_base',
     'kb_data'
 ],
-    function (Q, DashboardWidget, data) {
+    function (Promise, DashboardWidget, data) {
         'use strict';
         return Object.create(DashboardWidget, {
             init: {
@@ -293,8 +293,8 @@ define([
             },
             setInitialState: {
                 value: function () {
-                    return Q.promise(function (resolve, reject) {
-                        Q.all([data.getJSON({path: 'metrics', file: 'narrative_histogram'}),
+                    return new Promise(function (resolve, reject) {
+                        Promise.all([data.getJSON({path: 'metrics', file: 'narrative_histogram'}),
                               data.getJSON({path: 'metrics', file:'narrative_sharing_histogram'}),
                             this.viewState.whenItem('narratives', 10000)
                         ])

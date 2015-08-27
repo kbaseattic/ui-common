@@ -1,5 +1,5 @@
-define(['q', 'kb.utils', 'md5', 'kb.service.user_profile', 'kb.runtime'],
-    function (Q, Utils, md5, UserProfileService, R) {
+define(['bluebird', 'kb.utils', 'md5', 'kb.service.user_profile', 'kb.runtime'],
+    function (Promise, Utils, md5, UserProfileService, R) {
         "use strict";
         var UserProfile = Object.create({}, {
             init: {
@@ -25,13 +25,13 @@ define(['q', 'kb.utils', 'md5', 'kb.service.user_profile', 'kb.runtime'],
             },
             loadProfile: {
                 value: function (username) {
-                    return Q.Promise(function (resolve, reject, notify) {
+                    return new Promise(function (resolve, reject, notify) {
                         if (!this.userProfileClient) {
                             // We don't fetch any data if a user is not logged in. 
                             this.userRecord = null;
                             resolve(this);
                         } else {
-                            Utils.promise(this.userProfileClient, 'get_user_profile', [this.username])
+                            Promise.resolve(this.userProfileClient.get_user_profile([this.username]))
                                 .then(function (data) {
                                     if (data[0]) {
                                         // profile found
@@ -58,16 +58,16 @@ define(['q', 'kb.utils', 'md5', 'kb.service.user_profile', 'kb.runtime'],
                 value: function () {
                     this.userRecord.profile.userdata = null;
                     this.userRecord.profile.metadata.modified = (new Date()).toISOString();
-                    return Utils.promise(this.userProfileClient, 'set_user_profile', {
+                    return Promise.resolve(this.userProfileClient.set_user_profile({
                         profile: this.userRecord
-                    });
+                    }));
                 }
             },
             saveProfile: {
                 value: function () {
-                    return Utils.promise(this.userProfileClient, 'set_user_profile', {
+                    return Promise.resolve(this.userProfileClient.set_user_profile({
                         profile: this.userRecord
-                    });
+                    }));
                 }
             },
             /*
@@ -124,8 +124,8 @@ define(['q', 'kb.utils', 'md5', 'kb.service.user_profile', 'kb.runtime'],
 
                     // TODO: check that the current profile is in 'stub' state.
                     var profile = this;
-                    return Q.Promise(function (resolve, reject, notify) {
-                        Utils.promise(this.userProfileClient, 'lookup_globus_user', [this.username])
+                    return new Promise(function (resolve, reject, notify) {
+                        Promise.resolve(this.userProfileClient.lookup_globus_user([this.username]))
                             .then(function (data) {
 
                                 if (!data || !data[this.username]) {
@@ -144,9 +144,9 @@ define(['q', 'kb.utils', 'md5', 'kb.service.user_profile', 'kb.runtime'],
                                     createdBy: 'user'
                                 });
 
-                                Utils.promise(this.userProfileClient, 'set_user_profile', {
+                                Promise.resolve(this.userProfileClient.set_user_profile({
                                     profile: this.userRecord
-                                })
+                                }))
                                     .then(function () {
                                         resolve();
                                     })
@@ -167,8 +167,8 @@ define(['q', 'kb.utils', 'md5', 'kb.service.user_profile', 'kb.runtime'],
                 value: function (options) {
 
                     // TODO: Ensure that there is no profile?
-                    return Q.Promise(function (resolve, reject, notify) {
-                        Utils.promise(this.userProfileClient, 'lookup_globus_user', [this.username])
+                    return new Promise(function (resolve, reject, notify) {
+                        Promise.resolve(this.userProfileClient.lookup_globus_user([this.username]))
                             .then(function (data) {
 
                                 if (!data || !data[this.username]) {
@@ -186,9 +186,9 @@ define(['q', 'kb.utils', 'md5', 'kb.service.user_profile', 'kb.runtime'],
                                     createdBy: options.createdBy
                                 });
 
-                                Utils.promise(this.userProfileClient, 'set_user_profile', {
+                                Promise.resolve(this.userProfileClient.set_user_profile({
                                     profile: this.userRecord
-                                })
+                                }))
                                     .then(function () {
                                         resolve(this);
                                     }.bind(this))

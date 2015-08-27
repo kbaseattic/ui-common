@@ -1,6 +1,6 @@
 define([
     'jquery',
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb_widgetBases_baseWidget',
     'kb.html',
@@ -10,15 +10,15 @@ define([
     'kb.service.workspace',
     'kb.narrative'
 ],
-    function ($, q, R, BaseWidget, html, DOM, Utils, APIUtils, Workspace, Narrative) {
+    function ($, Promise, R, BaseWidget, html, DOM, Utils, APIUtils, Workspace, Narrative) {
         'use strict';
         function getData() {
-            return q.Promise(function (resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 var workspaceClient = new Workspace(R.getConfig('workspace_url'), {
                     token: R.getAuthToken()
                 }),
                     workspaceDb = {};
-                q(workspaceClient.list_workspace_info({
+                Promise.resolve(workspaceClient.list_workspace_info({
                     showDeleted: 0,
                     excludeGlobal: 1,
                     owners: [R.getUsername()]
@@ -33,7 +33,7 @@ define([
                                 workspaceDb[wsInfo.id] = wsInfo;
                             }
                         });
-                        return q(workspaceClient.list_objects({
+                        return new Promise.resolve(workspaceClient.list_objects({
                             ids: workspaceList,
                             includeMetadata: 1
                         }));
@@ -86,7 +86,7 @@ define([
             },
             onStart: {
                 value: function () {
-                    return q.Promise(function (resolve, reject) {
+                    return new Promise(function (resolve, reject) {
                         getData()
                             .then(function (data) {
                                 var rendered = render(data);

@@ -30,7 +30,7 @@
  * @typedef {(string|string[])} PropertyPath
  */
 
-define(['q', 'jquery'], function (Q, $) {
+define(['bluebird', 'jquery'], function (Promise, $) {
     "use strict";
     var Utils = Object.create({}, {
         version: {
@@ -296,7 +296,7 @@ define(['q', 'jquery'], function (Q, $) {
          */
         promise: {
             value: function (client, method, arg1) {
-                return Q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     if (!client[method]) {
                         throw new TypeError('Invalid KBase Client call; method "' + method + '" not found in client "' + client.constructor + '"');
                     }
@@ -759,7 +759,7 @@ define(['q', 'jquery'], function (Q, $) {
                 // JQuery ajax config handles the json conversion.
                 // If we want more control, we could just handle the jquery promise
                 // first, and then return a promise.
-                return Q($.ajax(path, {
+                return new Promise.resolve($.ajax(path, {
                     type: 'GET',
                     dataType: 'json',
                     timeout: timeout || 10000

@@ -23,7 +23,7 @@ define([
     'kb.app',
     'kb.runtime',
     'kb.appstate',
-    'q',
+    'bluebird',
     'kb.panel.navbar',
     'kb.client.profile',
     'yaml!ui.yml',
@@ -32,7 +32,7 @@ define([
     'bootstrap',
     'css!font-awesome',
     'domReady!'],
-    function (App, Runtime, AppState, Q, Navbar, ProfileService, UIConfig, Types) {
+    function (App, Runtime, AppState, Promise, Navbar, ProfileService, UIConfig, Types) {
         'use strict';
 
         var app = App.make();
@@ -72,18 +72,6 @@ define([
                 }
             });
 
-            /*
-             * 
-             
-             promise: function (params) {
-             return Q.Promise(function (resolve) {
-             resolve({
-             content: 'Route Not Found',
-             title: 'Not Found'
-             });
-             });
-             }
-             */
 
             /* 
              * Handle the "empty path", which is also the root of the site.
@@ -225,14 +213,13 @@ define([
 
         function installPlugins() {
             var loaders = UIConfig.plugins.map(function (plugin) {
-                console.log('loading plugin ' + plugin);
                 if (typeof plugin === 'string') {
                     plugin = {
                         name: plugin,
                         directory: 'plugins/' + plugin
                     };
                 }
-                var p = Q.Promise(function (resolve) {
+                var p = new Promise(function (resolve, reject) {
                     require(['yaml!' + plugin.directory + '/config.yml'], function (config) {
                         // build up a list of modules and add them to the require config.
                         var paths = {}, shims = {},
@@ -275,7 +262,7 @@ define([
                                 var installSteps = [];
                                 if (config.install.routes) {
                                     config.install.routes.forEach(function (route) {
-                                        installSteps.push(Q.Promise(function (resolve) {
+                                        installSteps.push(new Promise(function (resolve) {
                                             // Runtime.addRoute(route);
                                             if (route.panelFactory) {
                                                 require([route.panelFactory], function (factory) {
@@ -288,6 +275,14 @@ define([
                                                         panelFactory: factory
                                                     });
                                                     resolve();
+                                                }, function (err) {
+                                                    console.log('Error loading panel factory');
+                                                    console.log(err);
+                                                    reject({
+                                                        name: 'routeError',
+                                                        message: 'invalid route',
+                                                        route: route
+                                                    });
                                                 });
                                             } else if (route.panelObject) {
                                                 require([route.panelObject], function (obj) {
@@ -298,7 +293,10 @@ define([
                                                             pluginPath: sourcePath
                                                         },
                                                         panelObject: obj
-                                                    });
+                                                    }, function (err) {
+                                                    console.log('Error loading panel object');
+                                                    console.log(err);
+                                                });
                                                     resolve();
                                                 });
                                             } else  if (route.redirectHandler) {
@@ -319,7 +317,7 @@ define([
                                 
                                 if (config.install.menu) {
                                     config.install.menu.forEach(function (item) {
-                                        installSteps.push(Q.Promise(function (resolve) {
+                                        installSteps.push(new Promise(function (resolve) {
                                             Runtime.send('navbar', 'add-menu-item', item);
                                             resolve();
                                         }));
@@ -331,7 +329,7 @@ define([
                                         var type = typeDef.type,
                                             viewers = typeDef.viewers;
                                         viewers.forEach(function (viewerDef) {
-                                            installSteps.push(Q.Promise(function (resolve) {
+                                            installSteps.push(new Promise(function (resolve) {
                                                 Types.addViewer(type, viewerDef);
                                                 resolve();
                                             }));
@@ -340,10 +338,8 @@ define([
                                     });
                                 }
                                 
-                                console.log('Have ' + installSteps.length + ' steps');
-                                Q.all(installSteps)
+                                Promise.all(installSteps)
                                     .then(function () {
-                                        console.log('Finished install steps...');
                                         resolve();
                                     })
                                     .catch(function (err) {
@@ -361,18 +357,17 @@ define([
                 });
                 return p;
             });
-            return Q.all(loaders);
+            return new Promise.all(loaders);
         }
 
         function start() {
-
-            return Q.Promise(function (resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 // 
                 // SETUP
                 // 
                 // Set up the panel routes
                 function requirePromise(modules, fun) {
-                    return Q.Promise(function (resolve) {
+                    return new Promise(function (resolve) {
                         require(modules, function () {
                             fun.apply(null, arguments);
                             resolve();
@@ -396,10 +391,10 @@ define([
                     });
                 });
 
-                Q.all(panels)
+                Promise.all(panels)
                     .then(function () {
                         setupApp();
-                        resolve();
+                        // resolve();
                     })
                     .then(function () {
                         Runtime.logDebug({source: 'main', message: 'setting up app'});

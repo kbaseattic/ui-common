@@ -9,12 +9,12 @@ define([
     'jquery',
     'kb.html',
     'kb.runtime',
-    'q',
+    'bluebird',
     'kb.widget.spec.data-type-specification',
     'kb.widget.spec.module-specification',
     'kb.widget.spec.function-specification',
     'kb.widget.error'
-], function ($, html, R, q, DataTypeSpecWidget, ModuleSpecWidget, FunctionSpecWidget, ErrorWidget) {
+], function ($, html, R, Promise, DataTypeSpecWidget, ModuleSpecWidget, FunctionSpecWidget, ErrorWidget) {
     'use strict';
 
     var Widgets = function () {
@@ -73,7 +73,7 @@ define([
 
 
     function renderTypePanel(params) {
-        return q.Promise(function (resolve) {
+        return new Promise(function (resolve) {
 
             // Widgets
             // Widgets are an array of functions or promises which are 
@@ -103,7 +103,7 @@ define([
             var mount, container, $container, children = [];
 
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -112,24 +112,24 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     renderTypePanel(params)
                         .then(function (rendered) {
                             container.innerHTML = rendered.content;
                             R.send('app', 'title', rendered.title);
                             // create widgets.
                             children = rendered.widgets;
-                            q.all(children.map(function (w) {
+                            Promise.all(children.map(function (w) {
                                         console.log('creating...');
                                         console.log(w);
                                 return w.widget.create(w.config);
                             }))
                                 .then(function () {
-                                    q.all(children.map(function (w) {
+                                    Promise.all(children.map(function (w) {
                                         return w.widget.attach($('#' + w.id).get(0));
                                     }))
                                         .then(function (results) {
-                                            q.all(children.map(function (w) {
+                                            Promise.all(children.map(function (w) {
                                                 return w.widget.start(params);
                                             }))
                                                 .then(function (results) {
@@ -162,13 +162,13 @@ define([
                 });
             }
             function stop() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
 
                 });
             }
             function detach() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
@@ -189,7 +189,7 @@ define([
     }
     
     function renderFunctionPanel(params) {
-        return q.Promise(function (resolve) {
+        return new Promise(function (resolve) {
 
             // Widgets
             // Widgets are an array of functions or promises which are 
@@ -218,7 +218,7 @@ define([
             var mount, container, $container, children = [];
 
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -227,24 +227,24 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     renderFunctionPanel(params)
                         .then(function (rendered) {
                             container.innerHTML = rendered.content;
                             R.send('app', 'title', rendered.title);
                             // create widgets.
                             children = rendered.widgets;
-                            q.all(children.map(function (w) {
+                            Promise.all(children.map(function (w) {
                                         console.log('creating...');
                                         console.log(w);
                                 return w.widget.create(w.config);
                             }))
                                 .then(function () {
-                                    q.all(children.map(function (w) {
+                                    Promise.all(children.map(function (w) {
                                         return w.widget.attach($('#' + w.id).get(0));
                                     }))
                                         .then(function (results) {
-                                            q.all(children.map(function (w) {
+                                            Promise.all(children.map(function (w) {
                                                 return w.widget.start(params);
                                             }))
                                                 .then(function (results) {
@@ -277,13 +277,13 @@ define([
                 });
             }
             function stop() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
 
                 });
             }
             function detach() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
@@ -304,7 +304,7 @@ define([
     }
 
     function renderModulePanel(params) {
-        return q.Promise(function (resolve) {
+        return new Promise(function (resolve) {
 
             // Widgets
             // Widgets are an array of functions or promises which are 
@@ -337,7 +337,7 @@ define([
             var mount, container, $container, children = [];
 
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -346,22 +346,22 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     renderModulePanel(params)
                         .then(function (rendered) {
                             container.innerHTML = rendered.content;
                             R.send('app', 'title', 'Loading: ' + rendered.title);
                             // create widgets.
                             children = rendered.widgets;
-                            q.all(children.map(function (w) {                                
+                            Promise.all(children.map(function (w) {                                
                                 return w.widget.create(w.config);
                             }))
                                 .then(function () {
-                                    q.all(children.map(function (w) {
+                                    Promise.all(children.map(function (w) {
                                         return w.widget.attach($('#' + w.id).get(0));
                                     }))
                                         .then(function (results) {
-                                            q.all(children.map(function (w) {
+                                            Promise.all(children.map(function (w) {
                                                 return w.widget.start(params);
                                             }))
                                                 .then(function (results) {
@@ -406,13 +406,13 @@ define([
                 });
             }
             function stop() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
 
                 });
             }
             function detach() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }

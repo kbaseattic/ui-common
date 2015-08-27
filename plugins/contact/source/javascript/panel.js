@@ -8,10 +8,10 @@
 define([
     'kb.html',
     'kb.runtime',
-    'q',
+    'bluebird',
     'knockout'
 ],
-    function (html, R, Q, ko) {
+    function (html, R, Promise, ko) {
         'use strict';
         function renderContactForm() {
             var table = html.tag('table'),
@@ -126,12 +126,12 @@ define([
 
             // API
             function init(config) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function attach(node) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -141,20 +141,20 @@ define([
                 });
             }
             function detach(node) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount.removeChild(container);
                     resolve();
                 });
             }
             function start(node) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     contact = ContactViewModel();
                     ko.applyBindings(contact, container);
                     resolve();
                 });
             }
             function stop(node) {
-                return Q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     ko.cleanNode(container);
                     contact = null;
                     resolve();

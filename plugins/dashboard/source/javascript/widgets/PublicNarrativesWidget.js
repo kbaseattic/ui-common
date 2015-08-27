@@ -1,5 +1,5 @@
-define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb_widget_dashboard_base', 'kb.client.methods', 'kb.session', 'kb.widget.buttonbar', 'q', 'bootstrap'],
-   function ($, Postal, Utils, APIUtils, DashboardWidget, KBService, Session, Buttonbar, Q) {
+define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb_widget_dashboard_base', 'kb.client.methods', 'kb.session', 'kb.widget.buttonbar', 'bluebird', 'bootstrap'],
+   function ($, Postal, Utils, APIUtils, DashboardWidget, KBService, Session, Buttonbar, Promise) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {
@@ -183,14 +183,14 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb_widget_dashboard_bas
 
          setInitialState: {
             value: function (options) {
-               return Q.promise(function (resolve, reject, notify) {
+               return new Promise(function (resolve, reject, notify) {
                   // Get all workspaces, filter out those owned by the user,
                   // and those that are public
                   if (!Session.isLoggedIn()) {
                      resolve();
                      return;
                   }
-                  Q.all([this.kbservice.getNarratives({
+                  Promise.all([this.kbservice.getNarratives({
                            params: {
                               showDeleted: 0,
                               excludeGlobal: 0

@@ -5,10 +5,10 @@ define([
     'kb.service.workspace',
     'kb.client.methods',
     'kb.logger',
-    'q',
+    'bluebird',
     'kb.runtime'
 ],
-    function (DashboardWidget, Utils, NarrativeMethodStore, WorkspaceService, KBService, Logger, Q, R) {
+    function (DashboardWidget, Utils, NarrativeMethodStore, WorkspaceService, KBService, Logger, Promise, R) {
         "use strict";
         var widget = Object.create(DashboardWidget, {
             init: {
@@ -44,12 +44,12 @@ define([
             setInitialState: {
                 value: function () {
                     var widget = this;
-                    return Q.Promise(function (resolve, reject) {
+                    return new Promise(function (resolve, reject) {
                         if (!R.isLoggedIn()) {
                             this.setState('apps', null);
                             resolve();
                         } else {
-                            Q(this.methodStore.list_apps_full_info({}))
+                            Promise.resolve(this.methodStore.list_apps_full_info({}))
                                 .then(function (allApps) {
                                     var appMap = {};
 

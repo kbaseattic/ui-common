@@ -4,9 +4,9 @@ define([
     'kb_widget_userProfile_base',
     'kb.service.workspace',
     'kb.runtime',
-    'q'
+    'bluebird'
 ],
-    function ($, Utils, SocialWidget, WorkspaceService, R, Q) {
+    function ($, Utils, SocialWidget, WorkspaceService, R, Promise) {
         "use strict";
         var Widget = Object.create(SocialWidget, {
             init: {
@@ -69,69 +69,60 @@ define([
                 }
             },
             setInitialState: {
-                value: function (options) {
-                    // Reset or create the recent activity list.
-                    var def = Q.defer();
+                value: function (options) {                    
+                    return new Promise(function (resolve, reject) {
+                        // We only run any queries if the session is authenticated.
+                        if (!R.isLoggedIn()) {
+                            resolve();
+                            return;
+                        }
 
-                    // only sync the state when it is 
-                    //if (!this.isStateStatus('none')) {          
-                    //def.resolve();
-                    //return def.promise;
-                    //}
+                        // Note that Narratives are now associated 1-1 with a workspace. 
+                        // Some new narrative attributes, such as name and (maybe) description, are actually
+                        // stored as attributes of the workspace itself.
+                        // At present we can just use the presence of "narrative_nice_name" metadata attribute 
+                        // to flag a compatible workspace.
+                        //
+                        Promise.resolve(this.workspaceClient.list_workspace_info({
+                            showDeleted: 0,
+                            owners: [this.params.userId]
+                        }))
+                            .then(function (data) {
+                                var narratives = [];
+                                // First we both transform each ws info object into a nicer js object,
+                                // and filter for modern narrative workspaces.
+                                for (var i = 0; i < data.length; i++) {
+                                    //tuple<ws_id id, ws_name workspace, username owner, timestamp moddate,
+                                    //int object, permission user_permission, permission globalread,
+                                    //lock_status lockstat, usermeta metadata> workspace_info
+                                    var wsInfo = this.workspace_metadata_to_object(data[i]);
 
-                    // We only run any queries if the session is authenticated.
-                    if (!R.isLoggedIn()) {
-                        //options.success();
-                        def.resolve();
-                        return def.promise;
-                    }
-
-                    // Note that Narratives are now associated 1-1 with a workspace. 
-                    // Some new narrative attributes, such as name and (maybe) description, are actually
-                    // stored as attributes of the workspace itself.
-                    // At present we can just use the presence of "narrative_nice_name" metadata attribute 
-                    // to flag a compatible workspace.
-                    //
-                    Utils.promise(this.workspaceClient, 'list_workspace_info', {
-                        showDeleted: 0,
-                        owners: [this.params.userId]
-                    })
-                        .then(function (data) {
-                            var narratives = [];
-                            // First we both transform each ws info object into a nicer js object,
-                            // and filter for modern narrative workspaces.
-                            for (var i = 0; i < data.length; i++) {
-                                //tuple<ws_id id, ws_name workspace, username owner, timestamp moddate,
-                                //int object, permission user_permission, permission globalread,
-                                //lock_status lockstat, usermeta metadata> workspace_info
-                                var wsInfo = this.workspace_metadata_to_object(data[i]);
-
-                                // make sure a modern narrative.
-                                if (wsInfo.metadata.narrative && wsInfo.metadata.is_temporary !== 'true') {
-                                    narratives.push({
-                                        obj_id: this.makeWorkspaceObjectId(wsInfo.id, wsInfo.metadata.narrative),
-                                        title: wsInfo.metadata.narrative_nice_name,
-                                        description: wsInfo.metadata.narrative_description,
-                                        moddate: wsInfo.moddate
-                                    });
+                                    // make sure a modern narrative.
+                                    if (wsInfo.metadata.narrative && wsInfo.metadata.is_temporary !== 'true') {
+                                        narratives.push({
+                                            obj_id: this.makeWorkspaceObjectId(wsInfo.id, wsInfo.metadata.narrative),
+                                            title: wsInfo.metadata.narrative_nice_name,
+                                            description: wsInfo.metadata.narrative_description,
+                                            moddate: wsInfo.moddate
+                                        });
+                                    }
                                 }
-                            }
-                            // We should now have the list of recently active narratives.
-                            // Now we sort and limit the list.
-                            narratives.sort(function (a, b) {
-                                var x = new Date(a.moddate);
-                                var y = new Date(b.moddate);
-                                return ((x < y) ? 1 : ((x > y) ? -1 : 0));
+                                // We should now have the list of recently active narratives.
+                                // Now we sort and limit the list.
+                                narratives.sort(function (a, b) {
+                                    var x = new Date(a.moddate);
+                                    var y = new Date(b.moddate);
+                                    return ((x < y) ? 1 : ((x > y) ? -1 : 0));
+                                });
+                                this.setState('narratives', narratives);
+                                resolve();
+                            }.bind(this))
+                            .catch(function (err) {
+                                reject(err);
                             });
-                            this.setState('narratives', narratives);
-                            def.resolve();
-                        }.bind(this))
-                        .catch(function (err) {
-                            def.reject(err);
-                        });
 
-                    return def.promise;
-                }
+                    }
+                });
             }
         });
 

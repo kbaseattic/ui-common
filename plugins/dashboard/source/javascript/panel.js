@@ -9,15 +9,15 @@ define([
     'kb.html',
     'kb.runtime',
     'kb.statemachine',
-    'q',
+    'bluebird',
     'jquery',
     'kb.widget.widgetadapter'
 ],
-    function (html, R, StateMachine, q, $, widgetAdapter) {
+    function (html, R, StateMachine, Promise, $, widgetAdapter) {
         'use strict';
 
         function renderPanel() {
-            return q.Promise(function (resolve) {
+            return new Promise(function (resolve) {
                 // View stat is a local state machine for this view.
                 var panelState = Object.create(StateMachine).init();
 
@@ -102,12 +102,12 @@ define([
 
             // API 
             function init(config) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function attach(node) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -117,11 +117,11 @@ define([
                             R.send('app', 'title', rendered.title);
                             // create widgets.
                             children = rendered.widgets;
-                            q.all(children.map(function (w) {
+                            Promise.all(children.map(function (w) {
                                 return w.widget.init(w.config);
                             }))
                                 .then(function () {
-                                    q.all(children.map(function (w) {
+                                    Promise.all(children.map(function (w) {
                                         return w.widget.attach($('#' + w.id).get(0));
                                     }))
                                         .then(function (results) {
@@ -148,7 +148,7 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     // for now these are fire and forget.
                     // this has implications for lifecycle --
                     // for instance, if stop is called immediately after start
@@ -160,7 +160,7 @@ define([
                     // 
                     // NB: the widget connector, for now, needs the params
                     // for attachment.
-                    q.all(children.map(function (wc) {
+                    Promise.all(children.map(function (wc) {
                         return wc.widget.start(params);
                     }))
                         .then(function (results) {
@@ -173,8 +173,8 @@ define([
                 });
             }
             function stop() {
-                return q.Promise(function (resolve, reject) {
-                    q.all(children.map(function (wc) {
+                return new Promise(function (resolve, reject) {
+                    Promise.all(children.map(function (wc) {
                         return wc.widget.stop();
                     }))
                         .then(function (results) {
@@ -187,8 +187,8 @@ define([
                 });
             }
             function detach() {
-                return q.Promise(function (resolve, reject) {
-                    q.all(children.map(function (wc) {
+                return new Promise(function (resolve, reject) {
+                    Promise.all(children.map(function (wc) {
                         return wc.widget.detach();
                     }))
                         .then(function (results) {

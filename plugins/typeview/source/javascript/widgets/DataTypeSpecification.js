@@ -7,14 +7,14 @@
  */
 define([
     'jquery',
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb.html',
     'kb.utils',
     'kb.service.workspace',
     'kb_spec_common',
     'google-code-prettify'],
-    function ($, q, R, html, Utils, Workspace, specCommon, PR) {
+    function ($, Promise, R, html, Utils, Workspace, specCommon, PR) {
         'use strict';
 
         // Just take params for now
@@ -225,7 +225,7 @@ define([
                     token: R.getAuthToken()
                 }));
 
-                q(workspace.get_type_info(dataType))
+                Promise.resolve(workspace.get_type_info(dataType))
                     .then(function (data) {
                         var tabs = [
                             {title: 'Overview', id: 'overview', content: overviewTab},
@@ -285,13 +285,13 @@ define([
             var mount, container, $container, children = [];
             
             function create() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
 
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -301,14 +301,14 @@ define([
             }
             
             function detach() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     $container.empty();
                     resolve();
                 });
             }
 
             function start(params) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     $container.html(html.loading());
                 
                     // Parse the data type, throwing exceptions if malformed.
@@ -334,7 +334,7 @@ define([
             }
 
             function stop() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }

@@ -30,9 +30,9 @@ define(['jquery', 'kb.runtime', 'kb.utils', 'kb.html', 'kb.service.workspace', '
                 var workspace = new Workspace(R.getConfig('services.workspace.url'), {
                     token: options.token
                 });
-                Utils.promise(workspace, 'get_objects', {
+                Promise.resolve(workspace.get_objects'({
                     workspace: ws, name: name
-                })
+                }))
                     .then(function (data) {
                         var reflist = data[0].refs;
                         reflist.push(data[0].data.genome_ref);
@@ -137,9 +137,9 @@ define(['jquery', 'kb.runtime', 'kb.utils', 'kb.html', 'kb.service.workspace', '
                     // ui-common is a submodule
                     function mediaTab(ele, ws, id) {
                         var fba = new FBA(R.getConfig('services.fba.url'));
-                        Utils.promise(fba, 'get_media', {
+                        Promise.resolve(fba.get_media({
                             medias: [id], workspaces: [ws]
-                        })
+                        }))
                             .then(function (data) {
                                 $(ele).rmLoading();
                                 $(ele).kbaseMediaEditor({

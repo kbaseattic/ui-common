@@ -9,9 +9,9 @@ define([
     'kb_widget_dataview_modeling_objects',
     'kb.service.workspace',
     'kb.runtime',
-    'q'
+    'bluebird'
 ],
-    function (KBObjects, Workspace, R, q) {
+    function (KBObjects, Workspace, R, Promise) {
         'use strict';
         function KBasePhenotypes_PhenotypeSimulationSet(tabwidget) {
             var self = this;
@@ -44,7 +44,7 @@ define([
                     token: R.getAuthToken()
                 });
                         console.log(indata);
-                return q(workspace.get_objects([{ref: indata.phenotypeset_ref}]))
+                return new Promise.resolve(workspace.get_objects([{ref: indata.phenotypeset_ref}]))
                     .then(function (data) {
                         var kbObjects = new KBObjects();
                         self.phenoset = new kbObjects["KBasePhenotypes_PhenotypeSet"](self.tabwidget);

@@ -9,13 +9,13 @@
 define([
     'nunjucks',
     'jquery',
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb.utils',
     'kb.html', 
     'postal'
 ],
-    function (nunjucks, $, Q, R, Utils, html, Postal) {
+    function (nunjucks, $, Promise, R, Utils, html, Postal) {
         "use strict";
         var SocialWidget = Object.create({}, {
             // The init function interfaces this object with the caller, and sets up any 
@@ -286,7 +286,7 @@ define([
             },
             refresh: {
                 value: function () {
-                    return Q.Promise(function (resolve, reject, notify) {
+                    return new Promise(function (resolve, reject, notify) {
                         if (!this.refreshTimer) {
                             this.refreshTimer = window.setTimeout(function () {
                                 this.refreshTimer = null;
@@ -348,7 +348,7 @@ define([
             setInitialState: {
                 value: function (options) {
                     // The base method just resolves immediately (well, on the next turn.) 
-                    return Q.Promise(function (resolve, reject, notify) {
+                    return new Promise(function (resolve, reject, notify) {
                         resolve();
                     });
                 }

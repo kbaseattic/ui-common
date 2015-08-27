@@ -11,7 +11,7 @@
  */
 define([
     'jquery',
-    'q',
+    'bluebird',
     'kb.html',
     'kb.utils',
     'kb.runtime',
@@ -19,7 +19,7 @@ define([
     'kb.client.workspace',
     'kb.jquery.widget',
     'kb.jquery.kb-tabs'
-], function ($, q, html, Utils, R, Workspace, workspaceClient) {
+], function ($, Promise, html, Utils, R, Workspace, workspaceClient) {
     'use strict';
     $.KBWidget({
         name: "kbaseExpressionSeries",
@@ -40,10 +40,10 @@ define([
 
             container.html(html.loading());
 
-            q(workspace.get_objects([{workspace: options.ws, name: options.name}]))
+            Promise.resolve(workspace.get_objects([{workspace: options.ws, name: options.name}]))
                 .then(function (data) {
                     var reflist = data[0].refs;
-                    return q.all([data, wsClient.translateRefs(reflist)]);
+                    return new Promise.all([data, wsClient.translateRefs(reflist)]);
                 })
                 .then(function (data, refhash) {
                     buildTable(data, refhash);
@@ -62,7 +62,7 @@ define([
 
 
             function buildTable(data, refhash) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     // setup tabs
 
                     container.empty();
@@ -108,7 +108,7 @@ define([
                     for (var i = 0; i < series.length; i++) {
                         sample_refs.push({ref: series[i]});
                     }
-                    q(workspace.get_objects(sample_refs))
+                    Promise.resolve(workspace.get_objects(sample_refs))
                         .then(function (sample_data) {
                             // container.rmLoading();
                             //container.empty();

@@ -6,12 +6,12 @@
  white: true
  */
 define([
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb.service.fba',
     'kb.service.workspace',
     'kb_widget_dataview_modeling_objects'
-], function (Q, R, FBA, Workspace, KBObjects) {
+], function (Promise, R, FBA, Workspace, KBObjects) {
     'use strict';
     function KBaseFBA_FBAModel(modeltabs) {
         var self = this;
@@ -292,7 +292,7 @@ define([
                 var fba = new FBA(R.getConfig('services.fba.url'), {
                     token: R.getAuthToken()
                 });
-                return Q(fba.get_reactions({
+                return new Promise.resolve(fba.get_reactions({
                     reactions: [rxn.rxnkbid],
                     biochemistry: self.biochem,
                     biochemistry_workspace: self.biochemws
@@ -370,7 +370,7 @@ define([
                 var fba = new FBA(R.getConfig('services.fba.url'), {
                     token: R.getAuthToken()
                 });
-                return Q(fba.get_compounds({
+                return new Promise.resolve(fba.get_compounds({
                     compounds: [cpd.cpdkbid],
                     biochemistry: self.biochem,
                     biochemistry_workspace: self.biochemws
@@ -472,7 +472,7 @@ define([
             var workspace = new Workspace(R.getConfig('services.workspace.url'), {
                 token: R.getAuthToken()
             });
-            return Q(workspace.get_objects([{ref: ref}]))
+            return new Promise.resolve(workspace.get_objects([{ref: ref}]))
                 .then(function (data) {
                     var solutions = data[0].data.gapfillingSolutions;
                     return self.parse_gf_solutions(solutions);
@@ -548,7 +548,7 @@ define([
                 var fba = new FBA(R.getConfig('services.fba.url'), {
                     token: R.getAuthToken()
                 });
-                return Q(fba.get_reactions({
+                return new Promise.resolve(fba.get_reactions({
                     reactions: ids,
                     biochemistry: biochem,
                     biochemistry_workspace: biochemws

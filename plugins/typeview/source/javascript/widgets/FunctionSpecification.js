@@ -7,7 +7,7 @@
  */
 define([
     'jquery',
-    'q',
+    'bluebird',
     'underscore',
     'kb.runtime',
     'kb.html',
@@ -15,7 +15,7 @@ define([
     'kb_spec_common',
     'google-code-prettify',
     'kb.format'],
-    function ($, q, _, R, html, Workspace, specCommon, PR, Format) {
+    function ($, Promise, _, R, html, Workspace, specCommon, PR, Format) {
         'use strict';
 
         // Just take params for now
@@ -160,8 +160,8 @@ define([
             }
 
             function render() {
-                return q.Promise(function (resolve, reject) {
-                    q(workspace.get_func_info(functionId))
+                return new Promise(function (resolve, reject) {
+                    Promise.resolve(workspace.get_func_info(functionId))
                         .then(function (data) {
                                 var tabs = [
                                     {title: 'Overview', id: 'overview', content: overviewTab},
@@ -220,13 +220,13 @@ define([
             // API
             
             function create() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             
             function attach(node) {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -236,14 +236,14 @@ define([
             }
             
             function detach() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     container.empty();
                     resolve();
                 });
             }
 
             function start(params) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     $container.html(html.loading());
 
                     // Parse the data type, throwing exceptions if malformed.
@@ -273,7 +273,7 @@ define([
             }
 
             function stop() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }

@@ -1,11 +1,11 @@
 define([
-    'q',
+    'bluebird',
     'kb.runtime',
     'kb_widget_userProfile_base',
     'kb.client.methods',
     'kb.service.user_profile'
 ],
-    function (Q, R, SocialWidget, ClientMethods, UserProfileService) {
+    function (Promise, R, SocialWidget, ClientMethods, UserProfileService) {
         'use strict';
         var Widget = Object.create(SocialWidget, {
             init: {
@@ -47,11 +47,11 @@ define([
             },
             setInitialState: {
                 value: function (options) {
-                    return Q.Promise(function (resolve, reject) {
+                    return new Promise(function (resolve, reject) {
                         if (!R.isLoggedIn()) {
                             resolve();
                         } else {
-                            Q(this.userProfileClient.get_user_profile([this.params.userId]))
+                            Promise.resolve(this.userProfileClient.get_user_profile([this.params.userId]))
                                 .then(function (data) {
                                     if (data && data[0]) {
                                         this.setState('currentUserProfile', data[0], false);

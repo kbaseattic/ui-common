@@ -13,14 +13,14 @@ define([
     'kb.runtime',
     'kb.html',
     'jquery',
-    'q',
+    'bluebird',
     'uuid',
     'kb.service.workspace',
     'kb.service.ujs',
     'kb.easytree',
     'kb.jquery.authenticatedwidget'
 ],
-    function (R, html, $, Q, uuid, Workspace, UserAndJobState, EasyTree) {
+    function (R, html, $, Promise, uuid, Workspace, UserAndJobState, EasyTree) {
         'use strict';
         $.KBWidget({
             name: 'kbaseTree',

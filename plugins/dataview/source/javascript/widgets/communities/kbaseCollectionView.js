@@ -10,7 +10,7 @@
  */
 define([
     'jquery',
-    'q',
+    'bluebird',
     'kb.service.workspace',
     'kb.runtime',
     'kb.html',
@@ -18,7 +18,7 @@ define([
     'datatables_bootstrap',
     'kb.jquery.authenticatedwidget'
 ],
-    function ($, Q, Workspace, R, html) {
+    function ($, Promise, Workspace, R, html) {
         'use strict';
         $.KBWidget({
             name: 'CollectionView',
@@ -46,7 +46,7 @@ define([
 
                 var workspace = new Workspace(self.ws_url, {token: self.token}),
                     title;
-                Q(workspace.get_objects([{ref: self.options.ws + '/' + self.options.id}]))
+                Promise.resolve(workspace.get_objects([{ref: self.options.ws + '/' + self.options.id}]))
                     .then(function (data) {
                         if (data.length === 0) {
                             throw new Error('Object ' + self.options.id + ' does not exist in workspace ' + self.options.ws);
@@ -64,7 +64,7 @@ define([
                             });
                         title = collectionObject.name;
                         if (idList.length > 0) {
-                            return Q(workspace.get_objects(idList));
+                            return new Promise.resolve(workspace.get_objects(idList));
                         } else {
                             throw new Error('Collection is empty');
                         }

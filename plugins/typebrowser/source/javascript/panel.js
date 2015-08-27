@@ -6,13 +6,13 @@
  white: true
  */
 define([
-    'q',
+    'bluebird',
     'kb.html',
     'kb.dom',
     'kb.runtime',
     'kb_widget_typeBrowser'
 ],
-    function (q, html, DOM, R, typeBrowser) {
+    function (Promise, html, DOM, R, typeBrowser) {
         'use strict';
         
         function widget(config) {
@@ -57,18 +57,18 @@ define([
 
             // Widget API
             function init() {
-                return q.Promise(function (resolve) {
+                return new Promise(function (resolve) {
                     resolve();
                 });
             }
             function attach(node) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     mount = node;
                     container = DOM.createElement('div');
                     mount.appendChild(container);
                     container.innerHTML = html.flatten(rendered.content);
                     R.send('app', 'title', rendered.title);
-                    q.all(rendered.widgets.map(function (w) {
+                    Promise.all(rendered.widgets.map(function (w) {
                         return w.widget.attach(DOM.findById(w.id));
                     }))
                         .then(function () {
@@ -81,8 +81,8 @@ define([
                 });
             }
             function detach() {
-                return q.Promise(function (resolve, reject) {
-                    q.all(rendered.widgets.map(function (w) {
+                return new Promise(function (resolve, reject) {
+                    Promise.all(rendered.widgets.map(function (w) {
                         return w.widget.detach();
                     }))
                         .then(function () {
@@ -97,8 +97,8 @@ define([
                 });
             }
             function start(params) {
-                return q.Promise(function (resolve, reject) {
-                    q.all(rendered.widgets.map(function (w) {
+                return new Promise(function (resolve, reject) {
+                    Promise.all(rendered.widgets.map(function (w) {
                         return w.widget.start(params);
                     }))
                         .then(function () {
@@ -111,8 +111,8 @@ define([
                 });
             }
             function run(params) {
-                return q.Promise(function (resolve, reject) {
-                    q.all(rendered.widgets.map(function (w) {
+                return new Promise(function (resolve, reject) {
+                    Promise.all(rendered.widgets.map(function (w) {
                         return w.widget.run(params);
                     }))
                         .then(function () {
@@ -125,8 +125,8 @@ define([
                 });
             }
             function stop() {
-                return q.Promise(function (resolve, reject) {
-                    q.all(rendered.widgets.map(function (w) {
+                return new Promise(function (resolve, reject) {
+                    Promise.all(rendered.widgets.map(function (w) {
                         return w.widget.stop();
                     }))
                         .then(function () {
@@ -139,8 +139,8 @@ define([
                 });
             }
             function destroy() {
-                return q.Promise(function (resolve, reject) {
-                    q.all(rendered.widgets.map(function (w) {
+                return new Promise(function (resolve, reject) {
+                    Promise.all(rendered.widgets.map(function (w) {
                         if (w.widget.destroy) {
                             return w.widget.destroy();
                         }

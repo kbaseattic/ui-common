@@ -7,9 +7,9 @@
  */
 define([
     'jquery',
-    'q',
+    'bluebird',
     'kb.runtime'
-], function ($, q, R) {
+], function ($, Promise, R) {
     'use strict';
 
     function panelFactory(config) {
@@ -24,7 +24,7 @@ define([
 
             // API
             function attach(node) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     mount = node;
                     container = document.createElement('div');
                     mount.appendChild(container);
@@ -34,11 +34,11 @@ define([
                             R.send('app', 'title', rendered.title);
                             // create widgets.
                             children = rendered.widgets;
-                            q.all(children.map(function (w) {
+                            Promise.all(children.map(function (w) {
                                 return w.widget.init(w.config);
                             }))
                                 .then(function () {
-                                    q.all(children.map(function (w) {
+                                    Promise.all(children.map(function (w) {
                                         return w.widget.attach($('#' + w.id).get(0));
                                     }))
                                         .then(function (results) {
@@ -66,7 +66,7 @@ define([
             }
 
             function start(params) {
-                return q.Promise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     // for now these are fire and forget.
                     // this has implications for lifecycle --
                     // for instance, if stop is called immediately after start
@@ -78,7 +78,7 @@ define([
                     // 
                     // NB: the widget connector, for now, needs the params
                     // for attachment.
-                    q.all(children.map(function (wc) {
+                    Promise.all(children.map(function (wc) {
                         return wc.widget.start(params);
                     }))
                         .then(function (results) {
@@ -91,8 +91,8 @@ define([
                 });
             }
             function stop() {
-                return q.Promise(function (resolve, reject) {
-                    q.all(children.map(function (wc) {
+                return new Promise(function (resolve, reject) {
+                    Promise.all(children.map(function (wc) {
                         return wc.widget.stop();
                     }))
                         .then(function (results) {
@@ -105,8 +105,8 @@ define([
                 });
             }
             function detach() {
-                return q.Promise(function (resolve, reject) {
-                    q.all(children.map(function (wc) {
+                return new Promise(function (resolve, reject) {
+                    Promise.all(children.map(function (wc) {
                         return wc.widget.detach();
                     }))
                         .then(function (results) {

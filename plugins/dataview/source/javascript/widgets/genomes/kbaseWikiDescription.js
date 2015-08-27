@@ -25,8 +25,15 @@
  * @author Mike Sneddon [mwsneddon@lbl.gov]
  * @author Dylan Chivian [dcchivian@lbl.gov]
  */
-define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.service.cdmi-entity'],
-    function ($, R, _Widget, CDMI, CDMI_Entity) {
+define([
+    'jquery',
+    'kb.runtime',
+    'kb.html',
+    'kb.service.cdmi',
+    'kb.service.cdmi-entity',
+    'kb.jquery.widget'
+],
+    function ($, R, html, CDMI, CDMI_Entity) {
         'use strict';
         $.KBWidget({
             name: "KBaseWikiDescription",
@@ -41,7 +48,6 @@ define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.servi
              * @property {string} title - the title of this widget
              * @property {number} maxNumChars - (deprecated) the maximum number of characters of the description to show
              * @property {number} maxTextHeight - the max size of the description text area in pixels
-             * @property {string} loadingImage - (optional) the URI of a loading image
              */
             options: {
                 genomeID: null,
@@ -51,14 +57,12 @@ define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.servi
                 maxNumChars: 900,
                 width: 400,
                 maxTextHeight: 300,
-                loadingImage: null,
                 genomeInfo: null
             },
             /**
              * @type {string} cdmiURL - the default endpoint for the CDMI service
              */
-            // cdmiURL: "https://kbase.us/services/cdmi_api",
-            cdmiURL: R.getConfig('cdmi_url'),
+            cdmiURL: R.getConfig('services.cdmi.url'),
             /**
              * @function init
              * Initialize the widget. This initializes the CDMI client code.
@@ -92,7 +96,7 @@ define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.servi
              */
             renderCdmi: function () {
                 var self = this;
-                this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading...</center>");
+                this.showMessage(html.loading('loading...'));
 
                 /*
                  * A couple nested callbacks here.
@@ -258,7 +262,7 @@ define(['jquery', 'kb.runtime', 'kb.jquery.widget', 'kb.service.cdmi', 'kb.servi
             renderWorkspace: function () {
                 var self = this;
                 this.searchedOnce = false;
-                this.showMessage("<center><img src='" + this.options.loadingImage + "'> loading...</center>");
+                this.showMessage(html.loading('loading...'));
                 var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
 
                 obj['included'] = ["/taxonomy", "/scientific_name"];

@@ -11,12 +11,12 @@
 /* DOC: sample pure object widget with interface
  */
 define([
-    'q',    
+    'bluebird',    
     'kb.dom',
     'kb.runtime',
     'kb.html'
 ],
-    function (q, DOM, R, html) {
+    function (Promise, DOM, R, html) {
         'use strict';
         return Object.create({}, {
             
@@ -111,7 +111,7 @@ define([
            
             init: {
                 value: function (cfg) {
-                    return q.Promise(function (resolve) {
+                    return new Promise(function (resolve) {
                         this.recv('app', 'heartbeat', function () {
                             this.placeContent();
                         }.bind(this));
@@ -126,7 +126,7 @@ define([
             
             attach: {
                 value: function (node) {
-                    return q.Promise(function (resolve) {
+                    return new Promise(function (resolve) {
                         this.mount = node;
                         this.container = DOM.createElement('div');
                         DOM.append(this.mount, this.container);
@@ -141,7 +141,7 @@ define([
             
             start: {
                 value: function (params) {
-                    return q.Promise(function (resolve) {
+                    return new Promise(function (resolve) {
                         this.lastRefresh = Date.now();
                         this.recv('app', 'heartbeat', function () {
                             var now = Date.now(),
@@ -164,7 +164,7 @@ define([
             
             run: {
                 value: function (params) {
-                    return q.Promise(function (resolve) {
+                    return new Promise(function (resolve) {
                         if (this.onRun) {
                             this.onRun(params);
                         }
@@ -176,7 +176,7 @@ define([
             
             stop: {
                 value: function () {
-                    return q.Promise(function (resolve) {
+                    return new Promise(function (resolve) {
                         this.dropAll();
                         if (this.onStop) {
                             this.onStop();
@@ -188,7 +188,7 @@ define([
             
             detach: {
                 value: function () {
-                    return q.Promise(function (resolve) {
+                    return new Promise(function (resolve) {
                         if (this.onDetach) {
                             this.onDetach();
                         }
@@ -199,7 +199,7 @@ define([
             
             destroy: {
                 value: function () {
-                    return q.Promise(function (resolve) {
+                    return new Promise(function (resolve) {
                         if (this.onDestroy) {
                             this.onDestroy();
                         }

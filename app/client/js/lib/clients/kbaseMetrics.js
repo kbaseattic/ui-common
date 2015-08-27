@@ -5,14 +5,14 @@
     white: true
     browser: true
  */
-define(['jquery', 'q'], function ($, q) {
+define(['jquery', 'bluebird'], function ($, Promise) {
     'use strict';
     function getNarrativeHistogram() {
-        return q($.get('/data/metrics/narrative_histogram.json'));
+        return new Promise.resolve($.get('/data/metrics/narrative_histogram.json'));
     }
     
     function getNarrativeSharingHistogram() {
-        return q($.get('/data/metrics/narrative_sharing_histogram.json'));
+        return new Promise.resolve($.get('/data/metrics/narrative_sharing_histogram.json'));
     }
    
     return {
