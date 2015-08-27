@@ -197,6 +197,7 @@
 				'kbaseHistogram'                    : 'vis/kbaseHistogram',
 				'kbaseLineSerieschart'              : 'vis/kbaseLineSerieschart',
 				'kbaseLinechart'                    : 'vis/kbaseLinechart',
+				'kbaseSparkline'                    : 'vis/kbaseSparkline',
 				'kbasePiechart'                     : 'vis/kbasePiechart',
 				'kbaseRadialTreechart'              : 'vis/kbaseRadialTreechart',
 				'kbaseScatterplot'                  : 'vis/kbaseScatterplot',

@@ -58,6 +58,9 @@ define('kbaseVisWidget',
                 xAxisOrientation : 'bottom',
                 yAxisOrientation : 'left',
 
+                shouldRenderXAxis : true,
+                shouldRenderYAxis : true,
+
                 xLabelRegion : 'yGutter',
                 yLabelRegion : 'xGutter',
 
@@ -695,6 +698,10 @@ define('kbaseVisWidget',
 
                 var $self = this;
 
+                if (! this.options.shouldRenderXAxis) {
+                    return;
+                }
+
                 if (this.xScale() == undefined || this.xScale().domain == undefined) {
                     return;
                 }
@@ -743,6 +750,10 @@ define('kbaseVisWidget',
                 return $container.html();
             },
             renderYAxis: function () {
+
+                if (! this.options.shouldRenderYAxis) {
+                    return;
+                }
 
                 if (this.yScale() == undefined) {
                     return;
@@ -1070,8 +1081,8 @@ define('kbaseVisWidget',
 
             chartBounds: function () {
 
-                var widgetWidth = this.width();
-                var widgetHeight = this.height();
+                var widgetWidth = this.$elem.width();
+                var widgetHeight = this.$elem.height();
 
                 var chart = new Rectangle(
                     new Point(this.xPadding(), this.yGutter()),

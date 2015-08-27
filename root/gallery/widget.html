@@ -318,6 +318,18 @@
                             });
 
 
+                            var spark = [];
+                            for (var i = 20; i < 100; i++) {
+                                spark.push(Math.random());
+                            }
+
+                            var $line = $('#sparkline').kbaseSparkline(
+
+                                {
+                                    dataset : spark,
+                                }
+                            );
+
 
                             var bars = [];
 
@@ -835,6 +847,7 @@ transitionTime : 250,
 <div id = 'accordion'></div>
 
         <div style = 'display : block'>
+            <div id = 'sparkline' style = 'border : 1px solid green; width : 100px; height : 25px'></div>
             <div id = 'linechartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
             <button id = 'legend-button'>New legend</button>
             <div id = 'barchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>

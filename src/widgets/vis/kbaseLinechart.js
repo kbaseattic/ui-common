@@ -137,6 +137,9 @@ define('kbaseLinechart',
             highlightLineWidth : 1,
             shapeArea : 64,
 
+            xInset : 0.1,
+            yInset : 0.1,
+
         },
 
         _accessors : [
@@ -220,20 +223,27 @@ define('kbaseLinechart',
             }
 
 
-            return [
-                0.9 * d3.min(
+            var ret = [
+                d3.min(
                     this.dataset(),
                     function (l) {
                         return d3.min(l.values.map(function(d) { return d.x }))
                     }
                 ),
-                1.1 * d3.max(
+                d3.max(
                     this.dataset(),
                     function (l) {
                         return d3.max(l.values.map(function(d) { return d.x }))
                     }
                 )
             ];
+
+            var delta = Math.max(this.options.xInset * ret[0], this.options.xInset * ret[1]);
+            ret[0] -= delta;
+            ret[1] += delta;
+
+            return ret;
+
         },
 
         defaultYDomain : function() {
@@ -242,20 +252,26 @@ define('kbaseLinechart',
                 return [0,0];
             }
 
-            return [
-                0.9 * d3.min(
+            var ret = [
+                d3.min(
                     this.dataset(),
                     function (l) {
                         return d3.min(l.values.map(function(d) { return d.y }))
                     }
                 ),
-                1.1 * d3.max(
+                d3.max(
                     this.dataset(),
                     function (l) {
                         return d3.max(l.values.map(function(d) { return d.y }))
                     }
                 )
             ];
+
+            var delta = Math.max(this.options.yInset * ret[0], this.options.yInset * ret[1]);
+            ret[0] -= delta;
+            ret[1] += delta;
+
+            return ret;
         },
 
         renderChart : function() {
@@ -373,24 +389,24 @@ define('kbaseLinechart',
             var pointsData = [];
             this.dataset().forEach(function(line, i) {
 
-                if (line.shape) {
-                    line.values.forEach(function (point, i) {
+                line.values.forEach(function (point, i) {
 
+                    if (line.shape || point.shape) {
                         var newPoint = {};
                         for (var key in point) {
                             newPoint[key] = point[key];
                         };
 
-                        newPoint.color = line.fillColor || line.strokeColor || $line.options.fillColor;
-                        newPoint.shape = line.shape;
-                        newPoint.shapeArea = line.shapeArea || $line.options.shapeArea,
-                        newPoint.pointOver = line.pointOver || $line.options.pointOver,
-                        newPoint.pointOut = line.pointOut || $line.options.pointOut,
+                        newPoint.color = point.color || line.fillColor || line.strokeColor || $line.options.fillColor;
+                        newPoint.shape = point.shape || line.shape;
+                        newPoint.shapeArea = point.shapeArea || line.shapeArea || $line.options.shapeArea,
+                        newPoint.pointOver = point.pointOver || line.pointOver || $line.options.pointOver,
+                        newPoint.pointOut = point.pointOut || line.pointOut || $line.options.pointOut,
                         newPoint.id = [point.x, point.y, line.label].join('/'),
 
                         pointsData.push(newPoint);
-                    })
-                }
+                    }
+                })
             })
 
             var points = $line.data('D3svg').select($line.region('chart')).selectAll('.point').data(pointsData, function (d) { return d.id});
