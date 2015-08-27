@@ -14,8 +14,8 @@ define('kbaseSparkline',
         version: "1.0.0",
         options: {
 
-            xInset              : 0.05,
-            yInset              : 0.05,
+            xInset              : 0.02,
+            yInset              : 0.02,
             lineWidth           : 1,
             shapeArea           : 9,
             useHighlightLine    : false,
@@ -32,6 +32,8 @@ define('kbaseSparkline',
             lastPointShape      : 'circle',
             lastPointShapeArea  : 9,
             lastPointColor      : 'red',
+            shouldRenderXAxis   : false,
+            shouldRenderYAxis   : false,
 
         },
 
