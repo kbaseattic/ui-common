@@ -31,6 +31,10 @@
         init: function(options) {
             this._super(options);
 	    
+            var cfgWsUrl = kb.urls.workspace_url;
+            if (cfgWsUrl)
+                this.options.ws_url = cfgWsUrl;
+            
 		    // first initialize the type to widget config
             this.setupType2Widget();
 	    
@@ -291,7 +295,28 @@
 			    options: '{"genomeID":???objname,"workspaceID":???wsname,"featureID":???subid,"loadingImage":"'+this.options.loadingImage+'"}'
 			}
 		    }
-		}
+		},
+		
+		'KBaseFeatureValues.ExpressionMatrix': {
+		    widget: 'kbaseExpressionMatrix',
+            options: '{"expressionMatrixID":???objname,"workspaceID":???wsname}'
+		},
+		
+        'KBaseCollections.FeatureSet': {
+            widget: 'kbaseFeatureSet',
+            options: '{"featureset_name":???objname,"workspaceName":???wsname}'
+        },
+        
+        'KBaseFeatureValues.FeatureClusters': {
+            widget: 'kbaseExpressionFeatureClusters',
+            options: '{"clusterSetID":???objname,"workspaceID":???wsname}'
+        },
+        
+        'KBaseFeatureValues.EstimateKResult': {
+            widget: 'kbaseExpressionEstimateKTable',
+            options: '{"estimateKID":???objname,"workspaceID":???wsname}'
+        }
+		
 	    };
 	    
 	    /*var list = ''; var list2=''
