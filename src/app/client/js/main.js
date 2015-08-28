@@ -26,13 +26,13 @@ define([
     'bluebird',
     'kb.panel.navbar',
     'kb.client.profile',
-    'yaml!DEV/config/ui.yml',
+    'kb.config', 
     'kb_types',
     
     'bootstrap',
     'css!font-awesome',
     'domReady!'],
-    function (App, Runtime, AppState, Promise, Navbar, ProfileService, UIConfig, Types) {
+    function (App, Runtime, AppState, Promise, Navbar, ProfileService, Config, Types) {
         'use strict';
 
         var app = App.make();
@@ -45,11 +45,11 @@ define([
             navbar.setup();
 
             // Set up the navbar.
-            Object.keys(UIConfig.navbar.menu.available_items).forEach(function (menuId) {
-                navbar.addMenuItem(menuId, UIConfig.navbar.menu.available_items[menuId]);
+            Object.keys(Config.navbar.menu.available_items).forEach(function (menuId) {
+                navbar.addMenuItem(menuId, Config.navbar.menu.available_items[menuId]);
             });
-            Object.keys(UIConfig.navbar.menu.menus).forEach(function (menuId) {
-                navbar.addMenu(menuId, UIConfig.navbar.menu.menus[menuId]);
+            Object.keys(Config.navbar.menu.menus).forEach(function (menuId) {
+                navbar.addMenu(menuId, Config.navbar.menu.menus[menuId]);
             });
 
             Runtime.recv('navbar', 'add-menu-item', function (data) {
@@ -212,7 +212,7 @@ define([
         }
 
         function installPlugins() {
-            var loaders = UIConfig.plugins.map(function (plugin) {
+            var loaders = Config.plugins.map(function (plugin) {
                 if (typeof plugin === 'string') {
                     plugin = {
                         name: plugin,

@@ -224,12 +224,8 @@ module.exports = function (grunt) {
                 files: [
                     {
                         src: 'src/config/prod.yml',
-                        dest: buildDir('config/config.yml')
-                    },
-                    {
-                        src: 'src/config/ui.yml',
-                        dest: buildDir('config/ui.yml')
-                    },
+                        dest: buildDir('config/client.yml')
+                    },                    
                     {
                         cwd: 'src/app/client',
                         src: '**/*',
