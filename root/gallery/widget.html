@@ -325,6 +325,15 @@
                                 spark1.push(Math.random());
                                 spark2.push(Math.random());
                                 spark3.push(Math.random());
+
+                                if (i == 20) {
+                                    spark2.push({
+                                        y : Math.random(),
+                                        shape : 'circle',
+                                        shapeArea : 9,
+                                        color : 'red'
+                                    });
+                                }
                             }
 
                             var $spark1 = $('#spark1').kbaseSparkline( { dataset : spark1 } );
@@ -652,7 +661,7 @@
                                 debug : false,
                                 lineStyle : 'square',
                                 layout : 'cluster',
-                            displayStyle:'nt',
+//                            displayStyle:'nt',
                             distance : 50,
                             layout : 'cluster',
                             bias : 'leaf',
@@ -675,6 +684,9 @@ dataset :
                 },
                 {
                     "name" : "herding dogs",
+                    weight : 5,
+                    lineStroke : 'blue',
+                    tooltip : 'Magic!',
                     "children" : [
                         {"name" : "sheepdog"},
                         {"name" : "German Shepherd"},
