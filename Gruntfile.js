@@ -1,7 +1,21 @@
 'use strict';
 var path = require('path');
+var fs = require('fs');
 
 module.exports = function (grunt) {
+    // Config
+    // TODO: maybe read something from the runtime/config directory so we don't 
+    // need to tweak this and accidentally check it in...
+    var RUNTIME_DIR = '../../runtime';
+    var BUILD_DIR = RUNTIME_DIR + '/build';
+    
+    function buildDir(subdir) {
+        if (subdir) {
+            return path.normalize(BUILD_DIR + '/' + subdir);
+        } 
+        return path.normalize(BUILD_DIR);
+    }
+    
     // Project configuration
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-filerev');
@@ -149,8 +163,6 @@ module.exports = function (grunt) {
 
     ],
         bowerCopy = bowerFiles.map(function (cfg) {
-
-
             // path is like dir/path/name
             var path = [];
             // dir either dir or name is the first level directory.
@@ -170,8 +182,6 @@ module.exports = function (grunt) {
                     return true;
                 })
                 .join('/');
-            // console.log(path);
-
 
             var srcs;
             if (cfg.src === undefined) {
@@ -201,7 +211,7 @@ module.exports = function (grunt) {
                 expand: true,
                 cwd: 'bower_components/' + (cfg.dir || cfg.name) + (cd ? '/' + cd : ''),
                 src: sources,
-                dest: 'build/client/bower_components/' + (cfg.dir || cfg.name)
+                dest: buildDir('client/bower_components') + '/' + (cfg.dir || cfg.name)
             };
             // console.log(entry);
             return entry;
@@ -213,41 +223,41 @@ module.exports = function (grunt) {
             build: {
                 files: [
                     {
-                        src: 'config/prod.yml',
-                        dest: 'build/client/config.yml'
+                        src: 'src/config/prod.yml',
+                        dest: buildDir('config/config.yml')
                     },
                     {
-                        src: 'config/ui.yml',
-                        dest: 'build/client/ui.yml'
+                        src: 'src/config/ui.yml',
+                        dest: buildDir('config/ui.yml')
                     },
                     {
-                        cwd: 'app/client',
+                        cwd: 'src/app/client',
                         src: '**/*',
-                        dest: 'build/client',
+                        dest: buildDir('client'),
                         expand: true
                     },
                     {
                         cwd: 'lib',
                         src: '**/*',
-                        dest: 'build/client/lib',
+                        dest: buildDir('client/lib'),
                         expand: true
                     },
                     {
-                        cwd: 'plugins',
+                        cwd: 'src/plugins',
                         src: '**/*',
-                        dest: 'build/client/plugins',
+                        dest: buildDir('client/plugins'),
                         expand: true
                     },
                     {
-                        cwd: 'data',
+                        cwd: 'src/data',
                         src: '**/*',
-                        dest: 'build/client/data',
+                        dest: buildDir('client/data'),
                         expand: true
                     },
                     {
-                        cwd: 'app/server',
+                        cwd: 'src/app/server',
                         src: '**/*',
-                        dest: 'build/server',
+                        dest: buildDir('server'),
                         expand: true
                     }
                 ]
@@ -258,7 +268,12 @@ module.exports = function (grunt) {
         },
         clean: {
             build: {
-                src: ['build']
+                src: [buildDir()],
+                // We force, because our build directory is up a level 
+                // in the runtime directory.
+                options: {
+                    force: true
+                }
             }
         },
         connect: {
@@ -273,7 +288,7 @@ module.exports = function (grunt) {
         },
         'http-server': {
             dev: {
-                root: 'build/client',
+                root: buildDir('client'),
                 port: 8887,
                 host: '0.0.0.0',
                 autoIndex: true,
@@ -381,13 +396,12 @@ module.exports = function (grunt) {
                 files: [
                     {
                         expand: true,
-                        src: 'docs/**/*.md',
-                        dest: 'build/docs',
-                        ext: '.html'                            
+                        src: 'src/docs/**/*.md',
+                        dest: buildDir('docs'),
+                        ext: '.html'
                     }
                 ],
                 options: {
-                    
                 }
             }
         }
@@ -435,8 +449,8 @@ module.exports = function (grunt) {
     grunt.registerTask('develop', [
         'karma:dev',
     ]);
-    
+
     grunt.registerTask('preview', [
-        'open:dev','connect'
+        'open:dev', 'connect'
     ])
 };

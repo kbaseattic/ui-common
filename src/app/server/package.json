@@ -2,7 +2,7 @@
     "name": "erik",
     "version": "0.0.1",
     "dependencies": {
-        "node-static": "^0.7.7"
+        "js-yaml": "3.4.0"
     }
     
 }

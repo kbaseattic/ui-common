@@ -2,22 +2,25 @@ var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var url = require('url');
+var yaml = require('js-yaml');
 
 var serverConfig = {
-    port: 8080
-}
+    port: 8080,
+    mounts: {
+        plugin: ['..', '..', 'plugins'],
+        dev: ['..', '..', '..', 'dev'],
+        config: ['..', '..', 'config']
+    }
+};
 
 http.createServer(function (request, response) {
     'use strict';
-    // console.log('request starting...');
 
-// Configure.
+    // Configure.
     var mainRoot = ['..', 'client'];
-    
     var requstUrl = url.parse(request.url);
 
-
-// convert to an array
+    // convert to an array
     var l = requstUrl.pathname.split('/');
     // console.log(request.url);
     var normalized = l.filter(function (pathElement) {
@@ -33,10 +36,14 @@ http.createServer(function (request, response) {
 
 
 // This creates a plugins mount point at the same level as thes
-    var mounts = {
-        plugins: ['..', '..', '..', 'plugins']
-    };
-
+    try {
+        var serverConfig = yaml.safeLoad(fs.readFileSync('../../config/server.yml', 'utf8'));
+    } catch (e) {
+        console.log('Error reading server config');
+        console.log(e);
+        console.log('Exiting server');
+        process.exit();
+    }
 
     var root = mainRoot;
     var pathList = normalized;
@@ -49,7 +56,12 @@ http.createServer(function (request, response) {
         // mount point (a directory) defined herein.
         var mount = normalized[1];
         pathList = normalized.slice(2);
-        root = mounts[mount];
+        root = serverConfig.mounts[mount];
+        if (root === undefined) {
+            console.log('Root not defined for ' + mount);
+            console.log(pathList);
+            process.exit();
+        }
     }
 
     var filePath = root.concat(pathList);

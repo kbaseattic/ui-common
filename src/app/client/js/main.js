@@ -26,7 +26,7 @@ define([
     'bluebird',
     'kb.panel.navbar',
     'kb.client.profile',
-    'yaml!ui.yml',
+    'yaml!DEV/config/ui.yml',
     'kb_types',
     
     'bootstrap',
