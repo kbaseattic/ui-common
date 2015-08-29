@@ -34,6 +34,8 @@ define([
     'domReady!'],
     function (App, Runtime, AppState, Promise, Navbar, ProfileService, Config, Types) {
         'use strict';
+        
+        console.log(Config);
 
         var app = App.make();
         Runtime.setApp(app);
@@ -45,11 +47,11 @@ define([
             navbar.setup();
 
             // Set up the navbar.
-            Object.keys(Config.navbar.menu.available_items).forEach(function (menuId) {
-                navbar.addMenuItem(menuId, Config.navbar.menu.available_items[menuId]);
+            Object.keys(Config.getItem('navbar.menu.available_items')).forEach(function (menuId) {
+                navbar.addMenuItem(menuId, Config.getItem('navbar.menu.available_items')[menuId]);
             });
-            Object.keys(Config.navbar.menu.menus).forEach(function (menuId) {
-                navbar.addMenu(menuId, Config.navbar.menu.menus[menuId]);
+            Object.keys(Config.getItem('navbar.menu.menus')).forEach(function (menuId) {
+                navbar.addMenu(menuId, Config.getItem('navbar.menu.menus')[menuId]);
             });
 
             Runtime.recv('navbar', 'add-menu-item', function (data) {
@@ -212,7 +214,7 @@ define([
         }
 
         function installPlugins() {
-            var loaders = Config.plugins.map(function (plugin) {
+            var loaders = Config.getItem('plugins').map(function (plugin) {
                 if (typeof plugin === 'string') {
                     plugin = {
                         name: plugin,
