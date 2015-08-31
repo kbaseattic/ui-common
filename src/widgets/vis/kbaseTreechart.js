@@ -605,12 +605,12 @@ define('kbaseTreechart',
         });
 
         // Update the links
-        var link = chart.selectAll("path.link")
+        var link = chart.selectAll("path.tree-link")
             .data($tree.treeLayout.links($tree.nodes), function(d) { return $tree.uniqueness(d.target) });
 
                         // Enter any new links at the parent's previous position.
                         link.enter().insert("path", "g")
-                                .attr("class", "link")
+                                .attr("class", "tree-link")
                                 .attr('data-link-id', function (d) { return $tree.uniqueness(d.target) } )
                                 .attr('fill', 'none')
                                 .attr('stroke', function (d) { return d.target.lineStroke || $tree.options.lineStroke})
