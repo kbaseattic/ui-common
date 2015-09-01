@@ -403,18 +403,26 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
             onHeartbeat: {
                 value: function (data) {
                     if (this.status === 'dirty') {
+                        // make sure the flag is reset syncronously.
+                        // If we reset the flag in refresh().then(), as we 
+                        // did at one time, there is race condition -- another
+                        // heartbeat may occur during the refresh handling and 
+                        // trigger a second refresh (since the widget is still 
+                        // dirty.)
+                        this.status = 'clean';
                         this.refresh()
                             .then(function () {
-                                this.status = 'clean';
+                                // anything
                             }.bind(this))
                             .catch(function (err) {
                                 this.setError(err);
                             }.bind(this))
                             .done();
                     } else if (this.status === 'error') {
+                        this.status = 'errorshown';
                         this.refresh()
                             .then(function () {
-                                this.status = 'errorshown';
+                                // anything to do?
                             }.bind(this))
                             .catch(function (err) {
                                 this.setError(err);
