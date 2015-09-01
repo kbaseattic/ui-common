@@ -400,12 +400,12 @@ define('kbaseTreechart',
                     duration
                 );
 
-        var node = chart.selectAll("g.node")
+        var node = chart.selectAll("g.tree-node")
             .data(this.nodes, function(d) { return $tree.uniqueness(d) });
 
         // Enter any new nodes at the parent's previous position.
         var nodeEnter = node.enter().append("g")
-                .attr("class", "node")
+                .attr("class", "tree-node")
                 .attr('data-node-id', function (d) { return $tree.uniqueness(d) } )
                 .attr('opacity', 0)
                 .attr("transform", function (d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
@@ -462,7 +462,7 @@ define('kbaseTreechart',
 
         nodeEnter.append("text")
             //.attr('style', 'font-size : 11px')
-            .attr('class', 'nodeText')
+            .attr('class', 'tree-nodeText')
             .attr('data-text-id', function (d) { return $tree.uniqueness(d) } )
             .attr('style', 'font-size : 11px;cursor : pointer;-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;')
             .attr("dy", ".35em")
