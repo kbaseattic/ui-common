@@ -246,7 +246,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
                     // refreshing more expensive data.
                     // this.refreshBeat = 0;
                     //
-                    this.refreshInterval = 60000;
+                    this.refreshInterval = false;
                     this.refreshLastTime = null;
 
 
@@ -385,19 +385,22 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
             },
             handleHeartbeat: {
                 value: function (data) {
-                    var now = (new Date()).getTime();
-                    if (!this.refreshLastTime) {
-                        this.refreshLastTime = now;
-                    }
-                    if (now - this.refreshLastTime >= this.refreshInterval) {
-                        if (this.onRefreshbeat) {
-                            this.onRefreshbeat(data);
+                    if (this.refreshInterval !== false) {
+                        var now = (new Date()).getTime();
+                        if (!this.refreshLastTime) {
                             this.refreshLastTime = now;
+                        }
+                        if (now - this.refreshLastTime >= this.refreshInterval) {
+                            if (this.onRefreshbeat) {
+                                this.onRefreshbeat(data);
+                                this.refreshLastTime = now;
+                            }
                         }
                     }
                     if (this.onHeartbeat) {
                         this.onHeartbeat(data);
                     }
+                    
                 }
             },
             onHeartbeat: {
