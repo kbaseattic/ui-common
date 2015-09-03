@@ -246,7 +246,7 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
                     // refreshing more expensive data.
                     // this.refreshBeat = 0;
                     //
-                    this.refreshInterval = 60000;
+                    this.refreshInterval = false;
                     this.refreshLastTime = null;
 
 
@@ -385,36 +385,47 @@ define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 
             },
             handleHeartbeat: {
                 value: function (data) {
-                    var now = (new Date()).getTime();
-                    if (!this.refreshLastTime) {
-                        this.refreshLastTime = now;
-                    }
-                    if (now - this.refreshLastTime >= this.refreshInterval) {
-                        if (this.onRefreshbeat) {
-                            this.onRefreshbeat(data);
+                    if (this.refreshInterval !== false) {
+                        var now = (new Date()).getTime();
+                        if (!this.refreshLastTime) {
                             this.refreshLastTime = now;
+                        }
+                        if (now - this.refreshLastTime >= this.refreshInterval) {
+                            if (this.onRefreshbeat) {
+                                this.onRefreshbeat(data);
+                                this.refreshLastTime = now;
+                            }
                         }
                     }
                     if (this.onHeartbeat) {
                         this.onHeartbeat(data);
                     }
+                    
                 }
             },
             onHeartbeat: {
                 value: function (data) {
                     if (this.status === 'dirty') {
+                        // make sure the flag is reset syncronously.
+                        // If we reset the flag in refresh().then(), as we 
+                        // did at one time, there is race condition -- another
+                        // heartbeat may occur during the refresh handling and 
+                        // trigger a second refresh (since the widget is still 
+                        // dirty.)
+                        this.status = 'clean';
                         this.refresh()
                             .then(function () {
-                                this.status = 'clean';
+                                // anything
                             }.bind(this))
                             .catch(function (err) {
                                 this.setError(err);
                             }.bind(this))
                             .done();
                     } else if (this.status === 'error') {
+                        this.status = 'errorshown';
                         this.refresh()
                             .then(function () {
-                                this.status = 'errorshown';
+                                // anything to do?
                             }.bind(this))
                             .catch(function (err) {
                                 this.setError(err);
