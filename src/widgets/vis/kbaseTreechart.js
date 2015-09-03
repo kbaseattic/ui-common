@@ -536,7 +536,7 @@ define('kbaseTreechart',
             ;
 
         nodeUpdate.select("circle")
-            .attr("r", $tree.options.circleRadius)
+            .attr("r", function (d) { return d.radius || $tree.options.circleRadius})
             .attr('stroke', function (d) { return d.stroke || $tree.options.circleStroke})
             .style("fill", function (d) { return d._children ? $tree.options.openCircleFill : $tree.options.closedCircleFill; })
 
