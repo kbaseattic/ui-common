@@ -794,9 +794,11 @@ define('kbaseTreechart',
         if (d.children != undefined) {
             d._children = d.children;
             d.children = null;
+            d.open = false;
         } else {
             d.children = d._children;
             d._children = null;
+            d.open = true;
 
         }
     },
