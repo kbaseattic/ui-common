@@ -1,5 +1,6 @@
 'use strict';
 var path = require('path');
+var iniParser = require('node-ini');
 
 module.exports = function (grunt) {
     // Project configuration
@@ -14,6 +15,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks('grunt-http-server');
     grunt.loadNpmTasks('grunt-bower-task');
+
+    var deployCfg = iniParser.parseSync('deploy.cfg');
 
     /* 
      * This section sets up a mapping for bower packages.
@@ -146,21 +149,43 @@ module.exports = function (grunt) {
         }
 
     ],
-        bowerCopy = bowerFiles.map(function (cfg) {
+
+    bowerCopy = bowerFiles.map(function (cfg) {
+        // path is like dir/path/name
+        var path = [];
+        // dir either dir or name is the first level directory.
+        // path.unshift(cfg.dir || cfg.name);
+
+        // If there is a path (subdir) we add that too.
+        if (cfg.path) {
+            path.unshift(cfg.path);
+        }
+
+        // Until we get a path which we use as a prefix to the src.
+        var pathString = path
+            .filter(function (el) {
+                if (el === null || el === undefined || el === '') {
+                    return false;
+                }
+                return true;
+            })
+            .join('/');
+        // console.log(path);
 
 
-            // path is like dir/path/name
-            var path = [];
-            // dir either dir or name is the first level directory.
-            // path.unshift(cfg.dir || cfg.name);
-
-            // If there is a path (subdir) we add that too.
-            if (cfg.path) {
-                path.unshift(cfg.path);
+        var srcs;
+        if (cfg.src === undefined) {
+            srcs = [cfg.name + '.js'];
+        } else {
+            if (typeof cfg.src === 'string') {
+                srcs = [cfg.src];
+            } else {
+                srcs = cfg.src;
             }
+        }
 
-            // Until we get a path which we use as a prefix to the src.
-            var pathString = path
+        var sources = srcs.map(function (s) {
+            return [pathString, s]
                 .filter(function (el) {
                     if (el === null || el === undefined || el === '') {
                         return false;
@@ -168,42 +193,19 @@ module.exports = function (grunt) {
                     return true;
                 })
                 .join('/');
-            // console.log(path);
-
-
-            var srcs;
-            if (cfg.src === undefined) {
-                srcs = [cfg.name + '.js'];
-            } else {
-                if (typeof cfg.src === 'string') {
-                    srcs = [cfg.src];
-                } else {
-                    srcs = cfg.src;
-                }
-            }
-
-            var sources = srcs.map(function (s) {
-                return [pathString, s]
-                    .filter(function (el) {
-                        if (el === null || el === undefined || el === '') {
-                            return false;
-                        }
-                        return true;
-                    })
-                    .join('/');
-            });
-
-            var cd = cfg.cd;
-            var entry = {
-                nonull: true,
-                expand: true,
-                cwd: 'bower_components/' + (cfg.dir || cfg.name) + (cd ? '/' + cd : ''),
-                src: sources,
-                dest: 'build/client/bower_components/' + (cfg.dir || cfg.name)
-            };
-            // console.log(entry);
-            return entry;
         });
+
+        var cd = cfg.cd;
+        var entry = {
+            nonull: true,
+            expand: true,
+            cwd: 'bower_components/' + (cfg.dir || cfg.name) + (cd ? '/' + cd : ''),
+            src: sources,
+            dest: 'build/client/bower_components/' + (cfg.dir || cfg.name)
+        };
+        // console.log(entry);
+        return entry;
+    });
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -252,7 +254,17 @@ module.exports = function (grunt) {
             },
             bower: {
                 files: bowerCopy
-            }
+            },
+            deploy: {
+                files: [
+                    {
+                        cwd: 'build/client',
+                        src: '**/*',
+                        dest: deployCfg['ui-common']['TARGET'],
+                        expand: true
+                    }
+                ]
+            },
         },
         clean: {
             build: {
@@ -399,6 +411,11 @@ module.exports = function (grunt) {
             //'regex-replace'
     ]);
 
+    grunt.registerTask('deploy', [
+        'build',
+        'copy:deploy'
+    ]);
+
     // Does a single, local, unit test run.
     grunt.registerTask('test', [
         'karma:unit',
@@ -419,6 +436,7 @@ module.exports = function (grunt) {
     ]);
     
     grunt.registerTask('preview', [
-        'open:dev','connect'
+        'open:dev',
+        'connect'
     ])
 };

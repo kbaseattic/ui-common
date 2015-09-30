@@ -3,11 +3,10 @@ TOPDIR   	   = $(PWD)
 DISTLIB  	   = $(TOPDIR)/build
 DOCSLIB  	   = $(TOPDIR)/docs
 TARGET   	   = prod
-KBASE_CONFIG   = source/config/$(TARGET).yml
-UI_CONFIG	   = source/config/ui.yml
+KBASE_CONFIG   = config/$(TARGET).yml
+UI_CONFIG	   = config/ui.yml
 
-all:
-	test deploy docs
+all: init test
 
 init:
 	@bower install
@@ -22,7 +21,7 @@ default: init
 	@ grunt build
 	
 deploy:
-	@ echo "This Makefile is deprecated for deployment, please see README.deploy."
+	@ grunt deploy
 
 test: init
 	@ grunt test
