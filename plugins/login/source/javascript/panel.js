@@ -97,7 +97,7 @@ define([
                     .then(function (session) {
                         R.send('app', 'loggedin');
                         /* TODO should be configurable default login location */
-                        R.send('app', 'navigate', 'about');
+                        R.send('app', 'navigate', 'dashboard');
                         // App.navigateTo('about');
                     })
                     .catch(function (errorMsg) {
