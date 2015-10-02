@@ -20,4 +20,4 @@ before_install:
 install:
   - bower install
   - npm install
-script: grunt build-config && grunt test-travis
+script: grunt build && grunt test-travis
