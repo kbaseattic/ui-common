@@ -260,7 +260,7 @@ module.exports = function (grunt) {
                     {
                         cwd: 'build/client',
                         src: '**/*',
-                        dest: deployCfg['ui-common']['TARGET'],
+                        dest: deployCfg['ui-common']['deploy-target'],
                         expand: true
                     }
                 ]
@@ -438,5 +438,5 @@ module.exports = function (grunt) {
     grunt.registerTask('preview', [
         'open:dev',
         'connect'
-    ])
+    ]);
 };
