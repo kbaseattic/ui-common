@@ -292,8 +292,7 @@ module.exports = function (grunt) {
         },
         open: {
             dev: {
-                path: 'http://localhost:8887',
-                app: 'Firefox'
+                path: 'http://localhost:8887'
             }
         },
         // Compile the requirejs stuff into a single, uglified file.
