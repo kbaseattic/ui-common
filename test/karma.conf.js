@@ -73,13 +73,13 @@ module.exports = function(config) {
       {pattern: 'build/client/bower_components/require-yaml/yaml.js', included: false},
       {pattern: 'build/client/bower_components/require-css/css.js', included: false},
       {pattern: 'build/client/bower_components/js-yaml/dist/js-yaml.js', included: false},
-      {pattern: 'build/*.yml', included: false},
       {pattern: 'build/client/*.yml', included: false},
       {pattern: 'build/client/js/require-config.js', served: true, included: true},
       {pattern: 'build/client/js/lib/**/*.js', served: true, included: false},
       {pattern: 'build/client/js/main.js', served: true, included: false},
 
       {pattern: 'build/client/plugins/**/*.js', served: true, included: false},
+      // {pattern: 'test/spec/kbaseConfigSpec.js', included: false},      
       {pattern: 'test/spec/**/*.js', included: false},
 
       'test/test-main.js',

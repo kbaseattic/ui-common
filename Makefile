@@ -3,23 +3,20 @@ TOPDIR   	   = $(PWD)
 DISTLIB  	   = $(TOPDIR)/build
 DOCSLIB  	   = $(TOPDIR)/docs
 TARGET   	   = prod
-KBASE_CONFIG   = config/$(TARGET).yml
-UI_CONFIG	   = config/ui.yml
+KB_TOP		   = /kb
 
-all: init test
+all: init build
+
+default: init build
 
 init:
-	@bower install
-	@npm install
-	@mkdir -p $(DISTLIB)
-	@cp $(KBASE_CONFIG) $(DISTLIB)/config.yml
-	@cp $(UI_CONFIG) $(DISTLIB)/ui.yml
+	@ bower install
+	@ npm install
 
-default: init
-	@ git submodule init
-	@ git submodule update
+build:
 	@ grunt build
-	
+	@ node tools/process_config.js
+
 deploy:
 	@ grunt deploy
 
