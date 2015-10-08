@@ -18,7 +18,7 @@ Common user interface components and libraries for the KBase Project.
  * KBase Labs Templates
 
 ##Installation
-
+ulimit -n 2048
 
 
 ###Developer
