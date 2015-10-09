@@ -128,74 +128,258 @@
                                 }
                             );
 
-                            $('#linechartWidget').kbaseLinechart(
-                                {
-                                    scaleAxes       : true,
+                            var sin = [];
+                            var sin2 = [];
+                            for (var i = 20; i < 200; i++) {
+                                sin.push(
+                                    {
+                                        x : i,
+                                        y : 100 + 50 * Math.sin(0.1 * i),
+                                        y2 : 50 + 50 * Math.sin(0.1 * i)
+                                    }
+                                );
+                                sin2.push(75 + 50 * Math.sin(0.1 * i));
+                            }
 
-                                    xLabel      : 'Some useful experiment',
+                            var $line = $('#linechartWidget').kbaseLinechart(
+
+                                {
+
+                                    legendRegion : 'xGutter',
+                                    xGutter : 75,
+                                    //legendAlignment : 'TR',
+                                    autoLegend : true,
+                                    //useLineLabelToolTip : true,
+                                    //useOverLine : false,
+                                    legendLineHeight : 25,
+                                    legendSize : '18pt',
+                                    legendTextYOffset : 6,
+
+                                    xLabelSize : '12pt',
+                                    yLabelSize : '12pt',
+
+                                    lZegend : [
+                                        { label : 'foo', color : 'blue'},
+                                        { label : 'bar', color : 'red'},
+                                        { label : 'baz', color : 'green'},
+                                        { label : 'applegate farms', color : 'orange'},
+                                        { label : 'extra!', color : 'purple'},
+                                    ],
+
+                                    scaleAxes       : true,
+                                    //debug       : true,
+
+                                    xLabel      : 'Expression profile',
                                     yLabel      : 'Meaningful data',
+                                    xLabelRegion : 'yPadding',
+                                    yLabelRegion : 'xPadding',
+                                    hGrid : true,
+                                    xLabels : false,
+                                    transitionTime : 500,
+
+                                    xPadding : 40,
+
+                                    pointOver : function(d) {
+                                    console.log("POINT OVER", d);
+                                        this.showToolTip({label : 'point over obj'});
+                                    },
+                                    pointOut : function(d) {
+                                        this.hideToolTip();
+                                    },
+
+                                    //xAxisOrientation : 'top',
+                                    //xAxisRegion : 'yGutter',
+
+                                    //yAxisOrientation : 'right',
+                                    //yAxisRegion : 'xGutter',
+
+                                    yLabelOffset : -7,
 
                                     dataset : [
                                         {
-                                            color : 'green',
-                                            label : 'Data set 1',
-                                            values : [{x : 0, y : -1}, {x : 1, y : -0.5}, {x : 2, y : 0}, {x : 3, y : 0.5}, {x : 4, y : 1}],
+                                            strokeColor : 'red',
+                                            label : 'parabolic',
+                                            values : [0,1,4,9,16,25,{x : 60, y : 36},49,64,81,100,121,144,{y : 169, label : 'has a label!'}],
+                                            width : 1,
+                                            shape : 'circle',
+                                            shapeArea : 16,
+                                            //fillColor : 'red',
+                                        },
+
+                                        {
+                                            strokeColor : 'red',
+                                            fillColor : 'red',
+                                            values : [
+                                                { x : 10, y : 10, y2 : -10},
+                                                { x : 20, y : 15, y2 : -20},
+                                                { x : 30, y : 16, y2 : -5},
+                                                { x : 40, y : 18, y2 : -2},
+                                                { x : 50, y : 15, y2 : 5},
+                                                { x : 60, y : 20, y2 : 8},
+                                                { x : 70, y : 22, y2 : 3},
+                                                { x : 80, y : 25, y2 : 4},
+                                                { x : 90, y : 18, y2 : -5},
+                                                { x : 100, y : 15, y2 : -10},
+                                                { x : 110, y : 10, y2 : -12},
+                                                { x : 120, y : 5, y2 : -20},
+                                                { x : 130, y : 8, y2 : -30},
+                                                { x : 140, y : 10, y2 : -100},
+                                                { x : 150, y : 4, y2 : -10},
+                                            ],
+                                            label : 'area',
+                                            width : 0,
+                                            fillOpacity : 0.3,
                                         },
                                         {
-                                            color : 'blue',
-                                            label : 'Data set 2',
-                                            values : [{x : 0, y : 0.0001}, {x : 1, y : 100}, {x : 2, y : 0.0001}, {x : 3, y : 500}, {x : 4, y : .0001}],
+                                            strokeColor : 'orange',
+                                            label : 'jagged',
+                                            values : [10,20,30,40,50],
+                                            valuesz : [{x : 0, y : 180}, {x : 10, y : 160}, {x : 20, y : 140}, {x : 30, y : 120}, {x : 40, y : 100}, {x : 50, y : 80},
+                                                {x : 60, y : 60, label : 'label point 1'}, {x : 70, y : 40}, {x : 80, y : 20}, {x : 90, y : 0}, {x : 100, y : 20}, {x : 110, y : 40},
+                                                {x : 120, y : 60}, {x : 130, y : 80}, {x : 140, y : 100, label : 'label point 2'} ],
+                                            width : 2,
+                                            shape : 'square',
+                                            shapeArea : 64,
+                                            //fillColor : 'red',
+                                            pointOver : function(d) {
+                                                this.showToolTip({label : 'point over line'});
+                                            },
+                                            pointOut : function(d) {
+                                                this.hideToolTip();
+                                            }
                                         },
                                         {
-                                            color : 'gray',
-                                            label : 'mean line',
-                                            dasharray : 5,
-                                            values : [{x : 0, y : -0.3333}, {x : 1, y : 33.5}, {x : 2, y : 0.6667}, {x : 3, y : 167.833}, {x : 4, y : 1.6667}],
-                                        },
+                                            strokeColor : 'blue',
+                                            label : 'sin',
+                                            values : sin,
+                                            width : 1,
+                                            fillColor : 'blue',
+                                            strokeOpacity : 0.3,
+                                            fillOpacity : 0.3,
+                                        },//*/
+                                        /*{
+                                            strokeColor : 'black',
+                                            label : 'sin',
+                                            values : sin2,
+                                            width : 1,
+                                        },*/
                                     ],
 
                                 }
+
+                            );
+
+                            $('#legend-button').on('click', function(e) {
+
+                                /*$line.setLegend(
+                                    [
+                                        { label : 'able', color : 'yellow'},
+                                        { label : 'baker', color : 'purple'},
+                                        { label : 'charlie', color : 'black'},
+                                        { label : 'delta', color : 'cyan'},
+                                        { label : 'fooZ', color : 'blue'},
+                                    ]
+                                );*/
+
+                                $line.dataset()[0].values.push(Math.random() * 200);
+//                                $line.dataset()[1].values.push(Math.random() * 100);
+                                $line.dataset()[2].values.push(Math.sin($line.dataset()[2].values.length / 10) * 50);
+                               // $line.dataset()[0].values.push($line.dataset()[0].values.length * $line.dataset()[0].values.length);
+                                console.log($line.dataset()[0].values);
+
+                                $line.dataset()[0].strokeColor = 'purple';
+                                $line.dataset()[0].shape = 'square';
+                                $line.dataset()[1].strokeColor = 'black';
+                                $line.dataset()[1].shape = 'cross';
+
+                                $line.setDataset(
+                                    /*[
+                                        {
+                                            strokeColor : 'orange',
+                                            label : 'jagged',
+                                            values : [{x : 0, y : 180}, {x : 10, y : 160}, {x : 20, y : 140}, {x : 30, y : 120}, {x : 40, y : 100}, {x : 50, y : 80},
+                                                {x : 60, y : 60, label : 'label point 1'}, {x : 70, y : 40}, {x : 80, y : 20}, {x : 90, y : 0}, {x : 100, y : 20}, {x : 110, y : 40},
+                                                {x : 120, y : 60}, {x : 130, y : 80}, {x : 140, y : 100, label : 'label point 2'} ],
+                                            width : 2,
+                                            shape : 'square',
+                                            shapeArea : 64,
+                                            //fillColor : 'red',
+                                            pointOver : function(d) {
+                                                this.showToolTip({label : 'point over line'});
+                                            },
+                                            pointOut : function(d) {
+                                                this.hideToolTip();
+                                            }
+                                        }
+                                    ]*/
+                                    $line.dataset()
+                                );
+
+                            });
+
+
+                            var spark1 = [];
+                            var spark2 = [];
+                            var spark3 = [];
+                            for (var i = 0; i < 75; i++) {
+                                spark1.push(Math.random());
+                                spark2.push(Math.random());
+                                spark3.push(Math.random());
+
+                                if (i == 20) {
+                                    spark2.push({
+                                        y : Math.random(),
+                                        shape : 'circle',
+                                        shapeArea : 9,
+                                        color : 'red'
+                                    });
+                                }
+                            }
+
+                            var $spark1 = $('#spark1').kbaseSparkline( { dataset : spark1 } );
+                            var $spark2 = $('#spark2').kbaseSparkline( { dataset : spark2 } );
+                            var $spark3 = $('#spark3').kbaseSparkline( { dataset : spark3 } );
+
+
+                            var bars = [];
+
+                            for (var i = 0; i < 20; i++) {
+                                bars.push(
+                                    {
+                                        bar   : i,
+                                        color : '#00BBBB',
+                                        value : Math.random() * 20,
+                                        //color : ['#00BBBB', '#0000FF','#00BBBB', '#0000FF'],
+                                        //value : [Math.random() * 10, Math.random() * 20,Math.random() * 10, Math.random() * 30]
+                                    }
+                                );
+                            }
+                            console.log(bars);
+
+                            var $bar = $.jqElem('div').css({width : '800px', height : '500px'}).kbaseBarchart(
+
+                                {
+                                    scaleAxes   : true,
+
+                                    xLabel      : 'Survey Data',
+                                    //yLabel      : 'Meaningful data',
+                                    hGrid       : true,
+
+                                    dataset : bars,
+
+                                }
+
                             );
 
                             $('#barchartWidget').kbaseBarchart(
                                 {
                                     scaleAxes   : true,
 
-                                    xLabel      : 'Some useful experiment',
-                                    yLabel      : 'Meaningful data',
+                                    xLabel      : 'Survey Data',
+                                    //yLabel      : 'Meaningful data',
+                                    hGride : true,
 
-                                    dataset : [
-                                        {
-                                            bar : 'Bar 1',
-                                            value : 20,
-                                            color : 'red',
-                                        },
-                                        {
-                                            bar : 'Bar 2',
-                                            value : 50,
-                                            color : 'green'
-                                        },
-                                        {
-                                            bar : 'Bar 3',
-                                            value : 10,
-                                            color : 'blue',
-                                            label : 'Some meaningful mouseover value'
-                                        },
-
-                                        {
-                                            bar : 'Bar 4',
-                                            value : [10,20,30,40,50],
-                                            color : 'purple',
-                                        },
-                                        {
-                                            bar : 'Bar 5',
-                                            value : [10,20,30,40,50],
-                                            color : ['red', 'green', 'blue', 'cyan', 'magenta'],
-                                            label : ['6.67% effort', '13.34% talent', '20% failure', '26.67% determination', '33.33% mustard'],
-                                            stacked : true,
-                                        },
-
-                                    ],
+                                    dataset : bars,
 
                                 }
                             );
@@ -367,7 +551,36 @@
 
                             $('#random-hm_c').trigger('click');
 
+
+                            var pavel_data = {"data":[[0,0,1],[0,1,0.22437378465723734],[0,2,-0.05282216846735438],[0,3,-0.0657336809229566],[0,4,0.6097317208913948],[0,5,0.5425176628844238],[0,6,0.3439309383221102],[0,7,0.037145407026350594],[0,8,0.3089556469216014],[0,9,0.7417790860781828],[0,10,-0.46134326224504935],[1,0,0.22437378465723734],[1,1,1],[1,2,0.8302880807243083],[1,3,0.7636362475320498],[1,4,0.5779936789503318],[1,5,0.839948116422643],[1,6,0.8103994528862233],[1,7,0.7998426636454904],[1,8,0.861243414952622],[1,9,0.5590565296292523],[1,10,0.39261594349622286],[2,0,-0.05282216846735438],[2,1,0.8302880807243083],[2,2,1],[2,3,0.9539172382917777],[2,4,0.4878810638547996],[2,5,0.7069512016501768],[2,6,0.5392833855877311],[2,7,0.8462648456039754],[2,8,0.7922441597490814],[2,9,0.1432476127981901],[2,10,0.2660510734471336],[3,0,-0.0657336809229566],[3,1,0.7636362475320498],[3,2,0.9539172382917777],[3,3,1],[3,4,0.5532743721921256],[3,5,0.7059430904874227],[3,6,0.4675358273403718],[3,7,0.8323376367269241],[3,8,0.7283585026398363],[3,9,0.12217567101908242],[3,10,0.15325316115813803],[4,0,0.6097317208913948],[4,1,0.5779936789503318],[4,2,0.4878810638547996],[4,3,0.5532743721921256],[4,4,1],[4,5,0.8292934171251002],[4,6,0.5990312343088248],[4,7,0.37503028486045814],[4,8,0.5344077210261144],[4,9,0.5959107085990492],[4,10,-0.28738289592618543],[5,0,0.5425176628844238],[5,1,0.839948116422643],[5,2,0.7069512016501768],[5,3,0.7059430904874227],[5,4,0.8292934171251002],[5,5,1],[5,6,0.6209056238338956],[5,7,0.7560802936681007],[5,8,0.8087395364615049],[5,9,0.5604869559136527],[5,10,-0.05083306073047172],[6,0,0.3439309383221102],[6,1,0.8103994528862233],[6,2,0.5392833855877311],[6,3,0.4675358273403718],[6,4,0.5990312343088248],[6,5,0.6209056238338956],[6,6,1],[6,7,0.428199713846343],[6,8,0.5870017427704819],[6,9,0.6863426121415102],[6,10,0.46752671641992993],[7,0,0.037145407026350594],[7,1,0.7998426636454904],[7,2,0.8462648456039754],[7,3,0.8323376367269241],[7,4,0.37503028486045814],[7,5,0.7560802936681007],[7,6,0.428199713846343],[7,7,1],[7,8,0.8696648038744825],[7,9,0.18044270237528454],[7,10,0.21519669543929473],[8,0,0.3089556469216014],[8,1,0.861243414952622],[8,2,0.7922441597490814],[8,3,0.7283585026398363],[8,4,0.5344077210261144],[8,5,0.8087395364615049],[8,6,0.5870017427704819],[8,7,0.8696648038744825],[8,8,1],[8,9,0.5433832909292271],[8,10,0.036165574629291444],[9,0,0.7417790860781828],[9,1,0.5590565296292523],[9,2,0.1432476127981901],[9,3,0.12217567101908242],[9,4,0.5959107085990492],[9,5,0.5604869559136527],[9,6,0.6863426121415102],[9,7,0.18044270237528454],[9,8,0.5433832909292271],[9,9,1],[9,10,-0.09118786691187009],[10,0,-0.46134326224504935],[10,1,0.39261594349622286],[10,2,0.2660510734471336],[10,3,0.15325316115813803],[10,4,-0.28738289592618543],[10,5,-0.05083306073047172],[10,6,0.46752671641992993],[10,7,0.21519669543929473],[10,8,0.036165574629291444],[10,9,-0.09118786691187009],[10,10,1]],"labels":["VNG0001HVNG0001HVNG0001HVNG0001H-VNG0001H","VNG0002G","VNG0003C","VNG0006G","VNG0013C","VNG0014C","VNG0361C","VNG0518H","VNG0868H","VNG0289H","VNG0852C"]};
+
                             var heatmap =
+                                {
+                                    row_ids : [],
+                                    row_labels : [],
+                                    column_ids : [],
+                                    column_labels : [],
+                                    data : [],
+                                };
+
+                            for (var idx = 0; idx < 11; idx++) {
+                                var row = [];
+                                heatmap.data.push(row);
+                                for (var jdx = 10; jdx >= 0; jdx--) {
+                                    row.push(pavel_data.data[idx * 11 + jdx][2]);
+                                }
+                            }
+
+                            for (var ldx = pavel_data.labels.length - 1; ldx >= 0 ; ldx--) {
+                                var label = pavel_data.labels[ldx];
+                                heatmap.row_ids.push(label + '-row');
+                                heatmap.row_labels.push(label);
+                                heatmap.column_ids.unshift(label + '-column');
+                                heatmap.column_labels.unshift(label);
+                            }
+
+
+                            /*var heatmap =
                                 {
                                     row_ids : [],
                                     row_labels : [],
@@ -388,11 +601,22 @@
                                 heatmap.column_ids.push('Frobnoz' + idx);
                                 heatmap.column_labels.push('Frobnoz' + idx);
                             } //*/
-console.log(heatmap);
+
                             $('#heatmapWidget').kbaseHeatmap(
                                 {
                                     dataset : heatmap,
-                                    ulIcon : '../img/labs_icon.png',
+                                    colors : ['#0000AA', '#FFFFFF', '#AA0000'],
+                                    //ulIcon : '/functional-site/assets/navbar/images/kbase_logo.png',
+                                    minValue : -1.0,
+                                    maxValue : 1.0,
+                                    aspectRatio : 'maxSquare',
+
+                                    /*labelOver : function (d) {
+                                        console.log("OVER ", d);
+                                    },
+                                    labelOut : function (d) {
+                                        console.log("OUT OF ", d);
+                                    },*/
                                 }
                             );
 
@@ -435,6 +659,13 @@ console.log(heatmap);
                             var $tree = $('#treechartWidget').kbaseTreechart(
                                 {
                                 debug : false,
+                                lineStyle : 'square',
+                                layout : 'cluster',
+//                            displayStyle:'nt',
+                            distance : 50,
+                            layout : 'cluster',
+                            bias : 'leaf',
+                            fixed : true,
 dataset :
 {
     "name" : "animals",
@@ -453,6 +684,9 @@ dataset :
                 },
                 {
                     "name" : "herding dogs",
+                    weight : 5,
+                    lineStroke : 'blue',
+                    tooltip : 'Magic!',
                     "children" : [
                         {"name" : "sheepdog"},
                         {"name" : "German Shepherd"},
@@ -626,7 +860,11 @@ transitionTime : 250,
 <div id = 'accordion'></div>
 
         <div style = 'display : block'>
+            <div id = 'spark1' style = 'border : 0px solid green; width : 100px; height : 25px; display : inline-block'></div>
+            <div id = 'spark2' style = 'border : 0px solid green; width : 100px; height : 25px; display : inline-block'></div>
+            <div id = 'spark3' style = 'border : 0px solid green; width : 100px; height : 25px; display : inline-block'></div>
             <div id = 'linechartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            <button id = 'legend-button'>New legend</button>
             <div id = 'barchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
             <div id = 'scatterplotWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
             <div id = 'piechartWidget' style = 'border : 1px solid green; width : 1000px; height : 500px'></div>
