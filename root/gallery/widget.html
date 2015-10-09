@@ -200,50 +200,42 @@
                                 }
                             );
 
+                            var scatterset = [];
+
+                            var points = 200;
+
+                            var randomColor = function() {
+                                var colors = ['red', 'green', 'blue', 'cyan', 'magenta', 'yellow', 'orange', 'black'];
+                                return colors[Math.floor(Math.random() * colors.length)];
+                            }
+
+                            var randomShape = function() {
+                            //return 'circle';
+                                var shapes = ['circle', 'circle', 'circle', 'circle', 'circle', 'circle', 'square', 'triangle-up', 'triangle-down', 'diamond', 'cross'];
+                                return shapes[Math.floor(Math.random() * shapes.length)];
+                            }
+
+                            for (var idx = 0; idx < points; idx++) {
+                                scatterset.push(
+                                    {
+                                        x : Math.random() * 500,
+                                        y : Math.random() * 500,
+                                        weight : Math.random() * 225,
+                                        color : randomColor(),
+                                        label : 'Data point ' + idx,
+                                        shape : randomShape(),
+                                    }
+                                );
+                            }
+
                             $('#scatterplotWidget').kbaseScatterplot(
                                 {
                                     scaleAxes   : true,
 
-                                    xLabel      : 'Some useful experiment',
-                                    yLabel      : 'Meaningful data',
+                                    //xLabel      : 'Some useful experiment',
+                                    //yLabel      : 'Meaningful data',
 
-                                    dataset : [
-                                        {
-                                            x : 10,
-                                            y : 10,
-                                            weight : 10,
-                                            color  : 'blue',
-                                            label : 'This one looks like earth'
-                                        },
-                                        {
-                                            x : 20,
-                                            y : 12,
-                                            weight : 6,
-                                            color  : 'red',
-                                            label : 'This one looks like mars'
-                                        },
-                                        {
-                                            x : 40,
-                                            y : 8,
-                                            weight : 16,
-                                            color  : 'orange',
-                                            label : 'This one looks like jupiter'
-                                        },
-                                        {
-                                            x : 80,
-                                            y : 18,
-                                            weight : 13,
-                                            color  : 'green',
-                                            label : 'This one looks like Uranus'
-                                        },
-                                        {
-                                            x : 100,
-                                            y : 30,
-                                            weight : 5,
-                                            color  : 'black',
-                                        },
-
-                                    ],
+                                    dataset : scatterset,
 
                                 }
                             );
