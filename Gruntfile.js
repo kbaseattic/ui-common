@@ -260,7 +260,7 @@ module.exports = function (grunt) {
                     {
                         cwd: 'build/client',
                         src: '**/*',
-                        dest: deployCfg['ui-common']['deploy-target'],
+                        dest: deployCfg['ui-common']['deploy_target'],
                         expand: true
                     }
                 ]
