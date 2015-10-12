@@ -54,5 +54,5 @@ install:
             name: dashboard
             definition:
                 path: ['dashboard']
-                label: Dashbaord
+                label: Dashboard
                 icon: dashboard

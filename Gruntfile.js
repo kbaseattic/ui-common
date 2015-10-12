@@ -217,7 +217,7 @@ module.exports = function (grunt) {
                         dest: 'build/client/config.yml'
                     },
                     {
-                        src: 'config/ui.yml',
+                        src: 'config/ui-prod.yml',
                         dest: 'build/client/ui.yml'
                     },
                     {

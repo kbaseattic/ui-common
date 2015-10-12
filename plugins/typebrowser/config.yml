@@ -21,11 +21,11 @@ install:
         -
             path: ['typebrowser']
             panelFactory: kb_panel_typeBrowser
-    menu:
-        -
-            name: typebrowser
-            definition:
-                path: typebrowser
-                label: Type Browser
-                icon: beer
+    # menu:
+    #     -
+    #         name: typebrowser
+    #         definition:
+    #             path: typebrowser
+    #             label: Type Browser
+    #             icon: beer
         

@@ -256,7 +256,7 @@ define([
                     // refreshing more expensive data.
                     // this.refreshBeat = 0;
                     //
-                    this.refreshInterval = 36000;
+                    this.refreshInterval = 360000;
                     this.refreshLastTime = null;
 
 
@@ -398,16 +398,16 @@ define([
             },
             handleHeartbeat: {
                 value: function (data) {
-                    var now = (new Date()).getTime();
-                    if (!this.refreshLastTime) {
-                        this.refreshLastTime = now;
-                    }
-                    if (now - this.refreshLastTime >= this.refreshInterval) {
-                        if (this.onRefreshbeat) {
-                            this.onRefreshbeat(data);
-                            this.refreshLastTime = now;
-                        }
-                    }
+                    // var now = (new Date()).getTime();
+                    // if (!this.refreshLastTime) {
+                    //     this.refreshLastTime = now;
+                    // }
+                    // if (now - this.refreshLastTime >= this.refreshInterval) {
+                    //     if (this.onRefreshbeat) {
+                    //         this.onRefreshbeat(data);
+                    //         this.refreshLastTime = now;
+                    //     }
+                    // }
                     if (this.onHeartbeat) {
                         this.onHeartbeat(data);
                     }
