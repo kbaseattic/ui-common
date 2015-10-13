@@ -51,14 +51,18 @@ define('kbaseBarchart',
         options: {
             xScaleType  : 'ordinal',
             overColor : 'yellow',
-            strokeWidth : '2',
+            strokeWidth : 2,
+            zeroLine : false,
+
+            zeroLineColor : 'black',
+            zeroLineWidth : 1,
         },
 
         _accessors : [
 
         ],
 
-        defaultXDomain : function() {
+        defaultXDomain : function defaultXDomain () {
 
             if (this.dataset() == undefined) {
                 return [0,0];
@@ -67,7 +71,7 @@ define('kbaseBarchart',
             return this.dataset().map(function(d) { return d.bar });
         },
 
-        defaultYDomain : function() {
+        defaultYDomain : function defaultYDomain () {
 
             if (this.dataset() == undefined) {
                 return [0,0];
@@ -117,7 +121,7 @@ define('kbaseBarchart',
             ];
         },
 
-        extractLegend : function (dataset) {
+        extractLegend : function extractLegend (dataset) {
 
             var legend = [];
             dataset.forEach(
@@ -137,7 +141,7 @@ define('kbaseBarchart',
 
         },
 
-        renderChart : function() {
+        renderChart : function renderChart () {
 
             if (this.dataset() == undefined) {
                 return;
@@ -146,21 +150,36 @@ define('kbaseBarchart',
             var bounds = this.chartBounds();
             var $bar = this;
 
-            var funkyTown = function(barScale, d, i) {
+            var transitionTime = this.initialized
+                ? this.options.transitionTime
+                : 0;
+
+            var funkyTown = function(barScale, d, i, init) {
+
+                if (init) {
+                    this
+                        //.attr('width', 0)
+                        //.attr('height', 0)
+                        .attr('x', bounds.origin.x + bounds.size.width)
+                        //.attr('y', 0)
+                        .attr('opacity', 0)
+                }
+                else {
+
+                    this
+                        .attr('x', function (b, j) {
+
+                            var xId = d.bar;
+                            if ($bar.options.useIDMapping) {
+                                xId = $bar.xIDMap()[xId];
+                            }
+
+                            return $bar.xScale()(xId) + barScale(d.stacked ? 0 : j);
+                        } )
+                        .attr('opacity', 1)
+                }
+
                 this
-                    .attr('width', barScale.rangeBand())
-                    .attr('height', function(b, bi) {
-                        return Math.abs($bar.yScale()(0) - $bar.yScale()(b))
-                    })
-                    .attr('x', function (b, j) {
-
-                        var xId = d.bar;
-                        if ($bar.options.useIDMapping) {
-                            xId = $bar.xIDMap()[xId];
-                        }
-
-                        return $bar.xScale()(xId) + barScale(d.stacked ? 0 : j);
-                    } )
                     .attr('y', function (b, bi) {
 
                         var barHeight = b;
@@ -170,10 +189,15 @@ define('kbaseBarchart',
 
                         return $bar.yScale()(Math.max(0,barHeight));
                     } )
+                    .attr('width', barScale.rangeBand())
+                    .attr('height', function(b, bi) {
+                        return Math.abs($bar.yScale()(0) - $bar.yScale()(b))
+                    })
                     .attr('fill', function(b,j) { return d.color[ j % d.color.length ] })
                     .attr('stroke', function(b,j) { return d.stroke ? d.stroke[ j % d.stroke.length ] : 'none' })
                     .attr('stroke-width', function(b,j) { return d.strokeWidth || $bar.options.strokeWidth })
                     .attr('data-fill', function(b,j) { return d.color[ j % d.color.length ] });
+
                 return this;
             };
 
@@ -291,13 +315,13 @@ define('kbaseBarchart',
                         .enter()
                             .append('rect')
                             .attr('class', 'bar')
-                            .call(function() { return funkyTown.call(this, barScale, d, i) } );
+                            .call(function() { return funkyTown.call(this, barScale, d, i, true) } );
 
                     d3.select(this).selectAll('.bar')
                         .data(d.value)
                         .call(function() { return mouseAction.call(this, d,i) } )
                         .transition()
-                        .duration($bar.options.transitionTime)
+                        .duration(transitionTime)
                             .call(function() { return funkyTown.call(this, barScale, d, i) } );
 
                 })
@@ -344,28 +368,55 @@ define('kbaseBarchart',
             chart
                 .data(this.dataset())
                 .exit()
-                    .remove()
+                    .call(
+                        function nuke () {
+                            this.each(function (d, i) {
+                                d3.select(this).selectAll('.bar')
+                                    .transition()
+                                    .duration(transitionTime)
+                                        .attr('x', bounds.origin.x + bounds.size.width)
+                                        .attr('opacity', 0)
+                            })
+                        }
+                    )
+/*                    .transition()
+                    .duration(transitionTime)
+                        .attr('x', 0)
+                        .attr('opacity', 0)*/
+//                        .remove()
             ;
 
-            /*var barGroups = chart.selectAll('.bar')
-                .data(this.dataset())
-                .enter()
-                    .append('rect')
-                        .attr('class', 'bar')
-                        .call(funkyTown)
-            ;
+            if (this.options.zeroLine) {
 
-            barGroups
-                .data(this.dataset())
-                    .call(mouseAction)
-                    .transition()
-                    .duration(500)
-                        .call(funkyTown)
-            ;*/
+console.log("ZERO IS AT ", $bar.yScale()(0));
+
+                var zeroLine = this.D3svg().select( this.region('chart') ).selectAll('.zeroLine');
+
+                zeroLine
+                    .data([0])
+                        .enter()
+                            .append('line')
+                                .attr('class', 'zeroLine')
+                                .attr('x1', 0)
+                                .attr('x2', bounds.size.width)
+                                .attr('stroke', $bar.options.zeroLineColor)
+                                .attr('stroke-width', $bar.options.zeroLineWidth)
+                                .attr('y1', $bar.yScale()(0))
+                                .attr('y2', $bar.yScale()(0))
+
+                zeroLine
+                    .data([0])
+                        .transition()
+                        .duration(transitionTime)
+                            .attr('y1', $bar.yScale()(0))
+                            .attr('y2', $bar.yScale()(0))
+            }
+
+            this.initialized = true;
 
         },
 
-        setXScaleRange : function(range, xScale) {
+        setXScaleRange : function setXScaleRange (range, xScale) {
 
             if (xScale == undefined) {
                 xScale = this.xScale();
@@ -375,8 +426,9 @@ define('kbaseBarchart',
             return xScale;
         },
 
-        setYScaleRange : function(range, yScale) {
+        setYScaleRange : function setYScaleRange (range, yScale) {
             return this._super(range.reverse(), yScale.nice());
+
         },
 
 

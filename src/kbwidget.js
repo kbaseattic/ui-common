@@ -444,21 +444,20 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
             _functions : {
 
                 getter :
-                    function(name) {
-                        return function() {
+                    function getter(name) {
+                        return function keyGetter() {
                             return this.valueForKey(name);
                         }
                     },
 
                 setter :
-                    function (name) {
+                    function setter (name) {
                         return function (newVal) {
                             return this.setValueForKey(name, newVal);
                         }
                     },
 
-                getter_setter :
-                    function (name) {
+                getter_setter : function getter_setter (name) {
 
                         return function(newVal) {
                             if (arguments.length === 1) {
@@ -634,7 +633,7 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
                         }
                     }
 
-                    return function() {
+                    return function super_closure() {
                         var _oSuper = this._super;
                         var _oSuperMethod = this._superMethod;
                         this._super = _super;
@@ -791,10 +790,10 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
              * Writes text to console.
              * @param {String} txt The text to write.
              */
-            dbg : function (txt) { if (window.console) console.log(txt); },
+            dbg : function dbg (txt) { if (window.console) console.log(txt); },
 
 
-            callAfterInit : function (func) {
+            callAfterInit : function callAfterInit (func) {
                 var $me = this;
                 var delayer = function () {
 
@@ -899,15 +898,14 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
                 return this;
             },
 
-            valueForKey :
-                function (attribute) {
+            valueForKey : function valueForKey (attribute) {
                     //this.trigger('didAccessValueFor' + name + '.kbase');
                     return this._attributes[attribute];
                 },
 
             setValueForKey :
 
-                function(attribute, newVal) {
+                function setValueForKey(attribute, newVal) {
 
                     var triggerValues = undefined;
                     var oldVal = this.valueForKey(attribute);
@@ -934,7 +932,7 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
                     return this.valueForKey(attribute);
                 },
 
-            setValuesForKeys : function (obj) {
+            setValuesForKeys : function setValuesForKeys (obj) {
 
                 var objCopy = $.extend({}, obj);
 
@@ -955,7 +953,7 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
              * @param {Object} key The key for the data
              * @param {Object} value The data itself
              */
-            data : function (key, val) {
+            data : function data (key, val) {
 
                 if (this.options._storage === undefined) {
                     this.options._storage = {};
@@ -996,13 +994,13 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
                 return $elem;
             },
 
-            sortCaseInsensitively : function (a,b) {
+            sortCaseInsensitively : function sortCaseInsensitively (a,b) {
                      if (a.toLowerCase() < b.toLowerCase()) { return -1 }
                 else if (a.toLowerCase() > b.toLowerCase()) { return 1  }
                 else                            { return 0  }
             },
 
-            sortByKey : function (key, insensitively) {
+            sortByKey : function sortByKey (key, insensitively) {
                 if (insensitively) {
                     return function (a,b) {
                              if (a[key].toLowerCase() < b[key].toLowerCase()) { return -1 }
@@ -1019,15 +1017,15 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
                 }
             },
 
-            trigger : function () {
+            trigger : function trigger () {
                 this.$elem.trigger.apply(this.$elem, arguments);
             },
 
-            on : function () {
+            on : function on () {
                 this.$elem.on.apply(this.$elem, arguments);
             },
 
-            off : function () {
+            off : function off () {
                 this.$elem.off.apply(this.$elem, arguments);
             },
 
@@ -1082,7 +1080,7 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
                 this.unobserve($target, event, callback);
             },
 
-            uuid : function () {
+            uuid : function uuid () {
                 var result = '';
                 for (var i = 0; i < 32; i++) {
                     result += Math.floor(Math.random()*16).toString(16).toUpperCase();

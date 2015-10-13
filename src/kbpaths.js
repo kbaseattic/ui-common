@@ -206,6 +206,7 @@
 				'kbasePlantsNTO'                    : 'vis/plants/kbasePlantsNTO',
 				'kbasePlantsNetworkNarrative'       : 'vis/plants/kbasePlantsNetworkNarrative',
 				'kbasePlantsNetworkTable'           : 'vis/plants/kbasePlantsNetworkTable',
+				'kbasePMIBarchart'                       : 'vis/plants/kbasePMIBarchart',
 				'vis'                               : 'vis/vis',
 				'kbaseSimpleWSSelect'               : 'workspaces/kbaseSimpleWSSelect',
 				'kbaseWSButtons'                    : 'workspaces/kbaseWSButtons',

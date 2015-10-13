@@ -39,10 +39,10 @@ define('kbaseVisWidget',
                 ticker: 0,
                 radialGradientStopColor: 'black',
                 linearGradientStopColor: 'black',
-                defaultDataset: function () {
+                defaultDataset : function defaultDataset () {
                     return []
                 },
-                defaultLegend: function () {
+                defaultLegend : function defaultLegend () {
                     return []
                 },
                 width: '100%',
@@ -83,7 +83,7 @@ define('kbaseVisWidget',
 
                 //autoLegend : true,
             },
-            shouldScaleAxis: function (axis) {
+            shouldScaleAxis : function shouldScaleAxis (axis) {
                 if (this.options.scaleAxes) {
                     return true;
                 } else if (axis == 'x' && this.options.scaleXAxis) {
@@ -117,10 +117,10 @@ define('kbaseVisWidget',
                 'linearGradients',
                 'children',
             ],
-            input: function () {
+            input : function input () {
                 return this.dataset();
             },
-            setInput: function (newInput) {
+            setInput : function setInput (newInput) {
 
                 if ($.isPlainObject(newInput) && newInput.dataset != undefined) {
                     return this.setValuesForKeys(newInput);
@@ -129,23 +129,23 @@ define('kbaseVisWidget',
                 }
 
             },
-            setXLabel: function (newXLabel) {
+            setXLabel : function setXLabel (newXLabel) {
                 this.setValueForKey('xLabel', newXLabel);
                 this.render('xLabel');
             },
-            setYLabel: function (newYLabel) {
+            setYLabel : function setYLabel (newYLabel) {
                 this.setValueForKey('yLabel', newYLabel);
                 this.render('yLabel');
             },
-            setXScale: function (newXScale) {
+            setXScale : function setXScale (newXScale) {
                 this.setValueForKey('xScale', newXScale);
                 this.render('xAxis');
             },
-            setYScale: function (newYScale) {
+            setYScale : function setYScale (newYScale) {
                 this.setValueForKey('yScale', newYScale);
                 this.render('yAxis');
             },
-            createIDMapForDomain: function (domain) {
+            createIDMapForDomain : function createIDMapForDomain (domain) {
                 var map = {};
                 $.each(
                     domain,
@@ -155,7 +155,7 @@ define('kbaseVisWidget',
                 );
                 return map;
             },
-            setXScaleDomain: function (domain, scaleType) {
+            setXScaleDomain : function setXScaleDomain (domain, scaleType) {
                 var xScale = this.xScale();
 
                 if (xScale == undefined) {
@@ -179,7 +179,7 @@ define('kbaseVisWidget',
 
                 return xScale;
             },
-            setXScaleRange: function (range, xScale) {
+            setXScaleRange : function setXScaleRange (range, xScale) {
                 if (xScale == undefined) {
                     xScale = this.xScale();
                 }
@@ -187,7 +187,7 @@ define('kbaseVisWidget',
 
                 return xScale;
             },
-            setYScaleDomain: function (domain, scaleType) {
+            setYScaleDomain : function setYScaleDomain (domain, scaleType) {
                 var yScale = this.yScale();
 
                 if (yScale == undefined) {
@@ -210,7 +210,7 @@ define('kbaseVisWidget',
 
                 return yScale;
             },
-            setYScaleRange: function (range, yScale) {
+            setYScaleRange : function setYScaleRange (range, yScale) {
                 if (yScale == undefined) {
                     yScale = this.yScale();
                 }
@@ -218,7 +218,7 @@ define('kbaseVisWidget',
 
                 return yScale;
             },
-            init: function (options) {
+            init : function init (options) {
 
                 this._super(options);
 
@@ -283,7 +283,7 @@ define('kbaseVisWidget',
                 return this;
 
             },
-            render: function (field) {
+            render : function render (field) {
 
                 if (!this._init) {
                     return;
@@ -319,7 +319,7 @@ define('kbaseVisWidget',
 
             },
 
-            fitTextToWidth : function(text, width) {
+            fitTextToWidth : function fitTextToWidth (text, width) {
 
                 var fakeText = this.D3svg()
                     .append('text')
@@ -351,7 +351,7 @@ define('kbaseVisWidget',
 
             },
 
-            renderLegend : function() {
+            renderLegend : function renderLegend () {
 
                 if (this.legend() == undefined) {
                     return;
@@ -497,7 +497,7 @@ define('kbaseVisWidget',
 
             },
 
-            renderULCorner: function () {
+            renderULCorner : function renderULCorner () {
 
                 var ulBounds = this.ULBounds();
 
@@ -540,7 +540,7 @@ define('kbaseVisWidget',
                 }
             },
 
-            setLegend : function(newLegend) {
+            setLegend : function setLegend (newLegend) {
                 if (newLegend == undefined) {
                     newLegend = this.options.defaultLegend();
                 }
@@ -551,9 +551,9 @@ define('kbaseVisWidget',
             },
 
 
-            extractLegend : function(dataset) { /* no op in the super class */ },
+            extractLegend : function extractLegend (dataset) { /* no op in the super class */ },
 
-            setDataset: function (newDataset) {
+            setDataset : function setDataset (newDataset) {
 
                 if (newDataset == undefined) {
                     newDataset = this.options.defaultDataset();
@@ -567,6 +567,7 @@ define('kbaseVisWidget',
                 }
 
                 if (this.shouldScaleAxis('y')) {
+                console.log("SHOULD SCALE Y, so sets it", this.defaultYDomain());
                     this.setYScaleDomain(this.defaultYDomain());
                 }
 
@@ -576,7 +577,7 @@ define('kbaseVisWidget',
 
                 this.render();
             },
-            setDatasets: function (newDatasets) {
+            setDatasets : function setDatasets (newDatasets) {
 
                 if (newDatasets == undefined) {
                     newDatasets = [];
@@ -622,17 +623,17 @@ define('kbaseVisWidget',
                 this.callAfterInit(initKids);
 
             },
-            reenter: function (idx, dataset, $parent) {},
-            childOptions: function (idx, dataset) {
+            reenter : function reenter (idx, dataset, $parent) {},
+            childOptions : function childOptions (idx, dataset) {
                 return $.extend(true, {}, dataset.options || this.options.childOptions || this.options);
             },
-            defaultXDomain: function () {
+            defaultXDomain : function defaultXDomain () {
                 return [0, 100];
             },
-            defaultYDomain: function () {
+            defaultYDomain : function defaultYDomain () {
                 return [0, 100];
             },
-            renderXLabel: function () {
+            renderXLabel : function renderXLabel () {
                 var labelRegionBounds = this[this.options.xLabelRegion + 'Bounds']();
 
 
@@ -657,7 +658,7 @@ define('kbaseVisWidget',
                 ;
 
             },
-            renderYLabel: function () {
+            renderYLabel : function renderYLabel () {
 
                 var labelRegionBounds = this[this.options.yLabelRegion + 'Bounds']();
 
@@ -688,13 +689,13 @@ define('kbaseVisWidget',
                 ;
 
             },
-            xTickValues: function () {
+            xTickValues : function xTickValues () {
                 return;
             },
-            xTickLabel: function (val) {
+            xTickLabel : function xTickLabel (val) {
                 return val;
             },
-            renderXAxis: function () {
+            renderXAxis : function renderXAxis () {
 
                 var $self = this;
 
@@ -706,10 +707,24 @@ define('kbaseVisWidget',
                     return;
                 }
 
+                var axisTransform = this.options.xAxisRegion == 'yGutter' ? axisRegionBounds.size.height : 0;
+console.log("RENDERS X WITH TRANSFORM " , this.options.xAxisTransform);
+                if (this.options.xAxisTransform) {
+                    axisTransform = this.options.xAxisTransform;
+                }
+
+                var axisRegionBounds = this[this.options.xAxisRegion + 'Bounds']();
+
+                var xAxisOrientation = this.options.xAxisOrientation;
+
+                if (xAxisOrientation == 'bottom' && axisTransform > axisRegionBounds.size.height - 30) {
+                    xAxisOrientation = 'top';
+                }
+
                 var xAxis =
                     d3.svg.axis()
                     .scale(this.xScale())
-                    .orient(this.options.xAxisOrientation);
+                    .orient(xAxisOrientation);
 
                 var ticks = this.xTickValues();
 
@@ -729,27 +744,29 @@ define('kbaseVisWidget',
 
                 var gxAxis = this.D3svg().select(this.region(this.options.xAxisRegion)).select('.xAxis');
 
-                var axisRegionBounds = this[this.options.xAxisRegion + 'Bounds']();
-                var axisTransform = this.options.xAxisRegion == 'yGutter' ? axisRegionBounds.size.height : 0;
-
                 if (gxAxis[0][0] == undefined) {
                     gxAxis = this.D3svg().select(this.region(this.options.xAxisRegion))
                         .append('g')
                         .attr('class', 'xAxis axis')
                         .attr('fill', this.options.xAxisColor)
-                        .attr("transform", "translate(0," + axisTransform + ")")
                 }
+console.log("GX AXIS ", gxAxis, gxAxis[0][0].parentNode);
+
+gxAxis[0][0].parentNode.appendChild(gxAxis[0][0]);
+
+                this.D3svg().select(this.region(this.options.xAxisRegion)).selectAll('.xAxis').attr("transform", "translate(0," + axisTransform + ")");
 
                 gxAxis.transition().call(xAxis);
 
+
             },
-            svg2HTML: function () {
+            svg2HTML : function svg2HTML () {
                 var $container = $.jqElem('div')
                     .append(this.data('$svg'));
 
                 return $container.html();
             },
-            renderYAxis: function () {
+            renderYAxis : function renderYAxis () {
 
                 if (! this.options.shouldRenderYAxis) {
                     return;
@@ -783,14 +800,14 @@ define('kbaseVisWidget',
 
                 gyAxis.transition().call(yAxis);
             },
-            renderChart: function () {
+            renderChart : function renderChart () {
 
             },
-            setGutter: function (newGutter) {
+            setGutter : function setGutter (newGutter) {
                 this.xGutter(newGutter);
                 this.yGutter(newGutter);
             },
-            setPadding: function (newPadding) {
+            setPadding : function setPadding (newPadding) {
                 this.xPadding(newPadding);
                 this.yPadding(newPadding);
             },
@@ -805,7 +822,7 @@ define('kbaseVisWidget',
              +------------------------+
              */
 
-            appendUI: function ($elem) {
+            appendUI : function appendUI ($elem) {
 
                 var chartBounds = this.chartBounds();
                 if (chartBounds.size.width != chartBounds.size.height && this.options.aspectRatio != 'default') {
@@ -1009,14 +1026,14 @@ define('kbaseVisWidget',
                  ;*/
 
             },
-            D3svg: function () {
+            D3svg : function D3svg () {
                 if (this.options.parent) {
                     return this.options.parent.D3svg();
                 } else {
                     return this.data('D3svg');
                 }
             },
-            region: function (region, asName) {
+            region : function _region (region, asName) {
 
                 var dot = '';
 
@@ -1030,56 +1047,56 @@ define('kbaseVisWidget',
 
                 return dot + region + '-' + this.options.chartID;
             },
-            ULBounds: function () {
+            ULBounds : function ULBounds () {
                 return new Rectangle(
                     new Point(0, 0),
                     new Size(this.xPadding(), this.yGutter())
                     );
             },
-            URBounds: function () {
+            URBounds : function URBounds () {
                 return new Rectangle(
                     new Point(this.xPadding() + this.chartBounds().size.width, 0),
                     new Size(this.xGutter(), this.yGutter())
                     );
             },
-            LLBounds: function () {
+            LLBounds : function LLBounds () {
                 return new Rectangle(
                     new Point(0, this.yGutter() + this.chartBounds().size.height),
                     new Size(this.xPadding(), this.yPadding())
                     );
             },
-            LRBounds: function () {
+            LRBounds : function LRBounds () {
                 return new Rectangle(
                     new Point(this.xPadding() + this.chartBounds().size.width, this.yGutter() + this.chartBounds().size.height),
                     new Size(this.xPadding(), this.yPadding())
                     );
             },
-            xPaddingBounds: function () {
+            xPaddingBounds : function xPaddingBounds () {
                 return new Rectangle(
                     new Point(0, this.yGutter()),
                     new Size(this.xPadding(), this.chartBounds().size.height)
                     );
             },
-            xGutterBounds: function () {
+            xGutterBounds : function xGutterBounds () {
                 return new Rectangle(
                     new Point(this.xPadding() + this.chartBounds().size.width, this.yGutter()),
                     new Size(this.xGutter(), this.chartBounds().size.height)
                     );
             },
-            yGutterBounds: function () {
+            yGutterBounds : function yGutterBounds () {
                 return new Rectangle(
                     new Point(this.xPadding(), 0),
                     new Size(this.chartBounds().size.width, this.yGutter())
                     );
             },
-            yPaddingBounds: function () {
+            yPaddingBounds : function yPaddingBounds () {
                 return new Rectangle(
                     new Point(this.xPadding(), this.yGutter() + this.chartBounds().size.height),
                     new Size(this.chartBounds().size.width, this.yPadding())
                     );
             },
 
-            chartBounds: function () {
+            chartBounds : function chartBounds () {
 
                 var widgetWidth = this.$elem.width();
                 var widgetHeight = this.$elem.height();
@@ -1104,7 +1121,7 @@ define('kbaseVisWidget',
 
             },
 
-            showToolTip: function (args) {
+            showToolTip : function showToolTip (args) {
 
                 if (args.event == undefined) {
                     args.event = d3.event;
@@ -1116,10 +1133,10 @@ define('kbaseVisWidget',
                     .style("left", (args.event.pageX + 10) + "px")
                     .style("top", (args.event.pageY - 10) + "px");
             },
-            hideToolTip: function (args) {
+            hideToolTip : function hideToolTip (args) {
                 d3.selectAll('.visToolTip').style('display', 'none');
             },
-            radialGradient: function (grad) {
+            radialGradient : function radialGradient (grad) {
 
                 grad = $.extend(
                     true,
@@ -1223,7 +1240,7 @@ define('kbaseVisWidget',
                                         return this.radialGradients()[gradKey] = grad.id;
 
                                     },
-                                linearGradient: function (grad) {
+                                linearGradient : function linearGradient (grad) {
 
                                     var chartBounds = this.chartBounds();
 
@@ -1320,7 +1337,7 @@ define('kbaseVisWidget',
                                                             return this.linearGradients()[gradKey] = grad.id;
 
                                                         },
-                                                    wrap: function (text, width, xCoord) {
+                                                    wrap : function wrap (text, width, xCoord) {
 
                                                         if (xCoord == undefined) {
                                                             xCoord = function () {
@@ -1364,14 +1381,14 @@ define('kbaseVisWidget',
                                                             }
                                                         });
                                                     },
-                                                    absPos: function (obj) {
+                                                    absPos : function absPos (obj) {
 
                                                         var box = obj.getBBox();
                                                         var matrix = obj.getScreenCTM();
 
                                                         return {x: box.x + matrix.e, y: box.y + matrix.f};
                                                     },
-                                                    endall: function (transition, callback) {
+                                                    endall : function endall (transition, callback) {
                                                         var n = 0;
                                                         transition
                                                             .each(function () {
@@ -1382,7 +1399,7 @@ define('kbaseVisWidget',
                                                                     callback.apply(this, arguments);
                                                             });
                                                     },
-                                                    uniqueness: function (uniqueFunc) {
+                                                    uniqueness : function uniqueness (uniqueFunc) {
                                                         if (uniqueFunc == undefined) {
                                                             uniqueFunc = this.uniqueID;
                                                         }

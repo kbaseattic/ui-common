@@ -396,7 +396,7 @@
 
                                     var bars = [];
 
-                                    for (var i = 0; i < Math.random() * 30; i++) {
+                                    for (var i = 4; i < Math.random() * 30 + 4; i++) {
 
                                         var val = Math.random() * 20 - 10;
 
@@ -889,7 +889,7 @@ transitionTime : 250,
     </head>
 
     <body>
-
+        <div style = 'display : none'>
         <div>
             Simple demonstrations of visualization widgets. Mouse over the charts, they're all interactive.<br>
             The force directed graph has draggable nodes, and they can be selected by drawing on the box.
@@ -902,15 +902,13 @@ transitionTime : 250,
 
 <div id = 'accordion'></div>
 
-        <div style = 'display : block'>
+
             <div id = 'spark1' style = 'border : 0px solid green; width : 100px; height : 25px; display : inline-block'></div>
             <div id = 'spark2' style = 'border : 0px solid green; width : 100px; height : 25px; display : inline-block'></div>
             <div id = 'spark3' style = 'border : 0px solid green; width : 100px; height : 25px; display : inline-block'></div>
             <div id = 'linechartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
             <button id = 'legend-button'>New legend</button>
             <div id = 'barchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
-            <div id = 'PMIbarchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
-            <button id = 'pmi-button'>New data</button>
             <div id = 'scatterplotWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
             <div id = 'piechartWidget' style = 'border : 1px solid green; width : 1000px; height : 500px'></div>
             <button id = 'random-pie'>Randomize pie chart</button>
@@ -924,6 +922,8 @@ transitionTime : 250,
             <div id = 'json' style = 'border : 1px solid green;'></div>
         </div>
 
+            <div id = 'PMIbarchartWidget' style = 'border : 1px solid green; width : 800px; height : 600px'></div>
+            <button id = 'pmi-button'>New data</button>
 
     </body>
 
