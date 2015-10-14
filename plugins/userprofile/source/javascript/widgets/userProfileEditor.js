@@ -915,15 +915,15 @@ define([
                                 widget.renderEditView();
                             }.bind(this)
                         });
-                        R.send('navbar', 'addButton', {
-                            name: 'test',
-                            label: 'Test Button',
-                            style: 'primary',
-                            icon: 'comment', 
-                            callback: function () {
-                                alert('clicked me');
-                            }
-                        });
+                        // R.send('navbar', 'addButton', {
+                        //     name: 'test',
+                        //     label: 'Test Button',
+                        //     style: 'primary',
+                        //     icon: 'comment', 
+                        //     callback: function () {
+                        //         alert('clicked me');
+                        //     }
+                        // });
                         
                         /*navbar.clearButtons();
                         navbar.addButton({
