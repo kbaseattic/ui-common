@@ -274,7 +274,7 @@ define([
                 Session.logout()
                     .then(function () {
                         R.send('app', 'loggedout');
-                        R.send('app', 'navigate', 'welcome');
+                        R.send('app', 'navigate', 'login');
                     })
                     .catch(function (err) {
                         console.log('ERROR');
