@@ -98,7 +98,7 @@ define([
             app.addRoute({
                 path: [],
                 redirect: {
-                    path: 'welcome'
+                    path: 'dashboard'
                 }
             });
 
