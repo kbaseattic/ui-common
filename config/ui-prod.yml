@@ -49,6 +49,10 @@ navbar:
                 uri: https://kbase.us/contact-us
                 label: Contact KBase
                 icon: envelope-o
+            dashboard:
+                uri: "#dashboard"
+                label: Dashboard
+                icon: dashboard
         menus:
-            authenticated: [search, narrative, divider, about_kbase]
+            authenticated: [search, narrative, dashboard, divider, about_kbase]
             unauthenticated: [search, divider, about_kbase, contact_kbase]

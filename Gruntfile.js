@@ -452,7 +452,6 @@ module.exports = function (grunt) {
     ]);
     
     grunt.registerTask('preview', [
-        'build-test',
         'open:dev',
         'connect'
     ]);
