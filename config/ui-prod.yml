@@ -1,0 +1,54 @@
+## YAML Template.
+---
+plugins:
+    -
+        login
+    -
+        about
+    -
+        databrowser
+    -
+        userprofile
+    -
+        narrativestore
+    -
+        dashboard
+    -
+        dataview
+    -
+        typeview
+    -
+        contact
+    -
+        typebrowser
+    -
+        narrativemanager
+    -
+        visWidgets
+navbar:
+    menu:
+        available_items:
+            search: 
+                path: search/?q=*
+                label: Search Data
+                icon: search
+            narrative: 
+                uri: "#narrativemanager/start"
+                label: Narrative
+                icon: file
+            narrativeTutorial: 
+                uri: https://kbase.us/narrative-guide
+                label: Narrative Tutorial
+                icon: info-circle
+
+            about_kbase: 
+                uri: https://kbase.us/about
+                label: About KBase
+                icon: info-circle
+            contact_kbase: 
+                uri: https://kbase.us/contact-us
+                label: Contact KBase
+                icon: envelope-o
+        menus:
+            authenticated: [search, narrative, divider, about_kbase]
+            unauthenticated: [search, divider, about_kbase, contact_kbase]
