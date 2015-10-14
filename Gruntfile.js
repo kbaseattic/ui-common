@@ -252,6 +252,30 @@ module.exports = function (grunt) {
                     }
                 ]
             },
+            'config-prod': {
+                files: [
+                    {
+                        src: 'config/prod.yml',
+                        dest: 'build/client/config.yml'
+                    },
+                    {
+                        src: 'config/ui-prod.yml',
+                        dest: 'build/client/ui.yml'
+                    }
+                ]
+            },
+            'config-test': {
+                files: [
+                    {
+                        src: 'config/ci.yml',
+                        dest: 'build/client/config.yml'
+                    },
+                    {
+                        src: 'config/ui-test.yml',
+                        dest: 'build/client/ui.yml'
+                    }
+                ]
+            },
             bower: {
                 files: bowerCopy
             },
@@ -388,26 +412,19 @@ module.exports = function (grunt) {
 
     });
 
-    // Does the task of building the main config file.
-    // **Might get moved to an external shell script if this gets
-    // more complex.
-    grunt.registerTask('build-config', [
-        'copy'
-    ]);
-
-    //grunt.registerTask('clean', [
-    //   'clean:build'
-    //]);
-
     // Does the whole building task
     grunt.registerTask('build', [
         'bower:install',
         'copy:build',
-        'copy:bower'
-            // 'build-config'
-            //'requirejs',
-            //'filerev',
-            //'regex-replace'
+        'copy:bower',
+        'copy:config-prod'
+    ]);
+
+    grunt.registerTask('build-test', [
+        'bower:install',
+        'copy:build',
+        'copy:bower',
+        'copy:config-test'
     ]);
 
     grunt.registerTask('deploy', [
@@ -435,6 +452,7 @@ module.exports = function (grunt) {
     ]);
     
     grunt.registerTask('preview', [
+        'build-test',
         'open:dev',
         'connect'
     ]);
