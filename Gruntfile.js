@@ -249,6 +249,10 @@ module.exports = function (grunt) {
                         src: '**/*',
                         dest: 'build/server',
                         expand: true
+                    },
+                    {
+                        src: 'loading.html',
+                        dest: 'build/client/loading.html'
                     }
                 ]
             },
