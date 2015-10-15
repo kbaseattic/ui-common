@@ -49,10 +49,3 @@ install:
         -
             path: ['dashboard']
             panelFactory: kb_panel_dashboard
-    menu:
-        -
-            name: dashboard
-            definition:
-                path: ['dashboard']
-                label: Dashbaord
-                icon: dashboard

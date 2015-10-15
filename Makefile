@@ -10,7 +10,7 @@ all: init build
 default: init build
 
 init:
-	@ bower install
+	@ bower install --allow-root
 	@ npm install
 
 build:
@@ -25,7 +25,6 @@ test: init
 
 clean:
 	@ rm -rf $(DISTLIB)
-	@ rm -rf coverage/
 
 dist-clean: clean
 	@ rm -rf node_modules/

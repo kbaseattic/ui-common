@@ -21,11 +21,11 @@ install:
         -
             path: ['databrowser']
             panelFactory: kb_panel_databrowser
-    menu:
-        -
-            name: databrowser
-            definition:
-                path: databrowser
-                label: Data Browser
-                icon: database
+    # menu:
+    #     -
+    #         name: databrowser
+    #         definition:
+    #             path: databrowser
+    #             label: Data Browser
+    #             icon: database
         

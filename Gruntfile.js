@@ -217,7 +217,7 @@ module.exports = function (grunt) {
                         dest: 'build/client/config.yml'
                     },
                     {
-                        src: 'config/ui.yml',
+                        src: 'config/ui-prod.yml',
                         dest: 'build/client/ui.yml'
                     },
                     {
@@ -249,6 +249,34 @@ module.exports = function (grunt) {
                         src: '**/*',
                         dest: 'build/server',
                         expand: true
+                    },
+                    {
+                        src: 'loading.html',
+                        dest: 'build/client/loading.html'
+                    }
+                ]
+            },
+            'config-prod': {
+                files: [
+                    {
+                        src: 'config/prod.yml',
+                        dest: 'build/client/config.yml'
+                    },
+                    {
+                        src: 'config/ui-prod.yml',
+                        dest: 'build/client/ui.yml'
+                    }
+                ]
+            },
+            'config-test': {
+                files: [
+                    {
+                        src: 'config/ci.yml',
+                        dest: 'build/client/config.yml'
+                    },
+                    {
+                        src: 'config/ui-test.yml',
+                        dest: 'build/client/ui.yml'
                     }
                 ]
             },
@@ -260,7 +288,7 @@ module.exports = function (grunt) {
                     {
                         cwd: 'build/client',
                         src: '**/*',
-                        dest: deployCfg['ui-common']['deploy-target'],
+                        dest: deployCfg['ui-common']['deploy_target'],
                         expand: true
                     }
                 ]
@@ -388,30 +416,22 @@ module.exports = function (grunt) {
 
     });
 
-    // Does the task of building the main config file.
-    // **Might get moved to an external shell script if this gets
-    // more complex.
-    grunt.registerTask('build-config', [
-        'copy'
-    ]);
-
-    //grunt.registerTask('clean', [
-    //   'clean:build'
-    //]);
-
     // Does the whole building task
     grunt.registerTask('build', [
         'bower:install',
         'copy:build',
-        'copy:bower'
-            // 'build-config'
-            //'requirejs',
-            //'filerev',
-            //'regex-replace'
+        'copy:bower',
+        'copy:config-prod'
+    ]);
+
+    grunt.registerTask('build-test', [
+        'bower:install',
+        'copy:build',
+        'copy:bower',
+        'copy:config-test'
     ]);
 
     grunt.registerTask('deploy', [
-        'build',
         'copy:deploy'
     ]);
 
