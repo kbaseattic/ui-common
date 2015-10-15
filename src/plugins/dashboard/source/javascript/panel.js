@@ -16,8 +16,15 @@ define([
     function (html, R, StateMachine, Promise, $, widgetAdapter) {
         'use strict';
 
+        // Send the user to the login page if not logged in.
+        if (!R.isLoggedIn()) {
+            R.send('app', 'navigate', 'login');
+        }
+
         function renderPanel() {
+
             return new Promise(function (resolve) {
+
                 // View stat is a local state machine for this view.
                 var panelState = Object.create(StateMachine).init();
 

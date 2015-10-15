@@ -17,7 +17,7 @@ define(['kb.config'], function(Config) {
          * available to each spec.
          */
         var wsUrlConfig = 'services.workspace.url';
-        var wsUrlRegex = /^http[s]?:\/\/.*kbase\.us\/services\/ws\/$/;
+        var wsUrlRegex = /^http[s]?:\/\/.*kbase\.us\/services\/ws[\/]?$/;
         var newWsUrl = 'temporaryNewUrl';
         var nonExistentItem = 'nonExistentItem';
         var defaultUrl = 'defaultUrl';

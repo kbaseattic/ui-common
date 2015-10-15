@@ -1,6 +1,6 @@
 'use strict';
 var path = require('path');
-var fs = require('fs');
+var iniParser = require('node-ini');
 
 module.exports = function (grunt) {
     // Config
@@ -29,6 +29,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-http-server');
     grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-markdown');
+
+    var deployCfg = iniParser.parseSync('deploy.cfg');
 
     /* 
      * This section sets up a mapping for bower packages.
@@ -162,19 +164,43 @@ module.exports = function (grunt) {
         }
 
     ],
-        bowerCopy = bowerFiles.map(function (cfg) {
-            // path is like dir/path/name
-            var path = [];
-            // dir either dir or name is the first level directory.
-            // path.unshift(cfg.dir || cfg.name);
 
-            // If there is a path (subdir) we add that too.
-            if (cfg.path) {
-                path.unshift(cfg.path);
+    bowerCopy = bowerFiles.map(function (cfg) {
+        // path is like dir/path/name
+        var path = [];
+        // dir either dir or name is the first level directory.
+        // path.unshift(cfg.dir || cfg.name);
+
+        // If there is a path (subdir) we add that too.
+        if (cfg.path) {
+            path.unshift(cfg.path);
+        }
+
+        // Until we get a path which we use as a prefix to the src.
+        var pathString = path
+            .filter(function (el) {
+                if (el === null || el === undefined || el === '') {
+                    return false;
+                }
+                return true;
+            })
+            .join('/');
+        // console.log(path);
+
+
+        var srcs;
+        if (cfg.src === undefined) {
+            srcs = [cfg.name + '.js'];
+        } else {
+            if (typeof cfg.src === 'string') {
+                srcs = [cfg.src];
+            } else {
+                srcs = cfg.src;
             }
+        }
 
-            // Until we get a path which we use as a prefix to the src.
-            var pathString = path
+        var sources = srcs.map(function (s) {
+            return [pathString, s]
                 .filter(function (el) {
                     if (el === null || el === undefined || el === '') {
                         return false;
@@ -183,39 +209,19 @@ module.exports = function (grunt) {
                 })
                 .join('/');
 
-            var srcs;
-            if (cfg.src === undefined) {
-                srcs = [cfg.name + '.js'];
-            } else {
-                if (typeof cfg.src === 'string') {
-                    srcs = [cfg.src];
-                } else {
-                    srcs = cfg.src;
-                }
-            }
-
-            var sources = srcs.map(function (s) {
-                return [pathString, s]
-                    .filter(function (el) {
-                        if (el === null || el === undefined || el === '') {
-                            return false;
-                        }
-                        return true;
-                    })
-                    .join('/');
-            });
-
-            var cd = cfg.cd;
-            var entry = {
-                nonull: true,
-                expand: true,
-                cwd: 'bower_components/' + (cfg.dir || cfg.name) + (cd ? '/' + cd : ''),
-                src: sources,
-                dest: buildDir('client/bower_components') + '/' + (cfg.dir || cfg.name)
-            };
-            // console.log(entry);
-            return entry;
         });
+
+        var cd = cfg.cd;
+        var entry = {
+            nonull: true,
+            expand: true,
+            cwd: 'bower_components/' + (cfg.dir || cfg.name) + (cd ? '/' + cd : ''),
+            src: sources,
+            dest: 'build/client/bower_components/' + (cfg.dir || cfg.name)
+        };
+        // console.log(entry);
+        return entry;
+    });
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -223,9 +229,13 @@ module.exports = function (grunt) {
             build: {
                 files: [
                     {
-                        src: 'src/config/prod.yml',
-                        dest: buildDir('config/client.yml')
-                    },                    
+                        src: 'config/prod.yml',
+                        dest: 'build/client/config.yml'
+                    },
+                    {
+                        src: 'config/ui-prod.yml',
+                        dest: 'build/client/ui.yml'
+                    },
                     {
                         cwd: 'src/app/client',
                         src: '**/*',
@@ -255,12 +265,50 @@ module.exports = function (grunt) {
                         src: '**/*',
                         dest: buildDir('server'),
                         expand: true
+                    },
+                    {
+                        src: 'loading.html',
+                        dest: 'build/client/loading.html'
+                    }
+                ]
+            },
+            'config-prod': {
+                files: [
+                    {
+                        src: 'config/prod.yml',
+                        dest: 'build/client/config.yml'
+                    },
+                    {
+                        src: 'config/ui-prod.yml',
+                        dest: 'build/client/ui.yml'
+                    }
+                ]
+            },
+            'config-test': {
+                files: [
+                    {
+                        src: 'config/ci.yml',
+                        dest: 'build/client/config.yml'
+                    },
+                    {
+                        src: 'config/ui-test.yml',
+                        dest: 'build/client/ui.yml'
                     }
                 ]
             },
             bower: {
                 files: bowerCopy
-            }
+            },
+            deploy: {
+                files: [
+                    {
+                        cwd: 'build/client',
+                        src: '**/*',
+                        dest: deployCfg['ui-common']['deploy_target'],
+                        expand: true
+                    }
+                ]
+            },
         },
         clean: {
             build: {
@@ -293,8 +341,7 @@ module.exports = function (grunt) {
         },
         open: {
             dev: {
-                path: 'http://localhost:8887',
-                app: 'Firefox'
+                path: 'http://localhost:8887'
             }
         },
         // Compile the requirejs stuff into a single, uglified file.
@@ -404,27 +451,23 @@ module.exports = function (grunt) {
 
     });
 
-    // Does the task of building the main config file.
-    // **Might get moved to an external shell script if this gets
-    // more complex.
-    grunt.registerTask('build-config', [
-        'copy'
-    ]);
-
-    //grunt.registerTask('clean', [
-    //   'clean:build'
-    //]);
-
     // Does the whole building task
     grunt.registerTask('build', [
         'bower:install',
         'copy:build',
         'copy:bower',
-        'markdown:build'
-            // 'build-config'
-            //'requirejs',
-            //'filerev',
-            //'regex-replace'
+        'copy:config-prod'
+    ]);
+
+    grunt.registerTask('build-test', [
+        'bower:install',
+        'copy:build',
+        'copy:bower',
+        'copy:config-test'
+    ]);
+
+    grunt.registerTask('deploy', [
+        'copy:deploy'
     ]);
 
     // Does a single, local, unit test run.
@@ -447,6 +490,7 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('preview', [
-        'open:dev', 'connect'
-    ])
+        'open:dev',
+        'connect'
+    ]);
 };

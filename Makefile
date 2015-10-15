@@ -3,33 +3,28 @@ TOPDIR   	   = $(PWD)
 DISTLIB  	   = $(TOPDIR)/build
 DOCSLIB  	   = $(TOPDIR)/docs
 TARGET   	   = prod
-KBASE_CONFIG   = source/config/$(TARGET).yml
-UI_CONFIG	   = source/config/ui.yml
+KB_TOP		   = /kb
 
-all:
-	test deploy docs
+all: init build
+
+default: init build
 
 init:
-	@bower install
-	@npm install
-	@mkdir -p $(DISTLIB)
-	@cp $(KBASE_CONFIG) $(DISTLIB)/config.yml
-	@cp $(UI_CONFIG) $(DISTLIB)/ui.yml
+	@ bower install --allow-root
+	@ npm install
 
-default: init
-	@ git submodule init
-	@ git submodule update
+build:
 	@ grunt build
-	
+	@ node tools/process_config.js
+
 deploy:
-	@ echo "This Makefile is deprecated for deployment, please see README.deploy."
+	@ grunt deploy
 
 test: init
 	@ grunt test
 
 clean:
 	@ rm -rf $(DISTLIB)
-	@ rm -rf coverage/
 
 dist-clean: clean
 	@ rm -rf node_modules/
