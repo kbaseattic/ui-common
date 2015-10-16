@@ -212,7 +212,6 @@
             'kb.panel.datasearch': 'js/lib/panels/datasearch',
             'kb.panel.typeview': 'js/lib/panels/typeview',
             'kb.panel.message': 'js/lib/panels/message',
-            'kb.panel.sample.router': 'js/lib/panels/sample-router',
 
             // KBase JQuery Plugin Widgets
             // ---------------------------

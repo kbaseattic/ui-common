@@ -9,8 +9,8 @@
  browser: true,
  white: true
  */
-define(['jquery', 'kb.runtime', 'kb.utils', 'kb.html', 'kb.service.workspace', 'kb.client.workspace', 'kb.jquery.widget', 'kb.jquery.kb-tabs', 'kb.jquery.media-editor', 'datatables_bootstrap'],
-    function ($, R, Utils, html, Workspace, WorkspaceClient) {
+define(['jquery', 'bluebird', 'kb.runtime', 'kb.utils', 'kb.html', 'kb.service.workspace', 'kb.client.workspace', 'kb.jquery.widget', 'kb.jquery.kb-tabs', 'kb.jquery.media-editor', 'datatables_bootstrap'],
+    function ($, Promise, R, Utils, html, Workspace, WorkspaceClient) {
         'use strict';
         $.KBWidget({
             name: "kbasePhenotypeSet",
@@ -30,7 +30,7 @@ define(['jquery', 'kb.runtime', 'kb.utils', 'kb.html', 'kb.service.workspace', '
                 var workspace = new Workspace(R.getConfig('services.workspace.url'), {
                     token: options.token
                 });
-                Promise.resolve(workspace.get_objects'({
+                Promise.resolve(workspace.get_objects({
                     workspace: ws, name: name
                 }))
                     .then(function (data) {
@@ -46,15 +46,13 @@ define(['jquery', 'kb.runtime', 'kb.utils', 'kb.html', 'kb.service.workspace', '
                                 container.rmLoading();
                                 container.append('<div class="alert alert-danger">' +
                                     err.error.message + '</div>');
-                            })
-                            .done();
+                            });
                     })
                     .catch(function (err) {
                         container.rmLoading();
                         container.append('<div class="alert alert-danger">' +
                             err.error.message + '</div>')
-                    })
-                    .done();
+                    });
 
 
                 function buildTable(data, refhash) {
@@ -152,8 +150,7 @@ define(['jquery', 'kb.runtime', 'kb.utils', 'kb.html', 'kb.service.workspace', '
                                 $(ele).rmLoading();
                                 $(ele).append('<div class="alert alert-danger">' +
                                     err.error.message + '</div>');
-                            })
-                            .done();
+                            });
                     }
                 }
                 return this;
