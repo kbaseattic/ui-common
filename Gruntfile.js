@@ -177,7 +177,16 @@ module.exports = function (grunt) {
             dir: 'thrift-binary-protocol',
             cd: 'src',
             src: '**/*'
+        },
+        {
+            dir: 'kbase-ui-plugin-vis-widgets',
+            src: '**/*'
         }
+        
+//        {
+//            dir: 'kbase-ui-plugin-demo-vis-widget',
+//            src: '**/*'
+//        }
     ],
 
     bowerCopy = bowerFiles.map(function (cfg) {

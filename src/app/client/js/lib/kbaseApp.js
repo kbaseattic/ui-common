@@ -409,8 +409,8 @@ define([
             function doRedirectHandler(routed) {
                 // 
                 return new Promise(function (resolve) {
-                    var module = routed.route.module;
-                    var method = routed.route.method;
+                    var module = routed.route.redirectHandler.module,
+                        method = routed.route.redirectHandler.method;
                     
                     require([module], function (M) {
                         resolve(M[method](routed.params));                        

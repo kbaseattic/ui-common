@@ -10,7 +10,7 @@ source:
     modules:
         -
             module: kb_handler_narrativeManager
-            file: panel
+            file: handler
         -
             module: kb_narrativeManager
             file: narrativeManager
@@ -24,7 +24,7 @@ install:
                 copydata: {}
                 appparam: {}
             redirectHandler:
-                module: kb_panel_narrativeManager
+                module: kb_handler_narrativeManager
                 method: startOrCreateEmptyNarrative
         -
             path: [narrativemanager, new]
@@ -34,6 +34,6 @@ install:
                 copydata: {}
                 appparam: {}            
             redirectHandler:
-                module: kb_panel_narrativeManager
+                module: kb_handler_narrativeManager
                 method: createNewNarrative         
         

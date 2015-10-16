@@ -44,12 +44,10 @@ define([
             navbar.setup();
 
             // Set up the navbar.
-            console.log('adding menu items.');
             Object.keys(UIConfig.navbar.menu.available_items).forEach(function (menuId) {
                 console.log('adding menu item: '  + menuId);
                 navbar.addMenuItem(menuId, UIConfig.navbar.menu.available_items[menuId]);
             });
-            console.log('adding menus');
             Object.keys(UIConfig.navbar.menu.menus).forEach(function (menuId) {
                 navbar.addMenu(menuId, UIConfig.navbar.menu.menus[menuId]);
             });
@@ -179,6 +177,9 @@ define([
                     // i.e. make them all return a promise.
                 } else if (data.routeHandler.route.redirectHandler) {
                     app.doRedirectHandler(data.routeHandler)
+                        .then(function (newRoute) {
+                            Runtime.send('app', 'redirect', newRoute.redirect);
+                        })
                         .catch(function (err) {
                             console.error('ERROR');
                             console.error(err);
@@ -231,8 +232,6 @@ define([
                          // NB these are styles for the plugin as a whole.
                         // TODO: do away with this. the styles should be dependencies
                         // of the panel and widgets. widget css code is below...
-                        console.log('loading plugin ' + plugin.name);
-                        console.log(config);
                         if (config.source.styles) {
                             config.source.styles.forEach(function (style) {
                                 dependencies.push('css!' + sourcePath + '/css/' + style.file);
@@ -397,11 +396,8 @@ define([
                     // {module: 'kb.panel.sample'},
                     // {module: 'kb.panel.sample.router'}
                 ].map(function (panel) {
-                    console.log('about to load panel ');
-                    console.log(panel);
                     return requirePromise([panel.module], function (PanelModule) {
                         // this registers routes
-                        console.log('loading panel ' + panel.module);
                         PanelModule.setup(app, panel.config);
                     });
                 });
@@ -413,7 +409,6 @@ define([
                     })
                     .then(function () {
                         Runtime.logDebug({source: 'main', message: 'setting up app'});
-                        console.log(' installing plugins ');
                         return installPlugins();
                     })
                     .then(function () {

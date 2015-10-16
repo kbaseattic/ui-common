@@ -17,7 +17,7 @@ define([
         var NarrativeManager = NarrativeManagerService();
 
         function makeNarrativePath(wsId, objId) {
-            return '/narrative/ws.' + wsId + '.obj.' + objId;
+            return R.getConfig('services.narrative.url') + '/narrative/ws.' + wsId + '.obj.' + objId;
         }
 
         function renderError(error) {
