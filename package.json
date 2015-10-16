@@ -29,7 +29,9 @@
     "grunt-markdown": "0.7.0",
     "grunt-open": "0.2.3",
     "grunt-regex-replace": "^0.2.6",
+    "grunt-shell": "1.1.2",
     "gulp": "^3.9.0",
+    "ini-parser": "0.0.2",
     "jasmine-core": "^2.3.4",
     "jasmine-jquery": "^2.1.0",
     "karma": "^0.13.3",
@@ -40,10 +42,9 @@
     "karma-phantomjs-launcher": "^0.2.0",
     "karma-requirejs": "^0.2.2",
     "karma-safari-launcher": "0.1.1",
-    "phantomjs": "^1.9.17",
-    "ini-parser": "0.0.2",
-    "node-ini": "^1.0.0",
     "lodash": "^3.10.1",
+    "node-ini": "^1.0.0",
+    "phantomjs": "^1.9.17",
     "remap-istanbul": "^0.3.0"
   }
 }

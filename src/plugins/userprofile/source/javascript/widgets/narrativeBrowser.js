@@ -1,3 +1,6 @@
+/*global define */
+/*jslint white: true */
+
 define([
     'jquery',
     'kb.utils',
@@ -88,14 +91,14 @@ define([
                             owners: [this.params.userId]
                         }))
                             .then(function (data) {
-                                var narratives = [];
+                                var narratives = [], i, wsInfo;
                                 // First we both transform each ws info object into a nicer js object,
                                 // and filter for modern narrative workspaces.
-                                for (var i = 0; i < data.length; i++) {
+                                for (i = 0; i < data.length; i += 1) {
                                     //tuple<ws_id id, ws_name workspace, username owner, timestamp moddate,
                                     //int object, permission user_permission, permission globalread,
                                     //lock_status lockstat, usermeta metadata> workspace_info
-                                    var wsInfo = this.workspace_metadata_to_object(data[i]);
+                                    wsInfo = this.workspace_metadata_to_object(data[i]);
 
                                     // make sure a modern narrative.
                                     if (wsInfo.metadata.narrative && wsInfo.metadata.is_temporary !== 'true') {
@@ -110,8 +113,8 @@ define([
                                 // We should now have the list of recently active narratives.
                                 // Now we sort and limit the list.
                                 narratives.sort(function (a, b) {
-                                    var x = new Date(a.moddate);
-                                    var y = new Date(b.moddate);
+                                    var x = new Date(a.moddate),
+                                        y = new Date(b.moddate);
                                     return ((x < y) ? 1 : ((x > y) ? -1 : 0));
                                 });
                                 this.setState('narratives', narratives);
@@ -121,8 +124,8 @@ define([
                                 reject(err);
                             });
 
-                    }
-                });
+                    }.bind(this));
+                }
             }
         });
 

@@ -8,6 +8,7 @@ module.exports = function (grunt) {
     // need to tweak this and accidentally check it in...
     var RUNTIME_DIR = '../../runtime';
     var BUILD_DIR = RUNTIME_DIR + '/build';
+    BUILD_DIR = 'build';
     
     function buildDir(subdir) {
         if (subdir) {
@@ -29,6 +30,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-http-server');
     grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-markdown');
+    grunt.loadNpmTasks('grunt-shell');
 
     var deployCfg = iniParser.parseSync('deploy.cfg');
 
@@ -161,8 +163,16 @@ module.exports = function (grunt) {
         {
             name: 'kbase-ui-plugin-sample',
             src: 'src/**/*'
-        }
-
+        },
+         {
+            name: 'kbase-ui-plugin-databrowser',
+            src: 'src/**/*'
+        },
+         {
+            dir: 'kbase-data-api-js-wrappers',
+            cwd: 'dist/bower/pkg/js',
+            src: '**/*'
+        },
     ],
 
     bowerCopy = bowerFiles.map(function (cfg) {
@@ -230,11 +240,11 @@ module.exports = function (grunt) {
                 files: [
                     {
                         src: 'config/prod.yml',
-                        dest: 'build/client/config.yml'
+                        dest: buildDir('client/config.yml')
                     },
                     {
                         src: 'config/ui-prod.yml',
-                        dest: 'build/client/ui.yml'
+                        dest: buildDir('client/ui.yml')
                     },
                     {
                         cwd: 'src/app/client',
@@ -268,7 +278,7 @@ module.exports = function (grunt) {
                     },
                     {
                         src: 'loading.html',
-                        dest: 'build/client/loading.html'
+                        dest: buildDir('client/loading.html')
                     }
                 ]
             },
@@ -315,9 +325,9 @@ module.exports = function (grunt) {
                 src: [buildDir()],
                 // We force, because our build directory is up a level 
                 // in the runtime directory.
-                options: {
-                    force: true
-                }
+//                options: {
+//                    force: true
+//                }
             }
         },
         connect: {
@@ -447,7 +457,18 @@ module.exports = function (grunt) {
                 options: {
                 }
             }
-        }
+        },
+        shell: {
+            config: {
+                command: [
+                    'node',
+                    'tools/process_config.js'
+                ].join(' '),
+                options: {
+                    stderr: false
+                }
+            }
+        },
 
     });
 
@@ -456,7 +477,8 @@ module.exports = function (grunt) {
         'bower:install',
         'copy:build',
         'copy:bower',
-        'copy:config-prod'
+        'shell:config'
+        // 'copy:config-prod'
     ]);
 
     grunt.registerTask('build-test', [

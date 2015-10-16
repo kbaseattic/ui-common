@@ -119,6 +119,13 @@
             'kb.client.profile': 'js/lib/clients/profile',
             'kb.client.narrativemanager': 'js/lib/clients/narrativemanager',
             
+            // DATA API
+            thrift: 'bower_components/kbase-data-api-js-wrappers/thrift/thrift',
+            thrift_binary_protocol: 'bower_components/kbase-data-api-js-wrappers/thrift/thrift-js-binary-protocol',
+            taxon_types: 'bower_components/kbase-data-api-js-wrappers/thrift/taxon/taxon_types',
+            taxon_service: 'bower_components/kbase-data-api-js-wrappers/thrift/taxon/thrift_service',        
+            kb_taxon: 'bower_components/kbase-data-api-js-wrappers/Taxon',
+
             
             // KBase SPA
             // ---------

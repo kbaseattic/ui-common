@@ -23,7 +23,7 @@
     "d3": "3.5.5",
     "postal.js": "1.0.6",
     "q": "1.4.1",
-    "requirejs": "2.1.18",
+    "requirejs": "2.1.20",
     "requirejs-plugins": "1.0.3",
     "datatables": "1.10.7",
     "datatables-bootstrap3-plugin": "0.4.0",
@@ -57,6 +57,8 @@
     "require-yaml": "0.1.2",
     "kbase-ui-plugin-sample": "eapearson/kbase-ui-plugin-sample#0.0.1",
     "kb-ui-plugin-demo": "eapearson/kb-ui-plugin-demo",
-    "bluebird": "2.9.34"
+    "bluebird": "2.10.2",
+    "kbase-ui-plugin-databrowser": "https://github.com/eapearson/kbase-ui-plugin-databrowser.git#1be75b00920a6906caef1d8568f64230a96aa925",
+    "kbase-data-api-js-wrappers": "eapearson/kbase-data-api-js-wrappers#master"
   }
 }

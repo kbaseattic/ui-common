@@ -26,17 +26,14 @@ define([
     'bluebird',
     'kb.panel.navbar',
     'kb.client.profile',
-    'kb.config', 
     'kb_types',
-    
+    'yaml!ui.yml',
     'bootstrap',
     'css!font-awesome',
     'domReady!'],
-    function (App, Runtime, AppState, Promise, Navbar, ProfileService, Config, Types) {
+    function (App, Runtime, AppState, Promise, Navbar, ProfileService, Types, UIConfig) {
         'use strict';
         
-        console.log(Config);
-
         var app = App.make();
         Runtime.setApp(app);
 
@@ -47,11 +44,14 @@ define([
             navbar.setup();
 
             // Set up the navbar.
-            Object.keys(Config.getItem('navbar.menu.available_items')).forEach(function (menuId) {
-                navbar.addMenuItem(menuId, Config.getItem('navbar.menu.available_items')[menuId]);
+            console.log('adding menu items.');
+            Object.keys(UIConfig.navbar.menu.available_items).forEach(function (menuId) {
+                console.log('adding menu item: '  + menuId);
+                navbar.addMenuItem(menuId, UIConfig.navbar.menu.available_items[menuId]);
             });
-            Object.keys(Config.getItem('navbar.menu.menus')).forEach(function (menuId) {
-                navbar.addMenu(menuId, Config.getItem('navbar.menu.menus')[menuId]);
+            console.log('adding menus');
+            Object.keys(UIConfig.navbar.menu.menus).forEach(function (menuId) {
+                navbar.addMenu(menuId, UIConfig.navbar.menu.menus[menuId]);
             });
 
             Runtime.recv('navbar', 'add-menu-item', function (data) {
@@ -73,7 +73,6 @@ define([
                     path: 'message/notfound'
                 }
             });
-
 
             /* 
              * Handle the "empty path", which is also the root of the site.
@@ -214,7 +213,7 @@ define([
         }
 
         function installPlugins() {
-            var loaders = Config.getItem('plugins').map(function (plugin) {
+            var loaders = UIConfig.plugins.map(function (plugin) {
                 if (typeof plugin === 'string') {
                     plugin = {
                         name: plugin,
@@ -232,6 +231,8 @@ define([
                          // NB these are styles for the plugin as a whole.
                         // TODO: do away with this. the styles should be dependencies
                         // of the panel and widgets. widget css code is below...
+                        console.log('loading plugin ' + plugin.name);
+                        console.log(config);
                         if (config.source.styles) {
                             config.source.styles.forEach(function (style) {
                                 dependencies.push('css!' + sourcePath + '/css/' + style.file);
@@ -264,7 +265,7 @@ define([
                                 plugin: {
                                     path: '/' + sourcePath
                                 }
-                            }
+                            };
                         });
 
                         // Now install any routes.
@@ -396,8 +397,11 @@ define([
                     // {module: 'kb.panel.sample'},
                     // {module: 'kb.panel.sample.router'}
                 ].map(function (panel) {
+                    console.log('about to load panel ');
+                    console.log(panel);
                     return requirePromise([panel.module], function (PanelModule) {
                         // this registers routes
+                        console.log('loading panel ' + panel.module);
                         PanelModule.setup(app, panel.config);
                     });
                 });
@@ -409,6 +413,7 @@ define([
                     })
                     .then(function () {
                         Runtime.logDebug({source: 'main', message: 'setting up app'});
+                        console.log(' installing plugins ');
                         return installPlugins();
                     })
                     .then(function () {

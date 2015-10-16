@@ -6,7 +6,8 @@ plugins:
     -
         about
     -
-        databrowser
+        name: databrowser
+        directory: bower_components/kbase-ui-plugin-databrowser/src/plugin
     -
         userprofile
     -
@@ -19,12 +20,12 @@ plugins:
         typeview
     -
         contact
-    -
-        typebrowser
+    #-
+    #    typebrowser
     -
         narrativemanager
-    -
-        visWidgets
+    #-
+    #    visWidgets
 navbar:
     menu:
         available_items:

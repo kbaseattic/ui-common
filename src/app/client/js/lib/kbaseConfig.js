@@ -1,4 +1,4 @@
-define(['kb.utils', 'yaml!DEV/config/client.yml'],
+define(['kb.utils', 'yaml!config.yml'],
     function (Utils, config) {
         'use strict';
         var Config = Object.create({}, {
