@@ -1,0 +1,7 @@
+## KBase Front End App Server Config File
+---
+port: 8080
+mounts:
+    plugin: ['..', '..', 'plugins']
+    config: ['..', '..', 'config']
+    def:  ['..', '..', '..', 'dev']
