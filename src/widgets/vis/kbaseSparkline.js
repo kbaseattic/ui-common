@@ -54,7 +54,7 @@ define('kbaseSparkline',
                 lastPoint.shapeArea = this.options.lastPointShapeArea;
                 lastPoint.color     = this.options.lastPointColor;
             }
-            console.log("DATA IS NOW ", this.dataset());
+            
 
         }
     })

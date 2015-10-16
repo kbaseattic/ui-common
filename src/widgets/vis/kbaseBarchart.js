@@ -388,7 +388,6 @@ define('kbaseBarchart',
 
             if (this.options.zeroLine) {
 
-console.log("ZERO IS AT ", $bar.yScale()(0));
 
                 var zeroLine = this.D3svg().select( this.region('chart') ).selectAll('.zeroLine');
 
