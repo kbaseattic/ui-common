@@ -147,8 +147,7 @@ define([
                         }
                         container.append('<div class="alert alert-danger">' +
                             '<p>[Error] ' + message + '</p>' + '</div>');
-                    })
-                    .done();
+                    });
             };
             ready();
             return this;

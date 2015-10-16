@@ -29,8 +29,7 @@ function (UserProfile, AppState, R) {
                                             error: err
                                         });
                                         // Postal.channel('session').publish('profile.loadfailure', {error: err});
-                                    })
-                                    .done();
+                                    });
                             break;
                     }
                 })
@@ -41,8 +40,7 @@ function (UserProfile, AppState, R) {
                         message: errMsg
                     });
                     // Postal.channel('session').publish('profile.loadfailure', {error: err, message: errMsg});
-                })
-                .done();
+                });
     }
     
     return {

@@ -117,6 +117,7 @@ define([], function () {
                 }
                 if (found) {
                     foundRoute = {
+                        request: req,
                         params: params,
                         route: route
                     };

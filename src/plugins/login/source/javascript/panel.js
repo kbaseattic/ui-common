@@ -52,7 +52,8 @@ define([
 
 
         function widget(config) {
-            var mount, container, $container;
+            var mount, container, $container,
+                nextRequest;
 
 
             // This should be somewhere else, and handle all types of fields
@@ -97,8 +98,13 @@ define([
                     .then(function (session) {
                         R.send('app', 'loggedin');
                         /* TODO should be configurable default login location */
-                        R.send('app', 'navigate', 'dashboard');
+                        // ßR.send('app', 'navigate', 'dashboard');
                         // App.navigateTo('about');
+                        if (nextRequest) {
+                            R.send('app', 'navigate', nextRequest);
+                        } else {
+                            R.send('app', 'navigate', 'dashboard');
+                        }
                     })
                     .catch(function (errorMsg) {
                         element('running').hide();
@@ -108,8 +114,7 @@ define([
                         element('error').html(errorMsg).show();
                         element('sign-in').show();
                         element('signing-in').hide();
-                    })
-                    .done();
+                    });
             }
 
             var eventMan = EventMan();
@@ -202,6 +207,12 @@ define([
 
             function start(params) {
                 return new Promise(function (resolve) {
+                    if (params.nextrequest) {
+                        console.log(params.nextrequest);
+                        nextRequest = JSON.parse(params.nextrequest);
+                        console.log('next request is ');
+                        console.log(nextRequest);
+                    }
                     resolve();
                 });
             }

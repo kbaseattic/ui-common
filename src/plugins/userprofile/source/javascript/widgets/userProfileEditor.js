@@ -48,22 +48,7 @@ define([
                         }
                         return title;
                     }.bind(this));
-                    // create a gravatar-url out of an email address and a 
-                    // default option.
-                    this.templates.env.addFilter('gravatar', function (email, size, rating, gdefault) {
-                        // TODO: http/https.
-                        return UserProfile.makeGravatarURL(email, size, rating, gdefault);
-                    }.bind(this));
-                    this.templates.env.addFilter('kbmarkup', function (s) {
-                        s = s.replace(/\n/g, '<br>');
-                        return s;
-                    });
-                    this.templates.env.addFilter('avatarBackgroundColor', function (color) {
-                        return this.listMaps['avatarColor'][color].color;
-                    }.bind(this));
-                    this.templates.env.addFilter('avatarTextColor', function (color) {
-                        return this.listMaps['avatarColor'][color].textColor;
-                    }.bind(this));
+                    
 
                     return this;
                 }
@@ -85,8 +70,7 @@ define([
                         }.bind(this))
                         .catch(function (err) {
                             this.renderErrorView(err);
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
 
                     return this;
                 }
@@ -901,13 +885,24 @@ define([
                         // For now the user profile is available through the login widget, not the session.
                         this.places.title.html('You - ' + this.userProfile.getProp('user.realname') + ' (' + this.userProfile.getProp('user.username') + ')');
                         
-                        R.send('app', 'title', {
-                            title: 'Viewing your profile'
-                        });
                         R.send('navbar', 'clearButtons');
+                        R.send('navbar', 'title', 'Viewing your profile');
+                        
+                        R.send('navbar', 'addButton', {
+                            name: 'account',
+                            label: 'Account',
+                            style: 'default',
+                            icon: 'wrench',
+                            callback: function () {
+                                R.send('app', 'redirect', {
+                                    url: 'https://gologin.kbase.us/Dashboard',
+                                    new_window: true
+                                })
+                            }.bind(this)
+                        });
                         R.send('navbar', 'addButton', {
                             name: 'edit',
-                            label: 'Edit',
+                            label: 'Edit Profile',
                             style: 'primary',
                             icon: 'edit',
                             callback: function () {
@@ -915,15 +910,15 @@ define([
                                 widget.renderEditView();
                             }.bind(this)
                         });
-                        R.send('navbar', 'addButton', {
-                            name: 'test',
-                            label: 'Test Button',
-                            style: 'primary',
-                            icon: 'comment', 
-                            callback: function () {
-                                alert('clicked me');
-                            }
-                        });
+//                        R.send('navbar', 'addButton', {
+//                            name: 'test',
+//                            label: 'Test Button',
+//                            style: 'primary',
+//                            icon: 'comment', 
+//                            callback: function () {
+//                                alert('clicked me');
+//                            }
+//                        });
                         
                         /*navbar.clearButtons();
                         navbar.addButton({
@@ -989,7 +984,7 @@ define([
                     } else {
                         var title = this.userProfile.getProp('user.realname') + ' (' + this.userProfile.getProp('user.username') + ')';
                         this.places.title.html(title);
-                        R.send('app', 'title', {title: 'Viewing profile for ' + title});
+                        R.send('navbar', 'title', 'Viewing profile for ' + title);
                     }
                     this.renderPicture();
                     this.places.content.html(this.renderTemplate('view'));
@@ -1084,7 +1079,7 @@ define([
             renderEditView: {
                 value: function () {
                     var W = this;
-                    R.send('app', 'title', {title: 'Editing your profile'});
+                    R.send('navbar', 'title', {title: 'Editing your profile'});
                     R.send('navbar', 'clearButtons');
                     R.send('navbar', 'addButton', {
                         name: 'save',
@@ -1093,7 +1088,6 @@ define([
                         icon: 'save',
                         disabled: true,
                         callback: function () {
-                            console.log('but not here?');
                             if (W.updateUserProfileFromForm()) {
                                 W.userProfile.saveProfile()
                                     .then(function () {
@@ -1105,8 +1099,7 @@ define([
                                     })
                                     .catch(function (err) {
                                         W.renderErrorView(err);
-                                    })
-                                    .done();
+                                    });
                             }
                         }
                     });
@@ -1341,6 +1334,13 @@ define([
             },
             renderViewEditLayout: {
                 value: function () {
+                    if (this.isOwner()) {
+                        R.send('navbar', 'title', 'Viewing your profile');
+                    } else {
+                        var title = this.userProfile.getProp('user.realname') + ' (' + this.userProfile.getProp('user.username') + ')';
+                        this.places.title.html(title);
+                        R.send('navbar', 'title', 'Viewing profile for ' + title);
+                    }
                     nunjucks.configure({
                         autoescape: true
                     });

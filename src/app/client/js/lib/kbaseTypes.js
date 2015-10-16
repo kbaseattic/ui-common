@@ -116,8 +116,6 @@ define([
                 });
             }
             viewers.push(viewerDef);
-            console.log(types.debug());
-            
         }
         function setDefaultViewer(type, viewerId) {            
         }

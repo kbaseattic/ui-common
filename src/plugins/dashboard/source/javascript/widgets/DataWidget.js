@@ -105,8 +105,7 @@ define(['kb_widget_dashboard_base', 'kb.utils', 'kb.utils.api', 'kb.session', 'k
                                         console.log('ERROR');
                                         console.log(err);
                                         reject(err);
-                                    })
-                                    .done();
+                                    });
 
                             }.bind(this))
                             .catch(function (err) {
@@ -114,8 +113,7 @@ define(['kb_widget_dashboard_base', 'kb.utils', 'kb.utils.api', 'kb.session', 'k
                                 console.log(err);
 
                                 reject(err);
-                            })
-                            .done();
+                            });
                     }.bind(this));
                 }
             }

@@ -12,7 +12,7 @@
 	</div>
 </div>
 
-<table class="table table-bordered table-striped" id="collaborator_table_{{generatedId}}">
+<table class="table table-bordered table-striped" id="collaborator_table_{{instanceId}}">
 	<thead>
 	<tr>
 		<th>Name</th>
@@ -33,7 +33,7 @@
 
 <script>
 require(['jquery', 'datatables','datatables_bootstrap'], function ($) {
-    $('#collaborator_table_{{generatedId}}').dataTable({
+    $('#collaborator_table_{{instanceId}}').dataTable({
         initComplete: function (settings) {
             var api = this.api();
             var rowCount = api.data().length;

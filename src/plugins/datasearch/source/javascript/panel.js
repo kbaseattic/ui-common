@@ -60,8 +60,7 @@ define([
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
 
                 });
             }
@@ -143,8 +142,7 @@ define([
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
 
@@ -164,8 +162,7 @@ define([
                             console.log('ERROR1');
                             console.log(err);
                             reject(err);
-                        })
-                        .done();
+                        });
 
                 });
             }
@@ -206,8 +203,7 @@ define([
                             console.log('ERROR1');
                             console.log(err);
                             reject(err);
-                        })
-                        .done();
+                        });
 
                 });
             }
@@ -221,8 +217,7 @@ define([
                         .catch(function (err) {
                             console.log('ERROR');
                             console.log(err);
-                        })
-                        .done();
+                        });
                 });
             }
 
@@ -718,8 +713,7 @@ define([
                                     content: div({dataBind: {component: '"search-app"'}}),
                                     title: 'Data Search'
                                 });
-                            })
-                            .done();
+                            });
                     });
                 },
                 isBound: false,
@@ -735,14 +729,12 @@ define([
                                 .then(function (results) {
                                 })
                                 .catch(function (err) {
-                                })
-                                .done();
+                                });
                         })
                         .catch(function (err) {
                             console.log('ERROR');
                             console.log(err);
-                        })
-                        .done();
+                        });
 
                 },
                 stop: function (node, state) {

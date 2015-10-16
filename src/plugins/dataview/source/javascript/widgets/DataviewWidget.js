@@ -215,8 +215,7 @@ define([
                             console.log('ERROR');
                             console.log(err);
                             this.setError(err);
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
                 }
             },
             setup: {
@@ -301,8 +300,7 @@ define([
                         }.bind(this))
                         .catch(function (err) {
                             this.setError(err);
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
                 }
             },
             refresh: {

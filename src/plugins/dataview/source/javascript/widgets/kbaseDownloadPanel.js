@@ -158,8 +158,7 @@ define([
                     .catch(function (err) {
                         console.error('ERROR');
                         console.error(err);
-                    })
-                    .done();
+                    });
 
                 return this;
             },

@@ -10,16 +10,18 @@
             <table class="results" >
                 {% for result in state.searchResults %}
                 <tr>
-                    <td>
+                    {# <td>
                         {%if result.avatar.gravatar_default and result.email %} 
                         <img src="{{result.email | gravatar(64,"pg", result.avatar.gravatar_default)}}" class="avatar">
                         {% else %}
-                        <img src="{{env.root}}/images/nouserpic.png" class="avatar">
+                        <img src="{{env.root}}/images/nouserpic.png" style="width: 32px; height: 32px;" class="avatar">
                         {% endif %}
+                    #}
                     </td>
-                    <td>
+                    <td style="padding-top: 6px;">
                         <a href="#people/{{result.username}}">{{result.realname}}</a><br>
                         <i>{{result.username}}</i>
+                        {{result.email}}
                     </td>
                 </tr>
                 {% endfor %}

@@ -131,16 +131,14 @@ define([
                                             message: 'Error initializing widgets',
                                             error: err
                                         });
-                                    })
-                                    .done();
+                                    });
                             }.bind(this))
                             .catch(function (err) {
                                 reject({
                                     message: 'Error initializing panel',
                                     error: err
                                 });
-                            })
-                            .done();
+                            });
                     }.bind(this));
                 }
             },
@@ -176,16 +174,14 @@ define([
                                             message: 'Error attaching widgets',
                                             error: err
                                         });
-                                    })
-                                    .done();
+                                    });
                             }.bind(this))
                             .catch(function (err) {
                                 reject({
                                     message: 'Error attaching panel',
                                     error: err
                                 });
-                            })
-                            .done();
+                            });
                     }.bind(this));
                 }
             },
@@ -216,16 +212,14 @@ define([
                                             message: 'Error starting widgets',
                                             error: err
                                         });
-                                    })
-                                    .done();
+                                    });
                             }.bind(this))
                             .catch(function (err) {
                                 reject({
                                     message: 'Error starting panel',
                                     error: err
                                 });
-                            })
-                            .done();
+                            });
                     }.bind(this));
                 }
             },
@@ -256,16 +250,14 @@ define([
                                             message: 'Error running widgets',
                                             error: err
                                         });
-                                    })
-                                    .done();
+                                    });
                             }.bind(this))
                             .catch(function (err) {
                                 reject({
                                     message: 'Error running panel',
                                     error: err
                                 });
-                            })
-                            .done();
+                            });
                     }.bind(this));
                 }
             },
@@ -295,16 +287,14 @@ define([
                                             message: 'Error stopping widgets',
                                             error: err
                                         });
-                                    })
-                                    .done();
+                                    });
                             }.bind(this))
                             .catch(function (err) {
                                 reject({
                                     message: 'Error stopping panel',
                                     error: err
                                 });
-                            })
-                            .done();
+                            });
                     }.bind(this));
                 }
             },
@@ -334,16 +324,14 @@ define([
                                             message: 'Error detaching widgets',
                                             error: err
                                         });
-                                    })
-                                    .done();
+                                    });
                             }.bind(this))
                             .catch(function (err) {
                                 reject({
                                     message: 'Error detaching panel',
                                     error: err
                                 });
-                            })
-                            .done();
+                            });
                     }.bind(this));
                 }
             },
@@ -373,16 +361,14 @@ define([
                                             message: 'Error destroying widgets',
                                             error: err
                                         });
-                                    })
-                                    .done();
+                                    });
                             }.bind(this))
                             .catch(function (err) {
                                 reject({
                                     message: 'Error destroying panel',
                                     error: err
                                 });
-                            })
-                            .done();
+                            });
                     }.bind(this));
                 }
             }

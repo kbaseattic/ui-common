@@ -45,7 +45,6 @@ define([
 
             // Set up the navbar.
             Object.keys(UIConfig.navbar.menu.available_items).forEach(function (menuId) {
-                console.log('adding menu item: '  + menuId);
                 navbar.addMenuItem(menuId, UIConfig.navbar.menu.available_items[menuId]);
             });
             Object.keys(UIConfig.navbar.menu.menus).forEach(function (menuId) {
@@ -60,6 +59,21 @@ define([
             Runtime.recv('navbar', 'clear-buttons', function () {
                 navbar.clearButtons();
             });
+            
+            Runtime.recv('navbar', 'title', function (data) {
+                if (typeof data === 'object') {
+                    navbar.setTitle(data.title);
+                } else {
+                    navbar.setTitle(data);
+                }
+            })
+            Runtime.recv('app', 'title', function (data) {
+                if (typeof data === 'object') {
+                    navbar.setTitle(data.title);
+                } else {
+                    navbar.setTitle(data);
+                }
+            })
 
             // ?? (EAP)
             Runtime.props.setItem('navbar', navbar);
@@ -119,10 +133,11 @@ define([
                 .catch(function (err) {
                     console.error('ERROR');
                     console.error(err);
-                })
-                .done();
+                });
 
             Runtime.recv('app', 'navigate', function (data) {
+                console.log('navagating to ...');
+                console.log(data);
                 app.navigateTo(data);
             });
 
@@ -133,6 +148,7 @@ define([
             // This will work ... but we need to tune this!
             Runtime.recv('app', 'loggedin', function () {
                 ProfileService.loadProfile();
+                // Runtime.send('app', 'navigate', 'dashboard');
             });
 
             Runtime.recv('app', 'new-route', function (data) {
@@ -153,8 +169,7 @@ define([
                         .catch(function (err) {
                             console.log('ERROR');
                             console.log(err);
-                        })
-                        .done();
+                        });
                 } else if (data.routeHandler.route.panelFactory) {
                     // And ... we have another panel factory pattern here. We will
                     // converge as soon as we can...
@@ -162,8 +177,7 @@ define([
                         .catch(function (err) {
                             console.error('ERROR');
                             console.error(err);
-                        })
-                        .done();
+                        });
                 } else if (data.routeHandler.route.panelObject) {
                     // And ... we have another panel factory pattern here. We will
                     // converge as soon as we can...
@@ -171,8 +185,7 @@ define([
                         .catch(function (err) {
                             console.error('ERROR');
                             console.error(err);
-                        })
-                        .done();
+                        });
                     // TODO: merge the following with the first redirect handler... 
                     // i.e. make them all return a promise.
                 } else if (data.routeHandler.route.redirectHandler) {
@@ -183,15 +196,13 @@ define([
                         .catch(function (err) {
                             console.error('ERROR');
                             console.error(err);
-                        })
-                        .done();
+                        });
                 } else {
                     app.showPanel2('app', data.routeHandler)
                         .catch(function (err) {
                             console.error('ERROR');
                             console.error(err);
-                        })
-                        .done();
+                        });
                 }
             });
 
@@ -283,6 +294,7 @@ define([
                                                         config: {
                                                             pluginPath: '/' + sourcePath
                                                         },
+                                                        authorizationRequired: route.authorizationRequired,
                                                         panelFactory: factory
                                                     });
                                                     resolve();
@@ -356,11 +368,10 @@ define([
                                     .catch(function (err) {
                                         console.log('ERROR');
                                         console.log(err);
-                                    })
-                                    .done();
+                                    });
                             });
                         } else {
-                            console.log('No installation?');
+                            console.log('No installations for plugin ' + plugin.name);
                             resolve();
                         }
 
@@ -420,8 +431,7 @@ define([
                         console.log('ERROR loading panels');
                         console.log(err);
                         reject(err);
-                    })
-                    .done();
+                    });
             });
         }
 

@@ -137,13 +137,11 @@ define([
                                         })
                                         .catch(function (err) {
                                             reject(err);
-                                        })
-                                        .done();
+                                        });
                                 }.bind(this))
                                 .catch(function (err) {
                                     reject(err);
-                                })
-                                .done();
+                                });
                         }
                     }.bind(this));
                 }

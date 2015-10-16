@@ -165,27 +165,23 @@ define([
                                                 .catch(function (err) {
                                                     console.log('ERROR starting');
                                                     console.log(err);
-                                                })
-                                                .done();
+                                                });
                                         })
                                         .catch(function (err) {
                                             console.log('ERROR attaching');
                                             console.log(err);
-                                        })
-                                        .done();
+                                        });
                                 })
                                 .catch(function (err) {
                                     console.log('ERROR creating');
                                     console.log(err);
-                                })
-                                .done();
+                                });
                         })
                         .catch(function (err) {
                             console.log('ERROR rendering console');
                             console.log(err);
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             function stop() {

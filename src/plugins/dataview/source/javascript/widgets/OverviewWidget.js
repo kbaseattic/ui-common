@@ -281,8 +281,7 @@ define([
                             this.alert.addErrorMessage('Error', 'Error copying the data object to the selected Narrative. ' + msg);
                             console.log('ERROR');
                             console.log(err);
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
 
                 }
             },
@@ -307,8 +306,7 @@ define([
                         .catch(function (err) {
                             console.log('ERROR');
                             console.log(err);
-                        })
-                        .done();
+                        });
                 }
             },
             checkRefCountAndFetchOutgoingReferences: {
@@ -329,8 +327,7 @@ define([
                         }.bind(this))
                         .catch(function (err) {
                             this.setError('client', err);
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
                 }
             },
             fetchOutgoingReferences: {
@@ -363,8 +360,7 @@ define([
                         }.bind(this))
                         .catch(function (err) {
                             this.setError('client', err);
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
                 }
             },
             checkRefCountAndFetchReferences: {
@@ -380,8 +376,7 @@ define([
                         }.bind(this))
                         .catch(function (err) {
                             this.setError('client', err);
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
                 }
             },
             setError: {
@@ -419,8 +414,7 @@ define([
                         }.bind(this))
                         .catch(function (err) {
                             this.setError('client', err);
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
                 }
             },
             createDataIcon: {
@@ -546,14 +540,12 @@ define([
                                                 }.bind(this))
                                                 .catch(function (err) {
                                                     reject(err);
-                                                })
-                                                .done();
+                                                });
 
                                         }.bind(this))
                                         .catch(function (err) {
                                             reject(err);
-                                        })
-                                        .done();
+                                        });
 
                                 }
                             }.bind(this))
@@ -595,8 +587,7 @@ define([
                                     });
                                     reject(err);
                                 }
-                            }.bind(this))
-                            .done();
+                            }.bind(this));
                     }.bind(this));
                 }
             }

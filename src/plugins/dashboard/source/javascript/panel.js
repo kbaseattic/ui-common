@@ -109,8 +109,16 @@ define([
 
             // API 
             function init(config) {
-                return new Promise(function (resolve) {
-                    resolve();
+                return new Promise(function (resolve, reject) {
+                    if (!R.isLoggedIn()) {
+                        reject({
+                            type: 'AuthorizationError',
+                            reason: 'PanelRequiresAuthorization',
+                            message: 'The dashboard is only available for logged in users'
+                        });
+                    } else {
+                        resolve();
+                    }
                 });
             }
             function attach(node) {
@@ -137,21 +145,18 @@ define([
                                         .catch(function (err) {
                                             console.log('ERROR attaching');
                                             console.log(err);
-                                        })
-                                        .done();
+                                        });
                                 })
                                 .catch(function (err) {
                                     console.log('ERROR creating');
                                     console.log(err);
-                                })
-                                .done();
+                                });
                         })
                         .catch(function (err) {
                             console.log('ERROR rendering console');
                             console.log(err);
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             function start(params) {
@@ -175,8 +180,7 @@ define([
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             function stop() {
@@ -189,8 +193,7 @@ define([
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             function detach() {
@@ -203,8 +206,7 @@ define([
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             return {

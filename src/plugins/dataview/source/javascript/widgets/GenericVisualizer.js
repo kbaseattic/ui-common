@@ -165,8 +165,7 @@ define([
                         //console.log('ERROR');
                         //console.log(err);
                         reject(err);
-                    })
-                    .done();
+                    });
             });
         }
         function genericVisualizerWidgetFactory() {
@@ -234,8 +233,7 @@ define([
                             // TO BE DONE
                             showError(err);
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             function stop() {
@@ -247,8 +245,7 @@ define([
                             })
                             .catch(function (err) {
                                 reject(err);
-                            })
-                            .done();
+                            });
                     } else {
                         resolve();
                     }
@@ -263,8 +260,7 @@ define([
                             })
                             .catch(function (err) {
                                 reject(err);
-                            })
-                            .done();
+                            });
                     } else {
                         resolve();
                     }
@@ -279,8 +275,7 @@ define([
                             })
                             .catch(function (err) {
                                 reject(err);
-                            })
-                            .done();
+                            });
                     } else {
                         resolve();
                     }

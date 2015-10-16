@@ -33,4 +33,5 @@ install:
         -
             path: ['people', {type: param, name: username}]
             panelFactory: kb_panel_userProfile
+            authorizationRequired: true
         

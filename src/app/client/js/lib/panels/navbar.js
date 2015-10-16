@@ -72,8 +72,7 @@ define([
                         })
                         .then(function () {
                             return start();
-                        })
-                        .done();
+                        });
                 });
             }
             function detach() {
@@ -109,7 +108,7 @@ define([
                     // all we care about is the avatar menu
                     // this will be automatically re-rendered if we set the dirty
                     // flag.
-                    dirty();                        
+                    dirty();
                 }));
                 subscriptions2.push(R.recv('app', 'loggedin', function () {
                     // all we care about is the avatar menu
@@ -157,8 +156,7 @@ define([
                             .catch(function (err) {
                                 console.log('ERROR');
                                 console.log(err);
-                            })
-                            .done();
+                            });
                     }
                 }));
             }
@@ -273,15 +271,14 @@ define([
             function handleSignout(e) {
                 Session.logout()
                     .then(function () {
-                        R.send('app', 'loggedout');
                         R.send('app', 'navigate', 'login');
+                        R.send('app', 'loggedout');
                     })
                     .catch(function (err) {
                         console.log('ERROR');
                         console.log(err);
                         alert('Error signing out (check console for details)');
-                    })
-                    .done();
+                    });
             }
 
             // RENDERERS
@@ -505,9 +502,7 @@ define([
                 } else {
                     btn = button(attribs, [icon, label]);
                     addEvent('click', function (e) {
-                        console.log('yes, here!');
                         //e.preventDefault();
-                        console.log('yes, here2!');
                         cfg.callback();
                         return false;
                     }, id);

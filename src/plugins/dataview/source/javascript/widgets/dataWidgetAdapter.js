@@ -107,8 +107,7 @@ define([
                             //console.log('ERROR');
                             //console.log(err);
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
     

@@ -110,8 +110,7 @@ define([
                         container.html($('<p>')
                             .css({'padding': '10px 20px'})
                             .text('[Error] ' + message));
-                    })
-                    .done();
+                    });
                 return self;
             },
             loggedInCallback: function (event, auth) {

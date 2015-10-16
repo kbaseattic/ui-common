@@ -32,8 +32,23 @@
     font-size: 10pt;
     margin-top: -5px;
 }
-.navbar-right .fa::before { /* color nav icons */
+.btn[disabled] {
+    background-color: transparent;
+}
+.btn[disabled] .fa::before {
+    color: silver;
+}
+.btn-primary .fa::before { /* color nav icons */
   color: #2196F3;
+}
+.btn-default .fa::before { /* color nav icons */
+  color: #000000;
+}
+btn-warning .fa::before {
+    color: #F0AD4E;
+}
+btn-warning .fa::before {
+    color: #D9534F;
 }
 .navbar-right .kb-nav-btn:hover {
   background-color: #F5F5F5;

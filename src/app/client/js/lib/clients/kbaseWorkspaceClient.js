@@ -93,13 +93,11 @@ define([
                                     }.bind(this))
                                     .catch(function (err) {
                                         reject(err);
-                                    })
-                                    .done();
+                                    });
                             }.bind(this))
                             .catch(function (err) {
                                 reject(err);
-                            })
-                            .done();
+                            });
                     }.bind(this));
                 }
             },
@@ -140,8 +138,7 @@ define([
                             }.bind(this))
                             .catch(function (err) {
                                 reject(err);
-                            })
-                            .done();
+                            });
                     }.bind(this));
                 }
             },
@@ -174,8 +171,7 @@ define([
                             }.bind(this))
                             .catch(function (err) {
                                 reject(err);
-                            })
-                            .done();
+                            });
                     }.bind(this));
                 }
             },
@@ -235,8 +231,7 @@ define([
                                 console.log('ERROR');
                                 console.log(err);
                                 reject(err);
-                            })
-                            .done();
+                            });
                     }.bind(this));
                 }
             }

@@ -17,5 +17,7 @@ install:
         -
             path: ['login']
             queryParams: 
-                name: {}                    
+                name: {}
+                nextpath: {}
+                nextrequest: {}
             panelFactory: kb_panel_login

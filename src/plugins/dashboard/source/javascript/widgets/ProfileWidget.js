@@ -46,8 +46,7 @@ define(['kb_widget_dashboard_base', 'kb_user_profile', 'kb.service.user_profile'
                                     console.log('ERROR');
                                     console.log(err);
                                     reject(err);
-                                })
-                                .done();
+                                });
                         }.bind(this));
                     }
                 },

@@ -13,9 +13,10 @@ define([
     'kb.runtime',
     'kb.utils',
     'kb.html', 
-    'postal'
+    'postal',
+    'kb_user_profile',
 ],
-    function (nunjucks, $, Promise, R, Utils, html, Postal) {
+    function (nunjucks, $, Promise, R, Utils, html, Postal, UserProfile) {
         "use strict";
         var SocialWidget = Object.create({}, {
             // The init function interfaces this object with the caller, and sets up any 
@@ -96,12 +97,22 @@ define([
                     this.templates.env = new nunjucks.Environment(new nunjucks.WebLoader('/plugins/userprofile/source/javascript/widgets/' + this.widgetName + '/templates'), {
                         'autoescape': false
                     });
+                    // create a gravatar-url out of an email address and a 
+                    // default option.
+                    this.templates.env.addFilter('gravatar', function (email, size, rating, gdefault) {
+                        // TODO: http/https.
+                        return UserProfile.makeGravatarURL(email, size, rating, gdefault);
+                    }.bind(this));
                     this.templates.env.addFilter('kbmarkup', function (s) {
-                        if (s) {
-                            s = s.replace(/\n/g, '<br>');
-                        }
+                        s = s.replace(/\n/g, '<br>');
                         return s;
                     });
+                    this.templates.env.addFilter('avatarBackgroundColor', function (color) {
+                        return this.listMaps['avatarColor'][color].color;
+                    }.bind(this));
+                    this.templates.env.addFilter('avatarTextColor', function (color) {
+                        return this.listMaps['avatarColor'][color].textColor;
+                    }.bind(this));
                     // this is the cache of templates.
                     
                     this.templates.cache = {};
@@ -201,8 +212,7 @@ define([
                         }.bind(this))
                         .catch(function (err) {
                             this.setError(err);
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
                 }
             },
             setup: {
@@ -280,8 +290,7 @@ define([
                         }.bind(this))
                         .catch(function (err) {
                             this.setError(err);
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
                 }
             },
             refresh: {

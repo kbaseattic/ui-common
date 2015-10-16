@@ -352,8 +352,7 @@ define([
                             if (this.afterStart) {
                                 this.afterStart();
                             }
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
                     return this;
                 }
             },
@@ -422,8 +421,7 @@ define([
                             }.bind(this))
                             .catch(function (err) {
                                 this.setError(err);
-                            }.bind(this))
-                            .done();
+                            }.bind(this));
                     } else if (this.status === 'error') {
                         this.refresh()
                             .then(function () {
@@ -431,8 +429,7 @@ define([
                             }.bind(this))
                             .catch(function (err) {
                                 this.setError(err);
-                            }.bind(this))
-                            .done();
+                            }.bind(this));
                     }
                 }
             },
@@ -441,8 +438,7 @@ define([
                     this.setInitialState()
                         .catch(function (err) {
                             this.setError(err);
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
                     return this;
                 }
             },
@@ -639,8 +635,7 @@ define([
                             }.bind(this))
                             .catch(function (err) {
                                 this.setError(err);
-                            }.bind(this))
-                            .done();
+                            }.bind(this));
                 }
             },
             onLoggedOut: {
@@ -656,8 +651,7 @@ define([
                         }.bind(this))
                         .catch(function (err) {
                             this.setError(err);
-                        }.bind(this))
-                        .done();
+                        }.bind(this));
                 }
             },
             // STATE CALCULATIONS

@@ -80,7 +80,15 @@ define([
             function init(config) {
                 return new Promise(function (resolve) {
                     root = config.pluginPath;
-                    resolve();
+                     if (!R.isLoggedIn()) {
+                        reject({
+                            type: 'AuthorizationError',
+                            reason: 'PanelRequiresAuthorization',
+                            message: 'The dashboard is only available for logged in users'
+                        });
+                    } else {
+                        resolve();
+                    }
                 });
             }
             function attach(node) {
@@ -91,7 +99,7 @@ define([
                     renderPanel()
                         .then(function (rendered) {
                             container.innerHTML = rendered.content;
-                            R.send('app', 'title', rendered.title);
+                            // R.send('app', 'title', rendered.title);
                             // create widgets.
                             children = rendered.widgets;
                             Promise.all(children.map(function (w) {
@@ -109,21 +117,18 @@ define([
                                         .catch(function (err) {
                                             console.log('ERROR attaching');
                                             console.log(err);
-                                        })
-                                        .done();
+                                        });
                                 })
                                 .catch(function (err) {
                                     console.log('ERROR creating');
                                     console.log(err);
-                                })
-                                .done();
+                                });
                         })
                         .catch(function (err) {
                             console.log('ERROR rendering console');
                             console.log(err);
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             function start(params) {
@@ -147,8 +152,7 @@ define([
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             function stop() {
@@ -161,8 +165,7 @@ define([
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             function detach() {
@@ -175,8 +178,7 @@ define([
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             return {

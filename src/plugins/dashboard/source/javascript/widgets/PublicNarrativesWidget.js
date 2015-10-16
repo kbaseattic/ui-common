@@ -254,8 +254,7 @@ define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb_widget_dashboard_bas
                      }.bind(this))
                      .catch(function (err) {
                         reject(err);
-                     })
-                     .done();
+                     });
                }.bind(this));
             }
          }

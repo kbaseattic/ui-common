@@ -49,3 +49,4 @@ install:
         -
             path: ['dashboard']
             panelFactory: kb_panel_dashboard
+            authorizationRequired: true

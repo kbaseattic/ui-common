@@ -57,8 +57,7 @@ define([
                     console.log(e);
                     container.append('<div class="alert alert-danger">' +
                         e.error.message + '</div>')
-                })
-                .done();
+                });
 
 
             function buildTable(data, refhash) {
@@ -145,8 +144,7 @@ define([
                                     e.error.message + '</div>')
                             });
                             reject(e);
-                        })
-                        .done();
+                        });
                 });
             }
             return this;

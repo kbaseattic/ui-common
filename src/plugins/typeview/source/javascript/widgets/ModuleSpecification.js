@@ -241,8 +241,7 @@ define([
                                     console.log('ERROR');
                                     console.log(err);
 
-                                })
-                                .done();
+                                });
                         }
                     }
                 };
@@ -303,8 +302,7 @@ define([
                             //var error = 'Error rendering widget';
                             //console.log(err);
                             //container.html(error);
-                        })
-                        .done();
+                        });
                 });
             }
 
@@ -355,8 +353,7 @@ define([
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
 
                 });
             }

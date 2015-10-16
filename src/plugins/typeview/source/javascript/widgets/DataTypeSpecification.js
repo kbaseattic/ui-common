@@ -276,8 +276,7 @@ define([
                         var error = 'Error rendering widget';
                         console.log(err);
                         $container.html(error);
-                    })
-                    .done();
+                    });
             }
             
             // API

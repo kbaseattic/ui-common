@@ -181,8 +181,7 @@ define(['nunjucks', 'jquery', 'bluebird', 'kb.session', 'kb.utils', 'postal'],
           }.bind(this))
           .catch(function(err) {
             this.setError(err);
-          }.bind(this))
-          .done();
+          }.bind(this));
         }
       },
       
@@ -266,8 +265,7 @@ define(['nunjucks', 'jquery', 'bluebird', 'kb.session', 'kb.utils', 'postal'],
           }.bind(this))
           .catch (function(err) {
             this.setError(err);
-          }.bind(this))
-          .done();
+          }.bind(this));
         }
       },
 

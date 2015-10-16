@@ -55,8 +55,7 @@ define([
                             /* TODO: work out best pattern for error flow */
                             console.log('ERROR creating');
                             console.log(err);
-                        })
-                        .done();
+                        });
             });
         }
         function attach(node) {
@@ -74,8 +73,7 @@ define([
                             /* TODO: work out best pattern for error flow */
                             console.log('ERROR creating');
                             console.log(err);
-                        })
-                        .done();
+                        });
             });
         }
         function start(params) {
@@ -91,8 +89,7 @@ define([
                             /* TODO: work out best pattern for error flow */
                             console.log('ERROR creating');
                             console.log(err);
-                        })
-                        .done();
+                        });
                 resolve();
             });
         }
@@ -109,8 +106,7 @@ define([
                             /* TODO: work out best pattern for error flow */
                             console.log('ERROR creating');
                             console.log(err);
-                        })
-                        .done();
+                        });
             });
         }
         function stop() {
@@ -125,8 +121,7 @@ define([
                             /* TODO: work out best pattern for error flow */
                             console.log('ERROR creating');
                             console.log(err);
-                        })
-                        .done();
+                        });
             });
         }
         function detach() {
@@ -142,8 +137,7 @@ define([
                             /* TODO: work out best pattern for error flow */
                             console.log('ERROR creating');
                             console.log(err);
-                        })
-                        .done();
+                        });
             });
         }
         function destroy() {
@@ -158,8 +152,7 @@ define([
                             /* TODO: work out best pattern for error flow */
                             console.log('ERROR creating');
                             console.log(err);
-                        })
-                        .done();
+                        });
             });
         }
 

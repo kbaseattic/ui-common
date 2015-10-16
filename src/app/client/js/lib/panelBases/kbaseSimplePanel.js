@@ -47,21 +47,18 @@ define([
                                         .catch(function (err) {
                                             console.log('ERROR attaching');
                                             console.log(err);
-                                        })
-                                        .done();
+                                        });
                                 })
                                 .catch(function (err) {
                                     console.log('ERROR creating');
                                     console.log(err);
-                                })
-                                .done();
+                                });
                         })
                         .catch(function (err) {
                             console.log('ERROR rendering console');
                             console.log(err);
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
 
@@ -86,8 +83,7 @@ define([
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             function stop() {
@@ -100,8 +96,7 @@ define([
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             function detach() {
@@ -114,8 +109,7 @@ define([
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             return {

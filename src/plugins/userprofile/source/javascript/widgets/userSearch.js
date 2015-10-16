@@ -1,10 +1,11 @@
 define([
+    'jquery',
     'bluebird',
     'kb_widget_userProfile_base', 
     'kb.service.user_profile', 
     'kb.runtime'
 ],
-    function (Promise, SocialWidget, UserProfileService, R) {
+    function ($, Promise, SocialWidget, UserProfileService, R) {
         "use strict";
         var widget = Object.create(SocialWidget, {
             init: {
@@ -73,7 +74,6 @@ define([
                                                 return 0;
                                             }
                                         });
-                                        console.log(users);
                                         widget.setState('searchResults', users);
                                     })
                                     .catch(function (err) {

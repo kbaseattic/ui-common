@@ -44,10 +44,15 @@ define([
                 if (typeof location === 'string')  {
                     location = {path: location};
                 }
-                var loc = location.path;
+                // path may be an array.
+                var loc;
+                if (location.path.pop) {
+                    loc = location.path.join('/');
+                } else {
+                    loc = location.path;
+                }
                 if (location.params) {
                     loc += '?' + paramsToQuery(location.params);
-
                 }
                 
                 window.location.hash = '#' + loc;
@@ -237,8 +242,7 @@ define([
                                     .catch(function (err) {
                                         console.log('ERROR');
                                         console.log(err);
-                                    })
-                                    .done();
+                                    });
                             } else if (result.redirect) {
                                 replacePath(result.redirect);
                             }
@@ -247,8 +251,7 @@ define([
                             console.log('ERROR');
                             console.log(err);
                             mount('app', 'Error mounting this panel.' + err);
-                        })
-                        .done();
+                        });
                 }
             }
 
@@ -273,13 +276,11 @@ define([
                                         })
                                         .catch(function (err) {
                                             reject(err);
-                                        })
-                                        .done();
+                                        });
                                 })
                                 .catch(function (err) {
                                     reject(err);
-                                })
-                                .done();
+                                });
                         } else {
                             resolve();
                         }
@@ -302,20 +303,17 @@ define([
                                         })
                                         .catch(function (err) {
                                             reject(err);
-                                        })
-                                        .done();
+                                        });
                                 })
                                 .catch(function (err) {
                                     reject(err);
-                                })
-                                .done();
+                                });
                         })
                         .catch(function (err) {
                             console.log('ERROR');
                             console.log(err);
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
 
@@ -339,13 +337,11 @@ define([
                                         })
                                         .catch(function (err) {
                                             reject(err);
-                                        })
-                                        .done();
+                                        });
                                 })
                                 .catch(function (err) {
                                     reject(err);
-                                })
-                                .done();
+                                });
                         } else {
                             resolve();
                         }
@@ -369,8 +365,9 @@ define([
                                     newMount.container = $('<div id="' + newMount.id + '"/>');
                                     mountPoint.container.empty().append(newMount.container);
                                     mountPoint.mounted = newMount;
-                                    
+
                                     publish('navbar', 'clear-buttons');
+                                    publish('navbar', 'title', '');
 
                                     newMount.widget.attach(newMount.container.get(0))
                                         .then(function () {
@@ -385,23 +382,20 @@ define([
                                         })
                                         .catch(function (err) {
                                             reject(err);
-                                        })
-                                        .done();
+                                        });
                                 })
                                 .catch(function (err) {
                                     console.log('ERROR initializing panel');
                                     console.log(err);
                                     reject(err);
-                                })
-                                .done();
+                                });
 
                         })
                         .catch(function (err) {
                             console.log('ERROR');
                             console.log(err);
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             
@@ -432,8 +426,7 @@ define([
                         mountPoint.mounted.widget.stop()
                             .then(function () {
                                 return mountPoint.mounted.widget.detach();
-                            })
-                            .done();
+                            });
                     }
 
 
@@ -453,13 +446,11 @@ define([
                                 })
                                 .catch(function (err) {
                                     reject(err);
-                                })
-                                .done();
+                                });
                         })
                         .catch(function (err) {
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
 
@@ -485,8 +476,7 @@ define([
                             console.log('ERROR');
                             console.log(err);
                             mount('app', 'Error mounting this panel.' + err);
-                        })
-                        .done();
+                        });
                 }
             }
 
@@ -733,6 +723,20 @@ define([
                 var handler = router.findCurrentRoute();
                 if (!handler) {
                     publish('app', 'route-not-found');
+                }
+                if (handler.route.authorizationRequired) {
+                    if (!Session.isLoggedIn()) {
+                        var loginParams = {}
+                        if (handler.request.path) {
+                            loginParams.nextrequest = JSON.stringify(handler.request);
+                        }
+                        publish('app', 'navigate', {
+                            path: 'login',
+                            // TODO: path needs to be the path + params
+                            params: loginParams
+                        });
+                        return;
+                    }
                 }
                 publish('app', 'new-route', {
                     routeHandler: handler

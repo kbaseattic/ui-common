@@ -88,8 +88,7 @@ define([
                                                         exception: err
                                                     });
                                                     reject(err);
-                                                })
-                                                .done();
+                                                });
                                         })
                                         .catch(function (err) {
                                             R.logError({
@@ -97,8 +96,7 @@ define([
                                                 exception: err
                                             });
                                             reject(err);
-                                        })
-                                        .done();
+                                        });
                                 })
                                 .catch(function (err) {
                                     R.logError({
@@ -106,8 +104,7 @@ define([
                                         exception: err
                                     });
                                     reject(err);
-                                })
-                                .done();
+                                });
                         })
                         .catch(function (err) {
                             R.logError({
@@ -115,8 +112,7 @@ define([
                                 exception: err
                             });
                             reject(err);
-                        })
-                        .done();
+                        });
                 });
             }
             function stop() {
