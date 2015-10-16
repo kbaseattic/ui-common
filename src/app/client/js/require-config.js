@@ -120,8 +120,10 @@
             'kb.client.narrativemanager': 'js/lib/clients/narrativemanager',
             
             // DATA API
-            thrift: 'bower_components/kbase-data-api-js-wrappers/thrift/thrift',
-            thrift_binary_protocol: 'bower_components/kbase-data-api-js-wrappers/thrift/thrift-js-binary-protocol',
+            thrift: 'bower_components/thrift-binary-protocol/thrift-core',
+            thrift_transport_xhr: 'bower_components/thrift-binary-protocol/thrift-transport-xhr',
+            thrift_protocol_binary: 'bower_components/thrift-binary-protocol/thrift-protocol-binary',
+            
             taxon_types: 'bower_components/kbase-data-api-js-wrappers/thrift/taxon/taxon_types',
             taxon_service: 'bower_components/kbase-data-api-js-wrappers/thrift/taxon/thrift_service',        
             kb_taxon: 'bower_components/kbase-data-api-js-wrappers/Taxon',

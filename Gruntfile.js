@@ -170,9 +170,14 @@ module.exports = function (grunt) {
         },
          {
             dir: 'kbase-data-api-js-wrappers',
-            cwd: 'dist/bower/pkg/js',
+            cd: 'dist/bower/pkg/js',
             src: '**/*'
         },
+        {
+            dir: 'thrift-binary-protocol',
+            cd: 'src',
+            src: '**/*'
+        }
     ],
 
     bowerCopy = bowerFiles.map(function (cfg) {

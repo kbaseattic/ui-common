@@ -18,10 +18,11 @@ define([
     'kb.service.cdmi-entity',
     'kb.service.workspace',
     'kb.service.trees',
+    'kb_taxon',
 
     'kb.jquery.authenticatedwidget'
 ],
-    function ($, R, html, CDMI, CDMI_Entity, Workspace, KBaseTrees) {
+    function ($, R, html, CDMI, CDMI_Entity, Workspace, KBaseTrees, Taxon) {
         'use strict';
         $.KBWidget({
             name: "KBaseGenomeLineage",
@@ -36,9 +37,6 @@ define([
                 //isInCard: false,
                 genomeInfo: null
             },
-            token: null,
-            cdmiURL: R.getConfig('services.cmi.url'),
-            treesURL: R.getConfig('services.trees.url'),
             $infoTable: null,
             pref: null,
             init: function (options) {
@@ -56,15 +54,13 @@ define([
                 this.$elem.append(this.$messagePane);
 
                 this.render();
-                if (this.options.workspaceID === null) {
-                    this.renderCentralStore();
-                } else {
-                    this.renderWorkspace();
-                }
+                this.renderLineage();
 
                 return this;
             },
             render: function () {
+                
+                
                 this.$infoPanel = $("<div>");
 
                 this.$infoTable = $("<table>").addClass("table table-striped table-bordered");
@@ -73,33 +69,55 @@ define([
                 this.$infoPanel.hide();
                 this.$elem.append(this.$infoPanel);
             },
-            renderCentralStore: function () {
-                var self = this;
-                this.cdmiClient = new CDMI(this.cdmiURL);
-                this.entityClient = new CDMI_Entity(this.cdmiURL);
-
-                this.$infoPanel.hide();
-                this.showMessage(html.loading('loading...'));
-
-                // Fields to show:
-                // ID
-                // Workspace (if from a workspace)
-                // Owner (KBase Central Store vs. username)
-                // Scientific Name
-                // Taxonomy
-                // Taxonomy
-                this.entityClient.get_entity_Genome(
-                    [this.options.genomeID],
-                    ['id', 'scientific_name', 'domain', 'taxonomy'],
-                    $.proxy(
-                        function (genome) {
-                            genome = genome[0].data;
-                            self.showData(genome);
-                        },
-                        this
-                        ),
-                    this.renderError
-                    );
+            renderLineage: function () {
+                var self = this,
+                    taxonClient = Taxon({
+                        ref: self.getObjectIdentity(self.options.workspaceID, self.options.genomeID).ref,
+                        token: R.getAuthToken(),
+                        url: 'http://euk.kbase.us/taxon'
+                    }),
+                    ul = html.tag('ol'),
+                    li = html.tag('li'),
+                    a = html.tag('a'),
+                    table = html.tag('table'), 
+                    tr = html.tag('tr'),
+                    th = html.tag('th'),
+                    td = html.tag('td'),
+                    pre = html.tag('pre');
+            
+            
+                return taxonClient.getScientificName()
+                    .then(function (name) {
+                        // content = div(['Scientific name: ', name]);
+                        // w.send('ui', 'setTitle', 'Lineage of ' + name);
+                        return [name, taxonClient.getScientificLineage()];
+                    })
+                    .spread(function (scientificName, lineage) {
+                        var pad = 0,
+                            content = table({class: 'table table-striped table-bordered'}, [
+                                tr([
+                                    th('Name'), td(scientificName)
+                                ]),
+                                tr([
+                                    th('Taxonomic Lineage'), td(pre(ul({class: 'list-unstyled'}, lineage.map(function (item) {
+                                        var url = 'http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=' + item.trim(' ');
+                                        pad += 10;
+                                        return li({style: {'padding-left': String(pad) + 'px'}}, [
+                                            a({href: url, target: '_blank'}, item.trim(' '))]);
+                                    }))))
+                                ])
+                            ]);
+                        return {
+                            title: 'Taxon Lineage Widget',
+                            content: content
+                        };
+                    })
+                    .then(function (result) {
+                        self.$elem.html(result.content);
+                    })
+                    .catch(function (err) {
+                        self.renderError(err);  
+                    });
             },
             renderWorkspace: function () {
                 var self = this;
@@ -186,19 +204,6 @@ define([
                     });
                 }
             },
-            guessLinage: function () {
-                var self = this;
-                var tdElem = $('#tax_td_' + self.pref);
-                tdElem.html(html.loading('loading...'));
-                var treesSrv = new KBaseTrees(this.treesURL, {token: App.getAuthToken()});
-                var genomeRef = this.options.workspaceID + "/" + this.options.genomeID;
-                treesSrv.guess_taxonomy_path({query_genome: genomeRef}, function (data) {
-                    self.showLinage(data);
-                },
-                    function (data) {
-                        tdElem.html("Error accessing [trees] service: " + data.error.message);
-                    });
-            },
             getData: function () {
                 return {
                     title: "Taxonomic lineage for :",
@@ -232,6 +237,8 @@ define([
                 this.$messagePane.hide();
             },
             renderError: function (error) {
+                console.log('ERROR');
+                console.log(error);
                 var errString = "Sorry, an unknown error occurred";
                 if (typeof error === "string") {
                     errString = error;
