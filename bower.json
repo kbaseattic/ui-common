@@ -58,7 +58,7 @@
     "kbase-ui-plugin-sample": "eapearson/kbase-ui-plugin-sample#0.0.1",
     "kb-ui-plugin-demo": "eapearson/kb-ui-plugin-demo",
     "bluebird": "2.10.2",
-    "kbase-ui-plugin-databrowser": "https://github.com/eapearson/kbase-ui-plugin-databrowser.git#1be75b00920a6906caef1d8568f64230a96aa925",
+    "kbase-ui-plugin-databrowser": "https://github.com/eapearson/kbase-ui-plugin-databrowser.git#ease-dev-compat",
     "kbase-data-api-js-wrappers": "eapearson/kbase-data-api-js-wrappers#master",
     "kbase-ui-plugin-vis-widgets": "eapearson/kbase-ui-plugin-vis-widgets#master",
     "kbase-ui-plugin-demo-vis-widget": "eapearson/kbase-ui-plugin-demo-vis-widget#master"
