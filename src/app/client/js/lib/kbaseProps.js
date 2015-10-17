@@ -130,8 +130,7 @@ define([
                     return obj;
                 }
             };
-        }
-        ;
+        }        
 
         return {
             create: function () {
