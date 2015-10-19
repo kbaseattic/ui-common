@@ -251,8 +251,12 @@ module.exports = function (grunt) {
                         expand: true
                     },
                     {
-                        src: 'loading.html',
+                        src: 'tools/loading.html',
                         dest: 'build/client/loading.html'
+                    },
+                    {
+                        src: 'tools/widget-paths.js',
+                        dest: 'build/client/widget-paths.js'
                     }
                 ]
             },
