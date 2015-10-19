@@ -18,10 +18,15 @@ define([
     'kb.html',
     'kb.service.workspace',
     'kb.jquery.widget',
+    
     'kb_widget_dataview_genome_wideOverview',
     'kb_widget_dataview_genomeLiterature',
     'kb_widget_dataview_genome_wideTaxonomy',
-    'kb_widget_dataview_genome_wideAssemblyAnnotation'
+    'kb_widget_dataview_genome_wideAssemblyAnnotation',
+    
+    'kb_widget_dataview_genome_genePage',
+    'kb_widget_dataview_genome_geneSequence',
+    'kb_widget_dataview_genome_geneInstanceInfo'
 ],
     function ($, R, html, Workspace) {
         'use strict';

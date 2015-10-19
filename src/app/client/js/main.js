@@ -357,6 +357,11 @@ define([
                                                 resolve();
                                             }));
                                         });
+                                        if (typeDef.icon) {
+                                            installSteps.push(Promise.try(function () {
+                                                Types.setIcon(type, typeDef.icon);
+                                            }));
+                                        }
                                         
                                     });
                                 }

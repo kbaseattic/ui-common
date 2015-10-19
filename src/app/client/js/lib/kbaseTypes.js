@@ -104,10 +104,14 @@ define([
          */
         function addViewer(type, viewerDef) {
             var typeDef = types.getItem(['types', type.module, type.name]);
-            if (typeDef === undefined) {
+            if (typeDef === undefined || typeDef === null) {
                 types.setItem(['types', type.module, type.name], {
                     viewers: []
                 });
+            } else if (!types.hasItem(['types', type.module, type.name, 'viewers']) || 
+                        types.getItem(['types', type.module, type.name, 'viewers']) === null) {
+                // setting empty 
+                types.setItem(['types', type.module, type.name, 'viewers'], []);
             }
             var viewers = types.getItem(['types', type.module, type.name, 'viewers']);
             if (viewerDef.default) {
@@ -118,6 +122,17 @@ define([
             viewers.push(viewerDef);
         }
         function setDefaultViewer(type, viewerId) {            
+        }
+        
+        function setIcon(type, iconDef) {
+            var typeDef = types.getItem(['types', type.module, type.name]);
+            if (typeDef === undefined || typeDef === null) {
+                types.setItem(['types', type.module, type.name], {
+                    icon: iconDef
+                });
+            } else {
+                types.setItem(['types', type.module, type.name, 'icon'], iconDef);
+            } 
         }
         
         function getDefault(prop) {
@@ -174,6 +189,7 @@ define([
             parseTypeId: parseTypeId,
             makeType: makeType,
             makeVersion: makeVersion,
-            addViewer: addViewer
+            addViewer: addViewer,
+            setIcon: setIcon
         };
     });

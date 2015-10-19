@@ -14,10 +14,11 @@
  */
 define([
     'jquery', 
+    'bluebird',
     'kb.runtime',
     'kb.html',
     'kb.jquery.widget'
-], function ($, R, html) {
+], function ($, Promise, R, html) {
     'use strict';
     $.KBWidget({
         name: "KBaseGeneSequence",
@@ -29,7 +30,6 @@ define([
             auth: null,
             genomeID: null,
             workspaceID: null,
-            kbCache: null,
             width: 950,
             seq_cell_height: 208,
             genomeInfo: null
@@ -79,24 +79,36 @@ define([
             if (this.options.genomeInfo) {
                 self.ready(this.options.genomeInfo);
             } else {
-                if (!this.options.kbCache) {
-                    if (kb)
-                        this.options.kbCache = kb;
-                    else
-                        console.debug("No cache service found. D'oh!");
-                }
+//                if (!this.options.kbCache) {
+//                    if (kb)
+//                        this.options.kbCache = kb;
+//                    else
+//                        console.debug("No cache service found. D'oh!");
+//                }
                 var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
+                
+                var workspace = new Workspace(R.getConfig('services.workspace.url'), {
+                    token: R.getAuthToken()
+                });
+                Promise.resolve(workspace.get_objects([obj]))
+                    .then(function (result) {
+                        self.ready(result[0]);
+                    })
+                    .catch(function (err) {
+                        this.renderError(err);
+                    });
+                
 
-                var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
-                // on ws error
-                $.when(prom).fail($.proxy(function (error) {
-                    this.renderError(error);
-                }, this));
-                // on cache success
-                $.when(prom).done($.proxy(function (genome) {
-                    genome = genome[0];
-                    self.ready(genome);
-                }, this));
+//                var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
+//                // on ws error
+//                $.when(prom).fail($.proxy(function (error) {
+//                    this.renderError(error);
+//                }, this));
+//                // on cache success
+//                $.when(prom).done($.proxy(function (genome) {
+//                    genome = genome[0];
+//                    self.ready(genome);
+//                }, this));
             }
         },
         ready: function (genome) {
@@ -271,6 +283,6 @@ define([
                 .append("<br>" + errString);
             this.$elem.empty();
             this.$elem.append($errorDiv);
-        },
-    })
+        }
+    });
 });

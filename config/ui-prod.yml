@@ -5,9 +5,9 @@ plugins:
         login
     -
         about
-    -
-        name: databrowser
-        directory: bower_components/kbase-ui-plugin-databrowser/src/plugin
+    #-
+    #    name: databrowser
+    #    directory: bower_components/kbase-ui-plugin-databrowser/src/plugin
     -
         userprofile
     -

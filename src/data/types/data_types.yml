@@ -17,69 +17,10 @@ types:
         BiomMetagenome:
         BiomMetagenomeEntry:        
         Collection:
-            icon: 
-                type: fontAwesome
-                classes: ['fa-list-ul']
-            viewers:
-                -                
-                    # This the title for the widget
-                    title: 'Data View'                
-                    # This is the module name as specified in the plugin
-                    # it should follow standard namespacing
-                    module: kb_widget_dataview_communities_collection
-                    # This is the internal jquery object name for this widget.
-                    widget: CollectionView
-                    # If a bootstrap panel is requested to wrap this widget.
-                    panel: true
-                    # Mapping of standard options to the widget option properties.
-                    # By standard, I mean those defined in the GenericVisualizer widget.
-                    options:
-                        -
-                            from: workspaceId
-                            to: ws
-                        -
-                            from: objectId
-                            to: id
-                -
-                    default: true
-                    # This the title for the widget
-                    title: 'Data View 2'                
-                    # This is the module name as specified in the plugin
-                    # it should follow standard namespacing
-                    module: kb_widget_dataview_communities_collection
-                    # This is the internal jquery object name for this widget.
-                    widget: CollectionView
-                    # If a bootstrap panel is requested to wrap this widget.
-                    panel: true
-                    # Mapping of standard options to the widget option properties.
-                    # By standard, I mean those defined in the GenericVisualizer widget.
-                    options:
-                        -
-                            from: workspaceId
-                            to: ws
-                        -
-                            from: objectId
-                            to: id
         Data:
         DataHandle:
         Drisee:
-        FunctionalMatrix: 
-            icon:   
-                type: fontAwesome
-                classes: ['fa-table']
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_communities_functionalMatrix
-                    widget: AbundanceDataView
-                    panel: true
-                    options: 
-                        -
-                            from: workspaceId
-                            to: ws
-                        -
-                            from: objectId
-                            to: id
+        FunctionalMatrix:
         FunctionalProfile:
             viewers:
                 -
@@ -112,23 +53,7 @@ types:
                             to: id
         List:
         Metadata:
-        Metagenome: 
-            icon:   
-                type: kbase
-                classes: ['icon-metagenome', 'kb-data-icon-dnudge']
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_communities_metagenome
-                    widget: MetagenomeView
-                    panel: true,
-                    options:
-                        -
-                            from: workspaceId
-                            to: ws
-                        -
-                            from: objectId
-                            to: id
+        Metagenome:
         MetagenomeMatrix:
         MetagenomeProfile:
         MetagenomeSet:
@@ -144,56 +69,17 @@ types:
         StatMatrix:
         Statistics:
         StatsQC:
-        TaxonomicMatrix: 
-            icon:   
-                type: fontAwesome
-                classes: ['fa-table']
+        TaxonomicMatrix:
         TaxonomicProfile:
     Empty:
         AHandle:
         AType:
     GenomeComparison:
-        ProteomeComparison: 
-            icon:   
-                type: fontAwesome
-                classes: ['fa-arrows-h']
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_proteomeComparison_genomeComparison
-                    widget: GenomeComparisonWidget
-                    panel: true
-                    options:
-                        -
-                            from: workspaceId
-                            to: ws_name
-                        -
-                            from: objectId
-                            to: ws_id
+        ProteomeComparison:
     Inferelator:
         InferelatorRunResult:
     KBaseAssembly:
         AssemblyInput:
-            icon: 
-                type: kbase
-                classes: ['icon-reads', 'kb-data-icon-dnudge']  
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_assembly_assemblyInput
-                    widget: kbaseAssemblyInput
-                    panel: true
-                    options:
-                        -
-                            from: workspaceId
-                            to: workspaceId
-                        - 
-                            from: objectId
-                            to: objId
-                        -
-                            from: objectVersion
-                            to: objVer
-                            optional: true
         AssemblyReport:
             viewers:
                 -
@@ -209,58 +95,13 @@ types:
                             from: objectId
                             to: ws_id
         Handle:
-        PairedEndLibrary: 
-                icon:   
-                    type: kbase
-                    classes: ['icon-reads', 'kb-data-icon-dnudge']
-                viewers:
-                    -
-                        title: Data View
-                        module: kb_widget_dataview_assembly_pairedEndLibrary
-                        widget: kbasePairedEndLibrary
-                        panel: true
-                        options:
-                            -
-                                from: workspaceId
-                                to: workspaceId
-                            -    
-                                from: objectId
-                                to: objId
-                            -    
-                                from: objectVersion
-                                to: objVer
-                                optional: true
-        ReferenceAssembly: 
-            icon:   
-                type: fontAwesome
-                classes: ['fa-book']           
-        SingleEndLibrary: 
-            icon:   
-                type: kbase
-                classes: ['icon-reads', 'kb-data-icon-dnudge']
+        PairedEndLibrary:
+        ReferenceAssembly:       
+        SingleEndLibrary:
     KBaseBiochem:
         Biochemistry:
         BiochemistryStructures:
-        Media: 
-            icon:   
-                type: fontAwesome
-                classes: ['fa-flask']
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_modeling_tabTable
-                    widget: kbaseTabTable
-                    panel: true
-                    options: 
-                        -
-                            from: workspaceName 
-                            to: ws
-                        -
-                            from: objectName 
-                            to: obj
-                        -
-                            from: objectType 
-                            to: type
+        Media:
         MetabolicMap:
     KBaseCommon:
         Location:
@@ -304,46 +145,8 @@ types:
         ClassifierTrainingSet:
         ETC:
         FBA:
-            icon:  
-                type: kbase
-                classes: ['icon-metabolism', 'kb-data-icon-dnudge']
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_modeling_tabTable
-                    widget: kbaseTabTable
-                    panel: true
-                    options: 
-                        -
-                            from: workspaceName 
-                            to: ws
-                        -
-                            from: objectName 
-                            to: obj
-                        -
-                            from: objectType 
-                            to: type
         FBAComparison:
-        FBAModel: 
-            icon:   
-                type: kbase
-                classes: ['icon-metabolism', 'kb-data-icon-dnudge']
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_modeling_tabTable
-                    widget: kbaseTabTable
-                    panel: true
-                    options: 
-                        -
-                            from: workspaceName 
-                            to: ws
-                        -
-                            from: objectName 
-                            to: obj
-                        -
-                            from: objectType 
-                            to: type
+        FBAModel:
         FBAModelSet:
             # untested
             viewers:
@@ -373,23 +176,6 @@ types:
         AssemblyFile:
         FileRef:
         PairedEndLibrary:
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_assembly_filePairedEndLibrary
-                    widget: kbaseFilePairedEndLibrary
-                    panel: true
-                    options: 
-                        -
-                            from: workspaceId
-                            to: workspaceId
-                        -
-                            from: objectId
-                            to: objId
-                        -
-                            from: objectVersion
-                            to: objVer 
-                            optional: true
         SingleEndLibrary:
             # is this the same as KBaseAssembly.SingleEndLibrary?
     KBaseGeneFamilies:
@@ -404,27 +190,7 @@ types:
         DomainLibrary:
         DomainModelSet:
     KBaseGenomes:
-        ContigSet: 
-            icon: 
-                type: fontAwesome
-                classes: ['fa-align-justify']
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_contigset_contigSetView
-                    widget: kbaseContigSetView
-                    panel: true
-                    options: 
-                        -
-                            from: workspaceId 
-                            to: ws_name
-                        -
-                            from: objectId
-                            to: ws_id
-                        -
-                            from: objectVersion
-                            to: ver 
-                            optional: true
+        ContigSet:
         Feature:
         Genome: 
             icon:   
@@ -456,24 +222,12 @@ types:
                                     to: genomeID
                                 -
                                     from: workspaceId 
-                                    to: objectId
-        GenomeComparison: 
-            icon:   
-                type: kbase
-                classes: ['icon-compare']
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_proteomeComparison_genomeComparisonViewer
-                    widget: kbaseGenomeComparisonViewer
-                    panel: true
-                    options:
-                        -
-                            from: workspaceId 
-                            to: ws
-                        -
-                            from: objectId
-                            to: id
+                                    to: workspaceID
+                                -
+                                    from: subid
+                                    to: featureID
+                                    
+        GenomeComparison:
         GenomeDomainData:
         MetagenomeAnnotation:
             viewers:
@@ -489,23 +243,7 @@ types:
                         -
                             from: objectId 
                             to: id
-        Pangenome: 
-            icon:   
-                type: fontAwesome
-                classes: ['fa-bullseye']
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_genome_pangenome
-                    widget: kbasePanGenome
-                    panel: true
-                    options: 
-                        -
-                            from: workspaceName 
-                            to: ws
-                        -
-                            from: objectName 
-                            to: name
+        Pangenome:
         ProbabilisticAnnotation:
     KBaseGwasData:
         GwasExperimentSummary:
@@ -537,26 +275,7 @@ types:
         OntologyAccMap:
         gene_enrichment_annotations:
     KBasePhenotypes:
-        PhenotypeSet: 
-            icon:   
-                type: fontAwesome
-                classes: ['fa-list-ul']
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_modeling_tabTable
-                    widget: kbaseTabTable
-                    panel: true
-                    options: 
-                        -
-                            from: workspaceName 
-                            to: ws
-                        -
-                            from: objectName 
-                            to: obj
-                        -
-                            from: objectType 
-                            to: type
+        PhenotypeSet:
         PhenotypeSimulationSet:
             icon:   
                 type: fontAwesome
@@ -591,25 +310,6 @@ types:
         Genome:
             # different from KBaseGenomes.Genome?
         GenomeSet: 
-            icon:   
-                type: fontAwesome
-                classes: ['fa-list-ul']
-            viewers:
-                -
-                    title: Data View
-                    module: kb_widget_dataview_modeling_tabTable
-                    widget: kbaseTabTable
-                    panel: true
-                    options: 
-                        -
-                            from: workspaceName 
-                            to: ws
-                        -
-                            from: objectName 
-                            to: obj
-                        -
-                            from: objectType 
-                            to: type
         IndividualFeature:
         Ontology:
         SearchFeatureSet:

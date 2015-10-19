@@ -11,7 +11,10 @@
  browser: true,
  white: true
  */
-define(['jquery', 'kb_widget_dataview_assembly_singleObjectBasic'],
+define([
+    'jquery',
+    'kb_widget_dataview_assembly_singleObjectBasic'
+],
     function ($) {
         'use strict';
         $.KBWidget({
