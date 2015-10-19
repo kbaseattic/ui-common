@@ -1,0 +1,39 @@
+## YAML Template.
+---
+package:
+    author: Erik Pearson
+    name: narrative_manager
+    description: The narrative manager
+    date: August 8, 2015
+    version: 0.0.2
+source:
+    modules:
+        -
+            module: kb_handler_narrativeManager
+            file: handler
+        -
+            module: kb_narrativeManager
+            file: narrativeManager
+install:
+    routes:
+        -
+            path: ['narrativemanager', 'start']
+            queryParams:
+                app: {}
+                method: {}
+                copydata: {}
+                appparam: {}
+            redirectHandler:
+                module: kb_handler_narrativeManager
+                method: startOrCreateEmptyNarrative
+        -
+            path: ['narrativemanager', 'new']
+            queryParams:
+                app: {}
+                method: {}
+                copydata: {}
+                appparam: {}
+            redirectHandler:
+                module: kb_handler_narrativeManager
+                method: createNewNarrative         
+        

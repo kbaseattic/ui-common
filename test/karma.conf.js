@@ -35,7 +35,7 @@ module.exports = function(config) {
        * have the Require apparatus take over.
        */
       {pattern: 'build/client/bower_components/jquery/dist/jquery.js', included: false},
-      {pattern: 'build/client/bower_components/q/q.js', included: false},
+      {pattern: 'build/client/bower_components/bluebird/js/browser/bluebird.js', included: false},
       {pattern: 'build/client/bower_components/underscore/underscore.js', included: false},
       {pattern: 'build/client/bower_components/jquery-ui/jquery-ui.js', included: false},
       {pattern: 'build/client/bower_components/jquery-ui/themes/ui-lightness/jquery-ui.min.css', included: false},
@@ -67,6 +67,9 @@ module.exports = function(config) {
       {pattern: 'build/client/bower_components/stacktrace-js/dist/stacktrace.js', included: false},
       {pattern: 'build/client/bower_components/handlebars/handlebars.amd.js', included: false},
 
+      {pattern: 'build/client/bower_components/thrift-binary-protocol/*.js', included: false},     
+      {pattern: 'build/client/bower_components/kbase-data-api-js-wrappers/*.js', included: false},     
+      {pattern: 'build/client/bower_components/kbase-data-api-js-wrappers/thrift/taxon/*.js', included: false},     
 
       {pattern: 'build/client/bower_components/requirejs-text/text.js', included: false},
       {pattern: 'build/client/bower_components/requirejs-json/json.js', included: false},

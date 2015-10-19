@@ -1,0 +1,49 @@
+define(['kb_user_profile', 'kb.appstate', 'kb.runtime'],
+function (UserProfile, AppState, R) {
+    
+    function loadProfile() {
+        var userProfile = Object.create(UserProfile).init({username: R.getUsername()});
+        userProfile.loadProfile()
+                .then(function (profile) {
+                    switch (profile.getProfileStatus()) {
+                        case 'stub':
+                        case 'profile':
+                            /* TODO: do not need two ways of doing this... */
+                            AppState.setItem('userprofile', profile);
+                            R.send('app', 'profile.loaded', {
+                                profile: profile
+                            });
+                            // Postal.channel('session').publish('profile.loaded', {profile: profile});
+                            break;
+                        case 'none':
+                            profile.createStubProfile({createdBy: 'session'})
+                                    .then(function (profile) {
+                                        AppState.setItem('userprofile', profile);
+                                        R.send('app', 'profile.loaded', {
+                                            profile: profile
+                                        });
+                                        // Postal.channel('session').publish('profile.loaded', {profile: profile});
+                                    })
+                                    .catch(function (err) {
+                                        R.send('app', 'profile.loadfailure', {
+                                            error: err
+                                        });
+                                        // Postal.channel('session').publish('profile.loadfailure', {error: err});
+                                    });
+                            break;
+                    }
+                })
+                .catch(function (err) {
+                    var errMsg = 'Error getting user profile';
+                    R.send('app', 'profile.loadfailure', {
+                        error: err, 
+                        message: errMsg
+                    });
+                    // Postal.channel('session').publish('profile.loadfailure', {error: err, message: errMsg});
+                });
+    }
+    
+    return {
+        loadProfile: loadProfile
+    };
+});

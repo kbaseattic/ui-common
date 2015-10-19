@@ -3,6 +3,20 @@ var path = require('path');
 var iniParser = require('node-ini');
 
 module.exports = function (grunt) {
+    // Config
+    // TODO: maybe read something from the runtime/config directory so we don't 
+    // need to tweak this and accidentally check it in...
+    var RUNTIME_DIR = '../../runtime';
+    var BUILD_DIR = RUNTIME_DIR + '/build';
+    BUILD_DIR = 'build';
+    
+    function buildDir(subdir) {
+        if (subdir) {
+            return path.normalize(BUILD_DIR + '/' + subdir);
+        } 
+        return path.normalize(BUILD_DIR);
+    }
+    
     // Project configuration
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-filerev');
@@ -15,6 +29,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks('grunt-http-server');
     grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks('grunt-markdown');
+    grunt.loadNpmTasks('grunt-shell');
 
     var deployCfg = iniParser.parseSync('deploy.cfg');
 
@@ -42,7 +58,8 @@ module.exports = function (grunt) {
             src: 'dist/**/*'
         },
         {
-            name: 'q'
+            name: 'bluebird',
+            src: ['js/browser/bluebird.js']
         },
         {
             name: 'd3'
@@ -146,8 +163,30 @@ module.exports = function (grunt) {
         {
             name: 'kbase-ui-plugin-sample',
             src: 'src/**/*'
+        },
+         {
+            name: 'kbase-ui-plugin-databrowser',
+            src: 'src/**/*'
+        },
+         {
+            dir: 'kbase-data-api-js-wrappers',
+            cd: 'dist/bower/pkg/js',
+            src: '**/*'
+        },
+        {
+            dir: 'thrift-binary-protocol',
+            cd: 'src',
+            src: '**/*'
+        },
+        {
+            dir: 'kbase-ui-plugin-vis-widgets',
+            src: '**/*'
         }
-
+        
+//        {
+//            dir: 'kbase-ui-plugin-demo-vis-widget',
+//            src: '**/*'
+//        }
     ],
 
     bowerCopy = bowerFiles.map(function (cfg) {
@@ -193,6 +232,7 @@ module.exports = function (grunt) {
                     return true;
                 })
                 .join('/');
+
         });
 
         var cd = cfg.cd;
@@ -214,49 +254,45 @@ module.exports = function (grunt) {
                 files: [
                     {
                         src: 'config/prod.yml',
-                        dest: 'build/client/config.yml'
+                        dest: buildDir('client/config.yml')
                     },
                     {
                         src: 'config/ui-prod.yml',
-                        dest: 'build/client/ui.yml'
+                        dest: buildDir('client/ui.yml')
                     },
                     {
-                        cwd: 'app/client',
+                        cwd: 'src/app/client',
                         src: '**/*',
-                        dest: 'build/client',
+                        dest: buildDir('client'),
                         expand: true
                     },
                     {
                         cwd: 'lib',
                         src: '**/*',
-                        dest: 'build/client/lib',
+                        dest: buildDir('client/lib'),
                         expand: true
                     },
                     {
-                        cwd: 'plugins',
+                        cwd: 'src/plugins',
                         src: '**/*',
-                        dest: 'build/client/plugins',
+                        dest: buildDir('client/plugins'),
                         expand: true
                     },
                     {
-                        cwd: 'data',
+                        cwd: 'src/data',
                         src: '**/*',
-                        dest: 'build/client/data',
+                        dest: buildDir('client/data'),
                         expand: true
                     },
                     {
-                        cwd: 'app/server',
+                        cwd: 'src/app/server',
                         src: '**/*',
-                        dest: 'build/server',
+                        dest: buildDir('server'),
                         expand: true
                     },
                     {
-                        src: 'tools/loading.html',
-                        dest: 'build/client/loading.html'
-                    },
-                    {
-                        src: 'tools/widget-paths.js',
-                        dest: 'build/client/widget-paths.js'
+                        src: 'loading.html',
+                        dest: buildDir('client/loading.html')
                     }
                 ]
             },
@@ -310,7 +346,12 @@ module.exports = function (grunt) {
         },
         clean: {
             build: {
-                src: ['build']
+                src: [buildDir()],
+                // We force, because our build directory is up a level 
+                // in the runtime directory.
+//                options: {
+//                    force: true
+//                }
             }
         },
         connect: {
@@ -325,7 +366,7 @@ module.exports = function (grunt) {
         },
         'http-server': {
             dev: {
-                root: 'build/client',
+                root: buildDir('client'),
                 port: 8887,
                 host: '0.0.0.0',
                 autoIndex: true,
@@ -426,7 +467,32 @@ module.exports = function (grunt) {
                     copy: false
                 }
             }
-        }
+        },
+        markdown: {
+            build: {
+                files: [
+                    {
+                        expand: true,
+                        src: 'src/docs/**/*.md',
+                        dest: buildDir('docs'),
+                        ext: '.html'
+                    }
+                ],
+                options: {
+                }
+            }
+        },
+        shell: {
+            config: {
+                command: [
+                    'node',
+                    'tools/process_config.js'
+                ].join(' '),
+                options: {
+                    stderr: false
+                }
+            }
+        },
 
     });
 
@@ -435,8 +501,8 @@ module.exports = function (grunt) {
         'bower:install',
         'copy:build',
         'copy:bower',
-        'copy:config-prod',
-        'copy:build-search'
+        'shell:config'
+        // 'copy:config-prod'
     ]);
 
     grunt.registerTask('build-test', [
@@ -469,7 +535,7 @@ module.exports = function (grunt) {
     grunt.registerTask('develop', [
         'karma:dev',
     ]);
-    
+
     grunt.registerTask('preview', [
         'open:dev',
         'connect'

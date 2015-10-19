@@ -1,0 +1,40 @@
+## YAML Template.
+---
+package:
+    author: Erik Pearson
+    name: user_profile_panel
+    description: The user profile panel and associated widgets
+    date: August 5, 2015
+    version: 0.0.1
+source:
+    ## sources are relative to build/plugins/PACKAGE/source/javascript
+    ## NB: need to quote file names, otherwise 
+    modules:
+        -
+            module: kb_panel_userProfile
+            file: panel
+        -
+            module: kb_widget_userProfile_base
+            file: "widgets/userProfileBase"
+        -
+            module: kb_widget_userProfile_userProfileEditor
+            file: "widgets/userProfileEditor"
+        -
+            module: kb_widget_userProfile_userSearch
+            file: "widgets/userSearch"
+        -
+            module: kb_widget_userProfile_collaboratorNetwork
+            file: "widgets/collaboratorNetwork"
+        -
+            module: kb_widget_userProfile_narrativeBrowser
+            file: "widgets/narrativeBrowser"
+install:
+    routes:
+        -
+            path: ['people', {type: param, name: username}]
+            panelFactory: kb_panel_userProfile
+            authorizationRequired: true
+        
+        -
+            path: ['people']
+            panelFactory: kb_panel_userProfile

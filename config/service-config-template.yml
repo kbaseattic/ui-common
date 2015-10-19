@@ -51,4 +51,7 @@ services:
         name: User and Job State
     workspace:
         url: <%= ws_url %>
-        name: Workspace
+        name: Workspace    
+    narrative:
+        url: <%= narrative_url %>
+        name: Narrative User Interface
