@@ -218,7 +218,7 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                      name: 'search',
                      icon: 'search',
                      label: 'Search Data',
-                     url: '#/search/?q=*',
+                     url: '/search/#/search/?q=*',
                      place: 'end'
                   });
                   hasRegularMenuItems = true;
@@ -228,7 +228,7 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                      name: 'narrative',
                      label: 'Narrative',
                      icon: 'file',
-                     url: '#/narrativemanager/start',
+                     url: '/#narrativemanager/start',
                      external: true,
                      place: 'end'
                   });
@@ -240,7 +240,7 @@ define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
                      name: 'dashboard',
                      label: 'Dashboard',
                      icon: 'dashboard',
-                     url: '#/dashboard',
+                     url: '/#dashboard',
                      place: 'end'
                   });
                   hasRegularMenuItems = true;
