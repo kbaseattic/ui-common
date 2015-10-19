@@ -782,9 +782,10 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
         var kb = new KBCacheClient(null);
         $rootScope.kb = kb;
         window.kb = kb;
-        $state.go('login');
-        //$location.url('/login/');
-        $rootScope.$apply();
+        window.location = '/';
+        // $state.go('login');
+        // $location.absUrl('/');
+        // $rootScope.$apply();
 
     });
     

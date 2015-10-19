@@ -42,6 +42,9 @@ module.exports = function (grunt) {
      */
     var bowerFiles = [
         {
+            name: 'q'
+        },
+        {
             name: 'require',
             dir: 'requirejs'
         },
@@ -501,7 +504,8 @@ module.exports = function (grunt) {
         'bower:install',
         'copy:build',
         'copy:bower',
-        'shell:config'
+        'shell:config',
+        'copy:build-search'
         // 'copy:config-prod'
     ]);
 
