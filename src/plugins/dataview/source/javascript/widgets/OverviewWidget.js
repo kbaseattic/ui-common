@@ -425,8 +425,7 @@ define([
                         var icon = types.getIcon({type: type});
 
                         var code = 0;
-                        for (var i = 0; i < type.length; code += type.charCodeAt(i++))
-                            ;
+                        for (var i = 0; i < type.name.length; code += type.name.charCodeAt(i++));
                         var colors = [
                             "#F44336",
                             "#E91E63",
