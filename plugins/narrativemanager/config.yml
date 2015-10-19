@@ -17,7 +17,7 @@ source:
 install:
     routes:
         -
-            path: [narrativemanager, start]
+            path: ['narrativemanager', 'start']
             queryParams:
                 app: {}
                 method: {}
@@ -27,13 +27,12 @@ install:
                 module: kb_panel_narrativeManager
                 method: startOrCreateEmptyNarrative
         -
-            path: [narrativemanager, new]
+            path: ['narrativemanager', 'new']
             queryParams:
                 app: {}
                 method: {}
                 copydata: {}
-                appparam: {}            
+                appparam: {}
             redirectHandler:
                 module: kb_panel_narrativeManager
-                method: createNewNarrative         
-        
+                method: createNewNarrative

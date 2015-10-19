@@ -256,6 +256,16 @@ module.exports = function (grunt) {
                     }
                 ]
             },
+            'build-search': {
+                files: [
+                    {
+                        cwd: 'search',
+                        src: '**/*',
+                        dest: 'build/client/search',
+                        expand: true
+                    }
+                ]
+            },
             'config-prod': {
                 files: [
                     {
@@ -421,14 +431,16 @@ module.exports = function (grunt) {
         'bower:install',
         'copy:build',
         'copy:bower',
-        'copy:config-prod'
+        'copy:config-prod',
+        'copy:build-search'
     ]);
 
     grunt.registerTask('build-test', [
         'bower:install',
         'copy:build',
         'copy:bower',
-        'copy:config-test'
+        'copy:config-test',
+        'copy:build-search'
     ]);
 
     grunt.registerTask('deploy', [
