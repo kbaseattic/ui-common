@@ -35,3 +35,6 @@ install:
             panelFactory: kb_panel_userProfile
             authorizationRequired: true
         
+        -
+            path: ['people']
+            panelFactory: kb_panel_userProfile

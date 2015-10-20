@@ -42,6 +42,9 @@ module.exports = function (grunt) {
      */
     var bowerFiles = [
         {
+            name: 'q'
+        },
+        {
             name: 'require',
             dir: 'requirejs'
         },
@@ -296,6 +299,16 @@ module.exports = function (grunt) {
                     }
                 ]
             },
+            'build-search': {
+                files: [
+                    {
+                        cwd: 'search',
+                        src: '**/*',
+                        dest: 'build/client/search',
+                        expand: true
+                    }
+                ]
+            },
             'config-prod': {
                 files: [
                     {
@@ -491,7 +504,8 @@ module.exports = function (grunt) {
         'bower:install',
         'copy:build',
         'copy:bower',
-        'shell:config'
+        'shell:config',
+        'copy:build-search'
         // 'copy:config-prod'
     ]);
 
@@ -499,7 +513,8 @@ module.exports = function (grunt) {
         'bower:install',
         'copy:build',
         'copy:bower',
-        'copy:config-test'
+        'copy:config-test',
+        'copy:build-search'
     ]);
 
     grunt.registerTask('deploy', [

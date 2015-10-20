@@ -43,11 +43,11 @@ navbar:
     menu:
         available_items:
             search: 
-                path: search/?q=*
+                uri: "/search/#/search/?q=*"
                 label: Search Data
                 icon: search
             narrative: 
-                uri: #narrativemanager/start
+                uri: "#narrativemanager/start"
                 label: Narrative
                 icon: file
             narrativeTutorial: 
