@@ -19,7 +19,7 @@
     border: none;
     text-shadow: none !important;
     margin: 0;
-    box-shadow: 0 0 3px #CECECE;
+    /* box-shadow: 0 0 3px #CECECE; */
     margin-right: 5px;
 }
 #kb-nav-menu { /* don't add shadows here */

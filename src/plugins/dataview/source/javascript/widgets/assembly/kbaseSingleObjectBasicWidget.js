@@ -13,8 +13,15 @@
  * Pavel Novichkov <psnovichkov@lbl.gov>
  * @public
  */
-define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.service.workspace', 'kb.runtime', 'kb.html'],
-    function ($, _AuthenticatedWidget, Workspace, R, html) {
+define([
+    'jquery', 
+    'kb.runtime', 
+    'kb.service.workspace', 
+    'kb.html',
+    
+    'kb.jquery.authenticatedwidget',
+],
+    function ($, R, Workspace, html) {
         'use strict';
         $.KBWidget({
             name: 'kbaseSingleObjectBasicWidget',
@@ -28,7 +35,7 @@ define(['jquery', 'kb.jquery.authenticatedwidget', 'kb.service.workspace', 'kb.r
             init: function (options) {
                 this._super(options);
 
-                this.options.landingPageURL = "#/dataview/";
+                this.options.landingPageURL = "#dataview/";
                 this.workspaceURL = R.getConfig('services.workspace.url');
 
                 this.$errorPane = $('<div>').addClass('alert alert-danger').hide();

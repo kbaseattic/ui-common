@@ -12,14 +12,49 @@ define([
 ],
     function (_, props, typeDefs) {
         'use strict';
-        
+
         var types = props.make({
             data: typeDefs
         });
 
+        var colors = [
+            '#F44336',
+            '#E91E63',
+            '#9C27B0',
+            '#3F51B5',
+            '#2196F3',
+            '#673AB7',
+            '#FFC107',
+            '#0277BD',
+            '#00BCD4',
+            '#009688',
+            '#4CAF50',
+            '#33691E',
+            '#2E7D32',
+            '#AEEA00',
+            '#03A9F4',
+            '#FF9800',
+            '#FF5722',
+            '#795548',
+            '#006064',
+            '#607D8B'
+        ];
+
+        function getIconColor(type) {
+            var code = 0, i;
+            for (i = 0; i < type.length; i += 1) {
+                code += type.charCodeAt(i);
+            }
+            
+            return colors[code % colors.length];
+        }
+
         function getIcon(arg) {
             var icon = types.getItem(['types', arg.type.module, arg.type.name, 'icon']) || getDefault('icon'),
-                classes = icon.classes.map(function (x) {return x;});
+                classes = icon.classes.map(function (x) {
+                    return x;
+                }),
+                color = getIconColor(arg.type.name);
             switch (icon.type) {
                 case 'kbase':
                     classes.push('icon');
@@ -40,13 +75,14 @@ define([
                 case 'fontAwesome':
                     classes.push('fa');
                     break;
-            } 
+            }
             if (classes) {
                 return {
                     classes: classes,
                     type: icon.type,
-                    html: '<span class="' + classes.join(' ') + '"></span>'
-                }
+                    color: color,
+                    html: '<span class="' + classes.join(' ') + '" style="color: ' + color + '"></span>'
+                };
             }
         }
         function getViewer(arg) {
@@ -60,7 +96,7 @@ define([
                     }
                     return false;
                 });
-                if (defaults.length  === 1) {
+                if (defaults.length === 1) {
                     var copy = _.extend({}, defaults[0]);
                     delete copy.default;
                     return copy;
@@ -71,7 +107,7 @@ define([
                 }
             }
         }
-        
+
         /**
          * Adds a data vis widget to the runtime types.
          * 
@@ -79,35 +115,39 @@ define([
          * @param {type} arg
          * @returns {undefined}
          * -
-                    default: true
-                    # This the title for the widget
-                    title: 'Data View 2'                
-                    # This is the module name as specified in the plugin
-                    # it should follow standard namespacing
-                    module: kb_widget_dataview_communities_collection
-                    # This is the internal jquery object name for this widget.
-                    widget: CollectionView
-                    # If a bootstrap panel is requested to wrap this widget.
-                    panel: true
-                    # Mapping of standard options to the widget option properties.
-                    # By standard, I mean those defined in the GenericVisualizer widget.
-                    options:
-                        -
-                            from: workspaceId
-                            to: ws
-                        -
-                            from: objectId
-                            to: id
-                        -
-                            from: authToken
-                            to: token
+         default: true
+         # This the title for the widget
+         title: 'Data View 2'                
+         # This is the module name as specified in the plugin
+         # it should follow standard namespacing
+         module: kb_widget_dataview_communities_collection
+         # This is the internal jquery object name for this widget.
+         widget: CollectionView
+         # If a bootstrap panel is requested to wrap this widget.
+         panel: true
+         # Mapping of standard options to the widget option properties.
+         # By standard, I mean those defined in the GenericVisualizer widget.
+         options:
+         -
+         from: workspaceId
+         to: ws
+         -
+         from: objectId
+         to: id
+         -
+         from: authToken
+         to: token
          */
         function addViewer(type, viewerDef) {
             var typeDef = types.getItem(['types', type.module, type.name]);
-            if (typeDef === undefined) {
+            if (typeDef === undefined || typeDef === null) {
                 types.setItem(['types', type.module, type.name], {
                     viewers: []
                 });
+            } else if (!types.hasItem(['types', type.module, type.name, 'viewers']) ||
+                types.getItem(['types', type.module, type.name, 'viewers']) === null) {
+                // setting empty 
+                types.setItem(['types', type.module, type.name, 'viewers'], []);
             }
             var viewers = types.getItem(['types', type.module, type.name, 'viewers']);
             if (viewerDef.default) {
@@ -117,9 +157,20 @@ define([
             }
             viewers.push(viewerDef);
         }
-        function setDefaultViewer(type, viewerId) {            
+        function setDefaultViewer(type, viewerId) {
         }
-        
+
+        function setIcon(type, iconDef) {
+            var typeDef = types.getItem(['types', type.module, type.name]);
+            if (typeDef === undefined || typeDef === null) {
+                types.setItem(['types', type.module, type.name], {
+                    icon: iconDef
+                });
+            } else {
+                types.setItem(['types', type.module, type.name, 'icon'], iconDef);
+            }
+        }
+
         function getDefault(prop) {
             return types.getItem(['defaults', prop]);
         }
@@ -165,7 +216,7 @@ define([
         function makeVersion(type) {
             return type.version.major + '.' + type.version.minor;
         }
-        
+
         return {
             getIcon: getIcon,
             getViewer: getViewer,
@@ -174,6 +225,7 @@ define([
             parseTypeId: parseTypeId,
             makeType: makeType,
             makeVersion: makeVersion,
-            addViewer: addViewer
+            addViewer: addViewer,
+            setIcon: setIcon
         };
     });

@@ -66,3 +66,38 @@
 .modal-kbase .modal-content {
     border-radius: 1px;
 }
+
+
+/*.panel-title > [data-toggle="collapse"]::after {
+  margin-left: 6px;
+  font-family: "FontAwesome";
+  font-style: normal;
+  font-weight: normal;
+  font-size: 90%;
+  width: 12px;
+  color: silver;
+  line-height: 1;
+  vertical-align: baseline;
+  content: "\f078 ";
+}
+.panel-title > [data-toggle="collapse"].collapsed::after {
+  content: "\f054 ";*/
+  
+  .panel-title > [data-toggle="collapse"]::before {
+  display: inline-block;
+  margin-left: 0px;
+  margin-right: 4px;
+  font-family: "FontAwesome";
+  font-style: normal;
+  font-weight: normal;
+  font-size: 90%;
+  width: 12px;
+  color: silver;
+  line-height: 1;
+  vertical-align: baseline;
+  content: "\f078 ";
+}
+.panel-title > [data-toggle="collapse"].collapsed::before {
+    margin-left: 2px; margin-right: 2px;
+  content: "\f054 ";
+}

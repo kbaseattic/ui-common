@@ -5,9 +5,9 @@ define([
         'use strict';
 
         function item(config) {
-            
+
             var obj = config ? config.data || {} : {};
-            
+
             function getItem(props, defaultValue) {
                 if (typeof props === 'string') {
                     props = props.split('.');
@@ -119,7 +119,7 @@ define([
                 delete temp[propKey];
                 return true;
             }
-            
+
             return {
                 setItem: setItem,
                 hasItem: hasItem,
@@ -130,7 +130,7 @@ define([
                     return obj;
                 }
             };
-        };
+        }        
 
         return {
             create: function () {

@@ -8,11 +8,11 @@
 define([
     'jquery',
     'kb.runtime',
-    'kb.html',
     'kb.service.workspace',
     'kb.jquery.widget',
-    'kb_widget_dataview_genomeLineage'
-], function ($, R, html, Workspace) {
+    'kb_widget_dataview_genomeLineage',
+    'kb_widget_dataview_trees_tree'
+], function ($, R, Workspace) {
     'use strict';
     $.KBWidget({
         name: "KBaseGenomeWideTaxonomy",
@@ -29,12 +29,12 @@ define([
             return this;
         },
         render: function () {
-            var self = this;
-            var row = $('<div class="row">');
-            self.$elem.append(row);
-            var taxonomyinfo = $('<div class="col-md-5">');
+            var self = this,
+                    row = $('<div class="row">'),
+                    taxonomyinfo = $('<div class="col-md-5">'),
+                    tree = $('<div class="col-md-7">');
             row.append(taxonomyinfo);
-            var tree = $('<div class="col-md-7">');
+            self.$elem.append(row);
             row.append(tree);
             taxonomyinfo.KBaseGenomeLineage({
                 genomeID: self.options.genomeID,
@@ -44,20 +44,21 @@ define([
             this.prepareTree({ws: self.options.workspaceID, id: self.options.genomeID}, tree);
         },
         prepareTree: function (scope, $div) {
-            var objectIdentity = {ref: scope.ws + "/" + scope.id};
-            var workspace = new Workspace(R.getConfig('services.workspace.url'), {
-                token: R.getAuthToken()
-            });
+            var objectIdentity = {ref: scope.ws + "/" + scope.id},
+                workspace = new Workspace(R.getConfig('services.workspace.url'), {
+                    token: R.getAuthToken()
+                }),
+                self = this;
             workspace.list_referencing_objects([objectIdentity], function (data) {
                 var treeName = null,
-                    treeWs = null,
-                    i;
+                        treeWs = null,
+                        i;
                 for (i in data[0]) {
                     var objInfo = data[0][i],
-                        wsName = objInfo[7],
-                        wsId = objInfo[6],
-                        objName = objInfo[1],
-                        type = objInfo[2].split('-')[0];
+                            wsName = objInfo[7],
+                            wsId = objInfo[6],
+                            objName = objInfo[1],
+                            type = objInfo[2].split('-')[0];
                     // either match exactly the string, or we match with coercion the number
                     if (type === "KBaseTrees.Tree") {
                         treeName = objName;
@@ -66,42 +67,44 @@ define([
                     }
                 }
                 var $buildBtn = $("<button>")
-                    .addClass("kb-primary-btn")
-                    .append("Build Another Tree in a New Narrative");
+                        .addClass("kb-primary-btn")
+                        .append("Build Another Tree in a New Narrative");
                 var $buildNarPanel = $("<div>")
-                    .append($('<a href="#/narrativemanager/new?copydata=' + scope.ws + '/' + scope.id + '&app=build_species_tree&appparam=1,param0,' + scope.id + '" target="_blank">')
-                        .append($buildBtn));
+                        .append($('<a href="#/narrativemanager/new?copydata=' + scope.ws + '/' + scope.id + '&app=build_species_tree&appparam=1,param0,' + scope.id + '" target="_blank">')
+                                .append($buildBtn));
 
                 if (treeName) {
                     var $widgetDiv = $('<div>');
                     $div.append(
-                        $('<table>').append($('<tr>')
-                        .append($('<td>')
-                            .append('<h4>Showing Phylogenetic Tree: <a href="#/dataview/' + treeWs + '/' + treeName + '" target="_blank">' + treeName + '</a></h4>'))
-                        .append($('<td>')
-                            .append($buildNarPanel))));
+                            $('<table>').append($('<tr>')
+                            .append($('<td>')
+                                    .append('<h4>Showing Phylogenetic Tree: <a href="#/dataview/' + treeWs + '/' + treeName + '" target="_blank">' + treeName + '</a></h4>'))
+                            .append($('<td>')
+                                    .append($buildNarPanel))));
 
-                    $widgetDiv.kbaseTree({treeID: treeName, workspaceID: treeWs, genomeInfo: self.options.genomeInfo});
+                    $widgetDiv.kbaseTree({
+                        treeID: treeName,
+                        workspaceID: treeWs,
+                        genomeInfo: self.options.genomeInfo
+                    });
                     $div.append($widgetDiv);
                 } else {
                     $buildBtn.html("Launch a new Tree Building Narrative");
-                    $div
-                        .append('<b>There are no species trees created for this genome, but you can use the Narrative to build a new species tree of closely related genomes.</b>');
-
+                    $div.append('<b>There are no species trees created for this genome, but you can use the Narrative to build a new species tree of closely related genomes.</b>');
                     $div.append("<br><br>");
                     $div.append($buildNarPanel);
                     $div.append("<br><br>");
                 }
             },
-                function (error) {
-                    var err = '<b>Sorry!</b>  Error retreiveing species trees info';
-                    if (typeof error === "string") {
-                        err += ": " + error;
-                    } else if (error.error && error.error.message) {
-                        err += ": " + error.error.message;
-                    }
-                    $div.append(err);
-                });
+                    function (error) {
+                        var err = '<b>Sorry!</b>  Error retreiveing species trees info';
+                        if (typeof error === "string") {
+                            err += ": " + error;
+                        } else if (error.error && error.error.message) {
+                            err += ": " + error.error.message;
+                        }
+                        $div.append(err);
+                    });
         },
         getData: function () {
             return {

@@ -490,7 +490,7 @@ define([
 
             this.setData = function (indata) {
                 self.data = indata;
-                var workspace = new Workspace(R.getConfig('workspace_url', {
+                var workspace = new Workspace(R.getConfig('services.workspace.url', {
                     token: R.getAuthToken()
                 }));
                 return new Promise.resolve(workspace.get_objects([{ref: indata.fbamodel_ref}]))

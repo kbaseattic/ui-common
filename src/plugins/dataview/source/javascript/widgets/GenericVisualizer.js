@@ -105,7 +105,8 @@ define([
                             workspaceName: wsobject.ws,
                             objectVersion: wsobject.version,
                             objectType: wsobject.type,
-                            type: wsobject.type
+                            type: wsobject.type,
+                            subid: params.subid
                         };
                        
 
