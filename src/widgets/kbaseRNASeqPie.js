@@ -60,7 +60,16 @@ define('kbaseRNASeqPie',
 
         version: "1.0.0",
         options: {
+            pieWedges : ['mapped_reads', 'unmapped_reads'],
+            overviewItems : ['total_reads', 'mapped_reads', 'properly_paired', 'multiple_alignments', 'singletons', 'alignment_rate']
+        },
 
+        label_for_key : function(key) {
+            var label = key.replace(/_/g, ' ');
+                label = label.replace(/^([a-z])/, function up (l) { return       l.toUpperCase()});
+                label = label.replace(/ ([a-z])/, function up (l) { return ' ' + l.toUpperCase()});
+
+            return label;
         },
 
         _accessors : [
@@ -73,22 +82,21 @@ define('kbaseRNASeqPie',
 
             if (this.data('container')) {
 
-                this.data('container').removeTab('Details');
+                this.data('container').removeTab('Overview');
                 this.data('container').removeTab('Pie chart');
 
                 var $tableElem = $.jqElem('div');
 
+                var keys = [];
+                for (var i = 0; i < this.options.overviewItems.length; i++) {
+                    var key = this.options.overviewItems[i];
+                    keys.push( { value : key, label : this.label_for_key(key) } );
+                }
+
                 var $table = $tableElem.kbaseTable(
                     {
                         structure : {
-                            keys : [
-                                {value : 'total_reads', label : 'Total reads'},
-                                {value : 'mapped_reads', label : 'Mapped reads'},
-                                {value : 'properly_paired', label : 'Properly paired'},
-                                {value : 'multiple_alignments', label : 'Multiple alignments'},
-                                {value : 'singletons', label : 'Singletons'},
-                                {value : 'alignment_rate', label : 'Alignment Rate'},
-                            ],
+                            keys : keys,
                             rows : newDataset
                         }
 
@@ -97,7 +105,7 @@ define('kbaseRNASeqPie',
 
                 this.data('container').addTab(
                     {
-                        tab : 'Details',
+                        tab : 'Overview',
                         content : $tableElem
                     }
                 );
@@ -105,31 +113,26 @@ define('kbaseRNASeqPie',
 
                 var $pieElem = $.jqElem('div').css({width : this.$elem.width(), height : this.$elem.height() * .9});
 
+                var pieData = [];
+                for (var i = 0; i < this.options.pieWedges.length; i++) {
+                    var wedge = this.options.pieWedges[i];
+                    pieData.push(
+                        {
+                            value   : newDataset[wedge],
+                            label   : this.label_for_key(wedge),
+                            tooltip : this.label_for_key(wedge) + ' : ' + newDataset[wedge]
+                        }
+                    );
+                }
+
                 var $pie = $pieElem.kbasePiechart(
                     {
                         scaleAxes   : true,
                         useUniqueID : false,
-                        //transitionTime : 15000,
                         gradient : true,
-                        //startingPosition : 'final',
-
-                        //xLabel      : 'Some useful pie chart',
-                        //innerRadius : -100,
-                        //outerRadius : -105,
                         outsideLabels : true,
 
-                        dataset : [
-                            {
-                                value : newDataset.mapped_reads,
-                                color : '#FFFF00',
-                                label : 'Mapped Reads'
-                            },
-                            {
-                                value : newDataset.unmapped_reads,
-                                color : '#0000FF',
-                                label : 'Unmapped Reads'
-                            },
-                        ],
+                        dataset : pieData,
 
                     }
                 );
@@ -141,7 +144,7 @@ define('kbaseRNASeqPie',
                     }
                 );
 
-                this.data('container').showTab('Details');
+                this.data('container').showTab('Overview');
 
             }
         },
@@ -166,7 +169,7 @@ define('kbaseRNASeqPie',
                 {
                     tabs : [
                         {
-                            tab : 'Details',
+                            tab : 'Overview',
                             content : 'Loading...'
                         },
                         {

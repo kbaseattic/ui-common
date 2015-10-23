@@ -122,15 +122,17 @@
 
                             function generate_pie_data () {
 
-                                return {
+                                var data = {
                                     properly_paired : Math.floor(Math.random() * 100),
                                     multiple_alignments: Math.floor(Math.random() * 100),
                                     singletons: Math.floor(Math.random() * 100),
                                     alignment_rate : Math.floor(Math.random() * 100),
                                     mapped_reads: Math.floor(Math.random() * 100),
                                     unmapped_reads  :  Math.floor(Math.random() * 100),
-                                    total_reads : Math.floor(Math.random() * 100)
                                 }
+
+                                data.total_reads = data.mapped_reads + data.unmapped_reads;
+                                return data;
 
                             }
 
