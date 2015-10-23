@@ -598,6 +598,7 @@ define('kbaseTable',
                 }
             }
             else if (this.options.structure.keys != undefined) {
+
                 for (var idx = 0; idx < this.options.structure.keys.length; idx++) {
                     var key = this.options.structure.keys[idx];
 
@@ -651,11 +652,13 @@ define('kbaseTable',
 
             this.visRowString('Rows ' + (minRows + 1) + ' to ' + maxRows + ' of ' + this.numRows());
 
-            this.data('pageLeftButton').attr('disabled', minRows == 0);
-            this.data('pageRightButton').attr('disabled', maxRows == this.numRows());
+            if (this.options.navControls) {
+                this.data('pageLeftButton').attr('disabled', minRows == 0);
+                this.data('pageRightButton').attr('disabled', maxRows == this.numRows());
 
-            this.data('removeButton').attr('disabled', maxRows - minRows == 1);
-            this.data('addButton').attr('disabled', maxRows == this.numRows());
+                this.data('removeButton').attr('disabled', maxRows - minRows == 1);
+                this.data('addButton').attr('disabled', maxRows == this.numRows());
+            }
         },
 
         addOptions : function ($cell, options) {

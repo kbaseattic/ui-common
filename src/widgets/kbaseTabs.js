@@ -243,20 +243,22 @@ define('kbaseTabs',
             var $tab = this.data('tabs')[tabName];
             var $nav = this.data('nav')[tabName];
 
-            if ($nav.hasClass('active')) {
-                if ($nav.next('li').length) {
-                    $nav.next().find('a').trigger('click');
+            if ($tab && $nav) {
+                if ($nav.hasClass('active')) {
+                    if ($nav.next('li').length) {
+                        $nav.next().find('a').trigger('click');
+                    }
+                    else {
+                        $nav.prev('li').find('a').trigger('click');
+                    }
                 }
-                else {
-                    $nav.prev('li').find('a').trigger('click');
-                }
+    
+                $tab.remove();
+                $nav.remove();
+    
+                this.data('tabs')[tabName] = undefined;
+                this.data('nav')[tabName] = undefined;
             }
-
-            $tab.remove();
-            $nav.remove();
-
-            this.data('tabs')[tabName] = undefined;
-            this.data('nav')[tabName] = undefined;
         },
 
         shouldShowTab : function (tab) { return 1; },

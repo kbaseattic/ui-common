@@ -207,6 +207,8 @@
 				'kbasePlantsNetworkNarrative'       : 'vis/plants/kbasePlantsNetworkNarrative',
 				'kbasePlantsNetworkTable'           : 'vis/plants/kbasePlantsNetworkTable',
 				'kbasePMIBarchart'                       : 'vis/plants/kbasePMIBarchart',
+				'kbaseRNASeq'                       : 'kbaseRNASeq',
+				'kbaseRNASeqPie'                       : 'kbaseRNASeqPie',
 				'vis'                               : 'vis/vis',
 				'kbaseSimpleWSSelect'               : 'workspaces/kbaseSimpleWSSelect',
 				'kbaseWSButtons'                    : 'workspaces/kbaseWSButtons',
