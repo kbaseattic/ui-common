@@ -173,7 +173,7 @@ module.exports = function (grunt) {
         },
          {
             dir: 'kbase-data-api-js-wrappers',
-            cd: 'dist/bower/pkg/js',
+            cd: 'dist/bower/pkg',
             src: '**/*'
         },
         {
