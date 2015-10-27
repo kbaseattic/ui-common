@@ -24,16 +24,10 @@ module.exports = function(config) {
 
 
     // list of files / patterns to load in the browser
+    // currently, should load everything but the search subdirectory.
+    // This 'loading' just includes them in the paths provided
+    // Karma's webserver
     files: [
-      // had to add these all by hand, or Karma goes bugnuts.
-      /* These are the external dependencies. The bower components
-       * come with a LOT of stuff that isn't necessary, and causes
-       * problems when loaded in the test browser. Things like tests,
-       * or auto-generated minified AND maxified files that overlap.
-       * 
-       * It's cleaner to just load the list of them by hand, then
-       * have the Require apparatus take over.
-       */
       {pattern: 'build/client/!(search)/**/*.js', included: false},
       {pattern: 'build/client/!(search)/**/*.css', included: false},
       {pattern: 'build/client/js/require-config.js', included: true},
