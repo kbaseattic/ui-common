@@ -129,9 +129,15 @@
                                     alignment_rate : Math.floor(Math.random() * 100),
                                     mapped_reads: Math.floor(Math.random() * 100),
                                     unmapped_reads  :  Math.floor(Math.random() * 100),
+                                    mapped_reads : {
+                                        exons    : Math.floor(Math.random() * 25),
+                                        splice_junctions   : Math.floor(Math.random() * 25),
+                                        intergenic_regions : Math.floor(Math.random() * 25),
+                                        introns   : Math.floor(Math.random() * 25)
+                                    },
                                 }
 
-                                data.total_reads = data.mapped_reads + data.unmapped_reads;
+                                //data.total_reads = data.mapped_reads + data.unmapped_reads;
                                 return data;
 
                             }

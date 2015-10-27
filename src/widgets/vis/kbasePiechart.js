@@ -203,7 +203,7 @@ define('kbasePiechart',
         sliceAction : function($pie) {
 
             return function() {
-                var radius = $pie.outerRadius();
+                var radius = $pie.outerRadius() - 10;
 
                 var outerArcMaker = d3.svg.arc()
                     .innerRadius(radius)
@@ -339,7 +339,7 @@ define('kbasePiechart',
 
             var pieData = this.pieData($pie.dataset());
 
-            var radius = this.outerRadius();
+            var radius = this.outerRadius() - 10;
             var innerRadius = this.innerRadius();
 
             var arcMaker = d3.svg.arc()
@@ -489,7 +489,7 @@ define('kbasePiechart',
 
             };
 
-            var labelTown = function( opacity ) {
+            var labelTown = function labelTown( opacity ) {
 
                 if (opacity == undefined) {
                     opacity = 1;
@@ -547,7 +547,8 @@ define('kbasePiechart',
                                 var d2 = interpolate(t);
                                 var pos = myArcMaker.centroid(d2);
                                 if (useOutsideLabels) {
-                                    pos[0] = radius * 1.05 * $pie.midPosition(d2);
+                                    pos[0] = radius * 1.06 * $pie.midPosition(d2);
+                                    pos[1] += 2;
                                 }
                                 return "translate("+ pos +")";
                             };

@@ -45,12 +45,13 @@
 define('kbaseRNASeqPie',
     [
         'jquery',
+        'colorbrewer',
         'd3',
         'kbasePiechart',
         'kbaseTable',
         'kbwidget',
         'kbaseTabs',
-    ], function( $ ) {
+    ], function( $, colorbrewer ) {
 
     'use strict';
 
@@ -61,13 +62,32 @@ define('kbaseRNASeqPie',
         version: "1.0.0",
         options: {
             pieWedges : ['mapped_reads', 'unmapped_reads'],
-            overviewItems : ['total_reads', 'mapped_reads', 'properly_paired', 'multiple_alignments', 'singletons', 'alignment_rate']
+            overviewItems : ['total_reads', 'unmapped_reads', 'mapped_reads', 'multiple_alignments', 'singletons', 'alignment_rate'],
+            mapGrad : Array.prototype.slice.call(colorbrewer.Blues[9]).reverse(),
+            unmapGrad : Array.prototype.slice.call(colorbrewer.Oranges[9]).reverse(),
         },
 
-        label_for_key : function(key) {
+        value_for_wedge : function(val) {
+            if ($.isPlainObject(val)) {
+                var total = 0;
+                for (var key in val) {
+                    total += this.value_for_wedge(val[key]);
+                }
+                return total;
+            }
+            else {
+                return val || 0;
+            }
+        },
+
+        label_for_key : function(key, val) {
             var label = key.replace(/_/g, ' ');
                 label = label.replace(/^([a-z])/, function up (l) { return       l.toUpperCase()});
                 label = label.replace(/ ([a-z])/, function up (l) { return ' ' + l.toUpperCase()});
+
+            if (val != undefined) {
+                label = label + ' : ' + this.value_for_wedge(val);
+            }
 
             return label;
         },
@@ -78,7 +98,15 @@ define('kbaseRNASeqPie',
 
         setDataset : function setDataset(newDataset) {
 
+            var unmapGrad   = this.options.mapGrad;
+            var mapGrad     = this.options.unmapGrad;
+
+            var mapColor    = mapGrad[1];
+            var unmapColor  = unmapGrad[1];
+
             this.setValueForKey('dataset', newDataset);
+
+            newDataset['total_reads'] = this.value_for_wedge(newDataset['mapped_reads']) + this.value_for_wedge(newDataset['unmapped_reads']);
 
             if (this.data('container')) {
 
@@ -88,16 +116,26 @@ define('kbaseRNASeqPie',
                 var $tableElem = $.jqElem('div');
 
                 var keys = [];
+                var overViewValues = {};
                 for (var i = 0; i < this.options.overviewItems.length; i++) {
                     var key = this.options.overviewItems[i];
                     keys.push( { value : key, label : this.label_for_key(key) } );
+                    overViewValues[key] = this.value_for_wedge(newDataset[key]);
+
+                    if ($.isPlainObject(newDataset[key])) {
+                        for (var k in newDataset[key]) {
+                            keys.push({value : k, label : '&nbsp;&nbsp;&nbsp;' + this.label_for_key(k)});
+                            overViewValues[k] = newDataset[key][k];
+                        }
+                    }
+
                 }
 
                 var $table = $tableElem.kbaseTable(
                     {
                         structure : {
                             keys : keys,
-                            rows : newDataset
+                            rows : overViewValues
                         }
 
                     }
@@ -118,12 +156,16 @@ define('kbaseRNASeqPie',
                     var wedge = this.options.pieWedges[i];
                     pieData.push(
                         {
-                            value   : newDataset[wedge],
-                            label   : this.label_for_key(wedge),
-                            tooltip : this.label_for_key(wedge) + ' : ' + newDataset[wedge]
+                            value   : this.value_for_wedge(newDataset[wedge]),
+                            label   : this.label_for_key(wedge, newDataset[wedge]),
+                            color   : wedge == 'mapped_reads'
+                                ? mapColor
+                                : unmapColor
                         }
                     );
                 }
+
+                var minEdge = Math.min($pieElem.width(), $pieElem.height()) / 2 - 20;
 
                 var $pie = $pieElem.kbasePiechart(
                     {
@@ -131,11 +173,80 @@ define('kbaseRNASeqPie',
                         useUniqueID : false,
                         gradient : true,
                         outsideLabels : true,
+                        draggable : false,
 
                         dataset : pieData,
 
+                        outerRadius : minEdge - 30,
+                        outsideLabels : false,
+                        tooltips : false,
+
                     }
                 );
+
+                if ($.isPlainObject(newDataset['mapped_reads']) || $.isPlainObject(newDataset['unmapped_reads'])) {
+
+                    var donutData = [];
+
+                    if ($.isPlainObject(newDataset['mapped_reads'])) {
+
+                        var idx = 0;
+
+                        //actually this is 1/mapReadsTotal (to get the percentage values for each wedge) * mapTotal ( map + unmap Total). But terms cancel out.
+                        var wedgeConstant = 1 / (this.value_for_wedge(newDataset['mapped_reads']) + this.value_for_wedge(newDataset['unmapped_reads']));
+
+                        for (var key in newDataset['mapped_reads']) {
+
+                            if (newDataset['mapped_reads'][key] == 0) {
+                                continue;
+                            }
+
+                            donutData.push(
+                                {
+                                    value : newDataset['mapped_reads'][key] * wedgeConstant,
+                                    label : this.label_for_key(key, newDataset['mapped_reads'][key]),
+                                    color : mapGrad[idx++]
+                                }
+                            );
+                        }
+                    }
+
+                    if ($.isPlainObject(newDataset['unmapped_reads'])) {
+
+                        var idx = 0;
+
+                        //actually this is 1/mapReadsTotal (to get the percentage values for each wedge) * mapTotal ( map + unmap Total). But terms cancel out.
+                        var wedgeConstant = 1 / (this.value_for_wedge(newDataset['unmapped_reads']) + this.value_for_wedge(newDataset['mapped_reads']));
+
+                        for (var key in newDataset['unmapped_reads']) {
+
+                            if (newDataset['unmapped_reads'][key] == 0) {
+                                continue;
+                            }
+
+                            donutData.push(
+                                {
+                                    value : newDataset['unmapped_reads'][key] * wedgeConstant,
+                                    label : this.label_for_key(key, newDataset['unmapped_reads'][key]),
+                                    color : unmapGrad[idx++]
+                                }
+                            );
+                        }
+                    }
+
+                    var $donut = $.jqElem('div').kbasePiechart(
+                        {
+                            parent : $pie,
+                            dataset : donutData,
+                            innerRadius : $pie.outerRadius(),
+                            outerRadius : $pie.outerRadius() + 30,
+                            outsideLabels : true,
+                            autoEndAngle : true,
+                            draggable : false,
+                            tooltips : false,
+                        }
+                    );
+                }
 
                 this.data('container').addTab(
                     {
