@@ -24,65 +24,14 @@ module.exports = function(config) {
 
 
     // list of files / patterns to load in the browser
+    // currently, should load everything but the search subdirectory.
+    // This 'loading' just includes them in the paths provided
+    // Karma's webserver
     files: [
-      // had to add these all by hand, or Karma goes bugnuts.
-      /* These are the external dependencies. The bower components
-       * come with a LOT of stuff that isn't necessary, and causes
-       * problems when loaded in the test browser. Things like tests,
-       * or auto-generated minified AND maxified files that overlap.
-       * 
-       * It's cleaner to just load the list of them by hand, then
-       * have the Require apparatus take over.
-       */
-      {pattern: 'build/client/bower_components/jquery/dist/jquery.js', included: false},
-      {pattern: 'build/client/bower_components/bluebird/js/browser/bluebird.js', included: false},
-      {pattern: 'build/client/bower_components/underscore/underscore.js', included: false},
-      {pattern: 'build/client/bower_components/jquery-ui/jquery-ui.js', included: false},
-      {pattern: 'build/client/bower_components/jquery-ui/themes/ui-lightness/jquery-ui.min.css', included: false},
-      {pattern: 'build/client/bower_components/bootstrap/dist/js/bootstrap.js', included: false},
-      {pattern: 'build/client/bower_components/bootstrap/dist/css/bootstrap.min.css', included: false},
-      {pattern: 'build/client/bower_components/nunjucks/browser/nunjucks.js', included: false},
-      {pattern: 'build/client/bower_components/spark-md5/spark-md5.js', included: false},
-      {pattern: 'build/client/bower_components/lodash/lodash.js', included: false},
-      {pattern: 'build/client/bower_components/postal.js/lib/postal.js', included: false},
-      {pattern: 'build/client/bower_components/datatables/media/js/jquery.dataTables.js', included: false},
-      {pattern: 'build/client/bower_components/datatables/media/css/jquery.dataTables.css', included: false},
-      {pattern: 'build/client/bower_components/datatables-bootstrap3-plugin/media/js/datatables-bootstrap3.js', included: false},
-      {pattern: 'build/client/bower_components/datatables-bootstrap3-plugin/media/css/datatables-bootstrap3.css', included: false},
-      {pattern: 'build/client/bower_components/knockout/dist/knockout.js', included: false},
-      {pattern: 'build/client/bower_components/knockout-mapping/knockout.mapping.js', included: false},
-      {pattern: 'build/client/bower_components/blockUI/jquery.blockUI.js', included: false},
-      {pattern: 'build/client/bower_components/d3/d3.js', included: false},
-      {pattern: 'build/client/bower_components/d3-plugins-sankey/sankey.js', included: false},
-      {pattern: 'build/client/bower_components/d3-plugins-sankey/sankey.css', included: false},
-      {pattern: 'build/client/js/lib/etc/jquery-svg-graph-stacked-area.js', included: false},
-      {pattern: 'build/client/bower_components/node-uuid/uuid.js', included: false},
-      {pattern: 'build/client/lib/canvastext.js', included: false}, 
-      {pattern: 'build/client/lib/popit.js', included: false},
-      {pattern: 'build/client/lib/knhx.js', included: false},
-      {pattern: 'build/client/lib/googlepalette.js', included: false},
-      {pattern: 'build/client/bower_components/google-code-prettify/bin/prettify.min.js', included: false},
-      {pattern: 'build/client/bower_components/google-code-prettify/bin/prettify.min.css', included: false},
-      {pattern: 'build/client/bower_components/font-awesome/css/font-awesome.css', included: false},
-      {pattern: 'build/client/bower_components/stacktrace-js/dist/stacktrace.js', included: false},
-      {pattern: 'build/client/bower_components/handlebars/handlebars.amd.js', included: false},
-
-      {pattern: 'build/client/bower_components/thrift-binary-protocol/*.js', included: false},     
-      {pattern: 'build/client/bower_components/kbase-data-api-js-wrappers/*.js', included: false},     
-      {pattern: 'build/client/bower_components/kbase-data-api-js-wrappers/thrift/taxon/*.js', included: false},     
-
-      {pattern: 'build/client/bower_components/requirejs-text/text.js', included: false},
-      {pattern: 'build/client/bower_components/requirejs-json/json.js', included: false},
-      {pattern: 'build/client/bower_components/require-yaml/yaml.js', included: false},
-      {pattern: 'build/client/bower_components/require-css/css.js', included: false},
-      {pattern: 'build/client/bower_components/js-yaml/dist/js-yaml.js', included: false},
+      {pattern: 'build/client/!(search)/**/*.js', included: false},
+      {pattern: 'build/client/!(search)/**/*.css', included: false},
+      {pattern: 'build/client/js/require-config.js', included: true},
       {pattern: 'build/client/*.yml', included: false},
-      {pattern: 'build/client/js/require-config.js', served: true, included: true},
-      {pattern: 'build/client/js/lib/**/*.js', served: true, included: false},
-      {pattern: 'build/client/js/main.js', served: true, included: false},
-
-      {pattern: 'build/client/plugins/**/*.js', served: true, included: false},
-      // {pattern: 'test/spec/kbaseConfigSpec.js', included: false},      
       {pattern: 'test/spec/**/*.js', included: false},
 
       'test/test-main.js',
