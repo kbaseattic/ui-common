@@ -63,8 +63,12 @@ define('kbaseRNASeqPie',
         options: {
             pieWedges : ['mapped_reads', 'unmapped_reads'],
             overviewItems : ['total_reads', 'unmapped_reads', 'mapped_reads', 'multiple_alignments', 'singletons', 'alignment_rate'],
-            mapGrad : Array.prototype.slice.call(colorbrewer.Blues[9]).reverse(),
-            unmapGrad : Array.prototype.slice.call(colorbrewer.Oranges[9]).reverse(),
+            gradients : [
+                Array.prototype.slice.call(colorbrewer.Blues[9]).reverse(),
+                Array.prototype.slice.call(colorbrewer.Oranges[9]).reverse(),
+                Array.prototype.slice.call(colorbrewer.RdPu[9]).reverse(),
+                Array.prototype.slice.call(colorbrewer.YlGn[9]).reverse()
+            ],
         },
 
         value_for_wedge : function(val) {
@@ -98,11 +102,7 @@ define('kbaseRNASeqPie',
 
         setDataset : function setDataset(newDataset) {
 
-            var unmapGrad   = this.options.mapGrad;
-            var mapGrad     = this.options.unmapGrad;
-
-            var mapColor    = mapGrad[1];
-            var unmapColor  = unmapGrad[1];
+            var gradients = this.options.gradients;
 
             this.setValueForKey('dataset', newDataset);
 
@@ -154,13 +154,16 @@ define('kbaseRNASeqPie',
                 var pieData = [];
                 for (var i = 0; i < this.options.pieWedges.length; i++) {
                     var wedge = this.options.pieWedges[i];
+
+                    if (newDataset[wedge] === undefined) {
+                        continue;
+                    }
+
                     pieData.push(
                         {
                             value   : this.value_for_wedge(newDataset[wedge]),
                             label   : this.label_for_key(wedge, newDataset[wedge]),
-                            color   : wedge == 'mapped_reads'
-                                ? mapColor
-                                : unmapColor
+                            color   : gradients[i % gradients.length][1]
                         }
                     );
                 }
@@ -184,56 +187,62 @@ define('kbaseRNASeqPie',
                     }
                 );
 
-                if ($.isPlainObject(newDataset['mapped_reads']) || $.isPlainObject(newDataset['unmapped_reads'])) {
+                var wedgeTotal = 0;
+                var gIdx = 0;
+                var donutData = [];
+                var wedgeOffset = 0;
 
-                    var donutData = [];
+                for (var wIdx = 0; wIdx < this.options.pieWedges.length; wIdx++) {
+                    wedgeTotal += this.value_for_wedge(newDataset[ this.options.pieWedges[wIdx] ]);
+                }
 
-                    if ($.isPlainObject(newDataset['mapped_reads'])) {
+                for (var wIdx = 0; wIdx < this.options.pieWedges.length; wIdx++) {
+
+                    var wedge       = this.options.pieWedges[wIdx];
+                    var wedgeValue  = this.value_for_wedge(newDataset[wedge]);
+
+                    if ( $.isPlainObject(newDataset[wedge]) ) {
 
                         var idx = 0;
 
-                        //actually this is 1/mapReadsTotal (to get the percentage values for each wedge) * mapTotal ( map + unmap Total). But terms cancel out.
-                        var wedgeConstant = 1 / (this.value_for_wedge(newDataset['mapped_reads']) + this.value_for_wedge(newDataset['unmapped_reads']));
+                        var wedgeConstant = 1 / wedgeTotal;
 
-                        for (var key in newDataset['mapped_reads']) {
+                        var grad = gradients[gIdx];
 
-                            if (newDataset['mapped_reads'][key] == 0) {
+                        for (var key in newDataset[wedge]) {
+
+                            if (newDataset[wedge][key] == 0) {
                                 continue;
                             }
 
                             donutData.push(
                                 {
-                                    value : newDataset['mapped_reads'][key] * wedgeConstant,
-                                    label : this.label_for_key(key, newDataset['mapped_reads'][key]),
-                                    color : mapGrad[idx++]
+                                    value : newDataset[wedge][key] * wedgeConstant,
+                                    label : this.label_for_key(key, newDataset[wedge][key]),
+                                    color : grad[idx++]
                                 }
                             );
                         }
+
                     }
-
-                    if ($.isPlainObject(newDataset['unmapped_reads'])) {
-
-                        var idx = 0;
-
-                        //actually this is 1/mapReadsTotal (to get the percentage values for each wedge) * mapTotal ( map + unmap Total). But terms cancel out.
-                        var wedgeConstant = 1 / (this.value_for_wedge(newDataset['unmapped_reads']) + this.value_for_wedge(newDataset['mapped_reads']));
-
-                        for (var key in newDataset['unmapped_reads']) {
-
-                            if (newDataset['unmapped_reads'][key] == 0) {
-                                continue;
+                    else {
+                        wedgeOffset += wedgeValue;
+                        donutData.push(
+                            {
+                                value   : wedgeValue / wedgeTotal,
+                                label   : '',
+                                color   : 'white',
+                                gap     : true,
                             }
-
-                            donutData.push(
-                                {
-                                    value : newDataset['unmapped_reads'][key] * wedgeConstant,
-                                    label : this.label_for_key(key, newDataset['unmapped_reads'][key]),
-                                    color : unmapGrad[idx++]
-                                }
-                            );
-                        }
+                        )
                     }
 
+                    gIdx = ++gIdx % gradients.length;
+
+                }
+
+
+                if (donutData.length) {
                     var $donut = $.jqElem('div').kbasePiechart(
                         {
                             parent : $pie,

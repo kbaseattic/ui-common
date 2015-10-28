@@ -9,28 +9,32 @@ function Rectangle(origin,size) {
     this.size = size;
 }
 
-Rectangle.prototype.invert = function() {
+Rectangle.prototype.area = function area () {
+    return this.size.width * this.size.height;
+}
+
+Rectangle.prototype.invert = function invert () {
     return new Rectangle(
         this.height,
         this.width
     );
 }
 
-Rectangle.prototype.lowerRight = function() {
+Rectangle.prototype.lowerRight = function lowerRight () {
     return new Point(
         this.origin.x + this.size.width,
         this.origin.y + this.size.height
     )
 }
 
-Rectangle.prototype.insetRect = function(dx,dy) {
+Rectangle.prototype.insetRect = function insetRect (dx,dy) {
     return new Rectangle(
         new Point(this.origin.x + dx / 2, this.origin.y + dy / 2),
         new Size(this.size.width - dx, this.size.height - dy)
     );
 }
 
-Rectangle.prototype.fromString = function (string) {
+Rectangle.prototype.fromString = function fromString (string) {
     var results;
     if (results = string.match(/{{(.+),\s*(.+)},\s*{(.+),\s*(.+)}}/)) {
         return new Rectangle(
@@ -42,7 +46,7 @@ Rectangle.prototype.fromString = function (string) {
     }
 }
 
-Rectangle.prototype.intersects = function (r2) {
+Rectangle.prototype.intersects = function intersects (r2) {
     if (
         this.origin.x < r2.origin.x + r2.size.width
         && this.origin.x + this.size.width > r2.origin.x
@@ -57,7 +61,7 @@ Rectangle.prototype.intersects = function (r2) {
     }
 }
 
-Rectangle.prototype.unionRect = function (r2, padding) {
+Rectangle.prototype.unionRect = function unionRect (r2, padding) {
 
     var union = new Rectangle();
 
@@ -84,7 +88,7 @@ Rectangle.prototype.unionRect = function (r2, padding) {
 
 }
 
-Rectangle.prototype.isValidRect = function() {
+Rectangle.prototype.isValidRect = function isValidRect () {
     if (
            isNaN(this.origin.x)
         || isNaN(this.origin.y)
@@ -97,7 +101,7 @@ Rectangle.prototype.isValidRect = function() {
     }
 }
 
-Rectangle.prototype.intersectRect = function(r2) {
+Rectangle.prototype.intersectRect = function intersectRect (r2) {
 
     var intersect = new Rectangle();
 
@@ -125,7 +129,7 @@ Rectangle.prototype.intersectRect = function(r2) {
 
 }
 
-Rectangle.prototype.containsPoint = function (p) {
+Rectangle.prototype.containsPoint = function containsPoint (p) {
     var ux = this.origin.x + this.size.width;
     var uy = this.origin.y + this.size.height;
     if (p.x >= this.origin.x && p.x <= ux
@@ -137,7 +141,7 @@ Rectangle.prototype.containsPoint = function (p) {
     }
 }
 
-Rectangle.prototype.equals = function (r2) {
+Rectangle.prototype.equals = function equals (r2) {
     if (this == undefined || r2 == undefined) {
         return false;
     }
@@ -149,7 +153,7 @@ Rectangle.prototype.equals = function (r2) {
     }
 }
 
-Rectangle.prototype.asString = function () {
+Rectangle.prototype.asString = function asString () {
     return "{" + this.origin.asString() + ", " + this.size.asString() + "}";
 }
 
