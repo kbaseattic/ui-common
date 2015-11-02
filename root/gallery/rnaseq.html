@@ -148,12 +148,24 @@
                             }
 
                             var $pie = $('#RNASeqPieWidget').kbaseRNASeqPie(
-                                {
-                                    dataset : generate_pie_data(),
-                                }
+{  "dataset" : {
+                         "properly_paired" : 100 ,
+                         "multiple_alignments": 50 ,
+                         "singletons": 50 ,
+                         "alignment_rate": 80,
+                         "mapped_reads" : 200,
+                         "unmapped_reads"  :  50,
+                         "total_reads" : 250,
+                         "mapped_reads" : {
+                               "introns" : 50,
+                               "exons" : 75,
+                               "splice_junctions" : 100,
+                               "intergenic_regions" : 55
+                         }
+                     } }
                             );
 
-                            $pie.setDataset(generate_pie_data());
+                            //$pie.setDataset(generate_pie_data());
 
 
                             $('#pie-button').on('click', function(e) {

@@ -53,7 +53,7 @@ define('kbasePiechart',
             tooltips : true,
 
             rescaleChildren : true,
-            outerRadiusInset : 0,
+            outerRadiusInset : 10,
         },
 
         _accessors : [
@@ -212,7 +212,7 @@ define('kbasePiechart',
 
                 var outerArcMaker = d3.svg.arc()
                     .innerRadius(radius)
-                    .outerRadius(radius + $pie.options.outerRadiusInset);
+                    .outerRadius(radius + 10);
 
                 this.on('mouseover', function(d) {
 
