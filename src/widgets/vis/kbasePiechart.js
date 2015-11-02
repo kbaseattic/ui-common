@@ -53,6 +53,7 @@ define('kbasePiechart',
             tooltips : true,
 
             rescaleChildren : true,
+            outerRadiusInset : 0,
         },
 
         _accessors : [
@@ -75,6 +76,10 @@ define('kbasePiechart',
                 var ret = d.data.id || (d.data.id = this.ticker() );
                 return ret;
             }, this);
+
+            if (this.parent != undefined) {
+                this.outerRadiusInset = 0;
+            }
 
             return this;
         },
@@ -203,11 +208,11 @@ define('kbasePiechart',
         sliceAction : function($pie) {
 
             return function() {
-                var radius = $pie.outerRadius() - 10;
+                var radius = $pie.outerRadius() - $pie.options.outerRadiusInset;
 
                 var outerArcMaker = d3.svg.arc()
                     .innerRadius(radius)
-                    .outerRadius(radius + 10);
+                    .outerRadius(radius + $pie.options.outerRadiusInset);
 
                 this.on('mouseover', function(d) {
 
@@ -339,7 +344,7 @@ define('kbasePiechart',
 
             var pieData = this.pieData($pie.dataset());
 
-            var radius = this.outerRadius() - 10;
+            var radius = this.outerRadius() - this.options.outerRadiusInset;
             var innerRadius = this.innerRadius();
 
             var arcMaker = d3.svg.arc()
