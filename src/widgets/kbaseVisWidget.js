@@ -567,7 +567,6 @@ define('kbaseVisWidget',
                 }
 
                 if (this.shouldScaleAxis('y')) {
-                console.log("SHOULD SCALE Y, so sets it", this.defaultYDomain());
                     this.setYScaleDomain(this.defaultYDomain());
                 }
 
@@ -708,7 +707,7 @@ define('kbaseVisWidget',
                 }
 
                 var axisTransform = this.options.xAxisRegion == 'yGutter' ? axisRegionBounds.size.height : 0;
-console.log("RENDERS X WITH TRANSFORM " , this.options.xAxisTransform);
+
                 if (this.options.xAxisTransform) {
                     axisTransform = this.options.xAxisTransform;
                 }
@@ -750,7 +749,7 @@ console.log("RENDERS X WITH TRANSFORM " , this.options.xAxisTransform);
                         .attr('class', 'xAxis axis')
                         .attr('fill', this.options.xAxisColor)
                 }
-console.log("GX AXIS ", gxAxis, gxAxis[0][0].parentNode);
+
 
 gxAxis[0][0].parentNode.appendChild(gxAxis[0][0]);
 
