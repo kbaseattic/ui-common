@@ -104,6 +104,11 @@ define('kbaseRNASeqPie',
 
             var gradients = this.options.gradients;
 
+            //hack to allow two separate keys - mapped_reads or mapped_sections.
+            if (newDataset['mapped_sections'] != undefined) {
+                newDataset['mapped_reads'] = newDataset['mapped_sections'];
+            }
+
             this.setValueForKey('dataset', newDataset);
 
             newDataset['total_reads'] = this.value_for_wedge(newDataset['mapped_reads']) + this.value_for_wedge(newDataset['unmapped_reads']);
