@@ -279,6 +279,10 @@ define('kbaseRNASeqPie',
         init : function init(options) {
             this._super(options);
 
+            if (this.options.data) {
+                this.setDataset(this.options.data);
+            }
+
             this.appendUI(this.$elem);
 
             return this
