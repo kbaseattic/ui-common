@@ -277,11 +277,10 @@ define('kbaseRNASeqPie',
 
 
         init : function init(options) {
-            this._super(options);
 
-            if (this.options.data) {
-                this.setDataset(this.options.data);
-            }
+            console.log("THESE ARE MY CONSTRUCTOR ARGS : ", options);
+
+            this._super(options);
 
             this.appendUI(this.$elem);
 
