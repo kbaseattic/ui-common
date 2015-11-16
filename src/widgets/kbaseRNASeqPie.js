@@ -50,7 +50,9 @@ define('kbaseRNASeqPie',
         'kbasePiechart',
         'kbaseTable',
         'kbwidget',
+        'kbaseAuthenticatedWidget',
         'kbaseTabs',
+        'kbase-client-api',
     ], function( $, colorbrewer ) {
 
     'use strict';
@@ -58,6 +60,7 @@ define('kbaseRNASeqPie',
     $.KBWidget({
 
 	    name: "kbaseRNASeqPie",
+	    parent : "kbaseAuthenticatedWidget",
 
         version: "1.0.0",
         options: {
@@ -69,6 +72,7 @@ define('kbaseRNASeqPie',
                 Array.prototype.slice.call(colorbrewer.RdPu[9]).reverse(),
                 Array.prototype.slice.call(colorbrewer.YlGn[9]).reverse()
             ],
+            magicPieSize : 425,
         },
 
         value_for_wedge : function(val) {
@@ -154,7 +158,8 @@ define('kbaseRNASeqPie',
                 );
 
 
-                var $pieElem = $.jqElem('div').css({width : this.$elem.width(), height : this.$elem.height() * .9});
+                //var $pieElem = $.jqElem('div').css({width : this.$elem.width(), height : this.$elem.height() * .9});
+                var $pieElem = $.jqElem('div').css({width : this.options.magicPieSize, height : this.options.magicPieSize * .9});
 
                 var pieData = [];
                 for (var i = 0; i < this.options.pieWedges.length; i++) {
@@ -278,9 +283,22 @@ define('kbaseRNASeqPie',
 
         init : function init(options) {
 
-            console.log("THESE ARE MY CONSTRUCTOR ARGS : ", options);
+            var $pie = this;
 
             this._super(options);
+
+            var ws = new Workspace(window.kbconfig.urls.workspace, {token : this.authToken()});
+
+            var ws_vals = options.getAlignmentStats.workspace.split(':');
+
+            var ws_key = {
+                workspace : options.getAlignmentStats.workspace,
+                name : options.getAlignmentStats.output,
+            }
+
+            ws.get_objects([ws_key]).then(function (d) {
+                $pie.setDataset(d[0].data);
+            });
 
             this.appendUI(this.$elem);
 
@@ -310,8 +328,6 @@ define('kbaseRNASeqPie',
 
             this._rewireIds($containerElem, this);
             this.data('container', $container);
-
-            this.setDataset(this.dataset());
 
             $elem.append($containerElem);
 
