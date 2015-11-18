@@ -73,6 +73,7 @@ define('kbaseRNASeqPie',
                 Array.prototype.slice.call(colorbrewer.YlGn[9]).reverse()
             ],
             magicPieSize : 425,
+            methodName : 'KBaseRNASeq/view_alignment_statistics',
         },
 
         value_for_wedge : function(val) {
@@ -289,7 +290,7 @@ define('kbaseRNASeqPie',
 
             var nms = new NarrativeMethodStore(window.kbconfig.urls.narrative_method_store, {token : this.authToken()});
 
-            nms.get_method_spec({ids : ['KBaseRNASeq/view_alignment_statistics']}).then(function(d) {
+            nms.get_method_spec({ids : [$pie.options.methodName]}).then(function(d) {
 
                 var obj_key;
                 var ws_key;
