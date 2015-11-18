@@ -324,10 +324,27 @@ define('kbaseRNASeqPie',
 
                 ws.get_objects([ws_params]).then(function (d) {
                     $pie.setDataset(d[0].data);
-                });
+                })
+                .fail(function(d) {
+                    console.log(d);
+                    console.log ( $pie.data('container').hasTab('Overview') );
+
+                    $pie.$elem.empty();
+                    $pie.$elem
+                        .addClass('alert alert-danger')
+                        .html("Could not load object : " + d.error.message);
+                })
 
 
-            });
+            }).fail(function(d) {
+                console.log(d);
+                console.log ( $pie.data('container').hasTab('Overview') );
+
+                $pie.$elem.empty();
+                $pie.$elem
+                    .addClass('alert alert-danger')
+                    .html("Could not load method : " + $pie.options.methodName + ': ' + d.error.message);
+            })
 
 
             this.appendUI(this.$elem);
