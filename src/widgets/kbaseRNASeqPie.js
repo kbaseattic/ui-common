@@ -287,18 +287,47 @@ define('kbaseRNASeqPie',
 
             this._super(options);
 
-            var ws = new Workspace(window.kbconfig.urls.workspace, {token : this.authToken()});
+            var nms = new NarrativeMethodStore(window.kbconfig.urls.narrative_method_store, {token : this.authToken()});
 
-            var ws_vals = options.getAlignmentStats.workspace.split(':');
+            nms.get_method_spec({ids : ['KBaseRNASeq/view_alignment_statistics']}).then(function(d) {
 
-            var ws_key = {
-                workspace : options.getAlignmentStats.workspace,
-                name : options.getAlignmentStats.output,
-            }
+                var obj_key;
+                var ws_key;
+                var ws_id_key;
 
-            ws.get_objects([ws_key]).then(function (d) {
-                $pie.setDataset(d[0].data);
+                var mapping = d[0].behavior.kb_service_output_mapping;
+                for (var i = 0; i < mapping.length; i++) {
+                    var param = mapping[i];
+
+                    if (param.input_parameter) {
+                        obj_key = param.target_property;
+                    }
+
+                    if (param.narrative_system_variable == 'workspace') {
+                        ws_key = param.target_property;
+                    }
+
+                    if (param.narrative_system_variable == 'ws_id') {
+                        ws_id_key = param.target_property;
+                    }
+
+                }
+
+                var ws = new Workspace(window.kbconfig.urls.workspace, {token : $pie.authToken()});
+
+                var ws_params = {
+                    workspace : ws_key != undefined ? $pie.options[ws_key] : undefined,
+                    ws_id : ws_id_key != undefined ? $pie.options[ws_id] : undefined,
+                    name : obj_key != undefined ? $pie.options[obj_key] : undefined,
+                };
+
+                ws.get_objects([ws_params]).then(function (d) {
+                    $pie.setDataset(d[0].data);
+                });
+
+
             });
+
 
             this.appendUI(this.$elem);
 
