@@ -160,7 +160,7 @@ define('kbaseRNASeqPie',
 
 
                 //var $pieElem = $.jqElem('div').css({width : this.$elem.width(), height : this.$elem.height() * .9});
-                var $pieElem = $.jqElem('div').css({width : this.options.magicPieSize, height : this.options.magicPieSize * .9});
+                var $pieElem = $.jqElem('div').css({width : this.options.magicPieSize * 1.5, height : this.options.magicPieSize * .9});
 
                 var pieData = [];
                 for (var i = 0; i < this.options.pieWedges.length; i++) {

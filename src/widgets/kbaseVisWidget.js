@@ -351,6 +351,9 @@ define('kbaseVisWidget',
 
             },
 
+            legendOver : function legendOver() {},
+            legendOut : function legendOut() {},
+
             renderLegend : function renderLegend () {
 
                 if (this.legend() == undefined) {
@@ -450,6 +453,7 @@ define('kbaseVisWidget',
                                 .style('fill', function (b, j) { return d.color })
                                 .style('stroke', function (b, j) { return d.color })
                                 .attr('opacity', 1)
+
                         ;
 
                         g.selectAll('text')
@@ -461,15 +465,24 @@ define('kbaseVisWidget',
                                 .attr('opacity', 1)
                         ;
 
-                        if (truncationObj.truncated) {
-                            g.selectAll('text')
-                                .on('mouseover', function(d) {
+                        g.selectAll('text')
+                            .on('mouseover', function(d) {
+                                if (truncationObj.truncated) {
                                     $vis.showToolTip({label : truncationObj.text})
-                                })
-                                .on('mouseout', function(d) {
+                                }
+
+                                if (d.represents) {
+                                    $vis.legendOver(d.represents);
+                                }
+                            })
+                            .on('mouseout', function(d) {
+                                if (truncationObj.truncated) {
                                     $vis.hideToolTip();
-                                })
-                        }
+                                }
+                                if (d.represents) {
+                                    $vis.legendOut(d.represents);
+                                }
+                            })
                     })
                 ;
 
