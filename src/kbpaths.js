@@ -208,6 +208,7 @@
 				'kbasePlantsNetworkTable'           : 'vis/plants/kbasePlantsNetworkTable',
 				'kbasePMIBarchart'                       : 'vis/plants/kbasePMIBarchart',
 				'kbaseRNASeq'                       : 'kbaseRNASeq',
+				'ProteinDomainAnnotation'                       : 'vis/ProteinDomainAnnotation',
 				'kbaseRNASeqPie'                       : 'kbaseRNASeqPie',
 				'vis'                               : 'vis/vis',
 				'kbaseSimpleWSSelect'               : 'workspaces/kbaseSimpleWSSelect',
@@ -219,6 +220,7 @@
 				'kbaseWSObjectTable'                : 'workspaces/kbaseWSObjectTable',
 				'kbaseWSReferenceList'              : 'workspaces/kbaseWSReferenceList',
 				'kbaseWSSelector'                   : 'workspaces/kbaseWSSelector',
+                'kbaseVisMatrix' : 'vis/kbaseVisMatrix',
             },
             shim : {
                 bootstrap : {deps : ["jquery"]}

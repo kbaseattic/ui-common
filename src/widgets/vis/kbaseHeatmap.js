@@ -196,7 +196,7 @@ define('kbaseHeatmap',
                         //5 pixels up. Whee!
                         var width = d3.select(this).node().getComputedTextLength();
 
-                        return "rotate(-45,0,0) translate(" + (width / 2 + 5) + ",5)";// translate(2,3)";
+                        return "rotate(-45,0,0) translate(" + (width / 2 + 50) + ",5)";// translate(2,3)";
                     })
             ;
 
@@ -303,6 +303,9 @@ define('kbaseHeatmap',
                     .attr('y', 0)
                     .attr('width',  xGutterBounds.size.width / 3)
                     .attr('height', xGutterBounds.size.height)
+                    .attr('font-size', '11px')
+                    .attr('font-family', 'sans-serif')
+                    .attr('fill', 'black')
                     .attr('fill', 'url(#' + this.options.gradientID + ')')
             ;
 

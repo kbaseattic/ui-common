@@ -101,6 +101,7 @@ define('kbaseVisWidget',
                 'yPadding',
                 'width',
                 'height',
+                {name: 'json_dataset', setter: 'setJSONDataset'},
                 {name: 'dataset', setter: 'setDataset'},
                 {name: 'legend', setter: 'setLegend'},
                 {name: 'input', setter: 'setInput'},
@@ -218,6 +219,7 @@ define('kbaseVisWidget',
 
                 return yScale;
             },
+
             init : function init (options) {
 
                 this._super(options);
@@ -566,6 +568,27 @@ define('kbaseVisWidget',
 
             extractLegend : function extractLegend (dataset) { /* no op in the super class */ },
 
+            setJSONDataset : function (json_url) {
+                var $vis = this;
+                $.ajax(json_url, {dataType : 'json'}).then(function(d) {
+
+                    if (d.dataset) {
+
+                        $vis.setDataset(d.dataset);
+
+                        if (d.xLabel) {
+                            $vis.setXLabel(d.xLabel);
+                        }
+                        if (d.yLabel) {
+                            $vis.setYLabel(d.yLabel);
+                        }
+                    }
+                    else {
+                        $vis.setDataset(d);
+                    }
+                });
+            },
+
             setDataset : function setDataset (newDataset) {
 
                 if (newDataset == undefined) {
@@ -764,7 +787,7 @@ define('kbaseVisWidget',
                 }
 
 
-gxAxis[0][0].parentNode.appendChild(gxAxis[0][0]);
+                gxAxis[0][0].parentNode.appendChild(gxAxis[0][0]);
 
                 this.D3svg().select(this.region(this.options.xAxisRegion)).selectAll('.xAxis').attr("transform", "translate(0," + axisTransform + ")");
 
@@ -835,6 +858,8 @@ gxAxis[0][0].parentNode.appendChild(gxAxis[0][0]);
              */
 
             appendUI : function appendUI ($elem) {
+
+                var $vis = this;
 
                 var chartBounds = this.chartBounds();
                 if (chartBounds.size.width != chartBounds.size.height && this.options.aspectRatio != 'default') {
@@ -934,6 +959,18 @@ gxAxis[0][0].parentNode.appendChild(gxAxis[0][0]);
                     D3svg = this.D3svg();
                 }
 
+                if (this.options.rootRegion) {
+                    var rootRegion = $vis.region('root', true);
+                    D3svg = D3svg.selectAll('.' + rootRegion).data([{region : rootRegion}], function(d) { return d.region });
+                    D3svg
+                        .enter()
+                        .append('g')
+                        .attr('class', function (d) {return d.region })
+                        .attr('transform', $.proxy(function(region) {
+                            return $vis.buildTransformation($vis.options.rootRegion);
+                        }, this));
+                }
+
 
                 var regions = [
                     'chart', //add the chart first, because we want it to be at the lowest level.
@@ -949,8 +986,6 @@ gxAxis[0][0].parentNode.appendChild(gxAxis[0][0]);
                 ];
 
                 D3svg.selectAll('defs').data([null]).enter().append('defs').attr('class', 'definitions');
-
-                var $vis = this;
 
                 var regionG = D3svg.selectAll('g')
                     .data(regions, function (d) {
@@ -1015,16 +1050,7 @@ gxAxis[0][0].parentNode.appendChild(gxAxis[0][0]);
                                 return d.region
                             })
                             .attr('transform', function (d) {
-
-                                var transform = $vis.options.transformations[d.r] || $vis.options.transformations.global;//{ translate : {x : 0, y : 0}, scale : {width : .1, height : 1} };
-                                if (transform == undefined) {
-                                    return;
-                                }
-
-                                transform = $.extend(true, {translate: {x: 0, y: 0}, scale: {width: 1, height: 1}}, transform);
-
-                                return 'translate(' + transform.translate.x + ',' + transform.translate.y + ')'
-                                    + ' scale(' + transform.scale.width + ',' + transform.scale.height + ')';
+                                return $vis.buildTransformation($vis.options.transformations[d.r] || $vis.options.transformations.global);
                             })
                     }
                 );
@@ -1038,6 +1064,14 @@ gxAxis[0][0].parentNode.appendChild(gxAxis[0][0]);
                  ;*/
 
             },
+
+            buildTransformation : function buildTransformation(transformation) {
+                var transform = $.extend(true, {translate: {x: 0, y: 0}, scale: {width: 1, height: 1}}, transformation);
+
+                return 'translate(' + transform.translate.x + ',' + transform.translate.y + ')'
+                    + ' scale(' + transform.scale.width + ',' + transform.scale.height + ')';
+            },
+
             D3svg : function D3svg () {
                 if (this.options.parent) {
                     return this.options.parent.D3svg();

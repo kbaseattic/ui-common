@@ -63,6 +63,9 @@ define('kbaseScatterplot',
         version: "1.0.0",
         options: {
             overColor : 'yellow',
+            weight : 20,
+            color : 'black',
+            shape : 'circle',
         },
 
         _accessors : [
@@ -71,14 +74,12 @@ define('kbaseScatterplot',
 
         defaultXDomain : function() {
 
+
             if (this.dataset() == undefined) {
                 return [0,0];
             }
 
-            var min = 0.9 * d3.min(this.dataset().map( function(d) {return d.x}));
-            if (min > 0) {
-                min = 0;
-            }
+            var min = 0.9 * d3.min(this.dataset().map( function(d) {return d.x} ).filter(function(d) { return this.xScaleType() != 'log' || d != 0 }, this) );
 
             return [
                 min,
@@ -92,15 +93,12 @@ define('kbaseScatterplot',
                 return [0,0];
             }
 
-            var min = 0.9 * d3.min(this.dataset().map( function(d) {return d.y}));
-            if (min > 0) {
-                min = 0;
-            }
+            var min = 0.9 * d3.min(this.dataset().map( function(d) {return d.y}).filter(function(d) { return this.yScaleType() != 'log' || d != 0 }, this) );
 
             return [
                 min,
                 1.1 * d3.max(this.dataset().map( function(d) {return d.y}))
-            ];
+            ]
         },
 
         renderChart : function() {
@@ -116,23 +114,27 @@ define('kbaseScatterplot',
                 this
                     .attr('cx',
                         function (d) {
-                            return $scatter.xScale()(d.x)
+                            var cx = $scatter.xScale()(d.x);
+
+                            return isNaN(cx) ? -500000 : cx;
                         }
                     )
                     .attr('cy',
                         function (d) {
-                            return $scatter.yScale()(d.y)
+                            var cy = $scatter.yScale()(d.y);
+
+                            return isNaN(cy) ? -500000 : cy;
                         }
                     )
                     .attr('r',
                         function (d) {
-                            return d.weight
+                            return d.weight || $scatter.options.weight
                         }
                     )
                     //.attr('y', function (d) { return $scatter.yScale()(d.y) })
                     .attr('fill',
                         function(d) {
-                            return d.color;
+                            return d.color || $scatter.options.color
                         }
                     )
             };
@@ -149,7 +151,7 @@ define('kbaseScatterplot',
 
                     var label = d.label
                         ? d.label
-                        : d.weight + ' at (' + d.x + ',' + d.y + ')';
+                        : ($scatter.options.weight || d.weight) + ' at (' + d.x + ',' + d.y + ')';
 
                     if (label != undefined) {
                         $scatter.showToolTip(
@@ -166,7 +168,7 @@ define('kbaseScatterplot',
                             .attr('stroke', 'none');
                     }
 
-                    $scatter.data('D3svg').select('.yPadding').selectAll('g g text')
+                    $scatter.D3svg().select($scatter.region('yPadding')).selectAll('g g text')
                         .attr("fill",
                             function(r,ri){
                                return 'black';
@@ -178,14 +180,21 @@ define('kbaseScatterplot',
                 return this;
             };
 
-            var chart = this.data('D3svg').select('.chart').selectAll('.point');
+            var chart = this.D3svg().select(this.region('chart')).selectAll('.point');
             chart
                 .data(this.dataset())
                 .enter()
                     .append('path')
                     .attr('class', 'point')
-                    .attr("transform", function(d) { return "translate(" + $scatter.xScale()(d.x) + "," + $scatter.yScale()(d.y) + ")"; })
-                    .attr('d', function (d) { return d3.svg.symbol().type(d.shape).size(d.weight)() } )
+                    .attr("transform", function(d) {
+                        var x = $scatter.xScale()(d.x);
+                        var y = $scatter.yScale()(d.y);
+
+                         x = isNaN(x) ? -500000 : x; y = isNaN(y) ? -500000 : y;
+
+                        return "translate(" + x + "," + y + ")";
+                    })
+                    .attr('d', function (d) { return d3.svg.symbol().type(d.shape || $scatter.options.shape).size(d.weight || $scatter.options.weight)() } )
                     .call(funkyTown)
                     .call(mouseAction)
             ;

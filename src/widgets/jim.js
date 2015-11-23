@@ -66,6 +66,7 @@ define('jim',
 	'kbaseVenndiagram',
 	'kbaseVisWidget',
 	'kbwidget',
+	'kbaseVisMatrix',
     ],
     function() {
 

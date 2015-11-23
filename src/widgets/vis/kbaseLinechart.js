@@ -120,6 +120,7 @@ define('kbaseLinechart',
         options: {
             overColor : 'yellow',
             useOverLine : true,
+            highlightToFront : false,
             useLineLabelToolTip : true,
 
             lineWidth : 3,
@@ -146,6 +147,16 @@ define('kbaseLinechart',
 
         ],
 
+        legendOver : function legendOver(d) {
+            console.log("OVER ", d);
+
+            d.svg.parentNode.appendChild(d.svg);
+
+        },
+        legendOut : function legendOut(d) {
+            console.log("OVER ", d);
+        },
+
         extractLegend : function (dataset) {
 
             var legend = [];
@@ -153,9 +164,10 @@ define('kbaseLinechart',
                 function(line, idx) {
                     legend.push(
                         {
-                            color : line.strokeColor,
-                            label : line.label,
-                            shape : line.shape
+                            color       : line.strokeColor,
+                            label       : line.label,
+                            shape       : line.shape,
+                            represents  : line,
                         }
                     )
                 }
@@ -195,7 +207,7 @@ define('kbaseLinechart',
                                 else {
                                     point.x = xIdx;
                                 }
-                                if (point.y2) {
+                                if (point.y2 != undefined) {
                                     revLine.push( { x : point.x, y : point.y2} )
                                     delete point.y2;
                                 }
@@ -306,15 +318,15 @@ define('kbaseLinechart',
 
             var mouseAction = function() {
 
-                if (! $line.options.useOverLine) {
-                    return;
-                }
+                //if (! $line.options.useOverLine) {
+                //    return;
+                //}
 
                 this.on('mouseover', function(d) {
-                    if ($line.options.overColor) {
+                    if ($line.options.useOverLine && $line.options.overColor) {
                         d3.select(this)
                             .attr('stroke', $line.options.overColor)
-                            .attr('stroke-width', (d.width || $line.options.lineWidth) + 5);
+                            .attr('stroke-width', (d.width || $line.options.lineWidth) + .5);
                     }
 
                     if (d.label && $line.options.useLineLabelToolTip) {
@@ -325,18 +337,22 @@ define('kbaseLinechart',
                         );
                     }
 
+                    if ($line.options.highlightToFront) {
+                        d.svg.parentNode.appendChild(d.svg);
+                    }
+
                 })
                 .on('mouseout', function(d) {
-                    if ($line.options.overColor) {
+                    if ($line.options.useOverLine && $line.options.overColor) {
                         d3.select(this)
                             .attr('stroke',         function (d) { return d.strokeColor || $line.options.strokeColor } )
                             .attr('stroke-width',   function (d) {return d.width != undefined ? d.width : $line.options.lineWidth} );
-
-                        if ($line.options.useLineLabelToolTip) {
-                            $line.hideToolTip();
-                        }
-
                     }
+
+                    if ($line.options.useLineLabelToolTip) {
+                        $line.hideToolTip();
+                    }
+
                 })
                 return this;
             };
@@ -371,6 +387,9 @@ define('kbaseLinechart',
                         .attr('class', 'line')
                         .call(funkyTown)
                         .call(mouseAction)
+                        .each(function (d) {
+                            d.svg = this;
+                        })
                 ;
 
                 chart

@@ -17,6 +17,7 @@ define('vis',
         'kbaseVenndiagram',
         'kbaseJSONReflector',
 'GeneDistribution',
+        'kbaseVisMatrix',
     ],
     function() {
 
