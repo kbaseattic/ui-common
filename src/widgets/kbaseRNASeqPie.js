@@ -66,6 +66,7 @@ define('kbaseRNASeqPie',
         options: {
             pieWedges : ['mapped_reads', 'unmapped_reads'],
             overviewItems : ['total_reads', 'unmapped_reads', 'mapped_reads', 'multiple_alignments', 'singletons', 'alignment_rate'],
+            mapped_reads_Wedges : ['exons', 'splice_junctions', 'introns', 'intergenic_regions'],
             gradients : [
                 Array.prototype.slice.call(colorbrewer.Blues[9]).reverse(),
                 Array.prototype.slice.call(colorbrewer.Oranges[9]).reverse(),
@@ -104,6 +105,10 @@ define('kbaseRNASeqPie',
         _accessors : [
             {name: 'dataset', setter: 'setDataset'},
         ],
+
+        keysForWedge : function keysForWedge(key, obj) {
+            return this.options[key + '_Wedges'] || Object.keys(obj);
+        },
 
         setDataset : function setDataset(newDataset) {
 
@@ -220,7 +225,11 @@ define('kbaseRNASeqPie',
 
                         var grad = gradients[gIdx];
 
-                        for (var key in newDataset[wedge]) {
+                        var wedge_keys = this.keysForWedge(wedge, newDataset[wedge]);
+
+                        for (var wIdx = 0; wIdx < wedge_keys.length; wIdx++) {
+
+                            var key = wedge_keys[wIdx];
 
                             if (newDataset[wedge][key] == 0) {
                                 continue;
@@ -290,61 +299,63 @@ define('kbaseRNASeqPie',
 
             var nms = new NarrativeMethodStore(window.kbconfig.urls.narrative_method_store, {token : this.authToken()});
 
-            nms.get_method_spec({ids : [$pie.options.methodName]}).then(function(d) {
+            if (this.options.dataset) {
+                this.setDataset(this.options.dataset);
+            }
+            else {
 
-                var obj_key;
-                var ws_key;
-                var ws_id_key;
+                nms.get_method_spec({ids : [$pie.options.methodName]}).then(function(d) {
 
-                var mapping = d[0].behavior.kb_service_output_mapping;
-                for (var i = 0; i < mapping.length; i++) {
-                    var param = mapping[i];
+                    var obj_key;
+                    var ws_key;
+                    var ws_id_key;
 
-                    if (param.input_parameter) {
-                        obj_key = param.target_property;
+                    var mapping = d[0].behavior.kb_service_output_mapping;
+                    for (var i = 0; i < mapping.length; i++) {
+                        var param = mapping[i];
+
+                        if (param.input_parameter) {
+                            obj_key = param.target_property;
+                        }
+
+                        if (param.narrative_system_variable == 'workspace') {
+                            ws_key = param.target_property;
+                        }
+
+                        if (param.narrative_system_variable == 'ws_id') {
+                            ws_id_key = param.target_property;
+                        }
+
                     }
 
-                    if (param.narrative_system_variable == 'workspace') {
-                        ws_key = param.target_property;
-                    }
+                    var ws = new Workspace(window.kbconfig.urls.workspace, {token : $pie.authToken()});
 
-                    if (param.narrative_system_variable == 'ws_id') {
-                        ws_id_key = param.target_property;
-                    }
+                    var ws_params = {
+                        workspace : ws_key != undefined ? $pie.options[ws_key] : undefined,
+                        ws_id : ws_id_key != undefined ? $pie.options[ws_id] : undefined,
+                        name : obj_key != undefined ? $pie.options[obj_key] : undefined,
+                    };
 
-                }
+                    ws.get_objects([ws_params]).then(function (d) {
+                        $pie.setDataset(d[0].data);
+                    })
+                    .fail(function(d) {
 
-                var ws = new Workspace(window.kbconfig.urls.workspace, {token : $pie.authToken()});
+                        $pie.$elem.empty();
+                        $pie.$elem
+                            .addClass('alert alert-danger')
+                            .html("Could not load object : " + d.error.message);
+                    })
 
-                var ws_params = {
-                    workspace : ws_key != undefined ? $pie.options[ws_key] : undefined,
-                    ws_id : ws_id_key != undefined ? $pie.options[ws_id] : undefined,
-                    name : obj_key != undefined ? $pie.options[obj_key] : undefined,
-                };
 
-                ws.get_objects([ws_params]).then(function (d) {
-                    $pie.setDataset(d[0].data);
-                })
-                .fail(function(d) {
-                    console.log(d);
-                    console.log ( $pie.data('container').hasTab('Overview') );
+                }).fail(function(d) {
 
                     $pie.$elem.empty();
                     $pie.$elem
                         .addClass('alert alert-danger')
-                        .html("Could not load object : " + d.error.message);
+                        .html("Could not load method : " + $pie.options.methodName + ': ' + d.error.message);
                 })
-
-
-            }).fail(function(d) {
-                console.log(d);
-                console.log ( $pie.data('container').hasTab('Overview') );
-
-                $pie.$elem.empty();
-                $pie.$elem
-                    .addClass('alert alert-danger')
-                    .html("Could not load method : " + $pie.options.methodName + ': ' + d.error.message);
-            })
+            }
 
 
             this.appendUI(this.$elem);
