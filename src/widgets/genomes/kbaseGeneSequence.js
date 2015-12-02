@@ -193,13 +193,13 @@
                         var protDispStr = "";
                         var start_pos = 0;
                         var end_pos = 0;
-                        for (var i=0; (i+1)*seq_width-1 < proteinTranslationStr.length; i++) {
+                        for (var i=0; (i+1)*seq_width < proteinTranslationStr.length; i++) {
                             start_pos = i*seq_width;
-                            end_pos = (i+1)*seq_width - 1;
+                            end_pos = (i+1)*seq_width;
                             protDispStr += proteinTranslationStr.substring(start_pos,end_pos) + '<br>';
                         }
                         start_pos += seq_width;
-                        end_pos = proteinTranslationStr.length - 1;
+                        end_pos = proteinTranslationStr.length;
                         if (start_pos < proteinTranslationStr.length) {
                             protDispStr += proteinTranslationStr.substring(start_pos,end_pos) + '<br>';
                         }
