@@ -148,13 +148,12 @@ define('kbaseLinechart',
         ],
 
         legendOver : function legendOver(d) {
-            console.log("OVER ", d);
 
             d.svg.parentNode.appendChild(d.svg);
 
         },
         legendOut : function legendOut(d) {
-            console.log("OVER ", d);
+
         },
 
         extractLegend : function (dataset) {

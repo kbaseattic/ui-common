@@ -570,7 +570,12 @@ define('kbaseVisWidget',
 
             setJSONDataset : function (json_url) {
                 var $vis = this;
+
                 $.ajax(json_url, {dataType : 'json'}).then(function(d) {
+
+                    if (d.data && ! d.dataset) {
+                        d.dataset = d.data;
+                    }
 
                     if (d.dataset) {
 
@@ -586,6 +591,11 @@ define('kbaseVisWidget',
                     else {
                         $vis.setDataset(d);
                     }
+                }).fail(function(d) {
+                    $vis.$elem.empty();
+                    $vis.$elem
+                        .addClass('alert alert-danger')
+                        .html("Could not load JSON " + json_url + ' : ' + d.responseText);
                 });
             },
 
@@ -791,8 +801,26 @@ define('kbaseVisWidget',
 
                 this.D3svg().select(this.region(this.options.xAxisRegion)).selectAll('.xAxis').attr("transform", "translate(0," + axisTransform + ")");
 
-                gxAxis.transition().call(xAxis);
+                if (this.options.xAxisVerticalLabels) {
+                    gxAxis
+                        .selectAll("text")
+                            .attr("transform", function (d, i) {
+                                var bounds = $self.yGutterBounds();
 
+                                var textBounds = this.getBBox();
+
+                                //bullshit magic numbers. Moving it over by 2/3rds of the width seems to line it up nicely, and down by the height.
+                                return "rotate(90) translate(" + (textBounds.width * 2/3) + ",-" + textBounds.height + ")";
+                            })
+                    ;
+                }
+
+                var transitionTime = this.renderedXAxis
+                    ? this.options.transitionTime
+                    : 0;
+
+                gxAxis.transition().duration(transitionTime).call(xAxis);
+                this.renderedXAxis = true;
 
             },
             svg2HTML : function svg2HTML () {
@@ -833,7 +861,12 @@ define('kbaseVisWidget',
                         .attr("transform", "translate(" + axisTransform + ",0)")
                 }
 
-                gyAxis.transition().call(yAxis);
+                var transitionTime = this.renderedYAxis
+                    ? this.options.transitionTime
+                    : 0;
+
+                gyAxis.transition().duration(transitionTime).call(yAxis);
+                this.renderedYAxis = true;
             },
             renderChart : function renderChart () {
 
@@ -1447,7 +1480,7 @@ define('kbaseVisWidget',
                                                     },
                                                     uniqueness : function uniqueness (uniqueFunc) {
                                                         if (uniqueFunc == undefined) {
-                                                            uniqueFunc = this.uniqueID;
+                                                            uniqueFunc = this.options.uniqueFunc || this.uniqueID;
                                                         }
 
                                                         return this.options.useUniqueID

@@ -236,10 +236,14 @@ define('kbaseBarchart',
                             ? d.label[j % d.label.length]
                             : xIdLabel + ' is ' + d.value[j % d.value.length];//'pop up information!';
 
+                        var tooltip = d.tooltip
+                            ? d.tooltip[j % d.tooltip.length]
+                            : label;
+
                         if (label != undefined) {
                             $bar.showToolTip(
                                 {
-                                    label : label,
+                                    label : tooltip,
                                 }
                             );
                         }
@@ -284,6 +288,10 @@ define('kbaseBarchart',
                         d.label = [d.label];
                     }
 
+                    if (d.tooltip != undefined && ! $.isArray(d.tooltip)) {
+                        d.tooltip = [d.tooltip];
+                    }
+
                     //var barDomain = d.value;
                     //if (d.stacked && $.isArray(d.value)) {
                     //    barDomain = [d3.sum(d.value)];
@@ -324,6 +332,14 @@ define('kbaseBarchart',
                         .duration(transitionTime)
                             .call(function() { return funkyTown.call(this, barScale, d, i) } );
 
+                    d3.select(this).selectAll('.bar')
+                        .data(d.value)
+                        .exit()
+                        .transition().duration(transitionTime)
+                            .attr('x', bounds.origin.x + bounds.size.width)
+                            .attr('opacity', 0)
+                        //.each('end', function(d) { d3.select(this).remove() } )
+
                 })
                 return this;
             }
@@ -353,7 +369,7 @@ define('kbaseBarchart',
             var chart = this.D3svg().select( this.region('chart') ).selectAll('.barGroup');
 
             chart
-                .data(this.dataset())
+                .data(this.dataset(), $bar.uniqueness() )
                 .enter()
                     .append('g')
                     .attr('class', 'barGroup')
@@ -361,29 +377,32 @@ define('kbaseBarchart',
                         ;
 
             chart
-                .data(this.dataset())
+                .data(this.dataset(), $bar.uniqueness() )
                 .call(groupAction)
             ;
 
             chart
-                .data(this.dataset())
+                .data(this.dataset(), $bar.uniqueness() )
                 .exit()
                     .call(
                         function nuke () {
                             this.each(function (d, i) {
+
                                 d3.select(this).selectAll('.bar')
                                     .transition()
                                     .duration(transitionTime)
-                                        .attr('x', bounds.origin.x + bounds.size.width)
+                                        .attr('x', function (d) {
+                                            /*var x = d3.select(this).attr('x');
+                                            var xDest = x < bounds.origin.x + bounds.size.width / 2
+                                                ? bounds.origin.x
+                                                : bounds.origin.x + bounds.size.width;*/
+                                            return bounds.origin.x + bounds.size.width;
+                                        })
                                         .attr('opacity', 0)
+                                        .each('end', function() {d3.select(this.parentNode).remove() } )
                             })
                         }
                     )
-/*                    .transition()
-                    .duration(transitionTime)
-                        .attr('x', 0)
-                        .attr('opacity', 0)*/
-//                        .remove()
             ;
 
             if (this.options.zeroLine) {

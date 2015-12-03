@@ -180,12 +180,24 @@ define('kbaseScatterplot',
                 return this;
             };
 
-            var chart = this.D3svg().select(this.region('chart')).selectAll('.point');
+            var transitionTime = this.rendered
+                ? this.options.transitionTime
+                : 0;
+
+            var chart = this.D3svg().select(this.region('chart')).selectAll('.point').data(this.dataset());
             chart
-                .data(this.dataset())
                 .enter()
                     .append('path')
                     .attr('class', 'point')
+            ;
+
+            chart
+                .exit().remove();
+
+            chart
+                .call(mouseAction)
+                .transition()
+                .duration(transitionTime)
                     .attr("transform", function(d) {
                         var x = $scatter.xScale()(d.x);
                         var y = $scatter.yScale()(d.y);
@@ -196,18 +208,9 @@ define('kbaseScatterplot',
                     })
                     .attr('d', function (d) { return d3.svg.symbol().type(d.shape || $scatter.options.shape).size(d.weight || $scatter.options.weight)() } )
                     .call(funkyTown)
-                    .call(mouseAction)
             ;
-            chart.data(this.dataset())
-                .exit().remove();
 
-            chart
-                .data(this.dataset())
-                    .call(mouseAction)
-                    .transition()
-                    .duration(500)
-                        .call(funkyTown)
-            ;
+            this.rendered = true;
 
 
 

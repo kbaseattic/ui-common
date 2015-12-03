@@ -71,6 +71,10 @@
                         ], function($) {
                         $(function() {
 
+$('#tabs a').click(function (e) {
+  e.preventDefault()
+  $(this).tab('show')
+})
 
     var $accordion = $('#accordion').kbaseAccordion(
         {
@@ -141,33 +145,64 @@
                                 sin2.push(75 + 50 * Math.sin(0.1 * i));
                             }
 
+                            var area1 = [];
+                            for (var i = 0; i < 200; i++) {
+                                area1.push(
+                                    {
+                                        x : i,
+                                        y : i * i,
+                                        y2 : 0
+                                    }
+                                )
+                            };
+
+                            var area2 = [];
+                            for (var i = 0; i < 200; i++) {
+                                area2.push(
+                                    {
+                                        x : i,
+                                        y : Math.abs(Math.sin(i)) * i * i,
+                                        y2 : 0
+                                    }
+                                )
+                            };
+
+                            var area3 = [];
+                            for (var i = 0; i < 200; i++) {
+                                area3.push(
+                                    {
+                                        x : i,
+                                        y : i * i / 2,
+                                        y2 : 0
+                                    }
+                                )
+                            };
+
+                            var area4 = [];
+                            for (var i = 0; i < 200; i++) {
+                                area4.push(
+                                    {
+                                        x : i,
+                                        y : (i - 100) * (i - 100),
+                                        y2 : 0
+                                    }
+                                )
+                            };
+
                             var $line = $('#linechartWidget').kbaseLinechart(
 
                                 {
 
                                     legendRegion : 'xGutter',
                                     xGutter : 75,
-                                    //legendAlignment : 'TR',
+                                    useOverLine : false,
+
                                     autoLegend : true,
-                                    //useLineLabelToolTip : true,
-                                    //useOverLine : false,
-                                    legendLineHeight : 25,
-                                    legendSize : '18pt',
-                                    legendTextYOffset : 6,
 
                                     xLabelSize : '12pt',
                                     yLabelSize : '12pt',
 
-                                    lZegend : [
-                                        { label : 'foo', color : 'blue'},
-                                        { label : 'bar', color : 'red'},
-                                        { label : 'baz', color : 'green'},
-                                        { label : 'applegate farms', color : 'orange'},
-                                        { label : 'extra!', color : 'purple'},
-                                    ],
-
                                     scaleAxes       : true,
-                                    //debug       : true,
 
                                     xLabel      : 'Expression profile',
                                     yLabel      : 'Meaningful data',
@@ -187,82 +222,43 @@
                                         this.hideToolTip();
                                     },
 
-                                    //xAxisOrientation : 'top',
-                                    //xAxisRegion : 'yGutter',
-
-                                    //yAxisOrientation : 'right',
-                                    //yAxisRegion : 'xGutter',
 
                                     yLabelOffset : -7,
 
                                     dataset : [
                                         {
                                             strokeColor : 'red',
-                                            label : 'parabolic',
-                                            values : [0,1,4,9,16,25,{x : 60, y : 36},49,64,81,100,121,144,{y : 169, label : 'has a label!'}],
+                                            label : 'Set 1',
+                                            values : area1,
                                             width : 1,
-                                            shape : 'circle',
-                                            shapeArea : 16,
-                                            //fillColor : 'red',
-                                        },
-
-                                        {
-                                            strokeColor : 'red',
+                                            fillOpacity : 0.6,
                                             fillColor : 'red',
-                                            values : [
-                                                { x : 10, y : 10, y2 : -10},
-                                                { x : 20, y : 15, y2 : -20},
-                                                { x : 30, y : 16, y2 : -5},
-                                                { x : 40, y : 18, y2 : -2},
-                                                { x : 50, y : 15, y2 : 5},
-                                                { x : 60, y : 20, y2 : 8},
-                                                { x : 70, y : 22, y2 : 3},
-                                                { x : 80, y : 25, y2 : 4},
-                                                { x : 90, y : 18, y2 : -5},
-                                                { x : 100, y : 15, y2 : -10},
-                                                { x : 110, y : 10, y2 : -12},
-                                                { x : 120, y : 5, y2 : -20},
-                                                { x : 130, y : 8, y2 : -30},
-                                                { x : 140, y : 10, y2 : -100},
-                                                { x : 150, y : 4, y2 : -10},
-                                            ],
-                                            label : 'area',
-                                            width : 0,
-                                            fillOpacity : 0.3,
-                                        },
-                                        {
-                                            strokeColor : 'orange',
-                                            label : 'jagged',
-                                            values : [10,20,30,40,50],
-                                            valuesz : [{x : 0, y : 180}, {x : 10, y : 160}, {x : 20, y : 140}, {x : 30, y : 120}, {x : 40, y : 100}, {x : 50, y : 80},
-                                                {x : 60, y : 60, label : 'label point 1'}, {x : 70, y : 40}, {x : 80, y : 20}, {x : 90, y : 0}, {x : 100, y : 20}, {x : 110, y : 40},
-                                                {x : 120, y : 60}, {x : 130, y : 80}, {x : 140, y : 100, label : 'label point 2'} ],
-                                            width : 2,
-                                            shape : 'square',
-                                            shapeArea : 64,
-                                            //fillColor : 'red',
-                                            pointOver : function(d) {
-                                                this.showToolTip({label : 'point over line'});
-                                            },
-                                            pointOut : function(d) {
-                                                this.hideToolTip();
-                                            }
                                         },
                                         {
                                             strokeColor : 'blue',
-                                            label : 'sin',
-                                            values : sin,
+                                            label : 'Set 2',
+                                            values : area2,
                                             width : 1,
+                                            fillOpacity : 0.6,
                                             fillColor : 'blue',
-                                            strokeOpacity : 0.3,
-                                            fillOpacity : 0.3,
-                                        },//*/
-                                        /*{
-                                            strokeColor : 'black',
-                                            label : 'sin',
-                                            values : sin2,
+                                        },
+                                        {
+                                            strokeColor : 'green',
+                                            label : 'Set 3',
+                                            values : area3,
                                             width : 1,
-                                        },*/
+                                            fillOpacity : 0.6,
+                                            fillColor : 'green',
+                                        },
+                                        {
+                                            strokeColor : 'purple',
+                                            label : 'Set 4',
+                                            values : area4,
+                                            width : 1,
+                                            fillOpacity : 0.6,
+                                            fillColor : 'purple',
+                                        },
+
                                     ],
 
                                 }
@@ -423,7 +419,7 @@
                                 }
                             );
 
-                            $('#pmi-button').on('click', function(e) {
+                            $.jqElem('div')/*('#pmi-button')*/.on('click', function(e) {
                                 $pmi.setDataset(generate_pmi_data());
                             });
 
@@ -545,12 +541,14 @@
                                     xLabel      : 'Some useful experiment',
                                     labels : false,
                                     innerRadius : 50,
+                                    outerRadiusInset : 0,
 
                                     childOptions :
                                         {
 
                                             labels : false,
                                             startingPosition : pos,
+                                            outerRadiusInset : 0,
 
                                         }
 
@@ -822,7 +820,7 @@ dataset2 :
                                 }
                             );
 
-                            $('#treeCompare').kb_bind($tree, 'comparison');
+                            $.jqElem('div')/*('#treeCompare')*/.kb_bind($tree, 'comparison');
 
                             var $venn = $('#venn').kbaseVenndiagram(
                                 {
@@ -895,33 +893,67 @@ transitionTime : 250,
             The force directed graph has draggable nodes, and they can be selected by drawing on the box.
         </div>
 
-        <!--<div style = 'max-width : 800px; overflow : scroll'>-->
-            <div id = 'treechartWidget' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
-        <!--</div>-->
-        <div id = 'treeCompare'></div>
+        <ul class = 'nav nav-tabs ' id = 'tabs'>
+            <li roll = 'presentation' class = 'active'><a href = '#treePane'>Treechart</a></li>
+            <li roll = 'presentation' ><a href = '#sparkPane'>Spark lines</a></li>
+            <li roll = 'presentation' ><a href = '#linePane'>Line Chart</a></li>
+            <li roll = 'presentation' ><a href = '#barPane'>Bar Chart</a></li>
+            <li roll = 'presentation' ><a href = '#scatterPane'>Scatter Plot</a></li>
+            <li roll = 'presentation' ><a href = '#piePane'>Pie Chart</a></li>
+            <li roll = 'presentation' ><a href = '#hmcPane'>Circular Heatmap</a></li>
+            <li roll = 'presentation' ><a href = '#hmPane'>Heatmap</a></li>
+            <li roll = 'presentation' ><a href = '#networkPane'>Network Graph</a></li>
+            <li roll = 'presentation' ><a href = '#vennPane'>Venn Diagram</a></li>
+            <li roll = 'presentation' ><a href = '#accordionPane'>Accordion</a></li>
+            <li roll = 'presentation' ><a href = '#jsonPane'>JSON Reflector</a></li>
+            <li roll = 'presentation' ><a href = '#PMIbarchartWidget'>PMI Barchart</a></li>
+        </ul>
 
-<div id = 'accordion'></div>
+        <div class = 'tab-content'>
+            <div roll = 'tabpanel' class = 'tab-pane active' id = 'treePane'>
+                <div id = 'treechartWidget' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+            </div>
+            <div roll = 'tabpanel' class = 'tab-pane' id = 'sparkPane'>
+                <div id = 'spark1' style = 'border : 0px solid green; width : 100px; height : 25px; display : inline-block'></div>
+                <div id = 'spark2' style = 'border : 0px solid green; width : 100px; height : 25px; display : inline-block'></div>
+                <div id = 'spark3' style = 'border : 0px solid green; width : 100px; height : 25px; display : inline-block'></div>
+            </div>
+            <div roll = 'tabpanel' class = 'tab-pane' id = 'linePane'>
+                <div id = 'linechartWidget' style = 'border : 1px solid green; width : 900px; height : 600px'></div>
+            </div>
+            <div roll = 'tabpanel' class = 'tab-pane ' id = 'barPane'>
+                <div id = 'barchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            </div>
+            <div roll = 'tabpanel' class = 'tab-pane ' id = 'scatterPane'>
+                <div id = 'scatterplotWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            </div>
+            <div roll = 'tabpanel' class = 'tab-pane ' id = 'piePane'>
+                <div id = 'piechartWidget' style = 'border : 1px solid green; width : 1000px; height : 500px'></div>
+                <button id = 'random-pie'>Randomize pie chart</button>
+            </div>
+            <div roll = 'tabpanel' class = 'tab-pane ' id = 'hmcPane'>
+                <div id = 'circularHeatmap' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+                <button id = 'random-hm_c'>Randomize heatmap</button><button id = 'full-random-hm_c'>Fully randomize heatmap</button>
+            </div>
+            <div roll = 'tabpanel' class = 'tab-pane ' id = 'hmPane'>
+                <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+            </div>
+            <div roll = 'tabpanel' class = 'tab-pane ' id = 'networkPane'>
+                <div id = 'forcedNetwork' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+            </div>
+            <div roll = 'tabpanel' class = 'tab-pane ' id = 'vennPane'>
+                <div id = 'venn' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+            </div>
+            <div roll = 'tabpanel' class = 'tab-pane ' id = 'accordionPane'>
+                <div id = 'accordion'></div>
+            </div>
+            <div roll = 'tabpanel' class = 'tab-pane ' id = 'jsonPane'>
+                <div id = 'json' style = 'border : 1px solid green;'></div>
+            </div>
+            <div roll = 'tabpanel' class = 'tab-pane ' id = 'pmiPane'>
+                <div id = 'PMIbarchartWidget' style = 'border : 1px solid green;'></div>
+            </div>
 
-        <div style = 'display : block'>
-            <div id = 'spark1' style = 'border : 0px solid green; width : 100px; height : 25px; display : inline-block'></div>
-            <div id = 'spark2' style = 'border : 0px solid green; width : 100px; height : 25px; display : inline-block'></div>
-            <div id = 'spark3' style = 'border : 0px solid green; width : 100px; height : 25px; display : inline-block'></div>
-            <div id = 'linechartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
-            <button id = 'legend-button'>New legend</button>
-            <div id = 'barchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
-            <div id = 'PMIbarchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
-            <button id = 'pmi-button'>New data</button>
-            <div id = 'scatterplotWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
-            <div id = 'piechartWidget' style = 'border : 1px solid green; width : 1000px; height : 500px'></div>
-            <button id = 'random-pie'>Randomize pie chart</button>
-            <div id = 'circularHeatmap' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
-            <button id = 'random-hm_c'>Randomize heatmap</button><button id = 'full-random-hm_c'>Fully randomize heatmap</button>
-            <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
-            <div id = 'forcedNetwork' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
-            <div id = 'venn' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
-
-
-            <div id = 'json' style = 'border : 1px solid green;'></div>
         </div>
 
 

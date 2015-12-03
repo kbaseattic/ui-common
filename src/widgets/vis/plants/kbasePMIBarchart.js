@@ -47,7 +47,8 @@ define('kbasePMIBarchart',
         'jquery',
         'd3',
         'kbaseBarchart',
-        'kbwidget',
+        'kbaseAuthenticatedWidget',
+        'kbase-client-api',
     ], function( $ ) {
 
     'use strict';
@@ -55,10 +56,12 @@ define('kbasePMIBarchart',
     $.KBWidget({
 
 	    name: "kbasePMIBarchart",
+	    parent: "kbaseAuthenticatedWidget",
 
         version: "1.0.0",
         options: {
-
+            subsystem_annotation_object    : 'PlantSEED_Subsystems',
+            subsystem_annotation_workspace : 'PlantSEED',
         },
 
         _accessors : [
@@ -67,7 +70,16 @@ define('kbasePMIBarchart',
 
         setDataset : function setDataset(newDataset) {
 
+            var $pmi = this;
+
+            if (this.data('loader')) {
+                this.data('loader').hide();
+                this.data('barchartElem').show();
+                this.data('formElem').show();
+            }
+
             var colorScale = d3.scale.category20();
+            var groups = {};
 
             if (this.data('selectbox')) {
                 this.data('selectbox').empty();
@@ -76,23 +88,179 @@ define('kbasePMIBarchart',
 
                 for (var f = 0; f < keys.length; f++) {
                     var func = keys[f];
+
+                    var name = func.replace(/_/g, ' ');
+                    var group = name.replace(/:.+/, "");
+                    var sub_name = name.replace(/.+:\s*/, "");
+
                     this.data('selectbox')
                         .append(
                             $.jqElem('option')
                                 .attr('value', func)
-                                .append(func)
+                                .prop('selected', f == 0 ? true : false)
+                                .css('background-color', colorScale(f))
+                                .append(name)
                         )
 
                     for (var bar = 0; bar < newDataset.subsystems[func].length; bar++) {
                         newDataset.subsystems[func][bar].color = colorScale(f);
                     }
+
+                    if (! groups[group]) {
+
+                        var $groupButton = $.jqElem('div')
+                            .addClass('btn-group')
+                            .css({'padding-right' : '5px'})
+                            .append(
+                                $.jqElem('button')
+                                    .attr('type', 'button')
+                                    .addClass('btn btn-xs btn-default')
+                                    .append(
+                                        $.jqElem('span')
+                                            .css('display', 'none')
+                                            .addClass('check fa fa-check')
+                                            .append('&nbsp;')
+                                    )
+                                    .append(group)
+                                    .on('click', function(e) {
+                                        /*var isOpen = $(this).parent().hasClass('open');
+                                        $pmi.data('formElem').find('.btn-group').removeClass('open');
+                                        if (! isOpen) {
+                                            $(this).parent().addClass('open');
+                                        }*/
+
+                                        var $check = $(this).parent().find('.check');
+                                        var shouldOpen = $check.data('checked')
+                                            ? false
+                                            : true;
+
+                                        $.each(
+                                            $(this).parent().find('.subsystem-checkbox'),
+                                            function(i, c) {
+                                                if (shouldOpen && ! c.checked) {
+                                                    $(c).prop('checked', true);
+                                                }
+                                                else if (! shouldOpen && c.checked) {
+                                                    $(c).prop('checked', false);
+                                                }
+                                            }
+                                        );
+
+                                        if (shouldOpen) {
+                                            $check.show();
+                                            $check.data('checked', $(this).parent().find('.subsystem-checkbox').length);
+                                            $check.addClass('fa-check-square-o');
+                                            $check.removeClass('fa-check');
+                                        }
+                                        else {
+                                            $check.hide();
+                                            $check.data('checked', 0);
+                                            $check.removeClass('fa-check-square-o');
+                                            $check.addClass('fa-check');
+
+                                        }
+
+                                        var selected_subsystems = [];
+                                        $.each(
+                                            $pmi.$elem.find('.subsystem-checkbox'),
+                                            function(i,c) {
+                                                if (c.checked) {
+                                                    selected_subsystems.push($(c).val());
+                                                }
+                                            }
+                                        );
+
+                                        $pmi.displaySubsystems(selected_subsystems);
+
+                                    })
+                            )
+                            .append(
+                                $.jqElem('button')
+                                    .attr('type', 'button')
+                                    .addClass('btn btn-xs btn-default dropdown-toggle')
+                                    .append($.jqElem('span').addClass('caret'))
+                                    .on('click', function(e) {
+                                        var isOpen = $(this).parent().hasClass('open');
+                                        $pmi.data('formElem').find('.btn-group').removeClass('open');
+                                        if (! isOpen) {
+                                            $(this).parent().addClass('open');
+                                        }
+                                    })
+                            )
+                            .append(
+                                $.jqElem('ul')
+                                    .addClass('dropdown-menu')
+                                    .css({ width : '450px', 'padding-left' : '5px', 'text-align' : 'left' })
+                            )
+                        ;
+
+
+                        this.data('formElem').append($groupButton);
+
+                        groups[group] = $groupButton;
+                    }
+
+                    groups[group].find('ul').append(
+                        $.jqElem('li')
+                            .append(
+                                $.jqElem('label')
+                                    .append(
+                                        $.jqElem('input')
+                                            .attr('type', 'checkbox')
+                                            .attr('value', func)
+                                            .addClass('subsystem-checkbox')
+                                            .on('change', function(e) {
+                                                var $check = $(this).closest('.btn-group').find('.check');
+                                                if (this.checked) {
+                                                    $check.data('checked', ($check.data('checked') || 0) + 1);
+                                                    if ($check.data('checked') == $(this).closest('.btn-group').find('.subsystem-checkbox').length) {
+                                                        $check.addClass('fa-check-square-o');
+                                                        $check.removeClass('fa-check');
+                                                    }
+                                                    else {
+                                                        $check.removeClass('fa-check-square-o');
+                                                        $check.addClass('fa-check');
+                                                    }
+                                                    $check.show();
+                                                }
+                                                else {
+                                                    $check.data('checked', $check.data('checked') - 1);
+                                                    $check.removeClass('fa-check-square-o');
+                                                    $check.addClass('fa-check');
+                                                    if ($check.data('checked') == 0) {
+                                                        $check.hide();
+                                                    }
+                                                }
+
+                                                var selected_subsystems = [];
+                                                $.each(
+                                                    $pmi.$elem.find('.subsystem-checkbox'),
+                                                    function(i,c) {
+                                                        if (c.checked) {
+                                                            selected_subsystems.push($(c).val());
+                                                        }
+                                                    }
+                                                );
+
+                                                $pmi.displaySubsystems(selected_subsystems);
+                                            })
+                                    )
+                                    .append(
+                                        $.jqElem('span')
+                                            .css('color', colorScale(f))
+                                            .append('&nbsp;&nbsp;' + sub_name)
+                                    )
+                            )
+                    )
+
                 }
+
             }
 
             this.setValueForKey('dataset', newDataset);
 
             if (this.data('barchart')) {
-                this.setBarchartDataset(newDataset.subsystems[keys[0]]);
+                this.displaySubsystems(this.options.selected_subsystems);
             }
         },
 
@@ -106,9 +274,227 @@ define('kbasePMIBarchart',
         init : function init(options) {
             this._super(options);
 
+            var $pmi = this;
+
+            var ws = new Workspace(window.kbconfig.urls.workspace, {token : $pmi.authToken()});
+
+            var subanno_params = {
+                workspace : this.options.subsystem_annotation_workspace,
+                name : this.options.subsystem_annotation_object,
+            };
+
+            var fbaobj_params = {
+                workspace : 'PlantSEED',
+                name : 'Ngaditana_Model_GF_PHM.fba',
+            };
+
+            $.when(
+                ws.get_objects([subanno_params])    ,
+                ws.get_objects([fbaobj_params])
+            ).then(function (d1, d2) {
+
+                var sub_anno = d1[0].data;
+                var fba_obj = d2[0].data;
+
+            /* //for easy testing
+            $.when(
+                $.ajax('./sub_anno.json'),
+                $.ajax('./fba_obj.json')
+            ).then(function(r1, r2) {
+                var sub_anno = r1[0];//JSON.parse(r1[0]);
+                var fba_obj = r2[0];//JSON.parse(r2[0]);*/
+
+                var subsystem_fluxes = {};
+
+                var all_subsystems = Object.keys(sub_anno.subsystems);
+
+                $.each(
+                    all_subsystems,
+                    function (i, subsystem) {
+
+                        if (subsystem_fluxes[subsystem] == undefined) {
+                            subsystem_fluxes[subsystem] = {};
+                        }
+
+                        var my_fluxes = subsystem_fluxes[subsystem];
+
+                        $.each(
+                            sub_anno.subsystems[subsystem],
+                            function (i, val) {
+                                var ss_rxn = val[0];
+                                var rxn_dict = val[1];
+
+                                $.each(
+                                    fba_obj.FBAReactionVariables,
+                                    function (i, fba_rxn) {
+                                        var model_rxn = fba_rxn.modelreaction_ref;
+                                        var tmp = model_rxn.split(/\//);
+                                        model_rxn = tmp[tmp.length - 1];
+
+                                        var biochem_rxn = model_rxn;
+                                        biochem_rxn = biochem_rxn.replace(/_\w\d+$/, '');
+
+                                        if (biochem_rxn == ss_rxn) {
+
+                                            if (my_fluxes[model_rxn] == undefined) {
+                                                my_fluxes[model_rxn] = {};
+                                            }
+
+                                            my_fluxes[model_rxn]['flux'] = fba_rxn.value;
+
+                                            var m = model_rxn.match(/_(\w+)\d$/);
+                                            if (m.length) {
+                                                var tooltip = rxn_dict.tooltip + ' Compartment: ' + m[1] + "<br>";
+                                                tooltip = tooltip.replace(/\n/g, "<br>");
+                                                my_fluxes[model_rxn].tooltip = tooltip;
+                                            }
+                                        }
+                                    }
+                                );
+
+                            }
+                        );
+                    }
+                );
+
+                var dataset = {subsystems:{}};
+
+                $.each(
+                    subsystem_fluxes,
+                    function (subsystem, data) {
+
+                        var sortedKeys = Object.keys(data).sort();
+
+                        $.each(
+                            sortedKeys,
+                            function (i,k) {
+
+                                var v = data[k];
+
+                                if (dataset.subsystems[subsystem] == undefined) {
+                                    dataset.subsystems[subsystem] = [];
+                                }
+
+                                dataset.subsystems[subsystem].push(
+                                    {
+                                        bar : k,
+                                        value : v.flux,
+                                        tooltip : v.tooltip,
+                                        id : k,
+                                    }
+                                );
+
+                            }
+                        );
+                    }
+                );
+
+                $pmi.setDataset(dataset);
+
+
+            })
+            .fail(function(d) {
+
+                $pmi.$elem.empty();
+                $pmi.$elem
+                    .addClass('alert alert-danger')
+                    .html("Could not load object : " + d.error.message);
+            })
+
             this.appendUI(this.$elem);
 
             return this
+        },
+
+        displaySubsystems : function displaySubsystems(subsystems) {
+
+            var lastSubsystems = this.lastSubsystems;
+
+            if (lastSubsystems != undefined) {
+                var newKeys = {};
+                $.each(
+                    subsystems,
+                    function (i,v) {
+                        newKeys[v] = 1;
+                    }
+                );
+
+                var oldKeys = {};
+                $.each(
+                    lastSubsystems,
+                    function (i,v) {
+                        oldKeys[v] = 1;
+                    }
+                );
+
+                var newSubsystems = [];
+                $.each(
+                    lastSubsystems,
+                    function (i,v) {
+                        if (newKeys[v]) {
+                            newSubsystems.push(v);
+                        }
+                    }
+                );
+
+                $.each(
+                    subsystems,
+                    function (i,v) {
+                        if (! oldKeys[v]) {
+                            newSubsystems.push(v);
+                        }
+                    }
+                );
+
+                subsystems = newSubsystems;
+            }
+
+            this.lastSubsystems = subsystems;
+
+            var $pmi = this;
+            var merged = {};
+            $.each(
+                subsystems,
+                function (i,subsystem) {
+
+                    var $check = $pmi.$elem.find("[value='" + subsystem + "']");
+                    $check.prop('checked', true);
+                    $check.closest('.btn-group').find('.check').show();
+                    $check.closest('.btn-group').find('.check').data('checked', subsystems.length);
+
+                    $.each(
+                        $pmi.dataset().subsystems[subsystem],
+                        function (i, bar) {
+                            if (merged[bar.bar] == undefined) {
+                                merged[bar.bar] = {
+                                    bar : bar.bar,
+                                    value : [bar.value],
+                                    color : [bar.color],
+                                    tooltip : [bar.tooltip],
+                                    id : bar.bar
+                                };
+                            }
+                            else {
+                                merged[bar.bar].value.push(bar.value);
+                                merged[bar.bar].color.push(bar.color);
+                                merged[bar.bar].tooltip.push(bar.tooltip);
+                            }
+                        }
+                    );
+                }
+            );
+
+            var sortedKeys = Object.keys(merged).sort();
+            var bars = [];
+            $.each(
+                sortedKeys,
+                function (i,bar) {
+                    bars.push(merged[bar]);
+                }
+            );
+
+            //$pmi.setBarchartDataset($pmi.dataset().subsystems[$(this).val()[0]]);
+            $pmi.setBarchartDataset(bars);
         },
 
         appendUI : function appendUI($elem) {
@@ -118,13 +504,21 @@ define('kbasePMIBarchart',
             var $container = $.jqElem('div')
                 .append(
                     $.jqElem('div')
+                        .css('display', 'none')
+                        .attr('id', 'old-formElem')
+                        .append($.jqElem('span').append("Select subsystem(s):&nbsp;&nbsp;").css('float', 'left'))
                         .append(
                             $.jqElem('form')
                                 .append(
                                     $.jqElem('select').attr('id', 'selectbox')
+                                    .prop('multiple', true)
+                                    .css('border', '1px solid black')
                                     .on('change', function(e) {
                                         //alert('changed! ' + this.value);
-                                        $pmi.setBarchartDataset($pmi.dataset().subsystems[this.value]);
+                                        //$pmi.setBarchartDataset($pmi.dataset().subsystems[this.value]);
+
+                                        $pmi.displaySubsystems($(this).val());
+
 
                                     })
                                 )
@@ -133,8 +527,25 @@ define('kbasePMIBarchart',
                 .append(
                     $.jqElem('div')
                         .attr('id', 'barchartElem')
+                        .css('display', 'none')
                         .css('width', $elem.width())
                         .css('height', $elem.height() - 30)
+                )
+                .append(
+                    $.jqElem('div')
+                        .attr('id', 'formElem')
+                        .css({width : '100%', 'text-align' : 'center'})
+                )
+                .append(
+                    $.jqElem('div')
+                        .attr('id', 'loader')
+                        .append('<br>&nbsp;Loading data...<br>&nbsp;please wait...')
+                        .append($.jqElem('br'))
+                        .append(
+                            $.jqElem('div')
+                                .attr('align', 'center')
+                                .append($.jqElem('i').addClass('fa fa-spinner').addClass('fa fa-spin fa fa-4x'))
+                        )
                 )
             ;
 
@@ -145,10 +556,12 @@ define('kbasePMIBarchart',
                     {
                         scaleAxes   : true,
 
-                        xLabel      : 'PMI in some manner',
+                        //xLabel      : 'PMI in some manner',
                         xAxisRegion : 'chart',
+                        xAxisVerticalLabels : true,
                         //yLabel      : 'Meaningful data',
-                        //hGrid : true,
+                        hGrid : true,
+                        useUniqueID : true,
                     }
                 )
             );
@@ -164,10 +577,10 @@ define('kbasePMIBarchart',
 
             }
 
-//            this.data('barchart').options.xAxisTransform = this.data('barchart').yScale()(0);
-//            this.data('barchart').renderXAxis();
-this.data('barchart').initialized = false;
-            this.setDataset(this.dataset());
+            this.data('barchart').initialized = false;
+            if (this.dataset()) {
+                this.setDataset(this.dataset());
+            }
 
             $elem.append($container);
 
