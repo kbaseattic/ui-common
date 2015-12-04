@@ -49,6 +49,7 @@ define('kbasePMIBarchart',
         'kbaseBarchart',
         'kbaseAuthenticatedWidget',
         'kbase-client-api',
+        'bootstrap',
     ], function( $ ) {
 
     'use strict';
@@ -109,12 +110,12 @@ define('kbasePMIBarchart',
                     if (! groups[group]) {
 
                         var $groupButton = $.jqElem('div')
-                            .addClass('btn-group')
+                            .addClass('btn-group dropup')
                             .css({'padding-right' : '5px'})
                             .append(
                                 $.jqElem('button')
                                     .attr('type', 'button')
-                                    .addClass('btn btn-xs btn-default')
+                                    .addClass('btn btn-sm btn-default')
                                     .append(
                                         $.jqElem('span')
                                             .css('display', 'none')
@@ -177,7 +178,7 @@ define('kbasePMIBarchart',
                             .append(
                                 $.jqElem('button')
                                     .attr('type', 'button')
-                                    .addClass('btn btn-xs btn-default dropdown-toggle')
+                                    .addClass('btn btn-sm btn-default dropdown-toggle')
                                     .append($.jqElem('span').addClass('caret'))
                                     .on('click', function(e) {
                                         var isOpen = $(this).parent().hasClass('open');
@@ -259,7 +260,7 @@ define('kbasePMIBarchart',
 
             this.setValueForKey('dataset', newDataset);
 
-            if (this.data('barchart')) {
+            if (this.data('barchart') && this.options.selected_subsystems) {
                 this.displaySubsystems(this.options.selected_subsystems);
             }
         },
@@ -272,6 +273,9 @@ define('kbasePMIBarchart',
         },
 
         init : function init(options) {
+
+            this.$elem.parent().rmLoading();
+
             this._super(options);
 
             var $pmi = this;
@@ -528,8 +532,8 @@ define('kbasePMIBarchart',
                     $.jqElem('div')
                         .attr('id', 'barchartElem')
                         .css('display', 'none')
-                        .css('width', $elem.width())
-                        .css('height', $elem.height() - 30)
+                        .css('width', 800) //$elem.width())
+                        .css('height', 500) //$elem.height() - 30)
                 )
                 .append(
                     $.jqElem('div')
