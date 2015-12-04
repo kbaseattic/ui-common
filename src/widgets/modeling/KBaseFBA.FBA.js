@@ -1,7 +1,3 @@
-require(['kbasePMIBarchart'], function() {
-    //It's loaded! Blissfully assume success!
-});
-
 function KBaseFBA_FBA(modeltabs) {
     var self = this;
     this.modeltabs = modeltabs;
