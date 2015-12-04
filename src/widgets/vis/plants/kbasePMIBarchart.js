@@ -284,8 +284,8 @@ define('kbasePMIBarchart',
             };
 
             var fbaobj_params = {
-                workspace : 'PlantSEED',
-                name : 'Ngaditana_Model_GF_PHM.fba',
+                workspace : this.options.fba_workspace,
+                name : this.options.fba_object,
             };
 
             $.when(
