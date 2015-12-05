@@ -82,9 +82,9 @@ define('kbaseRNASeqHistogram',
             var ws = new Workspace("https://ci.kbase.us/services/ws", {token : $hist.authToken()});
 
             var ws_params = {
-                workspace : 'RNASeqTestData',
+                workspace : this.options.workspace,
                 //ws_id : ws_id_key != undefined ? $pie.options[ws_id] : undefined,
-                name : 'test_histogram_input'
+                name : this.options.output
             };
 
             ws.get_objects([ws_params]).then(function (d) {
