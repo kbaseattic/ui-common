@@ -10,7 +10,7 @@ function KBModeling(token) {
     this.kbapi = function(service, method, params) {
         var url, method;
         if (service == 'ws') {
-            url = "https://kbase.us/services/ws/";
+            url = window.kbconfig.urls.workspace || "https://ci.kbase.us/services/ws/";
             method = 'Workspace.'+method;
         } else if (service == 'fba') {
             url = "https://kbase.us/services/KBaseFBAModeling/";

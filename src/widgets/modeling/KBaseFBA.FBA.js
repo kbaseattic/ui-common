@@ -240,6 +240,18 @@ function KBaseFBA_FBA(modeltabs) {
             "key": "maxprod",
             "visible": 0
         }]
+    },
+    {
+        "name": "PMI",
+        "widget": "kbasePMIBarchart",
+        "getParams": function() {
+
+            return {
+                fba_workspace : self.workspace,
+                fba_object : self.objName
+            }
+
+        }
     }, {
         "name": "Pathways",
         "widget": "kbasePathways",
@@ -247,7 +259,8 @@ function KBaseFBA_FBA(modeltabs) {
             return {models: [self.model],
                     fbas: [self.data]};
         }
-    }];
+    },
+    ];
 
     this.setMetadata = function (indata) {
         this.workspace = indata[7];
