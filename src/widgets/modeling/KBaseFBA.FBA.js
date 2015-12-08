@@ -242,7 +242,7 @@ function KBaseFBA_FBA(modeltabs) {
         }]
     },
     {
-        "name": "PMI",
+        "name": "Bar charts",
         "widget": "kbasePMIBarchart",
         "getParams": function() {
 
