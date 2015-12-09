@@ -75,8 +75,6 @@ define('kbaseCummerbundPlot',
             };
 
             ws.get_objects([ws_params]).then(function (d) {
-                console.log("GOT DATA ", d);
-
                 $plot.setDataset(d[0].data.cummerbundplotSet);
             })
 
@@ -93,7 +91,6 @@ define('kbaseCummerbundPlot',
                 this.dataset(),
                 function (i,v) {
                     if (v.plot_title == plot) {
-                    console.log(v.id);console.log(v);
                         $plot.data('imgElem').attr('src', window.kbconfig.urls.shock + '/node/' + v.png_handle.id + '?download_raw');
                         $plot.data('descElem').html(v.plot_description)
                     };
