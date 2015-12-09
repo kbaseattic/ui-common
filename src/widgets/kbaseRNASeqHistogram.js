@@ -75,7 +75,7 @@ define('kbaseRNASeqHistogram',
 
             var $hist = this;
 
-            var ws = new Workspace("https://ci.kbase.us/services/ws", {token : $hist.authToken()});
+            var ws = new Workspace(window.kbconfig.urls.workspace, {token : $hist.authToken()});
 
             var ws_params = {
                 workspace : this.options.workspace,
