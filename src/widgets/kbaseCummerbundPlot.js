@@ -67,7 +67,10 @@ define('kbaseCummerbundPlot',
                     });
 
                     xhr.open(type, url, async, username, password);
-
+                    for (var i in headers ) {
+                        xhr.setRequestHeader(i, headers[i] );
+                    }
+                    xhr.overrideMimeType('image/png');
                     xhr.responseType = dataType;
                     xhr.send(data);
 
@@ -136,13 +139,19 @@ define('kbaseCummerbundPlot',
             var ws = new Workspace(window.kbconfig.urls.workspace, {token : $plot.authToken()});
 
             var ws_params = {
-                workspace : this.options.workspace,
-                name : this.options.object_name
+                //workspace : this.options.workspace,
+                wsid : window.kbconfig.workspaceId,
+                name : this.options.generate_cummerbund_plots
             };
 
             ws.get_objects([ws_params]).then(function (d) {
                 $plot.setDataset(d[0].data.cummerbundplotSet);
-            })
+            }).fail(function(d) {
+                $plot.$elem.empty();
+                $plot.$elem
+                    .addClass('alert alert-danger')
+                    .html("Could not load object : " + d.error.message);
+            });
 
             this.appendUI(this.$elem);
 
@@ -165,11 +174,8 @@ define('kbaseCummerbundPlot',
                             url : window.kbconfig.urls.shock + '/node/' + v.png_handle.id + '?download_raw',
                             type : 'GET',
                             processData : false,
-                            beforeSend : function(xhr) {
-                                xhr.setRequestHeader('Authorization', $plot.authToken)
-                            },
                             dataType : 'binary',
-                            headers:{'Content-Type':'image/png','X-Requested-With':'XMLHttpRequest'},
+                            headers:{'Authorization' : 'Oauth ' + $plot.authToken()},
                             processData : false
                             }
                         ).then(function(d) {
@@ -178,10 +184,14 @@ define('kbaseCummerbundPlot',
                             reader.readAsDataURL(d);
                             reader.onloadend = function() {
                                 var base64data = reader.result;
-                                base64data = base64data.replace('application/octet-stream', 'image/png');
                                 $plot.data('imgElem').attr('src', base64data);
                             }
 
+                        }).fail(function(d) {
+                            $plot.$elem.empty();
+                            $plot.$elem
+                                .addClass('alert alert-danger')
+                                .html("Could not load plot : " + (d.error.message || d.statusText));
                         })
                     }
                 }
