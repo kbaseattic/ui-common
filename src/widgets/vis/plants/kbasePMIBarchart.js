@@ -186,6 +186,41 @@ define('kbasePMIBarchart',
                                         if (! isOpen) {
                                             $(this).parent().addClass('open');
                                         }
+
+                                        var $check = $pmi.data('formElem').find('.check');
+                                        if (this.checked) {
+                                            $check.data('checked', ($check.data('checked') || 0) + 1);
+                                            if ($check.data('checked') == $(this).closest('.btn-group').find('.subsystem-checkbox').length) {
+                                                $check.addClass('fa-check-square-o');
+                                                $check.removeClass('fa-check');
+                                            }
+                                            else {
+                                                $check.removeClass('fa-check-square-o');
+                                                $check.addClass('fa-check');
+                                            }
+                                            $check.show();
+                                        }
+                                        else {
+                                            $check.data('checked', $check.data('checked') - 1);
+                                            $check.removeClass('fa-check-square-o');
+                                            $check.addClass('fa-check');
+                                            if ($check.data('checked') == 0) {
+                                                $check.hide();
+                                            }
+                                        }
+
+                                        var selected_subsystems = [];
+                                        $.each(
+                                            $pmi.$elem.find('.subsystem-checkbox'),
+                                            function(i,c) {
+                                                if (c.checked) {
+                                                    selected_subsystems.push($(c).val());
+                                                }
+                                            }
+                                        );
+
+                                        $pmi.displaySubsystems(selected_subsystems);
+
                                     })
                             )
                             .append(
@@ -211,6 +246,7 @@ define('kbasePMIBarchart',
                                             .attr('value', func)
                                             .addClass('subsystem-checkbox')
                                             .on('change', function(e) {
+return;
                                                 var $check = $(this).closest('.btn-group').find('.check');
                                                 if (this.checked) {
                                                     $check.data('checked', ($check.data('checked') || 0) + 1);
@@ -350,7 +386,12 @@ define('kbasePMIBarchart',
                                             if (m.length) {
                                                 var tooltip = rxn_dict.tooltip + ' Compartment: ' + m[1] + "<br>";
                                                 tooltip = tooltip.replace(/\n/g, "<br>");
+                                                //tooltip = tooltip.replace(/:(.+?)<br>/g, ": <i>$1</i><br>");
+                                                tooltip = tooltip.replace(/^(.+?):/g, "<b>$1:</b>");
+                                                tooltip = tooltip.replace(/<br>(.+?):/g, "<br><b>$1:</b>");
+                                                //tooltip = tooltip.replace(/Equation:(.+?)<br>/, "<div style = 'text-align : right'>$1</div>");
                                                 my_fluxes[model_rxn].tooltip = tooltip;
+                                                //'<span style = "white-space : nowrap">' + tooltip + '</span>';
                                             }
                                         }
                                     }
@@ -579,6 +620,31 @@ define('kbasePMIBarchart',
 
                 return [-max, max]
 
+            }
+
+            $barchart.superRenderChart = $barchart.renderChart;
+            $barchart.renderChart = function() {
+                $barchart.superRenderChart();
+
+                this.D3svg()
+                    .selectAll('.xAxis .tick text')
+                    .data(this.dataset())
+                    .on('mouseover', function(L, i) {
+                        $barchart.showToolTip(
+                            {
+                                label : $barchart.dataset()[i].tooltip[0],
+                            }
+                        );
+                    })
+                    .on('mouseout', function(d) {
+                        $barchart.hideToolTip();
+                    })
+            };
+
+            $barchart.superToolTip = $barchart.showToolTip;
+            $barchart.showToolTip = function(args) {
+                args.maxWidth = 1500;
+                $barchart.superToolTip(args);
             }
 
             this.data('barchart').initialized = false;

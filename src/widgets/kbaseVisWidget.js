@@ -1210,7 +1210,8 @@ define('kbaseVisWidget',
                     .style('display', 'block')
                     .html(args.label)
                     .style("left", (args.event.pageX + 10) + "px")
-                    .style("top", (args.event.pageY - 10) + "px");
+                    .style("top", (args.event.pageY - 10) + "px")
+                    .style('max-width', (args.maxWidth || '300') + 'px')
             },
             hideToolTip : function hideToolTip (args) {
                 d3.selectAll('.visToolTip').style('display', 'none');

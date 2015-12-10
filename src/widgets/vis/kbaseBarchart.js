@@ -318,21 +318,21 @@ define('kbaseBarchart',
                         .rangeBands([0,85], 0.05)
                     ;
 
-                    d3.select(this).selectAll('.bar')
+                    d3.select(this).selectAll('.barcharBar')
                         .data(d.value)
                         .enter()
                             .append('rect')
-                            .attr('class', 'bar')
+                            .attr('class', 'barcharBar')
                             .call(function() { return funkyTown.call(this, barScale, d, i, true) } );
 
-                    d3.select(this).selectAll('.bar')
+                    d3.select(this).selectAll('.barcharBar')
                         .data(d.value)
                         .call(function() { return mouseAction.call(this, d,i) } )
                         .transition()
                         .duration(transitionTime)
                             .call(function() { return funkyTown.call(this, barScale, d, i) } );
 
-                    d3.select(this).selectAll('.bar')
+                    d3.select(this).selectAll('.barcharBar')
                         .data(d.value)
                         .exit()
                         .transition().duration(transitionTime)
@@ -388,7 +388,7 @@ define('kbaseBarchart',
                         function nuke () {
                             this.each(function (d, i) {
 
-                                d3.select(this).selectAll('.bar')
+                                d3.select(this).selectAll('.barcharBar')
                                     .transition()
                                     .duration(transitionTime)
                                         .attr('x', function (d) {
