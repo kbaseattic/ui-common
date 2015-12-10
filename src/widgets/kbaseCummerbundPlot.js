@@ -15,6 +15,71 @@ define('kbaseCummerbundPlot',
 
     'use strict';
 
+    /*
+        for the ajaxTransport method below
+        The MIT License (MIT)
+
+        Copyright (c) 2014 Henry Algus
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy of
+        this software and associated documentation files (the "Software"), to deal in
+        the Software without restriction, including without limitation the rights to
+        use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+        the Software, and to permit persons to whom the Software is furnished to do so,
+        subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+        FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+        COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+        IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+        CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    */
+    $.ajaxTransport("+binary", function(options, originalOptions, jqXHR){
+        // check for conditions and support for blob / arraybuffer response type
+
+        if (window.FormData && ((options.dataType && (options.dataType == 'binary')) || (options.data && ((window.ArrayBuffer && options.data instanceof ArrayBuffer) || (window.Blob && options.data instanceof Blob)))))
+        {
+
+            return {
+                // create new XMLHttpRequest
+                send: function(headers, callback){
+            // setup all variables
+                    var xhr = new XMLHttpRequest(),
+            url = options.url,
+            type = options.type,
+            async = options.async || true,
+            // blob or arraybuffer. Default is blob
+            dataType = options.responseType || "blob",
+            data = options.data || null,
+            username = options.username || null,
+            password = options.password || null;
+
+                    xhr.addEventListener('load', function(){
+
+                var data = {};
+                data[options.dataType] = xhr.response;
+                // make callback and send data
+                callback(xhr.status, xhr.statusText, data, xhr.getAllResponseHeaders());
+                    });
+
+                    xhr.open(type, url, async, username, password);
+
+                    xhr.responseType = dataType;
+                    xhr.send(data);
+
+                },
+                abort: function(){
+                    jqXHR.abort();
+                }
+            };
+        }
+    });
+    //end MIT licensed section
+
     $.KBWidget({
 
 	    name: "kbaseCummerbundPlot",
@@ -28,6 +93,7 @@ define('kbaseCummerbundPlot',
         _accessors : [
             {name: 'dataset', setter: 'setDataset'},
         ],
+
 
         setDataset : function setDataset(newDataset) {
 
@@ -91,11 +157,35 @@ define('kbaseCummerbundPlot',
                 this.dataset(),
                 function (i,v) {
                     if (v.plot_title == plot) {
-                        $plot.data('imgElem').attr('src', window.kbconfig.urls.shock + '/node/' + v.png_handle.id + '?download_raw');
-                        $plot.data('descElem').html(v.plot_description)
-                    };
+                        $plot.data('imgElem').attr('src', undefined);
+                        $plot.data('descElem').html(v.plot_description);
+
+
+                        $.ajax({
+                            url : window.kbconfig.urls.shock + '/node/' + v.png_handle.id + '?download_raw',
+                            type : 'GET',
+                            processData : false,
+                            beforeSend : function(xhr) {
+                                xhr.setRequestHeader('Authorization', $plot.authToken)
+                            },
+                            dataType : 'binary',
+                            headers:{'Content-Type':'image/png','X-Requested-With':'XMLHttpRequest'},
+                            processData : false
+                            }
+                        ).then(function(d) {
+
+                            var reader = new FileReader();
+                            reader.readAsDataURL(d);
+                            reader.onloadend = function() {
+                                var base64data = reader.result;
+                                base64data = base64data.replace('application/octet-stream', 'image/png');
+                                $plot.data('imgElem').attr('src', base64data);
+                            }
+
+                        })
+                    }
                 }
-            )
+            );
         },
 
         appendUI : function appendUI($elem) {
@@ -113,12 +203,7 @@ define('kbaseCummerbundPlot',
                                 .append(
                                     $.jqElem('select').attr('id', 'selectbox')
                                     .on('change', function(e) {
-                                        //alert('changed! ' + this.value);
-                                        //$plot.setBarchartDataset($plot.dataset().subsystems[this.value]);
-
                                         $plot.displayPlot($(this).val());
-
-
                                     })
                                 )
                         )
@@ -127,8 +212,8 @@ define('kbaseCummerbundPlot',
                     $.jqElem('div')
                         .attr('id', 'plotElem')
                         .css('display', 'none')
-                        .css('width', 800) //$elem.width())
-                        .css('height', 500) //$elem.height() - 30)
+                        .css('width', 800)
+                        .css('height', 500)
                             .append(
                                 $.jqElem('img')
                                     .attr('id', 'imgElem')
