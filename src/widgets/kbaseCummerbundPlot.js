@@ -117,7 +117,7 @@ define('kbaseCummerbundPlot',
                         $plot.data('selectbox')
                             .append(
                                 $.jqElem('option')
-                                    .attr('value', v.plot_description)
+                                    .attr('value', v.plot_title)
                                     .append(v.plot_title)
                             )
                     }
@@ -165,6 +165,7 @@ define('kbaseCummerbundPlot',
             $.each(
                 this.dataset(),
                 function (i,v) {
+
                     if (v.plot_title == plot) {
                         $plot.data('imgElem').attr('src', undefined);
                         $plot.data('descElem').html(v.plot_description);
