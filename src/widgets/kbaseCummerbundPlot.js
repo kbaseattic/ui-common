@@ -132,6 +132,7 @@ define('kbaseCummerbundPlot',
 
 
         init : function init(options) {
+
             this._super(options);
 
             var $plot = this;
@@ -139,10 +140,14 @@ define('kbaseCummerbundPlot',
             var ws = new Workspace(window.kbconfig.urls.workspace, {token : $plot.authToken()});
 
             var ws_params = {
-                //workspace : this.options.workspace,
+                workspace : this.options.workspaceName,
                 wsid : window.kbconfig.workspaceId,
-                name : this.options.generate_cummerbund_plots
+                name : this.options.ws_cummerbund_output || this.options.generate_cummerbund_plots
             };
+
+            if (this.options.workspaceName) {
+                delete ws_params['wsid'];
+            }
 
             ws.get_objects([ws_params]).then(function (d) {
                 $plot.setDataset(d[0].data.cummerbundplotSet);
