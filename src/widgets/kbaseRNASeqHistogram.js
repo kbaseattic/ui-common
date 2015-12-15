@@ -99,8 +99,8 @@ define('kbaseRNASeqHistogram',
                     $.jqElem('div')
                         .attr('id', 'barchartElem')
                         .css('display', 'none')
-                        .css('width', $elem.width())
-                        .css('height', $elem.height() - 30)
+                        .css('width', 800) //$elem.width())
+                        .css('height', 500) //$elem.height() - 30)
                 )
                 .append(
                     $.jqElem('div')
