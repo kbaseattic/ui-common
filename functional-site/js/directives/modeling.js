@@ -8,18 +8,18 @@ angular.module('modeling-directives')
 .directive('kbWidget', function() {
     return {
         scope: {
-            ws: '=ws',
-            obj: '=obj'
+            ws: '@ws',
+            obj: '@obj'
         },
         link: function(scope, elem, attrs) {
             var params = {
                 ws: scope.ws,
-                obj: socpe.obj
+                obj: scope.obj
             }
 
             if (attrs.type) params.type = attrs.type;
 
-            $(elem)[attrs.kbWidget](params)
+            $(elem)[attrs.kbWidget](params);
         }
     }
  })
