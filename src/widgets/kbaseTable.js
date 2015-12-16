@@ -105,7 +105,7 @@ define('kbaseTable',
 
                 if (cell.type == 'th') {
                     value = value.replace(/(?:^|\s+)([a-z])/g, function(v) { return v.toUpperCase(); });
-                    value += ' : ';
+                    //value += ' : ';
                 }
 
                 if (typeof cell == 'object' && cell.setup != undefined) {
