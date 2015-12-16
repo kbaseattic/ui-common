@@ -1,44 +1,32 @@
 /*
 
-    var dataset = [];
-
-    var points = 200;
-
-    var randomColor = function() {
-        var colors = ['red', 'green', 'blue', 'cyan', 'magenta', 'yellow', 'orange', 'black'];
-        return colors[Math.floor(Math.random() * colors.length)];
-    }
-
-    var randomShape = function() {
-    //return 'circle';
-        var shapes = ['circle', 'circle', 'circle', 'circle', 'circle', 'circle', 'square', 'triangle-up', 'triangle-down', 'diamond', 'cross'];
-        return shapes[Math.floor(Math.random() * shapes.length)];
-    }
-
-    for (var idx = 0; idx < points; idx++) {
-        dataset.push(
-            {
-                x : Math.random() * 500,
-                y : Math.random() * 500,
-                weight : Math.random() * 225,
-                color : randomColor(),
-                label : 'Data point ' + idx,
-                shape : randomShape(),
-            }
-        );
-    }
-
-    var $scatter = $('#scatterplot').css({width : '800px', height : '500px'}).kbaseScatterplot(
+    $('#piechart').kbaseRNASeqPie(
         {
-            scaleAxes   : true,
+            workspace : "name of workspace",
 
-            //xLabel      : 'Some useful experiment',
-            //yLabel      : 'Meaningful data',
-
-            dataset : dataset,
-
+            output : "name of object"
+            OR
+            ws_alignment_sample_id : "name of object"
         }
     );
+
+    The loaded object should have the following fields populated, with some sort of integer/floating point value:
+
+
+    {
+        mapped_reads            : 5,
+        unmapped_reads          : 10,
+        //total_reads is implied to be 15
+        multiple_alignments     : 700,
+        singletons              : 800,
+        alignment_rate          : 900,
+
+        //optional fields to expand mapped_reads
+        exons                   : 1,
+        splice_junctions        : 2,
+        introns                 : 3,
+        intergenic_regions      : 4
+    }
 
 */
 
