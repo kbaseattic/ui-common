@@ -2,6 +2,28 @@
 
 angular.module('modeling-directives', []);
 angular.module('modeling-directives')
+
+// directive to invoke any "kbase widget" that takes a
+// workspace name, object name, and type (optional).
+.directive('kbWidget', function() {
+    return {
+        scope: {
+            ws: '=ws',
+            obj: '=obj'
+        },
+        link: function(scope, elem, attrs) {
+            var params = {
+                ws: scope.ws,
+                obj: socpe.obj
+            }
+
+            if (attrs.type) params.type = attrs.type;
+
+            $(elem)[attrs.kbWidget](params)
+        }
+    }
+ })
+
 .directive('pathways', function($location, $compile, $rootScope, $stateParams) {
     return {
         link: function(scope, ele, attrs) {
@@ -15,7 +37,7 @@ angular.module('modeling-directives')
             var selectionTable = $('<table cellpadding="0" cellspacing="0" border="0" \
                 class="table table-bordered table-striped">');
             var tabs = container.kbTabs({tabs: [
-                                            {name: 'Selection', content: selectionTable, active: true} 
+                                            {name: 'Selection', content: selectionTable, active: true}
                                         ]});
 
 
@@ -37,12 +59,12 @@ angular.module('modeling-directives')
 
                 // tooltip for hover on pathway name
                 container.find('.pathway-link')
-                         .tooltip({title: 'Open path tab', 
+                         .tooltip({title: 'Open path tab',
                                    placement: 'right', delay: {show: 1000}});
             } // end events
 
             function load_map(map, container) {
-                container.rmLoading();                        
+                container.rmLoading();
 
                 container.kbasePathway({model_ws: $stateParams.ws,
                                         model_name: $stateParams.id,
@@ -66,7 +88,7 @@ angular.module('modeling-directives')
                         "aoColumns": [
                             { sTitle: 'Name', mData: function(d) {
                                 return '<a class="pathway-link" data-map_id="'+d[1]+'">'+d[10].name+'</a>';
-                            }}, 
+                            }},
                             { sTitle: 'Map ID', mData: 1},
                             { sTitle: 'Rxn Count', sWidth: '10%', mData: function(d){
                                 if ('reaction_ids' in d[10]){
@@ -81,11 +103,11 @@ angular.module('modeling-directives')
                                 } else {
                                     return 'N/A';
                                 }
-                            }} , 
+                            }} ,
                             { sTitle: "Source","sWidth": "10%", mData: function(d) {
                                 return "KEGG";
                             }},
-                        ],                         
+                        ],
                         "oLanguage": {
                             "sEmptyTable": "No objects in workspace",
                             "sSearch": "Search:"
@@ -93,7 +115,7 @@ angular.module('modeling-directives')
                     }
 
 
-                    var table = selectionTable.dataTable(tableSettings);  
+                    var table = selectionTable.dataTable(tableSettings);
                     $compile(table)(scope);
 
                     if (self.default_map && self.default_map != 'list') {
@@ -104,7 +126,7 @@ angular.module('modeling-directives')
                                 self.loadMap(self.default_map);
                             }
                         }
-                    } 
+                    }
 
                 }).fail(function(e){
                     container.prepend('<div class="alert alert-danger">'+
@@ -138,12 +160,12 @@ angular.module('modeling-directives')
                     "fnDrawCallback": events,
                     "aaSorting": [[ 1, "asc" ]],
                     "aoColumns": [
-                        { sTitle: 'Name', mData: 'name'}, 
+                        { sTitle: 'Name', mData: 'name'},
                         { sTitle: 'Map ID', mData: 'id'},
                         { sTitle: 'Rxn Count', mData: 'rxn_count', sWidth: '10%'},
-                        { sTitle: 'Cpd Count', mData: 'cpd_count',  sWidth: '10%'} ,                                                                                            
+                        { sTitle: 'Cpd Count', mData: 'cpd_count',  sWidth: '10%'} ,
                         //{ sTitle: "Source","sWidth": "10%"},
-                    ],                         
+                    ],
                     "oLanguage": {
                         "sEmptyTable": "No objects in workspace",
                         "sSearch": "Search:"
@@ -163,34 +185,34 @@ angular.module('modeling-directives')
                         var aaData = [];
                         for (var i in d) {
                             var obj = d[i];
-                            var link = '<a class="pathway-link" data-map="'+obj[1]+'">'+obj[10].name+'</a>'                            
+                            var link = '<a class="pathway-link" data-map="'+obj[1]+'">'+obj[10].name+'</a>'
                             var name = link;
 
                             // add metadata if it is there
                             if ('reaction_ids' in obj[10] && 'compound_ids' in obj[10]) {
                                 var rxn_count = obj[10].reaction_ids.split(',').length;
-                                var cpd_count = obj[10].compound_ids.split(',').length;  
+                                var cpd_count = obj[10].compound_ids.split(',').length;
                             } else {
                                 var rxn_count = 'n/a';
                                 var cpd_count = 'n/a';
                             }
-    
-                            var row = {name: name, id: obj[1], rxn_count: rxn_count, 
+
+                            var row = {name: name, id: obj[1], rxn_count: rxn_count,
                                        cpd_count: cpd_count};
                             aaData.push(row)
 
-                            var map = {name: obj[10].name, id: obj[1], 
+                            var map = {name: obj[10].name, id: obj[1],
                                        rxn_count: rxn_count, cpd_count: cpd_count};
                             maps.push(map)
 
                         }
 
-                        tableSettings.aaData = aaData; 
+                        tableSettings.aaData = aaData;
 
                         var table_id = 'pathway-table';
                         $('#path-list').append('<table id="'+table_id+'" \
                                        class="table table-bordered table-striped" style="width: 100%;"></table>');
-                        var table = $('#'+table_id).dataTable(tableSettings);  
+                        var table = $('#'+table_id).dataTable(tableSettings);
                         $compile(table)(scope);
 
 
@@ -202,7 +224,7 @@ angular.module('modeling-directives')
                                     self.loadMap(self.default_map);
                                 }
                             }
-                        } 
+                        }
 
                     }).fail(function(e){
                         container.prepend('<div class="alert alert-danger">'+
@@ -212,20 +234,20 @@ angular.module('modeling-directives')
                 //load_map_list()
 
                 self.loadMap = function(map) {
-                    // there needs to be all this manual tab styling due to 
+                    // there needs to be all this manual tab styling due to
                     // url parms.
                     $('.tab').removeClass('active')
                     $('#path-tab-'+map).addClass('active');
-                    $('.tab-pane').removeClass('active');                             
+                    $('.tab-pane').removeClass('active');
                     $('#path-'+map).addClass('active');
                     $('#path-'+map).loading();
                     var p = kb.ws.get_objects([{workspace: self.ws, name: map}])
                     $.when(p).done(function(d) {
-                        $('#path-'+map).rmLoading();                        
+                        $('#path-'+map).rmLoading();
                         var d = d[0].data
 
-                        $('#path-'+map).kbasePathway({ws: self.ws, 
-                                                     mapID: map, 
+                        $('#path-'+map).kbasePathway({ws: self.ws,
+                                                     mapID: map,
                                                      mapData: d,
                                                      editable: true,
                                                      modelData: self.models,
@@ -251,7 +273,7 @@ angular.module('modeling-directives')
                             if (map == existing_map) {
                                 exists = true;
                                 return
-                            }          
+                            }
                         })
 
                         if (!exists) new_map_tab(map, name);
@@ -259,7 +281,7 @@ angular.module('modeling-directives')
 
                     // tooltip for hover on pathway name
                     container.find('.pathway-link')
-                             .tooltip({title: 'Open path tab', 
+                             .tooltip({title: 'Open path tab',
                                        placement: 'right', delay: {show: 1000}});
 
                 } // end events
@@ -269,36 +291,36 @@ angular.module('modeling-directives')
 
                     var tab = $('<li class="tab pathway-tab" data-map="'+map+'" id="path-tab-'+map+'"><a>'
                                         +name.slice(0, 12)+'...</a>'+
-                                '</li>')          
+                                '</li>')
 
                     container.find('.tab-content')
-                            .append('<div class="tab-pane" id="path-'+map+'"></div>'); 
+                            .append('<div class="tab-pane" id="path-'+map+'"></div>');
 
                     $('.pathway-tabs').append(tab);
 
                     $('.pathway-tab').unbind('click');
                     $('.pathway-tab').click(function() {
-                        $('.pathway-tabs li').removeClass('active')                        
+                        $('.pathway-tabs li').removeClass('active')
                         var map = $(this).data('map');
 
                         $location.search({map: map});
                         scope.$apply();
 
                         self.loadMap(map);
-                    }); 
+                    });
                 }
             }
 
 
             // fba selector dropdown
-            $(ele).loading();            
+            $(ele).loading();
             $.when(scope.ref_obj_prom).done(function() {
                 if (scope.fba_refs.length) {
                     var fba_selector = get_fba_selector(scope.fba_refs)
                     $('.pathway-tabs').prepend(fba_selector)
-                    loadMapSelector(scope.fba_refs[0].ws, scope.fba_refs[0].name)                                 
+                    loadMapSelector(scope.fba_refs[0].ws, scope.fba_refs[0].name)
                 } else {
-                    loadMapSelector(scope.selected[0].workspace)                    
+                    loadMapSelector(scope.selected[0].workspace)
                 }
 
 
@@ -315,7 +337,7 @@ angular.module('modeling-directives')
 
                 if (fba_name) {
                     var p2 = kb.get_fba(ws, fba_name);
-                } else { 
+                } else {
                     var p2;
                 }
 
@@ -351,16 +373,16 @@ angular.module('modeling-directives')
                 var row = $('<div class="row pathway-options">');
                 row.append(form)
 
-                ver_selector.find('select').change(function() { 
+                ver_selector.find('select').change(function() {
                     // special container for loading notice since floated
                     var spin = $('<div id="loading pull-right">');
                     spin.loading();
                     $('.pathway-options').append(spin);
-                    
+
                     var selected_fba = get_selected_fba();
 
                     loadMapSelector(selected_fba.ws, selected_fba.name);
-                })                
+                })
 
                 return row;
             }
@@ -484,7 +506,7 @@ angular.module('modeling-directives')
                                  .domain([0, max_end])
                                  .range([20, width-20]);
 
-        
+
 
             //Create the Axis
 
@@ -492,7 +514,7 @@ angular.module('modeling-directives')
                 .scale(x)
                 .orient("bottom")
 
-            
+
             var zoom = d3.behavior.zoom()
                 .x(x)
                 .scaleExtent([1, 10])
@@ -510,30 +532,30 @@ angular.module('modeling-directives')
             svg.append("rect")
                 .attr("class", "overlay")
                 .attr("width", width)
-                .attr("height", height);                                            
+                .attr("height", height);
 
             //Create an SVG group Element for the Axis elements and call the xAxis function
             var xAxisGroup = svg.append("g")
                             .attr("class", "x axis")
                             .attr("transform", "translate(0," + (height - padding_bottom) + ")")
                                 .call(xAxis);
-                            
+
 
             function zoomed() {
                 svg.select(".x.axis").call(xAxis);
-                //svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");                
+                //svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
                 svg.selectAll('.cdd-box').attr("x", function(d) {
-                    var start = d3.select(this).data()[0].start 
-                    var end = d3.select(this).data()[0].end                    
-                    return x(start) 
+                    var start = d3.select(this).data()[0].start
+                    var end = d3.select(this).data()[0].end
+                    return x(start)
                 })
                 .attr('width', function(){
-                    var start = d3.select(this).data()[0].start 
-                    var end = d3.select(this).data()[0].end                    
+                    var start = d3.select(this).data()[0].start
+                    var end = d3.select(this).data()[0].end
                     return ( x(end)-x(start) );
-                });  
+                });
             }
-            
+
             var ystart = 20
 
             // create row heights
@@ -549,7 +571,7 @@ angular.module('modeling-directives')
             }
 
             /*
-            var row_h = {1: height - ystart, 
+            var row_h = {1: height - ystart,
                          2: height - ystart-(2*h),
                          3: height - ystart-(4*h),
                          4: height - ystart-(6*h),
@@ -568,7 +590,7 @@ angular.module('modeling-directives')
             for (var i in numbers) {
                 var start = numbers[i][0];
                 var end = numbers[i][1];
-    
+
                 // go through existing rows to see if there is a good row
                 var found_row = 0 // starting with non existant key
                 for (var key in rows) {
@@ -607,17 +629,17 @@ angular.module('modeling-directives')
 
             function drawBox(start, end, height) {
                 var rect = svg.append('rect')
-                              .data([{start: start, end: end}])   
+                              .data([{start: start, end: end}])
                               .attr('class', 'cdd-box')
                               .attr('x', x(0))
                               .attr('y', 0)
                               .attr('width', x(0)-x(0))
-                              .attr('height', h)                                   
+                              .attr('height', h)
                               .transition()
                                   .duration(1000)
                                   .ease("elastic")
                                   .attr('x', x(start))
-                                   .attr('y', height)                                  
+                                   .attr('y', height)
                                   .attr('width', x(end)-x(start))
                                   .each("end", events)
 
@@ -653,7 +675,7 @@ angular.module('modeling-directives')
                         .attr('y1', 0)
                         .attr('x2', s)
                         .attr('y2', height)
-                        .attr('stroke-dasharray', "5,5" )                            
+                        .attr('stroke-dasharray', "5,5" )
 
                     svg.append('line')
                         .attr('class', 'grid-line')
@@ -673,7 +695,7 @@ angular.module('modeling-directives')
                         .attr('class', 'grid-label')
                        .text(end)
                         .attr('x', e+2)
-                        .attr('y', height - 10)                            
+                        .attr('y', height - 10)
 
 
                 }).on('mouseout', function(d){
@@ -690,8 +712,8 @@ angular.module('modeling-directives')
                     var x = coordinates[0];
                     var y = coordinates[1];
 
-                });                
-            }            
+                });
+            }
         }
     };
 })
@@ -772,14 +794,14 @@ angular.module('modeling-directives')
                            .attr('x', center_x + (i*w)+2)
                            .attr('y', center_y + (j*h)+h/2 +3)
                            .text(cpd_name)
-                        
+
                     }
 
                     svg.append('text')
                        .attr('class', 'etc-step-text')
                        .attr('x', center_x+(steps.length*w)+2)
                        .attr('y', center_y  + (j*h)+h/2 +3)
-                       .text(name)                        
+                       .text(name)
 
                 }
 
@@ -795,7 +817,7 @@ angular.module('modeling-directives')
 
                     paths[name] = []
 
-                    var steps = path.steps;                    
+                    var steps = path.steps;
                     for (var j in steps) {
                         var step = steps[j];
 
@@ -833,7 +855,7 @@ angular.module('modeling-directives')
                 var prom = kb.fba.get_compounds({compounds: cpd_ids})
 
                 var p = $.when(prom).then(function(cpds) {
-                    var obj = {}    
+                    var obj = {}
                     for (var i in cpds) {
                         obj[cpds[i].id] = cpds[i]
                     }
@@ -878,14 +900,14 @@ angular.module('modeling-directives')
                             tree_obj.name = sub_name;
                             tree_obj.parent = "null";
                             tree_obj.children = [{name: prod_name, parent: sub_name}];
-                            treeData.push(tree_obj);   
+                            treeData.push(tree_obj);
                         } else {
                             for (var k in treeData) {
                                 for (var z in treeData[k].children[z]) {
                                     if ( treeData[k].children[z].name == sub_name) {
                                         treeData[k].children[z].children = [{name: prod_name, parent: sub_name}]
                                         break;
-                                    }                                    
+                                    }
                                 }
 
                             }
@@ -906,7 +928,7 @@ angular.module('modeling-directives')
             }
 
 
-            function processData2(data) { 
+            function processData2(data) {
                 var paths = data.pathways;
 
                 /*
@@ -936,14 +958,14 @@ angular.module('modeling-directives')
 
 
                         if (data.length == 0) {
-                            data.push({name: sub_name, parent: null}) 
+                            data.push({name: sub_name, parent: null})
                         } else {
                             var presentInTree;
                             for (var k in data) {
                                 if (data[k].name == sub_name) {
                                     presentInTree = true
                                     break;
-                                }                    
+                                }
                             }
                             if (presentInTree) {
                                 console.error('skipping')
@@ -961,7 +983,7 @@ angular.module('modeling-directives')
                             data.push({name: prod_name, parent: steps[j].substrates.name})
                         }
 
-                    }                    
+                    }
                 }
 
                 // create a name: node map
@@ -1027,7 +1049,7 @@ angular.module('modeling-directives')
                 var margin = {top: 20, right: 120, bottom: 20, left: 120},
                  width = 960 - margin.right - margin.left,
                  height = 200 - margin.top - margin.bottom;
-                 
+
                 var i = 0;
 
                 var tree = d3.layout.tree()
@@ -1044,7 +1066,7 @@ angular.module('modeling-directives')
                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
                 root = treeData[0];
-                  
+
                 update(root);
 
                 function update(source) {
@@ -1063,7 +1085,7 @@ angular.module('modeling-directives')
                   // Enter the nodes.
                   var nodeEnter = node.enter().append("g")
                    .attr("class", "node")
-                   .attr("transform", function(d) { 
+                   .attr("transform", function(d) {
                     return "translate(" + d.y + "," + d.x + ")"; });
 
                   nodeEnter.append("circle")
@@ -1071,10 +1093,10 @@ angular.module('modeling-directives')
                    .style("fill", "#fff");
 
                   nodeEnter.append("text")
-                   .attr("x", function(d) { 
+                   .attr("x", function(d) {
                     return d.children || d._children ? -13 : 13; })
                    .attr("dy", ".35em")
-                   .attr("text-anchor", function(d) { 
+                   .attr("text-anchor", function(d) {
                     return d.children || d._children ? "end" : "start"; })
                    .text(function(d) { return d.name; })
                    .style("fill-opacity", 1);

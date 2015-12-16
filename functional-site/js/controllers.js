@@ -2,141 +2,11 @@
  *
  *  These are the 'glue' between models and views.
  *  See: https://docs.angularjs.org/guide/controller
- *  
+ *
 */
 app
 .controller('methodAccordion', function ($scope, narrative, $http) {
 })
-.controller('Analysis', function($scope, $state, $stateParams, $location, narrative, $http) {
-    // service for narrative (builder) state
-    $scope.narrative = narrative;
-
-    // selected workpsace
-    $scope.ddSelected = narrative.current_ws;
-    $scope.ws = $scope.ddSelected; // scope.ws variable for workspace browser
-
-    // let's make this happen: 
-    // http://ngmodules.org/modules/angularjs-json-rpc
-    if (!narrative.ws_objects) {
-        var p = kb.ws.list_objects({workspaces: [$scope.ddSelected]});
-        $.when(p).done(function(data){
-            $scope.$apply(function() {
-                narrative.ws_objects = data;
-
-                var types = {};
-                for (var i in data) {
-                    var type = data[i][2].split('-')[0];
-                    var obj = {name: data[i][1], id: data[i][0]};
-
-                    if (type in types) {
-                        types[type].push(obj);
-                    } else {
-                        types[type] = [obj];
-                    }
-                }
-
-                narrative.wsObjsByType = types
-            })
-        })
-    }
-
-    var prom = kb.ws.list_workspace_info({perm: 'w'});
-    $.when(prom).then(function(workspaces){
-        var workspaces = workspaces.sort(compare)
-
-        function compare(a,b) {
-            var t1 = kb.ui.getTimestamp(b[3]) 
-            var t2 = kb.ui.getTimestamp(a[3]) 
-            if (t1 < t2) return -1;
-            if (t1 > t2) return 1;
-            return 0;
-        }
-
-        var ws_list = [];
-        for (var i in workspaces) {
-            ws_list.push({name: workspaces[i][1], id: workspaces[i][0]})
-        }
-
-        $scope.$apply(function() {
-            narrative.ws_list = ws_list
-        })
-    });
-
-    // update workspace objects if dropdown changes
-    $scope.$watch('ddSelected', function(new_ws) {
-        var p = kb.ws.list_objects({workspaces: [new_ws]});
-        $.when(p).done(function(data){
-            $scope.$apply(function() {
-                narrative.ws_objects = data;
-
-                // if newly selected workspace is not the same
-                // as current, go to workspace browser view 
-                if (narrative.current_ws != new_ws) {
-                    narrative.current_ws = new_ws;                    
-                    $state.go('analysis.objects', null, {reload: true});
-                }
-            })
-        })  
-    })
-
-})
-
-.controller('Upload', function($scope, $state, $stateParams, $http) {
-    $scope.shockURL = "http://140.221.67.190:7078"
-
-    // improve by using angular http
-    $scope.uploadFile = function(files) {
-        $scope.$apply( function() {
-            $scope.uploadComplete = false;
-        })
-
-        //SHOCK.init({ token: USER_TOKEN, url: $scope.shockURL })
-        //SHOCK.upload('uploader')
-
-        var form = new FormData($('form')[0]);
-        $.ajax({
-            url: $scope.shockURL+'/node',  //Server script to process data
-            type: 'POST',
-            xhr: function() { 
-                var myXhr = $.ajaxSettings.xhr();
-                if(myXhr.upload){ 
-                    myXhr.upload.addEventListener('progress', updateProgress, false);
-                }
-                return myXhr;
-            },            
-            beforeSend: function (request) {
-                request.setRequestHeader("Authorization", SHOCK.auth_header.Authorization);
-            },
-            success: function(data) {
-                $scope.$apply(function() {
-                    $scope.uploadProgress = 0;
-                    $scope.uploadComplete = true; 
-                })
-
-            },
-            error: function(e){
-                console.log('fail', e)
-            },
-            data: form,
-            cache: false,
-            contentType: false,
-            processData: false
-        });
-
-        function updateProgress (oEvent) {
-            if (oEvent.lengthComputable) {
-                var percent = oEvent.loaded / files[0].size;
-                $scope.$apply(function() {
-                    $scope.uploadProgress = Math.floor(percent*100);
-                })
-            }
-        }
-
-    }
-
-})
-
-
 
 .controller('RxnDetail', function($scope, $stateParams) {
     $scope.ids = $stateParams.ids.split('&');
@@ -154,7 +24,7 @@ app
         if (form.find('#input2').val()) {
             url = url+'/'+form.find('#input2').val();
         }
-    
+
         $scope.$apply( $location.path( url ) );
     });
 })
@@ -186,7 +56,7 @@ app
     window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
-})  
+})
 
 .controller('MemeDetail', function($scope, $stateParams) {
     window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
@@ -210,14 +80,14 @@ app
     window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'workspace': $stateParams.ws,
-					 'kbCache' : kb};
+                     'kbCache' : kb};
 })
 
 .controller('FloatDataTable', function($scope, $stateParams) {
     window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
                      'workspace': $stateParams.ws,
-					 'kbCache' : kb};
+                     'kbCache' : kb};
 })
 
 .controller('RegpreciseDetail', function($scope, $stateParams) {
@@ -235,7 +105,7 @@ app
 .controller('PPIDetail', function($scope, $stateParams) {
     window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id);
     $scope.params = {'id': $stateParams.id,
-		     'ws': $stateParams.ws};
+             'ws': $stateParams.ws};
 })
 
 .controller('SpecDetail', function($scope, $stateParams) {
@@ -312,16 +182,16 @@ app
 
 .controller('WsRefViewer', function($scope, $stateParams) {
     $scope.params = {
-	'id': $stateParams.id,
-	'ws':$stateParams.ws,
-	'version':$stateParams.version,
+    'id': $stateParams.id,
+    'ws':$stateParams.ws,
+    'version':$stateParams.version,
         'kbCache' : kb }
 })
 .controller('WsRefUsersViewer', function($scope, $stateParams) {
     $scope.params = {
-	'id': $stateParams.id,
-	'ws':$stateParams.ws,
-	'version':$stateParams.version,
+    'id': $stateParams.id,
+    'ws':$stateParams.ws,
+    'version':$stateParams.version,
         'kbCache' : kb }
 })
 
@@ -334,27 +204,27 @@ app
 
 .controller('People', function($scope, $stateParams, $location) {
     $scope.params = { 'userid':$stateParams.userid, 'kbCache' : kb }
-   
+
     // NB need to use KBaseSessionSync here and not kb -- because kb is only valid at page load
-    // time. On angular path changes, it will not have been updated. So, e.g., after a user logs 
+    // time. On angular path changes, it will not have been updated. So, e.g., after a user logs
     // out and goes backing over their history...
     if (!$.KBaseSessionSync.isLoggedIn()) {
         var hash = window.location.hash;
         var path = '/login/';
         if (hash && hash.length > 0) {
             path += '?nextPath=' + encodeURIComponent(hash.substr(1));
-        } 
+        }
         $location.url(path);
         return;
     }
-    
-    
+
+
     // Set the styles for the user page
     $('<link>')
     .appendTo('head')
     .attr({type: 'text/css', rel: 'stylesheet'})
     .attr('href', 'views/social/user-page/style.css');
-    
+
     // Set up the navbar menu
     require(['kb.widget.navbar'], function (NAVBAR) {
       NAVBAR.clearMenu()
@@ -380,7 +250,7 @@ app
         url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&priority=3&components=10108&assignee=eapearson&summary=Bug%20on%20User%20Page'
       });
        */
-      
+
       /*
       .addHelpMenuItem({
         name: 'navtest',
@@ -389,32 +259,32 @@ app
         url: '#/navtest/x'
       })
       */
-    
-      
+
+
     });
-    
-   
+
+
 })
 
 .controller('Dashboard', function($scope, $stateParams, $location) {
     $scope.params = { 'kbCache' : kb }
-    
+
     if (!$.KBaseSessionSync.isLoggedIn()) {
         $location.url('/login/');
        return;
     }
-    
+
     // Set the styles for the dashboard page
     $('<link>')
     .appendTo('head')
     .attr({type: 'text/css', rel: 'stylesheet'})
     .attr('href', 'views/dashboard/style.css');
-   
+
     $('<link>')
     .appendTo('head')
     .attr({type: 'text/css', rel: 'stylesheet'})
     .attr('href', '/src/widgets/dashboard/style.css');
-    
+
     // Set up the navbar menu.
    // Note that the navbar is a singleton. There is only one per page/view, and it is as persistent
    // as the page/view is. It does maintain some state, notably the dom node it is attached to. This is
@@ -445,10 +315,10 @@ app
         url: 'https://atlassian.kbase.us/secure/CreateIssueDetails!init.jspa?pid=10200&issuetype=1&priority=3&components=10108&assignee=eapearson&summary=Bug%20on%20Dashboard'
       })
       */
-       
+
        // Set up the main State machine for this view.
        $scope.viewState = Object.create(StateMachine).init();
-			 
+
         // a cheap hartbeat for now... and just for the dashboard.
         var heartbeat = 0;
         $scope.heartbeatTimer = window.setInterval(function () {
@@ -464,19 +334,19 @@ app
                 // But the heartbeat timer will need to be stopped manually.
                 window.clearInterval($scope.heartbeatTimer);
         });
-      
+
     });
-     
+
 })
 
 .controller('NavTest', function($scope, $stateParams) {
     $scope.params = { 'appid':$stateParams.appid, 'kbCache' : kb }
-   
+
 })
 
 .controller('App', function($scope, $stateParams) {
     $scope.params = { 'appid':$stateParams.appid, 'kbCache' : kb }
-    $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder", 
+    $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder",
         handle: '.panel-heading',
         cancel: '.panel-title,.panel-subtitle,.label,.glyphicon',
         start: function() {
@@ -497,8 +367,8 @@ app
 
 .controller('Taxonomy', function($scope, $stateParams) {
     $scope.params = {
-	'taxonname': $stateParams.taxonname,
-	'ws':$stateParams.ws,
+    'taxonname': $stateParams.taxonname,
+    'ws':$stateParams.ws,
         'kbCache' : kb }
 })
 
@@ -513,7 +383,7 @@ app
         search: true, narrative: true
       });
     });
-    
+
     $scope.nar_url = configJSON.narrative_url;
 
     var sub = $location.path().split('/')[1];
@@ -540,7 +410,7 @@ app
 
 
 .controller('Login', function($scope, $stateParams, $location, kbaseLogin) {
-    
+
     // If we are logged in and landing here we redirect to the dashboard.
     if ($.KBaseSessionSync.isLoggedIn()) {
         if ($stateParams.nextPath) {
@@ -550,7 +420,7 @@ app
         }
         return;
     }
-    
+
     // Add a stripped down nav bar for the login page.
     require(['kb.widget.navbar'], function (NAVBAR) {
         NAVBAR.clear()
@@ -561,15 +431,15 @@ app
     });
 
     // Set up some scope properties.
-    $scope.nar_url = configJSON.narrative_url; // used for links to narratives    
-    
+    $scope.nar_url = configJSON.narrative_url; // used for links to narratives
+
     // ignore nextPath which is ... the login page.
     if ($stateParams.nextPath == '/login') {
         $scope.nextPath = null;
     } else {
         $scope.nextPath = $stateParams.nextPath;
     }
-    
+
     // callback for ng-click 'loginUser':
     $scope.loginUser = function (user, nextPath, nextURL) {
         require(['kb.session', 'postal', 'jquery'], function (Session, Postal, $) {
@@ -580,8 +450,8 @@ app
             var username = user?user.username:null;
             var password = user?user.password:null;
             $("#login_error").hide();
-            // Note that the login page does not handle login success -- the 
-            // app does that. 
+            // Note that the login page does not handle login success -- the
+            // app does that.
             //kbaseLogin.login(
              //   username,
             //    password
@@ -596,7 +466,7 @@ app
                         nextPath: nextPath,
                         nextURL: nextURL
                     });
-                   
+
                 })
                 .catch(function (errorMsg) {
                     // All error handling is handled locally.
@@ -620,12 +490,12 @@ app
 })
 
 .controller('WBLanding', function($scope, $stateParams) {
-    
+
     window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.id)
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
 
-    $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder", 
+    $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder",
         handle: '.panel-heading',
         cancel: '.panel-title,.panel-subtitle,.label,.glyphicon',
         start: function() {
@@ -643,11 +513,11 @@ app
 
 .controller('WBGeneLanding', function($scope, $stateParams) {
     window.location.replace("#/dataview/"+$stateParams.ws+'/'+$stateParams.gid+'?sub=Feature&subid='+$stateParams.fid);
-    
+
     $scope.ws = $stateParams.ws;
     $scope.fid = $stateParams.fid;
     $scope.gid = $stateParams.gid;
-    
+
     if($scope.ws == "CDS" ) {
         $scope.ws = "KBasePublicGenomesV3";
     }
@@ -658,8 +528,8 @@ app
         }
     }
     $scope.id = $scope.gid;
-    
-    $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder", 
+
+    $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder",
         handle: '.panel-heading',
         cancel: '.panel-title,.panel-subtitle,.label,.glyphicon',
         start: function() {
@@ -685,7 +555,7 @@ app
         type = "Model";
     }
 
-    $scope.type = type;  
+    $scope.type = type;
     $scope.ws = $stateParams.ws;
     $scope.id = $stateParams.id;
     $scope.selected = [{workspace: $scope.ws, name: $scope.id}]
@@ -693,7 +563,7 @@ app
     $scope.defaultMap = $stateParams.map;
 
 
-    $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder", 
+    $( "#sortable-landing" ).sortable({placeholder: "drag-placeholder",
         handle: '.panel-heading',
         cancel: '.panel-title,.panel-subtitle,.label,.glyphicon',
         start: function() {
@@ -717,7 +587,7 @@ app
     //if ($stateParams.tab == 'FBA') {
     //    $scope.tabs[1].active = true;
     //} else if ($stateParams.tab == "Model") {
-    //    $scope.tabs[0].active = true;        
+    //    $scope.tabs[0].active = true;
     //}
 
     $scope.type = type;
@@ -741,8 +611,8 @@ app
             var type = meta[2].split('-')[0]
 
             if (type == "KBaseFBA.FBA") {
-                $scope.fba_refs.push({ws: meta[7], 
-                               name: meta[1], 
+                $scope.fba_refs.push({ws: meta[7],
+                               name: meta[1],
                                date: kb.ui.formateDate(meta[3]),
                                timestamp: kb.ui.getTimestamp(meta[3])
                               });
@@ -772,7 +642,7 @@ app
     // if not logged in, prompt for login
     if (!USER_ID) {
         var signin_btn = $('#signin-button');
-        signin_btn.popover({content: "You must login before taking the tour", 
+        signin_btn.popover({content: "You must login before taking the tour",
                             trigger: 'manual', placement: 'bottom'})
         signin_btn.popover('show');
 
@@ -787,39 +657,39 @@ app
         var tour = [{element: '.btn-new-ws', text:'Create a new workspace here', placement: 'bottom'},
                     {element: '.btn-ws-settings', n: 2,
                         text:'Manage workspsace sharing and other settings, as \
-                        well as clone and delete workspaces using the gear button.', 
+                        well as clone and delete workspaces using the gear button.',
                         bVisible: true, time: 4000},
-                    {element: '.obj-id', n: 2, 
+                    {element: '.obj-id', n: 2,
                         text: 'View data about the object, including visualizations and KBase widgets'},
                     {element: '.show-versions', n: 2, text: 'View the objects history.'},
-                    {element: '.btn-show-info', n: 2, 
+                    {element: '.btn-show-info', n: 2,
                         text: 'View meta data,  download the objects, etc', bVisible: true},
-                    {element: '.ncheck', n: 2, text: 'Select objects by using checkboxes<br> and see options appear above', 
+                    {element: '.ncheck', n: 2, text: 'Select objects by using checkboxes<br> and see options appear above',
                         event: checkSomething},
-                    {element: '.btn-table-settings', text: 'Show and hide columns and set other object table settings'},   
+                    {element: '.btn-table-settings', text: 'Show and hide columns and set other object table settings'},
                     {element: '.type-filter', text: 'Filter objects by type'},
                     {element: '.btn-delete-obj', text: 'Delete the objects selected in the table'},
                     {element: '.btn-mv-dd', text: 'Go ahead, copy your colleague\'s objects to your own workspace'},
-                    {element: '.btn-rename-obj', text: 'Rename a selected object'},                        
+                    {element: '.btn-rename-obj', text: 'Rename a selected object'},
                     {element: '.btn-trash', text: 'View the trash bin for this workspace.<br>  \
-                                    Unreferenced objects will be deleted after 30 days.'}]                        
+                                    Unreferenced objects will be deleted after 30 days.'}]
 
         function exit_callback() {
             $scope.$apply( $state.go('ws') );
         }
 
         new Tour({tour: tour, exit_callback: exit_callback});
-    }   
+    }
 })
 
 .controller('Favorites', function($scope, $state, $stateParams, favoriteService, $compile) {
-    $scope.selected = [{workspace: 'chenrydemo', 
+    $scope.selected = [{workspace: 'chenrydemo',
                         name: 'kb|g.9.fbamdl.25.fba.55'}];
     //$scope.type = 'FBA';
 
     // model for state of favorites in application
     $scope.fav;
-    
+
     // this updates the dom with favorites from the service
     // "favoriteService" communicates with the server
     $scope.updateFavs = function() {
@@ -835,7 +705,7 @@ app
     }
 
     // update on first invocation
-    //$scope.updateFavs();    
+    //$scope.updateFavs();
 
     $scope.processData = function() {
         fav_by_kind = {}
@@ -845,34 +715,34 @@ app
             var kind = favs[i].type.split('-')[0];
             var module = favs[i].module
 
-            if (module in $scope.obj_mapping && $scope.obj_mapping[module] 
+            if (module in $scope.obj_mapping && $scope.obj_mapping[module]
                 && $scope.obj_mapping[module][kind] ) {
                 var sub = $scope.obj_mapping[module][kind];
             } else {
                 var sub = undefined
-            }                   
+            }
 
             //var sortable = ['FBAModel', 'FBA'];
             //var mv = ['Media', 'MetabolicMap', 'ETC'];
             //var route = (sortable.indexOf(kind) != -1 ? 'ws.mv' : sub)  //+sub : sub);
-            
+
             var route = sub;
             switch (kind) {
-                case 'FBA': 
+                case 'FBA':
                     route = 'ws.mv.fba';
                     break;
-                case 'FBAModel': 
+                case 'FBAModel':
                     route = 'ws.mv.model';
                     break;
-                case 'Media': 
+                case 'Media':
                     route = 'ws.media';
                     break;
-                case 'MetabolicMap': 
+                case 'MetabolicMap':
                     route = 'ws.maps';
                     break;
-                case 'Media': 
+                case 'Media':
                     route = 'ws.media';
-                    break; 
+                    break;
             }
 
             favs[i].route = route
@@ -979,7 +849,7 @@ app
         var path = '/login/';
         if (hash && hash.length > 0) {
             path += '?nextPath=' + encodeURIComponent(hash.substr(1));
-        } 
+        }
         $location.url(path);
     } else {
         $scope.params = $stateParams;
@@ -1023,7 +893,7 @@ function LPHelp($scope, $stateParams, $location) {
         if (form.find('#input3').val()) {
             url = url+'/'+form.find('#input3').val();
         }
-    
+
         $scope.$apply( $location.path( url ) );
     });
 }
@@ -1038,7 +908,7 @@ function ScrollCtrl($scope, $location, $anchorScroll) {
 
 
 angular.module('angular-json-rpc', []).config([ "$provide", function($provide) {
-    
+
     return $provide.decorator('$http', ['$delegate', function($delegate){
             $delegate.jsonrpc = function(url, method, parameters, config){
                 var data = {"jsonrpc": "2.0", "method": method, "params": parameters, "id" : 1};
