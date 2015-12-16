@@ -720,7 +720,7 @@ define('kbaseVisWidget',
                     .append('text')
                     .attr('class', 'yLabel')
                     .attr('x', labelRegionBounds.size.width / 2)
-                    .attr('y', labelRegionBounds.size.height / 2 + 3)
+                    .attr('y', labelRegionBounds.size.height / 2)
                     .attr('text-anchor', 'middle')
                     .attr('font-size', this.options.yLabelSize)
                     .attr('font-family', 'sans-serif')

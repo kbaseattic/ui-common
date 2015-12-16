@@ -63,6 +63,7 @@ define('kbasePMIBarchart',
         options: {
             subsystem_annotation_object    : 'PlantSEED_Subsystems',
             subsystem_annotation_workspace : 'PlantSEED',
+            selected_subsystems : ["Central Carbon: Glycolysis_and_Gluconeogenesis_in_plants"],
         },
 
         _accessors : [
@@ -130,6 +131,12 @@ define('kbasePMIBarchart',
                                             $(this).parent().addClass('open');
                                         }*/
 
+                                        if ( $(this).parent().hasClass( 'open') ) {
+                                            $(this).parent().removeClass('open');
+                                            var $span = $(this).next().find('span');
+                                            $span.toggleClass('fa-plus fa-caret-up');
+                                        }
+
                                         var $check = $(this).parent().find('.check');
                                         var shouldOpen = $check.data('checked')
                                             ? false
@@ -179,13 +186,16 @@ define('kbasePMIBarchart',
                                 $.jqElem('button')
                                     .attr('type', 'button')
                                     .addClass('btn btn-sm btn-default dropdown-toggle')
-                                    .append($.jqElem('span').addClass('caret'))
+                                    .append($.jqElem('span').addClass('fa fa-caret-up'))
                                     .on('click', function(e) {
                                         var isOpen = $(this).parent().hasClass('open');
                                         $pmi.data('formElem').find('.btn-group').removeClass('open');
                                         if (! isOpen) {
                                             $(this).parent().addClass('open');
                                         }
+
+                                            $(this).find('span').toggleClass('fa-caret-up');
+                                            $(this).find('span').toggleClass('fa-plus');
 
                                         var $check = $pmi.data('formElem').find('.check');
                                         if (this.checked) {
@@ -561,7 +571,6 @@ return;
                                     .on('change', function(e) {
                                         //alert('changed! ' + this.value);
                                         //$pmi.setBarchartDataset($pmi.dataset().subsystems[this.value]);
-
                                         $pmi.displaySubsystems($(this).val());
 
 
@@ -604,7 +613,7 @@ return;
                         //xLabel      : 'PMI in some manner',
                         xAxisRegion : 'chart',
                         xAxisVerticalLabels : true,
-                        //yLabel      : 'Meaningful data',
+                        yLabel      : 'Reaction Flux',
                         hGrid : true,
                         useUniqueID : true,
                     }
