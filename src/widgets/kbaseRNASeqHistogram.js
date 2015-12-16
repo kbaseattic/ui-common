@@ -121,6 +121,7 @@ define('kbaseRNASeqHistogram',
                 this.data('barchartElem').kbaseBarchart(
                     {
                         scaleAxes   : true,
+                        xPadding : 50,
 
                         //xLabel      : 'PMI in some manner',
                         //xAxisRegion : 'chart',
