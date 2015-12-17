@@ -123,6 +123,12 @@ define('kbaseRNASeqHistogram',
                         scaleAxes   : true,
                         xPadding : 50,
 
+                        xLabelRegion : 'yPadding',
+                        yLabelRegion : 'xPadding',
+
+                        xLabelOffset : 10,
+                        yLabelOffset : -10,
+
                         //xLabel      : 'PMI in some manner',
                         //xAxisRegion : 'chart',
                         //xAxisVerticalLabels : true,
