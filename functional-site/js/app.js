@@ -552,7 +552,11 @@ var app = angular.module('landing-pages',
 	.state('narrativestore',
 		{url: '/narrativestore/:type/:id',
 		templateUrl: 'views/narrative/narrative-store.html',
-		controller: 'NarrativeStore'});
+		controller: 'NarrativeStore'})
+  .state('narrativestore_namespace',
+    {url: '/narrativestore/:type/:namespace/:id',
+    templateUrl: 'views/narrative/narrative-store.html',
+    controller: 'NarrativeStore'});
                 
     $stateProvider
 	.state('kidledttype',
