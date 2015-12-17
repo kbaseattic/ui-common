@@ -58,7 +58,7 @@ define('kbaseRNASeqHistogram',
                 );
             }
 
-            this.setBarchartDataset(bars, newDataset.column_labels[0], newDataset.row_labels[0]);
+            this.setBarchartDataset(bars, newDataset.row_labels[0], newDataset.column_labels[0]);
 
             this.data('loader').hide();
             this.data('barchartElem').show();
@@ -85,6 +85,13 @@ define('kbaseRNASeqHistogram',
 
             ws.get_objects([ws_params]).then(function (d) {
                 $hist.setDataset(d[0].data);
+            })
+            .fail(function(d) {
+
+                $hist.$elem.empty();
+                $hist.$elem
+                    .addClass('alert alert-danger')
+                    .html("Could not load object : " + d.error.message);
             })
 
             this.appendUI(this.$elem);
