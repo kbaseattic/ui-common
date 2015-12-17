@@ -4,10 +4,11 @@
         parent: "kbaseAuthenticatedWidget",
 
         options: {
+            namespace: null, // generally a module name
             type: null, // either app or method
             id: null,
             loadingImage: "assets/img/ajax-loader.gif",
-	    narrativeStoreUrl:"https://kbase.us/services/narrative_method_store"
+	    narrativeStoreUrl:"https://kbase.us/services/narrative_method_store/rpc"
         },
 
         $mainPanel: null,
@@ -28,8 +29,15 @@
             this.$narMethodStoreInfo = $("<div>").css({margin:'10px', padding:'10px'});
             this.$elem.append(this.$narMethodStoreInfo);
 
-            this.narstore = new NarrativeMethodStore(this.options.narrativeStoreUrl+"/rpc");
+            if(kb.urls.narrative_method_store_url) {
+                this.options.narrativeStoreUrl = kb.urls.narrative_method_store_url;
+            }
+            this.narstore = new NarrativeMethodStore(this.options.narrativeStoreUrl);
             this.getNarMethodStoreInfo();
+
+            if (this.options.namespace) {
+                this.options.id = this.options.namespace + '/' + this.options.id;
+            }
 
             if (options.type==='app') {
                 this.fetchAppInfoAndRender();
@@ -74,10 +82,10 @@
 
                         self.$narMethodStoreInfo.append(
                             $('<table>').css({border:'1px solid #bbb', margin:'10px', padding:'10px'})
-                                /*.append($('<tr>')
+                                .append($('<tr>')
                                             .append($('<th>').append('Method Store URL  '))
                                             .append($('<td>').append(self.options.narrativeStoreUrl)))
-                                .append($('<tr>')
+                                /*.append($('<tr>')
                                             .append($('<th>').append('Method Spec Repo  '))
                                             .append($('<td>').append(status.git_spec_url)))
                                 .append($('<tr>')
