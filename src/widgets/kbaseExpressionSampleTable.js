@@ -7,6 +7,7 @@ define('kbaseExpressionSampleTable',
         'kbaseAuthenticatedWidget',
         'kbase-client-api',
         'kbaseTable',
+        'dataTables',
     ], function( $, colorbrewer ) {
 
     'use strict';
@@ -21,10 +22,6 @@ define('kbaseExpressionSampleTable',
 
         },
 
-        authToken : function() {
-            return "un=thomasoniii|tokenid=9dd17a66-8c78-11e5-942b-22000ab4b42b|expiry=1479224537|client_id=thomasoniii|token_type=Bearer|SigningSubject=https://nexus.api.globusonline.org/goauth/keys/5c2ed44a-8a30-11e5-b9f9-22000aef184d|sig=520590a675d6e9579b0dd4739fff40ea71ffd5e7e5bd950f691535a1bd19a2fef131ea94b88862fb430c8b7c73bb3f741eeb6bd02c74d4f74068db7f51e2f2b7664b43758ad23486264821bab3c7985614ee6f24b1a0428453e978551d0424902a2d9bc604483c85e4d2cbcd02a868e9d010aee3a75de2df7c9f8f1453453282";
-        },
-
         _accessors : [
             {name: 'dataset', setter: 'setDataset'},
         ],
@@ -37,11 +34,19 @@ define('kbaseExpressionSampleTable',
             $.each(
                 Object.keys(newDataset.expression_levels).sort(),
                 function (i,k) {
-                    rows.push({gene_id : k, feature_value : newDataset.expression_levels[k]});
+                    rows.push([k,newDataset.expression_levels[k]]);
                 }
             );
 
-            this.data('tableElem').kbaseTable(
+            var $dt = this.data('tableElem').DataTable({
+                aoColumns : [
+                    { title : 'Gene ID'},
+                    { title : 'Feature Value'}
+                ]
+            });
+            $dt.fnAddData(rows);
+
+            /*this.data('tableElem').kbaseTable(
                 {
                     sortable : true,
                     striped : true,
@@ -52,7 +57,7 @@ define('kbaseExpressionSampleTable',
                         rows : rows,
                     }
                 }
-            );
+            );*/
 
             this.data('loader').hide();
             this.data('tableElem').show();
@@ -92,9 +97,19 @@ define('kbaseExpressionSampleTable',
 
             $elem
                 .append(
-                    $.jqElem('div')
+                    $.jqElem('table')
                         .attr('id', 'tableElem')
+                        .addClass('display')
                         .css('display', 'none')
+                            .append(
+                                $.jqElem('thead')
+                                    .append(
+                                        $.jqElem('tr')
+                                            .append($.jqElem('th').append('Gene ID'))
+                                            .append($.jqElem('th').append('Feature Value'))
+                                    )
+                            )
+
                 )
                 .append(
                     $.jqElem('div')
