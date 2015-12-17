@@ -392,17 +392,15 @@ return;
 
                                             my_fluxes[model_rxn]['flux'] = fba_rxn.value;
 
-                                            var m = model_rxn.match(/_(\w+)\d$/);
-                                            if (m.length) {
-                                                var tooltip = rxn_dict.tooltip + ' Compartment: ' + m[1] + "<br>";
-                                                tooltip = tooltip.replace(/\n/g, "<br>");
-                                                //tooltip = tooltip.replace(/:(.+?)<br>/g, ": <i>$1</i><br>");
-                                                tooltip = tooltip.replace(/^(.+?):/g, "<b>$1:</b>");
-                                                tooltip = tooltip.replace(/<br>(.+?):/g, "<br><b>$1:</b>");
-                                                //tooltip = tooltip.replace(/Equation:(.+?)<br>/, "<div style = 'text-align : right'>$1</div>");
-                                                my_fluxes[model_rxn].tooltip = tooltip;
-                                                //'<span style = "white-space : nowrap">' + tooltip + '</span>';
-                                            }
+                                            var tooltip = rxn_dict.tooltip
+
+                                            tooltip = tooltip.replace(/\n/g, "<br>");
+                                            //tooltip = tooltip.replace(/:(.+?)<br>/g, ": <i>$1</i><br>");
+                                            tooltip = tooltip.replace(/^(.+?):/g, "<b>$1:</b>");
+                                            tooltip = tooltip.replace(/<br>(.+?):/g, "<br><b>$1:</b>");
+                                            //tooltip = tooltip.replace(/Equation:(.+?)<br>/, "<div style = 'text-align : right'>$1</div>");
+                                            my_fluxes[model_rxn].tooltip = tooltip;
+                                            //'<span style = "white-space : nowrap">' + tooltip + '</span>';
                                         }
                                     }
                                 );
@@ -609,6 +607,9 @@ return;
                 this.data('barchartElem').kbaseBarchart(
                     {
                         scaleAxes   : true,
+
+                        yLabelRegion : 'xPadding',
+                        //yLabelOffset : -10,
 
                         //xLabel      : 'PMI in some manner',
                         xAxisRegion : 'chart',
