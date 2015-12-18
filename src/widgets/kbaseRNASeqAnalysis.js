@@ -51,21 +51,13 @@ define('kbaseRNASeqAnalysis',
 
         },*/
 
-        init : function init(options) {
-
-            this._super(options);
-
-            this.setDataset(this.options.SetupRNASeqAnalysis);
+        loadAnalysis : function(ws, analysis) {
 
             var $rna = this;
 
-            this.appendUI(this.$elem);
-
-            var ws = new Workspace(window.kbconfig.urls.workspace, {token : this.authToken()});
-
             $.when(
-                ws.get_objects([{ ref : this.options.SetupRNASeqAnalysis.annotation_id}]),
-                ws.get_objects([{ ref : this.options.SetupRNASeqAnalysis.genome_id}])
+                ws.get_objects([{ ref : analysis.annotation_id}]),
+                ws.get_objects([{ ref : analysis.genome_id}])
             ).then(function (annotation, genome) {
                 $rna.dataset().genome_annotation = annotation[0].data.handle.file_name;
                 $rna.dataset().genome_name = genome[0].data.scientific_name;
@@ -79,6 +71,43 @@ define('kbaseRNASeqAnalysis',
                     .addClass('alert alert-danger')
                     .html("Could not load object : " + d.error.message);
             })
+        },
+
+        init : function init(options) {
+
+            this._super(options);
+
+            var $rna = this;
+            var ws = new Workspace(window.kbconfig.urls.workspace, {token : this.authToken()});
+
+            if (this.options.SetupRNASeqAnalysis) {
+                this.setDataset(this.options.SetupRNASeqAnalysis);
+                this.loadAnalysis(ws, this.options.SetupRNASeqAnalysis);
+            }
+            else {
+                ws.get_objects(
+                    [{
+                        workspace : this.options.workspaceName,
+                        name : this.options.ws_analysis_id
+                    }]
+                ).then(function(d) {
+                    $rna.setDataset(d[0].data);
+                    $rna.loadAnalysis(ws, d[0].data);
+                })
+                .fail(function(d) {
+
+                    $rna.$elem.empty();
+                    $rna.$elem
+                        .addClass('alert alert-danger')
+                        .html("Could not load object : " + d.error.message);
+                })
+            }
+
+
+            this.appendUI(this.$elem);
+
+
+
 
             return this;
         },

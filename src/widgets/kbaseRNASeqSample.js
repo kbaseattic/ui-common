@@ -40,8 +40,8 @@ define('kbaseRNASeqSample',
             var ws = new Workspace(window.kbconfig.urls.workspace, {token : $rna.authToken()});
 
             var ws_params = {
-                workspace : this.options.associateReads.workspace,
-                name : this.options.associateReads.output
+                workspace : this.options.workspaceName || this.options.associateReads.workspace,
+                name : this.options.ws_sample_id || this.options.associateReads.output
             };
 
             ws.get_objects([ws_params]).then(function (d) {
