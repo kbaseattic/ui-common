@@ -7,7 +7,7 @@ define('kbaseExpressionSampleTable',
         'kbaseAuthenticatedWidget',
         'kbase-client-api',
         'kbaseTable',
-        'dataTables',
+        'jquery-dataTables',
     ], function( $, colorbrewer ) {
 
     'use strict';
@@ -100,6 +100,7 @@ define('kbaseExpressionSampleTable',
                     $.jqElem('table')
                         .attr('id', 'tableElem')
                         .addClass('display')
+                        .css('width', '95%')
                         .css('display', 'none')
                             .append(
                                 $.jqElem('thead')
