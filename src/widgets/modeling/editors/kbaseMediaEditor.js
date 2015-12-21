@@ -414,16 +414,18 @@ $.KBWidget({
         // takes optional selector, returns list of
         // data from datatables (instead of api object)
         function getTableData(selector) {
-            if (selector)
-                var d = table.rows( selector ).data();
-            else
-                var d = table.rows().data();
+            var d = selector ? table.rows( selector ).data() : table.rows().data();
 
             var data = [];
             for (var i=0; i<d.length; i++) {
                 data.push(d[i]);
             }
             return data;
+        }
+
+        // function to save data,
+        function saveData(data) {
+            console.log('saving data', data);
         }
 
         return this;

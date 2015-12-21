@@ -125,7 +125,8 @@ var app = angular.module('landing-pages',
     $stateProvider
         .state('proto', {
           url: "/proto/:ws/:id",
-          templateUrl: 'views/proto.html'})
+          templateUrl: 'views/proto.html'
+      })
 
     // model viewer routing
     $stateProvider

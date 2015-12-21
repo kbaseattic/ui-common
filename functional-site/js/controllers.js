@@ -4,6 +4,7 @@
  *  See: https://docs.angularjs.org/guide/controller
  *
 */
+
 app
 .controller('methodAccordion', function ($scope, narrative, $http) {
 })

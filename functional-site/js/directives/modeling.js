@@ -5,16 +5,19 @@ angular.module('modeling-directives')
 
 // directive to invoke any "kbase widget" that takes a
 // workspace name, object name, and type (optional).
-.directive('kbWidget', function() {
+.directive('kbWidget', function($stateParams) {
     return {
         scope: {
-            ws: '@ws',
-            obj: '@obj'
+            ws: '=ws',
+            obj: '=obj'
         },
         link: function(scope, elem, attrs) {
+            var ws = $stateParams.ws,
+                obj = $stateParams.id;
+
             var params = {
-                ws: scope.ws,
-                obj: scope.obj
+                ws: ws,
+                obj: obj
             }
 
             if (attrs.type) params.type = attrs.type;
