@@ -1,0 +1,67 @@
+
+/**
+ *  this css corresponds to widgets in the current directory
+ */
+
+.kb-notify {
+    position: relative;
+    bottom: 10px;
+    width: 300px;
+    padding: 15px;
+    color: #fff;
+    background-color: #000;
+    opacity: 0.8;
+}
+
+.kb-notify.kb-notify-success {
+    color: #00CC09;
+}
+
+.modal-body .dataTables_processing {
+    border: 1px solid #aaa;
+    background: #E8F9FF;
+    opacity: 0.8;
+}
+
+.kb-editor .controls .btn{
+    margin: 0 10px;
+}
+
+.kb-media-editor > tbody > tr > td:first-child {
+    width: 1%;
+}
+
+.kb-media-editor > tbody > tr > td:first-child .fa-square-o {
+    font-size: 1.4em;
+    color: #666;
+}
+
+.kb-media-editor > tbody > tr > td:first-child:hover {
+    cursor: pointer;
+}
+
+.kb-media-editor > tbody > tr > td:first-child:hover .fa-square-o {
+    color: #000;
+}
+
+.kb-media-editor > tbody > tr.row-select .fa-square-o:before {
+    content: "\f046";
+    color: #444;
+}
+
+.kb-media-editor > tbody > tr > td.editable {
+    position: relative;
+}
+
+.kb-media-editor > tbody > tr > td.editable:hover:after{
+    content: "\f044";
+    font-family: FontAwesome;
+    position: absolute;
+    bottom: 0;
+    right: 2px;
+    color: #888;
+}
+
+.modal-dialog {
+    width: 70%;
+}

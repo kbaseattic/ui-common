@@ -108,7 +108,7 @@ $.KBWidget({
                 if ((col.type === 'tabLink' || col.type === 'wstype') && col.linkformat === 'dispWSRef') {
                     self.obj[tabSpec.key].forEach(function(item) {
                         if (refs.indexOf(item[col.key]) === -1) {
-                        	refs.push( {ref: item[col.key]} );
+                            refs.push( {ref: item[col.key]} );
                         }
                     })
                 }
@@ -276,7 +276,7 @@ $.KBWidget({
                         if (type == 'tabLink' && format == 'dispIDCompart') {
                             var dispid = d[key];
                             if ("dispid" in d) {
-                            	dispid = d.dispid;
+                                dispid = d.dispid;
                             }
                             return '<a class="id-click" data-id="'+d[key]+'" data-method="'+method+'">'+
                                              dispid+'</a>';
@@ -317,11 +317,11 @@ $.KBWidget({
         function tabLinkArray(a, method) {
             var links = [];
             a.forEach(function(d) {
-            	var dispid = d.id;
-				if ("dispid" in d) {
-					dispid = d.dispid;
-				}
-				links.push('<a class="id-click" data-id="'+d.id+'" data-method="'+method+'">'+dispid+'</a>');
+                var dispid = d.id;
+                if ("dispid" in d) {
+                    dispid = d.dispid;
+                }
+                links.push('<a class="id-click" data-id="'+d.id+'" data-method="'+method+'">'+dispid+'</a>');
             })
             return links.join(', ');
         }
@@ -385,7 +385,7 @@ $.KBWidget({
 
 
         this.getBiochemReaction = function(id) {
-        	var input = {reactions: [id]};
+            var input = {reactions: [id]};
             return self.kbapi('fba', 'get_reactions', {reactions: [id]})
                        .then(function(data) {
                           return data[0];
@@ -487,5 +487,3 @@ $.KBWidget({
     }
 })
 }( jQuery ) );
-
-

@@ -1,12 +1,22 @@
-/* 
-    kbaseModal
-
-    This is a helper widget for rendering modals using bootstrap v3.0.0
-
-    API Example:
-        var modal = $('<div>').kbaseModal({title: 'Model Details', 
-                                           rightLabel: 'Super Workspace,
-                                           subText: 'kb|g.super.genome '});
+/** 
+ *  kbaseModal
+ *
+ *  Authors:
+ *      nconrad@anl.gov
+ *
+ *   This is a helper widget for rendering modals using bootstrap v3.0.0
+ *
+ *   API
+ *
+ *   Basic Modal:
+ *
+ *      var modal = $('<div>').kbaseModal({
+ *         title: 'Model Details', 
+ *         rightLabel: 'Super Workspace,
+ *         subText: 'kb|g.super.genome '
+ *      });
+ *
+ *
 */
 
 (function( $, undefined ) {
@@ -42,15 +52,15 @@ $.KBWidget({
                               </div>\
                            </div>');
 
-        var modal_header = modal.find('.modal-header');
-        var modal_title = modal.find('.modal-title');
-        var modal_subtext = modal.find('.modal-subtext');
-        var modal_body = modal.find('.modal-body');
-        var modal_footer = modal.find('.modal-footer');        
+        var modalHeader = modal.find('.modal-header'),
+            modalTitle = modal.find('.modal-title'),
+            modalSubtext = modal.find('.modal-subtext'),
+            modalBody = modal.find('.modal-body'),
+            modalFooter = modal.find('.modal-footer');        
 
-        if (title) modal_title.append(title);
-        if (subtext) modal_subtext.append(subtext);
-        if (body) modal_body.append(body);       
+        if (title) modalTitle.append(title);
+        if (subtext) modalSubtext.append(subtext);
+        if (body) modalBody.append(body);       
 
         // destroy every time, unless specified otherwise
         if (!options.noDestroy) {
@@ -60,29 +70,28 @@ $.KBWidget({
         }
 
         this.header = function(data) {
-            if (data) modal_header.html(data);
-            return modal_header;
+            if (data) modalHeader.html(data);
+            return modalHeader;
         }
 
         this.title = function(data) {
-            if (data) modal_title.html(data);
-            return modal_title;
+            if (data) modalTitle.html(data);
+            return modalTitle;
         }        
 
         this.body = function(data) {
-            if (data) modal_body.html(data);          
-            return modal_body;
+            if (data) modalBody.html(data);          
+            return modalBody;
         }
 
         this.footer = function(data) {
-            if (data) modal_footer.html(data);
-            return modal_footer;
+            if (data) modalFooter.html(data);
+            return modalFooter;
         }
 
         this.buttons = function(buttons) {
-            modal_footer.html('')
-            for (var i in buttons) {
-                var btn = buttons[i];
+            modalFooter.html('')
+            buttons.forEach(function(btn) {
                 var text = btn.text;
 
                 // make modal dismiss by default
@@ -91,7 +100,6 @@ $.KBWidget({
                                             ' data-dismiss="modal">'+text+'</a>')
                 } else {
                     var ele = $('<a class="btn" data-name="'+text+'">'+text+'</a>')
-
                 } 
 
                 // set button colors
@@ -101,14 +109,12 @@ $.KBWidget({
                     ele.addClass('btn-default');                    
                 }
 
-                modal_footer.append(ele);
-            }
+                modalFooter.append(ele);
+            })
         }
 
         this.button = function(name) {
-            console.log('name', name)
-            console.log(modal_footer.find('[data-name="'+name+'"]'))
-            return modal_footer.find('[data-name="'+name+'"]');
+            return modalFooter.find('[data-name="'+name+'"]');
         }
 
         this.show = function() {
