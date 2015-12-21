@@ -463,6 +463,7 @@ define('kbaseVisWidget',
                                 .attr('x', textXOffset)       //magic numbers make things look pretty!
                                 .attr('y', textYOffset)
                                 .attr('font-size', $vis.options.legendSize)
+                                .style('cursor', 'pointer')
                                 .text(function () { return truncationObj.truncatedText })
                                 .attr('opacity', 1)
                         ;
@@ -503,6 +504,8 @@ define('kbaseVisWidget',
                             .transition().duration(time)
                             .attr('opacity', 0)
                             .remove();
+
+                        g.remove();
                     })
                 ;
 

@@ -311,11 +311,13 @@ return;
             }
         },
 
-        setBarchartDataset : function setBarchartDataset(newDataset) {
+        setBarchartDataset : function setBarchartDataset(newDataset, legend) {
             this.data('barchart').setDataset(newDataset);
 
             this.data('barchart').options.xAxisTransform = this.data('barchart').yScale()(0);
             this.data('barchart').renderXAxis();
+            this.data('barchart').setLegend(legend);
+
         },
 
         init : function init(options) {
@@ -506,6 +508,7 @@ return;
 
             var $pmi = this;
             var merged = {};
+            var legend = {};
             $.each(
                 subsystems,
                 function (i,subsystem) {
@@ -518,6 +521,11 @@ return;
                     $.each(
                         $pmi.dataset().subsystems[subsystem],
                         function (i, bar) {
+
+                            if (legend[subsystem] == undefined) {
+                                legend[subsystem] = bar.color;
+                            }
+
                             if (merged[bar.bar] == undefined) {
                                 merged[bar.bar] = {
                                     bar : bar.bar,
@@ -546,8 +554,23 @@ return;
                 }
             );
 
+            var sortedLegendKeys = Object.keys(legend).sort();
+            var sortedLegend = [];
+            $.each(
+                sortedLegendKeys,
+                function (i, key) {
+                    sortedLegend.push(
+                        {
+                            label : key,
+                            color : legend[key],
+                            shape : 'square'
+                        }
+                    )
+                }
+            );
+
             //$pmi.setBarchartDataset($pmi.dataset().subsystems[$(this).val()[0]]);
-            $pmi.setBarchartDataset(bars);
+            $pmi.setBarchartDataset(bars, sortedLegend);
         },
 
         appendUI : function appendUI($elem) {
@@ -580,7 +603,7 @@ return;
                     $.jqElem('div')
                         .attr('id', 'barchartElem')
                         .css('display', 'none')
-                        .css('width', 800) //$elem.width())
+                        .css('width', 1100) //$elem.width())
                         .css('height', 500) //$elem.height() - 30)
                 )
                 .append(
@@ -609,14 +632,14 @@ return;
                         scaleAxes   : true,
 
                         yLabelRegion : 'xPadding',
-                        //yLabelOffset : -10,
+                        xGutter : 300,
 
-                        //xLabel      : 'PMI in some manner',
                         xAxisRegion : 'chart',
                         xAxisVerticalLabels : true,
                         yLabel      : 'Reaction Flux',
                         hGrid : true,
                         useUniqueID : true,
+                        legendRegion : 'xGutter',
                     }
                 )
             );
