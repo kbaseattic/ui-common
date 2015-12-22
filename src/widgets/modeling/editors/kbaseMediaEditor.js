@@ -66,18 +66,20 @@ $.KBWidget({
         container.loading();
         kbapi('ws', 'get_objects', [param])
             .done(function(res){
-                rawData = res[0];
+                rawData = $.extend(true, {}, res[0]);
                 media = sanitizeMedia(res[0].data.mediacompounds);
+
+                console.log('raw media data', rawData)
 
                 // get cpd names from biochem, add to media data
                 // and render table
                 var ids = getCpdIds(media)
                 getCpds(ids, {select: ['name', 'id']} )
-                    .done(function(objs) {
+                    .then(function(objs) {
                         for (var i=0; i<objs.length; i++) {
                             media[i].name = objs[i].name;
                         }
-                        //console.log('media', media)
+
                         renderTable(media);
                         container.rmLoading();
                     })
@@ -284,11 +286,12 @@ $.KBWidget({
 
         function saveModal() {
             var name = objName // +'-edited';  save as same name by default.
-            var input = $('<input type="text" class="form-control" placeholder="'+name+'">'),
+            var input = $('<input type="text" class="form-control" placeholder="my-media-name">'),
                 form = $('<div class="form-group">'+
                             '<div class="col-sm-10"></div>' +
                           '</div>');
 
+            input.val(name);
             form.find('div').append(input);
 
             var modal = $('<div>').kbaseModal({
@@ -303,11 +306,7 @@ $.KBWidget({
             })
 
             modal.button('Save').on('click', function() {
-                if (input.val()) {
-                    //saveData(getTableData())
-                } else {
-                    saveData(getTableData(), wsName, name)
-                }
+                saveData(getTableData(), wsName, input.val())
             })
 
             modal.show();
@@ -403,16 +402,29 @@ $.KBWidget({
             }
         }
 
-        // takes list of cpd objects, sets defaults and returns
+        // takes list of cpd info, sets defaults and returns
         // list of cpd objects.
         function setCpdDefaults(cpds) {
+            // if not new media, use the same ref
+            var ref = media[0].compound_ref.split('/');
+            var defaultRef = media.length ?
+                ref.slice(0, ref.length-1).join('/')+'/' : '489/6/1/compounds/id/';
+
+            var newCpds = [];
             for (var i=0; i<cpds.length; i++) {
                 var cpd = cpds[i];
-                cpd.concentration = 0.001;
-                cpd.minFlux = -100;
-                cpd.maxFlux = 100;
+
+                newCpds.push({
+                    concentration: 0.001,
+                    minFlux: -100,
+                    maxFlux: 100,
+                    id: cpd.id,
+                    compound_ref: defaultRef+cpd.id,
+                    name: cpd.name
+                })
             }
-            return cpds;
+            
+            return newCpds;
         }
 
 
@@ -430,11 +442,11 @@ $.KBWidget({
 
         // function to save data,
         function saveData(data, ws, name) {
-            for (var i=0; i<data.length; i++) {
-                delete data[i]['name'];  // remove name, since not in spec
-            }
+            // don't remove name since it may not be in old objects
+            //for (var i=0; i<data.length; i++) {
+            //    delete data[i]['name'];
+            //}
             rawData.data.mediacompounds = data;
-            console.log('saving this', rawData)
 
             saveBtn.text('saving...');
             kbapi('ws', 'save_objects', {
@@ -449,10 +461,13 @@ $.KBWidget({
                 saveBtn.text('Save').hide();
                 saveAsBtn.text('Save as...').hide();
                 modeling.notice(container, 'Saved as '+name, 5000)
-            }).fail(function() {
-                alert("Oh no!  Something seems to have went wrong.")
+            }).fail(function(e) {
+                var error = JSON.stringify(JSON.parse(e.responseText), null,4);
+                $('<div>').kbaseModal({
+                    title: 'Oh no! Something seems to have went wrong',
+                    body: '<pre>'+error+'</pre>'
+                }).show();
             })
-
         }
 
         return this;
