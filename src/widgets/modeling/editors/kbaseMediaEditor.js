@@ -47,7 +47,17 @@ $.KBWidget({
             console.error('kbaseMediaEditor arguements are invalid');
 
         var table; // main table to be rendered
-        var media; // media data
+        var media; // actual media data
+        var rawData;  // raw workspace object
+
+        // some controls for the table
+        var saveBtn = $('<button class="btn btn-primary btn-save pull-right hide">'+
+                        'Save</button>');
+        var saveAsBtn = $('<button class="btn btn-primary btn-save pull-right hide">'+
+                        'Save as...</button>');
+        var addBtn = $('<button class="btn btn-primary pull-right">'+
+                       '<i class="fa fa-plus"></i> Add compounds...</button>');
+        var rmBtn = $('<button class="btn btn-danger pull-right hide">');
 
         // keep track of edits
         var _editHistory = new EditHistory();
@@ -56,6 +66,7 @@ $.KBWidget({
         container.loading();
         kbapi('ws', 'get_objects', [param])
             .done(function(res){
+                rawData = res[0];
                 media = sanitizeMedia(res[0].data.mediacompounds);
 
                 // get cpd names from biochem, add to media data
@@ -97,19 +108,14 @@ $.KBWidget({
             // add controls
             var controls = container.find('.controls');
 
-            var saveBtn = $('<button class="btn btn-primary btn-save pull-right hide">'+
-                'Save as...</button>');
+            controls.append(saveAsBtn);
             controls.append(saveBtn);
-
-            var addBtn = $('<button class="btn btn-primary pull-right">'+
-                '<i class="fa fa-plus"></i> Add compounds...</button>');
             controls.append(addBtn);
-
-            var rmBtn = $('<button class="btn btn-danger pull-right hide">');
             controls.append(rmBtn);
 
             addBtn.on('click', cpdModal);
-            saveBtn.on('click', saveModal);
+            saveBtn.on('click', function() { saveData(getTableData(), wsName, objName) });
+            saveAsBtn.on('click', saveModal);
             rmBtn.on('click', function() {
                 // get all selected data
                 var data = getTableData('.row-select');
@@ -277,7 +283,7 @@ $.KBWidget({
         }
 
         function saveModal() {
-            var name = objName+'-edited';
+            var name = objName // +'-edited';  save as same name by default.
             var input = $('<input type="text" class="form-control" placeholder="'+name+'">'),
                 form = $('<div class="form-group">'+
                             '<div class="col-sm-10"></div>' +
@@ -298,10 +304,9 @@ $.KBWidget({
 
             modal.button('Save').on('click', function() {
                 if (input.val()) {
-                    console.log('attempting to save', input.val());
+                    //saveData(getTableData())
                 } else {
-                    console.log('attempting to save', name);
-                    console.log('rows', getTableData())
+                    saveData(getTableData(), wsName, name)
                 }
             })
 
@@ -317,13 +322,13 @@ $.KBWidget({
             if (operation.op === 'modify') {
                 return;
             } else if (operation.op === 'add') {
-                console.log('attempting to add', operation.data)
                 table.rows.add( operation.data ).draw();
             } else if (operation.op === 'rm') {
-                console.log('attempting to remove', operation.data)
-                table.row( '.row-select' )
+                table.rows( '.row-select' )
                       .remove()
                       .draw();
+
+                console.log('new rows', table.rows( ))
             }
         }
 
@@ -424,8 +429,30 @@ $.KBWidget({
         }
 
         // function to save data,
-        function saveData(data) {
-            console.log('saving data', data);
+        function saveData(data, ws, name) {
+            for (var i=0; i<data.length; i++) {
+                delete data[i]['name'];  // remove name, since not in spec
+            }
+            rawData.data.mediacompounds = data;
+            console.log('saving this', rawData)
+
+            saveBtn.text('saving...');
+            kbapi('ws', 'save_objects', {
+                workspace: wsName,
+                objects: [{
+                    type: 'KBaseBiochem.Media',
+                    data: rawData.data,
+                    name: name,
+                    meta: rawData.info[10]
+                }]
+            }).done(function(res) {
+                saveBtn.text('Save').hide();
+                saveAsBtn.text('Save as...').hide();
+                modeling.notice(container, 'Saved as '+name, 5000)
+            }).fail(function() {
+                alert("Oh no!  Something seems to have went wrong.")
+            })
+
         }
 
         return this;
