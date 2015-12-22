@@ -1,8 +1,8 @@
 /**
- *	kbaseMediaEditor.js (kbaseMediaEditor)
+ *	kbaseModelEditor.js (kbaseModelEditor)
  *
  *	Given a pair of workspace and media object names or ids,
- *	produce an editable media table.
+ *	produce editable model tables.
  *
  * Authors:
  * 	 nconrad@mcs.anl.gov
@@ -14,7 +14,7 @@
 'use strict';
 
 $.KBWidget({
-    name: "kbaseMediaEditor",
+    name: "kbaseModelEditor",
     parent: "kbaseAuthenticatedWidget",
     version: "1.0.0",
     options: {},
@@ -42,9 +42,13 @@ $.KBWidget({
         else
             console.error('kbaseMediaEditor arguements are invalid');
 
-        var table; // main table to be rendered
-        var media; // actual media data
-        var rawData;  // raw workspace object
+        var table,          // main table to be edited (reactions for now)
+            modelObj,
+            model,          // actual model data
+            modelreactions, // edited table
+            rawData,        // raw workspace object
+            tabs;           // UI tabs
+
 
         // some controls for the table
         var saveBtn = $('<button class="btn btn-primary btn-save pull-right hide">'+
@@ -59,52 +63,93 @@ $.KBWidget({
         var _editHistory = new EditHistory();
 
         // get media data
-        container.loading();
         kbapi('ws', 'get_objects', [param])
             .done(function(res){
                 rawData = $.extend(true, {}, res[0]);
-                media = sanitizeMedia(res[0].data.mediacompounds);
+                console.log('raw model data', rawData)
 
-                console.log('raw media data', rawData)
+                modelObj = new modeling['KBaseFBA_FBAModel'](self);
+                modelObj.setMetadata(res[0].info);
+                modelObj.setData(res[0].data);
+                model = modelObj.data;
 
-                // get cpd names from biochem, add to media data
-                // and render table
-                var ids = getCpdIds(media)
-                getCpds(ids, {select: ['name', 'id']} )
-                    .then(function(objs) {
-                        for (var i=0; i<objs.length; i++) {
-                            media[i].name = objs[i].name;
-                        }
+                // table being edited
+                modelreactions = model.modelreactions;
 
-                        renderTable(media);
-                        container.rmLoading();
-                    })
+                console.log('model', model)
+                console.log('modelObj', modelObj)
+
+                // skip overview
+                var tabList = modelObj.tabList.slice(1);
+
+                var uiTabs = [];
+
+                var i = tabList.length;
+                while (i--) {
+                    var tab = tabList[i];
+
+                    // skip viz not needed
+                    if (['Genes', 'Pathways', 'Gapfilling'].indexOf(tab.name) !== -1) {
+                        tabList.splice(i,1);
+                        continue;
+                    }
+
+                    // add loading status
+                    var placeholder = $('<div>')
+                    placeholder.loading();
+
+                    uiTabs.unshift({name: tabList[i].name, content: placeholder});
+                }
+
+                uiTabs[0].active = true;
+                tabs = container.kbTabs({tabs: uiTabs});
+
+                buildContent(modelObj.tabList)
+
+                console.log('raw model data', rawData)
             })
 
-        // renders table, any associated controls, and events
-        function renderTable(data) {
-            table = $('<table class="table table-bordered table-striped'+
-                ' kb-media-editor" style="width: 100% !important;">')
-            container.append(table);
 
-            table = table.DataTable({
-                data: data,
-                order: [[ 2, "asc" ]],
-                dom: '<"top col-sm-6 controls"l><"top col-sm-6"f>rt<"bottom"ip><"clear">',
-                columns: [
-                    { orderable: false, data: function(row) {
-                        return '<i class="fa fa-square-o"></i>';
-                    } },
-                    { title: "Name", data: 'name'},
-                    { title: "Compound", data: 'id'},
-                    { title: "Concentration", data: 'concentration', className: 'editable'},
-                    { title: "Max Flux", data: 'maxFlux', className: 'editable'},
-                    { title: "Min Flux", data: 'minFlux', className: 'editable'}
-                ]
-            })
+        function buildContent(tabList) {
+
+            //5) Iterates over the entries in the spec and instantiate things
+            for (var i = 0; i < tabList.length; i++) {
+                var tabSpec = tabList[i];
+                var tabPane = tabs.tabContent(tabSpec.name);
+
+                // skip any vertical tables for now
+                if (tabSpec.type == 'verticaltbl') continue;
+
+                if (tabSpec.name === 'Reactions')
+                    createRxnTable(tabSpec, tabPane)
+                else
+                    createDataTable(tabSpec, tabPane);
+            }
+        }
+
+        function createDataTable(tabSpec, tabPane) {
+            var settings = getTableSettings(tabSpec, model);
+            tabPane.rmLoading();
+
+            // the 'style' here is a hack for narrative styling :/
+            var table = $('<table class="table table-bordered table-striped kb-media-editor" style="margin-left: auto; margin-right: auto;">')
+            tabPane.append(table);
+            var table = table.DataTable(settings);
+        }
+
+
+        // creates a datatable on a tabPane
+        function createRxnTable(tabSpec, tabPane) {
+            var settings = getTableSettings(tabSpec, model);
+            tabPane.rmLoading();
+
+            // the 'style' here is a hack for narrative styling :/
+            table = $('<table class="table table-bordered table-striped kb-media-editor" style="margin-left: auto; margin-right: auto;">')
+            tabPane.append(table);
+            table = table.DataTable(settings);
 
             // add controls
-            var controls = container.find('.controls');
+            var controls = tabPane.find('.controls');
 
             controls.append(saveAsBtn);
             controls.append(saveBtn);
@@ -146,9 +191,13 @@ $.KBWidget({
 
             // event for clickingon editable cells
             table.on('click', '.editable', function(e) {
-                $(this).attr('contentEditable', true);
-                $(this).addClass('editing-focus');
-                $(this).focus();
+                //if (table.cell(this).data().indexOf('=') !== -1) {
+                    //table.cells(this).data().draw()
+                //} else {
+                    $(this).attr('contenteditable', true);
+                    $(this).addClass('editing-focus');
+                    $(this).focus();
+                //}
             })
 
             table.on('blur', 'td.editable', function(){
@@ -156,7 +205,6 @@ $.KBWidget({
                     after = $(this).text();
 
                 // fixme: add better validation and error handling
-                after = parseFloat(after);
                 if (before === after) return;
 
                 // set data in datable memory
@@ -174,7 +222,78 @@ $.KBWidget({
                     $(this).blur();
                 }
             })
+
         }
+
+        // takes table spec and prepared data, returns datatables settings object
+        function getTableSettings(tab, data) {
+            var tableColumns = getColSettings(tab);
+
+            return {
+                dom: '<"top col-sm-6 controls"l><"top col-sm-6"f>rt<"bottom"ip><"clear">',
+                data: modelObj[tab.key],
+                columns: tableColumns,
+                order: [[ 1, "asc" ]],
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: 'Search '+tab.name
+                }
+            };
+        }
+
+        // takes table spec, returns datatables column settings
+        function getColSettings(tab) {
+            var settings = [];
+            var cols = tab.columns;
+
+            // add checkbox
+            if (tab.name == 'Reactions') {
+                settings.push({
+                    orderable: false,
+                    data: function(row) {
+                        return '<i class="fa fa-square-o"></i>';
+                    }
+                })
+            }
+
+            for (var i=0; i<cols.length; i++) {
+                var col = cols[i];
+                var key = col.key,
+                    type = col.type,
+                    format = col.linkformat,
+                    method = col.method,
+                    action = col.action
+
+                var config = {
+                    title: col.label,
+                    name: col.label,
+                    defaultContent: '-',
+                }
+
+                if (['equation', 'genes'].indexOf(key) !== -1)
+                    config.className = 'editable';
+
+                if ( key === 'genes' ) { // fixme: need not depend on spec
+                    config.data = function(row) {
+                        var items = []
+                        for (var i=0; i<row.genes.length; i++) {
+                            items.push(row.genes[i].id);
+                        }
+                        return items.join('<br>');
+                    }
+                } else {
+                    config.data = key;
+                }
+
+                if (col.width) config.width = col.width;
+
+                settings.push(config)
+            }
+
+
+            return settings
+        }
+
 
         // takes media data, adds id key/value, and sorts it.
         function sanitizeMedia(media) {
@@ -203,7 +322,7 @@ $.KBWidget({
                 ' " style="width: 100% !important;">');
 
             var modal = $('<div>').kbaseModal({
-                title: 'Add Compounds',
+                title: 'Add Reactions',
                 subText: 'Select compounds below, then click "add".',
                 body: table
             })
@@ -212,10 +331,10 @@ $.KBWidget({
                 processing: true,
                 serverSide: true,
                 orderMulti: false,
-                order: [[ 2, "asc" ]],
+                order: [[ 1, "asc" ]],
                 ajax: function (opts, callback, settings) {
-                    biochem('compounds', opts,
-                        ['name', 'id', 'mass', 'deltag', 'deltagerr']
+                    biochem('reactions', opts,
+                    ['id', 'name', 'definition']
                     ).done(function(res){
                         var data = {
                             data: res.docs,
@@ -230,11 +349,9 @@ $.KBWidget({
                     { orderable: false, data: function(row) {
                         return '<i class="fa fa-square-o"></i>';
                     } },
+                    { title: "Reaction", data: 'id'},
                     { title: "Name", data: 'name'},
-                    { title: "Compound", data: 'id'},
-                    { title: "Mass", data: 'mass', defaultContent: '-'},
-                    { title: "DeltaG", data: 'deltag', defaultContent: '-'},
-                    { title: "DeltaG error", data: 'deltagerr', defaultContent: '-'}
+                    { title: "Equation", data: 'definition', defaultContent: '-'}
                 ],
                 rowCallback: function( row, data, index ) {
                     if ( selectedRows.isSelected(data.id) )
@@ -270,7 +387,7 @@ $.KBWidget({
 
             // add compounds on click, hide dialog, give notice
             addBtn.on('click' , function() {
-                var data = setCpdDefaults( selectedRows.getSelected() ),
+                var data = setRxnDefaults( selectedRows.getSelected() ),
                     op = {op: 'add', data: data};
                 editTable(op);
                 modal.hide();
@@ -400,27 +517,26 @@ $.KBWidget({
 
         // takes list of cpd info, sets defaults and returns
         // list of cpd objects.
-        function setCpdDefaults(cpds) {
-            // if not new media, use the same ref
-            var ref = media[0].compound_ref.split('/');
-            var defaultRef = media.length ?
-                ref.slice(0, ref.length-1).join('/')+'/' : '489/6/1/compounds/id/';
+        function setRxnDefaults(rxns) {
+            // if not new model, use the same ref
+            var ref = modelreactions[0].reaction_ref.split('/');
+            var defaultRef = modelreactions.length ?
+                ref.slice(0, ref.length-1).join('/')+'/' : '489/6/1/reactions/id/';
 
-            var newCpds = [];
-            for (var i=0; i<cpds.length; i++) {
-                var cpd = cpds[i];
+            var newRxns = [];
+            for (var i=0; i<rxns.length; i++) {
+                var rxn = rxns[i];
 
-                newCpds.push({
-                    concentration: 0.001,
-                    minFlux: -100,
-                    maxFlux: 100,
-                    id: cpd.id,
-                    compound_ref: defaultRef+cpd.id,
-                    name: cpd.name
+                newRxns.push({
+                    equation: rxn.definition,
+                    id: rxn.id+'_c0',
+                    reaction_: defaultRef+rxn.id,
+                    name: rxn.name,
+                    genes: []
                 })
             }
 
-            return newCpds;
+            return newRxns;
         }
 
 
