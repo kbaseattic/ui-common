@@ -1631,6 +1631,7 @@ angular.module('lp-directives')
             $(ele).append($panel);
             $panel.find('.panel-title').append('Narrative Apps and Methods Documentation');
             $panel.find('.panel-body').KBaseNarrativeStoreView({
+                    namespace:   scope.params.namespace,
                     type:   scope.params.type,
                     id:  scope.params.id,
                     loadingImage: "assets/img/ajax-loader.gif"

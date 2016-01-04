@@ -87,7 +87,7 @@ $.KBWidget({
 
         self.kbapi('ws', 'get_objects', [param])
           .done(function(data){
-              var setMethod = self.obj.setData(data[0].data);
+              var setMethod = self.obj.setData(data[0].data, tabs);
 
               // see if setData method returns promise or not
               if (setMethod && 'done' in setMethod) {

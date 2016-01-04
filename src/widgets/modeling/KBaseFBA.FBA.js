@@ -240,14 +240,16 @@ function KBaseFBA_FBA(modeltabs) {
             "key": "maxprod",
             "visible": 0
         }]
-    }, {
+    },
+    {
         "name": "Pathways",
         "widget": "kbasePathways",
         "getParams": function() {
             return {models: [self.model],
                     fbas: [self.data]};
         }
-    }];
+    },
+    ];
 
     this.setMetadata = function (indata) {
         this.workspace = indata[7];
@@ -289,6 +291,7 @@ function KBaseFBA_FBA(modeltabs) {
 
     this.formatObject = function () {
         this.usermeta.model = self.data.fbamodel_ref;
+
         this.usermeta.media = self.data.media_ref;
         this.usermeta.objective = self.data.objectiveValue;
         this.usermeta.minfluxes = self.data.fluxMinimization;
@@ -518,12 +521,40 @@ function KBaseFBA_FBA(modeltabs) {
         }
     };
 
-	this.setData = function (indata) { // this is a mess
+	this.setData = function (indata, tabs) { // this is a mess
+
         self.data = indata;
         var p = self.modeltabs.kbapi('ws', 'get_objects', [{ref: indata.fbamodel_ref}]).then(function(data){
             self.model = data[0].data;
+
+            //this is a godawful hack. When we setData, lookup the PlantModelTemplate, and if it's there, then add a barchart
+            //otherwise, do nothing. Assume we'll attempt this if we've been given tabs.
+            if (tabs != undefined) {
+                self.modeltabs.kbapi('ws', 'get_objects', [{ref : self.model.template_ref}]).then(function(data) {
+
+                    if (data[0].info[1] == 'PlantModelTemplate') {
+
+                        tabs.$elem.find('[data-id=Pathways]').hide();
+
+                        var $barchartElem = $.jqElem('div')
+                        $barchartElem.kbasePMIBarchart(
+                                    {
+                                        fba_workspace : self.workspace,
+                                        fba_object : self.objName
+                                    }
+                                )
+
+                            tabs.addTab({
+                                "name": "Bar charts",
+                                'content' : $barchartElem
+                            });
+                    }
+                });
+            }
+
 			var kbModeling = new KBModeling();  // this is a mess
 			self.model = new kbModeling["KBaseFBA_FBAModel"](self.modeltabs);
+
 			self.model.setMetadata(data[0].info);
 			self.model.setData(data[0].data);
  			self.formatObject();
