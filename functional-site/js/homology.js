@@ -346,19 +346,6 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         }
     });
 
-    // This block of code will never be executed because of scoping, guessing nobody checked this
-    // when they modified the code.
-    /*
-    postal.channel('session').subscribe('login.success', function (session) {
-        $state.go('search');
-        $scope.$apply();
-    });
-
-    postal.channel('session').subscribe('logout.success', function (session) {
-        $state.go('search');
-        $scope.$apply();
-    });
-    */
 
     $scope.$bus.subscribe({
         channel: 'session',
@@ -370,27 +357,6 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
             $scope.options.userState.session.name = session.token;
         }
     });
-
-    /*
-     * disable -- logout now always goes to /login.
-
-    $scope.$bus.subscribe({
-        channel: 'session',
-        topic: 'logout.success',
-        callback: function() {
-            // by definition, there is no session available after logout.
-            $scope.options.userState.session.token = null;
-            $scope.options.userState.session.user_id = null;
-            $scope.options.userState.session.name = null;
-            // It was my mistake (eap) to pass an empty session object
-            // in the logout.success message.
-            //$scope.options.userState.session.token = session.token;
-            //$scope.options.userState.session.user_id = session.user_id;
-            //$scope.options.userState.session.name = session.name;
-            $state.go('search');
-        }
-    });
-     */
 
     $scope.availablePrograms = [{value: "blastn", label: "blastn"},
         {value: "blastp", label: "blastp", selected:true},
