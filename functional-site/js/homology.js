@@ -19,7 +19,7 @@ homologyApp.config(function($httpProvider,$stateProvider,$provide) {
         $stateProvider
             .state('homology', {
                 url: "/homology/?q&category&page&itemsPerPage&sort&facets",
-                templateUrl: 'views/search/search.html',
+                templateUrl: 'views/homology/homology.html',
                 controller: 'homologyController'
             });
 
@@ -392,6 +392,18 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
     });
      */
 
+    $scope.availablePrograms = [{value: "blastn", label: "blastn"},
+        {value: "blastp", label: "blastp", selected:true},
+        {value: "blastx", label: "blastx"},
+        {value: "tblastn", label: "tblastn"},
+        {value: "tblastx", label: "tblastx"}
+    ];
+
+    $scope.targetSequences = [{value:1, label:"1"},
+        {value: 10, label: "10", selected: true},
+        {value: 100, label: "100"},
+        {value: 1000, label: "1000"}
+    ];
 
     $scope.login = function() {
         postal.channel('loginwidget').publish('login.prompt');
@@ -1007,10 +1019,6 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
                 }
             }
 
-            //console.log("after remove");
-            //console.log($scope.options.searchOptions.perCategory[category][type]);
-            //console.log($scope.options.searchOptions.perCategory[category][type].length);
-
             if ($scope.options.searchOptions.perCategory[category][type].length === 0) {
                 delete $scope.options.searchOptions.perCategory[category][type];
             }
@@ -1100,118 +1108,6 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         }
     };
 
-
-    $scope.toggleFacet = function (name, value, checked) {
-        // need to reset the page when a facet changes
-        $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].page = 1;
-
-        if (checked) {
-            $scope.removeFacet(name, value);
-        }
-        else {
-            $scope.addFacet(name, value, true);
-        }
-
-        $scope.toggleFacetPanel(name);
-    };
-
-
-    $scope.toggleFacetPanel = function (key) {
-        if (!$scope.options.open_facet_panels.hasOwnProperty($scope.options.selectedCategory)) {
-            $scope.options.open_facet_panels[$scope.options.selectedCategory] = {};
-            $scope.options.open_facet_panels[$scope.options.selectedCategory][key] = true;
-        }
-        else if (!$scope.options.open_facet_panels[$scope.options.selectedCategory].hasOwnProperty(key)) {
-            $scope.options.open_facet_panels[$scope.options.selectedCategory][key] = true;
-        }
-        else if ($scope.options.open_facet_panels[$scope.options.selectedCategory][key] === false) {
-            $scope.options.open_facet_panels[$scope.options.selectedCategory][key] = true;
-        }
-        else {
-            $scope.options.open_facet_panels[$scope.options.selectedCategory][key] = false;
-        }
-    };
-
-    $scope.isFacetPanelCollapsed = function (key) {
-        return !angular.element("#" + key + "_panel").hasClass("in");
-    };
-
-    $scope.addFacet = function (name, value, searchAgain) {
-        //console.log([name, value]);
-
-        if (!$scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
-            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets = name + ":" + value.replace(",","*").replace(":","^");
-        }
-        else {
-            $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets += "," + name + ":" + value.replace(",","*").replace(":","^");
-        }
-
-        if (!$scope.options.active_facets.hasOwnProperty($scope.options.selectedCategory)) {
-            $scope.options.active_facets[$scope.options.selectedCategory] = {};
-        }
-
-        if (!$scope.options.active_facets[$scope.options.selectedCategory].hasOwnProperty(name)) {
-            $scope.options.active_facets[$scope.options.selectedCategory][name] = {};
-        }
-
-        $scope.options.active_facets[$scope.options.selectedCategory][name][value] = true;
-
-        if (searchAgain === undefined || searchAgain === true) {
-            $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);
-            $state.go("homology", {category: $scope.options.selectedCategory, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
-        }
-    };
-
-
-    $scope.removeFacet = function (name, value, searchAgain) {
-        $scope.removeSearchFilter($scope.options.selectedCategory, "facets", name, value);
-
-        delete $scope.options.active_facets[$scope.options.selectedCategory][name][value];
-
-        if ($.isEmptyObject($scope.options.active_facets[$scope.options.selectedCategory][name])) {
-            delete $scope.options.active_facets[$scope.options.selectedCategory][name];
-        }
-
-        if (!$scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
-            $scope.options.active_facets[$scope.options.selectedCategory] = {};
-        }
-
-        if (searchAgain === undefined || searchAgain === true) {
-            $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);
-            $state.go("homology", {category: $scope.options.selectedCategory, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
-        }
-    };
-
-
-    $scope.removeAllFacets = function () {
-        var changed = false;
-
-        for (var name in $scope.options.active_facets[$scope.options.selectedCategory]) {
-            //console.log(name);
-
-            if ($scope.options.active_facets[$scope.options.selectedCategory].hasOwnProperty(name)) {
-                //console.log(name);
-                for (var value in $scope.options.active_facets[$scope.options.selectedCategory][name]) {
-                    //console.log(value);
-                    if ($scope.options.active_facets[$scope.options.selectedCategory][name].hasOwnProperty(value)) {
-                        //console.log(value);
-                        $scope.removeSearchFilter($scope.options.selectedCategory, "facets", name, value);
-                        changed = true;
-                    }
-                }
-                delete $scope.options.active_facets[$scope.options.selectedCategory][name];
-
-                if (!$scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
-                    $scope.options.active_facets[$scope.options.selectedCategory] = {};
-                }
-            }
-        }
-
-        if (changed) {
-            $scope.getCount({q: $scope.options.searchOptions.general.q, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets}, $scope.options.selectedCategory);
-            $state.go("homology", {category: $scope.options.selectedCategory, facets: $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets, page: 1});
-        }
-    };
 
 
     $scope.setView = function (type) {
@@ -2087,24 +1983,6 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         $scope.saveUserState();
     };
 
-/*
-    $scope.toggleAllTransferCart = function() {
-        if ($scope.options.userState.session.transfer_cart.all) {
-            for (var d in $scope.options.userState.session.transfer_cart.items) {
-                if ($scope.options.userState.session.data_cart.data.hasOwnProperty(d)) {
-                    $scope.options.userState.session.data_cart.data[d].cart_selected = true;
-                }
-            }
-        }
-        else {
-            for (var d in $scope.options.userState.session.transfer_cart.items) {
-                if ($scope.options.userState.session.data_cart.data.hasOwnProperty(d)) {
-                    $scope.options.userState.session.data_cart.data[d].cart_selected = false;
-                }
-            }
-        }
-    };
-*/
 
     $scope.toggleAllDataCart = function(type) {
         console.log("toggleAllDataCart : " + type);
@@ -2248,16 +2126,6 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         }
     };
 
-
-/*
-    $scope.isActiveTab = function(category) {
-        return ($scope.options.selectedCategory.indexOf(category) === 0) || ($scope.options.data_tabs[category]);
-    };
-
-    $scope.setActiveTab = function(category) {
-        $scope.options.data_tabs.category = true;
-    };
-*/
 
     $scope.getSearchbarTooltipText = function () {
         if ($scope.options.selectedCategory) {
