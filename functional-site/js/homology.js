@@ -204,20 +204,22 @@ homologyApp.service('searchOptionsService', function searchOptionsService() {
 
     return {
         categoryInfo : {},
-        categoryTemplates : {},
-        categoryGroups : {},
         searchCategories : {},
         categoryRelationships : {},
-        expandedCategories : { 'genomes': true,
-                               'features': true,
-                               'metagenomes': true,
-                               'models_media': true,
-                               'models_fba': true
-                             },
+        expandedCategories : {
+            'features': true
+        },
         related: {},
         numPageLinks : 10,
         defaultSearchOptions : {
-                                "general": {"itemsPerPage": 10},
+                                "general": {
+                                    "itemsPerPage": 10,
+                                    "program": "blastp",
+                                    //"genome_ids": ["879462.4"],
+                                    "genome_ids": ["83333.84", "83332.12", "1005566.3",   "1005567.3",   "1005703.3",   "1005704.3",   "1005705.3", "1005706.3",   "1005941.3",   "1005994.3",   "1005995.3",   "1005996.3", "1005999.3",   "1005999.4",   "1006000.3",   "1006003.3",   "1006004.4", "1006006.8",   "1006007.3",   "1006543.3",   "1006551.4",   "1006554.3", "1006579.6",   "1006581.3",   "1007064.3",   "1007096.3",   "1007103.3", "1007104.3",   "1007105.3",   "1007109.3",   "1007110.3",   "1007111.3"],
+                                    "max_hit": 10,
+                                    "evalue": "1e-10"
+                                },
                                 "perCategory": {}
                                },
         categoryCounts : {},
@@ -250,10 +252,8 @@ homologyApp.service('searchOptionsService', function searchOptionsService() {
         transferring: false,
         objectsTransferred: 0,
         transferSize: 0,
-        selectedCategory : null,
+        selectedCategory : "features",
         pageLinksRange : [],
-        facets : null,
-        active_facets: {},
         active_sorts: {},
         open_facet_panels: {},
         data_tabs: {},
@@ -270,8 +270,6 @@ homologyApp.service('searchOptionsService', function searchOptionsService() {
             this.transferSize = 0;
             this.selectedCategory = null;
             this.pageLinksRange = [];
-            this.facets = null;
-            this.active_facets = {};
             this.active_sorts = {};
             this.open_facet_panels = {};
             this.data_tabs = {};
@@ -312,22 +310,6 @@ homologyApp.filter('highlight', function($sce) {
 /* Controllers */
 
 // This controller is responsible for the Search Data Nav and connects to the Search view controller
-homologyApp.controller('searchBarController', function searchBarCtrl($rootScope, $scope, $state) {
-    $scope.$on('queryChange', function(event, query) {
-        $scope.query = query;
-    });
-
-    $scope.newSearch = function () {
-        if ($scope.query && $scope.query.length > 0) {
-            //$rootScope.$state.go('search', {q: $scope.query});
-            $state.go('homology', {q: $scope.query});
-        }
-        else {
-            //$rootScope.$state.go('search', {q: "*"});
-            $state.go('homology', {q: "*"});
-        }
-    };
-});
 
 
 /*
@@ -495,19 +477,9 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         }
 
         $scope.options.templates = {};
-        for (var p in $scope.options.searchCategories) {
-            if ($scope.options.searchCategories.hasOwnProperty(p) && p !== "models") {
-                $scope.options.templates[p] = {};
-                $scope.options.templates[p]["root"] = "views/search/searchCategory.html";
-                $scope.options.templates[p]["header"] = "views/search/categories/" + p + "/" + p + "_header.html";
-                $scope.options.templates[p]["rows"] = "views/search/categories/" + p + "/" + p + "_rows.html";
-                $scope.options.templates[p]["expanded"] = "views/search/categories/" + p + "/" + p + "_expanded.html";
-            }
-            if ($scope.options.searchCategories.hasOwnProperty(p) && p === "models") {
-                $scope.options.templates[p] = {};
-                $scope.options.templates[p]["root"] = "views/search/categories/models.html";
-            }
-        }
+        $scope.options.templates["root"] = "views/homology/homologyResult.html";
+        $scope.options.templates["header"] = "views/homology/features_header.html";
+        $scope.options.templates["rows"] = "views/homology/features_rows.html";
 
         //console.log($scope.options.related);
         //console.log($scope.options.searchCategories);
@@ -535,242 +507,124 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
     };
 
 
-
-    $scope.getCount = function(options, category) {
-
-        //console.log("getCount");
-        //console.log([options, category]);
-
-        var queryOptions = {};
-
-        angular.copy(options, queryOptions);
-
-        queryOptions["page"] = 1;
-        queryOptions["itemsPerPage"] = 0;
-        queryOptions["category"] = category;
-
-        //console.log("getCount : " + JSON.stringify(queryOptions));
-
-        if (queryOptions.hasOwnProperty("facets") && queryOptions["facets"]) {
-            queryOptions["facets"] = $scope.sanitizeFacets(options["facets"]);
-        }
-
-        if (!$scope.options.userState.session.hasOwnProperty("ajax_requests") || !$scope.options.userState.session.ajax_requests) {
-            $scope.options.userState.session.ajax_requests = [];
-        }
-
-        $scope.options.userState.session.ajax_requests.push(
-            $http({method: 'GET',
-                   url: $rootScope.kb.search_url + "getResults",
-                   params: queryOptions,
-                   responseType: 'json'
-                  }).then(function (jsonResult) {
-                      if (jsonResult.data.totalResults === undefined) {
-                          $scope.options.categoryCounts[category] = 0;
-                      }
-                      else {
-                          $scope.options.categoryCounts[category] = jsonResult.data.totalResults;
-                      }
-
-                      if ($scope.options.selectedCategory && category === $scope.options.selectedCategory) {
-                          countsAvailable = true;
-                      }
-                      //console.log($scope.options.categoryCounts);
-                  }, function (error) {
-                      console.log(error);
-                      $scope.options.categoryCounts[category] = 0;
-                  }, function (update) {
-                      console.log(update);
-                  })
-        );
-    };
-
     $scope.getTotalCount = function() {
-        var sum = 0;
-        for (var p in $scope.options.categoryCounts) {
-            if ($scope.options.categoryCounts.hasOwnProperty(p)) {
-                sum += $scope.options.categoryCounts[p];
-            }
-        }
-
-        return sum;
+        return $scope.options.resultJSON.totalResults;
     };
 
-    $scope.getResults = function(category, options) {
-        //console.log($scope.options);
-        var queryOptions = {};
+    $scope.getHomologyResults = function(options){
 
-        if (!$scope.options.userState.session.hasOwnProperty("ajax_requests") || !$scope.options.userState.session.ajax_requests) {
-            $scope.options.userState.session.ajax_requests = [];
-        }
-
-        if (category === null || category === undefined) {
-            queryOptions = {'q': options.general.q};
-
-            $("#loading_message_text").html(options.defaultMessage);
-            $.blockUI({message: $("#loading_message")});
-
-            for (var p in $scope.options.searchCategories) {
-                if ($scope.options.searchCategories.hasOwnProperty(p) && $scope.options.searchCategories[p].category !== null) {
-                    if ($scope.options.searchCategories[p].category === $scope.options.selectedCategory && options.perCategory[p].hasOwnProperty("facets") && options.perCategory[p]["facets"]) {
-                        queryOptions["facets"] = $scope.sanitizeFacets(options.perCategory[p]["facets"]);
-                    }
-
-                    $scope.getCount(queryOptions, $scope.options.searchCategories[p].category);
-                    queryOptions = {'q': options.general.q};
-                }
-                else {
-                    $scope.options.categoryCounts[category] = 0;
-                }
-            }
-
-            $scope.options.countsAvailable = true;
-
-            // here we are waiting for all the ajax count calls to complete before unblocking the UI
-            $q.all($scope.options.userState.session.ajax_requests).then(function() {
-                $.unblockUI();
-                $scope.options.userState.session.ajax_requests = [];
-                $scope.searchActive = false;
-                //console.log($scope.options.categoryCounts);
-            });
-
-            return;
-        }
-
-        queryOptions.category = category;
-        for (var prop in options) {
-            if (prop === "general") {
-                for (var gen_prop in options.general) {
-                    if (options.general.hasOwnProperty(gen_prop)) {
-                        queryOptions[gen_prop] = options.general[gen_prop];
-                    }
-                }
-
-                if (queryOptions.hasOwnProperty("token")) {
-                    delete queryOptions.token;
-                }
-            }
-            else if (prop === "perCategory") {
-                for (var cat_prop in options.perCategory[category]) {
-                    if (options.perCategory[category].hasOwnProperty(cat_prop)) {
-                        queryOptions[cat_prop] = options.perCategory[category][cat_prop];
-                    }
-                }
-            }
-        }
-
-        if (queryOptions.hasOwnProperty("facets") && queryOptions["facets"]) {
-            queryOptions["facets"] = $scope.sanitizeFacets(queryOptions["facets"]);
-        }
+        var query = {
+            "program": options.program,
+            "parameters": [],
+            "output_format": "tabular",
+            "evalue": options.threshold,
+            "max_hits": options.max_target,
+            "min_coverage": 70,
+            "query": options.sequence,
+            "subject_genome": options.genome_ids
+        };
 
         $("#loading_message_text").html(options.defaultMessage);
         $.blockUI({message: $("#loading_message")});
 
-        //console.log("getResults : " + JSON.stringify(queryOptions));
+        $http({method: 'POST',
+            url: "http://larch.mcs.anl.gov:7133/search",
+            data: JSON.stringify(query)
+        }).then(function (response) {
 
-        $http({method: 'GET',
-               url: $rootScope.kb.search_url + "getResults",
-               params: queryOptions,
-               responseType: 'json'
-              }).then(function (jsonResult) {
+            $scope.options.resultJSON = {
+                items: $scope.parseTabularOutput(response.data),
+                itemCount: 10,
+                currentPage: 1,
+                itemsPerPage: 10
+            };
+            $scope.options.resultJSON.totalResults = $scope.options.resultJSON.items.length;
+            $scope.options.resultsAvailable = true;
 
-                  for (var i = 0; i < jsonResult.data.items.length; i++) {
-                      jsonResult.data.items[i].position = (jsonResult.data.currentPage - 1) * jsonResult.data.itemsPerPage + i + 1;
+            console.log($scope.options.resultJSON);
 
-                      if (jsonResult.data.items[i].hasOwnProperty("object_id")) {
-                          jsonResult.data.items[i].row_id = jsonResult.data.items[i].object_id.replace(/\||\./g,"_");
-                      }
-                      else {
-                          if (jsonResult.data.items[i].hasOwnProperty("feature_id")) {
-                              jsonResult.data.items[i].row_id = jsonResult.data.items[i].feature_id.replace(/\||\./g,"_");
-                              //console.log(jsonResult.data.items[i].row_id);
-                          }
-                          else if (jsonResult.data.items[i].hasOwnProperty("genome_id")) {
-                              jsonResult.data.items[i].row_id = jsonResult.data.items[i].genome_id.replace(/\||\./g,"_");
-                          }
-                      }
+            var position = $scope.options.resultJSON.currentPage % $scope.options.numPageLinks;
+            var start;
 
-                      if (jsonResult.data.items[i].hasOwnProperty("taxonomy")) {
-                          jsonResult.data.items[i].taxonomy = jsonResult.data.items[i].taxonomy.join('; ');
-                      }
-                  }
-
-                  $scope.options.resultJSON = jsonResult.data;
-                  $scope.options.resultsAvailable = true;
-                  $scope.options.pageLinksRange = [];
-
-                  $scope.options.facets = null;
-
-                  if ($scope.options.resultJSON.hasOwnProperty('facets')) {
-                      $scope.options.facets = [];
-
-                      for (var p in $scope.options.resultJSON.facets) {
-                          if ($scope.options.resultJSON.facets.hasOwnProperty(p)) {
-                              var facet_options = [];
-                              var count = 0;
-
-                              for (var i = 0; i < $scope.options.resultJSON.facets[p].length - 1; i += 2) {
-                                  facet_options.push({key: $scope.options.resultJSON.facets[p][i], value: $scope.options.resultJSON.facets[p][i+1]});
-                                  count += $scope.options.resultJSON.facets[p][i+1];
-                              }
-
-                              $scope.options.facets.push({key: p, value: facet_options, count: count});
-                          }
-                      }
-                  }
-
-                  var position = $scope.options.resultJSON.currentPage % $scope.options.numPageLinks;
-                  var start;
-
-                  if (position === 0) {
-                      start = $scope.options.resultJSON.currentPage - $scope.options.numPageLinks + 1;
-                  }
-                  else {
-                      start = $scope.options.resultJSON.currentPage - position + 1;
-                  }
-
-                  var end = start + $scope.options.numPageLinks;
-
-                  for (var p = start; p < end && (p - 1) * $scope.options.resultJSON.itemsPerPage < $scope.options.resultJSON.totalResults; p++) {
-                      $scope.options.pageLinksRange.push(p);
-                  }
-
-                  if ($scope.options.resultJSON.items.length > 0) {
-                      $scope.options.currentItemRange = $scope.options.resultJSON.items[0].position + "-" + $scope.options.resultJSON.items[$scope.options.resultJSON.items.length - 1].position;
-                  }
-                  else {
-                      console.log($scope.options);
-                  }
-
-                  //$scope.options.currentURL = $state.href("search", $stateParams, {absolute: true});
-                  $scope.options.currentURL = $state.href("homology", $stateParams, {absolute: true});
-
-                  console.log($scope.options.resultJSON);
-                  $.unblockUI();
-              }, function (error) {
-                  console.log("getResults threw an error!");
-                  console.log(error);
-                  $scope.options.resultsAvailable = false;
-                  $.unblockUI();
-              }, function (update) {
-                  console.log(update);
-              });
-    };
-
-
-    $scope.newSearch = function () {
-        if ($scope.options.searchOptions.general.q && $scope.options.searchOptions.general.q.length > 0) {
-            $scope.saveUserState();
-
-            // if we are in the category view, update the individual count
-            if ($scope.options.selectedCategory) {
-                $scope.getCount({q: $scope.options.searchOptions.general.q}, $scope.options.selectedCategory);
-                $state.go('homology', {q: $scope.options.searchOptions.general.q, category: $scope.options.selectedCategory, page: 1, sort: null, facets: null});
+            if (position === 0) {
+                start = $scope.options.resultJSON.currentPage - $scope.options.numPageLinks + 1;
             }
             else {
-                $state.go('homology', {q: $scope.options.searchOptions.general.q});
+                start = $scope.options.resultJSON.currentPage - position + 1;
             }
+
+            var end = start + $scope.options.numPageLinks;
+
+            for (var p = start; p < end && (p - 1) * $scope.options.resultJSON.itemsPerPage < $scope.options.resultJSON.totalResults; p++) {
+                $scope.options.pageLinksRange.push(p);
+            }
+
+            if ($scope.options.resultJSON.items.length > 0) {
+                $scope.options.currentItemRange = $scope.options.resultJSON.items[0].position + "-" + $scope.options.resultJSON.items[$scope.options.resultJSON.items.length - 1].position;
+            }
+            else {
+                console.log($scope.options);
+            }
+
+            $.unblockUI();
+
+        }, function (error) {
+            console.log("getResults threw an error!");
+            console.log(error);
+            $scope.options.resultsAvailable = false;
+            $.unblockUI();
+        }, function (update) {
+            console.log(update);
+        });
+    };
+
+    $scope.parseTabularOutput = function(output){
+        var lines = output.split('\n');
+        var entries = [];
+        lines.forEach(function(line, index){
+            var cols = line.split('\t');
+            if(cols.length > 1){
+                entries.push({
+                    "row_id": cols[1].split('|').slice(0,2).join("|"),
+                    "object_type": "KBaseSearch.Feature",
+                    "object_id": "",
+                    "position": (index+1),
+                    "qseqid": cols[0],
+                    "sseqid": cols[1],
+                    "pident": Number(cols[2]),
+                    "length": Number(cols[3]),
+                    "mismatch": cols[4],
+                    "gapopen": cols[5],
+                    "qstart": Number(cols[6]),
+                    "qend": Number(cols[7]),
+                    "sstart": Number(cols[8]),
+                    "send": Number(cols[9]),
+                    "evalue": cols[10],
+                    "bitscore": cols[11]
+                });
+            }
+        });
+        return entries;
+    };
+
+    $scope.newSearch = function () {
+
+        if ($scope.options.searchOptions.general.sequence && $scope.options.searchOptions.general.sequence.length > 0){
+            $scope.getHomologyResults($scope.options.searchOptions.general);
         }
+
+        //if ($scope.options.searchOptions.general.q && $scope.options.searchOptions.general.q.length > 0) {
+        //    $scope.saveUserState();
+		//
+        //    // if we are in the category view, update the individual count
+        //    if ($scope.options.selectedCategory) {
+        //        $scope.getCount({q: $scope.options.searchOptions.general.q}, $scope.options.selectedCategory);
+        //        $state.go('homology', {q: $scope.options.searchOptions.general.q, category: $scope.options.selectedCategory, page: 1, sort: null, facets: null});
+        //    }
+        //    else {
+        //        $state.go('homology', {q: $scope.options.searchOptions.general.q});
+        //    }
+        //}
     };
 
 
@@ -888,9 +742,6 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         if (!$scope.options.categoryInfo.hasOwnProperty("displayTree")) {
             init().then(function () {
                 captureState();
-                $scope.getResults(null, $scope.options.searchOptions);
-
-                $scope.getResults($scope.options.selectedCategory, $scope.options.searchOptions);
             });
         }
         else {
@@ -900,41 +751,16 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
             var queryOptions = {q: $scope.options.searchOptions.general.q};
 
             if ($scope.options.selectedCategory) {
-                if ($scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
-                    queryOptions.facets = $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets;
-                }
 
                 if ($scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("sort")) {
                     queryOptions.sort = $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].sort;
                 }
             }
 
-            if ($scope.options.selectedCategory) {
-                $scope.getCount(queryOptions, $scope.options.selectedCategory);
-            }
-
-            $scope.getResults($scope.options.selectedCategory, $scope.options.searchOptions);
+            $scope.getHomologyResults($scope.options.searchOptions);
         }
     };
 
-    $scope.selectCategory = function(value) {
-        $scope.options.selectedCategory = value;
-
-        //console.log("Selected category : " + value);
-        $scope.saveUserState();
-
-        if (value === null || value === 'null') {
-            $scope.options.reset();
-            $state.go("homology", {category: null, page: null, itemsPerPage: null, facets: null, sort: null});
-        }
-        else {
-            if (!$scope.options.searchOptions.perCategory.hasOwnProperty(value)) {
-                $scope.options.searchOptions.perCategory[value] = {"page": 1};
-            }
-
-            $state.go("homology", {category: $scope.options.selectedCategory, itemsPerPage: null, facets: null, sort: null});
-        }
-    };
 
 
     $scope.isInActiveCategoryTree = function(value) {
@@ -952,9 +778,6 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
 
             if (type === "sort") {
                 oldFilter = $scope.options.searchOptions.perCategory[category][type].indexOf(name);
-            }
-            else if (type === "facets") {
-                oldFilter = $scope.options.searchOptions.perCategory[category][type].indexOf(name + ":" + value.replace(",","*").replace(":","^"));
             }
 
             var nextComma = $scope.options.searchOptions.perCategory[category][type].indexOf(",");
@@ -1228,43 +1051,6 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
 
     };
 
-
-    $scope.copyGenomeSet = function(n) {
-
-    };
-
-
-    $scope.copyMetagenome = function(n) {
-        return $scope.workspace_service.get_object_info([{"name": $scope.options.userState.session.data_cart.data[n]["object_name"], "workspace": $scope.options.publicWorkspaces['metagenomes']}])
-            .fail(function (xhr, status, error) {
-                console.log(xhr);
-                console.log(status);
-                console.log(error);
-            })
-            .done(function (info, status, xhr) {
-                function success(result) {
-                    $scope.$apply(function () {
-                        $scope.options.objectsTransferred += 1;
-                        $scope.options.duplicates[n] = {};
-                        if ($scope.options.objectsTransferred === $scope.options.transferSize) {
-                            $scope.completeTransfer();
-                        }
-                    });
-                }
-
-                function error(result) {
-                    console.log("Object failed to copy");
-                    console.log(result);
-                    $scope.transferError($scope.options.userState.session.data_cart.data[n]["object_name"],
-                                         $scope.options.userState.session.data_cart.data[n]["object_id"],
-                                         result);
-                }
-
-                $scope.options.transferRequests += 1;
-
-                $scope.workspace_service.copy_object({"from": {"workspace": $scope.options.publicWorkspaces['metagenomes'], "name": info[0][1]}, "to": {"workspace": $scope.options.userState.session.selectedWorkspace, "name": $scope.options.userState.session.data_cart.data[n]["object_name"]}}, success, error);
-            });
-    };
 
 
     $scope.copyFeature = function(n) {
@@ -1772,26 +1558,7 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
 
     $scope.selectCheckbox = function(id, item) {
         if (!$scope.options.userState.session.data_cart.data.hasOwnProperty(id)) {
-            if (item.object_type.indexOf(".Genome") > -1) {
-                $scope.options.userState.session.data_cart.size += 1;
-                $scope.options.userState.session.data_cart.data[id] = {
-                    "workspace_name": item.workspace_name,
-                    "object_type": item.object_type,
-                    "object_id": item.object_id,
-                    "row_id": item.row_id,
-                    "genome_id": item.genome_id,
-                    "scientific_name": item.scientific_name,
-                    "domain": item.domain,
-                    "gc_content": item.gc_content,
-                    "num_contigs": item.num_contigs,
-                    "num_cds": item.num_cds,
-                    "genome_dna_size": item.genome_dna_size,
-                    "cart_selected": false
-                };
-                $scope.options.userState.session.data_cart.types['genomes'].markers[id] = {};
-                $scope.options.userState.session.data_cart.types['genomes'].size += 1;
-            }
-            else if (item.object_type.indexOf(".Feature") > -1) {
+            if (item.object_type.indexOf(".Feature") > -1) {
                 $scope.options.userState.session.data_cart.size += 1;
                 $scope.options.userState.session.data_cart.data[id] = {
                     "workspace_name": item.workspace_name,
@@ -1811,67 +1578,6 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
                 $scope.options.userState.session.data_cart.types['features'].markers[id] = {};
                 $scope.options.userState.session.data_cart.types['features'].size += 1;
             }
-            else if (item.object_type.indexOf(".Metagenome") > -1) {
-                $scope.options.userState.session.data_cart.size += 1;
-                $scope.options.userState.session.data_cart.data[id] = {
-                    "workspace_name": item.workspace_name,
-                    "object_id": item.object_id,
-                    "object_name": item.object_name,
-                    "object_type": item.object_type,
-                    "row_id": item.row_id,
-                    "metagenome_id": item.metagenome_id,
-                    "metagenome_name": item.metagenome_name,
-                    "project_name": item.project_name,
-                    "sample_name": item.sample_name,
-                    "cart_selected": false
-                };
-                $scope.options.userState.session.data_cart.types['metagenomes'].markers[id] = {};
-                $scope.options.userState.session.data_cart.types['metagenomes'].size += 1;
-            }
-            else if (item.object_type.indexOf("KBaseFBA") > -1 || item.object_type.indexOf("KBaseBiochem") > -1) {
-                if (item.object_type.indexOf(".FBAModel") > -1) {
-                    $scope.options.userState.session.data_cart.types['models'].subtypes['models_fba'].markers[id] = {};
-                    $scope.options.userState.session.data_cart.types['models'].subtypes['models_fba'].size += 1;
-                    $scope.options.userState.session.data_cart.types['models'].size += 1;
-                    $scope.options.userState.session.data_cart.data[id] = {
-                        "workspace_name": item.workspace_name,
-                        "object_id": item.object_id,
-                        "object_name": item.object_name,
-                        "object_type": item.object_type,
-                        "row_id": item.row_id,
-                        "fba_model_id": item.fba_model_id,
-                        "scientific_name": item.scientific_name,
-                        "number_of_features": item.number_of_features,
-                        "number_of_reactions": item.number_of_reactions,
-                        "number_of_gapfillings": item.number_of_gapfillings,
-                        "cart_selected": false
-                    };
-                }
-                else if (item.object_type.indexOf(".Media") > -1) {
-                    $scope.options.userState.session.data_cart.types['models'].subtypes['models_media'].markers[id] = {};
-                    $scope.options.userState.session.data_cart.types['models'].subtypes['models_media'].size += 1;
-                    $scope.options.userState.session.data_cart.types['models'].size += 1;
-                    $scope.options.userState.session.data_cart.data[id] = {
-                        "workspace_name": item.workspace_name,
-                        "object_id": item.object_id,
-                        "object_name": item.object_name,
-                        "object_type": item.object_type,
-                        "row_id": item.row_id,
-                        "media_id": item.media_id,
-                        "media_name": item.media_name,
-                        "media_type": item.media_type,
-                        "number_of_compounds": item.number_of_compounds,
-                        "is_defined": item.is_defined,
-                        "is_minimal": item.is_minimal,
-                        "cart_selected": false
-                    };
-                }
-                else {
-                    throw Error("Unknown Model type : " + item.object_type);
-                }
-
-                $scope.options.userState.session.data_cart.size += 1;
-            }
             else {
                 throw Error("Trying to add unknown type!");
             }
@@ -1883,29 +1589,9 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
             delete $scope.options.userState.session.data_cart.data[id];
             $scope.options.userState.session.data_cart.size -= 1;
 
-            if (item.object_type.indexOf(".Genome") > -1) {
-                delete $scope.options.userState.session.data_cart.types['genomes'].markers[id];
-                $scope.options.userState.session.data_cart.types['genomes'].size -= 1;
-            }
-            else if (item.object_type.indexOf(".Feature") > -1) {
+            if (item.object_type.indexOf(".Feature") > -1) {
                 delete $scope.options.userState.session.data_cart.types['features'].markers[id];
                 $scope.options.userState.session.data_cart.types['features'].size -= 1;
-            }
-            else if (item.object_type.indexOf(".Metagenome") > -1) {
-                delete $scope.options.userState.session.data_cart.types['metagenomes'].markers[id];
-                $scope.options.userState.session.data_cart.types['metagenomes'].size -= 1;
-            }
-            else if (item.object_type.indexOf("KBaseFBA") > -1 || item.object_type.indexOf("KBaseBiochem") > -1) {
-                if (item.object_type.indexOf(".FBAModel") > -1) {
-                    delete $scope.options.userState.session.data_cart.types['models'].subtypes['models_fba'].markers[id];
-                    $scope.options.userState.session.data_cart.types['models'].subtypes['models_fba'].size -= 1;
-                    $scope.options.userState.session.data_cart.types['models'].size -= 1;
-                }
-                else if (item.object_type.indexOf(".Media") > -1) {
-                    delete $scope.options.userState.session.data_cart.types['models'].subtypes['models_media'].markers[id];
-                    $scope.options.userState.session.data_cart.types['models'].subtypes['models_media'].size -= 1;
-                    $scope.options.userState.session.data_cart.types['models'].size -= 1;
-                }
             }
             else {
                 throw Error("Trying to delete unknown type!");
