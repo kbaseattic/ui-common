@@ -574,6 +574,11 @@ table.search-transfer-table {
     vertical-align:top;
 }
 
+.search-result-column-expanded-entry-cell pre {
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 12px;
+}
 .search-result-column-header {
     margin-left: 0px;
     margin-right: 0px;

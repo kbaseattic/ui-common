@@ -190,7 +190,7 @@ homologyApp.service('searchOptionsService', function searchOptionsService() {
                                     "max_hit": 10,
                                     "evalue": "1e-10"
                                 },
-                                "perCategory": {}
+                                "perCategory": {"features":{}}
                                },
         categoryCounts : {},
         searchOptions : this.defaultSearchOptions,
@@ -233,7 +233,7 @@ homologyApp.service('searchOptionsService', function searchOptionsService() {
             this.transferring = false;
             this.objectsTransferred = 0;
             this.transferSize = 0;
-            this.selectedCategory = null;
+            //this.selectedCategory = null;
             this.pageLinksRange = [];
             this.active_sorts = {};
             this.open_facet_panels = {};
@@ -269,6 +269,25 @@ homologyApp.filter('highlight', function($sce) {
         
         return input;
     };
+});
+
+homologyApp.filter('displayPairwiseComparison', function($sce) {
+   return function(pairwise){
+       var output = [];
+       var qSeqArr = pairwise.qseq.match(/.{1,60}/g);
+       var hSeqArr = pairwise.hseq.match(/.{1,60}/g);
+       var mlArr = pairwise.midline.match(/.{1,60}/g);
+
+       for (var i = 0, n = qSeqArr.length; i < n; i++) {
+           var pos = String("    " + (i*60 + 1)).slice(-4);
+           output.push(["Query", pos, qSeqArr[i]].join("  "));
+           output.push(["     ", "    ", mlArr[i]].join("  "));
+           output.push(["Sbjct", pos, hSeqArr[i]].join("  "));
+           output.push("\n");
+       }
+
+       return $sce.trustAsHtml(output.join("\n"));
+   }
 });
 
 
@@ -357,6 +376,7 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         $scope.options.templates["root"] = "views/homology/homologyResult.html";
         $scope.options.templates["header"] = "views/homology/features_header.html";
         $scope.options.templates["rows"] = "views/homology/features_rows.html";
+        $scope.options.templates["expanded"] = "views/homology/features_expanded.html";
     };
 
 
@@ -390,7 +410,7 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         var query = {
             "program": options.program,
             "parameters": [],
-            "output_format": "tabular",
+            "output_format": "json",
             "evalue": options.threshold,
             "max_hits": options.max_target,
             "min_coverage": 70,
@@ -407,7 +427,7 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         }).then(function (response) {
 
             $scope.options.resultJSON = {
-                items: $scope.parseTabularOutput(response.data),
+                items: $scope.formatJSONResult(response.data),
                 itemCount: 10,
                 currentPage: 1,
                 itemsPerPage: 10
@@ -452,31 +472,34 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         });
     };
 
-    $scope.parseTabularOutput = function(output){
-        var lines = output.split('\n');
+    $scope.formatJSONResult = function(json){
+        console.log(json);
+        var root = json.BlastOutput2.report.results.search;
+        var hits = root.hits;
+        var query_title = root.query_title;
         var entries = [];
-        lines.forEach(function(line, index){
-            var cols = line.split('\t');
-            if(cols.length > 1){
-                entries.push({
-                    "row_id": cols[1].split('|').slice(0,2).join("|"),
-                    "object_type": "KBaseSearch.Feature",
-                    "object_id": "",
-                    "position": (index+1),
-                    "qseqid": cols[0],
-                    "sseqid": cols[1],
-                    "pident": Number(cols[2]),
-                    "length": Number(cols[3]),
-                    "mismatch": cols[4],
-                    "gapopen": cols[5],
-                    "qstart": Number(cols[6]),
-                    "qend": Number(cols[7]),
-                    "sstart": Number(cols[8]),
-                    "send": Number(cols[9]),
-                    "evalue": cols[10],
-                    "bitscore": cols[11]
-                });
-            }
+        hits.forEach(function(hit, index){
+            //console.log(hit);
+            entries.push({
+                "row_id": hit.description[0].title.split('|').slice(0,2).join("|"),
+                "object_type": "KBaseSearch.Feature",
+                "position": (index + 1),
+                "qseqid": query_title,
+                "sseqid": hit.description[0].title,
+                "pident": parseInt(Number(hit.hsps[0].identity / hit.len * 10000))/100,
+                "length": hit.len,
+                "qstart": hit.hsps[0].query_from,
+                "qend": hit.hsps[0].query_to,
+                "sstart": hit.hsps[0].hit_from,
+                "send": hit.hsps[0].hit_to,
+                "evalue": hit.hsps[0].evalue,
+                "bitscore": Math.round(hit.hsps[0].bit_score),
+                "pairewise": {
+                    "qseq": hit.hsps[0].qseq,
+                    "hseq": hit.hsps[0].hseq,
+                    "midline": hit.hsps[0].midline
+                }
+           });
         });
         return entries;
     };
@@ -568,29 +591,6 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
             }
 
             // apply facets
-            if ($stateParams.facets !== null) {
-                  // clear any cached facets
-                  delete $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets;
-                  $scope.options.active_facets[$scope.options.selectedCategory] = {};
-
-                  var facetSplit = $stateParams.facets.split(",");
-
-                  var facet_keyval = [];
-
-                  for (var i = 0; i < facetSplit.length; i++) {
-                      facet_keyval = facetSplit[i].split(":");
-
-                      $scope.addFacet(facet_keyval[0],facet_keyval[1].replace("*",",").replace('^',':'), false);
-                  }
-            }
-            else {
-                $scope.options.facets = null;
-
-                if ($scope.options.selectedCategory && $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].hasOwnProperty("facets")) {
-                    delete $scope.options.searchOptions.perCategory[$scope.options.selectedCategory].facets;
-                    $scope.options.active_facets[$scope.options.selectedCategory] = {};
-                }
-            }
 
             // apply sorting
             if ($stateParams.sort !== null) {
