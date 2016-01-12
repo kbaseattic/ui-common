@@ -87,22 +87,6 @@ homologyApp.factory("require", function($rootScope) {
 /*
  *  This service is responsible for fetching the search service category information.
  */
-homologyApp.service('searchCategoryLoadService', function($q, $http, $rootScope) {
-    // Functions for fetching and manipulating model data
-    return {
-        getCategoryInfo : function () {
-            var deferred = $q.defer();
-
-            $http.get($rootScope.kb.search_url + "categories").then(function fetchCategories(results) {
-                this.categoriesJSON = results.data;
-                deferred.resolve(results);
-            });
-
-            return deferred.promise;
-        }
-    };
-});
-
 
 homologyApp.service('searchKBaseClientsService', function($q, $http, $rootScope) {
     return {
@@ -144,28 +128,14 @@ homologyApp.service('searchOptionsService', function searchOptionsService() {
         "breadcrumbs": {},
         "displayWorkspaces": false,
         "set": {
-            'genomes': true,
-            'features': true,
-            'metagenomes': true,
-            'models': false,
-            'models_fba': true,
-            'models_media': false
+            'features': true
         },
         "data_cart": {
             size: 0,
             all: false,
             data: {},
             types: {
-                'genomes': {all: false, size: 0, markers: {}},
-                'features': {all: false, size: 0, markers: {}},
-                'metagenomes': {all: false, size: 0, markers: {}},
-                'models': {
-                    size: 0,
-                    subtypes: {
-                        'models_fba': {all: false, size: 0, markers: {}},
-                        'models_media': {all: false, size: 0, markers: {}}
-                    }
-                }
+                'features': {all: false, size: 0, markers: {}}
             }
         },
         "transfer_cart": {
@@ -237,12 +207,7 @@ homologyApp.service('searchOptionsService', function searchOptionsService() {
                           },
         landingPagePrefix: "/functional-site/#/dataview/",
         iconMapping: {
-            "metagenomes": "<span class='fa-stack'><i class='fa fa-circle fa-stack-2x' style='color: rgb(255, 193, 7);'></i><i class='icon fa-inverse fa-stack-1x icon-metagenome kb-data-icon-dnudge'></i></span>",
-            "genomes": "<span class='fa-stack'><i class='fa fa-circle fa-stack-2x' style='color: rgb(63, 81, 181);'></i><i class='icon fa-inverse fa-stack-1x icon-genome kb-data-icon-dnudge'></i></span>",
             "features": "<span class='fa-stack'><i class='fa fa-circle fa-stack-2x' style='color: rgb(63, 81, 181);'></i><i class='icon fa-inverse fa-stack-1x icon-genome kb-data-icon-dnudge'></i></span>",
-            "models_fba": "<span class='fa-stack'><i class='fa fa-circle fa-stack-2x' style='color: rgb(0, 96, 100);'></i><i class='icon fa-inverse fa-stack-1x icon-metabolism kb-data-icon-dnudge'></i></span>",
-            "models_media": "<span class='fa-stack'><i class='fa fa-circle fa-stack-2x' style='color: rgb(244, 67, 54);'></i><i class='fa fa-inverse fa-stack-1x fa-flask'></i></span>",
-            "models": "<span class='fa-stack'><i class='fa fa-circle fa-stack-2x' style='color: rgb(0, 96, 100);'></i><i class='icon fa-inverse fa-stack-1x icon-metabolism kb-data-icon-dnudge'></i></span>",
             "all": "<span class='fa-stack'><img id='logo' src='assets/navbar/images/kbase_logo.png' width='46'></span>"
         },
         resultJSON : {},
@@ -387,102 +352,11 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
 
 
     $scope.loadCategories = function() {
-        var flattenCategories = function(resource) {
-            if (resource.hasOwnProperty("category") && $scope.options.categoryInfo.categories.hasOwnProperty(resource.category)) {
-                $scope.options.searchCategories[resource.category] = {"category": resource.category, "label": resource.label};
-            }
-
-            if (resource.hasOwnProperty("children")) {
-                for (var i = 0; i < resource.children.length; i++) {
-                    flattenCategories(resource.children[i]);
-                }
-            }
-        };
-
-        for (var p in $scope.options.categoryInfo.displayTree) {
-            if ($scope.options.categoryInfo.displayTree.hasOwnProperty(p)) {
-                flattenCategories($scope.options.categoryInfo.displayTree[p]);
-            }
-        }
-
-        var recordRelationships = function(node, nodeParent) {
-            if (node.hasOwnProperty("category")) {
-                $scope.options.categoryRelationships[node.category] = {"parent": nodeParent, "children": []};
-
-                if (node.hasOwnProperty("children")) {
-                    for (var i = 0; i < node.children.length; i++) {
-                        if (node.children[i].hasOwnProperty("category")) {
-                            $scope.options.categoryRelationships[node.category].children.push(node.children[i].category);
-
-                            recordRelationships(node.children[i], node.category);
-                        }
-                    }
-                }
-            }
-            else {
-                if (node.hasOwnProperty("children")) {
-                    for (var i = 0; i < node.children.length; i++) {
-                        recordRelationships(node.children[i], nodeParent);
-                    }
-                }
-            }
-        };
-
-        recordRelationships($scope.options.categoryInfo.displayTree['unauthenticated'], null);
-
-        var isRelated = function(a, b) {
-            var splits = [a.split("_"), b.split("_")];
-
-            if (splits[0][0] !== splits[1][0]) {
-                return false;
-            }
-
-            // test to see if a is an ancestor of b or just siblings
-            if (splits[0].length < splits[1].length) {
-                if (splits[0].length === 1) {
-                    return true;
-                }
-
-                for (var i = 0; i < splits[0].length; i++) {
-                    if (splits[0][i] !== splits[1][i]) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            // test to see if b is an ancestor of a or just siblings
-            else {
-                if (splits[1].length === 1) {
-                    return true;
-                }
-
-                for (var i = 0; i < splits[1].length; i++) {
-                    if (splits[1][i] !== splits[0][i]) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        };
-
-
-        for (var p in $scope.options.categoryRelationships) {
-            if ($scope.options.categoryRelationships.hasOwnProperty(p)) {
-                $scope.options.related[p] = {};
-
-                for (var psub in $scope.options.categoryRelationships) {
-                    $scope.options.related[p][psub] = isRelated(p, psub);
-                }
-            }
-        }
 
         $scope.options.templates = {};
         $scope.options.templates["root"] = "views/homology/homologyResult.html";
         $scope.options.templates["header"] = "views/homology/features_header.html";
         $scope.options.templates["rows"] = "views/homology/features_rows.html";
-
-        //console.log($scope.options.related);
-        //console.log($scope.options.searchCategories);
     };
 
 
@@ -637,8 +511,12 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
 
         var init = function () {
             // in here we initialize anything we would want to reset on starting a new search
-            return searchCategoryLoadService.getCategoryInfo().then(function(results) {
-                $scope.options.categoryInfo = results.data;
+            //return searchCategoryLoadService.getCategoryInfo().then(function(results) {
+            //    $scope.options.categoryInfo = results.data;
+            var deferred = $q.defer();
+            deferred.resolve();
+            return deferred.promise.then(function(){
+                $scope.options.categoryInfo.displayTree = true;
                 $scope.loadCategories();
             });
         };
@@ -1484,25 +1362,9 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
     };
 
     $scope.removeSelection = function(n) {
-        if (n.object_type.indexOf(".Genome") > -1) {
-            delete $scope.options.userState.session.data_cart.types['genomes'].markers[n.row_id];
-            $scope.options.userState.session.data_cart.types['genomes'].size -= 1;
-        }
-        else if (n.object_type.indexOf(".Feature") > -1) {
+        if (n.object_type.indexOf(".Feature") > -1) {
             delete $scope.options.userState.session.data_cart.types['features'].markers[n.row_id];
             $scope.options.userState.session.data_cart.types['features'].size -= 1;
-        }
-        else if (n.object_type.indexOf(".Metagenome") > -1) {
-            delete $scope.options.userState.session.data_cart.types['metagenomes'].markers[n.row_id];
-            $scope.options.userState.session.data_cart.types['metagenomes'].size -= 1;
-        }
-        else if (n.object_type.indexOf(".FBAModel") > -1 || n.object_type.indexOf(".Media") > -1) {
-            delete $scope.options.userState.session.data_cart.types['models'].markers[n.row_id];
-            $scope.options.userState.session.data_cart.types['models'].size -= 1;
-        }
-        else if (n.object_type.indexOf("KBaseGwas") > -1) {
-            delete $scope.options.userState.session.data_cart.types['gwas'].markers[n.row_id];
-            $scope.options.userState.session.data_cart.types['gwas'].size -= 1;
         }
         else {
             throw Error("Trying to delete unknown type!");
@@ -1519,15 +1381,7 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
             size: 0,
             data: {},
             types: {
-                'genomes': {all: false, size: 0, markers: {}},
-                'features': {all: false, size: 0, markers: {}},
-                'metagenomes': {all: false, size: 0, markers: {}},
-                'models': {size: 0,
-                           subtypes: {
-                               'models_fba': {all: false, size: 0, markers: {}},
-                               'models_media': {all: false, size: 0, markers: {}}
-                           }
-                        }
+                'features': {all: false, size: 0, markers: {}}
             }
         };
     };
