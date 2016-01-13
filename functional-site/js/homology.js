@@ -252,25 +252,6 @@ homologyApp.service('searchOptionsService', function searchOptionsService() {
 
 
 /* Filters */
-
-homologyApp.filter('highlight', function($sce) {
-    return function(input, tokens) {
-        if (tokens.length == 0 || tokens.length == 1 && tokens[0] == '*') {
-            return input;
-        }
-    
-        if (input) {    
-            console.log(tokens);
-            var regex = new RegExp('(' + tokens.join('|') + ')', 'ig');
-            console.log(regex.string);
-            console.log(input.replace(regex, '<span class="search-result-highlight">$&</span>'));
-            return $sce.trustAsHtml(input.replace(regex, '<span class="search-result-highlight">$&</span>'));
-        }
-        
-        return input;
-    };
-});
-
 homologyApp.filter('displayPairwiseComparison', function($sce) {
    return function(pairwise){
        var output = [];
