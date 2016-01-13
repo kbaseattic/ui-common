@@ -422,7 +422,7 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         $.blockUI({message: $("#loading_message")});
 
         $http({method: 'POST',
-            url: "http://larch.mcs.anl.gov:7133/search",
+            url: $rootScope.kb.homology_service_url,
             data: JSON.stringify(query)
         }).then(function (response) {
 
