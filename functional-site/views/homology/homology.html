@@ -197,7 +197,7 @@
                             </div>
                             <div class="col-md-12 search-results-toolbar">
                                 <div ng-if="options.expandedCategories[options.selectedCategory]" class="btn-group btn-group-xs col-xs-2 search-view-buttons" data-toggle="buttons">
-                                    <label for="list_view" class="control-label input-group">Views</label>
+                                    <label class="control-label input-group">Views</label>
                                     <label data-toggle="tooltip" data-placement="left" tooltip="Compact results" tooltip-placement="top" class="btn btn-small btn-default" ng-class="{'active': options.userState.session.viewType == 'compact'}" ng-click="setView('compact')">
                                         <input type="radio" name="list_view"/>
                                         <span class="glyphicon glyphicon-list"></span>
@@ -209,7 +209,7 @@
                                 </div>
                                 <div ng-if="!options.expandedCategories[options.selectedCategory]" class="btn-group btn-group-xs col-xs-2 search-view-buttons"></div>
                                 <div class="btn-group btn-group-xs col-xs-3 search-perpage-buttons" data-toggle="buttons">
-                                    <label for="rpp" class="control-label input-group">Items per page</label>
+                                    <label class="control-label input-group">Items per page</label>
                                     <label class="btn btn-default" ng-class="{'active': i == options.searchOptions.general.itemsPerPage}" ng-repeat="i in [10,25,50,100]" ng-click="setResultsPerPage(i)">
                                         <input type="radio" name="rpp" >{{i}}</input>
                                     </label>
@@ -252,7 +252,7 @@
 
         <div id="error" class="row hidden">
             Sorry, an error occurred. Please try again.
-            <hr></hr>
+            <hr/>
             <div id="error_text"></div>
         </div>
 
