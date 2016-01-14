@@ -323,16 +323,16 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
     ];
 
     // controls for genome name input boxes
-    $scope.numGenomes = [{num:0}];
+    $scope.targetGenomes = [{key:0}];
 
     $scope.addGenomeInputBox = function() {
-        var max = $scope.numGenomes[$scope.numGenomes.length-1];
-        $scope.numGenomes.push({num: (max.num + 1)});
+        var last = $scope.targetGenomes[$scope.targetGenomes.length-1];
+        $scope.targetGenomes.push({key: (last.key + 1)});
     };
 
     $scope.removeGenomeInputBox = function(item) {
-      $scope.numGenomes = $scope.numGenomes.filter(function(i){
-          return (i.num != item.num);
+      $scope.targetGenomes = $scope.targetGenomes.filter(function(i){
+          return (i.key != item.key);
       });
     };
 
@@ -351,10 +351,11 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         });
     };
 
-    $scope.onGenomeNameSelect = function($item, $model, $label) {
-        $scope.options.searchOptions.general.genome_ids.push($item.id);
+    $scope.onGenomeNameSelect = function($item, $model, $label, idx) {
+        //console.log($item, $model, $label, idx);
+        $scope.targetGenomes[idx].genome_id = $item.id;
     };
-    // end of controlls for genome name input boxes
+    // end of controls for genome name input boxes
 
     $scope.login = function() {
         postal.channel('loginwidget').publish('login.prompt');
@@ -502,9 +503,13 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
     $scope.getHomologyResults = function(options){
 
         // TODO: implement validation with proper message
-        if (options.genome_ids.length == 0) return;
+        //console.log($scope.targetGenomes);
+        var genomeIds = $scope.targetGenomes.map(function(genome){
+           return genome.genome_id;
+        });
+        if (genomeIds.length == 0) return;
 
-        var params = [options.sequence, options.program, options.genome_ids, "features", options.evalue, options.max_hit, 70];
+        var params = [options.sequence, options.program, genomeIds, "features", options.evalue, options.max_hit, 70];
 
         $("#loading_message_text").html(options.defaultMessage);
         $.blockUI({message: $("#loading_message")});
