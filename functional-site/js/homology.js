@@ -185,8 +185,7 @@ homologyApp.service('searchOptionsService', function searchOptionsService() {
                                 "general": {
                                     "itemsPerPage": 10,
                                     "program": "blastp",
-                                    //"genome_ids": ["879462.4"],
-                                    "genome_ids": ["83333.84", "83332.12", "1005566.3",   "1005567.3",   "1005703.3",   "1005704.3",   "1005705.3", "1005706.3",   "1005941.3",   "1005994.3",   "1005995.3",   "1005996.3", "1005999.3",   "1005999.4",   "1006000.3",   "1006003.3",   "1006004.4", "1006006.8",   "1006007.3",   "1006543.3",   "1006551.4",   "1006554.3", "1006579.6",   "1006581.3",   "1007064.3",   "1007096.3",   "1007103.3", "1007104.3",   "1007105.3",   "1007109.3",   "1007110.3",   "1007111.3"],
+                                    "genome_ids": ["kb|g.0","kb|g.3014","kb|g.23431"],
                                     "max_hit": 10,
                                     "evalue": "1e-10"
                                 },
@@ -386,34 +385,98 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         return $scope.options.resultJSON.totalResults;
     };
 
+    // reusing Bob's json rpc function
+    $scope.json_call_ajax = function(method, params, numRets, callback, errorCallback) {
+        var deferred = $.Deferred();
+
+        if (typeof callback === 'function') {
+            deferred.done(callback);
+        }
+
+        if (typeof errorCallback === 'function') {
+            deferred.fail(errorCallback);
+        }
+
+        var rpc = {
+            params : params,
+            method : method,
+            version: "1.1",
+            id: String(Math.random()).slice(2),
+        };
+
+        var beforeSend = null;
+        //var token = (_auth_cb && typeof _auth_cb === 'function') ? _auth_cb()
+        //    : (_auth.token ? _auth.token : null);
+        //if (token != null) {
+        //    beforeSend = function (xhr) {
+        //        xhr.setRequestHeader("Authorization", token);
+        //    }
+        //}
+
+        var xhr = jQuery.ajax({
+            url: $rootScope.kb.homology_service_url,
+            dataType: "text",
+            type: 'POST',
+            processData: false,
+            data: JSON.stringify(rpc),
+            beforeSend: beforeSend,
+            success: function (data, status, xhr) {
+                var result;
+                try {
+                    var resp = JSON.parse(data);
+                    result = (numRets === 1 ? resp.result[0] : resp.result);
+                } catch (err) {
+                    deferred.reject({
+                        status: 503,
+                        error: err,
+                        url: $rootScope.kb.homology_service_url,
+                        resp: data
+                    });
+                    return;
+                }
+                deferred.resolve(result);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                var error;
+                if (xhr.responseText) {
+                    try {
+                        var resp = JSON.parse(xhr.responseText);
+                        error = resp.error;
+                    } catch (err) { // Not JSON
+                        error = "Unknown error - " + xhr.responseText;
+                    }
+                } else {
+                    error = "Unknown Error";
+                }
+                deferred.reject({
+                    status: 500,
+                    error: error
+                });
+            }
+        });
+
+        var promise = deferred.promise();
+        promise.xhr = xhr;
+        return promise;
+    };
+
     $scope.getHomologyResults = function(options){
 
-        var query = {
-            "program": options.program,
-            "parameters": [],
-            "output_format": "json",
-            "evalue": options.threshold,
-            "max_hits": options.max_target,
-            "min_coverage": 70,
-            "query": options.sequence,
-            "subject_genome": options.genome_ids
-        };
+        var params = [options.sequence, options.program, options.genome_ids, "features", options.evalue, options.max_hit, 70];
 
         $("#loading_message_text").html(options.defaultMessage);
         $.blockUI({message: $("#loading_message")});
 
-        $http({method: 'POST',
-            url: $rootScope.kb.homology_service_url,
-            data: JSON.stringify(query)
-        }).then(function (response) {
+        $scope.json_call_ajax("HomologyService.blast_fasta_to_genomes", params, 2, function(data) {
 
+            var items = $scope.formatJSONResult(data);
             $scope.options.resultJSON = {
-                items: $scope.formatJSONResult(response.data),
+                items: items,
                 itemCount: 10,
                 currentPage: 1,
-                itemsPerPage: 10
+                itemsPerPage: 10,
+                totalResults: items.length
             };
-            $scope.options.resultJSON.totalResults = $scope.options.resultJSON.items.length;
             $scope.options.resultsAvailable = true;
 
             console.log($scope.options.resultJSON);
@@ -441,21 +504,21 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
                 console.log($scope.options);
             }
 
+            $scope.$apply();
             $.unblockUI();
 
         }, function (error) {
             console.log("getResults threw an error!");
             console.log(error);
             $scope.options.resultsAvailable = false;
+            $scope.$apply();
             $.unblockUI();
-        }, function (update) {
-            console.log(update);
         });
     };
 
     $scope.formatJSONResult = function(json){
         console.log(json);
-        var root = json.BlastOutput2.report.results.search;
+        var root = json[0][0].report.results.search;
         var hits = root.hits;
         var query_title = root.query_title;
         var entries = [];
@@ -490,19 +553,6 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         if ($scope.options.searchOptions.general.sequence && $scope.options.searchOptions.general.sequence.length > 0){
             $scope.getHomologyResults($scope.options.searchOptions.general);
         }
-
-        //if ($scope.options.searchOptions.general.q && $scope.options.searchOptions.general.q.length > 0) {
-        //    $scope.saveUserState();
-		//
-        //    // if we are in the category view, update the individual count
-        //    if ($scope.options.selectedCategory) {
-        //        $scope.getCount({q: $scope.options.searchOptions.general.q}, $scope.options.selectedCategory);
-        //        $state.go('homology', {q: $scope.options.searchOptions.general.q, category: $scope.options.selectedCategory, page: 1, sort: null, facets: null});
-        //    }
-        //    else {
-        //        $state.go('homology', {q: $scope.options.searchOptions.general.q});
-        //    }
-        //}
     };
 
 
