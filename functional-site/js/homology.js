@@ -260,10 +260,10 @@ homologyApp.filter('displayPairwiseComparison', function($sce) {
        var mlArr = pairwise.midline.match(/.{1,60}/g);
 
        for (var i = 0, n = qSeqArr.length; i < n; i++) {
-           var pos = String("    " + (i*60 + 1)).slice(-4);
-           output.push(["Query", pos, qSeqArr[i]].join("  "));
-           output.push(["     ", "    ", mlArr[i]].join("  "));
-           output.push(["Sbjct", pos, hSeqArr[i]].join("  "));
+           //var pos = String("    " + (i*60 + 1)).slice(-4); // TODO: need to use coordination.
+           output.push(["Query", qSeqArr[i]].join("  "));
+           output.push(["     ", mlArr[i]].join("  "));
+           output.push(["Sbjct", hSeqArr[i]].join("  "));
            output.push("\n");
        }
 
