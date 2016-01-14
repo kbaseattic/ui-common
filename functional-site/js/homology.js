@@ -185,7 +185,7 @@ homologyApp.service('searchOptionsService', function searchOptionsService() {
                                 "general": {
                                     "itemsPerPage": 10,
                                     "program": "blastp",
-                                    "genome_ids": ["kb|g.0","kb|g.3014","kb|g.23431"],
+                                    "genome_ids": [],
                                     "max_hit": 10,
                                     "evalue": "1e-10"
                                 },
@@ -304,6 +304,11 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         }
     });
 
+    $scope.availableDatabases = [{value: "kbase_fna", label: "KBase genomic sequences (fna)"},
+        {value: "kbase_ffn", label: "KBase gene sequences (ffn)"},
+        {value: "kbase_faa", label: "KBase protein sequences (faa)"}
+    ];
+
     $scope.availablePrograms = [{value: "blastn", label: "blastn"},
         {value: "blastp", label: "blastp", selected:true},
         {value: "blastx", label: "blastx"},
@@ -316,6 +321,40 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
         {value: 100, label: "100"},
         {value: 1000, label: "1000"}
     ];
+
+    // controls for genome name input boxes
+    $scope.numGenomes = [{num:0}];
+
+    $scope.addGenomeInputBox = function() {
+        var max = $scope.numGenomes[$scope.numGenomes.length-1];
+        $scope.numGenomes.push({num: (max.num + 1)});
+    };
+
+    $scope.removeGenomeInputBox = function(item) {
+      $scope.numGenomes = $scope.numGenomes.filter(function(i){
+          return (i.num != item.num);
+      });
+    };
+
+    $scope.getGenomeName = function(name) {
+        return $http.get($rootScope.kb.search_url + "getResults", {
+            params: {
+                category: 'genomes',
+                itemsPerPage: 20,
+                page: 1,
+                q: name
+            }
+        }).then(function(response){
+            return response.data.items.map(function(genome){
+               return {name: genome.scientific_name, id: genome.genome_id};
+            });
+        });
+    };
+
+    $scope.onGenomeNameSelect = function($item, $model, $label) {
+        $scope.options.searchOptions.general.genome_ids.push($item.id);
+    };
+    // end of controlls for genome name input boxes
 
     $scope.login = function() {
         postal.channel('loginwidget').publish('login.prompt');
@@ -462,6 +501,9 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
 
     $scope.getHomologyResults = function(options){
 
+        // TODO: implement validation with proper message
+        if (options.genome_ids.length == 0) return;
+
         var params = [options.sequence, options.program, options.genome_ids, "features", options.evalue, options.max_hit, 70];
 
         $("#loading_message_text").html(options.defaultMessage);
@@ -479,7 +521,7 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
             };
             $scope.options.resultsAvailable = true;
 
-            console.log($scope.options.resultJSON);
+            //console.log($scope.options.resultJSON);
 
             var position = $scope.options.resultJSON.currentPage % $scope.options.numPageLinks;
             var start;
@@ -517,7 +559,7 @@ homologyApp.controller('homologyController', function searchCtrl($rootScope, $sc
     };
 
     $scope.formatJSONResult = function(json){
-        console.log(json);
+        //console.log(json);
         var root = json[0][0].report.results.search;
         var hits = root.hits;
         var query_title = root.query_title;
