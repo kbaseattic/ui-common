@@ -106,7 +106,7 @@ homologyApp.service('searchKBaseClientsService', function($q, $http, $rootScope)
  *  This service houses the various options captured for Search, some of which
  *  are housed in local storage for persistence.
  */
-homologyApp.service('searchOptionsService', function searchOptionsService() {
+homologyApp.service('homologyOptionsService', function homologyOptionsService() {
     var genomesWorkspace = "KBasePublicGenomesV4";
     var searchGenomesWorkspace = "KBasePublicRichGenomesV4";
     var metagenomesWorkspace = "wilke:Data";
@@ -279,8 +279,8 @@ homologyApp.filter('displayPairwiseComparison', function($sce) {
 /*
  *  The main Search controller that is responsible for content inside the Search view.
  */
-homologyApp.controller('homologyController', function searchCtrl($rootScope, $scope, $q, $timeout, $http, $state, $stateParams, searchCategoryLoadService, searchOptionsService, searchKBaseClientsService, require) {
-    $scope.options = searchOptionsService;
+homologyApp.controller('homologyController', function searchCtrl($rootScope, $scope, $q, $timeout, $http, $state, $stateParams, homologyOptionsService, searchKBaseClientsService, require) {
+    $scope.options = homologyOptionsService;
     $scope.workspace_service;
     $scope.narrative_manager;
 
