@@ -44,7 +44,8 @@ define('kbaseExpressionSampleTable',
                     { title : 'Feature Value'}
                 ]
             });
-            $dt.fnAddData(rows);
+            //$dt.fnAddData(rows);
+            $dt.rows.add(rows);
 
             /*this.data('tableElem').kbaseTable(
                 {
