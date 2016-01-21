@@ -51,7 +51,7 @@ define('kbaseRNASeqHistogram',
 
                 bars.push(
                     {
-                        bar : xCoord,
+                        bar : i++,
                         value : newDataset.data[1].shift() || 0,
                         color : 'blue',
                     }
@@ -128,7 +128,7 @@ define('kbaseRNASeqHistogram',
                 this.data('barchartElem').kbaseBarchart(
                     {
                         scaleAxes   : true,
-                        xPadding : 50,
+                        xPadding : 60,
 
                         xLabelRegion : 'yPadding',
                         yLabelRegion : 'xPadding',
@@ -145,6 +145,33 @@ define('kbaseRNASeqHistogram',
                     }
                 )
             );
+
+            var $barchart = this.data('barchart');
+            $barchart.superRenderChart = $barchart.renderChart;
+            $barchart.renderChart = function() {
+                $barchart.superRenderChart();
+
+                this.D3svg()
+                    .selectAll('.xAxis .tick text')
+                    .data(this.dataset())
+                    .attr('fill', function (L, i) {
+                        var val = $barchart.dataset()[i].value;
+                        return val[0] === 0 ? undefined : 'blue';
+                    })
+                    .on('mouseover', function(L, i) {
+                        var tip = $barchart.dataset()[i].value;
+                        if (tip[0]) {
+                            $barchart.showToolTip(
+                                {
+                                    label : $barchart.dataset()[i].value,
+                                }
+                            );
+                        }
+                    })
+                    .on('mouseout', function(d) {
+                        $barchart.hideToolTip();
+                    })
+            };
 
         },
 
