@@ -38,14 +38,14 @@ define('kbaseExpressionSampleTable',
                 }
             );
 
-            var $dt = this.data('tableElem').DataTable({
+            var $dt = this.data('tableElem').dataTable({
                 aoColumns : [
                     { title : 'Gene ID'},
                     { title : 'Feature Value'}
                 ]
             });
-            //$dt.fnAddData(rows);
-            $dt.rows.add(rows);
+            $dt.fnAddData(rows);
+            //$dt.rows.add(rows);
 
             /*this.data('tableElem').kbaseTable(
                 {
