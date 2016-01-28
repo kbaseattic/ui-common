@@ -220,6 +220,7 @@ define('kbaseBarchart',
                                 function(r,ri){
                                     if (r == xId) {
                                         this.oldFill = d3.select(this).attr('fill');
+                                        this.hasOldFill = true;
                                         return $bar.options.overColor;
                                     }
                                     else {
@@ -260,7 +261,13 @@ define('kbaseBarchart',
                         $bar.data('D3svg').select('.yPadding').selectAll('g g text')
                             .attr("fill",
                                 function(r,ri){
-                                   return this.oldFill || d3.select(this).attr('fill');
+                                    if (this.hasOldFill) {
+                                        this.hasOldFill = false;
+                                        return this.oldFill;
+                                    }
+                                    else {
+                                        return d3.select(this).attr('fill');
+                                    }
                                 }
                         );
                         $bar.hideToolTip();

@@ -811,7 +811,6 @@ define('kbaseVisWidget',
                                 var bounds = $self.yGutterBounds();
 
                                 var textBounds = this.getBBox();
-
                                 //bullshit magic numbers. Moving it over by 2/3rds of the width seems to line it up nicely, and down by the height.
                                 return "rotate(90) translate(" + (textBounds.width * 2/3) + ",-" + textBounds.height + ")";
                             })
