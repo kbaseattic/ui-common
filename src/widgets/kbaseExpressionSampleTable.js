@@ -234,7 +234,7 @@ define('kbaseExpressionSampleTable',
                         yLabelOffset : -10,
 
                         yLabel : 'Number of Genes',
-                        xLabel : 'Gene Expression Level (FPKM)',
+                        xLabel : 'Gene Expression Level log2(FPKM + 1)',
                         xAxisVerticalLabels : true
 
                     }
