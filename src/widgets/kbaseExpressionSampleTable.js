@@ -44,7 +44,7 @@ define('kbaseExpressionSampleTable',
                 exprKeys,
                 function (i,k) {
 
-                    var val = newDataset.expression_levels[k];
+                    var val = Math.round(newDataset.expression_levels[k] * 1000) / 1000;
 
                     rows.push( [k, val] );
 
