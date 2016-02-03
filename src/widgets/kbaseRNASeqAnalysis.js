@@ -19,7 +19,7 @@ define('kbaseRNASeqAnalysis',
         version: "1.0.0",
         options: {
             tableColumns : ['Experiment name', 'Title', 'Experiment Description', 'Experiment design', 'Platform', 'Library type',
-                            'Genome name', 'Genome annotation', 'Number of samples', 'Number of replicates', /*'Tissue', 'Condition',*/
+                            'Genome name', 'Genome annotation', 'Number of samples', 'Sample IDs', 'Number of replicates', 'Tissue', 'Condition',
                             'Domain', 'Source', 'Publication Details']
         },
 
@@ -295,6 +295,7 @@ define('kbaseRNASeqAnalysis',
         },
 
         updateUI : function updateUI() {
+
             this.data('tableElem').kbaseTable(
                 {
                     structure : {
@@ -310,15 +311,18 @@ define('kbaseRNASeqAnalysis',
                             'Genome annotation' : this.dataset().genome_annotation,
                             'Number of samples' : this.dataset().num_samples,
                             'Number of replicates' : this.dataset().num_replicates,
-                            'Tissue' : this.dataset().tissue ? this.dataset().tissue.join(', ') : '',
+                            'Sample IDs': this.dataset().sample_ids ? this.dataset().sample_ids.join(', ') : '',
                             'Condition' : this.dataset().condition ? this.dataset().condition.join(', ') : '',
+
+
+                            'Tissue' : this.dataset().tissue ? this.dataset().tissue.join(', ') : '',
                             'Domain' : this.dataset().domain,
                             'Source' : this.dataset().source,
                             'Publication Details' : this.dataset().publication_id,
                             'Alignments'  : this.dataset().parsed_alignments,
                             'Expression Values' : this.dataset().parsed_expression_values,
-                            'Transcriptome ID' : this.dataset().transcriptome_id,
-                            'CuffDiff Diff Exp ID' : this.dataset().cuffdiff_diff_exp_id,
+                            'Merged Transcriptome' : this.dataset().transcriptome_id,
+                            'CuffDiff Differential Expression ID' : this.dataset().cuffdiff_diff_exp_id,
                         },
                     }
                 }
