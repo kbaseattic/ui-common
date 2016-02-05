@@ -89,8 +89,6 @@ define('kbaseHeatmap',
         init : function(options) {
             this._super(options);
 
-            this.options.gradientID = this.linearGradient( { colors : this.options.colors });
-
             return this;
         },
 
@@ -98,6 +96,8 @@ define('kbaseHeatmap',
             if (newDataset.data != undefined && ! $.isArray(newDataset.data) ) {
                 newDataset = newDataset.data;
             }
+
+            this.options.gradientID = this.linearGradient( { colors : this.options.colors });
 
             this._super(newDataset);
         },
@@ -196,7 +196,7 @@ define('kbaseHeatmap',
                         //5 pixels up. Whee!
                         var width = d3.select(this).node().getComputedTextLength();
 
-                        return "rotate(-45,0,0) translate(" + (width / 2 + 50) + ",5)";// translate(2,3)";
+                        return "rotate(-45,0,0) translate(" + (width / 2 + 5) + ",5)";// translate(2,3)";
                     })
             ;
 

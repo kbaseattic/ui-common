@@ -45,7 +45,9 @@ define('kbaseExpressionSampleTable',
                 function (i,k) {
 
                     var val = Math.round(newDataset.expression_levels[k] * 1000) / 1000;
-
+//if (val < 2.209) {
+//    return;
+//}
                     rows.push( [k, val] );
 
                     if (val < min) {
@@ -85,7 +87,32 @@ define('kbaseExpressionSampleTable',
 
         renderHistogram : function renderHistogram(bins) {
 
-            var barData = d3.layout.histogram().bins(bins)( this.barchartDataset() );
+            var $me = this;
+
+            if (bins === undefined) {
+                bins = this.options.numBins;
+            }
+
+            var filteredDataset = this.barchartDataset();
+
+            if (this.options.minCutoff != undefined || this.options.maxCutoff != undefined) {
+                filteredDataset = [];
+
+                $.each(this.barchartDataset(),
+                    function(i, v) {
+                        if (
+                            ($me.options.minCutoff == undefined || v >= $me.options.minCutoff)
+                            &&
+                            ($me.options.maxCutoff == undefined || v <= $me.options.maxCutoff)
+                            ) {
+                            filteredDataset.push(v);
+                        }
+                    }
+                );
+
+            }
+
+            var barData = d3.layout.histogram().bins(bins)( filteredDataset );
 
             var bars = [];
             var sigDigits = 1000;
@@ -179,6 +206,26 @@ define('kbaseExpressionSampleTable',
                         .text($me.options.numBins)
                 )
                 .append(' bins<br>')
+                .append(' Expression level at least ')
+                .append(
+                    $.jqElem('input')
+                        .attr('type', 'input')
+                        .attr('id', 'minCutoff')
+                        .on('change', function(e) {
+                            $me.options.minCutoff = $(this).val();
+                            $me.renderHistogram();
+                        })
+                )
+                .append(' Exprssion level at most ')
+                .append(
+                    $.jqElem('input')
+                        .attr('type', 'input')
+                        .attr('id', 'maxCutoff')
+                        .on('change', function(e) {
+                            $me.options.maxCutoff = $(this).val();
+                            $me.renderHistogram();
+                        })
+                )
                 .append($barElem)
             ;
 
