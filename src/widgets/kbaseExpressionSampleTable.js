@@ -95,15 +95,15 @@ define('kbaseExpressionSampleTable',
 
             var filteredDataset = this.barchartDataset();
 
-            if (this.options.minCutoff != undefined || this.options.maxCutoff != undefined) {
+            if (! isNaN(this.options.minCutoff) || ! isNaN(this.options.maxCutoff)) {
                 filteredDataset = [];
 
                 $.each(this.barchartDataset(),
                     function(i, v) {
                         if (
-                            ($me.options.minCutoff == undefined || v >= $me.options.minCutoff)
+                            (isNaN($me.options.minCutoff) || v >= $me.options.minCutoff)
                             &&
-                            ($me.options.maxCutoff == undefined || v <= $me.options.maxCutoff)
+                            (isNaN($me.options.maxCutoff) || v <= $me.options.maxCutoff)
                             ) {
                             filteredDataset.push(v);
                         }
@@ -127,6 +127,7 @@ define('kbaseExpressionSampleTable',
                             value : bin.y,
                             color : 'blue',
                             tooltip : bin.y + ' in range<br>' + range,
+                            id : bin.x,
                         }
                     );
                 }
@@ -197,7 +198,8 @@ define('kbaseExpressionSampleTable',
                         })
                         .on('change', function(e) {
                             $me.data('numBins').text($(this).val());
-                            $me.renderHistogram(parseInt($(this).val()));
+                            $me.options.numBins = parseInt($(this).val());
+                            $me.renderHistogram();
                         })
                 )
                 .append(
@@ -212,7 +214,7 @@ define('kbaseExpressionSampleTable',
                         .attr('type', 'input')
                         .attr('id', 'minCutoff')
                         .on('change', function(e) {
-                            $me.options.minCutoff = $(this).val();
+                            $me.options.minCutoff = parseFloat($(this).val());
                             $me.renderHistogram();
                         })
                 )
@@ -222,7 +224,7 @@ define('kbaseExpressionSampleTable',
                         .attr('type', 'input')
                         .attr('id', 'maxCutoff')
                         .on('change', function(e) {
-                            $me.options.maxCutoff = $(this).val();
+                            $me.options.maxCutoff = parseFloat($(this).val());
                             $me.renderHistogram();
                         })
                 )
@@ -282,7 +284,8 @@ define('kbaseExpressionSampleTable',
 
                         yLabel : 'Number of Genes',
                         xLabel : 'Gene Expression Level log2(FPKM + 1)',
-                        xAxisVerticalLabels : true
+                        xAxisVerticalLabels : true,
+                        useUniqueID : true,
 
                     }
                 )
