@@ -160,8 +160,17 @@ define('kbaseBarchart',
                     this
                         //.attr('width', 0)
                         //.attr('height', 0)
-                        .attr('x', bounds.origin.x + bounds.size.width)
-                        //.attr('y', 0)
+                        //.attr('x', bounds.origin.x + bounds.size.width)
+                        .attr('x', function(b, j) {
+                            var xId = d.bar;
+                            if ($bar.options.useIDMapping) {
+                                xId = $bar.xIDMap()[xId];
+                            }
+
+                            return $bar.xScale()(xId) + barScale(d.stacked ? 0 : j);
+                        })
+                        .attr('y', bounds.origin.x + bounds.size.height)
+                        .attr('height', 0)
                         .attr('opacity', 0)
                 }
                 else {
@@ -177,22 +186,23 @@ define('kbaseBarchart',
                             return $bar.xScale()(xId) + barScale(d.stacked ? 0 : j);
                         } )
                         .attr('opacity', 1)
+                        .attr('y', function (b, bi) {
+
+                            var barHeight = b;
+                            if (d.stacked && $.isArray(d.value)) {
+                                barHeight = d3.sum(d.value.slice(0,bi+1));
+                            }
+
+                            return $bar.yScale()(Math.max(0,barHeight));
+                        } )
+                        .attr('height', function(b, bi) {
+                            return Math.abs($bar.yScale()(0) - $bar.yScale()(b))
+                        })
                 }
 
                 this
-                    .attr('y', function (b, bi) {
 
-                        var barHeight = b;
-                        if (d.stacked && $.isArray(d.value)) {
-                            barHeight = d3.sum(d.value.slice(0,bi+1));
-                        }
-
-                        return $bar.yScale()(Math.max(0,barHeight));
-                    } )
                     .attr('width', barScale.rangeBand())
-                    .attr('height', function(b, bi) {
-                        return Math.abs($bar.yScale()(0) - $bar.yScale()(b))
-                    })
                     .attr('fill', function(b,j) { return d.color[ j % d.color.length ] })
                     .attr('stroke', function(b,j) { return d.stroke ? d.stroke[ j % d.stroke.length ] : 'none' })
                     .attr('stroke-width', function(b,j) { return d.strokeWidth || $bar.options.strokeWidth })
@@ -399,12 +409,12 @@ define('kbaseBarchart',
                                 d3.select(this).selectAll('.barcharBar')
                                     .transition()
                                     .duration(transitionTime)
-                                        .attr('x', function (d) {
+                                        .attr('y', function (d) {
                                             /*var x = d3.select(this).attr('x');
                                             var xDest = x < bounds.origin.x + bounds.size.width / 2
                                                 ? bounds.origin.x
                                                 : bounds.origin.x + bounds.size.width;*/
-                                            return bounds.origin.x + bounds.size.width;
+                                            return bounds.origin.x + bounds.size.height;
                                         })
                                         .attr('opacity', 0)
                                         .each('end', function() {d3.select(this.parentNode).remove() } )
