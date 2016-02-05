@@ -218,7 +218,7 @@ define('kbaseExpressionSampleTable',
                             $me.renderHistogram();
                         })
                 )
-                .append(' Exprssion level at most ')
+                .append(' Expression level at most ')
                 .append(
                     $.jqElem('input')
                         .attr('type', 'input')
