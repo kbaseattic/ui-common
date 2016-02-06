@@ -19,7 +19,7 @@ define('kbaseRNASeqAnalysis',
         version: "1.0.0",
         options: {
             tableColumns : ['Experiment name', 'Title', 'Experiment Description', 'Experiment design', 'Platform', 'Library type',
-                            'Genome name', 'Genome annotation', 'Number of samples', 'Sample IDs', 'Number of replicates', 'Tissue', 'Condition',
+                            'Genome name', 'Genome annotation', 'Number of samples', 'Reads Label', 'Number of replicates', 'Tissue', 'Condition',
                             'Domain', 'Source', 'Publication Details']
         },
 
@@ -63,6 +63,21 @@ define('kbaseRNASeqAnalysis',
             ];
 
             var external_ids = {};
+            var num_sample_ids = 0;
+
+            if (analysis.sample_ids) {
+
+                $.each(
+                    analysis.sample_ids,
+                    function (i, v) {
+                        num_sample_ids++;
+                        all_promises.push(
+                            ws.get_object_info([{ref : v}])
+                        )
+                    }
+                );
+            }
+
 
             if (analysis.alignments) {
 
@@ -134,6 +149,7 @@ define('kbaseRNASeqAnalysis',
                 var args = Array.prototype.slice.call(arguments);
 
                 if (args.length > 2) {
+
                     var extra_args = args.slice(2, args.length);
 
                     var info_keys = ['id', 'name', 'type', 'save_date', 'version', 'saved_by', 'ws_id', 'ws_name', 'chsum', 'size', 'meta'];
@@ -154,88 +170,122 @@ define('kbaseRNASeqAnalysis',
                         }
                     );
 
-                    var $parsed_alignments = $.jqElem('ul');
-                    $.each(
-                        analysis.alignments,
-                        function(k, v) {
-                            $parsed_alignments.append(
-                                $.jqElem('li')
-                                    .append(
-                                        $.jqElem('a')
-                                            .append(ref_map[k]['name'])
-                                            .on('click', function(e) {
-                                                var $cell = $rna.$elem.nearest('.cell');
-                                                var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
-                                                $rna.trigger('createViewerCell.Narrative', {
-                                                    'nearCellIdx': near_idx,
-                                                    'widget': 'kbaseNarrativeDataCell',
-                                                    'info' : ref_map[k]
-                                                });
-                                                return false;
-                                            })
-                                    )
-                                    .append(' : ')
-                                    .append(
-                                        $.jqElem('a')
-                                            .append(ref_map[v]['name'])
-                                            .on('click', function(e) {
-                                                var $cell = $rna.$elem.nearest('.cell');
-                                                var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
+                    if (analysis.sample_ids) {
+                        var $parsed_read_samples = $.jqElem('ul');
+                        $.each(
+                            analysis.sample_ids,
+                            function(k, v) {
 
-                                                $rna.trigger('createViewerCell.Narrative', {
-                                                    'nearCellIdx': near_idx,
-                                                    'widget': 'kbaseNarrativeDataCell',
-                                                    'info' : ref_map[v]
-                                                });
-                                                return false;
-                                            })
-                                    )
-                            );
-                        }
-                    )
-                    $rna.dataset().parsed_alignments = $parsed_alignments;
+                                $parsed_read_samples.append(
+                                    $.jqElem('li')
+                                        .append(
+                                            $.jqElem('a')
+                                                .append(ref_map[v]['name'])
+                                                .on('click', function(e) {
+                                                    var $cell = $rna.$elem.nearest('.cell');
+                                                    var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
+                                                    $rna.trigger('createViewerCell.Narrative', {
+                                                        'nearCellIdx': near_idx,
+                                                        'widget': 'kbaseNarrativeDataCell',
+                                                        'info' : ref_map[v]
+                                                    });
+                                                    return false;
+                                                })
+                                        )
+                                );
+                            }
+                        );
+                        $rna.dataset().parsed_read_samples = $parsed_read_samples;
 
-                    var $parsed_expression_values = $.jqElem('ul');
-                    $.each(
-                        analysis.expression_values,
-                        function(k, v) {
-                            $parsed_expression_values.append(
-                                $.jqElem('li')
-                                    .append(
-                                        $.jqElem('a')
-                                            .append(ref_map[k]['name'])
-                                            .on('click', function(e) {
-                                                var $cell = $rna.$elem.nearest('.cell');
-                                                var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
+                    }
 
-                                                $rna.trigger('createViewerCell.Narrative', {
-                                                    'nearCellIdx': near_idx,
-                                                    'widget': 'kbaseNarrativeDataCell',
-                                                    'info' : ref_map[k]
-                                                });
-                                                return false;
-                                            })
-                                    )
-                                    .append(' : ')
-                                    .append(
-                                        $.jqElem('a')
-                                            .append(ref_map[v]['name'])
-                                            .on('click', function(e) {
-                                                var $cell = $rna.$elem.nearest('.cell');
-                                                var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
+                    if (analysis.alignments) {
+                        var $parsed_alignments = $.jqElem('ul');
+                        $.each(
+                            analysis.alignments,
+                            function(k, v) {
+                                $parsed_alignments.append(
+                                    $.jqElem('li')
+                                        .append(
+                                            $.jqElem('a')
+                                                .append(ref_map[k]['name'])
+                                                .on('click', function(e) {
+                                                    var $cell = $rna.$elem.nearest('.cell');
+                                                    var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
+                                                    $rna.trigger('createViewerCell.Narrative', {
+                                                        'nearCellIdx': near_idx,
+                                                        'widget': 'kbaseNarrativeDataCell',
+                                                        'info' : ref_map[k]
+                                                    });
+                                                    return false;
+                                                })
+                                        )
+                                        .append(' : ')
+                                        .append(
+                                            $.jqElem('a')
+                                                .append(ref_map[v]['name'])
+                                                .on('click', function(e) {
+                                                    var $cell = $rna.$elem.nearest('.cell');
+                                                    var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
 
-                                                $rna.trigger('createViewerCell.Narrative', {
-                                                    'nearCellIdx': near_idx,
-                                                    'widget': 'kbaseNarrativeDataCell',
-                                                    'info' : ref_map[v]
-                                                });
-                                                return false;
-                                            })
-                                    )
-                            )
-                        }
-                    )
-                    $rna.dataset().parsed_expression_values = $parsed_expression_values;
+                                                    $rna.trigger('createViewerCell.Narrative', {
+                                                        'nearCellIdx': near_idx,
+                                                        'widget': 'kbaseNarrativeDataCell',
+                                                        'info' : ref_map[v]
+                                                    });
+                                                    return false;
+                                                })
+                                        )
+                                );
+                            }
+                        )
+                        $rna.dataset().parsed_alignments = $parsed_alignments;
+                    }
+
+                    if (analysis.expression_values) {
+
+                        var $parsed_expression_values = $.jqElem('ul');
+                        $.each(
+                            analysis.expression_values,
+                            function(k, v) {
+                                $parsed_expression_values.append(
+                                    $.jqElem('li')
+                                        .append(
+                                            $.jqElem('a')
+                                                .append(ref_map[k]['name'])
+                                                .on('click', function(e) {
+                                                    var $cell = $rna.$elem.nearest('.cell');
+                                                    var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
+
+                                                    $rna.trigger('createViewerCell.Narrative', {
+                                                        'nearCellIdx': near_idx,
+                                                        'widget': 'kbaseNarrativeDataCell',
+                                                        'info' : ref_map[k]
+                                                    });
+                                                    return false;
+                                                })
+                                        )
+                                        .append(' : ')
+                                        .append(
+                                            $.jqElem('a')
+                                                .append(ref_map[v]['name'])
+                                                .on('click', function(e) {
+                                                    var $cell = $rna.$elem.nearest('.cell');
+                                                    var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
+
+                                                    $rna.trigger('createViewerCell.Narrative', {
+                                                        'nearCellIdx': near_idx,
+                                                        'widget': 'kbaseNarrativeDataCell',
+                                                        'info' : ref_map[v]
+                                                    });
+                                                    return false;
+                                                })
+                                        )
+                                )
+                            }
+                        )
+                        $rna.dataset().parsed_expression_values = $parsed_expression_values;
+                    }
 
                 }
 
@@ -311,7 +361,7 @@ define('kbaseRNASeqAnalysis',
                             'Genome annotation' : this.dataset().genome_annotation,
                             'Number of samples' : this.dataset().num_samples,
                             'Number of replicates' : this.dataset().num_replicates,
-                            'Sample IDs': this.dataset().sample_ids ? this.dataset().sample_ids.join(', ') : '',
+                            'Reads Label': this.dataset().parsed_read_samples,
                             'Condition' : this.dataset().condition ? this.dataset().condition.join(', ') : '',
 
 

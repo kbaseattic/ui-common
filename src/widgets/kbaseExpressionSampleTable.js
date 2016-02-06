@@ -21,7 +21,8 @@ define('kbaseExpressionSampleTable',
 
         version: "1.0.0",
         options: {
-            numBins : 10,
+            numBins : 50,
+            minCutoff : 0.001,
         },
 
         _accessors : [
@@ -186,47 +187,90 @@ define('kbaseExpressionSampleTable',
 
             var $barContainer = $.jqElem('div')
                 .append(
-                    $.jqElem('input')
-                        .attr('type', 'range')
-                        .attr('min', 0)
-                        .attr('max', 100)
-                        .attr('value', $me.options.numBins)
-                        .attr('step', 1)
-                        .css('width', '800px')
-                        .on('input', function(e) {
-                            $me.data('numBins').text($(this).val());
-                        })
-                        .on('change', function(e) {
-                            $me.data('numBins').text($(this).val());
-                            $me.options.numBins = parseInt($(this).val());
-                            $me.renderHistogram();
-                        })
+                    $.jqElem('div')
+                        .attr('class', 'col-md-10')
+                        .append(
+                            $.jqElem('div')
+                                .attr('class', 'col-md-1')
+                                .append(
+                                    $.jqElem('div')
+                                        .append(
+                                            $.jqElem('span')
+                                                .attr('id', 'numBins')
+                                                .text($me.options.numBins)
+                                        )
+                                        .append(' bins')
+                                )
+                        )
+                        .append(
+                            $.jqElem('div')
+                                .attr('class', 'col-md-8')
+                                .append(
+                                    $.jqElem('input')
+                                        .attr('type', 'range')
+                                        .attr('min', 0)
+                                        .attr('max', 100)
+                                        .attr('value', $me.options.numBins)
+                                        .attr('step', 1)
+                                        .css('width', '800px')
+                                        .on('input', function(e) {
+                                            $me.data('numBins').text($(this).val());
+                                        })
+                                        .on('change', function(e) {
+                                            $me.data('numBins').text($(this).val());
+                                            $me.options.numBins = parseInt($(this).val());
+                                            $me.renderHistogram();
+                                        })
+                                )
+                        )
                 )
                 .append(
-                    $.jqElem('span')
-                        .attr('id', 'numBins')
-                        .text($me.options.numBins)
+                    $.jqElem('div')
+                        .attr('class', 'col-md-3')
+                        .append(
+                            $.jqElem('div')
+                                .attr('class', 'input-group')
+                                .append(
+                                    $.jqElem('div')
+                                        .attr('class', 'input-group-addon')
+                                        .append(' Expression level at least ')
+                                )
+                                .append(
+                                    $.jqElem('input')
+                                        .attr('type', 'input')
+                                        .attr('id', 'minCutoff')
+                                        .attr('class', 'form-control')
+                                        .attr('value', $me.options.minCutoff)
+                                        .on('change', function(e) {
+                                            $me.options.minCutoff = parseFloat($(this).val());
+                                            $me.renderHistogram();
+                                        })
+                                )
+                        )
                 )
-                .append(' bins<br>')
-                .append(' Expression level at least ')
                 .append(
-                    $.jqElem('input')
-                        .attr('type', 'input')
-                        .attr('id', 'minCutoff')
-                        .on('change', function(e) {
-                            $me.options.minCutoff = parseFloat($(this).val());
-                            $me.renderHistogram();
-                        })
-                )
-                .append(' Expression level at most ')
-                .append(
-                    $.jqElem('input')
-                        .attr('type', 'input')
-                        .attr('id', 'maxCutoff')
-                        .on('change', function(e) {
-                            $me.options.maxCutoff = parseFloat($(this).val());
-                            $me.renderHistogram();
-                        })
+                    $.jqElem('div')
+                        .attr('class', 'col-md-3 col-md-offset-4')
+                        .append(
+                            $.jqElem('div')
+                                .attr('class', 'input-group')
+                                .append(
+                                    $.jqElem('div')
+                                        .attr('class', 'input-group-addon')
+                                        .append(' Expression level at most ')
+                                )
+                                .append(
+                                    $.jqElem('input')
+                                        .attr('type', 'input')
+                                        .attr('class', 'form-control')
+                                        .attr('id', 'maxCutoff')
+                                        .attr('value', $me.options.maxCutoff)
+                                        .on('change', function(e) {
+                                            $me.options.maxCutoff = parseFloat($(this).val());
+                                            $me.renderHistogram();
+                                        })
+                                )
+                        )
                 )
                 .append($barElem)
             ;
