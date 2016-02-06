@@ -319,8 +319,8 @@ define('kbaseRNASeqAnalysis',
             else {
                 ws.get_objects(
                     [{
-                        workspace : this.options.workspaceName,
-                        name : this.options.ws_analysis_id
+                        workspace : this.options.workspace,
+                        name : this.options.output
                     }]
                 ).then(function(d) {
                     $rna.setDataset(d[0].data);
