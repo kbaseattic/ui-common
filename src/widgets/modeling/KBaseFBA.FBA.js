@@ -532,23 +532,33 @@ function KBaseFBA_FBA(modeltabs) {
             if (tabs != undefined) {
                 self.modeltabs.kbapi('ws', 'get_objects', [{ref : self.model.template_ref}]).then(function(data) {
 
+                    var $usePlantModel = 0;
+
                     if (data[0].info[1] == 'PlantModelTemplate') {
-
+                        $usePlantModel = 1;
                         tabs.$elem.find('[data-id=Pathways]').hide();
-
-                        var $barchartElem = $.jqElem('div')
-                        $barchartElem.kbasePMIBarchart(
-                                    {
-                                        fba_workspace : self.workspace,
-                                        fba_object : self.objName
-                                    }
-                                )
-
-                            tabs.addTab({
-                                "name": "Bar charts",
-                                'content' : $barchartElem
-                            });
                     }
+
+                    var $barchartElem = $.jqElem('div')
+                    $barchartElem.kbasePMIBarchart(
+                            {
+                                fba_workspace : self.workspace,
+                                fba_object : self.objName,
+                                subsystem_annotation_object    :
+                                    $usePlantModel
+                                        ? 'PlantSEED_Subsystems'
+                                        : 'default-kegg-subsystems',
+                                subsystem_annotation_workspace :
+                                    $usePlantModel
+                                        ? 'PlantSEED'
+                                        : 'kbase',
+                            }
+                        )
+
+                    tabs.addTab({
+                        "name": "Bar charts",
+                        'content' : $barchartElem
+                    });
                 });
             }
 
