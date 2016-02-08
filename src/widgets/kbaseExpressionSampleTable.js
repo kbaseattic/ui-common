@@ -75,7 +75,7 @@ define('kbaseExpressionSampleTable',
             var $dt = this.data('tableElem').dataTable({
                 aoColumns : [
                     { title : 'Gene ID'},
-                    { title : 'Feature Value'}
+                    { title : 'Feature Value : log2(FPKM + 1)'}
                 ]
             });
             $dt.fnAddData(rows);
@@ -126,7 +126,8 @@ define('kbaseExpressionSampleTable',
                         {
                             bar : range,
                             value : bin.y,
-                            color : 'blue',
+                            color : 'url(#' + $me.gradientID + ')',//'blue',
+                            //color : 'blue',
                             tooltip : bin.y + ' in range<br>' + range,
                             id : bin.x,
                         }
@@ -152,7 +153,10 @@ define('kbaseExpressionSampleTable',
                 name : this.options.output
             };
 
+            this.appendUI(this.$elem);
+
             ws.get_objects([ws_params]).then(function (d) {
+                $self.gradientID = $self.data('barchart').linearGradient( { colors : ['#0000FF', '#000099'] });
                 $self.setDataset(d[0].data);
             }).fail(function(d) {
 
@@ -161,8 +165,6 @@ define('kbaseExpressionSampleTable',
                     .addClass('alert alert-danger')
                     .html("Could not load object : " + d.error.message);
             })
-
-            this.appendUI(this.$elem);
 
             return this;
         },
@@ -178,7 +180,7 @@ define('kbaseExpressionSampleTable',
                             .append(
                                 $.jqElem('tr')
                                     .append($.jqElem('th').append('Gene ID'))
-                                    .append($.jqElem('th').append('Feature Value'))
+                                    .append($.jqElem('th').append('Feature Value : log2(FPKM + 1)'))
                             )
                     )
             ;
@@ -226,7 +228,7 @@ define('kbaseExpressionSampleTable',
                 )
                 .append(
                     $.jqElem('div')
-                        .attr('class', 'col-md-3')
+                        .attr('class', 'col-md-4')
                         .append(
                             $.jqElem('div')
                                 .attr('class', 'input-group')
@@ -250,7 +252,7 @@ define('kbaseExpressionSampleTable',
                 )
                 .append(
                     $.jqElem('div')
-                        .attr('class', 'col-md-3 col-md-offset-4')
+                        .attr('class', 'col-md-4 col-md-offset-3')
                         .append(
                             $.jqElem('div')
                                 .attr('class', 'input-group')
