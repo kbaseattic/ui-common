@@ -22,6 +22,26 @@ define('kbaseHistogram',
             colors : ['#0000FF', '#000099'],
         },
 
+        getState : function() {
+            return {
+                numBins : this.options.numBins,
+                minCutoff : this.options.minCutoff,
+                maxCutoff : this.options.maxCutoff
+            };
+        },
+
+        loadState : function(state) {
+            this.options.numBins = state.numBins;
+            this.options.minCutoff = state.minCutoff;
+            this.options.maxCutoff = state.maxCutoff;
+
+            this.data('minCutoff').val(this.options.minCutoff);
+            this.data('maxCutoff').val(this.options.maxCutoff);
+            this.data('numBins').text(this.options.numBins);
+            this.data('numBinsRange').val(this.options.numBins);
+
+        },
+
         _accessors : [
             'dataset',
         ],
@@ -73,6 +93,7 @@ define('kbaseHistogram',
                                 .attr('class', 'col-md-8')
                                 .append(
                                     $.jqElem('input')
+                                        .attr('id', 'numBinsRange')
                                         .attr('type', 'range')
                                         .attr('min', 0)
                                         .attr('max', 100)

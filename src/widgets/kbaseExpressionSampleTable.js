@@ -30,6 +30,15 @@ define('kbaseExpressionSampleTable',
             //{name: 'barchartDataset', setter: 'setBarchartDataset'},
         ],
 
+        getState : function() {
+            return this.data('histogram').getState();
+        },
+
+        loadState : function(state) {
+            this.data('histogram').loadState(state);
+            this.data('histogram').renderHistogram();
+        },
+
 
         setDataset : function setDataset(newDataset) {
 
@@ -151,7 +160,7 @@ define('kbaseExpressionSampleTable',
 
             $container.$elem.find('[data-tab=Histogram]').on('click', function(e) {
                 $histogram.renderXAxis();
-                setTimeout(function() {$histogram.renderHistogram($me.options.numBins) }, 300);
+                setTimeout(function() {$histogram.renderHistogram() }, 300);
             });
 
             $elem
