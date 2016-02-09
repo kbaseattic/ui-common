@@ -138,11 +138,17 @@ define('kbaseRNASeqAnalysis',
             }
 
             if (analysis.transcriptome_id) {
-                this.options.tableColumns.push('Transcriptome ID');
+                this.options.tableColumns.push('Cuffmerge Output');
+                all_promises.push(
+                    ws.get_object_info([{ref : analysis.transcriptome_id}])
+                );
             }
 
             if (analysis.cuffdiff_diff_exp_id) {
-                this.options.tableColumns.push('CuffDiff Diff Exp ID');
+                this.options.tableColumns.push('Cuffdiff Output');
+                all_promises.push(
+                    ws.get_object_info([{ref : analysis.cuffdiff_diff_exp_id}])
+                );
             }
 
             $.when.apply($, all_promises).then(function (annotation, genome) {
@@ -171,120 +177,23 @@ define('kbaseRNASeqAnalysis',
                     );
 
                     if (analysis.sample_ids) {
-                        var $parsed_read_samples = $.jqElem('ul');
-                        $.each(
-                            analysis.sample_ids,
-                            function(k, v) {
-
-                                $parsed_read_samples.append(
-                                    $.jqElem('li')
-                                        .append(
-                                            $.jqElem('a')
-                                                .append(ref_map[v]['name'])
-                                                .on('click', function(e) {
-                                                    var $cell = $rna.$elem.nearest('.cell');
-                                                    var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
-                                                    $rna.trigger('createViewerCell.Narrative', {
-                                                        'nearCellIdx': near_idx,
-                                                        'widget': 'kbaseNarrativeDataCell',
-                                                        'info' : ref_map[v]
-                                                    });
-                                                    return false;
-                                                })
-                                        )
-                                );
-                            }
-                        );
-                        $rna.dataset().parsed_read_samples = $parsed_read_samples;
-
+                        $rna.dataset().parsed_read_samples = $rna.ulFromData(analysis.sample_ids, ref_map);
                     }
 
                     if (analysis.alignments) {
-                        var $parsed_alignments = $.jqElem('ul');
-                        $.each(
-                            analysis.alignments,
-                            function(k, v) {
-                                $parsed_alignments.append(
-                                    $.jqElem('li')
-                                        .append(
-                                            $.jqElem('a')
-                                                .append(ref_map[k]['name'])
-                                                .on('click', function(e) {
-                                                    var $cell = $rna.$elem.nearest('.cell');
-                                                    var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
-                                                    $rna.trigger('createViewerCell.Narrative', {
-                                                        'nearCellIdx': near_idx,
-                                                        'widget': 'kbaseNarrativeDataCell',
-                                                        'info' : ref_map[k]
-                                                    });
-                                                    return false;
-                                                })
-                                        )
-                                        .append(' : ')
-                                        .append(
-                                            $.jqElem('a')
-                                                .append(ref_map[v]['name'])
-                                                .on('click', function(e) {
-                                                    var $cell = $rna.$elem.nearest('.cell');
-                                                    var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
-
-                                                    $rna.trigger('createViewerCell.Narrative', {
-                                                        'nearCellIdx': near_idx,
-                                                        'widget': 'kbaseNarrativeDataCell',
-                                                        'info' : ref_map[v]
-                                                    });
-                                                    return false;
-                                                })
-                                        )
-                                );
-                            }
-                        )
-                        $rna.dataset().parsed_alignments = $parsed_alignments;
+                        $rna.dataset().parsed_alignments = $rna.ulFromData(analysis.alignments, ref_map);
                     }
 
                     if (analysis.expression_values) {
+                        $rna.dataset().parsed_expression_values = $rna.ulFromData(analysis.expression_values, ref_map);
+                    }
 
-                        var $parsed_expression_values = $.jqElem('ul');
-                        $.each(
-                            analysis.expression_values,
-                            function(k, v) {
-                                $parsed_expression_values.append(
-                                    $.jqElem('li')
-                                        .append(
-                                            $.jqElem('a')
-                                                .append(ref_map[k]['name'])
-                                                .on('click', function(e) {
-                                                    var $cell = $rna.$elem.nearest('.cell');
-                                                    var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
+                    if (analysis.transcriptome_id) {
+                        $rna.dataset().parsed_transcriptome = $rna.ulFromData([analysis.transcriptome_id], ref_map);
+                    }
 
-                                                    $rna.trigger('createViewerCell.Narrative', {
-                                                        'nearCellIdx': near_idx,
-                                                        'widget': 'kbaseNarrativeDataCell',
-                                                        'info' : ref_map[k]
-                                                    });
-                                                    return false;
-                                                })
-                                        )
-                                        .append(' : ')
-                                        .append(
-                                            $.jqElem('a')
-                                                .append(ref_map[v]['name'])
-                                                .on('click', function(e) {
-                                                    var $cell = $rna.$elem.nearest('.cell');
-                                                    var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
-
-                                                    $rna.trigger('createViewerCell.Narrative', {
-                                                        'nearCellIdx': near_idx,
-                                                        'widget': 'kbaseNarrativeDataCell',
-                                                        'info' : ref_map[v]
-                                                    });
-                                                    return false;
-                                                })
-                                        )
-                                )
-                            }
-                        )
-                        $rna.dataset().parsed_expression_values = $parsed_expression_values;
+                    if (analysis.cuffdiff_diff_exp_id) {
+                        $rna.dataset().parsed_cuffdiff = $rna.ulFromData([analysis.cuffdiff_diff_exp_id], ref_map);
                     }
 
                 }
@@ -301,6 +210,65 @@ define('kbaseRNASeqAnalysis',
                     .addClass('alert alert-danger')
                     .html("Could not load object : " + d.error.message);
             });
+
+        },
+
+        ulFromData : function(ids, ref_map) {
+            var $ul = $.jqElem('ul').css('list-style', 'none');
+
+            $.each(
+                ids,
+                function(k, v) {
+                    var $li = $.jqElem('li');
+                    if (ref_map[k]) {
+                        $li.append(
+                            $.jqElem('li')
+                                .append(
+                                    $.jqElem('a')
+                                        .append(ref_map[k]['name'])
+                                        .on('click', function(e) {
+                                            var $cell = $rna.$elem.nearest('.cell');
+                                            var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
+
+                                            $rna.trigger('createViewerCell.Narrative', {
+                                                'nearCellIdx': near_idx,
+                                                'widget': 'kbaseNarrativeDataCell',
+                                                'info' : ref_map[k]
+                                            });
+                                            return false;
+                                        })
+                                )
+                        );
+                    }
+
+                    if (ref_map[k] && ref_map[v]) {
+                        $li.append(' : ');
+                    }
+
+                    if (ref_map[v]) {
+                        $li
+                            .append(
+                                $.jqElem('a')
+                                    .append(ref_map[v]['name'])
+                                    .on('click', function(e) {
+                                        var $cell = $rna.$elem.nearest('.cell');
+                                        var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
+
+                                        $rna.trigger('createViewerCell.Narrative', {
+                                            'nearCellIdx': near_idx,
+                                            'widget': 'kbaseNarrativeDataCell',
+                                            'info' : ref_map[v]
+                                        });
+                                        return false;
+                                    })
+                            )
+                    }
+
+                    $ul.append($li);
+                }
+            );
+
+            return $ul;
 
         },
 
@@ -371,8 +339,8 @@ define('kbaseRNASeqAnalysis',
                             'Publication Details' : this.dataset().publication_id,
                             'Alignments'  : this.dataset().parsed_alignments,
                             'Expression Values' : this.dataset().parsed_expression_values,
-                            'Merged Transcriptome' : this.dataset().transcriptome_id,
-                            'CuffDiff Differential Expression ID' : this.dataset().cuffdiff_diff_exp_id,
+                            'Cuffmerge Output' : this.dataset().parsed_transcriptome,
+                            'Cuffdiff Output' : this.dataset().parsed_cuffdiff,
                         },
                     }
                 }
