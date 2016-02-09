@@ -12,152 +12,224 @@ define('kbaseHistogram',
     $.KBWidget({
 
 	    name: "kbaseHistogram",
-	  parent: "kbaseBarchart",
+	  parent: "kbaseAuthenticatedWidget",
 
         version: "1.0.0",
         options: {
-            scaleAxes : true,
-            height : '500px',
-            xPadding : 80,
-
-            yPadding : 40,
+            numBins : 50,
+            minCutoff : 0.001,
+            tickColor : 'blue',
+            colors : ['#0000FF', '#000099'],
         },
 
         _accessors : [
-            'minBin',
-            'maxBin',
+            'dataset',
         ],
 
         setDataset : function(newDataset) {
-            if (! $.isArray(newDataset.data)) {
-                newDataset = newDataset.data;
+            this.dataset(newDataset);
+            this.renderHistogram( this.options.numBins);
+        },
+
+        renderXAxis : function() {
+            this.data('barchart').renderXAxis();
+        },
+
+        init : function init(options) {
+            this._super(options);
+
+            this.appendUI(this.$elem);
+
+            this.gradientID = this.data('barchart').linearGradient( { colors : this.options.colors });
+
+            return this;
+        },
+
+        appendUI : function appendUI($elem) {
+
+            var $me = this;
+
+            var $barElem = $.jqElem('div').css({width : 800, height : 500});
+
+            var $barContainer = $.jqElem('div')
+                .append(
+                    $.jqElem('div')
+                        .attr('class', 'col-md-10')
+                        .append(
+                            $.jqElem('div')
+                                .attr('class', 'col-md-1')
+                                .append(
+                                    $.jqElem('div')
+                                        .append(
+                                            $.jqElem('span')
+                                                .attr('id', 'numBins')
+                                                .text($me.options.numBins)
+                                        )
+                                        .append(' bins')
+                                )
+                        )
+                        .append(
+                            $.jqElem('div')
+                                .attr('class', 'col-md-8')
+                                .append(
+                                    $.jqElem('input')
+                                        .attr('type', 'range')
+                                        .attr('min', 0)
+                                        .attr('max', 100)
+                                        .attr('value', $me.options.numBins)
+                                        .attr('step', 1)
+                                        .css('width', '800px')
+                                        .on('input', function(e) {
+                                            $me.data('numBins').text($(this).val());
+                                        })
+                                        .on('change', function(e) {
+                                            $me.data('numBins').text($(this).val());
+                                            $me.options.numBins = parseInt($(this).val());
+                                            $me.renderHistogram();
+                                        })
+                                )
+                        )
+                )
+                .append(
+                    $.jqElem('div')
+                        .attr('class', 'col-md-4')
+                        .append(
+                            $.jqElem('div')
+                                .attr('class', 'input-group')
+                                .append(
+                                    $.jqElem('div')
+                                        .attr('class', 'input-group-addon')
+                                        .append(' Expression level at least ')
+                                )
+                                .append(
+                                    $.jqElem('input')
+                                        .attr('type', 'input')
+                                        .attr('id', 'minCutoff')
+                                        .attr('class', 'form-control')
+                                        .attr('value', $me.options.minCutoff)
+                                        .on('change', function(e) {
+                                            $me.options.minCutoff = parseFloat($(this).val());
+                                            $me.renderHistogram();
+                                        })
+                                )
+                        )
+                )
+                .append(
+                    $.jqElem('div')
+                        .attr('class', 'col-md-4 col-md-offset-3')
+                        .append(
+                            $.jqElem('div')
+                                .attr('class', 'input-group')
+                                .append(
+                                    $.jqElem('div')
+                                        .attr('class', 'input-group-addon')
+                                        .append(' Expression level at most ')
+                                )
+                                .append(
+                                    $.jqElem('input')
+                                        .attr('type', 'input')
+                                        .attr('class', 'form-control')
+                                        .attr('id', 'maxCutoff')
+                                        .attr('value', $me.options.maxCutoff)
+                                        .on('change', function(e) {
+                                            $me.options.maxCutoff = parseFloat($(this).val());
+                                            $me.renderHistogram();
+                                        })
+                                )
+                        )
+                )
+                .append($barElem)
+            ;
+
+            $elem
+                .append( $barContainer )
+            ;
+
+            var $barchart =
+                $barElem.kbaseBarchart( this.options )
+            ;
+
+            $barchart.superRenderXAxis = $barchart.renderXAxis;
+            $barchart.renderXAxis = function() {
+                $barchart.superRenderXAxis();
+
+                $barchart.D3svg()
+                    .selectAll('.xAxis .tick text')
+                    .attr('fill', this.options.tickColor)
+                    .on('mouseover', function(L, i) {
+                        $.each(
+                            $barchart.dataset(),
+                            function (i, d) {
+                                if (d.bar == L) {
+                                    $barchart.showToolTip({ label : d.tooltip })
+                                }
+                            }
+                        );
+
+                    })
+                    .on('mouseout', function(d) {
+                        $barchart.hideToolTip();
+                    })
+            };
+
+            this._rewireIds($elem, this);
+            this.data('barElem',   $barElem);
+            this.data('barchart', $barchart);
+
+        },
+
+        renderHistogram : function renderHistogram(bins) {
+
+            var $me = this;
+
+            if (bins === undefined) {
+                bins = this.options.numBins;
             }
 
-            var transformed = [];
+            var filteredDataset = this.dataset();
 
-            var i = 0;
-            for (i = 0; i < newDataset.data[0].length - 1; i++) {
-                var row = newDataset.data[0][i];
-                var col = newDataset.data[1][i];
+            if (! isNaN(this.options.minCutoff) || ! isNaN(this.options.maxCutoff)) {
+                filteredDataset = [];
 
-                var next = i < newDataset.data[0].length - 1
-                    ? ' to ' + newDataset.data[0][i + 1]
-                    : ' and up';
-
-                var label = 'Bin ' + row + next;
-
-                transformed.push(
-                    {
-                        bar     : label,
-                        value   : col,
-                        color   : 'white',
-                        stroke  : 'black',
-                        strokeWidth : 1,
+                $.each(this.dataset(),
+                    function(i, v) {
+                        if (
+                            (isNaN($me.options.minCutoff) || v >= $me.options.minCutoff)
+                            &&
+                            (isNaN($me.options.maxCutoff) || v <= $me.options.maxCutoff)
+                            ) {
+                            filteredDataset.push(v);
+                        }
                     }
                 );
 
             }
 
-            this.setYLabel(newDataset.column_labels[0]);
-            this.setXLabel(newDataset.row_labels[0]);
-            this.minBin(newDataset.data[0][0]);
-            this.maxBin(newDataset.data[0][newDataset.data[0].length - 1]);
+            var barData = d3.layout.histogram().bins(bins)( filteredDataset );
 
-            this._super(transformed);
-        },
+            var bars = [];
+            var sigDigits = 1000;
+            $.each(
+                barData,
+                function (i,bin) {
+                    var range = Math.round(bin.x * sigDigits) / sigDigits + ' to ' + (Math.round((bin.x + bin.dx) * sigDigits) / sigDigits);
 
-        renderXAxis : function() {
+                    bars.push(
+                        {
+                            bar : range,
+                            value : bin.y,
+                            color : 'url(#' + $me.gradientID + ')',//'blue',
+                            //color : 'blue',
+                            tooltip : bin.y + ' in range<br>' + range,
+                            id : bin.x,
+                        }
+                    );
+                }
+            );
 
-            if (this.xScale() == undefined || this.xScale().domain == undefined) {
-                return;
-            }
-
-            var xAxisScale = d3.scale.linear()
-                .domain([this.minBin(), this.maxBin()])
-                .range([0, this.chartBounds().size.width])
-            ;
-
-            var xAxis =
-                d3.svg.axis()
-                    .scale(xAxisScale)
-                    .orient('bottom')
-                    .ticks(10)
-            ;
-
-
-            var gxAxis = this.D3svg().select('.yPadding').select('.xAxis');
-
-            if (gxAxis[0][0] == undefined) {
-                gxAxis = this.D3svg().select('.yPadding')
-                    .append('g')
-                        .attr('class', 'xAxis axis')
-                        //.attr("transform", "translate(0," + this.yGutterBounds().size.height + ")")
-            }
-
-            var $hm = this;
-
-            gxAxis
-                .transition()
-                .duration(0)
-                .call(xAxis)
-            ;
-
+            this.data('barchart').setDataset(bars);
 
         },
-
-        renderXLabel : function() {
-            var yGutterBounds = this.yGutterBounds();
-
-            var xLabeldataset = [this.xLabel()];
-
-            var xLabel = this.D3svg().select( this.region('yPadding') ).selectAll('.xLabel');
-            xLabel
-                .data(xLabeldataset)
-                    .text( this.xLabel() )
-                .enter()
-                    .append('text')
-                        .attr('class', 'xLabel')
-                        .attr('x', yGutterBounds.size.width / 2)
-                        .attr('y', 25 + yGutterBounds.size.height / 2 + 3)
-                        .attr('text-anchor', 'middle')
-                        .attr('font-size', '11px')
-                        .attr('font-family', 'sans-serif')
-                        .attr('fill', 'black')
-                        .text(this.xLabel());
-            ;
-
-        },
-
-        renderYLabel : function() {
-
-            var xGutterBounds = this.xGutterBounds();
-
-            var yLabeldataset = [this.yLabel()];
-
-            var xLabel = this.D3svg().select( this.region('xPadding') ).selectAll('.yLabel');
-            xLabel
-                .data(yLabeldataset)
-                    .text( this.yLabel() )
-                .enter()
-                    .append('text')
-                        .attr('class', 'yLabel')
-                        .attr('x', xGutterBounds.size.width / 2)
-                        .attr('y', 10 + xGutterBounds.size.height / 2 + 3)
-                        .attr('text-anchor', 'middle')
-                        .attr('font-size', '11px')
-                        .attr('font-family', 'sans-serif')
-                        .attr('fill', 'black')
-                        .attr('transform', 'rotate(270,'
-                            + (xGutterBounds.size.width / 2 - 7)
-                            + ','
-                            + xGutterBounds.size.height / 2
-                            + ')')
-                        .text(this.yLabel());
-            ;
-
-        },
-
-
 
 
     });

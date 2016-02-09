@@ -214,7 +214,7 @@ define('kbaseRNASeqAnalysis',
         },
 
         ulFromData : function(ids, ref_map) {
-            var $ul = $.jqElem('ul').css('list-style', 'none');
+            var $ul = $.jqElem('ul').css('list-style-type', 'none');
 
             $.each(
                 ids,
