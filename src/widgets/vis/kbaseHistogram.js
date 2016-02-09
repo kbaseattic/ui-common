@@ -31,9 +31,17 @@ define('kbaseHistogram',
         },
 
         loadState : function(state) {
-            this.options.numBins = state.numBins;
-            this.options.minCutoff = state.minCutoff;
-            this.options.maxCutoff = state.maxCutoff;
+            this.options.numBins = parseInt(state.numBins);
+            this.options.minCutoff = parseFloat(state.minCutoff);
+            this.options.maxCutoff = parseFloat(state.maxCutoff);
+
+            if (isNaN(this.options.minCutoff)) {
+                delete this.options.minCutoff;
+            }
+
+            if (isNaN(this.options.maxCutoff)) {
+                delete this.options.maxCutoff;
+            }
 
             this.data('minCutoff').val(this.options.minCutoff);
             this.data('maxCutoff').val(this.options.maxCutoff);
