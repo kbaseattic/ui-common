@@ -536,7 +536,7 @@ function KBaseFBA_FBA(modeltabs) {
 
                     if (data[0].info[1] == 'PlantModelTemplate') {
                         $usePlantModel = 1;
-                        tabs.$elem.find('[data-id=Pathways]').hide();
+                        //tabs.$elem.find('[data-id=Pathways]').hide();
                     }
 
                     var $barchartElem = $.jqElem('div')
