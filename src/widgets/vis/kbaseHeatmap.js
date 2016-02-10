@@ -461,6 +461,10 @@ define('kbaseHeatmap',
             return colorScale;
         },
 
+        cellHeight : function cellHeight() {
+            return this.yScale().rangeBand() - this.options.cellPadding * 2
+        },
+
         renderChart : function() {
 
             var $hm = this;
@@ -505,7 +509,7 @@ define('kbaseHeatmap',
                 //.attr('y', function (d) { return $hm.yScale()(d.y) })
                 //.attr('opacity', function (d) { return d.value })
                 .attr('width', $hm.xScale().rangeBand() - $hm.options.cellPadding * 2)
-                .attr('height', $hm.yScale().rangeBand() - $hm.options.cellPadding * 2)
+                .attr('height', $hm.cellHeight())
                 .attr('rx', $hm.options.rx)
                 .attr('ry', $hm.options.ry)
                 .attr('fill',

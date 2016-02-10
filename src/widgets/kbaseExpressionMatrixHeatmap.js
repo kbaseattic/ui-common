@@ -30,7 +30,7 @@ define('kbaseExpressionMatrixHeatmap',
         setDataset : function setDataset(newDataset) {
             this.data('loader').hide();
             this.data('heatElem').show();
-console.log("SETS HEAT DATA ", newDataset);
+
             if (newDataset.data.values.length == 0) {
                 this.$elem.empty();
                 this.$elem
@@ -108,10 +108,16 @@ console.log("SETS HEAT DATA ", newDataset);
                 )
             ;
 
+            //XXX - I don't want to fix this right now. Setting yPadding to 0 will keep the background of the yPadding from overlaying
+            //on the chart, but it'll cut off half of the label at the bottom of the temp gauge.
+            //
+            //kbaseFigureObjectHeatmap has a better method for this, moving the hmElem declartion into setDataset. Easy to do,
+            //I just don't want to test it ATM.
+
             var $heatmap =
                 $heatElem.kbaseHeatmap(
                     {
-                        //colors : ['#0000FF', '#FFFFFF', '#FFFF00'],
+                        yPadding : 0
                     }
                 )
             ;
