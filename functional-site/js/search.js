@@ -133,8 +133,8 @@ searchApp.service('searchKBaseClientsService', function($q, $http, $rootScope) {
  *  are housed in local storage for persistence.
  */
 searchApp.service('searchOptionsService', function searchOptionsService() {
-    var genomesWorkspace = "KBasePublicGenomesV4";
-    var searchGenomesWorkspace = "KBasePublicRichGenomesV4";
+    var genomesWorkspace = "KBasePublicGenomesV5";
+    var searchGenomesWorkspace = "KBasePublicRichGenomesV5";
     var metagenomesWorkspace = "wilke:Data";
 
     var session = $.KBaseSessionSync.getKBaseSession();
