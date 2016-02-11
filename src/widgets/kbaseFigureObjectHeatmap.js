@@ -93,26 +93,32 @@ define('kbaseFigureObjectHeatmap',
 //groupInfo.ygtick_labels = ['zero', 'alpha', 'bravo', 'charlie'];
 //groupInfo.ygroup = [20,100,100,80];
 
-                var total_groups = groupInfo.ygroup.reduce(function(p,v) { return p + v} );
+                //this one assumes that all genes will always be in the dataset. They will not be.
+                //var total_groups = groupInfo.ygroup.reduce(function(p,v) { return p + v} );
+
+                //so, instead, we assign the total_groups to the length of the first row. Somewhat arbitrarily.
+                var total_groups = newDataset.data[0].length;
 
                 var groups = $heatmap.D3svg().select( $heatmap.region('xPadding') ).selectAll('.groupBox').data(groupInfo.ygtick_labels);
 
                 var groupsEnter = groups.enter().append('g');
 
+                var yIdxFunc =
+                    function(d,i) {
+
+                        var prior = 0;
+
+                        for (var j = 0; j < i; j++) {
+                            prior += groupInfo.ygroup[j];
+                        }
+                        return chartBounds.size.height * (prior / total_groups);
+                    }
+                ;
+
                 groupsEnter
                     .append('rect')
                         .attr('x', 0)
-                        .attr('y',
-                            function(d,i) {
-
-                                var prior = 0;
-
-                                for (var j = 0; j < i; j++) {
-                                    prior += groupInfo.ygroup[j];
-                                }
-                                return chartBounds.size.height * (prior / total_groups);
-                            }
-                        )
+                        .attr('y', yIdxFunc )
                         .attr('width', $heatmap.xPaddingBounds().size.width)
                         .attr('height',
                             function (d, i) {
@@ -122,12 +128,30 @@ define('kbaseFigureObjectHeatmap',
                         .attr('stroke', 'black')
                         .attr('fill', 'none')
                         .attr('stroke-width', '.5px')
+                        .attr('opacity',
+                            function(d,i) {
+                                var y = yIdxFunc(d,i);
+
+                                return y < chartBounds.size.height
+                                    ? 1
+                                    : 0;
+                            }
+                        )
                 ;
                 groupsEnter
                     .append('text')
                         .attr('x', 0)
                         .attr('y', 0)
                         .text(function (d,i) { this.idx = i; return d })
+                        .attr('opacity',
+                            function(d,i) {
+                                var y = yIdxFunc(d,i);
+
+                                return y < chartBounds.size.height
+                                    ? 1
+                                    : 0;
+                            }
+                        )
                 ;
 
                 //gotta transform it after it's been inserted. Fun.
