@@ -57,7 +57,7 @@ define('kbaseFigureObjectHeatmap',
                 var $heatmap =
                     $heatElem.kbaseHeatmap(
                         {
-                            //colors : ['#0000FF', '#FFFFFF', '#FFFF00'],
+                            colors : ['#0000FF', '#FFFFFF', '#FF0000'],
                             xPadding : 170,
                         }
                     )
@@ -101,7 +101,7 @@ define('kbaseFigureObjectHeatmap',
 
                 var groups = $heatmap.D3svg().select( $heatmap.region('xPadding') ).selectAll('.groupBox').data(groupInfo.ygtick_labels);
 
-                var groupsEnter = groups.enter().append('g');
+                var groupsEnter = groups.enter().insert('g', ':first-child');
 
                 var yIdxFunc =
                     function(d,i) {
@@ -126,7 +126,7 @@ define('kbaseFigureObjectHeatmap',
                             }
                         )
                         .attr('stroke', 'black')
-                        .attr('fill', 'none')
+                        .attr('fill', function (d, i) {return i % 2 ? '#EEEEEE' : 'none'} )
                         .attr('stroke-width', '.5px')
                         .attr('opacity',
                             function(d,i) {

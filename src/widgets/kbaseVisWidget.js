@@ -1402,14 +1402,20 @@ define('kbaseVisWidget',
                                                             gradStops
                                                                 .transition().duration(transitionTime)
                                                                 .attr('offset', function (d, i) {
-                                                                    var num = 0;
-                                                                    if (i == grad.colors.length - 1) {
-                                                                        num = 1;
-                                                                    } else if (i > 0) {
-                                                                        num = i / (grad.colors.length - 1)
+                                                                    if (grad.gradStops) {
+                                                                        return grad.gradStops[i];
                                                                     }
+                                                                    else {
 
-                                                                    return (Math.round(10000 * num) / 100) + '%'
+                                                                        var num = 0;
+                                                                        if (i == grad.colors.length - 1) {
+                                                                            num = 1;
+                                                                        } else if (i > 0) {
+                                                                            num = i / (grad.colors.length - 1)
+                                                                        }
+
+                                                                        return (Math.round(10000 * num) / 100) + '%'
+                                                                    }
                                                                 })
                                                                 .attr('stop-color', function (d) {
                                                                     return d
