@@ -808,11 +808,17 @@ define('kbaseVisWidget',
                     gxAxis
                         .selectAll("text")
                             .attr("transform", function (d, i) {
-                                var bounds = $self.yGutterBounds();
+                                try {
+                                    var bounds = $self.yGutterBounds();
 
-                                var textBounds = this.getBBox();
-                                //bullshit magic numbers. Moving it over by 2/3rds of the width seems to line it up nicely, and down by the height.
-                                return "rotate(90) translate(" + (textBounds.width * 2/3) + ",-" + textBounds.height + ")";
+                                    var textBounds = this.getBBox();
+                                    //bullshit magic numbers. Moving it over by 2/3rds of the width seems to line it up nicely, and down by the height.
+                                    return "rotate(90) translate(" + (textBounds.width * 2/3) + ",-" + textBounds.height + ")";
+                                }
+                                catch(err) {
+                                    //firefox is stupid! the first call to getBBox fails because it's not attached yet. Tosses an exception.
+                                    return undefined;
+                                }
                             })
                     ;
                 }

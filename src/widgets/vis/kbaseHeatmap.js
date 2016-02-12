@@ -442,17 +442,19 @@ define('kbaseHeatmap',
 
                 var max = this.options.maxValue;
                 var min = this.options.minValue;
-                if (max == undefined || min == undefined) {
-                    max = 0;
-                    min = 0;
-                    for (var i = 0; i < this.dataset().data.length; i++) {
-                        var row = this.dataset().data[i];
-                        for (var j = 0; j < row.length; j++) {
-                            if (row[j] > max) {
-                                max = row[j];
-                            }
-                            if (row[j] < min) {
-                                min = row[j];
+                if (this.dataset() != undefined) {
+                    if (max == undefined || min == undefined) {
+                        max = 0;
+                        min = 0;
+                        for (var i = 0; i < this.dataset().data.length; i++) {
+                            var row = this.dataset().data[i];
+                            for (var j = 0; j < row.length; j++) {
+                                if (row[j] > max) {
+                                    max = row[j];
+                                }
+                                if (row[j] < min) {
+                                    min = row[j];
+                                }
                             }
                         }
                     }
