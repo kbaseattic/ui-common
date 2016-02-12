@@ -97,9 +97,18 @@ define('kbaseHeatmap',
                 newDataset = newDataset.data;
             }
 
-            this.options.gradientID = this.linearGradient( { colors : this.options.colors });
-
             this._super(newDataset);
+
+            var colorScaleDomain = this.colorScale().nice().domain();
+
+            var zeroPercent = 100 * Math.abs(colorScaleDomain[0]) / (Math.abs(colorScaleDomain[0]) + Math.abs(colorScaleDomain[2]));
+
+            this.options.gradientID = this.linearGradient(
+                {
+                    colors : this.options.colors,
+                    gradStops : ['0%', zeroPercent + '%', '100%'],
+                }
+            );
         },
 
         setSpectrum : function(newSpectrum) {
@@ -449,7 +458,8 @@ define('kbaseHeatmap',
                     }
                 }
 
-                var domain = d3.range(min, max, (max - min) / this.options.colors.length);
+                //var domain = d3.range(min, max, (max - min) / this.options.colors.length);
+                var domain = [min, 0, max];
                 domain[0] = min;
                 domain[domain.length - 1] = max;
 
