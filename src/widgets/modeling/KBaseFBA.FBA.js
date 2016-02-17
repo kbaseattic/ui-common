@@ -552,6 +552,10 @@ function KBaseFBA_FBA(modeltabs) {
                                     $usePlantModel
                                         ? 'PlantSEED'
                                         : 'kbase',
+                                selected_subsystems :
+                                    $usePlantModel
+                                        ? ["Central Carbon: Glycolysis_and_Gluconeogenesis_in_plants"]
+                                        : ["Carbohydrate metabolism: Glycolysis / Gluconeogenesis"],
                             }
                         )
 
