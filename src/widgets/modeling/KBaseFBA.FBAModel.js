@@ -275,7 +275,7 @@ function KBaseFBA_FBAModel(modeltabs) {
 			var p = self.modeltabs.kbapi('fba', 'get_reactions', {
 				reactions: [rxn.rxnkbid],
 				biochemistry: self.biochem,
-    			biochemistry_workspace: self.biochemws
+    			biochemistry_workspace: "kbase",
 			}).then(function(data) {
 				if ("deltaG" in data[0]) {
 					output.push({
@@ -349,7 +349,7 @@ function KBaseFBA_FBAModel(modeltabs) {
 			var p = self.modeltabs.kbapi('fba', 'get_compounds', {
 				compounds: [cpd.cpdkbid],
 				biochemistry: self.biochem,
-    			biochemistry_workspace: self.biochemws
+    			biochemistry_workspace: "kbase",
 			}).then(function(data) {
 				if ("deltaG" in data[0]) {
 					output.push({
@@ -434,109 +434,6 @@ function KBaseFBA_FBAModel(modeltabs) {
 		return output;
     }
 
-    this.GapfillTab = function (info) {
-    	var gfid = info.id;
-
-        var gf = self.gfhash[gfid];
-        var ref;
-        if ("gapfill_ref" in gf) {
-        	ref = gf.gapfill_ref;
-        } else if ("fba_ref" in gf) {
-        	ref = gf.fba_ref;
-        }
-        if ("output" in gf) {
-        	return gf.output;
-        }
-        var p = self.modeltabs.kbapi('ws', 'get_objects', [{ref: ref}]).then(function(data){
-			var solutions = data[0].data.gapfillingSolutions;
-			return self.parse_gf_solutions(solutions);
-		}).then (function(solutions) {
-			if (gf.integrated == "1") {
-				gf.integrated = "yes";
-			} else if (gf.integrated == "0") {
-				gf.integrated = "no";
-			}
-			gf.output = [{
-				 "label": "Gapfill ID",
-				 "data": gf.simpid,
-			 }, {
-				 "label": "Media",
-				 "linkformat": "dispWSRef",
-				 "type": "wstype",
-				 "wstype": "KBaseFBA.Media",
-				 "data": gf.media_ref
-			 }, {
-				 "label": "Integrated",
-				 "data": gf.integrated
-			 }];
-			 if (gf.integrated == "yes") {
-			 	gf.output.push({
-			 		"label": "Integrated solution",
-				 	"data": gf.integrated_solution
-			 	});
-			 }
-			 var rxns = "";
-			 for (var i=0; i < solutions.length; i++) {
-			 	var solrxns = solutions[i].gapfillingSolutionReactions;
-			 	for (var j=0; j < solrxns.length; j++) {
-			 		if (j > 0) {
-			 			rxns += "<br>";
-			 		}
-			 		rxns += solrxns[j].id;
-			 		if ("equation" in solrxns[j]) {
-			 			rxns += ":"+solrxns[j].equation;
-			 		}
-			 	}
-			 }
-
-			gf.output.push({
-			 	"label": "Solution "+i,
-				"data": rxns
-			});
-
-			return gf.output;
-		});
-        return p;
-    }
-
-	this.parse_gf_solutions = function(solutions) {
-		var rxnshash = {};
-		var biochemws = "kbase";
-		var biochem = "default";
-		for (var i=0; i < solutions.length; i++) {
-			var solrxns = solutions[i].gapfillingSolutionReactions;
-			for (var j=0; j < solrxns.length; j++) {
-				var array = solrxns[j].reaction_ref.split("/");
-				solrxns[j].id = array.pop();
-				if (solrxns[j].id.match(/^rxn\d\d\d\d\d$/) && array[3] == "reactions") {
-					biochemws = array[0];
-					biochem = array[1];
-					rxnshash[solrxns[j].id] = solrxns[j];
-				}
-			}
-		}
-		var ids = new Array();
-		for (var key in rxnshash) {
-    		ids.push(key);
-		}
-		if (ids.length > 0) {
-			var p = self.modeltabs.kbapi('fba', 'get_reactions', {
-				reactions: ids,
-				biochemistry: biochem,
-    			biochemistry_workspace: biochemws
-			}).then(function(data){
-				for (var i=0; i < data.length; i++) {
-					if (data[i]) {
-						rxnshash[data[i].id].equation = data[i].definition;
-					}
-				}
-				return solutions;
-			});
-			return p;
-		}
-		return solutions;
-	};
-
     this.setData = function (indata) {
         this.data = indata;
         this.modelreactions = this.data.modelreactions;
@@ -567,6 +464,9 @@ function KBaseFBA_FBAModel(modeltabs) {
         for (var i=0; i< this.modelcompartments.length; i++) {
             var cmp = this.modelcompartments[i];
             cmp.cmpkbid = cmp.compartment_ref.split("/").pop();
+        	if (cmp.cmpkbid == "d") {
+        		this.biochem = "plantdefault";
+        	}
             cmp.name = self.cmpnamehash[cmp.cmpkbid];
             this.cmphash[cmp.id] = cmp;
         }
@@ -583,8 +483,6 @@ function KBaseFBA_FBAModel(modeltabs) {
             this.cpdhash[cpd.id] = cpd;
             if (cpd.cpdkbid != "cpd00000") {
                 var array = cpd.compound_ref.split("/");
-                this.biochemws = array[0];
-                this.biochem = array[1];
                 this.cpdhash[cpd.cpdkbid+"_"+cpd.cmpkbid] = cpd;
                 if (idarray[0] != cpd.cpdkbid) {
                 	cpd.dispid += "<br>("+cpd.cpdkbid+")";
