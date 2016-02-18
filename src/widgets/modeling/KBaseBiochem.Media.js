@@ -133,13 +133,19 @@ function KBaseBiochem_Media(tabwidget) {
         }, {
             "label": "Charge",
             "key": "charge"
+        }, {
+            "label": "Min uptake<br>(mol/g CDW hr)",
+            "key": "minFlux"
+        }, {
+            "label": "Max uptake<br>(mol/g CDW hr)",
+            "key": "maxFlux"
         },/* {
             "label": "Compartment",
             "key": "compartment",
             "type": "tabLink",
             "method": "CompartmentTab"
         }*/]
-    }, {
+    }/*, {
         "key": "reagents",
         "name": "Reagents",
         "type": "dataTable",
@@ -153,7 +159,7 @@ function KBaseBiochem_Media(tabwidget) {
             "label": "Concentration",
             "key": "concentration",
         }]
-    }];
+    }*/];
 }
 
 // make method of base class

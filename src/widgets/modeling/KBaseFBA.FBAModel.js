@@ -117,6 +117,9 @@ function KBaseFBA_FBAModel(modeltabs) {
             "key": "genes",
             "type": "tabLinkArray",
             "method": "GeneTab",
+        }, {
+            "label": "Gapfilling",
+            "key": "gapfillingstring",
         }]
     }, {
         "key": "modelcompounds",
@@ -216,9 +219,6 @@ function KBaseFBA_FBAModel(modeltabs) {
         "columns": [{
             "label": "Gapfill",
             "key": "simpid",
-            "linkformat": "dispID",
-            "type": "tabLink",
-            "method": "GapfillTab",
         }, {
             "label": "Integrated",
             "key": "integrated"
@@ -271,6 +271,7 @@ function KBaseFBA_FBAModel(modeltabs) {
 			"data": rxn.gpr
 		});
 		if (rxn.rxnkbid != "rxn00000") {
+			console.log(rxn.rxnkbid);
 			var p = self.modeltabs.kbapi('fba', 'get_reactions', {
 				reactions: [rxn.rxnkbid],
 				biochemistry: self.biochem,
@@ -553,8 +554,14 @@ function KBaseFBA_FBAModel(modeltabs) {
         this.gfhash = {};
         this.biochemws = "kbase";
 		this.biochem = "default";
+        var gfobjects = [];
         for (var i=0; i < this.gapfillings.length; i++) {
         	this.gapfillings[i].simpid = "gf."+(i+1);
+        	if ('fba_ref' in this.gapfillings[i] && this.gapfillings[i].fba_ref.length > 0) {
+        		gfobjects.push({ref: this.gapfillings[i].fba_ref});
+        	} else if ('gapfill_ref' in this.gapfillings[i] && this.gapfillings[i].gapfill_ref.length > 0) {
+        		gfobjects.push({ref: this.gapfillings[i].gapfill_ref});
+        	}
         	this.gfhash[this.gapfillings[i].simpid] = this.gapfillings[i];
         }
         for (var i=0; i< this.modelcompartments.length; i++) {
@@ -628,13 +635,14 @@ function KBaseFBA_FBAModel(modeltabs) {
             var idarray = rxn.id.split('_');
             rxn.dispid = idarray[0]+"["+idarray[1]+"]";
             rxn.rxnkbid = rxn.reaction_ref.split("/").pop();
+            rxn.rxnkbid = rxn.rxnkbid.replace(/_[a-zA-z]/,'');
             rxn.cmpkbid = rxn.modelcompartment_ref.split("/").pop();
             rxn.name = rxn.name.replace(/_[a-zA-z]\d+$/, '');
             rxn.gpr = "";
             if (rxn.name == "CustomReaction") {
                 rxn.name = rxn.dispid;
             }
-            this.rxnhash[rxn.id] = rxn;
+            self.rxnhash[rxn.id] = rxn;
             if (rxn.rxnkbid != "rxn00000") {
                 this.rxnhash[rxn.rxnkbid+"_"+rxn.cmpkbid] = rxn;
                 if (rxn.rxnkbid != idarray[0]) {
@@ -704,6 +712,16 @@ function KBaseFBA_FBAModel(modeltabs) {
                 rxn.gpr += ")";
             }
 
+			rxn.gapfilling = [];
+			for (var gf in rxn.gapfill_data) {
+				if (rxn.gapfill_data[gf][0][0] == '<') {
+					rxn.gapfilling.push(gf+": reverse");
+				} else {
+					rxn.gapfilling.push(gf+": forward");
+				}
+			}
+			rxn.gapfillingstring = rxn.gapfilling.join('<br>');
+			
             rxn.dispfeatures = "";
             rxn.genes = [];
             for (var gene in rxn.ftrhash) {
@@ -722,9 +740,36 @@ function KBaseFBA_FBAModel(modeltabs) {
 
             rxn.equation = reactants+" "+sign+" "+products;
         }
-
+        if (gfobjects.length > 0) {        
+			var p = self.modeltabs.kbapi('ws', 'get_objects', gfobjects).then(function(data){
+				for (var i=0; i < data.length; i++) {
+					var solrxns = data[i].data.gapfillingSolutions[0].gapfillingSolutionReactions;
+					for (var j=0; j < solrxns.length; j++) {
+						var array = solrxns[j].reaction_ref.split("/");
+						var id = array.pop();
+						var rxnobj;
+						if (id in self.rxnhash) {
+							rxnobj = self.rxnhash[id];
+						} else {
+							var cmparray = solrxns[j].compartment_ref.split("/");
+							var cmp = cmparray.pop();
+							id = id+"_"+cmp+solrxns[j].compartmentIndex;
+							rxnobj = self.rxnhash[id];
+						}
+						if (typeof rxnobj != "undefined") {
+							if (solrxns[j].direction == '<') {
+								rxnobj.gapfilling.push('gf.'+(i+1)+": reverse");
+							} else {
+								rxnobj.gapfilling.push('gf.'+(i+1)+": forward");
+							}
+							rxnobj.gapfillingstring = rxnobj.gapfilling.join('<br>');
+						}
+					}
+				}
+			});
+			return p;
+		}
     };
-
 }
 
 // make method of base class

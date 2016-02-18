@@ -117,9 +117,6 @@ function KBaseFBA_FBA(modeltabs) {
             "method": "ReactionTab",
             "width": "15%"
         }, {
-            "label": "Name",
-            "key": "name"
-        }, {
         	"label": "Flux",
             "key": "flux",
             "visible": 1
@@ -445,13 +442,13 @@ function KBaseFBA_FBA(modeltabs) {
             }
         }
         if (exp_value == 1) {
-        	this.tabList[1].columns.splice(3, 0,{
+        	this.tabList[1].columns.splice(2, 0,{
         		"label": "Scaled expression (unscaled value)",
             	"key": "exp_value",
         	});
         }
         if (exp_state == 1) {
-        	this.tabList[1].columns.splice(3, 0,{
+        	this.tabList[1].columns.splice(2, 0,{
         		"label": "Expression state",
             	"key": "exp_state",
         	});
