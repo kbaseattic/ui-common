@@ -156,24 +156,57 @@ define('kbaseFigureObjectHeatmap',
 
                 //gotta transform it after it's been inserted. Fun.
                 groups.selectAll('text')
-                        .attr('transform',
-                            function(d) {
+                    .attr('transform',
+                        function(d, i) {
 
-                                var width = d3.select(this).node().getComputedTextLength();
+                            var width = d3.select(this).node().getComputedTextLength();
 
-                                var offset = -2 - width;
+                            var groupHeight = chartBounds.size.height * (groupInfo.ygroup[this.idx] / total_groups);
+
+                            if (width < groupHeight) {
+
+                                var vOffset = -2 - width;
 
                                 if (this.idx > 0) {
-                                    var prior = 0;
-                                    for (var i = 0; i < this.idx; i++) {
-                                        prior += groupInfo.ygroup[i];
-                                    }
-                                    offset -= chartBounds.size.height * (prior / total_groups);
+                                    vOffset -= yIdxFunc(d,this.idx);
                                 }
 
-                                return 'rotate(270) translate(' + offset + ',12)'
+
+                                var hOffset = 12;//this.idx % 2 ? 30 : 12;
+                                this.v = true;
+                                return 'rotate(270) translate(' + vOffset + ',' + hOffset + ')'
                             }
-                        )
+                            else {
+                                var box = this.getBBox();
+                                vOffset = box.height + yIdxFunc(d,this.idx) + 1;
+                                this.h = true;
+                                return 'translate(1,' + vOffset + ')';
+                            }
+                        }
+                    )
+                    .each(function(d,i) {
+                        var box = this.getBBox();
+                        //magic width number! Ooo!
+                        if (this.h && box.width > 70) {
+                            var label = d3.select(this).text();
+                            if (label.length > 10) {
+                                d3.select(this).text(label.substring(0,7) + '...');
+                                d3.select(this)
+                                    .on('mouseover', function(d) {
+                                        d3.select(this).attr('fill', $self.options.overColor);
+                                        $self.data('heatmap').showToolTip(
+                                            {
+                                                label : label
+                                            }
+                                        );
+                                    })
+                                    .on('mouseout', function(d) {
+                                        d3.select(this).attr('fill', 'black');
+                                        $self.data('heatmap').hideToolTip();
+                                    })
+                            }
+                        }
+                    })
 
             }
 

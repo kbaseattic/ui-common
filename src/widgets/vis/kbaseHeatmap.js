@@ -196,17 +196,6 @@ define('kbaseHeatmap',
                 .transition()
                 .duration(0)
                 .call(xAxis)
-                .selectAll("text")
-                    .attr("transform", function (d, i) {
-                        var bounds = $hm.yGutterBounds();
-                        //bullshit hardwired magic numbers. The xAxis is "known"(?) to position @ (0,-9)
-                        //arbitrarily rotate around -12 because it looks right. I got nothin'.
-                        //then we move it 5 pixels to the right, which in our rotate coordinate system is
-                        //5 pixels up. Whee!
-                        var width = d3.select(this).node().getComputedTextLength();
-
-                        return "rotate(-45,0,0) translate(" + (width / 2 + 5) + ",5)";// translate(2,3)";
-                    })
             ;
 
             /*
@@ -249,6 +238,16 @@ define('kbaseHeatmap',
 
                 d3.select(this).attr('data-id', $hm.dataset().column_ids[label_idx]);
                 d3.select(this)
+                    .attr("transform", function (d, i) {
+                        var bounds = $hm.yGutterBounds();
+                        //bullshit hardwired magic numbers. The xAxis is "known"(?) to position @ (0,-9)
+                        //arbitrarily rotate around -12 because it looks right. I got nothin'.
+                        //then we move it 5 pixels to the right, which in our rotate coordinate system is
+                        //5 pixels up. Whee!
+
+                        var width = d3.select(this).node().getComputedTextLength();
+                        return "rotate(-45,0,0) translate(" + (width / 2 + 5) + ",5)";// translate(2,3)";
+                    })
                     .on('mouseover', function(d) {
                         d3.select(this).attr('fill', $hm.options.overColor);
                         var d3this = d3.select(this);
