@@ -114,7 +114,7 @@ define('kbaseRNASeqPie',
             if (this.data('container')) {
 
                 this.data('container').removeTab('Overview');
-                this.data('container').removeTab('Pie chart');
+                //this.data('container').removeTab('Pie chart');
 
                 var $tableElem = $.jqElem('div');
 
@@ -265,12 +265,12 @@ define('kbaseRNASeqPie',
                     );
                 }
 
-                this.data('container').addTab(
+                /*this.data('container').addTab(
                     {
                         tab : 'Pie chart',
                         content : $pieElem
                     }
-                );
+                );*/
 
                 this.data('container').showTab('Overview');
 
@@ -333,10 +333,10 @@ define('kbaseRNASeqPie',
                             tab : 'Overview',
                             content : 'Loading...'
                         },
-                        {
+                        /*{
                             tab : 'Pie chart',
                             content : 'Loading...'
-                        }
+                        }*/
                     ]
                 }
             )
