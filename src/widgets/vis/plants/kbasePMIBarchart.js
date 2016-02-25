@@ -307,7 +307,7 @@ return;
             this.setValueForKey('dataset', newDataset);
 
             if (this.data('barchart') && this.options.selected_subsystems) {
-                this.displaySubsystems(this.options.selected_subsystems);
+                //this.displaySubsystems(this.options.selected_subsystems);
             }
         },
 
@@ -320,31 +320,9 @@ return;
 
         },
 
-        init : function init(options) {
-
-            this.$elem.parent().rmLoading();
-
-            this._super(options);
+        parseWorkspaceData : function parseWorkspaceData(d1, d2) {
 
             var $pmi = this;
-
-            var ws = new Workspace(window.kbconfig.urls.workspace, {token : $pmi.authToken()});
-
-            var subanno_params = {
-                workspace : this.options.subsystem_annotation_workspace,
-                name : this.options.subsystem_annotation_object,
-            };
-
-            var fbaobj_params = {
-                workspace : this.options.fba_workspace,
-                name : this.options.fba_object,
-            };
-
-            $.when(
-                ws.get_objects([subanno_params])    ,
-                ws.get_objects([fbaobj_params])
-            ).then(function (d1, d2) {
-
                 var sub_anno = d1[0].data;
                 var fba_obj = d2[0].data;
 
@@ -446,6 +424,39 @@ return;
 
                 $pmi.setDataset(dataset);
 
+        },
+
+        init : function init(options) {
+
+            this.$elem.parent().rmLoading();
+
+            this._super(options);
+
+            var $pmi = this;
+
+            var ws = new Workspace(window.kbconfig.urls.workspace, {token : $pmi.authToken()});
+
+            var subanno_params = {
+                workspace : this.options.subsystem_annotation_workspace,
+                name : this.options.subsystem_annotation_object,
+            };
+
+            var fbaobj_params = {
+                workspace : this.options.fba_workspace,
+                name : this.options.fba_object,
+            };
+
+            $.when(
+                ws.get_objects([subanno_params])    ,
+                ws.get_objects([fbaobj_params])
+            ).then(function (d1, d2) {
+
+                var interval = setInterval(function(){
+                    if ($pmi.data('loader').is(':visible')) {
+                        clearInterval(interval);
+                        $pmi.parseWorkspaceData(d1, d2);
+                    }
+                }, 2000);
 
             })
             .fail(function(d) {
@@ -614,7 +625,7 @@ return;
                 .append(
                     $.jqElem('div')
                         .attr('id', 'loader')
-                        .append('<br>&nbsp;Loading data...<br>&nbsp;please wait...')
+                        .append('<br>&nbsp;Loading data...<br>&nbsp;please wait...<br>&nbsp;Data parsing may take upwards of 30 seconds, during which time this narrative may be unresponsive.')
                         .append($.jqElem('br'))
                         .append(
                             $.jqElem('div')
