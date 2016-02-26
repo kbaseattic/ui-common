@@ -107,7 +107,7 @@ $.KBWidget({
                         mapData = mapRes[0].data;
 
                     // no need to decode...
-                    container.append('<img src="data:image/png;base64,'+image+'" >');
+                    container.append('<img src="data:image/png;base64,'+image+'" style="display: inline-block;">');
                     container.append('<div id="pathway-'+elemID+'" style="position:absolute; top:0;">');
 
                     container.rmLoading();
