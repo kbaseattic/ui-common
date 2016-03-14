@@ -155,6 +155,19 @@ define('kbaseFigureObjectHeatmap',
                 ;
 
                 //gotta transform it after it's been inserted. Fun.
+                //first thing we do is select the text, get the size, and see if it's > 60. If it is, then it wouldn't fit horizontally,
+                //so we need to decrease its size. That way, in the next step when we select for the transform, we can properly place it.
+                groups.selectAll('text')
+                    .attr('font-size', function(d, i) {
+                        var width = d3.select(this).node().getComputedTextLength();
+
+                        var groupHeight = chartBounds.size.height * (groupInfo.ygroup[this.idx] / total_groups);
+
+                        if (width > groupHeight && width > 60) {   //magic numbers abound in KBase!
+                            this.tinySize = true;
+                            return '9px';
+                        }
+                    });
                 groups.selectAll('text')
                     .attr('transform',
                         function(d, i) {
@@ -180,6 +193,11 @@ define('kbaseFigureObjectHeatmap',
                                 var box = this.getBBox();
                                 vOffset = box.height + yIdxFunc(d,this.idx) + 1;
                                 this.h = true;
+
+                                if (this.tinySize) {
+                                    vOffset -= 2;
+                                }
+
                                 return 'translate(1,' + vOffset + ')';
                             }
                         }
