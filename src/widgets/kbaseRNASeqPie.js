@@ -127,7 +127,6 @@ define('kbaseRNASeqPie',
                     var value = this.value_for_wedge(newDataset[key]);
 
                     //skip all falsy values
-                    console.log("CHECKING ", key, value, !!value, !!0, !!null, !!undefined);
                     if (!!value == false) {
                       continue;
                     }
