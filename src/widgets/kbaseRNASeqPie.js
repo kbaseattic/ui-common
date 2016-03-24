@@ -121,9 +121,19 @@ define('kbaseRNASeqPie',
                 var keys = [];
                 var overViewValues = {};
                 for (var i = 0; i < this.options.overviewItems.length; i++) {
+
                     var key = this.options.overviewItems[i];
+
+                    var value = this.value_for_wedge(newDataset[key]);
+
+                    //skip all falsy values
+                    console.log("CHECKING ", key, value, !!value, !!0, !!null, !!undefined);
+                    if (!!value == false) {
+                      continue;
+                    }
+
                     keys.push( { value : key, label : this.label_for_key(key) } );
-                    overViewValues[key] = this.value_for_wedge(newDataset[key]);
+                    overViewValues[key] = value;
 
                     if ($.isPlainObject(newDataset[key])) {
                         for (var k in newDataset[key]) {
