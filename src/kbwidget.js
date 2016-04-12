@@ -4,18 +4,18 @@
 
 kbwidget.js defines the jquery kbase widget superclass and provides some additional functionality based around it.
 
-The main thing that comes out of it is the $.KBWidget() function, which is a function that creates a constructor for your widget.
+The main thing that comes out of it is the return KBWidget() function, which is a function that creates a constructor for your widget.
 There are other things available, but we'll come back to them.
 
 It also creates the root class for the jquery widgets (kbaseWidgets), although you won't directly interact with that.
 
 And it makes available a registery of all widgets at window.KBase.
 
-But $.KBWidget is the important one. This is your constructor constructor and should be used to create new jquery based widgets.
+But return KBWidget is the important one. This is your constructor constructor and should be used to create new jquery based widgets.
 
 Doing so is easy. It creates a classical inheritance environment. Simply call the function, name the widget, and define a parent.
 
-$.KBWidget(
+return KBWidget(
     {
         name: 'myFancyNewWidget',
         parent: 'someOtherWidget',  //if parent is not provided, defaults to kbaseWidget
@@ -138,34 +138,15 @@ $('someElement').kb_unbind($target, attribute, callback, transformers, accessors
 
  */
 
-define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
+define (
+	[
+		'jquery'
+	], function(
+		$
+	) {
 
     //'use strict';
 
-    $(document).on(
-        'libsLoaded.kbase',
-        function () {
-            $('[data-kbwidget]').each(function(idx, val) {
-                var $val = $(val);
-                var widget = $val.attr('data-kbwidget');
-
-                var options = $val.text();
-
-                $val.empty();
-                if (options !== undefined) {
-                    options = JSON.parse(options);
-                }
-                else {
-                    options = {};
-                }
-
-                $val[widget](options);
-
-            });
-        }
-    );
-
-    var KBase;
     var ucfirst = function(string) {
         if (string !== undefined && string.length) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -302,13 +283,6 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
 
     };
 
-    $.fn.asD3 = function() {
-        if (this.data('d3rep') === undefined) {
-            this.data('d3rep', d3.select(this.get(0)));
-        }
-        return this.data('d3rep')
-    };
-
     $.fn.kb_bind = function($target, attribute, transformers, accessors) {
 
         if (this.length > 1) {
@@ -434,44 +408,6 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
 
     };
 
-
-    var widgetRegistry = {};
-    if (KBase === undefined) {
-        KBase = window.KBase;
-    }
-    if (window.KBase === undefined) {
-        KBase = window.KBase = {
-            _functions : {
-
-                getter :
-                    function getter(name) {
-                        return function keyGetter() {
-                            return this.valueForKey(name);
-                        }
-                    },
-
-                setter :
-                    function setter (name) {
-                        return function (newVal) {
-                            return this.setValueForKey(name, newVal);
-                        }
-                    },
-
-                getter_setter : function getter_setter (name) {
-
-                        return function(newVal) {
-                            if (arguments.length === 1) {
-                                return this.setValueForKey(name, newVal);
-                            }
-                            else {
-                                return this.valueForKey(name);
-                            }
-                        }
-                    },
-            }
-        }
-    }
-
     function subclass(constructor, superConstructor) {
         function surrogateConstructor(){}
 
@@ -491,68 +427,37 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
         return $(tag);
     }
 
-    $.KBWidget = function (def) {
+    var KBWidget = function ($elem, def) {
         def = (def || {});
-        var name    = def.name;
-        var parent  = def.parent;
-
-        if (parent === undefined) {
-            parent = 'kbaseWidget';
-        }
-
-        var asPlugin= def.asPlugin;
-        if (asPlugin === undefined) {
-            asPlugin = true;
-        }
 
         var Widget = function ($elem) {
+
+            var self = this;
+
             this.$elem = $elem;
+
+            $elem[def.name] = function(method) {
+              return self.prototype[method].apply(
+                  $self[method](
+                    Array.prototype.slice.call(arguments, 1)
+                  )
+              );
+            }
+
             this.options = $.extend(true, {}, def.options, this.constructor.prototype.options);
             return this;
         }
 
-        if (name) {
-            var directName = name;
-            directName = directName.replace(/^kbase/, '');
-            directName = directName.charAt(0).toLowerCase() + directName.slice(1);
+        var parent;
 
-            KBase[directName] = function (options, $elem) {
-                var $w = new Widget();
-                if ($elem === undefined) {
-                    $elem = $.jqElem('div');
-                }
-                $w.$elem = $elem;
-
-                if (options === undefined) {
-                    options = {};
-                }
-                options.headless = true;
-
-                $w.init(options);
-                $w._init = true;
-                $w.trigger('initialized');
-                return $w;
-            }
-
-            widgetRegistry[name] = Widget;
-
-            if (def === undefined) {
-                def = parent;
-                parent = 'kbaseWidget';
-                if (def === undefined) {
-                    def = {};
-                }
-            }
+        if (def.parent) {
+          subclass(Widget, def.parent);
+          parent = def.parent;
         }
-
-        if (parent) {
-            var pWidget = widgetRegistry[parent];
-            if (pWidget === undefined)
-                throw new Error("Parent widget is not registered. Cannot find " + parent
-                    + " for " + name);
-            subclass(Widget, pWidget);
+        else {
+          parent = function() {};
         }
-
+console.log("PARENT IS", parent, $elem, def);
         var defCopy = $.extend(true, {}, def);
 
         Widget.prototype.__attributes = {};
@@ -606,12 +511,11 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
             defCopy._accessors = undefined;
         }
 
-        var extension = $.extend(true, {}, Widget.prototype.__attributes, widgetRegistry[parent].prototype.__attributes);
+        var extension = $.extend(true, {}, Widget.prototype.__attributes, parent.prototype.__attributes);
         Widget.prototype.__attributes = extension;
 
         for (var prop in defCopy) {
             //hella slick closure based _super method adapted from JQueryUI.
-//*
 
             if ($.isFunction(defCopy[prop])) {
 
@@ -625,11 +529,11 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
 
                     if (parent) {
                         var _super = function() {
-                            return widgetRegistry[parent].prototype[methodName].apply(this, arguments);
+                            return parent.prototype[methodName].apply(this, arguments);
                         }
 
                         var _superMethod = function(superMethodName) {
-                            return widgetRegistry[parent].prototype[superMethodName].apply(this, Array.prototype.slice.call(arguments, 1));
+                            return parent.prototype[superMethodName].apply(this, Array.prototype.slice.call(arguments, 1));
                         }
                     }
 
@@ -650,139 +554,19 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
 
             }
             else {
-//*/
                 Widget.prototype[prop] = defCopy[prop];
             }
         }
 
         if (parent) {
-            Widget.prototype.options = $.extend(true, {}, widgetRegistry[parent].prototype.options, Widget.prototype.options);
+            Widget.prototype.options = $.extend(true, {}, parent.prototype.options, Widget.prototype.options);
         }
 
-        if (asPlugin) {
-            var ctor = function (method, args) {
+        return Widget;
 
-                if (this.length > 1) {
-                    var methodArgs = arguments;
-                    $.each(
-                        this,
-                        function (idx, elem) {
-                            $.fn[name].apply($(elem), methodArgs);
-                        }
-                    )
-                    return this;
-                }
-
-                if (this.data(name) === undefined) {
-                    this.data(name, new Widget(this));
-                }
-
-                // Method calling logic
-                if (Widget.prototype[method]) {
-                    return Widget.prototype[method].apply(
-                        this.data(name),
-                        Array.prototype.slice.call(arguments, 1)
-                    );
-                } else if ( typeof method === 'object' || ! method ) {
-                    //return this.data(name).init( arguments );
-                    var args = arguments;
-                    var $w = this.data(name);
-                    if ($w._init === undefined) {
-                        $w = Widget.prototype.init.apply($w, arguments);
-                    }
-                    $w._init = true;
-                    $w.trigger('initialized');
-                    return $w;
-                } else {
-                    $.error( 'Method ' +  method + ' does not exist on ' + name);
-                }
-
-                return this;
-
-            };
-
-            //ctor.name = name;
-            $.fn[name] = ctor;
-            $[name]    = $.fn[name];
-        }
-
-        /**
-         * Registers events on this element.
-         * @param {String} name The event name to register
-         * @param {Function} callback The function to call when an event is
-         *        emitted.
-         */
-        this.on = function (evt, callback) {
-            this.$elem.bind(evt, callback);
-            return this;
-        };
-
-        /**
-         * Emits an event.
-         * @param {String} name The event name
-         * @param {Object} data The data to emit with the event
-         */
-        this.emit = function (evt, data) {
-            this.$elem.trigger(evt, data);
-            return this;
-        };
-
-        /**
-         * Unregisters events on this element.
-         * @param {String} name The event name to unregister from
-         */
-        this.off = function (evt) {
-            this.$elem.unbind(evt);
-            return this;
-        };
-
-        if (name !== undefined) {
-            Widget.prototype[name] = function () {
-                return $.fn[name].apply(this.$elem, arguments);
-            }
-
-            return $.fn[name];
-        } else {
-            return this;
-        }
     }
 
-    /**
-     * @method registry
-     * The set of globally-registered widgets.
-     * @return {Object} The registry
-     * @return {String} return.key The name of the widget
-     * @return {Object} return.value The widget
-     * @static
-     */
-    $.KBWidget.registry = function () {
-        var registry = {};
-        for (var widget in widgetRegistry) {
-            if (widget !== 'kbaseWidget') {
-                registry[widget] = widgetRegistry[widget];
-            }
-        }
-        return registry;
-    }
-
-    /**
-     * @method resetRegistry
-     * Unregisters all global widgets.
-     * Note that this does not delete the widgets if another reference to them
-     * is maintained (e.g., by variable assignment).
-     * @static
-     * @chainable
-     */
-    $.KBWidget.resetRegistry = function () {
-        for (var widget in widgetRegistry) {
-            if (widget !== 'kbaseWidget') {
-                delete widgetRegistry[widget];
-            }
-        }
-        return this;
-    }
-
-    $.KBWidget(
+    var kbaseWidget = KBWidget(
         {
             name : 'kbaseWidget',
 
@@ -1056,19 +840,6 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
                 );
             },
 
-/*
-            kb_bind : function($target, attribute, callback) {
-                var event = didChangeNoteForName(attribute);
-                $target.on(event, $target, callback);
-            },
-
-            kb_unbind : function($target, attribute, callback) {
-                var event = didChangeNoteForName(attribute);
-                $target.off(event, callback);
-            },
-*/
-
-//*
             kb_bind : function($target, attribute, callback) {
                 var event = didChangeNoteForName(attribute);
                 this.observe($target, event, callback);
@@ -1089,8 +860,8 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
                 return 'uuid-' + result;
             },
 
-//*/
-
         }
     );
+
+    return KBWidget;
 });
