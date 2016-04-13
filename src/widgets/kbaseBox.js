@@ -102,6 +102,7 @@ define (
 
         appendUI : function ($elem) {
             var canCollapse = this.options.canCollapse;
+            var canCollapseOnDoubleClick = this.options.canCollapseOnDoubleClick;
             var $div = $('<div></div>')
                 .append(
                     $('<div></div>')

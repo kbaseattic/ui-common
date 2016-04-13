@@ -87,6 +87,7 @@
 		'GeneDistribution',
 		'kbaseVisMatrix',
 		'kbaseAccordion',
+		'kbaseBox'
                         ], function(
 
     $,
@@ -108,7 +109,8 @@
 		kbaseJSONReflector,
 		GeneDistribution,
 		kbaseVisMatrix,
-		kbaseAccordion) {
+		kbaseAccordion,
+		kbaseBox) {
                         $(function() {
 
 $('#tabs a').click(function (e) {
@@ -902,6 +904,31 @@ transitionTime : 250,
                                 }
                             );
 
+    var $box =  new kbaseBox($('#box'), {
+            title : 'This is a box',
+            canCollapseOnDoubleClick: true,  //boolean. Whether or not clicking the title bar collapses the box
+            canCollapse: true,  //boolean. Whether or not to show the collapse button
+            content: 'Moo. We are a box. Take us to China.',  //The content within the box. Any HTML string or jquery element
+            //optional list of controls to populate buttons on the right end of the title bar. Give it an icon
+            //and a callback function.
+            controls : [
+                {
+                    icon : 'fa fa-search',
+                    callback : function(e) {
+                        console.log("clicked on search");
+                    },
+                    id : 'search' //optional. Keys the button to be available via $box.controls('search')
+                },
+                {
+                    icon : 'fa fa-minus',
+                    callback : function(e) {
+                        console.log("clicked on delete");
+                    }
+                },
+            ],
+        }
+    );
+
                         });
                     });
                 });
@@ -980,6 +1007,8 @@ transitionTime : 250,
             </div>
 
         </div>
+
+        <div id = 'box'></div>
 
 
     </body>
