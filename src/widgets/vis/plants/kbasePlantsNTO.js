@@ -3,18 +3,25 @@
 
 */
 
-define('kbasePlantsNTO',
-    [
-        'jquery',
-        'kbaseIrisWidget',
-        'kbaseTable',
-    ],
-    function ($) {
-        $.KBWidget(
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseIrisWidget',
+		'kbaseTable'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseIrisWidget,
+		kbaseTable
+	) {
+        return KBWidget(
         {
 
             name: "kbasePlantsNTO",
-            parent: 'kbaseIrisWidget',
+            parent : kbaseIrisWidget,
 
             version: "1.0.0",
 
@@ -596,8 +603,7 @@ this._rewireIds($tables, this);
 var $networkGraph = this.data('network')
     .css({width : 700, height : 600})
     .attr('align', 'center')
-    .kbaseForcedNetwork(
-        {
+    new kbaseForcedNetwork( , {
             linkDistance : 200,
             filter : true,
             nodeHighlightColor : '#002200',

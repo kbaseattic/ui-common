@@ -2,22 +2,27 @@
 
     A simple debugging widget which simply spits out pretty formatted JSON of whatever was handed into it.
 
-    $('<div>').kbaseJSONReflector(
-        {
+     new kbaseJSONReflector($('<div>'), {
             a : 'b',
             c : 'd',
             e : [1,2,3]
         }
     );
 */
-define('kbaseJSONReflector',
-    [
-        'jquery',
-    	'kbwidget'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseJSONReflector",
         version: "1.0.0",
         options: {

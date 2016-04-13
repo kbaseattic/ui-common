@@ -3,11 +3,16 @@
 
 */
 
-define('IdMapClient',
-    [
-        'jquery',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery'
+	], function(
+		KBWidget,
+		bootstrap,
+		$
+	) {
 
 window.IdMapClient = function (url, auth, auth_cb) {
 

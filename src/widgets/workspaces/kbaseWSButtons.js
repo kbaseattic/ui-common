@@ -1,14 +1,21 @@
-define('KBaseWSButtons',
-    [
-        'jquery',
-	'kbwidget',
-	'kbaseAuthenticatedWidget'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseAuthenticatedWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseWSButtons",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         
         options: {

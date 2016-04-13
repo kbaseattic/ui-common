@@ -2,21 +2,33 @@
 
 */
 
-define('kbaseTreechart',
-    [
-        'jquery',
-        'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbaseVisWidget',
+		'RGBColor',
+		'geometry_rectangle',
+		'geometry_point',
+		'geometry_size'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbaseVisWidget,
+		RGBColor,
+		geometry_rectangle,
+		geometry_point,
+		geometry_size
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
     name: "kbaseTreechart",
-    parent: "kbaseVisWidget",
+    parent : kbaseVisWidget,
 
     version: "1.0.0",
     options: {

@@ -461,7 +461,7 @@ define (
         def = (def || {});
 
         var Widget = function ($elem) {
-console.log("INVOKES WIDGET CONSTRUctOR!", this);
+
             var self = this;
 
             this.$elem = $elem;
@@ -481,8 +481,6 @@ console.log("INVOKES WIDGET CONSTRUctOR!", this);
             this._init = true;
             this.trigger('initialized');
 
-            $elem.append('started up');
-
             return this;
         }
 
@@ -495,9 +493,7 @@ console.log("INVOKES WIDGET CONSTRUctOR!", this);
             : function() {};
 
         subclass(Widget, parent);
-        if (def.name != 'kbaseWidget') {
-          console.log("TEST 1");
-        }
+
 
         var defCopy = $.extend(true, {}, def);
 

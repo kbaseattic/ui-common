@@ -1,12 +1,18 @@
-define('kbaseBioCpdTable',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseBioCpdTable",
     version: "1.0.0",
     options: {

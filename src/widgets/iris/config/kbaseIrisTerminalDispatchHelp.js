@@ -3,11 +3,16 @@
 
 */
 
-define('kbaseIrisTerminalDispatchHelp',
-    [
-        'kbaseIrisConfig'
-    ],
-    function() {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'kbaseIrisConfig'
+	], function(
+		KBWidget,
+		bootstrap,
+		kbaseIrisConfig
+	) {
 
         window.kbaseIrisConfig.terminal.run_dispatch.push(
             {

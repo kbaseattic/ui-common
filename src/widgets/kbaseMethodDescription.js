@@ -1,17 +1,27 @@
-define('kbaseMethodDescription',
-    [
-        'jquery',
-    	'kbwidget',
-    	'narrativeMethodStore',
-    	'kbaseAccordion',
-    	'kbaseLineSerieschart',
-    	'kbaseCarousel',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'narrativeMethodStore',
+		'kbaseAccordion',
+		'kbaseLineSerieschart',
+		'kbaseCarousel'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		narrativeMethodStore,
+		kbaseAccordion,
+		kbaseLineSerieschart,
+		kbaseCarousel
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseMethodDescription",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
         options: {
             color: "black",
@@ -249,13 +259,12 @@ define('kbaseMethodDescription',
                     }
                 );
 
-                var $lsc = $.jqElem('div').kbaseLineSerieschart();
+                var $lsc =  new kbaseLineSerieschart($.jqElem('div'));
 
                 lineData = lineData.sort($lsc.sortByKey('xLabel'));
                 labels = labels.sort();
 
-                $linechart.kbaseLineSerieschart(
-                    {
+                 new kbaseLineSerieschart($linechart, {
                         scaleAxes       : true,
 
                         xLabel      : 'Month',
@@ -309,8 +318,7 @@ define('kbaseMethodDescription',
 
 
 
-            var $methAccordion = $.jqElem('div').kbaseAccordion(
-                {
+            var $methAccordion =  new kbaseAccordion($.jqElem('div'), {
                     fontMultiplier : 3,
                     elements : elements
                 }

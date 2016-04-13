@@ -2,20 +2,31 @@
 
 */
 
-define('kbaseVisMatrix',
-    [
-        'jquery',
-        'd3',
-        'kbaseVisWidget',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbaseVisWidget',
+		'geometry_rectangle',
+		'geometry_point',
+		'geometry_size'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbaseVisWidget,
+		geometry_rectangle,
+		geometry_point,
+		geometry_size
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseVisMatrix",
-	  parent: "kbaseVisWidget",
+	  parent : kbaseVisWidget,
 
         version: "1.0.0",
         options: {

@@ -1,16 +1,22 @@
 /**
  * Shows a species description taken from Wikipedia.
  * Also includes a picture, but that'll be under a tab or something.
- */define('KBaseTaxonOverview',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseTaxonOverview",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
 
         options: {

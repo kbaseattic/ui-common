@@ -1,14 +1,21 @@
-define('KBaseGeneExprLinePlot',
-    [
-        'jquery',
-	'kbwidget',
-	'kbaseWidget'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseGeneExprLinePlot",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
         options: {
             title: "Gene expression line plot",

@@ -46,16 +46,23 @@
     		console.log("Tried to log in and got back: "); console.log(args);
     	});
 
-*/define('kbaseLogin',
-    [
-        'jquery',
-	'kbwidget',
-	'kbasePrompt'
-    ],
-    function ($) {
+*/define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbasePrompt'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbasePrompt
+	) {
 
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseLogin",
 
@@ -496,8 +503,7 @@
                     }
                     else {
 
-                        var $errorModal = $('<div></div>').kbasePrompt(
-                            {
+                        var $errorModal =  new kbasePrompt($('<div></div>'), {
                                 title : 'Login failed',
                                 body : $('<div></div>')
                                     .attr('class', 'alert alert-error')
@@ -729,8 +735,7 @@
 
             var $elem = this.$elem;
 
-            var $ld = $('<div></div').kbasePrompt(
-                {
+            var $ld =  new kbasePrompt($('<div></div'), {
                     title : 'Login to KBase',
                     controls : [
                         'cancelButton',

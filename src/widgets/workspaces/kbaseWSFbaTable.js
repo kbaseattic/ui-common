@@ -1,12 +1,18 @@
-define('kbaseWSFbaTable',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseWSFbaTable",
     version: "1.0.0",
     options: {

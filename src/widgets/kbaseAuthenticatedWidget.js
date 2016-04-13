@@ -2,16 +2,22 @@
 
 */
 
-define('kbaseAuthenticatedWidget',
-    [
-        'jquery',
-        'kbwidget',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseAuthenticatedWidget",
 

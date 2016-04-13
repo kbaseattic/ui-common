@@ -2,17 +2,25 @@
 
 */
 
-define('kbaseCircularHeatmap',
-    [
-        'jquery',
-        'd3',
-        'kbasePiechart',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbasePiechart'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbasePiechart
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseCircularHeatmap",
-	  parent: "kbasePiechart",
+	  parent : kbasePiechart,
 
         version: "1.0.0",
 

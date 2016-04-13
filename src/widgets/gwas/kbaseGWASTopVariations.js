@@ -1,13 +1,19 @@
-define('KBaseGWASTopVariations',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseGWASTopVariations",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         options: {
             width: window.innerWidth/4 - 20,

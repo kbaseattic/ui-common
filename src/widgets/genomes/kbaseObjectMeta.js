@@ -1,16 +1,22 @@
 /**
  * Shows info for a workspace object.
  *
- */define('KBaseObjectMeta',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
-	$.KBWidget({
+	return KBWidget({
 		name: "KBaseObjectMeta",
-		parent: "kbaseWidget",
+		parent : kbaseWidget,
 		version: "1.0.0",
 
 		wsUrl:"https://kbase.us/services/ws",

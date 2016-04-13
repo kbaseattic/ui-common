@@ -2,17 +2,24 @@
  * Output widget for visualization of Multiple Sequence Alignment.
  * @author Roman Sutormin <rsutormin@lbl.gov>
  * @public
- */define('kbaseMSA',
-    [
-        'jquery',
-	'kbwidget',
-	'kbaseAuthenticatedWidget'
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseAuthenticatedWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: 'kbaseMSA',
-        parent: 'kbaseAuthenticatedWidget',
+        parent : kbaseAuthenticatedWidget,
         version: '0.0.1',
         options: {
             msaID: null,

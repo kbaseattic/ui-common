@@ -1,15 +1,23 @@
-define('kbasePopularMethods',
-    [
-        'jquery',
-	'kbwidget',
-	'kbaseAccordion',
-	'kbaseTable',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseAccordion',
+		'kbaseTable'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseAccordion,
+		kbaseTable
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbasePopularMethods",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
 
         _accessors : ['stats'],
@@ -5163,12 +5171,11 @@ define('kbasePopularMethods',
                 }, this)
             );
 
-            var $accordion = $.jqElem('div').kbaseAccordion({ elements : []});
+            var $accordion =  new kbaseAccordion($.jqElem('div'), { elements : []});
 
             topData = topData.sort($accordion.sortByKey('hits')).reverse();
 
-            var $topTable = $.jqElem('div').kbaseTable(
-                {
+            var $topTable =  new kbaseTable($.jqElem('div'), {
                     structure : {
                         header : [{value : 'label', label : 'Method'}, {value : 'hits', label : 'Total calls'}],
                         rows : topData,

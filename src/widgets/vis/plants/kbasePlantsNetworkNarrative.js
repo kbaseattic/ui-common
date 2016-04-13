@@ -3,19 +3,27 @@
 
 */
 
-define('kbasePlantsNetworkNarrative',
-    [
-        'jquery',
-        'kbasePlantsNetworkTable',
-        'kbaseForcedNetwork',
-        'kbaseTable',
-    ],
-    function ($) {
-        $.KBWidget(
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbasePlantsNetworkTable',
+		'kbaseForcedNetwork',
+		'kbaseTable'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbasePlantsNetworkTable,
+		kbaseForcedNetwork,
+		kbaseTable
+	) {
+        return KBWidget(
         {
 
             name: "kbasePlantsNetworkNarrative",
-            parent: 'kbaseIrisWidget',
+            parent : kbaseIrisWidget,
 
             version: "1.0.0",
 
@@ -229,8 +237,7 @@ define('kbasePlantsNetworkNarrative',
                 var $networkGraph = $.jqElem('div')
                     .css({width : 700, height : 600})
                     .attr('align', 'center')
-                    .kbaseForcedNetwork(
-                        {
+                    new kbaseForcedNetwork( , {
                             linkDistance : 200,
                             filter : true,
                             nodeHighlightColor : '#002200',
@@ -245,8 +252,7 @@ define('kbasePlantsNetworkNarrative',
                     .html("No datasets with nodes selected");
                 this.data('msgBox', $msgBox);
 
-                var $networkTable = $.jqElem('div').kbasePlantsNetworkTable(
-                    {
+                var $networkTable =  new kbasePlantsNetworkTable($.jqElem('div'), {
                         $terminal       : this.options.$terminal,
                         networkGraph    : $networkGraph,
                         msgBox          : $msgBox,

@@ -1,23 +1,32 @@
 
 
-define('kbasePValueHistogram',
-    [
-        'jquery',
-        'kbwidget',
-        'kbaseAuthenticatedWidget',
-        'kbaseTabs',
-        'kbaseHistogram',
-        'kbase-client-api',
-        'kbaseTable',
-        'jquery-dataTables',
-    ], function( $, colorbrewer ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseAuthenticatedWidget',
+		'kbaseTabs',
+		'kbaseHistogram',
+		'kbaseTable'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseAuthenticatedWidget,
+		kbaseTabs,
+		kbaseHistogram,
+		kbaseTable
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbasePValueHistogram",
-	    parent : "kbaseAuthenticatedWidget",
+	    parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         options: {
@@ -96,8 +105,7 @@ define('kbasePValueHistogram',
             this._rewireIds($elem, this);
 
             var $histogram =
-                $histElem.kbaseHistogram(
-                    {
+                 new kbaseHistogram($histElem, {
                         scaleAxes   : true,
                         xPadding : 60,
                         yPadding : 120,

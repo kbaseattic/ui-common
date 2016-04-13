@@ -4,6 +4,7 @@
             urlArgs: "bust=" + (new Date()).getTime(),
             paths : {
                 'jquery'      : '../../ext/jquery/jquery-1.10.2.min',
+                'jquery-private' : '../jquery-private',
                 'jqueryui'    : '../../ext/jquery-ui/1.10.3/js/jquery-ui-1.10.3.custom.min',
                 'bootstrap'   : "../../ext/bootstrap/3.3.0/js/bootstrap.min",
                 'd3'          : "../../ext/d3/d3.min",
@@ -227,6 +228,10 @@
             },
             shim : {
                 bootstrap : {deps : ["jquery"]}
+            },
+            map : {
+                //'*' : {'jquery' : 'jquery-private'},
+                //'jquery-private' : {'jquery' : 'jquery'}
             }
         });
     });

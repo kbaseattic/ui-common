@@ -3,20 +3,26 @@
 
 */
 
-define('kbaseIrisWidget',
-    [
-        'jquery',
-        'kbaseAuthenticatedWidget',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseAuthenticatedWidget
+	) {
 
 
 
-    $.KBWidget(
+    return KBWidget(
         {
 
             name: "kbaseIrisWidget",
-            parent: 'kbaseAuthenticatedWidget',
+            parent : kbaseAuthenticatedWidget,
 
             version: "1.0.0",
             _accessors : [

@@ -3,11 +3,16 @@
 
 */
 
-define('CDMI_API',
-    [
-        'jquery',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery'
+	], function(
+		KBWidget,
+		bootstrap,
+		$
+	) {
 
 window.CDMI_API = function (url, auth, auth_cb) {
 

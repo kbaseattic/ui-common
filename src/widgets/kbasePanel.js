@@ -5,18 +5,24 @@
     The panels are removable and minimizable
 
     API Example:
-        var panel = this.$elem.kbasePanel({title: 'Model Details', 
+        var panel =  new kbasePanel(this.$elem, {title: 'Model Details', 
                                            rightLabel: 'Super Workspace,
                                            subText: 'kb|g.super.genome '});
-*/define('kbasePanel',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+*/define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
 
-$.KBWidget({
+return KBWidget({
     name: "kbasePanel",
     version: "1.0.0",
     options: {

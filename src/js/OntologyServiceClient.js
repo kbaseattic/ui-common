@@ -3,11 +3,16 @@
 
 */
 
-define('OntologyServiceClient',
-    [
-        'jquery',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery'
+	], function(
+		KBWidget,
+		bootstrap,
+		$
+	) {
 
 window.Ontology = function (url, auth, auth_cb) {
 

@@ -3,22 +3,30 @@
 
 */
 
-define('kbaseIrisTerminalWidget',
-    [
-        'jquery',
-        'kbaseIrisWidget',
-        'kbaseButtonControls',
-        'kbaseDeletePrompt',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseIrisWidget',
+		'kbaseButtonControls',
+		'kbaseDeletePrompt'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseIrisWidget,
+		kbaseButtonControls,
+		kbaseDeletePrompt
+	) {
 
 
 
-    $.KBWidget(
+    return KBWidget(
         {
 
             name: "kbaseIrisTerminalWidget",
-            parent: 'kbaseIrisWidget',
+            parent : kbaseIrisWidget,
 
             version: "1.0.0",
 
@@ -181,8 +189,7 @@ define('kbaseIrisTerminalWidget',
 
                 this._rewireIds($elem, this);
 
-                $inputDiv.kbaseButtonControls(
-                    {
+                 new kbaseButtonControls($inputDiv, {
                         context : this,
                         controls : [
                             {
@@ -228,8 +235,7 @@ define('kbaseIrisTerminalWidget',
                     }
                 );
 
-                this.data('outputWrapper').kbaseButtonControls(
-                    {
+                 new kbaseButtonControls(this.data('outputWrapper'), {
                         position : 'bottom',
                         posOffset : '-20px',
                         context : this,
@@ -274,8 +280,7 @@ define('kbaseIrisTerminalWidget',
             },
 
             removeWidgetPrompt : function() {
-                var $deletePrompt = $.jqElem('div').kbaseDeletePrompt(
-                    {
+                var $deletePrompt =  new kbaseDeletePrompt($.jqElem('div'), {
                         name     : 'this widget',
                         callback : $.proxy( function(e, $prompt) {
                             $prompt.closePrompt();

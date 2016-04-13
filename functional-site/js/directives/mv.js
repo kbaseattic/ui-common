@@ -46,7 +46,7 @@ angular.module('mv-directives')
                     $.when.apply($, proms2).done(function() {
                         var models = [].concat.apply([], arguments);
 
-                        $(element).kbaseModelCore({ids: ids, 
+kbaseModelCore(                        $(element), {ids: ids, 
                                                     workspaces: ws,
                                                     modelsData: models,
                                                     fbasData: fbas});
@@ -78,7 +78,7 @@ angular.module('mv-directives')
                     $(element).loading('loading model...');
                     $.when(prom2).done(function(models){
 
-                        $(element).kbaseModelCore({ids: ids, 
+kbaseModelCore(                        $(element), {ids: ids, 
                                                     workspaces: ws,
                                                     modelsData: models,
                                                     fbasData: fbas});

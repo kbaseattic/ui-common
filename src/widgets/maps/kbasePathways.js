@@ -1,15 +1,22 @@
-define('kbasePathways',
-    [
-        'jquery',
-	'kbwidget',
-	'kbasePathway'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbasePathway'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbasePathway
+	) {
 
 
 'use strict';
 
-$.KBWidget({
+return KBWidget({
     name: "kbasePathways",
     version: "1.0.0",
     options: {
@@ -111,7 +118,7 @@ $.KBWidget({
 
         function load_map(map, container) {
             if (models)
-                container.kbasePathway({models: models,
+                 new kbasePathway(container, {models: models,
                                         fbas: fbas,
                                         map_ws: map_ws,
                                         map_name: map,
@@ -119,7 +126,7 @@ $.KBWidget({
                                         editable: (options.editable ? true : false),
                                     })
             else
-                container.kbasePathway({model_ws: model_ws,
+                 new kbasePathway(container, {model_ws: model_ws,
                                         model_name: model_name,
                                         fba_ws: fba_ws,
                                         fba_name: fba_name,

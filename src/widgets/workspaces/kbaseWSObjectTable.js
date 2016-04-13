@@ -1,12 +1,18 @@
-define('kbaseWSObjectTable',
-    [
-        'jquery',
-	'kbwidget',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseWSObjectTable",
     version: "1.0.0",
     options: {
@@ -716,7 +722,7 @@ $.KBWidget({
                     style="float: left; margin: 0 5px 0 0;" >back</div>');
 
 
-                //modelView = $('#main-right-content').kbaseModelView({ids: ids,
+                //modelView =  new kbaseModelView($('#main-right-content'), {ids: ids,
                 //    workspaces: ws});
 
                 $('.back-button').unbind('click');

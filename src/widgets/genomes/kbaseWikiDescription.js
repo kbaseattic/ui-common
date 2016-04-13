@@ -20,16 +20,22 @@
  * @author Mike Sneddon [mwsneddon@lbl.gov]
  * @author Dylan Chivian [dcchivian@lbl.gov]
  */
- */define('KBaseWikiDescription',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
  
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseWikiDescription",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
 
         /**

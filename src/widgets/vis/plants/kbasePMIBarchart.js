@@ -28,8 +28,7 @@
         );
     }
 
-    var $scatter = $('#scatterplot').css({width : '800px', height : '500px'}).kbaseScatterplot(
-        {
+    var $scatter =  new kbaseScatterplot($('#scatterplot').css({width : '800px', height : '500px'}), {
             scaleAxes   : true,
 
             //xLabel      : 'Some useful experiment',
@@ -42,22 +41,31 @@
 
 */
 
-define('kbasePMIBarchart',
-    [
-        'jquery',
-        'd3',
-        'kbaseBarchart',
-        'kbaseAuthenticatedWidget',
-        'kbase-client-api',
-        'bootstrap',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbaseBarchart',
+		'kbaseAuthenticatedWidget',
+		'bootstrap'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbaseBarchart,
+		kbaseAuthenticatedWidget,
+		bootstrap
+	) {
 
-    'use strict';
+    //'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbasePMIBarchart",
-	    parent: "kbaseAuthenticatedWidget",
+	    parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         options: {
@@ -638,8 +646,7 @@ return;
             this._rewireIds($container, this);
 
             this.data('barchart',
-                this.data('barchartElem').kbaseBarchart(
-                    {
+                 new kbaseBarchart(this.data('barchartElem'), {
                         scaleAxes   : true,
 
                         yLabelRegion : 'xPadding',

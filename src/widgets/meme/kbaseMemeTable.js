@@ -1,13 +1,20 @@
-define('kbaseMemeTable',
-    [
-        'jquery',
-	'kbwidget',
-	'kbasePanel'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbasePanel'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbasePanel
+	) {
 
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseMemeTable",      
     version: "1.0.0",
     options: {
@@ -20,7 +27,7 @@ $.KBWidget({
         var self = this;        
         var ws = options.ws;
 
-        var panel = this.$elem.kbasePanel({title: 'MEME service results', 
+        var panel =  new kbasePanel(this.$elem, {title: 'MEME service results', 
                                            rightLabel: ws});
         panel.loading();
 

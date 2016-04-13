@@ -1,7 +1,6 @@
 /*
 
-    $('#piechart').kbaseMulticlusterHeatmap(
-        {
+     new kbaseMulticlusterHeatmap($('#piechart'), {
             workspace : "name of workspace",
 
             output : "name of object"
@@ -30,28 +29,43 @@
 
 */
 
-define('kbaseMulticlusterHeatmap',
-    [
-        'jquery',
-        'newick',
-        'colorbrewer',
-        'd3',
-        'kbasePiechart',
-        'kbaseTable',
-        'kbwidget',
-        'kbaseAuthenticatedWidget',
-        'kbaseTabs',
-        'kbase-client-api',
-        'kbaseHeatmap',
-        'kbaseTreechart',
-    ], function( $, newick, colorbrewer ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'newick',
+		'colorbrewer',
+		'd3',
+		'kbasePiechart',
+		'kbaseTable',
+		'kbwidget',
+		'kbaseAuthenticatedWidget',
+		'kbaseTabs',
+		'kbaseHeatmap',
+		'kbaseTreechart'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		newick,
+		colorbrewer,
+		d3,
+		kbasePiechart,
+		kbaseTable,
+		KBWidget,
+		kbaseAuthenticatedWidget,
+		kbaseTabs,
+		kbaseHeatmap,
+		kbaseTreechart
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseMulticlusterHeatmap",
-	    parent : "kbaseAuthenticatedWidget",
+	    parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         options: {
@@ -175,8 +189,7 @@ treeData = tree;
             var $hm = $.jqElem('div')
                 .css('width',  $elem.width())
                 .css('height', $elem.height())
-                .kbaseHeatmap(
-                {
+                new kbaseHeatmap( , {
                     //debug : true,
                     dataset : heatmap,
                     minValue : -1.0,
@@ -197,8 +210,7 @@ treeData = tree;
             var $tree = $.jqElem('div')
                 .css('width',  $elem.width())
                 .css('height', $elem.height())
-                .kbaseTreechart(
-                {
+                new kbaseTreechart( , {
                     parent : $hm,
                     staticWidth : true,
                     staticHeight : true,

@@ -1,17 +1,25 @@
-define('kbaseAppDescription',
-    [
-        'jquery',
-    	'kbwidget',
-    	'narrativeMethodStore',
-    	'kbaseAccordion',
-    	'kbaseCarousel',
-    	//'kbaseLineSerieschart',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'narrativeMethodStore',
+		'kbaseAccordion',
+		'kbaseCarousel'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		narrativeMethodStore,
+		kbaseAccordion,
+		kbaseCarousel
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseAppDescription",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
         options: {
             color: "black",
@@ -149,8 +157,7 @@ define('kbaseAppDescription',
 
 
             var $carouselDiv = $.jqElem('div');
-            $carouselDiv.kbaseCarousel(
-                {
+             new kbaseCarousel($carouselDiv, {
                     carousel : steps
                 }
             );
@@ -362,13 +369,12 @@ define('kbaseAppDescription',
                     }
                 );
 
-                var $lsc = $.jqElem('div').kbaseLineSerieschart();
+                var $lsc =  new kbaseLineSerieschart($.jqElem('div'));
 
                 lineData = lineData.sort($lsc.sortByKey('xLabel'));
                 labels = labels.sort();
 
-                $linechart.kbaseLineSerieschart(
-                    {
+                 new kbaseLineSerieschart($linechart, {
                         scaleAxes       : true,
 
                         xLabel      : 'Month',
@@ -422,8 +428,7 @@ define('kbaseAppDescription',
 
 
 
-            var $methAccordion = $.jqElem('div').kbaseAccordion(
-                {
+            var $methAccordion =  new kbaseAccordion($.jqElem('div'), {
                     fontMultiplier : 3,
                     elements : elements
                 }

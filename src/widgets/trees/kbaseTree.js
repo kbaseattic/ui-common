@@ -1,17 +1,24 @@
 /**
  * @author Bill Riehl <wjriehl@lbl.gov>, Roman Sutormin <rsutormin@lbl.gov>
  * @public
- */define('kbaseTree',
-    [
-        'jquery',
-	'kbwidget',
-	'kbaseAuthenticatedWidget'
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseAuthenticatedWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: 'kbaseTree',
-        parent: 'kbaseAuthenticatedWidget',
+        parent : kbaseAuthenticatedWidget,
         version: '0.0.1',
         options: {
             treeID: null,

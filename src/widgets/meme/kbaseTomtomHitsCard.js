@@ -1,13 +1,19 @@
-define('KBaseTomtomHitsCard',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseTomtomHitsCard",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
         options: {
             title: "TOMTOM Hits",

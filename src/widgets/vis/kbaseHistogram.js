@@ -2,17 +2,27 @@
 
 */
 
-define('kbaseHistogram',
-    [
-        'jquery',
-        'd3',
-        'kbaseBarchart',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbaseBarchart',
+		'kbaseAuthenticatedWidget',
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbaseBarchart,
+		kbaseAuthenticatedWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseHistogram",
-	  parent: "kbaseAuthenticatedWidget",
+	  parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         options: {

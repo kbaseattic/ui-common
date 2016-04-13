@@ -67,8 +67,48 @@
                 }
 
                 require(['kbpaths'], function() {
-                    require(['jquery', 'vis', 'kbaseAccordion',
-                        ], function($) {
+                    require(['jquery',
+		'kbwidget',
+		'kbaseBarchart',
+		'kbasePMIBarchart',
+		'kbaseHistogram',
+		'kbaseHeatmap',
+		'kbaseLinechart',
+		'kbaseSparkline',
+		'kbaseLineSerieschart',
+		'kbaseScatterplot',
+		'kbasePiechart',
+		'kbaseForcedNetwork',
+		'kbaseTreechart',
+		'kbaseCircularHeatmap',
+		'kbaseChordchart',
+		'kbaseVenndiagram',
+		'kbaseJSONReflector',
+		'GeneDistribution',
+		'kbaseVisMatrix',
+		'kbaseAccordion',
+                        ], function(
+
+    $,
+		KBWidget,
+		kbaseBarchart,
+		kbasePMIBarchart,
+		kbaseHistogram,
+		kbaseHeatmap,
+		kbaseLinechart,
+		kbaseSparkline,
+		kbaseLineSerieschart,
+		kbaseScatterplot,
+		kbasePiechart,
+		kbaseForcedNetwork,
+		kbaseTreechart,
+		kbaseCircularHeatmap,
+		kbaseChordchart,
+		kbaseVenndiagram,
+		kbaseJSONReflector,
+		GeneDistribution,
+		kbaseVisMatrix,
+		kbaseAccordion) {
                         $(function() {
 
 $('#tabs a').click(function (e) {
@@ -76,8 +116,7 @@ $('#tabs a').click(function (e) {
   $(this).tab('show')
 })
 
-    var $accordion = $('#accordion').kbaseAccordion(
-        {
+    var $accordion = new kbaseAccordion($('#accordion'), {
             elements :
                 [
                     {
@@ -103,8 +142,7 @@ $('#tabs a').click(function (e) {
 
                             var pos = getParameterByName('pos') || 'final';
 
-                            $('#json').kbaseJSONReflector(
-                                {
+                            new kbaseJSONReflector($('#json'), {
                                     scaleAxes       : true,
 
                                     xLabel      : 'Some useful experiment',
@@ -189,9 +227,7 @@ $('#tabs a').click(function (e) {
                                 )
                             };
 
-                            var $line = $('#linechartWidget').kbaseLinechart(
-
-                                {
+                            var $line = new kbaseLinechart($('#linechartWidget'), {
 
                                     legendRegion : 'xGutter',
                                     xGutter : 75,
@@ -332,9 +368,9 @@ $('#tabs a').click(function (e) {
                                 }
                             }
 
-                            var $spark1 = $('#spark1').kbaseSparkline( { dataset : spark1 } );
-                            var $spark2 = $('#spark2').kbaseSparkline( { dataset : spark2 } );
-                            var $spark3 = $('#spark3').kbaseSparkline( { dataset : spark3 } );
+                            var $spark1 = new kbaseSparkline($('#spark1'), { dataset : spark1 } );
+                            var $spark2 = new kbaseSparkline($('#spark2'), { dataset : spark2 } );
+                            var $spark3 = new kbaseSparkline($('#spark3'), { dataset : spark3 } );
 
 
                             var bars = [];
@@ -352,9 +388,7 @@ $('#tabs a').click(function (e) {
                             }
                             console.log(bars);
 
-                            var $bar = $.jqElem('div').css({width : '800px', height : '500px'}).kbaseBarchart(
-
-                                {
+                            var $bar = new kbaseBarchart($.jqElem('div').css({width : '800px', height : '500px'}), {
                                     scaleAxes   : true,
 
                                     xLabel      : 'Survey Data',
@@ -367,8 +401,7 @@ $('#tabs a').click(function (e) {
 
                             );
 
-                            $('#barchartWidget').kbaseBarchart(
-                                {
+                            new kbaseBarchart($('#barchartWidget'), {
                                     scaleAxes   : true,
 
                                     xLabel      : 'Survey Data',
@@ -413,11 +446,10 @@ $('#tabs a').click(function (e) {
 
                             }
 
-                            var $pmi = $('#PMIbarchartWidget').kbasePMIBarchart(
-                                {
+                            /*var $pmi = new kbasePMIBarchart($('#PMIbarchartWidget'), {
                                     dataset : generate_pmi_data(),
                                 }
-                            );
+                            );*/
 
                             $.jqElem('div')/*('#pmi-button')*/.on('click', function(e) {
                                 $pmi.setDataset(generate_pmi_data());
@@ -451,8 +483,7 @@ $('#tabs a').click(function (e) {
                                 );
                             }
 
-                            $('#scatterplotWidget').kbaseScatterplot(
-                                {
+                            new kbaseScatterplot($('#scatterplotWidget'), {
                                     scaleAxes   : true,
 
                                     //xLabel      : 'Some useful experiment',
@@ -463,8 +494,7 @@ $('#tabs a').click(function (e) {
                                 }
                             );
 
-                            var $pie = $('#piechartWidget').kbasePiechart(
-                                {
+                            var $pie = new kbasePiechart($('#piechartWidget'), {
                                     scaleAxes   : true,
                                     useUniqueID : false,
                                     //transitionTime : 15000,
@@ -533,8 +563,7 @@ $('#tabs a').click(function (e) {
                             });
 
 
-                            var $hm_c = $('#circularHeatmap').kbaseCircularHeatmap(
-                                {
+                            var $hm_c = new kbaseCircularHeatmap($('#circularHeatmap'), {
 
                                     startingPosition : pos,
 
@@ -643,8 +672,7 @@ $('#tabs a').click(function (e) {
                                 heatmap.column_labels.push('Frobnoz' + idx);
                             } //*/
 
-                            $('#heatmapWidget').kbaseHeatmap(
-                                {
+                            new kbaseHeatmap($('#heatmapWidget'), {
                                     dataset : heatmap,
                                     colors : ['#0000AA', '#FFFFFF', '#AA0000'],
                                     //ulIcon : '/functional-site/assets/navbar/images/kbase_logo.png',
@@ -661,8 +689,7 @@ $('#tabs a').click(function (e) {
                                 }
                             );
 
-                            $('#forcedNetwork').kbaseForcedNetwork(
-                                {
+                            new kbaseForcedNetwork($('#forcedNetwork'), {
                                     scaleAxes   : true,
 
                                     xLabel      : 'The Solar System',
@@ -697,8 +724,7 @@ $('#tabs a').click(function (e) {
                                 }
                             );
 
-                            var $tree = $('#treechartWidget').kbaseTreechart(
-                                {
+                            var $tree = new kbaseTreechart($('#treechartWidget'), {
                                 debug : false,
                                 lineStyle : 'square',
                                 layout : 'cluster',
@@ -822,8 +848,7 @@ dataset2 :
 
                             $.jqElem('div')/*('#treeCompare')*/.kb_bind($tree, 'comparison');
 
-                            var $venn = $('#venn').kbaseVenndiagram(
-                                {
+                            var $venn = new kbaseVenndiagram($('#venn'), {
                                 //debug : true,
 ZEDo : 2 * Math.PI * 25 / 360,
 transitionTime : 250,

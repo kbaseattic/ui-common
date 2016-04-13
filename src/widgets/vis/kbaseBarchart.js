@@ -12,9 +12,7 @@
                         );
                     }
 
-                    var $bar = $('#barchart').css({width : '800px', height : '500px'}).kbaseBarchart(
-
-                        {
+                    var $bar =  new kbaseBarchart($('#barchart').css({width : '800px', height : '500px'}), {
                             scaleAxes   : true,
 
                             xLabel      : 'Survey Data',
@@ -29,23 +27,35 @@
 
 */
 
-define('kbaseBarchart',
-    [
-        'jquery',
-        'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbaseVisWidget',
+		'RGBColor',
+		'geometry_rectangle',
+		'geometry_point',
+		'geometry_size'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbaseVisWidget,
+		RGBColor,
+		geometry_rectangle,
+		geometry_point,
+		geometry_size
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseBarchart",
-	  parent: "kbaseVisWidget",
+	  parent : kbaseVisWidget,
 
         version: "1.0.0",
         options: {

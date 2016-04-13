@@ -1,13 +1,19 @@
-define('KBaseWSReferenceList',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseWSReferenceList",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         
         //wsUrl: "http://dev04.berkeley.kbase.us:7058",

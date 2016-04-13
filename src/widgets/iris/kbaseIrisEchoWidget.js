@@ -3,22 +3,31 @@
 
 */
 
-define('kbaseIrisEchoWidget',
-    [
-        'jquery',
-        'kbaseIrisWidget',
-        'kbaseFormBuilder',
-        'kbaseBox',
-        'kbaseDeletePrompt'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseIrisWidget',
+		'kbaseFormBuilder',
+		'kbaseBox',
+		'kbaseDeletePrompt'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseIrisWidget,
+		kbaseFormBuilder,
+		kbaseBox,
+		kbaseDeletePrompt
+	) {
 
 
-    $.KBWidget(
+    return KBWidget(
         {
 
             name: "kbaseIrisEchoWidget",
-            parent: 'kbaseIrisWidget',
+            parent : kbaseIrisWidget,
 
             version: "1.0.0",
 
@@ -39,8 +48,7 @@ define('kbaseIrisEchoWidget',
 
             appendUI : function($elem) {
 
-                var $form = $.jqElem('div').kbaseFormBuilder(
-                    {
+                var $form =  new kbaseFormBuilder($.jqElem('div'), {
                         elements :
                             [
                                  {
@@ -55,8 +63,7 @@ define('kbaseIrisEchoWidget',
                     }
                 );
 
-                var $box = $.jqElem('div').kbaseBox(
-                    {
+                var $box =  new kbaseBox($.jqElem('div'), {
                         title : 'Echo Chamber',
                         content :
                             $.jqElem('div')
@@ -71,8 +78,7 @@ define('kbaseIrisEchoWidget',
                                 icon : 'fa fa-times',
                                 callback :
                                     $.proxy(function (e, $gui) {
-                                        var $deleteModal = $.jqElem('div').kbaseDeletePrompt(
-                                            {
+                                        var $deleteModal =  new kbaseDeletePrompt($.jqElem('div'), {
                                                 name : 'Echo Chamber',
                                                 callback : function(e, $prompt) {
                                                     $prompt.closePrompt();

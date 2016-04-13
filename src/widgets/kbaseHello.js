@@ -1,16 +1,22 @@
 /**
  * Just a simple example widget - makes a div with "Hello world!"
  * in a user-defined color (must be a css color - 'red' or 'yellow' or '#FF0000')
- */define('HelloWidget',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "HelloWidget",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
         options: {
             color: "black",

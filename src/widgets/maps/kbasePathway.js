@@ -7,17 +7,23 @@
  *      modelSeedVizConfig  - Used for colors and utility functions,
  *                            allowing for heatmap scaling, etc
  *
-*/define('kbasePathway',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+*/define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
 
 'use strict';
 
-$.KBWidget({
+return KBWidget({
     name: "kbasePathway",
     version: "1.0.0",
     options: {

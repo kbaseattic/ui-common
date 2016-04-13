@@ -3,19 +3,26 @@
 
 */
 
-define('kbaseIrisFileEditor',
-    [
-        'jquery',
-        'kbaseAuthenticatedWidget',
-        'kbasePrompt',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseAuthenticatedWidget',
+		'kbasePrompt'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseAuthenticatedWidget,
+		kbasePrompt
+	) {
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseIrisFileEditor",
-		parent: 'kbaseAuthenticatedWidget',
+		parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         _accessors : [
@@ -139,8 +146,7 @@ define('kbaseIrisFileEditor',
                 return;
             }
 
-            var $saveModal = $.jqElem('div').kbasePrompt(
-                    {
+            var $saveModal =  new kbasePrompt($.jqElem('div'), {
                         title : 'Save changes',
                         body : 'Save changes to <strong>' + this.file() + '</strong> before closing?',
                         controls : [

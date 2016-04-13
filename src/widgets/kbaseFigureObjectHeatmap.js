@@ -1,20 +1,28 @@
 
 
-define('kbaseFigureObjectHeatmap',
-    [
-        'jquery',
-        'kbwidget',
-        'kbaseAuthenticatedWidget',
-        'kbase-client-api',
-        'kbaseHeatmap',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseAuthenticatedWidget',
+		'kbaseHeatmap'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseAuthenticatedWidget,
+		kbaseHeatmap
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseFigureObjectHeatmap",
-	    parent : "kbaseAuthenticatedWidget",
+	    parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         options: {
@@ -55,8 +63,7 @@ define('kbaseFigureObjectHeatmap',
                 var $heatElem = $.jqElem('div').css({width : 800, height : newDataset.column_labels.length * this.options.magicHeight});
 
                 var $heatmap =
-                    $heatElem.kbaseHeatmap(
-                        {
+                     new kbaseHeatmap($heatElem, {
                             colors : ['#0000FF', '#FFFFFF', '#FF0000'],
                             xPadding : 170,
                         }

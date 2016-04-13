@@ -2,8 +2,7 @@
 
 Widget to create an accordion control. Easy to use!
 
-    var $accordion = $('#accordion').kbaseAccordion(
-        {
+    var $accordion =  new kbaseAccordion($('#accordion'), {
             elements :
                 [
                     {
@@ -28,10 +27,21 @@ Widget to create an accordion control. Easy to use!
 
 */
 
-define('kbaseAccordion', ['jquery', 'kbwidget'], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
 
-    $.KBWidget({
+    return KBWidget({
         name : 'kbaseAccordion',
         version: "1.0.0",
         options: {

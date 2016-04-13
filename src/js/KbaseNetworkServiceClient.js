@@ -3,11 +3,16 @@
 
 */
 
-define('KbaseNetworkServiceClient',
-    [
-        'jquery',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery'
+	], function(
+		KBWidget,
+		bootstrap,
+		$
+	) {
 
 window.KBaseNetworks = function (url, auth, auth_cb) {
 

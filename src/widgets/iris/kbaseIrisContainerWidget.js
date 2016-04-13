@@ -3,20 +3,27 @@
 
 */
 
-define('kbaseIrisContainerWidget',
-    [
-        'jquery',
-        'kbaseIrisWidget',
-        'kbaseButtonControls',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseIrisWidget',
+		'kbaseButtonControls'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseIrisWidget,
+		kbaseButtonControls
+	) {
 
 
-    $.KBWidget(
+    return KBWidget(
         {
 
             name: "kbaseIrisContainerWidget",
-            parent: 'kbaseIrisWidget',
+            parent : kbaseIrisWidget,
 
             version: "1.0.0",
 
@@ -121,8 +128,7 @@ define('kbaseIrisContainerWidget',
 
             appendUI : function($elem) {
 
-                $elem.kbaseButtonControls(
-                    {
+                 new kbaseButtonControls($elem, {
                         context : this,
                         controls : [
                             /*{

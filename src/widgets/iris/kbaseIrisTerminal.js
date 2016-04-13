@@ -3,31 +3,48 @@
 
 */
 
-define('kbaseIrisTerminal',
-    [
-        'jquery',
-        'kbwidget',
-        'kbaseButtonControls',
-        'kbaseIrisTutorial',
-        'kbaseIrisFileBrowser',
-        'kbaseAuthenticatedWidget',
-        'kbaseIrisCommands',
-        'kbaseIrisGrammar',
-        'kbaseIrisTerminalWidget',
-        'kbaseIrisTextWidget',
-        'kbaseIrisContainerWidget',
-        'kbaseTable',
-        'kbaseIrisConfig',
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseButtonControls',
+		'kbaseIrisTutorial',
+		'kbaseIrisFileBrowser',
+		'kbaseAuthenticatedWidget',
+		'kbaseIrisCommands',
+		'kbaseIrisGrammar',
+		'kbaseIrisTerminalWidget',
+		'kbaseIrisTextWidget',
+		'kbaseIrisContainerWidget',
+		'kbaseTable',
+		'kbaseIrisConfig',
+		'kbaseIrisTerminalDispatch'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseButtonControls,
+		kbaseIrisTutorial,
+		kbaseIrisFileBrowser,
+		kbaseAuthenticatedWidget,
+		kbaseIrisCommands,
+		kbaseIrisGrammar,
+		kbaseIrisTerminalWidget,
+		kbaseIrisTextWidget,
+		kbaseIrisContainerWidget,
+		kbaseTable,
+		kbaseIrisConfig,
+		kbaseIrisTerminalDispatch
+	) {
 
-        'kbaseIrisTerminalDispatch',
-    ],
-    function ($) {
 
-
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseIrisTerminal",
-		parent: 'kbaseAuthenticatedWidget',
+		parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         _accessors : [
@@ -386,8 +403,7 @@ define('kbaseIrisTerminal',
             else if (this.options.autocreateFileBrowser) {
 
                 this.addFileBrowser(
-                    $.jqElem('div').kbaseIrisFileBrowser (
-                        {
+                     new kbaseIrisFileBrowser($.jqElem('div'), {
                             client              : this.client(),
                             externalControls    : false,
                             invocationURL       : this.options.invocationURL,
@@ -466,8 +482,7 @@ define('kbaseIrisTerminal',
 
             if (this.options.commandsElement == undefined) {
                 this.options.commandsElement = $.jqElem('div');
-                this.options.commandsElement.kbaseIrisCommands(
-                    {
+                 new kbaseIrisCommands(this.options.commandsElement, {
                         client      : this.client(),
                         terminal    : this,
                     }
@@ -475,7 +490,7 @@ define('kbaseIrisTerminal',
             }
 
             if (this.options.grammar == undefined) {
-                this.options.grammar = $.jqElem('div').kbaseIrisGrammar();
+                this.options.grammar =  new kbaseIrisGrammar($.jqElem('div'));
             }
 
             var lastScrollTop = 0;
@@ -1026,7 +1041,7 @@ define('kbaseIrisTerminal',
                     this
                 )
             );
-            var $widget = $.jqElem('div').kbaseIrisTerminalWidget();
+            var $widget =  new kbaseIrisTerminalWidget($.jqElem('div'));
             this.appendWidget($widget);
             $widget.setOutput($tbl);
             $widget.setValue(
@@ -1041,7 +1056,7 @@ define('kbaseIrisTerminal',
 
         out_text: function(text, type) {
 
-            var $text = $.jqElem('div').kbaseIrisTextWidget();
+            var $text =  new kbaseIrisTextWidget($.jqElem('div'));
             this.appendWidget( $text );
 
             $text.setText(text, type);
@@ -1319,7 +1334,7 @@ define('kbaseIrisTerminal',
                 rawCmd = rawCmd[0];
             }
 
-            var $widget             = opts.$widget || $.jqElem('div').kbaseIrisTerminalWidget();
+            var $widget             =  new kbaseIrisTerminalWidget(opts.$widget || $.jqElem('div'));
             var $containerWidget    = opts.$containerWidget;
 
             var $deferred = $.Deferred();
@@ -1345,7 +1360,7 @@ define('kbaseIrisTerminal',
                         this.addCommandHistory(rawCmd);
                     }
 
-                    var $scriptWidget = $.jqElem('div').kbaseIrisTerminalWidget();
+                    var $scriptWidget =  new kbaseIrisTerminalWidget($.jqElem('div'));
 
                     if ($containerWidget) {
                         $containerWidget.appendWidget($scriptWidget);
@@ -1687,8 +1702,7 @@ define('kbaseIrisTerminal',
                     $widget.setPid(pid);
 
                     var $pe = $.jqElem('div').text(command);
-                    $pe.kbaseButtonControls(
-                        {
+                     new kbaseButtonControls($pe, {
                             onMouseover : true,
                             context : this,
                             controls : [

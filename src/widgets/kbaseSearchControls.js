@@ -2,8 +2,7 @@
     control to tack on arbitrary command groups to any container element.
     This lets you mouse over and display buttons (with icons) in the upper right.
 
-    $('#some_div').kbaseSearchControls(
-        {
+     new kbaseSearchControls($('#some_div'), {
             //list of controls to populate buttons on the right end of the title bar. Give it an icon
             //and a callback function.
             onMouseover : true,
@@ -28,9 +27,22 @@
     );
 */
 
-define('kbaseSearchControls', ['jquery', 'bootstrap', 'kbwidget'], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'bootstrap',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		bootstrap,
+		KBWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseSearchControls",
 

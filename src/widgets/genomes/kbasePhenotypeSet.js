@@ -1,17 +1,24 @@
 /**
  * Just a simple example widget to display phenotypedata
  * 
- */define('kbasePhenotypeSet',
-    [
-        'jquery',
-	'kbwidget',
-	'kbaseMediaEditor'
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseMediaEditor'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseMediaEditor
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbasePhenotypeSet",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
         options: {
             color: "black",
@@ -128,7 +135,7 @@
                     var prom = kb.fba.get_media({medias: [id], workspaces: [ws]})
                     $.when(prom).done(function(data) {
                         ele.rmLoading();
-                        $(ele).kbaseMediaEditor({ids: [id], 
+                         new kbaseMediaEditor($(ele), {ids: [id], 
                                                  workspaces : [ws],
                                                  data: data});
                     }).fail(function(e){

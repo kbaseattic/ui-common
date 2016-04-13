@@ -1,15 +1,21 @@
 /**
    Create a card with a cytoscape.js viewer for a network
- */define('KBaseNetworkCard',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseNetworkCard",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
         options: {
 	    width: 500,

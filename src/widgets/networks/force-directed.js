@@ -26,17 +26,23 @@
  *
  * @param {String|Number} options.minHeight
  * A minimum height for the widget
- */define('ForceDirectedNetwork',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
     var URL_ROOT = "http://140.221.84.142/objects/coexpr_test/Networks";
     var WS_URL = "http://kbase.us/services/workspace_service/";
     var GO_URL_TEMPLATE = "http://www.ebi.ac.uk/QuickGO/GTerm?id=<%= id %>";
-    $.KBWidget({
+    return KBWidget({
         name: "ForceDirectedNetwork",
         version: "0.1.0",
         options: {

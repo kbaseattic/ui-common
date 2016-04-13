@@ -2,8 +2,7 @@
 
     Widget to list all commands available in iris.
 
-    $('#command-list').kbaseIrisCommands(
-        {
+     new kbaseIrisCommands($('#command-list'), {
             client          : client,   //invocation client object
             englishCommands : true,     //use english commands or raw command names
             link : function (evt) {     //what should happen when you click on a command
@@ -22,20 +21,29 @@
 
 */
 
-define('kbaseIrisCommands',
-    [
-        'jquery',
-        'kbaseAccordion',
-        'kbaseButtonControls',
-        'kbaseBox',
-        'kbaseIrisConfig',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseAccordion',
+		'kbaseButtonControls',
+		'kbaseBox',
+		'kbaseIrisConfig'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseAccordion,
+		kbaseButtonControls,
+		kbaseBox,
+		kbaseIrisConfig
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseIrisCommands",
-		parent: 'kbaseAccordion',
+		parent : kbaseAccordion,
 
         version: "1.0.0",
         options: {
@@ -381,8 +389,7 @@ define('kbaseIrisCommands',
                 }
             }
 
-            $li.kbaseButtonControls(
-                {
+             new kbaseButtonControls($li, {
                     context : this,
                     controls : controls
                 }
@@ -564,8 +571,7 @@ define('kbaseIrisCommands',
                         )
                     ;
 
-            var $box = $.jqElem('div').kbaseBox(
-                {
+            var $box =  new kbaseBox($.jqElem('div'), {
                     'title' : 'Command list',
                     'content' :
                         $.jqElem('div')

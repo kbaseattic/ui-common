@@ -3,15 +3,22 @@
 
 */
 
-define('kbaseIrisProcessList',
-    [
-        'jquery',
-        'kbwidget',
-        'kbaseBox',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseBox'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseBox
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseIrisProcessList",
 
@@ -118,8 +125,7 @@ define('kbaseIrisProcessList',
 
         appendUI : function($elem) {
 
-            var $box = $elem.kbaseBox(
-                {
+            var $box =  new kbaseBox($elem, {
                     'title' : 'Running processes',
                     'content' :
                         $('<ul></ul>')

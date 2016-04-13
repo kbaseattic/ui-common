@@ -1,20 +1,28 @@
 
 
-define('kbaseRNASeqSample',
-    [
-        'jquery',
-        'kbaseTable',
-        'kbwidget',
-        'kbaseAuthenticatedWidget',
-        'kbase-client-api',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseTable',
+		'kbwidget',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseTable,
+		KBWidget,
+		kbaseAuthenticatedWidget
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseRNASeqSample",
-	    parent : "kbaseAuthenticatedWidget",
+	    parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         options: {
@@ -88,8 +96,7 @@ define('kbaseRNASeqSample',
         },
 
         updateUI : function updateUI() {
-            this.data('tableElem').kbaseTable(
-                {
+             new kbaseTable(this.data('tableElem'), {
                     structure : {
                         keys : [/*'SingleEnd Read', 'PairedEnd Read',*/ 'RNASeq experiment name', 'RNASeq sample label',
                         'RNASeq sample replicate id', 'Platform type', 'Reference genome', 'Tissue',

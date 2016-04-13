@@ -28,8 +28,7 @@
         );
     }
 
-    var $scatter = $('#scatterplot').css({width : '800px', height : '500px'}).kbaseScatterplot(
-        {
+    var $scatter =  new kbaseScatterplot($('#scatterplot').css({width : '800px', height : '500px'}), {
             scaleAxes   : true,
 
             //xLabel      : 'Some useful experiment',
@@ -42,18 +41,28 @@
 
 */
 
-define('kbaseRNASeq',
-    [
-        'jquery',
-        'd3',
-        'kbaseBarchart',
-        'kbaseTable',
-        'kbwidget',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbaseBarchart',
+		'kbaseTable',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbaseBarchart,
+		kbaseTable,
+		KBWidget
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseRNASeq",
 
@@ -113,8 +122,7 @@ define('kbaseRNASeq',
             this._rewireIds($container, this);
 
             /*this.data('barchart',
-                this.data('barchartElem').kbaseBarchart(
-                    {
+                 new kbaseBarchart(this.data('barchartElem'), {
                         scaleAxes   : true,
 
                         xLabel      : 'PMI in some manner',

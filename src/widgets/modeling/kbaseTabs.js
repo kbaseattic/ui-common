@@ -35,15 +35,21 @@
     // This is a programmatic way of showing a tab.
 
         tabs.showTab('tab_name');
-*/define('kbTabs',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+*/define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbTabs",
         version: "1.0.0",
         init: function(options) {

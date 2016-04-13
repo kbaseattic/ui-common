@@ -27,8 +27,7 @@
         heatmap.column_labels.unshift(label);
     }
 
-    var $hm = $('#heatmap').css({width : '1000px', height : '500px'}).kbaseHeatmap(
-        {
+    var $hm =  new kbaseHeatmap($('#heatmap').css({width : '1000px', height : '500px'}), {
             dataset : heatmap,
             colors : ['#0000AA', '#FFFFFF', '#AA0000'],
             //ulIcon : '/functional-site/assets/navbar/images/kbase_logo.png',
@@ -39,23 +38,35 @@
 
 */
 
-define('kbaseHeatmap',
-    [
-        'jquery',
-        'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbaseVisWidget',
+		'RGBColor',
+		'geometry_rectangle',
+		'geometry_point',
+		'geometry_size'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbaseVisWidget,
+		RGBColor,
+		geometry_rectangle,
+		geometry_point,
+		geometry_size
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseHeatmap",
-	  parent: "kbaseVisWidget",
+	  parent : kbaseVisWidget,
 
         version: "1.0.0",
         options: {
@@ -103,11 +114,15 @@ define('kbaseHeatmap',
 
             var zeroPercent = 100 * Math.abs(colorScaleDomain[0]) / (Math.abs(colorScaleDomain[0]) + Math.abs(colorScaleDomain[2]));
 
-            this.options.gradientID = this.linearGradient(
-                {
-                    colors : this.options.colors,
-                    gradStops : ['0%', zeroPercent + '%', '100%'],
-                }
+            this.callAfterInit(
+              $.proxy(function() {
+                this.options.gradientID = this.linearGradient(
+                    {
+                        colors : this.options.colors,
+                        gradStops : ['0%', zeroPercent + '%', '100%'],
+                    }
+                );
+              }, this)
             );
         },
 

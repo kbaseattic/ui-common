@@ -552,7 +552,7 @@ app.service('userState', function userStateService() {
 //add the login widget as a module
 var kbaseLogin = angular.module('kbaseLogin', []);
 kbaseLogin.factory('kbaseLogin', function() {
-  return $('#signin-button').kbaseLogin(); // assumes underscore has already been loaded on the page
+kbaseLogin(  return $('#signin-button')); // assumes underscore has already been loaded on the page
 });
 
 //add the Google Feeds API as a module
@@ -628,7 +628,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     };
 
     // sign in button
-    $('#signin-button').kbaseLogin({login_callback: finish_login,
+kbaseLogin(    $('#signin-button'), {login_callback: finish_login,
                                     logout_callback: finish_logout});
     $('#signin-button').css('padding', '0');
 

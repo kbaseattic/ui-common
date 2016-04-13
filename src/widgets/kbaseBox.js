@@ -2,8 +2,7 @@
 
     Easy widget to serve as a container with a title.
 
-    var $box = $('#box').kbaseBox(
-        {
+    var $box =  new kbaseBox($('#box'), {
             title : 'This is a box',
             canCollapseOnDoubleClick: true,  //boolean. Whether or not clicking the title bar collapses the box
             canCollapse: true,  //boolean. Whether or not to show the collapse button
@@ -36,9 +35,22 @@
 
 */
 
-define('kbaseBox', ['jquery', 'kbwidget', 'kbaseButtonControls'], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseButtonControls'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseButtonControls
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseBox",
 
@@ -170,8 +182,7 @@ define('kbaseBox', ['jquery', 'kbwidget', 'kbaseButtonControls'], function( $ ) 
             this._rewireIds($div, this);
 
             if (this.options.controls) {
-                this.data('banner-text').kbaseButtonControls(
-                    {
+                 new kbaseButtonControls(this.data('banner-text'), {
                         onMouseover : false,
                         controls : this.options.controls
                     }

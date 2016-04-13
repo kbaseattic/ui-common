@@ -2,17 +2,25 @@
 
 */
 
-define('GeneDistribution',
-    [
-        'jquery',
-        'd3',
-        'kbaseVisWidget',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbaseVisWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbaseVisWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "GeneDistribution",
-	  parent: "kbaseVisWidget",
+	  parent : kbaseVisWidget,
 
         version: "1.0.0",
         options: {

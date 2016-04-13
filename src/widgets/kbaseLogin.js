@@ -48,16 +48,23 @@
 
 */
 
-define('kbaseLogin',
-    [
-        'jquery',
-        'kbwidget',
-        'kbasePrompt'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbasePrompt'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbasePrompt
+	) {
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseLogin",
 
@@ -467,8 +474,7 @@ define('kbaseLogin',
                     }
                     else {
 
-                        var $errorModal = $('<div></div>').kbasePrompt(
-                            {
+                        var $errorModal =  new kbasePrompt($('<div></div>'), {
                                 title : 'Login failed',
                                 body : $('<div></div>')
                                     .attr('class', 'alert alert-danger')
@@ -700,8 +706,7 @@ define('kbaseLogin',
 
             var $elem = this.$elem;
 
-            var $ld = $('<div></div').kbasePrompt(
-                {
+            var $ld =  new kbasePrompt($('<div></div'), {
                     keyboard : false,
                     title : 'Login to KBase',
                     controls : [

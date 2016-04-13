@@ -44,7 +44,7 @@ angular.module('modeling-directives')
             function load_map(map, container) {
                 container.rmLoading();                        
 
-                container.kbasePathway({model_ws: $stateParams.ws,
+kbasePathway(                container, {model_ws: $stateParams.ws,
                                         model_name: $stateParams.id,
                                         map_ws: map_ws,
                                         map_name: map,
@@ -224,7 +224,7 @@ angular.module('modeling-directives')
                         $('#path-'+map).rmLoading();                        
                         var d = d[0].data
 
-                        $('#path-'+map).kbasePathway({ws: self.ws, 
+kbasePathway(                        $('#path-'+map), {ws: self.ws, 
                                                      mapID: map, 
                                                      mapData: d,
                                                      editable: true,
@@ -700,7 +700,7 @@ angular.module('modeling-directives')
     return {
         link: function(scope, ele, attrs) {
             console.log('here')
-            $(ele).kbaseModelEditor({ws: scope.ws, id: scope.id})
+kbaseModelEditor(            $(ele), {ws: scope.ws, id: scope.id})
 
         }
     }

@@ -4,16 +4,22 @@
  *
  * Gene "instance" info (e.g. coordinates on a particular strain's genome)
  * is in a different widget.
- */define('KBaseGeneInfo',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
-	$.KBWidget({
+	return KBWidget({
 		name: "KBaseGeneInfo",
-		parent: "kbaseWidget",
+		parent : kbaseWidget,
 		version: "1.0.0",
 
 		// the only options are the feature ID, whether it should be embedded in a card, and (optionally) the auth token.

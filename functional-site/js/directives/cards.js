@@ -413,7 +413,7 @@ angular.module('card-directives')
     .directive('wsobjgraphcenteredview', function($rootScope) {
         return {
             link: function(scope, ele, attrs) {
-		var p = $(ele).kbasePanel({title: 'Object Reference and Provenance Graph',
+		var p = kbasePanel($(ele), {title: 'Object Reference and Provenance Graph',
                                            rightLabel: scope.params.ws,
                                            subText: scope.params.id});
 		p.loading();

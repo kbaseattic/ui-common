@@ -1,15 +1,22 @@
-define('kbaseSparkline',
-    [
-        'jquery',
-        'kbaseLinechart',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseLinechart'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseLinechart
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseSparkline",
-	  parent: "kbaseLinechart",
+	  parent : kbaseLinechart,
 
         version: "1.0.0",
         options: {

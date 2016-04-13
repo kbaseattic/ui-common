@@ -3,21 +3,29 @@
 
 */
 
-define('kbaseDataBrowser',
-    [
-        'jquery',
-        'kbaseAuthenticatedWidget',
-        'kbaseButtonControls',
-        'kbaseBox',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseAuthenticatedWidget',
+		'kbaseButtonControls',
+		'kbaseBox'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseAuthenticatedWidget,
+		kbaseButtonControls,
+		kbaseBox
+	) {
 
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseDataBrowser",
-		parent: 'kbaseAuthenticatedWidget',
+		parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         /*options: {
@@ -193,8 +201,7 @@ define('kbaseDataBrowser',
                     }
 
                     if (controls) {
-                        $li.kbaseButtonControls(
-                            {
+                         new kbaseButtonControls($li, {
                                 controls : controls,
                                 id : val.id,
                                 context : this,
@@ -230,8 +237,7 @@ define('kbaseDataBrowser',
 
             this.appendContent(this.options.content, this.data('ul-nav'));
 
-            $elem.kbaseBox(
-                {
+             new kbaseBox($elem, {
                     title : this.options.title,
                     canCollapse : this.options.canCollapse,
                     content : $root,

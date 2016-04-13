@@ -1,18 +1,29 @@
-define('kbaseMethodGallery',
-    [
-        'jquery',
-	    'kbwidget',
-	    'kbasePopularMethods',
-	    'kbaseCarousel',
-	    'kbaseWalkablePath',
-	    'kbaseMethodDescription',
-	    'kbaseAppDescription',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbasePopularMethods',
+		'kbaseCarousel',
+		'kbaseWalkablePath',
+		'kbaseMethodDescription',
+		'kbaseAppDescription'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbasePopularMethods,
+		kbaseCarousel,
+		kbaseWalkablePath,
+		kbaseMethodDescription,
+		kbaseAppDescription
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseMethodGallery",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
         options: {
             color: "black",
@@ -106,7 +117,7 @@ define('kbaseMethodGallery',
             return;
 
             var $details = $.jqElem('div');
-            $details.kbaseAppDescription({app_id : id, gallery : this});
+             new kbaseAppDescription($details, {app_id : id, gallery : this});
 
             this.$elem.empty();
 
@@ -122,7 +133,7 @@ define('kbaseMethodGallery',
             return;
 
             var $details = $.jqElem('div');
-            $details.kbaseMethodDescription({method_id : id, gallery : this});
+             new kbaseMethodDescription($details, {method_id : id, gallery : this});
 
             this.$elem.empty();
             this.$elem.append($details);
@@ -785,16 +796,15 @@ define('kbaseMethodGallery',
 
             this._rewireIds($root, this);
 
-            var $mostPopular = $.jqElem('div').kbasePopularMethods();
+            var $mostPopular =  new kbasePopularMethods($.jqElem('div'));
             this.data('method-details').append($mostPopular.$elem);
 
-            var $methodDetails = this.data('method-details').kbaseMethodDescription(
-                {mostPopular : $mostPopular, sidePanel : this.options.sidePanel}
+            var $methodDetails =  new kbaseMethodDescription(this.data('method-details'), {mostPopular : $mostPopular, sidePanel : this.options.sidePanel}
             );
 
-            this.data('paths').kbaseWalkablePath({ methodDetails : $methodDetails, mostPopular : $mostPopular});
+             new kbaseWalkablePath(this.data('paths'), { methodDetails : $methodDetails, mostPopular : $mostPopular});
 
-            this.data('carousel').kbaseCarousel({ methodDetails : $methodDetails});
+             new kbaseCarousel(this.data('carousel'), { methodDetails : $methodDetails});
 
             $elem.append($root);
 

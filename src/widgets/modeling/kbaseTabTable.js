@@ -1,17 +1,24 @@
-define('kbaseTabTable',
-    [
-        'jquery',
-	'kbwidget',
-	'kbaseAuthenticatedWidget'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseAuthenticatedWidget
+	) {
 
 
 'use strict';
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseTabTable",
-    parent: "kbaseAuthenticatedWidget",
+    parent : kbaseAuthenticatedWidget,
     version: "1.0.0",
 
     init: function(input) {
@@ -247,7 +254,7 @@ $.KBWidget({
                     newTabEvents(info.id);
 
                 } else if (info.action == 'openWidget') {
-                    content.kbaseTabTable({ws: info.ws, type: info.type, obj: info.name} )
+                     new kbaseTabTable(content, {ws: info.ws, type: info.type, obj: info.name} )
                     tabs.addTab({name: info.id, content: content, removable: true});
                     tabs.showTab(info.id);
                     newTabEvents(info.id);

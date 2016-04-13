@@ -12,9 +12,7 @@
                         sin2.push(75 + 50 * Math.sin(0.1 * i));
                     }
 
-                    var $line = $('#linechart').css({width : '800px', height : '500px'}).kbaseLinechart(
-
-                        {
+                    var $line =  new kbaseLinechart($('#linechart').css({width : '800px', height : '500px'}), {
                             scaleAxes       : true,
                             //debug       : true,
 
@@ -98,23 +96,35 @@
                     );
 */
 
-define('kbaseLinechart',
-    [
-        'jquery',
-        'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbaseVisWidget',
+		'RGBColor',
+		'geometry_rectangle',
+		'geometry_point',
+		'geometry_size'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbaseVisWidget,
+		RGBColor,
+		geometry_rectangle,
+		geometry_point,
+		geometry_size
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseLinechart",
-	  parent: "kbaseVisWidget",
+	  parent : kbaseVisWidget,
 
         version: "1.0.0",
         options: {

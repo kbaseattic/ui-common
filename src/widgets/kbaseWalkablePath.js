@@ -1,18 +1,26 @@
 /**
  * Just a simple example widget - makes a div with "Hello world!"
  * in a user-defined color (must be a css color - 'red' or 'yellow' or '#FF0000')
- */define('kbaseWalkablePath',
-    [
-        'jquery',
-    	'kbwidget',
-    	'narrativeMethodStore',
-    	'kbaseAccordion',
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'narrativeMethodStore',
+		'kbaseAccordion'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		narrativeMethodStore,
+		kbaseAccordion
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseWalkablePath",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
         options: {
             narrativeMethodStoreURL : "https://kbase.us/services/narrative_method_store/rpc",
@@ -158,7 +166,7 @@
             nms.list_methods({}, function(data) {
 
                 //messy way just to get the sortByKey method. Need to make it a class method or something.
-                var $accordion = $.jqElem('div').kbaseAccordion({ elements : []});
+                var $accordion =  new kbaseAccordion($.jqElem('div'), { elements : []});
 
                 var categories = {};
 
@@ -243,7 +251,7 @@
 
                 list = list.sort($accordion.sortByKey('title'));
 
-                var $iaccordion = $.jqElem('div').kbaseAccordion({elements : list});
+                var $iaccordion =  new kbaseAccordion($.jqElem('div'), {elements : list});
 
                 if ($wp.options.keys == undefined) {
                     $wp.options.keys = {};

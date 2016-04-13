@@ -2,22 +2,35 @@
 
 */
 
-define('kbaseChordchart',
-    [
-        'jquery',
-        'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
-        'kbasePiechart',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbaseVisWidget',
+		'RGBColor',
+		'geometry_rectangle',
+		'geometry_point',
+		'geometry_size',
+		'kbasePiechart'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbaseVisWidget,
+		RGBColor,
+		geometry_rectangle,
+		geometry_point,
+		geometry_size,
+		kbasePiechart
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseChordchart",
-	  parent: "kbasePiechart",
+	  parent : kbasePiechart,
 
         version: "1.0.0",
         options: {
@@ -94,7 +107,7 @@ define('kbaseChordchart',
 
         sliceAction : function($chord) {
 
-            var superMethod = $.KBWidget.registry()[$chord.parent].prototype['sliceAction'];
+            var superMethod = this.parent.prototype.sliceAction;
 
             superMethod = superMethod.call(this, $chord);
 

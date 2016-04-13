@@ -1,13 +1,19 @@
 
-/* this is a work in progress */define('kbaseTableEditor',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+/* this is a work in progress */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseTableEditor",
         version: "1.0.0",
         options: {

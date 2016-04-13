@@ -1,24 +1,36 @@
 
 
-define('kbaseRNASeqHistogram',
-    [
-        'jquery',
-        'colorbrewer',
-        'd3',
-        'kbaseBarchart',
-        'kbaseTable',
-        'kbwidget',
-        'kbaseAuthenticatedWidget',
-        'kbaseTabs',
-        'kbase-client-api',
-    ], function( $, colorbrewer ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'colorbrewer',
+		'd3',
+		'kbaseBarchart',
+		'kbaseTable',
+		'kbwidget',
+		'kbaseAuthenticatedWidget',
+		'kbaseTabs'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		colorbrewer,
+		d3,
+		kbaseBarchart,
+		kbaseTable,
+		KBWidget,
+		kbaseAuthenticatedWidget,
+		kbaseTabs
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseRNASeqHistogram",
-	    parent : "kbaseAuthenticatedWidget",
+	    parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         options: {
@@ -125,8 +137,7 @@ define('kbaseRNASeqHistogram',
             this._rewireIds($elem, this);
 
             this.data('barchart',
-                this.data('barchartElem').kbaseBarchart(
-                    {
+                 new kbaseBarchart(this.data('barchartElem'), {
                         scaleAxes   : true,
                         xPadding : 60,
 

@@ -1,14 +1,21 @@
-define('KBaseGenomeGeneTable',
-    [
-        'jquery',
-	'kbwidget',
-	'kbaseAuthenticatedWidget'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseAuthenticatedWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseGenomeGeneTable",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         genome_id: null,
         ws_name: null,

@@ -2,8 +2,7 @@
 
     e.g.,
 
-    $('#table').kbaseTable(
-        {
+     new kbaseTable($('#table'), {
             structure : {
                 header : [
                     'a',
@@ -47,20 +46,28 @@
 
 */
 
-define('kbaseTable',
-    [
-        'jquery',
-        'kbwidget',
-        'kbaseDeletePrompt',
-        'kbaseButtonControls',
-        'kbaseSearchControls',
-        //'jqueryui',   //XXX - removed. But do I need this? I can't have it in right now because it directly conflicts with bootstrap's tooltip. Need to remember why it's here.
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseDeletePrompt',
+		'kbaseButtonControls',
+		'kbaseSearchControls'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseDeletePrompt,
+		kbaseButtonControls,
+		kbaseSearchControls
+	) {
 
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseTable",
 
@@ -489,8 +496,7 @@ define('kbaseTable',
 
             this._rewireIds(controlsTR, this);
 
-            this.data('searchDiv').kbaseSearchControls(
-                {
+             new kbaseSearchControls(this.data('searchDiv'), {
                     onMouseover : false,
                     type : 'inline',
                     context : this,
@@ -810,8 +816,7 @@ define('kbaseTable',
 
 
         deletePrompt : function(row) {
-            var $deleteModal = $('<div></div>').kbaseDeletePrompt(
-                {
+            var $deleteModal =  new kbaseDeletePrompt($('<div></div>'), {
                     name     : row,
                     callback : this.deleteRowCallback(row),
                 }

@@ -2,21 +2,33 @@
 
 */
 
-define('kbaseLineSerieschart',
-    [
-        'jquery',
-        'd3',
-        'kbaseLinechart',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbaseLinechart',
+		'RGBColor',
+		'geometry_rectangle',
+		'geometry_point',
+		'geometry_size'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbaseLinechart,
+		RGBColor,
+		geometry_rectangle,
+		geometry_point,
+		geometry_size
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseLineSerieschart",
-	  parent: "kbaseLinechart",
+	  parent : kbaseLinechart,
 
         version: "1.0.0",
         options: {

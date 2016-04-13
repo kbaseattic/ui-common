@@ -3,18 +3,24 @@
 
 */
 
-define('kbaseIrisWorkspace',
-    [
-        'jquery',
-        'kbaseTabs',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseTabs'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseTabs
+	) {
 
 
 
-    $.KBWidget({
+    return KBWidget({
         name   : 'kbaseIrisWorkspace',
-        parent : 'kbaseTabs',
+        parent : kbaseTabs,
         version: "1.0.0",
 
         options: {

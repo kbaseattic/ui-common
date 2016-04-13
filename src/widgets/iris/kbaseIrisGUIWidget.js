@@ -3,22 +3,31 @@
 
 */
 
-define('kbaseIrisGUIWidget',
-    [
-        'jquery',
-        'kbaseIrisWidget',
-        'kbaseFormBuilder',
-        'kbaseBox',
-        'kbaseDeletePrompt'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseIrisWidget',
+		'kbaseFormBuilder',
+		'kbaseBox',
+		'kbaseDeletePrompt'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseIrisWidget,
+		kbaseFormBuilder,
+		kbaseBox,
+		kbaseDeletePrompt
+	) {
 
 
-    $.KBWidget(
+    return KBWidget(
         {
 
             name: "kbaseIrisGUIWidget",
-            parent: 'kbaseIrisWidget',
+            parent : kbaseIrisWidget,
 
             version: "1.0.0",
 
@@ -36,14 +45,12 @@ define('kbaseIrisGUIWidget',
 
                 var meta = metaFunc(this.options.command);
 
-                var $form = $.jqElem('div').kbaseFormBuilder(
-                    {
+                var $form =  new kbaseFormBuilder($.jqElem('div'), {
                         elements : meta.fields
                     }
                 );
 
-                var $box = $.jqElem('div').kbaseBox(
-                    {
+                var $box =  new kbaseBox($.jqElem('div'), {
                         title : meta.label,
                         content :
                             $.jqElem('div')
@@ -75,7 +82,7 @@ define('kbaseIrisGUIWidget',
                             {
                                 icon : 'fa fa-copy',
                                 callback : $.proxy(function(e) {
-                                    var $box = this.data('box').kbaseBox();
+                                    var $box =  new kbaseBox(this.data('box'));
 
                                 }, this),
                                 id : 'runButton'
@@ -83,7 +90,7 @@ define('kbaseIrisGUIWidget',
                             {
                                 icon : 'fa fa-save',
                                 callback : $.proxy(function(e) {
-                                    var $box = this.data('box').kbaseBox();
+                                    var $box =  new kbaseBox(this.data('box'));
 
                                 }, this),
                                 id : 'runButton'
@@ -112,8 +119,7 @@ define('kbaseIrisGUIWidget',
                                 icon : 'fa fa-times',
                                 callback :
                                     $.proxy(function (e, $gui) {
-                                        var $deleteModal = $.jqElem('div').kbaseDeletePrompt(
-                                            {
+                                        var $deleteModal =  new kbaseDeletePrompt($.jqElem('div'), {
                                                 name : this.options.command,
                                                 callback : function(e, $prompt) {
                                                     $prompt.closePrompt();

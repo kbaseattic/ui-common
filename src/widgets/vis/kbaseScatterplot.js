@@ -28,8 +28,7 @@
                         );
                     }
 
-                    var $scatter = $('#scatterplot').css({width : '800px', height : '500px'}).kbaseScatterplot(
-                        {
+                    var $scatter =  new kbaseScatterplot($('#scatterplot').css({width : '800px', height : '500px'}), {
                             scaleAxes   : true,
 
                             //xLabel      : 'Some useful experiment',
@@ -42,23 +41,35 @@
 
 */
 
-define('kbaseScatterplot',
-    [
-        'jquery',
-        'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbaseVisWidget',
+		'RGBColor',
+		'geometry_rectangle',
+		'geometry_point',
+		'geometry_size'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		kbaseVisWidget,
+		RGBColor,
+		geometry_rectangle,
+		geometry_point,
+		geometry_size
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseScatterplot",
-	  parent: "kbaseVisWidget",
+	  parent : kbaseVisWidget,
 
         version: "1.0.0",
         options: {

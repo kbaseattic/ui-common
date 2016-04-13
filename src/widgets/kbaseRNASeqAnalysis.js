@@ -1,20 +1,28 @@
 
 
-define('kbaseRNASeqAnalysis',
-    [
-        'jquery',
-        'kbaseTable',
-        'kbwidget',
-        'kbaseAuthenticatedWidget',
-        'kbase-client-api',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseTable',
+		'kbwidget',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseTable,
+		KBWidget,
+		kbaseAuthenticatedWidget
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseRNASeqAnalysis",
-	    parent : "kbaseAuthenticatedWidget",
+	    parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         options: {
@@ -32,8 +40,7 @@ define('kbaseRNASeqAnalysis',
 
         /*setDataset : function setDataset(newDataset) {
 
-                var $table = $tableElem.kbaseTable(
-                    {
+                var $table =  new kbaseTable($tableElem, {
                         structure : {
                             keys : keys,
                             rows : overViewValues
@@ -314,8 +321,7 @@ define('kbaseRNASeqAnalysis',
 
         updateUI : function updateUI() {
 
-            this.data('tableElem').kbaseTable(
-                {
+             new kbaseTable(this.data('tableElem'), {
                     structure : {
                         keys : this.options.tableColumns,
                         rows : {

@@ -27,17 +27,24 @@
         ... etc ...
     ]
 }
-*/define('kbaseGeneTable',
-    [
-        'jquery',
-        'kbaseTable',
-	'kbwidget'
-    ],
-    function ($) {
+*/define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseTable',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseTable,
+		KBWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "GeneTableWidget",
-        parent : 'kbaseTable',
+        parent : kbaseTable,
         version: "0.1.0",
         options: {
             table: null,

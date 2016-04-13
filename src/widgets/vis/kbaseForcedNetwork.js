@@ -2,22 +2,35 @@
 
 */
 
-define('kbaseForcedNetwork',
-    [
-        'jquery',
-        'kbaseSearchControls',
-        'd3',
-        'kbaseVisWidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseSearchControls',
+		'd3',
+		'kbaseVisWidget',
+		'RGBColor',
+		'geometry_rectangle',
+		'geometry_point',
+		'geometry_size'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseSearchControls,
+		d3,
+		kbaseVisWidget,
+		RGBColor,
+		geometry_rectangle,
+		geometry_point,
+		geometry_size
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseForcedNetwork",
-	  parent: "kbaseVisWidget",
+	  parent : kbaseVisWidget,
 
         version: "1.0.0",
         options: {
@@ -209,8 +222,7 @@ define('kbaseForcedNetwork',
             }
 
             if (this.options.filter) {
-                this.$elem.kbaseSearchControls(
-                    {
+                 new kbaseSearchControls(this.$elem, {
                         context : this,
                         searchCallback : function(e, value, $force) {
                             $force.options.filterVal = new RegExp(value, 'i');

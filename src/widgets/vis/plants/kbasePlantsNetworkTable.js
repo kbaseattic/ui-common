@@ -3,18 +3,25 @@
 
 */
 
-define('kbasePlantsNetworkTable',
-    [
-        'jquery',
-        'kbaseIrisWidget',
-        'kbaseTable',
-    ],
-    function ($) {
-        $.KBWidget(
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseIrisWidget',
+		'kbaseTable'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseIrisWidget,
+		kbaseTable
+	) {
+        return KBWidget(
         {
 
             name: "kbasePlantsNetworkTable",
-            parent: 'kbaseIrisWidget',
+            parent : kbaseIrisWidget,
 
             version: "1.0.0",
 

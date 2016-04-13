@@ -2,17 +2,24 @@
 
 */
 
-define('kbaseIrisTutorial',
-    [
-        'jquery',
-        'kbwidget',
-        'kbaseIrisConfig',
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseIrisConfig'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseIrisConfig
+	) {
 
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseIrisTutorial",
 

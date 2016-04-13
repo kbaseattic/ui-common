@@ -1,17 +1,29 @@
 
 
-define('kbaseCummerbundPlot',
-    [
-        'jquery',
-        'colorbrewer',
-        'd3',
-        'kbaseBarchart',
-        'kbaseTable',
-        'kbwidget',
-        'kbaseAuthenticatedWidget',
-        'kbaseTabs',
-        'kbase-client-api',
-    ], function( $, colorbrewer ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'colorbrewer',
+		'd3',
+		'kbaseBarchart',
+		'kbaseTable',
+		'kbwidget',
+		'kbaseAuthenticatedWidget',
+		'kbaseTabs'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		colorbrewer,
+		d3,
+		kbaseBarchart,
+		kbaseTable,
+		KBWidget,
+		kbaseAuthenticatedWidget,
+		kbaseTabs
+	) {
 
     'use strict';
 
@@ -83,10 +95,10 @@ define('kbaseCummerbundPlot',
     });
     //end MIT licensed section
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseCummerbundPlot",
-	    parent : "kbaseAuthenticatedWidget",
+	    parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         options: {

@@ -1,17 +1,24 @@
 /**
  * Just a simple example widget to display phenotypedata
  * 
- */define('kbaseFunctGenomeComparison',
-    [
-        'jquery',
-	'kbwidget',
-	'kbaseWidget'
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseWidget
+	) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseFunctGenomeComparison",
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
 
         init: function(options) {

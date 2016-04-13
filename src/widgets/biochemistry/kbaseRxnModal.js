@@ -1,13 +1,20 @@
-define('kbaseRxnModal',
-    [
-        'jquery',
-	'kbwidget',
-	'kbaseModal'
-    ],
-    function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseModal'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseModal
+	) {
 
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseRxnModal",
     version: "1.0.0",
     options: {
@@ -20,7 +27,7 @@ $.KBWidget({
         var fba = new fbaModelServices('https://kbase.us/services/fba_model_services/');
         var kbws = new workspaceService('http://kbase.us/services/workspace_service/');        
 
-        var modal = self.$elem.kbaseModal({title: "Reaction Info", 
+        var modal =  new kbaseModal(self.$elem, {title: "Reaction Info", 
                 subText: "Note: this view is currently under development."})
         modal.loading();
         var modal_body = modal.body();

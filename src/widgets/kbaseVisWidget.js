@@ -2,20 +2,32 @@
  kbaseVisWidget
  */
 
-define('kbaseVisWidget',
-    [
-        'jquery',
-        'd3',
-        'kbwidget',
-        'RGBColor',
-        'geometry_rectangle',
-        'geometry_point',
-        'geometry_size'
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'd3',
+		'kbwidget',
+		'RGBColor',
+		'geometry_rectangle',
+		'geometry_point',
+		'geometry_size'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		d3,
+		KBWidget,
+		RGBColor,
+		geometry_rectangle,
+		geometry_point,
+		geometry_size
+	) {
 
-        'use strict';
+        //'use strict';
 
-        $.KBWidget({
+        return KBWidget({
             name: "kbaseVisWidget",
             version: "1.0.0",
             options: {
@@ -654,7 +666,8 @@ define('kbaseVisWidget',
                         } else {
                             var childOptions = $me.childOptions($me.children().length, newDatasets[i]);
                             childOptions.parent = $me;
-                            child = $.jqElem('div')[$me.name](childOptions);
+
+                            child = new $me.constructor($.jqElem('div'), childOptions);
                             $me.children().push(child);
                         }
 
@@ -1345,7 +1358,7 @@ define('kbaseVisWidget',
                                         grad
                                         );
 
-                                    var gradKey = [grad.cx, grad.cy, grad.r, grad.startColor, grad.stopColor].join(',');
+                                    var gradKey = [grad.x1, grad.x2, grad.y1, grad.y2, grad.width, grad.height, grad.startColor, grad.stopColor].join(',');
 
                                     if (this.linearGradients()[gradKey] != undefined && grad.id == undefined) {
                                         grad.id = this.linearGradients()[gradKey];

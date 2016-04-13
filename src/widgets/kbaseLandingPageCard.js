@@ -5,17 +5,23 @@
  * These kinds of cards should not be just instantiated on their own, but handled by a
  * manager - either the kbaseCardManager, or a derivative (kbaseGenomeCardManager, etc.).
  * Thus, cards should 
- */define('LandingPageCard',
-    [
-        'jquery',
-	'kbwidget'
-    ],
-    function ($) {
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
 
-    $.KBWidget({
+    return KBWidget({
         name: "LandingPageCard", 
-        parent: "kbaseWidget",
+        parent : kbaseWidget,
         version: "1.0.0",
         options: { 
             resizable: true,
