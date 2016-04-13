@@ -18,7 +18,7 @@ Doing so is easy. It creates a classical inheritance environment. Simply call th
 return KBWidget(
     {
         name: 'myFancyNewWidget',
-        parent: 'someOtherWidget',  //if parent is not provided, defaults to kbaseWidget
+        parent : someOtherWidget,  //if parent is not provided, defaults to kbaseWidget
         options : {
             // key / value pairs of optional values to hand into the object. These can be used to override values set as options
             // for the superclass. This key really should've been called defaults, but oh well.
@@ -408,6 +408,36 @@ define (
 
     };
 
+    var accessors = {
+
+        getter :
+            function getter(name) {
+                return function keyGetter() {
+                    return this.valueForKey(name);
+                }
+            },
+
+        setter :
+            function setter (name) {
+                return function (newVal) {
+                    return this.setValueForKey(name, newVal);
+                }
+            },
+
+        getter_setter : function getter_setter (name) {
+
+                return function(newVal) {
+                    if (arguments.length === 1) {
+                        return this.setValueForKey(name, newVal);
+                    }
+                    else {
+                        return this.valueForKey(name);
+                    }
+                }
+            },
+    }
+
+
     function subclass(constructor, superConstructor) {
         function surrogateConstructor(){}
 
@@ -427,37 +457,48 @@ define (
         return $(tag);
     }
 
-    var KBWidget = function ($elem, def) {
+    var KBWidget = function (def) {
         def = (def || {});
 
         var Widget = function ($elem) {
-
+console.log("INVOKES WIDGET CONSTRUctOR!", this);
             var self = this;
 
             this.$elem = $elem;
 
+            var args = Array.prototype.slice.call(arguments, 1);
+
             $elem[def.name] = function(method) {
               return self.prototype[method].apply(
                   $self[method](
-                    Array.prototype.slice.call(arguments, 1)
+                    args
                   )
               );
             }
 
-            this.options = $.extend(true, {}, def.options, this.constructor.prototype.options);
+            this.init.apply(this, args);
+
+            this._init = true;
+            this.trigger('initialized');
+
+            $elem.append('started up');
+
             return this;
         }
 
-        var parent;
+        Widget.options = $.extend(true, {}, def.options);
 
-        if (def.parent) {
-          subclass(Widget, def.parent);
-          parent = def.parent;
+        var parent = def.parent
+          ? def.parent
+          : kbaseWidget
+            ? kbaseWidget
+            : function() {};
+
+        subclass(Widget, parent);
+        if (def.name != 'kbaseWidget') {
+          console.log("TEST 1");
         }
-        else {
-          parent = function() {};
-        }
-console.log("PARENT IS", parent, $elem, def);
+
         var defCopy = $.extend(true, {}, def);
 
         Widget.prototype.__attributes = {};
@@ -490,16 +531,16 @@ console.log("PARENT IS", parent, $elem, def);
 
                     if (info.setter === info.getter && info.type.match(/rw/)) {
 
-                        Widget.prototype[info.getter] = KBase._functions.getter_setter(info.name);
+                        Widget.prototype[info.getter] = accessors.getter_setter(info.name);
 
                     }
                     else {
                         if (info.type.match(/w/) && info.setter !== undefined) {
-                            Widget.prototype[info.setter] = KBase._functions.setter(info.name);
+                            Widget.prototype[info.setter] = accessors.setter(info.name);
                         }
 
                         if (info.type.match(/r/) && info.getter !== undefined) {
-                            Widget.prototype[info.getter] = KBase._functions.getter(info.name);
+                            Widget.prototype[info.getter] = accessors.getter(info.name);
                         }
 
                     }
