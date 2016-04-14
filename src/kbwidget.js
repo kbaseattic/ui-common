@@ -140,9 +140,11 @@ $('someElement').kb_unbind($target, attribute, callback, transformers, accessors
 
 define (
 	[
-		'jquery'
+		'jquery',
+		'handlebars'
 	], function(
-		$
+		$,
+		Handlebars
 	) {
 
     //'use strict';
@@ -461,14 +463,21 @@ define (
         def = (def || {});
 
         var Widget = function ($elem) {
+            if ($elem.get(0) != undefined && $elem.get(0).kb_obj != undefined) {
+              return $elem.get(0).kb_obj;
+            }
 
             var self = this;
 
             this.$elem = $elem;
+            if ($elem.get(0) != undefined) {
+              $elem.get(0).kb_obj = self;
+            }
 
             var args = Array.prototype.slice.call(arguments, 1);
 
             $elem[def.name] = function(method) {
+
               return self.prototype[method].apply(
                   $self[method](
                     args

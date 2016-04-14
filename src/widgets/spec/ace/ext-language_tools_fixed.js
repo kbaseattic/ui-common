@@ -28,7 +28,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/ext/language_tools', ['require', 'exports', 'module' , 'ace/snippets', 'ace/autocomplete', 'ace/config', 'ace/autocomplete/text_completer', 'ace/editor'], function(require, exports, module) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'require',
+		'exports',
+		'module',
+		'ace/snippets',
+		'ace/autocomplete',
+		'ace/config',
+		'ace/autocomplete/text_completer',
+		'ace/editor'
+	], function(
+		KBWidget,
+		bootstrap,
+		require,
+		exports,
+		module,
+		ace_snippets,
+		ace_autocomplete,
+		ace_config,
+		ace_autocomplete_text_completer,
+		ace_editor
+	) {
 
 
 var snippetManager = require("../snippets").snippetManager;
@@ -148,7 +171,30 @@ require("../config").defineOptions(Editor.prototype, "editor", {
 
 });
 
-define('ace/snippets', ['require', 'exports', 'module' , 'ace/lib/lang', 'ace/range', 'ace/keyboard/hash_handler', 'ace/tokenizer', 'ace/lib/dom'], function(require, exports, module) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'require',
+		'exports',
+		'module',
+		'ace/lib/lang',
+		'ace/range',
+		'ace/keyboard/hash_handler',
+		'ace/tokenizer',
+		'ace/lib/dom'
+	], function(
+		KBWidget,
+		bootstrap,
+		require,
+		exports,
+		module,
+		ace_lib_lang,
+		ace_range,
+		ace_keyboard_hash_handler,
+		ace_tokenizer,
+		ace_lib_dom
+	) {
 
 var lang = require("./lib/lang")
 var Range = require("./range").Range
@@ -964,7 +1010,32 @@ exports.snippetManager = new SnippetManager();
 
 });
 
-define('ace/autocomplete', ['require', 'exports', 'module' , 'ace/keyboard/hash_handler', 'ace/autocomplete/popup', 'ace/autocomplete/util', 'ace/lib/event', 'ace/lib/lang', 'ace/snippets'], function(require, exports, module) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'require',
+		'exports',
+		'module',
+		'ace/keyboard/hash_handler',
+		'ace/autocomplete/popup',
+		'ace/autocomplete/util',
+		'ace/lib/event',
+		'ace/lib/lang',
+		'ace/snippets'
+	], function(
+		KBWidget,
+		bootstrap,
+		require,
+		exports,
+		module,
+		ace_keyboard_hash_handler,
+		ace_autocomplete_popup,
+		ace_autocomplete_util,
+		ace_lib_event,
+		ace_lib_lang,
+		ace_snippets
+	) {
 
 
 var HashHandler = require("./keyboard/hash_handler").HashHandler;
@@ -1281,7 +1352,34 @@ exports.FilteredList = FilteredList;
 
 });
 
-define('ace/autocomplete/popup', ['require', 'exports', 'module' , 'ace/edit_session', 'ace/virtual_renderer', 'ace/editor', 'ace/range', 'ace/lib/event', 'ace/lib/lang', 'ace/lib/dom'], function(require, exports, module) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'require',
+		'exports',
+		'module',
+		'ace/edit_session',
+		'ace/virtual_renderer',
+		'ace/editor',
+		'ace/range',
+		'ace/lib/event',
+		'ace/lib/lang',
+		'ace/lib/dom'
+	], function(
+		KBWidget,
+		bootstrap,
+		require,
+		exports,
+		module,
+		ace_edit_session,
+		ace_virtual_renderer,
+		ace_editor,
+		ace_range,
+		ace_lib_event,
+		ace_lib_lang,
+		ace_lib_dom
+	) {
 
 
 var EditSession = require("../edit_session").EditSession;

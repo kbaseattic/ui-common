@@ -40,7 +40,7 @@ describe("KBWidget", function () {
         });
         var child = return KBWidget({
             name: "ChildWidget1",
-            parent: "ParentWidget1"
+            parent : ParentWidget1
         });
         child.should.be.a.function;
         done();
@@ -53,7 +53,7 @@ describe("KBWidget", function () {
         });
         return KBWidget({
             name: "ChildWidget2",
-            parent: "ParentWidget2"
+            parent : ParentWidget2
         });
         $.fn.ChildWidget2.should.be.a.function;
         done();
@@ -64,7 +64,7 @@ describe("KBWidget", function () {
         (function () {
             return KBWidget({
                 name: "HelloWidget",
-                parent: "NonExistentWidget"
+                parent : NonExistentWidget
             })
         }).should.throw("Parent widget is not registered");
         done();
